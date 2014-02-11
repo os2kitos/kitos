@@ -1,0 +1,29 @@
+﻿@model UI.MVC4.Models.LoginViewModel
+
+@{
+    ViewBag.Title = "Log ind";
+}
+
+<h2>Log ind</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    
+    @Html.LabelFor(m => m.Username)
+    @Html.TextBoxFor(m => m.Username)
+
+    <br/>
+    
+    @Html.LabelFor(m => m.Password)
+    @Html.PasswordFor(m => m.Password)
+
+    <br/>
+    
+    @Html.CheckBoxFor(m => m.RememberMe)
+    @Html.LabelFor(m => m.RememberMe, new {@class = "checkbox"})
+
+    <br/>
+    
+    <input type="submit" value="Log ind"/>
+}
