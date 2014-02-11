@@ -35,8 +35,9 @@ namespace UI.MVC4.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login(LoginModel model, string returnUrl)
         {
-            if (ModelState.IsValid && WebSecurity.Login(model.UserName, model.Password, persistCookie: model.RememberMe))
+            if (ModelState.IsValid && Membership.ValidateUser(model.UserName, model.Password))
             {
+                FormsAuthentication.SetAuthCookie(model.UserName, model.RememberMe);
                 return RedirectToLocal(returnUrl);
             }
 
@@ -52,11 +53,12 @@ namespace UI.MVC4.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult LogOff()
         {
-            WebSecurity.Logout();
+            FormsAuthentication.SignOut();
 
             return RedirectToAction("Index", "Home");
         }
 
+        /*
         //
         // GET: /Account/Register
 
@@ -327,6 +329,8 @@ namespace UI.MVC4.Controllers
             ViewBag.ShowRemoveButton = externalLogins.Count > 1 || OAuthWebSecurity.HasLocalAccount(WebSecurity.GetUserId(User.Identity.Name));
             return PartialView("_RemoveExternalLoginsPartial", externalLogins);
         }
+         * 
+         */
 
         #region Helpers
         private ActionResult RedirectToLocal(string returnUrl)
