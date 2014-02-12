@@ -17,21 +17,6 @@ namespace UI.MVC4.Controllers
             return View();
         }
 
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your app description page!";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
-        }
-
-
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
@@ -61,6 +46,15 @@ namespace UI.MVC4.Controllers
 
             // If we got this far, we couldn't authenticate, redisplay form
             return View(loginModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Logout()
+        {
+            FormsAuthentication.SignOut();
+
+            return RedirectToAction("Index", "Home");
         }
 
         [Authorize(Roles = "User")]
