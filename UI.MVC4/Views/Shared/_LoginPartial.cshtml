@@ -8,6 +8,7 @@
     </text>
 } else {
     <ul>
-        <li>@Html.ActionLink("Log ind", "Login", "Home", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+        <li>@Html.ActionLink("Log ind", "Login", "Authorize")</li>
+        <li>@Html.ActionLink("Glemt password?", "ForgotPassword", "Authorize")</li>
     </ul>
 }

@@ -64,7 +64,7 @@ namespace UI.MVC4.Infrastructure
             if(String.IsNullOrEmpty(username))
                 throw new ProviderException("Bad username: null or empty");
 
-            var user = UserRepository.Get(username);
+            var user = UserRepository.GetByUsername(username);
             if (user == null)
             {
                 return new string[]{};
@@ -85,7 +85,7 @@ namespace UI.MVC4.Infrastructure
         /// <returns>True if and only if user exists and has that role</returns>
         public override bool IsUserInRole(string username, string roleName)
         {
-            var user = UserRepository.Get(username);
+            var user = UserRepository.GetByUsername(username);
 
             if (user == null) return false;
 

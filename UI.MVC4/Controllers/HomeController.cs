@@ -4,57 +4,21 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
+using Core.DomainModel;
+using Core.DomainServices;
+using Ninject;
 using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers
 {
     public class HomeController : Controller
     {
+
         public ActionResult Index()
         {
             ViewBag.Message = "Modify this template to jump-start your ASP.NET MVC application.";
 
             return View();
-        }
-
-        [AllowAnonymous]
-        public ActionResult Login(string returnUrl)
-        {
-            ViewBag.ReturnUrl = returnUrl;
-
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [AllowAnonymous]
-        public ActionResult Login(LoginViewModel loginModel, string returnUrl)
-        {
-            if (ModelState.IsValid && Membership.ValidateUser(loginModel.Username, loginModel.Password))
-            {
-                FormsAuthentication.SetAuthCookie(loginModel.Username, loginModel.RememberMe);
-
-                if (Url.IsLocalUrl(returnUrl))
-                {
-                    return Redirect(returnUrl);
-                }
-                else
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-            }
-
-            // If we got this far, we couldn't authenticate, redisplay form
-            return View(loginModel);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Logout()
-        {
-            FormsAuthentication.SignOut();
-
-            return RedirectToAction("Index", "Home");
         }
 
         [Authorize(Roles = "User")]

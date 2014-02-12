@@ -1,5 +1,6 @@
 using System.Web.Security;
 using Core.DomainServices;
+using Core.ApplicationServices;
 using Infrastructure.DataAccess;
 using UI.MVC4.Infrastructure;
 
@@ -59,6 +60,9 @@ namespace UI.MVC4.App_Start
         private static void RegisterServices(IKernel kernel)
         {
             kernel.Bind<IUserRepository>().To<UserRepository>();
+            kernel.Bind<IPasswordResetRepository>().To<PasswordResetRepository>();
+
+            kernel.Bind<IMailClient>().To<MailClient>().WithConstructorArgument("host", "localhost").WithConstructorArgument("port", 25);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);

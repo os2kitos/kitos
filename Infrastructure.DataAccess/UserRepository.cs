@@ -14,25 +14,30 @@ namespace Infrastructure.DataAccess
             InitFakeUsers();
         }
 
-        public User Get(int id)
+        public User GetById(int id)
         {
             return _users.SingleOrDefault(u => u.Id == id);
         }
 
-        public User Get(string username)
+        public User GetByUsername(string username)
         {
             return _users.SingleOrDefault(u => u.Username == username);
         }
 
-        public User Get(string username, string password)
+        public User GetByEmail(string email)
         {
-            //TODO: HASHING OF PASSWORDS!!!
-            return _users.SingleOrDefault(u => u.Username == username && u.Password == password);
+            return _users.SingleOrDefault(u => u.Email == email);
+        }
+
+        public void Update(User user)
+        {
+            
         }
 
         public bool Validate(string username, string password)
         {
-            return Get(username, password) != null;
+            //TODO: HASHING OF PASSWORDS!!!
+            return _users.SingleOrDefault(u => u.Username == username && u.Password == password) != null;
         }   
 
         private void InitFakeUsers()
@@ -43,6 +48,7 @@ namespace Infrastructure.DataAccess
                         Id = 0,
                         Username = "Admin",
                         Password = "Admin1234",
+                        Email = "admin@localhost",
                         Roles = new List<Role>()
                             {
                                 new Role() {Id = 0, Name = "User"},
@@ -52,8 +58,9 @@ namespace Infrastructure.DataAccess
                 new User()
                     {
                         Id = 0,
-                        Username = "User",
+                        Username = "Arne",
                         Password = "Password",
+                        Email = "arne@localhost",
                         Roles = new List<Role>()
                             {
                                 new Role() {Id = 0, Name = "User"},
