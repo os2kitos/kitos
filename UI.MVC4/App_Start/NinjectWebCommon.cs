@@ -60,7 +60,7 @@ namespace UI.MVC4.App_Start
         private static void RegisterServices(IKernel kernel)
         {
             kernel.Bind<IUserRepository>().To<UserRepository>();
-            kernel.Bind<IPasswordResetRepository>().To<PasswordResetRepository>();
+            kernel.Bind<IPasswordResetRequestRepository>().To<PasswordResetRequestRepository>();
 
             kernel.Bind<IMailClient>().To<MailClient>().WithConstructorArgument("host", "localhost").WithConstructorArgument("port", 25);
 

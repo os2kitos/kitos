@@ -1,0 +1,16 @@
+﻿@{
+    ViewBag.Title = "EmailSent";
+}
+
+<h2>Glemt password?</h2>
+<br/>
+@if (ViewBag.Success) 
+{
+    <text>
+        En email er blevet sendt til dig med et link og instruktioner til hvordan du nulstiller dit password.
+    </text>
+} else {
+    <text>
+        Afsendingen af emailen mislykkedes! @Html.ActionLink("Gå tilbage og prøv igen!", "ForgotPassword", "Authorize")
+    </text>
+}

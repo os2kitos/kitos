@@ -1,7 +1,7 @@
 ﻿@if (Request.IsAuthenticated) {
     <text>
         Logget ind som @User.Identity.Name | 
-        @using (Html.BeginForm("Logout", "Home", FormMethod.Post, new { id = "logoutForm" })) {
+        @using (Html.BeginForm("Logout", "Authorize", FormMethod.Post, new { id = "logoutForm" })) {
             @Html.AntiForgeryToken()
             <a href="javascript:document.getElementById('logoutForm').submit()">Log ud</a>
         }

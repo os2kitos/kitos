@@ -40,7 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IMailClient.cs" />
-    <Compile Include="IPasswordResetRepository.cs" />
+    <Compile Include="IPasswordResetRequestRepository.cs" />
     <Compile Include="IUserRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

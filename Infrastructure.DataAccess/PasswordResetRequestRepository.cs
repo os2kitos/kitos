@@ -6,26 +6,26 @@ using Core.DomainServices;
 
 namespace Infrastructure.DataAccess
 {
-    public class PasswordResetRepository : IPasswordResetRepository
+    public class PasswordResetRequestRepository : IPasswordResetRequestRepository
     {
-        private List<PasswordReset> _resets = new List<PasswordReset>();
+        private List<PasswordResetRequest> _resets = new List<PasswordResetRequest>();
 
-        public PasswordResetRepository()
+        public PasswordResetRequestRepository()
         {
             InitFakeResets();
         }
 
-        public void Create(PasswordReset passwordReset)
+        public void Create(PasswordResetRequest passwordReset)
         {
             //TODO
         }
 
-        public PasswordReset Get(string hash)
+        public PasswordResetRequest Get(string hash)
         {
             return _resets.SingleOrDefault(r => r.Hash == hash);
         }
 
-        public void Delete(PasswordReset passwordReset)
+        public void Delete(PasswordResetRequest passwordReset)
         {
             //TODO
         }
@@ -33,20 +33,20 @@ namespace Infrastructure.DataAccess
         //Fake it 'till you make it
         private void InitFakeResets()
         {
-            _resets = new List<PasswordReset>
+            _resets = new List<PasswordResetRequest>
                 {
-                    new PasswordReset
+                    new PasswordResetRequest
                         {
                             //This reset request is fine
                             Id = 0,
-                            Hash = "workingRequest", //ofcourse, this should be a hashed string
-                            Time = DateTime.Now.AddHours(-1),
+                            Hash = "workingRequest", //ofcourse, this should be a hashed string or something obscure
+                            Time = DateTime.Now.AddHours(-3),
                             User = new User()
                                 {
                                     Id = 0,
-                                    Username = "Admin",
-                                    Password = "Admin1234",
-                                    Email = "admin@localhost",
+                                    Name = "Simon Lynn-Pedersen",
+                                    Email = "slp@it-minds.dk",
+                                    Password = "slp",
                                     Roles = new List<Role>()
                                         {
                                             new Role() {Id = 0, Name = "User"},
@@ -54,18 +54,18 @@ namespace Infrastructure.DataAccess
                                         }
                                 }
                         },
-                    new PasswordReset
+                    new PasswordResetRequest
                         {
-                            //This reset request is outdated
+                            //This reset request is too old
                             Id = 0,
                             Hash = "outdatedRequest",
-                            Time = DateTime.Now.AddHours(-5),
+                            Time = DateTime.Now.AddHours(-13),
                             User = new User()
                                 {
                                     Id = 0,
-                                    Username = "Arne",
-                                    Password = "Password",
-                                    Email = "arne@localhost",
+                                    Name = "Arne Hansen",
+                                    Email = "arne@it-minds.dk",
+                                    Password = "arne",
                                     Roles = new List<Role>()
                                         {
                                             new Role() {Id = 0, Name = "User"},

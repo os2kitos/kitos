@@ -9,11 +9,15 @@ namespace UI.MVC4.Controllers
 {
     public class AuthorizeController : Controller
     {
+        //TODO: where do these go?
+        private const int ResetRequestTTL = 12;
+        private const string FromAddress = "kitos@it-minds.dk";
+
         private readonly IUserRepository _userRepository;
-        private readonly IPasswordResetRepository _passwordResetRepository;
+        private readonly IPasswordResetRequestRepository _passwordResetRepository;
         private readonly IMailClient _mailClient;
 
-        public AuthorizeController(IUserRepository userRepository, IPasswordResetRepository passwordResetRepository, IMailClient mailClient)
+        public AuthorizeController(IUserRepository userRepository, IPasswordResetRequestRepository passwordResetRepository, IMailClient mailClient)
         {
             _userRepository = userRepository;
             _passwordResetRepository = passwordResetRepository;
@@ -31,18 +35,17 @@ namespace UI.MVC4.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login(LoginViewModel loginModel, string returnUrl)
         {
-            if (ModelState.IsValid && Membership.ValidateUser(loginModel.Username, loginModel.Password))
+            //TODO: exception handling??
+            if (ModelState.IsValid && Membership.ValidateUser(loginModel.Email, loginModel.Password))
             {
-                FormsAuthentication.SetAuthCookie(loginModel.Username, loginModel.RememberMe);
+                FormsAuthentication.SetAuthCookie(loginModel.Email, loginModel.RememberMe);
 
                 if (Url.IsLocalUrl(returnUrl))
                 {
                     return Redirect(returnUrl);
                 }
-                else
-                {
-                    return RedirectToAction("Index", "Home");
-                }
+
+                return RedirectToAction("Index", "Home");
             }
 
             // If we got this far, we couldn't authenticate, redisplay form
@@ -58,16 +61,9 @@ namespace UI.MVC4.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        public ActionResult ForgotPassword(bool success = false)
+        public ActionResult ForgotPassword(bool userNotFound = false)
         {
-
-            //Did we just reset?
-            if (success)
-            {
-                ViewBag.Message = "En email med et link til at nulstille dit password er blevet afsendt!";
-            }
-
-
+            if (userNotFound) ViewBag.Message = "Ingen bruger er tilknyttet den email-addresse. Prøv igen.";
             return View();
         }
 
@@ -75,58 +71,86 @@ namespace UI.MVC4.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult ForgotPassword(ForgotPasswordViewModel model)
         {
-            //Lookup user either by username or email address
-            var user = _userRepository.GetByUsername(model.UserIdentifier) ??
-                       _userRepository.GetByEmail(model.UserIdentifier);
+            User user;
 
-            if (user != null)
+            try
             {
-                var time = DateTime.Now;
+                user = _userRepository.GetByEmail(model.Email);
+                if (user == null)
+                    throw new Exception();
+            }
+            catch
+            {
+                //Something went bad when trying to find a user. Report the error
 
-                //TODO: BETTER HASHING
-                var hash = FormsAuthentication.HashPasswordForStoringInConfigFile(time + user.Email, "MD5");
-                var passwordReset = new PasswordReset
+                //TODO: perhaps we shouldn't report that the user wasn't found?
+                //TODO: Right now we are leaking information about which users exist
+                return RedirectToAction("ForgotPassword", new {userNotFound = true});
+            }
+
+            try
+            {
+                var now = DateTime.Now;
+
+                //TODO: BETTER HASHING???
+                var hash = FormsAuthentication.HashPasswordForStoringInConfigFile(now + user.Email, "MD5");
+                var passwordReset = new PasswordResetRequest
                 {
                     Id = 0,
                     Hash = hash,
-                    Time = time,
+                    Time = now,
                     User = user
                 };
 
                 _passwordResetRepository.Create(passwordReset);
 
-                var resetLink = "http://kitos.dk/NotYetImplemented?Hash=" + hash;
-                var mailContent = "<a href='" + resetLink + "'>Klik her for at nulstille passwordet for din KITOS bruger</a>";
+                var resetLink = "http://kitos.dk/Authorize/ResetPassword?Hash=" + hash;
+                var mailContent = "<a href='" + resetLink + "'>Klik her for at nulstille passwordet for din KITOS bruger</a>. Linket udløber om " + ResetRequestTTL + " timer.";
 
-                //TODO: Exception handling, e.g. if user.Email is wrong formatted or something
-                _mailClient.Send("KITOS", user.Email, "Nulstilning af dit KITOS password", mailContent);
+                _mailClient.Send(FromAddress, user.Email, "Nulstilning af dit KITOS password", mailContent);
+            }
+            catch
+            {
+                //Something went bad when trying to create the password request/sent the mail
+                return RedirectToAction("EmailSent", new {success = false});
             }
 
-            //Even if we didn't find a user and sent an email, pretend that we did
-            //otherwise, we'd be leaking information about which users exists
-            return RedirectToAction("ForgotPassword", routeValues: new { success = true });
+            //Everything went fine!
+            return RedirectToAction("EmailSent");
         }
 
-        public ActionResult ResetPassword(string hash, bool retry = false)
+        public ActionResult EmailSent(bool success = true)
         {
-            var resetModel = new ResetPasswordViewModel { Retry = retry };
+            ViewBag.Success = success;
+            return View();
+        }
 
-            var passwordReset = _passwordResetRepository.Get(hash);
-            if (passwordReset != null)
+        public ActionResult ResetPassword(string hash)
+        {
+            ResetPasswordViewModel resetModel = null;
+
+            try
             {
+                var passwordReset = _passwordResetRepository.Get(hash);
+
                 var timespan = DateTime.Now - passwordReset.Time;
-                if (timespan.TotalHours < 2)
+                if (timespan.TotalHours < ResetRequestTTL)
                 {
-                    //successfully found reset request 
-                    //TODO: should we use AutoMapper here?? No, right?
-                    resetModel.Hash = hash;
-                    resetModel.Email = passwordReset.User.Email;
+                    //successfully found valid reset request 
+
+                    //TODO: should we use AutoMapper here??
+                    resetModel = new ResetPasswordViewModel {ResetHash = hash, Email = passwordReset.User.Email};
                 }
                 else
                 {
-                    //if the reset request is over 2 hours old, delete it
+                    //the reset request is too old, delete it
                     _passwordResetRepository.Delete(passwordReset);
                 }
+
+            }
+            catch
+            {
+                //TODO: leaving this empty is probably not a good idea??
             }
 
             return View(resetModel);
@@ -136,28 +160,36 @@ namespace UI.MVC4.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult ResetPassword(ResetPasswordViewModel resetModel)
         {
-            //does the reset request still exist?
-            var passwordReset = _passwordResetRepository.Get(resetModel.Hash);
-            if (passwordReset == null || !ModelState.IsValid)
+            try
             {
-                return RedirectToAction("ResetPassword", routeValues: new {hash = resetModel.Hash, retry = true});
+                //does the reset request still exist?
+                var passwordReset = _passwordResetRepository.Get(resetModel.ResetHash);
+
+                if(!ModelState.IsValid)
+                    throw new Exception();
+
+                //Everything is cool, set new password
+
+                var user = passwordReset.User;
+
+                //TODO: enforce password rules??
+                user.Password = resetModel.Password;
+
+                _userRepository.Update(user);
+
+                //delete the (now) used reset request
+                _passwordResetRepository.Delete(passwordReset);
+
+            }
+            catch
+            {
+                return RedirectToAction("ResetDone", new {success = false});
             }
 
-            var user = passwordReset.User;
-
-            //TODO: enforce password rules??
-            user.Password = resetModel.Password;
-
-            //TODO: exception handling??
-            _userRepository.Update(user);
-
-            //delete the (now) used reset request
-            _passwordResetRepository.Delete(passwordReset);
-
-            return RedirectToAction("ResetSuccess");
+            return RedirectToAction("ResetDone");
         }
 
-        public ActionResult ResetSuccess()
+        public ActionResult ResetDone(bool success = true)
         {
             return View();
         }

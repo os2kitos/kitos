@@ -9,8 +9,8 @@ namespace UI.MVC4.Models
     public class LoginViewModel
     {
         [Required]
-        [Display(Name = "Brugernavn")]
-        public string Username { get; set; }
+        [Display(Name = "Email adresse")]
+        public string Email { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
@@ -23,14 +23,13 @@ namespace UI.MVC4.Models
 
     public class ForgotPasswordViewModel
     {
-        [Display(Name = "Brugernavn eller email adresse")]
-        public string UserIdentifier { get; set; }
+        [Display(Name = "Email adresse")]
+        public string Email { get; set; }
     }
 
     public class ResetPasswordViewModel
     {
-        public bool Retry { get; set; }
-        public string Hash { get; set; }
+        public string ResetHash { get; set; }
 
         public string Email { get; set; }
 

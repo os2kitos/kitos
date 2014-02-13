@@ -19,11 +19,6 @@ namespace Infrastructure.DataAccess
             return _users.SingleOrDefault(u => u.Id == id);
         }
 
-        public User GetByUsername(string username)
-        {
-            return _users.SingleOrDefault(u => u.Username == username);
-        }
-
         public User GetByEmail(string email)
         {
             return _users.SingleOrDefault(u => u.Email == email);
@@ -34,10 +29,10 @@ namespace Infrastructure.DataAccess
             
         }
 
-        public bool Validate(string username, string password)
+        public bool Validate(string email, string password)
         {
             //TODO: HASHING OF PASSWORDS!!!
-            return _users.SingleOrDefault(u => u.Username == username && u.Password == password) != null;
+            return _users.SingleOrDefault(u => u.Email == email && u.Password == password) != null;
         }   
 
         private void InitFakeUsers()
@@ -46,9 +41,9 @@ namespace Infrastructure.DataAccess
                 new User()
                     {
                         Id = 0,
-                        Username = "Admin",
-                        Password = "Admin1234",
-                        Email = "admin@localhost",
+                        Name = "Simon Lynn-Pedersen",
+                        Email = "slp@it-minds.dk",
+                        Password = "slp",
                         Roles = new List<Role>()
                             {
                                 new Role() {Id = 0, Name = "User"},
@@ -58,9 +53,9 @@ namespace Infrastructure.DataAccess
                 new User()
                     {
                         Id = 0,
-                        Username = "Arne",
-                        Password = "Password",
-                        Email = "arne@localhost",
+                        Name = "Arne Hansen",
+                        Email = "arne@it-minds.dk",
+                        Password = "arne",
                         Roles = new List<Role>()
                             {
                                 new Role() {Id = 0, Name = "User"},
