@@ -1,0 +1,28 @@
+using System.Collections.Generic;
+
+namespace Core.DomainModel.ItContract
+{
+    public class ItContract
+    {
+        public ItContract()
+        {
+            this.ShipNotices = new List<ShipNotice>();
+        }
+
+        public int Id { get; set; }
+        public int ContractType_Id { get; set; }
+        public int ContractTemplate_Id { get; set; }
+        public int PurchaseForm_Id { get; set; }
+        public int PaymentModel_Id { get; set; }
+        public int Supplier_Id { get; set; }
+
+        public virtual Agreement Agreement { get; set; }
+        public virtual ContractTemplate ContractTemplate { get; set; }
+        public virtual ContractType ContractType { get; set; }
+        public virtual Payment Payment { get; set; }
+        public virtual PaymentModel PaymentModel { get; set; }
+        public virtual PurchaseForm PurchaseForm { get; set; }
+        public virtual Supplier Supplier { get; set; }
+        public virtual ICollection<ShipNotice> ShipNotices { get; set; }
+    }
+}
