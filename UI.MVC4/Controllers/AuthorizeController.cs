@@ -125,6 +125,7 @@ namespace UI.MVC4.Controllers
             return View();
         }
 
+        [HttpGet]
         public ActionResult ResetPassword(string hash)
         {
             ResetPasswordViewModel resetModel = null;
@@ -139,7 +140,7 @@ namespace UI.MVC4.Controllers
                     //successfully found valid reset request 
 
                     //TODO: should we use AutoMapper here??
-                    resetModel = new ResetPasswordViewModel {ResetHash = hash, Email = passwordReset.User.Email};
+                    resetModel = new ResetPasswordViewModel {RequestHash = hash, Email = passwordReset.User.Email};
                 }
                 else
                 {
@@ -163,7 +164,7 @@ namespace UI.MVC4.Controllers
             try
             {
                 //does the reset request still exist?
-                var passwordReset = _passwordResetRepository.Get(resetModel.ResetHash);
+                var passwordReset = _passwordResetRepository.Get(resetModel.RequestHash);
 
                 if(!ModelState.IsValid)
                     throw new Exception();
