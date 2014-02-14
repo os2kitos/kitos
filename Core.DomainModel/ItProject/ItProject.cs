@@ -45,9 +45,9 @@ namespace Core.DomainModel.ItProject
         public virtual ProjectCategory ProjectCategory { get; set; }
         public virtual ProjectType ProjectType { get; set; }
         public virtual Hierarchy Hierarchy { get; set; }
-        public virtual User ItProjectOwner { get; set; }
-        public virtual User ItProjectLeader { get; set; }
-        public virtual User PartItProjectLeader { get; set; }
-        public virtual User Consultant { get; set; }
+        public virtual Person ItProjectOwner { get; set; }
+        public virtual Person ItProjectLeader { get; set; }
+        public virtual Person PartItProjectLeader { get; set; }
+        public virtual Person Consultant { get; set; }
     }
 }

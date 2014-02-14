@@ -9,7 +9,7 @@ namespace Core.DomainModel
             this.ItProjects = new List<ItProject.ItProject>();
             this.ItSystems = new List<ItSystem.ItSystem>();
             this.Localizations = new List<Localization>();
-            this.Users = new List<User>();
+            this.People = new List<Person>();
         }
 
         public int Id { get; set; }
@@ -18,6 +18,6 @@ namespace Core.DomainModel
         public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
         public virtual ICollection<ItSystem.ItSystem> ItSystems { get; set; }
         public virtual ICollection<Localization> Localizations { get; set; }
-        public virtual ICollection<User> Users { get; set; }
+        public virtual ICollection<Person> People { get; set; }
     }
 }

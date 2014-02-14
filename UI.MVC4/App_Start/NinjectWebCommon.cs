@@ -1,3 +1,9 @@
+using System.Web.Security;
+using Core.DomainServices;
+using Core.ApplicationServices;
+using Infrastructure.DataAccess;
+using UI.MVC4.Infrastructure;
+
 [assembly: WebActivator.PreApplicationStartMethod(typeof(UI.MVC4.App_Start.NinjectWebCommon), "Start")]
 [assembly: WebActivator.ApplicationShutdownMethodAttribute(typeof(UI.MVC4.App_Start.NinjectWebCommon), "Stop")]
 
@@ -53,6 +59,15 @@ namespace UI.MVC4.App_Start
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel)
         {
+            kernel.Bind<IUserRepository>().To<UserRepository>();
+            kernel.Bind<IPasswordResetRequestRepository>().To<PasswordResetRequestRepository>();
+
+            kernel.Bind<IMailClient>().To<MailClient>().WithConstructorArgument("host", "localhost").WithConstructorArgument("port", 25);
+
+            //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
+            kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
+            kernel.Bind<RoleProvider>().ToMethod(ctx => Roles.Provider);
+            kernel.Bind<IHttpModule>().To<ProviderInitializationHttpModule>();
         }        
     }
 }

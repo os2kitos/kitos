@@ -28,15 +28,15 @@ namespace Infrastructure.DataAccess
         public DbSet<ContractType> ContractTypes { get; set; }
         public DbSet<DatabaseType> DatabaseTypes { get; set; }
         public DbSet<Department> Departments { get; set; }
-        public DbSet<Economy> Economys { get; set; }
+        public DbSet<Economy> Economies { get; set; }
         public DbSet<Environment> Environments { get; set; }
         public DbSet<ExternalReference> ExternalReferences { get; set; }
         public DbSet<ExternalReferenceType> ExternalReferenceTypes { get; set; }
-        public DbSet<Functionality> Functionalitys { get; set; }
+        public DbSet<Functionality> Functionalities { get; set; }
         public DbSet<Goal> Goals { get; set; }
-        public DbSet<GoalStatus> GoalStatuss { get; set; }
+        public DbSet<GoalStatus> GoalStatus { get; set; }
         public DbSet<Handover> Handovers { get; set; }
-        public DbSet<Hierarchy> Hierarchys { get; set; }
+        public DbSet<Hierarchy> Hierarchies { get; set; }
         public DbSet<Host> Hosts { get; set; }
         public DbSet<Core.DomainModel.ItSystem.Infrastructure> Infrastructures { get; set; }
         public DbSet<Interface> Interfaces { get; set; }
@@ -50,23 +50,23 @@ namespace Infrastructure.DataAccess
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<PaymentModel> PaymentModels { get; set; }
         public DbSet<Payment> Payments { get; set; }
-        public DbSet<PreAnalysis> PreAnalysiss { get; set; }
+        public DbSet<PreAnalysis> PreAnalysis { get; set; }
         public DbSet<ProgLanguage> ProgLanguages { get; set; }
-        public DbSet<ProjectCategory> ProjectCategorys { get; set; }
-        public DbSet<ProjectStatus> ProjectStatuss { get; set; }
+        public DbSet<ProjectCategory> ProjectCategories { get; set; }
+        public DbSet<ProjectStatus> ProjectStatus { get; set; }
         public DbSet<ProjectType> ProjectTypes { get; set; }
         public DbSet<PurchaseForm> PurchaseForms { get; set; }
-        public DbSet<Resource> Resourcess { get; set; }
+        public DbSet<Resource> Resources { get; set; }
         public DbSet<Risk> Risks { get; set; }
         public DbSet<ShipNotice> ShipNotices { get; set; }
-        public DbSet<Stakeholder> Stakeholderss { get; set; }
+        public DbSet<Stakeholder> Stakeholders { get; set; }
         public DbSet<SuperUser> SuperUsers { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<TaskSupport> TaskSupports { get; set; }
         public DbSet<Technology> Technologys { get; set; }
         public DbSet<UserAdministration> UserAdministrations { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Wish> Wishs { get; set; }
+        public DbSet<Person> People { get; set; }
+        public DbSet<Wish> Wishes { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -116,7 +116,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new TaskSupportMap());
             modelBuilder.Configurations.Add(new TechnologyMap());
             modelBuilder.Configurations.Add(new UserAdministrationMap());
-            modelBuilder.Configurations.Add(new UserMap());
+            modelBuilder.Configurations.Add(new PersonMap());
             modelBuilder.Configurations.Add(new WishMap());
         }
     }

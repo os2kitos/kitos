@@ -3,9 +3,9 @@ using Core.DomainModel;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class UserMap : EntityTypeConfiguration<User>
+    public class PersonMap : EntityTypeConfiguration<Person>
     {
-        public UserMap()
+        public PersonMap()
         {
             // Primary Key
             this.HasKey(t => t.Id);
@@ -15,14 +15,14 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired();
 
             // Table & Column Mappings
-            this.ToTable("User");
+            this.ToTable("Person");
             this.Property(t => t.Id).HasColumnName("Id");
             this.Property(t => t.Name).HasColumnName("Name");
             this.Property(t => t.Municipality_Id).HasColumnName("Municipality_Id");
 
             // Relationships
             this.HasRequired(t => t.Municipality)
-                .WithMany(t => t.Users)
+                .WithMany(t => t.People)
                 .HasForeignKey(d => d.Municipality_Id);
 
         }
