@@ -20,7 +20,7 @@ namespace Infrastructure.DataAccess
             //TODO
         }
 
-        public PasswordResetRequest Get(string hash)
+        public PasswordResetRequest GetByHash(string hash)
         {
             return _resets.SingleOrDefault(r => r.Hash == hash);
         }

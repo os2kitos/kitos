@@ -132,7 +132,7 @@ namespace UI.MVC4.Controllers
 
             try
             {
-                var passwordReset = _passwordResetRepository.Get(hash);
+                var passwordReset = _passwordResetRepository.GetByHash(hash);
 
                 var timespan = DateTime.Now - passwordReset.Time;
                 if (timespan.TotalHours < ResetRequestTTL)
@@ -164,7 +164,7 @@ namespace UI.MVC4.Controllers
             try
             {
                 //does the reset request still exist?
-                var passwordReset = _passwordResetRepository.Get(resetModel.RequestHash);
+                var passwordReset = _passwordResetRepository.GetByHash(resetModel.RequestHash);
 
                 if(!ModelState.IsValid)
                     throw new Exception();

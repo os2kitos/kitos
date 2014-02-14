@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.Security;
+using Core.DomainModel;
 using Core.DomainServices;
 using Ninject;
 
@@ -7,7 +8,8 @@ namespace UI.MVC4.Infrastructure
 {
     public class CustomMembershipProvider : MembershipProvider
     {
-        [Inject] public IUserRepository UserRepository { get; set; }
+        [Inject] 
+        public IUserRepository UserRepository { get; set; }
 
         #region not implemented
 
@@ -151,7 +153,11 @@ namespace UI.MVC4.Infrastructure
         
         public override bool ValidateUser(string username, string password)
         {
-            return UserRepository.Validate(username, password);
+            var user = UserRepository.GetByEmail(username);
+            if (user == null) return false;
+
+            //TODO: HASHING
+            return user.Password == password;
         }
     }
 }

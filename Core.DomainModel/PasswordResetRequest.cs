@@ -2,7 +2,6 @@
 
 namespace Core.DomainModel
 {
-    //TODO: perhaps this should be called something else, like reset request or something??
     public class PasswordResetRequest
     {
         public int Id { get; set; }

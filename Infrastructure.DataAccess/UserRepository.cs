@@ -29,12 +29,6 @@ namespace Infrastructure.DataAccess
             
         }
 
-        public bool Validate(string email, string password)
-        {
-            //TODO: HASHING OF PASSWORDS!!!
-            return _users.SingleOrDefault(u => u.Email == email && u.Password == password) != null;
-        }   
-
         private void InitFakeUsers()
         {
             _users = new List<User>(){

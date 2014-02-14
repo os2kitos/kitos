@@ -6,7 +6,7 @@ namespace Core.DomainServices
     {
         void Create(PasswordResetRequest passwordReset);
 
-        PasswordResetRequest Get(string hash);
+        PasswordResetRequest GetByHash(string hash);
 
         void Delete(PasswordResetRequest passwordReset);
     }

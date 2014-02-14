@@ -8,8 +8,5 @@ namespace Core.DomainServices
         User GetByEmail(string email);
 
         void Update(User user);
-
-        //TODO: Should this even be here - is it really the repository's responsibility??
-        bool Validate(string email, string password);
     }
 }
