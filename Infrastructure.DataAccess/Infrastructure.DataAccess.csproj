@@ -86,6 +86,7 @@
     <Compile Include="Mapping\PurchaseFormMap.cs" />
     <Compile Include="Mapping\ResourcesMap.cs" />
     <Compile Include="Mapping\RiskMap.cs" />
+    <Compile Include="Mapping\RoleMap.cs" />
     <Compile Include="Mapping\ShipNoticeMap.cs" />
     <Compile Include="Mapping\StakeholdersMap.cs" />
     <Compile Include="Mapping\SuperUserMap.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="Mapping\TaskSupportMap.cs" />
     <Compile Include="Mapping\TechnologyMap.cs" />
     <Compile Include="Mapping\UserAdministrationMap.cs" />
+    <Compile Include="Mapping\PersonMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
     <Compile Include="PasswordResetRequestRepository.cs" />
