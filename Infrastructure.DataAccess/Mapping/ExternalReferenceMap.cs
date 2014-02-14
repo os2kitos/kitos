@@ -24,7 +24,7 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Relationships
             this.HasRequired(t => t.ExternalReferenceType)
-                .WithMany(t => t.ExternalReferenceSets)
+                .WithMany(t => t.ExternalReferences)
                 .HasForeignKey(d => d.ExternalReferenceType_Id);
             this.HasRequired(t => t.ItProject)
                 .WithMany(t => t.ExternalReferences)

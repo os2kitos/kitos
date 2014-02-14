@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItProject
 {
-    public partial class ProjectStatus
+    public class ProjectStatus
     {
         public ProjectStatus()
         {

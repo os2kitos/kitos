@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel
 {
-    public partial class Municipality
+    public class Municipality
     {
         public Municipality()
         {
@@ -13,7 +13,7 @@ namespace Core.DomainModel
         }
 
         public int Id { get; set; }
-        public int Setup_Id { get; set; }
+        
         public virtual Configuration Configuration { get; set; }
         public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
         public virtual ICollection<ItSystem.ItSystem> ItSystems { get; set; }

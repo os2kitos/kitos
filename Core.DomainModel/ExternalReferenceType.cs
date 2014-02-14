@@ -6,11 +6,11 @@ namespace Core.DomainModel
     {
         public ExternalReferenceType()
         {
-            this.ExternalReferenceSets = new List<ExternalReference>();
+            this.ExternalReferences = new List<ExternalReference>();
         }
 
         public int Id { get; set; }
         public string Name { get; set; }
-        public virtual ICollection<ExternalReference> ExternalReferenceSets { get; set; }
+        public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
     }
 }

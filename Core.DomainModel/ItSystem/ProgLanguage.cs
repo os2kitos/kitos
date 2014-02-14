@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItSystem
 {
-    public partial class ProgLanguage
+    public class ProgLanguage
     {
         public ProgLanguage()
         {
@@ -10,6 +10,7 @@ namespace Core.DomainModel.ItSystem
         }
 
         public int Id { get; set; }
+
         public virtual ICollection<Technology> Technologies { get; set; }
     }
 }

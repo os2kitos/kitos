@@ -53,10 +53,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.ItProjects)
                 .HasForeignKey(d => d.Municipality_Id);
             this.HasRequired(t => t.ProjectCategory)
-                .WithMany(t => t.ItProjectSets)
+                .WithMany(t => t.ItProjects)
                 .HasForeignKey(d => d.ProjectCategory_Id);
             this.HasRequired(t => t.ProjectType)
-                .WithMany(t => t.ItProjectSets)
+                .WithMany(t => t.ItProjects)
                 .HasForeignKey(d => d.ProjectType_Id);
 
         }

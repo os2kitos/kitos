@@ -14,12 +14,10 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("Municipality");
             this.Property(t => t.Id).HasColumnName("Id");
-            this.Property(t => t.Setup_Id).HasColumnName("Setup_Id");
 
             // Relationships
-            this.HasRequired(t => t.Configuration)
-                .WithMany(t => t.MunicipalitySets)
-                .HasForeignKey(d => d.Setup_Id);
+            this.HasOptional(t => t.Configuration)
+                .WithRequired(t => t.Municipality);
 
         }
     }

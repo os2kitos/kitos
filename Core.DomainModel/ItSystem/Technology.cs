@@ -1,6 +1,6 @@
 namespace Core.DomainModel.ItSystem
 {
-    public partial class Technology
+    public class Technology
     {
         public int Id { get; set; }
         public int DatabaseType_Id { get; set; }
