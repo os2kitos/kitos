@@ -1,11 +1,11 @@
-using System.Data.Entity.ModelConfiguration;
+﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class PersonMap : EntityTypeConfiguration<Person>
+    public class UserMap : EntityTypeConfiguration<User>
     {
-        public PersonMap()
+        public UserMap()
         {
             // Primary Key
             this.HasKey(t => t.Id);
@@ -13,17 +13,25 @@ namespace Infrastructure.DataAccess.Mapping
             // Properties
             this.Property(t => t.Name)
                 .IsRequired();
+            this.Property(t => t.Email)
+                .IsRequired();
+            this.Property(t => t.Password)
+                .IsRequired();
 
             // Table & Column Mappings
-            this.ToTable("Person");
+            this.ToTable("User");
             this.Property(t => t.Id).HasColumnName("Id");
             this.Property(t => t.Name).HasColumnName("Name");
-            this.Property(t => t.Municipality_Id).HasColumnName("Municipality_Id");
+            this.Property(t => t.Email).HasColumnName("Email");
+            this.Property(t => t.Password).HasColumnName("Password");
+            this.Property(t => t.Role_Id).HasColumnName("Role_Id");
 
             // Relationships
-            this.HasRequired(t => t.Municipality)
-                .WithMany(t => t.People)
-                .HasForeignKey(d => d.Municipality_Id);
+            this.HasRequired(t => t.Role)
+                .WithMany(t => t.Users)
+                .HasForeignKey(d => d.Role_Id);
+            this.HasOptional(t => t.Municipality)
+                .WithMany(t => t.Users);
 
         }
     }

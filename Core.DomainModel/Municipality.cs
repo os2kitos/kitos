@@ -19,5 +19,6 @@ namespace Core.DomainModel
         public virtual ICollection<ItSystem.ItSystem> ItSystems { get; set; }
         public virtual ICollection<Localization> Localizations { get; set; }
         public virtual ICollection<Person> People { get; set; }
+        public virtual ICollection<User> Users { get; set; }
     }
 }
