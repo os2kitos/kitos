@@ -9,11 +9,12 @@ namespace UI.MVC4.Models
 {
     public class LoginViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "Dette felt skal udfyldes")]
+        [EmailAddress(ErrorMessage = "Dette felt er ikke en gyldig email-addresse")]
         [Display(Name = "Email adresse")]
         public string Email { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Dette felt skal udfyldes")]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
@@ -24,6 +25,8 @@ namespace UI.MVC4.Models
 
     public class ForgotPasswordViewModel
     {
+        [Required(ErrorMessage = "Dette felt skal udfyldes")]
+        [EmailAddress(ErrorMessage = "Dette felt er ikke en gyldig email-addresse")]
         [Display(Name = "Email adresse")]
         public string Email { get; set; }
     }
@@ -34,15 +37,17 @@ namespace UI.MVC4.Models
         public string RequestHash { get; set; }
 
         [HiddenInput(DisplayValue = false)]
+        [Display(Name = "Email adresse")]
         public string Email { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Dette felt skal udfyldes")]
         [Display(Name = "Nyt password")]
         [StringLength(int.MaxValue, MinimumLength = 6, ErrorMessage = "Passwordet skal være mindst 6 tegn")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        [System.ComponentModel.DataAnnotations.Compare("Password")]
+        [Required(ErrorMessage = "Dette felt skal udfyldes")]
+        [System.ComponentModel.DataAnnotations.Compare("Password", ErrorMessage = "De to felter svarer ikke overens")]
         [Display(Name = "Bekræft nyt password")]
         public string ConfirmPassword { get; set; }
     }
