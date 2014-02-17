@@ -198,7 +198,14 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AuthorizeController.cs" />
+    <Compile Include="Controllers\ItProjectGuidanceApiController.cs" />
+    <Compile Include="Controllers\GenericApiController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ItContractGuidanceApiController.cs" />
+    <Compile Include="Controllers\ItPreAnalysisApiController.cs" />
+    <Compile Include="Controllers\ItSystemGuidanceApiController.cs" />
+    <Compile Include="Controllers\SecuritySchemeApiController.cs" />
+    <Compile Include="Controllers\UserGuidanceApiController.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
