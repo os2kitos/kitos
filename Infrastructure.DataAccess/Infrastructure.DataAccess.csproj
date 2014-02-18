@@ -82,6 +82,7 @@
     <Compile Include="Mapping\MilestoneMap.cs" />
     <Compile Include="Mapping\MunicipalityMap.cs" />
     <Compile Include="Mapping\OrganizationMap.cs" />
+    <Compile Include="Mapping\PasswordResetRequestMap.cs" />
     <Compile Include="Mapping\PaymentMap.cs" />
     <Compile Include="Mapping\PaymentModelMap.cs" />
     <Compile Include="Mapping\PreAnalysisMap.cs" />
@@ -105,6 +106,11 @@
     <Compile Include="Mapping\UserGuidanceMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
+    <Compile Include="Migrations\201402181508375_Initial.cs" />
+    <Compile Include="Migrations\201402181508375_Initial.Designer.cs">
+      <DependentUpon>201402181508375_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="PasswordResetRequestRepository.cs" />
     <Compile Include="UserRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -122,6 +128,11 @@
       <Project>{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}</Project>
       <Name>Core.DomainServices</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201402181508375_Initial.resx">
+      <DependentUpon>201402181508375_Initial.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

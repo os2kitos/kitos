@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Data.Entity;
+using System.Linq;
 using System.Collections.Generic;
 using Core.DomainServices;
 using Core.DomainModel;
@@ -7,11 +9,14 @@ namespace Infrastructure.DataAccess
 {
     public class UserRepository : IUserRepository
     {
-        private List<User> _users = new List<User>();
+        private readonly KitosContext _context;
+        private readonly DbSet<User> _users;
+        private bool _disposed = false;
 
-        public UserRepository()
+        public UserRepository(KitosContext context)
         {
-            InitFakeUsers();
+            _context = context;
+            _users = context.Users;
         }
 
         public User GetById(int id)
@@ -26,37 +31,31 @@ namespace Infrastructure.DataAccess
 
         public void Update(User user)
         {
-            
+            // TODO
+            throw new NotImplementedException();
         }
 
-        private void InitFakeUsers()
+        public void Save()
         {
-            _users = new List<User>()
+            _context.SaveChanges();
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
             {
-                new User()
-                    {
-                        Id = 0,
-                        Name = "Simon Lynn-Pedersen",
-                        Email = "slp@it-minds.dk",
-                        Password = "slp",
-                        Roles = new List<Role>()
-                            {
-                                new Role() {Id = 0, Name = "User"},
-                                new Role() {Id = 1, Name = "Admin"}
-                            }
-                    },
-                new User()
-                    {
-                        Id = 0,
-                        Name = "Arne Hansen",
-                        Email = "arne@it-minds.dk",
-                        Password = "arne",
-                        Roles = new List<Role>()
-                            {
-                                new Role() {Id = 0, Name = "User"},
-                            }
-                    }
-            };
+                if (disposing)
+                {
+                    _context.Dispose();
+                }
+            }
+            _disposed = true;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }
