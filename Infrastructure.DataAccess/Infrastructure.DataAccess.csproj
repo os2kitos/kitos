@@ -76,6 +76,7 @@
     <Compile Include="Mapping\ItProjectMap.cs" />
     <Compile Include="Mapping\ItSystemGuidanceMap.cs" />
     <Compile Include="Mapping\ItSystemMap.cs" />
+    <Compile Include="Mapping\KitosIntroMap.cs" />
     <Compile Include="Mapping\KLEMap.cs" />
     <Compile Include="Mapping\LocalizationMap.cs" />
     <Compile Include="Mapping\MilestoneMap.cs" />

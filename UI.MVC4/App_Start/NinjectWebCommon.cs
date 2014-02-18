@@ -64,6 +64,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IPasswordResetRequestRepository>().To<PasswordResetRequestRepository>();
 
             kernel.Bind(typeof(IGenericRepository<ItContractGuidance>)).To(typeof(GenericRepository<ItContractGuidance>));
+            kernel.Bind(typeof(IGenericRepository<KitosIntro>)).To(typeof(GenericRepository<KitosIntro>));
 
             kernel.Bind<IMailClient>().To<MailClient>().WithConstructorArgument("host", "localhost").WithConstructorArgument("port", 25);
 

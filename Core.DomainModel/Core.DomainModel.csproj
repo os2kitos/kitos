@@ -97,6 +97,7 @@
     <Compile Include="Text\ItPreAnalysis.cs" />
     <Compile Include="Text\ItProjectGuidance.cs" />
     <Compile Include="Text\ItSystemGuidance.cs" />
+    <Compile Include="Text\KitosIntro.cs" />
     <Compile Include="Text\SecurityScheme.cs" />
     <Compile Include="Text\UserGuidance.cs" />
     <Compile Include="User.cs" />

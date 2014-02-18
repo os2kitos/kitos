@@ -205,6 +205,7 @@
     <Compile Include="Controllers\ItContractGuidanceApiController.cs" />
     <Compile Include="Controllers\ItPreAnalysisApiController.cs" />
     <Compile Include="Controllers\ItSystemGuidanceApiController.cs" />
+    <Compile Include="Controllers\KitosIntroApiController.cs" />
     <Compile Include="Controllers\SecuritySchemeApiController.cs" />
     <Compile Include="Controllers\UserGuidanceApiController.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
