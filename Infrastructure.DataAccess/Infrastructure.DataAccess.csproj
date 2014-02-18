@@ -82,6 +82,7 @@
     <Compile Include="Mapping\MilestoneMap.cs" />
     <Compile Include="Mapping\MunicipalityMap.cs" />
     <Compile Include="Mapping\OrganizationMap.cs" />
+    <Compile Include="Mapping\PasswordResetRequestMap.cs" />
     <Compile Include="Mapping\PaymentMap.cs" />
     <Compile Include="Mapping\PaymentModelMap.cs" />
     <Compile Include="Mapping\PreAnalysisMap.cs" />
