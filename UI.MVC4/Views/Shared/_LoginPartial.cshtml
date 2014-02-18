@@ -1,14 +1,14 @@
 ﻿@if (Request.IsAuthenticated) {
-    <text>
-        Logget ind som @User.Identity.Name | 
-        @using (Html.BeginForm("Logout", "Authorize", FormMethod.Post, new { id = "logoutForm" })) {
+        using (Html.BeginForm("Logout", "Authorize", FormMethod.Post, new { @class = "form-inline" })) {
             @Html.AntiForgeryToken()
-            <a href="javascript:document.getElementById('logoutForm').submit()">Log ud</a>
+
+            <div class="form-group small">
+                @Html.ActionLink(User.Identity.Name, "UserPage", "Home", null, new {@class = "btn btn-xs btn-link"})
+                <input type="submit" value="Log ud" class="btn btn-xs btn-link" />
+            </div>
+            
         }
-    </text>
 } else {
-    <ul>
-        <li>@Html.ActionLink("Log ind", "Login", "Authorize")</li>
-        <li>@Html.ActionLink("Glemt password?", "ForgotPassword", "Authorize")</li>
-    </ul>
+    @Html.ActionLink("Log ind", "Login", "Authorize", null, new {@class = "btn btn-xs btn-link"})
+    @Html.ActionLink("Glemt password?", "ForgotPassword", "Authorize", null, new {@class = "btn btn-xs btn-link"})
 }
