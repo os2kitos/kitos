@@ -2,7 +2,7 @@
     ViewBag.Title = "Index";
 }
 
-<div id="navbar-side" class="pull-right col-md-3">
+<div id="navbar-side" class="col-md-3">
     <ul class="nav nav-stacked">
         <li>@Html.ActionLink("Produktoversigt", "Index")</li>
         <li>@Html.ActionLink("Læs mere om fælles datamodel", "Index")</li>
@@ -12,7 +12,7 @@
     </ul>
 </div>
 
-<div id="page-text" data-type="textarea" data-pk="1" data-url="api/kitosintro/" data-geturl="api/kitosintroapi/"></div>
+<div id="page-text" data-type="wysihtml5" data-pk="0" data-apiurl="api/kitosintroapi/" class="col-md-7"></div>
 
 <!--
     <h2>Hvad er KITOS?</h2>
@@ -43,17 +43,20 @@
 @section scripts
 {
     <script>
+
         $(document).ready(function () {
             $.fn.editable.defaults.mode = "inline";
             $.fn.editable.defaults.ajaxOptions = { type: "PUT" };
             
             var pagetext = $("#page-text");
 
-            var geturl = pagetext.data("geturl") + pagetext.data("pk");
+            var url = pagetext.data("apiurl") + pagetext.data("pk");
 
-            $.get(geturl, function(data) {
-                pagetext.html = data.text;
-            }).done(function() {
+            pagetext.data("url", url);
+
+            $.get(url, function (result) {
+                pagetext.html(result.Text);
+            }).done(function () {
                 pagetext.editable();
             });
         });

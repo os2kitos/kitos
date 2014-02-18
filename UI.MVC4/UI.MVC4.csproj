@@ -197,17 +197,17 @@
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\AuthorizeController.cs" />
-    <Compile Include="Controllers\ItProjectGuidanceApiController.cs" />
-    <Compile Include="Controllers\GenericApiController.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\ItContractGuidanceApiController.cs" />
-    <Compile Include="Controllers\ItPreAnalysisApiController.cs" />
-    <Compile Include="Controllers\ItSystemGuidanceApiController.cs" />
-    <Compile Include="Controllers\KitosIntroApiController.cs" />
-    <Compile Include="Controllers\SecuritySchemeApiController.cs" />
-    <Compile Include="Controllers\UserGuidanceApiController.cs" />
+    <Compile Include="Controllers\API\KitosIntroApiController.cs" />
+    <Compile Include="Controllers\Web\AccountController.cs" />
+    <Compile Include="Controllers\Web\AuthorizeController.cs" />
+    <Compile Include="Controllers\API\ItProjectGuidanceApiController.cs" />
+    <Compile Include="Controllers\API\GenericApiController.cs" />
+    <Compile Include="Controllers\Web\HomeController.cs" />
+    <Compile Include="Controllers\API\ItContractGuidanceApiController.cs" />
+    <Compile Include="Controllers\API\ItPreAnalysisApiController.cs" />
+    <Compile Include="Controllers\API\ItSystemGuidanceApiController.cs" />
+    <Compile Include="Controllers\API\SecuritySchemeApiController.cs" />
+    <Compile Include="Controllers\API\UserGuidanceApiController.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -219,12 +219,14 @@
     <Compile Include="Infrastructure\ProviderInitializationHttpModule.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\AuthorizeViewModels.cs" />
+    <Compile Include="Models\XeditableReturnModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-cosmo.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
+    <Content Include="Content\bootstrap3-wysihtml5\bootstrap3-wysihtml5.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\kitos.css" />
@@ -291,6 +293,7 @@
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Images\logo.png" />
+    <Content Include="Scripts\bootstrap3-wysihtml5.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <None Include="Scripts\jquery-2.1.0.intellisense.js" />
@@ -306,6 +309,10 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\knockout-2.2.0.debug.js" />
     <Content Include="Scripts\knockout-2.2.0.js" />
+    <Content Include="Scripts\wysihtml5\parser_rules\advanced.js" />
+    <Content Include="Scripts\wysihtml5\parser_rules\simple.js" />
+    <Content Include="Scripts\wysihtml5\wysihtml5-0.3.0.js" />
+    <Content Include="Scripts\wysihtml5\wysihtml5-0.3.0.min.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
