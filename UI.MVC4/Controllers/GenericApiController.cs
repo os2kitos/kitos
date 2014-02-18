@@ -8,12 +8,12 @@ using Core.DomainServices;
 
 namespace UI.MVC4.Controllers
 {
-    public class GenericApiController<T> : ApiController 
+    public abstract class GenericApiController<T> : ApiController 
         where T : class
     {
         private readonly IGenericRepository<T> _repository;
 
-        public GenericApiController(IGenericRepository<T> repository)
+        protected GenericApiController(IGenericRepository<T> repository)
         {
             _repository = repository;
         }

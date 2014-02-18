@@ -47,7 +47,11 @@ namespace Infrastructure.DataAccess
                                     Name = "Simon Lynn-Pedersen",
                                     Email = "slp@it-minds.dk",
                                     Password = "slp",
-                                    Role = new Role() {Id = 1, Name = "Admin"}
+                                    Roles = new List<Role>()
+                                        {
+                                            new Role() {Id = 0, Name = "User"},
+                                            new Role() {Id = 1, Name = "Admin"}
+                                        }
                                 }
                         },
                     new PasswordResetRequest
@@ -62,7 +66,10 @@ namespace Infrastructure.DataAccess
                                     Name = "Arne Hansen",
                                     Email = "arne@it-minds.dk",
                                     Password = "arne",
-                                    Role = new Role() {Id = 0, Name = "User"}
+                                    Roles = new List<Role>()
+                                        {
+                                            new Role() {Id = 0, Name = "User"},
+                                        }
                                 }
                         }
                 };

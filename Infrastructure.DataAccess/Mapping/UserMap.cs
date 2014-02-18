@@ -24,12 +24,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.Name).HasColumnName("Name");
             this.Property(t => t.Email).HasColumnName("Email");
             this.Property(t => t.Password).HasColumnName("Password");
-            this.Property(t => t.Role_Id).HasColumnName("Role_Id");
 
             // Relationships
-            this.HasRequired(t => t.Role)
-                .WithMany(t => t.Users)
-                .HasForeignKey(d => d.Role_Id);
+            this.HasMany(t => t.Roles)
+                .WithMany(t => t.Users);
             this.HasOptional(t => t.Municipality)
                 .WithMany(t => t.Users);
 
