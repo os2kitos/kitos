@@ -70,7 +70,7 @@ namespace UI.MVC4.Infrastructure
                 return new string[]{};
             }
 
-            return new[] {user.Role.Name};
+            return user.Roles.Select(r => r.Name).ToArray();
         }
 
         public override string[] GetUsersInRole(string roleName)
@@ -89,7 +89,7 @@ namespace UI.MVC4.Infrastructure
 
             if (user == null) return false;
 
-            return user.Role.Name == roleName;
+            return user.Roles.Any(role => role.Name == roleName);
         }
 
         public override void RemoveUsersFromRoles(string[] usernames, string[] roleNames)

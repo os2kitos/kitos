@@ -48,6 +48,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ItProjectGuidance> ItProjectGuidance { get; set; }
         public DbSet<ItSystem> ItSystems { get; set; }
         public DbSet<ItSystemGuidance> ItSystemGuidance { get; set; }
+        public DbSet<KitosIntro> KitosIntro { get; set; }
         public DbSet<KLE> KLEs { get; set; }
         public DbSet<Localization> Localizations { get; set; }
         public DbSet<Milestone> Milestones { get; set; }
@@ -107,6 +108,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItProjectGuidanceMap());
             modelBuilder.Configurations.Add(new ItSystemMap());
             modelBuilder.Configurations.Add(new ItSystemGuidanceMap());
+            modelBuilder.Configurations.Add(new KitosIntroMap());
             modelBuilder.Configurations.Add(new KLEMap());
             modelBuilder.Configurations.Add(new LocalizationMap());
             modelBuilder.Configurations.Add(new MilestoneMap());

@@ -1,4 +1,6 @@
-﻿namespace Core.DomainModel
+﻿using System.Collections.Generic;
+
+namespace Core.DomainModel
 {
     public class User
     {
@@ -6,9 +8,8 @@
         public string Name { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public int Role_Id { get; set; }
 
-        public virtual Role Role { get; set; }
+        public virtual ICollection<Role> Roles { get; set; }
         public virtual Municipality Municipality { get; set; }
     }
 }

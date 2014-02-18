@@ -3,18 +3,17 @@ using Core.DomainModel.Text;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class UserGuidanceMap : EntityTypeConfiguration<UserGuidance>
+    public class KitosIntroMap : EntityTypeConfiguration<KitosIntro>
     {
-        public UserGuidanceMap()
+        public KitosIntroMap()
         {
             // Primary Key
             this.HasKey(t => t.Id);
 
             // Properties
             // Table & Column Mappings
-            this.ToTable("UserGuidance");
+            this.ToTable("KitosIntro");
             this.Property(t => t.Id).HasColumnName("Id");
-            this.Property(t => t.Text).HasColumnName("Text");
-        } 
+        }
     }
 }
