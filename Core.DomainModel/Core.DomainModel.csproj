@@ -93,6 +93,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Supplier.cs" />
     <Compile Include="Role.cs" />
+    <Compile Include="Text\ItContractGuidance.cs" />
+    <Compile Include="Text\ItPreAnalysis.cs" />
+    <Compile Include="Text\ItProjectGuidance.cs" />
+    <Compile Include="Text\ItSystemGuidance.cs" />
+    <Compile Include="Text\SecurityScheme.cs" />
+    <Compile Include="Text\UserGuidance.cs" />
     <Compile Include="User.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

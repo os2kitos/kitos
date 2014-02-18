@@ -3,6 +3,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.Text;
 using Infrastructure.DataAccess.Mapping;
 
 namespace Infrastructure.DataAccess
@@ -41,8 +42,12 @@ namespace Infrastructure.DataAccess
         public DbSet<Core.DomainModel.ItSystem.Infrastructure> Infrastructures { get; set; }
         public DbSet<Interface> Interfaces { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
+        public DbSet<ItContractGuidance> ItContractGuidance { get; set; }
+        public DbSet<ItPreAnalysis> ItPreAnalysis { get; set; }
         public DbSet<ItProject> ItProjects { get; set; }
+        public DbSet<ItProjectGuidance> ItProjectGuidance { get; set; }
         public DbSet<ItSystem> ItSystems { get; set; }
+        public DbSet<ItSystemGuidance> ItSystemGuidance { get; set; }
         public DbSet<KLE> KLEs { get; set; }
         public DbSet<Localization> Localizations { get; set; }
         public DbSet<Milestone> Milestones { get; set; }
@@ -60,6 +65,7 @@ namespace Infrastructure.DataAccess
         public DbSet<Resource> Resources { get; set; }
         public DbSet<Risk> Risks { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<SecurityScheme> SecurityScheme { get; set; }
         public DbSet<ShipNotice> ShipNotices { get; set; }
         public DbSet<Stakeholder> Stakeholders { get; set; }
         public DbSet<SuperUser> SuperUsers { get; set; }
@@ -67,6 +73,7 @@ namespace Infrastructure.DataAccess
         public DbSet<TaskSupport> TaskSupports { get; set; }
         public DbSet<Technology> Technologys { get; set; }
         public DbSet<UserAdministration> UserAdministrations { get; set; }
+        public DbSet<UserGuidance> UserGuidance { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Wish> Wishes { get; set; }
 
@@ -94,8 +101,12 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new InfrastructureMap());
             modelBuilder.Configurations.Add(new InterfaceMap());
             modelBuilder.Configurations.Add(new ItContractMap());
+            modelBuilder.Configurations.Add(new ItContractGuidanceMap());
+            modelBuilder.Configurations.Add(new ItPreAnalysisMap());
             modelBuilder.Configurations.Add(new ItProjectMap());
+            modelBuilder.Configurations.Add(new ItProjectGuidanceMap());
             modelBuilder.Configurations.Add(new ItSystemMap());
+            modelBuilder.Configurations.Add(new ItSystemGuidanceMap());
             modelBuilder.Configurations.Add(new KLEMap());
             modelBuilder.Configurations.Add(new LocalizationMap());
             modelBuilder.Configurations.Add(new MilestoneMap());
@@ -113,6 +124,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ResourcesMap());
             modelBuilder.Configurations.Add(new RiskMap());
             modelBuilder.Configurations.Add(new RoleMap());
+            modelBuilder.Configurations.Add(new SecuritySchemeMap());
             modelBuilder.Configurations.Add(new ShipNoticeMap());
             modelBuilder.Configurations.Add(new StakeholdersMap());
             modelBuilder.Configurations.Add(new SuperUserMap());
@@ -120,6 +132,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new TaskSupportMap());
             modelBuilder.Configurations.Add(new TechnologyMap());
             modelBuilder.Configurations.Add(new UserAdministrationMap());
+            modelBuilder.Configurations.Add(new UserGuidanceMap());
             modelBuilder.Configurations.Add(new UserMap());
             modelBuilder.Configurations.Add(new WishMap());
         }

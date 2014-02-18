@@ -1,4 +1,5 @@
 using System.Web.Security;
+using Core.DomainModel.Text;
 using Core.DomainServices;
 using Core.ApplicationServices;
 using Infrastructure.DataAccess;
@@ -61,6 +62,8 @@ namespace UI.MVC4.App_Start
         {
             kernel.Bind<IUserRepository>().To<UserRepository>();
             kernel.Bind<IPasswordResetRequestRepository>().To<PasswordResetRequestRepository>();
+
+            kernel.Bind(typeof(IGenericRepository<ItContractGuidance>)).To(typeof(GenericRepository<ItContractGuidance>));
 
             kernel.Bind<IMailClient>().To<MailClient>().WithConstructorArgument("host", "localhost").WithConstructorArgument("port", 25);
 
