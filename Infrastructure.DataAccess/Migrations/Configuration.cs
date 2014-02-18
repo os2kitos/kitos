@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Core.DomainModel;
+
 namespace Infrastructure.DataAccess.Migrations
 {
     using System;
@@ -26,6 +30,37 @@ namespace Infrastructure.DataAccess.Migrations
             //      new Person { FullName = "Rowan Miller" }
             //    );
             //
+
+            #region Roles
+            context.Roles.AddOrUpdate(x => x.Name,
+                                      new Role {Name = "User"},
+                                      new Role {Name = "Admin"}
+                );
+            var user = context.Roles.First(role => role.Name == "User");
+            var admin = context.Roles.First(role => role.Name == "Admin");
+            #endregion
+
+            #region Users
+            context.Users.AddOrUpdate(x => x.Email,
+                                      new User
+                                          {
+                                              Name = "Simon Lynn-Pedersen",
+                                              Email = "slp@it-minds.dk",
+                                              Password = "slp",
+                                              Roles = new Collection<Role> {admin, user}
+                                          },
+                                      new User
+                                          {
+                                              Id = 0,
+                                              Name = "Arne Hansen",
+                                              Email = "arne@it-minds.dk",
+                                              Password = "arne",
+                                              Roles = new Collection<Role> {user}
+                                          }
+                );
+            #endregion
+
+            // TODO password reset
         }
     }
 }
