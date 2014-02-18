@@ -12,25 +12,50 @@
     </ul>
 </div>
 
-<h2>Hvad er KITOS?</h2>
+<div id="page-text" data-type="textarea" data-pk="1" data-url="api/kitosintro/" data-geturl="api/kitosintroapi/"></div>
 
-KITOS er et cloud baseret IT system, som hver enkelt kommune gratis kan tage i brug med henblik på at danne sig et samlet overblik over kommunens:
-<br/>
-<ul>
-    <li>Digitaliseringsgrad af forvaltningens samlede (KLE) opgaver</li>
-    <li>IT projekter</li>
-    <li>IT systemer og snitflader</li>
-    <li>IT kontrakter</li>
-</ul>
+<!--
+    <h2>Hvad er KITOS?</h2>
 
-Hver enkelt kommune kan let klikke af hvilke af ovenstående 'moduler' de ønsker at benytte.
-<br />
-<br />
+    KITOS er et cloud baseret IT system, som hver enkelt kommune gratis kan tage i brug med henblik på at danne sig et samlet overblik over kommunens:
+    <br/>
+    <ul>
+        <li>Digitaliseringsgrad af forvaltningens samlede (KLE) opgaver</li>
+        <li>IT projekter</li>
+        <li>IT systemer og snitflader</li>
+        <li>IT kontrakter</li>
+    </ul>
 
-<h3>Hvordan får min kommune KITOS?</h3>
+    Hver enkelt kommune kan let klikke af hvilke af ovenstående 'moduler' de ønsker at benytte.
+    <br />
+    <br />
 
-@Html.ActionLink("Klik her, hvis jeres kommune ønsker at bruge KITOS", "Index")
+    <h3>Hvordan får min kommune KITOS?</h3>
 
-<br />
-<br />
-Du kan også læse mere om det digitale fællesskab KITOS og hvordan I bliver medlem på <a href="http://os2web.dk/kitos">OS2web.dk/KITOS</a>
+    Html.ActionLink("Klik her, hvis jeres kommune ønsker at bruge KITOS", "Index")
+
+    <br />
+    <br />
+    Du kan også læse mere om det digitale fællesskab KITOS og hvordan I bliver medlem på <a href="http://os2web.dk/kitos">OS2web.dk/KITOS</a>
+    
+-->
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $.fn.editable.defaults.mode = "inline";
+            $.fn.editable.defaults.ajaxOptions = { type: "PUT" };
+            
+            var pagetext = $("#page-text");
+
+            var geturl = pagetext.data("geturl") + pagetext.data("pk");
+
+            $.get(geturl, function(data) {
+                pagetext.html = data.text;
+            }).done(function() {
+                pagetext.editable();
+            });
+        });
+    </script>
+}
