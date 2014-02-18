@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainServices;
@@ -8,16 +9,20 @@ namespace Infrastructure.DataAccess
 {
     public class PasswordResetRequestRepository : IPasswordResetRequestRepository
     {
-        private List<PasswordResetRequest> _resets = new List<PasswordResetRequest>();
+        private readonly KitosContext _context;
+        private readonly DbSet<PasswordResetRequest> _resets;
+        private bool _disposed = false;
 
-        public PasswordResetRequestRepository()
+        public PasswordResetRequestRepository(KitosContext context)
         {
-            InitFakeResets();
+            _context = context;
+            _resets = context.PasswordResetRequests;
         }
 
         public void Create(PasswordResetRequest passwordReset)
         {
             //TODO
+            throw new NotImplementedException();
         }
 
         public PasswordResetRequest GetByHash(string hash)
@@ -28,51 +33,30 @@ namespace Infrastructure.DataAccess
         public void Delete(PasswordResetRequest passwordReset)
         {
             //TODO
+            throw new NotImplementedException();
         }
 
-        //Fake it 'till you make it
-        private void InitFakeResets()
+        public void Save()
         {
-            _resets = new List<PasswordResetRequest>
+            _context.SaveChanges();
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
                 {
-                    new PasswordResetRequest
-                        {
-                            //This reset request is fine
-                            Id = 0,
-                            Hash = "workingRequest", //ofcourse, this should be a hashed string or something obscure
-                            Time = DateTime.Now.AddHours(-3),
-                            User = new User()
-                                {
-                                    Id = 0,
-                                    Name = "Simon Lynn-Pedersen",
-                                    Email = "slp@it-minds.dk",
-                                    Password = "slp",
-                                    Roles = new List<Role>()
-                                        {
-                                            new Role() {Id = 0, Name = "User"},
-                                            new Role() {Id = 1, Name = "Admin"}
-                                        }
-                                }
-                        },
-                    new PasswordResetRequest
-                        {
-                            //This reset request is too old
-                            Id = 0,
-                            Hash = "outdatedRequest",
-                            Time = DateTime.Now.AddHours(-13),
-                            User = new User()
-                                {
-                                    Id = 0,
-                                    Name = "Arne Hansen",
-                                    Email = "arne@it-minds.dk",
-                                    Password = "arne",
-                                    Roles = new List<Role>()
-                                        {
-                                            new Role() {Id = 0, Name = "User"},
-                                        }
-                                }
-                        }
-                };
+                    _context.Dispose();
+                }
+            }
+            _disposed = true;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }
