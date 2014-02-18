@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Security;
 using Core.DomainModel.Text;
 using Core.DomainServices;
 using Infrastructure.DataAccess;
@@ -15,10 +16,9 @@ namespace UI.MVC4.Controllers.API
     {
         private readonly IGenericRepository<KitosIntro> _repository;
 
-        public KitosIntroApiController()
+        public KitosIntroApiController(IGenericRepository<KitosIntro> repository)
         {
-            //yeah yeah, I know, we should use DI
-            _repository = new FakeKitosIntroRepository();
+            _repository = repository;
         }
 
         // GET api/kitosintroapi
@@ -34,18 +34,30 @@ namespace UI.MVC4.Controllers.API
         }
 
         // POST api/kitosintroapi
+        [Authorize(Roles = "Admin")]
         public void Post([FromBody]string value)
         {
         }
 
         // PUT api/kitosintroapi/5
-        public void Put(int id, [FromBody] XeditableReturnModel returnModel)
+        [Authorize(Roles = "Admin")]
+        public HttpResponseMessage Put(int id, [FromBody] XeditableReturnModel returnModel)
         {
-            _repository.Update(new KitosIntro()
+            try
+            {
+                _repository.Update(new KitosIntro()
                 {
                     Id = id,
                     Text = returnModel.Value
                 });
+                _repository.Save();
+
+                return new HttpResponseMessage(HttpStatusCode.OK); // TODO correct?
+            }
+            catch (Exception)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
         }
 
         // DELETE api/kitosintroapi/5

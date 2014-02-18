@@ -12,7 +12,7 @@
     </ul>
 </div>
 
-<div id="page-text" data-type="wysihtml5" data-pk="0" data-apiurl="api/kitosintroapi/" class="col-md-7"></div>
+<div id="page-text" data-type="wysihtml5" data-pk="1" data-apiurl="api/kitosintroapi/" class="col-md-7"></div>
 
 <!--
     <h2>Hvad er KITOS?</h2>
@@ -57,7 +57,12 @@
             $.get(url, function (result) {
                 pagetext.html(result.Text);
             }).done(function () {
-                pagetext.editable();
+                @if (User.IsInRole("Admin"))
+                {
+                    <text>
+                        pagetext.editable();
+                    </text>
+                }
             });
         });
     </script>
