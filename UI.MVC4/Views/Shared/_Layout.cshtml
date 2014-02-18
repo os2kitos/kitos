@@ -2,40 +2,30 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title>@ViewBag.Title</title>
+        <title>@ViewBag.Title - KITOS</title>
         <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
         <meta name="viewport" content="width=device-width" />
         @Styles.Render("~/Content/css")
         <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
         <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
         @Scripts.Render("~/bundles/modernizr")
+
     </head>
     <body>
-        <header>
-            <div class="content-wrapper">
-                <div class="float-right">
-                    <section id="login">
-                        @Html.Partial("_LoginPartial")
-                    </section>
-                    <nav>
-                        <ul id="menu">
-                            <li>@Html.ActionLink("Index", "Index", "Home")</li>
-                            <li>@Html.ActionLink("Bruger", "UserPage", "Home")</li>
-                            <li>@Html.ActionLink("Admin", "AdminPage", "Home")</li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
-        </header>
-        <div id="body">
-            <section class="content-wrapper main-content clear-fix">
-                @RenderBody()
-            </section>
-        </div>
-        <footer>
-        </footer>
+        <div id="page-wrapper" class="container-fluid">
+            <!-- top nav: logo, menu buttons -->
+            @Html.Partial("_TopNavigation")
+            
+            <div id="page-content">
+                <div class="clearfix"></div>
 
+                @RenderBody()
+            </div>
+            
+        </div>
         @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/jqueryval")
         @RenderSection("scripts", required: false)
+
     </body>
 </html>

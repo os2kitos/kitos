@@ -1,0 +1,32 @@
+﻿<header id="top-nav" class="row">
+    <div class="col-md-2 text-center">
+        <img src="/Images/logo.png" alt="KITOS" title="Kommunernes IT Overbliks System" />
+    </div>
+    
+    @if (Request.IsAuthenticated)
+    {
+        <div class="col-md-8">
+            <nav class="container-fluid">
+                <ul>
+                    <li class="text-center col-md-3">@Html.ActionLink("Digitaliseringsgrad af opgaveportefølje", "Index", "Home")</li>
+                    <li class="text-center col-md-3">@Html.ActionLink("IT Projekter", "Index", "Home")</li>
+                    <li class="text-center col-md-3">@Html.ActionLink("IT Systemer", "Index", "Home")</li>
+                    <li class="text-center col-md-3">@Html.ActionLink("IT Kontrakter", "Index", "Home")</li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="col-md-2">
+            <a href="#">Vidensdeling</a> | <a href="#">Administration</a>
+            <br />
+            <br />
+            <select>
+                <option>Vælg organisation</option>
+            </select>
+        </div>
+    }
+    else
+    {
+        <h1 class="col-md-8 text-center"><strong class="white">K</strong>ommunernes <strong class="white">IT</strong> <strong class="light-blue">O</strong>verbliks <strong class="light-blue">S</strong>ystem</h1>
+    }
+</header>

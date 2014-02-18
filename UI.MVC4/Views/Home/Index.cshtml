@@ -1,4 +1,36 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Index";
 }
 
+<div id="navbar-side" class="pull-right col-md-3">
+    <ul class="nav nav-stacked">
+        <li>@Html.ActionLink("Produktoversigt", "Index")</li>
+        <li>@Html.ActionLink("Læs mere om fælles datamodel", "Index")</li>
+        <li>@Html.ActionLink("Installationsguide", "Index")</li>
+        <li>@Html.ActionLink("Guide/brugervejledninger", "Index")</li>
+        <li>@Html.ActionLink("ROADMAP", "Index")</li>
+    </ul>
+</div>
+
+<h2>Hvad er KITOS?</h2>
+
+KITOS er et cloud baseret IT system, som hver enkelt kommune gratis kan tage i brug med henblik på at danne sig et samlet overblik over kommunens:
+<br/>
+<ul>
+    <li>Digitaliseringsgrad af forvaltningens samlede (KLE) opgaver</li>
+    <li>IT projekter</li>
+    <li>IT systemer og snitflader</li>
+    <li>IT kontrakter</li>
+</ul>
+
+Hver enkelt kommune kan let klikke af hvilke af ovenstående 'moduler' de ønsker at benytte.
+<br />
+<br />
+
+<h3>Hvordan får min kommune KITOS?</h3>
+
+@Html.ActionLink("Klik her, hvis jeres kommune ønsker at bruge KITOS", "Index")
+
+<br />
+<br />
+Du kan også læse mere om det digitale fællesskab KITOS og hvordan I bliver medlem på <a href="http://os2web.dk/kitos">OS2web.dk/KITOS</a>
