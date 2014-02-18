@@ -32,15 +32,19 @@ namespace Infrastructure.DataAccess.Migrations
             //
 
             #region Roles
+
             context.Roles.AddOrUpdate(x => x.Name,
                                       new Role {Name = "User"},
                                       new Role {Name = "Admin"}
                 );
+
             var user = context.Roles.First(role => role.Name == "User");
             var admin = context.Roles.First(role => role.Name == "Admin");
+
             #endregion
 
             #region Users
+
             context.Users.AddOrUpdate(x => x.Email,
                                       new User
                                           {
@@ -58,9 +62,34 @@ namespace Infrastructure.DataAccess.Migrations
                                               Roles = new Collection<Role> {user}
                                           }
                 );
+
+            var simon = context.Users.Single(x => x.Email == "slp@it-minds.dk");
+            var arne = context.Users.Single(x => x.Email == "arne@it-minds.dk");
+
             #endregion
 
-            // TODO password reset
+            #region Password Reset Requests
+            
+            context.PasswordResetRequests.AddOrUpdate(x => x.Hash,
+                                                      new PasswordResetRequest
+                                                          {
+                                                              //This reset request is fine
+                                                              Id = 0,
+                                                              Hash = "workingRequest", //ofcourse, this should be a hashed string or something obscure
+                                                              Time = DateTime.Now.AddHours(-3),
+                                                              User = simon
+                                                          },
+                                                      new PasswordResetRequest
+                                                          {
+                                                              //This reset request is too old
+                                                              Id = 0,
+                                                              Hash = "outdatedRequest",
+                                                              Time = DateTime.Now.AddHours(-13),
+                                                              User = arne
+                                                          }
+                );
+
+            #endregion
         }
     }
 }
