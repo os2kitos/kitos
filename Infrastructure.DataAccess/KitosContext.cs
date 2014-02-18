@@ -54,6 +54,7 @@ namespace Infrastructure.DataAccess
         public DbSet<Milestone> Milestones { get; set; }
         public DbSet<Municipality> Municipalitys { get; set; }
         public DbSet<Organization> Organizations { get; set; }
+        public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
         public DbSet<PaymentModel> PaymentModels { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Person> People { get; set; }
@@ -114,6 +115,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new MilestoneMap());
             modelBuilder.Configurations.Add(new MunicipalityMap());
             modelBuilder.Configurations.Add(new OrganizationMap());
+            modelBuilder.Configurations.Add(new PasswordResetRequestMap());
             modelBuilder.Configurations.Add(new PaymentModelMap());
             modelBuilder.Configurations.Add(new PaymentMap());
             modelBuilder.Configurations.Add(new PersonMap());

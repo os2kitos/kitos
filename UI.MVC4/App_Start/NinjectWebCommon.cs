@@ -62,6 +62,7 @@ namespace UI.MVC4.App_Start
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel)
         {
+            kernel.Bind<KitosContext>().ToSelf();
             kernel.Bind<IUserRepository>().To<UserRepository>();
             kernel.Bind<IPasswordResetRequestRepository>().To<PasswordResetRequestRepository>();
 
