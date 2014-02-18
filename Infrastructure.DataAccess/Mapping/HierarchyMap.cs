@@ -17,13 +17,16 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Relationships
             this.HasRequired(t => t.ItProject)
-                .WithOptional(t => t.Hierarchy);
+                .WithOptional(t => t.Hierarchy)
+                .WillCascadeOnDelete(true);
 
             this.HasOptional(t => t.ItProjectRef)
-                .WithOptionalDependent();
+                .WithOptionalDependent()
+                .WillCascadeOnDelete(false);
 
             this.HasOptional(t => t.ItProgramRef)
-                .WithOptionalDependent();
+                .WithOptionalDependent()
+                .WillCascadeOnDelete(false);
         }
     }
 }

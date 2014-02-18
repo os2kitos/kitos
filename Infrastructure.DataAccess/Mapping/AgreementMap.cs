@@ -17,7 +17,7 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Relationships
             this.HasRequired(t => t.ItContract)
-                .WithRequiredPrincipal(t => t.Agreement);
+                .WithOptional(t => t.Agreement);
 
         }
     }

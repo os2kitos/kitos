@@ -17,7 +17,8 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Relationships
             this.HasOptional(t => t.Configuration)
-                .WithRequired(t => t.Municipality);
+                .WithRequired(t => t.Municipality)
+                .WillCascadeOnDelete(true);
 
         }
     }

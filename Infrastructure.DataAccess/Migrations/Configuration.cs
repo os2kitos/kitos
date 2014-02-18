@@ -33,63 +33,59 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Roles
 
-            context.Roles.AddOrUpdate(x => x.Name,
-                                      new Role {Name = "User"},
-                                      new Role {Name = "Admin"}
-                );
-
-            var user = context.Roles.First(role => role.Name == "User");
-            var admin = context.Roles.First(role => role.Name == "Admin");
-
+            var user = new Role {Name = "User"};
+            var admin = new Role {Name = "Admin"};
+            
+            context.Roles.AddOrUpdate(x => x.Name, user, admin);
+            
             #endregion
 
             #region Users
 
-            context.Users.AddOrUpdate(x => x.Email,
-                                      new User
-                                          {
-                                              Name = "Simon Lynn-Pedersen",
-                                              Email = "slp@it-minds.dk",
-                                              Password = "slp",
-                                              Roles = new Collection<Role> {admin, user}
-                                          },
-                                      new User
-                                          {
-                                              Id = 0,
-                                              Name = "Arne Hansen",
-                                              Email = "arne@it-minds.dk",
-                                              Password = "arne",
-                                              Roles = new Collection<Role> {user}
-                                          }
-                );
+            var simon = new User
+            {
+                Name = "Simon Lynn-Pedersen",
+                Email = "slp@it-minds.dk",
+                Password = "slp",
+                Roles = new List<Role> { user, admin }
+            };
+            var arne = new User
+            {
+                Name = "Arne Hansen",
+                Email = "arne@it-minds.dk",
+                Password = "arne",
+                Roles = new List<Role> { user }
+            };
 
-            var simon = context.Users.Single(x => x.Email == "slp@it-minds.dk");
-            var arne = context.Users.Single(x => x.Email == "arne@it-minds.dk");
+            context.Users.AddOrUpdate(x => x.Email, simon, arne);
 
             #endregion
 
             #region Password Reset Requests
-            
+
+            var simonId = context.Users.Single(x => x.Email == "slp@it-minds.dk").Id;
+            var arneId = context.Users.Single(x => x.Email == "arne@it-minds.dk").Id;
+
             context.PasswordResetRequests.AddOrUpdate(x => x.Hash,
                                                       new PasswordResetRequest
-                                                          {
-                                                              //This reset request is fine
-                                                              Id = 0,
-                                                              Hash = "workingRequest", //ofcourse, this should be a hashed string or something obscure
-                                                              Time = DateTime.MaxValue,
-                                                              User = simon
-                                                          },
+                                                      {
+                                                          //This reset request is fine
+                                                          Hash = "workingRequest", //ofcourse, this should be a hashed string or something obscure
+                                                          Time = DateTime.MaxValue,
+                                                          User_Id = simonId
+                                                      },
                                                       new PasswordResetRequest
-                                                          {
-                                                              //This reset request is too old
-                                                              Id = 0,
-                                                              Hash = "outdatedRequest",
-                                                              Time = DateTime.MinValue,
-                                                              User = arne
-                                                          }
+                                                      {
+                                                          //This reset request is too old
+                                                          Hash = "outdatedRequest",
+                                                          Time = DateTime.Now.AddYears(-1), // .MinValue is out-of-range of the SQL datetime type
+                                                          User_Id = arneId
+                                                      }
                 );
 
             #endregion
+
+            base.Seed(context);
         }
     }
 }

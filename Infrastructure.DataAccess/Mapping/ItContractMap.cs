@@ -19,6 +19,7 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.PurchaseForm_Id).HasColumnName("PurchaseForm_Id");
             this.Property(t => t.PaymentModel_Id).HasColumnName("PaymentModel_Id");
             this.Property(t => t.Supplier_Id).HasColumnName("Supplier_Id");
+            this.Property(t => t.Municipality_Id).HasColumnName("Municipality_Id");
 
             // Relationships
             this.HasRequired(t => t.ContractTemplate)
@@ -36,7 +37,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasRequired(t => t.Supplier)
                 .WithMany(t => t.ItContracts)
                 .HasForeignKey(d => d.Supplier_Id);
-
+            this.HasRequired(t => t.Municipality)
+                .WithMany(t => t.ItContracts)
+                .HasForeignKey(d => d.Municipality_Id)
+                .WillCascadeOnDelete(false);
         }
     }
 }

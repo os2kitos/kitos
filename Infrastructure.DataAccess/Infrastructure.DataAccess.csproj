@@ -106,9 +106,9 @@
     <Compile Include="Mapping\UserGuidanceMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
-    <Compile Include="Migrations\201402181323236_Initial.cs" />
-    <Compile Include="Migrations\201402181323236_Initial.Designer.cs">
-      <DependentUpon>201402181323236_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201402181508375_Initial.cs" />
+    <Compile Include="Migrations\201402181508375_Initial.Designer.cs">
+      <DependentUpon>201402181508375_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="PasswordResetRequestRepository.cs" />
@@ -130,8 +130,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201402181323236_Initial.resx">
-      <DependentUpon>201402181323236_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201402181508375_Initial.resx">
+      <DependentUpon>201402181508375_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
