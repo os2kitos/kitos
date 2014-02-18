@@ -105,6 +105,7 @@
     <Compile Include="Mapping\UserGuidanceMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="PasswordResetRequestRepository.cs" />
     <Compile Include="UserRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
