@@ -1,3 +1,4 @@
+using System.Web.Http;
 using System.Web.Security;
 using Core.DomainModel.Text;
 using Core.DomainServices;
@@ -51,6 +52,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IHttpModule>().To<HttpApplicationInitializationHttpModule>();
             
             RegisterServices(kernel);
+            GlobalConfiguration.Configuration.DependencyResolver = new NinjectDependencyResolver(kernel);
             return kernel;
         }
 
@@ -60,7 +62,7 @@ namespace UI.MVC4.App_Start
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel)
         {
-            kernel.Bind<KitosContext>().ToSelf();
+            kernel.Bind<KitosContext>().ToSelf().InRequestScope();
             kernel.Bind<IUserRepository>().To<UserRepository>();
             kernel.Bind<IPasswordResetRequestRepository>().To<PasswordResetRequestRepository>();
 

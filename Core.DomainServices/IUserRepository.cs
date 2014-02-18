@@ -2,11 +2,8 @@
 
 namespace Core.DomainServices
 {
-    public interface IUserRepository
+    public interface IUserRepository : IGenericRepository<User>
     {
-        User GetById(int id);
         User GetByEmail(string email);
-
-        void Update(User user);
     }
 }

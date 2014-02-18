@@ -2,7 +2,7 @@
     ViewBag.Title = "Index";
 }
 
-<div id="navbar-side" class="pull-right col-md-3">
+<div id="navbar-side" class="col-md-3">
     <ul class="nav nav-stacked">
         <li>@Html.ActionLink("Produktoversigt", "Index")</li>
         <li>@Html.ActionLink("Læs mere om fælles datamodel", "Index")</li>
@@ -12,25 +12,58 @@
     </ul>
 </div>
 
-<h2>Hvad er KITOS?</h2>
+<div id="page-text" data-type="wysihtml5" data-pk="1" data-apiurl="api/kitosintroapi/" class="col-md-7"></div>
 
-KITOS er et cloud baseret IT system, som hver enkelt kommune gratis kan tage i brug med henblik på at danne sig et samlet overblik over kommunens:
-<br/>
-<ul>
-    <li>Digitaliseringsgrad af forvaltningens samlede (KLE) opgaver</li>
-    <li>IT projekter</li>
-    <li>IT systemer og snitflader</li>
-    <li>IT kontrakter</li>
-</ul>
+<!--
+    <h2>Hvad er KITOS?</h2>
 
-Hver enkelt kommune kan let klikke af hvilke af ovenstående 'moduler' de ønsker at benytte.
-<br />
-<br />
+    KITOS er et cloud baseret IT system, som hver enkelt kommune gratis kan tage i brug med henblik på at danne sig et samlet overblik over kommunens:
+    <br/>
+    <ul>
+        <li>Digitaliseringsgrad af forvaltningens samlede (KLE) opgaver</li>
+        <li>IT projekter</li>
+        <li>IT systemer og snitflader</li>
+        <li>IT kontrakter</li>
+    </ul>
 
-<h3>Hvordan får min kommune KITOS?</h3>
+    Hver enkelt kommune kan let klikke af hvilke af ovenstående 'moduler' de ønsker at benytte.
+    <br />
+    <br />
 
-@Html.ActionLink("Klik her, hvis jeres kommune ønsker at bruge KITOS", "Index")
+    <h3>Hvordan får min kommune KITOS?</h3>
 
-<br />
-<br />
-Du kan også læse mere om det digitale fællesskab KITOS og hvordan I bliver medlem på <a href="http://os2web.dk/kitos">OS2web.dk/KITOS</a>
+    Html.ActionLink("Klik her, hvis jeres kommune ønsker at bruge KITOS", "Index")
+
+    <br />
+    <br />
+    Du kan også læse mere om det digitale fællesskab KITOS og hvordan I bliver medlem på <a href="http://os2web.dk/kitos">OS2web.dk/KITOS</a>
+    
+-->
+
+@section scripts
+{
+    <script>
+
+        $(document).ready(function () {
+            $.fn.editable.defaults.mode = "inline";
+            $.fn.editable.defaults.ajaxOptions = { type: "PUT" };
+            
+            var pagetext = $("#page-text");
+
+            var url = pagetext.data("apiurl") + pagetext.data("pk");
+
+            pagetext.data("url", url);
+
+            $.get(url, function (result) {
+                pagetext.html(result.Text);
+            }).done(function () {
+                @if (User.IsInRole("Admin"))
+                {
+                    <text>
+                        pagetext.editable();
+                    </text>
+                }
+            });
+        });
+    </script>
+}

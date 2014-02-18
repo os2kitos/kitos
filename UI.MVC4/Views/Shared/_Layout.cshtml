@@ -6,9 +6,11 @@
         <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
         <meta name="viewport" content="width=device-width" />
         @Styles.Render("~/Content/css")
-        <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
+        @Styles.Render("~/Content/bootstrap3-wysihtml5")
         @Scripts.Render("~/bundles/modernizr")
+
+        <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
+        <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/inputs-ext/wysihtml5/bootstrap-wysihtml5-0.0.2/bootstrap-wysihtml5-0.0.2.css" rel="stylesheet"/>
 
     </head>
     <body>
@@ -16,15 +18,20 @@
             <!-- top nav: logo, menu buttons -->
             @Html.Partial("_TopNavigation")
             
-            <div id="page-content">
-                <div class="clearfix"></div>
-
+            <div id="page-content" class="row">
                 @RenderBody()
             </div>
             
         </div>
         @Scripts.Render("~/bundles/jquery")
         @Scripts.Render("~/bundles/jqueryval")
+        @Scripts.Render("~/bundles/bootstrap")
+        @Scripts.Render("~/bundles/wysihtml5")
+        @Scripts.Render("~/bundles/bootstrap3-wysihtml5")
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/inputs-ext/wysihtml5/wysihtml5.js"></script>
+
         @RenderSection("scripts", required: false)
 
     </body>
