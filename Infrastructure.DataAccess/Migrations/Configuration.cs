@@ -76,7 +76,7 @@ namespace Infrastructure.DataAccess.Migrations
                                                               //This reset request is fine
                                                               Id = 0,
                                                               Hash = "workingRequest", //ofcourse, this should be a hashed string or something obscure
-                                                              Time = DateTime.Now.AddHours(-3),
+                                                              Time = DateTime.MaxValue,
                                                               User = simon
                                                           },
                                                       new PasswordResetRequest
@@ -84,7 +84,7 @@ namespace Infrastructure.DataAccess.Migrations
                                                               //This reset request is too old
                                                               Id = 0,
                                                               Hash = "outdatedRequest",
-                                                              Time = DateTime.Now.AddHours(-13),
+                                                              Time = DateTime.MinValue,
                                                               User = arne
                                                           }
                 );

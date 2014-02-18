@@ -30,8 +30,6 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.Users);
             this.HasOptional(t => t.Municipality)
                 .WithMany(t => t.Users);
-            this.HasMany(t => t.PasswordResetRequests)
-                .WithRequired(t => t.User);
 
         }
     }
