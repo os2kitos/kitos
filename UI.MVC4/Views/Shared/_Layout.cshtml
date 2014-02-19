@@ -15,7 +15,8 @@
     </head>
     <body>
         <div id="page-wrapper" class="container-fluid">
-            <!-- top nav: logo, menu buttons -->
+            <!-- NAVBAR
+                ================================================== -->
             @Html.Partial("_TopNavigation")
             
             <div id="page-content" class="row">
@@ -31,6 +32,7 @@
 
         <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/inputs-ext/wysihtml5/wysihtml5.js"></script>
+        <script src="@Url.Content("../../Scripts/holder.js")"></script>
 
         @RenderSection("scripts", required: false)
 

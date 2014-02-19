@@ -3,33 +3,34 @@
 @{
     ViewBag.Title = "Log ind";
 }
-
-<div class="col-md-3">
+<div class="container offset">
+    <div class="col-md-3">
     
-    <h2>Log ind</h2>
+        <h2>Log ind</h2>
 
-    @using (Html.BeginForm("Login", "Authorize", FormMethod.Post, new { @class = "form-horizontal" }))
-    {
-        @Html.AntiForgeryToken()
+        @using (Html.BeginForm("Login", "Authorize", FormMethod.Post, new { @class = "form-horizontal" }))
+        {
+            @Html.AntiForgeryToken()
 
-        <div class="form-group">
-            @Html.LabelFor(m => m.Email, new { @class = "control-label" })
-            @Html.TextBoxFor(m => m.Email, new { @class = "form-control input-sm" })
-            @Html.ValidationMessageFor(m => m.Email)
-        </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.Email)
+            </div>
             
-        <div class="form-group">
-            @Html.LabelFor(m => m.Password, new { @class = "control-label" })
-            @Html.PasswordFor(m => m.Password, new { @class = "form-control input-sm" })
-            @Html.ValidationMessageFor(m => m.Password)
-        </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Password, new { @class = "control-label" })
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.Password)
+            </div>
 
-        <div class="form-group">
-            @Html.CheckBoxFor(m => m.RememberMe)
-            @Html.LabelFor(m => m.RememberMe)
-        </div>
+            <div class="form-group">
+                @Html.CheckBoxFor(m => m.RememberMe)
+                @Html.LabelFor(m => m.RememberMe)
+            </div>
 
 
-        <input type="submit" value="Log ind" class="btn btn-default" />
-    }
+            <input type="submit" value="Log ind" class="btn btn-default" />
+        }
+    </div>
 </div>
