@@ -214,9 +214,11 @@
     </Compile>
     <Compile Include="Infrastructure\CustomMembershipProvider.cs" />
     <Compile Include="Infrastructure\CustomRoleProvider.cs" />
+    <Compile Include="Infrastructure\IUserRepositoryFactory.cs" />
     <Compile Include="Infrastructure\NinjectDependencyResolver.cs" />
     <Compile Include="Infrastructure\NinjectDependencyScope.cs" />
     <Compile Include="Infrastructure\ProviderInitializationHttpModule.cs" />
+    <Compile Include="Infrastructure\UserRepositoryFactory.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\AuthorizeViewModels.cs" />
     <Compile Include="Models\XeditableReturnModel.cs" />

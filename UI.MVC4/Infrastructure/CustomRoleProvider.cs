@@ -12,7 +12,7 @@ namespace UI.MVC4.Infrastructure
     public class CustomRoleProvider : RoleProvider
     {
         [Inject]
-        public IUserRepository UserRepository { get; set; }
+        public IUserRepositoryFactory UserRepositoryFactory { get; set; }
 
         public override void AddUsersToRoles(string[] usernames, string[] roleNames)
         {
@@ -61,10 +61,11 @@ namespace UI.MVC4.Infrastructure
         /// </returns>
         public override string[] GetRolesForUser(string username)
         {
+            var userRepository = UserRepositoryFactory.GetUserRepository();
             if(String.IsNullOrEmpty(username))
                 throw new ProviderException("Bad username: null or empty");
 
-            var user = UserRepository.GetByEmail(username);
+            var user = userRepository.GetByEmail(username);
             if (user == null)
             {
                 return new string[]{};
@@ -85,7 +86,8 @@ namespace UI.MVC4.Infrastructure
         /// <returns>True if and only if user exists and has that role</returns>
         public override bool IsUserInRole(string username, string roleName)
         {
-            var user = UserRepository.GetByEmail(username);
+            var userRepository = UserRepositoryFactory.GetUserRepository();
+            var user = userRepository.GetByEmail(username);
 
             if (user == null) return false;
 
