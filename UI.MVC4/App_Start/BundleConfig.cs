@@ -20,7 +20,8 @@ namespace UI.MVC4
 
             bundles.Add(new ScriptBundle("~/bundles/wysihtml5").Include(
                 "~/Scripts/wysihtml5/parser_rules/advanced.js",
-                "~/Scripts/wysihtml5/wysihtml5-{version}.js"));
+                "~/Scripts/wysihtml5/wysihtml5-{version}.js",
+                "~/Scripts/bootstrap3-wysihtml5.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include("~/Scripts/bootstrap.js"));
 
@@ -29,7 +30,10 @@ namespace UI.MVC4
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
                         "~/Scripts/modernizr-*"));
 
-            bundles.Add(new StyleBundle("~/Content/css").Include("~/Content/bootstrap-cosmo.*", "~/Content/kitos.css"));
+            bundles.Add(new StyleBundle("~/Content/css").Include(
+                "~/Content/bootstrap-cosmo.*", 
+                "~/Content/kitos.css", 
+                "~/Content/bootstrap3-wysihtml5/bootstrap3-wysihtml5.css"));
 
             bundles.Add(new StyleBundle("~/Content/themes/base/css").Include(
                         "~/Content/themes/base/jquery.ui.core.css",
@@ -44,9 +48,6 @@ namespace UI.MVC4
                         "~/Content/themes/base/jquery.ui.datepicker.css",
                         "~/Content/themes/base/jquery.ui.progressbar.css",
                         "~/Content/themes/base/jquery.ui.theme.css"));
-
-            bundles.Add(new ScriptBundle("~/bundles/bootstrap3-wysihtml5").Include("~/Scripts/bootstrap3-wysihtml5.js"));
-            bundles.Add(new StyleBundle("~/Content/bootstrap3-wysihtml5").Include("~/Content/bootstrap3-wysihtml5/bootstrap3-wysihtml5.css"));
         }
     }
 }
