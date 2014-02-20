@@ -63,18 +63,26 @@ namespace UI.MVC4.App_Start
         private static void RegisterServices(IKernel kernel)
         {
             kernel.Bind<KitosContext>().ToSelf().InRequestScope();
-            kernel.Bind<IUserRepository>().To<UserRepository>();
-            kernel.Bind<IPasswordResetRequestRepository>().To<PasswordResetRequestRepository>();
 
-            kernel.Bind(typeof(IGenericRepository<ItContractGuidance>)).To(typeof(GenericRepository<ItContractGuidance>));
-            kernel.Bind(typeof(IGenericRepository<KitosIntro>)).To(typeof(GenericRepository<KitosIntro>));
 
-            kernel.Bind<IMailClient>().To<MailClient>().WithConstructorArgument("host", "localhost").WithConstructorArgument("port", 25);
+            kernel.Bind<IUserRepository>().To<UserRepository>().InRequestScope();
+            kernel.Bind<IPasswordResetRequestRepository>().To<PasswordResetRequestRepository>().InRequestScope();
+
+            kernel.Bind(typeof(IGenericRepository<ItContractGuidance>)).To(typeof(GenericRepository<ItContractGuidance>)).InRequestScope();
+            kernel.Bind(typeof(IGenericRepository<KitosIntro>)).To(typeof(GenericRepository<KitosIntro>)).InRequestScope();
+
+            kernel.Bind<IMailClient>().To<MailClient>().InRequestScope().WithConstructorArgument("host", "localhost").WithConstructorArgument("port", 25);
+
+            kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
             kernel.Bind<RoleProvider>().ToMethod(ctx => Roles.Provider);
             kernel.Bind<IHttpModule>().To<ProviderInitializationHttpModule>();
         }        
+    }
+
+    internal interface IRoleProvider
+    {
     }
 }
