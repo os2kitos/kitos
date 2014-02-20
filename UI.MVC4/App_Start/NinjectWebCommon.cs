@@ -81,8 +81,4 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IHttpModule>().To<ProviderInitializationHttpModule>();
         }        
     }
-
-    internal interface IRoleProvider
-    {
-    }
 }
