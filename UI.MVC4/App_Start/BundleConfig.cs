@@ -18,13 +18,22 @@ namespace UI.MVC4
                         "~/Scripts/jquery.unobtrusive*",
                         "~/Scripts/jquery.validate*"));
 
+            bundles.Add(new ScriptBundle("~/bundles/wysihtml5").Include(
+                "~/Scripts/wysihtml5/parser_rules/advanced.js",
+                "~/Scripts/wysihtml5/wysihtml5-{version}.js",
+                "~/Scripts/bootstrap3-wysihtml5.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include("~/Scripts/bootstrap.js"));
+
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
                         "~/Scripts/modernizr-*"));
 
-            bundles.Add(new StyleBundle("~/Content/css").Include("~/Content/bootstrap-cosmo.*", "~/Content/kitos.css"));
-            //bundles.Add(new StyleBundle("~/Content/css").IncludeDirectory("~/Content/", "*.css", searchSubdirectories: false));
+            bundles.Add(new StyleBundle("~/Content/css").Include(
+                "~/Content/bootstrap-cosmo.*", 
+                "~/Content/kitos.css", 
+                "~/Content/bootstrap3-wysihtml5/bootstrap3-wysihtml5.css"));
 
             bundles.Add(new StyleBundle("~/Content/themes/base/css").Include(
                         "~/Content/themes/base/jquery.ui.core.css",

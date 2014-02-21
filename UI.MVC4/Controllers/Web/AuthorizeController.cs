@@ -103,6 +103,7 @@ namespace UI.MVC4.Controllers
                 };
 
                 _passwordResetRepository.Create(passwordReset);
+                _userRepository.Save();
 
                 var resetLink = "http://kitos.dk/Authorize/ResetPassword?Hash=" + hash;
                 var mailContent = "<a href='" + resetLink + "'>Klik her for at nulstille passwordet for din KITOS bruger</a>. Linket udløber om " + ResetRequestTTL + " timer.";
@@ -166,8 +167,8 @@ namespace UI.MVC4.Controllers
                 //does the reset request still exist?
                 var passwordReset = _passwordResetRepository.GetByHash(resetModel.RequestHash);
 
-                if(!ModelState.IsValid)
-                    throw new Exception();
+                if (!ModelState.IsValid)
+                    return View(resetModel);
 
                 //Everything is cool, set new password
 
@@ -177,9 +178,7 @@ namespace UI.MVC4.Controllers
                 user.Password = resetModel.Password;
 
                 _userRepository.Update(user);
-
-                //delete the (now) used reset request
-                _passwordResetRepository.Delete(passwordReset);
+                _userRepository.Save();
 
             }
             catch

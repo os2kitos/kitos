@@ -8,8 +8,8 @@ namespace UI.MVC4.Infrastructure
 {
     public class CustomMembershipProvider : MembershipProvider
     {
-        [Inject] 
-        public IUserRepository UserRepository { get; set; }
+        [Inject]
+        public IUserRepositoryFactory UserRepositoryFactory { get; set; }
 
         #region not implemented
 
@@ -153,7 +153,8 @@ namespace UI.MVC4.Infrastructure
         
         public override bool ValidateUser(string username, string password)
         {
-            var user = UserRepository.GetByEmail(username);
+            var userRepository = UserRepositoryFactory.GetUserRepository();
+            var user = userRepository.GetByEmail(username);
             if (user == null) return false;
 
             //TODO: HASHING
