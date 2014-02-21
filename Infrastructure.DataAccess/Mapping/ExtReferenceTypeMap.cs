@@ -3,9 +3,9 @@ using Core.DomainModel;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ExternalReferenceTypeMap : EntityTypeConfiguration<ExternalReferenceType>
+    public class ExtReferenceTypeMap : EntityTypeConfiguration<ExtReferenceType>
     {
-        public ExternalReferenceTypeMap()
+        public ExtReferenceTypeMap()
         {
             // Primary Key
             this.HasKey(t => t.Id);
@@ -15,7 +15,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired();
 
             // Table & Column Mappings
-            this.ToTable("ExternalReferenceType");
+            this.ToTable("ExtReferenceType");
             this.Property(t => t.Id).HasColumnName("Id");
             this.Property(t => t.Name).HasColumnName("Name");
         }
