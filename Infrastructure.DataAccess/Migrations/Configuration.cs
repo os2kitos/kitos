@@ -14,6 +14,10 @@ namespace Infrastructure.DataAccess.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
+            SetSqlGenerator("MySql.Data.MySqlClient", new MySql.Data.Entity.MySqlMigrationSqlGenerator());
+
+            //Use a smaller key size for our migration history table. See MySqlHistoryContext.cs
+            SetHistoryContextFactory("MySql.Data.MySqlClient", (conn, schema) => new MySqlHistoryContext(conn, schema));
         }
 
         protected override void Seed(Infrastructure.DataAccess.KitosContext context)
@@ -58,6 +62,8 @@ namespace Infrastructure.DataAccess.Migrations
             };
 
             context.Users.AddOrUpdate(x => x.Email, simon, arne);
+
+            context.SaveChanges();
 
             #endregion
 

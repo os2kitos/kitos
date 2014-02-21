@@ -3,9 +3,9 @@ using Core.DomainModel;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ExternalReferenceMap : EntityTypeConfiguration<ExternalReference>
+    public class ExtReferenceMap : EntityTypeConfiguration<ExtReference>
     {
-        public ExternalReferenceMap()
+        public ExtReferenceMap()
         {
             // Primary Key
             this.HasKey(t => t.Id);
@@ -15,22 +15,22 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired();
 
             // Table & Column Mappings
-            this.ToTable("ExternalReference");
+            this.ToTable("ExtReference");
             this.Property(t => t.Id).HasColumnName("Id");
             this.Property(t => t.Value).HasColumnName("Value");
             this.Property(t => t.ItProject_Id).HasColumnName("ItProject_Id");
-            this.Property(t => t.ExternalReferenceType_Id).HasColumnName("ExternalReferenceType_Id");
+            this.Property(t => t.ExtReferenceType_Id).HasColumnName("ExtReferenceType_Id");
             this.Property(t => t.ItSystem_Id).HasColumnName("ItSystem_Id");
 
             // Relationships
-            this.HasRequired(t => t.ExternalReferenceType)
-                .WithMany(t => t.ExternalReferences)
-                .HasForeignKey(d => d.ExternalReferenceType_Id);
+            this.HasRequired(t => t.ExtReferenceType)
+                .WithMany(t => t.ExtReferences)
+                .HasForeignKey(d => d.ExtReferenceType_Id);
             this.HasRequired(t => t.ItProject)
-                .WithMany(t => t.ExternalReferences)
+                .WithMany(t => t.ExtReferences)
                 .HasForeignKey(d => d.ItProject_Id);
             this.HasRequired(t => t.ItSystem)
-                .WithMany(t => t.ExternalReferences)
+                .WithMany(t => t.ExtReferences)
                 .HasForeignKey(d => d.ItSystem_Id);
 
         }

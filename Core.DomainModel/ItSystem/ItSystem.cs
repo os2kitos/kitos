@@ -8,7 +8,7 @@ namespace Core.DomainModel.ItSystem
         {
             this.BasicDatas = new List<BasicData>();
             this.Components = new List<Component>();
-            this.ExternalReferences = new List<ExternalReference>();
+            this.ExtReferences = new List<ExtReference>();
             this.Interfaces = new List<Interface>();
             this.ItSystems1 = new List<ItSystem>();
             this.KLEs = new List<KLE>();
@@ -22,7 +22,7 @@ namespace Core.DomainModel.ItSystem
 
         public virtual ICollection<BasicData> BasicDatas { get; set; }
         public virtual ICollection<Component> Components { get; set; }
-        public virtual ICollection<ExternalReference> ExternalReferences { get; set; } // TODO
+        public virtual ICollection<ExtReference> ExtReferences { get; set; } // TODO
         public virtual Functionality Functionality { get; set; }
         public virtual Infrastructure Infrastructure { get; set; }
         public virtual ICollection<Interface> Interfaces { get; set; }
