@@ -30,8 +30,8 @@ namespace Infrastructure.DataAccess
         public DbSet<Department> Departments { get; set; }
         public DbSet<Economy> Economies { get; set; }
         public DbSet<Environment> Environments { get; set; }
-        public DbSet<ExternalReference> ExternalReferences { get; set; }
-        public DbSet<ExternalReferenceType> ExternalReferenceTypes { get; set; }
+        public DbSet<ExtReference> ExtReferences { get; set; }
+        public DbSet<ExtReferenceType> ExtReferenceTypes { get; set; }
         public DbSet<Functionality> Functionalities { get; set; }
         public DbSet<Goal> Goals { get; set; }
         public DbSet<GoalStatus> GoalStatus { get; set; }
@@ -85,8 +85,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new DepartmentMap());
             modelBuilder.Configurations.Add(new EconomyMap());
             modelBuilder.Configurations.Add(new EnvironmentMap());
-            modelBuilder.Configurations.Add(new ExternalReferenceMap());
-            modelBuilder.Configurations.Add(new ExternalReferenceTypeMap());
+            modelBuilder.Configurations.Add(new ExtReferenceMap());
+            modelBuilder.Configurations.Add(new ExtReferenceTypeMap());
             modelBuilder.Configurations.Add(new FunctionalityMap());
             modelBuilder.Configurations.Add(new GoalMap());
             modelBuilder.Configurations.Add(new GoalStatusMap());

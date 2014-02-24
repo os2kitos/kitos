@@ -44,8 +44,8 @@
   <ItemGroup>
     <Compile Include="Configuration.cs" />
     <Compile Include="Department.cs" />
-    <Compile Include="ExternalReference.cs" />
-    <Compile Include="ExternalReferenceType.cs" />
+    <Compile Include="ExtReference.cs" />
+    <Compile Include="ExtReferenceType.cs" />
     <Compile Include="ItContract\Agreement.cs" />
     <Compile Include="ItContract\ContractTemplate.cs" />
     <Compile Include="ItContract\ContractType.cs" />
