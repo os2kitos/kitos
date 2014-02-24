@@ -1,8 +1,4 @@
-﻿using System;
-using System.Data.Entity;
-using System.Linq;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+﻿using System.Linq;
 using Core.DomainServices;
 using Core.DomainModel;
 

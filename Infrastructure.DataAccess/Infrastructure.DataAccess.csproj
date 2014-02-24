@@ -46,7 +46,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FakeKitosIntroRepository.cs" />
     <Compile Include="GenericRepository.cs" />
     <Compile Include="KitosContext.cs" />
     <Compile Include="Mapping\AgreementMap.cs" />
@@ -70,14 +69,9 @@
     <Compile Include="Mapping\HostMap.cs" />
     <Compile Include="Mapping\InfrastructureMap.cs" />
     <Compile Include="Mapping\InterfaceMap.cs" />
-    <Compile Include="Mapping\ItContractGuidanceMap.cs" />
     <Compile Include="Mapping\ItContractMap.cs" />
-    <Compile Include="Mapping\ItPreAnalysisMap.cs" />
-    <Compile Include="Mapping\ItProjectGuidanceMap.cs" />
     <Compile Include="Mapping\ItProjectMap.cs" />
-    <Compile Include="Mapping\ItSystemGuidanceMap.cs" />
     <Compile Include="Mapping\ItSystemMap.cs" />
-    <Compile Include="Mapping\KitosIntroMap.cs" />
     <Compile Include="Mapping\KLEMap.cs" />
     <Compile Include="Mapping\LocalizationMap.cs" />
     <Compile Include="Mapping\MilestoneMap.cs" />
@@ -95,21 +89,24 @@
     <Compile Include="Mapping\ResourcesMap.cs" />
     <Compile Include="Mapping\RiskMap.cs" />
     <Compile Include="Mapping\RoleMap.cs" />
-    <Compile Include="Mapping\SecuritySchemeMap.cs" />
     <Compile Include="Mapping\ShipNoticeMap.cs" />
     <Compile Include="Mapping\StakeholdersMap.cs" />
     <Compile Include="Mapping\SuperUserMap.cs" />
     <Compile Include="Mapping\SupplierMap.cs" />
     <Compile Include="Mapping\TaskSupportMap.cs" />
     <Compile Include="Mapping\TechnologyMap.cs" />
+    <Compile Include="Mapping\TextMap.cs" />
     <Compile Include="Mapping\UserAdministrationMap.cs" />
     <Compile Include="Mapping\PersonMap.cs" />
-    <Compile Include="Mapping\UserGuidanceMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
     <Compile Include="Migrations\201402181508375_Initial.cs" />
     <Compile Include="Migrations\201402181508375_Initial.Designer.cs">
       <DependentUpon>201402181508375_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201402241313065_Text.cs" />
+    <Compile Include="Migrations\201402241313065_Text.Designer.cs">
+      <DependentUpon>201402241313065_Text.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="PasswordResetRequestRepository.cs" />
@@ -133,6 +130,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201402181508375_Initial.resx">
       <DependentUpon>201402181508375_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201402241313065_Text.resx">
+      <DependentUpon>201402241313065_Text.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

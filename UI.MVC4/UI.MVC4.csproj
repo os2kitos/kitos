@@ -197,17 +197,11 @@
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\API\KitosIntroApiController.cs" />
     <Compile Include="Controllers\Web\AccountController.cs" />
     <Compile Include="Controllers\Web\AuthorizeController.cs" />
-    <Compile Include="Controllers\API\ItProjectGuidanceApiController.cs" />
     <Compile Include="Controllers\API\GenericApiController.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
-    <Compile Include="Controllers\API\ItContractGuidanceApiController.cs" />
-    <Compile Include="Controllers\API\ItPreAnalysisApiController.cs" />
-    <Compile Include="Controllers\API\ItSystemGuidanceApiController.cs" />
-    <Compile Include="Controllers\API\SecuritySchemeApiController.cs" />
-    <Compile Include="Controllers\API\UserGuidanceApiController.cs" />
+    <Compile Include="Controllers\API\TextController.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

@@ -1,31 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Core.DomainModel;
 using Core.DomainServices;
 
 namespace UI.MVC4.Controllers
 {
-    public abstract class GenericApiController<T> : ApiController 
-        where T : class
+    public abstract class GenericApiController<TModel, TKeyType> : ApiController // TODO perhaps it's possible to infer the TKeyType from TModel somehow
+        where TModel : class, IEntity<TKeyType>
     {
-        private readonly IGenericRepository<T> _repository;
+        private readonly IGenericRepository<TModel> _repository;
 
-        protected GenericApiController(IGenericRepository<T> repository)
+        protected GenericApiController(IGenericRepository<TModel> repository)
         {
             _repository = repository;
         }
 
         // GET api/T
-        public T Get(int id)
+        public TModel Get(TKeyType id)
         {
             return _repository.GetById(id);
         }
 
         // POST api/T
-        public HttpResponseMessage Post(T item)
+        public HttpResponseMessage Post(TModel item)
         {
             try
             {
@@ -33,7 +32,7 @@ namespace UI.MVC4.Controllers
                 _repository.Save();
 
                 var msg = new HttpResponseMessage(HttpStatusCode.Created);
-                //msg.Headers.Location = new Uri(Request.RequestUri + newItem.ID.ToString()); TODO
+                msg.Headers.Location = new Uri(Request.RequestUri + item.Id.ToString());
                 return msg;
             }
             catch (Exception)
@@ -43,9 +42,9 @@ namespace UI.MVC4.Controllers
         }
 
         // PUT api/T
-        public HttpResponseMessage Put(int id, T item)
+        public HttpResponseMessage Put(TKeyType id, TModel item)
         {
-            // item.Id = id; TODO
+            item.Id = id;
             try
             {
                 _repository.Update(item);
@@ -60,7 +59,7 @@ namespace UI.MVC4.Controllers
         }
 
         // DELETE api/T
-        public HttpResponseMessage Delete(int id)
+        public HttpResponseMessage Delete(TKeyType id)
         {
             try
             {

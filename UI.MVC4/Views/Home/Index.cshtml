@@ -83,8 +83,8 @@
             <img class="featurette-image img-responsive" data-src="holder.js/500x500/auto" alt="Generic placeholder image">
         </div>
         <div class="col-md-7">
-            <h2 class="featurette-heading">Hvad er KITOS? <span class="text-muted">KITOS er et cloud baseret IT system, som hver enkelt kommune gratis kan tage i brug.</span></h2>
-            <p class="lead"><div id="page-text" data-type="wysihtml5" data-pk="1" data-apiurl="api/kitosintroapi/" class="col-md-7"></div></p>
+            <h2 class="featurette-heading" data-type="wysihtml5" data-pk="intro-head" data-name="description" data-url="/api/text">Hvad er KITOS? <span class="text-muted">KITOS er et cloud baseret IT system, som hver enkelt kommune gratis kan tage i brug.</span></h2>
+            <p class="lead" data-type="wysihtml5" data-pk="intro-body" data-name="description" data-url="/api/text"></p>
         </div>
     </div>
 
@@ -102,44 +102,29 @@
     
     <hr class="featurette-divider">
 
-    <div class="row featurette">
-        <div class="col-md-5">
-            <img class="featurette-image img-responsive" data-src="holder.js/500x500/auto" alt="Generic placeholder image">
-        </div>
-        <div class="col-md-7">
-            <h2 class="featurette-heading">Læs mere om den fælles datamodel. <span class="text-muted">Nulla non metus auctor fringilla.</span></h2>
-            <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
-        </div>
-    </div>
-    
-    <hr class="featurette-divider">
-
     <!-- /END THE FEATURETTES -->
 </div>
 
 @section scripts
 {
     <script>
-
         $(document).ready(function () {
-            $.fn.editable.defaults.mode = "inline";
-            $.fn.editable.defaults.ajaxOptions = { type: "PUT" };
+            $.fn.editable.defaults.mode = 'inline';
+            $.fn.editable.defaults.ajaxOptions = { type: 'put', dataType: 'json' };
+            @if (!User.IsInRole("Admin"))
+            {
+                <text>
+                $.fn.editable.defaults.disabled = true;
+                </text>
+            }
             
-            var pagetext = $("#page-text");
-
-            var url = pagetext.data("apiurl") + pagetext.data("pk");
-
-            pagetext.data("url", url);
-
-            $.get(url, function (result) {
-                pagetext.html(result.Text);
-            }).done(function () {
-                @if (User.IsInRole("Admin"))
-                {
-                    <text>
-                        pagetext.editable();
-                    </text>
-                }
+            $('[data-type="wysihtml5"]').each(function () {
+                var self = $(this);
+                $.get(self.data("url") + "/" + self.data("pk"), function (result) {
+                    self.html(result.Description);
+                }).done(function() {
+                    self.editable();
+                });
             });
         });
     </script>

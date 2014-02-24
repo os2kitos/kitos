@@ -2,20 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Core.DomainModel;
 
 namespace Core.DomainServices
 {
-    public interface IGenericRepository<T> : IDisposable
-        where T : class
+    public interface IGenericRepository<TModel> : IDisposable
+        where TModel : class
     {
-        IEnumerable<T> Get(
-            Expression<Func<T, bool>> filter = null,
-            Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+        IEnumerable<TModel> Get(
+            Expression<Func<TModel, bool>> filter = null,
+            Func<IQueryable<TModel>, IOrderedQueryable<TModel>> orderBy = null,
             string includeProperties = "");
-        T GetById(int id);
-        void Insert(T entity);
-        void DeleteById(int id);
-        void Update(T entity);
+        TModel GetById<TKeyType>(TKeyType id);
+        void Insert(TModel entity);
+        void DeleteById<TKeyType>(TKeyType id);
+        void Update(TModel entity);
         void Save();
     }
 }
