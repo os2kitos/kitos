@@ -3,7 +3,7 @@ namespace Infrastructure.DataAccess.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class MySQLInitial : DbMigration
+    public partial class Initial : DbMigration
     {
         public override void Up()
         {
@@ -610,65 +610,11 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ItContract_Id);
             
             CreateTable(
-                "dbo.ItContractGuidance",
+                "dbo.Text",
                 c => new
                     {
-                        Id = c.Int(nullable: false, identity: true),
-                        Text = c.String(unicode: false),
-                    })
-                .PrimaryKey(t => t.Id);
-            
-            CreateTable(
-                "dbo.ItPreAnalysis",
-                c => new
-                    {
-                        Id = c.Int(nullable: false, identity: true),
-                        Text = c.String(unicode: false),
-                    })
-                .PrimaryKey(t => t.Id);
-            
-            CreateTable(
-                "dbo.ItProjectGuidance",
-                c => new
-                    {
-                        Id = c.Int(nullable: false, identity: true),
-                        Text = c.String(unicode: false),
-                    })
-                .PrimaryKey(t => t.Id);
-            
-            CreateTable(
-                "dbo.ItSystemGuidance",
-                c => new
-                    {
-                        Id = c.Int(nullable: false, identity: true),
-                        Text = c.String(unicode: false),
-                    })
-                .PrimaryKey(t => t.Id);
-            
-            CreateTable(
-                "dbo.KitosIntro",
-                c => new
-                    {
-                        Id = c.Int(nullable: false, identity: true),
-                        Text = c.String(unicode: false),
-                    })
-                .PrimaryKey(t => t.Id);
-            
-            CreateTable(
-                "dbo.SecurityScheme",
-                c => new
-                    {
-                        Id = c.Int(nullable: false, identity: true),
-                        Text = c.String(unicode: false),
-                    })
-                .PrimaryKey(t => t.Id);
-            
-            CreateTable(
-                "dbo.UserGuidance",
-                c => new
-                    {
-                        Id = c.Int(nullable: false, identity: true),
-                        Text = c.String(unicode: false),
+                        Id = c.String(nullable: false, maxLength: 128, unicode: false, storeType: "nvarchar"),
+                        Description = c.String(unicode: false),
                     })
                 .PrimaryKey(t => t.Id);
             
@@ -816,13 +762,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ItContract", new[] { "ContractType_Id" });
             DropIndex("dbo.ItContract", new[] { "ContractTemplate_Id" });
             DropTable("dbo.UserRoles");
-            DropTable("dbo.UserGuidance");
-            DropTable("dbo.SecurityScheme");
-            DropTable("dbo.KitosIntro");
-            DropTable("dbo.ItSystemGuidance");
-            DropTable("dbo.ItProjectGuidance");
-            DropTable("dbo.ItPreAnalysis");
-            DropTable("dbo.ItContractGuidance");
+            DropTable("dbo.Text");
             DropTable("dbo.ShipNotice");
             DropTable("dbo.PurchaseForm");
             DropTable("dbo.PaymentModel");
