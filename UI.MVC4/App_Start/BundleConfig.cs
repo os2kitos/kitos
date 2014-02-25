@@ -33,6 +33,7 @@ namespace UI.MVC4
             bundles.Add(new StyleBundle("~/Content/css").Include(
                 "~/Content/bootstrap-cosmo.*", 
                 "~/Content/kitos.css", 
+                "~/Content/carousel.css",
                 "~/Content/bootstrap3-wysihtml5/bootstrap3-wysihtml5.css"));
 
             bundles.Add(new StyleBundle("~/Content/themes/base/css").Include(

@@ -1,6 +1,6 @@
 using System.Web.Http;
 using System.Web.Security;
-using Core.DomainModel.Text;
+using Core.DomainModel;
 using Core.DomainServices;
 using Core.ApplicationServices;
 using Infrastructure.DataAccess;
@@ -52,7 +52,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IHttpModule>().To<HttpApplicationInitializationHttpModule>();
             
             RegisterServices(kernel);
-            GlobalConfiguration.Configuration.DependencyResolver = new NinjectDependencyResolver(kernel);
+            GlobalConfiguration.Configuration.DependencyResolver = new NinjectDependencyResolver(kernel); // non API controllers
             return kernel;
         }
 
@@ -64,12 +64,9 @@ namespace UI.MVC4.App_Start
         {
             kernel.Bind<KitosContext>().ToSelf().InRequestScope();
 
-
+            kernel.Bind<IGenericRepository<Text>>().To<GenericRepository<Text>>().InRequestScope();
             kernel.Bind<IUserRepository>().To<UserRepository>().InRequestScope();
             kernel.Bind<IPasswordResetRequestRepository>().To<PasswordResetRequestRepository>().InRequestScope();
-
-            kernel.Bind(typeof(IGenericRepository<ItContractGuidance>)).To(typeof(GenericRepository<ItContractGuidance>)).InRequestScope();
-            kernel.Bind(typeof(IGenericRepository<KitosIntro>)).To(typeof(GenericRepository<KitosIntro>)).InRequestScope();
 
             kernel.Bind<IMailClient>().To<MailClient>().InRequestScope().WithConstructorArgument("host", "localhost").WithConstructorArgument("port", 25);
 
@@ -79,6 +76,6 @@ namespace UI.MVC4.App_Start
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
             kernel.Bind<RoleProvider>().ToMethod(ctx => Roles.Provider);
             kernel.Bind<IHttpModule>().To<ProviderInitializationHttpModule>();
-        }        
+        }
     }
 }

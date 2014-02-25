@@ -4,14 +4,15 @@
     background-color: #fafafa;
 }
 div#page-wrapper {
+    min-width: 1024px;
+    max-width: 1280px;
     margin: 0px auto;
-
     padding: 0px;
 }
 div#page-content {
     min-width: 1024px;
     max-width: 1280px;
-    margin: 0px auto;
+    margin: 120px auto;
     padding: 0px 5px 0px 10px;
 }
 

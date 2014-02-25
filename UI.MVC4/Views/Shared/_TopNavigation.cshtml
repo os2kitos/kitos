@@ -1,53 +1,59 @@
-﻿<nav id="navbar-top" class="navbar navbar-default navbar-static-top" role="navigation">
+﻿<div class="navbar-wrapper">
     <div class="container-fluid">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="/">
-                <img src="/Images/logo.png" alt="KITOS" title="Kommunernes IT Overbliks System" />
-            </a>
-        </div>
+        <nav id="navbar-top" class="navbar navbar-inverse navbar-static-top" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/">KITOS</a>
+                </div>
+                <div class="navbar-collapse collapse">
+                    @if (Request.IsAuthenticated)
+                    {
+                        <ul class="nav navbar-nav">
+                            <li class="double-line">@Html.ActionLink("Digitaliseringsgrad af opgaveportefølje", "Index", "Home")</li>
+                            <li class="active">@Html.ActionLink("IT Projekter", "Index", "Home")</li>
+                            <li>@Html.ActionLink("IT Systemer", "Index", "Home")</li>
+                            <li>@Html.ActionLink("IT Kontrakter", "Index", "Home")</li>
+                        </ul>
+                        <div class="navbar-text navbar-text-small navbar-right navbar-complex">
+                            @using (Html.BeginForm("Logout", "Authorize", FormMethod.Post, new { @class = "form-inline" }))
+                            {
+                                @Html.AntiForgeryToken()
 
-        @if (Request.IsAuthenticated)
-        {
-            <ul class="nav navbar-nav">
-                <li class="double-line">@Html.ActionLink("Digitaliseringsgrad af opgaveportefølje", "Index", "Home")</li>
-                <li class="active">@Html.ActionLink("IT Projekter", "Index", "Home")</li>
-                <li>@Html.ActionLink("IT Systemer", "Index", "Home")</li>
-                <li>@Html.ActionLink("IT Kontrakter", "Index", "Home")</li>
-            </ul>
-            <div class="navbar-text navbar-text-small navbar-right navbar-complex">
-                @using (Html.BeginForm("Logout", "Authorize", FormMethod.Post, new { @class = "form-inline" }))
-                {
-                    @Html.AntiForgeryToken()
-
-                    <div class="form-group small">
-                        @Html.ActionLink(User.Identity.Name, "UserPage", "Home", null, new { @class = "btn btn-xs btn-link" })
-                        <input type="submit" value="Log ud" class="btn btn-xs btn-link" />
-                    </div>
+                                <div class="form-group small">
+                                    @Html.ActionLink(User.Identity.Name, "UserPage", "Home", null, new { @class = "btn btn-xs btn-link" })
+                                    <input type="submit" value="Log ud" class="btn btn-xs btn-link" />
+                                </div>
+                            }
+                            <select>
+                                <option>Vælg organisation</option>
+                            </select>
+                            <br/>
+                            <a href="#">Vidensdeling</a> | <a href="#">Administration</a>
+                            <br />
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="navbar-text navbar-text-large broken-white">
+                            <strong class="white">K</strong>ommunernes
+                            <strong class="white">IT</strong>
+                            <strong class="light-blue">O</strong>verbliks 
+                            <strong class="light-blue">S</strong>ystem
+                        </div>
             
-                }
-                <select>
-                    <option>Vælg organisation</option>
-                </select>
-                <br/>
-                <a href="#">Vidensdeling</a> | <a href="#">Administration</a>
-                <br />
+                        <div class="navbar-text navbar-text-small navbar-right">
+                            @Html.ActionLink("Log ind", "Login", "Authorize", null, new {@class = "btn btn-xs btn-link"})
+                            @Html.ActionLink("Glemt password?", "ForgotPassword", "Authorize", null, new {@class = "btn btn-xs btn-link"})
+                        </div>
+                    }
+                </div>
             </div>
-        }
-        else
-        {
-            
-            <div class="navbar-text navbar-text-large broken-white">
-                <strong class="white">K</strong>ommunernes 
-                <strong class="white">IT</strong>
-                <strong class="light-blue">O</strong>verbliks 
-                <strong class="light-blue">S</strong>ystem
-            </div>
-            
-            <div class="navbar-text navbar-text-small navbar-right">
-                @Html.ActionLink("Log ind", "Login", "Authorize", null, new {@class = "btn btn-xs btn-link"})
-                @Html.ActionLink("Glemt password?", "ForgotPassword", "Authorize", null, new {@class = "btn btn-xs btn-link"})
-            </div>
-            
-        }
+        </nav>
     </div>
-</nav>
+</div>

@@ -42,7 +42,7 @@ namespace Infrastructure.DataAccess
             return orderBy != null ? orderBy(query).ToList() : query.ToList();
         }
 
-        public T GetById(int id)
+        public T GetById<TKeyType>(TKeyType id)
         {
             return _dbSet.Find(id);
         }
@@ -52,7 +52,7 @@ namespace Infrastructure.DataAccess
             _dbSet.Add(entity);
         }
 
-        public void DeleteById(int id)
+        public void DeleteById<TKeyType>(TKeyType id)
         {
             var entityToDelete = _dbSet.Find(id);
             _dbSet.Remove(entityToDelete);
