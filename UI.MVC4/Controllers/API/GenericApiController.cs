@@ -18,14 +18,14 @@ namespace UI.MVC4.Controllers
         }
 
         // GET api/T
-        public TModel Get(TKeyType id)
+        public virtual TModel Get(TKeyType id)
         {
             return Repository.GetById(id);
         }
 
         // POST api/T
         [Authorize(Roles = "Admin")]
-        public HttpResponseMessage Post(TModel item)
+        public virtual HttpResponseMessage Post(TModel item)
         {
             try
             {
@@ -44,7 +44,7 @@ namespace UI.MVC4.Controllers
 
         // PUT api/T
         [Authorize(Roles = "Admin")]
-        public HttpResponseMessage Put(TKeyType id, TModel item)
+        public virtual HttpResponseMessage Put(TKeyType id, TModel item)
         {
             item.Id = id;
             try
@@ -62,7 +62,7 @@ namespace UI.MVC4.Controllers
 
         // DELETE api/T
         [Authorize(Roles = "Admin")]
-        public HttpResponseMessage Delete(TKeyType id)
+        public virtual HttpResponseMessage Delete(TKeyType id)
         {
             try
             {

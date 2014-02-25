@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel
 {
-    public class User
+    public class User : IEntity<int>
     {
         public User()
         {

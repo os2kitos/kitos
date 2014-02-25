@@ -5,7 +5,7 @@ using Core.DomainModel;
 using Core.DomainServices;
 using UI.MVC4.Models;
 
-namespace UI.MVC4.Controllers
+namespace UI.MVC4.Controllers.Web
 {
     public class AuthorizeController : Controller
     {
@@ -96,8 +96,7 @@ namespace UI.MVC4.Controllers
                 var hash = FormsAuthentication.HashPasswordForStoringInConfigFile(now + user.Email, "MD5");
                 var passwordReset = new PasswordResetRequest
                 {
-                    Id = 0,
-                    Hash = hash,
+                    Id = hash,
                     Time = now,
                     User = user
                 };

@@ -72,18 +72,18 @@ namespace Infrastructure.DataAccess.Migrations
             var simonId = context.Users.Single(x => x.Email == "slp@it-minds.dk").Id;
             var arneId = context.Users.Single(x => x.Email == "arne@it-minds.dk").Id;
 
-            context.PasswordResetRequests.AddOrUpdate(x => x.Hash,
+            context.PasswordResetRequests.AddOrUpdate(x => x.Id,
                                                       new PasswordResetRequest
                                                       {
                                                           //This reset request is fine
-                                                          Hash = "workingRequest", //ofcourse, this should be a hashed string or something obscure
+                                                          Id = "workingRequest", //ofcourse, this should be a hashed string or something obscure
                                                           Time = DateTime.MaxValue,
                                                           User_Id = simonId
                                                       },
                                                       new PasswordResetRequest
                                                       {
                                                           //This reset request is too old
-                                                          Hash = "outdatedRequest",
+                                                          Id = "outdatedRequest",
                                                           Time = DateTime.Now.AddYears(-1), // .MinValue is out-of-range of the SQL datetime type
                                                           User_Id = arneId
                                                       }

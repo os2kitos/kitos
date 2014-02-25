@@ -27,7 +27,7 @@ namespace Infrastructure.DataAccess
 
         public PasswordResetRequest GetByHash(string hash)
         {
-            return _resets.SingleOrDefault(r => r.Hash == hash);
+            return _resets.SingleOrDefault(r => r.Id == hash);
         }
 
         public void Delete(PasswordResetRequest passwordReset)
