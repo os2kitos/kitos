@@ -11,10 +11,14 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasKey(t => t.Id);
 
             // Properties
+            this.Property(t => t.IsSelected)
+                .IsRequired();
+
             // Table & Column Mappings
             this.ToTable("Configuration");
             this.Property(t => t.Id).HasColumnName("Id");
             this.Property(t => t.IsSelected).HasColumnName("IsSelected");
+
         }
     }
 }

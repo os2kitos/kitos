@@ -1,0 +1,167 @@
+﻿@{
+    ViewBag.Title = "Admin";
+}
+
+<h2>Admin</h2>
+
+<!-- Nav tabs -->
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#digital" data-toggle="tab">Digitaliseringsgrad</a></li>
+  <li><a href="#projekt" data-toggle="tab">IT Projekter</a></li>
+  <li><a href="#system" data-toggle="tab">IT Systemer</a></li>
+  <li><a href="#kontrakt" data-toggle="tab">IT Kontrakter</a></li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+    <div class="tab-pane active" id="digital">
+        Digitaliseringsgrad
+    </div>
+    <div class="tab-pane" id="projekt">
+        <form class="form-horizontal" role="form">
+            <div class="form-group">
+                <label for="input-url" class="col-sm-2 control-label">IT Projekt vejledning</label>
+                <div class="col-sm-5">
+                    <input type="url" class="form-control" id="input-url" />
+                </div>
+            </div>
+            
+            <div class="well">
+                <h4>Reference</h4>
+                <div class="form-group">
+                    <label for="input-esdh" class="col-sm-2 control-label">ESDH ref.</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="input-esdh" />
+                        <p class="help-block">Ref. til ESDH system, hvor der er projektdokumenter</p>
+                    </div>
+                </div>
+            
+                <div class="form-group">
+                    <label for="input-cmdb" class="col-sm-2 control-label">CMDB ref.</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="input-cmdb" />
+                        <p class="help-block">Ref. til CMDB o.l. system, hvor der er projektdokumenter</p>
+                    </div>
+                </div>
+            
+                <div class="form-group">
+                    <label for="input-mappe" class="col-sm-2 control-label">Mappe ref.</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="input-mappe" />
+                        <p class="help-block">Ref. til andre steder, hvor der er projektdokumenter</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="well">
+                <h4>Projekttype</h4>
+                <div class="form-group">
+                    <label for="input-projekt" class="col-sm-2 control-label">IT Projekt</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="input-projekt" />
+                        <p class="help-block">...</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="input-program" class="col-sm-2 control-label">IT Program</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="input-program" />
+                        <p class="help-block">...</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="input-omraade" class="col-sm-2 control-label">Indsatsområde</label>
+                    <div class="col-sm-5">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="input-omraade" />
+                            <span class="input-group-addon">
+                                <input type="checkbox" title="Medtag" />
+                            </span>
+                        </div>
+                        <p class="help-block">En samlebetegnelse for projekter, som ikke er et IT Program</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="well">
+                <h4>Projektfase</h4>
+                <div class="form-group">
+                    <label for="input-fase1" class="col-sm-2 control-label">Afventer</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="input-fase1" />
+                        <p class="help-block">...</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="input-fase2" class="col-sm-2 control-label">Foranalyse</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="input-fase2" />
+                        <p class="help-block">...</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="input-fase3" class="col-sm-2 control-label">Gennemførsel</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="input-fase3" />
+                        <p class="help-block">...</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="input-fase4" class="col-sm-2 control-label">Overlevering</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="input-fase4" />
+                        <p class="help-block">...</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="input-fase5" class="col-sm-2 control-label">Drift</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="input-fase5" />
+                        <p class="help-block">...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <hr/>
+            
+            <div class="well">
+                <h4>Portfølje</h4>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-5">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" value="">
+                                Medtag IKKE fanen 'Portfølje'
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-5">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" value="">
+                                Medtag kolonnen 'BC'
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+    </div>
+    <div class="tab-pane" id="system">
+        IT Systemer
+    </div>
+    <div class="tab-pane" id="kontrakt">
+        IT Kontrakter
+    </div>
+</div>

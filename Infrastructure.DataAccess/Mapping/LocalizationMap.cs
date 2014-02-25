@@ -11,16 +11,12 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasKey(t => t.Id);
 
             // Properties
-            this.Property(t => t.Literal)
-                .IsRequired();
-
             this.Property(t => t.Value)
                 .IsRequired();
 
             // Table & Column Mappings
             this.ToTable("Localization");
             this.Property(t => t.Id).HasColumnName("Id");
-            this.Property(t => t.Literal).HasColumnName("Literal");
             this.Property(t => t.Value).HasColumnName("Value");
             this.Property(t => t.Municipality_Id).HasColumnName("Municipality_Id");
 
