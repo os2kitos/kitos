@@ -211,7 +211,10 @@
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\API\MunicipalityController.cs" />
+    <Compile Include="Controllers\API\UserController.cs" />
     <Compile Include="Controllers\Web\AccountController.cs" />
+    <Compile Include="Controllers\Web\AdministrationController.cs" />
     <Compile Include="Controllers\Web\AuthorizeController.cs" />
     <Compile Include="Controllers\API\GenericApiController.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
@@ -371,6 +374,7 @@
     <Content Include="Views\Authorize\EmailSent.cshtml" />
     <Content Include="Views\Shared\_TopNavigation.old.cshtml" />
     <Content Include="Views\Shared\_TopNavigation.cshtml" />
+    <Content Include="Views\Administration\AddMunicipality.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

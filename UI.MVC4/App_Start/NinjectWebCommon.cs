@@ -65,6 +65,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<KitosContext>().ToSelf().InRequestScope();
 
             kernel.Bind<IGenericRepository<Text>>().To<GenericRepository<Text>>().InRequestScope();
+            kernel.Bind<IGenericRepository<Municipality>>().To<GenericRepository<Municipality>>().InRequestScope();
             kernel.Bind<IUserRepository>().To<UserRepository>().InRequestScope();
             kernel.Bind<IPasswordResetRequestRepository>().To<PasswordResetRequestRepository>().InRequestScope();
 
