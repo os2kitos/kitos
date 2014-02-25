@@ -229,7 +229,6 @@
     <Compile Include="Infrastructure\UserRepositoryFactory.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\AuthorizeViewModels.cs" />
-    <Compile Include="Models\XeditableReturnModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
