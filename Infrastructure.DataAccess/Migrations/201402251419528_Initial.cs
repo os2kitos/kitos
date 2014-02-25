@@ -614,7 +614,7 @@ namespace Infrastructure.DataAccess.Migrations
                 c => new
                     {
                         Id = c.String(nullable: false, maxLength: 128, unicode: false, storeType: "nvarchar"),
-                        Description = c.String(unicode: false),
+                        Value = c.String(unicode: false),
                     })
                 .PrimaryKey(t => t.Id);
             

@@ -122,13 +122,11 @@
             $('[data-type="wysihtml5"]').each(function() {
                 var self = $(this);
                 $.get(self.data("url"), function(result) {
-                    self.html(result.Description);
+                    self.html(result.Value);
                 }).done(function() {
                     self.editable({
                         params: function(params) {
-                            var data = {};
-                            data['Value'] = params.value;
-                            return data;
+                            return { Value: params.value };
                         }
                     });
                 });
