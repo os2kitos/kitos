@@ -211,6 +211,8 @@
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\API\ConfigController.cs" />
+    <Compile Include="Controllers\API\LocaleController.cs" />
     <Compile Include="Controllers\Web\AccountController.cs" />
     <Compile Include="Controllers\Web\AuthorizeController.cs" />
     <Compile Include="Controllers\API\GenericApiController.cs" />

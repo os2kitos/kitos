@@ -5,7 +5,7 @@ namespace UI.MVC4.Controllers
 {
     public class TextController : GenericApiController<Text, string>
     {
-        public TextController(IGenericRepository<Text> repository)
+        public TextController(IGenericRepository<Text> repository) 
             : base(repository)
         {
         }

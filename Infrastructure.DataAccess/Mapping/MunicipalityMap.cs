@@ -16,10 +16,15 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.Id).HasColumnName("Id");
 
             // Relationships
-            this.HasOptional(t => t.Configuration)
+            this.HasMany(t => t.Configurations)
                 .WithRequired(t => t.Municipality)
+                .HasForeignKey(d => d.Municipality_Id)
                 .WillCascadeOnDelete(true);
 
+            this.HasMany(t => t.Localizations)
+                .WithRequired(t => t.Municipality)
+                .HasForeignKey(d => d.Municipality_Id)
+                .WillCascadeOnDelete(true);
         }
     }
 }

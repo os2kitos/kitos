@@ -14,6 +14,7 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("Configuration");
             this.Property(t => t.Id).HasColumnName("Id");
+            this.Property(t => t.IsSelected).HasColumnName("IsSelected");
         }
     }
 }
