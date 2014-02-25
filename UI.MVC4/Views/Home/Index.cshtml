@@ -83,8 +83,8 @@
             <img class="featurette-image img-responsive" data-src="holder.js/500x500/auto" alt="Generic placeholder image">
         </div>
         <div class="col-md-7">
-            <h2 class="featurette-heading" data-type="wysihtml5" data-pk="intro-head" data-url="/api/text">Hvad er KITOS? <span class="text-muted">KITOS er et cloud baseret IT system, som hver enkelt kommune gratis kan tage i brug.</span></h2>
-            <p class="lead" data-type="wysihtml5" data-pk="intro-body" data-url="/api/text"></p>
+            <h2 class="featurette-heading" data-type="wysihtml5" data-url="/api/text/intro-head">Hvad er KITOS? <span class="text-muted">KITOS er et cloud baseret IT system, som hver enkelt kommune gratis kan tage i brug.</span></h2>
+            <p class="lead" data-type="wysihtml5" data-url="/api/text/intro-body"></p>
         </div>
     </div>
 
@@ -108,8 +108,9 @@
 @section scripts
 {
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             $.fn.editable.defaults.mode = 'inline';
+            $.fn.editable.defaults.send = 'always';
             $.fn.editable.defaults.ajaxOptions = { type: 'put' };
             @if (!User.IsInRole("Admin"))
             {
@@ -117,13 +118,19 @@
                 $.fn.editable.defaults.disabled = true;
                 </text>
             }
-            
-            $('[data-type="wysihtml5"]').each(function () {
+
+            $('[data-type="wysihtml5"]').each(function() {
                 var self = $(this);
-                $.get(self.data("url") + "/" + self.data("pk"), function (result) {
+                $.get(self.data("url"), function(result) {
                     self.html(result.Description);
                 }).done(function() {
-                    self.editable();
+                    self.editable({
+                        params: function(params) {
+                            var data = {};
+                            data['Value'] = params.value;
+                            return data;
+                        }
+                    });
                 });
             });
         });

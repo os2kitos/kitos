@@ -14,7 +14,7 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("Text");
             this.Property(t => t.Id).HasColumnName("Id");
-            this.Property(t => t.Description).HasColumnName("Description");
+            this.Property(t => t.Value).HasColumnName("Value");
 
         }
     }
