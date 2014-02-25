@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
+using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers
 {
@@ -14,23 +15,11 @@ namespace UI.MVC4.Controllers
         {
         }
 
-        // PUT api/T
-        [HttpPut]
-        public HttpResponseMessage Put([FromUri] string pk, [FromUri] string value, [FromUri] string name)
+        // PUT api/Text
+        public HttpResponseMessage Put(string id, [FromBody] XeditableReturnModel model)
         {
-            var item = new Text() { Id = pk, Description = value};
-            
-            try
-            {
-                Repository.Update(item);
-                Repository.Save();
-
-                return new HttpResponseMessage(HttpStatusCode.OK); // TODO correct?
-            }
-            catch (Exception)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
+            var item = new Text() {Id = id, Description = model.Value};
+            return base.Put(id, item);
         }
     }
 }
