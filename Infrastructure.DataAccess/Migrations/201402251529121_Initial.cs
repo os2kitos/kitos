@@ -66,6 +66,7 @@ namespace Infrastructure.DataAccess.Migrations
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
+                        Name = c.String(unicode: false),
                     })
                 .PrimaryKey(t => t.Id);
             
@@ -550,8 +551,7 @@ namespace Infrastructure.DataAccess.Migrations
                 "dbo.PasswordResetRequest",
                 c => new
                     {
-                        Id = c.Int(nullable: false, identity: true),
-                        Hash = c.String(unicode: false),
+                        Id = c.String(nullable: false, maxLength: 128, unicode: false, storeType: "nvarchar"),
                         Time = c.DateTime(nullable: false, precision: 0),
                         User_Id = c.Int(nullable: false),
                     })

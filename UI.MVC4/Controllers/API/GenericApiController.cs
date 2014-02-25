@@ -32,8 +32,9 @@ namespace UI.MVC4.Controllers
                 Repository.Insert(item);
                 Repository.Save();
 
-                var msg = new HttpResponseMessage(HttpStatusCode.Created);
-                msg.Headers.Location = new Uri(Request.RequestUri + item.Id.ToString());
+                //var msg = new HttpResponseMessage(HttpStatusCode.Created);
+                var msg = Request.CreateResponse(HttpStatusCode.Created, item);
+                msg.Headers.Location = new Uri(Request.RequestUri + "/" + item.Id.ToString());
                 return msg;
             }
             catch (Exception)
