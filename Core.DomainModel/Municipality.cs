@@ -6,7 +6,6 @@ namespace Core.DomainModel
     {
         public Municipality()
         {
-            this.Configurations = new List<Configuration>();
             this.ItProjects = new List<ItProject.ItProject>();
             this.ItSystems = new List<ItSystem.ItSystem>();
             this.ItContracts = new List<ItContract.ItContract>();
@@ -16,7 +15,7 @@ namespace Core.DomainModel
 
         public int Id { get; set; }
 
-        public virtual ICollection<Configuration> Configurations { get; set; }
+        public virtual Configuration Configuration { get; set; }
         public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
         public virtual ICollection<ItSystem.ItSystem> ItSystems { get; set; }
         public virtual ICollection<ItContract.ItContract> ItContracts { get; set; }
