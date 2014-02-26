@@ -220,6 +220,7 @@
     <Compile Include="Controllers\API\GenericApiController.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Controllers\API\TextController.cs" />
+    <Compile Include="Controllers\Web\TestController.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -376,6 +377,7 @@
     <Content Include="Views\Shared\_TopNavigation.old.cshtml" />
     <Content Include="Views\Shared\_TopNavigation.cshtml" />
     <Content Include="Views\Administration\AddMunicipality.cshtml" />
+    <Content Include="Views\Test\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
