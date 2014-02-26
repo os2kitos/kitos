@@ -28,10 +28,10 @@ namespace UI.MVC4.Controllers.API
             {
                 var user = AutoMapper.Mapper.Map<UserApiModel, User>(item);
 
-                _userService.AddUser(user);
+                user = _userService.AddUser(user);
 
                 var msg = Request.CreateResponse(HttpStatusCode.Created, AutoMapper.Mapper.Map<User,UserApiModel>(user));
-                msg.Headers.Location = new Uri(Request.RequestUri + "/" + item.Id);
+                msg.Headers.Location = new Uri(Request.RequestUri + "/" + user.Id);
                 return msg;
             }
             catch (Exception)
@@ -39,8 +39,7 @@ namespace UI.MVC4.Controllers.API
                 throw new HttpResponseException(HttpStatusCode.Conflict);
             }
         }
-
-        /* TODO: SHOULD THESE BE AVAILABLE?? 
+        
         [Authorize]
         public IEnumerable<UserApiModel> Get()
         {
@@ -52,7 +51,6 @@ namespace UI.MVC4.Controllers.API
         {
             return AutoMapper.Mapper.Map<User,UserApiModel>(_repository.GetById(id));
         }
-        */
     }
 
 }

@@ -14,7 +14,7 @@ namespace Core.DomainServices
             Func<IQueryable<TModel>, IOrderedQueryable<TModel>> orderBy = null,
             string includeProperties = "");
         TModel GetById<TKeyType>(TKeyType id);
-        void Insert(TModel entity);
+        TModel Insert(TModel entity);
         void DeleteById<TKeyType>(TKeyType id);
         void Update(TModel entity);
         void Save();

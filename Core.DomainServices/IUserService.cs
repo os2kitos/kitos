@@ -4,7 +4,7 @@ namespace Core.DomainServices
 {
     public interface IUserService
     {
-        void AddUser(User user);
+        User AddUser(User user);
         PasswordResetRequest IssuePasswordReset(User user);
         PasswordResetRequest GetPasswordReset(string requestId);
         void ResetPassword(string requestId, string newPassword);

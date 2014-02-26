@@ -27,12 +27,15 @@ namespace Core.ApplicationServices
             _cryptoService = cryptoService;
         }
 
-        public void AddUser(User user)
+        public User AddUser(User user)
         {
-            user.Salt = _cryptoService.Encrypt(DateTime.Now + "salt and pepper");
+            user.Salt = _cryptoService.Encrypt(DateTime.Now + " spices");
             user.Password = _cryptoService.Encrypt(DateTime.Now + user.Salt);
-            _userRepository.Insert(user);
+
+            user = _userRepository.Insert(user);
             IssuePasswordReset(user);
+
+            return user;
         }
 
         public PasswordResetRequest IssuePasswordReset(User user)
