@@ -67,16 +67,16 @@
 @section scripts
 {
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             $("#find-municipality-name").select2({
                 ajax: {
                     url: "/api/municipality",
                     dataType: "json",
                     quietMillis: 100,
-                    data: function (term) { return { term: term }; },
+                    data: function(term) { return { term: term }; },
                     results: function(data) {
                         var rslt = [];
-                        $.each(data, function (i, item) {
+                        $.each(data, function(i, item) {
                             rslt.push({ id: item.Id, text: item.Name });
                         });
                         console.log(rslt);
@@ -86,7 +86,7 @@
             });
 
 
-            $("#add-municipality").click(function () {
+            $("#add-municipality").click(function() {
                 var name = $("#add-municipality-name").val();
                 //creating municipality
                 $.ajax({
@@ -95,31 +95,36 @@
                     data: {
                         "Name": name
                     }
-
-                }).fail(function (result) {
+                }).fail(function(result) {
                     show_message("Kunne ikke oprette kommunen " + name);
-                }).done(function (result) {
+                }).done(function(result) {
                     var municipality = result;
 
-                    show_message("Kommunen " + name + " er oprettet i systemet med ID " + result.Id);
+                    show_message("Kommunen " + result.Name + " er oprettet i systemet med ID " + result.Id);
                 });
             });
-            
-            $("#add-admin").click(function () {
+
+            $("#add-admin").click(function() {
                 $.ajax({
                     type: "POST",
-                    url: "/api/user",
+                    url: "/api/localadmin",
                     data: {
                         "Name": $("#local-admin-name").val(),
                         "Email": $("#local-admin-email").val(),
-                        "Municipality_Id": $("#find-municipality-name").val()
+                        "Municipality_Id": $("#find-municipality-name").val(),
                     }
                 }).fail(function(result) {
-                    show_message("Kunne ikke oprette")
+                    show_message("Kunne ikke oprette brugeren");
+                }).done(function(result) {
+                    var user = result;
+
+                    show_message("Brugeren " + user.Name + " er oprettet i systemet med ID " + user.Id);
+
                 });
             });
+        });
 
-        /*
+    /*
         //creating user
         $.ajax({
             type: "POST",
@@ -149,4 +154,4 @@
         });
         */
     </script>
-}
+    }

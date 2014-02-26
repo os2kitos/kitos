@@ -23,7 +23,6 @@ namespace UI.MVC4.App_Start
             base.Configure();
 
             Mapper.CreateMap<User, UserApiModel>().ReverseMap();
-            Mapper.CreateMap<User, AdminApiModel>().ReverseMap();
 
             Mapper.CreateMap<Municipality, MunicipalityApiModel>().ReverseMap();
         }
