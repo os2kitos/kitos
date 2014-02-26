@@ -20,6 +20,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithRequired(t => t.Municipality)
                 .WillCascadeOnDelete(true);
 
+            this.HasMany(t => t.Localizations)
+                .WithRequired(t => t.Municipality)
+                .HasForeignKey(d => d.Municipality_Id)
+                .WillCascadeOnDelete(true);
         }
     }
 }
