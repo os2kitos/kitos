@@ -16,6 +16,12 @@ namespace UI.MVC4.Controllers.API
         {
         }
 
+
+        public virtual IEnumerable<Municipality> Get(string term)
+        {
+            return Repository.Get(m => m.Name.StartsWith(term));
+        }
+
         /*
 
         protected readonly IGenericRepository<Municipality> Repository;

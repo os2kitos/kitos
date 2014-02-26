@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -15,6 +16,11 @@ namespace UI.MVC4.Controllers
         protected GenericApiController(IGenericRepository<TModel> repository)
         {
             Repository = repository;
+        }
+
+        public virtual IEnumerable<TModel> Get()
+        {
+            return Repository.Get();
         }
 
         // GET api/T

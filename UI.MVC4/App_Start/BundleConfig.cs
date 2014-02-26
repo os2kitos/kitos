@@ -23,6 +23,12 @@ namespace UI.MVC4
                 "~/Scripts/wysihtml5/wysihtml5-{version}.js",
                 "~/Scripts/bootstrap3-wysihtml5.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/select2").Include(
+                        "~/Scripts/select2.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/js").Include(
+                        "~/Scripts/message.js"));
+
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include("~/Scripts/bootstrap.js"));
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
@@ -32,9 +38,11 @@ namespace UI.MVC4
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                 "~/Content/bootstrap-cosmo.*", 
-                "~/Content/kitos.css", 
                 "~/Content/carousel.css",
-                "~/Content/bootstrap3-wysihtml5/bootstrap3-wysihtml5.css"));
+                "~/Content/bootstrap3-wysihtml5/bootstrap3-wysihtml5.css",
+                "~/Content/css/select2.css",
+                "~/Content/select2-bootstrap.css",
+                "~/Content/kitos.css"));
 
             bundles.Add(new StyleBundle("~/Content/themes/base/css").Include(
                         "~/Content/themes/base/jquery.ui.core.css",

@@ -2,34 +2,63 @@
     ViewBag.Title = "Opret kommune";
 }
 
-<h2>Opret kommune</h2>
-<p>
-    Opret en ny kommune med tilhørende lokal administrator. 
-</p>
 <div class="col-md-7">
+    
+    <h2>Opret kommune</h2>
+    <p>
+        Opret en ny kommune i systemet.
+    </p>
     <form class="form-horizontal" role="form">
         <div class="form-group">
-            <label for="municipality-name" class="col-md-3 control-label">
+            <label for="add-municipality-name" class="col-md-3 control-label">
                 Kommunens navn
             </label>
             <div class="col-md-8">
-                <input type="text" id="municipality-name" class="form-control" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="municipality-name" class="col-md-3 control-label">
-                Lokal admin email-addresse
-            </label>
-            <div class="col-md-8">
-                <input type="email" id="local-admin-email" class="form-control"/>
-            <p class="help-block">
-                Vedkommende vil blive oprettet i systemet og få tilsendt et link til opsætning af password.
-            </p>
+                <input type="text" id="add-municipality-name" class="form-control" />
             </div>
         </div>
         <div class="form-group">
             <div class="col-md-8 col-md-offset-3">
-                <input id="add-municipality" class="btn btn-primary" type="button" value="Opret kommune"/>
+                <input id="add-municipality" class="btn btn-primary" type="button" value="Opret kommune" />
+            </div>
+        </div>
+    </form>
+
+    <h2>Tilføj lokal administrator</h2>
+    <p>
+        Opret en ny bruger og tilføj vedkommende som lokal administrator på en kommune.
+    </p>
+    <form class="form-horizontal" role="form">
+        <div class="form-group">
+            <label for="find-municipality-name" class="col-md-3 control-label">
+                Kommunens navn
+            </label>
+            <div class="col-md-8">
+                <input type="hidden" id="find-municipality-name" class="form-control"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="local-admin-name" class="col-md-3 control-label">
+                Lokal admin navn
+            </label>
+            <div class="col-md-8">
+                <input type="text" id="local-admin-name" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="local-admin-email" class="col-md-3 control-label">
+                Lokal admin email-addresse
+            </label>
+            <div class="col-md-8">
+                <input type="email" id="local-admin-email" class="form-control" />
+                <p class="help-block">
+                    Vedkommende vil blive oprettet i systemet og få tilsendt et link til opsætning af password.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-8 col-md-offset-3">
+                <input id="add-admin" class="btn btn-primary" type="button" value="Tilføj admin" />
             </div>
         </div>
     </form>
@@ -38,51 +67,78 @@
 @section scripts
 {
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
+            $("#find-municipality-name").select2({
+                ajax: {
+                    url: "/api/municipality",
+                    dataType: "json",
+                    quietMillis: 100,
+                    data: function (term) { return { term: term }; },
+                    results: function(data) {
+                        var rslt = [];
+                        $.each(data, function (i, item) {
+                            var text = item.Name;
+                            if(item.Users)
+                            rslt.push({ id: item.Id, text: item.Name });
+                        });
+                        console.log(rslt);
+                        return { results: rslt };
+                    }
+                }
+            });
+
+
             $("#add-municipality").click(function () {
-                
+                var name = $("#add-municipality-name").val();
                 //creating municipality
                 $.ajax({
                     type: "POST",
                     url: "/api/municipality",
                     data: {
-                        "Name": $("#municipality-name").val()
+                        "Name": name
                     }
-                    
+
                 }).fail(function (result) {
-                    console.log("Couldn't create municipality: " + result);
-                }).done(function(result) {
+                    show_message("Kunne ikke oprette kommunen " + name);
+                }).done(function (result) {
                     var municipality = result;
 
-                    //creating user
-                    $.ajax({
-                        type: "POST",
-                        url: "/api/user",
-                        data: {
-                            "Name": $("#local-admin-email").val(), //todo
-                            "Email": $("#local-admin-email").val(),
-                            "Municipality_Id": municipality.Id,
-                            "Role_Id": 2
-                        }
-                    }).fail(function(result) {
-                        console.log("Couldn't create user: " + result);
-                    }).done(function(result) {
-                        var user = result;
-
-                        //creating password reset request
-                        $.ajax({
-                            type: "POST",
-                            url: "/api/passwordresetrequest",
-                            data: {
-                                "User_Id": user.Id
-                            }
-                        }).done(function(result) {
-                            console.log(result);
-                        });
-
-                    });
+                    show_message("Kommunen " + name + " er oprettet i systemet med ID " + result.Id);
                 });
             });
+            
+
+
         });
+
+        /*
+        //creating user
+        $.ajax({
+            type: "POST",
+            url: "/api/user",
+            data: {
+                "Name": $("#local-admin-email").val(), //todo
+                "Email": $("#local-admin-email").val(),
+                "Municipality_Id": municipality.Id,
+                "Role_Id": 2
+            }
+        }).fail(function (result) {
+            console.log("Couldn't create user: " + result);
+        }).done(function (result) {
+            var user = result;
+
+            //creating password reset request
+            $.ajax({
+                type: "POST",
+                url: "/api/passwordresetrequest",
+                data: {
+                    "User_Id": user.Id
+                }
+            }).done(function (result) {
+                console.log(result);
+            });
+
+        });
+        */
     </script>
-    }
+}
