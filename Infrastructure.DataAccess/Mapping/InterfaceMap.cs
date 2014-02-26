@@ -21,6 +21,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.Interfaces)
                 .HasForeignKey(d => d.ItSystem_Id);
 
+            this.HasRequired(t => t.Method)
+                .WithMany(t => t.Interfaces)
+                .HasForeignKey(d => d.Method_Id);
         }
     }
 }

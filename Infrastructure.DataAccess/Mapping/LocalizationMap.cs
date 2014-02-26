@@ -22,7 +22,7 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Relationships
             this.HasRequired(t => t.Municipality)
-                .WithMany(t => t.Localizations)
+                .WithMany(t => t.Localization)
                 .HasForeignKey(d => d.Municipality_Id);
 
         }

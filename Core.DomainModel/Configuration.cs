@@ -2,26 +2,45 @@ namespace Core.DomainModel
 {
     public class Configuration : IEntity<int>
     {
+        public int Id { get; set; }
+
+        #region IT Support
+
+        public string ItSupportGuide { get; set; }
+        public bool ShowTabOverview { get; set; }
+        public bool ShowColumnUsage { get; set; }
+        public bool ShowColumnMandatory { get; set; }
+
+        #endregion
+
         #region IT Project
 
-        public int Id { get; set; }
         public string ItProjectGuide { get; set; }
-        public string EsdhRef { get; set; }
-        public string CmdbRef { get; set; }
-        public string FolderRef { get; set; }
-        public string ItProject { get; set; }
-        public string ItProgram { get; set; }
-        public string FocusArea { get; set; }
         public bool ShowFocusArea { get; set; }
-        public string Fase1 { get; set; }
-        public string Fase2 { get; set; }
-        public string Fase3 { get; set; }
-        public string Fase4 { get; set; }
-        public string Fase5 { get; set; }
-
         public bool ShowPortfolio { get; set; }
         public bool ShowBC { get; set; }
         
+        #endregion
+
+        #region IT System
+
+        public string ItSystemGuide { get; set; }
+
+        #endregion
+
+        #region IT Contract
+        
+        public bool ShowRightOfUse { get; set; }
+        public bool ShowLicense { get; set; }
+        public bool ShowOperation { get; set; }
+        public bool ShowMaintenance { get; set; }
+        public bool ShowSupport { get; set; }
+        public bool ShowServerLicense { get; set; }
+        public bool ShowServerOperation { get; set; }
+        public bool ShowBackup { get; set; }
+        public bool ShowSurveillance { get; set; }
+        public bool ShowOther { get; set; }
+
         #endregion
 
         public virtual Municipality Municipality { get; set; }

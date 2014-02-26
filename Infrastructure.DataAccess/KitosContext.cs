@@ -40,11 +40,13 @@ namespace Infrastructure.DataAccess
         public DbSet<Host> Hosts { get; set; }
         public DbSet<Core.DomainModel.ItSystem.Infrastructure> Infrastructures { get; set; }
         public DbSet<Interface> Interfaces { get; set; }
+        public DbSet<InterfaceType> InterfaceTypes { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
         public DbSet<ItProject> ItProjects { get; set; }
         public DbSet<ItSystem> ItSystems { get; set; }
         public DbSet<KLE> KLEs { get; set; }
         public DbSet<Localization> Localizations { get; set; }
+        public DbSet<Method> Methods { get; set; }
         public DbSet<Milestone> Milestones { get; set; }
         public DbSet<Municipality> Municipalitys { get; set; }
         public DbSet<Organization> Organizations { get; set; }
@@ -55,8 +57,11 @@ namespace Infrastructure.DataAccess
         public DbSet<PreAnalysis> PreAnalysis { get; set; }
         public DbSet<ProgLanguage> ProgLanguages { get; set; }
         public DbSet<ProjectCategory> ProjectCategories { get; set; }
+        public DbSet<ProjectPhase> ProjectPhases { get; set; }
+        public DbSet<ProjectPhaseLocale> ProjectPhaseLocales { get; set; }
         public DbSet<ProjectStatus> ProjectStatus { get; set; }
         public DbSet<ProjectType> ProjectTypes { get; set; }
+        public DbSet<ProtocolType> ProtocolTypes { get; set; }
         public DbSet<PurchaseForm> PurchaseForms { get; set; }
         public DbSet<Resource> Resources { get; set; }
         public DbSet<Risk> Risks { get; set; }
@@ -65,6 +70,7 @@ namespace Infrastructure.DataAccess
         public DbSet<Stakeholder> Stakeholders { get; set; }
         public DbSet<SuperUser> SuperUsers { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<SystemType> SystemTypes { get; set; }
         public DbSet<TaskSupport> TaskSupports { get; set; }
         public DbSet<Technology> Technologys { get; set; }
         public DbSet<Text> Texts { get; set; }
@@ -95,11 +101,13 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new HostMap());
             modelBuilder.Configurations.Add(new InfrastructureMap());
             modelBuilder.Configurations.Add(new InterfaceMap());
+            modelBuilder.Configurations.Add(new InterfaceTypeMap());
             modelBuilder.Configurations.Add(new ItContractMap());
             modelBuilder.Configurations.Add(new ItProjectMap());
             modelBuilder.Configurations.Add(new ItSystemMap());
             modelBuilder.Configurations.Add(new KLEMap());
             modelBuilder.Configurations.Add(new LocalizationMap());
+            modelBuilder.Configurations.Add(new MethodMap());
             modelBuilder.Configurations.Add(new MilestoneMap());
             modelBuilder.Configurations.Add(new MunicipalityMap());
             modelBuilder.Configurations.Add(new OrganizationMap());
@@ -110,8 +118,11 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new PreAnalysisMap());
             modelBuilder.Configurations.Add(new ProgLanguageMap());
             modelBuilder.Configurations.Add(new ProjectCategoryMap());
+            modelBuilder.Configurations.Add(new ProjectPhaseMap());
+            modelBuilder.Configurations.Add(new ProjectPhaseLocaleMap());
             modelBuilder.Configurations.Add(new ProjectStatusMap());
             modelBuilder.Configurations.Add(new ProjectTypeMap());
+            modelBuilder.Configurations.Add(new ProtocolTypeMap());
             modelBuilder.Configurations.Add(new PurchaseFormMap());
             modelBuilder.Configurations.Add(new ResourcesMap());
             modelBuilder.Configurations.Add(new RiskMap());
@@ -120,6 +131,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new StakeholdersMap());
             modelBuilder.Configurations.Add(new SuperUserMap());
             modelBuilder.Configurations.Add(new SupplierMap());
+            modelBuilder.Configurations.Add(new SystemTypeMap());
             modelBuilder.Configurations.Add(new TaskSupportMap());
             modelBuilder.Configurations.Add(new TechnologyMap());
             modelBuilder.Configurations.Add(new TextMap());

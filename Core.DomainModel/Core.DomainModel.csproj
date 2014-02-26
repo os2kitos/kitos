@@ -65,6 +65,8 @@
     <Compile Include="ItProject\Organization.cs" />
     <Compile Include="ItProject\PreAnalysis.cs" />
     <Compile Include="ItProject\ProjectCategory.cs" />
+    <Compile Include="ItProject\ProjectPhase.cs" />
+    <Compile Include="ItProject\ProjectPhaseLocale.cs" />
     <Compile Include="ItProject\ProjectStatus.cs" />
     <Compile Include="ItProject\ProjectType.cs" />
     <Compile Include="ItProject\Resource.cs" />
@@ -78,9 +80,13 @@
     <Compile Include="ItSystem\Host.cs" />
     <Compile Include="ItSystem\Infrastructure.cs" />
     <Compile Include="ItSystem\Interface.cs" />
+    <Compile Include="ItSystem\InterfaceType.cs" />
     <Compile Include="ItSystem\ItSystem.cs" />
+    <Compile Include="ItSystem\Method.cs" />
     <Compile Include="ItSystem\ProgLanguage.cs" />
+    <Compile Include="ItSystem\ProtocolType.cs" />
     <Compile Include="ItSystem\SuperUser.cs" />
+    <Compile Include="ItSystem\SystemType.cs" />
     <Compile Include="ItSystem\TaskSupport.cs" />
     <Compile Include="ItSystem\Technology.cs" />
     <Compile Include="ItSystem\UserAdministration.cs" />

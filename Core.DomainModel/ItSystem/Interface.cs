@@ -11,7 +11,10 @@ namespace Core.DomainModel.ItSystem
 
         public int Id { get; set; }
         public int ItSystem_Id { get; set; }
+        public int Method_Id { get; set; }
+        
         public virtual ICollection<Wish> Wishes { get; set; }
         public virtual ItSystem ItSystem { get; set; }
+        public virtual Method Method { get; set; }
     }
 }

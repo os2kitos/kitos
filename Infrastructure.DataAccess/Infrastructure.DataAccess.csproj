@@ -82,11 +82,13 @@
     <Compile Include="Mapping\HostMap.cs" />
     <Compile Include="Mapping\InfrastructureMap.cs" />
     <Compile Include="Mapping\InterfaceMap.cs" />
+    <Compile Include="Mapping\InterfaceTypeMap.cs" />
     <Compile Include="Mapping\ItContractMap.cs" />
     <Compile Include="Mapping\ItProjectMap.cs" />
     <Compile Include="Mapping\ItSystemMap.cs" />
     <Compile Include="Mapping\KLEMap.cs" />
     <Compile Include="Mapping\LocalizationMap.cs" />
+    <Compile Include="Mapping\MethodMap.cs" />
     <Compile Include="Mapping\MilestoneMap.cs" />
     <Compile Include="Mapping\MunicipalityMap.cs" />
     <Compile Include="Mapping\OrganizationMap.cs" />
@@ -96,8 +98,11 @@
     <Compile Include="Mapping\PreAnalysisMap.cs" />
     <Compile Include="Mapping\ProgLanguageMap.cs" />
     <Compile Include="Mapping\ProjectCategoryMap.cs" />
+    <Compile Include="Mapping\ProjectPhaseLocaleMap.cs" />
+    <Compile Include="Mapping\ProjectPhaseMap.cs" />
     <Compile Include="Mapping\ProjectStatusMap.cs" />
     <Compile Include="Mapping\ProjectTypeMap.cs" />
+    <Compile Include="Mapping\ProtocolTypeMap.cs" />
     <Compile Include="Mapping\PurchaseFormMap.cs" />
     <Compile Include="Mapping\ResourcesMap.cs" />
     <Compile Include="Mapping\RiskMap.cs" />
@@ -106,6 +111,7 @@
     <Compile Include="Mapping\StakeholdersMap.cs" />
     <Compile Include="Mapping\SuperUserMap.cs" />
     <Compile Include="Mapping\SupplierMap.cs" />
+    <Compile Include="Mapping\SystemTypeMap.cs" />
     <Compile Include="Mapping\TaskSupportMap.cs" />
     <Compile Include="Mapping\TechnologyMap.cs" />
     <Compile Include="Mapping\TextMap.cs" />

@@ -10,6 +10,9 @@ namespace Core.DomainModel.ItSystem
         }
 
         public int Id { get; set; }
+        public string Name { get; set; }
+        public bool IsActive { get; set; }
+        public string Note { get; set; }
 
         public virtual ICollection<Technology> Technologies { get; set; }
     }

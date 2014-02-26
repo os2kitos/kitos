@@ -169,14 +169,29 @@
 @section scripts
 {
     <script>
-        var uri = 'api/config/1';
+        var configUri = 'api/config/1';
+        var localeUri = 'api/locale/1';
+        
         $(document).ready(function() {
-            $.getJSON(uri)
+            $.getJSON(configUri)
                 .done(function (data) {
                     console.log(data);
+                    
+                    $("input[name='DigitalizationRateGuide']").val(data.DigitalizationRateGuide);
                     $("input[name='ItProjectGuide']").val(data.ItProjectGuide);
+                    $("input[name='ItSystemGuide']").val(data.ItProjectGuide);
                 })
                 .fail(function(jqXHR, textStatus, err) {
+                    console.log(jqXHR, textStatus, err);
+                });
+            
+            $.getJSON(localeUri)
+                .done(function (data) {
+                    console.log(data);
+                    $("input[name='EsdhRef']").val(data.EsdhRef);
+                    $("input[name='CmdbRef']").val(data.CmdbRef);
+                })
+                .fail(function (jqXHR, textStatus, err) {
                     console.log(jqXHR, textStatus, err);
                 });
         });
