@@ -66,12 +66,12 @@ namespace UI.MVC4.Infrastructure
                 throw new ProviderException("Bad username: null or empty");
 
             var user = userRepository.GetByEmail(username);
-            if (user == null)
+            if (user == null || user.Role == null)
             {
                 return new string[]{};
             }
 
-            return user.Roles.Select(r => r.Name).ToArray();
+            return new string[] {user.Role.Name};
         }
 
         public override string[] GetUsersInRole(string roleName)
@@ -89,9 +89,9 @@ namespace UI.MVC4.Infrastructure
             var userRepository = UserRepositoryFactory.GetUserRepository();
             var user = userRepository.GetByEmail(username);
 
-            if (user == null) return false;
+            if (user == null || user.Role == null) return false;
 
-            return user.Roles.Any(role => role.Name == roleName);
+            return user.Role.Name == roleName;
         }
 
         public override void RemoveUsersFromRoles(string[] usernames, string[] roleNames)

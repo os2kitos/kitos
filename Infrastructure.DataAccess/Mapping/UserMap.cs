@@ -26,10 +26,12 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.Password).HasColumnName("Password");
 
             // Relationships
-            this.HasMany(t => t.Roles)
-                .WithMany(t => t.Users);
+            this.HasOptional(t => t.Role)
+                .WithMany(t => t.Users)
+                .HasForeignKey(d => d.Role_Id);
             this.HasOptional(t => t.Municipality)
-                .WithMany(t => t.Users);
+                .WithMany(t => t.Users)
+                .HasForeignKey(d => d.Municipality_Id);
 
         }
     }

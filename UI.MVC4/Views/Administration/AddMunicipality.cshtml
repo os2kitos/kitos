@@ -39,32 +39,45 @@
 {
     <script>
         $(document).ready(function() {
-            $("#add-municipality").click(function() {
+            $("#add-municipality").click(function () {
+                
+                //creating municipality
                 $.ajax({
                     type: "POST",
                     url: "/api/municipality",
                     data: {
-                        "name": $("#municipality-name").val()
+                        "Name": $("#municipality-name").val()
                     }
-                }).fail(function(result) {
+                    
+                }).fail(function (result) {
                     console.log("Couldn't create municipality: " + result);
                 }).done(function(result) {
                     var municipality = result;
-                    console.log("Created municipality: " + municipality);
 
+                    //creating user
                     $.ajax({
                         type: "POST",
                         url: "/api/user",
                         data: {
-                            "name": $("#local-admin-email").val(), //todo
-                            "email": $("#local-admin-email").val(),
-                            "municipality": municipality,
-                            "roles": []
+                            "Name": $("#local-admin-email").val(), //todo
+                            "Email": $("#local-admin-email").val(),
+                            "Municipality_Id": municipality.Id,
+                            "Roles": []
                         }
                     }).fail(function(result) {
                         console.log("Couldn't create user: " + result);
                     }).done(function(result) {
-                        console.log("Created user: " + result);
+                        var user = result;
+
+                        //creating password reset request
+                        $.ajax({
+                            type: "POST",
+                            url: "/api/passwordresetrequest",
+                            data: {
+                                "User_Id": user.Id
+                            }
+                        });
+
                     });
                 });
             });

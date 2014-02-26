@@ -36,11 +36,9 @@ namespace Infrastructure.DataAccess.Migrations
             //
 
             #region Roles
-
-            var user = new Role {Name = "User"};
             var admin = new Role {Name = "Admin"};
             
-            context.Roles.AddOrUpdate(x => x.Name, user, admin);
+            context.Roles.AddOrUpdate(x => x.Name, admin);
             
             #endregion
 
@@ -51,14 +49,14 @@ namespace Infrastructure.DataAccess.Migrations
                 Name = "Simon Lynn-Pedersen",
                 Email = "slp@it-minds.dk",
                 Password = "slp",
-                Roles = new List<Role> { user, admin }
+                Role = admin
             };
             var arne = new User
             {
                 Name = "Arne Hansen",
                 Email = "arne@it-minds.dk",
                 Password = "arne",
-                Roles = new List<Role> { user }
+                Role = null
             };
 
             context.Users.AddOrUpdate(x => x.Email, simon, arne);
@@ -77,7 +75,7 @@ namespace Infrastructure.DataAccess.Migrations
                                                       {
                                                           //This reset request is fine
                                                           Id = "workingRequest", //ofcourse, this should be a hashed string or something obscure
-                                                          Time = DateTime.MaxValue,
+                                                          Time = DateTime.Now.AddYears(+20), //.MaxValue also seems to be out-of-range, but this should hopefully be good enough
                                                           User_Id = simonId
                                                       },
                                                       new PasswordResetRequest
