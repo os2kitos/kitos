@@ -10,28 +10,31 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class UserController : ApiController
-    {
+    public class AdminController : ApiController
+    { 
         private readonly IGenericRepository<User> _repository;
-        private readonly IUserService _userService;
 
-        public UserController(IGenericRepository<User> repository, IUserService userService)
+        public AdminController(IGenericRepository<User> repository)
         {
             _repository = repository;
-            _userService = userService;
         }
 
-        [Authorize]
-        public HttpResponseMessage Post(UserApiModel item)
+        [Authorize(Roles = "GlobalAdmin")]
+        public HttpResponseMessage Post(AdminApiModel item)
         {
             try
             {
-                var user = AutoMapper.Mapper.Map<UserApiModel, User>(item);
+                var user = AutoMapper.Mapper.Map<AdminApiModel, User>(item);
 
-                _userService.AddUser(user);
+                //todo: fix obvious security leak here
+                //(probably just create random default password)
+                user.Password = "default password";
 
-                var msg = Request.CreateResponse(HttpStatusCode.Created, AutoMapper.Mapper.Map<User,UserApiModel>(user));
-                msg.Headers.Location = new Uri(Request.RequestUri + "/" + item.Id);
+                _repository.Insert(user);
+                _repository.Save();
+
+                var msg = Request.CreateResponse(HttpStatusCode.Created, AutoMapper.Mapper.Map<User,AdminApiModel>(user));
+                msg.Headers.Location = new Uri(Request.RequestUri + "/" + item.Id.ToString());
                 return msg;
             }
             catch (Exception)
@@ -54,5 +57,4 @@ namespace UI.MVC4.Controllers.API
         }
         */
     }
-
 }

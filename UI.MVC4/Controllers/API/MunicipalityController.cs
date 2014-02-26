@@ -6,47 +6,52 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
+using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class MunicipalityController : GenericApiController<Municipality, int>
+    public class MunicipalityController : ApiController
     {
-        public MunicipalityController(IGenericRepository<Municipality> repository)
-            : base(repository)
-        {
-        }
-
-
-        public virtual IEnumerable<Municipality> Get(string term)
-        {
-            return Repository.Get(m => m.Name.StartsWith(term));
-        }
-
-        /*
-
-        protected readonly IGenericRepository<Municipality> Repository;
+        private readonly IGenericRepository<Municipality> _repository;
 
         public MunicipalityController(IGenericRepository<Municipality> repository)
         {
-            Repository = repository;
+            _repository = repository;
         }
 
         // GET api/T
-        public virtual Municipality Get(int id)
+        [Authorize]
+        public MunicipalityApiModel Get(int id)
         {
-            return Repository.GetById(id);
+            return AutoMapper.Mapper.Map<Municipality, MunicipalityApiModel>(_repository.GetById(id));
+        }
+
+        [Authorize]
+        public IEnumerable<MunicipalityApiModel> Get()
+        {
+            var municipalities = _repository.Get();
+            return AutoMapper.Mapper.Map<IEnumerable<Municipality>, List<MunicipalityApiModel>>(municipalities);
+        }
+
+
+        [Authorize]
+        public IEnumerable<MunicipalityApiModel> Get(string term)
+        {
+            var municipalities = _repository.Get(m => m.Name.StartsWith(term));
+            return AutoMapper.Mapper.Map<IEnumerable<Municipality>, List<MunicipalityApiModel>>(municipalities);
         }
 
         // POST api/T
         [Authorize(Roles = "GlobalAdmin")]
-        public virtual HttpResponseMessage Post(Municipality item)
+        public HttpResponseMessage Post(MunicipalityApiModel item)
         {
             try
             {
-                Repository.Insert(item);
-                Repository.Save();
-
-                var msg = new HttpResponseMessage(HttpStatusCode.Created);
+                var municipality = AutoMapper.Mapper.Map<MunicipalityApiModel, Municipality>(item);
+                _repository.Insert(municipality);
+                _repository.Save();
+                
+                var msg = Request.CreateResponse(HttpStatusCode.Created, AutoMapper.Mapper.Map<Municipality,MunicipalityApiModel>(municipality));
                 msg.Headers.Location = new Uri(Request.RequestUri + item.Id.ToString());
                 return msg;
             }
@@ -58,14 +63,16 @@ namespace UI.MVC4.Controllers.API
 
         // PUT api/T
         [Authorize(Roles = "GlobalAdmin")]
-        public virtual HttpResponseMessage Put(int id, Municipality item)
+        public HttpResponseMessage Put(int id, MunicipalityApiModel item)
         {
             item.Id = id;
             try
             {
-                Repository.Update(item);
-                Repository.Save();
-
+                var municipality = AutoMapper.Mapper.Map<MunicipalityApiModel, Municipality>(item);
+                _repository.Update(municipality);
+                _repository.Save();
+                
+                var msg = Request.CreateResponse(HttpStatusCode.Created, AutoMapper.Mapper.Map<Municipality,UserApiModel>(municipality));
                 return new HttpResponseMessage(HttpStatusCode.OK); // TODO correct?
             }
             catch (Exception)
@@ -80,8 +87,8 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                Repository.DeleteById(id);
-                Repository.Save();
+                _repository.DeleteById(id);
+                _repository.Save();
 
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
@@ -93,9 +100,8 @@ namespace UI.MVC4.Controllers.API
 
         protected override void Dispose(bool disposing)
         {
-            Repository.Dispose();
+            _repository.Dispose();
             base.Dispose(disposing);
         }
-         * */
     }
 }

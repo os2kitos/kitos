@@ -214,9 +214,11 @@
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\MappingConfig.cs" />
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\API\AdminController.cs" />
     <Compile Include="Controllers\API\MunicipalityController.cs" />
     <Compile Include="Controllers\API\PasswordResetRequestController.cs" />
     <Compile Include="Controllers\API\UserController.cs" />
@@ -240,6 +242,8 @@
     <Compile Include="Infrastructure\UserRepositoryFactory.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\AuthorizeViewModels.cs" />
+    <Compile Include="Models\AdminApiModel.cs" />
+    <Compile Include="Models\MunicipalityApiModel.cs" />
     <Compile Include="Models\UserApiModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

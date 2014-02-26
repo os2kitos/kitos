@@ -8,55 +8,32 @@ using System.Web.Http;
 using System.Web.Security;
 using Core.DomainModel;
 using Core.DomainServices;
+using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class PasswordResetRequestController : GenericApiController<PasswordResetRequest, string>
+    public class PasswordResetRequestController : ApiController
     {
-        //TODO: where do these go?
-        private const int ResetRequestTTL = 12;
-        private const string FromAddress = "kitos@it-minds.dk";
+        private readonly IUserService _userService;
+        private readonly IUserRepository _userRepository;
 
-        private readonly IGenericRepository<User> _userRepository;
-        private readonly IMailClient _mailClient;
-
-        public PasswordResetRequestController(IGenericRepository<PasswordResetRequest> repository, IGenericRepository<User> userRepository, IMailClient mailClient)
-            : base(repository)
+        public PasswordResetRequestController(IUserService userService, IUserRepository userRepository)
         {
+            _userService = userService;
             _userRepository = userRepository;
-            _mailClient = mailClient;
         }
 
         // POST api/PasswordResetRequest
-        public override HttpResponseMessage Post(PasswordResetRequest item)
+        public HttpResponseMessage Post(UserApiModel userApiModel)
         {
             try
             {
-                var user = _userRepository.GetById(item.User_Id);
-                if (user == null)
-                    throw new Exception();
+                var user = _userRepository.GetByEmail(userApiModel.Email);
 
-                var now = DateTime.Now;
-
-                //TODO: BETTER HASHING???
-                var hash = FormsAuthentication.HashPasswordForStoringInConfigFile(now + user.Email, "MD5");
-
-                item.Id = hash;
-                item.Time = now;
-                item.User = user;
-
-                Repository.Insert(item);
-                Repository.Save();
-
-                var resetLink = "http://kitos.dk/Authorize/ResetPassword?Hash=" + hash;
-                var mailContent = "<a href='" + resetLink +
-                                  "'>Klik her for at nulstille passwordet for din KITOS bruger</a>. Linket udløber om " +
-                                  ResetRequestTTL + " timer.";
-
-                _mailClient.Send(FromAddress, user.Email, "Nulstilning af dit KITOS password", mailContent);
+                var request = _userService.IssuePasswordReset(user);
 
                 var msg = new HttpResponseMessage(HttpStatusCode.Created);
-                msg.Headers.Location = new Uri(Request.RequestUri + item.Id);
+                msg.Headers.Location = new Uri(Request.RequestUri + request.Id);
                 return msg;
             }
             catch (SmtpException)
@@ -67,11 +44,6 @@ namespace UI.MVC4.Controllers.API
             {
                 throw new HttpResponseException(HttpStatusCode.Conflict);
             }
-        }
-
-        public override HttpResponseMessage Put(string id, PasswordResetRequest item)
-        {
-            throw new HttpResponseException(HttpStatusCode.MethodNotAllowed);
         }
     }
 }

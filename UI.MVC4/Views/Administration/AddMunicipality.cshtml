@@ -77,8 +77,6 @@
                     results: function(data) {
                         var rslt = [];
                         $.each(data, function (i, item) {
-                            var text = item.Name;
-                            if(item.Users)
                             rslt.push({ id: item.Id, text: item.Name });
                         });
                         console.log(rslt);
@@ -107,9 +105,19 @@
                 });
             });
             
-
-
-        });
+            $("#add-admin").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/api/user",
+                    data: {
+                        "Name": $("#local-admin-name").val(),
+                        "Email": $("#local-admin-email").val(),
+                        "Municipality_Id": $("#find-municipality-name").val()
+                    }
+                }).fail(function(result) {
+                    show_message("Kunne ikke oprette")
+                });
+            });
 
         /*
         //creating user

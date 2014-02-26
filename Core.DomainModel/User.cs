@@ -13,6 +13,7 @@ namespace Core.DomainModel
         public string Name { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
+        public string Salt { get; set; }
         public int? Municipality_Id { get; set; }
         public int? Role_Id { get; set; }
 
