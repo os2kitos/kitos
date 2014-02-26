@@ -326,6 +326,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\knockout-2.2.0.debug.js" />
     <Content Include="Scripts\knockout-2.2.0.js" />
+    <Content Include="Scripts\message.js" />
     <Content Include="Scripts\wysihtml5\parser_rules\advanced.js" />
     <Content Include="Scripts\wysihtml5\parser_rules\simple.js" />
     <Content Include="Scripts\wysihtml5\wysihtml5-0.3.0.js" />

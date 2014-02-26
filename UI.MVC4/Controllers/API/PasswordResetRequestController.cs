@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Mail;
 using System.Web.Http;
 using System.Web.Security;
 using Core.DomainModel;
@@ -48,13 +49,19 @@ namespace UI.MVC4.Controllers.API
                 Repository.Save();
 
                 var resetLink = "http://kitos.dk/Authorize/ResetPassword?Hash=" + hash;
-                var mailContent = "<a href='" + resetLink + "'>Klik her for at nulstille passwordet for din KITOS bruger</a>. Linket udløber om " + ResetRequestTTL + " timer.";
+                var mailContent = "<a href='" + resetLink +
+                                  "'>Klik her for at nulstille passwordet for din KITOS bruger</a>. Linket udløber om " +
+                                  ResetRequestTTL + " timer.";
 
                 _mailClient.Send(FromAddress, user.Email, "Nulstilning af dit KITOS password", mailContent);
 
                 var msg = new HttpResponseMessage(HttpStatusCode.Created);
                 msg.Headers.Location = new Uri(Request.RequestUri + item.Id);
                 return msg;
+            }
+            catch (SmtpException)
+            {
+                throw new HttpResponseException(HttpStatusCode.InternalServerError);
             }
             catch (Exception)
             {

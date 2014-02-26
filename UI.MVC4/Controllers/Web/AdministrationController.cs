@@ -19,7 +19,7 @@ namespace UI.MVC4.Controllers.Web
 
         //
         // GET: /AdministrationController/
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "GlobalAdmin")]
         public ActionResult AddMunicipality()
         {
             return View();

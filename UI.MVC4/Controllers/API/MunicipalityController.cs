@@ -32,7 +32,7 @@ namespace UI.MVC4.Controllers.API
         }
 
         // POST api/T
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "GlobalAdmin")]
         public virtual HttpResponseMessage Post(Municipality item)
         {
             try
@@ -51,7 +51,7 @@ namespace UI.MVC4.Controllers.API
         }
 
         // PUT api/T
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "GlobalAdmin")]
         public virtual HttpResponseMessage Put(int id, Municipality item)
         {
             item.Id = id;
@@ -69,7 +69,7 @@ namespace UI.MVC4.Controllers.API
         }
 
         // DELETE api/T
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "GlobalAdmin")]
         public virtual HttpResponseMessage Delete(int id)
         {
             try

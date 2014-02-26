@@ -11,7 +11,7 @@ namespace UI.MVC4.Controllers.Web
         //
         // GET: /Test/
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "GlobalAdmin")]
         public ActionResult Index()
         {
             return View();

@@ -24,7 +24,7 @@ namespace UI.MVC4.Controllers
         }
 
         // POST api/T
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "GlobalAdmin")]
         public virtual HttpResponseMessage Post(TModel item)
         {
             try
@@ -44,7 +44,7 @@ namespace UI.MVC4.Controllers
         }
 
         // PUT api/T
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "GlobalAdmin")]
         public virtual HttpResponseMessage Put(TKeyType id, TModel item)
         {
             item.Id = id;
@@ -62,7 +62,7 @@ namespace UI.MVC4.Controllers
         }
 
         // DELETE api/T
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "GlobalAdmin")]
         public virtual HttpResponseMessage Delete(TKeyType id)
         {
             try

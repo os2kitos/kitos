@@ -31,13 +31,16 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.ProjectType_Id).HasColumnName("ProjectType_Id");
             this.Property(t => t.ProjectCategory_Id).HasColumnName("ProjectCategory_Id");
             this.Property(t => t.Municipality_Id).HasColumnName("Municipality_Id");
+
+            /*
             this.Property(t => t.ItProjectOwner_Id).HasColumnName("ItProjectOwner_Id");
             this.Property(t => t.ItProjectLeader_Id).HasColumnName("ItProjectLeader_Id");
             this.Property(t => t.PartItProjectLeader_Id).HasColumnName("PartItProjectLeader_Id");
             this.Property(t => t.Consultant_Id).HasColumnName("Consultant_Id");
+             */
 
             // Relationships
-            this.HasOptional(t => t.ItProjectOwner)
+            /*this.HasOptional(t => t.ItProjectOwner)
                 .WithMany(t => t.OwnerOfItProjects)
                 .HasForeignKey(d => d.ItProjectOwner_Id)
                 .WillCascadeOnDelete(false);
@@ -52,7 +55,8 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.Consultant)
                 .WithMany(t => t.ConsultantOnItProjects)
                 .HasForeignKey(d => d.Consultant_Id)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(false);*/
+                
             this.HasRequired(t => t.Municipality)
                 .WithMany(t => t.ItProjects)
                 .HasForeignKey(d => d.Municipality_Id)

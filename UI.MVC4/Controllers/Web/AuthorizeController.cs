@@ -179,6 +179,8 @@ namespace UI.MVC4.Controllers.Web
                 _userRepository.Update(user);
                 _userRepository.Save();
 
+                _passwordResetRepository.Delete(passwordReset);
+
             }
             catch
             {

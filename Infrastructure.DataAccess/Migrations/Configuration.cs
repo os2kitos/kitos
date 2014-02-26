@@ -36,9 +36,10 @@ namespace Infrastructure.DataAccess.Migrations
             //
 
             #region Roles
-            var admin = new Role {Name = "Admin"};
-            
-            context.Roles.AddOrUpdate(x => x.Name, admin);
+            var globalAdmin = new Role { Name = "GlobalAdmin" };
+            var localAdmin = new Role { Name = "LocalAdmin" };
+
+            context.Roles.AddOrUpdate(x => x.Name, globalAdmin, localAdmin);
             
             #endregion
 
@@ -49,7 +50,7 @@ namespace Infrastructure.DataAccess.Migrations
                 Name = "Simon Lynn-Pedersen",
                 Email = "slp@it-minds.dk",
                 Password = "slp",
-                Role = admin
+                Role = globalAdmin
             };
             var arne = new User
             {
@@ -86,6 +87,42 @@ namespace Infrastructure.DataAccess.Migrations
                                                           User_Id = arneId
                                                       }
                 );
+
+            #endregion
+
+            #region GLOBAL MUNICIPALITY
+
+            var municipality = new Municipality()
+                {
+                    Name = "Fælleskommune"
+                };
+
+            context.Municipalitys.AddOrUpdate(x => x.Name, municipality);
+
+            context.SaveChanges();
+
+            var configuration = new Core.DomainModel.Configuration
+                {
+                    Municipality = municipality,
+                    ItProjectGuide = "Et eller andet lort",
+                    EsdhRef = "ESDH ref.",
+                    CmdbRef = "CMDB ref.",
+                    FolderRef = "Mappe ref.",
+                    Fase1 = "Afventer",
+                    Fase2 = "Foranalyse",
+                    Fase3 = "Gennemførsel",
+                    Fase4 = "Overlevering",
+                    Fase5 = "Drift",
+                    ItProject = "IT Projekt",
+                    ItProgram = "IT Program",
+                    FocusArea = "Indsatsområde",
+                    ShowFocusArea = false,
+                    ShowBC = false,
+                    ShowPortfolio = false
+                };
+
+            context.Configurations.AddOrUpdate(x => x.Id, configuration);
+            context.SaveChanges();
 
             #endregion
 
