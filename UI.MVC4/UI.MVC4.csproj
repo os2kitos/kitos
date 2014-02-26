@@ -437,6 +437,7 @@
     <Content Include="Views\Shared\_TopNavigation.cshtml" />
     <Content Include="Views\Administration\AddMunicipality.cshtml" />
     <Content Include="Views\Test\Index.cshtml" />
+    <Content Include="Views\Test\Encrypt.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

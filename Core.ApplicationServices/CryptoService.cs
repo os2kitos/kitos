@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System;
+using System.Security.Cryptography;
 using System.Text;
 using Core.DomainServices;
 
@@ -18,7 +19,7 @@ namespace Core.ApplicationServices
             byte[] bytes = Encoding.UTF8.GetBytes(str);
             byte[] encrypted = _crypt.ComputeHash(bytes);
 
-            return Encoding.UTF8.GetString(encrypted);
+            return Convert.ToBase64String(encrypted);
         }
     }
 }

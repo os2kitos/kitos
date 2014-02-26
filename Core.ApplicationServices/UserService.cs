@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
+using System.Web;
 using Core.DomainModel;
 using Core.DomainServices;
 
@@ -53,6 +54,7 @@ namespace Core.ApplicationServices
             _passwordResetRequestRepository.Save();
 
             var resetLink = "http://kitos.dk/Authorize/ResetPassword?Hash=" + hash;
+            resetLink = HttpUtility.UrlEncode(resetLink);
 
             var mailSubject = "Nulstilning af dit KITOS password";
             var mailContent = "<a href='" + resetLink +

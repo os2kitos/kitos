@@ -12,7 +12,6 @@ namespace UI.MVC4.Controllers.API
     public class LocalAdminController : ApiController
     {
         private readonly IUserService _userService;
-        private readonly IGenericRepository<User> _repository;
 
         public LocalAdminController(IUserService userService)
         {

@@ -533,6 +533,7 @@ namespace Infrastructure.DataAccess.Migrations
                         Name = c.String(nullable: false, unicode: false),
                         Email = c.String(nullable: false, unicode: false),
                         Password = c.String(nullable: false, unicode: false),
+                        Salt = c.String(unicode: false),
                         Municipality_Id = c.Int(),
                         Role_Id = c.Int(),
                     })
