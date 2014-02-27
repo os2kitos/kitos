@@ -17,6 +17,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired();
             this.Property(t => t.Password)
                 .IsRequired();
+            this.Property(t => t.Salt)
+                .IsRequired();
             this.Property(t => t.Municipality_Id)
                 .IsRequired();
 
