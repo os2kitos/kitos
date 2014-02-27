@@ -84,25 +84,26 @@ namespace Core.ApplicationServices
             return passwordReset;
         }
 
-        public void ResetPassword(string requestId, string newPassword)
+        public void ResetPassword(PasswordResetRequest passwordResetRequest, string newPassword)
         {
-            var passwordReset = GetPasswordReset(requestId);
-
-            if (passwordReset == null) 
-                throw new ArgumentException("Password reset request not found");
+            if (passwordResetRequest == null)
+                throw new ArgumentNullException("passwordResetRequest");
 
             if(!IsValidPassword(newPassword))
                 throw new ArgumentException("New password is invalid");
 
-            var user = passwordReset.User;
+            var user = passwordResetRequest.User;
 
             user.Password = _cryptoService.Encrypt(newPassword + user.Salt);
             _userRepository.Update(user);
-
             _userRepository.Save();
+
+            _passwordResetRequestRepository.DeleteById(passwordResetRequest.Id);
+            _passwordResetRequestRepository.Save();
         }
 
-        public bool IsValidPassword(string password)
+
+        private bool IsValidPassword(string password)
         {
             return password.Length >= 6;
         }

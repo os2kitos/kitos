@@ -118,7 +118,8 @@ namespace UI.MVC4.Controllers.Web
                 if (!ModelState.IsValid)
                     return View(resetModel);
 
-                _userService.ResetPassword(resetModel.RequestHash, resetModel.Password);
+                var resetRequest = _userService.GetPasswordReset(resetModel.RequestHash);
+                _userService.ResetPassword(resetRequest, resetModel.Password);
             }
             catch
             {
