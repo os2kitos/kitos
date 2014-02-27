@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -17,23 +18,29 @@ namespace UI.MVC4.Controllers
             Repository = repository;
         }
 
+        public virtual IEnumerable<TModel> Get()
+        {
+            return Repository.Get();
+        }
+
         // GET api/T
-        public TModel Get(TKeyType id)
+        public virtual TModel Get(TKeyType id)
         {
             return Repository.GetById(id);
         }
 
         // POST api/T
-        [Authorize(Roles = "Admin")]
-        public HttpResponseMessage Post(TModel item)
+        [Authorize(Roles = "GlobalAdmin")]
+        public virtual HttpResponseMessage Post(TModel item)
         {
             try
             {
                 Repository.Insert(item);
                 Repository.Save();
 
-                var msg = new HttpResponseMessage(HttpStatusCode.Created);
-                msg.Headers.Location = new Uri(Request.RequestUri + item.Id.ToString());
+                //var msg = new HttpResponseMessage(HttpStatusCode.Created);
+                var msg = Request.CreateResponse(HttpStatusCode.Created, item);
+                msg.Headers.Location = new Uri(Request.RequestUri + "/" + item.Id.ToString());
                 return msg;
             }
             catch (Exception)
@@ -43,8 +50,8 @@ namespace UI.MVC4.Controllers
         }
 
         // PUT api/T
-        [Authorize(Roles = "Admin")]
-        public HttpResponseMessage Put(TKeyType id, TModel item)
+        [Authorize(Roles = "GlobalAdmin")]
+        public virtual HttpResponseMessage Put(TKeyType id, TModel item)
         {
             item.Id = id;
             try
@@ -61,8 +68,8 @@ namespace UI.MVC4.Controllers
         }
 
         // DELETE api/T
-        [Authorize(Roles = "Admin")]
-        public HttpResponseMessage Delete(TKeyType id)
+        [Authorize(Roles = "GlobalAdmin")]
+        public virtual HttpResponseMessage Delete(TKeyType id)
         {
             try
             {

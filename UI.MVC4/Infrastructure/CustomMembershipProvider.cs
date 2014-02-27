@@ -11,6 +11,9 @@ namespace UI.MVC4.Infrastructure
         [Inject]
         public IUserRepositoryFactory UserRepositoryFactory { get; set; }
 
+        [Inject]
+        public ICryptoService CryptoService { get; set; }
+
         #region not implemented
 
         public override string ApplicationName
@@ -158,7 +161,7 @@ namespace UI.MVC4.Infrastructure
             if (user == null) return false;
 
             //TODO: HASHING
-            return user.Password == password;
+            return user.Password == CryptoService.Encrypt(password + user.Salt);
         }
     }
 }

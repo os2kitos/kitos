@@ -5,23 +5,17 @@ using Core.DomainModel;
 using Core.DomainServices;
 using UI.MVC4.Models;
 
-namespace UI.MVC4.Controllers
+namespace UI.MVC4.Controllers.Web
 {
     public class AuthorizeController : Controller
     {
-        //TODO: where do these go?
-        private const int ResetRequestTTL = 12;
-        private const string FromAddress = "kitos@it-minds.dk";
-
         private readonly IUserRepository _userRepository;
-        private readonly IPasswordResetRequestRepository _passwordResetRepository;
-        private readonly IMailClient _mailClient;
+        private readonly IUserService _userService;
 
-        public AuthorizeController(IUserRepository userRepository, IPasswordResetRequestRepository passwordResetRepository, IMailClient mailClient)
+        public AuthorizeController(IUserRepository userRepository, IUserService userService)
         {
             _userRepository = userRepository;
-            _passwordResetRepository = passwordResetRepository;
-            _mailClient = mailClient;
+            _userService = userService;
         }
 
         public ActionResult Login(string returnUrl)
@@ -71,44 +65,18 @@ namespace UI.MVC4.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult ForgotPassword(ForgotPasswordViewModel model)
         {
-            User user;
-
             try
             {
-                user = _userRepository.GetByEmail(model.Email);
-                if (user == null)
-                    throw new Exception();
+                var user = _userRepository.GetByEmail(model.Email);
+                _userService.IssuePasswordReset(user);
             }
-            catch
+            catch (ArgumentNullException)
             {
                 //Something went bad when trying to find a user. Report the error
 
                 //TODO: perhaps we shouldn't report that the user wasn't found?
                 //TODO: Right now we are leaking information about which users exist
                 return RedirectToAction("ForgotPassword", new {userNotFound = true});
-            }
-
-            try
-            {
-                var now = DateTime.Now;
-
-                //TODO: BETTER HASHING???
-                var hash = FormsAuthentication.HashPasswordForStoringInConfigFile(now + user.Email, "MD5");
-                var passwordReset = new PasswordResetRequest
-                {
-                    Id = 0,
-                    Hash = hash,
-                    Time = now,
-                    User = user
-                };
-
-                _passwordResetRepository.Create(passwordReset);
-                _userRepository.Save();
-
-                var resetLink = "http://kitos.dk/Authorize/ResetPassword?Hash=" + hash;
-                var mailContent = "<a href='" + resetLink + "'>Klik her for at nulstille passwordet for din KITOS bruger</a>. Linket udløber om " + ResetRequestTTL + " timer.";
-
-                _mailClient.Send(FromAddress, user.Email, "Nulstilning af dit KITOS password", mailContent);
             }
             catch
             {
@@ -129,32 +97,15 @@ namespace UI.MVC4.Controllers
         [HttpGet]
         public ActionResult ResetPassword(string hash)
         {
+            
             ResetPasswordViewModel resetModel = null;
 
-            try
+            var resetRequest = _userService.GetPasswordReset(hash);
+            if (resetRequest != null)
             {
-                var passwordReset = _passwordResetRepository.GetByHash(hash);
-
-                var timespan = DateTime.Now - passwordReset.Time;
-                if (timespan.TotalHours < ResetRequestTTL)
-                {
-                    //successfully found valid reset request 
-
-                    //TODO: should we use AutoMapper here??
-                    resetModel = new ResetPasswordViewModel {RequestHash = hash, Email = passwordReset.User.Email};
-                }
-                else
-                {
-                    //the reset request is too old, delete it
-                    _passwordResetRepository.Delete(passwordReset);
-                }
-
-            }
-            catch
-            {
-                //TODO: leaving this empty is probably not a good idea??
-            }
-
+                resetModel = new ResetPasswordViewModel {RequestHash = hash, Email = resetRequest.User.Email};
+            } 
+            
             return View(resetModel);
         }
 
@@ -164,22 +115,11 @@ namespace UI.MVC4.Controllers
         {
             try
             {
-                //does the reset request still exist?
-                var passwordReset = _passwordResetRepository.GetByHash(resetModel.RequestHash);
-
                 if (!ModelState.IsValid)
                     return View(resetModel);
 
-                //Everything is cool, set new password
-
-                var user = passwordReset.User;
-
-                //TODO: enforce password rules??
-                user.Password = resetModel.Password;
-
-                _userRepository.Update(user);
-                _userRepository.Save();
-
+                var resetRequest = _userService.GetPasswordReset(resetModel.RequestHash);
+                _userService.ResetPassword(resetRequest, resetModel.Password);
             }
             catch
             {

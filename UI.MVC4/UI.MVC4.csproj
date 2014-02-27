@@ -45,6 +45,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="AutoMapper">
+      <HintPath>..\packages\AutoMapper.3.1.1\lib\net40\AutoMapper.dll</HintPath>
+    </Reference>
+    <Reference Include="AutoMapper.Net4">
+      <HintPath>..\packages\AutoMapper.3.1.1\lib\net40\AutoMapper.Net4.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.6.0.2\lib\net45\EntityFramework.dll</HintPath>
@@ -208,14 +214,21 @@
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\MappingConfig.cs" />
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\API\LocalAdminController.cs" />
+    <Compile Include="Controllers\API\MunicipalityController.cs" />
+    <Compile Include="Controllers\API\PasswordResetRequestController.cs" />
+    <Compile Include="Controllers\API\UserController.cs" />
     <Compile Include="Controllers\Web\AccountController.cs" />
+    <Compile Include="Controllers\Web\AdministrationController.cs" />
     <Compile Include="Controllers\Web\AuthorizeController.cs" />
     <Compile Include="Controllers\API\GenericApiController.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Controllers\API\TextController.cs" />
+    <Compile Include="Controllers\Web\TestController.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -229,6 +242,8 @@
     <Compile Include="Infrastructure\UserRepositoryFactory.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\AuthorizeViewModels.cs" />
+    <Compile Include="Models\MunicipalityApiModel.cs" />
+    <Compile Include="Models\UserApiModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -239,7 +254,12 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\carousel.css" />
+    <Content Include="Content\css\select2-spinner.gif" />
+    <Content Include="Content\css\select2.css" />
+    <Content Include="Content\css\select2.png" />
+    <Content Include="Content\css\select2x2.png" />
     <Content Include="Content\kitos.css" />
+    <Content Include="Content\select2-bootstrap.css" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
@@ -321,6 +341,50 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\knockout-2.2.0.debug.js" />
     <Content Include="Scripts\knockout-2.2.0.js" />
+    <Content Include="Scripts\message.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_ar.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_bg.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_ca.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_cs.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_da.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_de.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_el.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_es.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_et.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_eu.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_fa.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_fi.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_fr.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_gl.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_he.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_hr.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_hu.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_id.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_is.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_it.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_ja.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_ko.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_lt.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_lv.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_mk.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_ms.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_nl.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_no.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_pl.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_pt-BR.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_pt-PT.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_ro.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_ru.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_sk.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_sv.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_th.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_tr.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_ua.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_vi.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_zh-CN.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_zh-TW.js" />
+    <Content Include="Scripts\select2.js" />
+    <Content Include="Scripts\select2.min.js" />
     <Content Include="Scripts\wysihtml5\parser_rules\advanced.js" />
     <Content Include="Scripts\wysihtml5\parser_rules\simple.js" />
     <Content Include="Scripts\wysihtml5\wysihtml5-0.3.0.js" />
@@ -371,6 +435,9 @@
     <Content Include="Views\Authorize\EmailSent.cshtml" />
     <Content Include="Views\Shared\_TopNavigation.old.cshtml" />
     <Content Include="Views\Shared\_TopNavigation.cshtml" />
+    <Content Include="Views\Administration\AddMunicipality.cshtml" />
+    <Content Include="Views\Test\Index.cshtml" />
+    <Content Include="Views\Test\Encrypt.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
