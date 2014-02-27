@@ -46,92 +46,91 @@ namespace Infrastructure.DataAccess.Migrations
             
             #endregion
 
-            #region Global municipality
-
-            var municipality = new Municipality()
-                {
-                    Name = "Fælleskommune"
-                };
-
-            context.Municipalitys.AddOrUpdate(x => x.Name, commonMunicipality);
-
-            context.SaveChanges();
-
             #region Drop Down Data
 
             context.ProjectTypes.AddOrUpdate(x => x.Name,
-                                             new ProjectType() {IsActive = true, Note = "...", Name = "Light"},
-                                             new ProjectType() {IsActive = true, Note = "...", Name = "Lokal"},
-                                             new ProjectType() {IsActive = true, Note = "...", Name = "Tværkommunalt"},
-                                             new ProjectType() {IsActive = true, Note = "...", Name = "SKAL"}
+                                             new ProjectType() { IsActive = true, Note = "...", Name = "Light" },
+                                             new ProjectType() { IsActive = true, Note = "...", Name = "Lokal" },
+                                             new ProjectType() { IsActive = true, Note = "...", Name = "Tværkommunalt" },
+                                             new ProjectType() { IsActive = true, Note = "...", Name = "SKAL" }
                 );
 
             context.SystemTypes.AddOrUpdate(x => x.Name,
-                                            new SystemType() {IsActive = true, Note = "...", Name = "Fag"},
-                                            new SystemType() {IsActive = true, Note = "...", Name = "ESDH"},
-                                            new SystemType() {IsActive = true, Note = "...", Name = "Støttesystemer"}
+                                            new SystemType() { IsActive = true, Note = "...", Name = "Fag" },
+                                            new SystemType() { IsActive = true, Note = "...", Name = "ESDH" },
+                                            new SystemType() { IsActive = true, Note = "...", Name = "Støttesystemer" }
                 );
 
             context.InterfaceTypes.AddOrUpdate(x => x.Name,
-                                               new InterfaceType() {IsActive = true, Note = "...", Name = "WS"});
+                                               new InterfaceType() { IsActive = true, Note = "...", Name = "WS" });
 
             context.ProtocolTypes.AddOrUpdate(x => x.Name,
-                                              new ProtocolType() {IsActive = true, Note = "...", Name = "OIORES"},
-                                              new ProtocolType() {IsActive = true, Note = "...", Name = "WS SOAP"}
+                                              new ProtocolType() { IsActive = true, Note = "...", Name = "OIORES" },
+                                              new ProtocolType() { IsActive = true, Note = "...", Name = "WS SOAP" }
                 );
 
             context.Methods.AddOrUpdate(x => x.Name,
-                                        new Method() {IsActive = true, Note = "...", Name = "Batch"},
-                                        new Method() {IsActive = true, Note = "...", Name = "Request-Response"}
+                                        new Method() { IsActive = true, Note = "...", Name = "Batch" },
+                                        new Method() { IsActive = true, Note = "...", Name = "Request-Response" }
                 );
 
             context.DatabaseTypes.AddOrUpdate(x => x.Name,
-                                              new DatabaseType() {IsActive = true, Note = "...", Name = "MSSQL"},
-                                              new DatabaseType() {IsActive = true, Note = "...", Name = "MySQL"}
+                                              new DatabaseType() { IsActive = true, Note = "...", Name = "MSSQL" },
+                                              new DatabaseType() { IsActive = true, Note = "...", Name = "MySQL" }
                 );
 
             context.Environments.AddOrUpdate(x => x.Name,
                                              new Core.DomainModel.ItSystem.Environment()
-                                                 {
-                                                     IsActive = true,
-                                                     Note = "...",
-                                                     Name = "Citrix"
-                                                 });
+                                             {
+                                                 IsActive = true,
+                                                 Note = "...",
+                                                 Name = "Citrix"
+                                             });
 
             context.ContractTypes.AddOrUpdate(x => x.Name,
-                                              new ContractType() {IsActive = true, Note = "...", Name = "Hovedkontrakt"},
+                                              new ContractType() { IsActive = true, Note = "...", Name = "Hovedkontrakt" },
                                               new ContractType()
-                                                  {
-                                                      IsActive = true,
-                                                      Note = "...",
-                                                      Name = "Tilægskontrakt"
-                                                  },
-                                              new ContractType() {IsActive = true, Note = "...", Name = "Snitflade"}
+                                              {
+                                                  IsActive = true,
+                                                  Note = "...",
+                                                  Name = "Tilægskontrakt"
+                                              },
+                                              new ContractType() { IsActive = true, Note = "...", Name = "Snitflade" }
                 );
 
             context.ContractTemplates.AddOrUpdate(x => x.Name,
-                                                  new ContractTemplate() {IsActive = true, Note = "...", Name = "K01"},
-                                                  new ContractTemplate() {IsActive = true, Note = "...", Name = "K02"},
-                                                  new ContractTemplate() {IsActive = true, Note = "...", Name = "K03"}
+                                                  new ContractTemplate() { IsActive = true, Note = "...", Name = "K01" },
+                                                  new ContractTemplate() { IsActive = true, Note = "...", Name = "K02" },
+                                                  new ContractTemplate() { IsActive = true, Note = "...", Name = "K03" }
                 );
 
             context.PurchaseForms.AddOrUpdate(x => x.Name,
-                                              new PurchaseForm() {IsActive = true, Note = "...", Name = "SKI"},
-                                              new PurchaseForm() {IsActive = true, Note = "...", Name = "SKI 02.19"},
-                                              new PurchaseForm() {IsActive = true, Note = "...", Name = "Udbud"}
+                                              new PurchaseForm() { IsActive = true, Note = "...", Name = "SKI" },
+                                              new PurchaseForm() { IsActive = true, Note = "...", Name = "SKI 02.19" },
+                                              new PurchaseForm() { IsActive = true, Note = "...", Name = "Udbud" }
                 );
 
             context.PaymentModels.AddOrUpdate(x => x.Name,
-                                              new PaymentModel() {IsActive = true, Note = "...", Name = "Licens"});
+                                              new PaymentModel() { IsActive = true, Note = "...", Name = "Licens" });
 
             context.SaveChanges();
 
             #endregion
 
+            #region Global municipality
+
+            var globalMunicipality = new Municipality()
+                {
+                    Name = "Fælleskommune"
+                };
+
+            context.Municipalitys.AddOrUpdate(x => x.Name, globalMunicipality);
+
+            context.SaveChanges();
 
             var configuration = new Core.DomainModel.Configuration
                 {
-                    Municipality = commonMunicipality,
+                    Municipality = globalMunicipality,
                     ItProjectGuide = "ProjectGuide",
                     //EsdhRef = "ESDH ref.",
                     //CmdbRef = "CMDB ref.",
@@ -163,7 +162,7 @@ namespace Infrastructure.DataAccess.Migrations
                 Salt = "uw5BuXBIc52n2pL2MH4NRZMg44SVmw3GmrvOAK5pxz4=", //encryption of "saltsimon"
                 Password = "2Pps82r5J0vIjvxJjHPf4mF/t2Q5VySmTiT2ZgV7e8U=", //"slp123" encrypted with salt
                 Role = globalAdmin,
-                Municipality = municipality
+                Municipality = globalMunicipality
             };
 
             context.Users.AddOrUpdate(x => x.Email, simon);
