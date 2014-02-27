@@ -8,8 +8,7 @@ namespace Infrastructure.DataAccess.Mapping
         public ProjectPhaseLocaleMap()
         {
             // Primary Key
-            this.HasKey(t => t.Id);
-            //this.HasKey(t => new { t.Municipality, t.ProjectPhase});
+            this.HasKey(t => new { t.Municipality_Id, t.ProjectPhase_Id });
 
             // Properties
             // Table & Column Mappings
@@ -17,10 +16,9 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Relationships
             this.HasRequired(t => t.Municipality)
-                .WithOptional(t => t.ProjectPhaseLocale);
+                .WithMany(t => t.ProjectPhaseLocales)
+                .HasForeignKey(t => t.Municipality_Id);
 
-            this.HasRequired(t => t.ProjectPhase)
-                .WithOptional(t => t.ProjectPhaseLocale);
         }
     }
 }

@@ -1,13 +1,13 @@
-﻿namespace Core.DomainModel.ItProject
+﻿using System.Collections.Generic;
+
+namespace Core.DomainModel.ItProject
 {
-    public class ProjectPhaseLocale : IEntity<int>
+    public class ProjectPhaseLocale
     {
-        // uses composit key from Municipality and ProjectPhase, 
-        // so no Id property
-        public int Id { get; set; }
+        public int Municipality_Id { get; set; }
+        public int ProjectPhase_Id { get; set; }
         public string Name { get; set; }
 
         public virtual Municipality Municipality { get; set; }
-        public virtual ProjectPhase ProjectPhase { get; set; }
     }
 }

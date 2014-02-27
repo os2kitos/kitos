@@ -225,6 +225,7 @@
     <Compile Include="Controllers\API\InterfaceTypeController.cs" />
     <Compile Include="Controllers\API\MethodController.cs" />
     <Compile Include="Controllers\API\PaymentModelController.cs" />
+    <Compile Include="Controllers\API\ProjectPhaseLocaleController.cs" />
     <Compile Include="Controllers\API\ProjectTypeController.cs" />
     <Compile Include="Controllers\API\ProtocolTypeController.cs" />
     <Compile Include="Controllers\API\PurchaseFormController.cs" />

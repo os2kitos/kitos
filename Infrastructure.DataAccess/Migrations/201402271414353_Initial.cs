@@ -553,21 +553,24 @@ namespace Infrastructure.DataAccess.Migrations
                         Name = c.String(unicode: false),
                         IsActive = c.Boolean(nullable: false),
                         Note = c.String(unicode: false),
+                        ProjectPhaseLocale_Municipality_Id = c.Int(),
+                        ProjectPhaseLocale_ProjectPhase_Id = c.Int(),
                     })
-                .PrimaryKey(t => t.Id);
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.ProjectPhaseLocale", t => new { t.ProjectPhaseLocale_Municipality_Id, t.ProjectPhaseLocale_ProjectPhase_Id })
+                .Index(t => new { t.ProjectPhaseLocale_Municipality_Id, t.ProjectPhaseLocale_ProjectPhase_Id });
             
             CreateTable(
                 "dbo.ProjectPhaseLocale",
                 c => new
                     {
-                        Id = c.Int(nullable: false),
+                        Municipality_Id = c.Int(nullable: false),
+                        ProjectPhase_Id = c.Int(nullable: false),
                         Name = c.String(unicode: false),
                     })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.Municipality", t => t.Id)
-                .ForeignKey("dbo.ProjectPhase", t => t.Id)
-                .Index(t => t.Id)
-                .Index(t => t.Id);
+                .PrimaryKey(t => new { t.Municipality_Id, t.ProjectPhase_Id })
+                .ForeignKey("dbo.Municipality", t => t.Municipality_Id, cascadeDelete: true)
+                .Index(t => t.Municipality_Id);
             
             CreateTable(
                 "dbo.ProjectType",
@@ -757,8 +760,8 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.Resource", "ItProject_Id", "dbo.ItProject");
             DropForeignKey("dbo.ItProject", "ProjectType_Id", "dbo.ProjectType");
             DropForeignKey("dbo.ProjectStatus", "ProjectPhase_Id", "dbo.ProjectPhase");
-            DropForeignKey("dbo.ProjectPhaseLocale", "Id", "dbo.ProjectPhase");
-            DropForeignKey("dbo.ProjectPhaseLocale", "Id", "dbo.Municipality");
+            DropForeignKey("dbo.ProjectPhase", new[] { "ProjectPhaseLocale_Municipality_Id", "ProjectPhaseLocale_ProjectPhase_Id" }, "dbo.ProjectPhaseLocale");
+            DropForeignKey("dbo.ProjectPhaseLocale", "Municipality_Id", "dbo.Municipality");
             DropForeignKey("dbo.Milestone", "ProjectStatus_Id", "dbo.ProjectStatus");
             DropForeignKey("dbo.ProjectStatus", "Id", "dbo.ItProject");
             DropForeignKey("dbo.ItProject", "ProjectCategory_Id", "dbo.ProjectCategory");
@@ -819,8 +822,8 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.Resource", new[] { "ItProject_Id" });
             DropIndex("dbo.ItProject", new[] { "ProjectType_Id" });
             DropIndex("dbo.ProjectStatus", new[] { "ProjectPhase_Id" });
-            DropIndex("dbo.ProjectPhaseLocale", new[] { "Id" });
-            DropIndex("dbo.ProjectPhaseLocale", new[] { "Id" });
+            DropIndex("dbo.ProjectPhase", new[] { "ProjectPhaseLocale_Municipality_Id", "ProjectPhaseLocale_ProjectPhase_Id" });
+            DropIndex("dbo.ProjectPhaseLocale", new[] { "Municipality_Id" });
             DropIndex("dbo.Milestone", new[] { "ProjectStatus_Id" });
             DropIndex("dbo.ProjectStatus", new[] { "Id" });
             DropIndex("dbo.ItProject", new[] { "ProjectCategory_Id" });
