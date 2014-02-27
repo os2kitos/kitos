@@ -3,7 +3,7 @@ using Core.DomainModel.ItProject;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ProjectPhaseLocaleMap : EntityTypeConfiguration<ProjectPhaseLocale>
+    public class ProjectPhaseLocaleMap : EntityTypeConfiguration<ProjPhaseLocale>
     {
         public ProjectPhaseLocaleMap()
         {

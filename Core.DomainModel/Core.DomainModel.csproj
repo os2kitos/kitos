@@ -64,7 +64,7 @@
     <Compile Include="ItProject\PreAnalysis.cs" />
     <Compile Include="ItProject\ProjectCategory.cs" />
     <Compile Include="ItProject\ProjectPhase.cs" />
-    <Compile Include="ItProject\ProjectPhaseLocale.cs" />
+    <Compile Include="ItProject\ProjPhaseLocale.cs" />
     <Compile Include="ItProject\ProjectStatus.cs" />
     <Compile Include="ItProject\ProjectType.cs" />
     <Compile Include="ItProject\Resource.cs" />

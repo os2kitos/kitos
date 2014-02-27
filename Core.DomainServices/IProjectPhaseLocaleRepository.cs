@@ -8,10 +8,10 @@ namespace Core.DomainServices
 {
     public interface IProjectPhaseLocaleRepository
     {
-        ProjectPhaseLocale GetById(int mId, int pId);
-        ProjectPhaseLocale Insert(ProjectPhaseLocale entity);
+        ProjPhaseLocale GetById(int mId, int pId);
+        ProjPhaseLocale Insert(ProjPhaseLocale entity);
         void DeleteById(int mId, int pId);
-        void Update(ProjectPhaseLocale entity);
+        void Update(ProjPhaseLocale entity);
         void Save(); 
     }
 }

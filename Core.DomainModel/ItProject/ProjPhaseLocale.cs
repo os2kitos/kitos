@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel.ItProject
 {
-    public class ProjectPhaseLocale
+    public class ProjPhaseLocale
     {
         public int Municipality_Id { get; set; }
         public int ProjectPhase_Id { get; set; }

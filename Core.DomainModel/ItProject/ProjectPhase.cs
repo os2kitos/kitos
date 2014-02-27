@@ -16,6 +16,5 @@ namespace Core.DomainModel.ItProject
         public string Note { get; set; }
 
         public virtual ICollection<ProjectStatus> ProjectStatuses { get; set; }
-        public ProjectPhaseLocale ProjectPhaseLocale { get; set; }
     }
 }

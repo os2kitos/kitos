@@ -57,7 +57,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ProgLanguage> ProgLanguages { get; set; }
         public DbSet<ProjectCategory> ProjectCategories { get; set; }
         public DbSet<ProjectPhase> ProjectPhases { get; set; }
-        public DbSet<ProjectPhaseLocale> ProjectPhaseLocales { get; set; }
+        public DbSet<ProjPhaseLocale> ProjectPhaseLocales { get; set; }
         public DbSet<ProjectStatus> ProjectStatus { get; set; }
         public DbSet<ProjectType> ProjectTypes { get; set; }
         public DbSet<ProtocolType> ProtocolTypes { get; set; }

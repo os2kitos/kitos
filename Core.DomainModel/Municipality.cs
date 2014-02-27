@@ -11,7 +11,7 @@ namespace Core.DomainModel
             this.ItSystems = new List<ItSystem.ItSystem>();
             this.ItContracts = new List<ItContract.ItContract>();
             this.Users = new List<User>();
-            this.ProjectPhaseLocales = new List<ProjectPhaseLocale>();
+            this.ProjectPhaseLocales = new List<ProjPhaseLocale>();
         }
 
         public int Id { get; set; }
@@ -23,6 +23,6 @@ namespace Core.DomainModel
         public virtual ICollection<ItContract.ItContract> ItContracts { get; set; }
         //public virtual Localization Localization { get; set; }
         public virtual ICollection<User> Users { get; set; }
-        public virtual ICollection<ProjectPhaseLocale> ProjectPhaseLocales { get; set; }
+        public virtual ICollection<ProjPhaseLocale> ProjectPhaseLocales { get; set; }
     }
 }

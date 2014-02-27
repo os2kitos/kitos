@@ -15,7 +15,7 @@ namespace UI.MVC4.Controllers.API
         }
 
         // GET api/ProjectPhaseLocale
-        public ProjectPhaseLocale Get(int mId, int pId)
+        public ProjPhaseLocale Get(int mId, int pId)
         {
             return Repository.GetById(mId, pId);
         }
