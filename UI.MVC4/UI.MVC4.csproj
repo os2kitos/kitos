@@ -218,6 +218,7 @@
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\API\GlobalAdminController.cs" />
     <Compile Include="Controllers\API\LocalAdminController.cs" />
     <Compile Include="Controllers\API\MunicipalityController.cs" />
     <Compile Include="Controllers\API\PasswordResetRequestController.cs" />
@@ -438,6 +439,7 @@
     <Content Include="Views\Administration\AddMunicipality.cshtml" />
     <Content Include="Views\Test\Index.cshtml" />
     <Content Include="Views\Test\Encrypt.cshtml" />
+    <Content Include="Views\Administration\AddGlobalAdmin.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
