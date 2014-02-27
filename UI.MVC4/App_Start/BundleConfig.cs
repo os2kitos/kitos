@@ -15,8 +15,9 @@ namespace UI.MVC4
                         "~/Scripts/jquery-ui-{version}.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
-                        "~/Scripts/jquery.unobtrusive*",
-                        "~/Scripts/jquery.validate*"));
+                        //"~/Scripts/jquery.unobtrusive*",
+                        "~/Scripts/jquery.validate.js",
+                        "~/Scripts/validate.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/wysihtml5").Include(
                 "~/Scripts/wysihtml5/parser_rules/advanced.js",

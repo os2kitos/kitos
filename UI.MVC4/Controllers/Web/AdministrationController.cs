@@ -6,7 +6,7 @@ using System.Web.Mvc;
 
 namespace UI.MVC4.Controllers.Web
 {
-    [Authorize(Roles = "GlobalAdmin")]
+    //[Authorize(Roles = "GlobalAdmin")]
     public class AdministrationController : Controller
     {
         //
@@ -21,6 +21,11 @@ namespace UI.MVC4.Controllers.Web
         //
         // GET: /AdministrationController/
         public ActionResult AddMunicipality()
+        {
+            return View();
+        }
+
+        public ActionResult AddLocalAdmin()
         {
             return View();
         }
