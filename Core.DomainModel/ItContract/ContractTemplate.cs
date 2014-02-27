@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItContract
 {
-    public class ContractTemplate
+    public class ContractTemplate : IEntity<int>
     {
         public ContractTemplate()
         {

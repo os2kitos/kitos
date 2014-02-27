@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class Environment
+    public class Environment : IEntity<int>
     {
         public Environment()
         {

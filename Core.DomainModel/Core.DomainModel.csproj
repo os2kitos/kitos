@@ -61,6 +61,7 @@
     <Compile Include="ItProject\Handover.cs" />
     <Compile Include="ItProject\Hierarchy.cs" />
     <Compile Include="ItProject\ItProject.cs" />
+    <Compile Include="ItProject\ItProjectTab.cs" />
     <Compile Include="ItProject\Milestone.cs" />
     <Compile Include="ItProject\Organization.cs" />
     <Compile Include="ItProject\PreAnalysis.cs" />

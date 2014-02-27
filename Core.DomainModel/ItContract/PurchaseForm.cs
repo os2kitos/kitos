@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItContract
 {
-    public class PurchaseForm
+    public class PurchaseForm : IEntity<int>
     {
         public PurchaseForm()
         {

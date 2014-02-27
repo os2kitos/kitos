@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class DatabaseType
+    public class DatabaseType : IEntity<int>
     {
         public DatabaseType()
         {
