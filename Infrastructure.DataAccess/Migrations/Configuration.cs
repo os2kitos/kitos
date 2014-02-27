@@ -40,7 +40,43 @@ namespace Infrastructure.DataAccess.Migrations
             var localAdmin = new Role { Name = "LocalAdmin" };
 
             context.Roles.AddOrUpdate(x => x.Name, globalAdmin, localAdmin);
-            
+
+            #endregion
+
+            #region Global municipality
+
+            var municipality = new Municipality()
+            {
+                Name = "Fælleskommune"
+            };
+
+            context.Municipalitys.AddOrUpdate(x => x.Name, municipality);
+
+            context.SaveChanges();
+
+            var configuration = new Core.DomainModel.Configuration
+            {
+                Municipality = municipality,
+                ItProjectGuide = "ProjektGuide",
+                EsdhRef = "ESDH ref.",
+                CmdbRef = "CMDB ref.",
+                FolderRef = "Mappe ref.",
+                Fase1 = "Afventer",
+                Fase2 = "Foranalyse",
+                Fase3 = "Gennemførsel",
+                Fase4 = "Overlevering",
+                Fase5 = "Drift",
+                ItProject = "IT Projekt",
+                ItProgram = "IT Program",
+                FocusArea = "Indsatsområde",
+                ShowFocusArea = false,
+                ShowBC = false,
+                ShowPortfolio = false
+            };
+
+            context.Configurations.AddOrUpdate(x => x.Id, configuration);
+            context.SaveChanges();
+
             #endregion
 
             #region Users
@@ -51,18 +87,11 @@ namespace Infrastructure.DataAccess.Migrations
                 Email = "slp@it-minds.dk",
                 Salt = "uw5BuXBIc52n2pL2MH4NRZMg44SVmw3GmrvOAK5pxz4=", //encryption of "saltsimon"
                 Password = "2Pps82r5J0vIjvxJjHPf4mF/t2Q5VySmTiT2ZgV7e8U=", //"slp123" encrypted with salt
-                Role = globalAdmin
-            };
-            var arne = new User
-            {
-                Name = "Arne Hansen",
-                Email = "arne@it-minds.dk",
-                Salt = "3BjriY7JfEIYC1nXThvzonDVtO4n1Wrj/+8y/AucIU8=", //encryption of "saltarne"
-                Password = "DnLnH1rqAnZm7//BVMRe63mBj1nY93zF4RsrUCRgH50=", //"arne" encrypted with salt
-                Role = null
+                Role = globalAdmin,
+                Municipality = municipality
             };
 
-            context.Users.AddOrUpdate(x => x.Email, simon, arne);
+            context.Users.AddOrUpdate(x => x.Email, simon);
 
             context.SaveChanges();
 
@@ -70,8 +99,8 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Password Reset Requests
 
+            /*
             var simonId = context.Users.Single(x => x.Email == "slp@it-minds.dk").Id;
-            var arneId = context.Users.Single(x => x.Email == "arne@it-minds.dk").Id;
 
             context.PasswordResetRequests.AddOrUpdate(x => x.Id,
                                                       new PasswordResetRequest
@@ -80,52 +109,10 @@ namespace Infrastructure.DataAccess.Migrations
                                                           Id = "workingRequest", //ofcourse, this should be a hashed string or something obscure
                                                           Time = DateTime.Now.AddYears(+20), //.MaxValue also seems to be out-of-range, but this should hopefully be good enough
                                                           User_Id = simonId
-                                                      },
-                                                      new PasswordResetRequest
-                                                      {
-                                                          //This reset request is too old
-                                                          Id = "outdatedRequest",
-                                                          Time = DateTime.Now.AddYears(-1), // .MinValue is out-of-range of the SQL datetime type
-                                                          User_Id = arneId
                                                       }
                 );
 
-            #endregion
-
-            #region GLOBAL MUNICIPALITY
-
-            var municipality = new Municipality()
-                {
-                    Name = "Fælleskommune"
-                };
-
-            context.Municipalitys.AddOrUpdate(x => x.Name, municipality);
-
-            context.SaveChanges();
-
-            var configuration = new Core.DomainModel.Configuration
-                {
-                    Municipality = municipality,
-                    ItProjectGuide = "Et eller andet lort",
-                    EsdhRef = "ESDH ref.",
-                    CmdbRef = "CMDB ref.",
-                    FolderRef = "Mappe ref.",
-                    Fase1 = "Afventer",
-                    Fase2 = "Foranalyse",
-                    Fase3 = "Gennemførsel",
-                    Fase4 = "Overlevering",
-                    Fase5 = "Drift",
-                    ItProject = "IT Projekt",
-                    ItProgram = "IT Program",
-                    FocusArea = "Indsatsområde",
-                    ShowFocusArea = false,
-                    ShowBC = false,
-                    ShowPortfolio = false
-                };
-
-            context.Configurations.AddOrUpdate(x => x.Id, configuration);
-            context.SaveChanges();
-
+             */
             #endregion
 
             base.Seed(context);
