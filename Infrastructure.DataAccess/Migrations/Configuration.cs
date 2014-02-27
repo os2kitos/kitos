@@ -106,6 +106,8 @@ namespace Infrastructure.DataAccess.Migrations
 
             context.SaveChanges();
 
+            #region Drop Down Data
+
             context.ProjectTypes.AddOrUpdate(x => x.Name,
                                              new ProjectType() {IsActive = true, Note = "...", Name = "Light"},
                                              new ProjectType() {IsActive = true, Note = "...", Name = "Lokal"},
@@ -119,7 +121,8 @@ namespace Infrastructure.DataAccess.Migrations
                                             new SystemType() {IsActive = true, Note = "...", Name = "Støttesystemer"}
                 );
 
-            context.InterfaceTypes.AddOrUpdate(x => x.Name, new InterfaceType() {IsActive = true, Note = "...", Name = "WS"});
+            context.InterfaceTypes.AddOrUpdate(x => x.Name,
+                                               new InterfaceType() {IsActive = true, Note = "...", Name = "WS"});
 
             context.ProtocolTypes.AddOrUpdate(x => x.Name,
                                               new ProtocolType() {IsActive = true, Note = "...", Name = "OIORES"},
@@ -169,6 +172,11 @@ namespace Infrastructure.DataAccess.Migrations
 
             context.PaymentModels.AddOrUpdate(x => x.Name,
                                               new PaymentModel() {IsActive = true, Note = "...", Name = "Licens"});
+
+            context.SaveChanges();
+
+            #endregion
+
 
             var configuration = new Core.DomainModel.Configuration
                 {
