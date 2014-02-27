@@ -8,6 +8,7 @@ namespace Infrastructure.DataAccess.Mapping
         public ProjectPhaseLocaleMap()
         {
             // Primary Key
+            this.HasKey(t => t.Id);
             //this.HasKey(t => new { t.Municipality, t.ProjectPhase});
 
             // Properties

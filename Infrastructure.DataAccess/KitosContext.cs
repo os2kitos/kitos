@@ -53,7 +53,6 @@ namespace Infrastructure.DataAccess
         public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
         public DbSet<PaymentModel> PaymentModels { get; set; }
         public DbSet<Payment> Payments { get; set; }
-        public DbSet<Person> People { get; set; }
         public DbSet<PreAnalysis> PreAnalysis { get; set; }
         public DbSet<ProgLanguage> ProgLanguages { get; set; }
         public DbSet<ProjectCategory> ProjectCategories { get; set; }
@@ -114,7 +113,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new PasswordResetRequestMap());
             modelBuilder.Configurations.Add(new PaymentModelMap());
             modelBuilder.Configurations.Add(new PaymentMap());
-            modelBuilder.Configurations.Add(new PersonMap());
             modelBuilder.Configurations.Add(new PreAnalysisMap());
             modelBuilder.Configurations.Add(new ProgLanguageMap());
             modelBuilder.Configurations.Add(new ProjectCategoryMap());

@@ -47,9 +47,9 @@ namespace Infrastructure.DataAccess
             return _dbSet.Find(id);
         }
 
-        public void Insert(T entity)
+        public T Insert(T entity)
         {
-            _dbSet.Add(entity);
+            return _dbSet.Add(entity);
         }
 
         public void DeleteById<TKeyType>(TKeyType id)

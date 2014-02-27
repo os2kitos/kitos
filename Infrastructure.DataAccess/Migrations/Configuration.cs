@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Migrations
 {
@@ -36,11 +39,10 @@ namespace Infrastructure.DataAccess.Migrations
             //
 
             #region Roles
+            var globalAdmin = new Role { Name = "GlobalAdmin" };
+            var localAdmin = new Role { Name = "LocalAdmin" };
 
-            var user = new Role {Name = "User"};
-            var admin = new Role {Name = "Admin"};
-            
-            context.Roles.AddOrUpdate(x => x.Name, user, admin);
+            context.Roles.AddOrUpdate(x => x.Name, globalAdmin, localAdmin);
             
             #endregion
 
@@ -50,15 +52,17 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 Name = "Simon Lynn-Pedersen",
                 Email = "slp@it-minds.dk",
-                Password = "slp",
-                Roles = new List<Role> { user, admin }
+                Salt = "uw5BuXBIc52n2pL2MH4NRZMg44SVmw3GmrvOAK5pxz4=", //encryption of "saltsimon"
+                Password = "2Pps82r5J0vIjvxJjHPf4mF/t2Q5VySmTiT2ZgV7e8U=", //"slp123" encrypted with salt
+                Role = globalAdmin
             };
             var arne = new User
             {
                 Name = "Arne Hansen",
                 Email = "arne@it-minds.dk",
-                Password = "arne",
-                Roles = new List<Role> { user }
+                Salt = "3BjriY7JfEIYC1nXThvzonDVtO4n1Wrj/+8y/AucIU8=", //encryption of "saltarne"
+                Password = "DnLnH1rqAnZm7//BVMRe63mBj1nY93zF4RsrUCRgH50=", //"arne" encrypted with salt
+                Role = null
             };
 
             context.Users.AddOrUpdate(x => x.Email, simon, arne);
@@ -72,22 +76,122 @@ namespace Infrastructure.DataAccess.Migrations
             var simonId = context.Users.Single(x => x.Email == "slp@it-minds.dk").Id;
             var arneId = context.Users.Single(x => x.Email == "arne@it-minds.dk").Id;
 
-            context.PasswordResetRequests.AddOrUpdate(x => x.Hash,
+            context.PasswordResetRequests.AddOrUpdate(x => x.Id,
                                                       new PasswordResetRequest
                                                       {
                                                           //This reset request is fine
-                                                          Hash = "workingRequest", //ofcourse, this should be a hashed string or something obscure
-                                                          Time = DateTime.MaxValue,
+                                                          Id = "workingRequest", //ofcourse, this should be a hashed string or something obscure
+                                                          Time = DateTime.Now.AddYears(+20), //.MaxValue also seems to be out-of-range, but this should hopefully be good enough
                                                           User_Id = simonId
                                                       },
                                                       new PasswordResetRequest
                                                       {
                                                           //This reset request is too old
-                                                          Hash = "outdatedRequest",
+                                                          Id = "outdatedRequest",
                                                           Time = DateTime.Now.AddYears(-1), // .MinValue is out-of-range of the SQL datetime type
                                                           User_Id = arneId
                                                       }
                 );
+
+            #endregion
+
+            #region GLOBAL MUNICIPALITY
+
+            var commonMunicipality = new Municipality()
+                {
+                    Name = "Fælleskommune"
+                };
+
+            context.Municipalitys.AddOrUpdate(x => x.Name, commonMunicipality);
+
+            context.SaveChanges();
+
+            context.ProjectTypes.AddOrUpdate(x => x.Name,
+                                             new ProjectType() {IsActive = true, Note = "...", Name = "Light"},
+                                             new ProjectType() {IsActive = true, Note = "...", Name = "Lokal"},
+                                             new ProjectType() {IsActive = true, Note = "...", Name = "Tværkommunalt"},
+                                             new ProjectType() {IsActive = true, Note = "...", Name = "SKAL"}
+                );
+
+            context.SystemTypes.AddOrUpdate(x => x.Name,
+                                            new SystemType() {IsActive = true, Note = "...", Name = "Fag"},
+                                            new SystemType() {IsActive = true, Note = "...", Name = "ESDH"},
+                                            new SystemType() {IsActive = true, Note = "...", Name = "Støttesystemer"}
+                );
+
+            context.InterfaceTypes.AddOrUpdate(x => x.Name, new InterfaceType() {IsActive = true, Note = "...", Name = "WS"});
+
+            context.ProtocolTypes.AddOrUpdate(x => x.Name,
+                                              new ProtocolType() {IsActive = true, Note = "...", Name = "OIORES"},
+                                              new ProtocolType() {IsActive = true, Note = "...", Name = "WS SOAP"}
+                );
+
+            context.Methods.AddOrUpdate(x => x.Name,
+                                        new Method() {IsActive = true, Note = "...", Name = "Batch"},
+                                        new Method() {IsActive = true, Note = "...", Name = "Request-Response"}
+                );
+
+            context.DatabaseTypes.AddOrUpdate(x => x.Name,
+                                              new DatabaseType() {IsActive = true, Note = "...", Name = "MSSQL"},
+                                              new DatabaseType() {IsActive = true, Note = "...", Name = "MySQL"}
+                );
+
+            context.Environments.AddOrUpdate(x => x.Name,
+                                             new Core.DomainModel.ItSystem.Environment()
+                                                 {
+                                                     IsActive = true,
+                                                     Note = "...",
+                                                     Name = "Citrix"
+                                                 });
+
+            context.ContractTypes.AddOrUpdate(x => x.Name,
+                                              new ContractType() {IsActive = true, Note = "...", Name = "Hovedkontrakt"},
+                                              new ContractType()
+                                                  {
+                                                      IsActive = true,
+                                                      Note = "...",
+                                                      Name = "Tilægskontrakt"
+                                                  },
+                                              new ContractType() {IsActive = true, Note = "...", Name = "Snitflade"}
+                );
+
+            context.ContractTemplates.AddOrUpdate(x => x.Name,
+                                                  new ContractTemplate() {IsActive = true, Note = "...", Name = "K01"},
+                                                  new ContractTemplate() {IsActive = true, Note = "...", Name = "K02"},
+                                                  new ContractTemplate() {IsActive = true, Note = "...", Name = "K03"}
+                );
+
+            context.PurchaseForms.AddOrUpdate(x => x.Name,
+                                              new PurchaseForm() {IsActive = true, Note = "...", Name = "SKI"},
+                                              new PurchaseForm() {IsActive = true, Note = "...", Name = "SKI 02.19"},
+                                              new PurchaseForm() {IsActive = true, Note = "...", Name = "Udbud"}
+                );
+
+            context.PaymentModels.AddOrUpdate(x => x.Name,
+                                              new PaymentModel() {IsActive = true, Note = "...", Name = "Licens"});
+
+            var configuration = new Core.DomainModel.Configuration
+                {
+                    Municipality = commonMunicipality,
+                    ItProjectGuide = "Et eller andet lort",
+                    //EsdhRef = "ESDH ref.",
+                    //CmdbRef = "CMDB ref.",
+                    //FolderRef = "Mappe ref.",
+                    //Fase1 = "Afventer",
+                    //Fase2 = "Foranalyse",
+                    //Fase3 = "Gennemførsel",
+                    //Fase4 = "Overlevering",
+                    //Fase5 = "Drift",
+                    //ItProject = "IT Projekt",
+                    //ItProgram = "IT Program",
+                    //FocusArea = "Indsatsområde",
+                    ShowFocusArea = false,
+                    ShowBC = false,
+                    ShowPortfolio = false
+                };
+
+            context.Configurations.AddOrUpdate(x => x.Id, configuration);
+            context.SaveChanges();
 
             #endregion
 

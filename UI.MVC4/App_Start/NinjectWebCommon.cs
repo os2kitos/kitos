@@ -65,10 +65,14 @@ namespace UI.MVC4.App_Start
             kernel.Bind<KitosContext>().ToSelf().InRequestScope();
 
             kernel.Bind<IGenericRepository<Text>>().To<GenericRepository<Text>>().InRequestScope();
-            kernel.Bind<IUserRepository>().To<UserRepository>().InRequestScope();
-            kernel.Bind<IPasswordResetRequestRepository>().To<PasswordResetRequestRepository>().InRequestScope();
+            kernel.Bind<IGenericRepository<Municipality>>().To<GenericRepository<Municipality>>().InRequestScope();
+            kernel.Bind<IGenericRepository<User>>().To<GenericRepository<User>>().InRequestScope();
+            kernel.Bind<IGenericRepository<PasswordResetRequest>>().To<GenericRepository<PasswordResetRequest>>().InRequestScope();
 
+            kernel.Bind<IUserRepository>().To<UserRepository>().InRequestScope();
             kernel.Bind<IMailClient>().To<MailClient>().InRequestScope().WithConstructorArgument("host", "localhost").WithConstructorArgument("port", 25);
+            kernel.Bind<ICryptoService>().To<CryptoService>();
+            kernel.Bind<IUserService>().To<UserService>().InRequestScope();
 
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
 

@@ -20,9 +20,6 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithRequired(t => t.Municipality)
                 .WillCascadeOnDelete(true);
 
-            this.HasOptional(t => t.Localization)
-                .WithRequired(t => t.Municipality)
-                .WillCascadeOnDelete(true);
         }
     }
 }

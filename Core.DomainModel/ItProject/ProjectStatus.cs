@@ -10,7 +10,7 @@ namespace Core.DomainModel.ItProject
         }
 
         public int Id { get; set; }
-        public int ProjectPhase_Id { get; set; }
+        public int? ProjectPhase_Id { get; set; }
 
         public virtual ItProject ItProject { get; set; }
         public virtual ICollection<Milestone> Milestones { get; set; }

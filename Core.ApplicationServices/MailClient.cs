@@ -16,7 +16,7 @@ namespace Core.ApplicationServices
         {
             var message = new MailMessage(from, to, subject, content) {IsBodyHtml = isHtml};
 
-            _client.Send(message);
+            //_client.Send(message); //TODO
         }
     }
 }

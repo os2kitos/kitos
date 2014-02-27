@@ -14,7 +14,6 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("PasswordResetRequest");
             this.Property(t => t.Id).HasColumnName("Id");
-            this.Property(t => t.Hash).HasColumnName("Hash");
             this.Property(t => t.Time).HasColumnName("Time");
             this.Property(t => t.User_Id).HasColumnName("User_Id");
 
