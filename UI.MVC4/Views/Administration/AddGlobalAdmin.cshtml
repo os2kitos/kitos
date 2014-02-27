@@ -10,19 +10,19 @@
     </p>
     <form class="form-horizontal" role="form" id="add-admin">
         <div class="form-group">
-            <label for="global-admin-name" class="col-md-3 control-label">
+            <label for="name" class="col-md-3 control-label">
                 Global admin navn
             </label>
             <div class="col-md-8">
-                <input type="text" id="global-admin-name" class="form-control" />
+                <input type="text" id="name" class="form-control" required/>
             </div>
         </div>
         <div class="form-group">
-            <label for="global-admin-email" class="col-md-3 control-label">
+            <label for="email" class="col-md-3 control-label">
                 Global admin email-addresse
             </label>
             <div class="col-md-8">
-                <input type="email" id="global-admin-email" class="form-control" />
+                <input type="email" id="email" class="form-control" required/>
                 <p class="help-block">
                     Vedkommende vil blive oprettet i systemet og få tilsendt et link til opsætning af password.
                 </p>
@@ -39,7 +39,18 @@
 @section scripts
 {
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
+
+            $("#add-admin").simpleAjax({
+                url: "/api/globaladmin",
+                map: {
+                    "Name": "#name",
+                    "Email": "#email",
+                },
+                successMessage: "Jaaa!!"
+            });
+
+            /*
             $("#add-admin").submit(function (event) {
                 event.preventDefault();
 
@@ -58,7 +69,7 @@
                     show_message("Brugeren " + user.Name + " er oprettet i systemet med ID " + user.Id);
 
                 });
-            });
+            });*/
         });
     </script>
 }

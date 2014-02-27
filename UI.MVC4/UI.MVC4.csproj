@@ -386,7 +386,7 @@
     <Content Include="Scripts\Select2-locales\select2_locale_zh-TW.js" />
     <Content Include="Scripts\select2.js" />
     <Content Include="Scripts\select2.min.js" />
-    <Content Include="Scripts\validate.js" />
+    <Content Include="Scripts\form.control.js" />
     <Content Include="Scripts\wysihtml5\parser_rules\advanced.js" />
     <Content Include="Scripts\wysihtml5\parser_rules\simple.js" />
     <Content Include="Scripts\wysihtml5\wysihtml5-0.3.0.js" />

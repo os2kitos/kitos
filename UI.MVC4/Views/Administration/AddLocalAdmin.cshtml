@@ -51,24 +51,38 @@
 @section scripts
 {
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
+
 
             /* filling out the municipality select */
-            $.get("/api/municipality").done(function (result) {
+            $.get("/api/municipality").done(function(result) {
                 $.each(result, function(i, mun) {
                     $("#municipality").append($("<option></option>")
                         .attr("value", mun.Id)
                         .text(mun.Name));
                 });
-                
 
-            }).always(function () {
+
+            }).always(function() {
                 /* when done with filling out, change to select2 */
                 $("#municipality").select2();
 
-                /* then add validation */
+
+                $("#add-admin").simpleAjax({
+                    url: "/api/localadmin",
+                    map: {
+                        "Name": "#name",
+                        "Email": "#email",
+                        "Municipality_Id": "#municipality"
+                    }
+                });
+
+                /* then add validation 
                 $("#add-admin").validate({
                     submitHandler: function () {
+
+                        $("#add-admin").disableSubmit();
+                        
                         $.ajax({
                             type: "POST",
                             url: "/api/localadmin",
@@ -84,9 +98,11 @@
 
                             show_message("Brugeren " + user.Email + " er oprettet i systemet med ID " + user.Id);
                             $("#add-admin")[0].reset();
+                        }).always(function(result) {
+                            $("#add-admin").enableSubmit();
                         });
                     }
-                });
+                }); */
             });
         });
     </script>
