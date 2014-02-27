@@ -46,58 +46,9 @@ namespace Infrastructure.DataAccess.Migrations
             
             #endregion
 
-            #region Users
+            #region Global municipality
 
-            var simon = new User
-            {
-                Name = "Simon Lynn-Pedersen",
-                Email = "slp@it-minds.dk",
-                Salt = "uw5BuXBIc52n2pL2MH4NRZMg44SVmw3GmrvOAK5pxz4=", //encryption of "saltsimon"
-                Password = "2Pps82r5J0vIjvxJjHPf4mF/t2Q5VySmTiT2ZgV7e8U=", //"slp123" encrypted with salt
-                Role = globalAdmin
-            };
-            var arne = new User
-            {
-                Name = "Arne Hansen",
-                Email = "arne@it-minds.dk",
-                Salt = "3BjriY7JfEIYC1nXThvzonDVtO4n1Wrj/+8y/AucIU8=", //encryption of "saltarne"
-                Password = "DnLnH1rqAnZm7//BVMRe63mBj1nY93zF4RsrUCRgH50=", //"arne" encrypted with salt
-                Role = null
-            };
-
-            context.Users.AddOrUpdate(x => x.Email, simon, arne);
-
-            context.SaveChanges();
-
-            #endregion
-
-            #region Password Reset Requests
-
-            var simonId = context.Users.Single(x => x.Email == "slp@it-minds.dk").Id;
-            var arneId = context.Users.Single(x => x.Email == "arne@it-minds.dk").Id;
-
-            context.PasswordResetRequests.AddOrUpdate(x => x.Id,
-                                                      new PasswordResetRequest
-                                                      {
-                                                          //This reset request is fine
-                                                          Id = "workingRequest", //ofcourse, this should be a hashed string or something obscure
-                                                          Time = DateTime.Now.AddYears(+20), //.MaxValue also seems to be out-of-range, but this should hopefully be good enough
-                                                          User_Id = simonId
-                                                      },
-                                                      new PasswordResetRequest
-                                                      {
-                                                          //This reset request is too old
-                                                          Id = "outdatedRequest",
-                                                          Time = DateTime.Now.AddYears(-1), // .MinValue is out-of-range of the SQL datetime type
-                                                          User_Id = arneId
-                                                      }
-                );
-
-            #endregion
-
-            #region GLOBAL MUNICIPALITY
-
-            var commonMunicipality = new Municipality()
+            var municipality = new Municipality()
                 {
                     Name = "Fælleskommune"
                 };
@@ -181,7 +132,7 @@ namespace Infrastructure.DataAccess.Migrations
             var configuration = new Core.DomainModel.Configuration
                 {
                     Municipality = commonMunicipality,
-                    ItProjectGuide = "Et eller andet lort",
+                    ItProjectGuide = "ProjectGuide",
                     //EsdhRef = "ESDH ref.",
                     //CmdbRef = "CMDB ref.",
                     //FolderRef = "Mappe ref.",
@@ -201,6 +152,42 @@ namespace Infrastructure.DataAccess.Migrations
             context.Configurations.AddOrUpdate(x => x.Id, configuration);
             context.SaveChanges();
 
+            #endregion
+
+            #region Users
+
+            var simon = new User
+            {
+                Name = "Simon Lynn-Pedersen",
+                Email = "slp@it-minds.dk",
+                Salt = "uw5BuXBIc52n2pL2MH4NRZMg44SVmw3GmrvOAK5pxz4=", //encryption of "saltsimon"
+                Password = "2Pps82r5J0vIjvxJjHPf4mF/t2Q5VySmTiT2ZgV7e8U=", //"slp123" encrypted with salt
+                Role = globalAdmin,
+                Municipality = municipality
+            };
+
+            context.Users.AddOrUpdate(x => x.Email, simon);
+
+            context.SaveChanges();
+
+            #endregion
+
+            #region Password Reset Requests
+
+            /*
+            var simonId = context.Users.Single(x => x.Email == "slp@it-minds.dk").Id;
+
+            context.PasswordResetRequests.AddOrUpdate(x => x.Id,
+                                                      new PasswordResetRequest
+                                                      {
+                                                          //This reset request is fine
+                                                          Id = "workingRequest", //ofcourse, this should be a hashed string or something obscure
+                                                          Time = DateTime.Now.AddYears(+20), //.MaxValue also seems to be out-of-range, but this should hopefully be good enough
+                                                          User_Id = simonId
+                                                      }
+                );
+
+             */
             #endregion
 
             base.Seed(context);

@@ -17,6 +17,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired();
             this.Property(t => t.Password)
                 .IsRequired();
+            this.Property(t => t.Salt)
+                .IsRequired();
+            this.Property(t => t.Municipality_Id)
+                .IsRequired();
 
             // Table & Column Mappings
             this.ToTable("User");
@@ -24,12 +28,13 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.Name).HasColumnName("Name");
             this.Property(t => t.Email).HasColumnName("Email");
             this.Property(t => t.Password).HasColumnName("Password");
+            this.Property(t => t.Municipality_Id).HasColumnName("Municipality_Id");
 
             // Relationships
             this.HasOptional(t => t.Role)
                 .WithMany(t => t.Users)
                 .HasForeignKey(d => d.Role_Id);
-            this.HasOptional(t => t.Municipality)
+            this.HasRequired(t => t.Municipality)
                 .WithMany(t => t.Users)
                 .HasForeignKey(d => d.Municipality_Id);
 
