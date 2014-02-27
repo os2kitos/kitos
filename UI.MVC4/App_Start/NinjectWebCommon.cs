@@ -70,8 +70,6 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<PasswordResetRequest>>().To<GenericRepository<PasswordResetRequest>>().InRequestScope();
 
             kernel.Bind<IUserRepository>().To<UserRepository>().InRequestScope();
-            kernel.Bind<IPasswordResetRequestRepository>().To<PasswordResetRequestRepository>().InRequestScope();
-
             kernel.Bind<IMailClient>().To<MailClient>().InRequestScope().WithConstructorArgument("host", "localhost").WithConstructorArgument("port", 25);
             kernel.Bind<ICryptoService>().To<CryptoService>();
             kernel.Bind<IUserService>().To<UserService>().InRequestScope();

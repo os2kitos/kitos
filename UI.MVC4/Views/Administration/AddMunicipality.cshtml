@@ -88,7 +88,6 @@
 
             $("#add-municipality").click(function() {
                 var name = $("#add-municipality-name").val();
-                //creating municipality
                 $.ajax({
                     type: "POST",
                     url: "/api/municipality",
@@ -123,35 +122,5 @@
                 });
             });
         });
-
-    /*
-        //creating user
-        $.ajax({
-            type: "POST",
-            url: "/api/user",
-            data: {
-                "Name": $("#local-admin-email").val(), //todo
-                "Email": $("#local-admin-email").val(),
-                "Municipality_Id": municipality.Id,
-                "Role_Id": 2
-            }
-        }).fail(function (result) {
-            console.log("Couldn't create user: " + result);
-        }).done(function (result) {
-            var user = result;
-
-            //creating password reset request
-            $.ajax({
-                type: "POST",
-                url: "/api/passwordresetrequest",
-                data: {
-                    "User_Id": user.Id
-                }
-            }).done(function (result) {
-                console.log(result);
-            });
-
-        });
-        */
     </script>
     }
