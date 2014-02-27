@@ -534,11 +534,11 @@ namespace Infrastructure.DataAccess.Migrations
                         Email = c.String(nullable: false, unicode: false),
                         Password = c.String(nullable: false, unicode: false),
                         Salt = c.String(unicode: false),
-                        Municipality_Id = c.Int(),
+                        Municipality_Id = c.Int(nullable: false),
                         Role_Id = c.Int(),
                     })
                 .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.Municipality", t => t.Municipality_Id)
+                .ForeignKey("dbo.Municipality", t => t.Municipality_Id, cascadeDelete: true)
                 .ForeignKey("dbo.Role", t => t.Role_Id)
                 .Index(t => t.Municipality_Id)
                 .Index(t => t.Role_Id);
