@@ -3,7 +3,7 @@ using Core.DomainServices;
 
 namespace UI.MVC4.Controllers
 {
-    public class TextController : GenericApiController<Text, string>
+    public class TextController : GenericApiController<Text, string, Text>
     {
         public TextController(IGenericRepository<Text> repository) 
             : base(repository)

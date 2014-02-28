@@ -52,32 +52,27 @@ namespace Infrastructure.DataAccess.Migrations
                                              new ProjectType() { IsActive = true, Note = "...", Name = "Light" },
                                              new ProjectType() { IsActive = true, Note = "...", Name = "Lokal" },
                                              new ProjectType() { IsActive = true, Note = "...", Name = "Tværkommunalt" },
-                                             new ProjectType() { IsActive = true, Note = "...", Name = "SKAL" }
-                );
+                                             new ProjectType() { IsActive = true, Note = "...", Name = "SKAL" });
 
             context.SystemTypes.AddOrUpdate(x => x.Name,
                                             new SystemType() { IsActive = true, Note = "...", Name = "Fag" },
                                             new SystemType() { IsActive = true, Note = "...", Name = "ESDH" },
-                                            new SystemType() { IsActive = true, Note = "...", Name = "Støttesystemer" }
-                );
+                                            new SystemType() { IsActive = true, Note = "...", Name = "Støttesystemer" });
 
             context.InterfaceTypes.AddOrUpdate(x => x.Name,
                                                new InterfaceType() { IsActive = true, Note = "...", Name = "WS" });
 
             context.ProtocolTypes.AddOrUpdate(x => x.Name,
                                               new ProtocolType() { IsActive = true, Note = "...", Name = "OIORES" },
-                                              new ProtocolType() { IsActive = true, Note = "...", Name = "WS SOAP" }
-                );
+                                              new ProtocolType() { IsActive = true, Note = "...", Name = "WS SOAP" });
 
             context.Methods.AddOrUpdate(x => x.Name,
                                         new Method() { IsActive = true, Note = "...", Name = "Batch" },
-                                        new Method() { IsActive = true, Note = "...", Name = "Request-Response" }
-                );
+                                        new Method() { IsActive = true, Note = "...", Name = "Request-Response" });
 
             context.DatabaseTypes.AddOrUpdate(x => x.Name,
                                               new DatabaseType() { IsActive = true, Note = "...", Name = "MSSQL" },
-                                              new DatabaseType() { IsActive = true, Note = "...", Name = "MySQL" }
-                );
+                                              new DatabaseType() { IsActive = true, Note = "...", Name = "MySQL" });
 
             context.Environments.AddOrUpdate(x => x.Name,
                                              new Core.DomainModel.ItSystem.Environment()
@@ -95,20 +90,17 @@ namespace Infrastructure.DataAccess.Migrations
                                                   Note = "...",
                                                   Name = "Tilægskontrakt"
                                               },
-                                              new ContractType() { IsActive = true, Note = "...", Name = "Snitflade" }
-                );
+                                              new ContractType() { IsActive = true, Note = "...", Name = "Snitflade" });
 
             context.ContractTemplates.AddOrUpdate(x => x.Name,
                                                   new ContractTemplate() { IsActive = true, Note = "...", Name = "K01" },
                                                   new ContractTemplate() { IsActive = true, Note = "...", Name = "K02" },
-                                                  new ContractTemplate() { IsActive = true, Note = "...", Name = "K03" }
-                );
+                                                  new ContractTemplate() { IsActive = true, Note = "...", Name = "K03" });
 
             context.PurchaseForms.AddOrUpdate(x => x.Name,
                                               new PurchaseForm() { IsActive = true, Note = "...", Name = "SKI" },
                                               new PurchaseForm() { IsActive = true, Note = "...", Name = "SKI 02.19" },
-                                              new PurchaseForm() { IsActive = true, Note = "...", Name = "Udbud" }
-                );
+                                              new PurchaseForm() { IsActive = true, Note = "...", Name = "Udbud" });
 
             context.PaymentModels.AddOrUpdate(x => x.Name,
                                               new PaymentModel() { IsActive = true, Note = "...", Name = "Licens" });
@@ -187,6 +179,14 @@ namespace Infrastructure.DataAccess.Migrations
                 );
 
              */
+            #endregion
+
+            #region Texts
+
+            context.Texts.AddOrUpdate(x => x.Id,
+                                      new Text() {Id = "intro-head", Value = "Head"},
+                                      new Text() {Id = "intro-body", Value = "Body"});
+
             #endregion
 
             base.Seed(context);
