@@ -18,15 +18,25 @@ namespace UI.MVC4.Controllers
             Repository = repository;
         }
 
-        public virtual IEnumerable<TDto> Get()
+        public virtual HttpResponseMessage Get()
         {
-            return AutoMapper.Mapper.Map<IEnumerable<TDto>>(Repository.Get());
+            var items = Repository.Get();
+
+            if (items == null)
+                return Request.CreateResponse(HttpStatusCode.NoContent);
+
+            return Request.CreateResponse(HttpStatusCode.OK, AutoMapper.Mapper.Map<IEnumerable<TDto>>(items));
         }
 
         // GET api/T
-        public virtual TDto Get(TKeyType id)
+        public virtual HttpResponseMessage Get(TKeyType id)
         {
-            return AutoMapper.Mapper.Map<TDto>(Repository.GetById(id));
+            var item = Repository.GetById(id);
+
+            if (item == null)
+                return Request.CreateResponse(HttpStatusCode.NoContent);
+
+            return Request.CreateResponse(HttpStatusCode.OK, AutoMapper.Mapper.Map<TDto>(item));
         }
 
         // POST api/T
