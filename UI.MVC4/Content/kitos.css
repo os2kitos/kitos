@@ -1,6 +1,6 @@
 ﻿body {
     font-size: 15px;
-    background-color: #fafafa;
+    background-color: #f0f0f0;
 }
 
 div#page-wrapper {
@@ -15,6 +15,11 @@ div#page-content {
     max-width: 1280px;
     margin: 120px auto;
     padding: 0px 5px 0px 10px;
+}
+
+div#page-body {
+    background-color: white;
+    padding: 30px;
 }
 
 /************ NAVIGATION BAR TOP **************/
@@ -82,31 +87,31 @@ div#page-content {
     list-style-type: none;
     margin: 0px;
 
-    border-bottom: 1px solid black;
+    /*
+        border-bottom: 1px solid black;
+        */
 }
 
 #sub-menu nav ul li {
-    position: relative;
-    top: 1px;
-    z-index: 1001;
 
     display: inline-block;
     margin-left: 10px;
 }
 
 #sub-menu nav ul li a.btn-tab {
+    /*
     border-style: solid;
-    border-color: black;
+    border-color: #5c5c5c;
+    border-bottom-color: black;
     border-width: 1px 1px 1px 1px;
+        */
     
     color: black;
-    background-color: inherit;
-
-    border-radius: 5px 5px 0px 0px;
+    background-color: #e6e6e6;
 }
 
 #sub-menu nav ul li a.btn-tab-active {
-    border-bottom: 1px solid #fafafa;
+    background-color: white;
 }
 
 /* TODO: Style these? */
