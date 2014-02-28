@@ -1,14 +1,15 @@
 ﻿body {
     font-size: 15px;
-
     background-color: #fafafa;
 }
+
 div#page-wrapper {
     min-width: 1024px;
     max-width: 1280px;
     margin: 0px auto;
     padding: 0px;
 }
+
 div#page-content {
     min-width: 1024px;
     max-width: 1280px;
@@ -20,63 +21,102 @@ div#page-content {
 #navbar-top {
     height: 100px;
     font-size: 15px;
-
     background-color: rgb(55, 96, 146);
-
     border: 0px;
 }
-#navbar-top .navbar-brand,
-#navbar-top .navbar-nav li a,
-#navbar-top .navbar-text {
-    line-height: 70px;
-    height: 70px;
 
-    padding: 0px 10px;
-    margin: 15px 5px;
+    #navbar-top .navbar-brand,
+    #navbar-top .navbar-nav li a,
+    #navbar-top .navbar-text {
+        line-height: 70px;
+        height: 70px;
+        padding: 0px 10px;
+        margin: 15px 5px;
+        text-align: center;
+    }
 
-    text-align: center;
-}
-#navbar-top li a {
-    width: 180px;
-}
-#navbar-top li.double-line a {
-    padding-top: 18px;
-    line-height: 17px;
-}
-#navbar-top .navbar-text-small {
-    font-size: 0.8em;
-}
-#navbar-top .navbar-text-large {
-    font-size: 3em;
-}
-#navbar-top .navbar-complex {
-    font-size: 0.7em;
-    line-height: 25px;
-    padding-top: -10px;
-}
-#navbar-top a {
-    color: white;
-}
-#navbar-top li.active a,
-#navbar-top li a:hover 
-{
-    background-color: rgb(219, 229, 241);
-    color: rgb(55, 96, 146);
-}
+    #navbar-top li a {
+        width: 180px;
+    }
 
-#navbar-top select {
-    color: black;
-}
+    #navbar-top li.double-line a {
+        padding-top: 18px;
+        line-height: 17px;
+    }
+
+    #navbar-top .navbar-text-small {
+        font-size: 0.8em;
+    }
+
+    #navbar-top .navbar-text-large {
+        font-size: 3em;
+    }
+
+    #navbar-top .navbar-complex {
+        font-size: 0.7em;
+        line-height: 25px;
+        padding-top: -10px;
+    }
+
+    #navbar-top a {
+        color: white;
+    }
+
+    #navbar-top li.active a,
+    #navbar-top li a:hover {
+        background-color: rgb(219, 229, 241);
+        color: rgb(55, 96, 146);
+    }
+
+    #navbar-top select {
+        color: black;
+    }
 /*********************************************/
 
+#sub-menu {
+    margin-top: 20px;
+
+}
+
+#sub-menu ul {
+    list-style-type: none;
+    margin: 0px;
+
+    border-bottom: 1px solid black;
+}
+
+#sub-menu nav ul li {
+    position: relative;
+    top: 1px;
+    z-index: 1001;
+
+    display: inline-block;
+    margin-left: 10px;
+}
+
+#sub-menu nav ul li a.btn-tab {
+    border-style: solid;
+    border-color: black;
+    border-width: 1px 1px 1px 1px;
+    
+    color: black;
+    background-color: inherit;
+
+    border-radius: 5px 5px 0px 0px;
+}
+
+#sub-menu nav ul li a.btn-tab-active {
+    border-bottom: 1px solid #fafafa;
+}
+
+/* TODO: Style these? */
 .alert-danger {
-    
 }
+
 .alert-success {
-    
 }
+
 .alert-info {
-    
 }
 
 #navbar-side {
@@ -87,9 +127,11 @@ div#page-content {
 .white {
     color: white !important;
 }
+
 .light-blue {
     color: rgb(208, 217, 229) !important;
 }
+
 .broken-white {
     color: #f0f0f0 !important;
 }

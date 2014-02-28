@@ -19,6 +19,11 @@
             @Html.Partial("_TopNavigation")
             
             <div id="page-content" class="row container-fluid" role="main">
+                
+                <div id="sub-menu">
+                    @RenderSection("submenu", required: false)
+                </div>
+
                 @RenderBody()
             </div>
             

@@ -224,7 +224,7 @@
     <Compile Include="Controllers\API\PasswordResetRequestController.cs" />
     <Compile Include="Controllers\API\UserController.cs" />
     <Compile Include="Controllers\Web\AccountController.cs" />
-    <Compile Include="Controllers\Web\AdministrationController.cs" />
+    <Compile Include="Controllers\Web\GlobalAdminController.cs" />
     <Compile Include="Controllers\Web\AuthorizeController.cs" />
     <Compile Include="Controllers\API\GenericApiController.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
@@ -234,6 +234,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\HtmlHelpers.cs" />
     <Compile Include="Infrastructure\CustomMembershipProvider.cs" />
     <Compile Include="Infrastructure\CustomRoleProvider.cs" />
     <Compile Include="Infrastructure\IUserRepositoryFactory.cs" />
@@ -439,11 +440,13 @@
     <Content Include="Views\Authorize\EmailSent.cshtml" />
     <Content Include="Views\Shared\_TopNavigation.old.cshtml" />
     <Content Include="Views\Shared\_TopNavigation.cshtml" />
-    <Content Include="Views\Administration\AddMunicipality.cshtml" />
+    <Content Include="Views\GlobalAdmin\AddMunicipality.cshtml" />
     <Content Include="Views\Test\Index.cshtml" />
     <Content Include="Views\Test\Encrypt.cshtml" />
-    <Content Include="Views\Administration\AddGlobalAdmin.cshtml" />
-    <Content Include="Views\Administration\AddLocalAdmin.cshtml" />
+    <Content Include="Views\GlobalAdmin\AddGlobalAdmin.cshtml" />
+    <Content Include="Views\GlobalAdmin\AddLocalAdmin.cshtml" />
+    <Content Include="Views\GlobalAdmin\Index.cshtml" />
+    <Content Include="Views\GlobalAdmin\_AdminSubmenu.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

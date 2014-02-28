@@ -2,6 +2,10 @@
     ViewBag.Title = "Tilføj lokal administrator";
 }
 
+@section submenu {
+    @Html.Partial("_AdminSubmenu")
+}
+
 <div class="col-md-7">
 
     <h2>Tilføj lokal administrator</h2>
@@ -52,8 +56,6 @@
 {
     <script>
         $(document).ready(function() {
-
-
             /* filling out the municipality select */
             $.get("/api/municipality").done(function(result) {
                 $.each(result, function(i, mun) {
@@ -61,7 +63,6 @@
                         .attr("value", mun.Id)
                         .text(mun.Name));
                 });
-
 
             }).always(function() {
                 /* when done with filling out, change to select2 */
