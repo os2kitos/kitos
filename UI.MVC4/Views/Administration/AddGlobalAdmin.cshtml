@@ -14,7 +14,7 @@
                 Global admin navn
             </label>
             <div class="col-md-8">
-                <input type="text" id="name" class="form-control" required/>
+                <input type="text" id="name" class="form-control" required minlength="2"/>
             </div>
         </div>
         <div class="form-group">
@@ -46,30 +46,8 @@
                 map: {
                     "Name": "#name",
                     "Email": "#email",
-                },
-                successMessage: "Jaaa!!"
+                }
             });
-
-            /*
-            $("#add-admin").submit(function (event) {
-                event.preventDefault();
-
-                $.ajax({
-                    type: "POST",
-                    url: "/api/globaladmin",
-                    data: {
-                        "Name": $("#global-admin-name").val(),
-                        "Email": $("#global-admin-email").val()
-                    }
-                }).fail(function (result) {
-                    show_message("Kunne ikke oprette brugeren");
-                }).done(function (result) {
-                    var user = result;
-
-                    show_message("Brugeren " + user.Name + " er oprettet i systemet med ID " + user.Id);
-
-                });
-            });*/
         });
     </script>
 }

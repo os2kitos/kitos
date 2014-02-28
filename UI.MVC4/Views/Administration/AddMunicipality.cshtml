@@ -36,25 +36,6 @@
                     "Name": "#name"
                 }
             });
-            
-            /*
-            $("#add-municipality").click(function () {
-                var name = $("#add-municipality-name").val();
-                $.ajax({
-                    type: "POST",
-                    url: "/api/municipality",
-                    data: {
-                        "Name": name
-                    }
-                }).fail(function (result) {
-                    show_message("Kunne ikke oprette kommunen " + name);
-                }).done(function (result) {
-                    var municipality = result;
-
-                    show_message("Kommunen " + result.Name + " er oprettet i systemet med ID " + result.Id);
-                });
-            });
-            */
         });
     </script>
 }

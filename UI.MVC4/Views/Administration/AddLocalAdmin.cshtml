@@ -24,7 +24,7 @@
                 Lokal admin navn
             </label>
             <div class="col-md-8">
-                <input type="text" id="name" name="name" class="form-control has-error" required/>
+                <input type="text" id="name" name="name" class="form-control" required minlength="2"/>
             </div>
         </div>
         <div class="form-group">
@@ -76,33 +76,6 @@
                         "Municipality_Id": "#municipality"
                     }
                 });
-
-                /* then add validation 
-                $("#add-admin").validate({
-                    submitHandler: function () {
-
-                        $("#add-admin").disableSubmit();
-                        
-                        $.ajax({
-                            type: "POST",
-                            url: "/api/localadmin",
-                            data: {
-                                "Name": $("#name").val(),
-                                "Email": $("#email").val(),
-                                "Municipality_Id": $("#municipality").val(),
-                            }
-                        }).fail(function (result) {
-                            show_message("Kunne ikke oprette brugeren");
-                        }).done(function (result) {
-                            var user = result;
-
-                            show_message("Brugeren " + user.Email + " er oprettet i systemet med ID " + user.Id);
-                            $("#add-admin")[0].reset();
-                        }).always(function(result) {
-                            $("#add-admin").enableSubmit();
-                        });
-                    }
-                }); */
             });
         });
     </script>
