@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -18,40 +19,57 @@ namespace UI.MVC4.Controllers
             Repository = repository;
         }
 
-        public virtual HttpResponseMessage Get()
+        protected virtual TDest Map<TDest, TSource>(TSource item)
         {
-            var items = Repository.Get();
+            return AutoMapper.Mapper.Map<TDest>(item);
+        }
 
-            if (items == null)
+        protected virtual IEnumerable<TModel> GetAllQuery()
+        {
+            return Repository.Get();
+        }
+
+        public HttpResponseMessage GetAll()
+        {
+            var items = GetAllQuery().ToList();
+
+            if (items.Any())
                 return Request.CreateResponse(HttpStatusCode.NoContent);
 
-            return Request.CreateResponse(HttpStatusCode.OK, AutoMapper.Mapper.Map<IEnumerable<TDto>>(items));
+            return Request.CreateResponse(HttpStatusCode.OK, Map<IEnumerable<TDto>, IEnumerable<TModel>>(items));
         }
 
         // GET api/T
-        public virtual HttpResponseMessage Get(TKeyType id)
+        public HttpResponseMessage GetSingle(TKeyType id)
         {
             var item = Repository.GetById(id);
 
             if (item == null)
                 return Request.CreateResponse(HttpStatusCode.NoContent);
 
-            return Request.CreateResponse(HttpStatusCode.OK, AutoMapper.Mapper.Map<TDto>(item));
+            return Request.CreateResponse(HttpStatusCode.OK, Map<TDto, TModel>(item));
+        }
+
+        protected TModel PostQuery(TModel item)
+        {
+            Repository.Insert(item);
+            Repository.Save();
+
+            return item;
         }
 
         // POST api/T
         [Authorize(Roles = "GlobalAdmin")]
-        public virtual HttpResponseMessage Post(TDto dto)
+        public HttpResponseMessage Post(TDto dto)
         {
-            var item = AutoMapper.Mapper.Map<TModel>(dto);
+            var item = Map<TModel, TDto>(dto);
             try
             {
-                Repository.Insert(item);
-                Repository.Save();
+                PostQuery(item);
 
                 //var msg = new HttpResponseMessage(HttpStatusCode.Created);
                 var msg = Request.CreateResponse(HttpStatusCode.Created, item);
-                msg.Headers.Location = new Uri(Request.RequestUri + "/" + item.Id.ToString());
+                msg.Headers.Location = new Uri(Request.RequestUri + "/" + item.Id));
                 return msg;
             }
             catch (Exception)
@@ -60,39 +78,51 @@ namespace UI.MVC4.Controllers
             }
         }
 
+        protected virtual TModel PutQuery(TModel item)
+        {
+            Repository.Update(item);
+            Repository.Save();
+
+            return item;
+        }
+
         // PUT api/T
         [Authorize(Roles = "GlobalAdmin")]
-        public virtual HttpResponseMessage Put(TKeyType id, TDto dto)
+        public HttpResponseMessage Put(TKeyType id, TDto dto)
         {
-            var item = AutoMapper.Mapper.Map<TModel>(dto);
+            var item = Map<TModel, TDto>(dto);
             item.Id = id;
             try
             {
-                Repository.Update(item);
-                Repository.Save();
+                PutQuery(item);
 
                 return new HttpResponseMessage(HttpStatusCode.OK); // TODO correct?
             }
             catch (Exception)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound); // TODO catch correct expection
+                throw new HttpResponseException(HttpStatusCode.NoContent); // TODO catch correct expection
             }
+        }
+
+        protected virtual void DeleteQuery(TKeyType id)
+        {
+            Repository.DeleteById(id);
+            Repository.Save();
         }
 
         // DELETE api/T
         [Authorize(Roles = "GlobalAdmin")]
-        public virtual HttpResponseMessage Delete(TKeyType id)
+        public HttpResponseMessage Delete(TKeyType id)
         {
             try
             {
-                Repository.DeleteById(id);
-                Repository.Save();
+                DeleteQuery(id);
 
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
             catch (Exception)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                throw new HttpResponseException(HttpStatusCode.NoContent);
             }
         }
 
