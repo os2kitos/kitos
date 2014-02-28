@@ -19,7 +19,7 @@ namespace UI.MVC4.Controllers
             Repository = repository;
         }
 
-        protected virtual TDest Map<TDest, TSource>(TSource item)
+        protected virtual TDest Map<TSource, TDest>(TSource item)
         {
             return AutoMapper.Mapper.Map<TDest>(item);
         }
@@ -33,10 +33,10 @@ namespace UI.MVC4.Controllers
         {
             var items = GetAllQuery().ToList();
 
-            if (items.Any())
+            if (!items.Any())
                 return Request.CreateResponse(HttpStatusCode.NoContent);
 
-            return Request.CreateResponse(HttpStatusCode.OK, Map<IEnumerable<TDto>, IEnumerable<TModel>>(items));
+            return Request.CreateResponse(HttpStatusCode.OK, Map<IEnumerable<TModel>, IEnumerable<TDto>>(items));
         }
 
         // GET api/T
@@ -47,7 +47,7 @@ namespace UI.MVC4.Controllers
             if (item == null)
                 return Request.CreateResponse(HttpStatusCode.NoContent);
 
-            return Request.CreateResponse(HttpStatusCode.OK, Map<TDto, TModel>(item));
+            return Request.CreateResponse(HttpStatusCode.OK, Map<TModel, TDto>(item));
         }
 
         protected TModel PostQuery(TModel item)
@@ -62,7 +62,7 @@ namespace UI.MVC4.Controllers
         [Authorize(Roles = "GlobalAdmin")]
         public HttpResponseMessage Post(TDto dto)
         {
-            var item = Map<TModel, TDto>(dto);
+            var item = Map<TDto, TModel>(dto);
             try
             {
                 PostQuery(item);
@@ -90,7 +90,7 @@ namespace UI.MVC4.Controllers
         [Authorize(Roles = "GlobalAdmin")]
         public HttpResponseMessage Put(TKeyType id, TDto dto)
         {
-            var item = Map<TModel, TDto>(dto);
+            var item = Map<TDto, TModel>(dto);
             item.Id = id;
             try
             {
