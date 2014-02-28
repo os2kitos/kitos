@@ -5,6 +5,8 @@
  */
 
 (function ($) {
+    "use strict";
+
     $.validator.setDefaults({
         ignore: "", //don't ignore the hidden select field
         errorClass: "has-error",
@@ -41,19 +43,24 @@
     //For some reason, this have to be here instead of up in setDefaults() above
     $.validator.messages.required = "Dette felt er påkrævet";
 
+    //disable all submits on a form
     $.fn.disableSubmit = function () {
         this.find(":submit").attr("disabled", "disabled");
         return this;
     };
+
+    //enable all submits on a form
     $.fn.enableSubmit = function () {
         this.find(":submit").removeAttr("disabled");
         return this;
     };
 
+    //validates a form and submits an ajax call on successful validation
     $.fn.simpleAjax = function (options) {
+        
         var settings = $.extend({
-            type: "POST",
-            map: [],
+            type: "POST", //"GET", "PUT", etc
+            map: {}, //map of "JSON id": "#html-id"
             pendingMessage: "Sender data...",
             successMessage: "Success!",
             failureMessage: "Fejl!",
