@@ -69,10 +69,14 @@ div#page-content {
 }
 /*********************************************/
 
-#message-box {
-    position: fixed;
-    bottom: 0;
-    z-index: 1337;
+.alert-danger {
+    
+}
+.alert-success {
+    
+}
+.alert-info {
+    
 }
 
 #navbar-side {

@@ -15,9 +15,7 @@ namespace UI.MVC4
                         "~/Scripts/jquery-ui-{version}.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
-                        //"~/Scripts/jquery.unobtrusive*",
-                        "~/Scripts/jquery.validate.js",
-                        "~/Scripts/form.control.js"));
+                        "~/Scripts/jquery.validate.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/wysihtml5").Include(
                 "~/Scripts/wysihtml5/parser_rules/advanced.js",
@@ -27,8 +25,11 @@ namespace UI.MVC4
             bundles.Add(new ScriptBundle("~/bundles/select2").Include(
                         "~/Scripts/select2.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/pnotify").Include(
+                        "~/Scripts/pnotify/jquery.pnotify.js"));
+
             bundles.Add(new ScriptBundle("~/bundles/js").Include(
-                        "~/Scripts/message.js"));
+                        "~/Scripts/form.control.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include("~/Scripts/bootstrap.js"));
 
@@ -41,6 +42,7 @@ namespace UI.MVC4
                 "~/Content/bootstrap-cosmo.*", 
                 "~/Content/carousel.css",
                 "~/Content/bootstrap3-wysihtml5/bootstrap3-wysihtml5.css",
+                "~/Content/pnotify/*.css",
                 "~/Content/css/select2.css",
                 "~/Content/select2-bootstrap.css",
                 "~/Content/kitos.css"));

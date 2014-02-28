@@ -7,6 +7,20 @@
 (function ($) {
     "use strict";
 
+    var stack = { "dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25, "spacing1": 5 };
+    
+    $.pnotify.defaults.styling = "bootstrap3";
+    $.pnotify.defaults.history = false;
+    $.pnotify.defaults.stack = stack;
+    $.pnotify.defaults.icon = false;
+    $.pnotify.defaults.shadow = false;
+    $.pnotify.defaults.title = false;
+    $.pnotify.defaults.animation = "slide";
+    $.pnotify.defaults.animation_speed = 100;
+    $.pnotify.defaults.delay = 5000;
+    $.pnotify.defaults.addclass = "stack-bottomleft";
+    
+
     $.validator.setDefaults({
         ignore: "", //don't ignore the hidden select field
         errorClass: "has-error",
@@ -65,11 +79,28 @@
             successMessage: "Success!",
             failureMessage: "Fejl!",
 
-            onFailure: function (result, failureMsg) {
-                show_message(failureMsg);
+            onPending: function (pendingMsg) {
+                return $.pnotify({
+                    text: pendingMsg,
+                    type: "info",
+                    hide: false
+                });
             },
-            onSuccess: function (result, successMsg) {
-                show_message(successMsg);
+            onFailure: function (result, failureMsg, prevNotice) {
+                return prevNotice.pnotify({
+                    text: failureMsg,
+                    type: "error",
+                    delay: 5000,
+                    hide: true
+                });
+            },
+            onSuccess: function (result, successMsg, prevNotice) {
+                return prevNotice.pnotify({
+                    text: successMsg,
+                    type: "success",
+                    delay: 5000,
+                    hide: true
+                });
             },
 
             preventMultipleSubmissions: true,
@@ -86,22 +117,23 @@
 
                 var data = {};
                 $.each(settings.map, function (i, v) {
-                    console.log(v);
                     data[i] = $(v).val();
                 });
-                
+
+                var notice = settings.onPending(settings.pendingMessage);
+
                 $.ajax({
                     type: settings.type,
                     url: settings.url,
                     data: data,
                 }).fail(function (result) {
-                    settings.onFailure(result, settings.failureMessage);
+                    notice = settings.onFailure(result, settings.failureMessage, notice);
 
                 }).done(function (result) {
                     if (settings.resetFormOnSuccess)
                         form[0].reset();
 
-                    settings.onSuccess(result, settings.successMessage);
+                    notice = settings.onSuccess(result, settings.successMessage, notice);
 
                 }).always(function (result) {
                     if (settings.preventMultipleSubmissions)

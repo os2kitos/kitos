@@ -260,6 +260,8 @@
     <Content Include="Content\css\select2.png" />
     <Content Include="Content\css\select2x2.png" />
     <Content Include="Content\kitos.css" />
+    <Content Include="Content\pnotify\jquery.pnotify.default.css" />
+    <Content Include="Content\pnotify\jquery.pnotify.default.icons.css" />
     <Content Include="Content\select2-bootstrap.css" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
@@ -342,7 +344,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\knockout-2.2.0.debug.js" />
     <Content Include="Scripts\knockout-2.2.0.js" />
-    <Content Include="Scripts\message.js" />
+    <Content Include="Scripts\pnotify\jquery.pnotify.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ar.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_bg.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ca.js" />
