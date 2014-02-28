@@ -255,7 +255,18 @@
     <Compile Include="Infrastructure\UserRepositoryFactory.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\AuthorizeViewModels.cs" />
+    <Compile Include="Models\ContractTemplateDTO.cs" />
+    <Compile Include="Models\ContractTypeDTO.cs" />
+    <Compile Include="Models\DatabaseTypeDTO.cs" />
+    <Compile Include="Models\EnvironmentDTO.cs" />
+    <Compile Include="Models\InterfaceTypeDTO.cs" />
+    <Compile Include="Models\MethodDTO.cs" />
     <Compile Include="Models\MunicipalityApiModel.cs" />
+    <Compile Include="Models\PaymentModelDTO.cs" />
+    <Compile Include="Models\ProjectTypeDTO.cs" />
+    <Compile Include="Models\ProtocolTypeDTO.cs" />
+    <Compile Include="Models\PurchaseFormDTO.cs" />
+    <Compile Include="Models\SystemTypeDTO.cs" />
     <Compile Include="Models\UserApiModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

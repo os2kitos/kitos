@@ -8,7 +8,7 @@ using Core.DomainServices;
 
 namespace UI.MVC4.Controllers
 {
-    public abstract class GenericApiController<TModel, TKeyType> : ApiController // TODO perhaps it's possible to infer the TKeyType from TModel somehow
+    public abstract class GenericApiController<TModel, TKeyType, TDto> : ApiController // TODO perhaps it's possible to infer the TKeyType from TModel somehow
         where TModel : class, IEntity<TKeyType>
     {
         protected readonly IGenericRepository<TModel> Repository;
@@ -18,21 +18,22 @@ namespace UI.MVC4.Controllers
             Repository = repository;
         }
 
-        public virtual IEnumerable<TModel> Get()
+        public virtual IEnumerable<TDto> Get()
         {
-            return Repository.Get();
+            return AutoMapper.Mapper.Map<IEnumerable<TDto>>(Repository.Get());
         }
 
         // GET api/T
-        public virtual TModel Get(TKeyType id)
+        public virtual TDto Get(TKeyType id)
         {
-            return Repository.GetById(id);
+            return AutoMapper.Mapper.Map<TDto>(Repository.GetById(id));
         }
 
         // POST api/T
         [Authorize(Roles = "GlobalAdmin")]
-        public virtual HttpResponseMessage Post(TModel item)
+        public virtual HttpResponseMessage Post(TDto dto)
         {
+            var item = AutoMapper.Mapper.Map<TModel>(dto);
             try
             {
                 Repository.Insert(item);
@@ -45,14 +46,15 @@ namespace UI.MVC4.Controllers
             }
             catch (Exception)
             {
-                throw new HttpResponseException(HttpStatusCode.Conflict);
+                throw new HttpResponseException(HttpStatusCode.Conflict); // TODO catch correct expection
             }
         }
 
         // PUT api/T
         [Authorize(Roles = "GlobalAdmin")]
-        public virtual HttpResponseMessage Put(TKeyType id, TModel item)
+        public virtual HttpResponseMessage Put(TKeyType id, TDto dto)
         {
+            var item = AutoMapper.Mapper.Map<TModel>(dto);
             item.Id = id;
             try
             {
@@ -63,7 +65,7 @@ namespace UI.MVC4.Controllers
             }
             catch (Exception)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                throw new HttpResponseException(HttpStatusCode.NotFound); // TODO catch correct expection
             }
         }
 
