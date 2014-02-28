@@ -69,7 +69,7 @@ namespace UI.MVC4.Controllers
 
                 //var msg = new HttpResponseMessage(HttpStatusCode.Created);
                 var msg = Request.CreateResponse(HttpStatusCode.Created, item);
-                msg.Headers.Location = new Uri(Request.RequestUri + "/" + item.Id));
+                msg.Headers.Location = new Uri(Request.RequestUri + "/" + item.Id);
                 return msg;
             }
             catch (Exception)
