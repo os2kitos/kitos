@@ -30,12 +30,19 @@
                                     <input type="submit" value="Log ud" class="btn btn-xs btn-link" />
                                 </div>
                             }
+
                             <select>
                                 <option>Vælg organisation</option>
                             </select>
-                            <br/>
-                            <a href="#">Vidensdeling</a> | <a href="#">Administration</a>
-                            <br />
+                            
+                            <p>
+                            @Html.ActionLink("Vidensdeling", "Index", "Home", null, new {@class = "btn btn-xs btn-link"})
+                            @if(User.IsInRole("GlobalAdmin"))
+                        {
+                                
+                            @Html.ActionLink("Global admin", "Index", "GlobalAdmin", null, new {@class = "btn btn-xs btn-link"})
+                        }
+                                </p>
                         </div>
                     }
                     else

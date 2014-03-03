@@ -7,10 +7,10 @@ using System.Web.Mvc;
 namespace UI.MVC4.Controllers.Web
 {
     [Authorize(Roles = "GlobalAdmin")]
-    public class AdministrationController : Controller
+    public class GlobalAdminController : Controller
     {
         //
-        // GET: /AdministrationController/
+        // GET: /GlobalAdminController/
 
         public ActionResult Index()
         {
@@ -19,8 +19,13 @@ namespace UI.MVC4.Controllers.Web
 
 
         //
-        // GET: /AdministrationController/
+        // GET: /GlobalAdminController/
         public ActionResult AddMunicipality()
+        {
+            return View();
+        }
+
+        public ActionResult AddLocalAdmin()
         {
             return View();
         }
