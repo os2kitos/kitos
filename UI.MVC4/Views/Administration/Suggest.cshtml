@@ -4,11 +4,11 @@
 
 <h2>Foreslå ny</h2>
 
-<div class="suggest-box container-fluid col-md-5">
+<div class="suggest-box container-fluid col-md-3">
     <a href="#" class="toggle-suggest-form">+ Foreslå ny ...</a>
 
     <div class="suggest-extended">
-        <p>Hvis du synes at der mangler et væsentlig element, kan du foreslå det her. Alle foreslag skal godkendes af en global administrator før de bliver tilgengængelige til brug.</p>
+        <p class="small">Hvis du synes at der mangler et væsentlig element, kan du foreslå det her. Alle foreslag skal godkendes af en global administrator før de bliver tilgengængelige til brug.</p>
         <form class="suggest-form">
             <div class="form-group">
                 <label class="control-label full-width">
@@ -16,7 +16,7 @@
                     <input type="text" name="name" class="form-control" required/>
                 </label>
             </div>
-                <input type="submit" class="btn btn-sm btn-primary" value="Foreslå"/>
+            <input type="submit" class="btn btn-sm btn-primary" value="Foreslå"/>
         </form>
     </div>
 </div>
@@ -26,7 +26,6 @@
     <script>
         $(document).ready(function() {
             $(".toggle-suggest-form").click(function () {
-                console.log($(this).next());
                 $(this).next().slideToggle("fast");
             });
         });
