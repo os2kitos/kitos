@@ -9,11 +9,28 @@
 
     <div class="suggest-extended">
         <p class="small">Hvis du synes at der mangler et væsentlig element, kan du foreslå det her. Alle foreslag skal godkendes af en global administrator før de bliver tilgengængelige til brug.</p>
-        <form class="suggest-form">
+        <form class="suggest-form" data-url="/api/notreal/">
             <div class="form-group">
                 <label class="control-label full-width">
                     Forslag:
-                    <input type="text" name="name" class="form-control" required/>
+                    <input type="text" name="nametext" class="form-control" required/>
+                </label>
+            </div>
+            <input type="submit" class="btn btn-sm btn-primary" value="Foreslå"/>
+        </form>
+    </div>
+</div>
+
+<div class="suggest-box container-fluid col-md-3 col-md-offset-3">
+    <a href="#" class="toggle-suggest-form">+ Foreslå ny ...</a>
+
+    <div class="suggest-extended">
+        <p class="small">Hvis du synes at der mangler et væsentlig element, kan du foreslå det her. Alle foreslag skal godkendes af en global administrator før de bliver tilgengængelige til brug.</p>
+        <form class="suggest-form" data-url="/api/notreal2">
+            <div class="form-group">
+                <label class="control-label full-width">
+                    Forslag:
+                    <input type="text" name="nametext" class="form-control" required/>
                 </label>
             </div>
             <input type="submit" class="btn btn-sm btn-primary" value="Foreslå"/>
@@ -27,6 +44,20 @@
         $(document).ready(function() {
             $(".toggle-suggest-form").click(function () {
                 $(this).next().slideToggle("fast");
+            });
+
+            $("form.suggest-form").each(function() {
+                var form = $(this);
+                form.simpleAjax({
+                    url: form.data("url"),
+                    getData: function() {
+                        return {
+                            "Name": form.find("input[name=nametext]").val(),
+                            "IsActive": false,
+                            "IsSuggestion": true
+                        };
+                    }
+                });
             });
         });
     </script>
