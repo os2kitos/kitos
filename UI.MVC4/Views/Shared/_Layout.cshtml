@@ -19,15 +19,19 @@
             @Html.Partial("_TopNavigation")
             
             <div id="page-content" class="row container-fluid" role="main">
-                @RenderBody()
-            </div>
-            
-            <div id="message-box">
-                <p id="message"></p>
+                
+                <div id="sub-menu">
+                    @RenderSection("submenu", required: false)
+                </div>
+
+                <div id="page-body" class="row container-fluid">
+                    @RenderBody()
+                </div>
             </div>
             
         </div>
         @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/pnotify")
         @Scripts.Render("~/bundles/jqueryval")
         @Scripts.Render("~/bundles/bootstrap")
         @Scripts.Render("~/bundles/wysihtml5")

@@ -237,7 +237,7 @@
     <Compile Include="Controllers\API\PasswordResetRequestController.cs" />
     <Compile Include="Controllers\API\UserController.cs" />
     <Compile Include="Controllers\Web\AccountController.cs" />
-    <Compile Include="Controllers\Web\AdministrationController.cs" />
+    <Compile Include="Controllers\Web\GlobalAdminController.cs" />
     <Compile Include="Controllers\Web\AuthorizeController.cs" />
     <Compile Include="Controllers\API\GenericApiController.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
@@ -247,6 +247,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\HtmlHelpers.cs" />
     <Compile Include="Infrastructure\CustomMembershipProvider.cs" />
     <Compile Include="Infrastructure\CustomRoleProvider.cs" />
     <Compile Include="Infrastructure\IUserRepositoryFactory.cs" />
@@ -285,6 +286,8 @@
     <Content Include="Content\css\select2.png" />
     <Content Include="Content\css\select2x2.png" />
     <Content Include="Content\kitos.css" />
+    <Content Include="Content\pnotify\jquery.pnotify.default.css" />
+    <Content Include="Content\pnotify\jquery.pnotify.default.icons.css" />
     <Content Include="Content\select2-bootstrap.css" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
@@ -367,7 +370,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\knockout-2.2.0.debug.js" />
     <Content Include="Scripts\knockout-2.2.0.js" />
-    <Content Include="Scripts\message.js" />
+    <Content Include="Scripts\pnotify\jquery.pnotify.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ar.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_bg.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ca.js" />
@@ -411,6 +414,7 @@
     <Content Include="Scripts\Select2-locales\select2_locale_zh-TW.js" />
     <Content Include="Scripts\select2.js" />
     <Content Include="Scripts\select2.min.js" />
+    <Content Include="Scripts\form.control.js" />
     <Content Include="Scripts\wysihtml5\parser_rules\advanced.js" />
     <Content Include="Scripts\wysihtml5\parser_rules\simple.js" />
     <Content Include="Scripts\wysihtml5\wysihtml5-0.3.0.js" />
@@ -461,11 +465,14 @@
     <Content Include="Views\Authorize\EmailSent.cshtml" />
     <Content Include="Views\Shared\_TopNavigation.old.cshtml" />
     <Content Include="Views\Shared\_TopNavigation.cshtml" />
-    <Content Include="Views\Administration\AddMunicipality.cshtml" />
+    <Content Include="Views\GlobalAdmin\AddMunicipality.cshtml" />
     <Content Include="Views\Test\Index.cshtml" />
     <Content Include="Views\Test\Encrypt.cshtml" />
-    <Content Include="Views\Administration\Index.cshtml" />
-    <Content Include="Views\Administration\AddGlobalAdmin.cshtml" />
+    <Content Include="Views\GlobalAdmin\AddGlobalAdmin.cshtml" />
+    <Content Include="Views\GlobalAdmin\AddLocalAdmin.cshtml" />
+    <Content Include="Views\GlobalAdmin\Index.cshtml" />
+    <Content Include="Views\GlobalAdmin\_AdminSubmenu.cshtml" />
+	<Content Include="Views\Administration\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

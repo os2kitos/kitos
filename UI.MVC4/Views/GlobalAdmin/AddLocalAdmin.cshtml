@@ -1,0 +1,83 @@
+﻿@{
+    ViewBag.Title = "Tilføj lokal administrator";
+}
+
+@section submenu {
+    @Html.Partial("_AdminSubmenu")
+}
+
+<div class="col-md-7">
+
+    <h2>Tilføj lokal administrator</h2>
+    <p>
+        Opret en ny bruger og tilføj vedkommende som lokal administrator på en kommune.
+    </p>
+    <form class="form-horizontal" role="form" id="add-admin">
+        <div class="form-group">
+            <label for="municipality" class="col-md-3 control-label">
+                Kommunens navn
+            </label>
+            <div class="col-md-8">
+                <select id="municipality" name="municipality" class="form-control" data-placeholder="Vælg kommune" required>
+                    <option></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-3 control-label">
+                Lokal admin navn
+            </label>
+            <div class="col-md-8">
+                <input type="text" id="name" name="name" class="form-control" required minlength="2"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="email" class="col-md-3 control-label">
+                Lokal admin email-addresse
+            </label>
+            <div class="col-md-8">
+                <input type="email" id="email" name="email" class="form-control" required/>
+            </div>
+        </div>
+        <div class="form-group">
+            <p class="help-block col-md-offset-3">
+                Vedkommende vil blive oprettet i systemet og få tilsendt et link til opsætning af password.
+            </p>
+        </div>
+        <div class="form-group">
+            <div class="col-md-8 col-md-offset-3">
+                <input class="btn btn-primary" type="submit" value="Tilføj admin" />
+            </div>
+        </div>
+    </form>
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function() {
+            /* filling out the municipality select */
+            $.get("/api/municipality").done(function(result) {
+                $.each(result, function(i, mun) {
+                    $("#municipality").append($("<option></option>")
+                        .attr("value", mun.Id)
+                        .text(mun.Name));
+                });
+
+            }).always(function() {
+                /* when done with filling out, change to select2 */
+                $("#municipality").select2();
+
+
+                $("#add-admin").simpleAjax({
+                    url: "/api/localadmin",
+                    map: {
+                        "Name": "#name",
+                        "Email": "#email",
+                        "Municipality_Id": "#municipality"
+                    }
+                });
+            });
+        });
+    </script>
+}
