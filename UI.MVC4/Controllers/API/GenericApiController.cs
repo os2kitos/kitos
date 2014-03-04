@@ -126,6 +126,33 @@ namespace UI.MVC4.Controllers
             }
         }
 
+        protected virtual TModel PatchQuery(TModel item)
+        {
+            Repository.Update(item);
+            Repository.Save();
+
+            return item;
+        }
+
+        // PATCH api/T
+        [Authorize(Roles = "GlobalAdmin")]
+        public HttpResponseMessage Patch(TKeyType id, TDto dto)
+        {
+            var item = Map<TDto, TModel>(dto);
+            item.Id = id;
+
+            try
+            {
+                PatchQuery(item);
+
+                return new HttpResponseMessage(HttpStatusCode.OK); // TODO correct?
+            }
+            catch (Exception)
+            {
+                throw new HttpResponseException(HttpStatusCode.NoContent); // TODO catch correct expection
+            }
+        }
+
         protected override void Dispose(bool disposing)
         {
             Repository.Dispose();
