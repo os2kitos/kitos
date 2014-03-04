@@ -7,6 +7,6 @@ namespace UI.MVC4.Models
 {
     public class LocaleDTO
     {
-        public string Value { get; set; }
+        public string Name { get; set; }
     }
 }
