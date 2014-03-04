@@ -124,9 +124,22 @@ div#page-body {
 .alert-info {
 }
 
+div.suggest-box {
+    background-color: #fafafa;
+    padding: 15px;
+    box-shadow: 3px 3px rgba(0, 0, 0, 0.1);
+}
+div.suggest-extended {
+    display: none;
+}
+
 #navbar-side {
     margin: 10px;
     padding: 0px;
+}
+
+.full-width {
+    width: 100%;
 }
 
 .white {
