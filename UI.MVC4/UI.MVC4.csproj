@@ -474,7 +474,7 @@
     <Content Include="Views\GlobalAdmin\AddLocalAdmin.cshtml" />
     <Content Include="Views\GlobalAdmin\Index.cshtml" />
     <Content Include="Views\GlobalAdmin\_AdminSubmenu.cshtml" />
-    <Content Include="Views\Administration\Index.cshtml" />
+	<Content Include="Views\Administration\Index.cshtml" />
     <Content Include="Views\Administration\Suggest.cshtml" />
   </ItemGroup>
   <ItemGroup>

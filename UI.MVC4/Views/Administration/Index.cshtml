@@ -56,34 +56,6 @@
             <div class="well">
                 <h4>Projektkategorier</h4>
                 <div id="project-cat"></div>
-                <div class="form-group">
-                    <label for="input-project" class="col-sm-2 control-label">IT Projekt</label>
-                    <div class="col-sm-5">
-                        <input type="text" name="ItProject" class="form-control" id="input-project" />
-                        <p class="help-block">...</p>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="input-program" class="col-sm-2 control-label">IT Program</label>
-                    <div class="col-sm-5">
-                        <input type="text" name="ItProgram" class="form-control" id="input-program" />
-                        <p class="help-block">...</p>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="input-focus-area" class="col-sm-2 control-label">Indsatsområde</label>
-                    <div class="col-sm-5">
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="input-focus-area" />
-                            <span class="input-group-addon">
-                                <input type="checkbox" name="ShowFocusArea" title="Medtag" />
-                            </span>
-                        </div>
-                        <p class="help-block">En samlebetegnelse for projekter, som ikke er et IT Program</p>
-                    </div>
-                </div>
             </div>
             
             <div class="well">
@@ -171,30 +143,58 @@
 {
     <script>
         var projectCatUri = 'api/projectCategory';
-        var projectCatUri = 'api/projectPhase';
+        var projectTypeUri = 'api/projectType';
         
-        function template(i, target, title, note) {
+        function patch(url, value) {
+            $.ajax({
+                url: url,
+                type: 'PATCH',
+                data: JSON.stringify({ IsActive: value }),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        function template(i, target, title, note, itemid) {
             var id = target + i;
 
             var container = $('<div/>', { 'class': 'form-group' });
-            $('<label/>', { 'for': id, 'class': 'col-sm-2 control-label', html: title}).appendTo(container);
+            $('<label/>', { 'for': id, 'class': 'col-sm-2 control-label', html: title }).appendTo(container);
             var container2 = $('<div/>', { 'class': 'col-sm-5' }).appendTo(container);
-            $('<input/>', { id: id, type: 'text', name: 'test', 'class': 'form-control' }).appendTo(container2);
+            var inputGroup = $('<div/>', { 'class': 'input-group' }).appendTo(container);
+            $('<input/>', { id: id, type: 'text', name: 'test', 'class': 'form-control' }).appendTo(inputGroup);
+            var span = $('<span/>', { 'class': 'input-group-addon' }).appendTo(inputGroup);
+            $('<input/>', { type: 'checkbox', name: 'test', title: 'Medtag' }).change(function() {
+                patch(projectCatUri + '/' + itemid, this.checked);
+            }).appendTo(span);
             $('<p/>', { 'class': 'help-block', html: note }).appendTo(container2);
             
             container.appendTo('#' + target);
         }
-
+        
         $(document).ready(function() {
-            $.getJSON(projectCatUri)
+            $.getJSON(projectTypeUri)
                 .done(function(data) {
-                    console.log(data);
-
                     $.each(data, function(i, e) {
-                        template(i, 'project-cat', e.Name, e.Note);
+                        template(i, 'project-cat', e.Name, e.Note, e.Id);
                     });
                 })
                 .fail(function(jqXHR, textStatus, err) {
+                    console.log(jqXHR, textStatus, err);
+                });
+            
+            $.getJSON(projectTypeUri)
+                .done(function (data) {
+                    console.log(data);
+
+                    $.each(data, function (i, e) {
+                        template(i, 'project-type', e.Name, e.Note);
+                    });
+                })
+                .fail(function (jqXHR, textStatus, err) {
                     console.log(jqXHR, textStatus, err);
                 });
         });

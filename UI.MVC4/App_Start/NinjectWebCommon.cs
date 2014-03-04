@@ -80,6 +80,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<PaymentModel>>().To<GenericRepository<PaymentModel>>().InRequestScope();
             kernel.Bind<IGenericRepository<ProjectPhase>>().To<GenericRepository<ProjectPhase>>().InRequestScope();
             kernel.Bind<IGenericRepository<ProjPhaseLocale>>().To<GenericRepository<ProjPhaseLocale>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ProjectCategory>>().To<GenericRepository<ProjectCategory>>().InRequestScope();
             kernel.Bind<IGenericRepository<ProjectType>>().To<GenericRepository<ProjectType>>().InRequestScope();
             kernel.Bind<IGenericRepository<ProtocolType>>().To<GenericRepository<ProtocolType>>().InRequestScope();
             kernel.Bind<IGenericRepository<PurchaseForm>>().To<GenericRepository<PurchaseForm>>().InRequestScope();

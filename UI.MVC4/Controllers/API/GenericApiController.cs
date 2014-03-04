@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Validation;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -50,7 +52,7 @@ namespace UI.MVC4.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, Map<TModel, TDto>(item));
         }
 
-        protected TModel PostQuery(TModel item)
+        protected virtual TModel PostQuery(TModel item)
         {
             Repository.Insert(item);
             Repository.Save();
@@ -123,6 +125,33 @@ namespace UI.MVC4.Controllers
             catch (Exception)
             {
                 throw new HttpResponseException(HttpStatusCode.NoContent);
+            }
+        }
+
+        protected virtual TModel PatchQuery(TModel item)
+        {
+            Repository.Patch(item);
+            Repository.Save();
+
+            return item;
+        }
+
+        // PATCH api/T
+        [Authorize(Roles = "GlobalAdmin")]
+        public HttpResponseMessage Patch(TKeyType id, TDto dto)
+        {
+            var item = Map<TDto, TModel>(dto);
+            item.Id = id;
+
+            try
+            {
+                PatchQuery(item);
+
+                return new HttpResponseMessage(HttpStatusCode.OK); // TODO correct?
+            }
+            catch (Exception)
+            {
+                throw new HttpResponseException(HttpStatusCode.NoContent); // TODO catch correct expection
             }
         }
 
