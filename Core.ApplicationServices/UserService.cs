@@ -68,7 +68,7 @@ namespace Core.ApplicationServices
 
         public PasswordResetRequest GetPasswordReset(string requestId)
         {
-            var passwordReset = _passwordResetRequestRepository.GetById(requestId);
+            var passwordReset = _passwordResetRequestRepository.GetByKey(requestId);
 
             if (passwordReset == null) return null;
 
@@ -76,7 +76,7 @@ namespace Core.ApplicationServices
             if (timespan.TotalHours > ResetRequestTTL)
             {
                 //the reset request is too old, delete it
-                _passwordResetRequestRepository.DeleteById(passwordReset.Id);
+                _passwordResetRequestRepository.DeleteByKey(passwordReset.Id);
                 _passwordResetRequestRepository.Save();
                 return null;
             }
@@ -98,7 +98,7 @@ namespace Core.ApplicationServices
             _userRepository.Update(user);
             _userRepository.Save();
 
-            _passwordResetRequestRepository.DeleteById(passwordResetRequest.Id);
+            _passwordResetRequestRepository.DeleteByKey(passwordResetRequest.Id);
             _passwordResetRequestRepository.Save();
         }
 

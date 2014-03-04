@@ -23,7 +23,7 @@ namespace UI.MVC4.Controllers.API
         [Authorize]
         public MunicipalityApiModel Get(int id)
         {
-            return AutoMapper.Mapper.Map<Municipality, MunicipalityApiModel>(_repository.GetById(id));
+            return AutoMapper.Mapper.Map<Municipality, MunicipalityApiModel>(_repository.GetByKey(id));
         }
 
         [Authorize]
@@ -87,7 +87,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                _repository.DeleteById(id);
+                _repository.DeleteByKey(id);
                 _repository.Save();
 
                 return new HttpResponseMessage(HttpStatusCode.OK);

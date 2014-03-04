@@ -45,9 +45,9 @@ namespace Infrastructure.DataAccess
             return orderBy != null ? orderBy(query).ToList() : query.ToList();
         }
 
-        public T GetById<TKeyType>(TKeyType id)
+        public T GetByKey(params object[] key)
         {
-            return _dbSet.Find(id);
+            return _dbSet.Find(key);
         }
 
         public T Insert(T entity)
@@ -55,9 +55,9 @@ namespace Infrastructure.DataAccess
             return _dbSet.Add(entity);
         }
 
-        public void DeleteById<TKeyType>(TKeyType id)
+        public void DeleteByKey(params object[] key)
         {
-            var entityToDelete = _dbSet.Find(id);
+            var entityToDelete = _dbSet.Find(key);
             _dbSet.Remove(entityToDelete);
         }
 
