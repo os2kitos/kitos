@@ -34,35 +34,35 @@ namespace UI.MVC4.App_Start
 
             Mapper.CreateMap<ContractTemplate, ContractTemplateDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.ItContracts, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
             Mapper.CreateMap<ContractType, ContractTypeDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.ItContracts, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
             Mapper.CreateMap<DatabaseType, DatabaseTypeDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.Technologies, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
             Mapper.CreateMap<Environment, EnvironmentDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.Technologies, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
             Mapper.CreateMap<InterfaceType, InterfaceTypeDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.ItSystems, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
             Mapper.CreateMap<Method, MethodDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.Interfaces, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
             Mapper.CreateMap<PaymentModel, PaymentModelDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.ItContracts, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
             Mapper.CreateMap<ProjectCategory, ProjectCategoryDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.ItProjects, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
             Mapper.CreateMap<ProjectType, ProjectTypeDTO>()
                   .ReverseMap()
@@ -70,15 +70,15 @@ namespace UI.MVC4.App_Start
 
             Mapper.CreateMap<ProtocolType, ProtocolTypeDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.ItSystems, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
             Mapper.CreateMap<PurchaseForm, PurchaseFormDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.ItContracts, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
             Mapper.CreateMap<SystemType, SystemTypeDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.ItSystem, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
         }
     }
 

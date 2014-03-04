@@ -22,7 +22,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(d => d.ItSystem_Id);
 
             this.HasRequired(t => t.Method)
-                .WithMany(t => t.Interfaces)
+                .WithMany(t => t.References)
                 .HasForeignKey(d => d.Method_Id);
         }
     }

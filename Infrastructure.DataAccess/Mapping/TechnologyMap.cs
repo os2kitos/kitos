@@ -20,10 +20,10 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Relationships
             this.HasRequired(t => t.DatabaseType)
-                .WithMany(t => t.Technologies)
+                .WithMany(t => t.References)
                 .HasForeignKey(d => d.DatabaseType_Id);
             this.HasRequired(t => t.Environment)
-                .WithMany(t => t.Technologies)
+                .WithMany(t => t.References)
                 .HasForeignKey(d => d.Environment_Id);
             this.HasRequired(t => t.ItSystem)
                 .WithOptional(t => t.Technology);

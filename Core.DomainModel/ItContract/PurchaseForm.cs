@@ -2,19 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItContract
 {
-    public class PurchaseForm : IEntity<int>
+    public class PurchaseForm : DropDownEntity<ItContract>
     {
-        public PurchaseForm()
-        {
-            this.ItContracts = new List<ItContract>();
-        }
-
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public bool IsActive { get; set; }
-        public bool IsSuggestion { get; set; }
-        public string Note { get; set; }
-
-        public virtual ICollection<ItContract> ItContracts { get; set; }
     }
 }
