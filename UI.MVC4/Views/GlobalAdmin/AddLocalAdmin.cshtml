@@ -71,10 +71,12 @@
 
                 $("#add-admin").simpleAjax({
                     url: "/api/localadmin",
-                    map: {
-                        "Name": "#name",
-                        "Email": "#email",
-                        "Municipality_Id": "#municipality"
+                    getData: function(form) {
+                        return {
+                            "Name": $("#name").val(),
+                            "Email": $("#email").val(),
+                            "Municipality_Id": $("#municipality").val()
+                        };
                     }
                 });
             });
