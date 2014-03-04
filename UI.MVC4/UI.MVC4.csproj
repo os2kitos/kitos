@@ -222,6 +222,7 @@
     <Compile Include="Controllers\API\ContractTypeController.cs" />
     <Compile Include="Controllers\API\DatabaseTypeController.cs" />
     <Compile Include="Controllers\API\EnvironmentController.cs" />
+    <Compile Include="Controllers\API\GenericLocaleApiController.cs" />
     <Compile Include="Controllers\API\InterfaceTypeController.cs" />
     <Compile Include="Controllers\API\MethodController.cs" />
     <Compile Include="Controllers\API\PaymentModelController.cs" />
@@ -263,6 +264,7 @@
     <Compile Include="Models\DatabaseTypeDTO.cs" />
     <Compile Include="Models\EnvironmentDTO.cs" />
     <Compile Include="Models\InterfaceTypeDTO.cs" />
+    <Compile Include="Models\LocaleDTO.cs" />
     <Compile Include="Models\MethodDTO.cs" />
     <Compile Include="Models\MunicipalityApiModel.cs" />
     <Compile Include="Models\PaymentModelDTO.cs" />
