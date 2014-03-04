@@ -19,89 +19,24 @@
     </div>
     <div class="tab-pane" id="projekt">
         <form class="form-horizontal" role="form">
-            <div class="form-group">
-                <label for="input-url" class="col-sm-2 control-label">IT Projekt vejledning</label>
-                <div class="col-sm-5">
-                    <input type="url" name="ItProjectGuide" class="form-control" id="input-url" />
-                </div>
-            </div>
-            
             <div class="well">
-                <h4>Reference</h4>
+                <h4>Generelt</h4>
                 <div class="form-group">
-                    <label for="input-esdh" class="col-sm-2 control-label">ESDH ref.</label>
+                    <label for="input-project-url" class="col-sm-2 control-label">IT Projekt vejledning</label>
                     <div class="col-sm-5">
-                        <input type="text" name="EsdhRef" class="form-control" id="input-esdh" />
-                        <p class="help-block">Ref. til ESDH system, hvor der er projektdokumenter</p>
-                    </div>
-                </div>
-            
-                <div class="form-group">
-                    <label for="input-cmdb" class="col-sm-2 control-label">CMDB ref.</label>
-                    <div class="col-sm-5">
-                        <input type="text" name="CmdbRef" class="form-control" id="input-cmdb" />
-                        <p class="help-block">Ref. til CMDB o.l. system, hvor der er projektdokumenter</p>
-                    </div>
-                </div>
-            
-                <div class="form-group">
-                    <label for="input-folder" class="col-sm-2 control-label">Mappe ref.</label>
-                    <div class="col-sm-5">
-                        <input type="text" name="FolderRef" class="form-control" id="input-folder" />
-                        <p class="help-block">Ref. til andre steder, hvor der er projektdokumenter</p>
+                        <input type="url" name="ItProjectGuide" class="form-control" id="input-project-url" />
                     </div>
                 </div>
             </div>
             
+            <hr>
+
             <div class="well">
                 <h4>Projektkategorier</h4>
                 <div id="project-cat"></div>
             </div>
-            
-            <div class="well">
-                <h4>Projektfase</h4>
-                <div class="form-group">
-                    <label for="input-fase1" class="col-sm-2 control-label">Afventer</label>
-                    <div class="col-sm-5">
-                        <input type="text" name="Fase1" class="form-control" id="input-fase1" />
-                        <p class="help-block">...</p>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="input-fase2" class="col-sm-2 control-label">Foranalyse</label>
-                    <div class="col-sm-5">
-                        <input type="text" name="Fase2" class="form-control" id="input-fase2" />
-                        <p class="help-block">...</p>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="input-fase3" class="col-sm-2 control-label">Gennemførsel</label>
-                    <div class="col-sm-5">
-                        <input type="text" name="Fase3" class="form-control" id="input-fase3" />
-                        <p class="help-block">...</p>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="input-fase4" class="col-sm-2 control-label">Overlevering</label>
-                    <div class="col-sm-5">
-                        <input type="text" name="Fase4" class="form-control" id="input-fase4" />
-                        <p class="help-block">...</p>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="input-fase5" class="col-sm-2 control-label">Drift</label>
-                    <div class="col-sm-5">
-                        <input type="text" name="Fase5" class="form-control" id="input-fase5" />
-                        <p class="help-block">...</p>
-                    </div>
-                </div>
-            </div>
-            
-            <hr/>
+                        
+            <hr>
             
             <div class="well">
                 <h4>Portfølje</h4>
@@ -132,19 +67,102 @@
         </form>
     </div>
     <div class="tab-pane" id="system">
-        IT Systemer
+        <form class="form-horizontal" role="form">
+            <div class="well">
+                <h4>Generelt</h4>
+                <div class="form-group">
+                    <label for="input-system-url" class="col-sm-2 control-label">IT System vejledning</label>
+                    <div class="col-sm-5">
+                        <input type="url" name="ItSystemGuide" class="form-control" id="input-system-url" />
+                    </div>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <div class="well">
+                <h4>Systemtype</h4>
+                <div id="system-type"></div>
+            </div>
+            
+            <div class="well">
+                <h4>Snitfladetype</h4>
+                <div id="interface-type"></div>
+            </div>
+            
+            <div class="well">
+                <h4>Grænseflade</h4>
+                <div id="protocol-type"></div>
+            </div>
+            
+            <div class="well">
+                <h4>Metode</h4>
+                <div id="method"></div>
+            </div>
+            
+            <hr>
+
+            <div class="well">
+                <h4>Database</h4>
+                <div id="database-type"></div>
+            </div>
+            
+            <div class="well">
+                <h4>Miljø</h4>
+                <div id="environment"></div>
+            </div>
+        </form>
     </div>
     <div class="tab-pane" id="kontrakt">
-        IT Kontrakter
+        <form class="form-horizontal" role="form">
+            <div class="well">
+                <h4>Generelt</h4>
+                <div class="form-group">
+                    <label for="input-contract-url" class="col-sm-2 control-label">IT Kontrakt vejledning</label>
+                    <div class="col-sm-5">
+                        <input type="url" name="ItSystemGuide" class="form-control" id="input-contract-url" />
+                    </div>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <div class="well">
+                <h4>Kontrakttype</h4>
+                <div id="contract-type"></div>
+            </div>
+            
+            <div class="well">
+                <h4>kontraktskabalon</h4>
+                <div id="contract-template"></div>
+            </div>
+            
+            <div class="well">
+                <h4>Indkøbsform</h4>
+                <div id="purchase-form"></div>
+            </div>
+            
+            <div class="well">
+                <h4>Overtagelsesprøver</h4>
+                <div id="contract-..."></div>
+            </div>
+            
+            <div class="well">
+                <h4>Betalignsmodeller</h4>
+                <div id="payment-model"></div>
+            </div>
+            
+            <div class="well">
+                <h4>Aftaleelementer</h4>
+                <div id="agreement-elements"></div>
+            </div>
+        </form>
     </div>
 </div>
 
 @section scripts
 {
-    <script>
-        var projectCatUri = 'api/projectCategory';
-        var projectTypeUri = 'api/projectType';
-        
+    <script>       
         function patch(url, value) {
             $.ajax({
                 url: url,
@@ -158,45 +176,72 @@
             });
         }
 
-        function template(i, target, title, note, itemid) {
+        var textboxWithCheckboxTemplate = function(uri, target, i, title, note, itemid, isActive) {
             var id = target + i;
 
-            var container = $('<div/>', { 'class': 'form-group' });
-            $('<label/>', { 'for': id, 'class': 'col-sm-2 control-label', html: title }).appendTo(container);
-            var container2 = $('<div/>', { 'class': 'col-sm-5' }).appendTo(container);
-            var inputGroup = $('<div/>', { 'class': 'input-group' }).appendTo(container);
-            $('<input/>', { id: id, type: 'text', name: 'test', 'class': 'form-control' }).appendTo(inputGroup);
-            var span = $('<span/>', { 'class': 'input-group-addon' }).appendTo(inputGroup);
-            $('<input/>', { type: 'checkbox', name: 'test', title: 'Medtag' }).change(function() {
-                patch(projectCatUri + '/' + itemid, this.checked);
+            var container = $('<div>', { 'class': 'form-group' });
+            $('<label>', { 'for': id, 'class': 'col-sm-2 control-label', html: title }).appendTo(container);
+            var container2 = $('<div>', { 'class': 'col-sm-5' }).appendTo(container);
+            var inputGroup = $('<div>', { 'class': 'input-group' }).appendTo(container2);
+            $('<input>', { id: id, type: 'text', name: 'test', 'class': 'form-control' }).appendTo(inputGroup);
+            var span = $('<span>', { 'class': 'input-group-addon' }).appendTo(inputGroup);
+            $('<input>', { type: 'checkbox', name: 'test', title: 'Medtag', checked: isActive }).change(function() {
+                patch(uri + '/' + itemid, this.checked);
             }).appendTo(span);
-            $('<p/>', { 'class': 'help-block', html: note }).appendTo(container2);
-            
-            container.appendTo('#' + target);
-        }
-        
-        $(document).ready(function() {
-            $.getJSON(projectTypeUri)
-                .done(function(data) {
-                    $.each(data, function(i, e) {
-                        template(i, 'project-cat', e.Name, e.Note, e.Id);
-                    });
-                })
-                .fail(function(jqXHR, textStatus, err) {
-                    console.log(jqXHR, textStatus, err);
-                });
-            
-            $.getJSON(projectTypeUri)
-                .done(function (data) {
-                    console.log(data);
+            $('<p>', { 'class': 'help-block', html: note }).appendTo(container2);
 
-                    $.each(data, function (i, e) {
-                        template(i, 'project-type', e.Name, e.Note);
-                    });
-                })
-                .fail(function (jqXHR, textStatus, err) {
-                    console.log(jqXHR, textStatus, err);
-                });
+            container.appendTo('#' + target);
+        };
+
+        var textboxTemplate = function (uri, target, i, title, note, itemid, isActive) {
+
+        };
+        
+        var checkboxTemplate = function (uri, target, i, title, note, itemid, isActive) {
+            var id = target + i;
+
+            var container = $('<div>', { 'class': 'form-group' });
+            var container2 = $('<div>', { 'class': 'col-sm-offset-2 col-sm-5' }).appendTo(container);
+            var container3 = $('<div>', { 'class': 'checkbox' }).appendTo(container2);
+            var label = $('<label>', { html: title }).appendTo(container3);
+            $('<input>', { type: 'checkbox', title: 'Medtag', checked: isActive }).change(function () {
+                patch(uri + '/' + itemid, this.checked);
+            }).appendTo(label);
+            $('<p>', { 'class': 'help-block', html: note }).appendTo(container2);
+
+            container.appendTo('#' + target);
+        };
+
+        function make(uri, elementId, template) {
+            $.getJSON(uri)
+               .done(function (data) {
+                   $.each(data, function (i, e) {
+                       template(uri, elementId, i, e.Name, e.Note, e.Id, e.IsActive);
+                   });
+               })
+               .fail(function (jqXHR, textStatus, err) {
+                   console.log(jqXHR, textStatus, err);
+               });
+        }
+
+        $(document).ready(function() {
+            // project
+            make('api/projectCategory', 'project-cat', checkboxTemplate);
+            
+            // system
+            make('api/systemType', 'system-type', checkboxTemplate);
+            make('api/interfaceType', 'interface-type', checkboxTemplate);
+            make('api/protocolType', 'protocol-type', checkboxTemplate);
+            make('api/method', 'method', checkboxTemplate);
+            make('api/databaseType', 'database-type', checkboxTemplate);
+            make('api/environment', 'environment', checkboxTemplate);
+            
+            // contract
+            make('api/contractType', 'contract-type', checkboxTemplate);
+            make('api/contractTemplate', 'contract-template', checkboxTemplate);
+            make('api/purchaseForm', 'purchase-form', checkboxTemplate);
+            make('api/paymentModel', 'payment-model', checkboxTemplate);
+            make('api/paymentModel', 'payment-model', checkboxTemplate);
         });
     </script>
 }
