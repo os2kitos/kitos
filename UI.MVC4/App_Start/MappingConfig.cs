@@ -60,6 +60,10 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.ItContracts, opt => opt.UseValue(null));
 
+            Mapper.CreateMap<ProjectCategory, ProjectCategoryDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.ItProjects, opt => opt.UseValue(null));
+
             Mapper.CreateMap<ProjectType, ProjectTypeDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.ItProjects, opt => opt.UseValue(null));

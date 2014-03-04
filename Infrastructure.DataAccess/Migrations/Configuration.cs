@@ -48,11 +48,16 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Drop Down Data
 
+            context.ProjectCategories.AddOrUpdate(x => x.Name,
+                                             new ProjectCategory() { IsActive = true, Note = "...", Name = "Light" },
+                                             new ProjectCategory() { IsActive = true, Note = "...", Name = "Lokal" },
+                                             new ProjectCategory() { IsActive = true, Note = "...", Name = "Tværkommunalt" },
+                                             new ProjectCategory() { IsActive = true, Note = "...", Name = "SKAL" });
+
             context.ProjectTypes.AddOrUpdate(x => x.Name,
-                                             new ProjectType() { IsActive = true, Note = "...", Name = "Light" },
-                                             new ProjectType() { IsActive = true, Note = "...", Name = "Lokal" },
-                                             new ProjectType() { IsActive = true, Note = "...", Name = "Tværkommunalt" },
-                                             new ProjectType() { IsActive = true, Note = "...", Name = "SKAL" });
+                                             new ProjectType() { IsActive = true, Note = "...", Name = "IT Projekt" },
+                                             new ProjectType() { IsActive = true, Note = "...", Name = "IT Program" },
+                                             new ProjectType() { IsActive = true, Note = "En samlebetegnelse for projekter, som ikke er et IT Program", Name = "Indsatsområde" });
 
             context.SystemTypes.AddOrUpdate(x => x.Name,
                                             new SystemType() { IsActive = true, Note = "...", Name = "Fag" },

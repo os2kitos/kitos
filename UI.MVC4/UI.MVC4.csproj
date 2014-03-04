@@ -225,6 +225,7 @@
     <Compile Include="Controllers\API\InterfaceTypeController.cs" />
     <Compile Include="Controllers\API\MethodController.cs" />
     <Compile Include="Controllers\API\PaymentModelController.cs" />
+    <Compile Include="Controllers\API\ProjectCategoryController.cs" />
     <Compile Include="Controllers\API\ProjectPhaseLocaleController.cs" />
     <Compile Include="Controllers\API\ProjectTypeController.cs" />
     <Compile Include="Controllers\API\ProtocolTypeController.cs" />
@@ -263,6 +264,7 @@
     <Compile Include="Models\MethodDTO.cs" />
     <Compile Include="Models\MunicipalityApiModel.cs" />
     <Compile Include="Models\PaymentModelDTO.cs" />
+    <Compile Include="Models\ProjectCategoryDTO.cs" />
     <Compile Include="Models\ProjectTypeDTO.cs" />
     <Compile Include="Models\ProtocolTypeDTO.cs" />
     <Compile Include="Models\PurchaseFormDTO.cs" />
