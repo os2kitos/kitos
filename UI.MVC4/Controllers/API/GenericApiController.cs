@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Validation;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -50,7 +52,7 @@ namespace UI.MVC4.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, Map<TModel, TDto>(item));
         }
 
-        protected TModel PostQuery(TModel item)
+        protected virtual TModel PostQuery(TModel item)
         {
             Repository.Insert(item);
             Repository.Save();
@@ -128,7 +130,7 @@ namespace UI.MVC4.Controllers
 
         protected virtual TModel PatchQuery(TModel item)
         {
-            Repository.Update(item);
+            Repository.Patch(item);
             Repository.Save();
 
             return item;

@@ -237,6 +237,7 @@
     <Compile Include="Controllers\API\PasswordResetRequestController.cs" />
     <Compile Include="Controllers\API\UserController.cs" />
     <Compile Include="Controllers\Web\AccountController.cs" />
+    <Compile Include="Controllers\Web\AdministrationController.cs" />
     <Compile Include="Controllers\Web\GlobalAdminController.cs" />
     <Compile Include="Controllers\Web\AuthorizeController.cs" />
     <Compile Include="Controllers\API\GenericApiController.cs" />
@@ -472,7 +473,7 @@
     <Content Include="Views\GlobalAdmin\AddLocalAdmin.cshtml" />
     <Content Include="Views\GlobalAdmin\Index.cshtml" />
     <Content Include="Views\GlobalAdmin\_AdminSubmenu.cshtml" />
-	<Content Include="Views\Administration\Index.cshtml" />
+    <Content Include="Views\Administration\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

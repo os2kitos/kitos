@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Data.Entity.Validation;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using Core.DomainServices;
 
 namespace Infrastructure.DataAccess
@@ -64,9 +67,38 @@ namespace Infrastructure.DataAccess
             _context.Entry(entity).State = EntityState.Modified;
         }
 
+        public void Patch(T entity)
+        {
+            _context.Configuration.ValidateOnSaveEnabled = false;
+            _dbSet.Attach(entity);
+            var entry = _context.Entry(entity);
+            foreach (var propertyInfo in typeof(T).GetProperties())
+            {
+                if (propertyInfo.Name == "Id")
+                    continue; // skip primary key
+                
+                if (propertyInfo.GetValue(entity) != null)
+                    entry.Property(propertyInfo.Name).IsModified = true;
+            }
+        }
+
         public void Save()
         {
-            _context.SaveChanges();
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch (DbEntityValidationException dbEx)
+            {
+                foreach (var validationErrors in dbEx.EntityValidationErrors)
+                {
+                    foreach (var validationError in validationErrors.ValidationErrors)
+                    {
+                        Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
+                    }
+                }
+                throw;
+            }
         }
 
         protected virtual void Dispose(bool disposing)

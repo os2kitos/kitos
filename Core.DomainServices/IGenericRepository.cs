@@ -18,5 +18,6 @@ namespace Core.DomainServices
         void DeleteById<TKeyType>(TKeyType id);
         void Update(TModel entity);
         void Save();
+        void Patch(TModel item);
     }
 }
