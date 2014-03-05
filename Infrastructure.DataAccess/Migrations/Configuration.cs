@@ -249,7 +249,7 @@ namespace Infrastructure.DataAccess.Migrations
                     User = eskild
                 };
 
-            context.DepartmentRights.AddOrUpdate(r => r.Id, simonDepartmentRight, eskildDepartmentRight);
+            context.DepartmentRights.AddOrUpdate(r => new {r.Object_Id, r.Role_Id, r.User_Id}, simonDepartmentRight, eskildDepartmentRight);
 
             #region Password Reset Requests
 

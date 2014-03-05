@@ -310,7 +310,6 @@ namespace Infrastructure.DataAccess.Migrations
                         Object_Id = c.Int(nullable: false),
                         Role_Id = c.Int(nullable: false),
                         User_Id = c.Int(nullable: false),
-                        Id = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => new { t.Object_Id, t.Role_Id, t.User_Id })
                 .ForeignKey("dbo.Department", t => t.Object_Id, cascadeDelete: true)
@@ -357,7 +356,6 @@ namespace Infrastructure.DataAccess.Migrations
                         Object_Id = c.Int(nullable: false),
                         Role_Id = c.Int(nullable: false),
                         User_Id = c.Int(nullable: false),
-                        Id = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => new { t.Object_Id, t.Role_Id, t.User_Id })
                 .ForeignKey("dbo.ItContract", t => t.Object_Id, cascadeDelete: true)
@@ -398,7 +396,6 @@ namespace Infrastructure.DataAccess.Migrations
                         Object_Id = c.Int(nullable: false),
                         Role_Id = c.Int(nullable: false),
                         User_Id = c.Int(nullable: false),
-                        Id = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => new { t.Object_Id, t.Role_Id, t.User_Id })
                 .ForeignKey("dbo.ItProject", t => t.Object_Id, cascadeDelete: true)
@@ -436,7 +433,6 @@ namespace Infrastructure.DataAccess.Migrations
                         Object_Id = c.Int(nullable: false),
                         Role_Id = c.Int(nullable: false),
                         User_Id = c.Int(nullable: false),
-                        Id = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => new { t.Object_Id, t.Role_Id, t.User_Id })
                 .ForeignKey("dbo.ItSystem", t => t.Object_Id, cascadeDelete: true)

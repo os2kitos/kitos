@@ -1,6 +1,6 @@
 ﻿namespace Core.DomainModel
 {
-    public interface IRight<TObject, TRole> : IEntity<int>
+    public interface IRight<TObject, TRole>
         where TRole : IEntity<int>
         where TObject : IEntity<int>
     {
