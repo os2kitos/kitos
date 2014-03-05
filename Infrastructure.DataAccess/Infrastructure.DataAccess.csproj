@@ -138,6 +138,10 @@
     <Compile Include="Migrations\201403051549272_Initial.Designer.cs">
       <DependentUpon>201403051549272_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201403051705542_gogo.cs" />
+    <Compile Include="Migrations\201403051705542_gogo.Designer.cs">
+      <DependentUpon>201403051705542_gogo.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
     <Compile Include="UserRepository.cs" />
@@ -160,6 +164,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201403051549272_Initial.resx">
       <DependentUpon>201403051549272_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201403051705542_gogo.resx">
+      <DependentUpon>201403051705542_gogo.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
