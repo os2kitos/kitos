@@ -125,12 +125,19 @@ div#page-body {
 }
 
 div.suggest-box {
-    background-color: #fafafa;
     padding: 15px;
-    box-shadow: 3px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
 }
 div.suggest-extended {
     display: none;
+    position: absolute;
+    z-index: 1000;
+    background-color: #fafafa;
+    padding: 15px;
+
+    -webkit-box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.24);
+    -moz-box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.24);
+    box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.24);
 }
 
 #navbar-side {
