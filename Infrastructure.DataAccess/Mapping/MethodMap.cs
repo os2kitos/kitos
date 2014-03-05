@@ -1,19 +1,19 @@
-using System.Data.Entity.ModelConfiguration;
-using Core.DomainModel;
+﻿using System.Data.Entity.ModelConfiguration;
+using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ConfigurationMap : EntityTypeConfiguration<Configuration>
+    public class MethodMap : EntityTypeConfiguration<Method>
     {
-        public ConfigurationMap()
+        public MethodMap()
         {
             // Primary Key
             this.HasKey(t => t.Id);
 
+            // Properties
             // Table & Column Mappings
-            this.ToTable("Configuration");
+            this.ToTable("Method");
             this.Property(t => t.Id).HasColumnName("Id");
-            
         }
     }
 }

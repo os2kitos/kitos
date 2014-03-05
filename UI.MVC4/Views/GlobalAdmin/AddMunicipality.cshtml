@@ -36,8 +36,10 @@
             
             $("#add-municipality").simpleAjax({
                 url: "/api/municipality",
-                map: {
-                    "Name": "#name"
+                getData: function(form) {
+                    return {
+                        "Name": $("#name").val()
+                    };
                 }
             });
         });

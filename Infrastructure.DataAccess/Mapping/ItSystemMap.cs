@@ -14,18 +14,31 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("ItSystem");
             this.Property(t => t.Id).HasColumnName("Id");
-            this.Property(t => t.ParentItSystem_Id).HasColumnName("ParentItSystem_Id");
-            this.Property(t => t.Municipality_Id).HasColumnName("Municipality_Id");
 
             // Relationships
             this.HasRequired(t => t.ParentItSystem)
                 .WithMany(t => t.ItSystems1)
                 .HasForeignKey(d => d.ParentItSystem_Id);
+
             this.HasRequired(t => t.Municipality)
                 .WithMany(t => t.ItSystems)
                 .HasForeignKey(d => d.Municipality_Id)
                 .WillCascadeOnDelete(false);
 
+            this.HasRequired(t => t.SystemType)
+                .WithMany(t => t.References)
+                .HasForeignKey(d => d.SystemType_Id)
+                .WillCascadeOnDelete(false);
+
+            this.HasRequired(t => t.InterfaceType)
+                .WithMany(t => t.References)
+                .HasForeignKey(d => d.InterfaceType_Id)
+                .WillCascadeOnDelete(false);
+
+            this.HasRequired(t => t.ProtocolType)
+                .WithMany(t => t.References)
+                .HasForeignKey(d => d.ProtocolType_Id)
+                .WillCascadeOnDelete(false);
         }
     }
 }

@@ -1,6 +1,9 @@
 using System.Web.Http;
 using System.Web.Security;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.ApplicationServices;
 using Infrastructure.DataAccess;
@@ -68,6 +71,29 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<Municipality>>().To<GenericRepository<Municipality>>().InRequestScope();
             kernel.Bind<IGenericRepository<User>>().To<GenericRepository<User>>().InRequestScope();
             kernel.Bind<IGenericRepository<PasswordResetRequest>>().To<GenericRepository<PasswordResetRequest>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ContractTemplate>>().To<GenericRepository<ContractTemplate>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ContractType>>().To<GenericRepository<ContractType>>().InRequestScope();
+            kernel.Bind<IGenericRepository<DatabaseType>>().To<GenericRepository<DatabaseType>>().InRequestScope();
+            kernel.Bind<IGenericRepository<Core.DomainModel.ItSystem.Environment>>().To<GenericRepository<Core.DomainModel.ItSystem.Environment>>().InRequestScope();
+            kernel.Bind<IGenericRepository<InterfaceType>>().To<GenericRepository<InterfaceType>>().InRequestScope();
+            kernel.Bind<IGenericRepository<Method>>().To<GenericRepository<Method>>().InRequestScope();
+            kernel.Bind<IGenericRepository<PaymentModel>>().To<GenericRepository<PaymentModel>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ProjectPhase>>().To<GenericRepository<ProjectPhase>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ProjPhaseLocale>>().To<GenericRepository<ProjPhaseLocale>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ProjectCategory>>().To<GenericRepository<ProjectCategory>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ProjectType>>().To<GenericRepository<ProjectType>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ProtocolType>>().To<GenericRepository<ProtocolType>>().InRequestScope();
+            kernel.Bind<IGenericRepository<PurchaseForm>>().To<GenericRepository<PurchaseForm>>().InRequestScope();
+            kernel.Bind<IGenericRepository<SystemType>>().To<GenericRepository<SystemType>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ExtReferenceType>>().To<GenericRepository<ExtReferenceType>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ExtRefTypeLocale>>().To<GenericRepository<ExtRefTypeLocale>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ItProjectRole>>().To<GenericRepository<ItProjectRole>>().InRequestScope();
+            kernel.Bind<IGenericRepository<Config>>().To<GenericRepository<Config>>();
+
+            kernel.Bind<IGenericRepository<ItContractModuleName>>().To<GenericRepository<ItContractModuleName>>();
+            kernel.Bind<IGenericRepository<ItProjectModuleName>>().To<GenericRepository<ItProjectModuleName>>();
+            kernel.Bind<IGenericRepository<ItSupportModuleName>>().To<GenericRepository<ItSupportModuleName>>();
+            kernel.Bind<IGenericRepository<ItSystemModuleName>>().To<GenericRepository<ItSystemModuleName>>();
 
             kernel.Bind<IUserRepository>().To<UserRepository>().InRequestScope();
             kernel.Bind<IMailClient>().To<MailClient>().InRequestScope().WithConstructorArgument("host", "localhost").WithConstructorArgument("port", 25);

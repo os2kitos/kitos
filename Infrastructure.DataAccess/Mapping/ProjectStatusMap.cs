@@ -19,6 +19,9 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasRequired(t => t.ItProject)
                 .WithOptional(t => t.ProjectStatus);
 
+            this.HasOptional(t => t.ProjectPhase)
+                .WithMany(t => t.References)
+                .HasForeignKey(d => d.ProjectPhase_Id);
         }
     }
 }

@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 
-namespace UI.MVC4.Controllers
+namespace UI.MVC4.Controllers.API
 {
-    public abstract class GenericApiController<TModel, TKeyType> : ApiController // TODO perhaps it's possible to infer the TKeyType from TModel somehow
+    public abstract class GenericApiController<TModel, TKeyType, TDto> : ApiController // TODO perhaps it's possible to infer the TKeyType from TModel somehow
         where TModel : class, IEntity<TKeyType>
     {
         protected readonly IGenericRepository<TModel> Repository;
@@ -18,69 +19,137 @@ namespace UI.MVC4.Controllers
             Repository = repository;
         }
 
-        public virtual IEnumerable<TModel> Get()
+        protected virtual TDest Map<TSource, TDest>(TSource item)
+        {
+            return AutoMapper.Mapper.Map<TDest>(item);
+        }
+
+        protected virtual IEnumerable<TModel> GetAllQuery()
         {
             return Repository.Get();
         }
 
-        // GET api/T
-        public virtual TModel Get(TKeyType id)
+        public HttpResponseMessage GetAll()
         {
-            return Repository.GetById(id);
+            var items = GetAllQuery().ToList();
+
+            if (!items.Any())
+                return Request.CreateResponse(HttpStatusCode.NoContent);
+
+            return Request.CreateResponse(HttpStatusCode.OK, Map<IEnumerable<TModel>, IEnumerable<TDto>>(items));
+        }
+
+        // GET api/T
+        public HttpResponseMessage GetSingle(TKeyType id)
+        {
+            var item = Repository.GetByKey(id);
+
+            if (item == null)
+                return Request.CreateResponse(HttpStatusCode.NoContent);
+
+            return Request.CreateResponse(HttpStatusCode.OK, Map<TModel, TDto>(item));
+        }
+
+        protected virtual TModel PostQuery(TModel item)
+        {
+            Repository.Insert(item);
+            Repository.Save();
+
+            return item;
         }
 
         // POST api/T
         [Authorize(Roles = "GlobalAdmin")]
-        public virtual HttpResponseMessage Post(TModel item)
+        public HttpResponseMessage Post(TDto dto)
         {
+            var item = Map<TDto, TModel>(dto);
             try
             {
-                Repository.Insert(item);
-                Repository.Save();
+                PostQuery(item);
 
                 //var msg = new HttpResponseMessage(HttpStatusCode.Created);
                 var msg = Request.CreateResponse(HttpStatusCode.Created, item);
-                msg.Headers.Location = new Uri(Request.RequestUri + "/" + item.Id.ToString());
+                msg.Headers.Location = new Uri(Request.RequestUri + "/" + item.Id);
                 return msg;
             }
             catch (Exception)
             {
-                throw new HttpResponseException(HttpStatusCode.Conflict);
+                throw new HttpResponseException(HttpStatusCode.Conflict); // TODO catch correct expection
             }
+        }
+
+        protected virtual TModel PutQuery(TModel item)
+        {
+            Repository.Update(item);
+            Repository.Save();
+
+            return item;
         }
 
         // PUT api/T
         [Authorize(Roles = "GlobalAdmin")]
-        public virtual HttpResponseMessage Put(TKeyType id, TModel item)
+        public HttpResponseMessage Put(TKeyType id, TDto dto)
         {
+            var item = Map<TDto, TModel>(dto);
             item.Id = id;
             try
             {
-                Repository.Update(item);
-                Repository.Save();
+                PutQuery(item);
 
                 return new HttpResponseMessage(HttpStatusCode.OK); // TODO correct?
             }
             catch (Exception)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                throw new HttpResponseException(HttpStatusCode.NoContent); // TODO catch correct expection
             }
+        }
+
+        protected virtual void DeleteQuery(TKeyType id)
+        {
+            Repository.DeleteByKey(id);
+            Repository.Save();
         }
 
         // DELETE api/T
         [Authorize(Roles = "GlobalAdmin")]
-        public virtual HttpResponseMessage Delete(TKeyType id)
+        public HttpResponseMessage Delete(TKeyType id)
         {
             try
             {
-                Repository.DeleteById(id);
-                Repository.Save();
+                DeleteQuery(id);
 
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
             catch (Exception)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                throw new HttpResponseException(HttpStatusCode.NoContent);
+            }
+        }
+
+        protected virtual TModel PatchQuery(TModel item)
+        {
+            Repository.Patch(item);
+            Repository.Save();
+
+            return item;
+        }
+
+        // PATCH api/T
+        [Authorize(Roles = "GlobalAdmin")]
+        public HttpResponseMessage Patch(TKeyType id, TDto dto)
+        {
+            var item = Map<TDto, TModel>(dto);
+            item.Id = id;
+
+            try
+            {
+                PatchQuery(item);
+
+                return new HttpResponseMessage(HttpStatusCode.OK); // TODO correct?
+            }
+            catch (Exception)
+            {
+                throw new HttpResponseException(HttpStatusCode.NoContent); // TODO catch correct expection
             }
         }
 

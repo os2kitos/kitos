@@ -3,15 +3,18 @@ using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
 {
-    public class Department
+    public class Department : IEntity<int>, IHasRights<DepartmentRight>
     {
         public Department()
         {
             this.Infrastructures = new List<Infrastructure>();
+            this.Rights = new List<DepartmentRight>();
         }
 
         public int Id { get; set; }
+        public string Name { get; set; }
 
         public virtual ICollection<Infrastructure> Infrastructures { get; set; }
+        public virtual ICollection<DepartmentRight> Rights { get; set; }
     }
 }

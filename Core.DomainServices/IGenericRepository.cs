@@ -13,10 +13,11 @@ namespace Core.DomainServices
             Expression<Func<TModel, bool>> filter = null,
             Func<IQueryable<TModel>, IOrderedQueryable<TModel>> orderBy = null,
             string includeProperties = "");
-        TModel GetById<TKeyType>(TKeyType id);
+        TModel GetByKey(params object[] key);
         TModel Insert(TModel entity);
-        void DeleteById<TKeyType>(TKeyType id);
+        void DeleteByKey(params object[] key);
         void Update(TModel entity);
         void Save();
+        void Patch(TModel item);
     }
 }
