@@ -223,6 +223,7 @@
     <Compile Include="Controllers\API\DatabaseTypeController.cs" />
     <Compile Include="Controllers\API\ConfigController.cs" />
     <Compile Include="Controllers\API\EnvironmentController.cs" />
+    <Compile Include="Controllers\API\GenericOptionApiController.cs" />
     <Compile Include="Controllers\API\InterfaceTypeController.cs" />
     <Compile Include="Controllers\API\MethodController.cs" />
     <Compile Include="Controllers\API\PaymentModelController.cs" />
@@ -259,20 +260,9 @@
     <Compile Include="Infrastructure\UserRepositoryFactory.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\AuthorizeViewModels.cs" />
-    <Compile Include="Models\ConfigDTO.cs" />
-    <Compile Include="Models\ContractTemplateDTO.cs" />
-    <Compile Include="Models\ContractTypeDTO.cs" />
-    <Compile Include="Models\DatabaseTypeDTO.cs" />
-    <Compile Include="Models\EnvironmentDTO.cs" />
-    <Compile Include="Models\InterfaceTypeDTO.cs" />
-    <Compile Include="Models\MethodDTO.cs" />
+	<Compile Include="Models\ConfigDTO.cs" />
+    <Compile Include="Models\OptionDTO.cs" />
     <Compile Include="Models\MunicipalityApiModel.cs" />
-    <Compile Include="Models\PaymentModelDTO.cs" />
-    <Compile Include="Models\ProjectCategoryDTO.cs" />
-    <Compile Include="Models\ProjectTypeDTO.cs" />
-    <Compile Include="Models\ProtocolTypeDTO.cs" />
-    <Compile Include="Models\PurchaseFormDTO.cs" />
-    <Compile Include="Models\SystemTypeDTO.cs" />
     <Compile Include="Models\UserApiModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -476,6 +466,7 @@
     <Content Include="Views\GlobalAdmin\Index.cshtml" />
     <Content Include="Views\GlobalAdmin\_AdminSubmenu.cshtml" />
     <Content Include="Views\Administration\Index.cshtml" />
+    <Content Include="Views\Administration\Suggest.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

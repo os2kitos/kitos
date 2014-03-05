@@ -1,0 +1,95 @@
+﻿@{
+    ViewBag.Title = "Foreslå ny";
+}
+
+<h2>Foreslå ny</h2>
+
+<div class="container-fluid col-md-3">
+    <h3>Alle tilgengængelige</h3>
+    <ul id="avail">
+        
+    </ul>
+</div>
+
+<div class="container-fluid col-md-3">
+    <h3>Alle ikke-forslag</h3>
+    <ul id="non-suggestions">
+        
+    </ul>
+</div>
+
+<div class="container-fluid col-md-3">
+    <h3>Alle forslag</h3>
+    <ul id="suggestions">
+        
+    </ul>
+</div>
+
+<div class="suggest-box container-fluid col-md-3">
+    <a href="#" class="toggle-suggest-form">+ Foreslå ny ...</a>
+
+    <div class="suggest-extended">
+        <p class="small">Hvis du synes at der mangler et væsentlig element, kan du foreslå det her. Alle foreslag skal godkendes af en global administrator før de bliver tilgengængelige til brug.</p>
+        <form class="suggest-form" data-url="/api/contracttype">
+            <div class="form-group">
+                <label class="control-label full-width">
+                    Forslag:
+                    <input type="text" name="nametext" class="form-control" required/>
+                </label>
+            </div>
+            <input type="submit" class="btn btn-sm btn-primary" value="Foreslå"/>
+        </form>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function() {
+            $(".toggle-suggest-form").click(function() {
+                $(this).next().slideToggle("fast");
+            });
+
+            $("form.suggest-form").each(function() {
+                var form = $(this);
+                form.simpleAjax({
+                    url: form.data("url"),
+                    getData: function() {
+                        return {
+                            "Name": form.find("input[name=nametext]").val(),
+                            "IsActive": false,
+                            "IsSuggestion": true
+                        };
+                    }
+                });
+            });
+
+            $.getJSON("/api/contracttype").done(function (data) {
+                var ul = $("ul#avail");
+                $.each(data, function(i, v) {
+                    ul.append(
+                        $("<li></li>").text(v.Name + " (a: " + v.IsActive + ", s: " + v.IsSuggestion + ")")
+                    );
+                });
+            });
+
+            $.getJSON("/api/contracttype?nonsuggestions").done(function (data) {
+                var ul = $("ul#non-suggestions");
+                $.each(data, function (i, v) {
+                    ul.append(
+                        $("<li></li>").text(v.Name + " (a: " + v.IsActive + ", s: " + v.IsSuggestion + ")")
+                    );
+                });
+            });
+            
+            $.getJSON("/api/contracttype?suggestions").done(function (data) {
+                var ul = $("ul#suggestions");
+                $.each(data, function (i, v) {
+                    ul.append(
+                        $("<li></li>").text(v.Name + " (a: " + v.IsActive + ", s: " + v.IsSuggestion + ")")
+                    );
+                });
+            });
+        });
+    </script>
+}

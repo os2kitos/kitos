@@ -23,16 +23,16 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Relationships
             this.HasRequired(t => t.ContractTemplate)
-                .WithMany(t => t.ItContracts)
+                .WithMany(t => t.References)
                 .HasForeignKey(d => d.ContractTemplate_Id);
             this.HasRequired(t => t.ContractType)
-                .WithMany(t => t.ItContracts)
+                .WithMany(t => t.References)
                 .HasForeignKey(d => d.ContractType_Id);
             this.HasRequired(t => t.PaymentModel)
-                .WithMany(t => t.ItContracts)
+                .WithMany(t => t.References)
                 .HasForeignKey(d => d.PaymentModel_Id);
             this.HasRequired(t => t.PurchaseForm)
-                .WithMany(t => t.ItContracts)
+                .WithMany(t => t.References)
                 .HasForeignKey(d => d.PurchaseForm_Id);
             this.HasRequired(t => t.Supplier)
                 .WithMany(t => t.ItContracts)

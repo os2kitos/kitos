@@ -9,9 +9,14 @@ namespace UI.MVC4.Controllers.Web
     public class AdministrationController : Controller
     {
         //
-        // GET: /Administration/
+        // GET: /Admin/
 
         public ActionResult Index()
+        {
+            return View();
+        }
+
+        public ActionResult Suggest()
         {
             return View();
         }

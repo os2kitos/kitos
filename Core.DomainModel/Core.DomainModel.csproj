@@ -43,6 +43,7 @@
     <Compile Include="Department.cs" />
     <Compile Include="ExtReference.cs" />
     <Compile Include="ExtReferenceType.cs" />
+    <Compile Include="IOptionEntity.cs" />
     <Compile Include="ItContractConfig.cs" />
     <Compile Include="ItContractModuleName.cs" />
     <Compile Include="ItContract\Agreement.cs" />

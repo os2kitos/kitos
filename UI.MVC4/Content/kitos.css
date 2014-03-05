@@ -124,9 +124,29 @@ div#page-body {
 .alert-info {
 }
 
+div.suggest-box {
+    padding: 15px;
+    position: relative;
+}
+div.suggest-extended {
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    background-color: #fafafa;
+    padding: 15px;
+
+    -webkit-box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.24);
+    -moz-box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.24);
+    box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.24);
+}
+
 #navbar-side {
     margin: 10px;
     padding: 0px;
+}
+
+.full-width {
+    width: 100%;
 }
 
 .white {

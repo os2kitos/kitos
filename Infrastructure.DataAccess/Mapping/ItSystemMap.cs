@@ -26,17 +26,17 @@ namespace Infrastructure.DataAccess.Mapping
                 .WillCascadeOnDelete(false);
 
             this.HasRequired(t => t.SystemType)
-                .WithMany(t => t.ItSystem)
+                .WithMany(t => t.References)
                 .HasForeignKey(d => d.SystemType_Id)
                 .WillCascadeOnDelete(false);
 
             this.HasRequired(t => t.InterfaceType)
-                .WithMany(t => t.ItSystems)
+                .WithMany(t => t.References)
                 .HasForeignKey(d => d.InterfaceType_Id)
                 .WillCascadeOnDelete(false);
 
             this.HasRequired(t => t.ProtocolType)
-                .WithMany(t => t.ItSystems)
+                .WithMany(t => t.References)
                 .HasForeignKey(d => d.ProtocolType_Id)
                 .WillCascadeOnDelete(false);
         }

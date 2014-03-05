@@ -3,18 +3,18 @@ using System.Collections.ObjectModel;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class Method : IEntity<int>
+    public class Method : IOptionEntity<Interface>
     {
         public Method()
         {
-            this.Interfaces = new Collection<Interface>();
+            References = new List<Interface>();
         }
 
         public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
+        public bool IsSuggestion { get; set; }
         public string Note { get; set; }
-
-        public virtual ICollection<Interface> Interfaces { get; set; }
+        public virtual ICollection<Interface> References { get; set; }
     }
 }
