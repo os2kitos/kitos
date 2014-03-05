@@ -1,12 +1,12 @@
 ﻿using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using UI.MVC4.Models;
 
-namespace UI.MVC4.Controllers
+namespace UI.MVC4.Controllers.API
 {
-    public class ProtocolTypeController : GenericApiController<ProjectType, int, ProjectTypeDTO>
+    public class ProtocolTypeController : GenericOptionApiController<ProtocolType, ItSystem>
     {
-        public ProtocolTypeController(IGenericRepository<ProjectType> repository) 
+        public ProtocolTypeController(IGenericRepository<ProtocolType> repository) 
             : base(repository)
         {
         }

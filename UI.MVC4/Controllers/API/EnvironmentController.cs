@@ -1,12 +1,11 @@
 ﻿using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using UI.MVC4.Models;
 
-namespace UI.MVC4.Controllers
+namespace UI.MVC4.Controllers.API
 {
-    public class EnvironmentController : GenericApiController<Environment, int, EnvironmentDTO>
+    public class EnvironmentController : GenericOptionApiController<Environment, Technology>
     {
-        public EnvironmentController(IGenericRepository<Environment> repository) 
+        public EnvironmentController(IGenericRepository<Environment> repository)
             : base(repository)
         {
         }

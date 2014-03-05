@@ -1,10 +1,9 @@
 ﻿using Core.DomainModel.ItProject;
 using Core.DomainServices;
-using UI.MVC4.Models;
 
-namespace UI.MVC4.Controllers
+namespace UI.MVC4.Controllers.API
 {
-    public class ProjectTypeController : GenericApiController<ProjectType, int, ProjectTypeDTO>
+    public class ProjectTypeController : GenericOptionApiController<ProjectType, ItProject>
     {
         public ProjectTypeController(IGenericRepository<ProjectType> repository) 
             : base(repository)

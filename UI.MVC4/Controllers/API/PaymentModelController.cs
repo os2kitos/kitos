@@ -1,10 +1,9 @@
 ﻿using Core.DomainModel.ItContract;
 using Core.DomainServices;
-using UI.MVC4.Models;
 
-namespace UI.MVC4.Controllers
+namespace UI.MVC4.Controllers.API
 {
-    public class PaymentModelController : GenericApiController<PaymentModel, int, PaymentModelDTO>
+    public class PaymentModelController : GenericOptionApiController<PaymentModel, ItContract>
     {
         public PaymentModelController(IGenericRepository<PaymentModel> repository) 
             : base(repository)

@@ -65,7 +65,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ProjectCategory_Id);
             this.HasRequired(t => t.ProjectType)
-                .WithMany(t => t.ItProjects)
+                .WithMany(t => t.References)
                 .HasForeignKey(d => d.ProjectType_Id);
 
         }

@@ -31,52 +31,52 @@ namespace UI.MVC4.App_Start
 
             // TODO do we need an admin DTO and normal DTO to strip unused properties in normal DTO
             // like IsActive and Note
-
-            Mapper.CreateMap<ContractTemplate, ContractTemplateDTO>()
+            
+            Mapper.CreateMap<ContractTemplate, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<ContractType, ContractTypeDTO>()
+            Mapper.CreateMap<ContractType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<DatabaseType, DatabaseTypeDTO>()
+            Mapper.CreateMap<DatabaseType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<Environment, EnvironmentDTO>()
+            Mapper.CreateMap<Environment, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<InterfaceType, InterfaceTypeDTO>()
+            Mapper.CreateMap<InterfaceType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<Method, MethodDTO>()
+            Mapper.CreateMap<Method, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<PaymentModel, PaymentModelDTO>()
+            Mapper.CreateMap<PaymentModel, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<ProjectCategory, ProjectCategoryDTO>()
+            Mapper.CreateMap<ProjectCategory, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<ProjectType, ProjectTypeDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.ItProjects, opt => opt.UseValue(null));
-
-            Mapper.CreateMap<ProtocolType, ProtocolTypeDTO>()
+            Mapper.CreateMap<ProjectType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<PurchaseForm, PurchaseFormDTO>()
+            Mapper.CreateMap<ProtocolType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<SystemType, SystemTypeDTO>()
+            Mapper.CreateMap<PurchaseForm, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
+            Mapper.CreateMap<SystemType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
         }

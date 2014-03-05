@@ -67,6 +67,6 @@ namespace UI.MVC4.Controllers.API
         protected override void DeleteQuery(int id)
         {
             base.DeleteQuery(id);
-        }
+        } 
     }
 }
