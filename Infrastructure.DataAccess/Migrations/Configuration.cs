@@ -152,7 +152,14 @@ namespace Infrastructure.DataAccess.Migrations
             context.SaveChanges();
 
             #endregion
-            
+
+            var department = new Department()
+                {
+                    Name = "Test organisation"
+                };
+
+            context.Departments.AddOrUpdate(d => d.Id, department);
+
             #region Department roles
 
             var boss = new DepartmentRole()
@@ -212,11 +219,37 @@ namespace Infrastructure.DataAccess.Migrations
                 Municipality = globalMunicipality
             };
 
+            var eskild = new User()
+                {
+                    Name = "Eskild",
+                    Email = "esd@it-minds.dk",
+                    Salt = "uw5BuXBIc52n2pL2MH4NRZMg44SVmw3GmrvOAK5pxz4=", //encryption of "saltsimon"
+                    Password = "2Pps82r5J0vIjvxJjHPf4mF/t2Q5VySmTiT2ZgV7e8U=", //"slp123" encrypted with salt
+                    Role = localAdmin,
+                    Municipality = globalMunicipality
+                };
+
             context.Users.AddOrUpdate(x => x.Email, simon);
 
             context.SaveChanges();
 
             #endregion
+
+            var simonDepartmentRight = new DepartmentRight()
+                {
+                    Object = department,
+                    Role = boss,
+                    User = simon
+                };
+
+            var eskildDepartmentRight = new DepartmentRight()
+                {
+                    Object = department,
+                    Role = resourcePerson,
+                    User = eskild
+                };
+
+            context.DepartmentRights.AddOrUpdate(r => r.Id, simonDepartmentRight, eskildDepartmentRight);
 
             #region Password Reset Requests
 
