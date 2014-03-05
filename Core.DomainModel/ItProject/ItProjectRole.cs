@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel.ItProject
 {
-    class ItProjectRole : IOptionEntity<ItProject>
+    public class ItProjectRole : IOptionEntity<ItProject>
     {
         public ItProjectRole()
         {

@@ -41,13 +41,16 @@
   <ItemGroup>
     <Compile Include="Configuration.cs" />
     <Compile Include="Department.cs" />
+    <Compile Include="DepartmentRight.cs" />
     <Compile Include="ExtReference.cs" />
     <Compile Include="ExtReferenceType.cs" />
     <Compile Include="IOptionEntity.cs" />
+    <Compile Include="IRight.cs" />
     <Compile Include="ItContract\Agreement.cs" />
     <Compile Include="ItContract\ContractTemplate.cs" />
     <Compile Include="ItContract\ContractType.cs" />
     <Compile Include="ItContract\ItContract.cs" />
+    <Compile Include="ItContract\ItContractRight.cs" />
     <Compile Include="ItContract\ItContractRole.cs" />
     <Compile Include="ItContract\Payment.cs" />
     <Compile Include="ItContract\PaymentModel.cs" />
@@ -60,6 +63,7 @@
     <Compile Include="ItProject\Handover.cs" />
     <Compile Include="ItProject\Hierarchy.cs" />
     <Compile Include="ItProject\ItProject.cs" />
+    <Compile Include="ItProject\ItProjectRight.cs" />
     <Compile Include="ItProject\ItProjectRole.cs" />
     <Compile Include="ItProject\ItProjectTab.cs" />
     <Compile Include="ItProject\Milestone.cs" />
@@ -83,6 +87,7 @@
     <Compile Include="ItSystem\Interface.cs" />
     <Compile Include="ItSystem\InterfaceType.cs" />
     <Compile Include="ItSystem\ItSystem.cs" />
+    <Compile Include="ItSystem\ItSystemRight.cs" />
     <Compile Include="ItSystem\ItSystemRole.cs" />
     <Compile Include="ItSystem\Method.cs" />
     <Compile Include="ItSystem\ProgLanguage.cs" />

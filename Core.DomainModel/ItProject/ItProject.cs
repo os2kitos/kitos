@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProject
+    public class ItProject : IEntity<int>
     {
         public ItProject()
         {

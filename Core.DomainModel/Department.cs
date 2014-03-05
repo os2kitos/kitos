@@ -3,7 +3,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
 {
-    public class Department
+    public class Department : IEntity<int>
     {
         public Department()
         {

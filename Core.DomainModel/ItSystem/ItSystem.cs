@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ItSystem
+    public class ItSystem : IEntity<int>
     {
         public ItSystem()
         {
