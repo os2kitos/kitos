@@ -17,12 +17,18 @@ namespace Core.DomainModel
         public int Id { get; set; }
         public string Name { get; set; }
         
-        public virtual Configuration Configuration { get; set; }
+        public virtual Config Config { get; set; }
         public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
         public virtual ICollection<ItSystem.ItSystem> ItSystems { get; set; }
         public virtual ICollection<ItContract.ItContract> ItContracts { get; set; }
         //public virtual Localization Localization { get; set; }
         public virtual ICollection<User> Users { get; set; }
         public virtual ICollection<ProjPhaseLocale> ProjectPhaseLocales { get; set; }
+
+        public virtual ItSupportConfig ItSupportConfig { get; set; }
+        public virtual ItProjectConfig ItProjectConfig { get; set; }
+        public virtual ItSystemConfig ItSystemConfig { get; set; }
+        public virtual ItContractConfig ItContractConfig { get; set; }
+
     }
 }

@@ -121,11 +121,11 @@ namespace Infrastructure.DataAccess.Migrations
                     Name = "Fælleskommune"
                 };
 
-            context.Municipalitys.AddOrUpdate(x => x.Name, globalMunicipality);
+            context.Municipalities.AddOrUpdate(x => x.Name, globalMunicipality);
 
             context.SaveChanges();
 
-            var configuration = new Core.DomainModel.Configuration
+            var configuration = new Core.DomainModel.Config
                 {
                     Municipality = globalMunicipality,
                     ItProjectGuide = "ProjectGuide",
@@ -145,7 +145,7 @@ namespace Infrastructure.DataAccess.Migrations
                     ShowPortfolio = false
                 };
 
-            context.Configurations.AddOrUpdate(x => x.Id, configuration);
+            context.Configs.AddOrUpdate(x => x.Id, configuration);
             context.SaveChanges();
 
             #endregion

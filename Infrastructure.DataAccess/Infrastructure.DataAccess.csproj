@@ -65,7 +65,7 @@
     <Compile Include="Mapping\BasicDataMap.cs" />
     <Compile Include="Mapping\CommunicationMap.cs" />
     <Compile Include="Mapping\ComponentsMap.cs" />
-    <Compile Include="Mapping\ConfigurationMap.cs" />
+    <Compile Include="Mapping\ConfigMap.cs" />
     <Compile Include="Mapping\ContractTemplateMap.cs" />
     <Compile Include="Mapping\ContractTypeMap.cs" />
     <Compile Include="Mapping\DatabaseTypeMap.cs" />
@@ -83,9 +83,16 @@
     <Compile Include="Mapping\InfrastructureMap.cs" />
     <Compile Include="Mapping\InterfaceMap.cs" />
     <Compile Include="Mapping\InterfaceTypeMap.cs" />
+    <Compile Include="Mapping\ItContractConfigMap.cs" />
     <Compile Include="Mapping\ItContractMap.cs" />
+    <Compile Include="Mapping\ItContractModuleNameMap.cs" />
+    <Compile Include="Mapping\ItProjectConfigMap.cs" />
     <Compile Include="Mapping\ItProjectMap.cs" />
+    <Compile Include="Mapping\ItProjectModuleNameMap.cs" />
+    <Compile Include="Mapping\ItSupportConfigMap.cs" />
+    <Compile Include="Mapping\ItSystemConfigMap.cs" />
     <Compile Include="Mapping\ItSystemMap.cs" />
+    <Compile Include="Mapping\ItSystemModuleNameMap.cs" />
     <Compile Include="Mapping\KLEMap.cs" />
     <Compile Include="Mapping\LocalizationMap.cs" />
     <Compile Include="Mapping\MethodMap.cs" />
