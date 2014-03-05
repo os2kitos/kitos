@@ -148,16 +148,15 @@
 {
     <script>
 
-        function patch(url, getData) {
+        function ajax(url, data, type, onSuccess) {
+            console.log(data);
             $.ajax({
                 url: url,
-                type: 'PATCH',
-                data: getData(),
+                type: type,
+                data: JSON.stringify(data),
                 dataType: 'json',
                 contentType: 'application/json',
-                success: function (data) {
-                    console.log(data);
-                }
+                success: onSuccess
             });
         };
 
@@ -173,14 +172,27 @@
             clone.appendTo("#" + target);
         };
 
-        var appendEdit = function (target, i, originalText, customText, note, itemid) {
+        var appendEdit = function (target, i, originalText, customText, note, itemid, localeUri) {
             var clone = $("div.config-clone.config-edit").clone();
 
             clone.removeClass("config-clone");
             clone.attr("id", "" + target + i);
 
             clone.find("input.config-edit-original").val(originalText);
-            clone.find("input.config-edit-custom").val("").attr("data-itemid", itemid);
+            clone.find("input.config-edit-custom")
+                .val("")
+                .attr("placeholder", originalText)
+                .attr("data-new", "new")
+                .attr("data-itemid", itemid)
+                .change(function () {
+                    var val = $(this).val();
+                    var type = $(this).attr("data-new") == "new" ? "POST" : "PUT";
+                    ajax(localeUri, { "Original_Id": itemid, "Name": val }, type,
+                        function (result) {
+                            $(this).highlight();
+                        }
+                    );
+                });
 
             clone.find("p.help-block").text(note);
 
@@ -192,7 +204,9 @@
                 .done(function (data) {
                     var target = $("#" + targetId);
                     $.each(data, function (i, e) {
-                        target.find("input.config-edit-custom[data-itemid=" + e.Original_Id + "]").val(e.Name);
+                        target.find("input.config-edit-custom[data-itemid=" + e.Original_Id + "]")
+                            .val(e.Name)
+                            .removeAttr("data-new");
                     });
                 })
                 .fail(function(jqXHR, textStatus, err) {
@@ -204,7 +218,7 @@
             $.getJSON(originalUri)
                 .done(function (data) {
                     $.each(data, function (i, e) {
-                        appendEdit(targetId, i, e.Name, "A", e.Note, e.Id);
+                        appendEdit(targetId, i, e.Name, "A", e.Note, e.Id, localeUri);
                     });
                     getLocale(localeUri, targetId);
                 })

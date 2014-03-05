@@ -8,6 +8,6 @@ namespace UI.MVC4.Models
     public class LocaleDTO
     {
         public string Name { get; set; }
-        public string Original_Id { get; set; }
+        public int Original_Id { get; set; }
     }
 }
