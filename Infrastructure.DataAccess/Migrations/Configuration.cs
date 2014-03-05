@@ -315,6 +315,69 @@ namespace Infrastructure.DataAccess.Migrations
 
             #endregion
 
+            var extRef1 = new ExtReferenceType()
+                {
+                    IsActive = true,
+                    Name = "ESDH Ref",
+                    Note = "Ref. til ESDH system, hvor der er projektdokumenter"
+                };
+            var extRef2 = new ExtReferenceType()
+                {
+                    IsActive = true,
+                    Name = "CMDB Ref",
+                    Note = "Ref. til CMDB o.l system, hvor der er projektdokumenter"
+                };
+            var extRef3 = new ExtReferenceType()
+                {
+                    IsActive = true,
+                    Name = "Mappe Ref",
+                    Note = "Ref. til andre steder, hvor der er projektdokumenter"
+                };
+            context.ExtReferenceTypes.AddOrUpdate(x => x.Name, extRef1, extRef2, extRef3);
+
+            var projPhase1 = new ProjectPhase()
+                {
+                    IsActive = true,
+                    Name = "Afventer",
+                    Note = "..."
+                };
+
+            context.ProjectPhases.AddOrUpdate(x => x.Name, projPhase1,
+                new ProjectPhase()
+                    {
+                        IsActive = true,
+                        Name = "Foranalyse",
+                        Note = "..."
+                    },
+                new ProjectPhase()
+                    {
+                        IsActive = true,
+                        Name = "Gennemførsel",
+                        Note = "..."
+                    },
+                new ProjectPhase()
+                    {
+                        IsActive = true,
+                        Name = "Overlevering",
+                        Note = "..."
+                    },
+                new ProjectPhase()
+                    {
+                        IsActive = true,
+                        Name = "Drift",
+                        Note = "..."
+                    }
+                );
+
+            context.ProjectPhaseLocales.AddOrUpdate(x => new {x.Municipality_Id, x.Original_Id},
+                                                    new ProjPhaseLocale()
+                                                        {
+                                                            Municipality = globalMunicipality,
+                                                            Original = projPhase1,
+                                                            Name = "Pending"
+                                                        }
+                );
+
             base.Seed(context);
         }
     }
