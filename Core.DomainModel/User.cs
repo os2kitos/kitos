@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
 {
@@ -20,5 +23,10 @@ namespace Core.DomainModel
         public virtual ICollection<PasswordResetRequest> PasswordResetRequests { get; set; }
         public virtual Role Role { get; set; }
         public virtual Municipality Municipality { get; set; }
+
+        public virtual ICollection<DepartmentRight> DepartmentRights { get; set; }
+        public virtual ICollection<ItProjectRight> ProjectRights { get; set; }
+        public virtual ICollection<ItSystemRight> SystemRights { get; set; }
+        public virtual ICollection<ItContractRight> ContractRights { get; set; }
     }
 }
