@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ItSystem
+    public class ItSystem : IEntity<int>, IHasRights<ItSystemRight>
     {
         public ItSystem()
         {
@@ -14,6 +14,7 @@ namespace Core.DomainModel.ItSystem
             this.KLEs = new List<KLE>();
             this.SuperUsers = new List<SuperUser>();
             this.TaskSupports = new List<TaskSupport>();
+            this.Rights = new List<ItSystemRight>();
         }
 
         public int Id { get; set; }
@@ -40,5 +41,6 @@ namespace Core.DomainModel.ItSystem
         public virtual SystemType SystemType { get; set; }
         public virtual InterfaceType InterfaceType { get; set; }
         public virtual ProtocolType ProtocolType { get; set; }
+        public virtual ICollection<ItSystemRight> Rights { get; set; }
     }
 }

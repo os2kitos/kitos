@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProject
+    public class ItProject : IEntity<int>, IHasRights<ItProjectRight>
     {
         public ItProject()
         {
@@ -13,6 +13,7 @@ namespace Core.DomainModel.ItProject
             this.Resources = new List<Resource>();
             this.Risks = new List<Risk>();
             this.Stakeholders = new List<Stakeholder>();
+            this.Rights = new List<ItProjectRight>();
         }
 
         public int Id { get; set; }
@@ -45,9 +46,7 @@ namespace Core.DomainModel.ItProject
         public virtual ProjectCategory ProjectCategory { get; set; }
         public virtual ProjectType ProjectType { get; set; }
         public virtual Hierarchy Hierarchy { get; set; }
-        /*public virtual Person ItProjectOwner { get; set; }
-        public virtual Person ItProjectLeader { get; set; }
-        public virtual Person PartItProjectLeader { get; set; }
-        public virtual Person Consultant { get; set; } */
+
+        public virtual ICollection<ItProjectRight> Rights { get; set; }
     }
 }

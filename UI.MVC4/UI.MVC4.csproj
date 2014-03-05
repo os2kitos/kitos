@@ -222,9 +222,13 @@
     <Compile Include="Controllers\API\ContractTypeController.cs" />
     <Compile Include="Controllers\API\DatabaseTypeController.cs" />
     <Compile Include="Controllers\API\ConfigController.cs" />
+    <Compile Include="Controllers\API\DepartmentRoleController.cs" />
     <Compile Include="Controllers\API\EnvironmentController.cs" />
     <Compile Include="Controllers\API\GenericOptionApiController.cs" />
     <Compile Include="Controllers\API\InterfaceTypeController.cs" />
+    <Compile Include="Controllers\API\ItContractRoleController.cs" />
+    <Compile Include="Controllers\API\ItProjectRoleController.cs" />
+    <Compile Include="Controllers\API\ItSystemRoleController.cs" />
     <Compile Include="Controllers\API\MethodController.cs" />
     <Compile Include="Controllers\API\PaymentModelController.cs" />
     <Compile Include="Controllers\API\ProjectCategoryController.cs" />

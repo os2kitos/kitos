@@ -38,7 +38,7 @@ namespace Infrastructure.DataAccess.Migrations
             //    );
             //
 
-            #region Roles
+            #region AdminRoles
             var globalAdmin = new Role { Name = "GlobalAdmin" };
             var localAdmin = new Role { Name = "LocalAdmin" };
 
@@ -191,6 +191,60 @@ namespace Infrastructure.DataAccess.Migrations
 
             #endregion
 
+            var department = new Department()
+                {
+                    Name = "Test organisation"
+                };
+
+            context.Departments.AddOrUpdate(d => d.Id, department);
+
+            #region Department roles
+
+            var boss = new DepartmentRole()
+                {
+                    IsActive = true,
+                    Name = "Chef",
+                    Note = "Lederen af en organisationsenhed"
+                };
+
+            var resourcePerson = new DepartmentRole()
+                {
+                    IsActive = true,
+                    Name = "Ressourceperson",
+                    Note = "..."
+                };
+
+            context.DepartmentRoles.AddOrUpdate(role => role.Id,
+                                                boss, resourcePerson,
+                                                new DepartmentRole() {IsActive = false, Name = "Inaktiv Org rolle"},
+                                                new DepartmentRole()
+                                                    {
+                                                        IsActive = false,
+                                                        IsSuggestion = true,
+                                                        Name = "Forslag til org rolle"
+                                                    }
+                );
+
+            #endregion
+            
+            #region Project roles
+            
+            context.ItProjectRoles.AddOrUpdate(r => r.Id,
+                                               new ItProjectRole() {IsActive = true, Name = "Projektejer"},
+                                               new ItProjectRole() {IsActive = true, Name = "Projektleder"},
+                                               new ItProjectRole() {IsActive = true, Name = "Delprojektleder"},
+                                               new ItProjectRole() {IsActive = true, Name = "Projektdeltager"},
+                                               new ItProjectRole() {IsActive = false, Name = "Inaktiv projektrolle"},
+                                               new ItProjectRole()
+                                                   {
+                                                       IsActive = false,
+                                                       IsSuggestion = true,
+                                                       Name = "Foreslået projektrolle"
+                                                   }
+                );
+
+            #endregion
+            
             #region Users
 
             var simon = new User
@@ -203,11 +257,37 @@ namespace Infrastructure.DataAccess.Migrations
                 Municipality = globalMunicipality
             };
 
+            var eskild = new User()
+                {
+                    Name = "Eskild",
+                    Email = "esd@it-minds.dk",
+                    Salt = "uw5BuXBIc52n2pL2MH4NRZMg44SVmw3GmrvOAK5pxz4=", //encryption of "saltsimon"
+                    Password = "2Pps82r5J0vIjvxJjHPf4mF/t2Q5VySmTiT2ZgV7e8U=", //"slp123" encrypted with salt
+                    Role = localAdmin,
+                    Municipality = globalMunicipality
+                };
+
             context.Users.AddOrUpdate(x => x.Email, simon);
 
             context.SaveChanges();
 
             #endregion
+
+            var simonDepartmentRight = new DepartmentRight()
+                {
+                    Object = department,
+                    Role = boss,
+                    User = simon
+                };
+
+            var eskildDepartmentRight = new DepartmentRight()
+                {
+                    Object = department,
+                    Role = resourcePerson,
+                    User = eskild
+                };
+
+            context.DepartmentRights.AddOrUpdate(r => new {r.Object_Id, r.Role_Id, r.User_Id}, simonDepartmentRight, eskildDepartmentRight);
 
             #region Password Reset Requests
 

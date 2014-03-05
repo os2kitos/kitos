@@ -2,11 +2,12 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItContract
 {
-    public class ItContract
+    public class ItContract : IEntity<int>, IHasRights<ItContractRight>
     {
         public ItContract()
         {
             this.ShipNotices = new List<ShipNotice>();
+            this.Rights = new List<ItContractRight>();
         }
 
         public int Id { get; set; }
@@ -26,5 +27,6 @@ namespace Core.DomainModel.ItContract
         public virtual Supplier Supplier { get; set; }
         public virtual Municipality Municipality { get; set; }
         public virtual ICollection<ShipNotice> ShipNotices { get; set; }
+        public virtual ICollection<ItContractRight> Rights { get; set; }
     }
 }
