@@ -80,6 +80,22 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
+            Mapper.CreateMap<ItContractModuleName, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
+            Mapper.CreateMap<ItProjectModuleName, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
+            Mapper.CreateMap<ItSupportModuleName, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
+            Mapper.CreateMap<ItSystemModuleName, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
             Mapper.CreateMap<Config, ConfigDTO>()
                   .ForMember(dest => dest.ItContractName, opt => opt.MapFrom(src => src.ItContractModuleName.Name))
                   .ForMember(dest => dest.ItProjectName, opt => opt.MapFrom(src => src.ItProjectModuleName.Name))
