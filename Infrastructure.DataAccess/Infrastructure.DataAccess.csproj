@@ -90,6 +90,7 @@
     <Compile Include="Mapping\ItProjectMap.cs" />
     <Compile Include="Mapping\ItProjectModuleNameMap.cs" />
     <Compile Include="Mapping\ItSupportConfigMap.cs" />
+    <Compile Include="Mapping\ItSupportModuleNameMap.cs" />
     <Compile Include="Mapping\ItSystemConfigMap.cs" />
     <Compile Include="Mapping\ItSystemMap.cs" />
     <Compile Include="Mapping\ItSystemModuleNameMap.cs" />

@@ -75,6 +75,7 @@
     <Compile Include="ItProject\Risk.cs" />
     <Compile Include="ItProject\Stakeholder.cs" />
     <Compile Include="ItSupportConfig.cs" />
+    <Compile Include="ItSupportModuleName.cs" />
     <Compile Include="ItSystemConfig.cs" />
     <Compile Include="ItSystemModuleName.cs" />
     <Compile Include="ItSystem\BasicData.cs" />

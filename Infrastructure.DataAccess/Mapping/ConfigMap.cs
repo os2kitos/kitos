@@ -18,6 +18,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasRequired(t => t.Municipality)
                 .WithOptional(t => t.Config);
 
+            this.HasRequired(t => t.ItSupportModuleName)
+                .WithMany(t => t.Configs)
+                .HasForeignKey(d => d.ItSupportModuleName_Id);
+
             this.HasRequired(t => t.ItContractModuleName)
                 .WithMany(t => t.Configs)
                 .HasForeignKey(d => d.ItContractModuleName_Id);

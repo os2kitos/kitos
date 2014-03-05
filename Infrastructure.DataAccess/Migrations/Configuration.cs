@@ -123,29 +123,67 @@ namespace Infrastructure.DataAccess.Migrations
 
             context.Municipalities.AddOrUpdate(x => x.Name, globalMunicipality);
 
-            context.SaveChanges();
+            var itSupportName = new ItSupportModuleName() {Name = "IT Understøttelse"};
+            context.ItSupportModuleNames.AddOrUpdate(x => x.Name,
+                new ItSupportModuleName() {Name = "IT Understøttelse af organisation"},
+                itSupportName,
+                new ItSupportModuleName() {Name = "Organisation"});
 
-            var configuration = new Core.DomainModel.Config
-                {
+            var itProjectName = new ItProjectModuleName() {Name = "IT Projekter"};
+            context.ItProjectModuleNames.AddOrUpdate(x => x.Name, 
+                itProjectName,
+                new ItProjectModuleName() {Name = "Projekter"});
+
+            var itSystemName = new ItSystemModuleName() {Name = "IT Systemer"};
+            context.ItSystemModuleNames.AddOrUpdate(x => x.Name,
+                itSystemName,
+                new ItSystemModuleName() {Name = "Systemer"});
+
+            var itContractName = new ItContractModuleName() {Name = "IT Kontrakter"};
+            context.ItContractModuleNames.AddOrUpdate(x => x.Name,
+                itContractName,
+                new ItContractModuleName() {Name = "Kontrakter"});
+
+            context.Configs.AddOrUpdate(x => x.Municipality,
+                new Config() {
                     Municipality = globalMunicipality,
-                    ItProjectGuide = "ProjectGuide",
-                    //EsdhRef = "ESDH ref.",
-                    //CmdbRef = "CMDB ref.",
-                    //FolderRef = "Mappe ref.",
-                    //Fase1 = "Afventer",
-                    //Fase2 = "Foranalyse",
-                    //Fase3 = "Gennemførsel",
-                    //Fase4 = "Overlevering",
-                    //Fase5 = "Drift",
-                    //ItProject = "IT Projekt",
-                    //ItProgram = "IT Program",
-                    //FocusArea = "Indsatsområde",
-                    ShowFocusArea = false,
-                    ShowBC = false,
-                    ShowPortfolio = false
-                };
+                    ItContractModuleName = itContractName,
+                    ItProjectModuleName = itProjectName,
+                    ItSupportModuleName = itSupportName,
+                    ItSystemModuleName = itSystemName,
+                    ShowItContractModule = true,
+                    ShowItProjectModule = true,
+                    ShowItSystemModule = true,
+                });
 
-            context.Configs.AddOrUpdate(x => x.Id, configuration);
+            context.ItSupportConfigs.AddOrUpdate(x => x.Municipality,
+                new ItSupportConfig()
+                    {
+                        Municipality = globalMunicipality, 
+                        ItSupportGuide = ".../itunderstøttelsesvejledning"
+                    });
+
+            context.ItProjectConfigs.AddOrUpdate(x => x.Municipality,
+                new ItProjectConfig()
+                    {
+                        Municipality = globalMunicipality,
+                        ItProjectGuide = ".../itprojektvejledning"
+                    });
+
+            context.ItSystemConfigs.AddOrUpdate(x => x.Municipality,
+                new ItSystemConfig()
+                    {
+                        Municipality = globalMunicipality, 
+                        ItSystemGuide = ".../itsystemvejledning"
+                    });
+
+            context.ItContractConfigs.AddOrUpdate(x => x.Municipality,
+                new ItContractConfig()
+                    {
+                        Municipality = globalMunicipality,
+                        ItContractGuide = ".../itkontraktvejledning"
+                    });
+
             context.SaveChanges();
 
             #endregion
