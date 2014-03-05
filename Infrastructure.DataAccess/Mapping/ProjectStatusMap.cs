@@ -20,7 +20,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithOptional(t => t.ProjectStatus);
 
             this.HasOptional(t => t.ProjectPhase)
-                .WithMany(t => t.ProjectStatuses)
+                .WithMany(t => t.References)
                 .HasForeignKey(d => d.ProjectPhase_Id);
         }
     }

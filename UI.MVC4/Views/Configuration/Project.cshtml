@@ -1,0 +1,195 @@
+﻿@{
+    ViewBag.Title = "Project";
+}
+
+<h2>Konfiguration af IT Projekt</h2>
+<div class="container-fluid">
+    <form class="form-horizontal config-form">
+
+        <div class="row">
+            <div class="col-md-1">
+                <h4>Generelt</h4>
+            </div>
+            <div class="col-md-10 col-md-offset-1">
+                <div class="form-group">
+                    <label for="input-project-navn" class="col-md-2 control-label">Modulnavn</label>
+                    <div class="col-md-6">
+                        <select class="form-control" id="input-project-navn"></select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="input-project-url" class="col-md-2 control-label">IT Projekt vejledning</label>
+                    <div class="col-md-6">
+                        <input type="url" name="ItProjectGuide" class="form-control" id="input-project-url" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="row">
+            <div class="col-md-2">
+                <h4>Referencer</h4>
+                Navngiv, hvis feltnavn er andet end KITOS default.
+            </div>
+
+            <div class="col-md-10 col-md-offset-0 container-fluid">
+                <div class="row">
+                    <div class="col-md-3"><strong>KITOS default</strong></div>
+                    <div class="col-md-4"><strong>Kommunespecifikt navn</strong></div>
+                </div>
+                <div id="project-ref">
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <label class="control-label">ESDH ref</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input class="form-control input-sm" type="text" name="foo" value=""/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <h4>Projektfaser</h4>
+                Navngiv, hvis faser er andet end KITOS default.
+            </div>
+
+            <div class="col-md-10">
+                <div id="project-phase"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <h4>Projektkategorier</h4>
+            </div>
+
+            <div class="col-md-10">
+                <div id="project-cat"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <h4>Roller</h4>
+            </div>
+
+            <div class="col-md-10">
+                <div id="project-roles"></div>
+            </div>
+        </div>
+    
+        <div class="row">
+            <div class="col-md-2">
+                <h4>Portfølje</h4>
+            </div>
+
+            <div class="col-md-10">
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-6">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="ShowPortfolio" value="">
+                                Medtag IKKE fanen 'Portfølje'
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-6">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="ShowBC" value="">
+                                Medtag kolonnen 'BC'
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form> 
+</div>
+
+<div class="config-clone config-edit form-group">
+    <div class="col-md-4">
+        <input class="form-control config-edit original" type="text" value="" disabled />
+        <p class="help-block"></p>
+    </div>
+    <div class="col-md-4">
+        <input class="form-control config-edit custom" type="text" value="" />
+    </div>
+</div>
+
+<div class="config-clone config-list form-group">
+    <div class="col-md-8">
+        <input class="config-list form-control" type="text" disabled/>
+        <p class="help-block"></p>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+
+        var appendList = function(target, i, title, note) {
+            var clone = $("div.config-clone.config-list").clone();
+
+            clone.removeClass("config-clone");
+            clone.attr("id", "" + target + i);
+
+            clone.find("input.config-list").val(title);
+            clone.find("p.help-block").text(note);
+
+            clone.appendTo("#" + target);
+        };
+
+        var appendEdit = function(target, i, originalText, customText, note) {
+            var clone = $("div.config-clone.config-list").clone();
+
+            clone.removeClass("config-clone");
+            clone.attr("id", "" + target + i);
+
+            clone.find("input.config-edit.original").val(originalText);
+            clone.find("input.config-edit.custom").val(customText).change();
+            clone.find("p.help-block").text(note);
+
+        };
+
+        function makeEdit(uri, elementId) {
+            $.getJSON(uri)
+                .done(function(data) {
+                    $.each(data, function(i, e) {
+                        appendEdit(elementId, i, e.Name, "", e.Note);
+                    });
+                })
+                .fail(function(jqXHR, textStatus, err) {
+                    console.log(jqXHR, textStatus, err);
+                });
+        }
+        
+        function makeList(uri, elementId) {
+            $.getJSON(uri)
+                .done(function (data) {
+                    $.each(data, function (i, e) {
+                        appendList(elementId, i, e.Name, e.Note);
+                    });
+                })
+                .fail(function (jqXHR, textStatus, err) {
+                    console.log(jqXHR, textStatus, err);
+                });
+        }
+
+        $(document).ready(function () {
+
+            makeEdit("/api/projectPhase", "project-phase");
+            makeList("/api/projectCategory", "project-cat");
+
+        });
+
+    </script>
+    }

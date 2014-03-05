@@ -233,6 +233,7 @@
     <Compile Include="Controllers\API\MethodController.cs" />
     <Compile Include="Controllers\API\PaymentModelController.cs" />
     <Compile Include="Controllers\API\ProjectCategoryController.cs" />
+    <Compile Include="Controllers\API\ProjectPhaseController.cs" />
     <Compile Include="Controllers\API\ProjectPhaseLocaleController.cs" />
     <Compile Include="Controllers\API\ProjectTypeController.cs" />
     <Compile Include="Controllers\API\ProtocolTypeController.cs" />
@@ -245,6 +246,7 @@
     <Compile Include="Controllers\API\UserController.cs" />
     <Compile Include="Controllers\Web\AccountController.cs" />
     <Compile Include="Controllers\Web\AdministrationController.cs" />
+    <Compile Include="Controllers\Web\ConfigurationController.cs" />
     <Compile Include="Controllers\Web\GlobalAdminController.cs" />
     <Compile Include="Controllers\Web\AuthorizeController.cs" />
     <Compile Include="Controllers\API\GenericApiController.cs" />
@@ -473,6 +475,7 @@
     <Content Include="Views\GlobalAdmin\_AdminSubmenu.cshtml" />
     <Content Include="Views\Administration\Index.cshtml" />
     <Content Include="Views\Administration\Suggest.cshtml" />
+    <Content Include="Views\Configuration\Project.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
