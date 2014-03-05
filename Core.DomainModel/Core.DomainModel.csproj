@@ -44,6 +44,8 @@
     <Compile Include="DepartmentRight.cs" />
     <Compile Include="ExtReference.cs" />
     <Compile Include="ExtReferenceType.cs" />
+    <Compile Include="ExtRefTypeLocale.cs" />
+    <Compile Include="IHasLocales.cs" />
     <Compile Include="IHasRights.cs" />
     <Compile Include="IOptionEntity.cs" />
     <Compile Include="IRight.cs" />

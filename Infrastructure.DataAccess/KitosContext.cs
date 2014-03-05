@@ -34,6 +34,7 @@ namespace Infrastructure.DataAccess
         public DbSet<Environment> Environments { get; set; }
         public DbSet<ExtReference> ExtReferences { get; set; }
         public DbSet<ExtReferenceType> ExtReferenceTypes { get; set; }
+        public DbSet<ExtRefTypeLocale> ExtRefTypeLocales { get; set; }
         public DbSet<Functionality> Functionalities { get; set; }
         public DbSet<Goal> Goals { get; set; }
         public DbSet<GoalStatus> GoalStatus { get; set; }
@@ -110,6 +111,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new EnvironmentMap());
             modelBuilder.Configurations.Add(new ExtReferenceMap());
             modelBuilder.Configurations.Add(new ExtReferenceTypeMap());
+            modelBuilder.Configurations.Add(new ExtRefTypeLocaleMap());
             modelBuilder.Configurations.Add(new FunctionalityMap());
             modelBuilder.Configurations.Add(new GoalMap());
             modelBuilder.Configurations.Add(new GoalStatusMap());

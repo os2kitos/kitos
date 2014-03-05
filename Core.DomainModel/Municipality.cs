@@ -24,6 +24,7 @@ namespace Core.DomainModel
         //public virtual Localization Localization { get; set; }
         public virtual ICollection<User> Users { get; set; }
         public virtual ICollection<ProjPhaseLocale> ProjectPhaseLocales { get; set; }
+        public virtual ICollection<ExtRefTypeLocale> ExtRefTypeLocales { get; set; }
 
         public virtual ItSupportConfig ItSupportConfig { get; set; }
         public virtual ItProjectConfig ItProjectConfig { get; set; }

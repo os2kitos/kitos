@@ -27,27 +27,19 @@
             </div>
         </div>
 
-        
+
         <div class="row">
             <div class="col-md-2">
                 <h4>Referencer</h4>
                 Navngiv, hvis feltnavn er andet end KITOS default.
             </div>
 
-            <div class="col-md-10 col-md-offset-0 container-fluid">
-                <div class="row">
-                    <div class="col-md-3"><strong>KITOS default</strong></div>
-                    <div class="col-md-4"><strong>Kommunespecifikt navn</strong></div>
+            <div class="col-md-9 col-md-offset-1">
+                <div class="row h4">
+                    <div class="col-md-4">KITOS default</div>
+                    <div class="col-md-4">Kommunespecifikt navn</div>
                 </div>
                 <div id="project-ref">
-                    <div class="form-group">
-                        <div class="col-md-3">
-                            <label class="control-label">ESDH ref</label>
-                        </div>
-                        <div class="col-md-4">
-                            <input class="form-control input-sm" type="text" name="foo" value=""/>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -58,8 +50,13 @@
                 Navngiv, hvis faser er andet end KITOS default.
             </div>
 
-            <div class="col-md-10">
-                <div id="project-phase"></div>
+            <div class="col-md-9 col-md-offset-1">
+                <div class="row h4">
+                    <div class="col-md-4">KITOS default</div>
+                    <div class="col-md-4">Kommunespecifikt navn</div>
+                </div>
+                <div id="project-phase">
+                </div>
             </div>
         </div>
 
@@ -68,7 +65,7 @@
                 <h4>Projektkategorier</h4>
             </div>
 
-            <div class="col-md-10">
+            <div class="col-md-9 col-md-offset-1">
                 <div id="project-cat"></div>
             </div>
         </div>
@@ -78,57 +75,72 @@
                 <h4>Roller</h4>
             </div>
 
-            <div class="col-md-10">
+            <div class="col-md-9 col-md-offset-1">
                 <div id="project-roles"></div>
             </div>
         </div>
-    
+
         <div class="row">
             <div class="col-md-2">
                 <h4>Portfølje</h4>
             </div>
 
-            <div class="col-md-10">
+            <div class="col-md-9 col-md-offset-1">
                 <div class="form-group">
-                    <div class="col-md-offset-2 col-md-6">
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" name="ShowPortfolio" value="">
-                                Medtag IKKE fanen 'Portfølje'
-                            </label>
-                        </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="ShowPortfolio" value="">
+                            Medtag IKKE fanen 'Portfølje'
+                        </label>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <div class="col-md-offset-2 col-md-6">
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" name="ShowBC" value="">
-                                Medtag kolonnen 'BC'
-                            </label>
-                        </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="ShowBC" value="">
+                            Medtag kolonnen 'BC'
+                        </label>
                     </div>
                 </div>
             </div>
         </div>
-    </form> 
+    </form>
 </div>
 
 <div class="config-clone config-edit form-group">
     <div class="col-md-4">
-        <input class="form-control config-edit original" type="text" value="" disabled />
+        <input class="form-control config-edit-original" type="text" value="" disabled />
         <p class="help-block"></p>
     </div>
     <div class="col-md-4">
-        <input class="form-control config-edit custom" type="text" value="" />
+        <input class="form-control config-edit-custom" type="text" value="" />
     </div>
 </div>
 
 <div class="config-clone config-list form-group">
     <div class="col-md-8">
-        <input class="config-list form-control" type="text" disabled/>
+        <input class="config-list form-control" type="text" disabled />
         <p class="help-block"></p>
+    </div>
+</div>
+
+<div class="config-clone suggest-box">
+    <a href="#" class="toggle-suggest-form btn btn-default">+ Foreslå ny</a>
+
+    <div class="suggest-extended">
+        <p class="small">Hvis du synes at der mangler et væsentlig element, kan du foreslå det her. Alle foreslag skal godkendes af en global administrator før de bliver tilgengængelige til brug.</p>
+
+        <form class="suggest-form" data-url="">
+            <div class="form-group">
+                <label class="control-label">
+                    Forslag:
+                    <input type="text" name="nametext" class="form-control input-sm" required />
+                </label>
+            </div>
+            <input type="submit" class="btn btn-sm btn-primary" value="Foreslå" />
+        </form>
+
     </div>
 </div>
 
@@ -136,7 +148,20 @@
 {
     <script>
 
-        var appendList = function(target, i, title, note) {
+        function patch(url, getData) {
+            $.ajax({
+                url: url,
+                type: 'PATCH',
+                data: getData(),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (data) {
+                    console.log(data);
+                }
+            });
+        };
+
+        var appendList = function (target, i, title, note) {
             var clone = $("div.config-clone.config-list").clone();
 
             clone.removeClass("config-clone");
@@ -148,35 +173,51 @@
             clone.appendTo("#" + target);
         };
 
-        var appendEdit = function(target, i, originalText, customText, note) {
-            var clone = $("div.config-clone.config-list").clone();
+        var appendEdit = function (target, i, originalText, customText, note, itemid) {
+            var clone = $("div.config-clone.config-edit").clone();
 
             clone.removeClass("config-clone");
             clone.attr("id", "" + target + i);
 
-            clone.find("input.config-edit.original").val(originalText);
-            clone.find("input.config-edit.custom").val(customText).change();
+            clone.find("input.config-edit-original").val(originalText);
+            clone.find("input.config-edit-custom").val("").attr("data-itemid", itemid);
+
             clone.find("p.help-block").text(note);
 
+            clone.appendTo("#" + target);
         };
-
-        function makeEdit(uri, elementId) {
+        
+        function getLocale(uri, targetId) {
             $.getJSON(uri)
-                .done(function(data) {
-                    $.each(data, function(i, e) {
-                        appendEdit(elementId, i, e.Name, "", e.Note);
+                .done(function (data) {
+                    var target = $("#" + targetId);
+                    $.each(data, function (i, e) {
+                        target.find("input.config-edit-custom[data-itemid=" + e.Original_Id + "]").val(e.Name);
                     });
                 })
                 .fail(function(jqXHR, textStatus, err) {
                     console.log(jqXHR, textStatus, err);
                 });
         }
-        
-        function makeList(uri, elementId) {
+
+        function makeEdit(originalUri, localeUri, targetId) {
+            $.getJSON(originalUri)
+                .done(function (data) {
+                    $.each(data, function (i, e) {
+                        appendEdit(targetId, i, e.Name, "A", e.Note, e.Id);
+                    });
+                    getLocale(localeUri, targetId);
+                })
+                .fail(function (jqXHR, textStatus, err) {
+                    console.log(jqXHR, textStatus, err);
+                });
+        }
+
+        function makeList(uri, targetId) {
             $.getJSON(uri)
                 .done(function (data) {
                     $.each(data, function (i, e) {
-                        appendList(elementId, i, e.Name, e.Note);
+                        appendList(targetId, i, e.Name, e.Note);
                     });
                 })
                 .fail(function (jqXHR, textStatus, err) {
@@ -186,10 +227,32 @@
 
         $(document).ready(function () {
 
-            makeEdit("/api/projectPhase", "project-phase");
+            makeEdit("/api/extReferenceType", "/api/extReferenceTypeLocale", "project-ref");
+            makeEdit("/api/projectPhase", "/api/projectPhaseLocale", "project-phase");
             makeList("/api/projectCategory", "project-cat");
+            makeList("/api/itProjectRole", "project-roles");
+
+
+            $(".toggle-suggest-form").click(function () {
+                $(this).next().slideToggle("fast");
+                return false;
+            });
+
+            $("form.suggest-form").each(function () {
+                var form = $(this);
+                form.simpleAjax({
+                    url: form.data("url"),
+                    getData: function () {
+                        return {
+                            "Name": form.find("input[name=nametext]").val(),
+                            "IsActive": false,
+                            "IsSuggestion": true
+                        };
+                    }
+                });
+            });
 
         });
 
     </script>
-    }
+}

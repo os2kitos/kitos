@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ProjectPhase : IOptionEntity<ProjectStatus>
+    public class ProjectPhase : IOptionEntity<ProjectStatus>, IHasLocales<ProjPhaseLocale>
     {
         public ProjectPhase()
         {
