@@ -23,17 +23,20 @@ namespace UI.MVC4.Controllers.API
             return this.Repository.Get(t => t.IsActive && !t.IsSuggestion);
         }
 
-        private IEnumerable<TModel> GetAllAllQuery()
+        public HttpResponseMessage GetAllSuggestions(bool? suggestions)
         {
-            return base.GetAllQuery();
+            var items = this.Repository.Get(t => t.IsSuggestion).ToList();
+
+            if (!items.Any())
+                return Request.CreateResponse(HttpStatusCode.NoContent);
+
+            return Request.CreateResponse(HttpStatusCode.OK, Map<IEnumerable<TModel>, IEnumerable<OptionDTO>>(items));
         }
 
 
-        public HttpResponseMessage GetAllAll(bool all)
+        public HttpResponseMessage GetAllNonSuggestions(bool? nonsuggestions)
         {
-            if (!all) return base.GetAll();
-
-            var items = GetAllAllQuery().ToList();
+            var items = this.Repository.Get(t => !t.IsSuggestion).ToList();
 
             if (!items.Any())
                 return Request.CreateResponse(HttpStatusCode.NoContent);
