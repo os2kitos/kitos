@@ -70,6 +70,8 @@
     <Compile Include="Mapping\ContractTypeMap.cs" />
     <Compile Include="Mapping\DatabaseTypeMap.cs" />
     <Compile Include="Mapping\DepartmentMap.cs" />
+    <Compile Include="Mapping\DepartmentRightMap.cs" />
+    <Compile Include="Mapping\DepartmentRoleMap.cs" />
     <Compile Include="Mapping\EconomyMap.cs" />
     <Compile Include="Mapping\EnvironmentMap.cs" />
     <Compile Include="Mapping\ExtReferenceMap.cs" />
@@ -84,8 +86,14 @@
     <Compile Include="Mapping\InterfaceMap.cs" />
     <Compile Include="Mapping\InterfaceTypeMap.cs" />
     <Compile Include="Mapping\ItContractMap.cs" />
+    <Compile Include="Mapping\ItContractRightMap.cs" />
+    <Compile Include="Mapping\ItContractRoleMap.cs" />
     <Compile Include="Mapping\ItProjectMap.cs" />
+    <Compile Include="Mapping\ItProjectRightMap.cs" />
+    <Compile Include="Mapping\ItProjectRoleMap.cs" />
     <Compile Include="Mapping\ItSystemMap.cs" />
+    <Compile Include="Mapping\ItSystemRightMap.cs" />
+    <Compile Include="Mapping\ItSystemRoleMap.cs" />
     <Compile Include="Mapping\KLEMap.cs" />
     <Compile Include="Mapping\LocalizationMap.cs" />
     <Compile Include="Mapping\MethodMap.cs" />
