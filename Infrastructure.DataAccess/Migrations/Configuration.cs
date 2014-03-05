@@ -38,7 +38,7 @@ namespace Infrastructure.DataAccess.Migrations
             //    );
             //
 
-            #region Roles
+            #region AdminRoles
             var globalAdmin = new Role { Name = "GlobalAdmin" };
             var localAdmin = new Role { Name = "LocalAdmin" };
 
@@ -152,7 +152,54 @@ namespace Infrastructure.DataAccess.Migrations
             context.SaveChanges();
 
             #endregion
+            
+            #region Department roles
 
+            var boss = new DepartmentRole()
+                {
+                    IsActive = true,
+                    Name = "Chef",
+                    Note = "Lederen af en organisationsenhed"
+                };
+
+            var resourcePerson = new DepartmentRole()
+                {
+                    IsActive = true,
+                    Name = "Ressourceperson",
+                    Note = "..."
+                };
+
+            context.DepartmentRoles.AddOrUpdate(role => role.Id,
+                                                boss, resourcePerson,
+                                                new DepartmentRole() {IsActive = false, Name = "Inaktiv Org rolle"},
+                                                new DepartmentRole()
+                                                    {
+                                                        IsActive = false,
+                                                        IsSuggestion = true,
+                                                        Name = "Forslag til org rolle"
+                                                    }
+                );
+
+            #endregion
+            
+            #region Project roles
+            
+            context.ItProjectRoles.AddOrUpdate(r => r.Id,
+                                               new ItProjectRole() {IsActive = true, Name = "Projektejer"},
+                                               new ItProjectRole() {IsActive = true, Name = "Projektleder"},
+                                               new ItProjectRole() {IsActive = true, Name = "Delprojektleder"},
+                                               new ItProjectRole() {IsActive = true, Name = "Projektdeltager"},
+                                               new ItProjectRole() {IsActive = false, Name = "Inaktiv projektrolle"},
+                                               new ItProjectRole()
+                                                   {
+                                                       IsActive = false,
+                                                       IsSuggestion = true,
+                                                       Name = "Foreslået projektrolle"
+                                                   }
+                );
+
+            #endregion
+            
             #region Users
 
             var simon = new User
