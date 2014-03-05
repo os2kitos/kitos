@@ -79,6 +79,9 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<SystemType, SystemTypeDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.ItSystem, opt => opt.UseValue(null));
+
+            Mapper.CreateMap<Config, ConfigDTO>()
+                  .ReverseMap();
         }
     }
 

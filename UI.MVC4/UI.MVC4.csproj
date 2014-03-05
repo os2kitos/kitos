@@ -221,6 +221,7 @@
     <Compile Include="Controllers\API\ContractTemplateController.cs" />
     <Compile Include="Controllers\API\ContractTypeController.cs" />
     <Compile Include="Controllers\API\DatabaseTypeController.cs" />
+    <Compile Include="Controllers\API\ConfigController.cs" />
     <Compile Include="Controllers\API\EnvironmentController.cs" />
     <Compile Include="Controllers\API\InterfaceTypeController.cs" />
     <Compile Include="Controllers\API\MethodController.cs" />
@@ -258,6 +259,7 @@
     <Compile Include="Infrastructure\UserRepositoryFactory.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\AuthorizeViewModels.cs" />
+    <Compile Include="Models\ConfigDTO.cs" />
     <Compile Include="Models\ContractTemplateDTO.cs" />
     <Compile Include="Models\ContractTypeDTO.cs" />
     <Compile Include="Models\DatabaseTypeDTO.cs" />
