@@ -48,6 +48,7 @@
     <Compile Include="ItContract\ContractTemplate.cs" />
     <Compile Include="ItContract\ContractType.cs" />
     <Compile Include="ItContract\ItContract.cs" />
+    <Compile Include="ItContract\ItContractRole.cs" />
     <Compile Include="ItContract\Payment.cs" />
     <Compile Include="ItContract\PaymentModel.cs" />
     <Compile Include="ItContract\PurchaseForm.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="ItProject\Handover.cs" />
     <Compile Include="ItProject\Hierarchy.cs" />
     <Compile Include="ItProject\ItProject.cs" />
+    <Compile Include="ItProject\ItProjectRole.cs" />
     <Compile Include="ItProject\ItProjectTab.cs" />
     <Compile Include="ItProject\Milestone.cs" />
     <Compile Include="ItProject\Organization.cs" />
@@ -81,6 +83,7 @@
     <Compile Include="ItSystem\Interface.cs" />
     <Compile Include="ItSystem\InterfaceType.cs" />
     <Compile Include="ItSystem\ItSystem.cs" />
+    <Compile Include="ItSystem\ItSystemRole.cs" />
     <Compile Include="ItSystem\Method.cs" />
     <Compile Include="ItSystem\ProgLanguage.cs" />
     <Compile Include="ItSystem\ProtocolType.cs" />
@@ -93,6 +96,7 @@
     <Compile Include="KLE.cs" />
     <Compile Include="Localization.cs" />
     <Compile Include="Municipality.cs" />
+    <Compile Include="DepartmentRole.cs" />
     <Compile Include="PasswordResetRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Supplier.cs" />
