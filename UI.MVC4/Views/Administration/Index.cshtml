@@ -195,7 +195,7 @@
 
 @section scripts
 {
-    <script>       
+    <script>
         function patch(url, value) {
             $.ajax({
                 url: url,
@@ -203,7 +203,7 @@
                 data: JSON.stringify({ IsActive: value }),
                 dataType: 'json',
                 contentType: 'application/json',
-                success: function (data) {
+                success: function(data) {
                     console.log(data);
                 }
             });
@@ -226,18 +226,18 @@
             container.appendTo('#' + target);
         };
 
-        var textboxTemplate = function (uri, target, i, title, note, itemid, isActive) {
+        var textboxTemplate = function(uri, target, i, title, note, itemid, isActive) {
 
         };
-        
-        var checkboxTemplate = function (uri, target, i, title, note, itemid, isActive) {
+
+        var checkboxTemplate = function(uri, target, i, title, note, itemid, isActive) {
             var id = target + i;
 
             var container = $('<div>', { 'class': 'form-group' });
             var container2 = $('<div>', { 'class': 'col-sm-offset-2 col-sm-5' }).appendTo(container);
             var container3 = $('<div>', { 'class': 'checkbox' }).appendTo(container2);
             var label = $('<label>', { html: title }).appendTo(container3);
-            $('<input>', { type: 'checkbox', title: 'Medtag', checked: isActive }).change(function () {
+            $('<input>', { type: 'checkbox', title: 'Medtag', checked: isActive }).change(function() {
                 patch(uri + '/' + itemid, this.checked);
             }).appendTo(label);
             $('<p>', { 'class': 'help-block', html: note }).appendTo(container2);
@@ -245,36 +245,74 @@
             container.appendTo('#' + target);
         };
 
-        function make(uri, elementId, template) {
+        var dropdownTemplate = function(uri, target, i, list) {
+            var id = target + i;
+            
+            var container = $('<div>', { 'class': 'form-group' });
+            var select = $('<select>', { 'class': 'form-control' }).appendTo(container);
+
+            $.each(list, function(x, e) {
+                select.append($('<option>', {
+                    value: 1,
+                    text: 'a'
+                }));
+            });
+            
+            container.appendTo('#' + target);
+        };
+
+        function makeList(uri, elementId, template) {
             $.getJSON(uri)
-               .done(function (data) {
-                   $.each(data, function (i, e) {
-                       template(uri, elementId, i, e.Name, e.Note, e.Id, e.IsActive);
-                   });
-               })
-               .fail(function (jqXHR, textStatus, err) {
-                   console.log(jqXHR, textStatus, err);
-               });
+                .done(function(data) {
+                    $.each(data, function(i, e) {
+                        template(uri, elementId, i, e.Name, e.Note, e.Id, e.IsActive);
+                    });
+                })
+                .fail(function(jqXHR, textStatus, err) {
+                    console.log(jqXHR, textStatus, err);
+                });
+        }
+
+        function makeDropdown(uri, elementId, tempalte, defaultValue) {
+            $.getJSON(uri)
+                .done(function(list) {
+                    template(uri, elementId, i, list);
+                })
+                .fail(function(jqXHR, textStatus, err) {
+                    console.log(jqXHR, textStatus, err);
+                });
         }
 
         $(document).ready(function() {
+            var config;
+            $.getJSON(uri)
+                .done(function(data) {
+                    config = data;
+                })
+                .fail(function(jqXHR, textStatus, err) {
+                    console.log(jqXHR, textStatus, err);
+                });
+
+            // support
+            makeDropdown('api/itsupportnames', 'support-module-names', dropdownTemplate, config.ItSupportName);
+
             // project
-            make('api/projectCategory', 'project-cat', checkboxTemplate);
-            
+            makeList('api/projectCategory', 'project-cat', checkboxTemplate);
+
             // system
-            make('api/systemType', 'system-type', checkboxTemplate);
-            make('api/interfaceType', 'interface-type', checkboxTemplate);
-            make('api/protocolType', 'protocol-type', checkboxTemplate);
-            make('api/method', 'method', checkboxTemplate);
-            make('api/databaseType', 'database-type', checkboxTemplate);
-            make('api/environment', 'environment', checkboxTemplate);
-            
+            makeList('api/systemType', 'system-type', checkboxTemplate);
+            makeList('api/interfaceType', 'interface-type', checkboxTemplate);
+            makeList('api/protocolType', 'protocol-type', checkboxTemplate);
+            makeList('api/method', 'method', checkboxTemplate);
+            makeList('api/databaseType', 'database-type', checkboxTemplate);
+            makeList('api/environment', 'environment', checkboxTemplate);
+
             // contract
-            make('api/contractType', 'contract-type', checkboxTemplate);
-            make('api/contractTemplate', 'contract-template', checkboxTemplate);
-            make('api/purchaseForm', 'purchase-form', checkboxTemplate);
-            make('api/paymentModel', 'payment-model', checkboxTemplate);
-            make('api/paymentModel', 'payment-model', checkboxTemplate);
+            makeList('api/contractType', 'contract-type', checkboxTemplate);
+            makeList('api/contractTemplate', 'contract-template', checkboxTemplate);
+            makeList('api/purchaseForm', 'purchase-form', checkboxTemplate);
+            makeList('api/paymentModel', 'payment-model', checkboxTemplate);
+            makeList('api/paymentModel', 'payment-model', checkboxTemplate);
         });
     </script>
 }
