@@ -47,9 +47,11 @@
 
             $("#add-admin").simpleAjax({
                 url: "/api/globaladmin",
-                map: {
-                    "Name": "#name",
-                    "Email": "#email",
+                getData: function (form) {
+                    return {
+                        "Name": $("#name").val(),
+                        "Email": $("#email").val()
+                    };
                 }
             });
         });

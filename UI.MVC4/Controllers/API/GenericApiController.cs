@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.Validation;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -9,7 +7,7 @@ using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 
-namespace UI.MVC4.Controllers
+namespace UI.MVC4.Controllers.API
 {
     public abstract class GenericApiController<TModel, TKeyType, TDto> : ApiController // TODO perhaps it's possible to infer the TKeyType from TModel somehow
         where TModel : class, IEntity<TKeyType>

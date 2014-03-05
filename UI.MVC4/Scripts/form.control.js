@@ -74,7 +74,9 @@
         
         var settings = $.extend({
             type: "POST", //"GET", "PUT", etc
-            map: {}, //map of "JSON id": "#html-id"
+            getData: function(form) {
+                return {};
+            },
             pendingMessage: "Sender data...",
             successMessage: "Success!",
             failureMessage: "Fejl!",
@@ -115,10 +117,7 @@
                 if (settings.preventMultipleSubmissions)
                     form.disableSubmit();
 
-                var data = {};
-                $.each(settings.map, function (i, v) {
-                    data[i] = $(v).val();
-                });
+                var data = settings.getData(form);
 
                 var notice = settings.onPending(settings.pendingMessage);
 

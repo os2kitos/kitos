@@ -65,11 +65,13 @@
     <Compile Include="Mapping\BasicDataMap.cs" />
     <Compile Include="Mapping\CommunicationMap.cs" />
     <Compile Include="Mapping\ComponentsMap.cs" />
-    <Compile Include="Mapping\ConfigurationMap.cs" />
+    <Compile Include="Mapping\ConfigMap.cs" />
     <Compile Include="Mapping\ContractTemplateMap.cs" />
     <Compile Include="Mapping\ContractTypeMap.cs" />
     <Compile Include="Mapping\DatabaseTypeMap.cs" />
     <Compile Include="Mapping\DepartmentMap.cs" />
+    <Compile Include="Mapping\DepartmentRightMap.cs" />
+    <Compile Include="Mapping\DepartmentRoleMap.cs" />
     <Compile Include="Mapping\EconomyMap.cs" />
     <Compile Include="Mapping\EnvironmentMap.cs" />
     <Compile Include="Mapping\ExtReferenceMap.cs" />
@@ -83,9 +85,23 @@
     <Compile Include="Mapping\InfrastructureMap.cs" />
     <Compile Include="Mapping\InterfaceMap.cs" />
     <Compile Include="Mapping\InterfaceTypeMap.cs" />
+    <Compile Include="Mapping\ItContractConfigMap.cs" />
     <Compile Include="Mapping\ItContractMap.cs" />
+    <Compile Include="Mapping\ItContractRightMap.cs" />
+    <Compile Include="Mapping\ItContractRoleMap.cs" />
+    <Compile Include="Mapping\ItContractModuleNameMap.cs" />
+    <Compile Include="Mapping\ItProjectConfigMap.cs" />
     <Compile Include="Mapping\ItProjectMap.cs" />
+    <Compile Include="Mapping\ItProjectModuleNameMap.cs" />
+    <Compile Include="Mapping\ItSupportConfigMap.cs" />
+    <Compile Include="Mapping\ItSupportModuleNameMap.cs" />
+    <Compile Include="Mapping\ItSystemConfigMap.cs" />
+    <Compile Include="Mapping\ItProjectRightMap.cs" />
+    <Compile Include="Mapping\ItProjectRoleMap.cs" />
     <Compile Include="Mapping\ItSystemMap.cs" />
+    <Compile Include="Mapping\ItSystemRightMap.cs" />
+    <Compile Include="Mapping\ItSystemRoleMap.cs" />
+    <Compile Include="Mapping\ItSystemModuleNameMap.cs" />
     <Compile Include="Mapping\KLEMap.cs" />
     <Compile Include="Mapping\LocalizationMap.cs" />
     <Compile Include="Mapping\MethodMap.cs" />
@@ -118,9 +134,9 @@
     <Compile Include="Mapping\UserAdministrationMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
-    <Compile Include="Migrations\201403041637301_Initial.cs" />
-    <Compile Include="Migrations\201403041637301_Initial.Designer.cs">
-      <DependentUpon>201403041637301_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201403051549272_Initial.cs" />
+    <Compile Include="Migrations\201403051549272_Initial.Designer.cs">
+      <DependentUpon>201403051549272_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -142,8 +158,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201403041637301_Initial.resx">
-      <DependentUpon>201403041637301_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201403051549272_Initial.resx">
+      <DependentUpon>201403051549272_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

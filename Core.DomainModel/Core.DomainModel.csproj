@@ -39,19 +39,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration.cs" />
+    <Compile Include="Config.cs" />
     <Compile Include="Department.cs" />
+    <Compile Include="DepartmentRight.cs" />
     <Compile Include="ExtReference.cs" />
     <Compile Include="ExtReferenceType.cs" />
+    <Compile Include="IHasRights.cs" />
+    <Compile Include="IOptionEntity.cs" />
+    <Compile Include="IRight.cs" />
+    <Compile Include="ItContractConfig.cs" />
+    <Compile Include="ItContractModuleName.cs" />
     <Compile Include="ILocaleEntity.cs" />
     <Compile Include="ItContract\Agreement.cs" />
     <Compile Include="ItContract\ContractTemplate.cs" />
     <Compile Include="ItContract\ContractType.cs" />
     <Compile Include="ItContract\ItContract.cs" />
+    <Compile Include="ItContract\ItContractRight.cs" />
+    <Compile Include="ItContract\ItContractRole.cs" />
     <Compile Include="ItContract\Payment.cs" />
     <Compile Include="ItContract\PaymentModel.cs" />
     <Compile Include="ItContract\PurchaseForm.cs" />
     <Compile Include="ItContract\ShipNotice.cs" />
+    <Compile Include="ItProjectConfig.cs" />
+    <Compile Include="ItProjectModuleName.cs" />
     <Compile Include="ItProject\Communication.cs" />
     <Compile Include="ItProject\Economy.cs" />
     <Compile Include="ItProject\Goal.cs" />
@@ -59,6 +69,8 @@
     <Compile Include="ItProject\Handover.cs" />
     <Compile Include="ItProject\Hierarchy.cs" />
     <Compile Include="ItProject\ItProject.cs" />
+    <Compile Include="ItProject\ItProjectRight.cs" />
+    <Compile Include="ItProject\ItProjectRole.cs" />
     <Compile Include="ItProject\ItProjectTab.cs" />
     <Compile Include="ItProject\Milestone.cs" />
     <Compile Include="ItProject\Organization.cs" />
@@ -71,6 +83,10 @@
     <Compile Include="ItProject\Resource.cs" />
     <Compile Include="ItProject\Risk.cs" />
     <Compile Include="ItProject\Stakeholder.cs" />
+    <Compile Include="ItSupportConfig.cs" />
+    <Compile Include="ItSupportModuleName.cs" />
+    <Compile Include="ItSystemConfig.cs" />
+    <Compile Include="ItSystemModuleName.cs" />
     <Compile Include="ItSystem\BasicData.cs" />
     <Compile Include="ItSystem\Component.cs" />
     <Compile Include="ItSystem\DatabaseType.cs" />
@@ -81,6 +97,8 @@
     <Compile Include="ItSystem\Interface.cs" />
     <Compile Include="ItSystem\InterfaceType.cs" />
     <Compile Include="ItSystem\ItSystem.cs" />
+    <Compile Include="ItSystem\ItSystemRight.cs" />
+    <Compile Include="ItSystem\ItSystemRole.cs" />
     <Compile Include="ItSystem\Method.cs" />
     <Compile Include="ItSystem\ProgLanguage.cs" />
     <Compile Include="ItSystem\ProtocolType.cs" />
@@ -93,6 +111,7 @@
     <Compile Include="KLE.cs" />
     <Compile Include="Localization.cs" />
     <Compile Include="Municipality.cs" />
+    <Compile Include="DepartmentRole.cs" />
     <Compile Include="PasswordResetRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Supplier.cs" />

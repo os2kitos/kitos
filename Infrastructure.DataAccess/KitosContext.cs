@@ -23,11 +23,13 @@ namespace Infrastructure.DataAccess
         public DbSet<BasicData> BasicDatas { get; set; }
         public DbSet<Communication> Communications { get; set; }
         public DbSet<Component> Components { get; set; }
-        public DbSet<Configuration> Configurations { get; set; }
+        public DbSet<Config> Configs { get; set; }
         public DbSet<ContractTemplate> ContractTemplates { get; set; }
         public DbSet<ContractType> ContractTypes { get; set; }
         public DbSet<DatabaseType> DatabaseTypes { get; set; }
         public DbSet<Department> Departments { get; set; }
+        public DbSet<DepartmentRight> DepartmentRights { get; set; }
+        public DbSet<DepartmentRole> DepartmentRoles { get; set; }
         public DbSet<Economy> Economies { get; set; }
         public DbSet<Environment> Environments { get; set; }
         public DbSet<ExtReference> ExtReferences { get; set; }
@@ -41,14 +43,28 @@ namespace Infrastructure.DataAccess
         public DbSet<Core.DomainModel.ItSystem.Infrastructure> Infrastructures { get; set; }
         public DbSet<Interface> Interfaces { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
+        public DbSet<ItContractConfig> ItContractConfigs { get; set; }
+        public DbSet<ItContractModuleName> ItContractModuleNames { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
+        public DbSet<ItContractRight> ItContractRights { get; set; }
+        public DbSet<ItContractRole> ItContractRoles { get; set; }
+        public DbSet<ItProjectConfig> ItProjectConfigs { get; set; }
+        public DbSet<ItProjectModuleName> ItProjectModuleNames { get; set; }
         public DbSet<ItProject> ItProjects { get; set; }
+        public DbSet<ItProjectRight> ItProjectRights { get; set; }
+        public DbSet<ItProjectRole> ItProjectRoles { get; set; }
+        public DbSet<ItSupportConfig> ItSupportConfigs { get; set; }
+        public DbSet<ItSupportModuleName> ItSupportModuleNames { get; set; }
+        public DbSet<ItSystemConfig> ItSystemConfigs { get; set; }
+        public DbSet<ItSystemModuleName> ItSystemModuleNames { get; set; }
         public DbSet<ItSystem> ItSystems { get; set; }
+        public DbSet<ItSystemRight> ItSystemRights { get; set; }
+        public DbSet<ItSystemRole> ItSystemRoles { get; set; }
         public DbSet<KLE> KLEs { get; set; }
         public DbSet<Localization> Localizations { get; set; }
         public DbSet<Method> Methods { get; set; }
         public DbSet<Milestone> Milestones { get; set; }
-        public DbSet<Municipality> Municipalitys { get; set; }
+        public DbSet<Municipality> Municipalities { get; set; }
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
         public DbSet<PaymentModel> PaymentModels { get; set; }
@@ -83,11 +99,13 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new BasicDataMap());
             modelBuilder.Configurations.Add(new CommunicationMap());
             modelBuilder.Configurations.Add(new ComponentsMap());
-            modelBuilder.Configurations.Add(new ConfigurationMap());
+            modelBuilder.Configurations.Add(new ConfigMap());
             modelBuilder.Configurations.Add(new ContractTemplateMap());
             modelBuilder.Configurations.Add(new ContractTypeMap());
             modelBuilder.Configurations.Add(new DatabaseTypeMap());
             modelBuilder.Configurations.Add(new DepartmentMap());
+            modelBuilder.Configurations.Add(new DepartmentRightMap());
+            modelBuilder.Configurations.Add(new DepartmentRoleMap());
             modelBuilder.Configurations.Add(new EconomyMap());
             modelBuilder.Configurations.Add(new EnvironmentMap());
             modelBuilder.Configurations.Add(new ExtReferenceMap());
@@ -102,8 +120,22 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new InterfaceMap());
             modelBuilder.Configurations.Add(new InterfaceTypeMap());
             modelBuilder.Configurations.Add(new ItContractMap());
+            modelBuilder.Configurations.Add(new ItContractRightMap());
+            modelBuilder.Configurations.Add(new ItContractRoleMap());
+            modelBuilder.Configurations.Add(new ItContractConfigMap());
+            modelBuilder.Configurations.Add(new ItContractModuleNameMap());
             modelBuilder.Configurations.Add(new ItProjectMap());
+            modelBuilder.Configurations.Add(new ItProjectRightMap());
+            modelBuilder.Configurations.Add(new ItProjectRoleMap());
+            modelBuilder.Configurations.Add(new ItProjectConfigMap());
+            modelBuilder.Configurations.Add(new ItProjectModuleNameMap());
+            modelBuilder.Configurations.Add(new ItSupportConfigMap());
+            modelBuilder.Configurations.Add(new ItSupportModuleNameMap());
             modelBuilder.Configurations.Add(new ItSystemMap());
+            modelBuilder.Configurations.Add(new ItSystemRightMap());
+            modelBuilder.Configurations.Add(new ItSystemRoleMap());
+            modelBuilder.Configurations.Add(new ItSystemConfigMap());
+            modelBuilder.Configurations.Add(new ItSystemModuleNameMap());
             modelBuilder.Configurations.Add(new KLEMap());
             modelBuilder.Configurations.Add(new LocalizationMap());
             modelBuilder.Configurations.Add(new MethodMap());

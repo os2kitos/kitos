@@ -85,6 +85,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<ProtocolType>>().To<GenericRepository<ProtocolType>>().InRequestScope();
             kernel.Bind<IGenericRepository<PurchaseForm>>().To<GenericRepository<PurchaseForm>>().InRequestScope();
             kernel.Bind<IGenericRepository<SystemType>>().To<GenericRepository<SystemType>>().InRequestScope();
+            kernel.Bind<IGenericRepository<Config>>().To<GenericRepository<Config>>();
 
             kernel.Bind<IUserRepository>().To<UserRepository>().InRequestScope();
             kernel.Bind<IMailClient>().To<MailClient>().InRequestScope().WithConstructorArgument("host", "localhost").WithConstructorArgument("port", 25);

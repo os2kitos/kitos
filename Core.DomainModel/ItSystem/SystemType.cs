@@ -3,18 +3,18 @@ using System.Collections.ObjectModel;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class SystemType : IEntity<int>
+    public class SystemType : IOptionEntity<ItSystem>
     {
         public SystemType()
         {
-            this.ItSystem = new Collection<ItSystem>();
+            References = new List<ItSystem>();
         }
 
         public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
+        public bool IsSuggestion { get; set; }
         public string Note { get; set; }
-
-        public virtual ICollection<ItSystem> ItSystem { get; set; }
+        public virtual ICollection<ItSystem> References { get; set; }
     }
 }
