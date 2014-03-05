@@ -228,6 +228,7 @@
     <Compile Include="Controllers\API\InterfaceTypeController.cs" />
     <Compile Include="Controllers\API\ItContractRoleController.cs" />
     <Compile Include="Controllers\API\ItProjectRoleController.cs" />
+    <Compile Include="Controllers\API\ItSupportNamesController.cs" />
     <Compile Include="Controllers\API\ItSystemRoleController.cs" />
     <Compile Include="Controllers\API\MethodController.cs" />
     <Compile Include="Controllers\API\PaymentModelController.cs" />
@@ -264,7 +265,7 @@
     <Compile Include="Infrastructure\UserRepositoryFactory.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\AuthorizeViewModels.cs" />
-	<Compile Include="Models\ConfigDTO.cs" />
+    <Compile Include="Models\ConfigDTO.cs" />
     <Compile Include="Models\OptionDTO.cs" />
     <Compile Include="Models\MunicipalityApiModel.cs" />
     <Compile Include="Models\UserApiModel.cs" />

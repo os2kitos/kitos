@@ -7,7 +7,7 @@
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">
   <li class="active"><a href="#digital" data-toggle="tab">IT Understøttelse</a></li>
-  <li><input type="checkbox" id="show-itprojects"> <a href="#projekt" data-toggle="tab">IT Projekter</a></li>
+  <li><a href="#projekt" data-toggle="tab">IT Projekter</a></li>
   <li><input type="checkbox" id="show-itsystems"> <a href="#system" data-toggle="tab">IT Systemer</a></li>
   <li><input type="checkbox" id="show-itcontracts"> <a href="#kontrakt" data-toggle="tab">IT Kontrakter</a></li>
 </ul>
@@ -15,13 +15,36 @@
 <!-- Tab panes -->
 <div class="tab-content">
     <div class="tab-pane active" id="digital">
-        IT Understøttelse
-    </div>
-    <div class="tab-pane" id="projekt">
+        <!-- IT SUPPORT -->
         <form class="form-horizontal" role="form">
             <div class="well">
                 <h4>Generelt</h4>
                 
+                <div id="support-show-tab"></div>
+                <div id="support-module-names"></div>
+                <div id="support-show-guide"></div>
+                <div id="support-guide"></div>
+            </div>
+            
+            <div class="well">
+                <h4>Overblik</h4>
+                
+                <div id="support-overview"></div>
+                <div id="support-usage"></div>
+                <div id="support-mandatory"></div>
+            </div>
+        </form>
+    </div>
+    <div class="tab-pane" id="projekt">
+        <!-- IT PROJECT -->
+        <form class="form-horizontal" role="form">
+            <div class="well">
+                <h4>Generelt</h4>
+                
+                <div class="well">
+                    <div id="project-show-tab"></div>
+                </div>
+
                 <div class="form-group">
                     <label for="input-project-navn" class="col-sm-2 control-label">Modulnavn</label>
                     <div class="col-sm-5">
@@ -75,6 +98,7 @@
         </form>
     </div>
     <div class="tab-pane" id="system">
+        <!-- IT SYSTEM -->
         <form class="form-horizontal" role="form">
             <div class="well">
                 <h4>Generelt</h4>
@@ -122,6 +146,7 @@
         </form>
     </div>
     <div class="tab-pane" id="kontrakt">
+        <!-- IT CONTRACT -->
         <form class="form-horizontal" role="form">
             <div class="well">
                 <h4>Generelt</h4>
