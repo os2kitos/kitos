@@ -572,6 +572,7 @@ namespace Infrastructure.DataAccess.Migrations
                         Id = c.Int(nullable: false, identity: true),
                         Name = c.String(nullable: false, unicode: false),
                         IsActive = c.Boolean(nullable: false),
+                        IsSuggestion = c.Boolean(nullable: false),
                         Note = c.String(unicode: false),
                     })
                 .PrimaryKey(t => t.Id);

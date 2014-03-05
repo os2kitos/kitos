@@ -95,7 +95,10 @@ namespace Infrastructure.DataAccess.Migrations
                                                   Note = "...",
                                                   Name = "Tilægskontrakt"
                                               },
-                                              new ContractType() { IsActive = true, Note = "...", Name = "Snitflade" });
+                                              new ContractType() { IsActive = true, Note = "...", Name = "Snitflade" },
+                                              new ContractType() { IsActive = false, Note = "...", Name = "Tidligere aktiv kontrakttype" },
+                                              new ContractType() { IsSuggestion = true, Note = "...", Name = "Forslag1" },
+                                              new ContractType() { IsSuggestion = true, Note = "...", Name = "Forslag2" });
 
             context.ContractTemplates.AddOrUpdate(x => x.Name,
                                                   new ContractTemplate() { IsActive = true, Note = "...", Name = "K01" },
