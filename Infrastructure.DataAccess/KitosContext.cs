@@ -28,6 +28,8 @@ namespace Infrastructure.DataAccess
         public DbSet<ContractType> ContractTypes { get; set; }
         public DbSet<DatabaseType> DatabaseTypes { get; set; }
         public DbSet<Department> Departments { get; set; }
+        public DbSet<DepartmentRight> DepartmentRights { get; set; }
+        public DbSet<DepartmentRole> DepartmentRoles { get; set; }
         public DbSet<Economy> Economies { get; set; }
         public DbSet<Environment> Environments { get; set; }
         public DbSet<ExtReference> ExtReferences { get; set; }
@@ -42,8 +44,14 @@ namespace Infrastructure.DataAccess
         public DbSet<Interface> Interfaces { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
+        public DbSet<ItContractRight> ItContractRights { get; set; }
+        public DbSet<ItContractRole> ItContractRoles { get; set; }
         public DbSet<ItProject> ItProjects { get; set; }
+        public DbSet<ItProjectRight> ItProjectRights { get; set; }
+        public DbSet<ItProjectRole> ItProjectRoles { get; set; }
         public DbSet<ItSystem> ItSystems { get; set; }
+        public DbSet<ItSystemRight> ItSystemRights { get; set; }
+        public DbSet<ItSystemRole> ItSystemRoles { get; set; }
         public DbSet<KLE> KLEs { get; set; }
         public DbSet<Localization> Localizations { get; set; }
         public DbSet<Method> Methods { get; set; }
@@ -88,6 +96,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ContractTypeMap());
             modelBuilder.Configurations.Add(new DatabaseTypeMap());
             modelBuilder.Configurations.Add(new DepartmentMap());
+            modelBuilder.Configurations.Add(new DepartmentRightMap());
+            modelBuilder.Configurations.Add(new DepartmentRoleMap());
             modelBuilder.Configurations.Add(new EconomyMap());
             modelBuilder.Configurations.Add(new EnvironmentMap());
             modelBuilder.Configurations.Add(new ExtReferenceMap());
@@ -102,8 +112,14 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new InterfaceMap());
             modelBuilder.Configurations.Add(new InterfaceTypeMap());
             modelBuilder.Configurations.Add(new ItContractMap());
+            modelBuilder.Configurations.Add(new ItContractRightMap());
+            modelBuilder.Configurations.Add(new ItContractRoleMap());
             modelBuilder.Configurations.Add(new ItProjectMap());
+            modelBuilder.Configurations.Add(new ItProjectRightMap());
+            modelBuilder.Configurations.Add(new ItProjectRoleMap());
             modelBuilder.Configurations.Add(new ItSystemMap());
+            modelBuilder.Configurations.Add(new ItSystemRightMap());
+            modelBuilder.Configurations.Add(new ItSystemRoleMap());
             modelBuilder.Configurations.Add(new KLEMap());
             modelBuilder.Configurations.Add(new LocalizationMap());
             modelBuilder.Configurations.Add(new MethodMap());
