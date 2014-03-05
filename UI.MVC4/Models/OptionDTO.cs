@@ -1,6 +1,6 @@
 ﻿namespace UI.MVC4.Models
 {
-    public abstract class DropDownDTO
+    public abstract class OptionDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }

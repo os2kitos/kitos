@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItContract
 {
-    public class ContractTemplate : IDropDownEntity<ItContract>
+    public class ContractTemplate : IOptionEntity<ItContract>
     {
         public int Id { get; set; }
         public string Name { get; set; }

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ProjectCategory : IDropDownEntity<ItProject>
+    public class ProjectCategory : IOptionEntity<ItProject>
     {
         public int Id { get; set; }
         public string Name { get; set; }

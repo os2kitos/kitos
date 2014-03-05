@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel
 {
-    public interface IDropDownEntity<T> : IEntity<int>
+    public interface IOptionEntity<T> : IEntity<int>
     {
         string Name { get; set; }
         bool IsActive { get; set; }

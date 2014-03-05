@@ -1,6 +1,6 @@
 ﻿namespace UI.MVC4.Models
 {
-    public class ContractTemplateDTO : DropDownDTO
+    public class ContractTemplateDTO : OptionDTO
     {
     }
 }

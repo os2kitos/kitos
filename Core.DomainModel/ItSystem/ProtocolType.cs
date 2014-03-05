@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ProtocolType : IDropDownEntity<ItSystem>
+    public class ProtocolType : IOptionEntity<ItSystem>
     {
         public int Id { get; set; }
         public string Name { get; set; }

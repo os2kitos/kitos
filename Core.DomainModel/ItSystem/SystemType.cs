@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class SystemType : IDropDownEntity<ItSystem>
+    public class SystemType : IOptionEntity<ItSystem>
     {
         public int Id { get; set; }
         public string Name { get; set; }

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class DatabaseType : IDropDownEntity<Technology>
+    public class DatabaseType : IOptionEntity<Technology>
     {
         public int Id { get; set; }
         public string Name { get; set; }

@@ -222,6 +222,7 @@
     <Compile Include="Controllers\API\ContractTypeController.cs" />
     <Compile Include="Controllers\API\DatabaseTypeController.cs" />
     <Compile Include="Controllers\API\EnvironmentController.cs" />
+    <Compile Include="Controllers\API\GenericOptionApiController.cs" />
     <Compile Include="Controllers\API\InterfaceTypeController.cs" />
     <Compile Include="Controllers\API\MethodController.cs" />
     <Compile Include="Controllers\API\PaymentModelController.cs" />
@@ -261,7 +262,7 @@
     <Compile Include="Models\ContractTemplateDTO.cs" />
     <Compile Include="Models\ContractTypeDTO.cs" />
     <Compile Include="Models\DatabaseTypeDTO.cs" />
-    <Compile Include="Models\DropDownDTO.cs" />
+    <Compile Include="Models\OptionDTO.cs" />
     <Compile Include="Models\EnvironmentDTO.cs" />
     <Compile Include="Models\InterfaceTypeDTO.cs" />
     <Compile Include="Models\MethodDTO.cs" />
@@ -474,7 +475,7 @@
     <Content Include="Views\GlobalAdmin\AddLocalAdmin.cshtml" />
     <Content Include="Views\GlobalAdmin\Index.cshtml" />
     <Content Include="Views\GlobalAdmin\_AdminSubmenu.cshtml" />
-	<Content Include="Views\Administration\Index.cshtml" />
+    <Content Include="Views\Administration\Index.cshtml" />
     <Content Include="Views\Administration\Suggest.cshtml" />
   </ItemGroup>
   <ItemGroup>

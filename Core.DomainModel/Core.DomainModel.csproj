@@ -43,7 +43,7 @@
     <Compile Include="Department.cs" />
     <Compile Include="ExtReference.cs" />
     <Compile Include="ExtReferenceType.cs" />
-    <Compile Include="IDropDownEntity.cs" />
+    <Compile Include="IOptionEntity.cs" />
     <Compile Include="ItContract\Agreement.cs" />
     <Compile Include="ItContract\ContractTemplate.cs" />
     <Compile Include="ItContract\ContractType.cs" />

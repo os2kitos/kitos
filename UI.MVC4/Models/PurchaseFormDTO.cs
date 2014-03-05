@@ -1,6 +1,6 @@
 ﻿namespace UI.MVC4.Models
 {
-    public class PurchaseFormDTO : DropDownDTO
+    public class PurchaseFormDTO : OptionDTO
     {
     }
 }

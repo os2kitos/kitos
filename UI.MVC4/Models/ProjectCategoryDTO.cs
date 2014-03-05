@@ -1,6 +1,6 @@
 ﻿namespace UI.MVC4.Models
 {
-    public class ProjectCategoryDTO : DropDownDTO
+    public class ProjectCategoryDTO : OptionDTO
     {
     }
 }
