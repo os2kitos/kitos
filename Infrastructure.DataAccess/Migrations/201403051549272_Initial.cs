@@ -77,32 +77,90 @@ namespace Infrastructure.DataAccess.Migrations
                 .PrimaryKey(t => t.Id);
             
             CreateTable(
-                "dbo.Configuration",
+                "dbo.Config",
                 c => new
                     {
                         Id = c.Int(nullable: false),
-                        ItSupportGuide = c.String(unicode: false),
-                        ShowTabOverview = c.Boolean(nullable: false),
-                        ShowColumnUsage = c.Boolean(nullable: false),
-                        ShowColumnMandatory = c.Boolean(nullable: false),
-                        ItProjectGuide = c.String(unicode: false),
-                        ShowFocusArea = c.Boolean(nullable: false),
-                        ShowPortfolio = c.Boolean(nullable: false),
-                        ShowBC = c.Boolean(nullable: false),
-                        ItSystemGuide = c.String(unicode: false),
-                        ShowRightOfUse = c.Boolean(nullable: false),
-                        ShowLicense = c.Boolean(nullable: false),
-                        ShowOperation = c.Boolean(nullable: false),
-                        ShowMaintenance = c.Boolean(nullable: false),
-                        ShowSupport = c.Boolean(nullable: false),
-                        ShowServerLicense = c.Boolean(nullable: false),
-                        ShowServerOperation = c.Boolean(nullable: false),
-                        ShowBackup = c.Boolean(nullable: false),
-                        ShowSurveillance = c.Boolean(nullable: false),
-                        ShowOther = c.Boolean(nullable: false),
+                        ShowItProjectModule = c.Boolean(nullable: false),
+                        ShowItSystemModule = c.Boolean(nullable: false),
+                        ShowItContractModule = c.Boolean(nullable: false),
+                        ItSupportModuleName_Id = c.Int(nullable: false),
+                        ItProjectModuleName_Id = c.Int(nullable: false),
+                        ItSystemModuleName_Id = c.Int(nullable: false),
+                        ItContractModuleName_Id = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.ItContractName", t => t.ItContractModuleName_Id, cascadeDelete: true)
+                .ForeignKey("dbo.ItProjectName", t => t.ItProjectModuleName_Id, cascadeDelete: true)
+                .ForeignKey("dbo.ItSupportName", t => t.ItSupportModuleName_Id, cascadeDelete: true)
+                .ForeignKey("dbo.ItSystemName", t => t.ItSystemModuleName_Id, cascadeDelete: true)
                 .ForeignKey("dbo.Municipality", t => t.Id, cascadeDelete: true)
+                .Index(t => t.ItContractModuleName_Id)
+                .Index(t => t.ItProjectModuleName_Id)
+                .Index(t => t.ItSupportModuleName_Id)
+                .Index(t => t.ItSystemModuleName_Id)
+                .Index(t => t.Id);
+            
+            CreateTable(
+                "dbo.ItContractName",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        Name = c.String(unicode: false),
+                    })
+                .PrimaryKey(t => t.Id);
+            
+            CreateTable(
+                "dbo.ItProjectName",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        Name = c.String(unicode: false),
+                    })
+                .PrimaryKey(t => t.Id);
+            
+            CreateTable(
+                "dbo.ItSupportName",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        Name = c.String(unicode: false),
+                    })
+                .PrimaryKey(t => t.Id);
+            
+            CreateTable(
+                "dbo.ItSystemName",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        Name = c.String(unicode: false),
+                    })
+                .PrimaryKey(t => t.Id);
+            
+            CreateTable(
+                "dbo.ItContractCfg",
+                c => new
+                    {
+                        Id = c.Int(nullable: false),
+                        ItContractGuide = c.String(unicode: false),
+                        ShowItContractGuide = c.Boolean(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.Municipality", t => t.Id)
+                .Index(t => t.Id);
+            
+            CreateTable(
+                "dbo.ItProjectCfg",
+                c => new
+                    {
+                        Id = c.Int(nullable: false),
+                        ItProjectGuide = c.String(unicode: false),
+                        ShowItProjectGuide = c.Boolean(nullable: false),
+                        ShowPortfolio = c.Boolean(nullable: false),
+                        ShowBC = c.Boolean(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.Municipality", t => t.Id)
                 .Index(t => t.Id);
             
             CreateTable(
@@ -763,6 +821,34 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ItProject_Id);
             
             CreateTable(
+                "dbo.ItSupportCfg",
+                c => new
+                    {
+                        Id = c.Int(nullable: false),
+                        ItSupportGuide = c.String(unicode: false),
+                        ShowItSupportGuide = c.Boolean(nullable: false),
+                        ShowTabOverview = c.Boolean(nullable: false),
+                        ShowColumnTechnology = c.Boolean(nullable: false),
+                        ShowColumnUsage = c.Boolean(nullable: false),
+                        ShowColumnMandatory = c.Boolean(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.Municipality", t => t.Id)
+                .Index(t => t.Id);
+            
+            CreateTable(
+                "dbo.ItSystemCfg",
+                c => new
+                    {
+                        Id = c.Int(nullable: false),
+                        ItSystemGuide = c.String(unicode: false),
+                        ShowItSystemGuide = c.Boolean(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.Municipality", t => t.Id)
+                .Index(t => t.Id);
+            
+            CreateTable(
                 "dbo.ProjectPhaseLocale",
                 c => new
                     {
@@ -874,6 +960,8 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.Payment", "Id", "dbo.ItContract");
             DropForeignKey("dbo.ItContract", "Municipality_Id", "dbo.Municipality");
             DropForeignKey("dbo.ProjectPhaseLocale", "Municipality_Id", "dbo.Municipality");
+            DropForeignKey("dbo.ItSystemCfg", "Id", "dbo.Municipality");
+            DropForeignKey("dbo.ItSupportCfg", "Id", "dbo.Municipality");
             DropForeignKey("dbo.Stakeholder", "ItProject_Id", "dbo.ItProject");
             DropForeignKey("dbo.Risk", "ItProject_Id", "dbo.ItProject");
             DropForeignKey("dbo.Resource", "ItProject_Id", "dbo.ItProject");
@@ -936,7 +1024,13 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.ExtReference", "ExtReferenceType_Id", "dbo.ExtReferenceType");
             DropForeignKey("dbo.Economy", "ItProject_Id", "dbo.ItProject");
             DropForeignKey("dbo.Communication", "ItProject_Id", "dbo.ItProject");
-            DropForeignKey("dbo.Configuration", "Id", "dbo.Municipality");
+            DropForeignKey("dbo.ItProjectCfg", "Id", "dbo.Municipality");
+            DropForeignKey("dbo.ItContractCfg", "Id", "dbo.Municipality");
+            DropForeignKey("dbo.Config", "Id", "dbo.Municipality");
+            DropForeignKey("dbo.Config", "ItSystemModuleName_Id", "dbo.ItSystemName");
+            DropForeignKey("dbo.Config", "ItSupportModuleName_Id", "dbo.ItSupportName");
+            DropForeignKey("dbo.Config", "ItProjectModuleName_Id", "dbo.ItProjectName");
+            DropForeignKey("dbo.Config", "ItContractModuleName_Id", "dbo.ItContractName");
             DropForeignKey("dbo.ItContract", "ContractType_Id", "dbo.ContractType");
             DropForeignKey("dbo.ItContract", "ContractTemplate_Id", "dbo.ContractTemplate");
             DropIndex("dbo.Agreement", new[] { "Id" });
@@ -947,6 +1041,8 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.Payment", new[] { "Id" });
             DropIndex("dbo.ItContract", new[] { "Municipality_Id" });
             DropIndex("dbo.ProjectPhaseLocale", new[] { "Municipality_Id" });
+            DropIndex("dbo.ItSystemCfg", new[] { "Id" });
+            DropIndex("dbo.ItSupportCfg", new[] { "Id" });
             DropIndex("dbo.Stakeholder", new[] { "ItProject_Id" });
             DropIndex("dbo.Risk", new[] { "ItProject_Id" });
             DropIndex("dbo.Resource", new[] { "ItProject_Id" });
@@ -1009,7 +1105,13 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ExtReference", new[] { "ExtReferenceType_Id" });
             DropIndex("dbo.Economy", new[] { "ItProject_Id" });
             DropIndex("dbo.Communication", new[] { "ItProject_Id" });
-            DropIndex("dbo.Configuration", new[] { "Id" });
+            DropIndex("dbo.ItProjectCfg", new[] { "Id" });
+            DropIndex("dbo.ItContractCfg", new[] { "Id" });
+            DropIndex("dbo.Config", new[] { "Id" });
+            DropIndex("dbo.Config", new[] { "ItSystemModuleName_Id" });
+            DropIndex("dbo.Config", new[] { "ItSupportModuleName_Id" });
+            DropIndex("dbo.Config", new[] { "ItProjectModuleName_Id" });
+            DropIndex("dbo.Config", new[] { "ItContractModuleName_Id" });
             DropIndex("dbo.ItContract", new[] { "ContractType_Id" });
             DropIndex("dbo.ItContract", new[] { "ContractTemplate_Id" });
             DropTable("dbo.Text");
@@ -1019,6 +1121,8 @@ namespace Infrastructure.DataAccess.Migrations
             DropTable("dbo.PaymentModel");
             DropTable("dbo.Payment");
             DropTable("dbo.ProjectPhaseLocale");
+            DropTable("dbo.ItSystemCfg");
+            DropTable("dbo.ItSupportCfg");
             DropTable("dbo.Stakeholder");
             DropTable("dbo.Risk");
             DropTable("dbo.Resource");
@@ -1071,7 +1175,13 @@ namespace Infrastructure.DataAccess.Migrations
             DropTable("dbo.Economy");
             DropTable("dbo.Communication");
             DropTable("dbo.ItProject");
-            DropTable("dbo.Configuration");
+            DropTable("dbo.ItProjectCfg");
+            DropTable("dbo.ItContractCfg");
+            DropTable("dbo.ItSystemName");
+            DropTable("dbo.ItSupportName");
+            DropTable("dbo.ItProjectName");
+            DropTable("dbo.ItContractName");
+            DropTable("dbo.Config");
             DropTable("dbo.Municipality");
             DropTable("dbo.ContractType");
             DropTable("dbo.ContractTemplate");

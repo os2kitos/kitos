@@ -12,7 +12,7 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Properties
             // Table & Column Mappings
-            this.ToTable("ItContractName");
+            this.ToTable("ItProjectName");
             this.Property(t => t.Id).HasColumnName("Id");
             this.Property(t => t.Name).HasColumnName("Name");
         }

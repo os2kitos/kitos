@@ -81,6 +81,10 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
             Mapper.CreateMap<Config, ConfigDTO>()
+                  .ForMember(dest => dest.ItContractName, opt => opt.MapFrom(src => src.ItContractModuleName.Name))
+                  .ForMember(dest => dest.ItProjectName, opt => opt.MapFrom(src => src.ItProjectModuleName.Name))
+                  .ForMember(dest => dest.ItSystemName, opt => opt.MapFrom(src => src.ItSystemModuleName.Name))
+                  .ForMember(dest => dest.ItSupportName, opt => opt.MapFrom(src => src.ItSupportModuleName.Name))
                   .ReverseMap();
         }
     }

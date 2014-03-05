@@ -147,7 +147,7 @@ namespace Infrastructure.DataAccess.Migrations
                 itContractName,
                 new ItContractModuleName() {Name = "Kontrakter"});
 
-            context.Configs.AddOrUpdate(x => x.Municipality,
+            context.Configs.AddOrUpdate(x => x.Id,
                 new Config() {
                     Municipality = globalMunicipality,
                     ItContractModuleName = itContractName,
@@ -159,28 +159,28 @@ namespace Infrastructure.DataAccess.Migrations
                     ShowItSystemModule = true,
                 });
 
-            context.ItSupportConfigs.AddOrUpdate(x => x.Municipality,
+            context.ItSupportConfigs.AddOrUpdate(x => x.Id,
                 new ItSupportConfig()
                     {
                         Municipality = globalMunicipality, 
                         ItSupportGuide = ".../itunderstøttelsesvejledning"
                     });
 
-            context.ItProjectConfigs.AddOrUpdate(x => x.Municipality,
+            context.ItProjectConfigs.AddOrUpdate(x => x.Id,
                 new ItProjectConfig()
                     {
                         Municipality = globalMunicipality,
                         ItProjectGuide = ".../itprojektvejledning"
                     });
 
-            context.ItSystemConfigs.AddOrUpdate(x => x.Municipality,
+            context.ItSystemConfigs.AddOrUpdate(x => x.Id,
                 new ItSystemConfig()
                     {
                         Municipality = globalMunicipality, 
                         ItSystemGuide = ".../itsystemvejledning"
                     });
 
-            context.ItContractConfigs.AddOrUpdate(x => x.Municipality,
+            context.ItContractConfigs.AddOrUpdate(x => x.Id,
                 new ItContractConfig()
                     {
                         Municipality = globalMunicipality,
