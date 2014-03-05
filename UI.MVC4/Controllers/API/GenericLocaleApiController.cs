@@ -27,7 +27,7 @@ namespace UI.MVC4.Controllers.API
 
         protected virtual IEnumerable<TModel> GetAllQuery()
         {
-            return Repository.Get();
+            return Repository.Get(l => l.Municipality_Id == 1);
         }
 
         protected virtual TModel PostQuery(TModel item)
@@ -55,6 +55,16 @@ namespace UI.MVC4.Controllers.API
 
             return Request.CreateResponse(HttpStatusCode.OK, Map<IEnumerable<TModel>, IEnumerable<LocaleDTO>>(items));
         }
+        
+        public HttpResponseMessage GetAllFromMunicipality([FromUri] int mId)
+        {
+            var items = Repository.Get(l => l.Municipality_Id == mId).ToList();
+
+            if (!items.Any())
+                return Request.CreateResponse(HttpStatusCode.NoContent);
+
+            return Request.CreateResponse(HttpStatusCode.OK, Map<IEnumerable<TModel>, IEnumerable<LocaleDTO>>(items));
+        }
 
         // GET api/T
         public HttpResponseMessage GetSingle([FromUri] int mId, [FromUri] int oId)
@@ -69,9 +79,10 @@ namespace UI.MVC4.Controllers.API
 
         // POST api/T
         [Authorize(Roles = "GlobalAdmin")]
-        public HttpResponseMessage Post([FromBody] LocaleDTO dto)
+        public HttpResponseMessage Post(LocaleDTO dto)
         {
             var item = Map<LocaleDTO, TModel>(dto);
+            item.Municipality_Id = 1;
             try
             {
                 PostQuery(item);
@@ -89,11 +100,10 @@ namespace UI.MVC4.Controllers.API
 
         // PUT api/T
         [Authorize(Roles = "GlobalAdmin")]
-        public HttpResponseMessage Put([FromUri] int mId, [FromUri] int oId, [FromBody] LocaleDTO dto)
+        public HttpResponseMessage Put(LocaleDTO dto)
         {
             var item = Map<LocaleDTO, TModel>(dto);
-            item.Municipality_Id = mId;
-            item.Original_Id = oId;
+            item.Municipality_Id = 1;
             try
             {
                 PutQuery(item);
