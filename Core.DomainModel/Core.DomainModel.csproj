@@ -44,6 +44,7 @@
     <Compile Include="DepartmentRight.cs" />
     <Compile Include="ExtReference.cs" />
     <Compile Include="ExtReferenceType.cs" />
+    <Compile Include="IHasRights.cs" />
     <Compile Include="IOptionEntity.cs" />
     <Compile Include="IRight.cs" />
     <Compile Include="ItContract\Agreement.cs" />

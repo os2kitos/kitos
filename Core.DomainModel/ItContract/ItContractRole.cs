@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel.ItContract
 {
-    public class ItContractRole : IOptionEntity<ItContract>
+    public class ItContractRole : IOptionEntity<ItContractRight>
     {
         public ItContractRole()
         {
-            References = new List<ItContract>();
+            References = new List<ItContractRight>();
         }
 
         public int Id { get; set; }
@@ -18,6 +18,6 @@ namespace Core.DomainModel.ItContract
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }
         public string Note { get; set; }
-        public virtual ICollection<ItContract> References { get; set; }
+        public virtual ICollection<ItContractRight> References { get; set; }
     }
 }

@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProjectRole : IOptionEntity<ItProject>
+    public class ItProjectRole : IOptionEntity<ItProjectRight>
     {
         public ItProjectRole()
         {
-            References = new List<ItProject>();
+            References = new List<ItProjectRight>();
         }
 
         public int Id { get; set; }
@@ -18,6 +18,6 @@ namespace Core.DomainModel.ItProject
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }
         public string Note { get; set; }
-        public virtual ICollection<ItProject> References { get; set; }
+        public virtual ICollection<ItProjectRight> References { get; set; }
     }
 }
