@@ -97,11 +97,15 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
             Mapper.CreateMap<Config, ConfigDTO>()
-                  .ForMember(dest => dest.ItContractName, opt => opt.MapFrom(src => src.ItContractModuleName.Name))
-                  .ForMember(dest => dest.ItProjectName, opt => opt.MapFrom(src => src.ItProjectModuleName.Name))
-                  .ForMember(dest => dest.ItSystemName, opt => opt.MapFrom(src => src.ItSystemModuleName.Name))
-                  .ForMember(dest => dest.ItSupportName, opt => opt.MapFrom(src => src.ItSupportModuleName.Name))
-                  .ReverseMap();
+                  .ForMember(dest => dest.ItContractNameId, opt => opt.MapFrom(src => src.ItContractModuleName_Id))
+                  .ForMember(dest => dest.ItProjectNameId, opt => opt.MapFrom(src => src.ItProjectModuleName_Id))
+                  .ForMember(dest => dest.ItSystemNameId, opt => opt.MapFrom(src => src.ItSystemModuleName_Id))
+                  .ForMember(dest => dest.ItSupportNameId, opt => opt.MapFrom(src => src.ItSupportModuleName_Id))
+                  .ReverseMap()
+                  .ForMember(dest => dest.ItContractModuleName_Id, opt => opt.MapFrom(src => src.ItContractNameId))
+                  .ForMember(dest => dest.ItProjectModuleName_Id, opt => opt.MapFrom(src => src.ItProjectNameId))
+                  .ForMember(dest => dest.ItSystemModuleName_Id, opt => opt.MapFrom(src => src.ItSystemNameId))
+                  .ForMember(dest => dest.ItSupportModuleName_Id, opt => opt.MapFrom(src => src.ItSupportNameId));
         }
     }
 

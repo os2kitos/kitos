@@ -8,8 +8,8 @@
 <ul class="nav nav-tabs">
   <li class="active"><a href="#digital" data-toggle="tab">IT Understøttelse</a></li>
   <li><a href="#projekt" data-toggle="tab">IT Projekter</a></li>
-  <li><input type="checkbox" id="show-itsystems"> <a href="#system" data-toggle="tab">IT Systemer</a></li>
-  <li><input type="checkbox" id="show-itcontracts"> <a href="#kontrakt" data-toggle="tab">IT Kontrakter</a></li>
+  <li><a href="#system" data-toggle="tab">IT Systemer</a></li>
+  <li><a href="#kontrakt" data-toggle="tab">IT Kontrakter</a></li>
 </ul>
 
 <!-- Tab panes -->
@@ -41,16 +41,9 @@
             <div class="well">
                 <h4>Generelt</h4>
                 
-                <div class="well">
-                    <div id="project-show-tab"></div>
-                </div>
+                <div id="project-show-tab"></div>
 
-                <div class="form-group">
-                    <label for="input-project-navn" class="col-sm-2 control-label">Modulnavn</label>
-                    <div class="col-sm-5">
-                        <select class="form-control" id="input-project-navn"></select>
-                    </div>
-                </div>
+                <div id="project-module-names"></div>
 
                 <div class="form-group">
                     <label for="input-project-url" class="col-sm-2 control-label">IT Projekt vejledning</label>
@@ -196,11 +189,17 @@
 @section scripts
 {
     <script>
-        function patch(url, value) {
+        function patchActive(url, value) {
+            patchCustom(url, 'IsActive', value);
+        }
+        
+        function patchCustom(url, key, value) {
+            var obj = new Object();
+            obj[key] = value;
             $.ajax({
                 url: url,
                 type: 'PATCH',
-                data: JSON.stringify({ IsActive: value }),
+                data: JSON.stringify(obj),
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function(data) {
@@ -219,7 +218,7 @@
             $('<input>', { id: id, type: 'text', name: 'test', 'class': 'form-control' }).appendTo(inputGroup);
             var span = $('<span>', { 'class': 'input-group-addon' }).appendTo(inputGroup);
             $('<input>', { type: 'checkbox', name: 'test', title: 'Medtag', checked: isActive }).change(function() {
-                patch(uri + '/' + itemid, this.checked);
+                patchActive(uri + '/' + itemid, this.checked);
             }).appendTo(span);
             $('<p>', { 'class': 'help-block', html: note }).appendTo(container2);
 
@@ -238,24 +237,29 @@
             var container3 = $('<div>', { 'class': 'checkbox' }).appendTo(container2);
             var label = $('<label>', { html: title }).appendTo(container3);
             $('<input>', { type: 'checkbox', title: 'Medtag', checked: isActive }).change(function() {
-                patch(uri + '/' + itemid, this.checked);
+                patchActive(uri + '/' + itemid, this.checked);
             }).appendTo(label);
             $('<p>', { 'class': 'help-block', html: note }).appendTo(container2);
 
             container.appendTo('#' + target);
         };
 
-        var dropdownTemplate = function(uri, target, i, list) {
-            var id = target + i;
+        var dropdownTemplate = function(uri, key, target, title, list, defaultValue) {
+            var id = target + '-select';
             
             var container = $('<div>', { 'class': 'form-group' });
-            var select = $('<select>', { 'class': 'form-control' }).appendTo(container);
-
+            $('<label>', { html: title, 'for': id, 'class': 'col-sm-2 control-label' }).appendTo(container);
+            var container2 = $('<div>', { 'class': 'col-sm-5' }).appendTo(container);
+            var select = $('<select>', { 'class': 'form-control', id: id }).appendTo(container2);
             $.each(list, function(x, e) {
                 select.append($('<option>', {
-                    value: 1,
-                    text: 'a'
+                    value: e.Id,
+                    text: e.Name
                 }));
+            });
+            select.val(defaultValue);
+            select.change(function() {
+                patchCustom(uri, key, this.value);
             });
             
             container.appendTo('#' + target);
@@ -273,10 +277,10 @@
                 });
         }
 
-        function makeDropdown(uri, elementId, tempalte, defaultValue) {
-            $.getJSON(uri)
+        function makeDropdown(getUri, postUri, key, elementId, title, template, defaultValue) {
+            $.getJSON(getUri)
                 .done(function(list) {
-                    template(uri, elementId, i, list);
+                    template(postUri, key, elementId, title, list, defaultValue);
                 })
                 .fail(function(jqXHR, textStatus, err) {
                     console.log(jqXHR, textStatus, err);
@@ -284,17 +288,17 @@
         }
 
         $(document).ready(function() {
-            var config;
-            $.getJSON(uri)
-                .done(function(data) {
-                    config = data;
+            // support
+            $.getJSON('api/config/?default')
+                .done(function (config) {
+                    //makeSingle('')
+
+                    makeDropdown('api/itSupportNames', 'api/config/1', 'ItSupportNameId', 'support-module-names', 'Modulnavn', dropdownTemplate, config.ItSupportNameId);
+                    makeDropdown('api/itProjectNames', 'api/config/1', 'ItProjectNameId', 'project-module-names', 'Modulnavn', dropdownTemplate, config.ItProjectNameId);
                 })
                 .fail(function(jqXHR, textStatus, err) {
                     console.log(jqXHR, textStatus, err);
                 });
-
-            // support
-            makeDropdown('api/itsupportnames', 'support-module-names', dropdownTemplate, config.ItSupportName);
 
             // project
             makeList('api/projectCategory', 'project-cat', checkboxTemplate);
