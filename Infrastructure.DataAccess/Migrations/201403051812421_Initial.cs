@@ -107,6 +107,9 @@ namespace Infrastructure.DataAccess.Migrations
                     {
                         Id = c.Int(nullable: false, identity: true),
                         Name = c.String(unicode: false),
+                        IsActive = c.Boolean(nullable: false),
+                        IsSuggestion = c.Boolean(nullable: false),
+                        Note = c.String(unicode: false),
                     })
                 .PrimaryKey(t => t.Id);
             
@@ -116,6 +119,9 @@ namespace Infrastructure.DataAccess.Migrations
                     {
                         Id = c.Int(nullable: false, identity: true),
                         Name = c.String(unicode: false),
+                        IsActive = c.Boolean(nullable: false),
+                        IsSuggestion = c.Boolean(nullable: false),
+                        Note = c.String(unicode: false),
                     })
                 .PrimaryKey(t => t.Id);
             
@@ -125,6 +131,9 @@ namespace Infrastructure.DataAccess.Migrations
                     {
                         Id = c.Int(nullable: false, identity: true),
                         Name = c.String(unicode: false),
+                        IsActive = c.Boolean(nullable: false),
+                        IsSuggestion = c.Boolean(nullable: false),
+                        Note = c.String(unicode: false),
                     })
                 .PrimaryKey(t => t.Id);
             
@@ -134,6 +143,9 @@ namespace Infrastructure.DataAccess.Migrations
                     {
                         Id = c.Int(nullable: false, identity: true),
                         Name = c.String(unicode: false),
+                        IsActive = c.Boolean(nullable: false),
+                        IsSuggestion = c.Boolean(nullable: false),
+                        Note = c.String(unicode: false),
                     })
                 .PrimaryKey(t => t.Id);
             
@@ -771,6 +783,7 @@ namespace Infrastructure.DataAccess.Migrations
                         Id = c.Int(nullable: false, identity: true),
                         Name = c.String(unicode: false),
                         IsActive = c.Boolean(nullable: false),
+                        IsSuggestion = c.Boolean(nullable: false),
                         Note = c.String(unicode: false),
                     })
                 .PrimaryKey(t => t.Id);
@@ -861,18 +874,6 @@ namespace Infrastructure.DataAccess.Migrations
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Municipality", t => t.Id)
                 .Index(t => t.Id);
-            
-            CreateTable(
-                "dbo.ProjectPhaseLocale",
-                c => new
-                    {
-                        Municipality_Id = c.Int(nullable: false),
-                        ProjectPhase_Id = c.Int(nullable: false),
-                        Name = c.String(unicode: false),
-                    })
-                .PrimaryKey(t => new { t.Municipality_Id, t.ProjectPhase_Id })
-                .ForeignKey("dbo.Municipality", t => t.Municipality_Id, cascadeDelete: true)
-                .Index(t => t.Municipality_Id);
             
             CreateTable(
                 "dbo.Payment",
@@ -973,7 +974,6 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.ItContract", "PaymentModel_Id", "dbo.PaymentModel");
             DropForeignKey("dbo.Payment", "Id", "dbo.ItContract");
             DropForeignKey("dbo.ItContract", "Municipality_Id", "dbo.Municipality");
-            DropForeignKey("dbo.ProjectPhaseLocale", "Municipality_Id", "dbo.Municipality");
             DropForeignKey("dbo.ItSystemCfg", "Id", "dbo.Municipality");
             DropForeignKey("dbo.ItSupportCfg", "Id", "dbo.Municipality");
             DropForeignKey("dbo.Stakeholder", "ItProject_Id", "dbo.ItProject");
@@ -1056,7 +1056,6 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ItContract", new[] { "PaymentModel_Id" });
             DropIndex("dbo.Payment", new[] { "Id" });
             DropIndex("dbo.ItContract", new[] { "Municipality_Id" });
-            DropIndex("dbo.ProjectPhaseLocale", new[] { "Municipality_Id" });
             DropIndex("dbo.ItSystemCfg", new[] { "Id" });
             DropIndex("dbo.ItSupportCfg", new[] { "Id" });
             DropIndex("dbo.Stakeholder", new[] { "ItProject_Id" });
@@ -1138,7 +1137,6 @@ namespace Infrastructure.DataAccess.Migrations
             DropTable("dbo.PurchaseForm");
             DropTable("dbo.PaymentModel");
             DropTable("dbo.Payment");
-            DropTable("dbo.ProjectPhaseLocale");
             DropTable("dbo.ItSystemCfg");
             DropTable("dbo.ItSupportCfg");
             DropTable("dbo.Stakeholder");
