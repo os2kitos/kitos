@@ -4,6 +4,11 @@ namespace Core.DomainModel.ItProject
 {
     public class ProjectCategory : IOptionEntity<ItProject>
     {
+        public ProjectCategory()
+        {
+            References = new List<ItProject>();
+        }
+
         public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }

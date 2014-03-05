@@ -5,6 +5,11 @@ namespace Core.DomainModel.ItSystem
 {
     public class InterfaceType : IOptionEntity<ItSystem>
     {
+        public InterfaceType()
+        {
+            References = new List<ItSystem>();
+        }
+
         public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }

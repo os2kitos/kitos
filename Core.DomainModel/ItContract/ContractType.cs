@@ -4,6 +4,11 @@ namespace Core.DomainModel.ItContract
 {
     public class ContractType : IOptionEntity<ItContract>
     {
+        public ContractType()
+        {
+            References = new List<ItContract>();
+        }
+
         public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }

@@ -4,6 +4,11 @@ namespace Core.DomainModel.ItSystem
 {
     public class DatabaseType : IOptionEntity<Technology>
     {
+        public DatabaseType()
+        {
+            References = new List<Technology>();
+        }
+
         public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
