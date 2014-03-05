@@ -44,11 +44,14 @@
     <Compile Include="DepartmentRight.cs" />
     <Compile Include="ExtReference.cs" />
     <Compile Include="ExtReferenceType.cs" />
+    <Compile Include="ExtRefTypeLocale.cs" />
+    <Compile Include="IHasLocales.cs" />
     <Compile Include="IHasRights.cs" />
     <Compile Include="IOptionEntity.cs" />
     <Compile Include="IRight.cs" />
     <Compile Include="ItContractConfig.cs" />
     <Compile Include="ItContractModuleName.cs" />
+    <Compile Include="ILocaleEntity.cs" />
     <Compile Include="ItContract\Agreement.cs" />
     <Compile Include="ItContract\ContractTemplate.cs" />
     <Compile Include="ItContract\ContractType.cs" />

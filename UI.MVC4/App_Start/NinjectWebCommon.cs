@@ -85,7 +85,11 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<ProtocolType>>().To<GenericRepository<ProtocolType>>().InRequestScope();
             kernel.Bind<IGenericRepository<PurchaseForm>>().To<GenericRepository<PurchaseForm>>().InRequestScope();
             kernel.Bind<IGenericRepository<SystemType>>().To<GenericRepository<SystemType>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ExtReferenceType>>().To<GenericRepository<ExtReferenceType>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ExtRefTypeLocale>>().To<GenericRepository<ExtRefTypeLocale>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ItProjectRole>>().To<GenericRepository<ItProjectRole>>().InRequestScope();
             kernel.Bind<IGenericRepository<Config>>().To<GenericRepository<Config>>();
+
             kernel.Bind<IGenericRepository<ItContractModuleName>>().To<GenericRepository<ItContractModuleName>>();
             kernel.Bind<IGenericRepository<ItProjectModuleName>>().To<GenericRepository<ItProjectModuleName>>();
             kernel.Bind<IGenericRepository<ItSupportModuleName>>().To<GenericRepository<ItSupportModuleName>>();

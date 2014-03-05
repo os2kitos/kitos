@@ -135,6 +135,8 @@ div.suggest-extended {
     background-color: #fafafa;
     padding: 15px;
 
+    width: 250px;
+
     -webkit-box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.24);
     -moz-box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.24);
     box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.24);
@@ -143,6 +145,21 @@ div.suggest-extended {
 #navbar-side {
     margin: 10px;
     padding: 0px;
+}
+
+form.config-form > div.row {
+    padding: 10px;
+    margin-bottom: 40px;
+}
+form.config-form > div.row:nth-child(odd) {
+    padding: 10px;
+    margin-bottom: 40px;
+    
+    background-color: #fafafa;
+}
+
+div.config-clone {
+    display: none;
 }
 
 .full-width {

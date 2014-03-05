@@ -42,7 +42,6 @@
     <Compile Include="ICryptoService.cs" />
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />
-    <Compile Include="IProjectPhaseLocaleRepository.cs" />
     <Compile Include="IUserRepository.cs" />
     <Compile Include="IUserService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

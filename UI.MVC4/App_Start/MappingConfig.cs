@@ -64,6 +64,10 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
+            Mapper.CreateMap<ProjectPhase, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
             Mapper.CreateMap<ProjectType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
@@ -95,6 +99,17 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<ItSystemModuleName, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
+            Mapper.CreateMap<ExtReferenceType, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
+            Mapper.CreateMap<ItProjectRole, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
+            Mapper.CreateMap<ProjPhaseLocale, LocaleDTO>().ReverseMap();
+            Mapper.CreateMap<ExtRefTypeLocale, LocaleDTO>().ReverseMap();
 
             Mapper.CreateMap<Config, ConfigDTO>()
                   .ForMember(dest => dest.ItContractNameId, opt => opt.MapFrom(src => src.ItContractModuleName_Id))

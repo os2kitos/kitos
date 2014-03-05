@@ -4,20 +4,10 @@ using Core.DomainServices;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class ProjectPhaseLocaleController : ApiController
+    public class ProjectPhaseLocaleController : GenericLocaleApiController<ProjPhaseLocale, ProjectPhase>
     {
-
-        protected readonly IProjectPhaseLocaleRepository Repository;
-
-        protected ProjectPhaseLocaleController(IProjectPhaseLocaleRepository repository)
+        public ProjectPhaseLocaleController(IGenericRepository<ProjPhaseLocale> repository) : base(repository)
         {
-            Repository = repository;
-        }
-
-        // GET api/ProjectPhaseLocale
-        public ProjPhaseLocale Get(int mId, int pId)
-        {
-            return Repository.GetById(mId, pId);
         }
     }
 }

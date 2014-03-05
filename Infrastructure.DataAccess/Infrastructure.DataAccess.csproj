@@ -76,6 +76,7 @@
     <Compile Include="Mapping\EnvironmentMap.cs" />
     <Compile Include="Mapping\ExtReferenceMap.cs" />
     <Compile Include="Mapping\ExtReferenceTypeMap.cs" />
+    <Compile Include="Mapping\ExtRefTypeLocaleMap.cs" />
     <Compile Include="Mapping\FunctionalityMap.cs" />
     <Compile Include="Mapping\GoalMap.cs" />
     <Compile Include="Mapping\GoalStatusMap.cs" />
@@ -134,13 +135,9 @@
     <Compile Include="Mapping\UserAdministrationMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
-    <Compile Include="Migrations\201403051549272_Initial.cs" />
-    <Compile Include="Migrations\201403051549272_Initial.Designer.cs">
-      <DependentUpon>201403051549272_Initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201403051705542_gogo.cs" />
-    <Compile Include="Migrations\201403051705542_gogo.Designer.cs">
-      <DependentUpon>201403051705542_gogo.cs</DependentUpon>
+    <Compile Include="Migrations\201403051955178_Initial.cs" />
+    <Compile Include="Migrations\201403051955178_Initial.Designer.cs">
+      <DependentUpon>201403051955178_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -162,11 +159,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201403051549272_Initial.resx">
-      <DependentUpon>201403051549272_Initial.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201403051705542_gogo.resx">
-      <DependentUpon>201403051705542_gogo.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201403051955178_Initial.resx">
+      <DependentUpon>201403051955178_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,22 +1,23 @@
 ﻿using System.Data.Entity.ModelConfiguration;
+using Core.DomainModel;
 using Core.DomainModel.ItProject;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ProjectPhaseLocaleMap : EntityTypeConfiguration<ProjPhaseLocale>
+    public class ExtRefTypeLocaleMap : EntityTypeConfiguration<ExtRefTypeLocale>
     {
-        public ProjectPhaseLocaleMap()
+        public ExtRefTypeLocaleMap()
         {
             // Primary Key
             this.HasKey(t => new { t.Municipality_Id, t.Original_Id });
 
             // Properties
             // Table & Column Mappings
-            this.ToTable("ProjectPhaseLocale");
+            this.ToTable("ExtRefTypeLocale");
 
             // Relationships
             this.HasRequired(t => t.Municipality)
-                .WithMany(t => t.ProjectPhaseLocales)
+                .WithMany(t => t.ExtRefTypeLocales)
                 .HasForeignKey(t => t.Municipality_Id);
 
             this.HasRequired(t => t.Original)

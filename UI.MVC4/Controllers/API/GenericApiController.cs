@@ -42,7 +42,7 @@ namespace UI.MVC4.Controllers.API
         // GET api/T
         public HttpResponseMessage GetSingle(TKeyType id)
         {
-            var item = Repository.GetById(id);
+            var item = Repository.GetByKey(id);
 
             if (item == null)
                 return Request.CreateResponse(HttpStatusCode.NoContent);
@@ -106,7 +106,7 @@ namespace UI.MVC4.Controllers.API
 
         protected virtual void DeleteQuery(TKeyType id)
         {
-            Repository.DeleteById(id);
+            Repository.DeleteByKey(id);
             Repository.Save();
         }
 
