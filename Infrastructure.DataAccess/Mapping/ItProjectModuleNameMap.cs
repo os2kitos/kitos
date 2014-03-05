@@ -16,4 +16,5 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.Id).HasColumnName("Id");
             this.Property(t => t.Name).HasColumnName("Name");
         }
+    }
 }

@@ -18,4 +18,5 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasRequired(t => t.Municipality)
                 .WithOptional(t => t.ItContractConfig);
         }
+    }
 }
