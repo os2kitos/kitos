@@ -1,0 +1,107 @@
+﻿@{
+    ViewBag.Title = "Konfiguration af IT Projekt";
+}
+
+<h2>Konfiguration af IT Projekt</h2>
+
+<div class="container-fluid">
+    <form class="form-horizontal config-form">
+
+        <div class="row">
+            <div class="col-md-1">
+                <h4>Generelt</h4>
+            </div>
+
+            <div class="col-md-10 col-md-offset-1">
+                <div class="form-group">
+                    <label for="input-project-navn" class="col-md-2 control-label">Modulnavn</label>
+                    <div class="col-md-6">
+                        <select class="form-control" id="input-project-name"></select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="input-project-url" class="col-md-2 control-label">IT Projekt vejledning</label>
+                    <div class="col-md-6">
+                        <input type="url" name="ItProjectGuide" class="form-control" id="input-project-url" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <h4>Referencer</h4>
+                Navngiv, hvis feltnavn er andet end KITOS default.
+            </div>
+
+            <div class="col-md-9 col-md-offset-1">
+                <div class="row h4">
+                    <div class="col-md-4">KITOS default</div>
+                </div>
+                <div id="project-ref">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <h4>Projektfaser</h4>
+                Navngiv, hvis faser er andet end KITOS default.
+            </div>
+
+            <div class="col-md-9 col-md-offset-1">
+                <div class="row h4">
+                    <div class="col-md-4">KITOS default</div>
+                </div>
+                <div id="project-phase">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <h4>Projektkategorier</h4>
+            </div>
+
+            <div class="col-md-9 col-md-offset-1">
+                <div id="project-cat"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <h4>Roller</h4>
+            </div>
+
+            <div class="col-md-9 col-md-offset-1">
+                <div id="project-roles"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <h4>Portfølje</h4>
+            </div>
+
+            <div class="col-md-9 col-md-offset-1">
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="ShowPortfolio" value="">
+                            Medtag IKKE fanen 'Portfølje'
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="ShowBC" value="">
+                            Medtag kolonnen 'BC'
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -256,6 +256,7 @@
     <Compile Include="Controllers\Web\GlobalAdminController.cs" />
     <Compile Include="Controllers\Web\AuthorizeController.cs" />
     <Compile Include="Controllers\API\GenericApiController.cs" />
+    <Compile Include="Controllers\Web\GlobalConfController.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Controllers\API\TextController.cs" />
     <Compile Include="Controllers\Web\TestController.cs" />
@@ -482,6 +483,7 @@
     <Content Include="Views\Administration\Index.cshtml" />
     <Content Include="Views\Administration\Suggest.cshtml" />
     <Content Include="Views\Configuration\Project.cshtml" />
+    <Content Include="Views\GlobalConf\Project.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
