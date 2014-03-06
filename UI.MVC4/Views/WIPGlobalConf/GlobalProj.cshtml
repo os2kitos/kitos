@@ -1,0 +1,176 @@
+﻿@{
+    ViewBag.Title = "Konfiguration af IT Projekt";
+}
+
+<h2>Konfiguration af IT Projekt</h2>
+
+<div class="container-fluid">
+    <form class="form-horizontal config-form">
+
+        <div class="row">
+            <div class="col-md-1">
+                <h4>Generelt</h4>
+            </div>
+
+            <div class="col-md-10 col-md-offset-1">
+                <div class="form-group">
+                    <label for="input-project-navn" class="col-md-2 control-label">Modulnavn</label>
+                    <div class="col-md-6">
+                        <select class="form-control" id="input-project-name"></select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="input-project-url" class="col-md-2 control-label">IT Projekt vejledning</label>
+                    <div class="col-md-6">
+                        <input type="url" name="ItProjectGuide" class="form-control" id="input-project-url" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <h4>Referencer</h4>
+                
+            </div>
+
+            <div class="col-md-9 col-md-offset-1">
+                <div id="project-ref">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <h4>Projektfaser</h4>
+            </div>
+
+            <div class="col-md-9 col-md-offset-1">
+                <div id="project-phase">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <h4>Projektkategorier</h4>
+            </div>
+
+            <div class="col-md-9 col-md-offset-1">
+                <div id="project-cat"></div>
+                <div id="project-cat-suggestions" class="suggestions">
+                    <h4>Forslag</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <h4>Roller</h4>
+            </div>
+
+            <div class="col-md-9 col-md-offset-1">
+                <div id="project-roles"></div>
+                <div id="project-roles-suggestions" class="suggestions">
+                    <h4>Forslag</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <h4>Portfølje</h4>
+            </div>
+
+            <div class="col-md-9 col-md-offset-1">
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="ShowPortfolio" value="">
+                            Medtag IKKE fanen 'Portfølje'
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="ShowBC" value="">
+                            Medtag kolonnen 'BC'
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="config-clone config-list form-group">
+    <div class="col-md-6">
+        <input class="config-list form-control" type="text" />
+        <p class="help-block"></p>
+    </div>
+    <div class="col-md-2 checkbox">
+        <label class="control-label">
+            <input type="checkbox" class="config-list-active" />
+            Aktiv
+        </label>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+
+        function ajax(url, data, type, onSuccess) {
+            console.log(data);
+            $.ajax({
+                url: url,
+                type: type,
+                data: JSON.stringify(data),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: onSuccess
+            });
+        };
+
+        var appendList = function(target, i, title, note, active) {
+            var clone = $("div.config-clone.config-list").clone();
+
+            clone.removeClass("config-clone");
+            clone.attr("id", "" + target + i);
+
+            console.log(active);
+            clone.find("input.config-list-active").attr("checked", active);
+            if (active)
+                clone.addClass("list-active");
+
+            clone.find("input.config-list").val(title);
+            clone.find("p.help-block").text(note);
+
+            clone.appendTo("#" + target);
+        };
+        
+        function makeList(uri, targetId) {
+            $.getJSON(uri)
+                .done(function (data) {
+                    $.each(data, function (i, e) {
+                        appendList(targetId, i, e.Name, e.Note, e.IsActive);
+                    });
+                })
+                .fail(function (jqXHR, textStatus, err) {
+                    console.log(jqXHR, textStatus, err);
+                });
+        };
+
+        $(document).ready(function() {
+            makeList("/api/extReferenceType", "project-ref");
+            makeList("/api/projectPhase", "project-phase");
+            makeList("/api/projectCategory", "project-cat");
+            makeList("/api/projectCategory?suggestions", "project-cat-suggestions");
+            makeList("/api/itProjectRole", "project-roles");
+            makeList("/api/itProjectRole?suggestions", "project-roles-suggestions");
+        });
+
+    </script>
+}

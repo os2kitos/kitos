@@ -251,11 +251,12 @@
     <Compile Include="Controllers\API\PasswordResetRequestController.cs" />
     <Compile Include="Controllers\API\UserController.cs" />
     <Compile Include="Controllers\Web\AccountController.cs" />
-    <Compile Include="Controllers\Web\AdministrationController.cs" />
-    <Compile Include="Controllers\Web\ConfigurationController.cs" />
+    <Compile Include="Controllers\Web\GlobalConfigController.cs" />
+    <Compile Include="Controllers\Web\LocalConfigController.cs" />
     <Compile Include="Controllers\Web\GlobalAdminController.cs" />
     <Compile Include="Controllers\Web\AuthorizeController.cs" />
     <Compile Include="Controllers\API\GenericApiController.cs" />
+    <Compile Include="Controllers\Web\WIPGlobalConfController.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Controllers\API\TextController.cs" />
     <Compile Include="Controllers\Web\TestController.cs" />
@@ -479,9 +480,10 @@
     <Content Include="Views\GlobalAdmin\AddLocalAdmin.cshtml" />
     <Content Include="Views\GlobalAdmin\Index.cshtml" />
     <Content Include="Views\GlobalAdmin\_AdminSubmenu.cshtml" />
-    <Content Include="Views\Administration\Index.cshtml" />
-    <Content Include="Views\Administration\Suggest.cshtml" />
-    <Content Include="Views\Configuration\Project.cshtml" />
+    <Content Include="Views\GlobalConfig\Index.cshtml" />
+    <Content Include="Views\GlobalConfig\Suggest.cshtml" />
+    <Content Include="Views\LocalConfig\Project.cshtml" />
+    <Content Include="Views\WIPGlobalConf\GlobalProj.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
