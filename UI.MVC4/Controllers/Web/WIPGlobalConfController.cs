@@ -6,7 +6,7 @@ using System.Web.Mvc;
 
 namespace UI.MVC4.Controllers.Web
 {
-    public class GlobalConfController : Controller
+    public class WIPGlobalConfController : Controller
     {
         //
         // GET: /GlobalConf/
@@ -16,7 +16,7 @@ namespace UI.MVC4.Controllers.Web
             return View();
         }
 
-        public ActionResult Project()
+        public ActionResult GlobalProj()
         {
             return View();
         }

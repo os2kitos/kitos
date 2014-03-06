@@ -6,7 +6,7 @@ using System.Web.Mvc;
 
 namespace UI.MVC4.Controllers.Web
 {
-    public class AdministrationController : Controller
+    public class GlobalConfigController : Controller
     {
         //
         // GET: /Admin/

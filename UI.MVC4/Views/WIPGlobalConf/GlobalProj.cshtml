@@ -32,13 +32,10 @@
         <div class="row">
             <div class="col-md-2">
                 <h4>Referencer</h4>
-                Navngiv, hvis feltnavn er andet end KITOS default.
+                
             </div>
 
             <div class="col-md-9 col-md-offset-1">
-                <div class="row h4">
-                    <div class="col-md-4">KITOS default</div>
-                </div>
                 <div id="project-ref">
                 </div>
             </div>
@@ -46,13 +43,9 @@
         <div class="row">
             <div class="col-md-2">
                 <h4>Projektfaser</h4>
-                Navngiv, hvis faser er andet end KITOS default.
             </div>
 
             <div class="col-md-9 col-md-offset-1">
-                <div class="row h4">
-                    <div class="col-md-4">KITOS default</div>
-                </div>
                 <div id="project-phase">
                 </div>
             </div>
@@ -65,6 +58,9 @@
 
             <div class="col-md-9 col-md-offset-1">
                 <div id="project-cat"></div>
+                <div id="project-cat-suggestions" class="suggestions">
+                    <h4>Forslag</h4>
+                </div>
             </div>
         </div>
 
@@ -75,6 +71,9 @@
 
             <div class="col-md-9 col-md-offset-1">
                 <div id="project-roles"></div>
+                <div id="project-roles-suggestions" class="suggestions">
+                    <h4>Forslag</h4>
+                </div>
             </div>
         </div>
 
@@ -105,3 +104,73 @@
         </div>
     </form>
 </div>
+
+<div class="config-clone config-list form-group">
+    <div class="col-md-6">
+        <input class="config-list form-control" type="text" />
+        <p class="help-block"></p>
+    </div>
+    <div class="col-md-2 checkbox">
+        <label class="control-label">
+            <input type="checkbox" class="config-list-active" />
+            Aktiv
+        </label>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+
+        function ajax(url, data, type, onSuccess) {
+            console.log(data);
+            $.ajax({
+                url: url,
+                type: type,
+                data: JSON.stringify(data),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: onSuccess
+            });
+        };
+
+        var appendList = function(target, i, title, note, active) {
+            var clone = $("div.config-clone.config-list").clone();
+
+            clone.removeClass("config-clone");
+            clone.attr("id", "" + target + i);
+
+            console.log(active);
+            clone.find("input.config-list-active").attr("checked", active);
+            if (active)
+                clone.addClass("list-active");
+
+            clone.find("input.config-list").val(title);
+            clone.find("p.help-block").text(note);
+
+            clone.appendTo("#" + target);
+        };
+        
+        function makeList(uri, targetId) {
+            $.getJSON(uri)
+                .done(function (data) {
+                    $.each(data, function (i, e) {
+                        appendList(targetId, i, e.Name, e.Note, e.IsActive);
+                    });
+                })
+                .fail(function (jqXHR, textStatus, err) {
+                    console.log(jqXHR, textStatus, err);
+                });
+        };
+
+        $(document).ready(function() {
+            makeList("/api/extReferenceType", "project-ref");
+            makeList("/api/projectPhase", "project-phase");
+            makeList("/api/projectCategory", "project-cat");
+            makeList("/api/projectCategory?suggestions", "project-cat-suggestions");
+            makeList("/api/itProjectRole", "project-roles");
+            makeList("/api/itProjectRole?suggestions", "project-roles-suggestions");
+        });
+
+    </script>
+}

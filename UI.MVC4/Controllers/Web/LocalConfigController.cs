@@ -7,7 +7,7 @@ using System.Web.Mvc;
 namespace UI.MVC4.Controllers.Web
 {
     [Authorize(Roles = "LocalAdmin,GlobalAdmin")]
-    public class ConfigurationController : Controller
+    public class LocalConfigController : Controller
     {
         //
         // GET: /Configuration/

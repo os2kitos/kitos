@@ -31,18 +31,23 @@
                                 </div>
                             }
 
+                            <!--
                             <select>
                                 <option>Vælg organisation</option>
                             </select>
                             
-                            <p>
-                            @Html.ActionLink("Vidensdeling", "Index", "Home", null, new {@class = "btn btn-xs btn-link"})
-                            @if(User.IsInRole("GlobalAdmin"))
-                        {
-                                
-                            @Html.ActionLink("Global admin", "Index", "GlobalAdmin", null, new {@class = "btn btn-xs btn-link"})
-                        }
-                                </p>
+                            -->
+
+                            
+                                <!-- @Html.ActionLink("Vidensdeling", "Index", "Home", null, new { @class = "btn btn-xs btn-link" }) -->
+                            
+                            <br/>
+                            @if (User.IsInRole("GlobalAdmin"))
+                            {
+                                @Html.ActionLink("Konfiguration", "Index", "GlobalConfig", null, new { @class = "btn btn-xs btn-link" })
+                                @Html.ActionLink("Administration", "Index", "GlobalAdmin", null, new { @class = "btn btn-xs btn-link" })
+
+                            }
                         </div>
                     }
                     else
@@ -55,8 +60,8 @@
                         </div>
             
                         <div class="navbar-text navbar-text-small navbar-right">
-                            @Html.ActionLink("Log ind", "Login", "Authorize", null, new {@class = "btn btn-xs btn-link"})
-                            @Html.ActionLink("Glemt password?", "ForgotPassword", "Authorize", null, new {@class = "btn btn-xs btn-link"})
+                            @Html.ActionLink("Log ind", "Login", "Authorize", null, new { @class = "btn btn-xs btn-link" })
+                            @Html.ActionLink("Glemt password?", "ForgotPassword", "Authorize", null, new { @class = "btn btn-xs btn-link" })
                         </div>
                     }
                 </div>
