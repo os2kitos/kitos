@@ -14,7 +14,7 @@
                 <div class="form-group">
                     <label for="input-project-navn" class="col-md-2 control-label">Modulnavn</label>
                     <div class="col-md-6">
-                        <select class="form-control" id="input-project-navn"></select>
+                        <select class="form-control" id="input-project-name"></select>
                     </div>
                 </div>
 
@@ -63,6 +63,8 @@
         <div class="row">
             <div class="col-md-2">
                 <h4>Projektkategorier</h4>
+                
+                <div class="add-suggest-box" data-url="/api/projectCategory"></div>
             </div>
 
             <div class="col-md-9 col-md-offset-1">
@@ -73,6 +75,7 @@
         <div class="row">
             <div class="col-md-2">
                 <h4>Roller</h4>
+                <div class="add-suggest-box" data-url="/api/projectRole"></div>
             </div>
 
             <div class="col-md-9 col-md-offset-1">
@@ -125,22 +128,22 @@
     </div>
 </div>
 
-<div class="config-clone suggest-box">
-    <a href="#" class="toggle-suggest-form btn btn-default">+ Foreslå ny</a>
+<div class="config-clone suggest-box container-fluid col-md-3">
+    <a href="#" class="toggle-suggest-form btn btn-default">+ Foreslå ny ...</a>
 
     <div class="suggest-extended">
         <p class="small">Hvis du synes at der mangler et væsentlig element, kan du foreslå det her. Alle foreslag skal godkendes af en global administrator før de bliver tilgengængelige til brug.</p>
-
-        <form class="suggest-form" data-url="">
+        <form class="suggest-form form-horizontal" data-url="">
             <div class="form-group">
                 <label class="control-label">
                     Forslag:
-                    <input type="text" name="nametext" class="form-control input-sm" required />
                 </label>
+                <input type="text" name="nametext" class="form-control input-sm" required/>
             </div>
-            <input type="submit" class="btn btn-sm btn-primary" value="Foreslå" />
+            <div class="form-group">
+                <input type="submit" class="btn btn-sm btn-primary" value="Foreslå"/>
+            </div>
         </form>
-
     </div>
 </div>
 
@@ -246,6 +249,12 @@
             makeList("/api/projectCategory", "project-cat");
             makeList("/api/itProjectRole", "project-roles");
 
+            $("div.add-suggest-box").each(function() {
+                var clone = $(".config-clone.suggest-box").clone();
+                clone.removeClass("config-clone");
+                clone.find("form").attr("data-url", $(this).attr("data-url"));
+                clone.appendTo($(this));
+            });
 
             $(".toggle-suggest-form").click(function () {
                 $(this).next().slideToggle("fast");

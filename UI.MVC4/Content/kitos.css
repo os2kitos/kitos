@@ -135,11 +135,18 @@ div.suggest-extended {
     background-color: #fafafa;
     padding: 15px;
 
-    width: 250px;
+    width: 300px;
 
     -webkit-box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.24);
     -moz-box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.24);
     box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.24);
+}
+form.suggest-form input[type=text] {
+    width: 90%;
+    margin-left: 10px;
+}
+input:disabled {
+    cursor: inherit !important;
 }
 
 #navbar-side {
