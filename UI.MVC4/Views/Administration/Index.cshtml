@@ -36,7 +36,7 @@
                 </div>
                 <div id="support-guide">
                     <div class="form-group">
-                        <label for="input-support-url" class="col-sm-2 control-label">IT Projekt vejledning</label>
+                        <label for="input-support-url" class="col-sm-2 control-label">IT understøttelse vejledning</label>
                         <div class="col-sm-5">
                             <input type="url" class="form-control" id="input-support-url">
                         </div>
@@ -547,14 +547,14 @@
 
         $(document).ready(function() {
             // support
-            $.getJSON('api/config/?default')
+            $.getJSON('/api/config/?default')
                 .done(function (config) {
                     //makeSingle('')
 
-                    makeDropdown('api/itSupportNames', 'api/config/1', 'ItSupportNameId', 'support-module-names', 'Modulnavn', dropdownTemplate, config.ItSupportNameId);
-                    makeDropdown('api/itProjectNames', 'api/config/1', 'ItProjectNameId', 'project-module-names', 'Modulnavn', dropdownTemplate, config.ItProjectNameId);
-                    makeDropdown('api/itSystemNames', 'api/config/1', 'ItSystemNameId', 'system-module-names', 'Modulnavn', dropdownTemplate, config.ItSystemNameId);
-                    makeDropdown('api/itContractNames', 'api/config/1', 'ItContractNameId', 'contract-module-names', 'Modulnavn', dropdownTemplate, config.ItContractNameId);
+                    makeDropdown('/api/itSupportNames', '/api/config/1', 'ItSupportNameId', 'support-module-names', 'Modulnavn', dropdownTemplate, config.ItSupportNameId);
+                    makeDropdown('/api/itProjectNames', '/api/config/1', 'ItProjectNameId', 'project-module-names', 'Modulnavn', dropdownTemplate, config.ItProjectNameId);
+                    makeDropdown('/api/itSystemNames', '/api/config/1', 'ItSystemNameId', 'system-module-names', 'Modulnavn', dropdownTemplate, config.ItSystemNameId);
+                    makeDropdown('/api/itContractNames', '/api/config/1', 'ItContractNameId', 'contract-module-names', 'Modulnavn', dropdownTemplate, config.ItContractNameId);
                 })
                 .fail(function(jqXHR, textStatus, err) {
                     console.log(jqXHR, textStatus, err);
