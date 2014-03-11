@@ -251,14 +251,14 @@
     <Compile Include="Controllers\API\PasswordResetRequestController.cs" />
     <Compile Include="Controllers\API\UserController.cs" />
     <Compile Include="Controllers\Web\AccountController.cs" />
-    <Compile Include="Controllers\Web\AngularController.cs" />
+    <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Controllers\Web\GlobalConfigController.cs" />
     <Compile Include="Controllers\Web\LocalConfigController.cs" />
     <Compile Include="Controllers\Web\GlobalAdminController.cs" />
     <Compile Include="Controllers\Web\AuthorizeController.cs" />
     <Compile Include="Controllers\API\GenericApiController.cs" />
     <Compile Include="Controllers\Web\WIPGlobalConfController.cs" />
-    <Compile Include="Controllers\Web\HomeController.cs" />
+    <Compile Include="Controllers\Web\OldHomeController.cs" />
     <Compile Include="Controllers\API\TextController.cs" />
     <Compile Include="Controllers\Web\TestController.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
@@ -293,6 +293,8 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Images\logo.png" />
+    <Content Include="Partials\Home\index.html" />
+    <Content Include="Partials\Subnav\Subnav.html" />
     <Content Include="Partials\Topnav\Authorized.html" />
     <Content Include="Partials\Topnav\Unauthorized.html" />
     <Content Include="Partials\Topnav\Topnav.html" />
@@ -315,6 +317,8 @@
     <Content Include="Scripts\angular-touch.min.js" />
     <Content Include="Scripts\angular.js" />
     <Content Include="Scripts\angular.min.js" />
+    <Content Include="Scripts\App\Controllers\Home\home.js" />
+    <Content Include="Scripts\App\main.js" />
     <Content Include="Scripts\bootstrap3-wysihtml5.js" />
     <Content Include="Scripts\errors.json" />
     <Content Include="Scripts\angular-touch.min.js.map" />
@@ -612,13 +616,13 @@
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Account\ExternalLoginFailure.cshtml" />
     <Content Include="Views\Account\ExternalLoginConfirmation.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\OldHome\Index.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Web.config" />
-    <Content Include="Views\Home\AdminPage.cshtml" />
-    <Content Include="Views\Home\UserPage.cshtml" />
+    <Content Include="Views\OldHome\AdminPage.cshtml" />
+    <Content Include="Views\OldHome\UserPage.cshtml" />
     <Content Include="Views\Authorize\Login.cshtml" />
     <Content Include="Views\Authorize\ForgotPassword.cshtml" />
     <Content Include="Views\Authorize\ResetPassword.cshtml" />
@@ -637,7 +641,7 @@
     <Content Include="Views\GlobalConfig\Suggest.cshtml" />
     <Content Include="Views\LocalConfig\Project.cshtml" />
     <Content Include="Views\WIPGlobalConf\GlobalProj.cshtml" />
-    <Content Include="Views\Angular\Index.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Scripts\version.json" />
   </ItemGroup>
   <ItemGroup>

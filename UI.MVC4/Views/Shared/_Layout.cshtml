@@ -1,8 +1,8 @@
 ﻿<!DOCTYPE html>
-<html lang="en" ng-app="kitosApp">
+<html lang="en" ng-app="App">
     <head>
         <meta charset="utf-8" />
-        <title>@ViewBag.Title - KITOS</title>
+        <title>{{page.title}} - KITOS</title>
         <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
         <meta name="viewport" content="width=device-width" />
         @Styles.Render("~/Content/css")
@@ -16,17 +16,16 @@
             
             <div id="page-content" class="row container-fluid" role="main">
                 
-                <div id="sub-menu">
-                    @RenderSection("submenu", required: false)
-                </div>
+                <div id="subnav" ng-include="'partials/subnav/subnav.html'"></div>
 
-                <div id="page-body" class="row container-fluid">
+                <div id="page-body" class="row container-fluid" ng-view>
                     @RenderBody()
                 </div>
             </div>
         </div>
         
         @Scripts.Render("~/Scripts/angular")
+        @Scripts.Render("~/Scripts/app")
 
         <script src="@Url.Content("../../Scripts/holder.js")"></script>
 

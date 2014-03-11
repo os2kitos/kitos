@@ -78,39 +78,29 @@ div#page-body {
     }
 /*********************************************/
 
-#sub-menu {
+#subnav {
     margin-top: 20px;
 
 }
 
-#sub-menu ul {
+#subnav ul {
     list-style-type: none;
     margin: 0px;
-
-    /*
-        border-bottom: 1px solid black;
-        */
 }
 
-#sub-menu nav ul li {
+#subnav nav ul li {
 
     display: inline-block;
     margin-left: 10px;
 }
 
-#sub-menu nav ul li a.btn-tab {
-    /*
-    border-style: solid;
-    border-color: #5c5c5c;
-    border-bottom-color: black;
-    border-width: 1px 1px 1px 1px;
-        */
+#subnav nav ul li a.btn-tab {
     
     color: black;
     background-color: #e6e6e6;
 }
 
-#sub-menu nav ul li a.btn-tab-active {
+#subnav nav ul li a.btn-tab-active {
     background-color: white;
 }
 

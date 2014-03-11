@@ -42,7 +42,11 @@ namespace UI.MVC4
              */
 
             bundles.Add(new ScriptBundle("~/Scripts/angular").Include(
-                "~/Scripts/angular.js"));
+                "~/Scripts/angular.js",
+                "~/Scripts/angular-route.js"));
+
+            bundles.Add(new ScriptBundle("~/Scripts/app").IncludeDirectory(
+                "~/Scripts/app", "*.js", true));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                 "~/Content/bootstrap-cosmo.*", 
