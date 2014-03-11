@@ -156,11 +156,12 @@ namespace UI.MVC4.Controllers.API
                 var value = l.Value;
                 
                 // check if property exists, if it doesn't something is terribly wrong with the mapping :/
-                
                 var propRef = itemType.GetProperty(destName);
-                dynamic i = 1;
+                var genericType = l.Value.GetType().MakeGenericType(new Type[] {propRef.GetType()});
+                // http://stackoverflow.com/questions/2604743/setting-generic-type-at-runtime
+                genericType.GetMethod("Value").Invoke();
                 if (propRef != null)
-                    propRef.SetValue(item, i);
+                    propRef.SetValue(item, value.Value<>());
             }
 
             try
