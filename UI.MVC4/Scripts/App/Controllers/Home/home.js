@@ -1,8 +1,12 @@
 ﻿(function(ng, app) {
 
-    app.controller("home.HomeController", function ($rootScope, $scope) {
+    app.controller("home.IndexController", function ($rootScope, $scope) {
         $rootScope.page = { title: "Index" };
-        $rootScope.subnav = [{ text: "test" }, { text: "foo" }];
+    });
+    
+    app.controller("home.LoginController", function ($rootScope, $scope) {
+        $rootScope.page = { title: "Log ind" };
+        //$rootScope.subnav = [{ text: "test" }, { text: "foo" }];
     });
 
 })(angular, App);

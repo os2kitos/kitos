@@ -19,8 +19,10 @@
                 <div id="subnav" ng-include="'partials/subnav/subnav.html'"></div>
 
                 <div id="page-body" class="row container-fluid" ng-view>
-                    @RenderBody()
                 </div>
+                
+                @{/* this doesn't really do anything, but it's necessary to shut up the interpreter */}
+                @RenderBody()
             </div>
         </div>
         

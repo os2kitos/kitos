@@ -3,7 +3,10 @@
 App.config(["$routeProvider", function ($routeProvider) {
     $routeProvider.when("/home", {
         templateUrl: "partials/home/index.html",
-        controller: "home.HomeController"
+        controller: "home.IndexController"
+    }).when("/home/login", {
+        templateUrl: "partials/home/login.html",
+        controller: "home.LoginController"
     }).otherwise({
         redirectTo: "/home"
     });

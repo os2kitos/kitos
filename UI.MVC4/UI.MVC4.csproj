@@ -294,6 +294,7 @@
     <Content Include="Global.asax" />
     <Content Include="Images\logo.png" />
     <Content Include="Partials\Home\index.html" />
+    <Content Include="Partials\Home\login.html" />
     <Content Include="Partials\Subnav\Subnav.html" />
     <Content Include="Partials\Topnav\Authorized.html" />
     <Content Include="Partials\Topnav\Unauthorized.html" />
