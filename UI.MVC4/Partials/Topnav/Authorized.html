@@ -7,9 +7,9 @@
 
 
 <div class="navbar-text navbar-text-small navbar-right navbar-complex">
-    <div class="small">
-        <a href="#">{{ user.username }}</a> 
-        <a href="#">Log ud</a>
+    <div>
+        <a href="#" class="btn btn-link">{{ user.name }}</a> 
+        <a href="#" class="btn btn-link" ng-click="logout()">Log ud</a>
     </div>
     
     <div ng-switch on="user.role">
