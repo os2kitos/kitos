@@ -1,0 +1,23 @@
+﻿<ul class="nav navbar-nav">
+    <li class="double-line"><a href="#">IT understøttelse af organisation</a></li>
+    <li><a href="#">IT Projekter</a></li>
+    <li><a href="#">IT Systemer</a></li>
+    <li><a href="#">IT Kontrakter</a></li>
+</ul>
+
+
+<div class="navbar-text navbar-text-small navbar-right navbar-complex">
+    <div class="small">
+        <a href="#">{{ user.username }}</a> 
+        <a href="#">Log ud</a>
+    </div>
+    
+    <div ng-switch on="user.role">
+        <div ng-switch-when="localAdmin">Lokal admin</div>
+        <div ng-switch-when="globalAdmin">Global admin</div>
+    </div>
+
+    <!-- TODO: Vidensdeling -->
+
+                            
+</div>
