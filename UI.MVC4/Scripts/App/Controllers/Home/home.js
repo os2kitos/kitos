@@ -35,12 +35,16 @@
                 "RememberMe": $scope.remember
             };
 
-            $http.post("api/authorize", data).success(function(result) {
+            $http.post("api/authorize", data).success(function (result) {
+
+                var roleid = result.Response.Role_Id;
+                var role = roleid == 1 ? "globalAdmin" : roleid == 2 ? "localAdmin" : "user";
                 $rootScope.user = {
                     name: result.Response.Name,
                     email: result.Response.Email,
                     municipality: result.Response.Municipality_Id,
-                    authStatus: "authorized"
+                    authStatus: "authorized",
+                    role: role
                 };
                 $location.path("/home");
             });

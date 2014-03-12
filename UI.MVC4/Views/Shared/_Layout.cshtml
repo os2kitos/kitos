@@ -28,8 +28,7 @@
         
         @Scripts.Render("~/Scripts/angular")
         @Scripts.Render("~/Scripts/app")
-
-        <script src="@Url.Content("../../Scripts/holder.js")"></script>
+        @Scripts.Render("~/Scripts/holder")
 
         @RenderSection("scripts", required: false)
 
