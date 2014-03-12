@@ -12,33 +12,33 @@ namespace UI.MVC4.Controllers.API
     {
         protected HttpResponseMessage CreateResponse(HttpStatusCode statusCode, string msg = "")
         {
-            var wrap = new ApiReturnModel<Object>
-            {
-                msg = msg,
-                response = null
-            };
+            var wrap = new ApiReturnDTO<Object>
+                {
+                    Msg = msg,
+                    Response = null
+                };
 
             return Request.CreateResponse(statusCode, wrap);
         }
 
         protected HttpResponseMessage CreateResponse(HttpStatusCode statusCode, Exception e)
         {
-            var wrap = new ApiReturnModel<Exception>
-            {
-                msg = e.Message,
-                response = e
-            };
+            var wrap = new ApiReturnDTO<Exception>
+                {
+                    Msg = e.Message,
+                    Response = e
+                };
 
             return Request.CreateResponse(statusCode, wrap);
         }
 
         protected HttpResponseMessage CreateResponse<T>(HttpStatusCode statusCode, T response, string msg = "")
-            where T: class
+            where T : class
         {
-            var wrap = new ApiReturnModel<T>
+            var wrap = new ApiReturnDTO<T>
                 {
-                    msg = msg,
-                    response = response
+                    Msg = msg,
+                    Response = response
                 };
 
             return Request.CreateResponse(statusCode, wrap);

@@ -72,7 +72,7 @@ namespace UI.MVC4.Controllers.API
                 _repository.Update(municipality);
                 _repository.Save();
                 
-                var msg = Request.CreateResponse(HttpStatusCode.Created, AutoMapper.Mapper.Map<Municipality,UserApiModel>(municipality));
+                var msg = Request.CreateResponse(HttpStatusCode.Created, AutoMapper.Mapper.Map<Municipality,UserDTO>(municipality));
                 return new HttpResponseMessage(HttpStatusCode.OK); // TODO correct?
             }
             catch (Exception)

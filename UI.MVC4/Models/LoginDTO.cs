@@ -1,6 +1,6 @@
 ﻿namespace UI.MVC4.Models
 {
-    public class LoginApiModel
+    public class LoginDTO
     {
         public string Email { get; set; }
         public string Password { get; set; }

@@ -22,15 +22,15 @@ namespace UI.MVC4.Controllers.API
         }
 
         [Authorize]
-        public HttpResponseMessage Post(UserApiModel item)
+        public HttpResponseMessage Post(UserDTO item)
         {
             try
             {
-                var user = AutoMapper.Mapper.Map<UserApiModel, User>(item);
+                var user = AutoMapper.Mapper.Map<UserDTO, User>(item);
 
                 user = _userService.AddUser(user);
 
-                var msg = Request.CreateResponse(HttpStatusCode.Created, AutoMapper.Mapper.Map<User,UserApiModel>(user));
+                var msg = Request.CreateResponse(HttpStatusCode.Created, AutoMapper.Mapper.Map<User,UserDTO>(user));
                 msg.Headers.Location = new Uri(Request.RequestUri + "/" + user.Id);
                 return msg;
             }
@@ -41,15 +41,15 @@ namespace UI.MVC4.Controllers.API
         }
         
         [Authorize]
-        public IEnumerable<UserApiModel> Get()
+        public IEnumerable<UserDTO> Get()
         {
-            return AutoMapper.Mapper.Map<IEnumerable<User>, List<UserApiModel>>(_repository.Get());
+            return AutoMapper.Mapper.Map<IEnumerable<User>, List<UserDTO>>(_repository.Get());
         }
         
         [Authorize]
-        public UserApiModel Get(int id)
+        public UserDTO Get(int id)
         {
-            return AutoMapper.Mapper.Map<User,UserApiModel>(_repository.GetByKey(id));
+            return AutoMapper.Mapper.Map<User,UserDTO>(_repository.GetByKey(id));
         }
     }
 

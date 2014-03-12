@@ -14,24 +14,26 @@ namespace UI.MVC4.Controllers.API
     public class AuthorizeController : BaseApiController
     {
         private readonly IUserRepository _userRepository;
+        private readonly IUserService _userService;
 
-        public AuthorizeController(IUserRepository userRepository)
+        public AuthorizeController(IUserRepository userRepository, IUserService userService)
         {
             _userRepository = userRepository;
+            _userService = userService;
         }
 
         // POST api/Authorize
-        public HttpResponseMessage Post(LoginApiModel loginApiModel)
+        public HttpResponseMessage PostLogin(LoginDTO loginDto)
         {
             try
             {
-                if (!Membership.ValidateUser(loginApiModel.Email, loginApiModel.Password))
+                if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
                     throw new ArgumentException();
 
-                FormsAuthentication.SetAuthCookie(loginApiModel.Email, loginApiModel.RememberMe);
+                FormsAuthentication.SetAuthCookie(loginDto.Email, loginDto.RememberMe);
 
-                var user = _userRepository.GetByEmail(loginApiModel.Email);
-                var userApiModel = AutoMapper.Mapper.Map<User, UserApiModel>(user);
+                var user = _userRepository.GetByEmail(loginDto.Email);
+                var userApiModel = AutoMapper.Mapper.Map<User, UserDTO>(user);
 
                 return CreateResponse(HttpStatusCode.Created, userApiModel);
             }
@@ -45,10 +47,27 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage Post(bool? logout)
+        public HttpResponseMessage PostLogout(bool? logout)
         {
             FormsAuthentication.SignOut();
             return CreateResponse(HttpStatusCode.OK);
+        }
+
+
+        public HttpResponseMessage PostResetpassword(bool? resetPassword, ResetPasswordDTO dto)
+        {
+            try
+            {
+                var resetRequest = _userService.GetPasswordReset(dto.RequestId);
+
+                _userService.ResetPassword(resetRequest, dto.NewPassword);
+                
+                return CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return CreateResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
     }
 }

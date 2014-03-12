@@ -12,7 +12,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class PasswordResetRequestController : ApiController
+    public class PasswordResetRequestController : BaseApiController
     {
         private readonly IUserService _userService;
         private readonly IUserRepository _userRepository;
@@ -24,25 +24,39 @@ namespace UI.MVC4.Controllers.API
         }
 
         // POST api/PasswordResetRequest
-        public HttpResponseMessage Post(UserApiModel userApiModel)
+        public HttpResponseMessage Post(UserDTO userDto)
         {
             try
             {
-                var user = _userRepository.GetByEmail(userApiModel.Email);
-
+                var user = _userRepository.GetByEmail(userDto.Email);
                 var request = _userService.IssuePasswordReset(user);
 
-                var msg = new HttpResponseMessage(HttpStatusCode.Created);
+                var dto = AutoMapper.Mapper.Map<PasswordResetRequest, PasswordResetRequestDTO>(request);
+
+                var msg = CreateResponse(HttpStatusCode.Created, dto);
                 msg.Headers.Location = new Uri(Request.RequestUri + request.Id);
                 return msg;
             }
-            catch (SmtpException)
+            catch (Exception e)
             {
-                throw new HttpResponseException(HttpStatusCode.InternalServerError);
+                return CreateResponse(HttpStatusCode.InternalServerError, e);
             }
-            catch (Exception)
+        }
+
+        // POST api/PasswordResetRequest
+        public HttpResponseMessage Get(string requestId)
+        {
+            try
             {
-                throw new HttpResponseException(HttpStatusCode.Conflict);
+                var request = _userService.GetPasswordReset(requestId);
+                var dto = AutoMapper.Mapper.Map<PasswordResetRequest, PasswordResetRequestDTO>(request);
+
+                var msg = CreateResponse(HttpStatusCode.OK, dto);
+                return msg;
+            }
+            catch (Exception e)
+            {
+                return CreateResponse(HttpStatusCode.InternalServerError, e);
             }
         }
     }

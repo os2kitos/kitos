@@ -5,10 +5,10 @@ using System.Web;
 
 namespace UI.MVC4.Models
 {
-    public class ApiReturnModel<T>
+    public class ApiReturnDTO<T>
         where T : class
     {
-        public string msg { get; set; }
-        public T response { get; set; }
+        public string Msg { get; set; }
+        public T Response { get; set; }
     }
 }

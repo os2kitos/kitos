@@ -5,7 +5,7 @@ using System.Web;
 
 namespace UI.MVC4.Models
 {
-    public class UserApiModel
+    public class UserDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }

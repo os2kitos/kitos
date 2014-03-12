@@ -19,18 +19,18 @@ namespace UI.MVC4.Controllers.API
         }
 
         [Authorize(Roles = "GlobalAdmin")]
-        public HttpResponseMessage Post(UserApiModel item)
+        public HttpResponseMessage Post(UserDTO item)
         {
             try
             {
-                var user = AutoMapper.Mapper.Map<UserApiModel, User>(item);
+                var user = AutoMapper.Mapper.Map<UserDTO, User>(item);
 
                 //TODO: Not hardcoding this
                 user.Role_Id = 2;
 
                 user = _userService.AddUser(user);
 
-                var msg = Request.CreateResponse(HttpStatusCode.Created, AutoMapper.Mapper.Map<User,UserApiModel>(user));
+                var msg = Request.CreateResponse(HttpStatusCode.Created, AutoMapper.Mapper.Map<User,UserDTO>(user));
                 msg.Headers.Location = new Uri(Request.RequestUri + "/" + user.Id);
                 return msg;
             }
