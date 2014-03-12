@@ -43,7 +43,8 @@ namespace UI.MVC4
 
             bundles.Add(new ScriptBundle("~/Scripts/angular").Include(
                 "~/Scripts/angular.js",
-                "~/Scripts/angular-route.js"));
+                "~/Scripts/angular-route.js",
+                "~/Scripts/AngularUI/ui-router.js"));
 
             bundles.Add(new ScriptBundle("~/Scripts/holder").Include("~/Scripts/holder.js"));
 

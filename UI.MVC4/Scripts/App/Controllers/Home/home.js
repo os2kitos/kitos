@@ -76,10 +76,6 @@
     app.controller("home.ResetPasswordCtrl", function ($rootScope, $scope, $http, $routeParams) {
         $rootScope.page.title = "Nyt password";
         
-        function noRequest() {
-            $scope.resetStatus = "noRequest";
-        }
-
         var requestId = $routeParams.requestId;
         $http.get("api/passwordresetrequest?requestId=" + requestId).success(function(result) {
             $scope.resetStatus = "enterPassword";
