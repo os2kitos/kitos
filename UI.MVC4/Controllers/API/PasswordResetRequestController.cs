@@ -24,16 +24,16 @@ namespace UI.MVC4.Controllers.API
         }
 
         // POST api/PasswordResetRequest
-        public HttpResponseMessage Post(UserDTO userDto)
+        public HttpResponseMessage Post([FromBody] UserDTO input)
         {
             try
             {
-                var user = _userRepository.GetByEmail(userDto.Email);
+                var user = _userRepository.GetByEmail(input.Email);
                 var request = _userService.IssuePasswordReset(user);
 
                 var dto = AutoMapper.Mapper.Map<PasswordResetRequest, PasswordResetRequestDTO>(request);
 
-                var msg = CreateResponse(HttpStatusCode.Created, dto);
+                var msg = CreateResponse(HttpStatusCode.OK, dto);
                 msg.Headers.Location = new Uri(Request.RequestUri + request.Id);
                 return msg;
             }
@@ -43,12 +43,13 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        // POST api/PasswordResetRequest
+        // GET api/PasswordResetRequest
         public HttpResponseMessage Get(string requestId)
         {
             try
             {
                 var request = _userService.GetPasswordReset(requestId);
+                if(request == null) throw new Exception("Request not found");
                 var dto = AutoMapper.Mapper.Map<PasswordResetRequest, PasswordResetRequestDTO>(request);
 
                 var msg = CreateResponse(HttpStatusCode.OK, dto);

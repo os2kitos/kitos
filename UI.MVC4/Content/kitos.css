@@ -174,3 +174,7 @@ div.config-clone {
 .broken-white {
     color: #f0f0f0 !important;
 }
+
+input.ng-invalid:not(.ng-pristine) {
+    background-color: rgba(240, 73, 73, 0.2) !important;
+}

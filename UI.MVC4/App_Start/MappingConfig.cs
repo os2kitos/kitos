@@ -133,6 +133,9 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<User, UserDTO>().ReverseMap();
 
             Mapper.CreateMap<Municipality, MunicipalityApiModel>().ReverseMap();
+
+            Mapper.CreateMap<PasswordResetRequest, PasswordResetRequestDTO>()
+                  .ForMember(dto => dto.UserEmail, opt => opt.MapFrom(src => src.User.Email));
         }
     }
 }

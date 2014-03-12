@@ -7,6 +7,7 @@ namespace UI.MVC4.Models
 {
     public class PasswordResetRequestDTO
     {
-        public string RequestId;
+        public string Id;
+        public string UserEmail;
     }
 }
