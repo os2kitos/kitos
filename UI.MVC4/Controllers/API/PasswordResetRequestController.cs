@@ -33,8 +33,8 @@ namespace UI.MVC4.Controllers.API
 
                 var dto = AutoMapper.Mapper.Map<PasswordResetRequest, PasswordResetRequestDTO>(request);
 
-                var msg = CreateResponse(HttpStatusCode.OK, dto);
-                msg.Headers.Location = new Uri(Request.RequestUri + request.Id);
+                var msg = CreateResponse(HttpStatusCode.OK);
+                msg.Headers.Location = new Uri(Request.RequestUri.ToString());
                 return msg;
             }
             catch (Exception e)

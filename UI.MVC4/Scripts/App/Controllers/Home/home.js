@@ -62,7 +62,6 @@
             $http.post("api/passwordresetrequest", data).success(function(result) {
                 $scope.requestSuccess = true;
                 $scope.email = "";
-
                 console.log(result);
             }).error(function (result) {
                 $scope.requestFailure = true;
