@@ -12,7 +12,7 @@
 
     }]);
     
-    app.controller('globalAdmin.NewMunicipalityCtrl', ['$rootScope', '$scope', '$http', function ($rootScope, $scope, $http) {
+    app.controller('globalAdmin.NewMunicipalityCtrl', ['$rootScope', '$scope', '$http', 'growl', function ($rootScope, $scope, $http, growl) {
         $rootScope.page.title = 'Ny kommune';
         $rootScope.page.subnav = [
             { state: "global-admin", text: "Opret kommune" }
@@ -22,19 +22,13 @@
             if ($scope.addForm.$invalid) return;
 
             var data = { "Name": $scope.name };
-
-            $scope.requestSuccess = $scope.requestFailure = false;
             
             $http.post('api/municipality', data).success(function (result) {
-                $scope.prevName = $scope.name;
+                growl.addSuccessMessage("Kommunen " + $scope.name + " er blevet oprettet!");
+
                 $scope.name = "";
-
-                $scope.requestSuccess = true;
-            }).error(function(result) {
-
-                $scope.prevName = $scope.name;
-
-                $scope.requestFailure = true;
+            }).error(function (result) {
+                growl.addErrorMessage("Kommunen " + $scope.name + " kunne ikke oprettes!");
             });
         };
     }]);

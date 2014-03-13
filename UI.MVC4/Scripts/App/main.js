@@ -4,6 +4,10 @@ App.config(['$urlRouterProvider', function ($urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
 }]);
 
+App.config(['growlProvider', function (growlProvider) {
+    growlProvider.globalTimeToLive(5000);
+}]);
+
 App.run(['$rootScope', '$http', '$state', function ($rootScope, $http, $state) {
     
     //init info
@@ -32,25 +36,45 @@ App.run(['$rootScope', '$http', '$state', function ($rootScope, $http, $state) {
         };
     };
 
-    var initUser = $http.get('api/authorize').success($rootScope.saveUser);
+    var hasInitUser = false;
+    var initUser = $http.get('api/authorize').success($rootScope.saveUser).finally(function() {
+        hasInitUser = true;
+    });
+    
+    function auth(toState, toParams) {
+        var user = $rootScope.user;
+        var authRoles = toState.authRoles;
+
+        return (user.authStatus == 'authorized' && (!authRoles || _.indexOf(authRoles, user.role) != -1));
+    }
 
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         if (toState.noAuth) return; //no need to auth
 
         //need to auth, but first when the initUser call is finished.
-        event.preventDefault();
+        if (!hasInitUser) {
 
-        initUser.finally(function () {
-            var user = $rootScope.user;
-            var userRole = user.role;
-            var authRoles = toState.authRoles;
+            //initUser is not yet loaded - wait for it
+            event.preventDefault();
+            
+            initUser.finally(function() {
+                var user = $rootScope.user;
+                var userRole = user.role;
+                var authRoles = toState.authRoles;
 
-            if (user.authStatus != 'authorized' || (authRoles && _.indexOf(authRoles, userRole) == -1)) {
-                $state.go('login', { to: toState.name });
-            } else {
-                $state.go(toState.name, toParams);
+                if (!auth(toState, toParams)) {
+                    $state.go('login', { to: toState.name, toParams: toParams });
+                } else {
+                    $state.go(toState, toParams);
+                }
+            });
+        } else {
+            //initUSer has loaded, just run auth()
+            if (!auth(toState, toParams)) {
+                event.preventDefault();
+                $state.go('login', { to: toState.name, toParams: toParams });
             }
-        });
+        }
 
     });
 }]);
