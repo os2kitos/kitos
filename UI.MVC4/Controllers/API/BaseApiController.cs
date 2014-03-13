@@ -15,7 +15,7 @@ namespace UI.MVC4.Controllers.API
             var wrap = new ApiReturnDTO<Object>
                 {
                     Msg = msg,
-                    Response = null
+                    Response = {}
                 };
 
             return Request.CreateResponse(statusCode, wrap);
@@ -33,7 +33,6 @@ namespace UI.MVC4.Controllers.API
         }
 
         protected HttpResponseMessage CreateResponse<T>(HttpStatusCode statusCode, T response, string msg = "")
-            where T : class
         {
             var wrap = new ApiReturnDTO<T>
                 {
@@ -42,6 +41,36 @@ namespace UI.MVC4.Controllers.API
                 };
 
             return Request.CreateResponse(statusCode, wrap);
+        }
+
+        protected HttpResponseMessage Created<T>(T response)
+        {
+            return CreateResponse(HttpStatusCode.Created, response);
+        }
+
+        protected HttpResponseMessage Ok()
+        {
+            return CreateResponse(HttpStatusCode.OK);
+        }
+
+        protected HttpResponseMessage Ok<T>(T response)
+        {
+            return CreateResponse(HttpStatusCode.OK, response);
+        }
+
+        protected HttpResponseMessage Error<T>(T response)
+        {
+            return CreateResponse(HttpStatusCode.InternalServerError, response);
+        }
+
+        protected HttpResponseMessage Unauthorized<T>()
+        {
+            return CreateResponse(HttpStatusCode.Unauthorized);
+        }
+
+        protected HttpResponseMessage Unauthorized<T>(T response)
+        {
+            return CreateResponse(HttpStatusCode.Unauthorized, response);
         }
     }
 }

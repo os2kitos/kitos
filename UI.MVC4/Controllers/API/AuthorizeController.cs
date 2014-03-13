@@ -28,7 +28,7 @@ namespace UI.MVC4.Controllers.API
             var user = _userRepository.GetByEmail(User.Identity.Name);
             var userApiModel = AutoMapper.Mapper.Map<User, UserDTO>(user);
 
-            return CreateResponse(HttpStatusCode.Created, userApiModel);
+            return Ok(userApiModel);
         }
 
         // POST api/Authorize
@@ -44,22 +44,22 @@ namespace UI.MVC4.Controllers.API
                 var user = _userRepository.GetByEmail(loginDto.Email);
                 var userApiModel = AutoMapper.Mapper.Map<User, UserDTO>(user);
 
-                return CreateResponse(HttpStatusCode.Created, userApiModel);
+                return Created(userApiModel);
             }
             catch (ArgumentException)
             {
-                return CreateResponse(HttpStatusCode.Unauthorized, "Bad credentials");
+                return Unauthorized("Bad credentials");
             }
             catch (Exception e)
             {
-                return CreateResponse(HttpStatusCode.InternalServerError, e);
+                return Error(e);
             }
         }
 
         public HttpResponseMessage PostLogout(bool? logout)
         {
             FormsAuthentication.SignOut();
-            return CreateResponse(HttpStatusCode.OK);
+            return Ok();
         }
 
 
@@ -70,12 +70,12 @@ namespace UI.MVC4.Controllers.API
                 var resetRequest = _userService.GetPasswordReset(dto.RequestId);
 
                 _userService.ResetPassword(resetRequest, dto.NewPassword);
-                
-                return CreateResponse(HttpStatusCode.OK);
+
+                return Ok();
             }
             catch (Exception e)
             {
-                return CreateResponse(HttpStatusCode.InternalServerError, e);
+                return Error(e);
             }
         }
     }
