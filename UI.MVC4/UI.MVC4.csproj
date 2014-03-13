@@ -289,6 +289,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\angular-growl\growl.css" />
     <Content Include="Content\bootstrap-cosmo.css" />
     <Content Include="Content\bootstrap3-wysihtml5\bootstrap3-wysihtml5.css" />
     <Content Include="Content\carousel.css" />
@@ -314,6 +315,9 @@
     <Content Include="Scripts\angular-cookies.js" />
     <Content Include="Scripts\angular-cookies.min.js" />
     <Content Include="Scripts\angular-csp.css" />
+    <Content Include="Scripts\angular-growl\growl.js" />
+    <Content Include="Scripts\angular-growl\growlDirective.js" />
+    <Content Include="Scripts\angular-growl\growlFactory.js" />
     <Content Include="Scripts\angular-loader.js" />
     <Content Include="Scripts\angular-loader.min.js" />
     <Content Include="Scripts\angular-mocks.js" />

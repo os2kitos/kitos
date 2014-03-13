@@ -1,5 +1,5 @@
 ﻿<nav>
     <ul>
-        <li ng-repeat="link in page.subnav"><a ui-sref="{{link.state}}" class="btn btn-tab btn-tab-active">{{link.text}}</a></li>
+        <li ng-repeat="link in page.subnav"><a ui-sref="{{link.state}}" ui-sref-active="btn-tab-active" class="btn btn-tab">{{link.text}}</a></li>
     </ul>
 </nav>

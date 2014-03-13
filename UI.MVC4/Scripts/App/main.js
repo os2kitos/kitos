@@ -1,12 +1,14 @@
-﻿var App = angular.module("App", ["ui.router"]);
+﻿var App = angular.module('App', ['ui.router', 'angular-growl']);
 
-App.config(function ($urlRouterProvider) {
-    $urlRouterProvider.otherwise("/");
-});
+App.config(['$urlRouterProvider', function ($urlRouterProvider) {
+    $urlRouterProvider.otherwise('/');
+}]);
 
-App.run(function ($rootScope, $http, $state) {
+App.run(['$rootScope', '$http', '$state', function ($rootScope, $http, $state) {
+    
+    //init info
     $rootScope.page = {
-        title: "Index",
+        title: 'Index',
         subnav: []
     };
 
@@ -14,9 +16,9 @@ App.run(function ($rootScope, $http, $state) {
 
     //logout function for top navigation bar
     $rootScope.logout = function () {
-        $http.post("api/authorize?logout").success(function (result) {
+        $http.post('api/authorize?logout').success(function (result) {
             $rootScope.user = {};
-            $state.go("index");
+            $state.go('index');
         });
     };
 
@@ -25,26 +27,30 @@ App.run(function ($rootScope, $http, $state) {
             name: result.Response.Name,
             email: result.Response.Email,
             municipality: result.Response.Municipality_Id,
-            authStatus: "authorized",
+            authStatus: 'authorized',
             role: result.Response.RoleName
         };
     };
 
-    var initUser = $http.get("api/authorize").success($rootScope.saveUser);
+    var initUser = $http.get('api/authorize').success($rootScope.saveUser);
 
-    $rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
+    $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         if (toState.noAuth) return; //no need to auth
+
+        //need to auth, but first when the initUser call is finished.
+        event.preventDefault();
 
         initUser.finally(function () {
             var user = $rootScope.user;
             var userRole = user.role;
             var authRoles = toState.authRoles;
 
-            if (user.authStatus != "authorized" || (authRoles && _.indexOf(authRoles, userRole) == -1)) {
-                $state.go("login", {to: toState.name});
-                event.preventDefault();
+            if (user.authStatus != 'authorized' || (authRoles && _.indexOf(authRoles, userRole) == -1)) {
+                $state.go('login', { to: toState.name });
+            } else {
+                $state.go(toState.name, toParams);
             }
         });
 
     });
-});
+}]);

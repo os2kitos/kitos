@@ -13,7 +13,7 @@
             controller: 'home.LoginCtrl',
             noAuth: true
         }).state('forgot-password', {
-            url: '/hforgot-password',
+            url: '/forgot-password',
             templateUrl: 'partials/home/forgot-password.html',
             controller: 'home.ForgotPasswordCtrl',
             noAuth: true
@@ -28,10 +28,12 @@
 
     app.controller('home.IndexCtrl', ['$rootScope', '$scope', function ($rootScope, $scope) {
         $rootScope.page.title = 'Index';
+        $rootScope.page.subnav = [];
     }]);
     
     app.controller('home.LoginCtrl', ['$rootScope', '$scope', '$http', '$state', '$stateParams', function ($rootScope, $scope, $http, $state, $stateParams) {
         $rootScope.page.title = 'Log ind';
+        $rootScope.page.subnav = [];
         
         //login
         $scope.submit = function () {
@@ -49,16 +51,15 @@
 
                 var to = $stateParams.to ? $stateParams.to : 'index';
 
-                console.log($stateParams);
-
                 $state.go(to);
             });
 
         };
     }]);
 
-    app.controller('home.ForgotPasswordCtrl', ['$rootScope', '$scope', '$http', function ($rootScope, $scope, $http) {
+    app.controller('home.ForgotPasswordCtrl', ['$rootScope', '$scope', '$http', 'growl', function ($rootScope, $scope, $http, growl) {
         $rootScope.page.title = 'Glemt password';
+        $rootScope.page.subnav = [];
         
         //submit 
         $scope.submit = function() {
@@ -69,17 +70,18 @@
             $scope.requestSuccess = $scope.requestFailure = false;
             
             $http.post('api/passwordresetrequest', data).success(function(result) {
-                $scope.requestSuccess = true;
+                growl.addSuccessMessage("En email er blevet sent til " + $scope.email);
                 $scope.email = '';
-                console.log(result);
+
             }).error(function (result) {
-                $scope.requestFailure = true;
+                growl.addErrorMessage("Emailadressen kunne ikke findes i systemet!");
             });
         };
     }]);
 
     app.controller('home.ResetPasswordCtrl', ['$rootScope', '$scope', '$http', '$stateParams', function ($rootScope, $scope, $http, $stateParams) {
         $rootScope.page.title = 'Nyt password';
+        $rootScope.page.subnav = [];
         
         var requestId = $stateParams.requestId;
         $http.get('api/passwordresetrequest?requestId=' + requestId).success(function(result) {

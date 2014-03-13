@@ -3,7 +3,11 @@
     <p>
         Opret en ny kommune i systemet.
     </p>
-    <form class="form-horizontal" role="form" name="addMunicipality">
+    
+    <p ng-show="requestSuccess">Kommunen {{prevName}} er oprettet!</p>
+    <p ng-show="requestFailure">Kommunen {{prevName}} kunne ikke oprettes!</p>
+
+    <form class="form-horizontal" role="form" name="addForm">
         <div class="form-group">
             <label for="name" class="col-md-3 control-label">
                 Kommunens navn
@@ -14,7 +18,7 @@
         </div>
         <div class="form-group">
             <div class="col-md-8 col-md-offset-3">
-                <input class="btn btn-primary" type="submit" onclick="submit()" value="Opret kommune" />
+                <input class="btn btn-primary" type="submit" ng-click="submit()" value="Opret kommune" />
             </div>
         </div>
     </form>

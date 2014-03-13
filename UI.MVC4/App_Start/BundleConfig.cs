@@ -44,7 +44,8 @@ namespace UI.MVC4
             bundles.Add(new ScriptBundle("~/Scripts/angular").Include(
                 "~/Scripts/angular.js",
                 "~/Scripts/angular-route.js",
-                "~/Scripts/AngularUI/ui-router.js"));
+                "~/Scripts/AngularUI/ui-router.js",
+                "~/Scripts/angular-growl/*.js"));
 
             bundles.Add(new ScriptBundle("~/Scripts/holder").Include("~/Scripts/holder.js"));
 
@@ -52,8 +53,9 @@ namespace UI.MVC4
                 "~/Scripts/app", "*.js", true));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
-                "~/Content/bootstrap-cosmo.*", 
+                "~/Content/bootstrap-cosmo.*",
                 "~/Content/carousel.css",
+                "~/Content/angular-growl/growl.css",
                 //"~/Content/bootstrap3-wysihtml5/bootstrap3-wysihtml5.css",
                 //"~/Content/pnotify/*.css",
                 //"~/Content/css/select2.css",
