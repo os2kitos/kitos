@@ -21,8 +21,6 @@ App.run(function ($rootScope, $http, $state) {
     };
 
     $rootScope.saveUser = function (result) {
-        console.log("Saving user: " + result);
-
         $rootScope.user = {
             name: result.Response.Name,
             email: result.Response.Email,
@@ -32,21 +30,21 @@ App.run(function ($rootScope, $http, $state) {
         };
     };
 
-    var startPromise = $http.get("api/authorize").success($rootScope.saveUser);
+    var initUser = $http.get("api/authorize").success($rootScope.saveUser);
 
     $rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
         if (toState.noAuth) return; //no need to auth
 
-        
+        initUser.finally(function () {
+            var user = $rootScope.user;
+            var userRole = user.role;
+            var authRoles = toState.authRoles;
 
-        var user = $rootScope.user;
-        var userRole = user.role;
-        var authRoles = toState.authRoles;
-        
-        if (user.authStatus != "authorized" || (authRoles && _.indexOf(authRoles, userRole) == -1)) {
-            $state.transitionTo("login");
-            event.preventDefault();
-        }
+            if (user.authStatus != "authorized" || (authRoles && _.indexOf(authRoles, userRole) == -1)) {
+                $state.go("login", {to: toState.name});
+                event.preventDefault();
+            }
+        });
 
     });
 });
