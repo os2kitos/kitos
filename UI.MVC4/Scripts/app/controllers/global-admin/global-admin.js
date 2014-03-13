@@ -1,13 +1,5 @@
 ﻿(function (ng, app) {
-    /*
-    app.config(["$routeProvider", function ($stateProvider) {
-        $routeProvider.when("/global-admin/new-municipality", {
-            templateUrl: "partials/global-admin/new-municipality.html",
-            controller: "globalAdmin.NewMunicipalityCtrl"
-        }).when("/global-admin", {
-            redirectTo: "/global-admin/new-municipality"
-        });
-    }]);*/
+   
     
     app.config(["$stateProvider", "$urlRouterProvider", function ($stateProvider, $urlRouterProvider) {
 
