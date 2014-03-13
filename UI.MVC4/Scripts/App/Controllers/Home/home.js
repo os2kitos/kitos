@@ -8,7 +8,7 @@
             controller: 'home.IndexCtrl',
             noAuth: true
         }).state('login', {
-            url: '/login',
+            url: '/login?to',
             templateUrl: 'partials/home/login.html',
             controller: 'home.LoginCtrl',
             noAuth: true
@@ -30,7 +30,7 @@
         $rootScope.page.title = 'Index';
     }]);
     
-    app.controller('home.LoginCtrl', ['$rootScope', '$scope', '$http', '$state', function ($rootScope, $scope, $http, $state) {
+    app.controller('home.LoginCtrl', ['$rootScope', '$scope', '$http', '$state', '$stateParams', function ($rootScope, $scope, $http, $state, $stateParams) {
         $rootScope.page.title = 'Log ind';
         
         //login
@@ -46,8 +46,12 @@
             $http.post('api/authorize', data).success(function (result) {
 
                 $rootScope.saveUser(result);
-                
-                $state.go('index');
+
+                var to = $stateParams.to ? $stateParams.to : 'index';
+
+                console.log($stateParams);
+
+                $state.go(to);
             });
 
         };
