@@ -142,26 +142,26 @@ namespace UI.MVC4.Controllers.API
             var item = Repository.GetByKey(id);
             var itemType = item.GetType();
 
-            foreach (var l in obj)
+            foreach (var valuePair in obj)
             {
                 // get name of mapped property
                 var map =
                     AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>()
                               .GetPropertyMaps()
-                              .SingleOrDefault(x => x.SourceMember.Name == l.Key);
+                              .SingleOrDefault(x => x.SourceMember.Name == valuePair.Key);
                 if (map == null) 
-                    continue;
+                    continue; // abort if no map found
                 
                 var destName = map.DestinationProperty.Name;
-                var value = l.Value;
-                
-                // check if property exists, if it doesn't something is terribly wrong with the mapping :/
+                var jToken = valuePair.Value;
+
                 var propRef = itemType.GetProperty(destName);
-                var genericType = l.Value.GetType().MakeGenericType(new Type[] {propRef.GetType()});
-                // http://stackoverflow.com/questions/2604743/setting-generic-type-at-runtime
-                genericType.GetMethod("Value").Invoke();
-                if (propRef != null)
-                    propRef.SetValue(item, value.Value<>());
+                var t = propRef.PropertyType;
+                // use reflection to call obj.Value<t>("keyName");
+                var genericMethod = jToken.GetType().GetMethod("Value").MakeGenericMethod(new Type[] { t });
+                var value = genericMethod.Invoke(obj, new object[] { valuePair.Key });
+                // update the entity
+                propRef.SetValue(item, value);
             }
 
             try
