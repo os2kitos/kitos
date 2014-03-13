@@ -1,28 +1,36 @@
 ﻿(function(ng, app) {
 
-    app.config(["$routeProvider", function ($routeProvider) {
-        $routeProvider.when("/home", {
+    app.config(["$stateProvider", "$urlRouterProvider", function ($stateProvider, $urlRouterProvider) {
+        
+        $stateProvider.state("index", {
+            url: "/",
             templateUrl: "partials/home/index.html",
-            controller: "home.IndexCtrl"
-        }).when("/home/login", {
+            controller: "home.IndexCtrl",
+            noAuth: true
+        }).state("login", {
+            url: "/login",
             templateUrl: "partials/home/login.html",
-            controller: "home.LoginCtrl"
-        }).when("/home/forgot-password", {
+            controller: "home.LoginCtrl",
+            noAuth: true
+        }).state("forgot-password", {
+            url: "/hforgot-password",
             templateUrl: "partials/home/forgot-password.html",
-            controller: "home.ForgotPasswordCtrl"
-        }).when("/home/reset-password/:requestId", {
+            controller: "home.ForgotPasswordCtrl",
+            noAuth: true
+        }).state("reset-password", {
+            url: "/reset-password/:requestId",
             templateUrl: "partials/home/reset-password.html",
-            controller: "home.ResetPasswordCtrl"
-        }).otherwise({
-            redirectTo: "/home"
+            controller: "home.ResetPasswordCtrl",
+            noAuth: true
         });
+
     }]);
 
     app.controller("home.IndexCtrl", function ($rootScope, $scope) {
         $rootScope.page.title = "Index";
     });
     
-    app.controller("home.LoginCtrl", function ($rootScope, $scope, $http, $location) {
+    app.controller("home.LoginCtrl", function ($rootScope, $scope, $http, $state) {
         $rootScope.page.title = "Log ind";
         
         //login
@@ -37,16 +45,9 @@
 
             $http.post("api/authorize", data).success(function (result) {
 
-                var roleid = result.Response.Role_Id;
-                var role = roleid == 1 ? "globalAdmin" : roleid == 2 ? "localAdmin" : "user";
-                $rootScope.user = {
-                    name: result.Response.Name,
-                    email: result.Response.Email,
-                    municipality: result.Response.Municipality_Id,
-                    authStatus: "authorized",
-                    role: role
-                };
-                $location.path("/home");
+                $rootScope.saveUser(result);
+                
+                $state.go("index");
             });
 
         };
@@ -73,10 +74,10 @@
         };
     });
 
-    app.controller("home.ResetPasswordCtrl", function ($rootScope, $scope, $http, $routeParams) {
+    app.controller("home.ResetPasswordCtrl", function ($rootScope, $scope, $http, $stateParams) {
         $rootScope.page.title = "Nyt password";
         
-        var requestId = $routeParams.requestId;
+        var requestId = $stateParams.requestId;
         $http.get("api/passwordresetrequest?requestId=" + requestId).success(function(result) {
             $scope.resetStatus = "enterPassword";
             $scope.email = result.Response.UserEmail;

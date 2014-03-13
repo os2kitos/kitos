@@ -130,7 +130,9 @@ namespace UI.MVC4.App_Start
         {
             base.Configure();
 
-            Mapper.CreateMap<User, UserDTO>().ReverseMap();
+            Mapper.CreateMap<User, UserDTO>()
+                .ForMember(dto => dto.RoleName, opt => opt.MapFrom(src => src.Role != null ? src.Role.Name : ""))
+                .ReverseMap();
 
             Mapper.CreateMap<Municipality, MunicipalityApiModel>().ReverseMap();
 

@@ -22,6 +22,15 @@ namespace UI.MVC4.Controllers.API
             _userService = userService;
         }
 
+        [Authorize]
+        public HttpResponseMessage GetLogin()
+        {
+            var user = _userRepository.GetByEmail(User.Identity.Name);
+            var userApiModel = AutoMapper.Mapper.Map<User, UserDTO>(user);
+
+            return CreateResponse(HttpStatusCode.Created, userApiModel);
+        }
+
         // POST api/Authorize
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
         {

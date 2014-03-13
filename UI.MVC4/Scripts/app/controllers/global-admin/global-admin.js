@@ -1,14 +1,25 @@
 ﻿(function (ng, app) {
-
-    app.config(["$routeProvider", function ($routeProvider) {
+    /*
+    app.config(["$routeProvider", function ($stateProvider) {
         $routeProvider.when("/global-admin/new-municipality", {
             templateUrl: "partials/global-admin/new-municipality.html",
             controller: "globalAdmin.NewMunicipalityCtrl"
         }).when("/global-admin", {
             redirectTo: "/global-admin/new-municipality"
         });
-    }]);
+    }]);*/
+    
+    app.config(["$stateProvider", "$urlRouterProvider", function ($stateProvider, $urlRouterProvider) {
 
+        $stateProvider.state("global-admin", {
+            url: "/global-admin",
+            templateUrl: "partials/global-admin/new-municipality.html",
+            controller: "globalAdmin.NewMunicipalityCtrl",
+            authRoles: ["GlobalAdmin"]
+        });
+
+    }]);
+    
     app.controller("globalAdmin.NewMunicipalityCtrl", function ($rootScope, $scope) {
         $rootScope.page.title = "Ny kommune";
         $rootScope.page.subnav = [];

@@ -22,9 +22,6 @@ namespace UI.MVC4
                 "~/Scripts/wysihtml5/wysihtml5-{version}.js",
                 "~/Scripts/bootstrap3-wysihtml5.js"));
 
-            bundles.Add(new ScriptBundle("~/bundles/select2").Include(
-                        "~/Scripts/select2.js"));
-
             bundles.Add(new ScriptBundle("~/bundles/pnotify").Include(
                         "~/Scripts/pnotify/jquery.pnotify.js"));
 
@@ -40,6 +37,9 @@ namespace UI.MVC4
                         "~/Scripts/modernizr-*"));
              * 
              */
+
+            bundles.Add(new ScriptBundle("~/Scripts/underscore").Include(
+                        "~/Scripts/underscore.js"));
 
             bundles.Add(new ScriptBundle("~/Scripts/angular").Include(
                 "~/Scripts/angular.js",
