@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en" ng-app="App">
+<html lang="en" data-ng-app="app">
     <head>
         <meta charset="utf-8" />
         <title>{{page.title}} - KITOS</title>
@@ -17,7 +17,7 @@
             
             <div id="page-content" class="row container-fluid" role="main">
                 
-                <div id="subnav" ng-include="'partials/subnav/subnav.html'"></div>
+                <div id="subnav" data-ng-include="'partials/subnav/subnav.html'"></div>
 
                 <div id="page-body" class="row container-fluid" ui-view>
                 </div>
@@ -28,9 +28,8 @@
         </div>
         
         @Scripts.Render("~/Scripts/angular")
+        @Scripts.Render("~/Scripts/libraries")
         @Scripts.Render("~/Scripts/app")
-        @Scripts.Render("~/Scripts/underscore")
-        @Scripts.Render("~/Scripts/holder")
 
         @RenderSection("scripts", required: false)
 

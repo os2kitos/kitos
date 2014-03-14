@@ -71,4 +71,4 @@
         };
     }]);
 
-})(angular, App);
+})(angular, app);

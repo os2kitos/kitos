@@ -38,16 +38,17 @@ namespace UI.MVC4
              * 
              */
 
-            bundles.Add(new ScriptBundle("~/Scripts/underscore").Include(
-                        "~/Scripts/underscore.js"));
+            bundles.Add(new ScriptBundle("~/Scripts/libraries")
+                .Include("~/Scripts/underscore.js")
+                .Include("~/Scripts/lodash.js")
+                .Include("~/Scripts/xeditable.js"));
 
             bundles.Add(new ScriptBundle("~/Scripts/angular").Include(
                 "~/Scripts/angular.js",
                 "~/Scripts/angular-route.js",
                 "~/Scripts/AngularUI/ui-router.js",
+                "~/Scripts/restangular.js",
                 "~/Scripts/angular-growl/*.js"));
-
-            bundles.Add(new ScriptBundle("~/Scripts/holder").Include("~/Scripts/holder.js"));
 
             bundles.Add(new ScriptBundle("~/Scripts/app").IncludeDirectory(
                 "~/Scripts/app", "*.js", true));
@@ -56,6 +57,7 @@ namespace UI.MVC4
                 "~/Content/bootstrap-cosmo.*",
                 "~/Content/carousel.css",
                 "~/Content/angular-growl/growl.css",
+                "~/Content/xeditable.css",
                 //"~/Content/bootstrap3-wysihtml5/bootstrap3-wysihtml5.css",
                 //"~/Content/pnotify/*.css",
                 //"~/Content/css/select2.css",

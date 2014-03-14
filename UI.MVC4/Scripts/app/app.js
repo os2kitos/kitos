@@ -1,14 +1,14 @@
-﻿var App = angular.module('App', ['ui.router', 'angular-growl', 'xeditable']);
+﻿var app = angular.module('app', ['ui.router', 'angular-growl', 'xeditable', 'restangular']);
 
-App.config(['$urlRouterProvider', function ($urlRouterProvider) {
+app.config(['$urlRouterProvider', function ($urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
 }]);
 
-App.config(['growlProvider', function (growlProvider) {
+app.config(['growlProvider', function (growlProvider) {
     growlProvider.globalTimeToLive(5000);
 }]);
 
-App.run(['$rootScope', '$http', '$state', function ($rootScope, $http, $state) {
+app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScope, $http, $state, editableOptions) {
     
     //init info
     $rootScope.page = {
@@ -17,6 +17,9 @@ App.run(['$rootScope', '$http', '$state', function ($rootScope, $http, $state) {
     };
 
     $rootScope.user = {};
+
+    //x-editable config
+    editableOptions.theme = 'bs3'; // bootstrap3 theme.
 
     //logout function for top navigation bar
     $rootScope.logout = function () {
