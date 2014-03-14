@@ -28,9 +28,9 @@ namespace UI.MVC4.Controllers.API
             var items = this.Repository.Get(t => t.IsSuggestion).ToList();
 
             if (!items.Any())
-                return Request.CreateResponse(HttpStatusCode.NoContent);
+                return NoContent();
 
-            return Request.CreateResponse(HttpStatusCode.OK, Map<IEnumerable<TModel>, IEnumerable<OptionDTO>>(items));
+            return Ok(Map<IEnumerable<TModel>, IEnumerable<OptionDTO>>(items));
         }
 
 
@@ -39,9 +39,9 @@ namespace UI.MVC4.Controllers.API
             var items = this.Repository.Get(t => !t.IsSuggestion).ToList();
 
             if (!items.Any())
-                return Request.CreateResponse(HttpStatusCode.NoContent);
+                return NoContent();
 
-            return Request.CreateResponse(HttpStatusCode.OK, Map<IEnumerable<TModel>, IEnumerable<OptionDTO>>(items));
+            return Ok(Map<IEnumerable<TModel>, IEnumerable<OptionDTO>>(items));
         }
 
         protected override TModel PostQuery(TModel item)

@@ -19,9 +19,9 @@ namespace UI.MVC4.Controllers.API
             var item = Repository.GetByKey(1); // global municipality has id 1
 
             if (item == null)
-                return Request.CreateResponse(HttpStatusCode.NoContent);
+                return NoContent();
 
-            return Request.CreateResponse(HttpStatusCode.OK, Map<Config, ConfigDTO>(item));
+            return Ok(Map<Config, ConfigDTO>(item));
         }
     }
 }

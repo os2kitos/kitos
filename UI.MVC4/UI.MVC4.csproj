@@ -268,7 +268,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\HtmlHelpers.cs" />
-    <Compile Include="Infrastructure\ApiHelper.cs" />
     <Compile Include="Infrastructure\CustomMembershipProvider.cs" />
     <Compile Include="Infrastructure\CustomRoleProvider.cs" />
     <Compile Include="Infrastructure\IUserRepositoryFactory.cs" />

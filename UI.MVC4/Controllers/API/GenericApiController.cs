@@ -9,7 +9,7 @@ using Core.DomainServices;
 
 namespace UI.MVC4.Controllers.API
 {
-    public abstract class GenericApiController<TModel, TKeyType, TDto> : ApiController // TODO perhaps it's possible to infer the TKeyType from TModel somehow
+    public abstract class GenericApiController<TModel, TKeyType, TDto> : BaseApiController // TODO perhaps it's possible to infer the TKeyType from TModel somehow
         where TModel : class, IEntity<TKeyType>
     {
         protected readonly IGenericRepository<TModel> Repository;
@@ -34,9 +34,9 @@ namespace UI.MVC4.Controllers.API
             var items = GetAllQuery().ToList();
 
             if (!items.Any())
-                return Request.CreateResponse(HttpStatusCode.NoContent);
+                return NoContent();
 
-            return Request.CreateResponse(HttpStatusCode.OK, Map<IEnumerable<TModel>, IEnumerable<TDto>>(items));
+            return Ok(Map<IEnumerable<TModel>, IEnumerable<TDto>>(items));
         }
 
         // GET api/T
@@ -45,9 +45,9 @@ namespace UI.MVC4.Controllers.API
             var item = Repository.GetByKey(id);
 
             if (item == null)
-                return Request.CreateResponse(HttpStatusCode.NoContent);
+                return NoContent();
 
-            return Request.CreateResponse(HttpStatusCode.OK, Map<TModel, TDto>(item));
+            return Ok(Map<TModel, TDto>(item));
         }
 
         protected virtual TModel PostQuery(TModel item)
@@ -68,13 +68,11 @@ namespace UI.MVC4.Controllers.API
                 PostQuery(item);
 
                 //var msg = new HttpResponseMessage(HttpStatusCode.Created);
-                var msg = Request.CreateResponse(HttpStatusCode.Created, item);
-                msg.Headers.Location = new Uri(Request.RequestUri + "/" + item.Id);
-                return msg;
+                return Created(item, new Uri(Request.RequestUri + "/" + item.Id));
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new HttpResponseException(HttpStatusCode.Conflict); // TODO catch correct expection
+                return Error(e);
             }
         }
 
@@ -96,11 +94,11 @@ namespace UI.MVC4.Controllers.API
             {
                 PutQuery(item);
 
-                return new HttpResponseMessage(HttpStatusCode.OK); // TODO correct?
+                return Ok(); //TODO correct?
             }
             catch (Exception)
             {
-                throw new HttpResponseException(HttpStatusCode.NoContent); // TODO catch correct expection
+                return NoContent(); // TODO catch correct expection
             }
         }
 
@@ -118,11 +116,11 @@ namespace UI.MVC4.Controllers.API
             {
                 DeleteQuery(id);
 
-                return new HttpResponseMessage(HttpStatusCode.OK);
+                return Ok();
             }
             catch (Exception)
             {
-                throw new HttpResponseException(HttpStatusCode.NoContent);
+                return NoContent(); // TODO catch correct expection
             }
         }
 
@@ -145,11 +143,12 @@ namespace UI.MVC4.Controllers.API
             {
                 PatchQuery(item);
 
-                return new HttpResponseMessage(HttpStatusCode.OK); // TODO correct?
+                //pretty sure we'll get a merge conflict here???
+                return Ok(); // TODO correct?
             }
             catch (Exception)
             {
-                throw new HttpResponseException(HttpStatusCode.NoContent); // TODO catch correct expection
+                return NoContent(); // TODO catch correct expection
             }
         }
 

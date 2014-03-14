@@ -10,6 +10,14 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
+    public class MunicipalityController : GenericApiController<Municipality, int, MunicipalityApiModel>
+    {
+        public MunicipalityController(IGenericRepository<Municipality> repository) : base(repository)
+        {
+        }
+    }
+
+    /* I don't remember why I didn't just use generic api controller?
     public class MunicipalityController : ApiController
     {
         private readonly IGenericRepository<Municipality> _repository;
@@ -104,4 +112,5 @@ namespace UI.MVC4.Controllers.API
             base.Dispose(disposing);
         }
     }
+     * */
 }

@@ -10,28 +10,6 @@ namespace UI.MVC4.Controllers.API
 {
     public abstract class BaseApiController : ApiController
     {
-        protected HttpResponseMessage CreateResponse(HttpStatusCode statusCode, string msg = "")
-        {
-            var wrap = new ApiReturnDTO<Object>
-                {
-                    Msg = msg,
-                    Response = {}
-                };
-
-            return Request.CreateResponse(statusCode, wrap);
-        }
-
-        protected HttpResponseMessage CreateResponse(HttpStatusCode statusCode, Exception e)
-        {
-            var wrap = new ApiReturnDTO<Exception>
-                {
-                    Msg = e.Message,
-                    Response = e
-                };
-
-            return Request.CreateResponse(statusCode, wrap);
-        }
-
         protected HttpResponseMessage CreateResponse<T>(HttpStatusCode statusCode, T response, string msg = "")
         {
             var wrap = new ApiReturnDTO<T>
@@ -43,9 +21,24 @@ namespace UI.MVC4.Controllers.API
             return Request.CreateResponse(statusCode, wrap);
         }
 
-        protected HttpResponseMessage Created<T>(T response)
+
+        protected HttpResponseMessage CreateResponse(HttpStatusCode statusCode, string msg = "")
         {
-            return CreateResponse(HttpStatusCode.Created, response);
+            return CreateResponse(statusCode, new object(), msg);
+        }
+
+        protected HttpResponseMessage CreateResponse(HttpStatusCode statusCode, Exception e)
+        {
+            return CreateResponse(statusCode, e, e.Message);
+        }
+
+        protected HttpResponseMessage Created<T>(T response, Uri location = null)
+        {
+            var result = CreateResponse(HttpStatusCode.Created, response);
+            if (location != null)
+                result.Headers.Location = location;
+
+            return result;
         }
 
         protected HttpResponseMessage Ok()
@@ -71,6 +64,11 @@ namespace UI.MVC4.Controllers.API
         protected HttpResponseMessage Unauthorized<T>(T response)
         {
             return CreateResponse(HttpStatusCode.Unauthorized, response);
+        }
+
+        protected HttpResponseMessage NoContent()
+        {
+            return CreateResponse(HttpStatusCode.NoContent);
         }
     }
 }

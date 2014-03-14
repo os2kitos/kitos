@@ -10,7 +10,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public abstract class GenericLocaleApiController<TModel, TOriginal> : ApiController
+    public abstract class GenericLocaleApiController<TModel, TOriginal> : BaseApiController
         where TModel : class, ILocaleEntity<TOriginal>
     {
         protected readonly IGenericRepository<TModel> Repository;
@@ -51,9 +51,9 @@ namespace UI.MVC4.Controllers.API
             var items = GetAllQuery().ToList();
 
             if (!items.Any())
-                return Request.CreateResponse(HttpStatusCode.NoContent);
+                return NoContent();
 
-            return Request.CreateResponse(HttpStatusCode.OK, Map<IEnumerable<TModel>, IEnumerable<LocaleDTO>>(items));
+            return Ok(Map<IEnumerable<TModel>, IEnumerable<LocaleDTO>>(items));
         }
         
         public HttpResponseMessage GetAllFromMunicipality([FromUri] int mId)
@@ -61,9 +61,9 @@ namespace UI.MVC4.Controllers.API
             var items = Repository.Get(l => l.Municipality_Id == mId).ToList();
 
             if (!items.Any())
-                return Request.CreateResponse(HttpStatusCode.NoContent);
+                return NoContent();
 
-            return Request.CreateResponse(HttpStatusCode.OK, Map<IEnumerable<TModel>, IEnumerable<LocaleDTO>>(items));
+            return Ok(Map<IEnumerable<TModel>, IEnumerable<LocaleDTO>>(items));
         }
 
         // GET api/T
@@ -72,9 +72,9 @@ namespace UI.MVC4.Controllers.API
             var item = Repository.GetByKey(mId, oId);
 
             if (item == null)
-                return Request.CreateResponse(HttpStatusCode.NoContent);
+                return NoContent();
 
-            return Request.CreateResponse(HttpStatusCode.OK, Map<TModel, LocaleDTO>(item));
+            return Ok(Map<TModel, LocaleDTO>(item));
         }
 
         // POST api/T
@@ -88,13 +88,12 @@ namespace UI.MVC4.Controllers.API
                 PostQuery(item);
 
                 //var msg = new HttpResponseMessage(HttpStatusCode.Created);
-                var msg = Request.CreateResponse(HttpStatusCode.Created, item);
-                msg.Headers.Location = new Uri(Request.RequestUri + "?mId=" + item.Municipality_Id + "&oId=" + item.Original_Id);
-                return msg;
+                return Created(item,
+                               new Uri(Request.RequestUri + "?mId=" + item.Municipality_Id + "&oId=" + item.Original_Id));
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new HttpResponseException(HttpStatusCode.Conflict); // TODO catch correct expection
+                return Error(e); // TODO catch correct expection
             }
         }
 
@@ -108,11 +107,11 @@ namespace UI.MVC4.Controllers.API
             {
                 PutQuery(item);
 
-                return new HttpResponseMessage(HttpStatusCode.OK); // TODO correct?
+                return Ok(); // TODO correct?
             }
             catch (Exception)
             {
-                throw new HttpResponseException(HttpStatusCode.NoContent); // TODO catch correct expection
+                return NoContent(); // TODO catch correct expection
             }
         }
     }

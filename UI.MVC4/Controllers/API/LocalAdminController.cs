@@ -9,7 +9,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class LocalAdminController : ApiController
+    public class LocalAdminController : BaseApiController
     {
         private readonly IUserService _userService;
 
@@ -30,17 +30,12 @@ namespace UI.MVC4.Controllers.API
 
                 user = _userService.AddUser(user);
 
-                var msg = Request.CreateResponse(HttpStatusCode.Created, AutoMapper.Mapper.Map<User,UserDTO>(user));
-                msg.Headers.Location = new Uri(Request.RequestUri + "/" + user.Id);
-                return msg;
+                return Created(AutoMapper.Mapper.Map<User, UserDTO>(user), new Uri(Request.RequestUri + "/" + user.Id));
+
             }
-            catch (SmtpException)
+            catch (Exception e)
             {
-                throw new HttpResponseException(HttpStatusCode.InternalServerError);
-            }
-            catch (Exception)
-            {
-                throw new HttpResponseException(HttpStatusCode.Conflict);
+                return Error(e);
             }
         }
     }
