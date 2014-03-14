@@ -1,46 +1,5 @@
 ﻿<div data-ng-controller="globalConfig.ProjectCtrl">
     <div class="well">
-        <h4>Generelt</h4>
-                
-        <div id="project-show-tab">
-            <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-5">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox">
-                            Vis fanen 'IT Projekter'
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="project-module-names"></div>
-                
-        <div id="project-show-guide">
-            <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-5">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox">
-                            Medtag vejledning
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label for="input-project-url" class="col-sm-2 control-label">IT Projekt vejledning</label>
-            <div class="col-sm-5">
-                <input type="url" name="ItProjectGuide" class="form-control" id="input-project-url" />
-            </div>
-        </div>
-    </div>
-            
-    <hr>
-
-    <div class="well">
         <h4>Reference</h4>
         <div class="form-group">
             <label for="input-system-ref1" class="col-sm-2 control-label">ESDH ref.</label>
@@ -112,7 +71,9 @@
 
     <div class="well">
         <h4>Projektkategorier</h4>
-        <div id="project-cat"></div>
+        <a href="#" data-editable-checkbox="category.Name" data-e-title="Medtag?" data-onbeforesave="patch({category.Name: $data})" data-ng-repeat="category in categories">
+            {{ category.Name && "Medtager" + category.Name || "Medtager ikke" }}
+        </a>
     </div>
                         
     <hr>

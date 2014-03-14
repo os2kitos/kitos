@@ -1,12 +1,12 @@
-﻿(function (ng, app) {
+﻿(function(ng, app) {
     var subnav = [
         { state: "config-org", text: "Organisation" },
         { state: "config-project", text: "IT Projekt" },
         { state: "config-system", text: "IT System" },
         { state: "config-contract", text: "IT Kontrakt" }
     ];
-    
-    app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
+
+    app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
 
         $stateProvider.state('config-org', {
             url: '/global-config/org',
@@ -31,10 +31,28 @@
         });
     }]);
 
-    app.controller('globalConfig.OrgCtrl', ['$rootScope', '$scope', '$http', 'growl', function($rootScope, $scope, $http, growl) {
+    app.controller('globalConfig.OrgCtrl', ['$rootScope', '$scope', 'Restangular', 'growl', function($rootScope, $scope, Restangular, growl) {
         $rootScope.page.title = 'Global konfiguration';
         $rootScope.page.subnav = subnav;
 
-        $scope.showTab = true;
+        var config = Restangular.one('config', 1);
+        config.get().then(function(result) {
+            $scope.ShowItSupporttModule = result.ShowItSupporttModule;
+        });
+
+        $scope.patch = function(data) {
+            return config.patch(data);
+        };
+    }]);
+
+    app.controller('globalConfig.ProjectCtrl', ['$rootScope', '$scope', 'Restangular', 'growl', function ($rootScope, $scope, Restangular, growl) {
+        $rootScope.page.title = 'Global konfiguration';
+        $rootScope.page.subnav = subnav;
+        
+        var baseCategories = Restangular.all('projectCategory');
+        baseCategories.getList().then(function (categories) {
+            console.log('asdf');
+            $scope.categories = categories;
+        });
     }]);
 })(angular, app);
