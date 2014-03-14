@@ -1,12 +1,18 @@
-﻿var App = angular.module("App", ["ui.router", "xeditable"]);
+﻿var App = angular.module('App', ['ui.router', 'angular-growl', 'xeditable']);
 
-App.config(function ($urlRouterProvider) {
-    $urlRouterProvider.otherwise("/");
-});
+App.config(['$urlRouterProvider', function ($urlRouterProvider) {
+    $urlRouterProvider.otherwise('/');
+}]);
 
-App.run(function ($rootScope, $http, $state) {
+App.config(['growlProvider', function (growlProvider) {
+    growlProvider.globalTimeToLive(5000);
+}]);
+
+App.run(['$rootScope', '$http', '$state', function ($rootScope, $http, $state) {
+    
+    //init info
     $rootScope.page = {
-        title: "Index",
+        title: 'Index',
         subnav: []
     };
 
@@ -14,39 +20,61 @@ App.run(function ($rootScope, $http, $state) {
 
     //logout function for top navigation bar
     $rootScope.logout = function () {
-        $http.post("api/authorize?logout").success(function (result) {
+        $http.post('api/authorize?logout').success(function (result) {
             $rootScope.user = {};
-            $state.go("index");
+            $state.go('index');
         });
     };
 
     $rootScope.saveUser = function (result) {
-        console.log("Saving user: " + result);
-
         $rootScope.user = {
             name: result.Response.Name,
             email: result.Response.Email,
             municipality: result.Response.Municipality_Id,
-            authStatus: "authorized",
+            authStatus: 'authorized',
             role: result.Response.RoleName
         };
     };
 
-    var startPromise = $http.get("api/authorize").success($rootScope.saveUser);
+    var hasInitUser = false;
+    var initUser = $http.get('api/authorize').success($rootScope.saveUser).finally(function() {
+        hasInitUser = true;
+    });
+    
+    function auth(toState, toParams) {
+        var user = $rootScope.user;
+        var authRoles = toState.authRoles;
 
-    $rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
+        return (user.authStatus == 'authorized' && (!authRoles || _.indexOf(authRoles, user.role) != -1));
+    }
+
+    $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         if (toState.noAuth) return; //no need to auth
 
+        //need to auth, but first when the initUser call is finished.
+        if (!hasInitUser) {
         
+            //initUser is not yet loaded - wait for it
+            event.preventDefault();
 
+            initUser.finally(function() {
         var user = $rootScope.user;
         var userRole = user.role;
         var authRoles = toState.authRoles;
         
-        if (user.authStatus != "authorized" || (authRoles && _.indexOf(authRoles, userRole) == -1)) {
-            $state.transitionTo("login");
+                if (!auth(toState, toParams)) {
+                    $state.go('login', { to: toState.name, toParams: toParams });
+                } else {
+                    $state.go(toState, toParams);
+                }
+            });
+        } else {
+            //initUSer has loaded, just run auth()
+            if (!auth(toState, toParams)) {
             event.preventDefault();
+                $state.go('login', { to: toState.name, toParams: toParams });
+            }
         }
 
     });
-});
+}]);
