@@ -310,6 +310,7 @@
     <Content Include="Partials\home\forgot-password.html" />
     <Content Include="Partials\home\index.html" />
     <Content Include="Partials\home\login.html" />
+    <Content Include="Partials\local-config\contract.html" />
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />
     <Content Include="Partials\topnav\unauthorized.html" />
@@ -340,6 +341,7 @@
     <Content Include="Scripts\AngularUI\ui-router.min.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-admin.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
+    <Content Include="Scripts\app\controllers\local-config\local-config.js" />
     <Content Include="Scripts\app\directives\form-validation.js" />
     <Content Include="Scripts\app\main.js" />
     <Content Include="Scripts\bootstrap3-wysihtml5.js" />

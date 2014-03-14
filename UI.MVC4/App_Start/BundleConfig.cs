@@ -33,6 +33,7 @@ namespace UI.MVC4
                 "~/Scripts/angular.js",
                 "~/Scripts/angular-route.js",
                 "~/Scripts/AngularUI/ui-router.js",
+                "~/Scripts/xeditable.js",
                 "~/Scripts/ui-bootstrap-tpls-{version}.js",
                 "~/Scripts/ui-select2.js",
                 "~/Scripts/angular-growl/*.js"));
@@ -48,6 +49,7 @@ namespace UI.MVC4
                 "~/Content/angular-growl/growl.css",
                 "~/Content/css/select2.css",
                 "~/Content/select2-bootstrap.css",
+                "~/Content/xeditable.css",
                 "~/Content/kitos.css"));
         }
     }

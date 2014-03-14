@@ -1,0 +1,158 @@
+﻿<div class="col-md-12">
+
+    <h2>IT Kontrakter</h2>
+    <p>
+        Konfigurér IT kontrakter
+    </p>
+    <div class="form-group row">
+        <label class="col-md-2 control-label">
+            Modulnavn
+        </label>
+        <div class="col-md-10">
+            <a href="#" data-editable-select="chosenNameId" data-buttons="no" data-e-ng-options="name.Id as name.Name for name in moduleNames">{{ moduleNames[chosenNameId - 1].Name; }}
+            </a>
+        </div>
+    </div>
+    <!--<div class="form-group row">
+        <label class="col-md-3 control-label">
+            Medtag vejledning
+        </label>
+        <div class="col-md-8">
+                <a href="#" data-editable-checkbox="useGuide" data-buttons="no" data-e-title="Medtag?">
+                {{ useGuide && "Medtag" || "Medtag ikke" }}
+            </a>
+        </div>
+    </div>-->
+    <div class="form-group row">
+        <label class="col-md-2 control-label">
+            IT Kontrakt vejledning
+        </label>
+        <div class="col-md-10">
+            <a href="#" data-editable-text="guideUrl" data-buttons="no">
+                {{ guideUrl || 'Ingen guide' }}
+            </a>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2 control-label">
+            Referencer
+        </label>
+        <div class="col-md-10 container-fluid">
+            <div class="row">
+                <div class="col-md-4 h4">KITOS default</div>
+                <div class="col-md-4 h4">Kommunespecifik oversættelse</div>
+                <div class="col-md-4 h4">Betydning</div>
+            </div>
+            <div class="row" data-ng-repeat="extRef in extRefs">
+                <div class="col-md-4">{{extRef.original}}</div>
+                <div class="col-md-4"><a href="#" data-editable-text="extRef.locale" data-buttons="no">{{extRef.locale || extRef.original}}</a></div>
+                <div class="col-md-4 small">{{extRef.note}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2 control-label">
+            Kontrakttyper
+        </label>
+        <div class="col-md-10 container-fluid">
+            <div class="row">
+                <div class="col-md-8 h4">KITOS default</div>
+                <div class="col-md-4 h4">Betydning</div>
+            </div>
+            <div class="row" data-ng-repeat="contractType in contractTypes">
+                <div class="col-md-8">{{contractType.original}}</div>
+                <div class="col-md-4 small">{{contractType.note}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2 control-label">
+            Kontraktskabeloner
+        </label>
+        <div class="col-md-10 container-fluid">
+            <div class="row">
+                <div class="col-md-8 h4">KITOS default</div>
+                <div class="col-md-4 h4">Betydning</div>
+            </div>
+            <div class="row" data-ng-repeat="contractTemplate in contractTemplates">
+                <div class="col-md-8">{{contractTemplate.original}}</div>
+                <div class="col-md-4 small">{{contractTemplate.note}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2 control-label">
+            Indkøbsformer
+        </label>
+        <div class="col-md-10 container-fluid">
+            <div class="row">
+                <div class="col-md-8 h4">KITOS default</div>
+                <div class="col-md-4 h4">Betydning</div>
+            </div>
+            <div class="row" data-ng-repeat="purchaseForm in purchaseForms">
+                <div class="col-md-8">{{purchaseForm.original}}</div>
+                <div class="col-md-4 small">{{purchaseForm.note}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2 control-label">
+            Roller
+        </label>
+        <div class="col-md-10 container-fluid">
+            <div class="row">
+                <div class="col-md-8 h4">KITOS default</div>
+                <div class="col-md-4 h4">Betydning</div>
+            </div>
+            <div class="row" data-ng-repeat="role in roles">
+                <div class="col-md-8">{{role.original}}</div>
+                <div class="col-md-4 small">{{role.note}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2 control-label">
+            Overtagelsesprøver
+        </label>
+        <div class="col-md-10 container-fluid">
+            <div class="row">
+                <div class="col-md-8 h4">KITOS default</div>
+                <div class="col-md-4 h4">Betydning</div>
+            </div>
+            <div class="row" data-ng-repeat="handoverTrial in handoverTrials">
+                <div class="col-md-8">{{handoverTrial.original}}</div>
+                <div class="col-md-4 small">{{handoverTrial.note}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2 control-label">
+            Betalingsmodeller
+        </label>
+        <div class="col-md-10 container-fluid">
+            <div class="row">
+                <div class="col-md-8 h4">KITOS default</div>
+                <div class="col-md-4 h4">Betydning</div>
+            </div>
+            <div class="row" data-ng-repeat="paymentModel in paymentModels">
+                <div class="col-md-8">{{paymentModel.original}}</div>
+                <div class="col-md-4 small">{{paymentModel.note}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2 control-label">
+            Aftaleelementer
+        </label>
+        <div class="col-md-10 container-fluid">
+            <div class="row">
+                <div class="col-md-8 h4">KITOS default</div>
+                <div class="col-md-4 h4">Betydning</div>
+            </div>
+            <div class="row" data-ng-repeat="agreementElement in agreementElements">
+                <div class="col-md-8">{{agreementElement.original}}</div>
+                <div class="col-md-4 small">{{agreementElement.note}}</div>
+            </div>
+        </div>
+    </div>
+</div>
