@@ -1,4 +1,4 @@
-﻿var app = angular.module('app', ['ui.router', 'angular-growl', 'xeditable', 'restangular']);
+﻿var app = angular.module('app', ['ui.router', 'ui.select2', 'angular-growl', 'xeditable', 'restangular']);
 
 app.config(['$urlRouterProvider', function ($urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
@@ -61,15 +61,15 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
 
         //need to auth, but first when the initUser call is finished.
         if (!hasInitUser) {
-        
+
             //initUser is not yet loaded - wait for it
             event.preventDefault();
-
+            
             initUser.finally(function() {
-        var user = $rootScope.user;
-        var userRole = user.role;
-        var authRoles = toState.authRoles;
-        
+                var user = $rootScope.user;
+                var userRole = user.role;
+                var authRoles = toState.authRoles;
+
                 if (!auth(toState, toParams)) {
                     $state.go('login', { to: toState.name, toParams: toParams });
                 } else {
@@ -79,7 +79,7 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
         } else {
             //initUSer has loaded, just run auth()
             if (!auth(toState, toParams)) {
-            event.preventDefault();
+                event.preventDefault();
                 $state.go('login', { to: toState.name, toParams: toParams });
             }
         }

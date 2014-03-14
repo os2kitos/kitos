@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
+using Newtonsoft.Json.Linq;
 
 namespace UI.MVC4.Controllers.API
 {
@@ -126,7 +127,7 @@ namespace UI.MVC4.Controllers.API
 
         protected virtual TModel PatchQuery(TModel item)
         {
-            Repository.Patch(item);
+            Repository.Update(item);
             Repository.Save();
 
             return item;
@@ -134,10 +135,32 @@ namespace UI.MVC4.Controllers.API
 
         // PATCH api/T
         [Authorize(Roles = "GlobalAdmin")]
-        public HttpResponseMessage Patch(TKeyType id, TDto dto)
+        public HttpResponseMessage Patch(TKeyType id, JObject obj)
         {
-            var item = Map<TDto, TModel>(dto);
-            item.Id = id;
+            var item = Repository.GetByKey(id);
+            var itemType = item.GetType();
+
+            foreach (var valuePair in obj)
+            {
+                // get name of mapped property
+                var map =
+                    AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>()
+                              .GetPropertyMaps()
+                              .SingleOrDefault(x => x.SourceMember.Name == valuePair.Key);
+                if (map == null) 
+                    continue; // abort if no map found
+                
+                var destName = map.DestinationProperty.Name;
+                var jToken = valuePair.Value;
+
+                var propRef = itemType.GetProperty(destName);
+                var t = propRef.PropertyType;
+                // use reflection to call obj.Value<t>("keyName");
+                var genericMethod = jToken.GetType().GetMethod("Value").MakeGenericMethod(new Type[] { t });
+                var value = genericMethod.Invoke(obj, new object[] { valuePair.Key });
+                // update the entity
+                propRef.SetValue(item, value);
+            }
 
             try
             {

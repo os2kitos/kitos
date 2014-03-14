@@ -2,6 +2,7 @@
    
     var subnav = [
             { state: "global-admin", text: "Opret kommune" },
+            { state: "new-global-admin", text: "Opret global admin" },
             { state: "new-local-admin", text: "Opret lokal admin" }
     ];
 
@@ -17,6 +18,11 @@
             url: '/global-admin/new-local-admin',
             templateUrl: 'partials/global-admin/new-local-admin.html',
             controller: 'globalAdmin.NewLocalAdminCtrl',
+            authRoles: ['GlobalAdmin']
+        }).state('new-global-admin', {
+            url: '/global-admin/new-global-admin',
+            templateUrl: 'partials/global-admin/new-global-admin.html',
+            controller: 'globalAdmin.NewGlobalAdminCtrl',
             authRoles: ['GlobalAdmin']
         });
 
@@ -64,9 +70,34 @@
 
                 $scope.name = "";
                 $scope.email = "";
+                $scope.municipality = "";
                 
             }).error(function (result) {
                 growl.addSuccessMessage("Lokaladmin " + $scope.name + " kunne ikke oprettes!");
+            });
+        };
+    }]);
+
+    app.controller('globalAdmin.NewGlobalAdminCtrl', ['$rootScope', '$scope', '$http', 'growl', function ($rootScope, $scope, $http, growl) {
+        $rootScope.page.title = 'Ny global admin';
+        $rootScope.page.subnav = subnav;
+
+        $scope.submit = function () {
+            if ($scope.addForm.$invalid) return;
+
+            var data = {
+                "Name": $scope.name,
+                "Email": $scope.email
+            };
+
+            $http.post('api/globaladmin', data).success(function (result) {
+                growl.addSuccessMessage("Global admin " + $scope.name + " er blevet oprettet!");
+
+                $scope.name = "";
+                $scope.email = "";
+
+            }).error(function (result) {
+                growl.addSuccessMessage("Global admin " + $scope.name + " kunne ikke oprettes!");
             });
         };
     }]);
