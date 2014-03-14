@@ -53,16 +53,21 @@
         $scope.submit = function () {
             if ($scope.addForm.$invalid) return;
 
-            var data = { "Name": $scope.name };
+            var data = {
+                "Name": $scope.name,
+                "Email": $scope.email,
+                "Municipality_Id": $scope.municipality
+            };
 
-            /*
-            $http.post('api/municipality', data).success(function (result) {
-                growl.addSuccessMessage("Kommunen " + $scope.name + " er blevet oprettet!");
+            $http.post('api/localadmin', data).success(function (result) {
+                growl.addSuccessMessage("Lokaladmin " + $scope.name + " er blevet oprettet!");
 
                 $scope.name = "";
+                $scope.email = "";
+                
             }).error(function (result) {
-                growl.addErrorMessage("Kommunen " + $scope.name + " kunne ikke oprettes!");
-            });*/
+                growl.addSuccessMessage("Lokaladmin " + $scope.name + " kunne ikke oprettes!");
+            });
         };
     }]);
 
