@@ -300,6 +300,10 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Images\logo.png" />
+    <Content Include="Partials\global-admin\config-contract.html" />
+    <Content Include="Partials\global-admin\config-org.html" />
+    <Content Include="Partials\global-admin\config-project.html" />
+    <Content Include="Partials\global-admin\config.html" />
     <Content Include="Partials\global-admin\new-municipality.html" />
     <Content Include="Partials\home\reset-password.html" />
     <Content Include="Partials\home\forgot-password.html" />
