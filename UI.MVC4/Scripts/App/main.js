@@ -1,4 +1,4 @@
-﻿var App = angular.module('App', ['ui.router', 'angular-growl']);
+﻿var App = angular.module('App', ['ui.router', 'ui.select2', 'angular-growl']);
 
 App.config(['$urlRouterProvider', function ($urlRouterProvider) {
     $urlRouterProvider.otherwise('/');

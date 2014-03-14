@@ -10,7 +10,9 @@
                 Kommunens navn
             </label>
             <div class="col-md-8">
-                <select name="municipality"data-ng-model="municipality" class="form-control" data-placeholder="Vælg kommune" required  data-ng-options="mun.Id as mun.Name for mun in municipalities">
+                <select type="text" data-ui-select2 name="municipality" data-ng-model="municipality" class="form-control" data-placeholder="Vælg kommune" data-ng-required="true">
+                    <option></option>
+                    <option data-ng-repeat="mun in municipalities" value="{{mun.Id}}">{{mun.Name}}</option>
                 </select>
             </div>
         </div>
@@ -19,7 +21,7 @@
                 Lokal admin navn
             </label>
             <div class="col-md-8">
-                <input type="text" name="name" data-ng-model="name" class="form-control" required data-ng-minlength="2"/>
+                <input type="text" name="name" data-ng-model="name" class="form-control" required data-ng-minlength="2" />
             </div>
         </div>
         <div class="form-group">
@@ -27,7 +29,7 @@
                 Lokal admin email-addresse
             </label>
             <div class="col-md-8">
-                <input type="email" name="email" data-ng-model="email" class="form-control" required/>
+                <input type="email" name="email" data-ng-model="email" class="form-control" required />
             </div>
         </div>
         <div class="form-group">
