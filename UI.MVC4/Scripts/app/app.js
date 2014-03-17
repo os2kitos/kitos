@@ -1,15 +1,20 @@
-﻿var App = angular.module('App', ['ui.router', 'ui.select2', 'angular-growl', 'xeditable']);
+﻿var app = angular.module('app', ['ui.router', 'ui.select2', 'angular-growl', 'xeditable', 'restangular']);
 
-App.config(['$urlRouterProvider', function ($urlRouterProvider) {
+app.config(['$urlRouterProvider', function ($urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
 }]);
 
-App.config(['growlProvider', function (growlProvider) {
+app.config(['growlProvider', 'RestangularProvider', function (growlProvider, RestangularProvider) {
     growlProvider.globalTimeToLive(5000);
+    
+    //Restangular config
+    RestangularProvider.setBaseUrl('/api');
+    RestangularProvider.setResponseExtractor(function (response, operation) {
+        return response.Response;
+    });
 }]);
 
-App.run(['$rootScope', '$http', '$state', function ($rootScope, $http, $state) {
-    
+app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScope, $http, $state, editableOptions) {
     //init info
     $rootScope.page = {
         title: 'Index',
@@ -17,6 +22,9 @@ App.run(['$rootScope', '$http', '$state', function ($rootScope, $http, $state) {
     };
 
     $rootScope.user = {};
+
+    //x-editable config
+    editableOptions.theme = 'bs3'; // bootstrap3 theme.
 
     //logout function for top navigation bar
     $rootScope.logout = function () {

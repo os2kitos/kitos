@@ -303,8 +303,12 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Images\logo.png" />
+    <Content Include="Partials\global-config\system.html" />
     <Content Include="Partials\global-admin\new-global-admin.html" />
     <Content Include="Partials\global-admin\new-local-admin.html" />
+    <Content Include="Partials\global-config\contract.html" />
+    <Content Include="Partials\global-config\org.html" />
+    <Content Include="Partials\global-config\project.html" />
     <Content Include="Partials\global-admin\new-municipality.html" />
     <Content Include="Partials\home\reset-password.html" />
     <Content Include="Partials\home\forgot-password.html" />
@@ -343,10 +347,11 @@
     <Content Include="Scripts\AngularUI\ui-router.js" />
     <Content Include="Scripts\AngularUI\ui-router.min.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-admin.js" />
+    <Content Include="Scripts\app\controllers\global-admin\global-config.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config.js" />
     <Content Include="Scripts\app\directives\form-validation.js" />
-    <Content Include="Scripts\app\main.js" />
+    <Content Include="Scripts\app\app.js" />
     <Content Include="Scripts\bootstrap3-wysihtml5.js" />
     <Content Include="Scripts\errors.json" />
     <Content Include="Scripts\angular-touch.min.js.map" />
@@ -609,6 +614,9 @@
     <Content Include="Scripts\jquery-1.7.2.min.js" />
     <Content Include="Scripts\knockout-2.2.0.debug.js" />
     <Content Include="Scripts\knockout-2.2.0.js" />
+    <Content Include="Scripts\lodash.js" />
+    <Content Include="Scripts\lodash.min.js" />
+    <Content Include="Scripts\pnotify\jquery.pnotify.js" />
     <Content Include="Scripts\form.control.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ar.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_bg.js" />
@@ -658,6 +666,8 @@
     <Content Include="Scripts\ui-bootstrap-tpls-0.10.0.js" />
     <Content Include="Scripts\ui-bootstrap-tpls-0.10.0.min.js" />
     <Content Include="Scripts\ui-select2.js" />
+    <Content Include="Scripts\restangular.js" />
+    <Content Include="Scripts\restangular.min.js" />
     <Content Include="Scripts\underscore.js" />
     <Content Include="Scripts\underscore.min.js" />
     <Content Include="Scripts\wysihtml5\parser_rules\advanced.js" />

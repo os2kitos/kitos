@@ -26,4 +26,4 @@
     }]);
    
 
-})(angular, App);
+})(angular, app);

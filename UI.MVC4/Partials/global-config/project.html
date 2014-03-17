@@ -1,0 +1,45 @@
+﻿<div data-ng-controller="globalConfig.ProjectCtrl">
+    <div class="form-horizontal">
+        <div class="well">
+            <h4>Reference</h4>
+
+            <div class="form-group" data-ng-repeat="item in refs">
+                <label class="col-sm-2 control-label">{{ item.Name }}</label>
+                <div class="col-sm-5">
+                    <a href="#" data-editable-text="item.Name" data-onbeforesave="patchRef($data, $index)">
+                        {{ item.Name || "Ikke sat" }}
+                    </a>
+                    <p class="help-block">{{ item.Note }}</p>
+                </div>
+            </div>
+        </div>
+            
+        <div class="well">
+            <h4>Projektfase</h4>       
+        
+            <div class="form-group" data-ng-repeat="item in phases">
+                <label class="col-sm-2 control-label">{{ item.Name }}</label>
+                <div class="col-sm-5">
+                    <a href="#" data-editable-text="item.Name" data-onbeforesave="patchPhase($data, $index)">
+                        {{ item.Name || "Ikke sat" }}
+                    </a>
+                    <p class="help-block">{{ item.Note }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="well">
+            <h4>Projektkategorier</h4>
+       
+            <div class="form-group" data-ng-repeat="item in categories">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchCategory($data, $index)">
+                            {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>                    
+                    </div>
+                </div>
+            </div>
+        </div>    
+    </div>
+</div>

@@ -145,12 +145,13 @@ namespace UI.MVC4.Controllers.API
                 // get name of mapped property
                 var map =
                     AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>()
-                              .GetPropertyMaps()
-                              .SingleOrDefault(x => x.SourceMember.Name == valuePair.Key);
-                if (map == null) 
+                              .GetPropertyMaps();
+                var nonNullMaps = map.Where(x => x.SourceMember != null);
+                var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name == valuePair.Key);
+                if (mapMember == null) 
                     continue; // abort if no map found
-                
-                var destName = map.DestinationProperty.Name;
+
+                var destName = mapMember.DestinationProperty.Name;
                 var jToken = valuePair.Value;
 
                 var propRef = itemType.GetProperty(destName);

@@ -166,4 +166,4 @@
 
             }]);
 
-})(angular, App);
+})(angular, app);

@@ -26,19 +26,19 @@ namespace UI.MVC4
              * 
              */
 
-            bundles.Add(new ScriptBundle("~/Scripts/underscore").Include(
-                        "~/Scripts/underscore.js"));
+            bundles.Add(new ScriptBundle("~/Scripts/libraries")
+                .Include("~/Scripts/underscore.js")
+                .Include("~/Scripts/lodash.js")
+                .Include("~/Scripts/xeditable.js"));
 
             bundles.Add(new ScriptBundle("~/Scripts/angular").Include(
                 "~/Scripts/angular.js",
                 "~/Scripts/angular-route.js",
                 "~/Scripts/AngularUI/ui-router.js",
-                "~/Scripts/xeditable.js",
                 "~/Scripts/ui-bootstrap-tpls-{version}.js",
                 "~/Scripts/ui-select2.js",
+                "~/Scripts/restangular.js",
                 "~/Scripts/angular-growl/*.js"));
-
-            bundles.Add(new ScriptBundle("~/Scripts/holder").Include("~/Scripts/holder.js"));
 
             bundles.Add(new ScriptBundle("~/Scripts/app").IncludeDirectory(
                 "~/Scripts/app", "*.js", true));

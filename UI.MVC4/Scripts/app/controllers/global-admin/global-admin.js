@@ -102,4 +102,4 @@
         };
     }]);
 
-})(angular, App);
+})(angular, app);

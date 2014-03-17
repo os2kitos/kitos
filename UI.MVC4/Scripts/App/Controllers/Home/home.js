@@ -107,4 +107,4 @@
 
     }]);
 
-})(angular, App);
+})(angular, app);

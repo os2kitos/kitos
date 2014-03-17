@@ -1,0 +1,25 @@
+﻿<div data-ng-controller="globalConfig.OrgCtrl">           
+    <div class="well">
+        <h4>Overblik</h4>
+
+        <a href="#" data-editable-checkbox="ShowOverview" data-e-title="Medtag fanen 'Overblik'?" data-onbeforesave="patch({ShowOverview: $data})">
+            {{ ShowOverview && "Medtager fanen 'Overblik'" || "Medtager fanen ikke 'Overblik'" }}
+        </a>
+        
+        <a href="#" data-editable-checkbox="ShowColumnTech" data-e-title="Medtag kolonen 'Teknologi'?" data-onbeforesave="patch({ShowColumnTech: $data})">
+            {{ ShowColumnTech && "Medtager kolonen 'Teknologi'" || "Medtager ikke kolonen 'Teknologi'" }}
+        </a>
+        
+        <a href="#" data-editable-checkbox="ShowColumnUsage" data-e-title="Medtag kolonnen 'Anvendelse'?" data-onbeforesave="patch({ShowColumnUsage: $data})">
+            {{ ShowColumnUsage && "Medtager kolonnen 'Anvendelse'" || "Medtager ikke kolonnen 'Anvendelse'" }}
+        </a>
+        
+        <a href="#" data-editable-checkbox="ShowColumnMandatory" data-e-title="Medtag kolonnen 'SKAL'?" data-onbeforesave="patch({ShowColumnMandatory: $data})">
+            {{ ShowColumnMandatory && "Medtager kolonnen 'SKAL'" || "Medtager ikke kolonnen 'SKAL'" }}
+        </a>
+    </div>
+    
+    <div class="well">
+        <h4>Roller</h4>
+    </div>
+</div>
