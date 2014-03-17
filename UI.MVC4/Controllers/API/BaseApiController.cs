@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security;
 using System.Web.Http;
 using UI.MVC4.Models;
 
@@ -51,12 +52,17 @@ namespace UI.MVC4.Controllers.API
             return CreateResponse(HttpStatusCode.OK, response);
         }
 
+        protected HttpResponseMessage Error(SecurityException e)
+        {
+            return Unauthorized();
+        }
+
         protected HttpResponseMessage Error<T>(T response)
         {
             return CreateResponse(HttpStatusCode.InternalServerError, response);
         }
 
-        protected HttpResponseMessage Unauthorized<T>()
+        protected HttpResponseMessage Unauthorized()
         {
             return CreateResponse(HttpStatusCode.Unauthorized);
         }

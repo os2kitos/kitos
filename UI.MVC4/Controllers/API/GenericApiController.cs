@@ -60,7 +60,7 @@ namespace UI.MVC4.Controllers.API
 
         // POST api/T
         [Authorize(Roles = "GlobalAdmin")]
-        public HttpResponseMessage Post(TDto dto)
+        public virtual HttpResponseMessage Post(TDto dto)
         {
             var item = Map<TDto, TModel>(dto);
             try
@@ -86,7 +86,7 @@ namespace UI.MVC4.Controllers.API
 
         // PUT api/T
         [Authorize(Roles = "GlobalAdmin")]
-        public HttpResponseMessage Put(TKeyType id, TDto dto)
+        public virtual HttpResponseMessage Put(TKeyType id, TDto dto)
         {
             var item = Map<TDto, TModel>(dto);
             item.Id = id;
@@ -110,7 +110,7 @@ namespace UI.MVC4.Controllers.API
 
         // DELETE api/T
         [Authorize(Roles = "GlobalAdmin")]
-        public HttpResponseMessage Delete(TKeyType id)
+        public virtual HttpResponseMessage Delete(TKeyType id)
         {
             try
             {

@@ -311,6 +311,9 @@
     <Content Include="Partials\home\index.html" />
     <Content Include="Partials\home\login.html" />
     <Content Include="Partials\local-config\contract.html" />
+    <Content Include="Partials\local-config\optionlist.html" />
+    <Content Include="Partials\local-config\optionlocalelist.html" />
+    <Content Include="Partials\local-config\suggest-new.html" />
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />
     <Content Include="Partials\topnav\unauthorized.html" />
@@ -663,7 +666,9 @@
     <Content Include="Scripts\wysihtml5\wysihtml5-0.3.0.min.js" />
     <Content Include="Scripts\xeditable.js" />
     <Content Include="Scripts\xeditable.min.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>

@@ -111,6 +111,9 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<ProjPhaseLocale, LocaleDTO>().ReverseMap();
             Mapper.CreateMap<ExtRefTypeLocale, LocaleDTO>().ReverseMap();
 
+            Mapper.CreateMap<ProjPhaseLocale, LocaleInputDTO>().ReverseMap();
+            Mapper.CreateMap<ExtRefTypeLocale, LocaleInputDTO>().ReverseMap();
+
             Mapper.CreateMap<Config, ConfigDTO>()
                   .ForMember(dest => dest.ItContractNameId, opt => opt.MapFrom(src => src.ItContractModuleName_Id))
                   .ForMember(dest => dest.ItProjectNameId, opt => opt.MapFrom(src => src.ItProjectModuleName_Id))

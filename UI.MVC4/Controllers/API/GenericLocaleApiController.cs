@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
@@ -14,10 +15,12 @@ namespace UI.MVC4.Controllers.API
         where TModel : class, ILocaleEntity<TOriginal>
     {
         protected readonly IGenericRepository<TModel> Repository;
+        private readonly IUserRepository _userRepository;
 
-        protected GenericLocaleApiController(IGenericRepository<TModel> repository)
+        protected GenericLocaleApiController(IGenericRepository<TModel> repository, IUserRepository userRepository)
         {
             Repository = repository;
+            _userRepository = userRepository;
         }
 
         protected virtual TDest Map<TSource, TDest>(TSource item)
@@ -78,13 +81,14 @@ namespace UI.MVC4.Controllers.API
         }
 
         // POST api/T
-        [Authorize(Roles = "GlobalAdmin")]
-        public HttpResponseMessage Post(LocaleDTO dto)
+        [Authorize(Roles = "GlobalAdmin, LocalAdmin")]
+        public HttpResponseMessage Post(LocaleInputDTO dto)
         {
-            var item = Map<LocaleDTO, TModel>(dto);
-            item.Municipality_Id = 1;
+            var item = Map<LocaleInputDTO, TModel>(dto);
             try
             {
+                TestMunicipalityMembership(dto.Municipality_Id);
+
                 PostQuery(item);
 
                 //var msg = new HttpResponseMessage(HttpStatusCode.Created);
@@ -98,20 +102,49 @@ namespace UI.MVC4.Controllers.API
         }
 
         // PUT api/T
-        [Authorize(Roles = "GlobalAdmin")]
-        public HttpResponseMessage Put(LocaleDTO dto)
+        [Authorize(Roles = "GlobalAdmin, LocalAdmin")]
+        public HttpResponseMessage Put(LocaleInputDTO dto)
         {
-            var item = Map<LocaleDTO, TModel>(dto);
-            item.Municipality_Id = 1;
+            var item = Map<LocaleInputDTO, TModel>(dto);
             try
             {
+                TestMunicipalityMembership(dto.Municipality_Id);
+
                 PutQuery(item);
 
                 return Ok(); // TODO correct?
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return NoContent(); // TODO catch correct expection
+                return Error(e);
+            }
+        }
+
+        // PUT api/T
+        [Authorize(Roles = "GlobalAdmin, LocalAdmin")]
+        public HttpResponseMessage Delete([FromUri] int mId, [FromUri] int oId)
+        {
+            try
+            {
+                TestMunicipalityMembership(mId);
+
+                Repository.DeleteByKey(mId, oId);
+                Repository.Save();
+
+                return Ok(); // TODO correct?
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        private void TestMunicipalityMembership(int mId)
+        {
+            var user = _userRepository.GetByEmail(User.Identity.Name);
+            if (user == null || user.Municipality_Id != mId)
+            {
+                throw new SecurityException();
             }
         }
     }

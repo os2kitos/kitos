@@ -15,5 +15,10 @@
 
         public bool ShowItSupportModule { get; set; }
         public int ItSupportNameId { get; set; }
+
+        public string ItSupportGuide { get; set; }
+        public string ItProjectGuide { get; set; }
+        public string ItContractGuide { get; set; }
+        public string ItSystemGuide { get; set; }
     }
 }
