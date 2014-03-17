@@ -8,9 +8,16 @@ namespace Core.DomainModel
         public bool ShowItContractModule { get; set; }
 
         public int ItSupportModuleName_Id { get; set; }
+        public string ItSupportGuide { get; set; }
+
         public int ItProjectModuleName_Id { get; set; }
+        public string ItProjectGuide { get; set; }
+
         public int ItSystemModuleName_Id { get; set; }
+        public string ItSystemGuide { get; set; }
+
         public int ItContractModuleName_Id { get; set; }
+        public string ItContractGuide { get; set; }
 
         public virtual ItSupportModuleName ItSupportModuleName { get; set; }
         public virtual ItProjectModuleName ItProjectModuleName { get; set; }

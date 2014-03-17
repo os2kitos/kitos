@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="GenericRepository.cs" />
     <Compile Include="KitosContext.cs" />
+    <Compile Include="Mapping\AgreementElementMap.cs" />
     <Compile Include="Mapping\AgreementMap.cs" />
     <Compile Include="Mapping\BasicDataMap.cs" />
     <Compile Include="Mapping\CommunicationMap.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="Mapping\ConfigMap.cs" />
     <Compile Include="Mapping\ContractTemplateMap.cs" />
     <Compile Include="Mapping\ContractTypeMap.cs" />
+    <Compile Include="Mapping\HandoverTrialMap.cs" />
     <Compile Include="Mapping\DatabaseTypeMap.cs" />
     <Compile Include="Mapping\DepartmentMap.cs" />
     <Compile Include="Mapping\DepartmentRightMap.cs" />
@@ -135,9 +137,13 @@
     <Compile Include="Mapping\UserAdministrationMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
-    <Compile Include="Migrations\201403051955178_Initial.cs" />
-    <Compile Include="Migrations\201403051955178_Initial.Designer.cs">
-      <DependentUpon>201403051955178_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201403171254075_Initial.cs" />
+    <Compile Include="Migrations\201403171254075_Initial.Designer.cs">
+      <DependentUpon>201403171254075_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201403171303091_Guides.cs" />
+    <Compile Include="Migrations\201403171303091_Guides.Designer.cs">
+      <DependentUpon>201403171303091_Guides.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -163,8 +169,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201403051955178_Initial.resx">
-      <DependentUpon>201403051955178_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201403171254075_Initial.resx">
+      <DependentUpon>201403171254075_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201403171303091_Guides.resx">
+      <DependentUpon>201403171303091_Guides.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

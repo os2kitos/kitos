@@ -20,6 +20,7 @@ namespace Infrastructure.DataAccess
         }
 
         public DbSet<Agreement> Agreements { get; set; }
+        public DbSet<AgreementElement> AgreementElements { get; set; }
         public DbSet<BasicData> BasicDatas { get; set; }
         public DbSet<Communication> Communications { get; set; }
         public DbSet<Component> Components { get; set; }
@@ -39,6 +40,7 @@ namespace Infrastructure.DataAccess
         public DbSet<Goal> Goals { get; set; }
         public DbSet<GoalStatus> GoalStatus { get; set; }
         public DbSet<Handover> Handovers { get; set; }
+        public DbSet<HandoverTrial> HandoverTrials { get; set; }
         public DbSet<Hierarchy> Hierarchies { get; set; }
         public DbSet<Host> Hosts { get; set; }
         public DbSet<Core.DomainModel.ItSystem.Infrastructure> Infrastructures { get; set; }
@@ -97,6 +99,7 @@ namespace Infrastructure.DataAccess
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Configurations.Add(new AgreementMap());
+            modelBuilder.Configurations.Add(new AgreementElementMap());
             modelBuilder.Configurations.Add(new BasicDataMap());
             modelBuilder.Configurations.Add(new CommunicationMap());
             modelBuilder.Configurations.Add(new ComponentsMap());
@@ -116,6 +119,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new GoalMap());
             modelBuilder.Configurations.Add(new GoalStatusMap());
             modelBuilder.Configurations.Add(new HandoverMap());
+            modelBuilder.Configurations.Add(new HandoverTrialMap());
             modelBuilder.Configurations.Add(new HierarchyMap());
             modelBuilder.Configurations.Add(new HostMap());
             modelBuilder.Configurations.Add(new InfrastructureMap());

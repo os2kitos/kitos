@@ -8,14 +8,29 @@ namespace Infrastructure.DataAccess.Migrations
         public override void Up()
         {
             CreateTable(
+                "dbo.AgreementElement",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        Name = c.String(nullable: false, unicode: false),
+                        IsActive = c.Boolean(nullable: false),
+                        IsSuggestion = c.Boolean(nullable: false),
+                        Note = c.String(unicode: false),
+                    })
+                .PrimaryKey(t => t.Id);
+            
+            CreateTable(
                 "dbo.Agreement",
                 c => new
                     {
                         Id = c.Int(nullable: false),
+                        AgreementElement_Id = c.Int(),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.ItContract", t => t.Id)
-                .Index(t => t.Id);
+                .ForeignKey("dbo.AgreementElement", t => t.AgreementElement_Id)
+                .Index(t => t.Id)
+                .Index(t => t.AgreementElement_Id);
             
             CreateTable(
                 "dbo.ItContract",
@@ -28,6 +43,7 @@ namespace Infrastructure.DataAccess.Migrations
                         PaymentModel_Id = c.Int(nullable: false),
                         Supplier_Id = c.Int(nullable: false),
                         Municipality_Id = c.Int(nullable: false),
+                        HandoverTrial_Id = c.Int(),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.ContractTemplate", t => t.ContractTemplate_Id, cascadeDelete: true)
@@ -36,12 +52,14 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.PaymentModel", t => t.PaymentModel_Id, cascadeDelete: true)
                 .ForeignKey("dbo.PurchaseForm", t => t.PurchaseForm_Id, cascadeDelete: true)
                 .ForeignKey("dbo.Supplier", t => t.Supplier_Id, cascadeDelete: true)
+                .ForeignKey("dbo.HandoverTrial", t => t.HandoverTrial_Id)
                 .Index(t => t.ContractTemplate_Id)
                 .Index(t => t.ContractType_Id)
                 .Index(t => t.Municipality_Id)
                 .Index(t => t.PaymentModel_Id)
                 .Index(t => t.PurchaseForm_Id)
-                .Index(t => t.Supplier_Id);
+                .Index(t => t.Supplier_Id)
+                .Index(t => t.HandoverTrial_Id);
             
             CreateTable(
                 "dbo.ContractTemplate",
@@ -942,6 +960,18 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ItContract_Id);
             
             CreateTable(
+                "dbo.HandoverTrial",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        Name = c.String(nullable: false, unicode: false),
+                        IsActive = c.Boolean(nullable: false),
+                        IsSuggestion = c.Boolean(nullable: false),
+                        Note = c.String(unicode: false),
+                    })
+                .PrimaryKey(t => t.Id);
+            
+            CreateTable(
                 "dbo.Localization",
                 c => new
                     {
@@ -984,6 +1014,8 @@ namespace Infrastructure.DataAccess.Migrations
         
         public override void Down()
         {
+            DropForeignKey("dbo.ItContract", "HandoverTrial_Id", "dbo.HandoverTrial");
+            DropForeignKey("dbo.Agreement", "AgreementElement_Id", "dbo.AgreementElement");
             DropForeignKey("dbo.Agreement", "Id", "dbo.ItContract");
             DropForeignKey("dbo.ItContract", "Supplier_Id", "dbo.Supplier");
             DropForeignKey("dbo.ShipNotice", "ItContract_Id", "dbo.ItContract");
@@ -1068,6 +1100,8 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.Config", "ItContractModuleName_Id", "dbo.ItContractName");
             DropForeignKey("dbo.ItContract", "ContractType_Id", "dbo.ContractType");
             DropForeignKey("dbo.ItContract", "ContractTemplate_Id", "dbo.ContractTemplate");
+            DropIndex("dbo.ItContract", new[] { "HandoverTrial_Id" });
+            DropIndex("dbo.Agreement", new[] { "AgreementElement_Id" });
             DropIndex("dbo.Agreement", new[] { "Id" });
             DropIndex("dbo.ItContract", new[] { "Supplier_Id" });
             DropIndex("dbo.ShipNotice", new[] { "ItContract_Id" });
@@ -1154,6 +1188,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ItContract", new[] { "ContractTemplate_Id" });
             DropTable("dbo.Text");
             DropTable("dbo.Localization");
+            DropTable("dbo.HandoverTrial");
             DropTable("dbo.ShipNotice");
             DropTable("dbo.PurchaseForm");
             DropTable("dbo.PaymentModel");
@@ -1226,6 +1261,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropTable("dbo.ContractTemplate");
             DropTable("dbo.ItContract");
             DropTable("dbo.Agreement");
+            DropTable("dbo.AgreementElement");
         }
     }
 }
