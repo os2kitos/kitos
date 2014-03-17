@@ -73,5 +73,41 @@
         baseRefs.getList({ nonsuggestions: true }).then(function (refs) {
             $scope.refs = refs;
         });
+        
+        $scope.patchRef = function (data, i) {
+            var item = $scope.refs[i];
+            return Restangular.one('extReferenceType', item.Id).patch({ Name: data });
+        };
+               
+        $scope.patchRole = function (data, i) {
+            var item = $scope.roles[i];
+            var result = Restangular.one('ItProjectRole', item.Id).patch({ IsActive: data }).then(function() {
+                updateRoles();
+            });
+            return result;
+        };
+        
+        $scope.patchSuggestion = function (data, i) {
+            var item = $scope.roleSuggestions[i];
+            var result = Restangular.one('ItProjectRole', item.Id).patch({ IsSuggestion: data }).then(function() {
+                updateRoles();
+            });
+            return result;
+        };
+
+        var baseRoles = Restangular.all('ItProjectRole');
+        var updateRoles = function () {
+            baseRoles.getList({ nonsuggestions: true }).then(function(roles) {
+                console.log('roles', roles);
+                $scope.roles = roles;
+            });
+            
+            baseRoles.getList({ suggestions: true }).then(function (roles) {
+                console.log('suggestions', roles);
+                $scope.roleSuggestions = roles;
+            });
+            //$scope.apply();
+        };
+        updateRoles();
     }]);
 })(angular, app);

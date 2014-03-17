@@ -15,7 +15,7 @@
         </div>
             
         <div class="well">
-            <h4>Projektfase</h4>       
+            <h4>Projektfase</h4>
         
             <div class="form-group" data-ng-repeat="item in phases">
                 <label class="col-sm-2 control-label">{{ item.Name }}</label>
@@ -36,10 +36,38 @@
                     <div class="checkbox">
                         <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchCategory($data, $index)">
                             {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
-                        </a>                    
+                        </a>
                     </div>
                 </div>
             </div>
-        </div>    
+        </div>
+        
+        <div class="well">
+            <h4>Roller</h4>
+       
+            <div class="form-group" data-ng-repeat="item in roles">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchRole($data, $index)">
+                            {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <h5>Rolle forslag</h5>
+            
+            <div class="form-group" data-ng-repeat="item in roleSuggestions">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchSuggestion($data, $index)">
+                            {{ item.IsSuggestion && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
