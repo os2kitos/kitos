@@ -49,7 +49,6 @@
     <Compile Include="IHasRights.cs" />
     <Compile Include="IOptionEntity.cs" />
     <Compile Include="IRight.cs" />
-    <Compile Include="ItContractConfig.cs" />
     <Compile Include="ItContractModuleName.cs" />
     <Compile Include="ILocaleEntity.cs" />
     <Compile Include="ItContract\Agreement.cs" />
@@ -64,7 +63,6 @@
     <Compile Include="ItContract\PaymentModel.cs" />
     <Compile Include="ItContract\PurchaseForm.cs" />
     <Compile Include="ItContract\ShipNotice.cs" />
-    <Compile Include="ItProjectConfig.cs" />
     <Compile Include="ItProjectModuleName.cs" />
     <Compile Include="ItProject\Communication.cs" />
     <Compile Include="ItProject\Economy.cs" />
@@ -87,9 +85,7 @@
     <Compile Include="ItProject\Resource.cs" />
     <Compile Include="ItProject\Risk.cs" />
     <Compile Include="ItProject\Stakeholder.cs" />
-    <Compile Include="ItSupportConfig.cs" />
     <Compile Include="ItSupportModuleName.cs" />
-    <Compile Include="ItSystemConfig.cs" />
     <Compile Include="ItSystemModuleName.cs" />
     <Compile Include="ItSystem\BasicData.cs" />
     <Compile Include="ItSystem\Component.cs" />

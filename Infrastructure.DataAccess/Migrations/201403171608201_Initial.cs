@@ -103,9 +103,19 @@ namespace Infrastructure.DataAccess.Migrations
                         ShowItSystemModule = c.Boolean(nullable: false),
                         ShowItContractModule = c.Boolean(nullable: false),
                         ItSupportModuleName_Id = c.Int(nullable: false),
+                        ItSupportGuide = c.String(unicode: false),
+                        ShowTabOverview = c.Boolean(nullable: false),
+                        ShowColumnTechnology = c.Boolean(nullable: false),
+                        ShowColumnUsage = c.Boolean(nullable: false),
+                        ShowColumnMandatory = c.Boolean(nullable: false),
                         ItProjectModuleName_Id = c.Int(nullable: false),
+                        ItProjectGuide = c.String(unicode: false),
+                        ShowPortfolio = c.Boolean(nullable: false),
+                        ShowBC = c.Boolean(nullable: false),
                         ItSystemModuleName_Id = c.Int(nullable: false),
+                        ItSystemGuide = c.String(unicode: false),
                         ItContractModuleName_Id = c.Int(nullable: false),
+                        ItContractGuide = c.String(unicode: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.ItContractName", t => t.ItContractModuleName_Id, cascadeDelete: true)
@@ -857,60 +867,6 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ItProject_Id);
             
             CreateTable(
-                "dbo.ItContractCfg",
-                c => new
-                    {
-                        Id = c.Int(nullable: false),
-                        ItContractGuide = c.String(unicode: false),
-                        ShowItContractGuide = c.Boolean(nullable: false),
-                    })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.Municipality", t => t.Id)
-                .Index(t => t.Id);
-            
-            CreateTable(
-                "dbo.ItProjectCfg",
-                c => new
-                    {
-                        Id = c.Int(nullable: false),
-                        ItProjectGuide = c.String(unicode: false),
-                        ShowItProjectGuide = c.Boolean(nullable: false),
-                        ShowPortfolio = c.Boolean(nullable: false),
-                        ShowBC = c.Boolean(nullable: false),
-                    })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.Municipality", t => t.Id)
-                .Index(t => t.Id);
-            
-            CreateTable(
-                "dbo.ItSupportCfg",
-                c => new
-                    {
-                        Id = c.Int(nullable: false),
-                        ItSupportGuide = c.String(unicode: false),
-                        ShowItSupportGuide = c.Boolean(nullable: false),
-                        ShowTabOverview = c.Boolean(nullable: false),
-                        ShowColumnTechnology = c.Boolean(nullable: false),
-                        ShowColumnUsage = c.Boolean(nullable: false),
-                        ShowColumnMandatory = c.Boolean(nullable: false),
-                    })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.Municipality", t => t.Id)
-                .Index(t => t.Id);
-            
-            CreateTable(
-                "dbo.ItSystemCfg",
-                c => new
-                    {
-                        Id = c.Int(nullable: false),
-                        ItSystemGuide = c.String(unicode: false),
-                        ShowItSystemGuide = c.Boolean(nullable: false),
-                    })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.Municipality", t => t.Id)
-                .Index(t => t.Id);
-            
-            CreateTable(
                 "dbo.Payment",
                 c => new
                     {
@@ -1023,10 +979,6 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.ItContract", "PaymentModel_Id", "dbo.PaymentModel");
             DropForeignKey("dbo.Payment", "Id", "dbo.ItContract");
             DropForeignKey("dbo.ItContract", "Municipality_Id", "dbo.Municipality");
-            DropForeignKey("dbo.ItSystemCfg", "Id", "dbo.Municipality");
-            DropForeignKey("dbo.ItSupportCfg", "Id", "dbo.Municipality");
-            DropForeignKey("dbo.ItProjectCfg", "Id", "dbo.Municipality");
-            DropForeignKey("dbo.ItContractCfg", "Id", "dbo.Municipality");
             DropForeignKey("dbo.ExtRefTypeLocale", "Original_Id", "dbo.ExtReferenceType");
             DropForeignKey("dbo.ExtReference", "ItSystem_Id", "dbo.ItSystem");
             DropForeignKey("dbo.ExtReference", "ItProject_Id", "dbo.ItProject");
@@ -1109,10 +1061,6 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ItContract", new[] { "PaymentModel_Id" });
             DropIndex("dbo.Payment", new[] { "Id" });
             DropIndex("dbo.ItContract", new[] { "Municipality_Id" });
-            DropIndex("dbo.ItSystemCfg", new[] { "Id" });
-            DropIndex("dbo.ItSupportCfg", new[] { "Id" });
-            DropIndex("dbo.ItProjectCfg", new[] { "Id" });
-            DropIndex("dbo.ItContractCfg", new[] { "Id" });
             DropIndex("dbo.ExtRefTypeLocale", new[] { "Original_Id" });
             DropIndex("dbo.ExtReference", new[] { "ItSystem_Id" });
             DropIndex("dbo.ExtReference", new[] { "ItProject_Id" });
@@ -1193,10 +1141,6 @@ namespace Infrastructure.DataAccess.Migrations
             DropTable("dbo.PurchaseForm");
             DropTable("dbo.PaymentModel");
             DropTable("dbo.Payment");
-            DropTable("dbo.ItSystemCfg");
-            DropTable("dbo.ItSupportCfg");
-            DropTable("dbo.ItProjectCfg");
-            DropTable("dbo.ItContractCfg");
             DropTable("dbo.Stakeholder");
             DropTable("dbo.Risk");
             DropTable("dbo.Resource");

@@ -26,10 +26,5 @@ namespace Core.DomainModel
         public virtual ICollection<ProjPhaseLocale> ProjectPhaseLocales { get; set; }
         public virtual ICollection<ExtRefTypeLocale> ExtRefTypeLocales { get; set; }
 
-        public virtual ItSupportConfig ItSupportConfig { get; set; }
-        public virtual ItProjectConfig ItProjectConfig { get; set; }
-        public virtual ItSystemConfig ItSystemConfig { get; set; }
-        public virtual ItContractConfig ItContractConfig { get; set; }
-
     }
 }

@@ -59,9 +59,9 @@ namespace UI.MVC4.Controllers.API
             return Ok(Map<IEnumerable<TModel>, IEnumerable<LocaleDTO>>(items));
         }
         
-        public HttpResponseMessage GetAllFromMunicipality([FromUri] int mId)
+        public HttpResponseMessage Get(int id)
         {
-            var items = Repository.Get(l => l.Municipality_Id == mId).ToList();
+            var items = Repository.Get(l => l.Municipality_Id == id).ToList();
 
             if (!items.Any())
                 return NoContent();

@@ -218,6 +218,7 @@
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\API\AgreementElementController.cs" />
     <Compile Include="Controllers\API\AuthorizeController.cs" />
     <Compile Include="Controllers\API\BaseApiController.cs" />
     <Compile Include="Controllers\API\ContractTemplateController.cs" />
@@ -230,6 +231,7 @@
     <Compile Include="Controllers\API\ExtReferenceTypeController.cs" />
     <Compile Include="Controllers\API\GenericLocaleApiController.cs" />
     <Compile Include="Controllers\API\GenericOptionApiController.cs" />
+    <Compile Include="Controllers\API\HandoverTrialController.cs" />
     <Compile Include="Controllers\API\InterfaceTypeController.cs" />
     <Compile Include="Controllers\API\ItContractNamesController.cs" />
     <Compile Include="Controllers\API\ItContractRoleController.cs" />
@@ -317,7 +319,10 @@
     <Content Include="Partials\local-config\contract.html" />
     <Content Include="Partials\local-config\optionlist.html" />
     <Content Include="Partials\local-config\optionlocalelist.html" />
+    <Content Include="Partials\local-config\project.html" />
     <Content Include="Partials\local-config\suggest-new.html" />
+    <Content Include="Partials\local-config\support.html" />
+    <Content Include="Partials\local-config\system.html" />
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />
     <Content Include="Partials\topnav\unauthorized.html" />

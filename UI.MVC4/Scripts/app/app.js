@@ -1,4 +1,4 @@
-﻿var app = angular.module('app', ['ui.router', 'ui.select2', 'angular-growl', 'xeditable', 'restangular']);
+﻿var app = angular.module('app', ['ui.router', 'ui.select2', 'ngAnimate', 'angular-growl', 'xeditable', 'restangular']);
 
 app.config(['$urlRouterProvider', function ($urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
@@ -6,6 +6,7 @@ app.config(['$urlRouterProvider', function ($urlRouterProvider) {
 
 app.config(['growlProvider', 'RestangularProvider', function (growlProvider, RestangularProvider) {
     growlProvider.globalTimeToLive(5000);
+    growlProvider.onlyUniqueMessages(false);
     
     //Restangular config
     RestangularProvider.setBaseUrl('/api');

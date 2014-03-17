@@ -151,7 +151,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItContractModuleName() {Name = "Kontrakter"});
 
             context.Configs.AddOrUpdate(x => x.Id,
-                new Config() {
+                new Core.DomainModel.Config() {
                     Municipality = globalMunicipality,
                     ItContractModuleName = itContractName,
                     ItProjectModuleName = itProjectName,
@@ -160,35 +160,11 @@ namespace Infrastructure.DataAccess.Migrations
                     ShowItContractModule = true,
                     ShowItProjectModule = true,
                     ShowItSystemModule = true,
+                    ItSupportGuide = ".../itunderstøttelsesvejledning",
+                    ItProjectGuide = ".../itprojektvejledning",
+                    ItSystemGuide = ".../itsystemvejledning",
+                    ItContractGuide = ".../itkontraktvejledning"
                 });
-
-            context.ItSupportConfigs.AddOrUpdate(x => x.Id,
-                new ItSupportConfig()
-                    {
-                        Municipality = globalMunicipality, 
-                        ItSupportGuide = ".../itunderstøttelsesvejledning"
-                    });
-
-            context.ItProjectConfigs.AddOrUpdate(x => x.Id,
-                new ItProjectConfig()
-                    {
-                        Municipality = globalMunicipality,
-                        ItProjectGuide = ".../itprojektvejledning"
-                    });
-
-            context.ItSystemConfigs.AddOrUpdate(x => x.Id,
-                new ItSystemConfig()
-                    {
-                        Municipality = globalMunicipality, 
-                        ItSystemGuide = ".../itsystemvejledning"
-                    });
-
-            context.ItContractConfigs.AddOrUpdate(x => x.Id,
-                new ItContractConfig()
-                    {
-                        Municipality = globalMunicipality,
-                        ItContractGuide = ".../itkontraktvejledning"
-                    });
 
             context.SaveChanges();
 

@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http;
+using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 using UI.MVC4.Models;
@@ -22,6 +23,18 @@ namespace UI.MVC4.Controllers.API
                 return NoContent();
 
             return Ok(Map<Config, ConfigDTO>(item));
+        }
+
+        [Authorize(Roles = "LocalAdmin")]
+        public override HttpResponseMessage Patch(int id, Newtonsoft.Json.Linq.JObject obj)
+        {
+            return base.Patch(id, obj);
+        }
+
+        [Authorize(Roles = "LocalAdmin")]
+        protected override Config PatchQuery(Config item)
+        {
+            return base.PatchQuery(item);
         }
     }
 }
