@@ -134,4 +134,4 @@
 
             }]);
 
-})(angular, App);
+})(angular, app);

@@ -40,7 +40,7 @@
             $scope.ShowItSupporttModule = result.ShowItSupporttModule;
         });
 
-        $scope.patch = function(data) {
+        $scope.patch = function (data) {
             return config.patch(data);
         };
     }]);
@@ -50,9 +50,28 @@
         $rootScope.page.subnav = subnav;
         
         var baseCategories = Restangular.all('projectCategory');
-        baseCategories.getList().then(function (categories) {
-            console.log('asdf');
+        baseCategories.getList({nonsuggestions: true}).then(function (categories) {
             $scope.categories = categories;
+        });
+        
+        $scope.patchProjectCategory = function (data, i) {
+            var item = $scope.categories[i];
+            return Restangular.one('projectCategory', item.Id).patch({IsActive: data});
+        };
+        
+        var basePhases = Restangular.all('ProjectPhase');
+        basePhases.getList({ nonsuggestions: true }).then(function (phases) {
+            $scope.phases = phases;
+        });
+        
+        $scope.patchPhase = function (data, i) {
+            var item = $scope.phases[i];
+            return Restangular.one('ProjectPhase', item.Id).patch({ Name: data });
+        };
+
+        var baseRefs = Restangular.all('extReferenceType');
+        baseRefs.getList({ nonsuggestions: true }).then(function (refs) {
+            $scope.refs = refs;
         });
     }]);
 })(angular, app);

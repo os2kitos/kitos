@@ -1,105 +1,45 @@
 ﻿<div data-ng-controller="globalConfig.ProjectCtrl">
-    <div class="well">
-        <h4>Reference</h4>
-        <div class="form-group">
-            <label for="input-system-ref1" class="col-sm-2 control-label">ESDH ref.</label>
-            <div class="col-sm-5">
-                <input type="text" class="form-control" id="input-system-ref1" />
-                <p class="help-block">Ref. til ESDH system, hvor der er projektdokumenter</p>
-            </div>
-        </div>
-               
-        <div class="form-group">
-            <label for="input-system-ref2" class="col-sm-2 control-label">CMDB ref.</label>
-            <div class="col-sm-5">
-                <input type="text" class="form-control" id="input-system-ref2" />
-                <p class="help-block">Ref. til CMDB o.l. system, hvor der er projektdokumenter</p>
-            </div>
-        </div>
-                
-        <div class="form-group">
-            <label for="input-system-ref3" class="col-sm-2 control-label">Mappe ref.</label>
-            <div class="col-sm-5">
-                <input type="text" class="form-control" id="input-system-ref3" />
-                <p class="help-block">Ref. til andre steder, hvor der er projektdokumenter</p>
-            </div>
-        </div>
-    </div>
-            
-    <div class="well">
-        <h4>Projektfase</h4>
-        <div class="form-group">
-            <label for="input-system-phase1" class="col-sm-2 control-label">Afventer</label>
-            <div class="col-sm-5">
-                <input type="text" class="form-control" id="input-system-phase1" />
-                <p class="help-block">...</p>
-            </div>
-        </div>
-               
-        <div class="form-group">
-            <label for="input-system-phase2" class="col-sm-2 control-label">Foranalyse</label>
-            <div class="col-sm-5">
-                <input type="text" class="form-control" id="input-system-phase2" />
-                <p class="help-block">...</p>
-            </div>
-        </div>
-                
-        <div class="form-group">
-            <label for="input-system-phase3" class="col-sm-2 control-label">Gennemførsel</label>
-            <div class="col-sm-5">
-                <input type="text" class="form-control" id="input-system-phase3" />
-                <p class="help-block">...</p>
-            </div>
-        </div>
-                
-        <div class="form-group">
-            <label for="input-system-phase4" class="col-sm-2 control-label">Overlevering</label>
-            <div class="col-sm-5">
-                <input type="text" class="form-control" id="input-system-phase4" />
-                <p class="help-block">...</p>
-            </div>
-        </div>
-                
-        <div class="form-group">
-            <label for="input-system-phase5" class="col-sm-2 control-label">Drift</label>
-            <div class="col-sm-5">
-                <input type="text" class="form-control" id="input-system-phase5" />
-                <p class="help-block">...</p>
-            </div>
-        </div>
-    </div>
+    <div class="form-horizontal">
+        <div class="well">
+            <h4>Reference</h4>
 
-    <div class="well">
-        <h4>Projektkategorier</h4>
-        <a href="#" data-editable-checkbox="category.Name" data-e-title="Medtag?" data-onbeforesave="patch({category.Name: $data})" data-ng-repeat="category in categories">
-            {{ category.Name && "Medtager" + category.Name || "Medtager ikke" }}
-        </a>
-    </div>
-                        
-    <hr>
+            <div class="form-group" data-ng-repeat="item in refs">
+                <label class="col-sm-2 control-label">{{ item.Name }}</label>
+                <div class="col-sm-5">
+                    <a href="#" data-editable-text="item.Name" data-onbeforesave="patchRef($data, $index)">
+                        {{ item.Name || "Ikke sat" }}
+                    </a>
+                    <p class="help-block">{{ item.Note }}</p>
+                </div>
+            </div>
+        </div>
             
-    <div class="well">
-        <h4>Portfølje</h4>
-        <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-5">
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="ShowPortfolio" value="">
-                        Medtag IKKE fanen 'Portfølje'
-                    </label>
+        <div class="well">
+            <h4>Projektfase</h4>       
+        
+            <div class="form-group" data-ng-repeat="item in phases">
+                <label class="col-sm-2 control-label">{{ item.Name }}</label>
+                <div class="col-sm-5">
+                    <a href="#" data-editable-text="item.Name" data-onbeforesave="patchPhase($data, $index)">
+                        {{ item.Name || "Ikke sat" }}
+                    </a>
+                    <p class="help-block">{{ item.Note }}</p>
                 </div>
             </div>
         </div>
-                
-        <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-5">
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="ShowBC" value="">
-                        Medtag kolonnen 'BC'
-                    </label>
+
+        <div class="well">
+            <h4>Projektkategorier</h4>
+       
+            <div class="form-group" data-ng-repeat="item in categories">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchCategory($data, $index)">
+                            {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>                    
+                    </div>
                 </div>
             </div>
-        </div>
+        </div>    
     </div>
 </div>
