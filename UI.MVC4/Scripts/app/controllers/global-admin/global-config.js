@@ -35,33 +35,7 @@
         $rootScope.page.title = 'Global konfiguration';
         $rootScope.page.subnav = subnav;
 
-        $scope.patchRole = function (data, i) {
-            var item = $scope.roles[i];
-            var result = Restangular.one('DepartmentRole', item.Id).patch({ IsActive: data }).then(function () {
-                updateRoles();
-            });
-            return result;
-        };
-
-        $scope.patchSuggestion = function (data, i) {
-            var item = $scope.roleSuggestions[i];
-            var result = Restangular.one('DepartmentRole', item.Id).patch({ IsSuggestion: data }).then(function () {
-                updateRoles();
-            });
-            return result;
-        };
-
-        var baseRoles = Restangular.all('DepartmentRole');
-        function updateRoles() {
-            baseRoles.getList({ nonsuggestions: true }).then(function (roles) {
-                $scope.roles = roles;
-            });
-
-            baseRoles.getList({ suggestions: true }).then(function (roles) {
-                $scope.roleSuggestions = roles;
-            });
-        };
-        updateRoles();
+        handler($scope, Restangular, 'DepartmentRole', 'DepartmentRoles');
     }]);
 
     app.controller('globalConfig.ProjectCtrl', ['$rootScope', '$scope', 'Restangular', 'growl', function ($rootScope, $scope, Restangular, growl) {
@@ -141,7 +115,7 @@
             return Restangular.one('extReferenceType', item.Id).patch({ Name: data });
         };
 
-        handler($scope, Restangular, 'ItSystemRole', 'ItSystemRoles');        
+        handler($scope, Restangular, 'ItSystemRole', 'ItSystemRoles');
         handler($scope, Restangular, 'SystemType', 'SystemTypes');
         handler($scope, Restangular, 'InterfaceType', 'InterfaceTypes');
         handler($scope, Restangular, 'ProtocolType', 'ProtocolTypes');
