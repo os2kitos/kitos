@@ -32,7 +32,7 @@ namespace UI.MVC4.Controllers.API
 
         public HttpResponseMessage GetAll()
         {
-            var items = GetAllQuery().ToList();
+            var items = GetAllQuery();
 
             return Ok(Map<IEnumerable<TModel>, IEnumerable<TDto>>(items));
         }
