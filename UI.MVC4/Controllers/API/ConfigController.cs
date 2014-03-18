@@ -25,13 +25,13 @@ namespace UI.MVC4.Controllers.API
             return Ok(Map<Config, ConfigDTO>(item));
         }
 
-        [Authorize(Roles = "LocalAdmin")]
+        //[Authorize(Roles = "LocalAdmin")]
         public override HttpResponseMessage Patch(int id, Newtonsoft.Json.Linq.JObject obj)
         {
             return base.Patch(id, obj);
         }
 
-        [Authorize(Roles = "LocalAdmin")]
+        //[Authorize(Roles = "LocalAdmin")]
         protected override Config PatchQuery(Config item)
         {
             return base.PatchQuery(item);
