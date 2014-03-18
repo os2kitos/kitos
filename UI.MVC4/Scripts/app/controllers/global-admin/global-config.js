@@ -172,7 +172,7 @@
         $scope.patchType = function (data, i) {
             var item = $scope.roles[i];
             var result = Restangular.one('SystemType', item.Id).patch({ IsActive: data }).then(function () {
-                updateRoles();
+                updateTypes();
             });
             return result;
         };
@@ -180,7 +180,7 @@
         $scope.patchTypeSuggestion = function (data, i) {
             var item = $scope.roleSuggestions[i];
             var result = Restangular.one('SystemType', item.Id).patch({ IsSuggestion: data }).then(function () {
-                updateRoles();
+                updateTypes();
             });
             return result;
         };
@@ -196,5 +196,33 @@
             });
         };
         updateTypes();
+        
+        $scope.patchInterface = function (data, i) {
+            var item = $scope.roles[i];
+            var result = Restangular.one('InterfaceType', item.Id).patch({ IsActive: data }).then(function () {
+                updateInterfaces();
+            });
+            return result;
+        };
+
+        $scope.patchInterfaceSuggestion = function (data, i) {
+            var item = $scope.roleSuggestions[i];
+            var result = Restangular.one('InterfaceType', item.Id).patch({ IsSuggestion: data }).then(function () {
+                updateInterfaces();
+            });
+            return result;
+        };
+
+        var baseInterfaces = Restangular.all('InterfaceType');
+        function updateInterfaces() {
+            baseInterfaces.getList({ nonsuggestions: true }).then(function (list) {
+                $scope.interfaces = list;
+            });
+
+            baseInterfaces.getList({ suggestions: true }).then(function (list) {
+                $scope.interfacesSuggestions = list;
+            });
+        };
+        updateInterfaces();
     }]);
 })(angular, app);
