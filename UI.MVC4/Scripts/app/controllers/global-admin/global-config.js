@@ -224,5 +224,61 @@
             });
         };
         updateInterfaces();
+        
+        $scope.patchProtocol = function (data, i) {
+            var item = $scope.roles[i];
+            var result = Restangular.one('ProtocolType', item.Id).patch({ IsActive: data }).then(function () {
+                updateProtocols();
+            });
+            return result;
+        };
+
+        $scope.patchProtocolSuggestion = function (data, i) {
+            var item = $scope.roleSuggestions[i];
+            var result = Restangular.one('ProtocolType', item.Id).patch({ IsSuggestion: data }).then(function () {
+                updateProtocols();
+            });
+            return result;
+        };
+
+        var baseProtocols = Restangular.all('ProtocolType');
+        function updateProtocols() {
+            baseProtocols.getList({ nonsuggestions: true }).then(function (list) {
+                $scope.protocols = list;
+            });
+
+            baseProtocols.getList({ suggestions: true }).then(function (list) {
+                $scope.protocolsSuggestions = list;
+            });
+        };
+        updateProtocols();
+        
+        $scope.patchMethod = function (data, i) {
+            var item = $scope.roles[i];
+            var result = Restangular.one('Method', item.Id).patch({ IsActive: data }).then(function () {
+                updateMethods();
+            });
+            return result;
+        };
+
+        $scope.patchProtocolSuggestion = function (data, i) {
+            var item = $scope.roleSuggestions[i];
+            var result = Restangular.one('Method', item.Id).patch({ IsSuggestion: data }).then(function () {
+                updateMethods();
+            });
+            return result;
+        };
+
+        var baseMethods = Restangular.all('Method');
+        function updateMethods() {
+            baseMethods.getList({ nonsuggestions: true }).then(function (list) {
+                $scope.methods = list;
+            });
+
+            baseMethods.getList({ suggestions: true }).then(function (list) {
+                $scope.methodsSuggestions = list;
+            });
+        };
+        updateMethods();
     }]);
 })(angular, app);
