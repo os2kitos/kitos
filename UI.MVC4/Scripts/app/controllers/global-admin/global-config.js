@@ -35,14 +35,35 @@
         $rootScope.page.title = 'Global konfiguration';
         $rootScope.page.subnav = subnav;
 
-        var config = Restangular.one('config', 1);
-        config.get().then(function(result) {
-            $scope.ShowItSupporttModule = result.ShowItSupporttModule;
-        });
-
-        $scope.patch = function (data) {
-            return config.patch(data);
+        $scope.patchRole = function (data, i) {
+            var item = $scope.roles[i];
+            var result = Restangular.one('DepartmentRole', item.Id).patch({ IsActive: data }).then(function () {
+                updateRoles();
+            });
+            return result;
         };
+
+        $scope.patchSuggestion = function (data, i) {
+            var item = $scope.roleSuggestions[i];
+            var result = Restangular.one('DepartmentRole', item.Id).patch({ IsSuggestion: data }).then(function () {
+                updateRoles();
+            });
+            return result;
+        };
+
+        var baseRoles = Restangular.all('DepartmentRole');
+        var updateRoles = function () {
+            baseRoles.getList({ nonsuggestions: true }).then(function (roles) {
+                console.log('roles', roles);
+                $scope.roles = roles;
+            });
+
+            baseRoles.getList({ suggestions: true }).then(function (roles) {
+                console.log('suggestions', roles);
+                $scope.roleSuggestions = roles;
+            });
+        };
+        updateRoles();
     }]);
 
     app.controller('globalConfig.ProjectCtrl', ['$rootScope', '$scope', 'Restangular', 'growl', function ($rootScope, $scope, Restangular, growl) {
@@ -106,7 +127,6 @@
                 console.log('suggestions', roles);
                 $scope.roleSuggestions = roles;
             });
-            //$scope.apply();
         };
         updateRoles();
     }]);
