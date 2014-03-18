@@ -34,9 +34,6 @@ namespace UI.MVC4.Controllers.API
         {
             var items = GetAllQuery().ToList();
 
-            if (!items.Any())
-                return NoContent();
-
             return Ok(Map<IEnumerable<TModel>, IEnumerable<TDto>>(items));
         }
 
@@ -46,7 +43,7 @@ namespace UI.MVC4.Controllers.API
             var item = Repository.GetByKey(id);
 
             if (item == null)
-                return NoContent();
+                return NotFound();
 
             return Ok(Map<TModel, TDto>(item));
         }
