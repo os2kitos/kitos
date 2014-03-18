@@ -3,10 +3,10 @@
         <div class="well">
             <h4>Roller</h4>
        
-            <div class="form-group" data-ng-repeat="item in roles">
+            <div class="form-group" data-ng-repeat="item in DepartmentRoles">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchRole($data, $index)">
+                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchDepartmentRole($data, $index)">
                             {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
                         </a>
                     </div>
@@ -17,10 +17,10 @@
             
             <h5>Rolle forslag</h5>
             
-            <div class="form-group" data-ng-repeat="item in roleSuggestions">
+            <div class="form-group" data-ng-repeat="item in DepartmentRoleSuggestions">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchSuggestion(!$data, $index)">
+                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchDepartmentRoleSuggestion(!$data, $index)">
                             {{ item.IsSuggestion && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
                         </a>
                     </div>
