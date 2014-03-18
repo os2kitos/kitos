@@ -31,6 +31,37 @@
         });
     }]);
 
+    function handler($scope, Restangular, nameSingular, namePlural) {
+        var local = {};
+
+        $scope['patch' + nameSingular] = function (data, i) {
+            var item = $scope[namePlural][i];
+            var result = Restangular.one(nameSingular, item.Id).patch({ IsActive: data }).then(function () {
+                local['update' + namePlural]();
+            });
+            return result;
+        };
+
+        $scope['patch' + nameSingular + 'Suggestion'] = function (data, i) {
+            var item = $scope[nameSingular + 'Suggestions'][i];
+            var result = Restangular.one('Method', item.Id).patch({ IsSuggestion: data }).then(function () {
+                local['update' + namePlural]();
+            });
+            return result;
+        };
+
+        local['update' + namePlural] = function () {
+            Restangular.all(nameSingular).getList({ nonsuggestions: true }).then(function (list) {
+                $scope[namePlural] = list;
+            });
+
+            Restangular.all(nameSingular).getList({ suggestions: true }).then(function (list) {
+                $scope[nameSingular + 'Suggestions'] = list;
+            });
+        };
+        local['update' + namePlural]();
+    }
+
     app.controller('globalConfig.OrgCtrl', ['$rootScope', '$scope', 'Restangular', 'growl', function($rootScope, $scope, Restangular, growl) {
         $rootScope.page.title = 'Global konfiguration';
         $rootScope.page.subnav = subnav;
@@ -71,34 +102,8 @@
             var item = $scope.refs[i];
             return Restangular.one('extReferenceType', item.Id).patch({ Name: data });
         };
-               
-        $scope.patchRole = function (data, i) {
-            var item = $scope.roles[i];
-            var result = Restangular.one('ItProjectRole', item.Id).patch({ IsActive: data }).then(function() {
-                updateRoles();
-            });
-            return result;
-        };
-        
-        $scope.patchSuggestion = function (data, i) {
-            var item = $scope.roleSuggestions[i];
-            var result = Restangular.one('ItProjectRole', item.Id).patch({ IsSuggestion: data }).then(function() {
-                updateRoles();
-            });
-            return result;
-        };
 
-        var baseRoles = Restangular.all('ItProjectRole');
-        function updateRoles() {
-            baseRoles.getList({ nonsuggestions: true }).then(function(roles) {
-                $scope.roles = roles;
-            });
-            
-            baseRoles.getList({ suggestions: true }).then(function (roles) {
-                $scope.roleSuggestions = roles;
-            });
-        };
-        updateRoles();
+        handler($scope, Restangular, 'ItProjectRole', 'ItProjectRoles');
     }]);
 
     app.controller('globalConfig.SystemCtrl', ['$rootScope', '$scope', 'Restangular', 'growl', function($rootScope, $scope, Restangular, growl) {
@@ -124,34 +129,26 @@
         handler($scope, Restangular, 'Environment', 'Environments');
     }]);
 
-    function handler($scope, Restangular, nameSingular, namePlural) {
-        var local = {};
+    app.controller('globalConfig.ContractCtrl', ['$rootScope', '$scope', 'Restangular', 'growl', function ($rootScope, $scope, Restangular, growl) {
+        $rootScope.page.title = 'Global konfiguration';
+        $rootScope.page.subnav = subnav;
+        
+        var baseRefs = Restangular.all('extReferenceType');
+        baseRefs.getList({ nonsuggestions: true }).then(function (refs) {
+            $scope.refs = refs;
+        });
 
-        $scope['patch' + nameSingular] = function (data, i) {
-            var item = $scope[namePlural][i];
-            var result = Restangular.one(nameSingular, item.Id).patch({ IsActive: data }).then(function () {
-                local['update' + namePlural]();
-            });
-            return result;
+        $scope.patchRef = function (data, i) {
+            var item = $scope.refs[i];
+            return Restangular.one('extReferenceType', item.Id).patch({ Name: data });
         };
-
-        $scope['patch' + nameSingular + 'Suggestion'] = function (data, i) {
-            var item = $scope[nameSingular + 'Suggestions'][i];
-            var result = Restangular.one('Method', item.Id).patch({ IsSuggestion: data }).then(function () {
-                local['update' + namePlural]();
-            });
-            return result;
-        };
-
-        local['update' + namePlural] = function () {
-            Restangular.all(nameSingular).getList({ nonsuggestions: true }).then(function (list) {
-                $scope[namePlural] = list;
-            });
-
-            Restangular.all(nameSingular).getList({ suggestions: true }).then(function (list) {
-                $scope[nameSingular + 'Suggestions'] = list;
-            });
-        };
-        local['update' + namePlural]();
-    }
+        
+        handler($scope, Restangular, 'ContractType', 'ContractTypes');
+        handler($scope, Restangular, 'ContractTemplate', 'ContractTemplates');
+        handler($scope, Restangular, 'PurchaseForm', 'PurchaseForms');
+        handler($scope, Restangular, 'ItContractRole', 'ItContractRoles');
+        handler($scope, Restangular, 'HandoverTrial', 'HandoverTrials');
+        handler($scope, Restangular, 'PaymentModel', 'PaymentModels');
+        handler($scope, Restangular, 'AgreementElement', 'AgreementElement');
+    }]);
 })(angular, app);
