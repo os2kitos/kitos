@@ -25,21 +25,15 @@ namespace UI.MVC4.Controllers.API
 
         public HttpResponseMessage GetAllSuggestions(bool? suggestions)
         {
-            var items = this.Repository.Get(t => t.IsSuggestion).ToList();
-
-            if (!items.Any())
-                return NoContent();
-
+            var items = this.Repository.Get(t => t.IsSuggestion);
+            
             return Ok(Map<IEnumerable<TModel>, IEnumerable<OptionDTO>>(items));
         }
 
 
         public HttpResponseMessage GetAllNonSuggestions(bool? nonsuggestions)
         {
-            var items = this.Repository.Get(t => !t.IsSuggestion).ToList();
-
-            if (!items.Any())
-                return NoContent();
+            var items = this.Repository.Get(t => !t.IsSuggestion);
 
             return Ok(Map<IEnumerable<TModel>, IEnumerable<OptionDTO>>(items));
         }

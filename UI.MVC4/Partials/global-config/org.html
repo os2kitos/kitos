@@ -1,25 +1,31 @@
 ﻿<div data-ng-controller="globalConfig.OrgCtrl">           
-    <div class="well">
-        <h4>Overblik</h4>
-
-        <a href="#" data-editable-checkbox="ShowOverview" data-e-title="Medtag fanen 'Overblik'?" data-onbeforesave="patch({ShowOverview: $data})">
-            {{ ShowOverview && "Medtager fanen 'Overblik'" || "Medtager fanen ikke 'Overblik'" }}
-        </a>
-        
-        <a href="#" data-editable-checkbox="ShowColumnTech" data-e-title="Medtag kolonen 'Teknologi'?" data-onbeforesave="patch({ShowColumnTech: $data})">
-            {{ ShowColumnTech && "Medtager kolonen 'Teknologi'" || "Medtager ikke kolonen 'Teknologi'" }}
-        </a>
-        
-        <a href="#" data-editable-checkbox="ShowColumnUsage" data-e-title="Medtag kolonnen 'Anvendelse'?" data-onbeforesave="patch({ShowColumnUsage: $data})">
-            {{ ShowColumnUsage && "Medtager kolonnen 'Anvendelse'" || "Medtager ikke kolonnen 'Anvendelse'" }}
-        </a>
-        
-        <a href="#" data-editable-checkbox="ShowColumnMandatory" data-e-title="Medtag kolonnen 'SKAL'?" data-onbeforesave="patch({ShowColumnMandatory: $data})">
-            {{ ShowColumnMandatory && "Medtager kolonnen 'SKAL'" || "Medtager ikke kolonnen 'SKAL'" }}
-        </a>
-    </div>
-    
-    <div class="well">
-        <h4>Roller</h4>
+    <div class="form-horizontal">
+        <div class="well">
+            <h4>Roller</h4>
+       
+            <div class="form-group" data-ng-repeat="item in roles">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchRole($data, $index)">
+                            {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <h5>Rolle forslag</h5>
+            
+            <div class="form-group" data-ng-repeat="item in roleSuggestions">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchSuggestion(!$data, $index)">
+                            {{ item.IsSuggestion && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

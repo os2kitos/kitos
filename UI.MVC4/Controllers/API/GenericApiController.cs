@@ -32,10 +32,7 @@ namespace UI.MVC4.Controllers.API
 
         public HttpResponseMessage GetAll()
         {
-            var items = GetAllQuery().ToList();
-
-            if (!items.Any())
-                return NoContent();
+            var items = GetAllQuery();
 
             return Ok(Map<IEnumerable<TModel>, IEnumerable<TDto>>(items));
         }
@@ -46,7 +43,7 @@ namespace UI.MVC4.Controllers.API
             var item = Repository.GetByKey(id);
 
             if (item == null)
-                return NoContent();
+                return NotFound();
 
             return Ok(Map<TModel, TDto>(item));
         }

@@ -127,7 +127,7 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<ExtRefTypeLocale, LocaleInputDTO>().ReverseMap();
 
             Mapper.CreateMap<Config, ConfigDTO>().ReverseMap();
-
+            
         }
     }
 
