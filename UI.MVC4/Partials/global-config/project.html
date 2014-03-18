@@ -62,7 +62,7 @@
             <div class="form-group" data-ng-repeat="item in roleSuggestions">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchSuggestion($data, $index)">
+                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchSuggestion(!$data, $index)">
                             {{ item.IsSuggestion && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
                         </a>
                     </div>
