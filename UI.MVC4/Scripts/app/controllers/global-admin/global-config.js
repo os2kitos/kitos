@@ -54,12 +54,10 @@
         var baseRoles = Restangular.all('DepartmentRole');
         var updateRoles = function () {
             baseRoles.getList({ nonsuggestions: true }).then(function (roles) {
-                console.log('roles', roles);
                 $scope.roles = roles;
             });
 
             baseRoles.getList({ suggestions: true }).then(function (roles) {
-                console.log('suggestions', roles);
                 $scope.roleSuggestions = roles;
             });
         };
@@ -119,15 +117,84 @@
         var baseRoles = Restangular.all('ItProjectRole');
         var updateRoles = function () {
             baseRoles.getList({ nonsuggestions: true }).then(function(roles) {
-                console.log('roles', roles);
                 $scope.roles = roles;
             });
             
             baseRoles.getList({ suggestions: true }).then(function (roles) {
-                console.log('suggestions', roles);
                 $scope.roleSuggestions = roles;
             });
         };
         updateRoles();
+    }]);
+
+    app.controller('globalConfig.SystemCtrl', ['$rootScope', '$scope', 'Restangular', 'growl', function($rootScope, $scope, Restangular, growl) {
+        $rootScope.page.title = 'Global konfiguration';
+        $rootScope.page.subnav = subnav;
+        
+        var baseRefs = Restangular.all('extReferenceType');
+        baseRefs.getList({ nonsuggestions: true }).then(function (refs) {
+            $scope.refs = refs;
+        });
+
+        $scope.patchRef = function (data, i) {
+            var item = $scope.refs[i];
+            return Restangular.one('extReferenceType', item.Id).patch({ Name: data });
+        };
+
+        $scope.patchRole = function (data, i) {
+            var item = $scope.roles[i];
+            var result = Restangular.one('ItSystemRole', item.Id).patch({ IsActive: data }).then(function () {
+                updateRoles();
+            });
+            return result;
+        };
+
+        $scope.patchRoleSuggestion = function (data, i) {
+            var item = $scope.roleSuggestions[i];
+            var result = Restangular.one('ItSystemRole', item.Id).patch({ IsSuggestion: data }).then(function () {
+                updateRoles();
+            });
+            return result;
+        };
+
+        var baseRoles = Restangular.all('ItSystemRole');
+        function updateRoles() {
+            baseRoles.getList({ nonsuggestions: true }).then(function (list) {
+                $scope.roles = list;
+            });
+
+            baseRoles.getList({ suggestions: true }).then(function (list) {
+                $scope.roleSuggestions = list;
+            });
+        };
+        updateRoles();
+        
+        $scope.patchType = function (data, i) {
+            var item = $scope.roles[i];
+            var result = Restangular.one('SystemType', item.Id).patch({ IsActive: data }).then(function () {
+                updateRoles();
+            });
+            return result;
+        };
+
+        $scope.patchTypeSuggestion = function (data, i) {
+            var item = $scope.roleSuggestions[i];
+            var result = Restangular.one('SystemType', item.Id).patch({ IsSuggestion: data }).then(function () {
+                updateRoles();
+            });
+            return result;
+        };
+
+        var baseTypes = Restangular.all('SystemType');
+        function updateTypes() {
+            baseTypes.getList({ nonsuggestions: true }).then(function (list) {
+                $scope.types = list;
+            });
+
+            baseTypes.getList({ suggestions: true }).then(function (list) {
+                $scope.typeSuggestions = list;
+            });
+        };
+        updateTypes();
     }]);
 })(angular, app);

@@ -1,1 +1,73 @@
-﻿<div data-ng-controller="globalConfig.SystemCtrl"></div>
+﻿<div data-ng-controller="globalConfig.SystemCtrl">
+    <div class="form-horizontal">
+        <div class="well">
+            <h4>Reference</h4>
+
+            <div class="form-group" data-ng-repeat="item in refs">
+                <label class="col-sm-2 control-label">{{ item.Name }}</label>
+                <div class="col-sm-5">
+                    <a href="#" data-editable-text="item.Name" data-onbeforesave="patchRef($data, $index)">
+                        {{ item.Name || "Ikke sat" }}
+                    </a>
+                    <p class="help-block">{{ item.Note }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="well">
+            <h4>Roller</h4>
+       
+            <div class="form-group" data-ng-repeat="item in roles">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchRole($data, $index)">
+                            {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <h5>Rolle forslag</h5>
+            
+            <div class="form-group" data-ng-repeat="item in roleSuggestions">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchRoleSuggestion(!$data, $index)">
+                            {{ item.IsSuggestion && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="well">
+            <h4>Systemtyper</h4>
+            
+            <div class="form-group" data-ng-repeat="item in types">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchType($data, $index)">
+                            {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <h5>Systemtype forslag</h5>
+            
+            <div class="form-group" data-ng-repeat="item in typeSuggestions">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchTypeSuggestion(!$data, $index)">
+                            {{ item.IsSuggestion && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
