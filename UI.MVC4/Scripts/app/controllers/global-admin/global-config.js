@@ -52,7 +52,7 @@
         };
 
         var baseRoles = Restangular.all('DepartmentRole');
-        var updateRoles = function () {
+        function updateRoles() {
             baseRoles.getList({ nonsuggestions: true }).then(function (roles) {
                 $scope.roles = roles;
             });
@@ -115,7 +115,7 @@
         };
 
         var baseRoles = Restangular.all('ItProjectRole');
-        var updateRoles = function () {
+        function updateRoles() {
             baseRoles.getList({ nonsuggestions: true }).then(function(roles) {
                 $scope.roles = roles;
             });
