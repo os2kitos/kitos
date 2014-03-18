@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 
 namespace UI.MVC4.Controllers.API
 {
-    public abstract class GenericApiController<TModel, TKeyType, TDto> : ApiController // TODO perhaps it's possible to infer the TKeyType from TModel somehow
+    public abstract class GenericApiController<TModel, TKeyType, TDto> : BaseApiController // TODO perhaps it's possible to infer the TKeyType from TModel somehow
         where TModel : class, IEntity<TKeyType>
     {
         protected readonly IGenericRepository<TModel> Repository;
@@ -32,12 +32,9 @@ namespace UI.MVC4.Controllers.API
 
         public HttpResponseMessage GetAll()
         {
-            var items = GetAllQuery().ToList();
+            var items = GetAllQuery();
 
-            if (!items.Any())
-                return Request.CreateResponse(HttpStatusCode.NoContent);
-
-            return Request.CreateResponse(HttpStatusCode.OK, Map<IEnumerable<TModel>, IEnumerable<TDto>>(items));
+            return Ok(Map<IEnumerable<TModel>, IEnumerable<TDto>>(items));
         }
 
         // GET api/T
@@ -46,9 +43,9 @@ namespace UI.MVC4.Controllers.API
             var item = Repository.GetByKey(id);
 
             if (item == null)
-                return Request.CreateResponse(HttpStatusCode.NoContent);
+                return NotFound();
 
-            return Request.CreateResponse(HttpStatusCode.OK, Map<TModel, TDto>(item));
+            return Ok(Map<TModel, TDto>(item));
         }
 
         protected virtual TModel PostQuery(TModel item)
@@ -60,8 +57,8 @@ namespace UI.MVC4.Controllers.API
         }
 
         // POST api/T
-        [Authorize(Roles = "GlobalAdmin")]
-        public HttpResponseMessage Post(TDto dto)
+        //[Authorize(Roles = "GlobalAdmin")] TODO: FIX!
+        public virtual HttpResponseMessage Post(TDto dto)
         {
             var item = Map<TDto, TModel>(dto);
             try
@@ -69,13 +66,11 @@ namespace UI.MVC4.Controllers.API
                 PostQuery(item);
 
                 //var msg = new HttpResponseMessage(HttpStatusCode.Created);
-                var msg = Request.CreateResponse(HttpStatusCode.Created, item);
-                msg.Headers.Location = new Uri(Request.RequestUri + "/" + item.Id);
-                return msg;
+                return Created(item, new Uri(Request.RequestUri + "/" + item.Id));
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new HttpResponseException(HttpStatusCode.Conflict); // TODO catch correct expection
+                return Error(e);
             }
         }
 
@@ -88,8 +83,8 @@ namespace UI.MVC4.Controllers.API
         }
 
         // PUT api/T
-        [Authorize(Roles = "GlobalAdmin")]
-        public HttpResponseMessage Put(TKeyType id, TDto dto)
+        //[Authorize(Roles = "GlobalAdmin")] TODO: FIX!
+        public virtual HttpResponseMessage Put(TKeyType id, TDto dto)
         {
             var item = Map<TDto, TModel>(dto);
             item.Id = id;
@@ -97,11 +92,11 @@ namespace UI.MVC4.Controllers.API
             {
                 PutQuery(item);
 
-                return new HttpResponseMessage(HttpStatusCode.OK); // TODO correct?
+                return Ok(); //TODO correct?
             }
             catch (Exception)
             {
-                throw new HttpResponseException(HttpStatusCode.NoContent); // TODO catch correct expection
+                return NoContent(); // TODO catch correct expection
             }
         }
 
@@ -112,18 +107,18 @@ namespace UI.MVC4.Controllers.API
         }
 
         // DELETE api/T
-        [Authorize(Roles = "GlobalAdmin")]
-        public HttpResponseMessage Delete(TKeyType id)
+        //[Authorize(Roles = "GlobalAdmin")] TODO: FIX!
+        public virtual HttpResponseMessage Delete(TKeyType id)
         {
             try
             {
                 DeleteQuery(id);
 
-                return new HttpResponseMessage(HttpStatusCode.OK);
+                return Ok();
             }
             catch (Exception)
             {
-                throw new HttpResponseException(HttpStatusCode.NoContent);
+                return NoContent(); // TODO catch correct expection
             }
         }
 
@@ -136,8 +131,8 @@ namespace UI.MVC4.Controllers.API
         }
 
         // PATCH api/T
-        [Authorize(Roles = "GlobalAdmin")]
-        public HttpResponseMessage Patch(TKeyType id, JObject obj)
+        //[Authorize(Roles = "GlobalAdmin")] TODO: FIX!
+        public virtual HttpResponseMessage Patch(TKeyType id, JObject obj)
         {
             var item = Repository.GetByKey(id);
             var itemType = item.GetType();
@@ -147,12 +142,13 @@ namespace UI.MVC4.Controllers.API
                 // get name of mapped property
                 var map =
                     AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>()
-                              .GetPropertyMaps()
-                              .SingleOrDefault(x => x.SourceMember.Name == valuePair.Key);
-                if (map == null) 
+                              .GetPropertyMaps();
+                var nonNullMaps = map.Where(x => x.SourceMember != null);
+                var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name == valuePair.Key);
+                if (mapMember == null) 
                     continue; // abort if no map found
-                
-                var destName = map.DestinationProperty.Name;
+
+                var destName = mapMember.DestinationProperty.Name;
                 var jToken = valuePair.Value;
 
                 var propRef = itemType.GetProperty(destName);
@@ -168,11 +164,12 @@ namespace UI.MVC4.Controllers.API
             {
                 PatchQuery(item);
 
-                return new HttpResponseMessage(HttpStatusCode.OK); // TODO correct?
+                //pretty sure we'll get a merge conflict here???
+                return Ok(); // TODO correct?
             }
             catch (Exception)
             {
-                throw new HttpResponseException(HttpStatusCode.NoContent); // TODO catch correct expection
+                return NoContent(); // TODO catch correct expection
             }
         }
 

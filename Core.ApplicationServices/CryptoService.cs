@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 using System.Text;
+using System.Web;
 using Core.DomainServices;
 
 namespace Core.ApplicationServices
@@ -19,7 +20,8 @@ namespace Core.ApplicationServices
             byte[] bytes = Encoding.UTF8.GetBytes(str);
             byte[] encrypted = _crypt.ComputeHash(bytes);
 
-            return Convert.ToBase64String(encrypted);
+            return HttpServerUtility.UrlTokenEncode(encrypted);
+            //return Convert.ToBase64String(encrypted);
         }
     }
 }

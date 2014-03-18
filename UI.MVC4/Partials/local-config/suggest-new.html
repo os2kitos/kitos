@@ -1,0 +1,20 @@
+﻿<div class="form-group row" data-ng-init="open = false">
+    <div class="col-md-10 col-md-offset-2 container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <a class="btn btn-xs btn-default" data-ng-click="open = !open">{{open && "Skjul" || "Foreslå ny"}}</a>
+                <div data-ng-show="open" class="suggest-box">
+                    <form class="form-inline" novalidate="novalidate" name="suggestForm">
+                        <p class="small">Hvis du synes at der mangler et væsentlig element, kan du foreslå det her. Alle foreslag skal godkendes af en global administrator før de bliver tilgengængelige til brug.</p>
+                        <div class="form-group">
+                            <label class="control-label">Forslag:
+                                <input type="text" data-ng-model="suggestion" class="form-control input-sm" data-ng-required="true"/>
+                            </label>
+                            <input type="submit" class="btn btn-default btn-sm" value="Send foreslag" data-ng-click="suggest()" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

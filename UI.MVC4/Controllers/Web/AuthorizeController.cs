@@ -39,7 +39,7 @@ namespace UI.MVC4.Controllers.Web
                     return Redirect(returnUrl);
                 }
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "OldHome");
             }
 
             // If we got this far, we couldn't authenticate, redisplay form
@@ -52,7 +52,7 @@ namespace UI.MVC4.Controllers.Web
         {
             FormsAuthentication.SignOut();
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "OldHome");
         }
 
         public ActionResult ForgotPassword(bool userNotFound = false)

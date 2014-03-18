@@ -10,7 +10,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class UserController : ApiController
+    public class UserController : BaseApiController
     {
         private readonly IGenericRepository<User> _repository;
         private readonly IUserService _userService;
@@ -22,34 +22,32 @@ namespace UI.MVC4.Controllers.API
         }
 
         [Authorize]
-        public HttpResponseMessage Post(UserApiModel item)
+        public HttpResponseMessage Post(UserDTO item)
         {
             try
             {
-                var user = AutoMapper.Mapper.Map<UserApiModel, User>(item);
+                var user = AutoMapper.Mapper.Map<UserDTO, User>(item);
 
                 user = _userService.AddUser(user);
 
-                var msg = Request.CreateResponse(HttpStatusCode.Created, AutoMapper.Mapper.Map<User,UserApiModel>(user));
-                msg.Headers.Location = new Uri(Request.RequestUri + "/" + user.Id);
-                return msg;
+                return Created(AutoMapper.Mapper.Map<User, UserDTO>(user), new Uri(Request.RequestUri + "/" + user.Id));
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new HttpResponseException(HttpStatusCode.Conflict);
+                return Error(e);
             }
         }
         
         [Authorize]
-        public IEnumerable<UserApiModel> Get()
+        public IEnumerable<UserDTO> Get()
         {
-            return AutoMapper.Mapper.Map<IEnumerable<User>, List<UserApiModel>>(_repository.Get());
+            return AutoMapper.Mapper.Map<IEnumerable<User>, List<UserDTO>>(_repository.Get());
         }
         
         [Authorize]
-        public UserApiModel Get(int id)
+        public UserDTO Get(int id)
         {
-            return AutoMapper.Mapper.Map<User,UserApiModel>(_repository.GetByKey(id));
+            return AutoMapper.Mapper.Map<User,UserDTO>(_repository.GetByKey(id));
         }
     }
 

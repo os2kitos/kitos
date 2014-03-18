@@ -55,7 +55,7 @@ namespace UI.MVC4.Controllers
         {
             FormsAuthentication.SignOut();
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "OldHome");
         }
 
         /*
@@ -341,7 +341,7 @@ namespace UI.MVC4.Controllers
             }
             else
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "OldHome");
             }
         }
 

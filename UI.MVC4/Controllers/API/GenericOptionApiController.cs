@@ -25,25 +25,19 @@ namespace UI.MVC4.Controllers.API
 
         public HttpResponseMessage GetAllSuggestions(bool? suggestions)
         {
-            var items = this.Repository.Get(t => t.IsSuggestion).ToList();
-
-            if (!items.Any())
-                return Request.CreateResponse(HttpStatusCode.NoContent);
-
-            return Request.CreateResponse(HttpStatusCode.OK, Map<IEnumerable<TModel>, IEnumerable<OptionDTO>>(items));
+            var items = this.Repository.Get(t => t.IsSuggestion);
+            
+            return Ok(Map<IEnumerable<TModel>, IEnumerable<OptionDTO>>(items));
         }
 
 
         public HttpResponseMessage GetAllNonSuggestions(bool? nonsuggestions)
         {
-            var items = this.Repository.Get(t => !t.IsSuggestion).ToList();
+            var items = this.Repository.Get(t => !t.IsSuggestion);
 
-            if (!items.Any())
-                return Request.CreateResponse(HttpStatusCode.NoContent);
-
-            return Request.CreateResponse(HttpStatusCode.OK, Map<IEnumerable<TModel>, IEnumerable<OptionDTO>>(items));
+            return Ok(Map<IEnumerable<TModel>, IEnumerable<OptionDTO>>(items));
         }
-
+        
         protected override TModel PostQuery(TModel item)
         {
             if(!item.IsSuggestion && !User.IsInRole("GlobalAdmin"))
@@ -60,16 +54,16 @@ namespace UI.MVC4.Controllers.API
             return base.PutQuery(item);
         }
 
-        //TODO?
-        protected override TModel PatchQuery(TModel item)
+        [Authorize(Roles = "LocalAdmin, GlobalAdmin")]
+        public override HttpResponseMessage Post(OptionDTO dto)
         {
-            return base.PatchQuery(item);
+            return base.Post(dto);
         }
 
-        //TODO?
-        protected override void DeleteQuery(int id)
+        [Authorize(Roles = "LocalAdmin, GlobalAdmin")]
+        public override HttpResponseMessage Put(int id, OptionDTO dto)
         {
-            base.DeleteQuery(id);
-        } 
+            return base.Put(id, dto);
+        }
     }
 }

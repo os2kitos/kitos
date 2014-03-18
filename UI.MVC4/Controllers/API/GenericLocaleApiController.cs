@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
@@ -10,14 +11,16 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public abstract class GenericLocaleApiController<TModel, TOriginal> : ApiController
+    public abstract class GenericLocaleApiController<TModel, TOriginal> : BaseApiController
         where TModel : class, ILocaleEntity<TOriginal>
     {
         protected readonly IGenericRepository<TModel> Repository;
+        private readonly IUserRepository _userRepository;
 
-        protected GenericLocaleApiController(IGenericRepository<TModel> repository)
+        protected GenericLocaleApiController(IGenericRepository<TModel> repository, IUserRepository userRepository)
         {
             Repository = repository;
+            _userRepository = userRepository;
         }
 
         protected virtual TDest Map<TSource, TDest>(TSource item)
@@ -51,19 +54,19 @@ namespace UI.MVC4.Controllers.API
             var items = GetAllQuery().ToList();
 
             if (!items.Any())
-                return Request.CreateResponse(HttpStatusCode.NoContent);
+                return NoContent();
 
-            return Request.CreateResponse(HttpStatusCode.OK, Map<IEnumerable<TModel>, IEnumerable<LocaleDTO>>(items));
+            return Ok(Map<IEnumerable<TModel>, IEnumerable<LocaleDTO>>(items));
         }
         
-        public HttpResponseMessage GetAllFromMunicipality([FromUri] int mId)
+        public HttpResponseMessage Get(int id)
         {
-            var items = Repository.Get(l => l.Municipality_Id == mId).ToList();
+            var items = Repository.Get(l => l.Municipality_Id == id).ToList();
 
             if (!items.Any())
-                return Request.CreateResponse(HttpStatusCode.NoContent);
+                return NoContent();
 
-            return Request.CreateResponse(HttpStatusCode.OK, Map<IEnumerable<TModel>, IEnumerable<LocaleDTO>>(items));
+            return Ok(Map<IEnumerable<TModel>, IEnumerable<LocaleDTO>>(items));
         }
 
         // GET api/T
@@ -72,47 +75,76 @@ namespace UI.MVC4.Controllers.API
             var item = Repository.GetByKey(mId, oId);
 
             if (item == null)
-                return Request.CreateResponse(HttpStatusCode.NoContent);
+                return NoContent();
 
-            return Request.CreateResponse(HttpStatusCode.OK, Map<TModel, LocaleDTO>(item));
+            return Ok(Map<TModel, LocaleDTO>(item));
         }
 
         // POST api/T
-        [Authorize(Roles = "GlobalAdmin")]
-        public HttpResponseMessage Post(LocaleDTO dto)
+        [Authorize(Roles = "GlobalAdmin, LocalAdmin")]
+        public HttpResponseMessage Post(LocaleInputDTO dto)
         {
-            var item = Map<LocaleDTO, TModel>(dto);
-            item.Municipality_Id = 1;
+            var item = Map<LocaleInputDTO, TModel>(dto);
             try
             {
+                TestMunicipalityMembership(dto.Municipality_Id);
+
                 PostQuery(item);
 
                 //var msg = new HttpResponseMessage(HttpStatusCode.Created);
-                var msg = Request.CreateResponse(HttpStatusCode.Created, item);
-                msg.Headers.Location = new Uri(Request.RequestUri + "?mId=" + item.Municipality_Id + "&oId=" + item.Original_Id);
-                return msg;
+                return Created(item,
+                               new Uri(Request.RequestUri + "?mId=" + item.Municipality_Id + "&oId=" + item.Original_Id));
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new HttpResponseException(HttpStatusCode.Conflict); // TODO catch correct expection
+                return Error(e); // TODO catch correct expection
             }
         }
 
         // PUT api/T
-        [Authorize(Roles = "GlobalAdmin")]
-        public HttpResponseMessage Put(LocaleDTO dto)
+        [Authorize(Roles = "GlobalAdmin, LocalAdmin")]
+        public HttpResponseMessage Put(LocaleInputDTO dto)
         {
-            var item = Map<LocaleDTO, TModel>(dto);
-            item.Municipality_Id = 1;
+            var item = Map<LocaleInputDTO, TModel>(dto);
             try
             {
+                TestMunicipalityMembership(dto.Municipality_Id);
+
                 PutQuery(item);
 
-                return new HttpResponseMessage(HttpStatusCode.OK); // TODO correct?
+                return Ok(); // TODO correct?
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new HttpResponseException(HttpStatusCode.NoContent); // TODO catch correct expection
+                return Error(e);
+            }
+        }
+
+        // PUT api/T
+        [Authorize(Roles = "GlobalAdmin, LocalAdmin")]
+        public HttpResponseMessage Delete([FromUri] int mId, [FromUri] int oId)
+        {
+            try
+            {
+                TestMunicipalityMembership(mId);
+
+                Repository.DeleteByKey(mId, oId);
+                Repository.Save();
+
+                return Ok(); // TODO correct?
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        private void TestMunicipalityMembership(int mId)
+        {
+            var user = _userRepository.GetByEmail(User.Identity.Name);
+            if (user == null || user.Municipality_Id != mId)
+            {
+                throw new SecurityException();
             }
         }
     }

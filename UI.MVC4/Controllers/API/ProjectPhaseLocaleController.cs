@@ -6,7 +6,7 @@ namespace UI.MVC4.Controllers.API
 {
     public class ProjectPhaseLocaleController : GenericLocaleApiController<ProjPhaseLocale, ProjectPhase>
     {
-        public ProjectPhaseLocaleController(IGenericRepository<ProjPhaseLocale> repository) : base(repository)
+        public ProjectPhaseLocaleController(IGenericRepository<ProjPhaseLocale> repository, IUserRepository userRepository) : base(repository, userRepository)
         {
         }
     }

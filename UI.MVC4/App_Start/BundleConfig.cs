@@ -8,58 +8,50 @@ namespace UI.MVC4
         // For more information on Bundling, visit http://go.microsoft.com/fwlink/?LinkId=254725
         public static void RegisterBundles(BundleCollection bundles)
         {
-            bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
+            bundles.Add(new ScriptBundle("~/Scripts/jquery").Include(
                         "~/Scripts/jquery-{version}.js"));
 
+            bundles.Add(new ScriptBundle("~/Scripts/select2").Include(
+                "~/Scripts/select2.js"
+            ));
+
+            /*
             bundles.Add(new ScriptBundle("~/bundles/jqueryui").Include(
                         "~/Scripts/jquery-ui-{version}.js"));
-
-            bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
-                        "~/Scripts/jquery.validate.js"));
-
-            bundles.Add(new ScriptBundle("~/bundles/wysihtml5").Include(
-                "~/Scripts/wysihtml5/parser_rules/advanced.js",
-                "~/Scripts/wysihtml5/wysihtml5-{version}.js",
-                "~/Scripts/bootstrap3-wysihtml5.js"));
-
-            bundles.Add(new ScriptBundle("~/bundles/select2").Include(
-                        "~/Scripts/select2.js"));
-
-            bundles.Add(new ScriptBundle("~/bundles/pnotify").Include(
-                        "~/Scripts/pnotify/jquery.pnotify.js"));
-
-            bundles.Add(new ScriptBundle("~/bundles/js").Include(
-                        "~/Scripts/form.control.js"));
-
-            bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include("~/Scripts/bootstrap.js"));
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
                         "~/Scripts/modernizr-*"));
+             * 
+             */
+
+            bundles.Add(new ScriptBundle("~/Scripts/libraries")
+                .Include("~/Scripts/underscore.js")
+                .Include("~/Scripts/lodash.js")
+                .Include("~/Scripts/xeditable.js"));
+
+            bundles.Add(new ScriptBundle("~/Scripts/angular").Include(
+                "~/Scripts/angular.js",
+                "~/Scripts/angular-animate.js",
+                "~/Scripts/angular-route.js",
+                "~/Scripts/AngularUI/ui-router.js",
+                "~/Scripts/ui-bootstrap-tpls-{version}.js",
+                "~/Scripts/ui-select2.js",
+                "~/Scripts/restangular.js",
+                "~/Scripts/angular-growl/*.js"));
+
+            bundles.Add(new ScriptBundle("~/Scripts/app").IncludeDirectory(
+                "~/Scripts/app", "*.js", true));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
-                "~/Content/bootstrap-cosmo.*", 
+                "~/Content/bootstrap-cosmo.*",
                 "~/Content/carousel.css",
-                "~/Content/bootstrap3-wysihtml5/bootstrap3-wysihtml5.css",
-                "~/Content/pnotify/*.css",
+                "~/Content/angular-growl/growl.css",
                 "~/Content/css/select2.css",
                 "~/Content/select2-bootstrap.css",
+                "~/Content/xeditable.css",
                 "~/Content/kitos.css"));
-
-            bundles.Add(new StyleBundle("~/Content/themes/base/css").Include(
-                        "~/Content/themes/base/jquery.ui.core.css",
-                        "~/Content/themes/base/jquery.ui.resizable.css",
-                        "~/Content/themes/base/jquery.ui.selectable.css",
-                        "~/Content/themes/base/jquery.ui.accordion.css",
-                        "~/Content/themes/base/jquery.ui.autocomplete.css",
-                        "~/Content/themes/base/jquery.ui.button.css",
-                        "~/Content/themes/base/jquery.ui.dialog.css",
-                        "~/Content/themes/base/jquery.ui.slider.css",
-                        "~/Content/themes/base/jquery.ui.tabs.css",
-                        "~/Content/themes/base/jquery.ui.datepicker.css",
-                        "~/Content/themes/base/jquery.ui.progressbar.css",
-                        "~/Content/themes/base/jquery.ui.theme.css"));
         }
     }
 }

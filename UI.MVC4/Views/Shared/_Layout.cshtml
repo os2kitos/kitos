@@ -1,46 +1,37 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-ng-app="app">
     <head>
         <meta charset="utf-8" />
-        <title>@ViewBag.Title - KITOS</title>
+        <title>{{page.title}} - KITOS</title>
         <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
         <meta name="viewport" content="width=device-width" />
         @Styles.Render("~/Content/css")
-        @Scripts.Render("~/bundles/modernizr")
-
-        <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
-        <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/inputs-ext/wysihtml5/bootstrap-wysihtml5-0.0.2/bootstrap-wysihtml5-0.0.2.css" rel="stylesheet"/>
-
+        
     </head>
     <body>
+        <div data-growl></div>
         <div id="page-wrapper" class="container-fluid">
             <!-- NAVBAR
                 ================================================== -->
-            @Html.Partial("_TopNavigation")
+            <div ng-include="'partials/topnav/topnav.html'"></div>
             
             <div id="page-content" class="row container-fluid" role="main">
                 
-                <div id="sub-menu">
-                    @RenderSection("submenu", required: false)
-                </div>
+                <div id="subnav" data-ng-include="'partials/subnav/subnav.html'"></div>
 
-                <div id="page-body" class="row container-fluid">
-                    @RenderBody()
+                <div id="page-body" class="row container-fluid" ui-view>
                 </div>
+                
+                @{/* this doesn't really do anything, but it's necessary to shut up the interpreter */}
+                @RenderBody()
             </div>
-            
         </div>
-        @Scripts.Render("~/bundles/jquery")
-        @Scripts.Render("~/bundles/pnotify")
-        @Scripts.Render("~/bundles/jqueryval")
-        @Scripts.Render("~/bundles/bootstrap")
-        @Scripts.Render("~/bundles/wysihtml5")
-        @Scripts.Render("~/bundles/select2")
-        @Scripts.Render("~/bundles/js")
-
-        <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/inputs-ext/wysihtml5/wysihtml5.js"></script>
-        <script src="@Url.Content("../../Scripts/holder.js")"></script>
+        
+        @Scripts.Render("~/Scripts/jquery")
+        @Scripts.Render("~/Scripts/select2")
+        @Scripts.Render("~/Scripts/angular")
+        @Scripts.Render("~/Scripts/libraries")
+        @Scripts.Render("~/Scripts/app")
 
         @RenderSection("scripts", required: false)
 

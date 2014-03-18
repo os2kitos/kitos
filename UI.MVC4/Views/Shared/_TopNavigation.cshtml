@@ -15,18 +15,19 @@
                     @if (Request.IsAuthenticated)
                     {
                         <ul class="nav navbar-nav">
-                            <li class="double-line">@Html.ActionLink("Digitaliseringsgrad af opgaveportefølje", "Index", "Home")</li>
-                            <li class="active">@Html.ActionLink("IT Projekter", "Index", "Home")</li>
-                            <li>@Html.ActionLink("IT Systemer", "Index", "Home")</li>
-                            <li>@Html.ActionLink("IT Kontrakter", "Index", "Home")</li>
+                            <li class="double-line">@Html.ActionLink("Digitaliseringsgrad af opgaveportefølje", "Index", "OldHome")</li>
+                            <li class="active">@Html.ActionLink("IT Projekter", "Index", "OldHome")</li>
+                            <li>@Html.ActionLink("IT Systemer", "Index", "OldHome")</li>
+                            <li>@Html.ActionLink("IT Kontrakter", "Index", "OldHome")</li>
                         </ul>
+                        
                         <div class="navbar-text navbar-text-small navbar-right navbar-complex">
                             @using (Html.BeginForm("Logout", "Authorize", FormMethod.Post, new { @class = "form-inline" }))
                             {
                                 @Html.AntiForgeryToken()
 
                                 <div class="form-group small">
-                                    @Html.ActionLink(User.Identity.Name, "UserPage", "Home", null, new { @class = "btn btn-xs btn-link" })
+                                    @Html.ActionLink(User.Identity.Name, "UserPage", "OldHome", null, new { @class = "btn btn-xs btn-link" })
                                     <input type="submit" value="Log ud" class="btn btn-xs btn-link" />
                                 </div>
                             }
@@ -39,7 +40,7 @@
                             -->
 
                             
-                                <!-- @Html.ActionLink("Vidensdeling", "Index", "Home", null, new { @class = "btn btn-xs btn-link" }) -->
+                                <!-- @Html.ActionLink("Vidensdeling", "Index", "OldHome", null, new { @class = "btn btn-xs btn-link" }) -->
                             
                             <br/>
                             @if (User.IsInRole("GlobalAdmin"))

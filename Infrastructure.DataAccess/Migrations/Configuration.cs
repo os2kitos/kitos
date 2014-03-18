@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -37,6 +38,8 @@ namespace Infrastructure.DataAccess.Migrations
             //      new Person { FullName = "Rowan Miller" }
             //    );
             //
+
+            var cryptoService = new CryptoService();
 
             #region AdminRoles
             var globalAdmin = new Role { Name = "GlobalAdmin" };
@@ -148,7 +151,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItContractModuleName() {Name = "Kontrakter"});
 
             context.Configs.AddOrUpdate(x => x.Id,
-                new Config() {
+                new Core.DomainModel.Config() {
                     Municipality = globalMunicipality,
                     ItContractModuleName = itContractName,
                     ItProjectModuleName = itProjectName,
@@ -157,35 +160,11 @@ namespace Infrastructure.DataAccess.Migrations
                     ShowItContractModule = true,
                     ShowItProjectModule = true,
                     ShowItSystemModule = true,
+                    ItSupportGuide = ".../itunderstøttelsesvejledning",
+                    ItProjectGuide = ".../itprojektvejledning",
+                    ItSystemGuide = ".../itsystemvejledning",
+                    ItContractGuide = ".../itkontraktvejledning"
                 });
-
-            context.ItSupportConfigs.AddOrUpdate(x => x.Id,
-                new ItSupportConfig()
-                    {
-                        Municipality = globalMunicipality, 
-                        ItSupportGuide = ".../itunderstøttelsesvejledning"
-                    });
-
-            context.ItProjectConfigs.AddOrUpdate(x => x.Id,
-                new ItProjectConfig()
-                    {
-                        Municipality = globalMunicipality,
-                        ItProjectGuide = ".../itprojektvejledning"
-                    });
-
-            context.ItSystemConfigs.AddOrUpdate(x => x.Id,
-                new ItSystemConfig()
-                    {
-                        Municipality = globalMunicipality, 
-                        ItSystemGuide = ".../itsystemvejledning"
-                    });
-
-            context.ItContractConfigs.AddOrUpdate(x => x.Id,
-                new ItContractConfig()
-                    {
-                        Municipality = globalMunicipality,
-                        ItContractGuide = ".../itkontraktvejledning"
-                    });
 
             context.SaveChanges();
 
@@ -247,22 +226,24 @@ namespace Infrastructure.DataAccess.Migrations
             
             #region Users
 
+            var simonSalt = cryptoService.Encrypt("simonsalt");
             var simon = new User
             {
                 Name = "Simon Lynn-Pedersen",
                 Email = "slp@it-minds.dk",
-                Salt = "uw5BuXBIc52n2pL2MH4NRZMg44SVmw3GmrvOAK5pxz4=", //encryption of "saltsimon"
-                Password = "2Pps82r5J0vIjvxJjHPf4mF/t2Q5VySmTiT2ZgV7e8U=", //"slp123" encrypted with salt
+                Salt = simonSalt,
+                Password = cryptoService.Encrypt("slp123" + simonSalt),
                 Role = globalAdmin,
                 Municipality = globalMunicipality
             };
 
+            var eskildSalt = cryptoService.Encrypt("eskildsalt");
             var eskild = new User()
                 {
                     Name = "Eskild",
                     Email = "esd@it-minds.dk",
-                    Salt = "uw5BuXBIc52n2pL2MH4NRZMg44SVmw3GmrvOAK5pxz4=", //encryption of "saltsimon"
-                    Password = "2Pps82r5J0vIjvxJjHPf4mF/t2Q5VySmTiT2ZgV7e8U=", //"slp123" encrypted with salt
+                    Salt = eskildSalt,
+                    Password = cryptoService.Encrypt("arne123" + eskildSalt),
                     Role = localAdmin,
                     Municipality = globalMunicipality
                 };

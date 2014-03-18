@@ -108,19 +108,26 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
+            Mapper.CreateMap<ItSystemRole, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
+            Mapper.CreateMap<ItContractRole, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
+            Mapper.CreateMap<DepartmentRole, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
             Mapper.CreateMap<ProjPhaseLocale, LocaleDTO>().ReverseMap();
             Mapper.CreateMap<ExtRefTypeLocale, LocaleDTO>().ReverseMap();
 
-            Mapper.CreateMap<Config, ConfigDTO>()
-                  .ForMember(dest => dest.ItContractNameId, opt => opt.MapFrom(src => src.ItContractModuleName_Id))
-                  .ForMember(dest => dest.ItProjectNameId, opt => opt.MapFrom(src => src.ItProjectModuleName_Id))
-                  .ForMember(dest => dest.ItSystemNameId, opt => opt.MapFrom(src => src.ItSystemModuleName_Id))
-                  .ForMember(dest => dest.ItSupportNameId, opt => opt.MapFrom(src => src.ItSupportModuleName_Id))
-                  .ReverseMap()
-                  .ForMember(dest => dest.ItContractModuleName_Id, opt => opt.MapFrom(src => src.ItContractNameId))
-                  .ForMember(dest => dest.ItProjectModuleName_Id, opt => opt.MapFrom(src => src.ItProjectNameId))
-                  .ForMember(dest => dest.ItSystemModuleName_Id, opt => opt.MapFrom(src => src.ItSystemNameId))
-                  .ForMember(dest => dest.ItSupportModuleName_Id, opt => opt.MapFrom(src => src.ItSupportNameId));
+            Mapper.CreateMap<ProjPhaseLocale, LocaleInputDTO>().ReverseMap();
+            Mapper.CreateMap<ExtRefTypeLocale, LocaleInputDTO>().ReverseMap();
+
+            Mapper.CreateMap<Config, ConfigDTO>().ReverseMap();
+            
         }
     }
 
@@ -130,9 +137,14 @@ namespace UI.MVC4.App_Start
         {
             base.Configure();
 
-            Mapper.CreateMap<User, UserApiModel>().ReverseMap();
+            Mapper.CreateMap<User, UserDTO>()
+                .ForMember(dto => dto.RoleName, opt => opt.MapFrom(src => src.Role != null ? src.Role.Name : ""))
+                .ReverseMap();
 
             Mapper.CreateMap<Municipality, MunicipalityApiModel>().ReverseMap();
+
+            Mapper.CreateMap<PasswordResetRequest, PasswordResetRequestDTO>()
+                  .ForMember(dto => dto.UserEmail, opt => opt.MapFrom(src => src.User.Email));
         }
     }
 }

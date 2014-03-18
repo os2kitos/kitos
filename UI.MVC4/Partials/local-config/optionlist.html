@@ -1,0 +1,15 @@
+﻿<div class="form-group row">
+    <label class="col-md-2 control-label">
+        {{ title }}
+    </label>
+    <div class="col-md-10 container-fluid">
+        <div class="row">
+            <div class="col-md-8 h4">KITOS default</div>
+            <div class="col-md-4 h4">Betydning</div>
+        </div>
+        <div class="row" data-ng-repeat="option in list">
+            <div class="col-md-8">{{option.name}}</div>
+            <div class="col-md-4 small">{{option.note}}</div>
+        </div>
+    </div>
+</div>

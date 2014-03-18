@@ -78,39 +78,29 @@ div#page-body {
     }
 /*********************************************/
 
-#sub-menu {
+#subnav {
     margin-top: 20px;
 
 }
 
-#sub-menu ul {
+#subnav ul {
     list-style-type: none;
     margin: 0px;
-
-    /*
-        border-bottom: 1px solid black;
-        */
 }
 
-#sub-menu nav ul li {
+#subnav nav ul li {
 
     display: inline-block;
     margin-left: 10px;
 }
 
-#sub-menu nav ul li a.btn-tab {
-    /*
-    border-style: solid;
-    border-color: #5c5c5c;
-    border-bottom-color: black;
-    border-width: 1px 1px 1px 1px;
-        */
+#subnav nav ul li a.btn-tab {
     
     color: black;
     background-color: #e6e6e6;
 }
 
-#sub-menu nav ul li a.btn-tab-active {
+#subnav nav ul li a.btn-tab-active {
     background-color: white;
 }
 
@@ -126,47 +116,10 @@ div#page-body {
 
 div.suggest-box {
     padding: 15px;
-    position: relative;
 }
-div.suggest-extended {
-    display: none;
-    position: absolute;
-    z-index: 1000;
-    background-color: #fafafa;
-    padding: 15px;
 
-    width: 300px;
-
-    -webkit-box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.24);
-    -moz-box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.24);
-    box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.24);
-}
-form.suggest-form input[type=text] {
-    width: 90%;
-    margin-left: 10px;
-}
 input:disabled {
     cursor: inherit !important;
-}
-
-#navbar-side {
-    margin: 10px;
-    padding: 0px;
-}
-
-form.config-form > div.row {
-    padding: 10px;
-    margin-bottom: 40px;
-}
-form.config-form > div.row:nth-child(odd) {
-    padding: 10px;
-    margin-bottom: 40px;
-    
-    background-color: #fafafa;
-}
-
-div.config-clone {
-    display: none;
 }
 
 .full-width {
@@ -183,4 +136,10 @@ div.config-clone {
 
 .broken-white {
     color: #f0f0f0 !important;
+}
+
+/* invalid input fields */
+input.ng-invalid:not(.ng-pristine) {
+    background-color: rgba(240, 73, 73, 0.2) !important;
+
 }

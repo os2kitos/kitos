@@ -3,7 +3,7 @@
             @Html.AntiForgeryToken()
 
             <div class="form-group small">
-                @Html.ActionLink(User.Identity.Name, "UserPage", "Home", null, new {@class = "btn btn-xs btn-link"})
+                @Html.ActionLink(User.Identity.Name, "UserPage", "OldHome", null, new {@class = "btn btn-xs btn-link"})
                 <input type="submit" value="Log ud" class="btn btn-xs btn-link" />
             </div>
             

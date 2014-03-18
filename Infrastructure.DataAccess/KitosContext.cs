@@ -20,6 +20,7 @@ namespace Infrastructure.DataAccess
         }
 
         public DbSet<Agreement> Agreements { get; set; }
+        public DbSet<AgreementElement> AgreementElements { get; set; }
         public DbSet<BasicData> BasicDatas { get; set; }
         public DbSet<Communication> Communications { get; set; }
         public DbSet<Component> Components { get; set; }
@@ -39,24 +40,21 @@ namespace Infrastructure.DataAccess
         public DbSet<Goal> Goals { get; set; }
         public DbSet<GoalStatus> GoalStatus { get; set; }
         public DbSet<Handover> Handovers { get; set; }
+        public DbSet<HandoverTrial> HandoverTrials { get; set; }
         public DbSet<Hierarchy> Hierarchies { get; set; }
         public DbSet<Host> Hosts { get; set; }
         public DbSet<Core.DomainModel.ItSystem.Infrastructure> Infrastructures { get; set; }
         public DbSet<Interface> Interfaces { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
-        public DbSet<ItContractConfig> ItContractConfigs { get; set; }
         public DbSet<ItContractModuleName> ItContractModuleNames { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
         public DbSet<ItContractRight> ItContractRights { get; set; }
         public DbSet<ItContractRole> ItContractRoles { get; set; }
-        public DbSet<ItProjectConfig> ItProjectConfigs { get; set; }
         public DbSet<ItProjectModuleName> ItProjectModuleNames { get; set; }
         public DbSet<ItProject> ItProjects { get; set; }
         public DbSet<ItProjectRight> ItProjectRights { get; set; }
         public DbSet<ItProjectRole> ItProjectRoles { get; set; }
-        public DbSet<ItSupportConfig> ItSupportConfigs { get; set; }
         public DbSet<ItSupportModuleName> ItSupportModuleNames { get; set; }
-        public DbSet<ItSystemConfig> ItSystemConfigs { get; set; }
         public DbSet<ItSystemModuleName> ItSystemModuleNames { get; set; }
         public DbSet<ItSystem> ItSystems { get; set; }
         public DbSet<ItSystemRight> ItSystemRights { get; set; }
@@ -97,6 +95,7 @@ namespace Infrastructure.DataAccess
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Configurations.Add(new AgreementMap());
+            modelBuilder.Configurations.Add(new AgreementElementMap());
             modelBuilder.Configurations.Add(new BasicDataMap());
             modelBuilder.Configurations.Add(new CommunicationMap());
             modelBuilder.Configurations.Add(new ComponentsMap());
@@ -116,6 +115,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new GoalMap());
             modelBuilder.Configurations.Add(new GoalStatusMap());
             modelBuilder.Configurations.Add(new HandoverMap());
+            modelBuilder.Configurations.Add(new HandoverTrialMap());
             modelBuilder.Configurations.Add(new HierarchyMap());
             modelBuilder.Configurations.Add(new HostMap());
             modelBuilder.Configurations.Add(new InfrastructureMap());
@@ -124,19 +124,15 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItContractMap());
             modelBuilder.Configurations.Add(new ItContractRightMap());
             modelBuilder.Configurations.Add(new ItContractRoleMap());
-            modelBuilder.Configurations.Add(new ItContractConfigMap());
             modelBuilder.Configurations.Add(new ItContractModuleNameMap());
             modelBuilder.Configurations.Add(new ItProjectMap());
             modelBuilder.Configurations.Add(new ItProjectRightMap());
             modelBuilder.Configurations.Add(new ItProjectRoleMap());
-            modelBuilder.Configurations.Add(new ItProjectConfigMap());
             modelBuilder.Configurations.Add(new ItProjectModuleNameMap());
-            modelBuilder.Configurations.Add(new ItSupportConfigMap());
             modelBuilder.Configurations.Add(new ItSupportModuleNameMap());
             modelBuilder.Configurations.Add(new ItSystemMap());
             modelBuilder.Configurations.Add(new ItSystemRightMap());
             modelBuilder.Configurations.Add(new ItSystemRoleMap());
-            modelBuilder.Configurations.Add(new ItSystemConfigMap());
             modelBuilder.Configurations.Add(new ItSystemModuleNameMap());
             modelBuilder.Configurations.Add(new KLEMap());
             modelBuilder.Configurations.Add(new LocalizationMap());
