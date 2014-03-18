@@ -147,6 +147,7 @@
         handler($scope, Restangular, 'ProtocolType', 'ProtocolTypes');
         handler($scope, Restangular, 'Method', 'Methods');
         handler($scope, Restangular, 'DatabaseType', 'DatabaseTypes');
+        handler($scope, Restangular, 'Environment', 'Environments');
     }]);
 
     function handler($scope, Restangular, nameSingular, namePlural) {
