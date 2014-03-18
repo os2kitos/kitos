@@ -141,144 +141,42 @@
             return Restangular.one('extReferenceType', item.Id).patch({ Name: data });
         };
 
-        $scope.patchRole = function (data, i) {
-            var item = $scope.roles[i];
-            var result = Restangular.one('ItSystemRole', item.Id).patch({ IsActive: data }).then(function () {
-                updateRoles();
-            });
-            return result;
-        };
-
-        $scope.patchRoleSuggestion = function (data, i) {
-            var item = $scope.roleSuggestions[i];
-            var result = Restangular.one('ItSystemRole', item.Id).patch({ IsSuggestion: data }).then(function () {
-                updateRoles();
-            });
-            return result;
-        };
-
-        var baseRoles = Restangular.all('ItSystemRole');
-        function updateRoles() {
-            baseRoles.getList({ nonsuggestions: true }).then(function (list) {
-                $scope.roles = list;
-            });
-
-            baseRoles.getList({ suggestions: true }).then(function (list) {
-                $scope.roleSuggestions = list;
-            });
-        };
-        updateRoles();
-        
-        $scope.patchType = function (data, i) {
-            var item = $scope.roles[i];
-            var result = Restangular.one('SystemType', item.Id).patch({ IsActive: data }).then(function () {
-                updateTypes();
-            });
-            return result;
-        };
-
-        $scope.patchTypeSuggestion = function (data, i) {
-            var item = $scope.roleSuggestions[i];
-            var result = Restangular.one('SystemType', item.Id).patch({ IsSuggestion: data }).then(function () {
-                updateTypes();
-            });
-            return result;
-        };
-
-        var baseTypes = Restangular.all('SystemType');
-        function updateTypes() {
-            baseTypes.getList({ nonsuggestions: true }).then(function (list) {
-                $scope.types = list;
-            });
-
-            baseTypes.getList({ suggestions: true }).then(function (list) {
-                $scope.typeSuggestions = list;
-            });
-        };
-        updateTypes();
-        
-        $scope.patchInterface = function (data, i) {
-            var item = $scope.roles[i];
-            var result = Restangular.one('InterfaceType', item.Id).patch({ IsActive: data }).then(function () {
-                updateInterfaces();
-            });
-            return result;
-        };
-
-        $scope.patchInterfaceSuggestion = function (data, i) {
-            var item = $scope.roleSuggestions[i];
-            var result = Restangular.one('InterfaceType', item.Id).patch({ IsSuggestion: data }).then(function () {
-                updateInterfaces();
-            });
-            return result;
-        };
-
-        var baseInterfaces = Restangular.all('InterfaceType');
-        function updateInterfaces() {
-            baseInterfaces.getList({ nonsuggestions: true }).then(function (list) {
-                $scope.interfaces = list;
-            });
-
-            baseInterfaces.getList({ suggestions: true }).then(function (list) {
-                $scope.interfacesSuggestions = list;
-            });
-        };
-        updateInterfaces();
-        
-        $scope.patchProtocol = function (data, i) {
-            var item = $scope.roles[i];
-            var result = Restangular.one('ProtocolType', item.Id).patch({ IsActive: data }).then(function () {
-                updateProtocols();
-            });
-            return result;
-        };
-
-        $scope.patchProtocolSuggestion = function (data, i) {
-            var item = $scope.roleSuggestions[i];
-            var result = Restangular.one('ProtocolType', item.Id).patch({ IsSuggestion: data }).then(function () {
-                updateProtocols();
-            });
-            return result;
-        };
-
-        var baseProtocols = Restangular.all('ProtocolType');
-        function updateProtocols() {
-            baseProtocols.getList({ nonsuggestions: true }).then(function (list) {
-                $scope.protocols = list;
-            });
-
-            baseProtocols.getList({ suggestions: true }).then(function (list) {
-                $scope.protocolsSuggestions = list;
-            });
-        };
-        updateProtocols();
-        
-        $scope.patchMethod = function (data, i) {
-            var item = $scope.roles[i];
-            var result = Restangular.one('Method', item.Id).patch({ IsActive: data }).then(function () {
-                updateMethods();
-            });
-            return result;
-        };
-
-        $scope.patchProtocolSuggestion = function (data, i) {
-            var item = $scope.roleSuggestions[i];
-            var result = Restangular.one('Method', item.Id).patch({ IsSuggestion: data }).then(function () {
-                updateMethods();
-            });
-            return result;
-        };
-
-        var baseMethods = Restangular.all('Method');
-        function updateMethods() {
-            baseMethods.getList({ nonsuggestions: true }).then(function (list) {
-                $scope.methods = list;
-            });
-
-            baseMethods.getList({ suggestions: true }).then(function (list) {
-                $scope.methodsSuggestions = list;
-            });
-        };
-        updateMethods();
+        handler($scope, Restangular, 'ItSystemRole', 'ItSystemRoles');        
+        handler($scope, Restangular, 'SystemType', 'SystemTypes');
+        handler($scope, Restangular, 'InterfaceType', 'InterfaceTypes');
+        handler($scope, Restangular, 'ProtocolType', 'ProtocolTypes');
+        handler($scope, Restangular, 'Method', 'Methods');
+        handler($scope, Restangular, 'DatabaseType', 'DatabaseTypes');
     }]);
+
+    function handler($scope, Restangular, nameSingular, namePlural) {
+        var local = {};
+
+        $scope['patch' + nameSingular] = function (data, i) {
+            var item = $scope[namePlural][i];
+            var result = Restangular.one(nameSingular, item.Id).patch({ IsActive: data }).then(function () {
+                local['update' + namePlural]();
+            });
+            return result;
+        };
+
+        $scope['patch' + nameSingular + 'Suggestion'] = function (data, i) {
+            var item = $scope[nameSingular + 'Suggestions'][i];
+            var result = Restangular.one('Method', item.Id).patch({ IsSuggestion: data }).then(function () {
+                local['update' + namePlural]();
+            });
+            return result;
+        };
+
+        local['update' + namePlural] = function () {
+            Restangular.all(nameSingular).getList({ nonsuggestions: true }).then(function (list) {
+                $scope[namePlural] = list;
+            });
+
+            Restangular.all(nameSingular).getList({ suggestions: true }).then(function (list) {
+                $scope[nameSingular + 'Suggestions'] = list;
+            });
+        };
+        local['update' + namePlural]();
+    }
 })(angular, app);
