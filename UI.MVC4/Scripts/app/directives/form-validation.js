@@ -1,5 +1,4 @@
 ﻿(function (ng, app) {
-    
     app.directive('match', [function () {
         return {
             restrict: 'A',
@@ -24,6 +23,4 @@
             }
         };
     }]);
-   
-
 })(angular, app);
