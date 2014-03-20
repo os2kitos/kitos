@@ -254,7 +254,6 @@
     <Compile Include="Controllers\API\MunicipalityController.cs" />
     <Compile Include="Controllers\API\PasswordResetRequestController.cs" />
     <Compile Include="Controllers\API\UserController.cs" />
-    <Compile Include="Controllers\Web\AccountController.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Controllers\Web\GlobalConfigController.cs" />
     <Compile Include="Controllers\Web\LocalConfigController.cs" />
@@ -265,7 +264,6 @@
     <Compile Include="Controllers\Web\OldHomeController.cs" />
     <Compile Include="Controllers\API\TextController.cs" />
     <Compile Include="Controllers\Web\TestController.cs" />
-    <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -277,7 +275,6 @@
     <Compile Include="Infrastructure\NinjectDependencyScope.cs" />
     <Compile Include="Infrastructure\ProviderInitializationHttpModule.cs" />
     <Compile Include="Infrastructure\UserRepositoryFactory.cs" />
-    <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\ApiReturnDTO.cs" />
     <Compile Include="Models\AuthorizeViewModels.cs" />
     <Compile Include="Models\ConfigDTO.cs" />
@@ -618,6 +615,7 @@
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <None Include="Properties\PublishProfiles\Kitos - Debug.pubxml" />
     <None Include="Scripts\jquery-1.7.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.7.2.js" />
     <Content Include="Scripts\jquery-1.7.2.min.js" />
@@ -625,7 +623,6 @@
     <Content Include="Scripts\knockout-2.2.0.js" />
     <Content Include="Scripts\lodash.js" />
     <Content Include="Scripts\lodash.min.js" />
-    <Content Include="Scripts\pnotify\jquery.pnotify.js" />
     <Content Include="Scripts\form.control.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ar.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_bg.js" />
@@ -752,6 +749,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="Content\themes\base\images\" />
     <Folder Include="Content\themes\base\minified\images\" />
+    <Folder Include="Filters\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
