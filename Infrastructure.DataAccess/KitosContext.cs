@@ -11,9 +11,7 @@ namespace Infrastructure.DataAccess
     {
         static KitosContext()
         {
-#if DEBUG
-            Database.SetInitializer(new CreateDatabaseIfNotExists<KitosContext>());
-#endif
+
         }
 
         public KitosContext()
