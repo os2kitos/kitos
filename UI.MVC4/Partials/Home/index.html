@@ -1,4 +1,4 @@
-﻿<div class="container-fluid marketing">
+﻿<div class="container-fluid marketing" data-ng-controller="home.IndexCtrl">
 
     <div class="row">
         <div class="col-lg-4">
@@ -28,8 +28,12 @@
             <img class="featurette-image img-responsive" data-src="holder.js/500x500/auto" alt="Generic placeholder image" holder-fix>
         </div>
         <div class="col-md-7">
-            <h2 class="featurette-heading" data-type="wysihtml5" data-url="/api/text/intro-head">Hvad er KITOS? <span class="text-muted">KITOS er et cloud baseret IT system, som hver enkelt kommune gratis kan tage i brug.</span></h2>
-            <p class="lead" data-type="wysihtml5" data-url="/api/text/intro-body"></p>
+            <h2 class="featurette-heading" data-editable-textarea="introhead">
+                {{ introhead || 'tom' }}
+            </h2>
+            <p class="lead" data-editable-textarea="introbody">
+                {{ introbody || 'tom' }}
+            </p>
         </div>
     </div>
 
