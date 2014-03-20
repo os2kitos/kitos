@@ -8,12 +8,11 @@ namespace UI.MVC4
         // For more information on Bundling, visit http://go.microsoft.com/fwlink/?LinkId=254725
         public static void RegisterBundles(BundleCollection bundles)
         {
+            // jQuery and plugins
             bundles.Add(new ScriptBundle("~/Scripts/jquery").Include(
-                        "~/Scripts/jquery-{version}.js"));
-
-            bundles.Add(new ScriptBundle("~/Scripts/select2").Include(
-                "~/Scripts/select2.js"
-            ));
+                "~/Scripts/jquery-{version}.js",
+                "~/Scripts/holder.js",
+                "~/Scripts/select2.js"));
 
             /*
             bundles.Add(new ScriptBundle("~/bundles/jqueryui").Include(
@@ -26,11 +25,13 @@ namespace UI.MVC4
              * 
              */
 
-            bundles.Add(new ScriptBundle("~/Scripts/libraries")
-                .Include("~/Scripts/underscore.js")
-                .Include("~/Scripts/lodash.js")
-                .Include("~/Scripts/xeditable.js"));
+            // standalone libraries
+            bundles.Add(new ScriptBundle("~/Scripts/libraries").Include(
+                "~/Scripts/underscore.js",
+                "~/Scripts/lodash.js",
+                "~/Scripts/wysihtml5/wysihtml5-{version}.js"));
 
+            // angularjs and plugins
             bundles.Add(new ScriptBundle("~/Scripts/angular").Include(
                 "~/Scripts/angular.js",
                 "~/Scripts/angular-animate.js",
@@ -39,16 +40,20 @@ namespace UI.MVC4
                 "~/Scripts/ui-bootstrap-tpls-{version}.js",
                 "~/Scripts/ui-select2.js",
                 "~/Scripts/restangular.js",
-                "~/Scripts/angular-growl/*.js"));
+                "~/Scripts/angular-growl/*.js",
+                "~/Scripts/xeditable.js"));
 
+            // angular app files
             bundles.Add(new ScriptBundle("~/Scripts/app").IncludeDirectory(
                 "~/Scripts/app", "*.js", true));
 
+            // css
             bundles.Add(new StyleBundle("~/Content/css").Include(
                 "~/Content/bootstrap-cosmo.*",
                 "~/Content/carousel.css",
                 "~/Content/angular-growl/growl.css",
                 "~/Content/css/select2.css",
+                "~/Content/css/bootstrap-wysihtml5.css",
                 "~/Content/select2-bootstrap.css",
                 "~/Content/xeditable.css",
                 "~/Content/kitos.css"));
