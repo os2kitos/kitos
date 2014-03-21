@@ -26,9 +26,17 @@
 
     }]);
 
-    app.controller('home.IndexCtrl', ['$rootScope', '$scope', function ($rootScope, $scope) {
+    app.controller('home.IndexCtrl', ['$rootScope', '$scope', 'Restangular', function ($rootScope, $scope, Restangular) {
         $rootScope.page.title = 'Index';
         $rootScope.page.subnav = [];
+
+        Restangular.one('text', 'intro-head').get().then(function (data) {
+            $scope.introhead = data.Value;
+        });
+        
+        Restangular.one('text', 'intro-body').get().then(function (data) {
+            $scope.introbody = data.Value;
+        });
     }]);
     
     app.controller('home.LoginCtrl', ['$rootScope', '$scope', '$http', '$state', '$stateParams', function ($rootScope, $scope, $http, $state, $stateParams) {
