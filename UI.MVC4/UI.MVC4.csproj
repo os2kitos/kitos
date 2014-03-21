@@ -223,9 +223,10 @@
     <Compile Include="Controllers\API\BaseApiController.cs" />
     <Compile Include="Controllers\API\ContractTemplateController.cs" />
     <Compile Include="Controllers\API\ContractTypeController.cs" />
+    <Compile Include="Models\CreateLocalAdminDTO.cs" />
     <Compile Include="Controllers\API\DatabaseTypeController.cs" />
     <Compile Include="Controllers\API\ConfigController.cs" />
-    <Compile Include="Controllers\API\DepartmentRoleController.cs" />
+    <Compile Include="Controllers\API\OrganizationRoleController.cs" />
     <Compile Include="Controllers\API\EnvironmentController.cs" />
     <Compile Include="Controllers\API\ExtReferenceTypeLocaleController.cs" />
     <Compile Include="Controllers\API\ExtReferenceTypeController.cs" />
@@ -241,6 +242,7 @@
     <Compile Include="Controllers\API\ItSystemNamesController.cs" />
     <Compile Include="Controllers\API\ItSystemRoleController.cs" />
     <Compile Include="Controllers\API\MethodController.cs" />
+    <Compile Include="Controllers\API\OrganizationUnitController.cs" />
     <Compile Include="Controllers\API\PaymentModelController.cs" />
     <Compile Include="Controllers\API\ProjectCategoryController.cs" />
     <Compile Include="Controllers\API\ProjectPhaseController.cs" />
@@ -251,7 +253,7 @@
     <Compile Include="Controllers\API\SystemTypeController.cs" />
     <Compile Include="Controllers\API\GlobalAdminController.cs" />
     <Compile Include="Controllers\API\LocalAdminController.cs" />
-    <Compile Include="Controllers\API\MunicipalityController.cs" />
+    <Compile Include="Controllers\API\OrganizationController.cs" />
     <Compile Include="Controllers\API\PasswordResetRequestController.cs" />
     <Compile Include="Controllers\API\UserController.cs" />
     <Compile Include="Controllers\Web\AccountController.cs" />
@@ -284,7 +286,8 @@
     <Compile Include="Models\LocaleDTO.cs" />
     <Compile Include="Models\LoginDTO.cs" />
     <Compile Include="Models\OptionDTO.cs" />
-    <Compile Include="Models\MunicipalityApiModel.cs" />
+    <Compile Include="Models\OrganizationDTO.cs" />
+    <Compile Include="Models\OrgUnitDTO.cs" />
     <Compile Include="Models\PasswordResetRequestDTO.cs" />
     <Compile Include="Models\ResetPasswordDTO.cs" />
     <Compile Include="Models\UserDTO.cs" />
@@ -312,7 +315,7 @@
     <Content Include="Partials\global-config\contract.html" />
     <Content Include="Partials\global-config\org.html" />
     <Content Include="Partials\global-config\project.html" />
-    <Content Include="Partials\global-admin\new-municipality.html" />
+    <Content Include="Partials\global-admin\new-organization.html" />
     <Content Include="Partials\home\reset-password.html" />
     <Content Include="Partials\home\forgot-password.html" />
     <Content Include="Partials\home\index.html" />
@@ -324,6 +327,8 @@
     <Content Include="Partials\local-config\suggest-new.html" />
     <Content Include="Partials\local-config\support.html" />
     <Content Include="Partials\local-config\system.html" />
+    <Content Include="Partials\org\org-unit.html" />
+    <Content Include="Partials\org\org.html" />
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />
     <Content Include="Partials\topnav\unauthorized.html" />
@@ -356,6 +361,7 @@
     <Content Include="Scripts\app\controllers\global-admin\global-config.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config.js" />
+    <Content Include="Scripts\app\controllers\org\org.js" />
     <Content Include="Scripts\app\directives\form-validation.js" />
     <Content Include="Scripts\app\app.js" />
     <Content Include="Scripts\bootstrap3-wysihtml5.js" />

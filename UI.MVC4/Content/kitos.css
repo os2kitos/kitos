@@ -80,29 +80,64 @@ div#page-body {
 
 #subnav {
     margin-top: 20px;
-
 }
 
-#subnav ul {
-    list-style-type: none;
-    margin: 0px;
-}
+    #subnav ul {
+        list-style-type: none;
+        margin: 0px;
+    }
 
-#subnav nav ul li {
+    #subnav nav ul li {
+        display: inline-block;
+        margin-left: 10px;
+    }
 
-    display: inline-block;
-    margin-left: 10px;
-}
+        #subnav nav ul li a.btn-tab {
+            color: black;
+            background-color: #e6e6e6;
+        }
 
-#subnav nav ul li a.btn-tab {
+        #subnav nav ul li a.btn-tab-active {
+            background-color: white;
+        }
+
+
+div.org-node {
     
-    color: black;
-    background-color: #e6e6e6;
 }
 
-#subnav nav ul li a.btn-tab-active {
-    background-color: white;
+div.org-node li {
+    list-style-type: none;
+    margin: 0;
+    padding: 10px 5px 0 5px;
+    position: relative;
 }
+
+    div.org-node li::before, .org-node li::after {
+        content: '';
+        left: -20px;
+        position: absolute;
+        right: auto;
+    }
+
+    div.org-node li::before {
+        border-left: 2px solid #dddddd;
+        bottom: 50px;
+        height: 100%;
+        top: 0;
+        width: 1px;
+    }
+
+    div.org-node li:last-child::before {
+        height: 20px;
+    }
+
+    div.org-node li::after {
+        border-top: 2px solid #dddddd;
+        height: 20px;
+        top: 20px;
+        width: 20px;
+    }
 
 /* TODO: Style these? */
 .alert-danger {
@@ -141,5 +176,4 @@ input:disabled {
 /* invalid input fields */
 input.ng-invalid:not(.ng-pristine) {
     background-color: rgba(240, 73, 73, 0.2) !important;
-
 }

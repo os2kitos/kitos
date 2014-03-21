@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel
 {
-    public class DepartmentRole : IOptionEntity<DepartmentRight>
+    public class OrganizationRole : IOptionEntity<OrganizationRight>
     {
-        public DepartmentRole()
+        public OrganizationRole()
         {
-            References = new List<DepartmentRight>();
+            References = new List<OrganizationRight>();
         }
 
         public int Id { get; set; }
@@ -18,6 +18,6 @@ namespace Core.DomainModel
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }
         public string Note { get; set; }
-        public virtual ICollection<DepartmentRight> References { get; set; }
+        public virtual ICollection<OrganizationRight> References { get; set; }
     }
 }

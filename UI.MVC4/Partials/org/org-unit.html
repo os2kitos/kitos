@@ -1,0 +1,8 @@
+﻿<div class="org-node">
+    <span class="node-info">{{node.Name}}</span>
+    <ul>
+        <li data-ng-repeat="node in node.Children">
+            <div data-ng-include="'partials/org/org-unit.html'"></div>
+        </li>
+    </ul>
+</div>

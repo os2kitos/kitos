@@ -1,6 +1,6 @@
 namespace Core.DomainModel.ItProject
 {
-    public class Organization
+    public class OrgTab
     {
         public int Id { get; set; }
 

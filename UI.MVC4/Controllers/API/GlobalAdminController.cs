@@ -18,16 +18,12 @@ namespace UI.MVC4.Controllers.API
             _userService = userService;
         }
 
-        [Authorize(Roles = "GlobalAdmin")]
         public HttpResponseMessage Post(UserDTO item)
         {
             try
             {
                 var user = AutoMapper.Mapper.Map<UserDTO, User>(item);
-
-                //TODO: Not hardcoding this
-                user.Role_Id = 1;
-                user.Municipality_Id = 1;
+                user.IsGlobalAdmin = true;
 
                 user = _userService.AddUser(user);
 

@@ -8,7 +8,7 @@ namespace Core.DomainModel.ItProject
         public int Original_Id { get; set; }
         public string Name { get; set; }
 
-        public virtual Municipality Municipality { get; set; }
+        public virtual Organization Organization { get; set; }
         public virtual ProjectPhase Original { get; set; }
     }
 }

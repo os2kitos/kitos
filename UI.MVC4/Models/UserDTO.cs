@@ -10,7 +10,5 @@ namespace UI.MVC4.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
-        public int Municipality_Id { get; set; }
-        public string RoleName { get; set; }
     }
 }

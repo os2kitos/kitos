@@ -20,7 +20,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.ItSystems1)
                 .HasForeignKey(d => d.ParentItSystem_Id);
 
-            this.HasRequired(t => t.Municipality)
+            this.HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystems)
                 .HasForeignKey(d => d.Municipality_Id)
                 .WillCascadeOnDelete(false);

@@ -19,6 +19,8 @@ namespace Infrastructure.DataAccess
         {
         }
 
+        public DbSet<AdminRight> AdminRights { get; set; }
+        public DbSet<AdminRole> AdminRoles { get; set; }
         public DbSet<Agreement> Agreements { get; set; }
         public DbSet<AgreementElement> AgreementElements { get; set; }
         public DbSet<BasicData> BasicDatas { get; set; }
@@ -28,9 +30,6 @@ namespace Infrastructure.DataAccess
         public DbSet<ContractTemplate> ContractTemplates { get; set; }
         public DbSet<ContractType> ContractTypes { get; set; }
         public DbSet<DatabaseType> DatabaseTypes { get; set; }
-        public DbSet<Department> Departments { get; set; }
-        public DbSet<DepartmentRight> DepartmentRights { get; set; }
-        public DbSet<DepartmentRole> DepartmentRoles { get; set; }
         public DbSet<Economy> Economies { get; set; }
         public DbSet<Environment> Environments { get; set; }
         public DbSet<ExtReference> ExtReferences { get; set; }
@@ -63,8 +62,11 @@ namespace Infrastructure.DataAccess
         public DbSet<Localization> Localizations { get; set; }
         public DbSet<Method> Methods { get; set; }
         public DbSet<Milestone> Milestones { get; set; }
-        public DbSet<Municipality> Municipalities { get; set; }
         public DbSet<Organization> Organizations { get; set; }
+        public DbSet<OrgTab> OrgTabs { get; set; }
+        public DbSet<OrganizationUnit> OrganizationUnits { get; set; }
+        public DbSet<OrganizationRight> OrganizationRights { get; set; }
+        public DbSet<OrganizationRole> OrganizationRoles { get; set; }
         public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
         public DbSet<PaymentModel> PaymentModels { get; set; }
         public DbSet<Payment> Payments { get; set; }
@@ -79,7 +81,6 @@ namespace Infrastructure.DataAccess
         public DbSet<PurchaseForm> PurchaseForms { get; set; }
         public DbSet<Resource> Resources { get; set; }
         public DbSet<Risk> Risks { get; set; }
-        public DbSet<Role> Roles { get; set; }
         public DbSet<ShipNotice> ShipNotices { get; set; }
         public DbSet<Stakeholder> Stakeholders { get; set; }
         public DbSet<SuperUser> SuperUsers { get; set; }
@@ -94,6 +95,8 @@ namespace Infrastructure.DataAccess
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            modelBuilder.Configurations.Add(new AdminRightMap());
+            modelBuilder.Configurations.Add(new AdminRoleMap());
             modelBuilder.Configurations.Add(new AgreementMap());
             modelBuilder.Configurations.Add(new AgreementElementMap());
             modelBuilder.Configurations.Add(new BasicDataMap());
@@ -103,9 +106,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ContractTemplateMap());
             modelBuilder.Configurations.Add(new ContractTypeMap());
             modelBuilder.Configurations.Add(new DatabaseTypeMap());
-            modelBuilder.Configurations.Add(new DepartmentMap());
-            modelBuilder.Configurations.Add(new DepartmentRightMap());
-            modelBuilder.Configurations.Add(new DepartmentRoleMap());
             modelBuilder.Configurations.Add(new EconomyMap());
             modelBuilder.Configurations.Add(new EnvironmentMap());
             modelBuilder.Configurations.Add(new ExtReferenceMap());
@@ -138,8 +138,11 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new LocalizationMap());
             modelBuilder.Configurations.Add(new MethodMap());
             modelBuilder.Configurations.Add(new MilestoneMap());
-            modelBuilder.Configurations.Add(new MunicipalityMap());
             modelBuilder.Configurations.Add(new OrganizationMap());
+            modelBuilder.Configurations.Add(new OrgTabMap());
+            modelBuilder.Configurations.Add(new OrganizationUnitMap());
+            modelBuilder.Configurations.Add(new OrganizationRightMap());
+            modelBuilder.Configurations.Add(new OrganizationRoleMap());
             modelBuilder.Configurations.Add(new PasswordResetRequestMap());
             modelBuilder.Configurations.Add(new PaymentModelMap());
             modelBuilder.Configurations.Add(new PaymentMap());
@@ -154,7 +157,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new PurchaseFormMap());
             modelBuilder.Configurations.Add(new ResourcesMap());
             modelBuilder.Configurations.Add(new RiskMap());
-            modelBuilder.Configurations.Add(new RoleMap());
             modelBuilder.Configurations.Add(new ShipNoticeMap());
             modelBuilder.Configurations.Add(new StakeholdersMap());
             modelBuilder.Configurations.Add(new SuperUserMap());

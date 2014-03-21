@@ -11,7 +11,7 @@ namespace Core.DomainModel
         public int Municipality_Id { get; set; }
         public int Original_Id { get; set; }
         public string Name { get; set; }
-        public Municipality Municipality { get; set; }
+        public Organization Organization { get; set; }
         public ExtReferenceType Original { get; set; }
     }
 }

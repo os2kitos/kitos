@@ -17,7 +17,7 @@ namespace UI.MVC4.Controllers.API
         // GET api/T/default
         public HttpResponseMessage GetDefault(bool? @default)
         {
-            var item = Repository.GetByKey(1); // global municipality has id 1
+            var item = Repository.GetByKey(1); // global Organization has id 1
 
             if (item == null)
                 return NoContent();

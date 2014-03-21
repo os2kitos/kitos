@@ -81,7 +81,6 @@ namespace UI.MVC4.Controllers.API
         }
 
         // POST api/T
-        [Authorize(Roles = "GlobalAdmin, LocalAdmin")]
         public HttpResponseMessage Post(LocaleInputDTO dto)
         {
             var item = Map<LocaleInputDTO, TModel>(dto);
@@ -102,7 +101,6 @@ namespace UI.MVC4.Controllers.API
         }
 
         // PUT api/T
-        [Authorize(Roles = "GlobalAdmin, LocalAdmin")]
         public HttpResponseMessage Put(LocaleInputDTO dto)
         {
             var item = Map<LocaleInputDTO, TModel>(dto);
@@ -121,7 +119,6 @@ namespace UI.MVC4.Controllers.API
         }
 
         // PUT api/T
-        [Authorize(Roles = "GlobalAdmin, LocalAdmin")]
         public HttpResponseMessage Delete([FromUri] int mId, [FromUri] int oId)
         {
             try
@@ -141,11 +138,7 @@ namespace UI.MVC4.Controllers.API
 
         private void TestMunicipalityMembership(int mId)
         {
-            var user = _userRepository.GetByEmail(User.Identity.Name);
-            if (user == null || user.Municipality_Id != mId)
-            {
-                throw new SecurityException();
-            }
+            throw new NotImplementedException();
         }
     }
 }

@@ -33,6 +33,6 @@ namespace Core.DomainModel
         public virtual ItProjectModuleName ItProjectModuleName { get; set; }
         public virtual ItSystemModuleName ItSystemModuleName { get; set; }
         public virtual ItContractModuleName ItContractModuleName { get; set; }
-        public virtual Municipality Municipality { get; set; }
+        public virtual Organization Organization { get; set; }
     }
 }

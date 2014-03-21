@@ -37,7 +37,7 @@
 
         $scope.patchRole = function (data, i) {
             var item = $scope.roles[i];
-            var result = Restangular.one('DepartmentRole', item.Id).patch({ IsActive: data }).then(function () {
+            var result = Restangular.one('OrganizationRole', item.Id).patch({ IsActive: data }).then(function () {
                 updateRoles();
             });
             return result;
@@ -45,13 +45,13 @@
 
         $scope.patchSuggestion = function (data, i) {
             var item = $scope.roleSuggestions[i];
-            var result = Restangular.one('DepartmentRole', item.Id).patch({ IsSuggestion: data }).then(function () {
+            var result = Restangular.one('OrganizationRole', item.Id).patch({ IsSuggestion: data }).then(function () {
                 updateRoles();
             });
             return result;
         };
 
-        var baseRoles = Restangular.all('DepartmentRole');
+        var baseRoles = Restangular.all('OrganizationRole');
         function updateRoles() {
             baseRoles.getList({ nonsuggestions: true }).then(function (roles) {
                 $scope.roles = roles;

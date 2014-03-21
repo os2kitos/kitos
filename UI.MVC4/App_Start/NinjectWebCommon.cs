@@ -68,7 +68,8 @@ namespace UI.MVC4.App_Start
             kernel.Bind<KitosContext>().ToSelf().InRequestScope();
 
             kernel.Bind<IGenericRepository<Text>>().To<GenericRepository<Text>>().InRequestScope();
-            kernel.Bind<IGenericRepository<Municipality>>().To<GenericRepository<Municipality>>().InRequestScope();
+            kernel.Bind<IGenericRepository<Organization>>().To<GenericRepository<Organization>>().InRequestScope();
+            kernel.Bind<IGenericRepository<OrganizationUnit>>().To<GenericRepository<OrganizationUnit>>().InRequestScope();
             kernel.Bind<IGenericRepository<User>>().To<GenericRepository<User>>().InRequestScope();
             kernel.Bind<IGenericRepository<PasswordResetRequest>>().To<GenericRepository<PasswordResetRequest>>().InRequestScope();
             kernel.Bind<IGenericRepository<ContractTemplate>>().To<GenericRepository<ContractTemplate>>().InRequestScope();
@@ -93,7 +94,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<ItProjectRole>>().To<GenericRepository<ItProjectRole>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItContractRole>>().To<GenericRepository<ItContractRole>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItSystemRole>>().To<GenericRepository<ItSystemRole>>().InRequestScope();
-            kernel.Bind<IGenericRepository<DepartmentRole>>().To<GenericRepository<DepartmentRole>>().InRequestScope();
+            kernel.Bind<IGenericRepository<OrganizationRole>>().To<GenericRepository<OrganizationRole>>().InRequestScope();
 
             kernel.Bind<IGenericRepository<Config>>().To<GenericRepository<Config>>();
 
@@ -106,7 +107,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IMailClient>().To<MailClient>().InRequestScope().WithConstructorArgument("host", "localhost").WithConstructorArgument("port", 25);
             kernel.Bind<ICryptoService>().To<CryptoService>();
             kernel.Bind<IUserService>().To<UserService>().InRequestScope();
-            kernel.Bind<IMunicipalityService>().To<MunicipalityService>().InRequestScope();
+            kernel.Bind<IOrganizationService>().To<OrganizationService>().InRequestScope();
 
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
 

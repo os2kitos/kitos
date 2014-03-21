@@ -15,7 +15,7 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.Id).HasColumnName("Id");
 
             // Relationships
-            this.HasRequired(t => t.Municipality)
+            this.HasRequired(t => t.Organization)
                 .WithOptional(t => t.Config);
 
             this.HasRequired(t => t.ItSupportModuleName)

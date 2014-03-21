@@ -36,13 +36,13 @@ namespace Core.DomainModel.ItProject
         public virtual GoalStatus GoalStatus { get; set; }
         public virtual Handover Handover { get; set; }
         public virtual ICollection<KLE> KLEs { get; set; } // TODO
-        public virtual Organization Organization { get; set; }
+        public virtual OrgTab OrgTab { get; set; }
         public virtual PreAnalysis PreAnalysis { get; set; }
         public virtual ProjectStatus ProjectStatus { get; set; }
         public virtual ICollection<Resource> Resources { get; set; }
         public virtual ICollection<Risk> Risks { get; set; }
         public virtual ICollection<Stakeholder> Stakeholders { get; set; }
-        public virtual Municipality Municipality { get; set; }
+        public virtual Organization Organization { get; set; }
         public virtual ProjectCategory ProjectCategory { get; set; }
         public virtual ProjectType ProjectType { get; set; }
         public virtual Hierarchy Hierarchy { get; set; }

@@ -17,16 +17,14 @@ namespace Core.DomainModel
         public string Email { get; set; }
         public string Password { get; set; }
         public string Salt { get; set; }
-        public int Municipality_Id { get; set; }
-        public int? Role_Id { get; set; }
+        public bool IsGlobalAdmin { get; set; }
 
         public virtual ICollection<PasswordResetRequest> PasswordResetRequests { get; set; }
-        public virtual Role Role { get; set; }
-        public virtual Municipality Municipality { get; set; }
 
-        public virtual ICollection<DepartmentRight> DepartmentRights { get; set; }
+        public virtual ICollection<OrganizationRight> OrganizationRights { get; set; }
         public virtual ICollection<ItProjectRight> ProjectRights { get; set; }
         public virtual ICollection<ItSystemRight> SystemRights { get; set; }
         public virtual ICollection<ItContractRight> ContractRights { get; set; }
+        public virtual ICollection<AdminRight> AdminRights { get; set; }
     }
 }

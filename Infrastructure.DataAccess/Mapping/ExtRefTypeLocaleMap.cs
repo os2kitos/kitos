@@ -16,7 +16,7 @@ namespace Infrastructure.DataAccess.Mapping
             this.ToTable("ExtRefTypeLocale");
 
             // Relationships
-            this.HasRequired(t => t.Municipality)
+            this.HasRequired(t => t.Organization)
                 .WithMany(t => t.ExtRefTypeLocales)
                 .HasForeignKey(t => t.Municipality_Id);
 

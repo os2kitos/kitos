@@ -6,13 +6,13 @@ using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class DepartmentRightMap : EntityTypeConfiguration<DepartmentRight>
+    public class OrganizationRightMap : EntityTypeConfiguration<OrganizationRight>
     {
-        public DepartmentRightMap()
+        public OrganizationRightMap()
         {
             this.HasKey(right => new { right.Object_Id, right.Role_Id, right.User_Id });
 
-            this.ToTable("DepartmentRight");
+            this.ToTable("OrganizationRight");
 
             this.HasRequired(right => right.Object)
                 .WithMany(proj => proj.Rights)
@@ -23,7 +23,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(right => right.Role_Id);
 
             this.HasRequired(right => right.User)
-                .WithMany(user => user.DepartmentRights)
+                .WithMany(user => user.OrganizationRights)
                 .HasForeignKey(right => right.User_Id);
         }
     }

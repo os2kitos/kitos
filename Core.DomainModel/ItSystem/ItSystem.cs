@@ -37,7 +37,7 @@ namespace Core.DomainModel.ItSystem
         public virtual ICollection<TaskSupport> TaskSupports { get; set; }
         public virtual Technology Technology { get; set; }
         public virtual UserAdministration UserAdministration { get; set; }
-        public virtual Municipality Municipality { get; set; }
+        public virtual Organization Organization { get; set; }
         public virtual SystemType SystemType { get; set; }
         public virtual InterfaceType InterfaceType { get; set; }
         public virtual ProtocolType ProtocolType { get; set; }
