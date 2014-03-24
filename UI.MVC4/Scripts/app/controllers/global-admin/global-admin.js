@@ -73,7 +73,7 @@
                 $scope.organization = ""; 
                 
             }).error(function (result) {
-                growl.addSuccessMessage("Lokaladmin " + $scope.name + " kunne ikke oprettes!");
+                growl.addErrorMessage("Lokaladmin " + $scope.name + " kunne ikke oprettes!");
             });
         };
     }]);
@@ -97,7 +97,7 @@
                 $scope.email = "";
 
             }).error(function (result) {
-                growl.addSuccessMessage("Global admin " + $scope.name + " kunne ikke oprettes!");
+                growl.addErrorMessage("Global admin " + $scope.name + " kunne ikke oprettes!");
             });
         };
     }]);

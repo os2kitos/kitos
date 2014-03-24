@@ -8,85 +8,23 @@ namespace Infrastructure.DataAccess.Migrations
         public override void Up()
         {
             CreateTable(
-                "dbo.AgreementElement",
+                "dbo.AdminRight",
                 c => new
                     {
-                        Id = c.Int(nullable: false, identity: true),
-                        Name = c.String(nullable: false, unicode: false),
-                        IsActive = c.Boolean(nullable: false),
-                        IsSuggestion = c.Boolean(nullable: false),
-                        Note = c.String(unicode: false),
+                        Object_Id = c.Int(nullable: false),
+                        Role_Id = c.Int(nullable: false),
+                        User_Id = c.Int(nullable: false),
                     })
-                .PrimaryKey(t => t.Id);
+                .PrimaryKey(t => new { t.Object_Id, t.Role_Id, t.User_Id })
+                .ForeignKey("dbo.Organization", t => t.Object_Id, cascadeDelete: true)
+                .ForeignKey("dbo.AdminRole", t => t.Role_Id, cascadeDelete: true)
+                .ForeignKey("dbo.User", t => t.User_Id, cascadeDelete: true)
+                .Index(t => t.Object_Id)
+                .Index(t => t.Role_Id)
+                .Index(t => t.User_Id);
             
             CreateTable(
-                "dbo.Agreement",
-                c => new
-                    {
-                        Id = c.Int(nullable: false),
-                        AgreementElement_Id = c.Int(),
-                    })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.ItContract", t => t.Id)
-                .ForeignKey("dbo.AgreementElement", t => t.AgreementElement_Id)
-                .Index(t => t.Id)
-                .Index(t => t.AgreementElement_Id);
-            
-            CreateTable(
-                "dbo.ItContract",
-                c => new
-                    {
-                        Id = c.Int(nullable: false, identity: true),
-                        ContractType_Id = c.Int(nullable: false),
-                        ContractTemplate_Id = c.Int(nullable: false),
-                        PurchaseForm_Id = c.Int(nullable: false),
-                        PaymentModel_Id = c.Int(nullable: false),
-                        Supplier_Id = c.Int(nullable: false),
-                        Municipality_Id = c.Int(nullable: false),
-                        HandoverTrial_Id = c.Int(),
-                    })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.ContractTemplate", t => t.ContractTemplate_Id, cascadeDelete: true)
-                .ForeignKey("dbo.ContractType", t => t.ContractType_Id, cascadeDelete: true)
-                .ForeignKey("dbo.Municipality", t => t.Municipality_Id)
-                .ForeignKey("dbo.PaymentModel", t => t.PaymentModel_Id, cascadeDelete: true)
-                .ForeignKey("dbo.PurchaseForm", t => t.PurchaseForm_Id, cascadeDelete: true)
-                .ForeignKey("dbo.Supplier", t => t.Supplier_Id, cascadeDelete: true)
-                .ForeignKey("dbo.HandoverTrial", t => t.HandoverTrial_Id)
-                .Index(t => t.ContractTemplate_Id)
-                .Index(t => t.ContractType_Id)
-                .Index(t => t.Municipality_Id)
-                .Index(t => t.PaymentModel_Id)
-                .Index(t => t.PurchaseForm_Id)
-                .Index(t => t.Supplier_Id)
-                .Index(t => t.HandoverTrial_Id);
-            
-            CreateTable(
-                "dbo.ContractTemplate",
-                c => new
-                    {
-                        Id = c.Int(nullable: false, identity: true),
-                        Name = c.String(nullable: false, unicode: false),
-                        IsActive = c.Boolean(nullable: false),
-                        IsSuggestion = c.Boolean(nullable: false),
-                        Note = c.String(unicode: false),
-                    })
-                .PrimaryKey(t => t.Id);
-            
-            CreateTable(
-                "dbo.ContractType",
-                c => new
-                    {
-                        Id = c.Int(nullable: false, identity: true),
-                        Name = c.String(nullable: false, unicode: false),
-                        IsActive = c.Boolean(nullable: false),
-                        IsSuggestion = c.Boolean(nullable: false),
-                        Note = c.String(unicode: false),
-                    })
-                .PrimaryKey(t => t.Id);
-            
-            CreateTable(
-                "dbo.Municipality",
+                "dbo.Organization",
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
@@ -122,7 +60,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.ItProjectName", t => t.ItProjectModuleName_Id, cascadeDelete: true)
                 .ForeignKey("dbo.ItSupportName", t => t.ItSupportModuleName_Id, cascadeDelete: true)
                 .ForeignKey("dbo.ItSystemName", t => t.ItSystemModuleName_Id, cascadeDelete: true)
-                .ForeignKey("dbo.Municipality", t => t.Id, cascadeDelete: true)
+                .ForeignKey("dbo.Organization", t => t.Id, cascadeDelete: true)
                 .Index(t => t.ItContractModuleName_Id)
                 .Index(t => t.ItProjectModuleName_Id)
                 .Index(t => t.ItSupportModuleName_Id)
@@ -186,7 +124,7 @@ namespace Infrastructure.DataAccess.Migrations
                         Name = c.String(unicode: false),
                     })
                 .PrimaryKey(t => new { t.Municipality_Id, t.Original_Id })
-                .ForeignKey("dbo.Municipality", t => t.Municipality_Id, cascadeDelete: true)
+                .ForeignKey("dbo.Organization", t => t.Municipality_Id, cascadeDelete: true)
                 .ForeignKey("dbo.ExtReferenceType", t => t.Original_Id, cascadeDelete: true)
                 .Index(t => t.Municipality_Id)
                 .Index(t => t.Original_Id);
@@ -240,7 +178,7 @@ namespace Infrastructure.DataAccess.Migrations
                         Consultant_Id = c.Int(),
                     })
                 .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.Municipality", t => t.Municipality_Id)
+                .ForeignKey("dbo.Organization", t => t.Municipality_Id)
                 .ForeignKey("dbo.ProjectCategory", t => t.ProjectCategory_Id, cascadeDelete: true)
                 .ForeignKey("dbo.ProjectType", t => t.ProjectType_Id, cascadeDelete: true)
                 .Index(t => t.Municipality_Id)
@@ -343,7 +281,7 @@ namespace Infrastructure.DataAccess.Migrations
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.InterfaceType", t => t.InterfaceType_Id)
-                .ForeignKey("dbo.Municipality", t => t.Municipality_Id)
+                .ForeignKey("dbo.Organization", t => t.Municipality_Id)
                 .ForeignKey("dbo.ItSystem", t => t.ParentItSystem_Id)
                 .ForeignKey("dbo.ProtocolType", t => t.ProtocolType_Id)
                 .ForeignKey("dbo.SystemType", t => t.SystemType_Id)
@@ -462,7 +400,7 @@ namespace Infrastructure.DataAccess.Migrations
                         Municipality_Id = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.Municipality", t => t.Municipality_Id, cascadeDelete: true)
+                .ForeignKey("dbo.Organization", t => t.Municipality_Id, cascadeDelete: true)
                 .ForeignKey("dbo.OrganizationUnit", t => t.Parent_Id, cascadeDelete: true)
                 .Index(t => t.Municipality_Id)
                 .Index(t => t.Parent_Id);
@@ -504,14 +442,9 @@ namespace Infrastructure.DataAccess.Migrations
                         Email = c.String(nullable: false, unicode: false),
                         Password = c.String(nullable: false, unicode: false),
                         Salt = c.String(nullable: false, unicode: false),
-                        Municipality_Id = c.Int(nullable: false),
-                        Role_Id = c.Int(),
+                        IsGlobalAdmin = c.Boolean(nullable: false),
                     })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.Municipality", t => t.Municipality_Id, cascadeDelete: true)
-                .ForeignKey("dbo.Role", t => t.Role_Id)
-                .Index(t => t.Municipality_Id)
-                .Index(t => t.Role_Id);
+                .PrimaryKey(t => t.Id);
             
             CreateTable(
                 "dbo.ItContractRight",
@@ -528,6 +461,129 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.Object_Id)
                 .Index(t => t.Role_Id)
                 .Index(t => t.User_Id);
+            
+            CreateTable(
+                "dbo.ItContract",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        ContractType_Id = c.Int(nullable: false),
+                        ContractTemplate_Id = c.Int(nullable: false),
+                        PurchaseForm_Id = c.Int(nullable: false),
+                        PaymentModel_Id = c.Int(nullable: false),
+                        Supplier_Id = c.Int(nullable: false),
+                        Municipality_Id = c.Int(nullable: false),
+                        HandoverTrial_Id = c.Int(),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.ContractTemplate", t => t.ContractTemplate_Id, cascadeDelete: true)
+                .ForeignKey("dbo.ContractType", t => t.ContractType_Id, cascadeDelete: true)
+                .ForeignKey("dbo.Organization", t => t.Municipality_Id)
+                .ForeignKey("dbo.PaymentModel", t => t.PaymentModel_Id, cascadeDelete: true)
+                .ForeignKey("dbo.PurchaseForm", t => t.PurchaseForm_Id, cascadeDelete: true)
+                .ForeignKey("dbo.Supplier", t => t.Supplier_Id, cascadeDelete: true)
+                .ForeignKey("dbo.HandoverTrial", t => t.HandoverTrial_Id)
+                .Index(t => t.ContractTemplate_Id)
+                .Index(t => t.ContractType_Id)
+                .Index(t => t.Municipality_Id)
+                .Index(t => t.PaymentModel_Id)
+                .Index(t => t.PurchaseForm_Id)
+                .Index(t => t.Supplier_Id)
+                .Index(t => t.HandoverTrial_Id);
+            
+            CreateTable(
+                "dbo.Agreement",
+                c => new
+                    {
+                        Id = c.Int(nullable: false),
+                        AgreementElement_Id = c.Int(),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.ItContract", t => t.Id)
+                .ForeignKey("dbo.AgreementElement", t => t.AgreementElement_Id)
+                .Index(t => t.Id)
+                .Index(t => t.AgreementElement_Id);
+            
+            CreateTable(
+                "dbo.ContractTemplate",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        Name = c.String(nullable: false, unicode: false),
+                        IsActive = c.Boolean(nullable: false),
+                        IsSuggestion = c.Boolean(nullable: false),
+                        Note = c.String(unicode: false),
+                    })
+                .PrimaryKey(t => t.Id);
+            
+            CreateTable(
+                "dbo.ContractType",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        Name = c.String(nullable: false, unicode: false),
+                        IsActive = c.Boolean(nullable: false),
+                        IsSuggestion = c.Boolean(nullable: false),
+                        Note = c.String(unicode: false),
+                    })
+                .PrimaryKey(t => t.Id);
+            
+            CreateTable(
+                "dbo.Payment",
+                c => new
+                    {
+                        Id = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.ItContract", t => t.Id)
+                .Index(t => t.Id);
+            
+            CreateTable(
+                "dbo.PaymentModel",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        Name = c.String(unicode: false),
+                        IsActive = c.Boolean(nullable: false),
+                        IsSuggestion = c.Boolean(nullable: false),
+                        Note = c.String(unicode: false),
+                    })
+                .PrimaryKey(t => t.Id);
+            
+            CreateTable(
+                "dbo.PurchaseForm",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        Name = c.String(unicode: false),
+                        IsActive = c.Boolean(nullable: false),
+                        IsSuggestion = c.Boolean(nullable: false),
+                        Note = c.String(unicode: false),
+                    })
+                .PrimaryKey(t => t.Id);
+            
+            CreateTable(
+                "dbo.ShipNotice",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        AlarmDate = c.String(nullable: false, unicode: false),
+                        To = c.String(nullable: false, unicode: false),
+                        Cc = c.String(nullable: false, unicode: false),
+                        Subject = c.String(nullable: false, unicode: false),
+                        ItContract_Id = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.ItContract", t => t.ItContract_Id, cascadeDelete: true)
+                .Index(t => t.ItContract_Id);
+            
+            CreateTable(
+                "dbo.Supplier",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                    })
+                .PrimaryKey(t => t.Id);
             
             CreateTable(
                 "dbo.ItContractRole",
@@ -582,15 +638,6 @@ namespace Infrastructure.DataAccess.Migrations
                 .PrimaryKey(t => t.Id);
             
             CreateTable(
-                "dbo.Role",
-                c => new
-                    {
-                        Id = c.Int(nullable: false, identity: true),
-                        Name = c.String(nullable: false, unicode: false),
-                    })
-                .PrimaryKey(t => t.Id);
-            
-            CreateTable(
                 "dbo.ItSystemRight",
                 c => new
                     {
@@ -615,14 +662,6 @@ namespace Infrastructure.DataAccess.Migrations
                         IsActive = c.Boolean(nullable: false),
                         IsSuggestion = c.Boolean(nullable: false),
                         Note = c.String(unicode: false),
-                    })
-                .PrimaryKey(t => t.Id);
-            
-            CreateTable(
-                "dbo.Supplier",
-                c => new
-                    {
-                        Id = c.Int(nullable: false, identity: true),
                     })
                 .PrimaryKey(t => t.Id);
             
@@ -822,7 +861,7 @@ namespace Infrastructure.DataAccess.Migrations
                         Name = c.String(unicode: false),
                     })
                 .PrimaryKey(t => new { t.Municipality_Id, t.Original_Id })
-                .ForeignKey("dbo.Municipality", t => t.Municipality_Id, cascadeDelete: true)
+                .ForeignKey("dbo.Organization", t => t.Municipality_Id, cascadeDelete: true)
                 .ForeignKey("dbo.ProjectPhase", t => t.Original_Id, cascadeDelete: true)
                 .Index(t => t.Municipality_Id)
                 .Index(t => t.Original_Id);
@@ -873,21 +912,11 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ItProject_Id);
             
             CreateTable(
-                "dbo.Payment",
-                c => new
-                    {
-                        Id = c.Int(nullable: false),
-                    })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.ItContract", t => t.Id)
-                .Index(t => t.Id);
-            
-            CreateTable(
-                "dbo.PaymentModel",
+                "dbo.AdminRole",
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
-                        Name = c.String(unicode: false),
+                        Name = c.String(nullable: false, unicode: false),
                         IsActive = c.Boolean(nullable: false),
                         IsSuggestion = c.Boolean(nullable: false),
                         Note = c.String(unicode: false),
@@ -895,31 +924,16 @@ namespace Infrastructure.DataAccess.Migrations
                 .PrimaryKey(t => t.Id);
             
             CreateTable(
-                "dbo.PurchaseForm",
+                "dbo.AgreementElement",
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
-                        Name = c.String(unicode: false),
+                        Name = c.String(nullable: false, unicode: false),
                         IsActive = c.Boolean(nullable: false),
                         IsSuggestion = c.Boolean(nullable: false),
                         Note = c.String(unicode: false),
                     })
                 .PrimaryKey(t => t.Id);
-            
-            CreateTable(
-                "dbo.ShipNotice",
-                c => new
-                    {
-                        Id = c.Int(nullable: false, identity: true),
-                        AlarmDate = c.String(nullable: false, unicode: false),
-                        To = c.String(nullable: false, unicode: false),
-                        Cc = c.String(nullable: false, unicode: false),
-                        Subject = c.String(nullable: false, unicode: false),
-                        ItContract_Id = c.Int(nullable: false),
-                    })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.ItContract", t => t.ItContract_Id, cascadeDelete: true)
-                .Index(t => t.ItContract_Id);
             
             CreateTable(
                 "dbo.HandoverTrial",
@@ -978,13 +992,9 @@ namespace Infrastructure.DataAccess.Migrations
         {
             DropForeignKey("dbo.ItContract", "HandoverTrial_Id", "dbo.HandoverTrial");
             DropForeignKey("dbo.Agreement", "AgreementElement_Id", "dbo.AgreementElement");
-            DropForeignKey("dbo.Agreement", "Id", "dbo.ItContract");
-            DropForeignKey("dbo.ItContract", "Supplier_Id", "dbo.Supplier");
-            DropForeignKey("dbo.ShipNotice", "ItContract_Id", "dbo.ItContract");
-            DropForeignKey("dbo.ItContract", "PurchaseForm_Id", "dbo.PurchaseForm");
-            DropForeignKey("dbo.ItContract", "PaymentModel_Id", "dbo.PaymentModel");
-            DropForeignKey("dbo.Payment", "Id", "dbo.ItContract");
-            DropForeignKey("dbo.ItContract", "Municipality_Id", "dbo.Municipality");
+            DropForeignKey("dbo.AdminRight", "User_Id", "dbo.User");
+            DropForeignKey("dbo.AdminRight", "Role_Id", "dbo.AdminRole");
+            DropForeignKey("dbo.AdminRight", "Object_Id", "dbo.Organization");
             DropForeignKey("dbo.ExtRefTypeLocale", "Original_Id", "dbo.ExtReferenceType");
             DropForeignKey("dbo.ExtReference", "ItSystem_Id", "dbo.ItSystem");
             DropForeignKey("dbo.ExtReference", "ItProject_Id", "dbo.ItProject");
@@ -994,13 +1004,13 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.ItProject", "ProjectType_Id", "dbo.ProjectType");
             DropForeignKey("dbo.ProjectStatus", "ProjectPhase_Id", "dbo.ProjectPhase");
             DropForeignKey("dbo.ProjectPhaseLocale", "Original_Id", "dbo.ProjectPhase");
-            DropForeignKey("dbo.ProjectPhaseLocale", "Municipality_Id", "dbo.Municipality");
+            DropForeignKey("dbo.ProjectPhaseLocale", "Municipality_Id", "dbo.Organization");
             DropForeignKey("dbo.Milestone", "ProjectStatus_Id", "dbo.ProjectStatus");
             DropForeignKey("dbo.ProjectStatus", "Id", "dbo.ItProject");
             DropForeignKey("dbo.ItProject", "ProjectCategory_Id", "dbo.ProjectCategory");
             DropForeignKey("dbo.PreAnalysis", "Id", "dbo.ItProject");
             DropForeignKey("dbo.OrgTab", "Id", "dbo.ItProject");
-            DropForeignKey("dbo.ItProject", "Municipality_Id", "dbo.Municipality");
+            DropForeignKey("dbo.ItProject", "Municipality_Id", "dbo.Organization");
             DropForeignKey("dbo.KLE", "ItSystem_Id", "dbo.ItSystem");
             DropForeignKey("dbo.UserAdministration", "Id", "dbo.ItSystem");
             DropForeignKey("dbo.Technology", "ProgLanguage_Id", "dbo.ProgLanguage");
@@ -1012,7 +1022,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.SuperUser", "ItSystem_Id", "dbo.ItSystem");
             DropForeignKey("dbo.ItSystem", "ProtocolType_Id", "dbo.ProtocolType");
             DropForeignKey("dbo.ItSystem", "ParentItSystem_Id", "dbo.ItSystem");
-            DropForeignKey("dbo.ItSystem", "Municipality_Id", "dbo.Municipality");
+            DropForeignKey("dbo.ItSystem", "Municipality_Id", "dbo.Organization");
             DropForeignKey("dbo.ItSystem", "InterfaceType_Id", "dbo.InterfaceType");
             DropForeignKey("dbo.Infrastructure", "Supplier_Id", "dbo.Supplier");
             DropForeignKey("dbo.Infrastructure", "Department_Id", "dbo.OrganizationUnit");
@@ -1020,19 +1030,26 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.ItSystemRight", "User_Id", "dbo.User");
             DropForeignKey("dbo.ItSystemRight", "Role_Id", "dbo.ItSystemRole");
             DropForeignKey("dbo.ItSystemRight", "Object_Id", "dbo.ItSystem");
-            DropForeignKey("dbo.User", "Role_Id", "dbo.Role");
             DropForeignKey("dbo.ItProjectRight", "User_Id", "dbo.User");
             DropForeignKey("dbo.ItProjectRight", "Role_Id", "dbo.ItProjectRole");
             DropForeignKey("dbo.ItProjectRight", "Object_Id", "dbo.ItProject");
             DropForeignKey("dbo.PasswordResetRequest", "User_Id", "dbo.User");
-            DropForeignKey("dbo.User", "Municipality_Id", "dbo.Municipality");
             DropForeignKey("dbo.ItContractRight", "User_Id", "dbo.User");
             DropForeignKey("dbo.ItContractRight", "Role_Id", "dbo.ItContractRole");
             DropForeignKey("dbo.ItContractRight", "Object_Id", "dbo.ItContract");
+            DropForeignKey("dbo.ItContract", "Supplier_Id", "dbo.Supplier");
+            DropForeignKey("dbo.ShipNotice", "ItContract_Id", "dbo.ItContract");
+            DropForeignKey("dbo.ItContract", "PurchaseForm_Id", "dbo.PurchaseForm");
+            DropForeignKey("dbo.ItContract", "PaymentModel_Id", "dbo.PaymentModel");
+            DropForeignKey("dbo.Payment", "Id", "dbo.ItContract");
+            DropForeignKey("dbo.ItContract", "Municipality_Id", "dbo.Organization");
+            DropForeignKey("dbo.ItContract", "ContractType_Id", "dbo.ContractType");
+            DropForeignKey("dbo.ItContract", "ContractTemplate_Id", "dbo.ContractTemplate");
+            DropForeignKey("dbo.Agreement", "Id", "dbo.ItContract");
             DropForeignKey("dbo.OrganizationRight", "Role_Id", "dbo.OrganizationRole");
             DropForeignKey("dbo.OrganizationRight", "Object_Id", "dbo.OrganizationUnit");
             DropForeignKey("dbo.OrganizationUnit", "Parent_Id", "dbo.OrganizationUnit");
-            DropForeignKey("dbo.OrganizationUnit", "Municipality_Id", "dbo.Municipality");
+            DropForeignKey("dbo.OrganizationUnit", "Municipality_Id", "dbo.Organization");
             DropForeignKey("dbo.Infrastructure", "Id", "dbo.ItSystem");
             DropForeignKey("dbo.Infrastructure", "Host_Id", "dbo.Host");
             DropForeignKey("dbo.Wish", "Interface_Id", "dbo.Interface");
@@ -1052,23 +1069,17 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.Economy", "ItProject_Id", "dbo.ItProject");
             DropForeignKey("dbo.Communication", "ItProject_Id", "dbo.ItProject");
             DropForeignKey("dbo.ExtReference", "ExtReferenceType_Id", "dbo.ExtReferenceType");
-            DropForeignKey("dbo.ExtRefTypeLocale", "Municipality_Id", "dbo.Municipality");
-            DropForeignKey("dbo.Config", "Id", "dbo.Municipality");
+            DropForeignKey("dbo.ExtRefTypeLocale", "Municipality_Id", "dbo.Organization");
+            DropForeignKey("dbo.Config", "Id", "dbo.Organization");
             DropForeignKey("dbo.Config", "ItSystemModuleName_Id", "dbo.ItSystemName");
             DropForeignKey("dbo.Config", "ItSupportModuleName_Id", "dbo.ItSupportName");
             DropForeignKey("dbo.Config", "ItProjectModuleName_Id", "dbo.ItProjectName");
             DropForeignKey("dbo.Config", "ItContractModuleName_Id", "dbo.ItContractName");
-            DropForeignKey("dbo.ItContract", "ContractType_Id", "dbo.ContractType");
-            DropForeignKey("dbo.ItContract", "ContractTemplate_Id", "dbo.ContractTemplate");
             DropIndex("dbo.ItContract", new[] { "HandoverTrial_Id" });
             DropIndex("dbo.Agreement", new[] { "AgreementElement_Id" });
-            DropIndex("dbo.Agreement", new[] { "Id" });
-            DropIndex("dbo.ItContract", new[] { "Supplier_Id" });
-            DropIndex("dbo.ShipNotice", new[] { "ItContract_Id" });
-            DropIndex("dbo.ItContract", new[] { "PurchaseForm_Id" });
-            DropIndex("dbo.ItContract", new[] { "PaymentModel_Id" });
-            DropIndex("dbo.Payment", new[] { "Id" });
-            DropIndex("dbo.ItContract", new[] { "Municipality_Id" });
+            DropIndex("dbo.AdminRight", new[] { "User_Id" });
+            DropIndex("dbo.AdminRight", new[] { "Role_Id" });
+            DropIndex("dbo.AdminRight", new[] { "Object_Id" });
             DropIndex("dbo.ExtRefTypeLocale", new[] { "Original_Id" });
             DropIndex("dbo.ExtReference", new[] { "ItSystem_Id" });
             DropIndex("dbo.ExtReference", new[] { "ItProject_Id" });
@@ -1104,15 +1115,22 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ItSystemRight", new[] { "User_Id" });
             DropIndex("dbo.ItSystemRight", new[] { "Role_Id" });
             DropIndex("dbo.ItSystemRight", new[] { "Object_Id" });
-            DropIndex("dbo.User", new[] { "Role_Id" });
             DropIndex("dbo.ItProjectRight", new[] { "User_Id" });
             DropIndex("dbo.ItProjectRight", new[] { "Role_Id" });
             DropIndex("dbo.ItProjectRight", new[] { "Object_Id" });
             DropIndex("dbo.PasswordResetRequest", new[] { "User_Id" });
-            DropIndex("dbo.User", new[] { "Municipality_Id" });
             DropIndex("dbo.ItContractRight", new[] { "User_Id" });
             DropIndex("dbo.ItContractRight", new[] { "Role_Id" });
             DropIndex("dbo.ItContractRight", new[] { "Object_Id" });
+            DropIndex("dbo.ItContract", new[] { "Supplier_Id" });
+            DropIndex("dbo.ShipNotice", new[] { "ItContract_Id" });
+            DropIndex("dbo.ItContract", new[] { "PurchaseForm_Id" });
+            DropIndex("dbo.ItContract", new[] { "PaymentModel_Id" });
+            DropIndex("dbo.Payment", new[] { "Id" });
+            DropIndex("dbo.ItContract", new[] { "Municipality_Id" });
+            DropIndex("dbo.ItContract", new[] { "ContractType_Id" });
+            DropIndex("dbo.ItContract", new[] { "ContractTemplate_Id" });
+            DropIndex("dbo.Agreement", new[] { "Id" });
             DropIndex("dbo.OrganizationRight", new[] { "Role_Id" });
             DropIndex("dbo.OrganizationRight", new[] { "Object_Id" });
             DropIndex("dbo.OrganizationUnit", new[] { "Parent_Id" });
@@ -1142,15 +1160,11 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.Config", new[] { "ItSupportModuleName_Id" });
             DropIndex("dbo.Config", new[] { "ItProjectModuleName_Id" });
             DropIndex("dbo.Config", new[] { "ItContractModuleName_Id" });
-            DropIndex("dbo.ItContract", new[] { "ContractType_Id" });
-            DropIndex("dbo.ItContract", new[] { "ContractTemplate_Id" });
             DropTable("dbo.Text");
             DropTable("dbo.Localization");
             DropTable("dbo.HandoverTrial");
-            DropTable("dbo.ShipNotice");
-            DropTable("dbo.PurchaseForm");
-            DropTable("dbo.PaymentModel");
-            DropTable("dbo.Payment");
+            DropTable("dbo.AgreementElement");
+            DropTable("dbo.AdminRole");
             DropTable("dbo.Stakeholder");
             DropTable("dbo.Risk");
             DropTable("dbo.Resource");
@@ -1172,14 +1186,21 @@ namespace Infrastructure.DataAccess.Migrations
             DropTable("dbo.SuperUser");
             DropTable("dbo.ProtocolType");
             DropTable("dbo.InterfaceType");
-            DropTable("dbo.Supplier");
             DropTable("dbo.ItSystemRole");
             DropTable("dbo.ItSystemRight");
-            DropTable("dbo.Role");
             DropTable("dbo.ItProjectRole");
             DropTable("dbo.ItProjectRight");
             DropTable("dbo.PasswordResetRequest");
             DropTable("dbo.ItContractRole");
+            DropTable("dbo.Supplier");
+            DropTable("dbo.ShipNotice");
+            DropTable("dbo.PurchaseForm");
+            DropTable("dbo.PaymentModel");
+            DropTable("dbo.Payment");
+            DropTable("dbo.ContractType");
+            DropTable("dbo.ContractTemplate");
+            DropTable("dbo.Agreement");
+            DropTable("dbo.ItContract");
             DropTable("dbo.ItContractRight");
             DropTable("dbo.User");
             DropTable("dbo.OrganizationRole");
@@ -1210,12 +1231,8 @@ namespace Infrastructure.DataAccess.Migrations
             DropTable("dbo.ItProjectName");
             DropTable("dbo.ItContractName");
             DropTable("dbo.Config");
-            DropTable("dbo.Municipality");
-            DropTable("dbo.ContractType");
-            DropTable("dbo.ContractTemplate");
-            DropTable("dbo.ItContract");
-            DropTable("dbo.Agreement");
-            DropTable("dbo.AgreementElement");
+            DropTable("dbo.Organization");
+            DropTable("dbo.AdminRight");
         }
     }
 }

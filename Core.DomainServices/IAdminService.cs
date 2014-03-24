@@ -8,5 +8,7 @@ namespace Core.DomainServices
 
         bool IsGlobalAdmin(User user);
         bool IsLocalAdmin(User user, Organization organization);
+
+        AdminRole GetLocalAdminRole();
     }
 }

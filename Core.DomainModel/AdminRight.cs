@@ -11,8 +11,8 @@ namespace Core.DomainModel
         public int User_Id { get; set; }
         public int Role_Id { get; set; }
         public int Object_Id { get; set; }
-        public User User { get; set; }
-        public AdminRole Role { get; set; }
-        public Organization Object { get; set; }
+        public virtual User User { get; set; }
+        public virtual AdminRole Role { get; set; }
+        public virtual Organization Object { get; set; }
     }
 }

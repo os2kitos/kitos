@@ -37,11 +37,11 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
 
     $rootScope.saveUser = function (result) {
         $rootScope.user = {
+            authStatus: 'authorized',
             name: result.Response.Name,
             email: result.Response.Email,
-            municipality: result.Response.Municipality_Id,
-            authStatus: 'authorized',
-            role: result.Response.RoleName
+            adminRights: result.Response.adminRights,
+            isGlobalAdmin: result.Response.IsGlobalAdmin
         };
     };
 
@@ -52,9 +52,23 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
     
     function auth(toState, toParams) {
         var user = $rootScope.user;
-        var authRoles = toState.authRoles;
 
-        return (user.authStatus == 'authorized' && (!authRoles || _.indexOf(authRoles, user.role) != -1));
+        if (user.authStatus != 'authorized') return false; //user hasn't authorized
+        
+        var adminRoles = toState.adminRoles;
+        if (!adminRoles) return true; //no specific admin role needed
+
+        //go through each of the roles on the state
+        return _.some(adminRoles, function (role) {
+            
+            //if the state role is global admin, and the user is global admin, it's cool
+            if (role == "GlobalAdmin" && user.isGlobalAdmin) return true;
+            
+            //otherwise, check if there exist a userRight with that rolename.
+            return _.some(user.adminRights, function(userRight) {
+                return userRight.RoleName == role;
+            });
+        });
     }
 
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
@@ -71,15 +85,15 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
                 var userRole = user.role;
                 var authRoles = toState.authRoles;
 
-                if (!auth(toState, toParams)) {
+                if (!auth(toState)) {
                     $state.go('login', { to: toState.name, toParams: toParams });
                 } else {
                     $state.go(toState, toParams);
                 }
             });
         } else {
-            //initUSer has loaded, just run auth()
-            if (!auth(toState, toParams)) {
+            //initUser has loaded, just run auth()
+            if (!auth(toState)) {
                 event.preventDefault();
                 $state.go('login', { to: toState.name, toParams: toParams });
             }

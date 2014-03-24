@@ -96,6 +96,10 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<ItSystemRole>>().To<GenericRepository<ItSystemRole>>().InRequestScope();
             kernel.Bind<IGenericRepository<OrganizationRole>>().To<GenericRepository<OrganizationRole>>().InRequestScope();
 
+
+            kernel.Bind<IGenericRepository<AdminRight>>().To<GenericRepository<AdminRight>>().InRequestScope();
+            kernel.Bind<IGenericRepository<AdminRole>>().To<GenericRepository<AdminRole>>().InRequestScope();
+
             kernel.Bind<IGenericRepository<Config>>().To<GenericRepository<Config>>();
 
             kernel.Bind<IGenericRepository<ItContractModuleName>>().To<GenericRepository<ItContractModuleName>>();
@@ -108,6 +112,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<ICryptoService>().To<CryptoService>();
             kernel.Bind<IUserService>().To<UserService>().InRequestScope();
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InRequestScope();
+            kernel.Bind<IAdminService>().To<AdminService>().InRequestScope();
 
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
 

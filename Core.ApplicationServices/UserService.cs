@@ -31,7 +31,8 @@ namespace Core.ApplicationServices
         public User AddUser(User user)
         {
             user.Salt = _cryptoService.Encrypt(DateTime.Now + " spices");
-            user.Password = _cryptoService.Encrypt(DateTime.Now + user.Salt);
+            user.Password = _cryptoService.Encrypt("arne123" + user.Salt); //TODO: Don't use default password
+            //user.Password = _cryptoService.Encrypt(DateTime.Now + user.Salt);
 
             user = _userRepository.Insert(user);
             IssuePasswordReset(user);
