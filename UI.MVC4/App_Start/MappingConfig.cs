@@ -108,7 +108,7 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<ItSystemRole, OptionDTO>()
+            Mapper.CreateMap<ItSystemRole, RoleDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
