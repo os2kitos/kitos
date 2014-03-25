@@ -9,7 +9,7 @@ using Core.DomainServices;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class ItContractRoleController : GenericOptionApiController<ItContractRole, ItContractRight>
+    public class ItContractRoleController : GenericRoleApiController<ItContractRole, ItContractRight>
     {
         public ItContractRoleController(IGenericRepository<ItContractRole> repository) : base(repository)
         {

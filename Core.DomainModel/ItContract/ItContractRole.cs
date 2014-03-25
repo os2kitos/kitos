@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel.ItContract
 {
-    public class ItContractRole : IOptionEntity<ItContractRight>
+    public class ItContractRole : IRoleEntity<ItContractRight>
     {
         public ItContractRole()
         {
