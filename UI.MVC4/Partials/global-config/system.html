@@ -40,7 +40,7 @@
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
                         <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchItSystemRoleSuggestion(!$data, $index)">
-                            {{ item.IsSuggestion && "Medtager " + item.Name || "Medtager ikke " + item.Name }} {{ item.HasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
+                            {{ item.IsSuggestion && "Medtager " + item.Name || "Medtager ikke " + item.Name }} med {{ item.HasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
                         </a>
                     </div>
                 </div>
