@@ -383,6 +383,19 @@ namespace Infrastructure.DataAccess.Migrations
 
             #endregion
 
+            #region Admin rights
+
+            context.AdminRights.AddOrUpdate(right => new {right.Object_Id, right.Role_Id, right.User_Id},
+                                            new AdminRight()
+                                                {
+                                                    Object = roskilde,
+                                                    Role = localAdmin,
+                                                    User = brian
+                                                });
+
+            context.SaveChanges();
+
+            #endregion
 
             #region Password Reset Requests
 

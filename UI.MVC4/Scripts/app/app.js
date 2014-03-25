@@ -36,13 +36,20 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
     };
 
     $rootScope.saveUser = function (result) {
+        var isLocalAdmin = _.some(result.Response.AdminRights, function(userRight) {
+            return userRight.RoleName == "LocalAdmin";
+        });
+
         $rootScope.user = {
             authStatus: 'authorized',
             name: result.Response.Name,
             email: result.Response.Email,
-            adminRights: result.Response.adminRights,
-            isGlobalAdmin: result.Response.IsGlobalAdmin
+            isGlobalAdmin: result.Response.IsGlobalAdmin,
+            isLocalAdmin: isLocalAdmin,
+            isLocalAdminFor: _.pluck(result.Response.AdminRights, 'Organization_Id')
         };
+
+        console.log($rootScope.user);
     };
 
     var hasInitUser = false;
@@ -60,14 +67,8 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
 
         //go through each of the roles on the state
         return _.some(adminRoles, function (role) {
-            
             //if the state role is global admin, and the user is global admin, it's cool
-            if (role == "GlobalAdmin" && user.isGlobalAdmin) return true;
-            
-            //otherwise, check if there exist a userRight with that rolename.
-            return _.some(user.adminRights, function(userRight) {
-                return userRight.RoleName == role;
-            });
+            return (role == "GlobalAdmin" && user.isGlobalAdmin) || (role == "LocalAdmin" && user.isLocalAdmin);
         });
     }
 

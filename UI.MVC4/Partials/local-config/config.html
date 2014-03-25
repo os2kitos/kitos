@@ -1,0 +1,24 @@
+﻿<h3>Konfiguration af organisationen {{ organization.Name }}</h3>
+
+<div>
+    <div data-ng-click="toggle(support)"><h4>IT Understøttelse</h4></div>
+    <div data-ng-show="support.show">
+        <div data-ng-include="'partials/local-config/support.html'"></div>
+    </div>
+</div>
+<div>
+    <div data-ng-click="toggle(project, this)"><h4>IT Projekter</h4></div>
+    <div data-ng-show="project.show"><div data-ng-include="'partials/local-config/project.html'"></div></div>
+</div>
+<div>
+    <div data-ng-click="toggle(system)"><h4>IT Systemer</h4></div>
+    <div data-ng-show="system.show"><div data-ng-include="'partials/local-config/system.html'"></div></div>
+</div>
+<div>
+    <div data-ng-click="toggle(contract)"><h4>IT Kontrakter</h4></div>
+    <div data-ng-show="contract.show"><div data-ng-include="'partials/local-config/contract.html'"></div></div>
+</div>
+<!--
+    <div data-ng-include="'partials/local-config/system.html'"></div>
+    <div data-ng-include="'partials/local-config/contract.html'"></div>
+-->

@@ -70,7 +70,7 @@ namespace UI.MVC4.Controllers.API
         }
 
         // GET api/T
-        public HttpResponseMessage GetSingle([FromUri] int mId, [FromUri] int oId)
+        public HttpResponseMessage GetSingle([FromUri] int orgId, [FromUri] int oId)
         {
             var item = Repository.GetByKey(mId, oId);
 
@@ -92,7 +92,7 @@ namespace UI.MVC4.Controllers.API
 
                 //var msg = new HttpResponseMessage(HttpStatusCode.Created);
                 return Created(item,
-                               new Uri(Request.RequestUri + "?mId=" + item.Municipality_Id + "&oId=" + item.Original_Id));
+                               new Uri(Request.RequestUri + "?orgId=" + item.Municipality_Id + "&oId=" + item.Original_Id));
             }
             catch (Exception e)
             {
@@ -119,7 +119,7 @@ namespace UI.MVC4.Controllers.API
         }
 
         // PUT api/T
-        public HttpResponseMessage Delete([FromUri] int mId, [FromUri] int oId)
+        public HttpResponseMessage Delete([FromUri] int orgId, [FromUri] int oId)
         {
             try
             {
@@ -138,7 +138,7 @@ namespace UI.MVC4.Controllers.API
 
         private void TestMunicipalityMembership(int mId)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
     }
 }
