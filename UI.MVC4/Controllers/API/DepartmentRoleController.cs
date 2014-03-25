@@ -6,12 +6,14 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
+using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class DepartmentRoleController : GenericRoleApiController<DepartmentRole, DepartmentRight>
+    public class DepartmentRoleController : GenericOptionApiController<DepartmentRole, DepartmentRight, RoleDTO>
     {
-        public DepartmentRoleController(IGenericRepository<DepartmentRole> repository) : base(repository)
+        public DepartmentRoleController(IGenericRepository<DepartmentRole> repository) 
+            : base(repository)
         {
         }
     }
