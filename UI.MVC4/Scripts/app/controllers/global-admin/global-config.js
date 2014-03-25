@@ -44,9 +44,15 @@
 
         $scope['patch' + nameSingular + 'Suggestion'] = function (data, i) {
             var item = $scope[nameSingular + 'Suggestions'][i];
-            var result = Restangular.one('Method', item.Id).patch({ IsSuggestion: data }).then(function () {
+            var result = Restangular.one(nameSingular, item.Id).patch({ IsSuggestion: data }).then(function () {
                 local['update' + namePlural]();
             });
+            return result;
+        };
+        
+        $scope['patch' + nameSingular + 'Access'] = function (data, i) {
+            var item = $scope[namePlural][i];
+            var result = Restangular.one(nameSingular, item.Id).patch({ HasWriteAccess: data });
             return result;
         };
 

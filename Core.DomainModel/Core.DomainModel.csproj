@@ -49,6 +49,7 @@
     <Compile Include="IHasRights.cs" />
     <Compile Include="IOptionEntity.cs" />
     <Compile Include="IRight.cs" />
+    <Compile Include="IRoleEntity.cs" />
     <Compile Include="ItContractModuleName.cs" />
     <Compile Include="ILocaleEntity.cs" />
     <Compile Include="ItContract\Agreement.cs" />

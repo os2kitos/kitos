@@ -24,6 +24,11 @@
                             {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
                         </a>
                     </div>
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="item.HasWriteAccess" data-e-title="Skriverettighed?" data-onbeforesave="patchItSystemRoleAccess($data, $index)">
+                            {{ item.HasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
+                        </a>
+                    </div>
                 </div>
             </div>
             
@@ -35,7 +40,7 @@
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
                         <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchItSystemRoleSuggestion(!$data, $index)">
-                            {{ item.IsSuggestion && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                            {{ item.IsSuggestion && "Medtager " + item.Name || "Medtager ikke " + item.Name }} med {{ item.HasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
                         </a>
                     </div>
                 </div>

@@ -104,19 +104,19 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<ItProjectRole, OptionDTO>()
+            Mapper.CreateMap<ItProjectRole, RoleDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<ItSystemRole, OptionDTO>()
+            Mapper.CreateMap<ItSystemRole, RoleDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<ItContractRole, OptionDTO>()
+            Mapper.CreateMap<ItContractRole, RoleDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<DepartmentRole, OptionDTO>()
+            Mapper.CreateMap<DepartmentRole, RoleDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
