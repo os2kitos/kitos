@@ -230,6 +230,7 @@
     <Compile Include="Controllers\API\ExtReferenceTypeController.cs" />
     <Compile Include="Controllers\API\GenericLocaleApiController.cs" />
     <Compile Include="Controllers\API\GenericOptionApiController.cs" />
+    <Compile Include="Controllers\API\GenericRoleApiController.cs" />
     <Compile Include="Controllers\API\HandoverTrialController.cs" />
     <Compile Include="Controllers\API\InterfaceTypeController.cs" />
     <Compile Include="Controllers\API\ItContractNamesController.cs" />
@@ -283,6 +284,7 @@
     <Compile Include="Models\MunicipalityApiModel.cs" />
     <Compile Include="Models\PasswordResetRequestDTO.cs" />
     <Compile Include="Models\ResetPasswordDTO.cs" />
+    <Compile Include="Models\RoleDTO.cs" />
     <Compile Include="Models\UserDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

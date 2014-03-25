@@ -9,9 +9,10 @@ using Core.DomainServices;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class ItProjectRoleController : GenericOptionApiController<ItProjectRole, ItProjectRight>
+    public class ItProjectRoleController : GenericRoleApiController<ItProjectRole, ItProjectRight>
     {
-        public ItProjectRoleController(IGenericRepository<ItProjectRole> repository) : base(repository)
+        public ItProjectRoleController(IGenericRepository<ItProjectRole> repository) 
+            : base(repository)
         {
         }
     }

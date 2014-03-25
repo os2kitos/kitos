@@ -51,7 +51,7 @@
         };
         
         $scope['patch' + nameSingular + 'Access'] = function (data, i) {
-            var item = $scope[nameSingular][i];
+            var item = $scope[namePlural][i];
             var result = Restangular.one(nameSingular, item.Id).patch({ HasWriteAccess: data });
             return result;
         };
