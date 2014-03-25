@@ -11,7 +11,8 @@ namespace UI.MVC4.Controllers.API
 {
     public class ItSystemRoleController : GenericOptionApiController<ItSystemRole, ItSystemRight>
     {
-        public ItSystemRoleController(IGenericRepository<ItSystemRole> repository) : base(repository)
+        public ItSystemRoleController(IGenericRepository<ItSystemRole> repository) 
+            : base(repository)
         {
         }
     }
