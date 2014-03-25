@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel
 {
-    public class DepartmentRole : IOptionEntity<DepartmentRight>
+    public class DepartmentRole : IRoleEntity<DepartmentRight>
     {
         public DepartmentRole()
         {
