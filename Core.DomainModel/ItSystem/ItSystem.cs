@@ -11,7 +11,7 @@ namespace Core.DomainModel.ItSystem
             this.ExtReferences = new List<ExtReference>();
             this.Interfaces = new List<Interface>();
             this.ItSystems1 = new List<ItSystem>();
-            this.KLEs = new List<KLE>();
+            this.KLEs = new List<TaskRef>();
             this.SuperUsers = new List<SuperUser>();
             this.TaskSupports = new List<TaskSupport>();
             this.Rights = new List<ItSystemRight>();
@@ -32,7 +32,7 @@ namespace Core.DomainModel.ItSystem
         public virtual ICollection<Interface> Interfaces { get; set; }
         public virtual ICollection<ItSystem> ItSystems1 { get; set; } // ??? TODO
         public virtual ItSystem ParentItSystem { get; set; }
-        public virtual ICollection<KLE> KLEs { get; set; } // TODO
+        public virtual ICollection<TaskRef> KLEs { get; set; } // TODO
         public virtual ICollection<SuperUser> SuperUsers { get; set; }
         public virtual ICollection<TaskSupport> TaskSupports { get; set; }
         public virtual Technology Technology { get; set; }
