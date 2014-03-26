@@ -280,7 +280,7 @@
                 };
                 
                 $scope.support = {
-                    show: false,
+                    show: true,
                     moduleNames: supportNamesHttp.data.Response,
                     chosenNameId: config.ItSupportModuleName_Id,
                     guideUrl: config.ItSupportGuide,

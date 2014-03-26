@@ -177,3 +177,11 @@ input:disabled {
 input.ng-invalid:not(.ng-pristine) {
     background-color: rgba(240, 73, 73, 0.2) !important;
 }
+
+div.tab-content {
+    padding-top: 20px;
+}
+
+.nav-tabs a {
+    cursor: pointer;
+}

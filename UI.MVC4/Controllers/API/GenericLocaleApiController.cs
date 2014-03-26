@@ -72,7 +72,7 @@ namespace UI.MVC4.Controllers.API
         // GET api/T
         public HttpResponseMessage GetSingle([FromUri] int orgId, [FromUri] int oId)
         {
-            var item = Repository.GetByKey(mId, oId);
+            var item = Repository.GetByKey(orgId, oId);
 
             if (item == null)
                 return NoContent();
@@ -123,9 +123,9 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                TestMunicipalityMembership(mId);
+                TestMunicipalityMembership(orgId);
 
-                Repository.DeleteByKey(mId, oId);
+                Repository.DeleteByKey(orgId, oId);
                 Repository.Save();
 
                 return Ok(); // TODO correct?
