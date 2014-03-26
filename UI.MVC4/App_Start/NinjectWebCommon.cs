@@ -89,6 +89,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<AgreementElement>>().To<GenericRepository<AgreementElement>>().InRequestScope();
             kernel.Bind<IGenericRepository<ExtReferenceType>>().To<GenericRepository<ExtReferenceType>>().InRequestScope();
             kernel.Bind<IGenericRepository<ExtRefTypeLocale>>().To<GenericRepository<ExtRefTypeLocale>>().InRequestScope();
+            kernel.Bind<IGenericRepository<TaskRef>>().To<GenericRepository<TaskRef>>().InRequestScope();
 
             kernel.Bind<IGenericRepository<ItProjectRole>>().To<GenericRepository<ItProjectRole>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItContractRole>>().To<GenericRepository<ItContractRole>>().InRequestScope();

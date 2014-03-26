@@ -317,16 +317,22 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ItProjectRef_Id);
             
             CreateTable(
-                "dbo.KLE",
+                "dbo.TaskRef",
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
-                        ItProject_Id = c.Int(nullable: false),
-                        ItSystem_Id = c.Int(nullable: false),
+                        Uuid = c.Guid(nullable: false),
+                        Type = c.String(unicode: false),
+                        TaskKey = c.String(unicode: false),
+                        Description = c.String(unicode: false),
+                        ActiveFrom = c.DateTime(precision: 0),
+                        ActiveTo = c.DateTime(precision: 0),
+                        ItProject_Id = c.Int(),
+                        ItSystem_Id = c.Int(),
                     })
                 .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.ItProject", t => t.ItProject_Id, cascadeDelete: true)
-                .ForeignKey("dbo.ItSystem", t => t.ItSystem_Id, cascadeDelete: true)
+                .ForeignKey("dbo.ItProject", t => t.ItProject_Id)
+                .ForeignKey("dbo.ItSystem", t => t.ItSystem_Id)
                 .Index(t => t.ItProject_Id)
                 .Index(t => t.ItSystem_Id);
             
@@ -1003,7 +1009,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.PreAnalysis", "Id", "dbo.ItProject");
             DropForeignKey("dbo.Organization", "Id", "dbo.ItProject");
             DropForeignKey("dbo.ItProject", "Municipality_Id", "dbo.Municipality");
-            DropForeignKey("dbo.KLE", "ItSystem_Id", "dbo.ItSystem");
+            DropForeignKey("dbo.TaskRef", "ItSystem_Id", "dbo.ItSystem");
             DropForeignKey("dbo.UserAdministration", "Id", "dbo.ItSystem");
             DropForeignKey("dbo.Technology", "ProgLanguage_Id", "dbo.ProgLanguage");
             DropForeignKey("dbo.Technology", "Id", "dbo.ItSystem");
@@ -1042,7 +1048,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.Functionality", "Id", "dbo.ItSystem");
             DropForeignKey("dbo.Component", "ItSystem_Id", "dbo.ItSystem");
             DropForeignKey("dbo.BasicData", "ItSystem_Id", "dbo.ItSystem");
-            DropForeignKey("dbo.KLE", "ItProject_Id", "dbo.ItProject");
+            DropForeignKey("dbo.TaskRef", "ItProject_Id", "dbo.ItProject");
             DropForeignKey("dbo.Hierarchy", "ItProjectRef_Id", "dbo.ItProject");
             DropForeignKey("dbo.Hierarchy", "Id", "dbo.ItProject");
             DropForeignKey("dbo.Hierarchy", "ItProgramRef_Id", "dbo.ItProject");
@@ -1110,8 +1116,8 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ItSystem", new[] { "SystemType_Id" });
             DropIndex("dbo.ItSystem", new[] { "Municipality_Id" });
             DropIndex("dbo.ItSystem", new[] { "ParentItSystem_Id" });
-            DropIndex("dbo.KLE", new[] { "ItSystem_Id" });
-            DropIndex("dbo.KLE", new[] { "ItProject_Id" });
+            DropIndex("dbo.TaskRef", new[] { "ItSystem_Id" });
+            DropIndex("dbo.TaskRef", new[] { "ItProject_Id" });
             DropIndex("dbo.Hierarchy", new[] { "ItProjectRef_Id" });
             DropIndex("dbo.Hierarchy", new[] { "ItProgramRef_Id" });
             DropIndex("dbo.Hierarchy", new[] { "Id" });
@@ -1192,7 +1198,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropTable("dbo.Component");
             DropTable("dbo.BasicData");
             DropTable("dbo.ItSystem");
-            DropTable("dbo.KLE");
+            DropTable("dbo.TaskRef");
             DropTable("dbo.Hierarchy");
             DropTable("dbo.Handover");
             DropTable("dbo.Goal");
