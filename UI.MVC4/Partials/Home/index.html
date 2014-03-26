@@ -28,10 +28,10 @@
             <img class="featurette-image img-responsive" data-src="holder.js/500x500/auto" alt="Generic placeholder image" holder-fix>
         </div>
         <div class="col-md-7">
-            <h2 class="featurette-heading" data-editable-textarea="introhead">
+            <h2 class="featurette-heading" data-editable-textarea="introhead" data-onbeforesave="submitIntroHead($data)">
                 {{ introhead || 'tom' }}
             </h2>
-            <p class="lead" data-editable-textarea="introbody">
+            <p class="lead" data-editable-textarea="introbody" data-onbeforesave="submitIntroBody($data)">
                 {{ introbody || 'tom' }}
             </p>
         </div>
