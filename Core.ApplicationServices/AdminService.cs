@@ -39,15 +39,7 @@ namespace Core.ApplicationServices
 
         public AdminRole GetLocalAdminRole()
         {
-            var result = _adminRoles.Get(role => role.Name == "LocalAdmin").FirstOrDefault();
-
-            if(result == null){ 
-                result = _adminRoles.Insert(new AdminRole(){ Name = "LocalAdmin" });
-
-                _adminRoles.Save();
-            }
-
-            return result;
+            return _adminRoles.Get(role => role.Name == "LocalAdmin").First();
         }
     }
 }

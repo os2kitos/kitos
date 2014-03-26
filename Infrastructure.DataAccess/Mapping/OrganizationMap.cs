@@ -14,6 +14,8 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("Organization");
             this.Property(t => t.Id).HasColumnName("Id");
+            this.Property(t => t.Cvr).IsOptional();
+            this.Property(t => t.Type).IsOptional();
 
             // Relationships
             this.HasOptional(t => t.Config)

@@ -3,6 +3,13 @@ using Core.DomainModel.ItProject;
 
 namespace Core.DomainModel
 {
+    public enum OrganizationType
+    {
+        Company,
+        Municipality,
+        CommunityOfInterests
+    }
+
     public class Organization : IEntity<int>
     {
         public Organization()
@@ -17,6 +24,8 @@ namespace Core.DomainModel
 
         public int Id { get; set; }
         public string Name { get; set; }
+        public OrganizationType? Type { get; set; }
+        public int? Cvr { get; set; }
         
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
 
