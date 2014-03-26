@@ -1,88 +1,218 @@
 ﻿<div data-ng-controller="globalConfig.ContractCtrl">
-    <div class="well">
-        <h4>Generelt</h4>
-        <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-5">
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox">
-                        Vis fanen 'IT Kontracter'
-                    </label>
+    <div class="form-horizontal">
+        <div class="well">
+            <h4>Reference</h4>
+
+            <div class="form-group" data-ng-repeat="item in refs">
+                <label class="col-sm-2 control-label">{{ item.Name }}</label>
+                <div class="col-sm-5">
+                    <a href="#" data-editable-text="item.Name" data-onbeforesave="patchRef($data, $index)">
+                        {{ item.Name || "Ikke sat" }}
+                    </a>
+                    <p class="help-block">{{ item.Note }}</p>
                 </div>
             </div>
         </div>
-                
-        <div id="contract-module-names"></div>
-
-        <div id="contract-show-guide">
-            <div class="form-group">
+        
+        <div class="well">
+            <h4>Kontrakttyper</h4>
+       
+            <div class="form-group" data-ng-repeat="item in ContractTypes">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <label>
-                            <input type="checkbox">
-                            Medtag vejledning
-                        </label>
+                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchContractType($data, $index)">
+                            {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <h5>Kontrakttype forslag</h5>
+            
+            <div class="form-group" data-ng-repeat="item in ContractTypeSuggestions">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchItContractTypeSuggestion(!$data, $index)">
+                            {{ item.IsSuggestion && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
-                
-        <div class="form-group">
-            <label for="input-contract-url" class="col-sm-2 control-label">IT Kontrakt vejledning</label>
-            <div class="col-sm-5">
-                <input type="url" name="ItSystemGuide" class="form-control" id="input-contract-url" />
-            </div>
-        </div>
-    </div>
-            
-    <hr>
-            
-    <div class="well">
-        <h4>Reference</h4>
-        <div class="form-group">
-            <label for="input-contract-ref1" class="col-sm-2 control-label">ESDH ref.</label>
-            <div class="col-sm-5">
-                <input type="text" class="form-control" id="input-contract-ref1" />
-                <p class="help-block">Ref. til ESDH system, hvor der er projektdokumenter</p>
-            </div>
-        </div>
-                
-        <div class="form-group">
-            <label for="input-contract-ref3" class="col-sm-2 control-label">Mappe ref.</label>
-            <div class="col-sm-5">
-                <input type="text" class="form-control" id="input-contract-ref3" />
-                <p class="help-block">Ref. til andre steder, hvor der er projektdokumenter</p>
-            </div>
-        </div>
-    </div>
 
-    <div class="well">
-        <h4>Kontrakttype</h4>
-        <div id="contract-type"></div>
-    </div>
+        <div class="well">
+            <h4>Kontraktskabaloner</h4>
+       
+            <div class="form-group" data-ng-repeat="item in ContractTemplates">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchContractTemplate($data, $index)">
+                            {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
             
-    <div class="well">
-        <h4>kontraktskabalon</h4>
-        <div id="contract-template"></div>
-    </div>
+            <hr>
             
-    <div class="well">
-        <h4>Indkøbsform</h4>
-        <div id="purchase-form"></div>
-    </div>
+            <h5>Kontraktskabalon forslag</h5>
             
-    <div class="well">
-        <h4>Overtagelsesprøver</h4>
-        <div id="contract-..."></div>
-    </div>
+            <div class="form-group" data-ng-repeat="item in ContractTemplateSuggestions">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchContractTemplateSuggestion(!$data, $index)">
+                            {{ item.IsSuggestion && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="well">
+            <h4>Indkøbsformer</h4>
+       
+            <div class="form-group" data-ng-repeat="item in PurchaseForms">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchPurchaseForm($data, $index)">
+                            {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
             
-    <div class="well">
-        <h4>Betalignsmodeller</h4>
-        <div id="payment-model"></div>
-    </div>
+            <hr>
             
-    <div class="well">
-        <h4>Aftaleelementer</h4>
-        <div id="agreement-elements"></div>
+            <h5>Indkøbsform forslag</h5>
+            
+            <div class="form-group" data-ng-repeat="item in PurchaseFormSuggestions">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchPurchaseFormSuggestion(!$data, $index)">
+                            {{ item.IsSuggestion && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="well">
+            <h4>Roller</h4>
+       
+            <div class="form-group" data-ng-repeat="item in ItContractRoles">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchItContractRole($data, $index)">
+                            {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="item.HasWriteAccess" data-e-title="Skriverettighed?" data-onbeforesave="patchItContractRoleAccess($data, $index)">
+                            {{ item.HasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <h5>Rolle forslag</h5>
+            
+            <div class="form-group" data-ng-repeat="item in ItContractRoleSuggestions">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchItContractRoleSuggestion(!$data, $index)">
+                            {{ item.IsSuggestion && "Medtager " + item.Name || "Medtager ikke " + item.Name }} med {{ item.HasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="well">
+            <h4>Overtagelsesprøver</h4>
+       
+            <div class="form-group" data-ng-repeat="item in HandoverTrials">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchHandoverTrial($data, $index)">
+                            {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <h5>Overtagelsesprøve forslag</h5>
+            
+            <div class="form-group" data-ng-repeat="item in HandoverTrialSuggestions">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchHandoverTrialSuggestion(!$data, $index)">
+                            {{ item.IsSuggestion && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="well">
+            <h4>Betalignsmodeller</h4>
+       
+            <div class="form-group" data-ng-repeat="item in PaymentModels">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchPaymentModel($data, $index)">
+                            {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <h5>Betalignsmodel forslag</h5>
+            
+            <div class="form-group" data-ng-repeat="item in PaymentModelSuggestions">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchPaymentModelSuggestion(!$data, $index)">
+                            {{ item.IsSuggestion && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="well">
+            <h4>Aftaleelementer</h4>
+       
+            <div class="form-group" data-ng-repeat="item in AgreementElements">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchAgreementElement($data, $index)">
+                            {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <h5>Aftaleelement forslag</h5>
+            
+            <div class="form-group" data-ng-repeat="item in AgreementElementSuggestions">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchAgreementElementSuggestion(!$data, $index)">
+                            {{ item.IsSuggestion && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

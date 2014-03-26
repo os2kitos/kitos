@@ -51,12 +51,11 @@
     <Reference Include="AutoMapper.Net4">
       <HintPath>..\packages\AutoMapper.3.1.1\lib\net40\AutoMapper.Net4.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\EntityFramework.6.0.2\lib\net45\EntityFramework.dll</HintPath>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer">
-      <HintPath>..\packages\EntityFramework.6.0.2\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.1.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="MySql.Data, Version=6.8.3.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
@@ -256,7 +255,6 @@
     <Compile Include="Controllers\API\OrganizationController.cs" />
     <Compile Include="Controllers\API\PasswordResetRequestController.cs" />
     <Compile Include="Controllers\API\UserController.cs" />
-    <Compile Include="Controllers\Web\AccountController.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Controllers\Web\GlobalConfigController.cs" />
     <Compile Include="Controllers\Web\LocalConfigController.cs" />
@@ -267,7 +265,6 @@
     <Compile Include="Controllers\Web\OldHomeController.cs" />
     <Compile Include="Controllers\API\TextController.cs" />
     <Compile Include="Controllers\Web\TestController.cs" />
-    <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -279,7 +276,6 @@
     <Compile Include="Infrastructure\NinjectDependencyScope.cs" />
     <Compile Include="Infrastructure\ProviderInitializationHttpModule.cs" />
     <Compile Include="Infrastructure\UserRepositoryFactory.cs" />
-    <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\ApiReturnDTO.cs" />
     <Compile Include="Models\AuthorizeViewModels.cs" />
     <Compile Include="Models\ConfigDTO.cs" />
@@ -291,6 +287,7 @@
     <Compile Include="Models\PasswordResetRequestDTO.cs" />
     <Compile Include="Models\ResetPasswordDTO.cs" />
     <Compile Include="Models\AdminRightDTO.cs" />
+    <Compile Include="Models\RoleDTO.cs" />
     <Compile Include="Models\UserDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -366,6 +363,7 @@
     <Content Include="Scripts\app\controllers\home\home.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config.js" />
     <Content Include="Scripts\app\controllers\org\org.js" />
+    <Content Include="Scripts\app\directives\directives.js" />
     <Content Include="Scripts\app\directives\form-validation.js" />
     <Content Include="Scripts\app\app.js" />
     <Content Include="Scripts\bootstrap3-wysihtml5.js" />
@@ -628,14 +626,12 @@
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
-    <None Include="Scripts\jquery-1.7.2.intellisense.js" />
-    <Content Include="Scripts\jquery-1.7.2.js" />
-    <Content Include="Scripts\jquery-1.7.2.min.js" />
-    <Content Include="Scripts\knockout-2.2.0.debug.js" />
-    <Content Include="Scripts\knockout-2.2.0.js" />
+    <None Include="Properties\PublishProfiles\Kitos - Debug.pubxml" />
+    <None Include="Scripts\jquery-2.1.0.intellisense.js" />
+    <Content Include="Scripts\jquery-2.1.0.js" />
+    <Content Include="Scripts\jquery-2.1.0.min.js" />
     <Content Include="Scripts\lodash.js" />
     <Content Include="Scripts\lodash.min.js" />
-    <Content Include="Scripts\pnotify\jquery.pnotify.js" />
     <Content Include="Scripts\form.control.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ar.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_bg.js" />
@@ -757,11 +753,13 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Scripts\version.json" />
     <Content Include="Scripts\underscore.min.map" />
+    <Content Include="Scripts\jquery-2.1.0.min.map" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Content\themes\base\images\" />
     <Folder Include="Content\themes\base\minified\images\" />
+    <Folder Include="Filters\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

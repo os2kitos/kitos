@@ -11,7 +11,7 @@ namespace Infrastructure.DataAccess
     {
         static KitosContext()
         {
-            Database.SetInitializer<KitosContext>(null);
+
         }
 
         public KitosContext()

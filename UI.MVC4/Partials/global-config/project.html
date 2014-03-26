@@ -45,11 +45,16 @@
         <div class="well">
             <h4>Roller</h4>
        
-            <div class="form-group" data-ng-repeat="item in roles">
+            <div class="form-group" data-ng-repeat="item in ItProjectRoles">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchRole($data, $index)">
+                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchItProjectRole($data, $index)">
                             {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        </a>
+                    </div>
+                    <div class="checkbox">
+                        <a href="#" data-editable-checkbox="item.HasWriteAccess" data-e-title="Skriverettighed?" data-onbeforesave="patchItProjectRoleAccess($data, $index)">
+                            {{ item.HasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
                         </a>
                     </div>
                 </div>
@@ -59,11 +64,11 @@
             
             <h5>Rolle forslag</h5>
             
-            <div class="form-group" data-ng-repeat="item in roleSuggestions">
+            <div class="form-group" data-ng-repeat="item in ItProjectRoleSuggestions">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchSuggestion(!$data, $index)">
-                            {{ item.IsSuggestion && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchItProjectRoleSuggestion(!$data, $index)">
+                            {{ item.IsSuggestion && "Medtage " + item.Name || "Medtager ikke " + item.Name }} med {{ item.HasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
                         </a>
                     </div>
                 </div>
