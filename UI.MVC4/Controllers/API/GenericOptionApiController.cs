@@ -54,13 +54,11 @@ namespace UI.MVC4.Controllers.API
             return base.PutQuery(item);
         }
 
-        [Authorize(Roles = "LocalAdmin, GlobalAdmin")]
         public override HttpResponseMessage Post(OptionDTO dto)
         {
             return base.Post(dto);
         }
 
-        [Authorize(Roles = "LocalAdmin, GlobalAdmin")]
         public override HttpResponseMessage Put(int id, OptionDTO dto)
         {
             return base.Put(id, dto);
