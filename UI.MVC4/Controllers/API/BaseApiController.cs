@@ -5,12 +5,21 @@ using System.Net;
 using System.Net.Http;
 using System.Security;
 using System.Web.Http;
+using Core.DomainModel;
+using Core.DomainServices;
+using Ninject;
 using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
     public abstract class BaseApiController : ApiController
     {
+        [Inject]
+        public IGenericRepository<User> UserRepository { get; set; }
+
+        [Inject]
+        public IAdminService AdminService { get; set; }
+
         protected HttpResponseMessage CreateResponse<T>(HttpStatusCode statusCode, T response, string msg = "")
         {
             var wrap = new ApiReturnDTO<T>
@@ -80,6 +89,20 @@ namespace UI.MVC4.Controllers.API
         protected HttpResponseMessage NotFound()
         {
             return CreateResponse(HttpStatusCode.NotFound);
+        }
+
+        protected bool IsGlobalAdmin()
+        {
+            try
+            {
+                var user = UserRepository.GetByKey(User.Identity.Name);
+                
+                return AdminService.IsGlobalAdmin(user);
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
