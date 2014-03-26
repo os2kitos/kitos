@@ -52,15 +52,23 @@ namespace Core.ApplicationServices
             _passwordResetRequestRepository.Insert(request);
             _passwordResetRequestRepository.Save();
 
-            var resetLink = "http://kitos.dk/Authorize/ResetPassword?Hash=" + hash;
-            resetLink = HttpUtility.UrlEncode(resetLink);
+            var resetLink = "http://kitos.dk/#/reset-password?Hash=" + HttpUtility.UrlEncode(hash);
 
             const string mailSubject = "Nulstilning af dit KITOS password";
-            var mailContent = "<a href='" + resetLink +
-                              "'>Klik her for at nulstille passwordet for din KITOS bruger</a>. Linket udløber om " +
+            var mailContent = "<a href='" + resetLink + "'>" +
+                              "Klik her for at nulstille passwordet for din KITOS bruger</a>. Linket udløber om " +
                               ResetRequestTTL + " timer.";
 
-            _mailClient.Send(user.Email, mailSubject, mailContent);
+            var message = new MailMessage()
+                {
+                    Body = mailContent,
+                    IsBodyHtml = true,
+                    BodyEncoding = Encoding.UTF8,
+                    Subject = mailSubject,
+                };
+            message.To.Add(user.Email);
+
+            _mailClient.Send(message);
 
             return request;
         }

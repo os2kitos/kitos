@@ -30,21 +30,9 @@ namespace Core.ApplicationServices
         /// <summary>
         /// Sends the specified mail.
         /// </summary>
-        /// <param name="to">To.</param>
-        /// <param name="subject">The subject.</param>
-        /// <param name="content">The content.</param>
-        /// <param name="isHtml">if set to <c>true</c> [is HTML].</param>
-        public void Send(string to, string subject, string content, bool isHtml = true)
+        /// <param name="message">The message.</param>
+        public void Send(MailMessage message)
         {
-            var address = new MailAddress(to);
-            var message = new MailMessage
-                {
-                    Subject = subject,
-                    Body = content,
-                    IsBodyHtml = isHtml
-                };
-            message.To.Add(address);
-
             _client.Send(message);
         }
     }
