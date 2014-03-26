@@ -52,7 +52,7 @@ namespace Core.ApplicationServices
             _passwordResetRequestRepository.Insert(request);
             _passwordResetRequestRepository.Save();
 
-            var resetLink = "http://kitos.dk/#/reset-password?Hash=" + HttpUtility.UrlEncode(hash);
+            var resetLink = "http://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(hash);
 
             const string mailSubject = "Nulstilning af dit KITOS password";
             var mailContent = "<a href='" + resetLink + "'>" +
