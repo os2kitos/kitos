@@ -1,30 +1,7 @@
 ﻿(function (ng, app) {
     
     var subnav = [];
-
-    /*app.directive('chooseAdminOrg', ['$rootScope', '$http', '$state', 'growl', function ($rootScope, $http, $state, growl) {
-        return {
-            scope: {
-                url: '@',
-                chosen: '='
-            },
-            templateUrl: 'partials/local-config/choose-org.html',
-            link: function (scope, element, attrs) {
-                $http.get("api/organization").success(function (data) {
-
-                    scope.organizations = _.filter(data.Response, function (org) {
-                        return _.contains($rootScope.user.isLocalAdminFor, org.Id);
-                    });
-
-                });
-
-                scope.choose = function () {
-                    $state.go("local-config.Edit", { chosenId: scope.chosen });
-                };
-            }
-        };
-    }]);*/
-
+    
     app.directive('suggestNew', ['$http', 'growl', function ($http, growl) {
         return {
             scope: {
@@ -38,6 +15,34 @@
                     var data = {
                         'IsSuggestion': true,
                         'Name': scope.suggestion
+                    };
+
+                    $http.post(scope.url, data).success(function (result) {
+                        growl.addSuccessMessage('Foreslag sendt!');
+                        scope.suggestion = "";
+                    }).error(function (result) {
+                        growl.addErrorMessage('Kunne ikke sende foreslag!');
+                    });
+                };
+            }
+        };
+    }]);
+    
+    app.directive('suggestNewRole', ['$http', 'growl', function ($http, growl) {
+        return {
+            scope: {
+                url: '@'
+            },
+            templateUrl: 'partials/local-config/suggest-new-role.html',
+            link: function (scope, element, attrs) {
+                scope.suggest = function () {
+                    if (scope.suggestForm.$invalid) return;
+
+                    var data = {
+                        'IsSuggestion': true,
+                        'Name': scope.suggestion,
+                        'HasReadAccess': true,
+                        'HasWriteAccess': scope.writeAccess
                     };
 
                     $http.post(scope.url, data).success(function (result) {

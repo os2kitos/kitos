@@ -319,6 +319,7 @@
     <Content Include="Partials\home\index.html" />
     <Content Include="Partials\home\login.html" />
     <Content Include="Partials\local-config\config.html" />
+    <Content Include="Partials\local-config\suggest-new-role.html" />
     <Content Include="Partials\local-config\index.html" />
     <Content Include="Partials\local-config\contract.html" />
     <Content Include="Partials\local-config\optionlist.html" />
