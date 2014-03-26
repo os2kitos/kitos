@@ -13,7 +13,6 @@ namespace Core.ApplicationServices
     {
         //TODO: where do these go?
         private const int ResetRequestTTL = 12;
-        private const string FromAddress = "no-reply@kitos.dk";
 
         private readonly IGenericRepository<User> _userRepository;
         private readonly IGenericRepository<PasswordResetRequest> _passwordResetRequestRepository;
@@ -56,12 +55,12 @@ namespace Core.ApplicationServices
             var resetLink = "http://kitos.dk/Authorize/ResetPassword?Hash=" + hash;
             resetLink = HttpUtility.UrlEncode(resetLink);
 
-            var mailSubject = "Nulstilning af dit KITOS password";
+            const string mailSubject = "Nulstilning af dit KITOS password";
             var mailContent = "<a href='" + resetLink +
                               "'>Klik her for at nulstille passwordet for din KITOS bruger</a>. Linket udløber om " +
                               ResetRequestTTL + " timer.";
 
-            _mailClient.Send(FromAddress, user.Email, mailSubject, mailContent);
+            _mailClient.Send(user.Email, mailSubject, mailContent);
 
             return request;
         }
