@@ -30,7 +30,6 @@ namespace Core.ApplicationServices
         /// <summary>
         /// Sends the specified mail.
         /// </summary>
-        /// <param name="from">From.</param>
         /// <param name="to">To.</param>
         /// <param name="subject">The subject.</param>
         /// <param name="content">The content.</param>
@@ -46,7 +45,7 @@ namespace Core.ApplicationServices
                 };
             message.To.Add(address);
 
-            _client.Send(message); //TODO
+            _client.Send(message);
         }
     }
 }
