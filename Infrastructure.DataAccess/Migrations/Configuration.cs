@@ -520,7 +520,71 @@ namespace Infrastructure.DataAccess.Migrations
 
             #endregion
 
+            #region KLE
 
+            context.TaskRefs.AddOrUpdate(x => x.TaskKey,
+                                         new TaskRef()
+                                             {
+                                                 TaskKey = "00",
+                                                 Description = "Kommunens styrelse",
+                                                 Type = "KLE"
+                                             },
+                                         new TaskRef()
+                                             {
+                                                 TaskKey = "00.01",
+                                                 Description = "Kommunens styrelse",
+                                                 Type = "KLE"
+                                             },
+                                         new TaskRef()
+                                             {
+                                                 TaskKey = "00.01.00",
+                                                 Description = "Kommunens styrelse i almindelighed",
+                                                 Type = "KLE"
+                                             },
+                                         new TaskRef()
+                                             {
+                                                 TaskKey = "00.01.10",
+                                                 Description = "Opgaver der dækker flere hovedgrupper",
+                                                 Type = "KLE"
+                                             },
+                                         new TaskRef()
+                                             {
+                                                 TaskKey = "00.03",
+                                                 Description = "International virksomhed og EU",
+                                                 Type = "KLE"
+                                             },
+                                         new TaskRef()
+                                             {
+                                                 TaskKey = "00.03.00",
+                                                 Description = "International virksomhed og EU i almindelighed",
+                                                 Type = "KLE"
+                                             },
+                                         new TaskRef()
+                                             {
+                                                 TaskKey = "00.03.02",
+                                                 Description = "Internationale organisationers virksomhed",
+                                                 Type = "KLE"
+                                             },
+                                         new TaskRef()
+                                             {
+                                                 TaskKey = "00.03.04",
+                                                 Description = "Regionaludvikling EU",
+                                                 Type = "KLE"
+                                             },
+                                         new TaskRef()
+                                             {
+                                                 TaskKey = "00.03.08",
+                                                 Description = "EU-interessevaretagelse",
+                                                 Type = "KLE"
+                                             },
+                                         new TaskRef()
+                                             {
+                                                 TaskKey = "00.03.10",
+                                                 Description = "Internationalt samarbejde",
+                                                 Type = "KLE"
+                                             });
+
+            #endregion
 
             context.ProjectPhaseLocales.AddOrUpdate(x => new { x.Municipality_Id, x.Original_Id },
                                                     new ProjPhaseLocale()

@@ -71,6 +71,35 @@
             </div>
 
         </div>
+        
+        <div class="row">
+            <div class="col-md-12" data-ng-hide="chosenTaskList">
+                <h3>Vælg opgaver tilkyttet organisationen</h3>
+            </div>
+
+            <div class="col-md-12" data-ng-show="chosenTaskList">
+                <div class="panel panel-primary">
+                    <table class="full-width table">
+                        <thead>
+                            <tr>
+                                <th>Organisationsenhed</th>
+                                <th>ID</th>
+                                <th>Navn</th>
+                                <th>Overblik</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="right in chosenOrgUnit.OrgRights">
+                                <td>{{ orgUnits[right.Object_Id].Name }}</td>
+                                <td>{{ orgRoles[right.Role_Id].Name }}</td>
+                                <td>{{ right.User.Name }}</td>
+                                <td><input type="checkbox"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>

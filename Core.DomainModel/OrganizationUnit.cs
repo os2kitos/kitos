@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
@@ -9,6 +10,7 @@ namespace Core.DomainModel
         {
             this.Infrastructures = new List<Infrastructure>();
             this.Rights = new List<OrganizationRight>();
+            this.TaskRefs = new List<TaskRef>();
         }
 
         public int Id { get; set; }
@@ -23,5 +25,6 @@ namespace Core.DomainModel
 
         public virtual ICollection<Infrastructure> Infrastructures { get; set; }
         public virtual ICollection<OrganizationRight> Rights { get; set; }
+        public virtual ICollection<TaskRef> TaskRefs { get; set; }
     }
 }

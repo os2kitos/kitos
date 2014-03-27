@@ -24,6 +24,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(m => m.OrgUnits)
                 .HasForeignKey(o => o.Organization_Id)
                 .WillCascadeOnDelete(true);
+
+            this.HasMany(o => o.TaskRefs)
+                .WithMany(p => p.OrganizationUnits);
         }
     }
 }

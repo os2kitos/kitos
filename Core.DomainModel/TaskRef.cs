@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Core.DomainModel
 {
@@ -16,5 +17,6 @@ namespace Core.DomainModel
 
         public virtual ItProject.ItProject ItProject { get; set; }
         public virtual ItSystem.ItSystem ItSystem { get; set; }
+        public virtual ICollection<OrganizationUnit> OrganizationUnits { get; set; }
     }
 }
