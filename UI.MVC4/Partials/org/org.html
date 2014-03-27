@@ -1,9 +1,7 @@
 ﻿<div class="col-md-12">
-
-    <h2>Organisation</h2>
-
+    
     <div class="col-md-4 container-fluid">
-        <h3>Organisationsenheder</h3>
+        <h2>Organisationsenheder</h2>
         <div data-ng-repeat="node in nodes">
             <div data-ng-include="'partials/org/org-unit.html'"></div>
         </div>
@@ -11,13 +9,15 @@
 
     <div class="col-md-8 container-fluid">
         <div class="row">
-
+            
+            <!-- if no org unit is selected, this is shown -->
             <div class="col-md-12" data-ng-hide="chosenOrgUnit">
                 <h3>Vælg en organisationsenhed</h3>
                 <p>Her kan du få overblik over de organisationsenheder, som du er tilknyttet.</p>
                 <p><strong>Start med at vælge en organisationsenhed i oversigten til venstre.</strong></p>
             </div>
-
+            
+            <!-- if an org unit has been selected -->
             <div class="col-md-12" data-ng-show="chosenOrgUnit">
                 <h3>{{ chosenOrgUnit.Name }}</h3>
                 <p>Du har valgt enheden {{ chosenOrgUnit.Name }} under organisationen {{ chosenOrgUnit.Organization.Name }}.</p>
@@ -28,14 +28,15 @@
                     <table class="full-width table table-striped">
                         <thead>
                             <tr>
-                                <th>Organisationsenhed</th>
-                                <th>Brugerrolle</th>
-                                <th>Navn</th>
-                                <th>Email</th>
+                                <th><a ng-click="rightSortChange('orgUnitName')">Organisationsenhed</a></th>
+                                <th><a ng-click="rightSortChange('roleName')">Brugerrolle</a></th>
+                                <th><a ng-click="rightSortChange('userName')">Navn</a></th>
+                                <th><a ng-click="rightSortChange('userEmail')">Email</a></th>
+                                <th></th>
                             </tr>
                         </thead>
                         <!-- for each right -->
-                        <tbody data-ng-repeat="right in chosenOrgUnit.OrgRights | filter: { show: true }">
+                        <tbody data-ng-repeat="right in chosenOrgUnit.OrgRights | filter : { show: true } | orderBy : rightSort : rightSortReverse">
                             
                             <!-- show -->
                             <tr data-ng-hide="right.edit">
@@ -44,13 +45,13 @@
                                 <td>{{ right.User.Name }}</td>
                                 <td>{{ right.User.Email }}</td>
                                 <td>
-                                    <i class="glyphicon glyphicon-pencil pull-right" data-ng-click="right.edit = true"></i>
-                                    <i class="glyphicon glyphicon-trash pull-right" data-confirmed-click="deleteRight(right)" data-confirm-click="Er du sikker på at du vil slette?"></i>
+                                    <a data-ng-click="right.edit = true" class="btn btn-link btn-sm"><i class="glyphicon glyphicon-pencil pull-right"></i></a>
+                                    <a class="btn btn-link btn-sm"  data-confirmed-click="deleteRight(right)" data-confirm-click="Er du sikker på at du vil slette?"><i class="glyphicon glyphicon-trash pull-right"></i></a>
                                 </td>
                             </tr>
                             
                             <!-- edit -->
-                            <tr data-ng-show="right.edit" class="highlight">
+                            <tr data-ng-show="right.edit">
                                 <td>
                                     <input type="text" disabled="" class="form-control input-sm" value="{{ orgUnits[right.Object_Id].Name }}"/>
                                 </td>

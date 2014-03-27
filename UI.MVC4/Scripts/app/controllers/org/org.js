@@ -157,7 +157,10 @@
                     'Object_Id': unitId,
                     'Role_Id': role.Id,
                     'User_Id': user.Id,
-                    'User': user
+                    'User': user,
+                    'userForSelect': { id: user.Id, text: user.Name },
+                    'roleForSelect': role.Id,
+                    show: true
                 });
                 
                 $scope.newRole = "";
@@ -186,6 +189,8 @@
         };
 
         $scope.updateRight = function (right) {
+
+            if (!right.roleForSelect || !right.userForSelect) return;
             
             //old values
             var oId = right.Object_Id;
@@ -197,7 +202,7 @@
             var role = $scope.orgRoles[right.roleForSelect];
             var user = users[right.userForSelect.id];
 
-            //if nothing was changed, just close edit
+            //if nothing was changed, just exit edit-mode
             if (oId == unitId && rId == role.Id && uId == user.Id) {
                 right.edit = false;
             }
@@ -240,6 +245,33 @@
 
                 growl.addErrorMessage('Kunne ikke knytte ' + user.Name + ' i rollen!');
             });
+        };
+
+        $scope.rightSortBy = "orgUnitName";
+        $scope.rightSortReverse = false;
+        $scope.rightSort = function(right) {
+            switch ($scope.rightSortBy) {
+                case "orgUnitName":
+                    return $scope.orgUnits[right.Object_Id].Name;
+                case "roleName":
+                    return $scope.orgRoles[right.Role_Id].Name;
+                case "userName":
+                    return right.User.Name;
+                case "userEmail":
+                    return right.User.Email;
+                default:
+                    return $scope.orgUnits[right.Object_Id].Name;
+            }
+        };
+
+        $scope.rightSortChange = function(val) {
+            if ($scope.rightSortBy == val) {
+                $scope.rightSortReverse = !$scope.rightSortReverse;
+            } else {
+                $scope.rightSortReverse = false;
+            }
+
+            $scope.rightSortBy = val;
         };
 
     }]);
