@@ -22,9 +22,9 @@
                 <h3>{{ chosenOrgUnit.Name }}</h3>
                 <p>Du har valgt enheden {{ chosenOrgUnit.Name }} under organisationen {{ chosenOrgUnit.Organization.Name }}.</p>
 
-                <div>
-                    <table class="full-width">
-                        <caption>Organisationsroller</caption>
+                <div class="panel panel-primary">
+                    <div class="panel-heading">Organisationsroller</div>
+                    <table class="full-width table">
                         <thead>
                             <tr>
                                 <th>Organisationsenhed</th>
@@ -41,24 +41,9 @@
                                 <td>{{ right.User.Email }}</td>
                             </tr>
 
-                            <!--<tr>
-                                <td>
-                                    {{ chosenOrgUnit.Name }}
-                                </td>
-                                <td>
-                                    <select data-ng-model="newRole" data-ng-options="orgRole.Id as orgRole.Name for orgRole in orgRoles">
-                                    </select>
-                                </td>
-                                <td colspan="2">
-                                    <input type="text" data-ui-select2="userSelectOptions" data-ng-model="selectedUser" class="form-control" data-placeholder="Find bruger"/>
-                                </td>
-                            </tr>-->
                         </tbody>
                     </table>
-
-                    <div>
-                        <h5>Tilknyt bruger til {{chosenOrgUnit.Name}}</h5>
-
+                    <div class="panel-footer">
                         <form class="form-horizontal" novalidate="novalidate">
                             <div class="form-group col-md-5">
                                 <label for="selectRole" class="control-label">
@@ -77,9 +62,11 @@
                             </div>
                         </form>
                     </div>
-
-                    {{selectedUser}}
                 </div>
+
+
+
+                {{selectedUser}}
 
             </div>
 
