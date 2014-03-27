@@ -19,7 +19,7 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Relationships
             this.HasOptional(t => t.ItProject)
-                .WithMany(t => t.KLEs)
+                .WithMany(t => t.TaskRefs)
                 .HasForeignKey(d => d.ItProject_Id);
             this.HasOptional(t => t.ItSystem)
                 .WithMany(t => t.KLEs)
