@@ -3,10 +3,7 @@
     var subnav = [
             { state: 'org-view', text: 'Organisation' }
     ];
-
-    var users = [];
-
-
+    
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
 
         $stateProvider.state('org-view', {
@@ -30,6 +27,8 @@
         
         //cache
         var orgs = [];
+
+        $scope.users = [];
 
         //flatten map of all loaded orgUnits
         $scope.orgUnits = [];
@@ -107,7 +106,7 @@
                     right.show = true;
                     
                     //save user for later
-                    users[right.User.Id] = right.User;
+                    $rootScope.users[right.User.Id] = right.User;
                 });
 
             });
@@ -115,44 +114,6 @@
             $scope.chosenOrgUnit = node;
         };
 
-        $scope.userSelectOptions = {
-            minimumInputLength: 2,
-            initSelection: function (element, callback) {
-            },
-            ajax: {
-                data: function (term, page) {
-                    return { query: term };
-                },
-                quietMillis: 500,
-                transport: function (queryParams) {
-                    //console.log(queryParams);
-                    var res = $http.get('api/user?q=' + queryParams.data.query).then(queryParams.success);
-                    res.abort = function () {
-                        return null;
-                    };
-
-                    return res;
-                },
-                results: function (data, page) {
-                    console.log(data);
-                    var results = [];
-
-                    _.each(data.data.Response, function (user) {
-                        //Save to cache
-                        users[user.Id] = user;
-
-                        results.push({
-                            id: user.Id,
-                            text: user.Name
-                        });
-                    });
-
-                    return { results: results };
-                }
-            }
-
-
-        };
 
         $scope.submitRight = function () {
 
@@ -160,7 +121,7 @@
 
             var unitId = $scope.chosenOrgUnit.Id;
             var role = $scope.orgRoles[parseInt($scope.newRole)];
-            var user = users[$scope.selectedUser.id];
+            var user = $rootScope.users[$scope.selectedUser.id];
 
             var data = {
                 'Object_Id': unitId,
@@ -218,7 +179,7 @@
             //new values
             var unitId = right.Object_Id;
             var role = $scope.orgRoles[right.roleForSelect];
-            var user = users[right.userForSelect.id];
+            var user = $rootScope.users[right.userForSelect.id];
 
             //if nothing was changed, just exit edit-mode
             if (oId == unitId && rId == role.Id && uId == user.Id) {

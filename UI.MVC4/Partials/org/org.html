@@ -47,8 +47,12 @@
                                 <td>{{ right.User.Email }}</td>
                                 <td>
                                     <div data-ng-show="chosenOrgUnit.hasWriteAccess">
-                                        <a data-ng-click="right.edit = true" class="btn btn-link btn-sm"><i class="glyphicon glyphicon-pencil pull-right"></i></a>
-                                        <a class="btn btn-link btn-sm"  data-confirmed-click="deleteRight(right)" data-confirm-click="Er du sikker på at du vil slette?"><i class="glyphicon glyphicon-trash pull-right"></i></a>
+                                        <a data-ng-click="right.edit = true" class="btn btn-link btn-sm"><i class="glyphicon glyphicon-pencil"></i></a>
+                                        <a class="btn btn-link btn-sm" 
+                                           data-confirmed-click="deleteRight(right)" 
+                                           data-confirm-click="Er du sikker på at du vil slette?">
+                                            <i class="glyphicon glyphicon-trash pull-right"></i>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
@@ -66,9 +70,11 @@
                                     </select>
                                 </td>
                                 <td colspan="2">
+                                    <input data-select-user="" data-ng-model="right.userForSelect" data-ng-required="true" data-users-cache="users"/>
+                                    <!--
                                     <input type="text" name="selectUser" data-ui-select2="userSelectOptions" 
                                            data-ng-model="right.userForSelect" class="form-control input-sm" 
-                                           data-placeholder="Find bruger" data-ng-required="true" />
+                                           data-placeholder="Find bruger" data-ng-required="true" />-->
                                 </td>
                                 <td>
                                     <input type="submit" class="btn btn-primary btn-sm" data-ng-click="updateRight(right)" value="Gem" />
@@ -89,9 +95,13 @@
                                     </select>
                                 </td>
                                 <td colspan="2">
-                                    <input type="text" name="selectUser" data-ui-select2="userSelectOptions" 
-                                           data-ng-model="selectedUser" class="form-control input-sm" 
-                                           data-placeholder="Find bruger" data-ng-required="true" /></td>
+                                    <input data-select-user="foo" data-ng-model="selectedUser" data-ng-required="true" data-users-cache="users"/>
+                                    <!--
+                                        <input type="text" name="selectUser" data-ui-select2="userSelectOptions" 
+                                               data-ng-model="selectedUser" class="form-control input-sm" 
+                                               data-placeholder="Find bruger" data-ng-required="true" /> -->
+                                        
+                                </td>
                                 <td>
                                     <input type="submit" class="btn btn-primary btn-sm" data-ng-click="submitRight()" value="Gem" />
                                 </td>
