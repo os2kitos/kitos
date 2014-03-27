@@ -383,8 +383,16 @@ namespace Infrastructure.DataAccess.Migrations
                     HasWriteAccess = true
                 };
 
+            var employee = new OrganizationRole()
+                {
+                    IsActive = true,
+                    Name = "Medarbejder",
+                    Note = "...",
+                    HasWriteAccess = false
+                };
+
             context.OrganizationRoles.AddOrUpdate(role => role.Id,
-                                                boss, resourcePerson,
+                                                boss, resourcePerson, employee,
                                                 new OrganizationRole() { IsActive = false, Name = "Inaktiv Org rolle" },
                                                 new OrganizationRole()
                                                     {

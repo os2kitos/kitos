@@ -4,6 +4,8 @@
             { state: 'org-view', text: 'Organisation' }
     ];
 
+    var users = [];
+
 
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
 
@@ -57,6 +59,7 @@
         
         $scope.chooseOrgUnit = function (node) {
             
+            //get organization related to the org unit
             if (!node.Organization) {
 
                 //try get from cache
@@ -76,16 +79,26 @@
                 }
             }
             
-            if (!node.OrgRights) {
-                $http.get('api/organizationRight?organizationUnitId=' + node.Id).success(function(data) {
-                    node.OrgRights = data.Response;
+            //get org rights on the org unit and subtree
+            $http.get('api/organizationRight?organizationUnitId=' + node.Id).success(function(data) {
+                node.OrgRights = data.Response;
+
+                _.each(node.OrgRights, function (right) {
+                    right.userForSelect = { id: right.User.Id, text: right.User.Name };
+                    right.roleForSelect = right.Role_Id;
+                    right.show = true;
+                    
+                    //save user for later
+                    users[right.User.Id] = right.User;
                 });
-            }
+
+            });
             
             $scope.chosenOrgUnit = node;
         };
 
         $scope.userSelectOptions = {
+            minimumInputLength: 2,
             initSelection: function (element, callback) {
             },
             ajax: {
@@ -97,7 +110,6 @@
                     //console.log(queryParams);
                     var res = $http.get('api/user?q=' + queryParams.data.query).then(queryParams.success);
                     res.abort = function () {
-                        console.log('Aborting...');
                         return null;
                     };
 
@@ -108,6 +120,9 @@
                     var results = [];
 
                     _.each(data.data.Response, function (user) {
+                        //Save to cache
+                        users[user.Id] = user;
+
                         results.push({
                             id: user.Id,
                             text: user.Name
@@ -122,13 +137,109 @@
         };
 
         $scope.submitRight = function () {
+
+            if (!$scope.selectedUser || !$scope.newRole) return;
+
+            var unitId = $scope.chosenOrgUnit.Id;
+            var role = $scope.orgRoles[parseInt($scope.newRole)];
+            var user = users[$scope.selectedUser.id];
+
             var data = {
-                'Object_Id': $scope.chosenOrgUnit.Id,
-                'Role_Id': $scope.newRole,
-                'User_Id': $scope.selectedUser.id
+                'Object_Id': unitId,
+                'Role_Id': role.Id,
+                'User_Id': user.Id
             };
 
-            console.log(data);
+            $http.post("api/organizationright", data).success(function(result) {
+                growl.addSuccessMessage(user.Name + " er knyttet i rollen " + role.Name);
+
+                $scope.chosenOrgUnit.OrgRights.push({
+                    'Object_Id': unitId,
+                    'Role_Id': role.Id,
+                    'User_Id': user.Id,
+                    'User': user
+                });
+                
+                $scope.newRole = "";
+                $scope.selectedUser = "";
+                
+            }).error(function (result) {
+                
+                growl.addErrorMessage('Kunne ikke knytte ' + user.Name + ' i rollen!');
+            });
+        };
+
+        $scope.deleteRight = function(right) {
+
+            var oId = right.Object_Id;
+            var rId = right.Role_Id;
+            var uId = right.User_Id;
+
+            $http.delete("api/organizationright?oId=" + oId + "&rId=" + rId + "&uId=" + uId).success(function(deleteResult) {
+                right.show = false;
+                growl.addSuccessMessage('Rollen er slettet!');
+            }).error(function(deleteResult) {
+
+                growl.addErrorMessage('Kunne ikke slette rollen!');
+            });
+
+        };
+
+        $scope.updateRight = function (right) {
+            
+            //old values
+            var oId = right.Object_Id;
+            var rId = right.Role_Id;
+            var uId = right.User_Id;
+            
+            //new values
+            var unitId = right.Object_Id;
+            var role = $scope.orgRoles[right.roleForSelect];
+            var user = users[right.userForSelect.id];
+
+            //if nothing was changed, just close edit
+            if (oId == unitId && rId == role.Id && uId == user.Id) {
+                right.edit = false;
+            }
+
+            //otherwise, we should delete the old entry, then add a new one
+
+            $http.delete("api/organizationright?oId=" + oId + "&rId=" + rId + "&uId=" + uId).success(function(deleteResult) {
+
+                var data = {
+                    'Object_Id': unitId,
+                    'Role_Id': role.Id,
+                    'User_Id': user.Id
+                };
+
+                $http.post("api/organizationright", data).success(function (result) {
+
+                    right.Role_Id = role.Id;
+                    right.User = user;
+                    right.User_Id = user.Id;
+
+                    right.edit = false;
+
+                    growl.addSuccessMessage(user.Name + " er knyttet i rollen " + role.Name);
+
+                }).error(function (result) {
+
+                    //we successfully deleted the old entry, but didn't add a new one
+                    //fuck
+
+                    right.show = false;
+                    
+                    growl.addErrorMessage('Kunne ikke knytte ' + user.Name + ' i rollen!');
+                });
+                
+            }).error(function (deleteResult) {
+                
+                //couldn't delete the old entry, just reset select options
+                right.userForSelect = { id: right.User.id, text: right.User.Name };
+                right.roleForSelect = right.Role_Id;
+
+                growl.addErrorMessage('Kunne ikke knytte ' + user.Name + ' i rollen!');
+            });
         };
 
     }]);

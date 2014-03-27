@@ -2,14 +2,14 @@
 
     <h2>Organisation</h2>
 
-    <div class="col-md-5 container-fluid">
+    <div class="col-md-4 container-fluid">
         <h3>Organisationsenheder</h3>
         <div data-ng-repeat="node in nodes">
             <div data-ng-include="'partials/org/org-unit.html'"></div>
         </div>
     </div>
 
-    <div class="col-md-7 container-fluid">
+    <div class="col-md-8 container-fluid">
         <div class="row">
 
             <div class="col-md-12" data-ng-hide="chosenOrgUnit">
@@ -22,9 +22,10 @@
                 <h3>{{ chosenOrgUnit.Name }}</h3>
                 <p>Du har valgt enheden {{ chosenOrgUnit.Name }} under organisationen {{ chosenOrgUnit.Organization.Name }}.</p>
 
+                <!-- Organization Roles -->
                 <div class="panel panel-primary">
                     <div class="panel-heading">Organisationsroller</div>
-                    <table class="full-width table">
+                    <table class="full-width table table-striped">
                         <thead>
                             <tr>
                                 <th>Organisationsenhed</th>
@@ -33,40 +34,68 @@
                                 <th>Email</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr data-ng-repeat="right in chosenOrgUnit.OrgRights">
+                        <!-- for each right -->
+                        <tbody data-ng-repeat="right in chosenOrgUnit.OrgRights | filter: { show: true }">
+                            
+                            <!-- show -->
+                            <tr data-ng-hide="right.edit">
                                 <td>{{ orgUnits[right.Object_Id].Name }}</td>
                                 <td>{{ orgRoles[right.Role_Id].Name }}</td>
                                 <td>{{ right.User.Name }}</td>
                                 <td>{{ right.User.Email }}</td>
+                                <td>
+                                    <i class="glyphicon glyphicon-pencil pull-right" data-ng-click="right.edit = true"></i>
+                                    <i class="glyphicon glyphicon-trash pull-right" data-confirmed-click="deleteRight(right)" data-confirm-click="Er du sikker på at du vil slette?"></i>
+                                </td>
                             </tr>
-
+                            
+                            <!-- edit -->
+                            <tr data-ng-show="right.edit" class="highlight">
+                                <td>
+                                    <input type="text" disabled="" class="form-control input-sm" value="{{ orgUnits[right.Object_Id].Name }}"/>
+                                </td>
+                                <td>
+                                    <select data-ui-select2="" name="selectRole" data-ng-model="right.roleForSelect" class="form-control input-sm">
+                                        <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.Id}}">
+                                            {{orgRole.Name}} ({{orgRole.HasWriteAccess && "skriv" || "læs" }})
+                                        </option>
+                                    </select>
+                                </td>
+                                <td colspan="2">
+                                    <input type="text" name="selectUser" data-ui-select2="userSelectOptions" 
+                                           data-ng-model="right.userForSelect" class="form-control input-sm" 
+                                           data-placeholder="Find bruger" data-ng-required="true" />
+                                </td>
+                                <td>
+                                    <input type="submit" class="btn btn-primary btn-sm" data-ng-click="updateRight(right)" value="Gem" />
+                                </td>
+                            </tr>
                         </tbody>
+
+                        <!-- add-new-right row -->
+                        <tbody>
+                            <tr>
+                                <td><input type="text" disabled="" class="form-control input-sm" value="{{ chosenOrgUnit.Name }}"/></td>
+                                <td>
+                                    <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en brugerrolle" class="form-control input-sm">
+                                        <option value=""></option>
+                                        <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.Id}}">
+                                            {{orgRole.Name}} ({{orgRole.HasWriteAccess && "skriv" || "læs" }})
+                                        </option>
+                                    </select>
+                                </td>
+                                <td colspan="2">
+                                    <input type="text" name="selectUser" data-ui-select2="userSelectOptions" 
+                                           data-ng-model="selectedUser" class="form-control input-sm" 
+                                           data-placeholder="Find bruger" data-ng-required="true" /></td>
+                                <td>
+                                    <input type="submit" class="btn btn-primary btn-sm" data-ng-click="submitRight()" value="Gem" />
+                                </td>
+                            </tr>
+                        </tbody>
+
                     </table>
-                    <div class="panel-footer">
-                        <form class="form-horizontal" novalidate="novalidate">
-                            <div class="form-group col-md-5">
-                                <label for="selectRole" class="control-label">
-                                    Rolle: 
-                                </label>
-                                <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en brugerrolle" class="form-control">
-                                    <option value=""></option>
-                                    <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.Id}}">{{orgRole.Name}} ({{orgRole.HasWriteAccess && "skriv" || "læs" }})</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-md-5 col-md-offset-1">
-                                <label for="selectUser" class="control-label">
-                                    Bruger: 
-                                </label>
-                                <input type="text" name="selectUser" data-ui-select2="userSelectOptions" data-ng-model="selectedUser" class="form-control" data-placeholder="Find bruger" />
-                            </div>
-                        </form>
-                    </div>
                 </div>
-
-
-
-                {{selectedUser}}
 
             </div>
 
