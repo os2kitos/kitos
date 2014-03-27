@@ -22,7 +22,7 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasRequired(o => o.Organization)
                 .WithMany(m => m.OrgUnits)
-                .HasForeignKey(o => o.Municipality_Id)
+                .HasForeignKey(o => o.Organization_Id)
                 .WillCascadeOnDelete(true);
         }
     }

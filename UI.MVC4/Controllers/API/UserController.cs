@@ -37,17 +37,47 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
         }
-        
-        [Authorize]
-        public IEnumerable<UserDTO> Get()
+
+        public HttpResponseMessage Get()
         {
-            return AutoMapper.Mapper.Map<IEnumerable<User>, List<UserDTO>>(_repository.Get());
+            try
+            {
+                var users = _repository.Get();
+                return Ok(AutoMapper.Mapper.Map<IEnumerable<User>, List<UserDTO>>(users));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
         }
-        
-        [Authorize]
-        public UserDTO Get(int id)
+
+        public HttpResponseMessage Get(int id)
         {
-            return AutoMapper.Mapper.Map<User,UserDTO>(_repository.GetByKey(id));
+            try
+            {
+                var user = _repository.GetByKey(id);
+                return Ok(AutoMapper.Mapper.Map<User, UserDTO>(user));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage Get(string q)
+        {
+            if (string.IsNullOrEmpty(q)) return Get();
+
+            try
+            {
+                var users = _repository.Get(u => u.Name.StartsWith(q) || u.Email.StartsWith(q));
+                return Ok(AutoMapper.Mapper.Map<IEnumerable<User>, IEnumerable<UserDTO>>(users));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+            
         }
     }
 

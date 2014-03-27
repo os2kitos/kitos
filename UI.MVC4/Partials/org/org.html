@@ -1,14 +1,88 @@
 ﻿<div class="col-md-12">
 
     <h2>Organisation</h2>
-    
+
     <div class="col-md-5 container-fluid">
-        <div data-ng-include="'partials/org/org-unit.html'"></div>
+        <h3>Organisationsenheder</h3>
+        <div data-ng-repeat="node in nodes">
+            <div data-ng-include="'partials/org/org-unit.html'"></div>
+        </div>
     </div>
-    
+
     <div class="col-md-7 container-fluid">
         <div class="row">
-            <div class="col-md-12">Valgt organisationsenhed: {{ selectedUnit.Name }}</div>
+
+            <div class="col-md-12" data-ng-hide="chosenOrgUnit">
+                <h3>Vælg en organisationsenhed</h3>
+                <p>Her kan du få overblik over de organisationsenheder, som du er tilknyttet.</p>
+                <p><strong>Start med at vælge en organisationsenhed i oversigten til venstre.</strong></p>
+            </div>
+
+            <div class="col-md-12" data-ng-show="chosenOrgUnit">
+                <h3>{{ chosenOrgUnit.Name }}</h3>
+                <p>Du har valgt enheden {{ chosenOrgUnit.Name }} under organisationen {{ chosenOrgUnit.Organization.Name }}.</p>
+
+                <div>
+                    <table class="full-width">
+                        <caption>Organisationsroller</caption>
+                        <thead>
+                            <tr>
+                                <th>Organisationsenhed</th>
+                                <th>Brugerrolle</th>
+                                <th>Navn</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="right in chosenOrgUnit.OrgRights">
+                                <td>{{ orgUnits[right.Object_Id].Name }}</td>
+                                <td>{{ orgRoles[right.Role_Id].Name }}</td>
+                                <td>{{ right.User.Name }}</td>
+                                <td>{{ right.User.Email }}</td>
+                            </tr>
+
+                            <!--<tr>
+                                <td>
+                                    {{ chosenOrgUnit.Name }}
+                                </td>
+                                <td>
+                                    <select data-ng-model="newRole" data-ng-options="orgRole.Id as orgRole.Name for orgRole in orgRoles">
+                                    </select>
+                                </td>
+                                <td colspan="2">
+                                    <input type="text" data-ui-select2="userSelectOptions" data-ng-model="selectedUser" class="form-control" data-placeholder="Find bruger"/>
+                                </td>
+                            </tr>-->
+                        </tbody>
+                    </table>
+
+                    <div>
+                        <h5>Tilknyt bruger til {{chosenOrgUnit.Name}}</h5>
+
+                        <form class="form-horizontal" novalidate="novalidate">
+                            <div class="form-group col-md-5">
+                                <label for="selectRole" class="control-label">
+                                    Rolle: 
+                                </label>
+                                <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en brugerrolle" class="form-control">
+                                    <option value=""></option>
+                                    <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.Id}}">{{orgRole.Name}} ({{orgRole.HasWriteAccess && "skriv" || "læs" }})</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-5 col-md-offset-1">
+                                <label for="selectUser" class="control-label">
+                                    Bruger: 
+                                </label>
+                                <input type="text" name="selectUser" data-ui-select2="userSelectOptions" data-ng-model="selectedUser" class="form-control" data-placeholder="Find bruger" />
+                            </div>
+                        </form>
+                    </div>
+
+                    {{selectedUser}}
+                </div>
+
+            </div>
+
         </div>
     </div>
 

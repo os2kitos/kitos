@@ -9,7 +9,7 @@ namespace UI.MVC4.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public int Municipality_Id { get; set; }
+        public int Organization_Id { get; set; }
         public int Parent_Id { get; set; }
         public List<OrgUnitDTO> Children { get; set; } 
     }

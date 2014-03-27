@@ -198,11 +198,13 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Municipalities
 
-            var globalMunicipality = municipalityService.CreateMunicipality("Fælleskommune");
+            //var globalMunicipality = municipalityService.CreateMunicipality("Fælleskommune");
 
             var roskilde = municipalityService.CreateMunicipality("Roskilde");
 
-            context.Organizations.AddOrUpdate(x => x.Name, globalMunicipality, roskilde);
+            var sorø = municipalityService.CreateMunicipality("Sorø");
+
+            context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø);
 
             context.SaveChanges();
 
@@ -300,20 +302,85 @@ namespace Infrastructure.DataAccess.Migrations
 
             #endregion
 
+            #region Sorø OrgUnits
+
+            //LEVEL 0
+            var rootUnit2 = sorø.OrgUnits.First();
+
+            //LEVEL 1
+            var level1a = new OrganizationUnit()
+            {
+                Organization = sorø,
+                Parent = rootUnit2,
+                Name = "Direktørområde"
+            };
+
+            //LEVEL 2
+            var level2a = new OrganizationUnit()
+            {
+                Organization = sorø,
+                Parent = level1a,
+                Name = "Afdeling 1"
+            };
+
+            var level2b = new OrganizationUnit()
+            {
+                Organization = sorø,
+                Parent = level1a,
+                Name = "Afdeling 2"
+            };
+
+            var level2c = new OrganizationUnit()
+            {
+                Organization = sorø,
+                Parent = level1a,
+                Name = "Afdeling 3"
+            };
+
+            //LEVEL 2
+            var level3a = new OrganizationUnit()
+            {
+                Organization = sorø,
+                Parent = level2a,
+                Name = "Afdeling 1a"
+            };
+
+            var level3b = new OrganizationUnit()
+            {
+                Organization = sorø,
+                Parent = level2b,
+                Name = "Afdeling 2a"
+            };
+
+            var level3c = new OrganizationUnit()
+            {
+                Organization = sorø,
+                Parent = level2b,
+                Name = "Afdeling 2b"
+            };
+
+            context.OrganizationUnits.AddOrUpdate(o => o.Name, level1a, level2a, level2b, level2c, level3a, level3b,
+                                                  level3c);
+            context.SaveChanges();
+
+            #endregion
+
             #region OrganizationUnit roles
 
             var boss = new OrganizationRole()
                 {
                     IsActive = true,
                     Name = "Chef",
-                    Note = "Lederen af en organisationsenhed"
+                    Note = "Lederen af en organisationsenhed",
+                    HasWriteAccess = true
                 };
 
             var resourcePerson = new OrganizationRole()
                 {
                     IsActive = true,
                     Name = "Ressourceperson",
-                    Note = "..."
+                    Note = "...",
+                    HasWriteAccess = true
                 };
 
             context.OrganizationRoles.AddOrUpdate(role => role.Id,
@@ -349,35 +416,20 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Users
 
-            var simonSalt = cryptoService.Encrypt("simonsalt");
-            var simon = new User
-            {
-                Name = "Simon Lynn-Pedersen",
-                Email = "slp@it-minds.dk",
-                Salt = simonSalt,
-                Password = cryptoService.Encrypt("slp123" + simonSalt),
-                IsGlobalAdmin = true
-            };
+            var simon = SimpleUser("Simon Lynn-Pedersen", "slp@it-minds.dk", "slp123", cryptoService);
+            simon.IsGlobalAdmin = true;
 
-            var eskildSalt = cryptoService.Encrypt("eskildsalt");
-            var eskild = new User()
-                {
-                    Name = "Eskild",
-                    Email = "esd@it-minds.dk",
-                    Salt = eskildSalt,
-                    Password = cryptoService.Encrypt("arne123" + eskildSalt)
-                };
+            var eskild = SimpleUser("Eskild", "esd@it-minds.dk", "arne123", cryptoService);
 
-            var brianSalt = cryptoService.Encrypt("brian-foobarbaz");
-            var brian = new User()
-            {
-                Name = "Brian",
-                Email = "brian@it-minds.dk",
-                Salt = brianSalt,
-                Password = cryptoService.Encrypt("brian123" + brianSalt)
-            };
+            var brian = SimpleUser("Brian Andersen", "brian@it-minds.dk", "brian123", cryptoService);
 
-            context.Users.AddOrUpdate(x => x.Email, simon, eskild, brian);
+            var roskildeUser1 = SimpleUser("Pia", "pia@it-minds.dk", "arne123", cryptoService);
+            var roskildeUser2 = SimpleUser("Morten", "morten@it-minds.dk", "arne123", cryptoService);
+            var roskildeUser3 = SimpleUser("Anders", "anders@it-minds.dk", "arne123", cryptoService);
+            var roskildeUser4 = SimpleUser("Peter", "peter@it-minds.dk", "arne123", cryptoService);
+            var roskildeUser5 = SimpleUser("Jesper", "jesper@it-minds.dk", "arne123", cryptoService);
+
+            context.Users.AddOrUpdate(x => x.Email, simon, eskild, brian, roskildeUser1, roskildeUser2, roskildeUser3, roskildeUser4, roskildeUser5);
 
             context.SaveChanges();
 
@@ -391,7 +443,52 @@ namespace Infrastructure.DataAccess.Migrations
                                                     Object = roskilde,
                                                     Role = localAdmin,
                                                     User = brian
+                                                },
+                                            new AdminRight()
+                                                {
+                                                    Object = roskilde,
+                                                    Role = localAdmin,
+                                                    User = roskildeUser3
+                                                },
+                                            new AdminRight()
+                                                {
+                                                    Object = sorø,
+                                                    Role = localAdmin,
+                                                    User = brian
                                                 });
+
+            context.SaveChanges();
+
+            #endregion
+
+            #region Org rights
+
+            context.OrganizationRights.AddOrUpdate(right => new { right.Object_Id, right.Role_Id, right.User_Id },
+                    new OrganizationRight()
+                        {
+                            Object = itservice,
+                            Role = resourcePerson,
+                            User = roskildeUser1
+                        },
+                    new OrganizationRight()
+                        {
+                            Object = digi,
+                            Role = boss,
+                            User = roskildeUser2
+                        },
+                    new OrganizationRight()
+                    {
+                        Object = hr,
+                        Role = resourcePerson,
+                        User = roskildeUser2
+                    },
+                    new OrganizationRight()
+                    {
+                        Object = teamcontact,
+                        Role = resourcePerson,
+                        User = roskildeUser4
+                    }
+                );
 
             context.SaveChanges();
 
@@ -435,6 +532,18 @@ namespace Infrastructure.DataAccess.Migrations
                 );
 
             base.Seed(context);
+        }
+
+        private User SimpleUser(string name, string email, string password, CryptoService cryptoService)
+        {
+            var salt = cryptoService.Encrypt(name + "salt");
+            return new User()
+                {
+                    Name = name,
+                    Email = email,
+                    Salt = salt,
+                    Password = cryptoService.Encrypt(password + salt)
+                };
         }
     }
 }

@@ -41,6 +41,7 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
         });
 
         $rootScope.user = {
+            id: result.Response.Id,
             authStatus: 'authorized',
             name: result.Response.Name,
             email: result.Response.Email,

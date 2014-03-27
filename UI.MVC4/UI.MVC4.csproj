@@ -222,6 +222,7 @@
     <Compile Include="Controllers\API\BaseApiController.cs" />
     <Compile Include="Controllers\API\ContractTemplateController.cs" />
     <Compile Include="Controllers\API\ContractTypeController.cs" />
+    <Compile Include="Controllers\API\OrganizationRightController.cs" />
     <Compile Include="Models\CreateLocalAdminDTO.cs" />
     <Compile Include="Controllers\API\DatabaseTypeController.cs" />
     <Compile Include="Controllers\API\ConfigController.cs" />
@@ -287,6 +288,8 @@
     <Compile Include="Models\PasswordResetRequestDTO.cs" />
     <Compile Include="Models\ResetPasswordDTO.cs" />
     <Compile Include="Models\AdminRightDTO.cs" />
+    <Compile Include="Models\RightOutputDTO.cs" />
+    <Compile Include="Models\RightInputDTO.cs" />
     <Compile Include="Models\RoleDTO.cs" />
     <Compile Include="Models\UserDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

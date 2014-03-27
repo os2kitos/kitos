@@ -5,8 +5,8 @@
         public int User_Id { get; set; }
         public int Role_Id { get; set; }
         public int Object_Id { get; set; }
-        public User User { get; set; }
-        public OrganizationRole Role { get; set; }
-        public OrganizationUnit Object { get; set; }
+        public virtual User User { get; set; }
+        public virtual OrganizationRole Role { get; set; }
+        public virtual OrganizationUnit Object { get; set; }
     }
 }

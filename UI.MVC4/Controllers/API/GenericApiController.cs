@@ -20,6 +20,18 @@ namespace UI.MVC4.Controllers.API
             Repository = repository;
         }
 
+        //for easy access
+        protected virtual TDto Map(TModel model)
+        {
+            return Map<TModel, TDto>(model);
+        }
+
+        //for easy access
+        protected virtual TModel Map(TDto dto)
+        {
+            return Map<TDto, TModel>(dto);
+        }
+
         protected virtual TDest Map<TSource, TDest>(TSource item)
         {
             return AutoMapper.Mapper.Map<TDest>(item);

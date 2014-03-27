@@ -95,13 +95,29 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var user = UserRepository.GetByKey(User.Identity.Name);
-                
-                return AdminService.IsGlobalAdmin(user);
+                return AdminService.IsGlobalAdmin(KitosUser);
             }
             catch
             {
                 return false;
+            }
+        }
+
+        protected User KitosUser
+        {
+            get
+            {
+                try
+                {
+                    var user = UserRepository.Get(u => u.Email == User.Identity.Name).FirstOrDefault();
+                    if(user == null) throw new SecurityException();
+
+                    return user;
+                }
+                catch
+                {
+                    throw new SecurityException();
+                }
             }
         }
     }
