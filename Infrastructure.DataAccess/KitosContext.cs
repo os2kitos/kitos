@@ -58,7 +58,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ItSystem> ItSystems { get; set; }
         public DbSet<ItSystemRight> ItSystemRights { get; set; }
         public DbSet<ItSystemRole> ItSystemRoles { get; set; }
-        public DbSet<KLE> KLEs { get; set; }
+        public DbSet<TaskRef> TaskRefs { get; set; }
         public DbSet<Localization> Localizations { get; set; }
         public DbSet<Method> Methods { get; set; }
         public DbSet<Milestone> Milestones { get; set; }
@@ -134,7 +134,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemRightMap());
             modelBuilder.Configurations.Add(new ItSystemRoleMap());
             modelBuilder.Configurations.Add(new ItSystemModuleNameMap());
-            modelBuilder.Configurations.Add(new KLEMap());
+            modelBuilder.Configurations.Add(new TaskRefMap());
             modelBuilder.Configurations.Add(new LocalizationMap());
             modelBuilder.Configurations.Add(new MethodMap());
             modelBuilder.Configurations.Add(new MilestoneMap());

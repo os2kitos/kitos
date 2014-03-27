@@ -32,10 +32,20 @@
 
         Restangular.one('text', 'intro-head').get().then(function (data) {
             $scope.introhead = data.Value;
+
+            $scope.submitIntroHead = function(newValue) {
+                data.Value = newValue;
+                data.put();
+            };
         });
         
         Restangular.one('text', 'intro-body').get().then(function (data) {
             $scope.introbody = data.Value;
+            
+            $scope.submitIntroBody = function (newValue) {
+                data.Value = newValue;
+                data.put();
+            };
         });
     }]);
     

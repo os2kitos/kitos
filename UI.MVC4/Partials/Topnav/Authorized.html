@@ -5,19 +5,21 @@
     <li><a href="#">IT Kontrakter</a></li>
 </ul>
 
-
 <div class="navbar-text navbar-text-small navbar-right navbar-complex">
     <div>
         <a href="#" class="btn btn-link">{{ user.name }}</a> 
-        <a href="#" class="btn btn-link" ng-click="logout()">Log ud</a>
+        <a href="#" class="btn btn-link" data-ng-click="logout()">Log ud</a>
     </div>
     
-    <div ng-switch on="user.role">
-        <div ng-switch-when="LocalAdmin">Lokal admin</div>
-        <div ng-switch-when="GlobalAdmin">Global admin</div>
+    <div data-ng-switch data-on="user.role">
+        <div data-ng-switch-when="LocalAdmin">
+            <a data-ui-sref="local-config-support">Lokal admin</a>
+        </div>
+        <div data-ng-switch-when="GlobalAdmin">
+            <a data-ui-sref="global-admin">Global admin</a>
+            <a data-ui-sref="config-org">Global konfig</a>
+        </div>
     </div>
 
-    <!-- TODO: Vidensdeling -->
-
-                            
+    <!-- TODO: Vidensdeling -->                        
 </div>

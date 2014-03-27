@@ -146,6 +146,9 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<PasswordResetRequest, PasswordResetRequestDTO>()
                   .ForMember(dto => dto.UserEmail, opt => opt.MapFrom(src => src.User.Email));
 
+            Mapper.CreateMap<TaskRef, TaskRefDTO>()
+                  .ReverseMap();
+
             Mapper.CreateMap<AdminRight, AdminRightDTO>()
                   .ForMember(dto => dto.Organization_Id, opt => opt.MapFrom(src => src.Object_Id))
                   .ForMember(dto => dto.RoleName, opt => opt.MapFrom(src => src.Role.Name));

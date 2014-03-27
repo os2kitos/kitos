@@ -7,16 +7,33 @@ namespace Core.ApplicationServices
     {
         private readonly SmtpClient _client;
 
+        /// <summary>
+        /// Construct a smtp client with configuration from web.config
+        /// </summary>
+        public MailClient()
+        {
+            _client = new SmtpClient();
+        }
+
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MailClient"/> class.
+        /// </summary>
+        /// <param name="host">The host.</param>
+        /// <param name="port">The port.</param>
+        /// <param name="enableSsl">if set to <c>true</c> [enable SSL].</param>
         public MailClient(string host, int port, bool enableSsl = false)
         {
             _client = new SmtpClient(host, port) {EnableSsl = enableSsl};
         }
 
-        public void Send(string from, string to, string subject, string content, bool isHtml = true)
+        /// <summary>
+        /// Sends the specified mail.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        public void Send(MailMessage message)
         {
-            var message = new MailMessage(from, to, subject, content) {IsBodyHtml = isHtml};
-
-            //_client.Send(message); //TODO
+            _client.Send(message);
         }
     }
 }

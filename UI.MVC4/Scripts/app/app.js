@@ -10,6 +10,9 @@ app.config(['growlProvider', 'RestangularProvider', function (growlProvider, Res
     
     //Restangular config
     RestangularProvider.setBaseUrl('/api');
+    RestangularProvider.setRestangularFields({
+        id: 'Id'
+    });
     RestangularProvider.setResponseExtractor(function (response, operation) {
         return response.Response;
     });

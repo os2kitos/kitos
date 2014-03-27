@@ -9,7 +9,7 @@ namespace Core.DomainModel.ItProject
             this.Communications = new List<Communication>();
             this.Economies = new List<Economy>();
             this.ExtReferences = new List<ExtReference>();
-            this.KLEs = new List<KLE>();
+            this.TaskRefs = new List<TaskRef>();
             this.Resources = new List<Resource>();
             this.Risks = new List<Risk>();
             this.Stakeholders = new List<Stakeholder>();
@@ -35,7 +35,7 @@ namespace Core.DomainModel.ItProject
         public virtual ICollection<ExtReference> ExtReferences { get; set; } // TODO
         public virtual GoalStatus GoalStatus { get; set; }
         public virtual Handover Handover { get; set; }
-        public virtual ICollection<KLE> KLEs { get; set; } // TODO
+        public virtual ICollection<TaskRef> TaskRefs { get; set; } // TODO
         public virtual OrgTab OrgTab { get; set; }
         public virtual PreAnalysis PreAnalysis { get; set; }
         public virtual ProjectStatus ProjectStatus { get; set; }

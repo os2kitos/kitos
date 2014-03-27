@@ -110,7 +110,7 @@
     <Compile Include="ItSystem\Technology.cs" />
     <Compile Include="ItSystem\UserAdministration.cs" />
     <Compile Include="ItSystem\Wish.cs" />
-    <Compile Include="KLE.cs" />
+    <Compile Include="TaskRef.cs" />
     <Compile Include="Localization.cs" />
     <Compile Include="Organization.cs" />
     <Compile Include="OrganizationRole.cs" />

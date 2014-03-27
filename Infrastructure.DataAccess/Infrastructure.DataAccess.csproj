@@ -102,7 +102,7 @@
     <Compile Include="Mapping\ItSystemRightMap.cs" />
     <Compile Include="Mapping\ItSystemRoleMap.cs" />
     <Compile Include="Mapping\ItSystemModuleNameMap.cs" />
-    <Compile Include="Mapping\KLEMap.cs" />
+    <Compile Include="Mapping\TaskRefMap.cs" />
     <Compile Include="Mapping\LocalizationMap.cs" />
     <Compile Include="Mapping\MethodMap.cs" />
     <Compile Include="Mapping\MilestoneMap.cs" />

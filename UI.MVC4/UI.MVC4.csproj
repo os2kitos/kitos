@@ -255,6 +255,7 @@
     <Compile Include="Controllers\API\LocalAdminController.cs" />
     <Compile Include="Controllers\API\OrganizationController.cs" />
     <Compile Include="Controllers\API\PasswordResetRequestController.cs" />
+    <Compile Include="Controllers\API\TaskRefController.cs" />
     <Compile Include="Controllers\API\UserController.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Controllers\Web\GlobalConfigController.cs" />
@@ -291,6 +292,7 @@
     <Compile Include="Models\RightOutputDTO.cs" />
     <Compile Include="Models\RightInputDTO.cs" />
     <Compile Include="Models\RoleDTO.cs" />
+    <Compile Include="Models\TaskRefDTO.cs" />
     <Compile Include="Models\UserDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

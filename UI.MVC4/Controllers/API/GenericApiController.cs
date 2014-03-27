@@ -78,7 +78,7 @@ namespace UI.MVC4.Controllers.API
                 PostQuery(item);
 
                 //var msg = new HttpResponseMessage(HttpStatusCode.Created);
-                return Created(item, new Uri(Request.RequestUri + "/" + item.Id));
+                return Created(Map<TModel,TDto>(item), new Uri(Request.RequestUri + "/" + item.Id));
             }
             catch (Exception e)
             {
