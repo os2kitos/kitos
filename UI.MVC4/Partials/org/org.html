@@ -45,8 +45,10 @@
                                 <td>{{ right.User.Name }}</td>
                                 <td>{{ right.User.Email }}</td>
                                 <td>
-                                    <a data-ng-click="right.edit = true" class="btn btn-link btn-sm"><i class="glyphicon glyphicon-pencil pull-right"></i></a>
-                                    <a class="btn btn-link btn-sm"  data-confirmed-click="deleteRight(right)" data-confirm-click="Er du sikker på at du vil slette?"><i class="glyphicon glyphicon-trash pull-right"></i></a>
+                                    <div data-ng-show="chosenOrgUnit.hasWriteAccess">
+                                        <a data-ng-click="right.edit = true" class="btn btn-link btn-sm"><i class="glyphicon glyphicon-pencil pull-right"></i></a>
+                                        <a class="btn btn-link btn-sm"  data-confirmed-click="deleteRight(right)" data-confirm-click="Er du sikker på at du vil slette?"><i class="glyphicon glyphicon-trash pull-right"></i></a>
+                                    </div>
                                 </td>
                             </tr>
                             
@@ -74,7 +76,7 @@
                         </tbody>
 
                         <!-- add-new-right row -->
-                        <tbody>
+                        <tbody data-ng-show="chosenOrgUnit.hasWriteAccess">
                             <tr>
                                 <td><input type="text" disabled="" class="form-control input-sm" value="{{ chosenOrgUnit.Name }}"/></td>
                                 <td>

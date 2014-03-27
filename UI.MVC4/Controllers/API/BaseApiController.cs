@@ -61,22 +61,25 @@ namespace UI.MVC4.Controllers.API
             return CreateResponse(HttpStatusCode.OK, response);
         }
 
-        protected HttpResponseMessage Error(SecurityException e)
+        // TODO: This doesn't seem to work
+        protected virtual HttpResponseMessage Error(SecurityException e)
         {
-            return Unauthorized();
+            return Unauthorized(e.Message);
         }
 
-        protected HttpResponseMessage Error<T>(T response)
+        protected virtual HttpResponseMessage Error<T>(T response)
         {
+            if (response is SecurityException) return Unauthorized();
+
             return CreateResponse(HttpStatusCode.InternalServerError, response);
         }
 
-        protected HttpResponseMessage Unauthorized()
+        protected virtual HttpResponseMessage Unauthorized()
         {
             return CreateResponse(HttpStatusCode.Unauthorized);
         }
 
-        protected HttpResponseMessage Unauthorized<T>(T response)
+        protected virtual HttpResponseMessage Unauthorized<T>(T response)
         {
             return CreateResponse(HttpStatusCode.Unauthorized, response);
         }

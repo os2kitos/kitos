@@ -78,6 +78,24 @@
                     });
                 }
             }
+
+            if (!node.writeAccessChecked) {
+                
+                //this url is waaay too long
+                $http.get('api/organizationRight?hasWriteAccess&orgUnitId=' + node.Id + '&userId=' + userId)
+                    .success(function (result) {
+
+                        function flag(node) {
+                            node.hasWriteAccessChecked = true;
+                            node.hasWriteAccess = result.Response;
+
+                            if (result.Response) _.each(node.Children, flag);
+                        }
+
+                        flag(node);
+                    }
+                );
+            }
             
             //get org rights on the org unit and subtree
             $http.get('api/organizationRight?organizationUnitId=' + node.Id).success(function(data) {

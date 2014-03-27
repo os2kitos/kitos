@@ -7,10 +7,12 @@ namespace Core.DomainServices
     public class OrgUnitService : IOrgUnitService
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
+        private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
 
-        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository)
+        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<OrganizationRight> orgRightRepository)
         {
             _orgUnitRepository = orgUnitRepository;
+            _orgRightRepository = orgRightRepository;
         }
 
         public ICollection<OrganizationUnit> GetByUser(User user)
@@ -63,7 +65,6 @@ namespace Core.DomainServices
 
             return reached;
         }
-
         public bool HasWriteAccess(User user, int orgUnitId)
         {
             var orgUnit = _orgUnitRepository.GetByKey(orgUnitId);
@@ -73,7 +74,25 @@ namespace Core.DomainServices
 
         public bool HasWriteAccess(User user, OrganizationUnit unit)
         {
-            return true; //TODO
+            // check all rights for the user on this org unit,
+            // as well as every ancestor org unit
+            // if we find a unit with write access, we return it
+            do
+            {
+                //this is to avoid the 'access to modified closure' warning
+                var currUnit = unit;
+
+                var writeRights =
+                    _orgRightRepository.Get(
+                        right => right.User_Id == user.Id && right.Object_Id == currUnit.Id && right.Role.HasWriteAccess).ToList();
+
+                if (writeRights.Any()) return true;
+
+                unit = currUnit.Parent;
+
+            } while (unit != null);
+
+            return false;
         }
     }
 }

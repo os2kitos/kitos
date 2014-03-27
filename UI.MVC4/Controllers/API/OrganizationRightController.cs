@@ -47,11 +47,29 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        /* TODO: this is not very RESTful (just look at the verbs 'get-has') */
+        //returns true if the user with userId has writeAccess to the orgUnit with organizationUnitId
+        public HttpResponseMessage GetHasWriteAccess(bool? hasWriteAccess, int orgUnitId, int userId)
+        {
+            try
+            {
+                var user = UserRepository.GetByKey(userId);
+
+                var result = _orgUnitService.HasWriteAccess(user, orgUnitId);
+
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage Post(RightInputDTO inputDTO)
         {
             try
             {
-                if(!_orgUnitService.HasWriteAccess(KitosUser, inputDTO.Object_Id))
+                if (!_orgUnitService.HasWriteAccess(KitosUser, inputDTO.Object_Id))
                     throw new SecurityException("User doesn't have write permission for that Organization Unit");
 
                 var right = AutoMapper.Mapper.Map<RightInputDTO, OrganizationRight>(inputDTO);
