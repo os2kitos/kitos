@@ -215,3 +215,7 @@ div.tab-content {
 a {
     cursor: pointer;
 }
+
+div.popover {
+    color: black !important;
+}
