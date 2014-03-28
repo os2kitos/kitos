@@ -28,7 +28,7 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
     //users cache
     $rootScope.users = [];
     $rootScope.selectUserOptions = {
-        minimumInputLength: 2,
+        minimumInputLength: 1,
         initSelection: function (element, callback) {
         },
         ajax: {

@@ -28,46 +28,77 @@
             templateUrl: 'partials/directives/select-user.html',
             link: function (scope, element, attr) {
 
-                scope.selectUserOptions = {
-                    minimumInputLength: 1,
-                    initSelection: function (elem, callback) {
-                    },
-                    ajax: {
-                        data: function (term, page) {
-                            return { query: term };
-                        },
-                        quietMillis: 500,
-                        transport: function (queryParams) {
-                            //console.log(queryParams);
-                            var res = $http.get('api/user?q=' + queryParams.data.query).then(queryParams.success);
-                            res.abort = function () {
-                                return null;
+            }
+        };
+    }
+
+    ]);
+    
+
+    app.directive('addUser', ['$http', '$modal', function ($http, $modal) {
+        return {
+            scope: {
+                userResult: '=?addUser',
+                selectResult: '=?forSelect2'
+            },
+            replace: true,
+            templateUrl: 'partials/directives/add-user-button.html',
+            link: function (scope, element, attr) {
+
+                scope.open = function() {
+                    var modal = $modal.open({
+                        templateUrl: 'partials/directives/add-user-modal.html',
+                        controller: ['$scope', 'growl', '$modalInstance', function ($scope, growl, $modalInstance) {
+
+                            $scope.newUser = {};
+
+                            $scope.addUser = function () {
+                                
+                                if ($scope.newUser.form.$invalid) return;
+
+                                var name = $scope.newUser.name;
+                                var email = $scope.newUser.email;
+
+                                var data = {
+                                    'Name': name,
+                                    'Email': email
+                                };
+
+                                $scope.newUser.submitting = true;
+                                
+                                $http.post("api/user", data).success(function (result) {
+                                    growl.addSuccessMessage(name + " er oprettet i KITOS");
+
+                                    $modalInstance.close(result.Response);
+                                }).error(function (result)
+                                {
+                                    $scope.newUser.submitting = false;
+                                    growl.addErrorMessage("Fejl! " + name + " blev ikke oprettet i KITOS!");
+                                });
                             };
 
-                            return res;
-                        },
-                        results: function (data, page) {
-                            console.log(data);
-                            var results = [];
+                            $scope.cancel = function() {
+                                $modalInstance.dismiss('cancel');
+                            };
+                        }]
+                    });
 
-                            _.each(data.data.Response, function (user) {
-                                //Save to cache
-                                if(scope.usersCache) scope.usersCache[user.Id] = user;
-
-                                results.push({
-                                    id: user.Id,
-                                    text: user.Name
-                                });
-                            });
-
-                            return { results: results };
-                        }
-                    }
-
-
+                    modal.result.then(function (userResult) {
+                            scope.userResult = userResult;
+                        
+                            scope.selectResult = {
+                                id: userResult.Id,
+                                text: userResult.Name
+                            };
+                    }, function() {
+                        scope.userResult = null;
+                        scope.selectResult = {
+                            id: null,
+                            text: null
+                        };
+                    });
                 };
 
-                console.log(scope);
             }
         };
     }
