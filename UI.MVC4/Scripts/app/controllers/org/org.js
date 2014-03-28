@@ -20,7 +20,7 @@
 
     }]);
 
-    app.controller('org.OrgViewCtrl', ['$rootScope', '$scope', '$http', 'growl', 'orgRolesHttp', function ($rootScope, $scope, $http, growl, orgRolesHttp) {
+    app.controller('org.OrgViewCtrl', ['$rootScope', '$scope', '$http', 'growl', 'orgRolesHttp', 'Restangular', function ($rootScope, $scope, $http, growl, orgRolesHttp, Restangular) {
         $rootScope.page.title = 'Organisation';
         $rootScope.page.subnav = subnav;
 
@@ -131,6 +131,13 @@
             console.log(data);
         };
 
+        Restangular.getList('OrganizationUnit/' + chooseOrgUnit.Id, 'taskrefs').then(function(refs) {
+            $scope.chosenTaskRefs = refs;
+        });
+        
+        Restangular.getList('OrganizationUnit/' + chooseOrgUnit.ParentId, 'taskrefs').then(function (refs) {
+            $scope.availableTaskRefs = refs;
+        });
     }]);
 
 })(angular, app);
