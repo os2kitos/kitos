@@ -448,19 +448,7 @@ namespace Infrastructure.DataAccess.Migrations
                                                 {
                                                     Object = roskilde,
                                                     Role = localAdmin,
-                                                    User = brian
-                                                },
-                                            new AdminRight()
-                                                {
-                                                    Object = roskilde,
-                                                    Role = localAdmin,
-                                                    User = roskildeUser3
-                                                },
-                                            new AdminRight()
-                                                {
-                                                    Object = sorø,
-                                                    Role = localAdmin,
-                                                    User = brian
+                                                    User = roskildeUser1
                                                 });
 
             context.SaveChanges();
