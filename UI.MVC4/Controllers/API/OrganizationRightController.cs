@@ -75,7 +75,10 @@ namespace UI.MVC4.Controllers.API
                 var right = AutoMapper.Mapper.Map<RightInputDTO, OrganizationRight>(inputDTO);
 
                 right = _repository.Insert(right);
-                _repository.Save();
+                _repository.Save(); 
+
+                right.User = UserRepository.GetByKey(right.User_Id);
+
                 //TODO: FIX navigation properties not loading properly!!!
                 var outputDTO = AutoMapper.Mapper.Map<OrganizationRight, RightOutputDTO>(right);
 

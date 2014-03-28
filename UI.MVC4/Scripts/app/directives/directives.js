@@ -79,10 +79,7 @@
                         };
                     }, function() {
                         scope.userResult = null;
-                        scope.selectResult = {
-                            id: null,
-                            text: null
-                        };
+                        scope.selectResult = null;
                     });
                 };
 
