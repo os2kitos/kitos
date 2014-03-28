@@ -25,51 +25,10 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
         subnav: []
     };
 
-    //users cache
-    $rootScope.users = [];
-    $rootScope.selectUserOptions = {
-        minimumInputLength: 1,
-        initSelection: function (element, callback) {
-        },
-        ajax: {
-            data: function (term, page) {
-                return { query: term };
-            },
-            quietMillis: 500,
-            transport: function (queryParams) {
-                //console.log(queryParams);
-                var res = $http.get('api/user?q=' + queryParams.data.query).then(queryParams.success);
-                res.abort = function () {
-                    return null;
-                };
-
-                return res;
-            },
-            results: function (data, page) {
-                console.log(data);
-                var results = [];
-
-                _.each(data.data.Response, function (user) {
-                    //Save to cache
-                    $rootScope.users[user.Id] = user;
-
-                    results.push({
-                        id: user.Id,
-                        text: user.Name
-                    });
-                });
-
-                return { results: results };
-            }
-        }
-
-
-    };
-
-    $rootScope.user = {};
-
     //x-editable config
     editableOptions.theme = 'bs3'; // bootstrap3 theme.
+
+    $rootScope.user = {};
 
     //logout function for top navigation bar
     $rootScope.logout = function () {
