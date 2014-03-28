@@ -17,13 +17,23 @@ namespace Core.DomainServices
 
         public ICollection<OrganizationUnit> GetByUser(User user)
         {
-            //add the OrgUnits that the user is directly connected to, through OrgRights
-            var units = user.OrganizationRights.Select(orgRight => orgRight.Object).ToList();
+            List<OrganizationUnit> units;
 
-            //add the OrgUnits that the user is indirectly connected to, through an Admin role on an organization
-            foreach (var adminRights in user.AdminRights)
+            if (user.IsGlobalAdmin)
             {
-                units.Add(adminRights.Object.OrgUnits.First());
+                units = _orgUnitRepository.Get().ToList();
+            }
+            else
+            {
+                //add the OrgUnits that the user is directly connected to, through OrgRights
+                units = user.OrganizationRights.Select(orgRight => orgRight.Object).ToList();
+
+                //add the OrgUnits that the user is indirectly connected to, through an Admin role on an organization
+                foreach (var adminRights in user.AdminRights)
+                {
+                    units.Add(adminRights.Object.OrgUnits.First());
+                }
+
             }
 
             var roots = units.Select(GetRoot);
