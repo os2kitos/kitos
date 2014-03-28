@@ -1,3 +1,11 @@
-﻿<input type="text" data-ui-select2="selectUserOptions"
-               class="form-control input-sm"
-               data-placeholder="Vælg bruger" />
+﻿<div class="input-group full-width">
+    <input data-ng-model="userModel"
+           type="text"
+           data-ui-select2="selectUserOptions"
+           class="input-sm form-control"
+           data-placeholder="Vælg bruger" />
+
+    <div class="input-group-btn">
+        <button data-add-user="" />
+    </div>
+</div>
