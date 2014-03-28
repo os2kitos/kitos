@@ -20,7 +20,7 @@
 
     }]);
 
-    app.controller('org.OrgViewCtrl', ['$rootScope', '$scope', '$http', 'growl', 'orgRolesHttp', 'Restangular', function ($rootScope, $scope, $http, growl, orgRolesHttp, Restangular) {
+    app.controller('org.OrgViewCtrl', ['$rootScope', '$scope', '$http', 'growl', 'orgRolesHttp', '$q', function ($rootScope, $scope, $http, growl, orgRolesHttp, $q) {
         $rootScope.page.title = 'Organisation';
         $rootScope.page.subnav = subnav;
 
@@ -131,31 +131,48 @@
             console.log(data);
         };
 
-        $scope.$watch('chosenOrgUnit', function (newOrgUnit, oldOrgUnit) {
-            if (newOrgUnit === null)
-                return; // abort if bogus
-            
-            $http.get('api/organizationUnit/' + newOrgUnit.Id + '?taskrefs').success(function(data) {
-                $scope.chosenTaskRefs = data.Response;
-            });
-
-            if (newOrgUnit.Parent_Id === 0) { // if root org unit list all taskrefs as available
-                $http.get('api/taskref').success(function (data) {
-                    $scope.availableTaskRefs = data.Response;
-                });
-            } else { // else only show selected on parent orgunit
-                $http.get('api/organizationUnit/' + newOrgUnit.Parent_Id + '?taskrefs').success(function (data) {
-                    $scope.availableTaskRefs = data.Response;
-                });
+        $scope.updateTask = function (task) {
+            task.selected = !task.selected;
+            var orgUnitId = $scope.chosenOrgUnit.Id;
+            if (task.selected === true) {
+                $http.post('api/organizationUnit/' + orgUnitId + '?taskref=' + task.Id).finally(updateLists());
+            } else {
+                $http.delete('api/organizationUnit/' + orgUnitId + '?taskref=' + task.Id).finally(updateLists());
             }
-            
-            //Restangular.all('OrganizationUnit/' + newValue.Id).getList({ taskrefs: null }).then(function (refs) {
-            //    $scope.chosenTaskRefs = refs;
-            //});
+        };
 
-            //Restangular.all('OrganizationUnit/' + newValue.ParentId).getList({ taskrefs: null }).then(function (refs) {
-            //    $scope.availableTaskRefs = refs;
-            //});
+        function updateLists() {
+            var orgUnitId = $scope.chosenOrgUnit.Id,
+                orgUnitParentId = $scope.chosenOrgUnit.Parent_Id;
+
+            var listOfQs = [];
+            listOfQs.push($http.get('api/organizationUnit/' + orgUnitId + '?taskrefs').success(function(data) {
+                $scope.chosenTaskRefs = data.Response;
+            }));
+            
+            if (orgUnitParentId === 0) { // if root org unit list all taskrefs as available
+                listOfQs.push($http.get('api/taskref').success(function (data) {
+                    $scope.availableTaskRefs = data.Response;
+                }));
+            } else { // else only show selected on parent orgunit
+                listOfQs.push($http.get('api/organizationUnit/' + orgUnitParentId + '?taskrefs').success(function (data) {
+                    $scope.availableTaskRefs = data.Response;
+                }));
+            }
+
+            $q.all(listOfQs).then(function() {
+                _.each($scope.chosenTaskRefs, function(selectedTasks) {
+                    var task = _.find($scope.availableTaskRefs, function(availableTasks) {
+                        return availableTasks.Id == selectedTasks.Id;
+                    });
+                    task.selected = true;
+                });
+            });
+        }
+
+        $scope.$watch('chosenOrgUnit', function (newOrgUnit, oldOrgUnit) {
+            if (newOrgUnit !== null)
+                updateLists();
         });
     }]);
 

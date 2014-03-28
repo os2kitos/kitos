@@ -67,39 +67,58 @@
 
 
                 {{selectedUser}}
+                
+                
+                <div class="col-md-12">
+                    <h3>Vælg opgaver tilkyttet organisationen</h3>
+                </div>
+            
+                <div class="col-md-12">
+                    <div class="panel panel-primary">
+                        <table class="full-width table">
+                            <thead>
+                                <tr>
+                                    <th>Organisationsenhed</th>
+                                    <th>ID</th>
+                                    <th>Navn</th>
+                                    <th>Overblik</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr data-ng-repeat="task in chosenTaskRefs">
+                                    <td></td>
+                                    <td>{{ task.TaskKey }}</td>
+                                    <td>{{ task.Description }}</td>
+                                    <td><input type="checkbox"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-            </div>
-
-        </div>
-        
-        <div class="row">
-            <div class="col-md-12" data-ng-hide="chosenTaskList">
-                <h3>Vælg opgaver tilkyttet organisationen</h3>
-            </div>
-
-            <div class="col-md-12" data-ng-show="chosenTaskList">
-                <div class="panel panel-primary">
-                    <table class="full-width table">
-                        <thead>
-                            <tr>
-                                <th>Organisationsenhed</th>
-                                <th>ID</th>
-                                <th>Navn</th>
-                                <th>Overblik</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr data-ng-repeat="task in availableTaskRefs">
-                                <td>foo</td>
-                                <td>{{ task.TaskKey }}</td>
-                                <td>{{ task.Name }}</td>
-                                <td><input type="checkbox"/></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="col-md-12">
+                    <div class="panel panel-primary">
+                        <table class="full-width table">
+                            <thead>
+                                <tr>
+                                    <th>Tilknyttet</th>
+                                    <th>ID</th>
+                                    <th>Navn</th>
+                                    <th>Overblik</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr data-ng-repeat="task in availableTaskRefs">
+                                    <td><input type="checkbox" data-ng-checked="task.selected" data-ng-click="updateTask(task)"/></td>
+                                    <td>{{ task.TaskKey }}</td>
+                                    <td>{{ task.Description }}</td>
+                                    <td><input type="checkbox"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
 </div>

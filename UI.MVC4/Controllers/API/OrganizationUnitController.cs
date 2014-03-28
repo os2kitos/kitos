@@ -63,7 +63,7 @@ namespace UI.MVC4.Controllers.API
 
         public HttpResponseMessage GetTaskRefs(int id, [FromUri] bool? taskRefs)
         {
-            var refs = Repository.Get(x => x.TaskRefs.Any(y => y.Id == id)).SelectMany(x => x.TaskRefs);
+            var refs = Repository.Get(x => x.Id == id).SelectMany(x => x.TaskRefs);
             return Ok(Map<IEnumerable<TaskRef>, IEnumerable<TaskRefDTO>>(refs));
         }
 
