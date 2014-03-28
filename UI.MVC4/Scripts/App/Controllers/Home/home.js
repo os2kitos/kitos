@@ -49,7 +49,7 @@
         });
     }]);
     
-    app.controller('home.LoginCtrl', ['$rootScope', '$scope', '$http', '$state', '$stateParams', function ($rootScope, $scope, $http, $state, $stateParams) {
+    app.controller('home.LoginCtrl', ['$rootScope', '$scope', '$http', '$state', '$stateParams', 'growl', function ($rootScope, $scope, $http, $state, $stateParams, growl) {
         $rootScope.page.title = 'Log ind';
         $rootScope.page.subnav = [];
         
@@ -64,12 +64,15 @@
             };
 
             $http.post('api/authorize', data).success(function (result) {
+                growl.addSuccessMessage("Du er nu logget ind!");
 
                 $rootScope.saveUser(result);
 
                 var to = $stateParams.to ? $stateParams.to : 'index';
 
                 $state.go(to);
+            }).error(function (result) {
+                growl.addErrorMessage("Forkert brugernavn eller password!");
             });
 
         };

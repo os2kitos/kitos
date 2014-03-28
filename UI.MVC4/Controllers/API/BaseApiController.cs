@@ -123,5 +123,10 @@ namespace UI.MVC4.Controllers.API
                 }
             }
         }
+
+        protected bool IsAuthenticated
+        {
+            get { return User.Identity.IsAuthenticated; }
+        }
     }
 }
