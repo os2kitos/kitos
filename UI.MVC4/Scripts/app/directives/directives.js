@@ -22,13 +22,93 @@
             };
         }]);
 
-    app.directive('selectUser', ['$http', function ($http) {
+    app.directive('selectUser', ['$rootScope', '$http', function ($rootScope, $http) {
         return {
+            scope: {},
             replace: true,
             templateUrl: 'partials/directives/select-user.html',
-            link: function (scope, element, attr) {
+            controller: ['$scope', function($scope) {
+                $scope.selectUserOptions = {
+                    minimumInputLength: 1,
+                    initSelection: function(elem, callback) {
+                    },
+                    ajax: {
+                        data: function(term, page) {
+                            return { query: term };
+                        },
+                        quietMillis: 500,
+                        transport: function(queryParams) {
+                            var res = $http.get('api/user?q=' + queryParams.data.query).then(queryParams.success);
+                            res.abort = function() {
+                                return null;
+                            };
 
-            }
+                            return res;
+                        },
+                        results: function(data, page) {
+                            console.log(data);
+                            var results = [];
+
+                            _.each(data.data.Response, function(user) {
+
+                                results.push({
+                                    id: user.Id,
+                                    text: user.Name
+                                });
+                            });
+
+                            return { results: results };
+                        }
+                    }
+                };
+            }]
+            /*
+            link: function (scope, element, attr) {
+                scope.$parent = $rootScope;
+
+                console.log(Select2);
+                scope.Select2 = Select2;
+
+                scope.selectUserOptions = {
+                    minimumInputLength: 1,
+                    initSelection: function(elem, callback) {
+                    },
+                    ajax: {
+                        data: function(term, page) {
+                            return { query: term };
+                        },
+                        quietMillis: 500,
+                        transport: function(queryParams) {
+                            //console.log(queryParams);
+                            var res = $http.get('api/user?q=' + queryParams.data.query).then(queryParams.success);
+                            res.abort = function() {
+                                return null;
+                            };
+
+                            return res;
+                        },
+                        results: function(data, page) {
+                            console.log(data);
+                            var results = [];
+
+                            _.each(data.data.Response, function(user) {
+                                //Save to cache
+                                $rootScope.users[user.Id] = user;
+
+                                results.push({
+                                    id: user.Id,
+                                    text: user.Name
+                                });
+                            });
+
+                            return { results: results };
+                        }
+                    }
+                };
+
+                console.log(scope);
+
+            }*/
         };
     }
 

@@ -71,10 +71,6 @@
                                 </td>
                                 <td colspan="2">
                                     <input data-select-user="" data-ng-model="right.userForSelect" data-ng-required="true" data-users-cache="users"/>
-                                    <!--
-                                    <input type="text" name="selectUser" data-ui-select2="userSelectOptions" 
-                                           data-ng-model="right.userForSelect" class="form-control input-sm" 
-                                           data-placeholder="Find bruger" data-ng-required="true" />-->
                                 </td>
                                 <td>
                                     <input type="submit" class="btn btn-primary btn-sm" data-ng-click="updateRight(right)" value="Gem" />
@@ -94,16 +90,11 @@
                                         </option>
                                     </select>
                                 </td>
-                                <td colspan="2">
+                                <td colspan="2" class="form-group">
                                     <input data-select-user="foo" data-ng-model="selectedUser" data-ng-required="true" data-users-cache="users"/>
-                                    <!--
-                                        <input type="text" name="selectUser" data-ui-select2="userSelectOptions" 
-                                               data-ng-model="selectedUser" class="form-control input-sm" 
-                                               data-placeholder="Find bruger" data-ng-required="true" /> -->
-                                        
+                                    <input data-add-user=""/>
                                 </td>
                                 <td>
-                                    <input data-add-user="" data-for-select2="selectedUser"/>
                                     <input type="submit" class="btn btn-primary btn-sm" data-ng-click="submitRight()" value="Gem" />
                                 </td>
                             </tr>
