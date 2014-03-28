@@ -156,7 +156,7 @@
             //Restangular.all('OrganizationUnit/' + newValue.ParentId).getList({ taskrefs: null }).then(function (refs) {
             //    $scope.availableTaskRefs = refs;
             //});
-        }, );
+        });
     }]);
 
 })(angular, app);
