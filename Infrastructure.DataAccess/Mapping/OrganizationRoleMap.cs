@@ -6,13 +6,13 @@ using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class DepartmentRoleMap : EntityTypeConfiguration<DepartmentRole>
+    public class OrganizationRoleMap : EntityTypeConfiguration<OrganizationRole>
     {
-        public DepartmentRoleMap()
+        public OrganizationRoleMap()
         {
             this.HasKey(t => t.Id);
 
-            this.ToTable("DepartmentRole");
+            this.ToTable("OrganizationRole");
 
             this.Property(t => t.Name).IsRequired();
         }

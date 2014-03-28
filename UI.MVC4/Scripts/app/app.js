@@ -1,4 +1,4 @@
-﻿var app = angular.module('app', ['ui.router', 'ui.select2', 'ngAnimate', 'angular-growl', 'xeditable', 'restangular']);
+﻿var app = angular.module('app', ['ui.router', 'ui.bootstrap', 'ui.select2', 'ngAnimate', 'angular-growl', 'xeditable', 'restangular']);
 
 app.config(['$urlRouterProvider', function ($urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
@@ -25,6 +25,47 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
         subnav: []
     };
 
+    //users cache
+    $rootScope.users = [];
+    $rootScope.selectUserOptions = {
+        minimumInputLength: 2,
+        initSelection: function (element, callback) {
+        },
+        ajax: {
+            data: function (term, page) {
+                return { query: term };
+            },
+            quietMillis: 500,
+            transport: function (queryParams) {
+                //console.log(queryParams);
+                var res = $http.get('api/user?q=' + queryParams.data.query).then(queryParams.success);
+                res.abort = function () {
+                    return null;
+                };
+
+                return res;
+            },
+            results: function (data, page) {
+                console.log(data);
+                var results = [];
+
+                _.each(data.data.Response, function (user) {
+                    //Save to cache
+                    $rootScope.users[user.Id] = user;
+
+                    results.push({
+                        id: user.Id,
+                        text: user.Name
+                    });
+                });
+
+                return { results: results };
+            }
+        }
+
+
+    };
+
     $rootScope.user = {};
 
     //x-editable config
@@ -39,13 +80,20 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
     };
 
     $rootScope.saveUser = function (result) {
+        var isLocalAdmin = _.some(result.Response.AdminRights, function(userRight) {
+            return userRight.RoleName == "LocalAdmin";
+        });
+
         $rootScope.user = {
+            id: result.Response.Id,
+            authStatus: 'authorized',
             name: result.Response.Name,
             email: result.Response.Email,
-            municipality: result.Response.Municipality_Id,
-            authStatus: 'authorized',
-            role: result.Response.RoleName
+            isGlobalAdmin: result.Response.IsGlobalAdmin,
+            isLocalAdmin: isLocalAdmin,
+            isLocalAdminFor: _.pluck(result.Response.AdminRights, 'Organization_Id')
         };
+
     };
 
     var hasInitUser = false;
@@ -55,9 +103,17 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
     
     function auth(toState, toParams) {
         var user = $rootScope.user;
-        var authRoles = toState.authRoles;
 
-        return (user.authStatus == 'authorized' && (!authRoles || _.indexOf(authRoles, user.role) != -1));
+        if (user.authStatus != 'authorized') return false; //user hasn't authorized
+        
+        var adminRoles = toState.adminRoles;
+        if (!adminRoles) return true; //no specific admin role needed
+
+        //go through each of the roles on the state
+        return _.some(adminRoles, function (role) {
+            //if the state role is global admin, and the user is global admin, it's cool
+            return (role == "GlobalAdmin" && user.isGlobalAdmin) || (role == "LocalAdmin" && user.isLocalAdmin);
+        });
     }
 
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
@@ -74,15 +130,15 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
                 var userRole = user.role;
                 var authRoles = toState.authRoles;
 
-                if (!auth(toState, toParams)) {
+                if (!auth(toState)) {
                     $state.go('login', { to: toState.name, toParams: toParams });
                 } else {
                     $state.go(toState, toParams);
                 }
             });
         } else {
-            //initUSer has loaded, just run auth()
-            if (!auth(toState, toParams)) {
+            //initUser has loaded, just run auth()
+            if (!auth(toState)) {
                 event.preventDefault();
                 $state.go('login', { to: toState.name, toParams: toParams });
             }

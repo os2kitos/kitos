@@ -38,6 +38,6 @@ namespace Core.DomainModel
 
         #endregion
 
-        //public virtual Municipality Municipality { get; set; }
+        //public virtual Organization Organization { get; set; }
     }
 }

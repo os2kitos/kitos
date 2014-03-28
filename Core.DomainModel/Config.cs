@@ -33,6 +33,33 @@ namespace Core.DomainModel
         public virtual ItProjectModuleName ItProjectModuleName { get; set; }
         public virtual ItSystemModuleName ItSystemModuleName { get; set; }
         public virtual ItContractModuleName ItContractModuleName { get; set; }
-        public virtual Municipality Municipality { get; set; }
+        public virtual Organization Organization { get; set; }
+
+        public static Config Default
+        {
+            get
+            {
+                return new Config()
+                    {
+                        ShowItContractModule = true,
+                        ShowItProjectModule = true,
+                        ShowItSystemModule = true,
+                        ItSupportModuleName_Id = 1,
+                        ItContractModuleName_Id = 1,
+                        ItProjectModuleName_Id = 1,
+                        ItSystemModuleName_Id = 1,
+                        ItSupportGuide = ".../itunderstøttelsesvejledning",
+                        ItProjectGuide = ".../itprojektvejledning",
+                        ItSystemGuide = ".../itsystemvejledning",
+                        ItContractGuide = ".../itkontraktvejledning",
+                        ShowBC = true,
+                        ShowPortfolio = true,
+                        ShowColumnMandatory = true,
+                        ShowColumnTechnology = true,
+                        ShowColumnUsage = true,
+                        ShowTabOverview = true
+                    };
+            }
+        }
     }
 }

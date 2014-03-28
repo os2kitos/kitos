@@ -15,7 +15,7 @@ namespace Infrastructure.DataAccess.Mapping
             this.ToTable("ProjectPhaseLocale");
 
             // Relationships
-            this.HasRequired(t => t.Municipality)
+            this.HasRequired(t => t.Organization)
                 .WithMany(t => t.ProjectPhaseLocales)
                 .HasForeignKey(t => t.Municipality_Id);
 

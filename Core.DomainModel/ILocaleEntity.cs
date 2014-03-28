@@ -6,7 +6,7 @@
         int Original_Id { get; set; }
         string Name { get; set; }
 
-        Municipality Municipality { get; set; }
+        Organization Organization { get; set; }
         TOriginal Original { get; set; }
     }
 }

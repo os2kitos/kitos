@@ -40,13 +40,13 @@ namespace Infrastructure.DataAccess.Migrations
             //
 
             var cryptoService = new CryptoService();
+            var municipalityService = new OrganizationService();
 
             #region AdminRoles
-            var globalAdmin = new Role { Name = "GlobalAdmin" };
-            var localAdmin = new Role { Name = "LocalAdmin" };
 
-            context.Roles.AddOrUpdate(x => x.Name, globalAdmin, localAdmin);
-            
+            var localAdmin = new AdminRole { Name = "LocalAdmin" };
+            context.AdminRoles.AddOrUpdate(x => x.Name, localAdmin);
+
             #endregion
 
             #region Drop Down Data
@@ -116,192 +116,36 @@ namespace Infrastructure.DataAccess.Migrations
             context.PaymentModels.AddOrUpdate(x => x.Name,
                                               new PaymentModel() { IsActive = true, Note = "...", Name = "Licens" });
 
-            context.SaveChanges();
-
-            #endregion
-
-            #region Global municipality
-
-            var globalMunicipality = new Municipality()
-                {
-                    Name = "Fælleskommune"
-                };
-
-            context.Municipalities.AddOrUpdate(x => x.Name, globalMunicipality);
-
-            var itSupportName = new ItSupportModuleName() {Name = "IT Understøttelse"};
+            var itSupportName = new ItSupportModuleName() { Name = "IT Understøttelse" };
             context.ItSupportModuleNames.AddOrUpdate(x => x.Name,
-                new ItSupportModuleName() {Name = "IT Understøttelse af organisation"},
+                new ItSupportModuleName() { Name = "IT Understøttelse af organisation" },
                 itSupportName,
-                new ItSupportModuleName() {Name = "Organisation"});
+                new ItSupportModuleName() { Name = "Organisation" });
 
-            var itProjectName = new ItProjectModuleName() {Name = "IT Projekter"};
-            context.ItProjectModuleNames.AddOrUpdate(x => x.Name, 
+            var itProjectName = new ItProjectModuleName() { Name = "IT Projekter" };
+            context.ItProjectModuleNames.AddOrUpdate(x => x.Name,
                 itProjectName,
-                new ItProjectModuleName() {Name = "Projekter"});
+                new ItProjectModuleName() { Name = "Projekter" });
 
-            var itSystemName = new ItSystemModuleName() {Name = "IT Systemer"};
+            var itSystemName = new ItSystemModuleName() { Name = "IT Systemer" };
             context.ItSystemModuleNames.AddOrUpdate(x => x.Name,
                 itSystemName,
-                new ItSystemModuleName() {Name = "Systemer"});
+                new ItSystemModuleName() { Name = "Systemer" });
 
-            var itContractName = new ItContractModuleName() {Name = "IT Kontrakter"};
+            var itContractName = new ItContractModuleName() { Name = "IT Kontrakter" };
             context.ItContractModuleNames.AddOrUpdate(x => x.Name,
                 itContractName,
-                new ItContractModuleName() {Name = "Kontrakter"});
-
-            context.Configs.AddOrUpdate(x => x.Id,
-                new Core.DomainModel.Config() {
-                    Municipality = globalMunicipality,
-                    ItContractModuleName = itContractName,
-                    ItProjectModuleName = itProjectName,
-                    ItSupportModuleName = itSupportName,
-                    ItSystemModuleName = itSystemName,
-                    ShowItContractModule = true,
-                    ShowItProjectModule = true,
-                    ShowItSystemModule = true,
-                    ItSupportGuide = ".../itunderstøttelsesvejledning",
-                    ItProjectGuide = ".../itprojektvejledning",
-                    ItSystemGuide = ".../itsystemvejledning",
-                    ItContractGuide = ".../itkontraktvejledning"
-                });
+                new ItContractModuleName() { Name = "Kontrakter" });
 
             context.SaveChanges();
 
-            #endregion
-
-            var department = new Department()
-                {
-                    Name = "Test organisation"
-                };
-
-            context.Departments.AddOrUpdate(d => d.Id, department);
-
-            #region Department roles
-
-            var boss = new DepartmentRole()
-                {
-                    IsActive = true,
-                    Name = "Chef",
-                    Note = "Lederen af en organisationsenhed"
-                };
-
-            var resourcePerson = new DepartmentRole()
-                {
-                    IsActive = true,
-                    Name = "Ressourceperson",
-                    Note = "..."
-                };
-
-            context.DepartmentRoles.AddOrUpdate(role => role.Id,
-                                                boss, resourcePerson,
-                                                new DepartmentRole() {IsActive = false, Name = "Inaktiv Org rolle"},
-                                                new DepartmentRole()
-                                                    {
-                                                        IsActive = false,
-                                                        IsSuggestion = true,
-                                                        Name = "Forslag til org rolle"
-                                                    }
-                );
-
-            #endregion
-            
-            #region Project roles
-            
-            context.ItProjectRoles.AddOrUpdate(r => r.Id,
-                                               new ItProjectRole() {IsActive = true, Name = "Projektejer"},
-                                               new ItProjectRole() {IsActive = true, Name = "Projektleder"},
-                                               new ItProjectRole() {IsActive = true, Name = "Delprojektleder"},
-                                               new ItProjectRole() {IsActive = true, Name = "Projektdeltager"},
-                                               new ItProjectRole() {IsActive = false, Name = "Inaktiv projektrolle"},
-                                               new ItProjectRole()
-                                                   {
-                                                       IsActive = false,
-                                                       IsSuggestion = true,
-                                                       Name = "Foreslået projektrolle"
-                                                   }
-                );
-
-            #endregion
-            
-            #region Users
-
-            var simonSalt = cryptoService.Encrypt("simonsalt");
-            var simon = new User
-            {
-                Name = "Simon Lynn-Pedersen",
-                Email = "slp@it-minds.dk",
-                Salt = simonSalt,
-                Password = cryptoService.Encrypt("slp123" + simonSalt),
-                Role = globalAdmin,
-                Municipality = globalMunicipality
-            };
-
-            var eskildSalt = cryptoService.Encrypt("eskildsalt");
-            var eskild = new User()
-                {
-                    Name = "Eskild",
-                    Email = "esd@it-minds.dk",
-                    Salt = eskildSalt,
-                    Password = cryptoService.Encrypt("arne123" + eskildSalt),
-                    Role = localAdmin,
-                    Municipality = globalMunicipality
-                };
-
-            context.Users.AddOrUpdate(x => x.Email, simon);
-
-            context.SaveChanges();
-
-            #endregion
-
-            var simonDepartmentRight = new DepartmentRight()
-                {
-                    Object = department,
-                    Role = boss,
-                    User = simon
-                };
-
-            var eskildDepartmentRight = new DepartmentRight()
-                {
-                    Object = department,
-                    Role = resourcePerson,
-                    User = eskild
-                };
-
-            context.DepartmentRights.AddOrUpdate(r => new {r.Object_Id, r.Role_Id, r.User_Id}, simonDepartmentRight, eskildDepartmentRight);
-
-            #region Password Reset Requests
-
-            /*
-            var simonId = context.Users.Single(x => x.Email == "slp@it-minds.dk").Id;
-
-            context.PasswordResetRequests.AddOrUpdate(x => x.Id,
-                                                      new PasswordResetRequest
-                                                      {
-                                                          //This reset request is fine
-                                                          Id = "workingRequest", //ofcourse, this should be a hashed string or something obscure
-                                                          Time = DateTime.Now.AddYears(+20), //.MaxValue also seems to be out-of-range, but this should hopefully be good enough
-                                                          User_Id = simonId
-                                                      }
-                );
-
-             */
-            #endregion
-
-            #region Texts
-
-            context.Texts.AddOrUpdate(x => x.Id,
-                                      new Text() {Id = "intro-head", Value = "Head"},
-                                      new Text() {Id = "intro-body", Value = "Body"});
-
-            #endregion
 
             var extRef1 = new ExtReferenceType()
-                {
-                    IsActive = true,
-                    Name = "ESDH Ref",
-                    Note = "Ref. til ESDH system, hvor der er projektdokumenter"
-                };
+                            {
+                                IsActive = true,
+                                Name = "ESDH Ref",
+                                Note = "Ref. til ESDH system, hvor der er projektdokumenter"
+                            };
             var extRef2 = new ExtReferenceType()
                 {
                     IsActive = true,
@@ -350,16 +194,364 @@ namespace Infrastructure.DataAccess.Migrations
                     }
                 );
 
-            context.ProjectPhaseLocales.AddOrUpdate(x => new {x.Municipality_Id, x.Original_Id},
+            #endregion
+
+            #region Municipalities
+
+            //var globalMunicipality = municipalityService.CreateMunicipality("Fælleskommune");
+
+            var roskilde = municipalityService.CreateMunicipality("Roskilde");
+
+            var sorø = municipalityService.CreateMunicipality("Sorø");
+
+            context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø);
+
+            context.SaveChanges();
+
+            #endregion
+
+            #region Roskilde OrgUnits
+
+            //LEVEL 0
+            var rootUnit = roskilde.OrgUnits.First();
+
+            //LEVEL 1
+            var munChief = new OrganizationUnit()
+                {
+                    Organization = roskilde,
+                    Parent = rootUnit,
+                    Name = "Kommunaldirektøren"
+                };
+            var wellfare = new OrganizationUnit()
+            {
+                Organization = roskilde,
+                Parent = rootUnit,
+                Name = "Velfærd"
+            };
+
+            //LEVEL 2
+            var digi = new OrganizationUnit()
+                {
+                    Organization = roskilde,
+                    Parent = munChief,
+                    Name = "Digitalisering og Borgerservice"
+                };
+
+            var hrcouncil = new OrganizationUnit()
+                {
+                    Organization = roskilde,
+                    Parent = munChief,
+                    Name = "HR og Byråd"
+                };
+
+            var elderArea = new OrganizationUnit()
+            {
+                Organization = roskilde,
+                Parent = wellfare,
+                Name = "Ældreområdet"
+            };
+
+            //LEVEL 3
+            var itservice = new OrganizationUnit()
+            {
+                Organization = roskilde,
+                Parent = digi,
+                Name = "IT Service"
+            };
+            var projectunit = new OrganizationUnit()
+            {
+                Organization = roskilde,
+                Parent = digi,
+                Name = "Projektenheden"
+            };
+            var citizenservice = new OrganizationUnit()
+            {
+                Organization = roskilde,
+                Parent = digi,
+                Name = "Borgerservice"
+            };
+            var hr = new OrganizationUnit()
+            {
+                Organization = roskilde,
+                Parent = hrcouncil,
+                Name = "HR"
+            };
+            var nursinghome = new OrganizationUnit()
+            {
+                Organization = roskilde,
+                Parent = elderArea,
+                Name = "Plejehjem"
+            };
+
+            //LEVEL 4
+            var infra = new OrganizationUnit()
+            {
+                Organization = roskilde,
+                Parent = itservice,
+                Name = "Infrastruktur"
+            };
+            var teamcontact = new OrganizationUnit()
+            {
+                Organization = roskilde,
+                Parent = citizenservice,
+                Name = "Team Kontaktcenter"
+            };
+
+            context.OrganizationUnits.AddOrUpdate(o => o.Name, munChief, wellfare, digi, hrcouncil, elderArea, itservice, projectunit, citizenservice, hr, nursinghome, infra, teamcontact);
+            context.SaveChanges();
+
+            #endregion
+
+            #region Sorø OrgUnits
+
+            //LEVEL 0
+            var rootUnit2 = sorø.OrgUnits.First();
+
+            //LEVEL 1
+            var level1a = new OrganizationUnit()
+            {
+                Organization = sorø,
+                Parent = rootUnit2,
+                Name = "Direktørområde"
+            };
+
+            //LEVEL 2
+            var level2a = new OrganizationUnit()
+            {
+                Organization = sorø,
+                Parent = level1a,
+                Name = "Afdeling 1"
+            };
+
+            var level2b = new OrganizationUnit()
+            {
+                Organization = sorø,
+                Parent = level1a,
+                Name = "Afdeling 2"
+            };
+
+            var level2c = new OrganizationUnit()
+            {
+                Organization = sorø,
+                Parent = level1a,
+                Name = "Afdeling 3"
+            };
+
+            //LEVEL 2
+            var level3a = new OrganizationUnit()
+            {
+                Organization = sorø,
+                Parent = level2a,
+                Name = "Afdeling 1a"
+            };
+
+            var level3b = new OrganizationUnit()
+            {
+                Organization = sorø,
+                Parent = level2b,
+                Name = "Afdeling 2a"
+            };
+
+            var level3c = new OrganizationUnit()
+            {
+                Organization = sorø,
+                Parent = level2b,
+                Name = "Afdeling 2b"
+            };
+
+            context.OrganizationUnits.AddOrUpdate(o => o.Name, level1a, level2a, level2b, level2c, level3a, level3b,
+                                                  level3c);
+            context.SaveChanges();
+
+            #endregion
+
+            #region OrganizationUnit roles
+
+            var boss = new OrganizationRole()
+                {
+                    IsActive = true,
+                    Name = "Chef",
+                    Note = "Lederen af en organisationsenhed",
+                    HasWriteAccess = true
+                };
+
+            var resourcePerson = new OrganizationRole()
+                {
+                    IsActive = true,
+                    Name = "Ressourceperson",
+                    Note = "...",
+                    HasWriteAccess = true
+                };
+
+            var employee = new OrganizationRole()
+                {
+                    IsActive = true,
+                    Name = "Medarbejder",
+                    Note = "...",
+                    HasWriteAccess = false
+                };
+
+            context.OrganizationRoles.AddOrUpdate(role => role.Id,
+                                                boss, resourcePerson, employee,
+                                                new OrganizationRole() { IsActive = false, Name = "Inaktiv Org rolle" },
+                                                new OrganizationRole()
+                                                    {
+                                                        IsActive = false,
+                                                        IsSuggestion = true,
+                                                        Name = "Forslag til org rolle"
+                                                    }
+                );
+
+            #endregion
+
+            #region Project roles
+
+            context.ItProjectRoles.AddOrUpdate(r => r.Id,
+                                               new ItProjectRole() { IsActive = true, Name = "Projektejer" },
+                                               new ItProjectRole() { IsActive = true, Name = "Projektleder" },
+                                               new ItProjectRole() { IsActive = true, Name = "Delprojektleder" },
+                                               new ItProjectRole() { IsActive = true, Name = "Projektdeltager" },
+                                               new ItProjectRole() { IsActive = false, Name = "Inaktiv projektrolle" },
+                                               new ItProjectRole()
+                                                   {
+                                                       IsActive = false,
+                                                       IsSuggestion = true,
+                                                       Name = "Foreslået projektrolle"
+                                                   }
+                );
+
+            #endregion
+
+            #region Users
+
+            var simon = SimpleUser("Simon Lynn-Pedersen", "slp@it-minds.dk", "slp123", cryptoService);
+            simon.IsGlobalAdmin = true;
+
+            var eskild = SimpleUser("Eskild", "esd@it-minds.dk", "arne123", cryptoService);
+
+            var brian = SimpleUser("Brian Andersen", "brian@it-minds.dk", "brian123", cryptoService);
+
+            var roskildeUser1 = SimpleUser("Pia", "pia@it-minds.dk", "arne123", cryptoService);
+            var roskildeUser2 = SimpleUser("Morten", "morten@it-minds.dk", "arne123", cryptoService);
+            var roskildeUser3 = SimpleUser("Anders", "anders@it-minds.dk", "arne123", cryptoService);
+            var roskildeUser4 = SimpleUser("Peter", "peter@it-minds.dk", "arne123", cryptoService);
+            var roskildeUser5 = SimpleUser("Jesper", "jesper@it-minds.dk", "arne123", cryptoService);
+
+            context.Users.AddOrUpdate(x => x.Email, simon, eskild, brian, roskildeUser1, roskildeUser2, roskildeUser3, roskildeUser4, roskildeUser5);
+
+            context.SaveChanges();
+
+            #endregion
+
+            #region Admin rights
+
+            context.AdminRights.AddOrUpdate(right => new {right.Object_Id, right.Role_Id, right.User_Id},
+                                            new AdminRight()
+                                                {
+                                                    Object = roskilde,
+                                                    Role = localAdmin,
+                                                    User = brian
+                                                },
+                                            new AdminRight()
+                                                {
+                                                    Object = roskilde,
+                                                    Role = localAdmin,
+                                                    User = roskildeUser3
+                                                },
+                                            new AdminRight()
+                                                {
+                                                    Object = sorø,
+                                                    Role = localAdmin,
+                                                    User = brian
+                                                });
+
+            context.SaveChanges();
+
+            #endregion
+
+            #region Org rights
+
+            context.OrganizationRights.AddOrUpdate(right => new { right.Object_Id, right.Role_Id, right.User_Id },
+                    new OrganizationRight()
+                        {
+                            Object = itservice,
+                            Role = resourcePerson,
+                            User = roskildeUser1
+                        },
+                    new OrganizationRight()
+                        {
+                            Object = digi,
+                            Role = boss,
+                            User = roskildeUser2
+                        },
+                    new OrganizationRight()
+                    {
+                        Object = hr,
+                        Role = resourcePerson,
+                        User = roskildeUser2
+                    },
+                    new OrganizationRight()
+                    {
+                        Object = teamcontact,
+                        Role = resourcePerson,
+                        User = roskildeUser4
+                    }
+                );
+
+            context.SaveChanges();
+
+            #endregion
+
+            #region Password Reset Requests
+
+            /*
+            var simonId = context.Users.Single(x => x.Email == "slp@it-minds.dk").Id;
+
+            context.PasswordResetRequests.AddOrUpdate(x => x.Id,
+                                                      new PasswordResetRequest
+                                                      {
+                                                          //This reset request is fine
+                                                          Id = "workingRequest", //ofcourse, this should be a hashed string or something obscure
+                                                          Time = DateTime.Now.AddYears(+20), //.MaxValue also seems to be out-of-range, but this should hopefully be good enough
+                                                          User_Id = simonId
+                                                      }
+                );
+
+             */
+            #endregion
+
+            #region Texts
+
+            context.Texts.AddOrUpdate(x => x.Id,
+                                      new Text() { Id = "intro-head", Value = "Head" },
+                                      new Text() { Id = "intro-body", Value = "Body" });
+
+            #endregion
+
+
+
+            context.ProjectPhaseLocales.AddOrUpdate(x => new { x.Municipality_Id, x.Original_Id },
                                                     new ProjPhaseLocale()
                                                         {
-                                                            Municipality = globalMunicipality,
+                                                            Organization = roskilde,
                                                             Original = projPhase1,
                                                             Name = "Pending"
                                                         }
                 );
 
             base.Seed(context);
+        }
+
+        private User SimpleUser(string name, string email, string password, CryptoService cryptoService)
+        {
+            var salt = cryptoService.Encrypt(name + "salt");
+            return new User()
+                {
+                    Name = name,
+                    Email = email,
+                    Salt = salt,
+                    Password = cryptoService.Encrypt(password + salt)
+                };
         }
     }
 }

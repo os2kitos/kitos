@@ -61,6 +61,9 @@ namespace UI.MVC4.Infrastructure
         /// </returns>
         public override string[] GetRolesForUser(string username)
         {
+            throw new NotImplementedException();
+
+            /*
             var userRepository = UserRepositoryFactory.GetUserRepository();
             if(String.IsNullOrEmpty(username))
                 throw new ProviderException("Bad username: null or empty");
@@ -71,7 +74,7 @@ namespace UI.MVC4.Infrastructure
                 return new string[]{};
             }
 
-            return new string[] {user.Role.Name};
+            return new string[] {user.Role.Name};*/
         }
 
         public override string[] GetUsersInRole(string roleName)
@@ -86,12 +89,15 @@ namespace UI.MVC4.Infrastructure
         /// <returns>True if and only if user exists and has that role</returns>
         public override bool IsUserInRole(string username, string roleName)
         {
+            throw new NotImplementedException();
+            
+            /*
             var userRepository = UserRepositoryFactory.GetUserRepository();
             var user = userRepository.GetByEmail(username);
 
             if (user == null || user.Role == null) return false;
 
-            return user.Role.Name == roleName;
+            return user.Role.Name == roleName;*/
         }
 
         public override void RemoveUsersFromRoles(string[] usernames, string[] roleNames)

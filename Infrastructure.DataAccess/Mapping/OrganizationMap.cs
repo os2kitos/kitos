@@ -1,5 +1,5 @@
 using System.Data.Entity.ModelConfiguration;
-using Core.DomainModel.ItProject;
+using Core.DomainModel;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -14,10 +14,13 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("Organization");
             this.Property(t => t.Id).HasColumnName("Id");
+            this.Property(t => t.Cvr).IsOptional();
+            this.Property(t => t.Type).IsOptional();
 
             // Relationships
-            this.HasRequired(t => t.ItProject)
-                .WithOptional(t => t.Organization);
+            this.HasOptional(t => t.Config)
+                .WithRequired(t => t.Organization)
+                .WillCascadeOnDelete(true);
 
         }
     }

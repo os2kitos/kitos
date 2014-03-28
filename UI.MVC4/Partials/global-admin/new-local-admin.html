@@ -2,17 +2,17 @@
 
     <h2>Tilføj lokal administrator</h2>
     <p>
-        Opret en ny bruger og tilføj vedkommende som lokal administrator på en kommune.
+        Opret en ny bruger og tilføj vedkommende som lokal administrator på en organisation.
     </p>
     <form class="form-horizontal" role="form" name="addForm">
         <div class="form-group">
-            <label for="municipality" class="col-md-3 control-label">
-                Kommunens navn
+            <label for="organization" class="col-md-3 control-label">
+                Organisationens navn
             </label>
             <div class="col-md-8">
-                <select type="text" data-ui-select2 name="municipality" data-ng-model="municipality" class="form-control" data-placeholder="Vælg kommune" data-ng-required="true">
+                <select type="text" data-ui-select2 name="organization" data-ng-model="organization" class="form-control" data-placeholder="Vælg organisation" data-ng-required="true">
                     <option></option>
-                    <option data-ng-repeat="mun in municipalities" value="{{mun.Id}}">{{mun.Name}}</option>
+                    <option data-ng-repeat="org in organizations" value="{{org.Id}}">{{org.Name}}</option>
                 </select>
             </div>
         </div>

@@ -1,16 +1,12 @@
 ﻿<div class="col-md-12">
-
-    <h2>IT Kontrakter</h2>
-    <p>
-        Konfigurér IT kontrakter
-    </p>
+    
     <div class="form-group row">
         <label class="col-md-2 control-label">
             Modulnavn
         </label>
         <div class="col-md-10">
-            <a href="#" data-editable-select="chosenNameId" data-buttons="no" data-e-ng-options="name.Id as name.Name for name in moduleNames" data-onbeforesave="updateConfig($data, 'ItContractModuleName_Id')">
-                {{ moduleNames[chosenNameId - 1].Name; }}
+            <a href="#" data-editable-select="contract.chosenNameId" data-buttons="no" data-e-ng-options="name.Id as name.Name for name in contract.moduleNames" data-onbeforesave="updateConfig($data, 'ItContractModuleName_Id')">
+                {{ contract.moduleNames[contract.chosenNameId - 1].Name; }}
             </a>
         </div>
     </div>
@@ -19,33 +15,33 @@
             Vejledning
         </label>
         <div class="col-md-10">
-            <a href="#" data-editable-text="guideUrl" data-buttons="no" data-onbeforesave="updateConfig($data, 'ItContractGuide')">
-                {{ guideUrl || 'Ingen guide' }}
+            <a href="#" data-editable-text="contract.guideUrl" data-buttons="no" data-onbeforesave="updateConfig($data, 'ItContractGuide')">
+                {{ contract.guideUrl || 'Ingen guide' }}
             </a>
         </div>
     </div>
     
-    <div data-option-locale-list title="Referencer" data-locales-url="api/extReferenceTypeLocale" data-options-url="api/extReferenceType"></div>
+    <div data-option-locale-list="" title="Referencer" data-locales-url="api/extReferenceTypeLocale" data-options-url="api/extReferenceType" data-org-id="orgId"></div>
     
-    <div data-option-list title="Kontrakttyper" data-options-url="api/contractType"></div>
-    <div data-suggest-new data-url="api/contractType"></div>
+    <div data-option-list="" title="Kontrakttyper" data-options-url="api/contractType"></div>
+    <div data-suggest-new="" data-url="api/contractType"></div>
 
-    <div data-option-list title="Kontraktskabeloner" data-options-url="api/contractTemplate"></div>
-    <div data-suggest-new data-url="api/contractTemplate"></div>
+    <div data-option-list="" title="Kontraktskabeloner" data-options-url="api/contractTemplate"></div>
+    <div data-suggest-new="" data-url="api/contractTemplate"></div>
 
-    <div data-option-list title="Indkøbsformer" data-options-url="api/purchaseForm"></div>
-    <div data-suggest-new data-url="api/purchaseForm"></div>
+    <div data-option-list="" title="Indkøbsformer" data-options-url="api/purchaseForm"></div>
+    <div data-suggest-new="" data-url="api/purchaseForm"></div>
 
-    <div data-option-list title="Roller" data-options-url="api/itContractRole"></div>
-    <div data-suggest-new data-url="api/itContractRole"></div>
+    <div data-option-list="" title="Roller" data-options-url="api/itContractRole"></div>
+    <div data-suggest-new-role="" data-url="api/itContractRole"></div>
 
-    <div data-option-list title="Overtagelsesprøver" data-options-url="api/handoverTrial"></div>
-    <div data-suggest-new data-url="api/handoverTrial"></div>
+    <div data-option-list="" title="Overtagelsesprøver" data-options-url="api/handoverTrial"></div>
+    <div data-suggest-new="" data-url="api/handoverTrial"></div>
 
-    <div data-option-list title="Betalingsmodeller" data-options-url="api/paymentModel"></div>
-    <div data-suggest-new data-url="api/paymentModel"></div>
+    <div data-option-list="" title="Betalingsmodeller" data-options-url="api/paymentModel"></div>
+    <div data-suggest-new="" data-url="api/paymentModel"></div>
 
-    <div data-option-list title="Aftaleelementer" data-options-url="api/agreementElement"></div>
-    <div data-suggest-new data-url="api/agreementElement"></div>
+    <div data-option-list="" title="Aftaleelementer" data-options-url="api/agreementElement"></div>
+    <div data-suggest-new="" data-url="api/agreementElement"></div>
     
 </div>

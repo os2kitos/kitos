@@ -10,9 +10,9 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class DepartmentRoleController : GenericOptionApiController<DepartmentRole, DepartmentRight, RoleDTO>
+    public class OrganizationRoleController : GenericOptionApiController<OrganizationRole, OrganizationRight, RoleDTO>
     {
-        public DepartmentRoleController(IGenericRepository<DepartmentRole> repository) 
+        public OrganizationRoleController(IGenericRepository<OrganizationRole> repository) 
             : base(repository)
         {
         }

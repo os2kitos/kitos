@@ -1,7 +1,7 @@
 ﻿(function (ng, app) {
    
     var subnav = [
-            { state: "global-admin", text: "Opret kommune" },
+            { state: "global-admin", text: "Opret organisation" },
             { state: "new-global-admin", text: "Opret global admin" },
             { state: "new-local-admin", text: "Opret lokal admin" }
     ];
@@ -11,8 +11,8 @@
 
         $stateProvider.state('global-admin', {
             url: '/global-admin',
-            templateUrl: 'partials/global-admin/new-municipality.html',
-            controller: 'globalAdmin.NewMunicipalityCtrl',
+            templateUrl: 'partials/global-admin/new-organization.html',
+            controller: 'globalAdmin.NewOrganizationCtrl',
             authRoles: ['GlobalAdmin']
         }).state('new-local-admin', {
             url: '/global-admin/new-local-admin',
@@ -28,8 +28,8 @@
 
     }]);
     
-    app.controller('globalAdmin.NewMunicipalityCtrl', ['$rootScope', '$scope', '$http', 'growl', function ($rootScope, $scope, $http, growl) {
-        $rootScope.page.title = 'Ny kommune';
+    app.controller('globalAdmin.NewOrganizationCtrl', ['$rootScope', '$scope', '$http', 'growl', function ($rootScope, $scope, $http, growl) {
+        $rootScope.page.title = 'Ny organisation';
         $rootScope.page.subnav = subnav;
 
         $scope.submit = function() {
@@ -37,12 +37,12 @@
 
             var data = { "Name": $scope.name };
             
-            $http.post('api/municipality', data).success(function (result) {
-                growl.addSuccessMessage("Kommunen " + $scope.name + " er blevet oprettet!");
+            $http.post('api/organization', data).success(function (result) {
+                growl.addSuccessMessage("Organisationen " + $scope.name + " er blevet oprettet!");
 
                 $scope.name = "";
             }).error(function (result) {
-                growl.addErrorMessage("Kommunen " + $scope.name + " kunne ikke oprettes!");
+                growl.addErrorMessage("Organisationen " + $scope.name + " kunne ikke oprettes!");
             });
         };
     }]);
@@ -51,9 +51,9 @@
         $rootScope.page.title = 'Ny lokal admin';
         $rootScope.page.subnav = subnav;
 
-        $scope.municipalities = [];
-        $http.get("api/municipality").success(function(result) {
-            $scope.municipalities = result.Response;
+        $scope.organizations = [];
+        $http.get("api/organization").success(function(result) {
+            $scope.organizations = result.Response;
         });
 
         $scope.submit = function () {
@@ -62,7 +62,7 @@
             var data = {
                 "Name": $scope.name,
                 "Email": $scope.email,
-                "Municipality_Id": $scope.municipality
+                "Organization_Id": $scope.organization //TODO!!!
             };
 
             $http.post('api/localadmin', data).success(function (result) {
@@ -70,10 +70,10 @@
 
                 $scope.name = "";
                 $scope.email = "";
-                $scope.municipality = "";
+                $scope.organization = ""; 
                 
             }).error(function (result) {
-                growl.addSuccessMessage("Lokaladmin " + $scope.name + " kunne ikke oprettes!");
+                growl.addErrorMessage("Lokaladmin " + $scope.name + " kunne ikke oprettes!");
             });
         };
     }]);
@@ -97,7 +97,7 @@
                 $scope.email = "";
 
             }).error(function (result) {
-                growl.addSuccessMessage("Global admin " + $scope.name + " kunne ikke oprettes!");
+                growl.addErrorMessage("Global admin " + $scope.name + " kunne ikke oprettes!");
             });
         };
     }]);

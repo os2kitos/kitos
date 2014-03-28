@@ -70,9 +70,9 @@ namespace UI.MVC4.Controllers.API
         }
 
         // GET api/T
-        public HttpResponseMessage GetSingle([FromUri] int mId, [FromUri] int oId)
+        public HttpResponseMessage GetSingle([FromUri] int orgId, [FromUri] int oId)
         {
-            var item = Repository.GetByKey(mId, oId);
+            var item = Repository.GetByKey(orgId, oId);
 
             if (item == null)
                 return NoContent();
@@ -81,7 +81,6 @@ namespace UI.MVC4.Controllers.API
         }
 
         // POST api/T
-        [Authorize(Roles = "GlobalAdmin, LocalAdmin")]
         public HttpResponseMessage Post(LocaleInputDTO dto)
         {
             var item = Map<LocaleInputDTO, TModel>(dto);
@@ -93,7 +92,7 @@ namespace UI.MVC4.Controllers.API
 
                 //var msg = new HttpResponseMessage(HttpStatusCode.Created);
                 return Created(item,
-                               new Uri(Request.RequestUri + "?mId=" + item.Municipality_Id + "&oId=" + item.Original_Id));
+                               new Uri(Request.RequestUri + "?orgId=" + item.Municipality_Id + "&oId=" + item.Original_Id));
             }
             catch (Exception e)
             {
@@ -102,7 +101,6 @@ namespace UI.MVC4.Controllers.API
         }
 
         // PUT api/T
-        [Authorize(Roles = "GlobalAdmin, LocalAdmin")]
         public HttpResponseMessage Put(LocaleInputDTO dto)
         {
             var item = Map<LocaleInputDTO, TModel>(dto);
@@ -121,14 +119,13 @@ namespace UI.MVC4.Controllers.API
         }
 
         // PUT api/T
-        [Authorize(Roles = "GlobalAdmin, LocalAdmin")]
-        public HttpResponseMessage Delete([FromUri] int mId, [FromUri] int oId)
+        public HttpResponseMessage Delete([FromUri] int orgId, [FromUri] int oId)
         {
             try
             {
-                TestMunicipalityMembership(mId);
+                TestMunicipalityMembership(orgId);
 
-                Repository.DeleteByKey(mId, oId);
+                Repository.DeleteByKey(orgId, oId);
                 Repository.Save();
 
                 return Ok(); // TODO correct?
@@ -141,11 +138,7 @@ namespace UI.MVC4.Controllers.API
 
         private void TestMunicipalityMembership(int mId)
         {
-            var user = _userRepository.GetByEmail(User.Identity.Name);
-            if (user == null || user.Municipality_Id != mId)
-            {
-                throw new SecurityException();
-            }
+            //throw new NotImplementedException();
         }
     }
 }

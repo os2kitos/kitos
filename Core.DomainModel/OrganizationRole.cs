@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel
 {
-    public class DepartmentRole : IRoleEntity<DepartmentRight>
+    public class OrganizationRole : IRoleEntity<OrganizationRight>
     {
-        public DepartmentRole()
+        public OrganizationRole()
         {
             HasReadAccess = true;
-            References = new List<DepartmentRight>();
+            References = new List<OrganizationRight>();
         }
 
         public int Id { get; set; }
@@ -21,6 +21,6 @@ namespace Core.DomainModel
         public bool HasReadAccess { get; set; }
         public bool HasWriteAccess { get; set; }
         public string Note { get; set; }
-        public virtual ICollection<DepartmentRight> References { get; set; }
+        public virtual ICollection<OrganizationRight> References { get; set; }
     }
 }

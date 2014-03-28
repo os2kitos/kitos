@@ -1,0 +1,15 @@
+﻿<div class="org-node" data-ng-class="{'selected': node == chosenOrgUnit}">
+    <span class="org-node-info">
+        <a data-ng-click="chooseOrgUnit(node)">{{node.Name}}</a>
+        <span data-ng-show="node.Children">
+            <a data-ng-click="node.isOpen = !node.isOpen">
+            <i class="glyphicon" data-ng-class="{'glyphicon-chevron-down': node.isOpen, 'glyphicon-chevron-right': !node.isOpen}"></i>
+                </a>
+        </span>
+    </span>
+    <ul data-ng-show="node.isOpen">
+        <li data-ng-repeat="node in node.Children">
+            <div data-ng-include="'partials/org/org-unit.html'"></div>
+        </li>
+    </ul>
+</div>

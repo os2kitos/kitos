@@ -57,7 +57,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(d => d.Consultant_Id)
                 .WillCascadeOnDelete(false);*/
                 
-            this.HasRequired(t => t.Municipality)
+            this.HasRequired(t => t.Organization)
                 .WithMany(t => t.ItProjects)
                 .HasForeignKey(d => d.Municipality_Id)
                 .WillCascadeOnDelete(false);

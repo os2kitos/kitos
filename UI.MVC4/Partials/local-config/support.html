@@ -1,16 +1,11 @@
 ﻿<div class="col-md-12">
-
-    <h2>IT Kontrakter</h2>
-    <p>
-        Konfigurér IT understøttelse
-    </p>
     <div class="form-group row">
         <label class="col-md-2 control-label">
             Modulnavn
         </label>
         <div class="col-md-10">
-            <a href="#" data-editable-select="chosenNameId" data-buttons="no" data-e-ng-options="name.Id as name.Name for name in moduleNames" data-onbeforesave="updateConfig($data, 'ItSupportModuleName_Id')">
-                {{ moduleNames[chosenNameId - 1].Name; }}
+            <a href="#" data-editable-select="support.chosenNameId" data-buttons="no" data-e-ng-options="name.Id as name.Name for name in support.moduleNames" data-onbeforesave="updateConfig($data, 'ItSupportModuleName_Id')">
+                {{ support.moduleNames[support.chosenNameId - 1].Name; }}
             </a>
         </div>
     </div>
@@ -19,13 +14,13 @@
             Vejledning
         </label>
         <div class="col-md-10">
-            <a href="#" data-editable-text="guideUrl" data-buttons="no" data-onbeforesave="updateConfig($data, 'ItSupportGuide')">
-                {{ guideUrl || 'Ingen guide' }}
+            <a href="#" data-editable-text="support.guideUrl" data-buttons="no" data-onbeforesave="updateConfig($data, 'ItSupportGuide')">
+                {{ support.guideUrl || 'Ingen guide' }}
             </a>
         </div>
     </div>
     
-    <div data-option-locale-list title="Referencer" data-locales-url="api/extReferenceTypeLocale" data-options-url="api/extReferenceType"></div>
+    <div data-option-locale-list="" title="Referencer" data-locales-url="api/extReferenceTypeLocale" data-options-url="api/extReferenceType" data-org-id="orgId"></div>
 
     <div class="form-group row">
         <label class="col-md-2 control-label">
@@ -33,33 +28,33 @@
         </label>
         <div class="col-md-10">
             <div>
-                <a href="#" data-editable-checkbox="showTabOverview" data-e-title="Medtag fanen 'Overblik'?" data-onbeforesave="updateConfig($data, 'ShowTabOverview')" data-buttons="no">
-                    {{showTabOverview && "Medtager fanen 'Overblik'" || "Medtager IKKE fanen 'Overblik'" }}
+                <a href="#" data-editable-checkbox="support.showTabOverview" data-e-title="Medtag fanen 'Overblik'?" data-onbeforesave="updateConfig($data, 'ShowTabOverview')" data-buttons="no">
+                    {{support.showTabOverview && "Medtager fanen 'Overblik'" || "Medtager IKKE fanen 'Overblik'" }}
                 </a>
             </div>
 
             <div>
-                <a href="#" data-editable-checkbox="showTechnology" data-e-title="Medtag kolonnen 'Teknologi'?" data-onbeforesave="updateConfig($data, 'ShowColumnTechnology')" data-buttons="no">
-                    {{showTechnology && "Medtager kolonnen 'Teknologi'" || "Medtager IKKE kolonnen 'Teknologi'" }}
+                <a href="#" data-editable-checkbox="support.showTechnology" data-e-title="Medtag kolonnen 'Teknologi'?" data-onbeforesave="updateConfig($data, 'ShowColumnTechnology')" data-buttons="no">
+                    {{support.showTechnology && "Medtager kolonnen 'Teknologi'" || "Medtager IKKE kolonnen 'Teknologi'" }}
                 </a>
             </div>
 
             <div>
-                <a href="#" data-editable-checkbox="showUsage" data-e-title="Medtag kolonnen 'Anvendelse'?" data-onbeforesave="updateConfig($data, 'ShowColumnUsage')" data-buttons="no">
-                    {{showUsage && "Medtager kolonnen 'Anvendelse'" || "Medtager IKKE kolonnen 'Anvendelse'" }}
+                <a href="#" data-editable-checkbox="support.showUsage" data-e-title="Medtag kolonnen 'Anvendelse'?" data-onbeforesave="updateConfig($data, 'ShowColumnUsage')" data-buttons="no">
+                    {{support.showUsage && "Medtager kolonnen 'Anvendelse'" || "Medtager IKKE kolonnen 'Anvendelse'" }}
                 </a>
             </div>
 
             <div>
-                <a href="#" data-editable-checkbox="showMandatory" data-e-title="Medtag kolonnen 'SKAL'?" data-onbeforesave="updateConfig($data, 'ShowColumnMandatory')" data-buttons="no">
-                    {{showMandatory && "Medtager kolonnen 'SKAL'" || "Medtager IKKE kolonnen 'SKAL'" }}
+                <a href="#" data-editable-checkbox="support.showMandatory" data-e-title="Medtag kolonnen 'SKAL'?" data-onbeforesave="updateConfig($data, 'ShowColumnMandatory')" data-buttons="no">
+                    {{support.showMandatory && "Medtager kolonnen 'SKAL'" || "Medtager IKKE kolonnen 'SKAL'" }}
                 </a>
             </div>
 
         </div>
     </div>
 
-    <div data-option-list title="Roller" data-options-url="api/departmentRole"></div>
-    <div data-suggest-new data-url="api/departmentRole"></div>
+    <div data-option-list="" title="Roller" data-options-url="api/organizationRole"></div>
+    <div data-suggest-new-role="" data-url="api/organizationRole"></div>
     
 </div>

@@ -5,12 +5,21 @@ using System.Net;
 using System.Net.Http;
 using System.Security;
 using System.Web.Http;
+using Core.DomainModel;
+using Core.DomainServices;
+using Ninject;
 using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
     public abstract class BaseApiController : ApiController
     {
+        [Inject]
+        public IGenericRepository<User> UserRepository { get; set; }
+
+        [Inject]
+        public IAdminService AdminService { get; set; }
+
         protected HttpResponseMessage CreateResponse<T>(HttpStatusCode statusCode, T response, string msg = "")
         {
             var wrap = new ApiReturnDTO<T>
@@ -52,22 +61,25 @@ namespace UI.MVC4.Controllers.API
             return CreateResponse(HttpStatusCode.OK, response);
         }
 
-        protected HttpResponseMessage Error(SecurityException e)
+        // TODO: This doesn't seem to work
+        protected virtual HttpResponseMessage Error(SecurityException e)
         {
-            return Unauthorized();
+            return Unauthorized(e.Message);
         }
 
-        protected HttpResponseMessage Error<T>(T response)
+        protected virtual HttpResponseMessage Error<T>(T response)
         {
+            if (response is SecurityException) return Unauthorized();
+
             return CreateResponse(HttpStatusCode.InternalServerError, response);
         }
 
-        protected HttpResponseMessage Unauthorized()
+        protected virtual HttpResponseMessage Unauthorized()
         {
             return CreateResponse(HttpStatusCode.Unauthorized);
         }
 
-        protected HttpResponseMessage Unauthorized<T>(T response)
+        protected virtual HttpResponseMessage Unauthorized<T>(T response)
         {
             return CreateResponse(HttpStatusCode.Unauthorized, response);
         }
@@ -80,6 +92,36 @@ namespace UI.MVC4.Controllers.API
         protected HttpResponseMessage NotFound()
         {
             return CreateResponse(HttpStatusCode.NotFound);
+        }
+
+        protected bool IsGlobalAdmin()
+        {
+            try
+            {
+                return AdminService.IsGlobalAdmin(KitosUser);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        protected User KitosUser
+        {
+            get
+            {
+                try
+                {
+                    var user = UserRepository.Get(u => u.Email == User.Identity.Name).FirstOrDefault();
+                    if(user == null) throw new SecurityException();
+
+                    return user;
+                }
+                catch
+                {
+                    throw new SecurityException();
+                }
+            }
         }
     }
 }

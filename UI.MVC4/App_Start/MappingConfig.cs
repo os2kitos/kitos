@@ -116,7 +116,7 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<DepartmentRole, RoleDTO>()
+            Mapper.CreateMap<OrganizationRole, RoleDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
@@ -138,16 +138,23 @@ namespace UI.MVC4.App_Start
             base.Configure();
 
             Mapper.CreateMap<User, UserDTO>()
-                .ForMember(dto => dto.RoleName, opt => opt.MapFrom(src => src.Role != null ? src.Role.Name : ""))
                 .ReverseMap();
 
-            Mapper.CreateMap<Municipality, MunicipalityApiModel>().ReverseMap();
+            Mapper.CreateMap<Organization, OrganizationDTO>().ReverseMap();
+            Mapper.CreateMap<OrganizationUnit, OrgUnitDTO>().ReverseMap();
 
             Mapper.CreateMap<PasswordResetRequest, PasswordResetRequestDTO>()
                   .ForMember(dto => dto.UserEmail, opt => opt.MapFrom(src => src.User.Email));
 
             Mapper.CreateMap<TaskRef, TaskRefDTO>()
                   .ReverseMap();
+
+            Mapper.CreateMap<AdminRight, AdminRightDTO>()
+                  .ForMember(dto => dto.Organization_Id, opt => opt.MapFrom(src => src.Object_Id))
+                  .ForMember(dto => dto.RoleName, opt => opt.MapFrom(src => src.Role.Name));
+
+            Mapper.CreateMap<OrganizationRight, RightOutputDTO>();
+            Mapper.CreateMap<RightInputDTO, OrganizationRight>();
         }
     }
 }

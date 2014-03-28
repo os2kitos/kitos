@@ -18,7 +18,7 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.Department_Id).HasColumnName("Department_Id");
 
             // Relationships
-            this.HasRequired(t => t.Department)
+            this.HasRequired(t => t.OrganizationUnit)
                 .WithMany(t => t.Infrastructures)
                 .HasForeignKey(d => d.Department_Id);
             this.HasRequired(t => t.Host)

@@ -5,9 +5,9 @@ using System.Web;
 
 namespace UI.MVC4.Models
 {
-    public class MunicipalityApiModel
+    public class AdminRightDTO
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
+        public int Organization_Id { get; set; }
+        public string RoleName { get; set; }
     }
 }

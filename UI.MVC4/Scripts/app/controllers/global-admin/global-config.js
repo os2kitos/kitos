@@ -49,7 +49,7 @@
             });
             return result;
         };
-        
+
         $scope['patch' + nameSingular + 'Access'] = function (data, i) {
             var item = $scope[namePlural][i];
             var result = Restangular.one(nameSingular, item.Id).patch({ HasWriteAccess: data });
@@ -72,7 +72,7 @@
         $rootScope.page.title = 'Global konfiguration';
         $rootScope.page.subnav = subnav;
 
-        handler($scope, Restangular, 'DepartmentRole', 'DepartmentRoles');
+        handler($scope, Restangular, 'OrganizationRole', 'OrganizationRoles');
     }]);
 
     app.controller('globalConfig.ProjectCtrl', ['$rootScope', '$scope', 'Restangular', 'growl', function ($rootScope, $scope, Restangular, growl) {
@@ -108,7 +108,7 @@
             var item = $scope.refs[i];
             return Restangular.one('extReferenceType', item.Id).patch({ Name: data });
         };
-
+               
         handler($scope, Restangular, 'ItProjectRole', 'ItProjectRoles');
     }]);
 
@@ -126,7 +126,7 @@
             return Restangular.one('extReferenceType', item.Id).patch({ Name: data });
         };
 
-        handler($scope, Restangular, 'ItSystemRole', 'ItSystemRoles');
+        handler($scope, Restangular, 'ItSystemRole', 'ItSystemRoles');        
         handler($scope, Restangular, 'SystemType', 'SystemTypes');
         handler($scope, Restangular, 'InterfaceType', 'InterfaceTypes');
         handler($scope, Restangular, 'ProtocolType', 'ProtocolTypes');
@@ -138,17 +138,17 @@
     app.controller('globalConfig.ContractCtrl', ['$rootScope', '$scope', 'Restangular', 'growl', function ($rootScope, $scope, Restangular, growl) {
         $rootScope.page.title = 'Global konfiguration';
         $rootScope.page.subnav = subnav;
-        
+
         var baseRefs = Restangular.all('extReferenceType');
         baseRefs.getList({ nonsuggestions: true }).then(function (refs) {
             $scope.refs = refs;
-        });
+            });
 
         $scope.patchRef = function (data, i) {
             var item = $scope.refs[i];
             return Restangular.one('extReferenceType', item.Id).patch({ Name: data });
         };
-        
+
         handler($scope, Restangular, 'ContractType', 'ContractTypes');
         handler($scope, Restangular, 'ContractTemplate', 'ContractTemplates');
         handler($scope, Restangular, 'PurchaseForm', 'PurchaseForms');

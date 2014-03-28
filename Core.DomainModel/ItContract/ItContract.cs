@@ -25,7 +25,7 @@ namespace Core.DomainModel.ItContract
         public virtual PaymentModel PaymentModel { get; set; }
         public virtual PurchaseForm PurchaseForm { get; set; }
         public virtual Supplier Supplier { get; set; }
-        public virtual Municipality Municipality { get; set; }
+        public virtual Organization Organization { get; set; }
         public virtual ICollection<ShipNotice> ShipNotices { get; set; }
         public virtual ICollection<ItContractRight> Rights { get; set; }
     }

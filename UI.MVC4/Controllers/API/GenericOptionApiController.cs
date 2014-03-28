@@ -14,7 +14,8 @@ namespace UI.MVC4.Controllers.API
     public abstract class GenericOptionApiController<TModel, TReference, TDto> : GenericApiController<TModel, int, TDto>
         where TModel : class, IOptionEntity<TReference>
     {
-        protected GenericOptionApiController(IGenericRepository<TModel> repository) : base(repository)
+        protected GenericOptionApiController(IGenericRepository<TModel> repository) 
+            : base(repository)
         {
         }
 
@@ -26,10 +27,9 @@ namespace UI.MVC4.Controllers.API
         public HttpResponseMessage GetAllSuggestions(bool? suggestions)
         {
             var items = this.Repository.Get(t => t.IsSuggestion);
-
+            
             return Ok(Map<IEnumerable<TModel>, IEnumerable<TDto>>(items));
         }
-
 
         public HttpResponseMessage GetAllNonSuggestions(bool? nonsuggestions)
         {
@@ -40,7 +40,7 @@ namespace UI.MVC4.Controllers.API
         
         protected override TModel PostQuery(TModel item)
         {
-            if(!item.IsSuggestion && !User.IsInRole("GlobalAdmin"))
+            if(!item.IsSuggestion && !IsGlobalAdmin())
                 throw new SecurityException();
 
             return base.PostQuery(item);
@@ -48,22 +48,10 @@ namespace UI.MVC4.Controllers.API
 
         protected override TModel PutQuery(TModel item)
         {
-            if (!item.IsSuggestion && !User.IsInRole("GlobalAdmin"))
+            if (!item.IsSuggestion && !IsGlobalAdmin())
                 throw new SecurityException();
 
             return base.PutQuery(item);
-        }
-
-        [Authorize(Roles = "LocalAdmin, GlobalAdmin")]
-        public override HttpResponseMessage Post(TDto dto)
-        {
-            return base.Post(dto);
-        }
-
-        [Authorize(Roles = "LocalAdmin, GlobalAdmin")]
-        public override HttpResponseMessage Put(int id, TDto dto)
-        {
-            return base.Put(id, dto);
         }
     }
 }

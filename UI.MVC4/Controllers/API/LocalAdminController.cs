@@ -12,23 +12,31 @@ namespace UI.MVC4.Controllers.API
     public class LocalAdminController : BaseApiController
     {
         private readonly IUserService _userService;
+        private readonly IAdminService _adminService;
+        private readonly IGenericRepository<Organization> _organizationRepository;
 
-        public LocalAdminController(IUserService userService)
+        public LocalAdminController(IUserService userService, IAdminService adminService, IGenericRepository<Organization> organizationRepository)
         {
             _userService = userService;
+            _adminService = adminService;
+            _organizationRepository = organizationRepository;
         }
 
-        [Authorize(Roles = "GlobalAdmin")]
-        public HttpResponseMessage Post(UserDTO item)
+        public HttpResponseMessage Post(CreateLocalAdminDTO item)
         {
             try
             {
-                var user = AutoMapper.Mapper.Map<UserDTO, User>(item);
-
-                //TODO: Not hardcoding this
-                user.Role_Id = 2;
+                var user = new User()
+                    {
+                        Name = item.Name,
+                        Email = item.Email
+                    };
 
                 user = _userService.AddUser(user);
+
+                var organization = _organizationRepository.GetByKey(item.Organization_Id);
+
+                _adminService.MakeLocalAdmin(user, organization);
 
                 return Created(AutoMapper.Mapper.Map<User, UserDTO>(user), new Uri(Request.RequestUri + "/" + user.Id));
 

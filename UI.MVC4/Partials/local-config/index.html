@@ -1,0 +1,22 @@
+﻿<div class="col-md-12">
+    <h2>Konfiguration</h2>
+
+    <p>Her kan du konfigurere de organisationer, som du er lokal administrator for.</p>
+
+    <div class="col-md-12">
+
+        <div class="col-md-4">
+            Vælg en organisation:
+            <select data-ui-select2 data-ng-model="orgChooser.chosen" class="form-control" data-placeholder="Vælg organisation" data-ng-required="true" data-ng-click="choose()">
+                <option></option>
+                <option data-ng-repeat="org in orgChooser.options" value="{{org.Id}}">{{org.Name}}</option>
+            </select>
+
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div data-ui-view=""></div>
+    </div>
+
+</div>
