@@ -139,7 +139,7 @@
                 scope.$watch(attr.on, function(newVal, oldVal) {
                     if (!newVal) return;
 
-                    element.addClass("highlight", 400).removeClass("highlight", 1000);
+                    element.addClass("highlight", 10).removeClass("highlight", 1000);
 
                 });
 
