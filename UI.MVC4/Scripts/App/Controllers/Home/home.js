@@ -26,7 +26,7 @@
 
     }]);
 
-    app.controller('home.IndexCtrl', ['$rootScope', '$scope', 'Restangular', function ($rootScope, $scope, Restangular) {
+    app.controller('home.IndexCtrl', ['$rootScope', '$scope', '$http', '$state', '$stateParams', 'growl', 'Restangular', function ($rootScope, $scope, $http, $state, $stateParams, growl, Restangular) {
         $rootScope.page.title = 'Index';
         $rootScope.page.subnav = [];
 
@@ -47,8 +47,34 @@
                 data.put();
             };
         });
+
+        //login
+        $scope.submitLogin = function () {
+            if ($scope.loginForm.$invalid) return;
+
+            var data = {
+                'Email': $scope.email,
+                'Password': $scope.password,
+                'RememberMe': $scope.remember
+            };
+
+            $http.post('api/authorize', data).success(function (result) {
+                growl.addSuccessMessage("Du er nu logget ind!");
+
+                $rootScope.saveUser(result);
+
+                //redirect to another state or to the org-view state by default
+                var to = $stateParams.to ? $stateParams.to : 'org-view';
+
+                $state.go(to);
+            }).error(function (result) {
+                growl.addErrorMessage("Forkert brugernavn eller password!");
+            });
+
+        };
     }]);
     
+    /*
     app.controller('home.LoginCtrl', ['$rootScope', '$scope', '$http', '$state', '$stateParams', 'growl', function ($rootScope, $scope, $http, $state, $stateParams, growl) {
         $rootScope.page.title = 'Log ind';
         $rootScope.page.subnav = [];
@@ -76,7 +102,7 @@
             });
 
         };
-    }]);
+    }]);*/
 
     app.controller('home.ForgotPasswordCtrl', ['$rootScope', '$scope', '$http', 'growl', function ($rootScope, $scope, $http, growl) {
         $rootScope.page.title = 'Glemt password';
