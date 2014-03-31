@@ -30,7 +30,7 @@
                         <thead>
                             <tr>
                                 <th><a ng-click="rightSortChange('orgUnitName')">Organisationsenhed</a></th>
-                                <th><a ng-click="rightSortChange('roleName')">Brugerrolle</a></th>
+                                <th><a ng-click="rightSortChange('roleName')">Organisationsrolle</a></th>
                                 <th><a ng-click="rightSortChange('userName')">Navn</a></th>
                                 <th><a ng-click="rightSortChange('userEmail')">Email</a></th>
                                 <th></th>
@@ -84,7 +84,7 @@
                             <tr>
                                 <td><input type="text" disabled="" class="form-control input-sm" value="{{ chosenOrgUnit.Name }}"/></td>
                                 <td>
-                                    <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en brugerrolle" class="form-control input-sm">
+                                    <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en organisationsrolle" class="form-control input-sm">
                                         <option value=""></option>
                                         <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.Id}}">
                                             {{orgRole.Name}} ({{orgRole.HasWriteAccess && "skriv" || "læs" }})
