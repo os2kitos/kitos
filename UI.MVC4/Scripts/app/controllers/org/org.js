@@ -146,27 +146,28 @@
                 orgUnitParentId = $scope.chosenOrgUnit.Parent_Id;
 
             var listOfQs = [];
-            listOfQs.push($http.get('api/organizationUnit/' + orgUnitId + '?taskrefs').success(function(data) {
-                $scope.chosenTaskRefs = data.Response;
-            }));
+            listOfQs.push($http.get('api/organizationUnit/' + orgUnitId + '?taskrefs'));
             
             if (orgUnitParentId === 0) { // if root org unit list all taskrefs as available
-                listOfQs.push($http.get('api/taskref').success(function (data) {
-                    $scope.availableTaskRefs = data.Response;
-                }));
+                listOfQs.push($http.get('api/taskref'));
             } else { // else only show selected on parent orgunit
-                listOfQs.push($http.get('api/organizationUnit/' + orgUnitParentId + '?taskrefs').success(function (data) {
-                    $scope.availableTaskRefs = data.Response;
-                }));
+                listOfQs.push($http.get('api/organizationUnit/' + orgUnitParentId + '?taskrefs'));
             }
 
-            $q.all(listOfQs).then(function() {
-                _.each($scope.chosenTaskRefs, function(selectedTasks) {
-                    var task = _.find($scope.availableTaskRefs, function(availableTasks) {
+            $q.all(listOfQs).then(function (result) {
+                // NOTE the order of promises is important!
+                var chosenTaskRefs = result[0].Response,
+                    availableTaskRefs = result[1].Response;
+                
+                angular.forEach(chosenTaskRefs, function(selectedTasks) {
+                    var task = _.find(availableTaskRefs, function(availableTasks) {
                         return availableTasks.Id == selectedTasks.Id;
                     });
                     task.selected = true;
                 });
+                
+                $scope.chosenTaskRefs = chosenTaskRefs;
+                $scope.availableTaskRefs = availableTaskRefs;
             });
         }
 
