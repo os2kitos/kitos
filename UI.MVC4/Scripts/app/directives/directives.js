@@ -131,5 +131,20 @@
             }]
         };
     }]);
-    
+
+    app.directive('highlight', ['$timeout', function ($timeout) {
+        return {
+            link: function(scope, element, attr) {
+
+                scope.$watch(attr.on, function(newVal, oldVal) {
+                    if (!newVal) return;
+
+                    element.addClass("highlight", 400).removeClass("highlight", 1000);
+
+                });
+
+            }
+        };
+    }]);
+
 })(angular, app);
