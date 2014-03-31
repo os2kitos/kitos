@@ -21,11 +21,12 @@ namespace UI.MVC4.Controllers.API
             _userService = userService;
         }
 
-        [Authorize]
         public HttpResponseMessage Post(UserDTO item)
         {
             try
             {
+                if (!IsAuthenticated) return Unauthorized();
+
                 var user = AutoMapper.Mapper.Map<UserDTO, User>(item);
 
                 user = _userService.AddUser(user);

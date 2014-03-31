@@ -3,8 +3,7 @@
     var subnav = [
             { state: 'org-view', text: 'Organisation' }
     ];
-
-
+    
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
 
         $stateProvider.state('org-view', {
@@ -25,9 +24,11 @@
         $rootScope.page.subnav = subnav;
 
         var userId = $rootScope.user.id;
-        
+
         //cache
         var orgs = [];
+
+        //$scope.users = [];
 
         //flatten map of all loaded orgUnits
         $scope.orgUnits = [];
@@ -36,8 +37,6 @@
         _.each(orgRolesHttp.data.Response, function(orgRole) {
             $scope.orgRoles[orgRole.Id] = orgRole;
         });
-
-        console.log($scope.orgRoles);
         
         
         function flatten(orgUnit) {
@@ -57,6 +56,7 @@
         
         $scope.chooseOrgUnit = function (node) {
             
+            //get organization related to the org unit
             if (!node.Organization) {
 
                 //try get from cache
@@ -75,60 +75,177 @@
                     });
                 }
             }
-            
-            if (!node.OrgRights) {
-                $http.get('api/organizationRight?organizationUnitId=' + node.Id).success(function(data) {
-                    node.OrgRights = data.Response;
-                });
+
+            if (!node.writeAccessChecked) {
+                
+                //this url is pretty too long
+                $http.get('api/organizationRight?hasWriteAccess&orgUnitId=' + node.Id + '&userId=' + userId)
+                    .success(function (result) {
+
+                        function flag(myNode) {
+                            myNode.hasWriteAccessChecked = true;
+                            myNode.hasWriteAccess = result.Response;
+
+                            if (result.Response) _.each(myNode.Children, flag);
+                        }
+
+                        flag(node);
+                    }
+                );
             }
+            
+            //get org rights on the org unit and subtree
+            $http.get('api/organizationRight?organizationUnitId=' + node.Id).success(function(data) {
+                node.OrgRights = data.Response;
+
+                _.each(node.OrgRights, function (right) {
+                    right.userForSelect = { id: right.User.Id, text: right.User.Name };
+                    right.roleForSelect = right.Role_Id;
+                    right.show = true;
+                });
+
+            });
             
             $scope.chosenOrgUnit = node;
         };
 
-        $scope.userSelectOptions = {
-            initSelection: function (element, callback) {
-            },
-            ajax: {
-                data: function (term, page) {
-                    return { query: term };
-                },
-                quietMillis: 500,
-                transport: function (queryParams) {
-                    //console.log(queryParams);
-                    var res = $http.get('api/user?q=' + queryParams.data.query).then(queryParams.success);
-                    res.abort = function () {
-                        console.log('Aborting...');
-                        return null;
-                    };
 
-                    return res;
-                },
-                results: function (data, page) {
-                    console.log(data);
-                    var results = [];
+        $scope.submitRight = function () {
 
-                    _.each(data.data.Response, function (user) {
-                        results.push({
-                            id: user.Id,
-                            text: user.Name
-                        });
-                    });
+            if (!$scope.selectedUser || !$scope.newRole) return;
 
-                    return { results: results };
-                }
-            }
+            var oId = $scope.chosenOrgUnit.Id;
+            var rId = parseInt($scope.newRole);
+            var uId = $scope.selectedUser.id;
 
+            var data = {
+                'Object_Id': oId,
+                'Role_Id': rId,
+                'User_Id': uId
+            };
+
+            $http.post("api/organizationright", data).success(function (result) {
+                growl.addSuccessMessage(result.Response.User.Name + " er knyttet i rollen");
+
+                $scope.chosenOrgUnit.OrgRights.push({
+                    'Object_Id': result.Response.Object_Id,
+                    'Role_Id': result.Response.Role_Id,
+                    'User_Id': result.Response.User_Id,
+                    'User': result.Response.User,
+                    'userForSelect': { id: result.Response.User_Id, text: result.Response.User.Name },
+                    'roleForSelect': result.Response.Role_Id,
+                    show: true
+                });
+                
+                $scope.newRole = "";
+                $scope.selectedUser = "";
+                
+            }).error(function (result) {
+                
+                growl.addErrorMessage('Fejl!');
+            });
+        };
+
+        $scope.deleteRight = function(right) {
+
+            var oId = right.Object_Id;
+            var rId = right.Role_Id;
+            var uId = right.User_Id;
+
+            $http.delete("api/organizationright?oId=" + oId + "&rId=" + rId + "&uId=" + uId).success(function(deleteResult) {
+                right.show = false;
+                growl.addSuccessMessage('Rollen er slettet!');
+            }).error(function(deleteResult) {
+
+                growl.addErrorMessage('Kunne ikke slette rollen!');
+            });
 
         };
 
-        $scope.submitRight = function () {
-            var data = {
-                'Object_Id': $scope.chosenOrgUnit.Id,
-                'Role_Id': $scope.newRole,
-                'User_Id': $scope.selectedUser.id
-            };
+        $scope.updateRight = function (right) {
 
-            console.log(data);
+            if (!right.roleForSelect || !right.userForSelect) return;
+            
+            //old values
+            var oIdOld = right.Object_Id;
+            var rIdOld = right.Role_Id;
+            var uIdOld = right.User_Id;
+            
+            //new values
+            var oIdNew = right.Object_Id;
+            var rIdNew = right.roleForSelect;
+            var uIdNew = right.userForSelect.id;
+            
+            //if nothing was changed, just exit edit-mode
+            if (oIdOld == oIdNew && rIdOld == rIdNew && uIdOld == uIdNew) {
+                right.edit = false;
+            }
+
+            //otherwise, we should delete the old entry, then add a new one
+
+            $http.delete("api/organizationright?oId=" + oIdOld + "&rId=" + rIdOld + "&uId=" + uIdOld).success(function(deleteResult) {
+
+                var data = {
+                    'Object_Id': oIdNew,
+                    'Role_Id': rIdNew,
+                    'User_Id': uIdNew
+                };
+
+                $http.post("api/organizationright", data).success(function (result) {
+
+                    right.Role_Id = result.Response.Role_Id;
+                    right.User = result.Response.User;
+                    right.User_Id = result.Response.User_Id;
+
+                    right.edit = false;
+
+                    growl.addSuccessMessage(right.User.Name + " er knyttet i rollen");
+
+                }).error(function (result) {
+
+                    //we successfully deleted the old entry, but didn't add a new one
+                    //fuck
+
+                    right.show = false;
+                    
+                    growl.addErrorMessage('Fejl!');
+                });
+                
+            }).error(function (deleteResult) {
+                
+                //couldn't delete the old entry, just reset select options
+                right.userForSelect = { id: right.User.id, text: right.User.Name };
+                right.roleForSelect = right.Role_Id;
+
+                growl.addErrorMessage('Fejl!');
+            });
+        };
+
+        $scope.rightSortBy = "orgUnitName";
+        $scope.rightSortReverse = false;
+        $scope.rightSort = function(right) {
+            switch ($scope.rightSortBy) {
+                case "orgUnitName":
+                    return $scope.orgUnits[right.Object_Id].Name;
+                case "roleName":
+                    return $scope.orgRoles[right.Role_Id].Name;
+                case "userName":
+                    return right.User.Name;
+                case "userEmail":
+                    return right.User.Email;
+                default:
+                    return $scope.orgUnits[right.Object_Id].Name;
+            }
+        };
+
+        $scope.rightSortChange = function(val) {
+            if ($scope.rightSortBy == val) {
+                $scope.rightSortReverse = !$scope.rightSortReverse;
+            } else {
+                $scope.rightSortReverse = false;
+            }
+
+            $scope.rightSortBy = val;
         };
 
         $scope.updateTask = function (task) {

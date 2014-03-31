@@ -383,8 +383,16 @@ namespace Infrastructure.DataAccess.Migrations
                     HasWriteAccess = true
                 };
 
+            var employee = new OrganizationRole()
+                {
+                    IsActive = true,
+                    Name = "Medarbejder",
+                    Note = "...",
+                    HasWriteAccess = false
+                };
+
             context.OrganizationRoles.AddOrUpdate(role => role.Id,
-                                                boss, resourcePerson,
+                                                boss, resourcePerson, employee,
                                                 new OrganizationRole() { IsActive = false, Name = "Inaktiv Org rolle" },
                                                 new OrganizationRole()
                                                     {
@@ -420,16 +428,14 @@ namespace Infrastructure.DataAccess.Migrations
             simon.IsGlobalAdmin = true;
 
             var eskild = SimpleUser("Eskild", "esd@it-minds.dk", "arne123", cryptoService);
-
-            var brian = SimpleUser("Brian Andersen", "brian@it-minds.dk", "brian123", cryptoService);
-
+            
             var roskildeUser1 = SimpleUser("Pia", "pia@it-minds.dk", "arne123", cryptoService);
             var roskildeUser2 = SimpleUser("Morten", "morten@it-minds.dk", "arne123", cryptoService);
             var roskildeUser3 = SimpleUser("Anders", "anders@it-minds.dk", "arne123", cryptoService);
             var roskildeUser4 = SimpleUser("Peter", "peter@it-minds.dk", "arne123", cryptoService);
             var roskildeUser5 = SimpleUser("Jesper", "jesper@it-minds.dk", "arne123", cryptoService);
 
-            context.Users.AddOrUpdate(x => x.Email, simon, eskild, brian, roskildeUser1, roskildeUser2, roskildeUser3, roskildeUser4, roskildeUser5);
+            context.Users.AddOrUpdate(x => x.Email, simon, eskild, roskildeUser1, roskildeUser2, roskildeUser3, roskildeUser4, roskildeUser5);
 
             context.SaveChanges();
 
@@ -442,19 +448,7 @@ namespace Infrastructure.DataAccess.Migrations
                                                 {
                                                     Object = roskilde,
                                                     Role = localAdmin,
-                                                    User = brian
-                                                },
-                                            new AdminRight()
-                                                {
-                                                    Object = roskilde,
-                                                    Role = localAdmin,
-                                                    User = roskildeUser3
-                                                },
-                                            new AdminRight()
-                                                {
-                                                    Object = sorø,
-                                                    Role = localAdmin,
-                                                    User = brian
+                                                    User = roskildeUser1
                                                 });
 
             context.SaveChanges();

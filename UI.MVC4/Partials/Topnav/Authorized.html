@@ -1,5 +1,5 @@
 ﻿<ul class="nav navbar-nav">
-    <li class="double-line"><a href="#">IT understøttelse af organisation</a></li>
+    <li class="double-line"><a data-ui-sref="org-view">IT understøttelse af organisation</a></li>
     <li><a href="#">IT Projekter</a></li>
     <li><a href="#">IT Systemer</a></li>
     <li><a href="#">IT Kontrakter</a></li>
@@ -11,11 +11,11 @@
         <a href="#" class="btn btn-link" data-ng-click="logout()">Log ud</a>
     </div>
     
-    <div data-ng-switch data-on="user.role">
-        <div data-ng-switch-when="LocalAdmin">
-            <a data-ui-sref="local-config-support">Lokal admin</a>
+    <div>
+        <div data-ng-show="user.isLocalAdmin">
+            <a data-ui-sref="local-config">Lokal admin</a>
         </div>
-        <div data-ng-switch-when="GlobalAdmin">
+        <div data-ng-show="user.isGlobalAdmin">
             <a data-ui-sref="global-admin">Global admin</a>
             <a data-ui-sref="config-org">Global konfig</a>
         </div>

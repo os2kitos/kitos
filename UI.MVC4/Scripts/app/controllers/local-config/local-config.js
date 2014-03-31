@@ -256,6 +256,7 @@
         ['$rootScope', '$scope', '$http', '$state', 'organizationsHttp',
             function($rootScope, $scope, $http, $state, organizationsHttp) {
                 $rootScope.page.title = 'Konfiguration';
+                $rootScope.subnav = subnav;
 
                 $scope.orgChooser = {
                     options: _.filter(organizationsHttp.data.Response,
@@ -273,6 +274,8 @@
     app.controller('localConfig.EditCtrl',
         ['$rootScope', '$scope', '$http', '$stateParams', 'growl', 'organizationHttp', 'supportNamesHttp', 'projectNamesHttp', 'systemNamesHttp', 'contractNamesHttp', 'configHttp',
             function ($rootScope, $scope, $http, $stateParams, growl, organizationHttp, supportNamesHttp, projectNamesHttp, systemNamesHttp, contractNamesHttp, configHttp) {
+                $rootScope.page.title = 'Konfiguration';
+                $rootScope.subnav = subnav;
                 
                 $scope.orgId = $stateParams.chosenId;
                 $scope.orgChooser.chosen = $stateParams.chosenId;

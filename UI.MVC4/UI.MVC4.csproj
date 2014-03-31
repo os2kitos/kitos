@@ -312,6 +312,9 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Images\logo.png" />
+    <Content Include="Partials\directives\add-user-button.html" />
+    <Content Include="Partials\directives\add-user-modal.html" />
+    <Content Include="Partials\directives\select-user.html" />
     <Content Include="Partials\global-config\system.html" />
     <Content Include="Partials\global-admin\new-global-admin.html" />
     <Content Include="Partials\global-admin\new-local-admin.html" />

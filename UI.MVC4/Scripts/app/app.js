@@ -25,10 +25,10 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
         subnav: []
     };
 
-    $rootScope.user = {};
-
     //x-editable config
     editableOptions.theme = 'bs3'; // bootstrap3 theme.
+
+    $rootScope.user = {};
 
     //logout function for top navigation bar
     $rootScope.logout = function () {
@@ -53,7 +53,6 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
             isLocalAdminFor: _.pluck(result.Response.AdminRights, 'Organization_Id')
         };
 
-        console.log($rootScope.user);
     };
 
     var hasInitUser = false;
