@@ -59,21 +59,22 @@
         $scope.submit = function () {
             if ($scope.addForm.$invalid) return;
 
+            var selectedUser = $scope.selectedUser;
+            var orgId = $scope.organization;
+
             var data = {
-                "Name": $scope.name,
-                "Email": $scope.email,
-                "Organization_Id": $scope.organization //TODO!!!
+                "User_Id": selectedUser.id,
+                "Organization_Id": orgId //TODO!!!
             };
 
             $http.post('api/localadmin', data).success(function (result) {
-                growl.addSuccessMessage("Lokaladmin " + $scope.name + " er blevet oprettet!");
+                growl.addSuccessMessage(selectedUser.text + " er blevet lokal admin!");
 
-                $scope.name = "";
-                $scope.email = "";
+                $scope.selectedUser = null;
                 $scope.organization = ""; 
                 
             }).error(function (result) {
-                growl.addErrorMessage("Lokaladmin " + $scope.name + " kunne ikke oprettes!");
+                growl.addErrorMessage("Fejl! " + selectedUser.text + " blev ikke lokal admin!");
             });
         };
     }]);

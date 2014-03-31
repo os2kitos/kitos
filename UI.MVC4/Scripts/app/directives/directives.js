@@ -90,6 +90,7 @@
     app.directive('selectUser', ['$rootScope', '$http', function ($rootScope, $http) {
         return {
             scope: {
+                inputName: '@?name',
                 userModel: '='
             },
             replace: true,
