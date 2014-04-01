@@ -18,14 +18,15 @@ namespace UI.MVC4.Controllers.API
             _userService = userService;
         }
 
-        public HttpResponseMessage Post(UserDTO item)
+        public HttpResponseMessage Post(CreateGlobalAdminDTO item)
         {
             try
             {
-                var user = AutoMapper.Mapper.Map<UserDTO, User>(item);
+                var user = UserRepository.GetByKey(item.User_Id);
+
                 user.IsGlobalAdmin = true;
 
-                user = _userService.AddUser(user);
+                UserRepository.Save();
 
                 return Created(AutoMapper.Mapper.Map<User, UserDTO>(user), new Uri(Request.RequestUri + "/" + user.Id));
             }
