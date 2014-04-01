@@ -2,9 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{2AC4CFA8-D99E-4DF2-9E2D-202E3A7BD29E}"
-	ProjectSection(SolutionItems) = preProject
-		web.config = web.config
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{500B4C1D-B871-49A0-94E7-BD0623101EF6}"
 EndProject
