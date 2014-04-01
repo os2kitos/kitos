@@ -690,12 +690,15 @@ namespace Infrastructure.DataAccess.Migrations
                         ActiveTo = c.DateTime(precision: 0),
                         ItProject_Id = c.Int(),
                         ItSystem_Id = c.Int(),
+                        Parent_Id = c.Int(),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.ItProject", t => t.ItProject_Id)
                 .ForeignKey("dbo.ItSystem", t => t.ItSystem_Id)
+                .ForeignKey("dbo.TaskRef", t => t.Parent_Id)
                 .Index(t => t.ItProject_Id)
-                .Index(t => t.ItSystem_Id);
+                .Index(t => t.ItSystem_Id)
+                .Index(t => t.Parent_Id);
             
             CreateTable(
                 "dbo.OrganizationUnit",
@@ -1052,6 +1055,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.ItSystem", "ProtocolType_Id", "dbo.ProtocolType");
             DropForeignKey("dbo.ItSystem", "ParentItSystem_Id", "dbo.ItSystem");
             DropForeignKey("dbo.ItSystem", "Municipality_Id", "dbo.Organization");
+            DropForeignKey("dbo.TaskRef", "Parent_Id", "dbo.TaskRef");
             DropForeignKey("dbo.OrganizationUnitTaskRefs", "TaskRef_Id", "dbo.TaskRef");
             DropForeignKey("dbo.OrganizationUnitTaskRefs", "OrganizationUnit_Id", "dbo.OrganizationUnit");
             DropForeignKey("dbo.OrganizationRight", "User_Id", "dbo.User");
@@ -1126,6 +1130,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.OrganizationRight", new[] { "Object_Id" });
             DropIndex("dbo.OrganizationUnit", new[] { "Organization_Id" });
             DropIndex("dbo.OrganizationUnit", new[] { "Parent_Id" });
+            DropIndex("dbo.TaskRef", new[] { "Parent_Id" });
             DropIndex("dbo.TaskRef", new[] { "ItSystem_Id" });
             DropIndex("dbo.TaskRef", new[] { "ItProject_Id" });
             DropIndex("dbo.Interface", new[] { "Method_Id" });

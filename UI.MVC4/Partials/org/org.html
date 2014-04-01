@@ -1,7 +1,7 @@
 ﻿<div class="col-md-12">
 
     <div class="col-md-4 container-fluid">
-    <h2>Organisation</h2>
+        <h2>Organisation</h2>
         <p>Du er tilknyttet disse organisationer:</p>
         <div data-ng-repeat="node in nodes">
             <div data-ng-include="'partials/org/org-unit.html'"></div>
@@ -85,11 +85,11 @@
                                 <td><input type="text" disabled="" class="form-control input-sm" value="{{ chosenOrgUnit.Name }}"/></td>
                                 <td>
                                     <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en brugerrolle" class="form-control input-sm">
-                                    <option value=""></option>
+                                        <option value=""></option>
                                         <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.Id}}">
                                             {{orgRole.Name}} ({{orgRole.HasWriteAccess && "skriv" || "læs" }})
                                         </option>
-                                </select>
+                                    </select>
                                 </td>
                                 <td colspan="2" class="form-group">
                                     <input data-select-user="foo" data-user-model="selectedUser" />
@@ -99,57 +99,53 @@
                                 </td>
                             </tr>
                         </tbody>
-
                     </table>
                 </div>
-            </div>
+                
+                <div class="panel panel-primary" data-ng-switch="isTasksEditable">
+                    <button type="button" data-ng-click="isTasksEditable = !isTasksEditable">Rediger</button>
+                    <div class="panel-heading">Tilknyttede opgaver</div>
+                    <table class="full-width table" data-ng-switch-when="false">
+                        <thead>
+                            <tr>
+                                <th>Organisationsenhed</th>
+                                <th>ID</th>
+                                <th>Navn</th>
+                                <th>Overblik</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="task in chosenTaskRefs">
+                                <td>{{ mapIdToOrgUnit(task.HandledByOrgUnit) }}</td>
+                                <td>{{ task.TaskKey }}</td>
+                                <td>{{ task.Description }}</td>
+                                <td><input type="checkbox"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-                <div class="col-md-12">
-                    <div class="panel panel-primary">
-                        <table class="full-width table">
-                            <thead>
-                                <tr>
-                                    <th>Organisationsenhed</th>
-                                    <th>ID</th>
-                                    <th>Navn</th>
-                                    <th>Overblik</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr data-ng-repeat="task in chosenTaskRefs">
-                                    <td></td>
-                                    <td>{{ task.TaskKey }}</td>
-                                    <td>{{ task.Description }}</td>
-                                    <td><input type="checkbox"/></td>
-                                </tr>
-                            </tbody>
-                        </table>
-        </div>
-    </div>
-
-                <div class="col-md-12">
-                    <div class="panel panel-primary">
-                        <table class="full-width table">
-                            <thead>
-                                <tr>
-                                    <th>Tilknyttet</th>
-                                    <th>ID</th>
-                                    <th>Navn</th>
-                                    <th>Overblik</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr data-ng-repeat="task in availableTaskRefs">
-                                    <td><input type="checkbox" data-ng-checked="task.selected" data-ng-click="updateTask(task)"/></td>
-                                    <td>{{ task.TaskKey }}</td>
-                                    <td>{{ task.Description }}</td>
-                                    <td><input type="checkbox"/></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <table class="full-width table" data-ng-switch-when="true">
+                        <thead>
+                            <tr>
+                                <th>Tilknyttet</th>
+                                <th>ID</th>
+                                <th>Navn</th>
+                                <th>Overblik</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="task in availableTaskRefs">
+                                <td><input type="checkbox" data-ng-checked="task.selected" data-ng-click="updateTask(task)"/></td>
+                                <td>{{ task.TaskKey }}</td>
+                                <td>{{ task.Description }}</td>
+                                <td><input type="checkbox"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
+            </div>              
         </div>
     </div>
 </div>
+
+

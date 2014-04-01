@@ -86,7 +86,7 @@ namespace UI.MVC4.Controllers.API
 
         protected HttpResponseMessage NoContent()
         {
-            return CreateResponse(HttpStatusCode.NoContent, new List<Object>());
+            return CreateResponse(HttpStatusCode.NoContent);
         }
 
         protected HttpResponseMessage NotFound()

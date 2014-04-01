@@ -64,7 +64,7 @@ namespace UI.MVC4.Controllers.API
         public HttpResponseMessage GetTaskRefs(int id, [FromUri] bool? taskRefs)
         {
             var refs = Repository.Get(x => x.Id == id).SelectMany(x => x.TaskRefs);
-            return Ok(Map<IEnumerable<TaskRef>, IEnumerable<TaskRefDTO>>(refs));
+            return Ok(Map<IEnumerable<TaskRef>, IEnumerable<TaskOrgUnitRefDTO>>(refs));
         }
 
         public HttpResponseMessage PostTaskRef(int id, [FromUri] int taskRef)
@@ -74,7 +74,7 @@ namespace UI.MVC4.Controllers.API
             orgUnit.TaskRefs.Add(taskRefEntity);
             Repository.Update(orgUnit);
             Repository.Save();
-            return NoContent(); // TODO figure out what to return when refs are posted
+            return Ok(); // TODO figure out what to return when refs are posted
         }
 
         public HttpResponseMessage DeleteTaskRef(int id, [FromUri] int taskRef)

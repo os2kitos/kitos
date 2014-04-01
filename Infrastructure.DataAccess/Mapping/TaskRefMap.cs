@@ -18,6 +18,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.ItSystem_Id).HasColumnName("ItSystem_Id");
 
             // Relationships
+            this.HasOptional(t => t.Parent)
+                .WithMany(t => t.Children)
+                .HasForeignKey(d => d.Parent_Id)
+                .WillCascadeOnDelete(false);
             this.HasOptional(t => t.ItProject)
                 .WithMany(t => t.TaskRefs)
                 .HasForeignKey(d => d.ItProject_Id);

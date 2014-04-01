@@ -252,9 +252,9 @@
             task.selected = !task.selected;
             var orgUnitId = $scope.chosenOrgUnit.Id;
             if (task.selected === true) {
-                $http.post('api/organizationUnit/' + orgUnitId + '?taskref=' + task.Id).finally(updateLists());
+                $http.post('api/organizationUnit/' + orgUnitId + '?taskref=' + task.Id).success(updateLists);
             } else {
-                $http.delete('api/organizationUnit/' + orgUnitId + '?taskref=' + task.Id).finally(updateLists());
+                $http.delete('api/organizationUnit/' + orgUnitId + '?taskref=' + task.Id).success(updateLists);
             }
         };
 
@@ -273,8 +273,8 @@
 
             $q.all(listOfQs).then(function (result) {
                 // NOTE the order of promises is important!
-                var chosenTaskRefs = result[0].Response,
-                    availableTaskRefs = result[1].Response;
+                var chosenTaskRefs = result[0].data.Response,
+                    availableTaskRefs = result[1].data.Response;
                 
                 angular.forEach(chosenTaskRefs, function(selectedTasks) {
                     var task = _.find(availableTaskRefs, function(availableTasks) {
@@ -282,11 +282,24 @@
                     });
                     task.selected = true;
                 });
-                
+
                 $scope.chosenTaskRefs = chosenTaskRefs;
                 $scope.availableTaskRefs = availableTaskRefs;
             });
         }
+
+        $scope.isTasksEditable = false;
+        $scope.mapIdToOrgUnit = function (idList) {
+            return _.map(idList, function(id) {
+                var foundOrgUnit = _.find($scope.orgUnits, function (orgUnit) {
+                    if (angular.isUndefined(orgUnit))
+                        return false;
+                    
+                    return orgUnit.Id == id;
+                });
+                return foundOrgUnit.Name;
+            });
+        };
 
         $scope.$watch('chosenOrgUnit', function (newOrgUnit, oldOrgUnit) {
             if (newOrgUnit !== null)
