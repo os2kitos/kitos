@@ -11,6 +11,7 @@ namespace UI.MVC4
             // jQuery and plugins
             bundles.Add(new ScriptBundle("~/Scripts/jquery").Include(
                 "~/Scripts/jquery-{version}.js",
+                "~/Scripts/jquery-ui-{version}.js",
                 "~/Scripts/holder.js",
                 "~/Scripts/select2.js"));
 

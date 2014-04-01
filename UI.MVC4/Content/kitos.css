@@ -1,29 +1,34 @@
-﻿body {
+﻿body
+{
     font-size: 15px;
     background-color: #f0f0f0;
 }
 
-div#page-wrapper {
+div#page-wrapper
+{
     min-width: 1024px;
     max-width: 1280px;
     margin: 0px auto;
     padding: 0px;
 }
 
-div#page-content {
+div#page-content
+{
     min-width: 1024px;
     max-width: 1280px;
     margin: 120px auto;
     padding: 0px 5px 0px 10px;
 }
 
-div#page-body {
+div#page-body
+{
     background-color: white;
     padding: 30px;
 }
 
 /************ NAVIGATION BAR TOP **************/
-#navbar-top {
+#navbar-top
+{
     height: 100px;
     font-size: 15px;
     background-color: rgb(55, 96, 146);
@@ -32,7 +37,8 @@ div#page-body {
 
     #navbar-top .navbar-brand,
     #navbar-top .navbar-nav li a,
-    #navbar-top .navbar-text {
+    #navbar-top .navbar-text
+    {
         line-height: 70px;
         height: 70px;
         padding: 0px 10px;
@@ -40,182 +46,226 @@ div#page-body {
         text-align: center;
     }
 
-    #navbar-top li a {
+    #navbar-top li a
+    {
         width: 180px;
     }
 
-    #navbar-top li.double-line a {
+    #navbar-top li.double-line a
+    {
         padding-top: 18px;
         line-height: 17px;
     }
 
-    #navbar-top .navbar-text-small {
+    #navbar-top .navbar-text-small
+    {
         font-size: 0.8em;
     }
 
-    #navbar-top .navbar-text-large {
+    #navbar-top .navbar-text-large
+    {
         font-size: 3em;
     }
 
-    #navbar-top .navbar-complex {
+    #navbar-top .navbar-complex
+    {
         font-size: 0.7em;
         line-height: 25px;
         padding-top: -10px;
     }
 
-    #navbar-top a {
+    #navbar-top a
+    {
         color: white;
     }
 
     #navbar-top li.active a,
-    #navbar-top li a:hover {
+    #navbar-top li a:hover
+    {
         background-color: rgb(219, 229, 241);
         color: rgb(55, 96, 146);
     }
 
-    #navbar-top select {
+    #navbar-top select
+    {
         color: black;
     }
 /*********************************************/
 
-#subnav {
+#subnav
+{
     margin-top: 20px;
 }
 
-    #subnav ul {
+    #subnav ul
+    {
         list-style-type: none;
         margin: 0px;
     }
 
-    #subnav nav ul li {
+    #subnav nav ul li
+    {
         display: inline-block;
         margin-left: 10px;
     }
 
-        #subnav nav ul li a.btn-tab {
+        #subnav nav ul li a.btn-tab
+        {
             color: black;
             background-color: #e6e6e6;
         }
 
-        #subnav nav ul li a.btn-tab-active {
+        #subnav nav ul li a.btn-tab-active
+        {
             background-color: white;
         }
 
 
-div.org-node {
+div.org-node
+{
     padding: 5px;
 }
 
-div.org-node span.org-node-info {
-    padding: 2px 10px 2px 10px;
-    border: 1px solid rgb(143, 143, 143);
-    border-radius: 6px;
-    background-color: white;
-}
-
-div.org-node a {
-    color: black;
-}
-
-div.org-node.selected span.org-node-info {
-    background-color: rgb(220, 242, 255);
-}
-div.org-node.selected > span.org-node-info {
-    background-color: rgb(206, 210, 254);
-}
-
-
-div.org-node li {
-    list-style-type: none;
-    margin: 0;
-    padding: 10px 5px 0 5px;
-    position: relative;
+    div.org-node span.org-node-info
+    {
+        padding: 2px 10px 2px 10px;
+        border: 1px solid rgb(143, 143, 143);
+        border-radius: 6px;
+        background-color: white;
     }
 
-    div.org-node li::before, .org-node li::after {
-        content: '';
-        left: -20px;
-        position: absolute;
-        right: auto;
+    div.org-node a
+    {
+        color: black;
     }
 
-    div.org-node li::before {
-        border-left: 2px solid #dddddd;
-        bottom: 50px;
-        height: 100%;
-        top: 5px;
-        width: 1px;
+    div.org-node.selected span.org-node-info
+    {
+        background-color: rgb(220, 242, 255);
     }
 
-    div.org-node.selected li::before {
+    div.org-node.selected > span.org-node-info
+    {
+        background-color: rgb(206, 210, 254);
+    }
+
+
+    div.org-node li
+    {
+        list-style-type: none;
+        margin: 0;
+        padding: 10px 5px 0 5px;
+        position: relative;
+    }
+
+        div.org-node li::before, .org-node li::after
+        {
+            content: '';
+            left: -20px;
+            position: absolute;
+            right: auto;
+        }
+
+        div.org-node li::before
+        {
+            border-left: 2px solid #dddddd;
+            bottom: 50px;
+            height: 100%;
+            top: 5px;
+            width: 1px;
+        }
+
+    div.org-node.selected li::before
+    {
         border-color: #aaaaaa;
     }
 
-    div.org-node li:last-child::before {
+    div.org-node li:last-child::before
+    {
         height: 15px;
     }
 
-    div.org-node li::after {
+    div.org-node li::after
+    {
         border-top: 2px solid #dddddd;
         height: 15px;
         top: 20px;
         width: 25px;
     }
 
-    div.org-node.selected li::after {
+    div.org-node.selected li::after
+    {
         border-color: #aaaaaa;
     }
 /* TODO: Style these? */
-.alert-danger {
+.alert-danger
+{
 }
 
-.alert-success {
+.alert-success
+{
 }
 
-.alert-info {
+.alert-info
+{
 }
 
-div.suggest-box {
+div.suggest-box
+{
     padding: 15px;
 }
 
-input:disabled {
+input:disabled
+{
     cursor: inherit !important;
 }
 
-.full-width {
+.full-width
+{
     width: 100%;
 }
 
-.white {
+.white
+{
     color: white !important;
 }
 
-.light-blue {
+.light-blue
+{
     color: rgb(208, 217, 229) !important;
 }
 
-.broken-white {
+.broken-white
+{
     color: #f0f0f0 !important;
 }
 
 /* invalid input fields */
-input.ng-invalid:not(.ng-pristine) {
+input.ng-invalid:not(.ng-pristine)
+{
     background-color: rgba(240, 73, 73, 0.2) !important;
 }
 
-div.tab-content {
+div.tab-content
+{
     padding-top: 20px;
 }
 
-.nav-tabs a {
+.nav-tabs a
+{
     cursor: pointer;
 }
 
-a {
+a
+{
     cursor: pointer;
 }
 
-div.popover {
+div.popover
+{
     color: black !important;
+}
+
+.highlight {
+    background-color: rgb(255, 255, 177);
 }
