@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 
@@ -42,8 +43,15 @@ namespace Core.DomainServices
 
         public OrganizationUnit GetRoot(OrganizationUnit unit)
         {
-            //TODO: this will fuck up if there's a loop!
-            while (unit.Parent != null) unit = unit.Parent;
+            var whereWeStarted = unit;
+
+            while (unit.Parent != null)
+            {
+                unit = unit.Parent;
+
+                //did we get a loop?
+                if(unit.Id == whereWeStarted.Id) throw new Exception("Loop in Organization Units");
+            }
 
             return unit;
         }
@@ -75,6 +83,28 @@ namespace Core.DomainServices
 
             return reached;
         }
+
+        public bool IsAncestorOf(OrganizationUnit unit, OrganizationUnit ancestor)
+        {
+            do
+            {
+                if (unit.Id == ancestor.Id) return true;
+
+                unit = unit.Parent;
+
+            } while (unit != null);
+
+            return false;
+        }
+
+        public bool IsAncestorOf(int unitId, int ancestorId)
+        {
+            var unit = _orgUnitRepository.GetByKey(unitId);
+            var ancestor = _orgUnitRepository.GetByKey(ancestorId);
+
+            return IsAncestorOf(unit, ancestor);
+        }
+
         public bool HasWriteAccess(User user, int orgUnitId)
         {
             var orgUnit = _orgUnitRepository.GetByKey(orgUnitId);
