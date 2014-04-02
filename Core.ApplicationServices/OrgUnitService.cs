@@ -86,6 +86,8 @@ namespace Core.DomainServices
 
         public bool IsAncestorOf(OrganizationUnit unit, OrganizationUnit ancestor)
         {
+            if (unit == null || ancestor == null) return false;
+
             do
             {
                 if (unit.Id == ancestor.Id) return true;

@@ -39,7 +39,14 @@
         });
 
 
-        function flattenAndLoad(orgUnit, inheritWriteAccess) {
+        function flattenAndSave(orgUnit, inheritWriteAccess) {
+            if ($scope.orgUnits[orgUnit.Id]) {
+
+                var old = $scope.orgUnits[orgUnit.Id];
+                orgUnit.isOpen = old.isOpen;
+
+            }
+            
             $scope.orgUnits[orgUnit.Id] = orgUnit;
 
             if (!inheritWriteAccess) {
@@ -47,7 +54,7 @@
                     orgUnit.hasWriteAccess = result.Response;
                     
                     _.each(orgUnit.Children, function(u) {
-                        return flattenAndLoad(u, result.Response);
+                        return flattenAndSave(u, result.Response);
                     });
 
                 });
@@ -57,19 +64,22 @@
                 orgUnit.hasWriteAccess = true;
 
                 _.each(orgUnit.Children, function (u) {
-                    return flattenAndLoad(u, true);
+                    return flattenAndSave(u, true);
                 });
 
             }
         }
 
-        $http.get('api/organizationunit?userId=' + userId).success(function(result) {
-            $scope.nodes = result.Response;
+        function load() {
+            $http.get('api/organizationunit?userId=' + userId).success(function(result) {
+                $scope.nodes = result.Response;
 
-            _.each(result.Response, flattenAndLoad);
-        });
+                _.each(result.Response, flattenAndSave);
+            });
+        }
 
-        
+        load();
+
         $scope.chosenOrgUnit = null;
         
         $scope.chooseOrgUnit = function (node) {
@@ -247,37 +257,64 @@
 
             $scope.rightSortBy = val;
         };
-
-        $scope.addUnit = function(parent) {
-            $scope.editUnit({ 'Parent_Id': parent.Id }, true);
-        };
         
-        $scope.editUnit = function (unit, createNew) {
-            var oldParentId = unit.Parent_Id;
-
+        $scope.editUnit = function (unit) {
+            
             var modal = $modal.open({
                 templateUrl: 'partials/org/edit-org-unit-modal.html',
                 controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
 
-                    $modalScope.orgUnits = $scope.orgUnits;
+                    $modalScope.orgUnits = _.where($scope.orgUnits, { hasWriteAccess: true });
 
-                    console.log($modalScope.orgUnits);
-                    
-                    $modalScope.orgUnit = unit;
+                    $modalScope.isNew = false;
 
-                    $modalScope.save = function () {
+                    $modalScope.orgUnit = {
+                        'id': unit.Id,
+                        'oldName': unit.Name,
+                        'newName': unit.Name,
+                        'newParent': unit.Parent_Id,
+                        'orgId': unit.Organization_Id,
+                        'isRoot': unit.Parent_Id == 0
+                    };
 
-                        if ($modalScope.orgUnit.form.$invalid) return;
+                    console.log($modalScope.orgUnit);
 
-                        var name = $modalScope.orgUnit.Name;
-                        var parent = $modalScope.orgUnit.Parent_Id;
+                    $modalScope.patch = function () {
                         
-                        //try to get the organization id from 
-                        var orgId = $modalScope.orgUnit.Organization_Id;
-                        if (!orgId) {
-                            //take parent's organization id
-                            orgId = $modalScope.orgUnits[parent].Organization_Id;
-                        }
+                        var name = $modalScope.orgUnit.newName;
+                        var parent = $modalScope.orgUnit.newParent;
+                        var orgId = $modalScope.orgUnit.orgId;
+                        
+                        if (!name) return;
+
+                        var data = {
+                            'Name': name
+                        };
+
+                        if (parent) data['Parent_Id'] = parent;
+
+                        $modalScope.submitting = true;
+                        
+                        var id = $modalScope.orgUnit.id;
+
+                        $http({ method: 'PATCH', url: "api/organizationUnit/" + id, data: data }).success(function(result) {
+                            growl.addSuccessMessage(name + " er ændret.");
+
+                            $modalInstance.close(result.Response);
+                        }).error(function(result) {
+                            $modalScope.submitting = false;
+                            growl.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
+                        });
+
+                    };
+
+                    $modalScope.post = function() {
+                        
+                        var name = $modalScope.newOrgUnit.name;
+                        if (!name) return;
+
+                        var parent = $modalScope.newOrgUnit.parent;
+                        var orgId = $modalScope.newOrgUnit.orgId;
 
                         var data = {
                             'Name': name,
@@ -286,28 +323,28 @@
                         };
 
                         $modalScope.submitting = true;
-                        
-                        if (createNew) {
-                            $http.post("api/organizationUnit", data).success(function(result) {
-                                growl.addSuccessMessage(name + " er oprettet i KITOS");
 
-                                $modalInstance.close(result.Response);
-                            }).error(function(result) {
-                                $modalScope.submitting = false;
-                                growl.addErrorMessage("Fejl! " + name + " blev ikke oprettet i KITOS!");
-                            });
-                        } else {
-                            var id = $modalScope.orgUnit.Id;
-                            
-                            $http({ method: 'PATCH', url: "api/organizationUnit/" + id, data: data }).success(function (result) {
-                                growl.addSuccessMessage(name + " er ændret.");
+                        var id = $modalScope.orgUnit.Id;
 
-                                $modalInstance.close(result.Response);
-                            }).error(function (result) {
-                                $modalScope.submitting = false;
-                                growl.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
-                            });
-                        }
+                        $http({ method: 'POST', url: "api/organizationUnit/" + id, data: data }).success(function (result) {
+                            growl.addSuccessMessage(name + " er gemt.");
+
+                            $modalInstance.close(result.Response);
+                        }).error(function (result) {
+                            $modalScope.submitting = false;
+                            growl.addErrorMessage("Fejl! " + name + " kunne ikke gemmes!");
+                        });
+                    };
+
+                    $modalScope.new = function () {
+                        $modalScope.createNew = true;
+                        $modalScope.newOrgUnit = {
+                            name: 'Unavngiven',
+                            parent: $modalScope.orgUnit.id,
+                            orgId: $modalScope.orgUnit.orgId
+                        };
+
+                        console.log($modalScope.newOrgUnit);
                     };
 
                     $modalScope.cancel = function () {
@@ -318,24 +355,14 @@
 
             modal.result.then(function (returnedUnit) {
 
-                if (!createNew) {
-                    
-                    //remove old reference
-                    var oldParent = $scope.orgUnits[oldParentId];
-                    oldParent.Children = _.reject(oldParent.Children, function(u) {
-                        return u.Id == returnedUnit.Id;
-                    });
-                }
-                
-                //save to cache
-                $scope.orgUnits[returnedUnit.Id] = returnedUnit;
+                load();
 
-                //update new parent element
-                var newParent = $scope.orgUnits[returnedUnit.Parent_Id];
-                newParent.Children.push(returnedUnit);
+                var chosenId = $scope.chosenOrgUnit.Id;
 
-                console.log(newParent);
-                
+                var newChosen = $scope.orgUnits[chosenId];
+
+                $scope.chooseOrgUnit(newChosen);
+
             });
         };
 
