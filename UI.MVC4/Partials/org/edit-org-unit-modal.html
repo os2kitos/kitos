@@ -35,11 +35,14 @@
             </div>
         </form>
 
-        <button class="btn btn-primary btn-sm pull-left" data-ng-click="new()">
+        <button class="btn btn-primary btn-sm pull-left" data-ng-click="new()" data-ng-disabled="submitting" >
             <i class="glyphicon glyphicon-plus"></i> 
             Opret ny underafdeling
         </button>
-        <button class="btn btn-danger btn-sm pull-right" data-ng-click="" data-ng-hide="orgUnit.isRoot">
+        <button class="btn btn-danger btn-sm pull-right"
+            data-ng-disabled="submitting" 
+            data-confirmed-click="delete()"
+            data-confirm-click="Er du sikker på at du vil slette denne afdeling? Dette vil også slette alle underafdelinger!" data-ng-hide="orgUnit.isRoot">
             <i class="glyphicon glyphicon-trash"></i> 
             Slet afdeling
         </button>

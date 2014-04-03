@@ -308,6 +308,8 @@
                     $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot;
 
                     $modalScope.patch = function () {
+                        //don't allow duplicate submitting
+                        if ($modalScope.submitting) return;
                         
                         var name = $modalScope.orgUnit.newName;
                         var parent = $modalScope.orgUnit.newParent;
@@ -321,8 +323,8 @@
                         if ($modalScope.canChangeParent && parent) data['Parent_Id'] = parent;
 
                         $modalScope.submitting = true;
-                        
-                        var id = $modalScope.orgUnit.id;
+
+                        var id = unit.Id;
 
                         $http({ method: 'PATCH', url: "api/organizationUnit/" + id, data: data }).success(function(result) {
                             growl.addSuccessMessage(name + " er ændret.");
@@ -335,8 +337,10 @@
 
                     };
 
-                    $modalScope.post = function() {
-                        
+                    $modalScope.post = function () {
+                        //don't allow duplicate submitting
+                        if ($modalScope.submitting) return;
+
                         var name = $modalScope.newOrgUnit.name;
                         if (!name) return;
 
@@ -370,6 +374,24 @@
                         };
 
                         console.log($modalScope.newOrgUnit);
+                    };
+
+                    $modalScope.delete = function () {
+                        //don't allow duplicate submitting
+                        if ($modalScope.submitting) return;
+
+                        $modalScope.submitting = true;
+
+                        $http.delete("api/organizationUnit/" + unit.Id).success(function() {
+                            $modalInstance.close();
+                            growl.addSuccessMessage(unit.Name + " er slettet!");
+                            
+                        }).error(function() {
+                            $modalScope.submitting = false;
+
+                            growl.addErrorMessage("Fejl! " + unit.Name + " kunne ikke slettes!");
+                        });
+
                     };
 
                     $modalScope.cancel = function () {

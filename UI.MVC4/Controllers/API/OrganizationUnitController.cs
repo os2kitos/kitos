@@ -15,10 +15,12 @@ namespace UI.MVC4.Controllers.API
     public class OrganizationUnitController : GenericApiController<OrganizationUnit, int, OrgUnitDTO>
     {
         private readonly IOrgUnitService _orgUnitService;
+        private readonly IAdminService _adminService;
 
-        public OrganizationUnitController(IGenericRepository<OrganizationUnit> repository, IOrgUnitService orgUnitService) : base(repository)
+        public OrganizationUnitController(IGenericRepository<OrganizationUnit> repository, IOrgUnitService orgUnitService, IAdminService adminService) : base(repository)
         {
             _orgUnitService = orgUnitService;
+            _adminService = adminService;
         }
 
         public HttpResponseMessage GetByUser(int userId)
@@ -65,8 +67,8 @@ namespace UI.MVC4.Controllers.API
                 JToken jtoken;
                 if (obj.TryGetValue("Parent_Id", out jtoken))
                 {
-                    //You have to be local admin to change parent
-                    if (!_orgUnitService.IsLocalAdminFor(KitosUser, id))
+                    //You have to be local or global admin to change parent
+                    if (!_adminService.IsGlobalAdmin(KitosUser) && !_orgUnitService.IsLocalAdminFor(KitosUser, id))
                         return Unauthorized();
 
                     var parentId = jtoken.Value<int>();
@@ -90,6 +92,14 @@ namespace UI.MVC4.Controllers.API
         public override HttpResponseMessage Put(int id, OrgUnitDTO dto)
         {
             return NotAllowed();
+        }
+
+        protected override void DeleteQuery(int id)
+        {
+            if(!_orgUnitService.HasWriteAccess(KitosUser, id))
+                throw new SecurityException();
+
+            base.DeleteQuery(id);
         }
 
     }
