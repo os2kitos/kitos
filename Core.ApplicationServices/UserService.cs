@@ -30,11 +30,12 @@ namespace Core.ApplicationServices
 
         public User AddUser(User user)
         {
-            //check if user already exists. If so, just return him
             //to avoid access to modified closure-warning
             var tmp = user;
-            var existingUser = _userRepository.Get(u => u.Email == tmp.Email).ToList();
-            if (existingUser.Any()) return existingUser.First();
+
+            //check if user already exists. If so, just return him
+            var existingUser = _userRepository.Get(u => u.Email == tmp.Email).FirstOrDefault();
+            if (existingUser != null) return existingUser;
 
             //otherwise, hash his salt and default password
             user.Salt = _cryptoService.Encrypt(DateTime.Now + " spices");
