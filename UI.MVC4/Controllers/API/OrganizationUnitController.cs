@@ -74,6 +74,12 @@ namespace UI.MVC4.Controllers.API
                 var task = _taskRepository.GetByKey(taskRef);
                 var orgUnit = Repository.GetByKey(id);
 
+                //only add a task, if the parent org unit also has it
+                if (orgUnit.Parent != null && !HasTaskRecursive(orgUnit.Parent, task))
+                {
+                    return Unauthorized(); //TODO this should be Conflict(), 
+                }
+
                 //removed every selected subtask
                 RemoveTaskTree(orgUnit, task);
                 //add this task
