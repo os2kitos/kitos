@@ -69,22 +69,93 @@ namespace UI.MVC4.Controllers.API
 
         public HttpResponseMessage PostTaskRef(int id, [FromUri] int taskRef)
         {
-            var taskRefEntity = _taskRepository.GetByKey(taskRef);
+            var task = _taskRepository.GetByKey(taskRef);
             var orgUnit = Repository.GetByKey(id);
-            orgUnit.TaskRefs.Add(taskRefEntity);
-            Repository.Update(orgUnit);
+
+            AddTask(orgUnit, task);
+            TaskRefNotifyParent(orgUnit, task);
+
             Repository.Save();
             return Ok(); // TODO figure out what to return when refs are posted
         }
 
         public HttpResponseMessage DeleteTaskRef(int id, [FromUri] int taskRef)
         {
-            var taskRefEntity = _taskRepository.GetByKey(taskRef);
+            var task = _taskRepository.GetByKey(taskRef);
             var orgUnit = Repository.GetByKey(id);
-            orgUnit.TaskRefs.Remove(taskRefEntity);
-            Repository.Update(orgUnit);
+
+            RemoveTask(orgUnit, task);
+            TaskRefNotifyParent(orgUnit, task);
+
             Repository.Save();
             return NoContent(); // TODO figure out what to return when refs are posted
+        }
+
+        //recursively notify the parent of a task, that something has changed
+        private void TaskRefNotifyParent(OrganizationUnit unit, TaskRef task)
+        {
+            var parent = task.Parent;
+            if (parent == null) return;
+
+            var parentStatus = parent.Children.All(t => HasTask(unit, t));
+
+            if (parentStatus)
+            {
+                if (!HasTask(unit, parent)) unit.TaskRefs.Add(parent);
+            }
+            else
+            {
+                unit.TaskRefs.Remove(parent);
+            }
+
+            Repository.Update(unit);
+
+            //next, notify parent's parent
+            TaskRefNotifyParent(unit, parent);
+        }
+
+        //add a task and all its children
+        private void AddTask(OrganizationUnit unit, TaskRef task)
+        {
+            var unvisited = new Queue<TaskRef>();
+            unvisited.Enqueue(task);
+
+            foreach (var taskRef in unvisited)
+            {
+                if(!HasTask(unit, task)) unit.TaskRefs.Add(task);
+
+                foreach (var child in taskRef.Children)
+                {
+                    unvisited.Enqueue(child);
+                }
+            }
+
+            Repository.Update(unit);
+        }
+
+        //remove a task and all its children
+        private void RemoveTask(OrganizationUnit unit, TaskRef task)
+        {
+            var unvisited = new Queue<TaskRef>();
+            unvisited.Enqueue(task);
+
+            foreach (var taskRef in unvisited)
+            {
+                unit.TaskRefs.Remove(task);
+
+                foreach (var child in taskRef.Children)
+                {
+                    unvisited.Enqueue(child);
+                }
+            }
+
+            Repository.Update(unit);
+        }
+
+        //non-recursively check if a given unit has selected that task
+        private bool HasTask(OrganizationUnit unit, TaskRef task)
+        {
+            return unit.TaskRefs.Contains(task);
         }
     }
 }
