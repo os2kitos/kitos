@@ -152,7 +152,7 @@ namespace UI.MVC4.Controllers.API
             Repository.Update(unit);
         }
 
-        //non-recursively check if a given unit has selected that task
+        //check if a given unit has selected that task
         private bool HasTask(OrganizationUnit unit, TaskRef task)
         {
             return unit.TaskRefs.Contains(task);
