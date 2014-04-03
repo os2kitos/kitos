@@ -28,7 +28,7 @@
                         <i class="glyphicon glyphicon-lock" title="Du har ikke skriveadgang til denne organisationsenhed"></i>
                     </span>
                     <span class="pull-right small" data-ng-show="chosenOrgUnit.hasWriteAccess">
-                        <i class="glyphicon glyphicon-pencil" title="Du har skriveadgang til denne organisationsenhed"></i>
+                        <a data-ng-click="editUnit(chosenOrgUnit)"><i class="glyphicon glyphicon-cog" title="Rediger {{chosenOrgUnit.Name}}"></i></a>
                     </span>
                 </h3>
 

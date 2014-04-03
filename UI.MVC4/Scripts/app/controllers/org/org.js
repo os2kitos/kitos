@@ -70,15 +70,23 @@
             }
         }
 
-        function load() {
-            $http.get('api/organizationunit?userId=' + userId).success(function(result) {
+        function loadUnits() {
+
+            return $http.get('api/organizationunit?userId=' + userId).success(function(result) {
                 $scope.nodes = result.Response;
 
                 _.each(result.Response, flattenAndSave);
+
+                if ($scope.chosenOrgUnit) {
+                    
+                    var chosenId = $scope.chosenOrgUnit.Id;
+                    var newChosen = $scope.orgUnits[chosenId];
+                    $scope.chooseOrgUnit(newChosen);
+                }
             });
         }
 
-        load();
+        loadUnits();
 
         $scope.chosenOrgUnit = null;
         
@@ -264,10 +272,28 @@
                 templateUrl: 'partials/org/edit-org-unit-modal.html',
                 controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
 
-                    $modalScope.orgUnits = _.where($scope.orgUnits, { hasWriteAccess: true });
-
+                    //edit or create-new mode
                     $modalScope.isNew = false;
+                    
+                    //holds a list of org units, which the user can select as the parent
+                    $modalScope.orgUnits = [];
+                    
+                    //filter out those orgunits, that are outside the organisation
+                    //or is currently a subdepartment of the unit
+                    function filter(node) {
+                        if (node.Organization_Id != unit.Organization_Id) return;
+                        
+                        //this avoid every subdepartment
+                        if (node.Id == unit.Id) return;
 
+                        $modalScope.orgUnits.push(node);
+                        
+                        _.each(node.Children, filter);
+                    }
+                    _.each($scope.nodes, filter);
+
+
+                    //format the selected unit for editing
                     $modalScope.orgUnit = {
                         'id': unit.Id,
                         'oldName': unit.Name,
@@ -276,14 +302,15 @@
                         'orgId': unit.Organization_Id,
                         'isRoot': unit.Parent_Id == 0
                     };
-
-                    console.log($modalScope.orgUnit);
+                    
+                    //only allow changing the parent if user is admin, and the unit isn't at the root
+                    $modalScope.isAdmin = $rootScope.user.isGlobalAdmin || _.contains($rootScope.user.isLocalAdminFor, unit.Organization_Id);
+                    $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot;
 
                     $modalScope.patch = function () {
                         
                         var name = $modalScope.orgUnit.newName;
                         var parent = $modalScope.orgUnit.newParent;
-                        var orgId = $modalScope.orgUnit.orgId;
                         
                         if (!name) return;
 
@@ -291,7 +318,7 @@
                             'Name': name
                         };
 
-                        if (parent) data['Parent_Id'] = parent;
+                        if ($modalScope.canChangeParent && parent) data['Parent_Id'] = parent;
 
                         $modalScope.submitting = true;
                         
@@ -323,10 +350,8 @@
                         };
 
                         $modalScope.submitting = true;
-
-                        var id = $modalScope.orgUnit.Id;
-
-                        $http({ method: 'POST', url: "api/organizationUnit/" + id, data: data }).success(function (result) {
+                        
+                        $http({ method: 'POST', url: "api/organizationUnit/", data: data }).success(function (result) {
                             growl.addSuccessMessage(name + " er gemt.");
 
                             $modalInstance.close(result.Response);
@@ -339,7 +364,7 @@
                     $modalScope.new = function () {
                         $modalScope.createNew = true;
                         $modalScope.newOrgUnit = {
-                            name: 'Unavngiven',
+                            name: 'Ny afdeling',
                             parent: $modalScope.orgUnit.id,
                             orgId: $modalScope.orgUnit.orgId
                         };
@@ -353,15 +378,9 @@
                 }]
             });
 
-            modal.result.then(function (returnedUnit) {
+            modal.result.then(function(returnedUnit) {
 
-                load();
-
-                var chosenId = $scope.chosenOrgUnit.Id;
-
-                var newChosen = $scope.orgUnits[chosenId];
-
-                $scope.chooseOrgUnit(newChosen);
+                loadUnits();
 
             });
         };

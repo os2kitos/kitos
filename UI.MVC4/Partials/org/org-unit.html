@@ -1,4 +1,4 @@
-﻿<div class="org-node" data-ng-class="{'selected': node == chosenOrgUnit}">
+﻿<div class="org-node" data-ng-class="{'selected': node == chosenOrgUnit, 'hasWriteAccess': node.hasWriteAccess}">
     <span class="org-node-info">
         <span data-ng-show="node.Children.length > 0">
             <a data-ng-click="node.isOpen = !node.isOpen" class="small">
@@ -6,11 +6,6 @@
             </a>
         </span>
         <a data-ng-click="chooseOrgUnit(node)">{{node.Name}}</a>
-        
-        <span class="small text-muted" data-ng-show="node.hasWriteAccess">
-            <a data-ng-click="editUnit(node)"><i class="glyphicon glyphicon-cog"></i></a>
-            <a data-ng-click="addUnit(node)"><i class="glyphicon glyphicon-plus"></i></a>
-        </span>
     </span>
     <ul data-ng-show="node.isOpen">
         <li data-ng-repeat="node in node.Children">

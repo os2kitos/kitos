@@ -125,37 +125,36 @@ div.org-node
 {
     display: block;
     width: 100%;
-    padding: 5px;
 }
-
-    div.org-node span.org-node-info
-    {
-        padding: 2px 10px 2px 10px;
-        border: 1px solid rgb(143, 143, 143);
-        border-radius: 6px;
-        background: white;
-    }
-
     div.org-node a
     {
         color: black;
+        text-decoration: none;
+    }
+
+    div.org-node span.org-node-info
+    {
+        display: inline-block;
+        margin: 0;
+        padding: 4px 10px;
+        background: rgb(219, 229, 241);
     }
 
     div.org-node.selected span.org-node-info
     {
-        background-color: rgb(220, 242, 255);
+        background-color: rgb(177, 207, 243);
     }
 
     div.org-node.selected > span.org-node-info
     {
-        background-color: rgb(206, 210, 254);
+        background-color: rgb(125, 154, 189);
     }
 
 
     div.org-node li
     {
         list-style-type: none;
-        padding: 5px 0 0 0;
+        padding: 5px 5px;
         margin: 0;
         position: relative;
     }

@@ -83,17 +83,5 @@ namespace UI.MVC4.Controllers.API
             return base.Patch(id, obj);
         }
 
-        protected override OrganizationUnit PatchQuery(OrganizationUnit item)
-        {
-            //if the new parent is actually a descendant of the item, don't update - this would create a loop!
-            if (item.Parent_Id.HasValue && _orgUnitService.IsAncestorOf(item.Parent_Id.Value, item.Id))
-            {
-                throw new ArgumentException("Self reference loop");
-            }
-
-
-
-            return base.PatchQuery(item);
-        }
     }
 }

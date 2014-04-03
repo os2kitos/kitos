@@ -13,24 +13,39 @@
                     <input type="text" name="name" data-ng-model="orgUnit.newName" class="form-control" data-ng-required="true" />
                 </div>
             </div>
-            <div class="form-group" data-ng-hide="orgUnit.isRoot">
+            <div class="form-group">
                 <label for="parent" class="col-md-3 control-label">
                     Overordnet enhed
                 </label>
                 <div class="col-md-8">
-                    <select type="text" data-ui-select2="" name="parent" data-ng-model="orgUnit.newParent" class="form-control" data-placeholder="Vælg overordnet" data-ng-required="true" data-ng-disabled="orgUnit.isRoot">
+                    <select type="text" data-ui-select2="" name="parent" data-ng-model="orgUnit.newParent" class="form-control" data-placeholder="Vælg overordnet" data-ng-required="true" data-ng-disabled="!canChangeParent">
                         <option></option>
                         <option data-ng-repeat="unit in orgUnits" value="{{unit.Id}}">{{unit.Name}}</option>
                     </select>
                 </div>
+                <div class="col-md-8 col-md-offset-3">
+                    <p class="help-block" data-ng-show="canChangeParent">
+                        Der kan kun vælges blandt de organisationsenheder som er indenfor samme organisation, og som ikke er en underafdeling til {{orgUnit.oldName}}.
+                    </p>
+                    <p class="help-block" data-ng-hide="canChangeParent">
+                        Du kan ikke ændre {{ orgUnit.oldName + 's' }} overordnet organisationsenhed.  
+                        <span data-ng-show="!isAdmin">Kontakt en lokal administrator.</span>
+                    </p>
+                </div>
             </div>
         </form>
 
-        <button class="btn btn-primary btn-sm" data-ng-click="new()">Opret ny underafdeling</button>
-        <button class="btn btn-danger btn-sm" data-ng-click="" data-ng-hide="orgUnit.isRoot">Slet afdeling</button>
+        <button class="btn btn-primary btn-sm pull-left" data-ng-click="new()">
+            <i class="glyphicon glyphicon-plus"></i> 
+            Opret ny underafdeling
+        </button>
+        <button class="btn btn-danger btn-sm pull-right" data-ng-click="" data-ng-hide="orgUnit.isRoot">
+            <i class="glyphicon glyphicon-trash"></i> 
+            Slet afdeling
+        </button>
     </div>
 
-    <div class="modal-footer">
+    <div class="modal-footer text-center">
         <button class="btn btn-primary" data-ng-disabled="submitting" data-ng-click="patch()">Gem</button>
         <button class="btn btn-warning" data-ng-click="cancel()">Annuller</button>
     </div>
@@ -57,10 +72,7 @@
                     Overordnet enhed
                 </label>
                 <div class="col-md-8">
-                    <select type="text" data-ui-select2="" name="parent" data-ng-model="newOrgUnit.parent" class="form-control" data-placeholder="Vælg overordnet" data-ng-required="true" data-ng-disabled="true">
-                        <option></option>
-                        <option data-ng-repeat="unit in orgUnits" value="{{unit.Id}}">{{unit.Name}}</option>
-                    </select>
+                    <input type="text" value="{{orgUnit.oldName}}" class="form-control" disabled="disabled"/>
                 </div>
             </div>
         </form>
