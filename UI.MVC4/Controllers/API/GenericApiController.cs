@@ -129,9 +129,9 @@ namespace UI.MVC4.Controllers.API
 
                 return Ok();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return NoContent(); // TODO catch correct expection
+                return Error(e); // TODO catch correct expection
             }
         }
 

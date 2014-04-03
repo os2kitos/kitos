@@ -17,5 +17,8 @@ namespace Core.DomainServices
 
         bool HasWriteAccess(User user, int orgUnitId);
         bool HasWriteAccess(User user, OrganizationUnit unit);
+
+        bool IsLocalAdminFor(User user, int orgUnitId);
+        bool IsLocalAdminFor(User user, OrganizationUnit unit);
     }
 }

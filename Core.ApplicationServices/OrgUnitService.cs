@@ -9,11 +9,13 @@ namespace Core.DomainServices
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
+        private readonly IAdminService _adminService;
 
-        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<OrganizationRight> orgRightRepository)
+        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<OrganizationRight> orgRightRepository, IAdminService adminService)
         {
             _orgUnitRepository = orgUnitRepository;
             _orgRightRepository = orgRightRepository;
+            _adminService = adminService;
         }
 
         public ICollection<OrganizationUnit> GetByUser(User user)
@@ -140,6 +142,17 @@ namespace Core.DomainServices
             } while (unit != null);
 
             return false;
+        }
+
+        public bool IsLocalAdminFor(User user, int orgUnitId)
+        {
+            var orgUnit = _orgUnitRepository.GetByKey(orgUnitId);
+            return IsLocalAdminFor(user, orgUnit);
+        }
+
+        public bool IsLocalAdminFor(User user, OrganizationUnit unit)
+        {
+            return _adminService.IsLocalAdmin(user, unit.Organization);
         }
     }
 }
