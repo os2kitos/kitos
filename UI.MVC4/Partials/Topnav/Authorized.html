@@ -1,23 +1,25 @@
 ﻿<ul class="nav navbar-nav">
-    <li class="double-line"><a data-ui-sref="org-view">IT understøttelse af organisation</a></li>
-    <li><a href="#">IT Projekter</a></li>
-    <li><a href="#">IT Systemer</a></li>
-    <li><a href="#">IT Kontrakter</a></li>
+    <li class="double-line">
+        <a data-ui-sref="org-view" data-ui-sref-active="active">IT understøttelse af organisation</a>
+    </li>
+    <li><a>IT Projekter</a></li>
+    <li><a>IT Systemer</a></li>
+    <li><a>IT Kontrakter</a></li>
 </ul>
 
 <div class="navbar-text navbar-text-small navbar-right navbar-complex">
     <div>
-        <a href="#" class="btn btn-link">{{ user.name }}</a> 
-        <a href="#" class="btn btn-link" data-ng-click="logout()">Log ud</a>
+        <a>{{ user.name }}</a> 
+        <a data-ng-click="logout()">Log ud</a>
     </div>
     
     <div>
         <div data-ng-show="user.isLocalAdmin">
-            <a data-ui-sref="local-config">Lokal admin</a>
+            <a data-ui-sref="local-config" data-ui-sref-active="active">Lokal admin</a>
         </div>
         <div data-ng-show="user.isGlobalAdmin">
-            <a data-ui-sref="global-admin">Global admin</a>
-            <a data-ui-sref="config-org">Global konfig</a>
+            <a data-ui-sref="global-admin" data-ui-sref-active="active">Global admin</a>
+            <a data-ui-sref="config-org" data-ui-sref-active="active">Global konfig</a>
         </div>
     </div>
 

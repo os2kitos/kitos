@@ -77,18 +77,15 @@ div#page-body
     #navbar-top a
     {
         color: white;
+        padding: 5px;
     }
 
-    #navbar-top li.active a,
-    #navbar-top li a:hover
-    {
+    #navbar-top a.active,
+    #navbar-top a:hover {
         background-color: rgb(219, 229, 241);
         color: rgb(55, 96, 146);
-    }
 
-    #navbar-top select
-    {
-        color: black;
+        text-decoration: none;
     }
 /*********************************************/
 
@@ -138,43 +135,43 @@ div.org-node
         margin: 0;
         padding: 4px 10px;
         background: rgb(219, 229, 241);
-    }
+}
 
     div.org-node.selected span.org-node-info
     {
         background-color: rgb(177, 207, 243);
-    }
+}
 
     div.org-node.selected > span.org-node-info
     {
         background-color: rgb(125, 154, 189);
-    }
+}
 
 
     div.org-node li
     {
-        list-style-type: none;
+    list-style-type: none;
         padding: 5px 5px;
-        margin: 0;
-        position: relative;
+    margin: 0;
+    position: relative;
     }
 
         div.org-node li::before, .org-node li::after
         {
-            content: '';
-            left: -20px;
-            position: absolute;
-            right: auto;
-        }
+        content: '';
+        left: -20px;
+        position: absolute;
+        right: auto;
+    }
 
         div.org-node li::before
         {
-            border-left: 2px solid #dddddd;
-            bottom: 50px;
-            height: 100%;
-            top: 5px;
-            width: 1px;
-        }
+        border-left: 2px solid #dddddd;
+        bottom: 50px;
+        height: 100%;
+        top: 5px;
+        width: 1px;
+    }
 
     div.org-node.selected li::before
     {
