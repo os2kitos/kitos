@@ -69,26 +69,65 @@ namespace UI.MVC4.Controllers.API
 
         public HttpResponseMessage PostTaskRef(int id, [FromUri] int taskRef)
         {
-            var task = _taskRepository.GetByKey(taskRef);
-            var orgUnit = Repository.GetByKey(id);
+            try
+            {
+                var task = _taskRepository.GetByKey(taskRef);
+                var orgUnit = Repository.GetByKey(id);
 
-            AddTask(orgUnit, task);
-            TaskRefNotifyParentAdd(orgUnit, task);
+                //removed every selected subtask
+                RemoveTaskTree(orgUnit, task);
+                //add this task
+                AddTask(orgUnit, task);
+                //notify parent
+                TaskRefNotifyParentAdd(orgUnit, task);
 
-            Repository.Save();
-            return Ok(); // TODO figure out what to return when refs are posted
+                Repository.Save();
+                return Ok(); // TODO figure out what to return when refs are posted
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
         }
 
         public HttpResponseMessage DeleteTaskRef(int id, [FromUri] int taskRef)
         {
-            var task = _taskRepository.GetByKey(taskRef);
-            var orgUnit = Repository.GetByKey(id);
+            try
+            {
+                var task = _taskRepository.GetByKey(taskRef);
+                var orgUnit = Repository.GetByKey(id);
 
-            RemoveTaskTree(orgUnit, task);
-            TaskRefNotifyParentRemove(orgUnit, task);
+                //we gotta remove the task on this unit and every sub orgUnit, so
+                //breadth first traversal of the org unit tree
+                var unvisitedUnits = new Queue<OrganizationUnit>();
+                unvisitedUnits.Enqueue(orgUnit);
 
-            Repository.Save();
-            return NoContent(); // TODO figure out what to return when refs are posted
+                while (unvisitedUnits.Count > 0)
+                {
+                    var unit = unvisitedUnits.Dequeue();
+
+                    //removed this task and all subtasks
+                    RemoveTaskTree(unit, task);
+                    //notify parent
+                    TaskRefNotifyParentRemove(unit, task);
+
+                    //do the same for every org unit child
+                    foreach (var child in unit.Children)
+                    {
+                        unvisitedUnits.Enqueue(child);
+                    }
+                    
+
+                    Repository.Save();
+
+                }
+
+                return NoContent(); // TODO figure out what to return when refs are posted
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
         }
 
 
@@ -99,16 +138,19 @@ namespace UI.MVC4.Controllers.API
             if (parent == null) return;
 
             //remove the parent task
-            unit.TaskRefs.Remove(parent);
-
-            //add every child task - except the one, which was just removed
-            foreach (var child in parent.Children)
+            if (HasTaskRecursive(unit, parent))
             {
-                if(child != task) AddTask(unit, child);
-            }
+                unit.TaskRefs.Remove(parent);
 
-            //since the parent was now removed, we should notify the parent's parent
-            TaskRefNotifyParentRemove(unit, parent);
+                //add every child task - except the one, which was just removed
+                foreach (var child in parent.Children)
+                {
+                    if (child != task) AddTask(unit, child);
+                }
+
+                //since the parent was now removed, we should notify the parent's parent
+                TaskRefNotifyParentRemove(unit, parent);
+            }
         }
 
 
@@ -147,27 +189,27 @@ namespace UI.MVC4.Controllers.API
             Repository.Update(unit);
         }
 
-        //remove a task and all its children
+        //remove a task and all its children.
         private void RemoveTaskTree(OrganizationUnit unit, TaskRef task)
         {
             var unvisited = new Queue<TaskRef>();
             unvisited.Enqueue(task);
 
-            foreach (var taskRef in unvisited)
+            while (unvisited.Count > 0)
             {
+                var taskRef = unvisited.Dequeue();
+
                 //remove task ref on the unit, if it exist
                 if (unit.TaskRefs.Contains(taskRef))
                 {
                     unit.TaskRefs.Remove(taskRef);
                     //since taskref is on the unit, we know that none of its children will be, so we're done with this subtree
                 }
-                else
+
+                //if task ref wasn't on the unit, maybe some of it's children are
+                foreach (var child in taskRef.Children)
                 {
-                    //if task ref wasn't on the unit, maybe some of it's children are
-                    foreach (var child in taskRef.Children)
-                    {
-                        unvisited.Enqueue(child);
-                    }
+                    unvisited.Enqueue(child);
                 }
             }
 
@@ -178,6 +220,18 @@ namespace UI.MVC4.Controllers.API
         private bool HasTask(OrganizationUnit unit, TaskRef task)
         {
             return unit.TaskRefs.Contains(task);
+        }
+
+        private bool HasTaskRecursive(OrganizationUnit unit, TaskRef task)
+        {
+            while (task != null)
+            {
+                if (unit.TaskRefs.Contains(task)) return true;
+
+                task = task.Parent;
+            }
+
+            return false;
         }
     }
 }
