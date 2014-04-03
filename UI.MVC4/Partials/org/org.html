@@ -15,18 +15,36 @@
             <div class="col-md-12" data-ng-hide="chosenOrgUnit">
                 <h3>Vælg en organisationsenhed</h3>
                 <p>Her kan du få overblik over de organisationsenheder, som du er tilknyttet.</p>
-                <p><strong>Start med at vælge en organisationsenhed i oversigten til venstre.</strong></p>
+                <p>
+                    <strong>Start med at vælge en organisationsenhed i oversigten til venstre.</strong>
+                </p>
             </div>
             
             <!-- if an org unit has been selected -->
             <div class="col-md-12" data-ng-show="chosenOrgUnit">
-                <h3>{{ chosenOrgUnit.Name }}</h3>
-                <p>Du har valgt enheden {{ chosenOrgUnit.Name }} under organisationen {{ chosenOrgUnit.Organization.Name }}.</p>
+                <h3>
+                    {{ chosenOrgUnit.Name }} <span class="text-muted"> ({{ chosenOrgUnit.Organization.Name }})</span>
+                    <span class="pull-right small" data-ng-hide="chosenOrgUnit.hasWriteAccess">
+                        <i class="glyphicon glyphicon-lock" title="Du har ikke skriveadgang til denne organisationsenhed"></i>
+                    </span>
+                    <span class="pull-right small" data-ng-show="chosenOrgUnit.hasWriteAccess">
+                        <a data-ng-click="editUnit(chosenOrgUnit)"><i class="glyphicon glyphicon-cog" title="Rediger {{chosenOrgUnit.Name}}"></i></a>
+                    </span>
+                </h3>
 
                 <!-- Organization Roles -->
-                <div class="panel panel-primary">
-                    <div class="panel-heading">Organisationsroller</div>
-                    <table class="full-width table table-striped">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <i class="glyphicon glyphicon-user"></i>
+                        Organisationsroller
+
+                        <a class="pull-right" 
+                           data-ng-show="chosenOrgUnit.hasWriteAccess" 
+                            data-ng-click="chosenOrgUnit.editRights = !chosenOrgUnit.editRights">
+                            Rediger
+                        </a>
+                    </div>
+                    <table class="full-width table">
                         <thead>
                             <tr>
                                 <th><a ng-click="rightSortChange('orgUnitName')">Organisationsenhed</a></th>
@@ -46,7 +64,7 @@
                                 <td>{{ right.User.Name }}</td>
                                 <td>{{ right.User.Email }}</td>
                                 <td>
-                                    <div data-ng-show="chosenOrgUnit.hasWriteAccess">
+                                    <div data-ng-show="chosenOrgUnit.hasWriteAccess && chosenOrgUnit.editRights">
                                         <a data-ng-click="right.edit = true" class="btn btn-link btn-sm"><i class="glyphicon glyphicon-pencil"></i></a>
                                         <a class="btn btn-link btn-sm" 
                                            data-confirmed-click="deleteRight(right)" 
@@ -79,7 +97,7 @@
                         </tbody>
 
                         <!-- add-new-right row -->
-                        <tbody data-ng-show="chosenOrgUnit.hasWriteAccess">
+                        <tbody data-ng-show="chosenOrgUnit.hasWriteAccess && chosenOrgUnit.editRights">
                             <tr>
                                 <td><input type="text" disabled="" class="form-control input-sm" value="{{ chosenOrgUnit.Name }}"/></td>
                                 <td>
