@@ -338,6 +338,7 @@
     <Content Include="Partials\local-config\suggest-new.html" />
     <Content Include="Partials\local-config\support.html" />
     <Content Include="Partials\local-config\system.html" />
+    <Content Include="Partials\org\task.html" />
     <Content Include="Partials\org\org-unit.html" />
     <Content Include="Partials\org\org.html" />
     <Content Include="Partials\subnav\subnav.html" />
@@ -364,6 +365,8 @@
     <Content Include="Scripts\angular-scenario.js" />
     <Content Include="Scripts\angular-touch.js" />
     <Content Include="Scripts\angular-touch.min.js" />
+    <Content Include="Scripts\angular-ui-util\ui-utils.js" />
+    <Content Include="Scripts\angular-ui-util\ui-utils.min.js" />
     <Content Include="Scripts\angular.js" />
     <Content Include="Scripts\angular.min.js" />
     <Content Include="Scripts\AngularUI\ui-router.js" />

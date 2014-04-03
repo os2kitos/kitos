@@ -105,6 +105,7 @@
                 <div class="panel panel-primary" data-ng-switch="isTasksEditable">
                     <button type="button" data-ng-click="isTasksEditable = !isTasksEditable">Rediger</button>
                     <div class="panel-heading">Tilknyttede opgaver</div>
+
                     <table class="full-width table" data-ng-switch-when="false">
                         <thead>
                             <tr>
@@ -124,24 +125,11 @@
                         </tbody>
                     </table>
 
-                    <table class="full-width table" data-ng-switch-when="true">
-                        <thead>
-                            <tr>
-                                <th>Tilknyttet</th>
-                                <th>ID</th>
-                                <th>Navn</th>
-                                <th>Overblik</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr data-ng-repeat="task in availableTaskRefs">
-                                <td><input type="checkbox" data-ng-checked="task.selected" data-ng-click="updateTask(task)"/></td>
-                                <td>{{ task.TaskKey }}</td>
-                                <td>{{ task.Description }}</td>
-                                <td><input type="checkbox"/></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div data-ng-switch-when="true">
+                        <div data-ng-repeat="task in availableTaskRefs">
+                            <div data-ng-include="'partials/org/task.html'"></div>
+                        </div>
+                    </div>
                 </div>
             </div>              
         </div>

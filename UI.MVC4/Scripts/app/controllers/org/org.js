@@ -251,24 +251,35 @@
         $scope.updateTask = function (task) {
             task.selected = !task.selected;
             var orgUnitId = $scope.chosenOrgUnit.Id;
+
+            task.setChildrenState(task.selected);
+            // if all children has been selected then send parent task
+            task.setParentState();
+
             if (task.selected === true) {
-                $http.post('api/organizationUnit/' + orgUnitId + '?taskref=' + task.Id).success(updateLists);
+                //$http.post('api/organizationUnit/' + orgUnitId + '?taskref=' + task.Id).success(updateLists);
             } else {
-                $http.delete('api/organizationUnit/' + orgUnitId + '?taskref=' + task.Id).success(updateLists);
+                //$http.delete('api/organizationUnit/' + orgUnitId + '?taskref=' + task.Id).success(updateLists);
             }
         };
 
-        function updateLists() {
+        function updateLists(all) {
             var orgUnitId = $scope.chosenOrgUnit.Id,
                 orgUnitParentId = $scope.chosenOrgUnit.Parent_Id;
 
             var listOfQs = [];
             listOfQs.push($http.get('api/organizationUnit/' + orgUnitId + '?taskrefs'));
-            
-            if (orgUnitParentId === 0) { // if root org unit list all taskrefs as available
-                listOfQs.push($http.get('api/taskref'));
-            } else { // else only show selected on parent orgunit
-                listOfQs.push($http.get('api/organizationUnit/' + orgUnitParentId + '?taskrefs'));
+
+            if (all === true) { // fetch all available tasks (should only be called when it changes like when orgUnit changes)
+                if (orgUnitParentId === 0) { // if root org unit list all taskrefs as available
+                    listOfQs.push($http.get('api/taskref'));
+                } else { // else only show selected on parent orgunit
+                    listOfQs.push($http.get('api/organizationUnit/' + orgUnitParentId + '?taskrefs'));
+                }
+            } else {
+                var deferred = new $q.defer();
+                deferred.resolve({ data: { Response: $scope.availableTaskRefsRaw } }); // mimic http response
+                listOfQs.push(deferred.promise);
             }
 
             $q.all(listOfQs).then(function (result) {
@@ -284,8 +295,105 @@
                 });
 
                 $scope.chosenTaskRefs = chosenTaskRefs;
-                $scope.availableTaskRefs = availableTaskRefs;
+                if (all === true) {
+                    $scope.availableTaskRefsRaw = availableTaskRefs;
+                    $scope.availableTaskRefs = toHierarchy(availableTaskRefs, 'Id', 'Parent_Id', 'parent', 'children');
+                }
             });
+        }
+
+        function toHierarchy(flatAry, idPropertyName, parentIdPropetyName, parentPropetyName, childPropertyName) {
+            var copy = angular.copy(flatAry);
+            var sorted = _.sortBy(copy, function(obj) {
+                return obj[parentIdPropetyName];
+            });
+
+            function search(nestedAry, id) {
+                if (!nestedAry || !id) 
+                    throw new Error("Invalid argument(s)"); // abort if not valid input
+
+                for (var i = 0; i < nestedAry.length; i++) {
+                    var obj = nestedAry[i];
+                    if (obj[idPropertyName] === id) {
+                        return obj;
+                    } else if (obj.hasOwnProperty(childPropertyName)) { // has children, search them too
+                        var found = search(obj[childPropertyName], id);
+                        if (found) return found;
+                    }
+                }
+            }
+
+            var hierarchy = [];
+            _.each(sorted, function (obj) {
+                // define functions
+                obj.isAllChildren = function (isChecked) {
+                    if (typeof isChecked !== 'boolean')
+                        throw new Error('Argument must be a boolean');
+
+                    return _.every(this.children, function(child) {
+                        if (isChecked === true) {
+                            return child.selected === true;
+                        } else {
+                            return child.selected === false && child.indeterminate === false;
+                        }
+                    });
+                };
+                obj.setState = function(isChecked) {
+                    if (isChecked === true) {
+                        this.indeterminate = false;
+                        this.selected = true;
+                    } else if (isChecked === false) {
+                        this.indeterminate = false;
+                        this.selected = false;
+                    } else {
+                        this.indeterminate = true;
+                        this.selected = false;
+                    }
+                };
+                obj.setChildrenState = function(isChecked) {
+                    if (typeof isChecked !== 'boolean')
+                        throw new Error('Argument must be a boolean');
+                    
+                    var children = this.children;
+                    if (!children) return;
+                    
+                    _.each(children, function(child) {
+                        child.setState(isChecked);
+                        child.setChildrenState(isChecked);
+                    });
+                };
+                obj.setParentState = function () {
+                    var parent = this.parent;
+                    if (!parent)
+                        return;
+                    if (parent.isAllChildren(true)) {
+                        parent.setState(true);
+                    } else if (parent.isAllChildren(false)) {
+                        parent.setState(false);
+                    } else {
+                        // if all children is neither true or false 
+                        // then it must be a mix
+                        // so we need to set the parent as not selected 
+                        // and show the indeterminate state
+                        parent.setState(null);
+                    }
+                    // cascade up the tree
+                    parent.setParentState();
+                };
+
+                if (obj[parentIdPropetyName] === null) // is root
+                    hierarchy.push(obj);
+                else {
+                    var parentObj = search(hierarchy, obj[parentIdPropetyName]);
+                    if (!parentObj.hasOwnProperty(childPropertyName))
+                        parentObj[childPropertyName] = [];
+
+                    obj[parentPropetyName] = parentObj;
+                    parentObj[childPropertyName].push(obj);
+                }
+            });
+
+            return hierarchy;
         }
 
         $scope.isTasksEditable = false;
@@ -303,7 +411,7 @@
 
         $scope.$watch('chosenOrgUnit', function (newOrgUnit, oldOrgUnit) {
             if (newOrgUnit !== null)
-                updateLists();
+                updateLists(true);
         });
     }]);
 

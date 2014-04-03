@@ -41,7 +41,8 @@ namespace UI.MVC4
                 "~/Scripts/ui-select2.js",
                 "~/Scripts/restangular.js",
                 "~/Scripts/angular-growl/*.js",
-                "~/Scripts/xeditable.js"));
+                "~/Scripts/xeditable.js",
+                "~/Scripts/angular-ui-util/ui-utils.js"));
 
             // angular app files
             bundles.Add(new ScriptBundle("~/Scripts/app").IncludeDirectory(

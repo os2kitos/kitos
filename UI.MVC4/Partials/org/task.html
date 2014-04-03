@@ -1,0 +1,18 @@
+﻿<div>
+    <span>
+        <label>
+            <input type="checkbox" data-ng-checked="task.selected" data-ui-indeterminate="task.indeterminate" data-ng-click="updateTask(task)"/>
+            {{ task.TaskKey }} {{ task.Description }}
+        </label>
+        <span data-ng-show="task.children">
+            <a data-ng-click="task.isOpen = !task.isOpen">
+                <i class="glyphicon" data-ng-class="{'glyphicon-chevron-down': task.isOpen, 'glyphicon-chevron-right': !task.isOpen}"></i>
+            </a>
+        </span>
+    </span>
+    <ul data-ng-show="task.isOpen">
+        <li data-ng-repeat="task in task.children">
+            <div data-ng-include="'partials/org/task.html'"></div>
+        </li>
+    </ul>
+</div>
