@@ -73,7 +73,7 @@ namespace UI.MVC4.Controllers.API
             var orgUnit = Repository.GetByKey(id);
 
             AddTask(orgUnit, task);
-            TaskRefNotifyParent(orgUnit, task);
+            TaskRefNotifyParentAdd(orgUnit, task);
 
             Repository.Save();
             return Ok(); // TODO figure out what to return when refs are posted
@@ -84,68 +84,90 @@ namespace UI.MVC4.Controllers.API
             var task = _taskRepository.GetByKey(taskRef);
             var orgUnit = Repository.GetByKey(id);
 
-            RemoveTask(orgUnit, task);
-            TaskRefNotifyParent(orgUnit, task);
+            RemoveTaskTree(orgUnit, task);
+            TaskRefNotifyParentRemove(orgUnit, task);
 
             Repository.Save();
             return NoContent(); // TODO figure out what to return when refs are posted
         }
 
-        //recursively notify the parent of a task, that something has changed
-        private void TaskRefNotifyParent(OrganizationUnit unit, TaskRef task)
+
+        //call this when removing a task to notify the parent-task, that the child has changed
+        private void TaskRefNotifyParentRemove(OrganizationUnit unit, TaskRef task)
         {
             var parent = task.Parent;
             if (parent == null) return;
 
-            var parentStatus = parent.Children.All(t => HasTask(unit, t));
+            //remove the parent task
+            unit.TaskRefs.Remove(parent);
 
-            if (parentStatus)
+            //add every child task - except the one, which was just removed
+            foreach (var child in parent.Children)
             {
-                if (!HasTask(unit, parent)) unit.TaskRefs.Add(parent);
+                if(child != task) AddTask(unit, child);
             }
-            else
+
+            //since the parent was now removed, we should notify the parent's parent
+            TaskRefNotifyParentRemove(unit, parent);
+        }
+
+
+        //call this when adding a task to notify the parent-task, that the child has changed
+        private void TaskRefNotifyParentAdd(OrganizationUnit unit, TaskRef task)
+        {
+            var parent = task.Parent;
+            if (parent == null) return;
+
+            //check if all children has been selected
+            var allChildrenSelected = parent.Children.All(t => HasTask(unit, t));
+
+            if (!allChildrenSelected) return;
+
+            //if we get this far, every child of parent has been selected
+            //add parent task
+            AddTask(unit, parent);
+
+            //remove children task, which are now superfluous
+            foreach (var child in parent.Children)
             {
-                unit.TaskRefs.Remove(parent);
+                RemoveTaskTree(unit, child);
             }
 
             Repository.Update(unit);
 
             //next, notify parent's parent
-            TaskRefNotifyParent(unit, parent);
+            TaskRefNotifyParentAdd(unit, parent);
         }
 
-        //add a task and all its children
+        //add a task 
         private void AddTask(OrganizationUnit unit, TaskRef task)
         {
-            var unvisited = new Queue<TaskRef>();
-            unvisited.Enqueue(task);
-
-            foreach (var taskRef in unvisited)
-            {
-                if(!HasTask(unit, task)) unit.TaskRefs.Add(task);
-
-                foreach (var child in taskRef.Children)
-                {
-                    unvisited.Enqueue(child);
-                }
-            }
+            if(!HasTask(unit, task)) unit.TaskRefs.Add(task);
 
             Repository.Update(unit);
         }
 
         //remove a task and all its children
-        private void RemoveTask(OrganizationUnit unit, TaskRef task)
+        private void RemoveTaskTree(OrganizationUnit unit, TaskRef task)
         {
             var unvisited = new Queue<TaskRef>();
             unvisited.Enqueue(task);
 
             foreach (var taskRef in unvisited)
             {
-                unit.TaskRefs.Remove(task);
-
-                foreach (var child in taskRef.Children)
+                //remove task ref on the unit, if it exist
+                if (unit.TaskRefs.Contains(taskRef))
                 {
-                    unvisited.Enqueue(child);
+                    unit.TaskRefs.Remove(taskRef);
+                    //since taskref is on the unit, we know that none of its children will be, so we're done with this subtree
+                }
+                else
+                {
+                    //if task ref wasn't on the unit, maybe some of it's children are
+                    foreach (var child in taskRef.Children)
+                    {
+                        unvisited.Enqueue(child);
+                    }
                 }
             }
 
