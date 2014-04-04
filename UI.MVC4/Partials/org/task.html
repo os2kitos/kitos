@@ -2,9 +2,9 @@
     <span>
         <label data-ng-show="task.canWrite">
             <input type="checkbox" data-ng-checked="task.selected" data-ui-indeterminate="task.indeterminate" data-ng-click="updateTask(task)"/>
-            {{ task.TaskKey }} {{ task.Description }} {{ task.handledByOrgUnit }}
+            {{ task.taskKey }} {{ task.description }} {{ task.handledByOrgUnit }}
         </label>
-        <span data-ng-show="!task.canWrite">{{ task.TaskKey }} {{ task.Description }} </span>
+        <span data-ng-show="!task.canWrite">{{ task.taskKey }} {{ task.description }} </span>
         <span data-ng-show="task.children">
             <a data-ng-click="task.isOpen = !task.isOpen">
                 <i class="glyphicon" data-ng-class="{'glyphicon-chevron-down': task.isOpen, 'glyphicon-chevron-right': !task.isOpen}"></i>

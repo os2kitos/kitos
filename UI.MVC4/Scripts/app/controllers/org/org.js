@@ -414,20 +414,20 @@
 
         $scope.updateTask = function (task) {
             task.selected = !task.selected;
-            var orgUnitId = $scope.chosenOrgUnit.Id;
+            var orgUnitId = $scope.chosenOrgUnit.id;
 
             task.setChildrenState(task.selected);
             task.setParentState();
 
             if (task.selected === true) {
-                $http.post('api/organizationUnit/' + orgUnitId + '?taskref=' + task.Id);
+                $http.post('api/organizationUnit/' + orgUnitId + '?taskref=' + task.id);
             } else {
-                $http.delete('api/organizationUnit/' + orgUnitId + '?taskref=' + task.Id);
+                $http.delete('api/organizationUnit/' + orgUnitId + '?taskref=' + task.id);
             }
         };
 
         function filterTasks() {
-            var orgUnitParentId = $scope.chosenOrgUnit.Parent_Id;
+            var orgUnitParentId = $scope.chosenOrgUnit.parentId;
 
             if (orgUnitParentId === 0) {
                 // root tree, show all
@@ -438,10 +438,10 @@
             } else {
                 // node tree, show selected from parent
                 $http.get('api/organizationUnit/' + orgUnitParentId + '?taskrefs').success(function (result) {
-                    var selectedTasksOnParent = result.Response;
+                    var selectedTasksOnParent = result.response;
                     _.each(selectedTasksOnParent, function (selectedTask) {
                         var foundTask = _.find($scope.allTasksFlat, function (task) {
-                            return task.Id === selectedTask.Id;
+                            return task.id === selectedTask.id;
                         });
                         if (foundTask) {
                             foundTask.show = true;
@@ -455,20 +455,20 @@
         }
 
         function selectTasks() {
-            var orgUnitId = $scope.chosenOrgUnit.Id;
+            var orgUnitId = $scope.chosenOrgUnit.id;
 
             $http.get('api/organizationUnit/' + orgUnitId + '?taskrefs').success(function(result) {
-                var selectedTasks = result.Response;
+                var selectedTasks = result.response;
                 _.each(selectedTasks, function (selectTask) {
                     var foundTask = _.find($scope.allTasksFlat, function(task) {
-                        return task.Id === selectTask.Id;
+                        return task.id === selectTask.id;
                     });
                     if (foundTask) {
                         foundTask.selected = true;
                         foundTask.setChildrenState(true);
                         foundTask.setParentState();
 
-                        foundTask.handledByOrgUnit = mapIdToOrgUnit(selectTask.HandledByOrgUnit);
+                        foundTask.handledByOrgUnit = mapIdToOrgUnit(selectTask.handledByOrgUnit);
                     }
                 });
             });
@@ -479,9 +479,9 @@
                 var foundOrgUnit = _.find($scope.orgUnits, function (orgUnit) {
                     if (angular.isUndefined(orgUnit))
                         return false;
-                    return orgUnit.Id == id;
+                    return orgUnit.id == id;
                 });
-                return foundOrgUnit.Name;
+                return foundOrgUnit.name;
             });
         };
 
@@ -618,11 +618,11 @@
             // only get if not previously set
             if (!$scope.allTasksFlat) {
                 $http.get('api/taskref').success(function (result) {
-                    var tasks = result.Response;
+                    var tasks = result.response;
                     // flat array for easy searching
                     $scope.allTasksFlat = tasks;
                     // nested array for angular to generate tree in a repeat
-                    $scope.allTasksTree = toHierarchy(tasks, 'Id', 'Parent_Id');
+                    $scope.allTasksTree = toHierarchy(tasks, 'id', 'parentId');
                     deferred.resolve();
                 });
             } else {
