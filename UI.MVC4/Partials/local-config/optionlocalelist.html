@@ -11,7 +11,7 @@
         <div class="row" data-ng-repeat="option in list">
             <div class="col-md-4">{{option.name}}</div>
             <div class="col-md-4">
-                <a href="#" data-editable-text="option.localeName" data-buttons="no" onbeforesave="updateLocale($data, option)">{{option.localeName || option.name}}</a>
+                <a href="#" data-editable-text="option.localeName" data-buttons="no" data-onbeforesave="updateLocale($data, option)">{{option.localeName || option.name}}</a>
             </div>
             <div class="col-md-4 small">{{option.note}}</div>
         </div>

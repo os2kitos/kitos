@@ -190,7 +190,7 @@
                 .change(function () {
                     var val = $(this).val();
                     var type = $(this).attr("data-new") == "new" ? "POST" : "PUT";
-                    ajax(localeUri, { "Original_Id": itemid, "Name": val }, type,
+                    ajax(localeUri, { "OriginalId": itemid, "Name": val }, type,
                         function (result) {
                             $(this).highlight();
                         }
@@ -207,7 +207,7 @@
                 .done(function (data) {
                     var target = $("#" + targetId);
                     $.each(data, function (i, e) {
-                        target.find("input.config-edit-custom[data-itemid=" + e.Original_Id + "]")
+                        target.find("input.config-edit-custom[data-itemid=" + e.OriginalId + "]")
                             .val(e.Name)
                             .removeAttr("data-new");
                     });

@@ -36,7 +36,7 @@
 
         $scope['patch' + nameSingular] = function (data, i) {
             var item = $scope[namePlural][i];
-            var result = Restangular.one(nameSingular, item.Id).patch({ IsActive: data }).then(function () {
+            var result = Restangular.one(nameSingular, item.id).patch({ isActive: data }).then(function () {
                 local['update' + namePlural]();
             });
             return result;
@@ -44,7 +44,7 @@
 
         $scope['patch' + nameSingular + 'Suggestion'] = function (data, i) {
             var item = $scope[nameSingular + 'Suggestions'][i];
-            var result = Restangular.one(nameSingular, item.Id).patch({ IsSuggestion: data }).then(function () {
+            var result = Restangular.one(nameSingular, item.id).patch({ isSuggestion: data }).then(function () {
                 local['update' + namePlural]();
             });
             return result;
@@ -52,7 +52,7 @@
 
         $scope['patch' + nameSingular + 'Access'] = function (data, i) {
             var item = $scope[namePlural][i];
-            var result = Restangular.one(nameSingular, item.Id).patch({ HasWriteAccess: data });
+            var result = Restangular.one(nameSingular, item.id).patch({ hasWriteAccess: data });
             return result;
         };
 
@@ -86,7 +86,7 @@
         
         $scope.patchProjectCategory = function (data, i) {
             var item = $scope.categories[i];
-            return Restangular.one('projectCategory', item.Id).patch({IsActive: data});
+            return Restangular.one('projectCategory', item.id).patch({isActive: data});
         };
         
         var basePhases = Restangular.all('ProjectPhase');
@@ -96,7 +96,7 @@
         
         $scope.patchPhase = function (data, i) {
             var item = $scope.phases[i];
-            return Restangular.one('ProjectPhase', item.Id).patch({ Name: data });
+            return Restangular.one('ProjectPhase', item.id).patch({ name: data });
         };
 
         var baseRefs = Restangular.all('extReferenceType');
@@ -106,7 +106,7 @@
         
         $scope.patchRef = function (data, i) {
             var item = $scope.refs[i];
-            return Restangular.one('extReferenceType', item.Id).patch({ Name: data });
+            return Restangular.one('extReferenceType', item.id).patch({ name: data });
         };
                
         handler($scope, Restangular, 'ItProjectRole', 'ItProjectRoles');
@@ -123,7 +123,7 @@
 
         $scope.patchRef = function (data, i) {
             var item = $scope.refs[i];
-            return Restangular.one('extReferenceType', item.Id).patch({ Name: data });
+            return Restangular.one('extReferenceType', item.id).patch({ name: data });
         };
 
         handler($scope, Restangular, 'ItSystemRole', 'ItSystemRoles');        
@@ -146,7 +146,7 @@
 
         $scope.patchRef = function (data, i) {
             var item = $scope.refs[i];
-            return Restangular.one('extReferenceType', item.Id).patch({ Name: data });
+            return Restangular.one('extReferenceType', item.id).patch({ name: data });
         };
 
         handler($scope, Restangular, 'ContractType', 'ContractTypes');

@@ -30,7 +30,7 @@ namespace UI.MVC4.Controllers.API
 
         protected virtual IEnumerable<TModel> GetAllQuery()
         {
-            return Repository.Get(l => l.Municipality_Id == 1);
+            return Repository.Get(l => l.MunicipalityId == 1);
         }
 
         protected virtual TModel PostQuery(TModel item)
@@ -61,7 +61,7 @@ namespace UI.MVC4.Controllers.API
         
         public HttpResponseMessage Get(int id)
         {
-            var items = Repository.Get(l => l.Municipality_Id == id).ToList();
+            var items = Repository.Get(l => l.MunicipalityId == id).ToList();
 
             if (!items.Any())
                 return NoContent();
@@ -86,13 +86,13 @@ namespace UI.MVC4.Controllers.API
             var item = Map<LocaleInputDTO, TModel>(dto);
             try
             {
-                TestMunicipalityMembership(dto.Municipality_Id);
+                TestMunicipalityMembership(dto.MunicipalityId);
 
                 PostQuery(item);
 
                 //var msg = new HttpResponseMessage(HttpStatusCode.Created);
                 return Created(item,
-                               new Uri(Request.RequestUri + "?orgId=" + item.Municipality_Id + "&oId=" + item.Original_Id));
+                               new Uri(Request.RequestUri + "?orgId=" + item.MunicipalityId + "&oId=" + item.OriginalId));
             }
             catch (Exception e)
             {
@@ -106,7 +106,7 @@ namespace UI.MVC4.Controllers.API
             var item = Map<LocaleInputDTO, TModel>(dto);
             try
             {
-                TestMunicipalityMembership(dto.Municipality_Id);
+                TestMunicipalityMembership(dto.MunicipalityId);
 
                 PutQuery(item);
 

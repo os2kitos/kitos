@@ -18,20 +18,20 @@ namespace Infrastructure.DataAccess.Mapping
             this.ToTable("ExtReference");
             this.Property(t => t.Id).HasColumnName("Id");
             this.Property(t => t.Value).HasColumnName("Value");
-            this.Property(t => t.ItProject_Id).HasColumnName("ItProject_Id");
-            this.Property(t => t.ExtReferenceType_Id).HasColumnName("ExtReferenceType_Id");
-            this.Property(t => t.ItSystem_Id).HasColumnName("ItSystem_Id");
+            this.Property(t => t.ItProjectId).HasColumnName("ItProjectId");
+            this.Property(t => t.ExtReferenceTypeId).HasColumnName("ExtReferenceTypeId");
+            this.Property(t => t.ItSystemId).HasColumnName("ItSystemId");
 
             // Relationships
             this.HasRequired(t => t.ExtReferenceType)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.ExtReferenceType_Id);
+                .HasForeignKey(d => d.ExtReferenceTypeId);
             this.HasRequired(t => t.ItProject)
                 .WithMany(t => t.ExtReferences)
-                .HasForeignKey(d => d.ItProject_Id);
+                .HasForeignKey(d => d.ItProjectId);
             this.HasRequired(t => t.ItSystem)
                 .WithMany(t => t.ExtReferences)
-                .HasForeignKey(d => d.ItSystem_Id);
+                .HasForeignKey(d => d.ItSystemId);
 
         }
     }

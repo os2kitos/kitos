@@ -26,15 +26,9 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var user = new User()
-                    {
-                        Name = item.Name,
-                        Email = item.Email
-                    };
+                var user = UserRepository.GetByKey(item.UserId);
 
-                user = _userService.AddUser(user);
-
-                var organization = _organizationRepository.GetByKey(item.Organization_Id);
+                var organization = _organizationRepository.GetByKey(item.OrganizationId);
 
                 _adminService.MakeLocalAdmin(user, organization);
 

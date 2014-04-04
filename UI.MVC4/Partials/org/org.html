@@ -15,38 +15,57 @@
             <div class="col-md-12" data-ng-hide="chosenOrgUnit">
                 <h3>Vælg en organisationsenhed</h3>
                 <p>Her kan du få overblik over de organisationsenheder, som du er tilknyttet.</p>
-                <p><strong>Start med at vælge en organisationsenhed i oversigten til venstre.</strong></p>
+                <p>
+                    <strong>Start med at vælge en organisationsenhed i oversigten til venstre.</strong>
+                </p>
             </div>
 
             <!-- if an org unit has been selected -->
             <div class="col-md-12" data-ng-show="chosenOrgUnit">
-                <h3>{{ chosenOrgUnit.Name }}</h3>
-                <p>Du har valgt enheden {{ chosenOrgUnit.Name }} under organisationen {{ chosenOrgUnit.Organization.Name }}.</p>
+                <h3>
+                    {{ chosenOrgUnit.name }} 
+                    <span class="text-muted"> ({{ chosenOrgUnit.organization.name }})</span>
+                    <span class="pull-right small" data-ng-hide="chosenOrgUnit.hasWriteAccess">
+                        <i class="glyphicon glyphicon-lock" title="Du har ikke skriveadgang til denne organisationsenhed"></i>
+                    </span>
+                    <span class="pull-right small" data-ng-show="chosenOrgUnit.hasWriteAccess">
+                        <a data-ng-click="editUnit(chosenOrgUnit)"><i class="glyphicon glyphicon-cog" title="Rediger {{chosenOrgUnit.name}}"></i></a>
+                    </span>
+                </h3>
 
                 <!-- Organization Roles -->
-                <div class="panel panel-primary">
-                    <div class="panel-heading">Organisationsroller</div>
-                    <table class="full-width table table-striped">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <i class="glyphicon glyphicon-user"></i>
+                        Organisationsroller
+
+                        <a class="pull-right" 
+                           data-ng-show="chosenOrgUnit.hasWriteAccess" 
+                            data-ng-click="chosenOrgUnit.editRights = !chosenOrgUnit.editRights">
+                            Rediger
+                        </a>
+                    </div>
+                    <table class="full-width table">
                         <thead>
                             <tr>
                                 <th><a ng-click="rightSortChange('orgUnitName')">Organisationsenhed</a></th>
-                                <th><a ng-click="rightSortChange('roleName')">Brugerrolle</a></th>
+                                <th><a ng-click="rightSortChange('roleName')">Organisationsrolle</a></th>
                                 <th><a ng-click="rightSortChange('userName')">Navn</a></th>
                                 <th><a ng-click="rightSortChange('userEmail')">Email</a></th>
                                 <th></th>
                             </tr>
                         </thead>
                         <!-- for each right -->
-                        <tbody data-ng-repeat="right in chosenOrgUnit.OrgRights | filter : { show: true } | orderBy : rightSort : rightSortReverse">
+                        <tbody data-ng-repeat="right in chosenOrgUnit.orgRights | filter : { show: true } | orderBy : rightSort : rightSortReverse">
                             
                             <!-- show -->
                             <tr data-ng-hide="right.edit">
-                                <td>{{ orgUnits[right.Object_Id].Name }}</td>
-                                <td>{{ orgRoles[right.Role_Id].Name }}</td>
-                                <td>{{ right.User.Name }}</td>
-                                <td>{{ right.User.Email }}</td>
+                                <td>{{ orgUnits[right.objectId].name }}</td>
+                                <td>{{ orgRoles[right.roleId].name }}</td>
+                                <td>{{ right.user.name }}</td>
+                                <td>{{ right.user.email }}</td>
                                 <td>
-                                    <div data-ng-show="chosenOrgUnit.hasWriteAccess">
+                                    <div data-ng-show="chosenOrgUnit.hasWriteAccess && chosenOrgUnit.editRights">
                                         <a data-ng-click="right.edit = true" class="btn btn-link btn-sm"><i class="glyphicon glyphicon-pencil"></i></a>
                                         <a class="btn btn-link btn-sm" 
                                            data-confirmed-click="deleteRight(right)" 
@@ -60,18 +79,17 @@
                             <!-- edit -->
                             <tr data-ng-show="right.edit">
                                 <td>
-                                    <input type="text" disabled="" class="form-control input-sm" value="{{ orgUnits[right.Object_Id].Name }}"/>
+                                    <input type="text" disabled="disabled" class="form-control input-sm" value="{{ orgUnits[right.objectId].name }}"/>
                                 </td>
                                 <td>
                                     <select data-ui-select2="" name="selectRole" data-ng-model="right.roleForSelect" class="form-control input-sm">
-                                        <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.Id}}">
-                                            {{orgRole.Name}} ({{orgRole.HasWriteAccess && "skriv" || "læs" }})
+                                        <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.id}}">
+                                            {{orgRole.name}} ({{orgRole.hasWriteAccess && "skriv" || "læs" }})
                                         </option>
                                     </select>
                                 </td>
                                 <td colspan="2">
                                     <input data-select-user="foo" data-user-model="right.userForSelect" />
-                                    <!--<input data-select-user="" data-ng-model="right.userForSelect" data-ng-required="true" data-users-cache="users"/>-->
                                 </td>
                                 <td>
                                     <input type="submit" class="btn btn-primary btn-sm" data-ng-click="updateRight(right)" value="Gem" />
@@ -80,14 +98,14 @@
                         </tbody>
 
                         <!-- add-new-right row -->
-                        <tbody data-ng-show="chosenOrgUnit.hasWriteAccess">
+                        <tbody data-ng-show="chosenOrgUnit.hasWriteAccess && chosenOrgUnit.editRights">
                             <tr>
-                                <td><input type="text" disabled="" class="form-control input-sm" value="{{ chosenOrgUnit.Name }}"/></td>
+                                <td><input type="text" disabled="disabled" class="form-control input-sm" value="{{ chosenOrgUnit.name }}"/></td>
                                 <td>
-                                    <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en brugerrolle" class="form-control input-sm">
+                                    <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en organisationsrolle" class="form-control input-sm">
                                         <option value=""></option>
-                                        <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.Id}}">
-                                            {{orgRole.Name}} ({{orgRole.HasWriteAccess && "skriv" || "læs" }})
+                                        <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.id}}">
+                                            {{orgRole.name}} ({{orgRole.hasWriteAccess && "skriv" || "læs" }})
                                         </option>
                                     </select>
                                 </td>

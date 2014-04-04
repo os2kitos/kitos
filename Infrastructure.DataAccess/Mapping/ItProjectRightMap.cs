@@ -9,21 +9,21 @@ namespace Infrastructure.DataAccess.Mapping
     {
         public ItProjectRightMap()
         {
-            this.HasKey(right => new {right.Object_Id, right.Role_Id, right.User_Id});
+            this.HasKey(right => new {right.ObjectId, right.RoleId, right.UserId});
 
             this.ToTable("ItProjectRight");
 
             this.HasRequired(right => right.Object)
                 .WithMany(proj => proj.Rights)
-                .HasForeignKey(right => right.Object_Id);
+                .HasForeignKey(right => right.ObjectId);
 
             this.HasRequired(right => right.Role)
                 .WithMany(role => role.References)
-                .HasForeignKey(right => right.Role_Id);
+                .HasForeignKey(right => right.RoleId);
 
             this.HasRequired(right => right.User)
                 .WithMany(user => user.ProjectRights)
-                .HasForeignKey(right => right.User_Id);
+                .HasForeignKey(right => right.UserId);
         }
     }
 }

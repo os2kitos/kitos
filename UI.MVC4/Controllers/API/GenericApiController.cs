@@ -129,9 +129,9 @@ namespace UI.MVC4.Controllers.API
 
                 return Ok();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return NoContent(); // TODO catch correct expection
+                return Error(e); // TODO catch correct expection
             }
         }
 
@@ -157,7 +157,7 @@ namespace UI.MVC4.Controllers.API
                     AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>()
                               .GetPropertyMaps();
                 var nonNullMaps = map.Where(x => x.SourceMember != null);
-                var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name == valuePair.Key);
+                var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name.Equals(valuePair.Key, StringComparison.InvariantCultureIgnoreCase));
                 if (mapMember == null) 
                     continue; // abort if no map found
 
@@ -178,7 +178,7 @@ namespace UI.MVC4.Controllers.API
                 PatchQuery(item);
 
                 //pretty sure we'll get a merge conflict here???
-                return Ok(); // TODO correct?
+                return Ok(Map(item)); // TODO correct?
             }
             catch (Exception)
             {

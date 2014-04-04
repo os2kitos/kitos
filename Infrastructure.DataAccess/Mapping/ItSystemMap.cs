@@ -18,26 +18,26 @@ namespace Infrastructure.DataAccess.Mapping
             // Relationships
             this.HasRequired(t => t.ParentItSystem)
                 .WithMany(t => t.ItSystems1)
-                .HasForeignKey(d => d.ParentItSystem_Id);
+                .HasForeignKey(d => d.ParentItSystemId);
 
             this.HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystems)
-                .HasForeignKey(d => d.Municipality_Id)
+                .HasForeignKey(d => d.MunicipalityId)
                 .WillCascadeOnDelete(false);
 
             this.HasRequired(t => t.SystemType)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.SystemType_Id)
+                .HasForeignKey(d => d.SystemTypeId)
                 .WillCascadeOnDelete(false);
 
             this.HasRequired(t => t.InterfaceType)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.InterfaceType_Id)
+                .HasForeignKey(d => d.InterfaceTypeId)
                 .WillCascadeOnDelete(false);
 
             this.HasRequired(t => t.ProtocolType)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.ProtocolType_Id)
+                .HasForeignKey(d => d.ProtocolTypeId)
                 .WillCascadeOnDelete(false);
         }
     }

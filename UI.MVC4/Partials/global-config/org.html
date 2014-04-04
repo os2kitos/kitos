@@ -6,13 +6,13 @@
             <div class="form-group" data-ng-repeat="item in OrganizationRoles">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchOrganizationRole($data, $index)">
-                            {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        <a href="#" data-editable-checkbox="item.isActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchOrganizationRole($data, $index)">
+                            {{ item.isActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.HasWriteAccess" data-e-title="Skriverettighed?" data-onbeforesave="patchOrganizationRoleAccess($data, $index)">
-                            {{ item.HasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
+                        <a href="#" data-editable-checkbox="item.hasWriteAccess" data-e-title="Skriverettighed?" data-onbeforesave="patchOrganizationRoleAccess($data, $index)">
+                            {{ item.hasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
                         </a>
                     </div>
                 </div>
@@ -25,8 +25,8 @@
             <div class="form-group" data-ng-repeat="item in OrganizationRoleSuggestions">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchOrganizationRoleSuggestion(!$data, $index)">
-                            {{ item.IsSuggestion && "Medtager " + item.Name || "Medtager ikke " + item.Name }} med {{ item.HasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
+                        <a href="#" data-editable-checkbox="!item.isSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchOrganizationRoleSuggestion(!$data, $index)">
+                            {{ item.isSuggestion && "Medtager " + item.name || "Medtager ikke " + item.name }} med {{ item.hasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
                         </a>
                     </div>
                 </div>

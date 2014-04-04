@@ -34,7 +34,7 @@ namespace Core.ApplicationServices
 
         public bool IsLocalAdmin(User user, Organization organization)
         {
-            return user.AdminRights.Any(right => right.Role.Name == "LocalAdmin" && right.Object_Id == organization.Id);
+            return user.AdminRights.Any(right => right.Role.Name == "LocalAdmin" && right.ObjectId == organization.Id);
         }
 
         public AdminRole GetLocalAdminRole()

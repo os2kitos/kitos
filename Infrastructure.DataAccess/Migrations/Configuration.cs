@@ -443,7 +443,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Admin rights
 
-            context.AdminRights.AddOrUpdate(right => new {right.Object_Id, right.Role_Id, right.User_Id},
+            context.AdminRights.AddOrUpdate(right => new {right.ObjectId, right.RoleId, right.UserId},
                                             new AdminRight()
                                                 {
                                                     Object = roskilde,
@@ -457,7 +457,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Org rights
 
-            context.OrganizationRights.AddOrUpdate(right => new { right.Object_Id, right.Role_Id, right.User_Id },
+            context.OrganizationRights.AddOrUpdate(right => new { right.ObjectId, right.RoleId, right.UserId },
                     new OrganizationRight()
                         {
                             Object = itservice,
@@ -499,7 +499,7 @@ namespace Infrastructure.DataAccess.Migrations
                                                           //This reset request is fine
                                                           Id = "workingRequest", //ofcourse, this should be a hashed string or something obscure
                                                           Time = DateTime.Now.AddYears(+20), //.MaxValue also seems to be out-of-range, but this should hopefully be good enough
-                                                          User_Id = simonId
+                                                          UserId = simonId
                                                       }
                 );
 
@@ -584,7 +584,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             #endregion
 
-            context.ProjectPhaseLocales.AddOrUpdate(x => new { x.Municipality_Id, x.Original_Id },
+            context.ProjectPhaseLocales.AddOrUpdate(x => new { x.MunicipalityId, x.OriginalId },
                                                     new ProjPhaseLocale()
                                                         {
                                                             Organization = roskilde,

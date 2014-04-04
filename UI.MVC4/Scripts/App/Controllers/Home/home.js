@@ -3,14 +3,9 @@
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
         
         $stateProvider.state('index', {
-            url: '/',
+            url: '/?login?to',
             templateUrl: 'partials/home/index.html',
             controller: 'home.IndexCtrl',
-            noAuth: true
-        }).state('login', {
-            url: '/login?to',
-            templateUrl: 'partials/home/login.html',
-            controller: 'home.LoginCtrl',
             noAuth: true
         }).state('forgot-password', {
             url: '/forgot-password',
@@ -26,41 +21,38 @@
 
     }]);
 
-    app.controller('home.IndexCtrl', ['$rootScope', '$scope', 'Restangular', function ($rootScope, $scope, Restangular) {
+    app.controller('home.IndexCtrl', ['$rootScope', '$scope', '$http', '$state', '$stateParams', 'growl', 'Restangular', function ($rootScope, $scope, $http, $state, $stateParams, growl, Restangular) {
         $rootScope.page.title = 'Index';
         $rootScope.page.subnav = [];
-
+        
         Restangular.one('text', 'intro-head').get().then(function (data) {
-            $scope.introhead = data.Value;
+            $scope.introhead = data.value;
 
             $scope.submitIntroHead = function(newValue) {
-                data.Value = newValue;
+                data.value = newValue;
                 data.put();
             };
         });
         
         Restangular.one('text', 'intro-body').get().then(function (data) {
-            $scope.introbody = data.Value;
+            $scope.introbody = data.value;
             
             $scope.submitIntroBody = function (newValue) {
-                data.Value = newValue;
+                data.value = newValue;
                 data.put();
             };
         });
-    }]);
-    
-    app.controller('home.LoginCtrl', ['$rootScope', '$scope', '$http', '$state', '$stateParams', 'growl', function ($rootScope, $scope, $http, $state, $stateParams, growl) {
-        $rootScope.page.title = 'Log ind';
-        $rootScope.page.subnav = [];
-        
+
+        $scope.highlightLogin = $stateParams.login;
+
         //login
-        $scope.submit = function () {
+        $scope.submitLogin = function () {
             if ($scope.loginForm.$invalid) return;
 
             var data = {
-                'Email': $scope.email,
-                'Password': $scope.password,
-                'RememberMe': $scope.remember
+                "email": $scope.email,
+                "password": $scope.password,
+                "rememberMe": $scope.remember
             };
 
             $http.post('api/authorize', data).success(function (result) {
@@ -68,7 +60,8 @@
 
                 $rootScope.saveUser(result);
 
-                var to = $stateParams.to ? $stateParams.to : 'index';
+                //redirect to another state or to the org-view state by default
+                var to = $stateParams.to ? $stateParams.to : 'org-view';
 
                 $state.go(to);
             }).error(function (result) {
@@ -77,7 +70,7 @@
 
         };
     }]);
-
+    
     app.controller('home.ForgotPasswordCtrl', ['$rootScope', '$scope', '$http', 'growl', function ($rootScope, $scope, $http, growl) {
         $rootScope.page.title = 'Glemt password';
         $rootScope.page.subnav = [];
@@ -86,7 +79,7 @@
         $scope.submit = function() {
             if ($scope.requestForm.$invalid) return;
 
-            var data = { 'Email': $scope.email };
+            var data = { "email": $scope.email };
 
             $scope.requestSuccess = $scope.requestFailure = false;
             
@@ -107,7 +100,7 @@
         var requestId = $stateParams.requestId;
         $http.get('api/passwordresetrequest?requestId=' + requestId).success(function(result) {
             $scope.resetStatus = 'enterPassword';
-            $scope.email = result.Response.UserEmail;
+            $scope.email = result.response.userEmail;
         }).error(function() {
             $scope.resetStatus = 'missingRequest';
         });
@@ -115,7 +108,7 @@
         $scope.submit = function() {
             if ($scope.resetForm.$invalid) return;
 
-            var data = { 'RequestId': requestId, 'NewPassword': $scope.password };
+            var data = { "requestId": requestId, "newPassword": $scope.password };
             
             $http.post('api/authorize?resetPassword', data).success(function (result) {
                 $scope.resetStatus = 'success';

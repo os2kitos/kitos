@@ -30,12 +30,12 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.To).HasColumnName("To");
             this.Property(t => t.Cc).HasColumnName("Cc");
             this.Property(t => t.Subject).HasColumnName("Subject");
-            this.Property(t => t.ItContract_Id).HasColumnName("ItContract_Id");
+            this.Property(t => t.ItContractId).HasColumnName("ItContractId");
 
             // Relationships
             this.HasRequired(t => t.ItContract)
                 .WithMany(t => t.ShipNotices)
-                .HasForeignKey(d => d.ItContract_Id);
+                .HasForeignKey(d => d.ItContractId);
         }
     }
 }

@@ -18,9 +18,9 @@ namespace Core.DomainModel
         public string Description { get; set; }
         public DateTime? ActiveFrom { get; set; }
         public DateTime? ActiveTo { get; set; }
-        public int? ItProject_Id { get; set; }
-        public int? ItSystem_Id { get; set; }
-        public int? Parent_Id { get; set; }
+        public int? ItProjectId { get; set; }
+        public int? ItSystemId { get; set; }
+        public int? ParentId { get; set; }
 
         public virtual TaskRef Parent { get; set; }
         public virtual ICollection<TaskRef> Children { get; set; }

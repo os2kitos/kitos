@@ -8,13 +8,13 @@ namespace UI.MVC4.Models
     public class LocaleDTO
     {
         public string Name { get; set; }
-        public int Original_Id { get; set; }
+        public int OriginalId { get; set; }
     }
 
     public class LocaleInputDTO
     {
         public string Name { get; set; }
-        public int Original_Id { get; set; }
-        public int Municipality_Id { get; set; }
+        public int OriginalId { get; set; }
+        public int MunicipalityId { get; set; }
     }
 }

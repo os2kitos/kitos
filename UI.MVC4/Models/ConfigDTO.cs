@@ -9,7 +9,7 @@ namespace UI.MVC4.Models
         public bool ShowItContractModule { get; set; }
 
         /* IT SUPPORT */
-        public int ItSupportModuleName_Id { get; set; }
+        public int ItSupportModuleNameId { get; set; }
         public string ItSupportGuide { get; set; }
         public bool ShowTabOverview { get; set; }
         public bool ShowColumnTechnology { get; set; }
@@ -17,17 +17,17 @@ namespace UI.MVC4.Models
         public bool ShowColumnMandatory { get; set; }
 
         /* IT PROJECT */
-        public int ItProjectModuleName_Id { get; set; }
+        public int ItProjectModuleNameId { get; set; }
         public string ItProjectGuide { get; set; }
         public bool ShowPortfolio { get; set; }
         public bool ShowBC { get; set; }
 
         /* IT SYSTEM */
-        public int ItSystemModuleName_Id { get; set; }
+        public int ItSystemModuleNameId { get; set; }
         public string ItSystemGuide { get; set; }
 
         /* IT CONTRACT */
-        public int ItContractModuleName_Id { get; set; }
+        public int ItContractModuleNameId { get; set; }
         public string ItContractGuide { get; set; }
     }
 }

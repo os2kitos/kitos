@@ -20,19 +20,19 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasRequired(t => t.ItSupportModuleName)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.ItSupportModuleName_Id);
+                .HasForeignKey(d => d.ItSupportModuleNameId);
 
             this.HasRequired(t => t.ItContractModuleName)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.ItContractModuleName_Id);
+                .HasForeignKey(d => d.ItContractModuleNameId);
 
             this.HasRequired(t => t.ItProjectModuleName)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.ItProjectModuleName_Id);
+                .HasForeignKey(d => d.ItProjectModuleNameId);
 
             this.HasRequired(t => t.ItSystemModuleName)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.ItSystemModuleName_Id);
+                .HasForeignKey(d => d.ItSystemModuleNameId);
         }
     }
 }

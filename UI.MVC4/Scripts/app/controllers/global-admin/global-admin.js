@@ -35,7 +35,7 @@
         $scope.submit = function() {
             if ($scope.addForm.$invalid) return;
 
-            var data = { "Name": $scope.name };
+            var data = { "name": $scope.name };
             
             $http.post('api/organization', data).success(function (result) {
                 growl.addSuccessMessage("Organisationen " + $scope.name + " er blevet oprettet!");
@@ -53,27 +53,28 @@
 
         $scope.organizations = [];
         $http.get("api/organization").success(function(result) {
-            $scope.organizations = result.Response;
+            $scope.organizations = result.response;
         });
 
         $scope.submit = function () {
             if ($scope.addForm.$invalid) return;
 
+            var selectedUser = $scope.selectedUser;
+            var orgId = $scope.organization;
+
             var data = {
-                "Name": $scope.name,
-                "Email": $scope.email,
-                "Organization_Id": $scope.organization //TODO!!!
+                "userId": selectedUser.id,
+                "organizationId": orgId
             };
 
             $http.post('api/localadmin', data).success(function (result) {
-                growl.addSuccessMessage("Lokaladmin " + $scope.name + " er blevet oprettet!");
+                growl.addSuccessMessage(selectedUser.text + " er blevet lokal admin!");
 
-                $scope.name = "";
-                $scope.email = "";
+                $scope.selectedUser = null;
                 $scope.organization = ""; 
                 
             }).error(function (result) {
-                growl.addErrorMessage("Lokaladmin " + $scope.name + " kunne ikke oprettes!");
+                growl.addErrorMessage("Fejl! " + selectedUser.text + " blev ikke lokal admin!");
             });
         };
     }]);
@@ -85,19 +86,19 @@
         $scope.submit = function () {
             if ($scope.addForm.$invalid) return;
 
+            var selectedUser = $scope.selectedUser;
+
             var data = {
-                "Name": $scope.name,
-                "Email": $scope.email
+                "userId": selectedUser.id,
             };
 
             $http.post('api/globaladmin', data).success(function (result) {
-                growl.addSuccessMessage("Global admin " + $scope.name + " er blevet oprettet!");
+                growl.addSuccessMessage(selectedUser.text + " er blevet global admin!");
 
-                $scope.name = "";
-                $scope.email = "";
+                $scope.selectedUser = null;
 
             }).error(function (result) {
-                growl.addErrorMessage("Global admin " + $scope.name + " kunne ikke oprettes!");
+                growl.addErrorMessage("Fejl! " + selectedUser.text + " blev ikke global admin!");
             });
         };
     }]);

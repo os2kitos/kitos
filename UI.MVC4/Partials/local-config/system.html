@@ -4,8 +4,8 @@
             Modulnavn
         </label>
         <div class="col-md-10">
-            <a href="#" data-editable-select="system.chosenNameId" data-buttons="no" data-e-ng-options="name.Id as name.Name for name in system.moduleNames" data-onbeforesave="updateConfig($data, 'ItSystemModuleName_Id')">
-                {{ system.moduleNames[system.chosenNameId - 1].Name; }}
+            <a href="#" data-editable-select="system.chosenNameId" data-buttons="no" data-e-ng-options="name.id as name.name for name in system.moduleNames" data-onbeforesave="updateConfig($data, 'itSystemModuleNameId')">
+                {{ system.moduleNames[system.chosenNameId - 1].name; }}
             </a>
         </div>
     </div>
@@ -14,7 +14,7 @@
             Vejledning
         </label>
         <div class="col-md-10">
-            <a href="#" data-editable-text="system.guideUrl" data-buttons="no" data-onbeforesave="updateConfig($data, 'ItSystemGuide')">
+            <a href="#" data-editable-text="system.guideUrl" data-buttons="no" data-onbeforesave="updateConfig($data, 'itSystemGuide')">
                 {{ system.guideUrl || 'Ingen guide' }}
             </a>
         </div>
@@ -38,7 +38,7 @@
     <div data-suggest-new="" data-url="api/method"></div>
 
     <div data-option-list="" title="Database" data-options-url="api/databasetype"></div>
-    <div data-suggest-new="" data-url="api/database"></div>
+    <div data-suggest-new="" data-url="api/databasetype"></div>
 
     <div data-option-list="" title="Environment" data-options-url="api/environment"></div>
     <div data-suggest-new="" data-url="api/environment"></div>

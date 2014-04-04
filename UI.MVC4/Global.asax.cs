@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace UI.MVC4
 {
@@ -27,6 +28,9 @@ namespace UI.MVC4
 
             //Turns off self reference looping when serializing models in API controlllers
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+
+            // Set JSON serialization in WEB API to use camelCase (javascript) instead of PascalCase (C#)
+            GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
         }
     }
 }

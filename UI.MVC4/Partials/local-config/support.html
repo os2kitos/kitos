@@ -4,8 +4,8 @@
             Modulnavn
         </label>
         <div class="col-md-10">
-            <a href="#" data-editable-select="support.chosenNameId" data-buttons="no" data-e-ng-options="name.Id as name.Name for name in support.moduleNames" data-onbeforesave="updateConfig($data, 'ItSupportModuleName_Id')">
-                {{ support.moduleNames[support.chosenNameId - 1].Name; }}
+            <a href="#" data-editable-select="support.chosenNameId" data-buttons="no" data-e-ng-options="name.id as name.name for name in support.moduleNames" data-onbeforesave="updateConfig($data, 'itSupportModuleNameId')">
+                {{ support.moduleNames[support.chosenNameId - 1].name; }}
             </a>
         </div>
     </div>
@@ -14,7 +14,7 @@
             Vejledning
         </label>
         <div class="col-md-10">
-            <a href="#" data-editable-text="support.guideUrl" data-buttons="no" data-onbeforesave="updateConfig($data, 'ItSupportGuide')">
+            <a href="#" data-editable-text="support.guideUrl" data-buttons="no" data-onbeforesave="updateConfig($data, 'itSupportGuide')">
                 {{ support.guideUrl || 'Ingen guide' }}
             </a>
         </div>
@@ -28,25 +28,25 @@
         </label>
         <div class="col-md-10">
             <div>
-                <a href="#" data-editable-checkbox="support.showTabOverview" data-e-title="Medtag fanen 'Overblik'?" data-onbeforesave="updateConfig($data, 'ShowTabOverview')" data-buttons="no">
+                <a href="#" data-editable-checkbox="support.showTabOverview" data-e-title="Medtag fanen 'Overblik'?" data-onbeforesave="updateConfig($data, 'showTabOverview')" data-buttons="no">
                     {{support.showTabOverview && "Medtager fanen 'Overblik'" || "Medtager IKKE fanen 'Overblik'" }}
                 </a>
             </div>
 
             <div>
-                <a href="#" data-editable-checkbox="support.showTechnology" data-e-title="Medtag kolonnen 'Teknologi'?" data-onbeforesave="updateConfig($data, 'ShowColumnTechnology')" data-buttons="no">
+                <a href="#" data-editable-checkbox="support.showTechnology" data-e-title="Medtag kolonnen 'Teknologi'?" data-onbeforesave="updateConfig($data, 'showColumnTechnology')" data-buttons="no">
                     {{support.showTechnology && "Medtager kolonnen 'Teknologi'" || "Medtager IKKE kolonnen 'Teknologi'" }}
                 </a>
             </div>
 
             <div>
-                <a href="#" data-editable-checkbox="support.showUsage" data-e-title="Medtag kolonnen 'Anvendelse'?" data-onbeforesave="updateConfig($data, 'ShowColumnUsage')" data-buttons="no">
+                <a href="#" data-editable-checkbox="support.showUsage" data-e-title="Medtag kolonnen 'Anvendelse'?" data-onbeforesave="updateConfig($data, 'showColumnUsage')" data-buttons="no">
                     {{support.showUsage && "Medtager kolonnen 'Anvendelse'" || "Medtager IKKE kolonnen 'Anvendelse'" }}
                 </a>
             </div>
 
             <div>
-                <a href="#" data-editable-checkbox="support.showMandatory" data-e-title="Medtag kolonnen 'SKAL'?" data-onbeforesave="updateConfig($data, 'ShowColumnMandatory')" data-buttons="no">
+                <a href="#" data-editable-checkbox="support.showMandatory" data-e-title="Medtag kolonnen 'SKAL'?" data-onbeforesave="updateConfig($data, 'showColumnMandatory')" data-buttons="no">
                     {{support.showMandatory && "Medtager kolonnen 'SKAL'" || "Medtager IKKE kolonnen 'SKAL'" }}
                 </a>
             </div>

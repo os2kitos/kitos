@@ -14,12 +14,12 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("Stakeholder");
             this.Property(t => t.Id).HasColumnName("Id");
-            this.Property(t => t.ItProject_Id).HasColumnName("ItProject_Id");
+            this.Property(t => t.ItProjectId).HasColumnName("ItProjectId");
 
             // Relationships
             this.HasRequired(t => t.ItProject)
                 .WithMany(t => t.Stakeholders)
-                .HasForeignKey(d => d.ItProject_Id);
+                .HasForeignKey(d => d.ItProjectId);
 
         }
     }
