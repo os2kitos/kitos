@@ -1,6 +1,6 @@
 ﻿<div>
     <span>
-        <label>
+        <label data-ng-show="task.show">
             <input type="checkbox" data-ng-checked="task.selected" data-ui-indeterminate="task.indeterminate" data-ng-click="updateTask(task)"/>
             {{ task.TaskKey }} {{ task.Description }}
         </label>

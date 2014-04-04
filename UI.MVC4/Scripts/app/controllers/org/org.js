@@ -263,48 +263,58 @@
             }
         };
 
-        function updateLists(all) {
-            var orgUnitId = $scope.chosenOrgUnit.Id,
-                orgUnitParentId = $scope.chosenOrgUnit.Parent_Id;
+        function filterTasks() {
+            var orgUnitParentId = $scope.chosenOrgUnit.Parent_Id;
 
-            var listOfQs = [];
-            listOfQs.push($http.get('api/organizationUnit/' + orgUnitId + '?taskrefs'));
-
-            if (all === true) { // fetch all available tasks (should only be called when it changes like when orgUnit changes)
-                if (orgUnitParentId === 0) { // if root org unit list all taskrefs as available
-                    listOfQs.push($http.get('api/taskref'));
-                } else { // else only show selected on parent orgunit
-                    listOfQs.push($http.get('api/organizationUnit/' + orgUnitParentId + '?taskrefs'));
-                }
-            } else {
-                var deferred = new $q.defer();
-                deferred.resolve({ data: { Response: $scope.availableTaskRefsRaw } }); // mimic http response
-                listOfQs.push(deferred.promise);
-            }
-
-            $q.all(listOfQs).then(function (result) {
-                // NOTE the order of promises is important!
-                var chosenTaskRefs = result[0].data.Response,
-                    availableTaskRefs = result[1].data.Response;
-                
-                angular.forEach(chosenTaskRefs, function(selectedTasks) {
-                    var task = _.find(availableTaskRefs, function(availableTasks) {
-                        return availableTasks.Id == selectedTasks.Id;
-                    });
-                    task.selected = true;
+            if (orgUnitParentId === 0) {
+                // root tree, show all
+                _.each($scope.allTasksFlat, function(task) {
+                    task.show = true;
                 });
+            } else {
+                // node tree, show selected from parent
+                $http.get('api/organizationUnit/' + orgUnitParentId + '?taskrefs').success(function (result) {
+                    var selectedTasksOnParent = result.Response;
+                    _.each(selectedTasksOnParent, function (selectedTask) {
+                        var foundTask = _.find($scope.allTasksFlat, function (task) {
+                            return task.Id === selectedTask.Id;
+                        });
+                        if (foundTask) {
+                            foundTask.show = true;
+                            foundTask.setChildrenShown(true);
+                            foundTask.setParentShown(true);
+                        }
+                    });
+                });
+            }
+        }
 
-                $scope.chosenTaskRefs = chosenTaskRefs;
-                if (all === true) {
-                    $scope.availableTaskRefsRaw = availableTaskRefs;
-                    $scope.availableTaskRefs = toHierarchy(availableTaskRefs, 'Id', 'Parent_Id', 'parent', 'children');
-                }
+        function selectTasks() {
+            var orgUnitId = $scope.chosenOrgUnit.Id;
+
+            $http.get('api/organizationUnit/' + orgUnitId + '?taskrefs').success(function(result) {
+                var selectedTasks = result.Response;
+                _.each(selectedTasks, function (selectTask) {
+                    var foundTask = _.find($scope.allTasksFlat, function(task) {
+                        return task.Id === selectTask.Id;
+                    });
+                    if (foundTask) {
+                        foundTask.selected = true;
+                        foundTask.setChildrenState(true);
+                        foundTask.setParentState();
+                    }
+                });
             });
         }
 
         function toHierarchy(flatAry, idPropertyName, parentIdPropetyName, parentPropetyName, childPropertyName) {
-            var copy = angular.copy(flatAry);
-            var sorted = _.sortBy(copy, function(obj) {
+            // default values
+            parentPropetyName = typeof parentPropetyName !== 'undefined' ? parentPropetyName : 'parent';
+            childPropertyName = typeof childPropertyName !== 'undefined' ?  childPropertyName : 'children';
+
+            // sort by parent to get roots (roots are null) first, then we only need to iterrate once
+            // example [1, 1, null, 2] -> [null, 1, 1, 2] (number is parent id)
+            var sorted = _.sortBy(flatAry, function(obj) {
                 return obj[parentIdPropetyName];
             });
 
@@ -337,6 +347,23 @@
                             return child.selected === false && child.indeterminate === false;
                         }
                     });
+                };
+                obj.setChildrenShown = function(isShown) {
+                    if (typeof isShown !== 'boolean')
+                        throw new Error('Argument must be a boolean');
+
+                    var children = this.children;
+                    if (!children) return;
+
+                    _.each(children, function (child) {
+                        child.show = isShown;
+                        child.setChildrenShown(isShown);
+                    });
+                };
+                obj.setParentShown = function (isShown) {
+                    var parent = this.parent;
+                    if (!parent) return;
+                    parent.setParentShown(isShown);
                 };
                 obj.setState = function(isChecked) {
                     if (isChecked === true) {
@@ -410,9 +437,41 @@
         };
 
         $scope.$watch('chosenOrgUnit', function (newOrgUnit, oldOrgUnit) {
-            if (newOrgUnit !== null)
-                updateLists(true);
+            if (newOrgUnit !== null) {
+                getAllTasks().then(function() {
+                    resetTasks();
+                    filterTasks();
+                    selectTasks();
+                });
+                //updateLists(true);
+            }
+                
         });
+
+        function getAllTasks() {
+            var deferred = $q.defer();
+            // only get if not previously set
+            if (!$scope.allTasksFlat) {
+                $http.get('api/taskref').success(function (result) {
+                    var tasks = result.Response;
+                    // flat array for easy searching
+                    $scope.allTasksFlat = tasks;
+                    // nested array for angular to generate tree in a repeat
+                    $scope.allTasksTree = toHierarchy(tasks, 'Id', 'Parent_Id');
+                    deferred.resolve();
+                });
+            } else {
+                deferred.resolve();
+            }
+            return deferred.promise;
+        }
+
+        function resetTasks() {
+            _.each($scope.allTasksFlat, function(task) {
+                task.show = false;
+                task.selected = false;
+            });
+        }
     }]);
 
 })(angular, app);
