@@ -40,6 +40,12 @@
 
 
         function flattenAndSave(orgUnit, inheritWriteAccess) {
+
+            console.log("Flatten:");
+            console.log(orgUnit);
+            console.log("inheritWriteAccess: " + inheritWriteAccess);
+
+            //restore previously saved settings
             if ($scope.orgUnits[orgUnit.id]) {
 
                 var old = $scope.orgUnits[orgUnit.id];
@@ -54,7 +60,7 @@
                     orgUnit.hasWriteAccess = result.response;
                     
                     _.each(orgUnit.children, function(u) {
-                        return flattenAndSave(u, result.response);
+                        flattenAndSave(u, result.response);
                     });
 
                 });
@@ -75,7 +81,9 @@
             return $http.get('api/organizationunit?userId=' + userId).success(function(result) {
                 $scope.nodes = result.response;
 
-                _.each(result.response, flattenAndSave);
+                _.each(result.response, function(u) {
+                    flattenAndSave(u, false);
+                });
 
                 if ($scope.chosenOrgUnit) {
                     
@@ -93,18 +101,18 @@
         $scope.chooseOrgUnit = function (node) {
             
             //get organization related to the org unit
-            if (!node.Organization) {
+            if (!node.organization) {
 
                 //try get from cache
                 if (orgs[node.organization_Id]) {
                     
-                    node.Organization = orgs[node.organization_Id];
+                    node.organization = orgs[node.organization_Id];
                     
                 } else {
                     //else get from server
                     
                     $http.get('api/organization/' + node.organization_Id).success(function (data) {
-                        node.Organization = data.response;
+                        node.organization = data.response;
                         
                         //save to cache
                         orgs[node.organization_Id] = data.response;
@@ -114,9 +122,9 @@
             
             //get org rights on the org unit and subtree
             $http.get('api/organizationRight?organizationUnitId=' + node.id).success(function(data) {
-                node.OrgRights = data.response;
+                node.orgRights = data.response;
 
-                _.each(node.OrgRights, function (right) {
+                _.each(node.orgRights, function (right) {
                     right.userForSelect = { id: right.user.id, text: right.user.name };
                     right.roleForSelect = right.role_Id;
                     right.show = true;
@@ -145,7 +153,7 @@
             $http.post("api/organizationright", data).success(function (result) {
                 growl.addSuccessMessage(result.response.user.name + " er knyttet i rollen");
 
-                $scope.chosenOrgUnit.OrgRights.push({
+                $scope.chosenOrgUnit.orgRights.push({
                     "object_Id": result.response.object_Id,
                     "role_Id": result.response.role_Id,
                     "user_Id": result.response.user_Id,

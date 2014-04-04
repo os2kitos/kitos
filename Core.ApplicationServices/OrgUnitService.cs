@@ -119,9 +119,9 @@ namespace Core.DomainServices
         public bool HasWriteAccess(User user, OrganizationUnit unit)
         {
             //if user is global admin or local admin, user has write access
-            if (user.IsGlobalAdmin) return true;
+            if (_adminService.IsGlobalAdmin(user)) return true;
 
-            if (user.AdminRights.Select(r => r.Object_Id == unit.Organization_Id).Any()) return true;
+            if (IsLocalAdminFor(user, unit)) return true;
 
             // check all rights for the user on this org unit,
             // as well as every ancestor org unit

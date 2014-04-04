@@ -65,7 +65,7 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 JToken jtoken;
-                if (obj.TryGetValue("Parent_Id", out jtoken))
+                if (obj.TryGetValue("parent_Id", out jtoken))
                 {
                     //You have to be local or global admin to change parent
                     if (!_adminService.IsGlobalAdmin(KitosUser) && !_orgUnitService.IsLocalAdminFor(KitosUser, id))

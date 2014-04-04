@@ -33,7 +33,7 @@ namespace Core.ApplicationServices
         /// <param name="message">The message.</param>
         public void Send(MailMessage message)
         {
-            _client.Send(message);
+            //_client.Send(message);
         }
     }
 }

@@ -157,7 +157,7 @@ namespace UI.MVC4.Controllers.API
                     AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>()
                               .GetPropertyMaps();
                 var nonNullMaps = map.Where(x => x.SourceMember != null);
-                var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name == valuePair.Key);
+                var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name.Equals(valuePair.Key, StringComparison.InvariantCultureIgnoreCase));
                 if (mapMember == null) 
                     continue; // abort if no map found
 
