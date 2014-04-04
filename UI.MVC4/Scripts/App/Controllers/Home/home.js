@@ -26,19 +26,19 @@
         $rootScope.page.subnav = [];
         
         Restangular.one('text', 'intro-head').get().then(function (data) {
-            $scope.introhead = data.Value;
+            $scope.introhead = data.value;
 
             $scope.submitIntroHead = function(newValue) {
-                data.Value = newValue;
+                data.value = newValue;
                 data.put();
             };
         });
         
         Restangular.one('text', 'intro-body').get().then(function (data) {
-            $scope.introbody = data.Value;
+            $scope.introbody = data.value;
             
             $scope.submitIntroBody = function (newValue) {
-                data.Value = newValue;
+                data.value = newValue;
                 data.put();
             };
         });
