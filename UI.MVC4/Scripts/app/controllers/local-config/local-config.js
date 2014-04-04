@@ -106,7 +106,7 @@
                     _.each(options, function (v) {
 
                         var locale = _.find(locales, function (loc) {
-                            return loc.original_Id == v.id;
+                            return loc.originalId == v.id;
                         });
 
                         var isNew = _.isUndefined(locale);
@@ -137,8 +137,8 @@
 
                         var data = {
                             "name": value,
-                            "original_Id": oId,
-                            "municipality_Id": orgId
+                            "originalId": oId,
+                            "municipalityId": orgId
                         };
 
                         return $http({ method: method, url: scope.localesUrl, data: data })
@@ -249,7 +249,7 @@
                 $scope.support = {
                     show: true,
                     moduleNames: supportNamesHttp.data.response,
-                    chosenNameId: config.itSupportModuleName_Id,
+                    chosenNameId: config.itSupportModuleNameId,
                     guideUrl: config.itSupportGuide,
                     showTabOverview: config.showTabOverview,
                     showTechnology: config.showColumnTechnology,
@@ -260,7 +260,7 @@
                 $scope.project = {
                     show: false,
                     moduleNames: projectNamesHttp.data.response,
-                    chosenNameId: config.itProjectModuleName_Id,
+                    chosenNameId: config.itProjectModuleNameId,
                     guideUrl: config.itProjectGuide,
                     showPortfolio: config.showPortfolio,
                     showBC: config.showBC
@@ -269,14 +269,14 @@
                 $scope.system = {
                     show: false,
                     moduleNames: systemNamesHttp.data.response,
-                    chosenNameId: config.itSystemModuleName_Id,
+                    chosenNameId: config.itSystemModuleNameId,
                     guideUrl: config.itSystemGuide
                 };
 
                 $scope.contract = {
                     show: false,
                     moduleNames: contractNamesHttp.data.response,
-                    chosenNameId: config.itContractModuleName_Id,
+                    chosenNameId: config.itContractModuleNameId,
                     guideUrl: config.itContractGuide
                 };
 

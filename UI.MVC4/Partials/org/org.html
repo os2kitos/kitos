@@ -60,8 +60,8 @@
                             
                             <!-- show -->
                             <tr data-ng-hide="right.edit">
-                                <td>{{ orgUnits[right.object_Id].name }}</td>
-                                <td>{{ orgRoles[right.role_Id].name }}</td>
+                                <td>{{ orgUnits[right.objectId].name }}</td>
+                                <td>{{ orgRoles[right.roleId].name }}</td>
                                 <td>{{ right.user.name }}</td>
                                 <td>{{ right.user.email }}</td>
                                 <td>
@@ -79,7 +79,7 @@
                             <!-- edit -->
                             <tr data-ng-show="right.edit">
                                 <td>
-                                    <input type="text" disabled="" class="form-control input-sm" value="{{ orgUnits[right.object_Id].name }}"/>
+                                    <input type="text" disabled="disabled" class="form-control input-sm" value="{{ orgUnits[right.objectId].name }}"/>
                                 </td>
                                 <td>
                                     <select data-ui-select2="" name="selectRole" data-ng-model="right.roleForSelect" class="form-control input-sm">
@@ -100,7 +100,7 @@
                         <!-- add-new-right row -->
                         <tbody data-ng-show="chosenOrgUnit.hasWriteAccess && chosenOrgUnit.editRights">
                             <tr>
-                                <td><input type="text" disabled="" class="form-control input-sm" value="{{ chosenOrgUnit.name }}"/></td>
+                                <td><input type="text" disabled="disabled" class="form-control input-sm" value="{{ chosenOrgUnit.name }}"/></td>
                                 <td>
                                     <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en organisationsrolle" class="form-control input-sm">
                                         <option value=""></option>

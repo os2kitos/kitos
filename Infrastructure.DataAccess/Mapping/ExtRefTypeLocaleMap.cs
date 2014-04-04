@@ -9,7 +9,7 @@ namespace Infrastructure.DataAccess.Mapping
         public ExtRefTypeLocaleMap()
         {
             // Primary Key
-            this.HasKey(t => new { t.Municipality_Id, t.Original_Id });
+            this.HasKey(t => new { t.MunicipalityId, t.OriginalId });
 
             // Properties
             // Table & Column Mappings
@@ -18,11 +18,11 @@ namespace Infrastructure.DataAccess.Mapping
             // Relationships
             this.HasRequired(t => t.Organization)
                 .WithMany(t => t.ExtRefTypeLocales)
-                .HasForeignKey(t => t.Municipality_Id);
+                .HasForeignKey(t => t.MunicipalityId);
 
             this.HasRequired(t => t.Original)
                 .WithMany(t => t.Locales)
-                .HasForeignKey(t => t.Original_Id);
+                .HasForeignKey(t => t.OriginalId);
         }
     }
 }

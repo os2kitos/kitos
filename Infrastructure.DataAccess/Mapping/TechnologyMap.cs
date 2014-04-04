@@ -14,22 +14,22 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("Technology");
             this.Property(t => t.Id).HasColumnName("Id");
-            this.Property(t => t.DatabaseType_Id).HasColumnName("DatabaseType_Id");
-            this.Property(t => t.Environment_Id).HasColumnName("Environment_Id");
-            this.Property(t => t.ProgLanguage_Id).HasColumnName("ProgLanguage_Id");
+            this.Property(t => t.DatabaseTypeId).HasColumnName("DatabaseTypeId");
+            this.Property(t => t.EnvironmentId).HasColumnName("EnvironmentId");
+            this.Property(t => t.ProgLanguageId).HasColumnName("ProgLanguageId");
 
             // Relationships
             this.HasRequired(t => t.DatabaseType)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.DatabaseType_Id);
+                .HasForeignKey(d => d.DatabaseTypeId);
             this.HasRequired(t => t.Environment)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.Environment_Id);
+                .HasForeignKey(d => d.EnvironmentId);
             this.HasRequired(t => t.ItSystem)
                 .WithOptional(t => t.Technology);
             this.HasRequired(t => t.ProgLanguage)
                 .WithMany(t => t.Technologies)
-                .HasForeignKey(d => d.ProgLanguage_Id);
+                .HasForeignKey(d => d.ProgLanguageId);
 
         }
     }

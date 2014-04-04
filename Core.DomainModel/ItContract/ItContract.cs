@@ -11,12 +11,12 @@ namespace Core.DomainModel.ItContract
         }
 
         public int Id { get; set; }
-        public int ContractType_Id { get; set; }
-        public int ContractTemplate_Id { get; set; }
-        public int PurchaseForm_Id { get; set; }
-        public int PaymentModel_Id { get; set; }
-        public int Supplier_Id { get; set; }
-        public int Municipality_Id { get; set; }
+        public int ContractTypeId { get; set; }
+        public int ContractTemplateId { get; set; }
+        public int PurchaseFormId { get; set; }
+        public int PaymentModelId { get; set; }
+        public int SupplierId { get; set; }
+        public int MunicipalityId { get; set; }
 
         public virtual Agreement Agreement { get; set; }
         public virtual ContractTemplate ContractTemplate { get; set; }

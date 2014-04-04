@@ -7,7 +7,7 @@ namespace UI.MVC4.Models
 {
     public class AdminRightDTO
     {
-        public int Organization_Id { get; set; }
+        public int OrganizationId { get; set; }
         public string RoleName { get; set; }
     }
 }

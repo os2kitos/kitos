@@ -22,7 +22,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var user = UserRepository.GetByKey(item.User_Id);
+                var user = UserRepository.GetByKey(item.UserId);
 
                 user.IsGlobalAdmin = true;
 

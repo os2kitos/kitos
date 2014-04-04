@@ -158,7 +158,7 @@ namespace UI.MVC4.App_Start
                   .ReverseMap();
 
             Mapper.CreateMap<AdminRight, AdminRightDTO>()
-                  .ForMember(dto => dto.Organization_Id, opt => opt.MapFrom(src => src.Object_Id))
+                  .ForMember(dto => dto.OrganizationId, opt => opt.MapFrom(src => src.ObjectId))
                   .ForMember(dto => dto.RoleName, opt => opt.MapFrom(src => src.Role.Name));
 
             Mapper.CreateMap<OrganizationRight, RightOutputDTO>();

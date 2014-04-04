@@ -4,8 +4,8 @@ namespace Core.DomainModel.ItProject
 {
     public class ProjPhaseLocale : ILocaleEntity<ProjectPhase>
     {
-        public int Municipality_Id { get; set; }
-        public int Original_Id { get; set; }
+        public int MunicipalityId { get; set; }
+        public int OriginalId { get; set; }
         public string Name { get; set; }
 
         public virtual Organization Organization { get; set; }

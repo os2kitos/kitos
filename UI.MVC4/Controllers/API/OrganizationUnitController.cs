@@ -46,7 +46,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var orgUnit = Repository.Get(o => o.Organization_Id == organization && o.Parent == null).FirstOrDefault();
+                var orgUnit = Repository.Get(o => o.OrganizationId == organization && o.Parent == null).FirstOrDefault();
 
                 if (orgUnit == null) return NotFound();
 
@@ -65,7 +65,7 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 JToken jtoken;
-                if (obj.TryGetValue("parent_Id", out jtoken))
+                if (obj.TryGetValue("parentId", out jtoken))
                 {
                     //You have to be local or global admin to change parent
                     if (!_adminService.IsGlobalAdmin(KitosUser) && !_orgUnitService.IsLocalAdminFor(KitosUser, id))

@@ -13,22 +13,22 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("Infrastructure");
             this.Property(t => t.Id).HasColumnName("Id");
-            this.Property(t => t.Host_Id).HasColumnName("Host_Id");
-            this.Property(t => t.Supplier_Id).HasColumnName("Supplier_Id");
-            this.Property(t => t.Department_Id).HasColumnName("Department_Id");
+            this.Property(t => t.HostId).HasColumnName("HostId");
+            this.Property(t => t.SupplierId).HasColumnName("SupplierId");
+            this.Property(t => t.DepartmentId).HasColumnName("DepartmentId");
 
             // Relationships
             this.HasRequired(t => t.OrganizationUnit)
                 .WithMany(t => t.Infrastructures)
-                .HasForeignKey(d => d.Department_Id);
+                .HasForeignKey(d => d.DepartmentId);
             this.HasRequired(t => t.Host)
                 .WithMany(t => t.Infrastructures)
-                .HasForeignKey(d => d.Host_Id);
+                .HasForeignKey(d => d.HostId);
             this.HasRequired(t => t.ItSystem)
                 .WithOptional(t => t.Infrastructure);
             this.HasRequired(t => t.Supplier)
                 .WithMany(t => t.Infrastructures)
-                .HasForeignKey(d => d.Supplier_Id);
+                .HasForeignKey(d => d.SupplierId);
 
         }
     }

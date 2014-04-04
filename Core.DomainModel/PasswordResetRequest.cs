@@ -6,7 +6,7 @@ namespace Core.DomainModel
     {
         public string Id { get; set; }
         public DateTime Time { get; set; }
-        public int User_Id { get; set; }
+        public int UserId { get; set; }
 
         public virtual User User { get; set; }
     }

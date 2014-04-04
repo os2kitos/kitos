@@ -2,9 +2,9 @@
 {
     public class ItSystemRight : IRight<ItSystem, ItSystemRole>
     {
-        public int User_Id { get; set; }
-        public int Role_Id { get; set; }
-        public int Object_Id { get; set; }
+        public int UserId { get; set; }
+        public int RoleId { get; set; }
+        public int ObjectId { get; set; }
         public User User { get; set; }
         public ItSystemRole Role { get; set; }
         public ItSystem Object { get; set; }

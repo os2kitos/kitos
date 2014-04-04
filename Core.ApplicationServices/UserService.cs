@@ -59,7 +59,7 @@ namespace Core.ApplicationServices
 
             var hash = _cryptoService.Encrypt(now + user.Email);
 
-            var request = new PasswordResetRequest {Id = hash, Time = now, User_Id = user.Id};
+            var request = new PasswordResetRequest {Id = hash, Time = now, UserId = user.Id};
 
             _passwordResetRequestRepository.Insert(request);
             _passwordResetRequestRepository.Save();

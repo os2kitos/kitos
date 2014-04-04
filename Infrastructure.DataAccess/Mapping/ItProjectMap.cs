@@ -28,45 +28,45 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.IsTermsOfReferenceApproved).HasColumnName("IsTermsOfReferenceApproved");
             this.Property(t => t.Note).HasColumnName("Note");
             this.Property(t => t.Name).HasColumnName("Name");
-            this.Property(t => t.ProjectType_Id).HasColumnName("ProjectType_Id");
-            this.Property(t => t.ProjectCategory_Id).HasColumnName("ProjectCategory_Id");
-            this.Property(t => t.Municipality_Id).HasColumnName("Municipality_Id");
+            this.Property(t => t.ProjectTypeId).HasColumnName("ProjectTypeId");
+            this.Property(t => t.ProjectCategoryId).HasColumnName("ProjectCategoryId");
+            this.Property(t => t.MunicipalityId).HasColumnName("MunicipalityId");
 
             /*
-            this.Property(t => t.ItProjectOwner_Id).HasColumnName("ItProjectOwner_Id");
-            this.Property(t => t.ItProjectLeader_Id).HasColumnName("ItProjectLeader_Id");
-            this.Property(t => t.PartItProjectLeader_Id).HasColumnName("PartItProjectLeader_Id");
-            this.Property(t => t.Consultant_Id).HasColumnName("Consultant_Id");
+            this.Property(t => t.ItProjectOwnerId).HasColumnName("ItProjectOwnerId");
+            this.Property(t => t.ItProjectLeaderId).HasColumnName("ItProjectLeaderId");
+            this.Property(t => t.PartItProjectLeaderId).HasColumnName("PartItProjectLeaderId");
+            this.Property(t => t.ConsultantId).HasColumnName("ConsultantId");
              */
 
             // Relationships
             /*this.HasOptional(t => t.ItProjectOwner)
                 .WithMany(t => t.OwnerOfItProjects)
-                .HasForeignKey(d => d.ItProjectOwner_Id)
+                .HasForeignKey(d => d.ItProjectOwnerId)
                 .WillCascadeOnDelete(false);
             this.HasOptional(t => t.ItProjectLeader)
                 .WithMany(t => t.LeaderOfItProjects)
-                .HasForeignKey(d => d.ItProjectLeader_Id)
+                .HasForeignKey(d => d.ItProjectLeaderId)
                 .WillCascadeOnDelete(false);
             this.HasOptional(t => t.PartItProjectLeader)
                 .WithMany(t => t.LeaderOfPartItProjects)
-                .HasForeignKey(d => d.PartItProjectLeader_Id)
+                .HasForeignKey(d => d.PartItProjectLeaderId)
                 .WillCascadeOnDelete(false);
             this.HasOptional(t => t.Consultant)
                 .WithMany(t => t.ConsultantOnItProjects)
-                .HasForeignKey(d => d.Consultant_Id)
+                .HasForeignKey(d => d.ConsultantId)
                 .WillCascadeOnDelete(false);*/
                 
             this.HasRequired(t => t.Organization)
                 .WithMany(t => t.ItProjects)
-                .HasForeignKey(d => d.Municipality_Id)
+                .HasForeignKey(d => d.MunicipalityId)
                 .WillCascadeOnDelete(false);
             this.HasRequired(t => t.ProjectCategory)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.ProjectCategory_Id);
+                .HasForeignKey(d => d.ProjectCategoryId);
             this.HasRequired(t => t.ProjectType)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.ProjectType_Id);
+                .HasForeignKey(d => d.ProjectTypeId);
 
         }
     }

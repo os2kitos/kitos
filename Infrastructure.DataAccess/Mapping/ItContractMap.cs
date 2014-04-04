@@ -14,32 +14,32 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("ItContract");
             this.Property(t => t.Id).HasColumnName("Id");
-            this.Property(t => t.ContractType_Id).HasColumnName("ContractType_Id");
-            this.Property(t => t.ContractTemplate_Id).HasColumnName("ContractTemplate_Id");
-            this.Property(t => t.PurchaseForm_Id).HasColumnName("PurchaseForm_Id");
-            this.Property(t => t.PaymentModel_Id).HasColumnName("PaymentModel_Id");
-            this.Property(t => t.Supplier_Id).HasColumnName("Supplier_Id");
-            this.Property(t => t.Municipality_Id).HasColumnName("Municipality_Id");
+            this.Property(t => t.ContractTypeId).HasColumnName("ContractTypeId");
+            this.Property(t => t.ContractTemplateId).HasColumnName("ContractTemplateId");
+            this.Property(t => t.PurchaseFormId).HasColumnName("PurchaseFormId");
+            this.Property(t => t.PaymentModelId).HasColumnName("PaymentModelId");
+            this.Property(t => t.SupplierId).HasColumnName("SupplierId");
+            this.Property(t => t.MunicipalityId).HasColumnName("MunicipalityId");
 
             // Relationships
             this.HasRequired(t => t.ContractTemplate)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.ContractTemplate_Id);
+                .HasForeignKey(d => d.ContractTemplateId);
             this.HasRequired(t => t.ContractType)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.ContractType_Id);
+                .HasForeignKey(d => d.ContractTypeId);
             this.HasRequired(t => t.PaymentModel)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.PaymentModel_Id);
+                .HasForeignKey(d => d.PaymentModelId);
             this.HasRequired(t => t.PurchaseForm)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.PurchaseForm_Id);
+                .HasForeignKey(d => d.PurchaseFormId);
             this.HasRequired(t => t.Supplier)
                 .WithMany(t => t.ItContracts)
-                .HasForeignKey(d => d.Supplier_Id);
+                .HasForeignKey(d => d.SupplierId);
             this.HasRequired(t => t.Organization)
                 .WithMany(t => t.ItContracts)
-                .HasForeignKey(d => d.Municipality_Id)
+                .HasForeignKey(d => d.MunicipalityId)
                 .WillCascadeOnDelete(false);
         }
     }

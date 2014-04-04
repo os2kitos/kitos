@@ -18,11 +18,11 @@ namespace Core.DomainModel.ItSystem
         }
 
         public int Id { get; set; }
-        public int ParentItSystem_Id { get; set; }
-        public int Municipality_Id { get; set; }
-        public int SystemType_Id { get; set; }
-        public int InterfaceType_Id { get; set; }
-        public int ProtocolType_Id { get; set; }
+        public int ParentItSystemId { get; set; }
+        public int MunicipalityId { get; set; }
+        public int SystemTypeId { get; set; }
+        public int InterfaceTypeId { get; set; }
+        public int ProtocolTypeId { get; set; }
 
         public virtual ICollection<BasicData> BasicDatas { get; set; }
         public virtual ICollection<Component> Components { get; set; }

@@ -34,7 +34,7 @@ namespace UI.MVC4.Controllers.API
                 foreach (var orgUnit in orgUnits)
                 {
                     var unit = orgUnit;
-                    rights.AddRange(_repository.Get(right => right.Object_Id == unit.Id));
+                    rights.AddRange(_repository.Get(right => right.ObjectId == unit.Id));
                 }
 
                 var dtos = AutoMapper.Mapper.Map<ICollection<OrganizationRight>, ICollection<RightOutputDTO>>(rights);
@@ -69,7 +69,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                if (!_orgUnitService.HasWriteAccess(KitosUser, inputDTO.Object_Id))
+                if (!_orgUnitService.HasWriteAccess(KitosUser, inputDTO.ObjectId))
                     throw new SecurityException("User doesn't have write permission for that Organization Unit");
 
                 var right = AutoMapper.Mapper.Map<RightInputDTO, OrganizationRight>(inputDTO);
@@ -77,7 +77,7 @@ namespace UI.MVC4.Controllers.API
                 right = _repository.Insert(right);
                 _repository.Save(); 
 
-                right.User = UserRepository.GetByKey(right.User_Id);
+                right.User = UserRepository.GetByKey(right.UserId);
 
                 //TODO: FIX navigation properties not loading properly!!!
                 var outputDTO = AutoMapper.Mapper.Map<OrganizationRight, RightOutputDTO>(right);
@@ -110,14 +110,14 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                if (!_orgUnitService.HasWriteAccess(KitosUser, inputDTO.Object_Id))
+                if (!_orgUnitService.HasWriteAccess(KitosUser, inputDTO.ObjectId))
                     throw new SecurityException("User doesn't have write permission for that Organization Unit");
 
                 _repository.DeleteByKey(oId, rId, uId);
 
-                right.Object_Id = inputDTO.Object_Id;
-                right.Role_Id = inputDTO.Role_Id;
-                right.User_Id = inputDTO.User_Id;
+                right.ObjectId = inputDTO.ObjectId;
+                right.RoleId = inputDTO.RoleId;
+                right.UserId = inputDTO.UserId;
 
                 _repository.Update(right);
                 _repository.Save();
