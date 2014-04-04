@@ -131,6 +131,9 @@
             $scope.chosenOrgUnit = node;
         };
 
+        $scope.$watch("selectedUser", function() {
+            $scope.submitRight();
+        });
 
         $scope.submitRight = function () {
 
@@ -139,6 +142,8 @@
             var oId = $scope.chosenOrgUnit.id;
             var rId = parseInt($scope.newRole);
             var uId = $scope.selectedUser.id;
+
+            if (!oId || !rId || !uId) return;
 
             var data = {
                 "objectId": oId,
