@@ -303,10 +303,23 @@
                         foundTask.selected = true;
                         foundTask.setChildrenState(true);
                         foundTask.setParentState();
+
+                        foundTask.handledByOrgUnit = mapIdToOrgUnit(selectTask.HandledByOrgUnit);
                     }
                 });
             });
         }
+        
+        function mapIdToOrgUnit(idList) {
+            return _.map(idList, function (id) {
+                var foundOrgUnit = _.find($scope.orgUnits, function (orgUnit) {
+                    if (angular.isUndefined(orgUnit))
+                        return false;
+                    return orgUnit.Id == id;
+                });
+                return foundOrgUnit.Name;
+            });
+        };
 
         function toHierarchy(flatAry, idPropertyName, parentIdPropetyName, parentPropetyName, childPropertyName) {
             // default values
@@ -426,18 +439,6 @@
             return hierarchy;
         }
 
-        $scope.mapIdToOrgUnit = function (idList) {
-            return _.map(idList, function(id) {
-                var foundOrgUnit = _.find($scope.orgUnits, function (orgUnit) {
-                    if (angular.isUndefined(orgUnit))
-                        return false;
-                    
-                    return orgUnit.Id == id;
-                });
-                return foundOrgUnit.Name;
-            });
-        };
-
         $scope.$watch('chosenOrgUnit', function (newOrgUnit, oldOrgUnit) {
             if (newOrgUnit !== null) {
                 getAllTasks().then(function() {
@@ -472,6 +473,7 @@
                 task.selected = false;
                 task.indeterminate = false;
                 task.canWrite = false;
+                delete task.handledByOrgUnit;
             });
         }
     }]);
