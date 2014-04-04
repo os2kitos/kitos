@@ -12,6 +12,6 @@ namespace UI.MVC4.Models
         public string Description { get; set; }
         public DateTime? ActiveFrom { get; set; }
         public DateTime? ActiveTo { get; set; }
-        public int? Parent_Id { get; set; }
+        public int? ParentId { get; set; }
     }
 }
