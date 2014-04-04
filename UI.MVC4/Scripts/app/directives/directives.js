@@ -57,7 +57,7 @@
                                 $http.post("api/user", data).success(function(result) {
                                     growl.addSuccessMessage(name + " er oprettet i KITOS");
 
-                                    $modalInstance.close(result.Response);
+                                    $modalInstance.close(result.response);
                                 }).error(function(result) {
                                     $scope.newUser.submitting = false;
                                     growl.addErrorMessage("Fejl! " + name + " blev ikke oprettet i KITOS!");
@@ -74,7 +74,7 @@
                         scope.userResult = userResult;
 
                         scope.selectResult = {
-                            id: userResult.Id,
+                            id: userResult.id,
                             text: userResult.name
                         };
                     }, function() {
@@ -114,13 +114,12 @@
                             return res;
                         },
                         results: function(data, page) {
-                            console.log(data);
                             var results = [];
 
-                            _.each(data.data.Response, function(user) {
+                            _.each(data.data.response, function(user) {
 
                                 results.push({
-                                    id: user.Id,
+                                    id: user.id,
                                     text: user.name
                                 });
                             });
@@ -133,7 +132,7 @@
         };
     }]);
 
-    app.directive('highlight', ['$timeout', function ($timeout) {
+    app.directive('highlight', [function () {
         return {
             link: function(scope, element, attr) {
 

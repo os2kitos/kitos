@@ -59,10 +59,10 @@
                             
                             <!-- show -->
                             <tr data-ng-hide="right.edit">
-                                <td>{{ orgUnits[right.Object_Id].name }}</td>
-                                <td>{{ orgRoles[right.Role_Id].name }}</td>
-                                <td>{{ right.User.Name }}</td>
-                                <td>{{ right.User.Email }}</td>
+                                <td>{{ orgUnits[right.object_Id].name }}</td>
+                                <td>{{ orgRoles[right.role_Id].name }}</td>
+                                <td>{{ right.user.Name }}</td>
+                                <td>{{ right.user.Email }}</td>
                                 <td>
                                     <div data-ng-show="chosenOrgUnit.hasWriteAccess && chosenOrgUnit.editRights">
                                         <a data-ng-click="right.edit = true" class="btn btn-link btn-sm"><i class="glyphicon glyphicon-pencil"></i></a>
@@ -78,7 +78,7 @@
                             <!-- edit -->
                             <tr data-ng-show="right.edit">
                                 <td>
-                                    <input type="text" disabled="" class="form-control input-sm" value="{{ orgUnits[right.Object_Id].name }}"/>
+                                    <input type="text" disabled="" class="form-control input-sm" value="{{ orgUnits[right.object_Id].name }}"/>
                                 </td>
                                 <td>
                                     <select data-ui-select2="" name="selectRole" data-ng-model="right.roleForSelect" class="form-control input-sm">

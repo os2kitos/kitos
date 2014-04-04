@@ -34,27 +34,27 @@
         $scope.orgUnits = {};
 
         $scope.orgRoles = {};
-        _.each(orgRolesHttp.data.Response, function(orgRole) {
-            $scope.orgRoles[orgRole.Id] = orgRole;
+        _.each(orgRolesHttp.data.response, function(orgRole) {
+            $scope.orgRoles[orgRole.id] = orgRole;
         });
 
 
         function flattenAndSave(orgUnit, inheritWriteAccess) {
-            if ($scope.orgUnits[orgUnit.Id]) {
+            if ($scope.orgUnits[orgUnit.id]) {
 
-                var old = $scope.orgUnits[orgUnit.Id];
+                var old = $scope.orgUnits[orgUnit.id];
                 orgUnit.isOpen = old.isOpen;
 
             }
             
-            $scope.orgUnits[orgUnit.Id] = orgUnit;
+            $scope.orgUnits[orgUnit.id] = orgUnit;
 
             if (!inheritWriteAccess) {
-                $http.get('api/organizationRight?hasWriteAccess&orgUnitId=' + orgUnit.Id + '&userId=' + userId).success(function (result) {
-                    orgUnit.hasWriteAccess = result.Response;
+                $http.get('api/organizationRight?hasWriteAccess&orgUnitId=' + orgUnit.id + '&userId=' + userId).success(function (result) {
+                    orgUnit.hasWriteAccess = result.response;
                     
-                    _.each(orgUnit.Children, function(u) {
-                        return flattenAndSave(u, result.Response);
+                    _.each(orgUnit.children, function(u) {
+                        return flattenAndSave(u, result.response);
                     });
 
                 });
@@ -63,7 +63,7 @@
                 
                 orgUnit.hasWriteAccess = true;
 
-                _.each(orgUnit.Children, function (u) {
+                _.each(orgUnit.children, function (u) {
                     return flattenAndSave(u, true);
                 });
 
@@ -73,13 +73,13 @@
         function loadUnits() {
 
             return $http.get('api/organizationunit?userId=' + userId).success(function(result) {
-                $scope.nodes = result.Response;
+                $scope.nodes = result.response;
 
-                _.each(result.Response, flattenAndSave);
+                _.each(result.response, flattenAndSave);
 
                 if ($scope.chosenOrgUnit) {
                     
-                    var chosenId = $scope.chosenOrgUnit.Id;
+                    var chosenId = $scope.chosenOrgUnit.id;
                     var newChosen = $scope.orgUnits[chosenId];
                     $scope.chooseOrgUnit(newChosen);
                 }
@@ -104,21 +104,21 @@
                     //else get from server
                     
                     $http.get('api/organization/' + node.organization_Id).success(function (data) {
-                        node.Organization = data.Response;
+                        node.Organization = data.response;
                         
                         //save to cache
-                        orgs[node.organization_Id] = data.Response;
+                        orgs[node.organization_Id] = data.response;
                     });
                 }
             }
             
             //get org rights on the org unit and subtree
-            $http.get('api/organizationRight?organizationUnitId=' + node.Id).success(function(data) {
-                node.OrgRights = data.Response;
+            $http.get('api/organizationRight?organizationUnitId=' + node.id).success(function(data) {
+                node.OrgRights = data.response;
 
                 _.each(node.OrgRights, function (right) {
-                    right.userForSelect = { id: right.User.Id, text: right.User.name };
-                    right.roleForSelect = right.Role_Id;
+                    right.userForSelect = { id: right.user.id, text: right.user.name };
+                    right.roleForSelect = right.role_Id;
                     right.show = true;
                 });
 
@@ -132,26 +132,26 @@
 
             if (!$scope.selectedUser || !$scope.newRole) return;
 
-            var oId = $scope.chosenOrgUnit.Id;
+            var oId = $scope.chosenOrgUnit.id;
             var rId = parseInt($scope.newRole);
             var uId = $scope.selectedUser.id;
 
             var data = {
-                'Object_Id': oId,
-                'Role_Id': rId,
+                "object_Id": oId,
+                "role_Id": rId,
                 "user_Id": uId
             };
 
             $http.post("api/organizationright", data).success(function (result) {
-                growl.addSuccessMessage(result.Response.User.name + " er knyttet i rollen");
+                growl.addSuccessMessage(result.response.user.name + " er knyttet i rollen");
 
                 $scope.chosenOrgUnit.OrgRights.push({
-                    'Object_Id': result.Response.Object_Id,
-                    'Role_Id': result.Response.Role_Id,
-                    "user_Id": result.Response.user_Id,
-                    'User': result.Response.User,
-                    'userForSelect': { id: result.Response.user_Id, text: result.Response.User.name },
-                    'roleForSelect': result.Response.Role_Id,
+                    "object_Id": result.response.object_Id,
+                    "role_Id": result.response.role_Id,
+                    "user_Id": result.response.user_Id,
+                    "user": result.response.user,
+                    'userForSelect': { id: result.response.user_Id, text: result.response.user.name },
+                    'roleForSelect': result.response.role_Id,
                     show: true
                 });
                 
@@ -166,8 +166,8 @@
 
         $scope.deleteRight = function(right) {
 
-            var oId = right.Object_Id;
-            var rId = right.Role_Id;
+            var oId = right.object_Id;
+            var rId = right.role_Id;
             var uId = right.user_Id;
 
             $http.delete("api/organizationright?oId=" + oId + "&rId=" + rId + "&uId=" + uId).success(function(deleteResult) {
@@ -185,12 +185,12 @@
             if (!right.roleForSelect || !right.userForSelect) return;
             
             //old values
-            var oIdOld = right.Object_Id;
-            var rIdOld = right.Role_Id;
+            var oIdOld = right.object_Id;
+            var rIdOld = right.role_Id;
             var uIdOld = right.user_Id;
             
             //new values
-            var oIdNew = right.Object_Id;
+            var oIdNew = right.object_Id;
             var rIdNew = right.roleForSelect;
             var uIdNew = right.userForSelect.id;
             
@@ -204,20 +204,20 @@
             $http.delete("api/organizationright?oId=" + oIdOld + "&rId=" + rIdOld + "&uId=" + uIdOld).success(function(deleteResult) {
 
                 var data = {
-                    'Object_Id': oIdNew,
-                    'Role_Id': rIdNew,
+                    "object_Id": oIdNew,
+                    "role_Id": rIdNew,
                     "user_Id": uIdNew
                 };
 
                 $http.post("api/organizationright", data).success(function (result) {
 
-                    right.Role_Id = result.Response.Role_Id;
-                    right.User = result.Response.User;
-                    right.user_Id = result.Response.user_Id;
+                    right.role_Id = result.response.role_Id;
+                    right.user = result.response.user;
+                    right.user_Id = result.response.user_Id;
 
                     right.edit = false;
 
-                    growl.addSuccessMessage(right.User.name + " er knyttet i rollen");
+                    growl.addSuccessMessage(right.user.name + " er knyttet i rollen");
 
                 }).error(function (result) {
 
@@ -232,8 +232,8 @@
             }).error(function (deleteResult) {
                 
                 //couldn't delete the old entry, just reset select options
-                right.userForSelect = { id: right.User.id, text: right.User.name };
-                right.roleForSelect = right.Role_Id;
+                right.userForSelect = { id: right.user.id, text: right.user.name };
+                right.roleForSelect = right.role_Id;
 
                 growl.addErrorMessage('Fejl!');
             });
@@ -244,15 +244,15 @@
         $scope.rightSort = function(right) {
             switch ($scope.rightSortBy) {
                 case "orgUnitName":
-                    return $scope.orgUnits[right.Object_Id].name;
+                    return $scope.orgUnits[right.object_Id].name;
                 case "roleName":
-                    return $scope.orgRoles[right.Role_Id].name;
+                    return $scope.orgRoles[right.role_Id].name;
                 case "userName":
-                    return right.User.name;
+                    return right.user.name;
                 case "userEmail":
-                    return right.User.email;
+                    return right.user.email;
                 default:
-                    return $scope.orgUnits[right.Object_Id].name;
+                    return $scope.orgUnits[right.object_Id].name;
             }
         };
 
@@ -284,23 +284,23 @@
                         if (node.organization_Id != unit.organization_Id) return;
                         
                         //this avoid every subdepartment
-                        if (node.Id == unit.Id) return;
+                        if (node.id == unit.id) return;
 
                         $modalScope.orgUnits.push(node);
                         
-                        _.each(node.Children, filter);
+                        _.each(node.children, filter);
                     }
                     _.each($scope.nodes, filter);
 
 
                     //format the selected unit for editing
                     $modalScope.orgUnit = {
-                        'id': unit.Id,
+                        'id': unit.id,
                         'oldName': unit.name,
                         'newName': unit.name,
-                        'newParent': unit.Parent_Id,
+                        'newParent': unit.parent_Id,
                         'orgId': unit.organization_Id,
-                        'isRoot': unit.Parent_Id == 0
+                        'isRoot': unit.parent_Id == 0
                     };
                     
                     //only allow changing the parent if user is admin, and the unit isn't at the root
@@ -320,16 +320,17 @@
                             "name": name
                         };
 
-                        if ($modalScope.canChangeParent && parent) data['Parent_Id'] = parent;
+                        //only allow changing the parent if user is admin, and the unit isn't at the root
+                        if ($modalScope.canChangeParent && parent) data["parent_Id"] = parent;
 
                         $modalScope.submitting = true;
 
-                        var id = unit.Id;
+                        var id = unit.id;
 
                         $http({ method: 'PATCH', url: "api/organizationUnit/" + id, data: data }).success(function(result) {
                             growl.addSuccessMessage(name + " er ændret.");
 
-                            $modalInstance.close(result.Response);
+                            $modalInstance.close(result.response);
                         }).error(function(result) {
                             $modalScope.submitting = false;
                             growl.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
@@ -349,7 +350,7 @@
 
                         var data = {
                             "name": name,
-                            'Parent_Id': parent,
+                            "parent_Id": parent,
                             "organization_Id": orgId
                         };
 
@@ -358,7 +359,7 @@
                         $http({ method: 'POST', url: "api/organizationUnit/", data: data }).success(function (result) {
                             growl.addSuccessMessage(name + " er gemt.");
 
-                            $modalInstance.close(result.Response);
+                            $modalInstance.close(result.response);
                         }).error(function (result) {
                             $modalScope.submitting = false;
                             growl.addErrorMessage("Fejl! " + name + " kunne ikke gemmes!");
@@ -382,7 +383,7 @@
 
                         $modalScope.submitting = true;
 
-                        $http.delete("api/organizationUnit/" + unit.Id).success(function() {
+                        $http.delete("api/organizationUnit/" + unit.id).success(function() {
                             $modalInstance.close();
                             growl.addSuccessMessage(unit.name + " er slettet!");
                             
