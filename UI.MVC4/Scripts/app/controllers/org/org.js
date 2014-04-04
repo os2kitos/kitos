@@ -253,13 +253,12 @@
             var orgUnitId = $scope.chosenOrgUnit.Id;
 
             task.setChildrenState(task.selected);
-            // if all children has been selected then send parent task
             task.setParentState();
 
             if (task.selected === true) {
-                //$http.post('api/organizationUnit/' + orgUnitId + '?taskref=' + task.Id).success(updateLists);
+                $http.post('api/organizationUnit/' + orgUnitId + '?taskref=' + task.Id);
             } else {
-                //$http.delete('api/organizationUnit/' + orgUnitId + '?taskref=' + task.Id).success(updateLists);
+                $http.delete('api/organizationUnit/' + orgUnitId + '?taskref=' + task.Id);
             }
         };
 
@@ -270,6 +269,7 @@
                 // root tree, show all
                 _.each($scope.allTasksFlat, function(task) {
                     task.show = true;
+                    task.canWrite = true;
                 });
             } else {
                 // node tree, show selected from parent
@@ -281,6 +281,7 @@
                         });
                         if (foundTask) {
                             foundTask.show = true;
+                            foundTask.canWrite = true;
                             foundTask.setChildrenShown(true);
                             foundTask.setParentShown(true);
                         }
@@ -357,12 +358,14 @@
 
                     _.each(children, function (child) {
                         child.show = isShown;
+                        child.canWrite = isShown;
                         child.setChildrenShown(isShown);
                     });
                 };
                 obj.setParentShown = function (isShown) {
                     var parent = this.parent;
                     if (!parent) return;
+                    parent.show = isShown;
                     parent.setParentShown(isShown);
                 };
                 obj.setState = function(isChecked) {
@@ -423,7 +426,6 @@
             return hierarchy;
         }
 
-        $scope.isTasksEditable = false;
         $scope.mapIdToOrgUnit = function (idList) {
             return _.map(idList, function(id) {
                 var foundOrgUnit = _.find($scope.orgUnits, function (orgUnit) {
@@ -443,9 +445,7 @@
                     filterTasks();
                     selectTasks();
                 });
-                //updateLists(true);
             }
-                
         });
 
         function getAllTasks() {
@@ -470,6 +470,8 @@
             _.each($scope.allTasksFlat, function(task) {
                 task.show = false;
                 task.selected = false;
+                task.indeterminate = false;
+                task.canWrite = false;
             });
         }
     }]);

@@ -103,29 +103,8 @@
                 </div>
                 
                 <div class="panel panel-primary" data-ng-switch="isTasksEditable">
-                    <button type="button" data-ng-click="isTasksEditable = !isTasksEditable">Rediger</button>
                     <div class="panel-heading">Tilknyttede opgaver</div>
-
-                    <table class="full-width table" data-ng-switch-when="false">
-                        <thead>
-                            <tr>
-                                <th>Organisationsenhed</th>
-                                <th>ID</th>
-                                <th>Navn</th>
-                                <th>Overblik</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr data-ng-repeat="task in chosenTaskRefs">
-                                <td>{{ mapIdToOrgUnit(task.HandledByOrgUnit) }}</td>
-                                <td>{{ task.TaskKey }}</td>
-                                <td>{{ task.Description }}</td>
-                                <td><input type="checkbox"/></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div data-ng-switch-when="true">
+                    <div>
                         <div data-ng-repeat="task in allTasksTree">
                             <div data-ng-include="'partials/org/task.html'"></div>
                         </div>
