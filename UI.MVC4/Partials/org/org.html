@@ -102,18 +102,15 @@
                             <tr>
                                 <td><input type="text" disabled="disabled" class="form-control input-sm" value="{{ chosenOrgUnit.name }}"/></td>
                                 <td>
-                                    <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en organisationsrolle" class="form-control input-sm">
+                                    <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en organisationsrolle" class="form-control input-sm" data-ng-change="submitRight()">
                                         <option value=""></option>
                                         <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.id}}">
                                             {{orgRole.name}} ({{orgRole.hasWriteAccess && "skriv" || "læs" }})
                                         </option>
-                                    </select>
+                                    </select>   
                                 </td>
-                                <td colspan="2" class="form-group">
+                                <td colspan="3" class="form-group">
                                     <input data-select-user="foo" data-user-model="selectedUser" />
-                                </td>
-                                <td>
-                                    <input type="submit" class="btn btn-primary btn-sm" data-ng-click="submitRight()" value="Gem" />
                                 </td>
                             </tr>
                         </tbody>
