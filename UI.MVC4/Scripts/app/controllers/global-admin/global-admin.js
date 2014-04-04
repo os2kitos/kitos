@@ -53,7 +53,7 @@
 
         $scope.organizations = [];
         $http.get("api/organization").success(function(result) {
-            $scope.organizations = result.Response;
+            $scope.organizations = result.response;
         });
 
         $scope.submit = function () {
@@ -63,8 +63,8 @@
             var orgId = $scope.organization;
 
             var data = {
-                "User_Id": selectedUser.id,
-                "Organization_Id": orgId
+                "user_Id": selectedUser.id,
+                "organization_Id": orgId
             };
 
             $http.post('api/localadmin', data).success(function (result) {
@@ -89,7 +89,7 @@
             var selectedUser = $scope.selectedUser;
 
             var data = {
-                "User_Id": selectedUser.id,
+                "user_Id": selectedUser.id,
             };
 
             $http.post('api/globaladmin', data).success(function (result) {

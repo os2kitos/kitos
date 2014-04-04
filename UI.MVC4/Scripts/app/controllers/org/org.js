@@ -96,18 +96,18 @@
             if (!node.Organization) {
 
                 //try get from cache
-                if (orgs[node.Organization_Id]) {
+                if (orgs[node.organization_Id]) {
                     
-                    node.Organization = orgs[node.Organization_Id];
+                    node.Organization = orgs[node.organization_Id];
                     
                 } else {
                     //else get from server
                     
-                    $http.get('api/organization/' + node.Organization_Id).success(function (data) {
+                    $http.get('api/organization/' + node.organization_Id).success(function (data) {
                         node.Organization = data.Response;
                         
                         //save to cache
-                        orgs[node.Organization_Id] = data.Response;
+                        orgs[node.organization_Id] = data.Response;
                     });
                 }
             }
@@ -139,7 +139,7 @@
             var data = {
                 'Object_Id': oId,
                 'Role_Id': rId,
-                'User_Id': uId
+                "user_Id": uId
             };
 
             $http.post("api/organizationright", data).success(function (result) {
@@ -148,9 +148,9 @@
                 $scope.chosenOrgUnit.OrgRights.push({
                     'Object_Id': result.Response.Object_Id,
                     'Role_Id': result.Response.Role_Id,
-                    'User_Id': result.Response.User_Id,
+                    "user_Id": result.Response.user_Id,
                     'User': result.Response.User,
-                    'userForSelect': { id: result.Response.User_Id, text: result.Response.User.name },
+                    'userForSelect': { id: result.Response.user_Id, text: result.Response.User.name },
                     'roleForSelect': result.Response.Role_Id,
                     show: true
                 });
@@ -168,7 +168,7 @@
 
             var oId = right.Object_Id;
             var rId = right.Role_Id;
-            var uId = right.User_Id;
+            var uId = right.user_Id;
 
             $http.delete("api/organizationright?oId=" + oId + "&rId=" + rId + "&uId=" + uId).success(function(deleteResult) {
                 right.show = false;
@@ -187,7 +187,7 @@
             //old values
             var oIdOld = right.Object_Id;
             var rIdOld = right.Role_Id;
-            var uIdOld = right.User_Id;
+            var uIdOld = right.user_Id;
             
             //new values
             var oIdNew = right.Object_Id;
@@ -206,14 +206,14 @@
                 var data = {
                     'Object_Id': oIdNew,
                     'Role_Id': rIdNew,
-                    'User_Id': uIdNew
+                    "user_Id": uIdNew
                 };
 
                 $http.post("api/organizationright", data).success(function (result) {
 
                     right.Role_Id = result.Response.Role_Id;
                     right.User = result.Response.User;
-                    right.User_Id = result.Response.User_Id;
+                    right.user_Id = result.Response.user_Id;
 
                     right.edit = false;
 
@@ -281,7 +281,7 @@
                     //filter out those orgunits, that are outside the organisation
                     //or is currently a subdepartment of the unit
                     function filter(node) {
-                        if (node.Organization_Id != unit.Organization_Id) return;
+                        if (node.organization_Id != unit.organization_Id) return;
                         
                         //this avoid every subdepartment
                         if (node.Id == unit.Id) return;
@@ -299,12 +299,12 @@
                         'oldName': unit.name,
                         'newName': unit.name,
                         'newParent': unit.Parent_Id,
-                        'orgId': unit.Organization_Id,
+                        'orgId': unit.organization_Id,
                         'isRoot': unit.Parent_Id == 0
                     };
                     
                     //only allow changing the parent if user is admin, and the unit isn't at the root
-                    $modalScope.isAdmin = $rootScope.user.isGlobalAdmin || _.contains($rootScope.user.isLocalAdminFor, unit.Organization_Id);
+                    $modalScope.isAdmin = $rootScope.user.isGlobalAdmin || _.contains($rootScope.user.isLocalAdminFor, unit.organization_Id);
                     $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot;
 
                     $modalScope.patch = function () {
@@ -350,7 +350,7 @@
                         var data = {
                             "name": name,
                             'Parent_Id': parent,
-                            'Organization_Id': orgId
+                            "organization_Id": orgId
                         };
 
                         $modalScope.submitting = true;
