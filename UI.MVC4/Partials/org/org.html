@@ -83,7 +83,7 @@
                                 <td>
                                     <select data-ui-select2="" name="selectRole" data-ng-model="right.roleForSelect" class="form-control input-sm">
                                         <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.Id}}">
-                                            {{orgRole.name}} ({{orgRole.HasWriteAccess && "skriv" || "læs" }})
+                                            {{orgRole.name}} ({{orgRole.hasWriteAccess && "skriv" || "læs" }})
                                         </option>
                                     </select>
                                 </td>
@@ -104,7 +104,7 @@
                                     <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en organisationsrolle" class="form-control input-sm">
                                         <option value=""></option>
                                         <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.Id}}">
-                                            {{orgRole.name}} ({{orgRole.HasWriteAccess && "skriv" || "læs" }})
+                                            {{orgRole.name}} ({{orgRole.hasWriteAccess && "skriv" || "læs" }})
                                         </option>
                                     </select>
                                 </td>

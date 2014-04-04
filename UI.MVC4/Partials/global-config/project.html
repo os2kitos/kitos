@@ -34,8 +34,8 @@
             <div class="form-group" data-ng-repeat="item in categories">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchCategory($data, $index)">
-                            {{ item.IsActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
+                        <a href="#" data-editable-checkbox="item.isActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchCategory($data, $index)">
+                            {{ item.isActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>
                 </div>
@@ -48,13 +48,13 @@
             <div class="form-group" data-ng-repeat="item in ItProjectRoles">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchItProjectRole($data, $index)">
-                            {{ item.IsActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
+                        <a href="#" data-editable-checkbox="item.isActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchItProjectRole($data, $index)">
+                            {{ item.isActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.HasWriteAccess" data-e-title="Skriverettighed?" data-onbeforesave="patchItProjectRoleAccess($data, $index)">
-                            {{ item.HasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
+                        <a href="#" data-editable-checkbox="item.hasWriteAccess" data-e-title="Skriverettighed?" data-onbeforesave="patchItProjectRoleAccess($data, $index)">
+                            {{ item.hasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
                         </a>
                     </div>
                 </div>
@@ -67,8 +67,8 @@
             <div class="form-group" data-ng-repeat="item in ItProjectRoleSuggestions">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchItProjectRoleSuggestion(!$data, $index)">
-                            {{ item.IsSuggestion && "Medtage " + item.name || "Medtager ikke " + item.name }} med {{ item.HasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
+                        <a href="#" data-editable-checkbox="!item.isSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchItProjectRoleSuggestion(!$data, $index)">
+                            {{ item.isSuggestion && "Medtage " + item.name || "Medtager ikke " + item.name }} med {{ item.hasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
                         </a>
                     </div>
                 </div>

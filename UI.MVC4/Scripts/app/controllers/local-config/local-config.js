@@ -13,7 +13,7 @@
                     if (scope.suggestForm.$invalid) return;
 
                     var data = {
-                        'IsSuggestion': true,
+                        "isSuggestion": true,
                         "name": scope.suggestion
                     };
 
@@ -39,10 +39,10 @@
                     if (scope.suggestForm.$invalid) return;
 
                     var data = {
-                        'IsSuggestion': true,
+                        "isSuggestion": true,
                         "name": scope.suggestion,
-                        'HasReadAccess': true,
-                        'HasWriteAccess': scope.writeAccess
+                        "hasReadAccess": true,
+                        "hasWriteAccess": scope.writeAccess
                     };
 
                     $http.post(scope.url, data).success(function (result) {
@@ -68,11 +68,11 @@
                 scope.list = [];
 
                 var optionsData = $http.get(scope.optionsUrl).success(function (result) {
-                    _.each(result.Response, function (v) {
+                    _.each(result.response, function (v) {
                         scope.list.push({
-                            id: v.Id,
+                            id: v.id,
                             name: v.name,
-                            note: v.Note
+                            note: v.note
                         });
                     });
                 });
@@ -100,22 +100,22 @@
                     $http.get(scope.localesUrl + '/' + orgId)
                 ]).then(function (result) {
 
-                    var options = result[0].data.Response;
-                    var locales = result[1].data.Response;
+                    var options = result[0].data.response;
+                    var locales = result[1].data.response;
 
                     _.each(options, function (v) {
 
                         var locale = _.find(locales, function (loc) {
-                            return loc.Original_Id == v.Id;
+                            return loc.original_Id == v.id;
                         });
 
                         var isNew = _.isUndefined(locale);
                         var localeName = isNew ? '' : locale.name;
 
                         scope.list.push({
-                            id: v.Id,
+                            id: v.id,
                             name: v.name,
-                            note: v.Note,
+                            note: v.note,
                             localeName: localeName,
                             isNew: isNew
                         });
@@ -137,8 +137,8 @@
 
                         var data = {
                             "name": value,
-                            'Original_Id': oId,
-                            'Municipality_Id': orgId
+                            "original_Id": oId,
+                            "municipality_Id": orgId
                         };
 
                         return $http({ method: method, url: scope.localesUrl, data: data })
@@ -198,47 +198,6 @@
             }
         });
 
-
-        /* .state('local-config-support', {
-            url: '/local-config/:chosenId',
-            templateUrl: 'partials/local-config/support.html',
-            controller: 'localConfig.SupportCtrl',
-            authRoles: ['LocalAdmin'],
-            resolve: {
-                moduleNamesHttp: ['$http', function ($http) {
-                    return $http.get('api/itsupportnames');
-                }],
-                
-                configHttp: ['$http', '$stateParams', '$rootScope', function ($http, $stateParams) {
-                    if (!$stateParams.chosenId) return true;
-                    
-                    return $http.get('api/config/' + $stateParams.chosenId);
-                }]
-            }
-        });.state('local-config-edt.project', {
-            url: '/local-config/project',
-            templateUrl: 'partials/local-config/project.html',
-            controller: 'localConfig.ProjectCtrl',
-            authRoles: ['LocalAdmin', 'GlobalAdmin'],
-            resolve: {
-                moduleNamesHttp: ['$http', function ($http) {
-                    return $http.get('api/itprojectnames');
-                }],
-                configHttp: ['$http', '$rootScope', function ($http, $rootScope) {
-                    var munId = $rootScope.user.municipality;
-                    return $http.get('api/config/' + chosenId);
-                }]
-            }
-        }).state('local-config.system', {
-            url: '/local-config/system',
-            templateUrl: 'partials/local-config/system.html',
-            controller: 'localConfig.SystemCtrl'
-        }).state('local-config-contract', {
-            url: '/local-config/contract',
-            templateUrl: 'partials/local-config/contract.html',
-            controller: 'localConfig.ContractCtrl'
-        });
-        */
     }]);
 
     var patch = function ($http, growl, url, value, fieldName) {
@@ -259,10 +218,10 @@
                 $rootScope.page.subnav = [];
 
                 $scope.orgChooser = {
-                    options: _.filter(organizationsHttp.data.Response,
+                    options: _.filter(organizationsHttp.data.response,
                         function(org) {
                             return _.contains($rootScope.user.isLocalAdminFor,
-                                org.Id);
+                                org.id);
                         })
                 };
 
@@ -280,45 +239,45 @@
                 $scope.orgId = $stateParams.chosenId;
                 $scope.orgChooser.chosen = $stateParams.chosenId;
 
-                $scope.organization = organizationHttp.data.Response;
+                $scope.organization = organizationHttp.data.response;
 
-                var config = configHttp.data.Response;
+                var config = configHttp.data.response;
                 $scope.updateConfig = function (value, fieldName) {
-                    return patch($http, growl, 'api/config/' + config.Id, value, fieldName);
+                    return patch($http, growl, 'api/config/' + config.id, value, fieldName);
                 };
                 
                 $scope.support = {
                     show: true,
-                    moduleNames: supportNamesHttp.data.Response,
-                    chosenNameId: config.ItSupportModuleName_Id,
-                    guideUrl: config.ItSupportGuide,
-                    showTabOverview: config.ShowTabOverview,
-                    showTechnology: config.ShowColumnTechnology,
-                    showUsage: config.ShowColumnUsage,
-                    showMandatory: config.ShowColumnMandatory
+                    moduleNames: supportNamesHttp.data.response,
+                    chosenNameId: config.itSupportModuleName_Id,
+                    guideUrl: config.itSupportGuide,
+                    showTabOverview: config.showTabOverview,
+                    showTechnology: config.showColumnTechnology,
+                    showUsage: config.showColumnUsage,
+                    showMandatory: config.showColumnMandatory
                 };
 
                 $scope.project = {
                     show: false,
-                    moduleNames: projectNamesHttp.data.Response,
-                    chosenNameId: config.ItProjectModuleName_Id,
-                    guideUrl: config.ItProjectGuide,
-                    showPortfolio: config.ShowPortfolio,
-                    showBC: config.ShowBC
+                    moduleNames: projectNamesHttp.data.response,
+                    chosenNameId: config.itProjectModuleName_Id,
+                    guideUrl: config.itProjectGuide,
+                    showPortfolio: config.showPortfolio,
+                    showBC: config.showBC
                 };
 
                 $scope.system = {
                     show: false,
-                    moduleNames: systemNamesHttp.data.Response,
-                    chosenNameId: config.ItSystemModuleName_Id,
-                    guideUrl: config.ItSystemGuide
+                    moduleNames: systemNamesHttp.data.response,
+                    chosenNameId: config.itSystemModuleName_Id,
+                    guideUrl: config.itSystemGuide
                 };
 
                 $scope.contract = {
                     show: false,
-                    moduleNames: contractNamesHttp.data.Response,
-                    chosenNameId: config.ItContractModuleName_Id,
-                    guideUrl: config.ItContractGuide
+                    moduleNames: contractNamesHttp.data.response,
+                    chosenNameId: config.itContractModuleName_Id,
+                    guideUrl: config.itContractGuide
                 };
 
                 $scope.toggle = function (object, s) {

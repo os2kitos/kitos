@@ -20,8 +20,8 @@
             <div class="form-group" data-ng-repeat="item in ContractTypes">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchContractType($data, $index)">
-                            {{ item.IsActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
+                        <a href="#" data-editable-checkbox="item.isActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchContractType($data, $index)">
+                            {{ item.isActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>
                 </div>
@@ -34,8 +34,8 @@
             <div class="form-group" data-ng-repeat="item in ContractTypeSuggestions">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchItContractTypeSuggestion(!$data, $index)">
-                            {{ item.IsSuggestion && "Medtager " + item.name || "Medtager ikke " + item.name }}
+                        <a href="#" data-editable-checkbox="!item.isSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchItContractTypeSuggestion(!$data, $index)">
+                            {{ item.isSuggestion && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>
                 </div>
@@ -48,8 +48,8 @@
             <div class="form-group" data-ng-repeat="item in ContractTemplates">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchContractTemplate($data, $index)">
-                            {{ item.IsActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
+                        <a href="#" data-editable-checkbox="item.isActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchContractTemplate($data, $index)">
+                            {{ item.isActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>
                 </div>
@@ -62,8 +62,8 @@
             <div class="form-group" data-ng-repeat="item in ContractTemplateSuggestions">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchContractTemplateSuggestion(!$data, $index)">
-                            {{ item.IsSuggestion && "Medtager " + item.name || "Medtager ikke " + item.name }}
+                        <a href="#" data-editable-checkbox="!item.isSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchContractTemplateSuggestion(!$data, $index)">
+                            {{ item.isSuggestion && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>
                 </div>
@@ -76,8 +76,8 @@
             <div class="form-group" data-ng-repeat="item in PurchaseForms">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchPurchaseForm($data, $index)">
-                            {{ item.IsActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
+                        <a href="#" data-editable-checkbox="item.isActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchPurchaseForm($data, $index)">
+                            {{ item.isActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>
                 </div>
@@ -90,8 +90,8 @@
             <div class="form-group" data-ng-repeat="item in PurchaseFormSuggestions">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchPurchaseFormSuggestion(!$data, $index)">
-                            {{ item.IsSuggestion && "Medtager " + item.name || "Medtager ikke " + item.name }}
+                        <a href="#" data-editable-checkbox="!item.isSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchPurchaseFormSuggestion(!$data, $index)">
+                            {{ item.isSuggestion && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>
                 </div>
@@ -104,13 +104,13 @@
             <div class="form-group" data-ng-repeat="item in ItContractRoles">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchItContractRole($data, $index)">
-                            {{ item.IsActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
+                        <a href="#" data-editable-checkbox="item.isActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchItContractRole($data, $index)">
+                            {{ item.isActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.HasWriteAccess" data-e-title="Skriverettighed?" data-onbeforesave="patchItContractRoleAccess($data, $index)">
-                            {{ item.HasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
+                        <a href="#" data-editable-checkbox="item.hasWriteAccess" data-e-title="Skriverettighed?" data-onbeforesave="patchItContractRoleAccess($data, $index)">
+                            {{ item.hasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
                         </a>
                     </div>
                 </div>
@@ -123,8 +123,8 @@
             <div class="form-group" data-ng-repeat="item in ItContractRoleSuggestions">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchItContractRoleSuggestion(!$data, $index)">
-                            {{ item.IsSuggestion && "Medtager " + item.name || "Medtager ikke " + item.name }} med {{ item.HasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
+                        <a href="#" data-editable-checkbox="!item.isSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchItContractRoleSuggestion(!$data, $index)">
+                            {{ item.isSuggestion && "Medtager " + item.name || "Medtager ikke " + item.name }} med {{ item.hasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
                         </a>
                     </div>
                 </div>
@@ -137,8 +137,8 @@
             <div class="form-group" data-ng-repeat="item in HandoverTrials">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchHandoverTrial($data, $index)">
-                            {{ item.IsActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
+                        <a href="#" data-editable-checkbox="item.isActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchHandoverTrial($data, $index)">
+                            {{ item.isActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>
                 </div>
@@ -151,8 +151,8 @@
             <div class="form-group" data-ng-repeat="item in HandoverTrialSuggestions">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchHandoverTrialSuggestion(!$data, $index)">
-                            {{ item.IsSuggestion && "Medtager " + item.name || "Medtager ikke " + item.name }}
+                        <a href="#" data-editable-checkbox="!item.isSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchHandoverTrialSuggestion(!$data, $index)">
+                            {{ item.isSuggestion && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>
                 </div>
@@ -165,8 +165,8 @@
             <div class="form-group" data-ng-repeat="item in PaymentModels">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchPaymentModel($data, $index)">
-                            {{ item.IsActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
+                        <a href="#" data-editable-checkbox="item.isActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchPaymentModel($data, $index)">
+                            {{ item.isActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>
                 </div>
@@ -179,8 +179,8 @@
             <div class="form-group" data-ng-repeat="item in PaymentModelSuggestions">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchPaymentModelSuggestion(!$data, $index)">
-                            {{ item.IsSuggestion && "Medtager " + item.name || "Medtager ikke " + item.name }}
+                        <a href="#" data-editable-checkbox="!item.isSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchPaymentModelSuggestion(!$data, $index)">
+                            {{ item.isSuggestion && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>
                 </div>
@@ -193,8 +193,8 @@
             <div class="form-group" data-ng-repeat="item in AgreementElements">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchAgreementElement($data, $index)">
-                            {{ item.IsActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
+                        <a href="#" data-editable-checkbox="item.isActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchAgreementElement($data, $index)">
+                            {{ item.isActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>
                 </div>
@@ -207,8 +207,8 @@
             <div class="form-group" data-ng-repeat="item in AgreementElementSuggestions">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchAgreementElementSuggestion(!$data, $index)">
-                            {{ item.IsSuggestion && "Medtager " + item.name || "Medtager ikke " + item.name }}
+                        <a href="#" data-editable-checkbox="!item.isSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchAgreementElementSuggestion(!$data, $index)">
+                            {{ item.isSuggestion && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>
                 </div>
