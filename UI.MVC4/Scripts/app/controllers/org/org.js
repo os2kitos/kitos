@@ -40,11 +40,7 @@
 
 
         function flattenAndSave(orgUnit, inheritWriteAccess) {
-
-            console.log("Flatten:");
-            console.log(orgUnit);
-            console.log("inheritWriteAccess: " + inheritWriteAccess);
-
+            
             //restore previously saved settings
             if ($scope.orgUnits[orgUnit.id]) {
 
