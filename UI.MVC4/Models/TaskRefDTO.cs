@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace UI.MVC4.Models
 {
@@ -10,6 +11,7 @@ namespace UI.MVC4.Models
         public string TaskKey { get; set; }
         public string Description { get; set; }
         public DateTime? ActiveFrom { get; set; }
-        public DateTime? ActiveTo { get; set; } 
+        public DateTime? ActiveTo { get; set; }
+        public int? ParentId { get; set; }
     }
 }

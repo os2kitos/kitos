@@ -1,5 +1,5 @@
 ﻿<div class="col-md-12">
-    
+
     <div class="col-md-4 container-fluid">
         <h2>Organisation</h2>
         <p>Du er tilknyttet disse organisationer:</p>
@@ -10,7 +10,7 @@
 
     <div class="col-md-8 container-fluid">
         <div class="row">
-            
+
             <!-- if no org unit is selected, this is shown -->
             <div class="col-md-12" data-ng-hide="chosenOrgUnit">
                 <h3>Vælg en organisationsenhed</h3>
@@ -19,7 +19,7 @@
                     <strong>Start med at vælge en organisationsenhed i oversigten til venstre.</strong>
                 </p>
             </div>
-            
+
             <!-- if an org unit has been selected -->
             <div class="col-md-12" data-ng-show="chosenOrgUnit">
                 <h3>
@@ -75,7 +75,7 @@
                                     </div>
                                 </td>
                             </tr>
-                            
+
                             <!-- edit -->
                             <tr data-ng-show="right.edit">
                                 <td>
@@ -117,12 +117,20 @@
                                 </td>
                             </tr>
                         </tbody>
-
                     </table>
                 </div>
-            </div>
-
+                
+                <div class="panel panel-primary" data-ng-switch="isTasksEditable">
+                    <div class="panel-heading">Tilknyttede opgaver</div>
+                    <div>
+                        <div data-ng-repeat="task in allTasksTree">
+                            <div data-ng-include="'partials/org/task.html'"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>              
         </div>
     </div>
-
 </div>
+
+

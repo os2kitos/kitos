@@ -152,10 +152,13 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<OrganizationUnit, OrgUnitDTO>().ReverseMap();
 
             Mapper.CreateMap<PasswordResetRequest, PasswordResetRequestDTO>()
-                  .ForMember(dto => dto.UserEmail, opt => opt.MapFrom(src => src.User.Email));
+                  .ForMember(dest => dest.UserEmail, opt => opt.MapFrom(src => src.User.Email));
 
             Mapper.CreateMap<TaskRef, TaskRefDTO>()
                   .ReverseMap();
+
+            Mapper.CreateMap<TaskRef, TaskOrgUnitRefDTO>()
+                  .ForMember(dest => dest.HandledByOrgUnit, opt => opt.MapFrom(src => src.OrganizationUnits.Select(x => x.Id)));
 
             Mapper.CreateMap<AdminRight, AdminRightDTO>()
                   .ForMember(dto => dto.OrganizationId, opt => opt.MapFrom(src => src.ObjectId))

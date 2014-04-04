@@ -19,7 +19,7 @@
 
     }]);
 
-    app.controller('org.OrgViewCtrl', ['$rootScope', '$scope', '$http', '$modal', 'growl', 'orgRolesHttp', function ($rootScope, $scope, $http, $modal, growl, orgRolesHttp) {
+    app.controller('org.OrgViewCtrl', ['$rootScope', '$scope', '$http', '$modal', 'growl', 'orgRolesHttp', '$q', function ($rootScope, $scope, $http, $modal, growl, orgRolesHttp, $q) {
         $rootScope.page.title = 'Organisation';
         $rootScope.page.subnav = subnav;
 
@@ -37,18 +37,18 @@
         _.each(orgRolesHttp.data.response, function(orgRole) {
             $scope.orgRoles[orgRole.id] = orgRole;
         });
-
-
+        
+        
         function flattenAndSave(orgUnit, inheritWriteAccess) {
-            
+
             //restore previously saved settings
             if ($scope.orgUnits[orgUnit.id]) {
 
                 var old = $scope.orgUnits[orgUnit.id];
                 orgUnit.isOpen = old.isOpen;
 
-            }
-            
+        }
+        
             $scope.orgUnits[orgUnit.id] = orgUnit;
 
             if (!inheritWriteAccess) {
@@ -57,10 +57,10 @@
                     
                     _.each(orgUnit.children, function(u) {
                         flattenAndSave(u, result.response);
-                    });
+        });
 
                 });
-                
+        
             } else {
                 
                 orgUnit.hasWriteAccess = true;
@@ -115,7 +115,7 @@
                     });
                 }
             }
-            
+
             //get org rights on the org unit and subtree
             $http.get('api/organizationRight?organizationUnitId=' + node.id).success(function(data) {
                 node.orgRights = data.response;
@@ -269,7 +269,7 @@
 
             $scope.rightSortBy = val;
         };
-        
+
         $scope.editUnit = function (unit) {
             
             var modal = $modal.open({
@@ -412,6 +412,234 @@
             });
         };
 
+        $scope.updateTask = function (task) {
+            task.selected = !task.selected;
+            var orgUnitId = $scope.chosenOrgUnit.id;
+
+            task.setChildrenState(task.selected);
+            task.setParentState();
+
+            if (task.selected === true) {
+                $http.post('api/organizationUnit/' + orgUnitId + '?taskref=' + task.id);
+            } else {
+                $http.delete('api/organizationUnit/' + orgUnitId + '?taskref=' + task.id);
+            }
+        };
+
+        function filterTasks() {
+            var orgUnitParentId = $scope.chosenOrgUnit.parentId;
+
+            if (orgUnitParentId === 0) {
+                // root tree, show all
+                _.each($scope.allTasksFlat, function(task) {
+                    task.show = true;
+                    task.canWrite = true;
+                });
+            } else {
+                // node tree, show selected from parent
+                $http.get('api/organizationUnit/' + orgUnitParentId + '?taskrefs').success(function (result) {
+                    var selectedTasksOnParent = result.response;
+                    _.each(selectedTasksOnParent, function (selectedTask) {
+                        var foundTask = _.find($scope.allTasksFlat, function (task) {
+                            return task.id === selectedTask.id;
+                        });
+                        if (foundTask) {
+                            foundTask.show = true;
+                            foundTask.canWrite = true;
+                            foundTask.setChildrenShown(true);
+                            foundTask.setParentShown(true);
+                        }
+                    });
+                });
+            }
+        }
+
+        function selectTasks() {
+            var orgUnitId = $scope.chosenOrgUnit.id;
+
+            $http.get('api/organizationUnit/' + orgUnitId + '?taskrefs').success(function(result) {
+                var selectedTasks = result.response;
+                _.each(selectedTasks, function (selectTask) {
+                    var foundTask = _.find($scope.allTasksFlat, function(task) {
+                        return task.id === selectTask.id;
+                    });
+                    if (foundTask) {
+                        foundTask.selected = true;
+                        foundTask.setChildrenState(true);
+                        foundTask.setParentState();
+
+                        foundTask.handledByOrgUnit = mapIdToOrgUnit(selectTask.handledByOrgUnit);
+                    }
+                });
+            });
+        }
+        
+        function mapIdToOrgUnit(idList) {
+            return _.map(idList, function (id) {
+                var foundOrgUnit = _.find($scope.orgUnits, function (orgUnit) {
+                    if (angular.isUndefined(orgUnit))
+                        return false;
+                    return orgUnit.id == id;
+                });
+                return foundOrgUnit.name;
+            });
+        };
+
+        function toHierarchy(flatAry, idPropertyName, parentIdPropetyName, parentPropetyName, childPropertyName) {
+            // default values
+            parentPropetyName = typeof parentPropetyName !== 'undefined' ? parentPropetyName : 'parent';
+            childPropertyName = typeof childPropertyName !== 'undefined' ?  childPropertyName : 'children';
+
+            // sort by parent to get roots (roots are null) first, then we only need to iterrate once
+            // example [1, 1, null, 2] -> [null, 1, 1, 2] (number is parent id)
+            var sorted = _.sortBy(flatAry, function(obj) {
+                return obj[parentIdPropetyName];
+            });
+
+            function search(nestedAry, id) {
+                if (!nestedAry || !id) 
+                    throw new Error("Invalid argument(s)"); // abort if not valid input
+
+                for (var i = 0; i < nestedAry.length; i++) {
+                    var obj = nestedAry[i];
+                    if (obj[idPropertyName] === id) {
+                        return obj;
+                    } else if (obj.hasOwnProperty(childPropertyName)) { // has children, search them too
+                        var found = search(obj[childPropertyName], id);
+                        if (found) return found;
+                    }
+                }
+            }
+
+            var hierarchy = [];
+            _.each(sorted, function (obj) {
+                // define functions
+                obj.isAllChildren = function (isChecked) {
+                    if (typeof isChecked !== 'boolean')
+                        throw new Error('Argument must be a boolean');
+
+                    return _.every(this.children, function(child) {
+                        if (isChecked === true) {
+                            return child.selected === true;
+                        } else {
+                            return child.selected === false && child.indeterminate === false;
+                        }
+                    });
+                };
+                obj.setChildrenShown = function(isShown) {
+                    if (typeof isShown !== 'boolean')
+                        throw new Error('Argument must be a boolean');
+
+                    var children = this.children;
+                    if (!children) return;
+
+                    _.each(children, function (child) {
+                        child.show = isShown;
+                        child.canWrite = isShown;
+                        child.setChildrenShown(isShown);
+                    });
+                };
+                obj.setParentShown = function (isShown) {
+                    var parent = this.parent;
+                    if (!parent) return;
+                    parent.show = isShown;
+                    parent.setParentShown(isShown);
+                };
+                obj.setState = function(isChecked) {
+                    if (isChecked === true) {
+                        this.indeterminate = false;
+                        this.selected = true;
+                    } else if (isChecked === false) {
+                        this.indeterminate = false;
+                        this.selected = false;
+                    } else {
+                        this.indeterminate = true;
+                        this.selected = false;
+                    }
+                };
+                obj.setChildrenState = function(isChecked) {
+                    if (typeof isChecked !== 'boolean')
+                        throw new Error('Argument must be a boolean');
+
+                    var children = this.children;
+                    if (!children) return;
+
+                    _.each(children, function (child) {
+                        child.setState(isChecked);
+                        child.setChildrenState(isChecked);
+                    });
+                };
+                obj.setParentState = function () {
+                    var parent = this.parent;
+                    if (!parent)
+                        return;
+                    if (parent.isAllChildren(true)) {
+                        parent.setState(true);
+                    } else if (parent.isAllChildren(false)) {
+                        parent.setState(false);
+                    } else {
+                        // if all children is neither true or false 
+                        // then it must be a mix
+                        // so we need to set the parent as not selected 
+                        // and show the indeterminate state
+                        parent.setState(null);
+                    }
+                    // cascade up the tree
+                    parent.setParentState();
+                };
+
+                if (obj[parentIdPropetyName] === null) // is root
+                    hierarchy.push(obj);
+                else {
+                    var parentObj = search(hierarchy, obj[parentIdPropetyName]);
+                    if (!parentObj.hasOwnProperty(childPropertyName))
+                        parentObj[childPropertyName] = [];
+
+                    obj[parentPropetyName] = parentObj;
+                    parentObj[childPropertyName].push(obj);
+                }
+            });
+
+            return hierarchy;
+        }
+
+        $scope.$watch('chosenOrgUnit', function (newOrgUnit, oldOrgUnit) {
+            if (newOrgUnit !== null) {
+                getAllTasks().then(function () {
+                    resetTasks();
+                    filterTasks();
+                    selectTasks();
+                });
+            }
+        });
+
+        function getAllTasks() {
+            var deferred = $q.defer();
+            // only get if not previously set
+            if (!$scope.allTasksFlat) {
+                $http.get('api/taskref').success(function (result) {
+                    var tasks = result.response;
+                    // flat array for easy searching
+                    $scope.allTasksFlat = tasks;
+                    // nested array for angular to generate tree in a repeat
+                    $scope.allTasksTree = toHierarchy(tasks, 'id', 'parentId');
+                    deferred.resolve();
+                });
+            } else {
+                deferred.resolve();
+            }
+            return deferred.promise;
+        }
+
+        function resetTasks() {
+            _.each($scope.allTasksFlat, function (task) {
+                task.show = false;
+                task.selected = false;
+                task.indeterminate = false;
+                task.canWrite = false;
+                delete task.handledByOrgUnit;
+            });
+        }
     }]);
 
 })(angular, app);
