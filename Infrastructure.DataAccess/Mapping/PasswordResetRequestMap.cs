@@ -15,12 +15,12 @@ namespace Infrastructure.DataAccess.Mapping
             this.ToTable("PasswordResetRequest");
             this.Property(t => t.Id).HasColumnName("Id");
             this.Property(t => t.Time).HasColumnName("Time");
-            this.Property(t => t.User_Id).HasColumnName("User_Id");
+            this.Property(t => t.UserId).HasColumnName("UserId");
 
             // Relationships
             this.HasRequired(t => t.User)
                 .WithMany(t => t.PasswordResetRequests)
-                .HasForeignKey(d => d.User_Id);
+                .HasForeignKey(d => d.UserId);
                 
         }
     }

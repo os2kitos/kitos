@@ -3,9 +3,9 @@ namespace Core.DomainModel.ItSystem
     public class Infrastructure
     {
         public int Id { get; set; }
-        public int Host_Id { get; set; }
-        public int Supplier_Id { get; set; }
-        public int Department_Id { get; set; }
+        public int HostId { get; set; }
+        public int SupplierId { get; set; }
+        public int DepartmentId { get; set; }
 
         public virtual OrganizationUnit OrganizationUnit { get; set; }
         public virtual Host Host { get; set; }

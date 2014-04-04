@@ -2,7 +2,7 @@
 {
     public class CreateLocalAdminDTO
     {
-        public int User_Id { get; set; }
-        public int Organization_Id { get; set; }
+        public int UserId { get; set; }
+        public int OrganizationId { get; set; }
     }
 }

@@ -7,7 +7,7 @@ namespace Core.DomainModel.ItContract
         public string To { get; set; }
         public string Cc { get; set; }
         public string Subject { get; set; }
-        public int ItContract_Id { get; set; }
+        public int ItContractId { get; set; }
 
         public virtual ItContract ItContract { get; set; }
     }

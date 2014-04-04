@@ -14,16 +14,16 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("TaskRef");
             this.Property(t => t.Id).HasColumnName("Id");
-            this.Property(t => t.ItProject_Id).HasColumnName("ItProject_Id");
-            this.Property(t => t.ItSystem_Id).HasColumnName("ItSystem_Id");
+            this.Property(t => t.ItProjectId).HasColumnName("ItProjectId");
+            this.Property(t => t.ItSystemId).HasColumnName("ItSystemId");
 
             // Relationships
             this.HasOptional(t => t.ItProject)
                 .WithMany(t => t.TaskRefs)
-                .HasForeignKey(d => d.ItProject_Id);
+                .HasForeignKey(d => d.ItProjectId);
             this.HasOptional(t => t.ItSystem)
                 .WithMany(t => t.KLEs)
-                .HasForeignKey(d => d.ItSystem_Id);
+                .HasForeignKey(d => d.ItSystemId);
 
         }
     }

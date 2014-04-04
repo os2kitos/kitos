@@ -133,7 +133,7 @@ namespace Core.DomainServices
 
                 var writeRights =
                     _orgRightRepository.Get(
-                        right => right.User_Id == user.Id && right.Object_Id == currUnit.Id && right.Role.HasWriteAccess).ToList();
+                        right => right.UserId == user.Id && right.ObjectId == currUnit.Id && right.Role.HasWriteAccess).ToList();
 
                 if (writeRights.Any()) return true;
 

@@ -13,8 +13,8 @@ namespace Core.DomainModel
 
         public int Id { get; set; }
         public string Name { get; set; }
-        public int? Parent_Id { get; set; }
-        public int Organization_Id { get; set; }
+        public int? ParentId { get; set; }
+        public int OrganizationId { get; set; }
 
         public virtual OrganizationUnit Parent { get; set; }
         public virtual ICollection<OrganizationUnit> Children { get; set; }

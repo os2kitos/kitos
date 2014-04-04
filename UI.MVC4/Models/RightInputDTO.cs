@@ -7,8 +7,8 @@ namespace UI.MVC4.Models
 {
     public class RightInputDTO
     {
-        public int Object_Id { get; set; }
-        public int Role_Id { get; set; }
-        public int User_Id { get; set; }
+        public int ObjectId { get; set; }
+        public int RoleId { get; set; }
+        public int UserId { get; set; }
     }
 }

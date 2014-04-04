@@ -8,7 +8,7 @@ namespace Core.DomainModel
         public bool ShowItContractModule { get; set; }
 
         /* IT SUPPORT */
-        public int ItSupportModuleName_Id { get; set; }
+        public int ItSupportModuleNameId { get; set; }
         public string ItSupportGuide { get; set; }
         public bool ShowTabOverview { get; set; }
         public bool ShowColumnTechnology { get; set; }
@@ -16,17 +16,17 @@ namespace Core.DomainModel
         public bool ShowColumnMandatory { get; set; }
 
         /* IT PROJECT */
-        public int ItProjectModuleName_Id { get; set; }
+        public int ItProjectModuleNameId { get; set; }
         public string ItProjectGuide { get; set; }
         public bool ShowPortfolio { get; set; }
         public bool ShowBC { get; set; }
 
         /* IT SYSTEM */
-        public int ItSystemModuleName_Id { get; set; }
+        public int ItSystemModuleNameId { get; set; }
         public string ItSystemGuide { get; set; }
 
         /* IT CONTRACT */
-        public int ItContractModuleName_Id { get; set; }
+        public int ItContractModuleNameId { get; set; }
         public string ItContractGuide { get; set; }
 
         public virtual ItSupportModuleName ItSupportModuleName { get; set; }
@@ -44,10 +44,10 @@ namespace Core.DomainModel
                         ShowItContractModule = true,
                         ShowItProjectModule = true,
                         ShowItSystemModule = true,
-                        ItSupportModuleName_Id = 1,
-                        ItContractModuleName_Id = 1,
-                        ItProjectModuleName_Id = 1,
-                        ItSystemModuleName_Id = 1,
+                        ItSupportModuleNameId = 1,
+                        ItContractModuleNameId = 1,
+                        ItProjectModuleNameId = 1,
+                        ItSystemModuleNameId = 1,
                         ItSupportGuide = ".../itunderstøttelsesvejledning",
                         ItProjectGuide = ".../itprojektvejledning",
                         ItSystemGuide = ".../itsystemvejledning",

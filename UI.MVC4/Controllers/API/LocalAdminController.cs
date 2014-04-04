@@ -26,9 +26,9 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var user = UserRepository.GetByKey(item.User_Id);
+                var user = UserRepository.GetByKey(item.UserId);
 
-                var organization = _organizationRepository.GetByKey(item.Organization_Id);
+                var organization = _organizationRepository.GetByKey(item.OrganizationId);
 
                 _adminService.MakeLocalAdmin(user, organization);
 

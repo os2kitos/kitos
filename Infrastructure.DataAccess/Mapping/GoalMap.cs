@@ -14,12 +14,12 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("Goal");
             this.Property(t => t.Id).HasColumnName("Id");
-            this.Property(t => t.GoalStatus_Id).HasColumnName("GoalStatus_Id");
+            this.Property(t => t.GoalStatusId).HasColumnName("GoalStatusId");
 
             // Relationships
             this.HasRequired(t => t.GoalStatus)
                 .WithMany(t => t.Goals)
-                .HasForeignKey(d => d.GoalStatus_Id);
+                .HasForeignKey(d => d.GoalStatusId);
 
         }
     }

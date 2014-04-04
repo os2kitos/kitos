@@ -17,12 +17,12 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasOptional(o => o.Parent)
                 .WithMany(p => p.Children)
-                .HasForeignKey(o => o.Parent_Id)
+                .HasForeignKey(o => o.ParentId)
                 .WillCascadeOnDelete(true);
 
             this.HasRequired(o => o.Organization)
                 .WithMany(m => m.OrgUnits)
-                .HasForeignKey(o => o.Organization_Id)
+                .HasForeignKey(o => o.OrganizationId)
                 .WillCascadeOnDelete(true);
         }
     }

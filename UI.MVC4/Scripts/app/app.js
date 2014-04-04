@@ -50,7 +50,7 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
             email: result.response.email,
             isGlobalAdmin: result.response.isGlobalAdmin,
             isLocalAdmin: isLocalAdmin,
-            isLocalAdminFor: _.pluck(result.response.adminRights, 'organization_Id')
+            isLocalAdminFor: _.pluck(result.response.adminRights, 'organizationId')
         };
 
     };

@@ -4,7 +4,7 @@
             Modulnavn
         </label>
         <div class="col-md-10">
-            <a href="#" data-editable-select="support.chosenNameId" data-buttons="no" data-e-ng-options="name.id as name.name for name in support.moduleNames" data-onbeforesave="updateConfig($data, 'itSupportModuleName_Id')">
+            <a href="#" data-editable-select="support.chosenNameId" data-buttons="no" data-e-ng-options="name.id as name.name for name in support.moduleNames" data-onbeforesave="updateConfig($data, 'itSupportModuleNameId')">
                 {{ support.moduleNames[support.chosenNameId - 1].name; }}
             </a>
         </div>

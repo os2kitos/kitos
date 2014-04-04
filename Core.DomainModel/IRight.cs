@@ -4,9 +4,9 @@
         where TRole : IEntity<int>
         where TObject : IEntity<int>
     {
-        int User_Id { get; set; }
-        int Role_Id { get; set; }
-        int Object_Id { get; set; }
+        int UserId { get; set; }
+        int RoleId { get; set; }
+        int ObjectId { get; set; }
 
         User User { get; set; }
         TRole Role { get; set; }

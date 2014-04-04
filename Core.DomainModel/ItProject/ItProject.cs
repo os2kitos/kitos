@@ -22,13 +22,13 @@ namespace Core.DomainModel.ItProject
         public bool IsTermsOfReferenceApproved { get; set; }
         public string Note { get; set; }
         public string Name { get; set; }
-        public int ProjectType_Id { get; set; }
-        public int ProjectCategory_Id { get; set; }
-        public int Municipality_Id { get; set; }
-        public int? ItProjectOwner_Id { get; set; }
-        public int? ItProjectLeader_Id { get; set; }
-        public int? PartItProjectLeader_Id { get; set; }
-        public int? Consultant_Id { get; set; }
+        public int ProjectTypeId { get; set; }
+        public int ProjectCategoryId { get; set; }
+        public int MunicipalityId { get; set; }
+        public int? ItProjectOwnerId { get; set; }
+        public int? ItProjectLeaderId { get; set; }
+        public int? PartItProjectLeaderId { get; set; }
+        public int? ConsultantId { get; set; }
 
         public virtual ICollection<Communication> Communications { get; set; }
         public virtual ICollection<Economy> Economies { get; set; }

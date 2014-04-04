@@ -100,18 +100,18 @@
             if (!node.organization) {
 
                 //try get from cache
-                if (orgs[node.organization_Id]) {
+                if (orgs[node.organizationId]) {
                     
-                    node.organization = orgs[node.organization_Id];
+                    node.organization = orgs[node.organizationId];
                     
                 } else {
                     //else get from server
                     
-                    $http.get('api/organization/' + node.organization_Id).success(function (data) {
+                    $http.get('api/organization/' + node.organizationId).success(function (data) {
                         node.organization = data.response;
                         
                         //save to cache
-                        orgs[node.organization_Id] = data.response;
+                        orgs[node.organizationId] = data.response;
                     });
                 }
             }
@@ -122,7 +122,7 @@
 
                 _.each(node.orgRights, function (right) {
                     right.userForSelect = { id: right.user.id, text: right.user.name };
-                    right.roleForSelect = right.role_Id;
+                    right.roleForSelect = right.roleId;
                     right.show = true;
                 });
 
@@ -141,21 +141,21 @@
             var uId = $scope.selectedUser.id;
 
             var data = {
-                "object_Id": oId,
-                "role_Id": rId,
-                "user_Id": uId
+                "objectId": oId,
+                "roleId": rId,
+                "userId": uId
             };
 
             $http.post("api/organizationright", data).success(function (result) {
                 growl.addSuccessMessage(result.response.user.name + " er knyttet i rollen");
 
                 $scope.chosenOrgUnit.orgRights.push({
-                    "object_Id": result.response.object_Id,
-                    "role_Id": result.response.role_Id,
-                    "user_Id": result.response.user_Id,
+                    "objectId": result.response.objectId,
+                    "roleId": result.response.roleId,
+                    "userId": result.response.userId,
                     "user": result.response.user,
-                    'userForSelect': { id: result.response.user_Id, text: result.response.user.name },
-                    'roleForSelect': result.response.role_Id,
+                    'userForSelect': { id: result.response.userId, text: result.response.user.name },
+                    'roleForSelect': result.response.roleId,
                     show: true
                 });
                 
@@ -170,9 +170,9 @@
 
         $scope.deleteRight = function(right) {
 
-            var oId = right.object_Id;
-            var rId = right.role_Id;
-            var uId = right.user_Id;
+            var oId = right.objectId;
+            var rId = right.roleId;
+            var uId = right.userId;
 
             $http.delete("api/organizationright?oId=" + oId + "&rId=" + rId + "&uId=" + uId).success(function(deleteResult) {
                 right.show = false;
@@ -189,12 +189,12 @@
             if (!right.roleForSelect || !right.userForSelect) return;
             
             //old values
-            var oIdOld = right.object_Id;
-            var rIdOld = right.role_Id;
-            var uIdOld = right.user_Id;
+            var oIdOld = right.objectId;
+            var rIdOld = right.roleId;
+            var uIdOld = right.userId;
             
             //new values
-            var oIdNew = right.object_Id;
+            var oIdNew = right.objectId;
             var rIdNew = right.roleForSelect;
             var uIdNew = right.userForSelect.id;
             
@@ -208,16 +208,16 @@
             $http.delete("api/organizationright?oId=" + oIdOld + "&rId=" + rIdOld + "&uId=" + uIdOld).success(function(deleteResult) {
 
                 var data = {
-                    "object_Id": oIdNew,
-                    "role_Id": rIdNew,
-                    "user_Id": uIdNew
+                    "objectId": oIdNew,
+                    "roleId": rIdNew,
+                    "userId": uIdNew
                 };
 
                 $http.post("api/organizationright", data).success(function (result) {
 
-                    right.role_Id = result.response.role_Id;
+                    right.roleId = result.response.roleId;
                     right.user = result.response.user;
-                    right.user_Id = result.response.user_Id;
+                    right.userId = result.response.userId;
 
                     right.edit = false;
 
@@ -237,7 +237,7 @@
                 
                 //couldn't delete the old entry, just reset select options
                 right.userForSelect = { id: right.user.id, text: right.user.name };
-                right.roleForSelect = right.role_Id;
+                right.roleForSelect = right.roleId;
 
                 growl.addErrorMessage('Fejl!');
             });
@@ -248,15 +248,15 @@
         $scope.rightSort = function(right) {
             switch ($scope.rightSortBy) {
                 case "orgUnitName":
-                    return $scope.orgUnits[right.object_Id].name;
+                    return $scope.orgUnits[right.objectId].name;
                 case "roleName":
-                    return $scope.orgRoles[right.role_Id].name;
+                    return $scope.orgRoles[right.roleId].name;
                 case "userName":
                     return right.user.name;
                 case "userEmail":
                     return right.user.email;
                 default:
-                    return $scope.orgUnits[right.object_Id].name;
+                    return $scope.orgUnits[right.objectId].name;
             }
         };
 
@@ -285,7 +285,7 @@
                     //filter out those orgunits, that are outside the organisation
                     //or is currently a subdepartment of the unit
                     function filter(node) {
-                        if (node.organization_Id != unit.organization_Id) return;
+                        if (node.organizationId != unit.organizationId) return;
                         
                         //this avoid every subdepartment
                         if (node.id == unit.id) return;
@@ -302,13 +302,13 @@
                         'id': unit.id,
                         'oldName': unit.name,
                         'newName': unit.name,
-                        'newParent': unit.parent_Id,
-                        'orgId': unit.organization_Id,
-                        'isRoot': unit.parent_Id == 0
+                        'newParent': unit.parentId,
+                        'orgId': unit.organizationId,
+                        'isRoot': unit.parentId == 0
                     };
                     
                     //only allow changing the parent if user is admin, and the unit isn't at the root
-                    $modalScope.isAdmin = $rootScope.user.isGlobalAdmin || _.contains($rootScope.user.isLocalAdminFor, unit.organization_Id);
+                    $modalScope.isAdmin = $rootScope.user.isGlobalAdmin || _.contains($rootScope.user.isLocalAdminFor, unit.organizationId);
                     $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot;
 
                     $modalScope.patch = function () {
@@ -325,7 +325,7 @@
                         };
 
                         //only allow changing the parent if user is admin, and the unit isn't at the root
-                        if ($modalScope.canChangeParent && parent) data["parent_Id"] = parent;
+                        if ($modalScope.canChangeParent && parent) data["parentId"] = parent;
 
                         $modalScope.submitting = true;
 
@@ -354,8 +354,8 @@
 
                         var data = {
                             "name": name,
-                            "parent_Id": parent,
-                            "organization_Id": orgId
+                            "parentId": parent,
+                            "organizationId": orgId
                         };
 
                         $modalScope.submitting = true;

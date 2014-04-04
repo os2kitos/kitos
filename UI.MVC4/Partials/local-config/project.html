@@ -4,7 +4,7 @@
             Modulnavn
         </label>
         <div class="col-md-10">
-            <a href="#" data-editable-select="project.chosenNameId" data-buttons="no" data-e-ng-options="name.id as name.name for name in project.moduleNames" data-onbeforesave="updateConfig($data, 'itProjectModuleName_Id')">
+            <a href="#" data-editable-select="project.chosenNameId" data-buttons="no" data-e-ng-options="name.id as name.name for name in project.moduleNames" data-onbeforesave="updateConfig($data, 'itProjectModuleNameId')">
                 {{ project.moduleNames[project.chosenNameId - 1].name; }}
             </a>
         </div>
