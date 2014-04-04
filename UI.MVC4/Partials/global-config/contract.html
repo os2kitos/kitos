@@ -6,10 +6,10 @@
             <div class="form-group" data-ng-repeat="item in refs">
                 <label class="col-sm-2 control-label">{{ item.name }}</label>
                 <div class="col-sm-5">
-                    <a href="#" data-editable-text="item.Name" data-onbeforesave="patchRef($data, $index)">
+                    <a href="#" data-editable-text="item.name" data-onbeforesave="patchRef($data, $index)">
                         {{ item.name || "Ikke sat" }}
                     </a>
-                    <p class="help-block">{{ item.Note }}</p>
+                    <p class="help-block">{{ item.note }}</p>
                 </div>
             </div>
         </div>
@@ -34,7 +34,7 @@
             <div class="form-group" data-ng-repeat="item in ContractTypeSuggestions">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="!item.isSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchItContractTypeSuggestion(!$data, $index)">
+                        <a href="#" data-editable-checkbox="!item.isSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchContractTypeSuggestion(!$data, $index)">
                             {{ item.isSuggestion && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>

@@ -20,7 +20,7 @@
                 <div class="col-md-8">
                     <select type="text" data-ui-select2="" name="parent" data-ng-model="orgUnit.newParent" class="form-control" data-placeholder="Vælg overordnet" data-ng-required="true" data-ng-disabled="!canChangeParent">
                         <option></option>
-                        <option data-ng-repeat="unit in orgUnits" value="{{unit.Id}}">{{unit.name}}</option>
+                        <option data-ng-repeat="unit in orgUnits" value="{{unit.id}}">{{unit.name}}</option>
                     </select>
                 </div>
                 <div class="col-md-8 col-md-offset-3">
