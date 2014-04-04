@@ -23,12 +23,13 @@
             <!-- if an org unit has been selected -->
             <div class="col-md-12" data-ng-show="chosenOrgUnit">
                 <h3>
-                    {{ chosenOrgUnit.Name }} <span class="text-muted"> ({{ chosenOrgUnit.Organization.Name }})</span>
+                    {{ chosenOrgUnit.name }} 
+                    <span class="text-muted"> ({{ chosenOrgUnit.organization.name }})</span>
                     <span class="pull-right small" data-ng-hide="chosenOrgUnit.hasWriteAccess">
                         <i class="glyphicon glyphicon-lock" title="Du har ikke skriveadgang til denne organisationsenhed"></i>
                     </span>
                     <span class="pull-right small" data-ng-show="chosenOrgUnit.hasWriteAccess">
-                        <a data-ng-click="editUnit(chosenOrgUnit)"><i class="glyphicon glyphicon-cog" title="Rediger {{chosenOrgUnit.Name}}"></i></a>
+                        <a data-ng-click="editUnit(chosenOrgUnit)"><i class="glyphicon glyphicon-cog" title="Rediger {{chosenOrgUnit.name}}"></i></a>
                     </span>
                 </h3>
 
@@ -55,14 +56,14 @@
                             </tr>
                         </thead>
                         <!-- for each right -->
-                        <tbody data-ng-repeat="right in chosenOrgUnit.OrgRights | filter : { show: true } | orderBy : rightSort : rightSortReverse">
+                        <tbody data-ng-repeat="right in chosenOrgUnit.orgRights | filter : { show: true } | orderBy : rightSort : rightSortReverse">
                             
                             <!-- show -->
                             <tr data-ng-hide="right.edit">
-                                <td>{{ orgUnits[right.Object_Id].Name }}</td>
-                                <td>{{ orgRoles[right.Role_Id].Name }}</td>
-                                <td>{{ right.User.Name }}</td>
-                                <td>{{ right.User.Email }}</td>
+                                <td>{{ orgUnits[right.object_Id].name }}</td>
+                                <td>{{ orgRoles[right.role_Id].name }}</td>
+                                <td>{{ right.user.name }}</td>
+                                <td>{{ right.user.email }}</td>
                                 <td>
                                     <div data-ng-show="chosenOrgUnit.hasWriteAccess && chosenOrgUnit.editRights">
                                         <a data-ng-click="right.edit = true" class="btn btn-link btn-sm"><i class="glyphicon glyphicon-pencil"></i></a>
@@ -78,12 +79,12 @@
                             <!-- edit -->
                             <tr data-ng-show="right.edit">
                                 <td>
-                                    <input type="text" disabled="" class="form-control input-sm" value="{{ orgUnits[right.Object_Id].Name }}"/>
+                                    <input type="text" disabled="" class="form-control input-sm" value="{{ orgUnits[right.object_Id].name }}"/>
                                 </td>
                                 <td>
                                     <select data-ui-select2="" name="selectRole" data-ng-model="right.roleForSelect" class="form-control input-sm">
-                                        <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.Id}}">
-                                            {{orgRole.Name}} ({{orgRole.HasWriteAccess && "skriv" || "læs" }})
+                                        <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.id}}">
+                                            {{orgRole.name}} ({{orgRole.hasWriteAccess && "skriv" || "læs" }})
                                         </option>
                                     </select>
                                 </td>
@@ -99,12 +100,12 @@
                         <!-- add-new-right row -->
                         <tbody data-ng-show="chosenOrgUnit.hasWriteAccess && chosenOrgUnit.editRights">
                             <tr>
-                                <td><input type="text" disabled="" class="form-control input-sm" value="{{ chosenOrgUnit.Name }}"/></td>
+                                <td><input type="text" disabled="" class="form-control input-sm" value="{{ chosenOrgUnit.name }}"/></td>
                                 <td>
                                     <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en organisationsrolle" class="form-control input-sm">
                                         <option value=""></option>
-                                        <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.Id}}">
-                                            {{orgRole.Name}} ({{orgRole.HasWriteAccess && "skriv" || "læs" }})
+                                        <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.id}}">
+                                            {{orgRole.name}} ({{orgRole.hasWriteAccess && "skriv" || "læs" }})
                                         </option>
                                     </select>
                                 </td>

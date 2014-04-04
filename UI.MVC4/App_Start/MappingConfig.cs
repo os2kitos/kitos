@@ -32,6 +32,14 @@ namespace UI.MVC4.App_Start
             // TODO do we need an admin DTO and normal DTO to strip unused properties in normal DTO
             // like IsActive and Note
 
+            Mapper.CreateMap<AgreementElement, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
+            Mapper.CreateMap<HandoverTrial, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
             Mapper.CreateMap<ContractTemplate, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
