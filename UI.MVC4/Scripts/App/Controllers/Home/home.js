@@ -51,8 +51,8 @@
 
             var data = {
                 "email": $scope.email,
-                'Password': $scope.password,
-                'RememberMe': $scope.remember
+                "password": $scope.password,
+                "rememberMe": $scope.remember
             };
 
             $http.post('api/authorize', data).success(function (result) {
@@ -71,36 +71,6 @@
         };
     }]);
     
-    /*
-    app.controller('home.LoginCtrl', ['$rootScope', '$scope', '$http', '$state', '$stateParams', 'growl', function ($rootScope, $scope, $http, $state, $stateParams, growl) {
-        $rootScope.page.title = 'Log ind';
-        $rootScope.page.subnav = [];
-        
-        //login
-        $scope.submit = function () {
-            if ($scope.loginForm.$invalid) return;
-
-            var data = {
-                'email': $scope.email,
-                'Password': $scope.password,
-                'RememberMe': $scope.remember
-            };
-
-            $http.post('api/authorize', data).success(function (result) {
-                growl.addSuccessMessage("Du er nu logget ind!");
-
-                $rootScope.saveUser(result);
-
-                var to = $stateParams.to ? $stateParams.to : 'index';
-
-                $state.go(to);
-            }).error(function (result) {
-                growl.addErrorMessage("Forkert brugernavn eller password!");
-            });
-
-        };
-    }]);*/
-
     app.controller('home.ForgotPasswordCtrl', ['$rootScope', '$scope', '$http', 'growl', function ($rootScope, $scope, $http, growl) {
         $rootScope.page.title = 'Glemt password';
         $rootScope.page.subnav = [];
@@ -130,7 +100,7 @@
         var requestId = $stateParams.requestId;
         $http.get('api/passwordresetrequest?requestId=' + requestId).success(function(result) {
             $scope.resetStatus = 'enterPassword';
-            $scope.email = result.Response.UserEmail;
+            $scope.email = result.response.userEmail;
         }).error(function() {
             $scope.resetStatus = 'missingRequest';
         });
@@ -138,7 +108,7 @@
         $scope.submit = function() {
             if ($scope.resetForm.$invalid) return;
 
-            var data = { 'RequestId': requestId, 'NewPassword': $scope.password };
+            var data = { "requestId": requestId, "newPassword": $scope.password };
             
             $http.post('api/authorize?resetPassword', data).success(function (result) {
                 $scope.resetStatus = 'success';
