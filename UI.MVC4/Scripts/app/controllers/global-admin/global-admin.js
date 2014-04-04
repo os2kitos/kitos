@@ -35,7 +35,7 @@
         $scope.submit = function() {
             if ($scope.addForm.$invalid) return;
 
-            var data = { "Name": $scope.name };
+            var data = { "name": $scope.name };
             
             $http.post('api/organization', data).success(function (result) {
                 growl.addSuccessMessage("Organisationen " + $scope.name + " er blevet oprettet!");

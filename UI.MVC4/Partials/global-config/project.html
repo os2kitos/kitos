@@ -4,10 +4,10 @@
             <h4>Reference</h4>
 
             <div class="form-group" data-ng-repeat="item in refs">
-                <label class="col-sm-2 control-label">{{ item.Name }}</label>
+                <label class="col-sm-2 control-label">{{ item.name }}</label>
                 <div class="col-sm-5">
-                    <a href="#" data-editable-text="item.Name" data-onbeforesave="patchRef($data, $index)">
-                        {{ item.Name || "Ikke sat" }}
+                    <a href="#" data-editable-text="item.name" data-onbeforesave="patchRef($data, $index)">
+                        {{ item.name || "Ikke sat" }}
                     </a>
                     <p class="help-block">{{ item.Note }}</p>
                 </div>
@@ -18,10 +18,10 @@
             <h4>Projektfase</h4>
         
             <div class="form-group" data-ng-repeat="item in phases">
-                <label class="col-sm-2 control-label">{{ item.Name }}</label>
+                <label class="col-sm-2 control-label">{{ item.name }}</label>
                 <div class="col-sm-5">
-                    <a href="#" data-editable-text="item.Name" data-onbeforesave="patchPhase($data, $index)">
-                        {{ item.Name || "Ikke sat" }}
+                    <a href="#" data-editable-text="item.name" data-onbeforesave="patchPhase($data, $index)">
+                        {{ item.name || "Ikke sat" }}
                     </a>
                     <p class="help-block">{{ item.Note }}</p>
                 </div>
@@ -34,8 +34,8 @@
             <div class="form-group" data-ng-repeat="item in categories">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchCategory($data, $index)">
-                            {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchCategory($data, $index)">
+                            {{ item.IsActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>
                 </div>
@@ -48,8 +48,8 @@
             <div class="form-group" data-ng-repeat="item in ItProjectRoles">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchItProjectRole($data, $index)">
-                            {{ item.IsActive && "Medtager " + item.Name || "Medtager ikke " + item.Name }}
+                        <a href="#" data-editable-checkbox="item.IsActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchItProjectRole($data, $index)">
+                            {{ item.IsActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>
                     <div class="checkbox">
@@ -67,8 +67,8 @@
             <div class="form-group" data-ng-repeat="item in ItProjectRoleSuggestions">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.Name}}?" data-onbeforesave="patchItProjectRoleSuggestion(!$data, $index)">
-                            {{ item.IsSuggestion && "Medtage " + item.Name || "Medtager ikke " + item.Name }} med {{ item.HasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
+                        <a href="#" data-editable-checkbox="!item.IsSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchItProjectRoleSuggestion(!$data, $index)">
+                            {{ item.IsSuggestion && "Medtage " + item.name || "Medtager ikke " + item.name }} med {{ item.HasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
                         </a>
                     </div>
                 </div>

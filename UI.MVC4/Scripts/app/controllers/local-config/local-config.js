@@ -14,7 +14,7 @@
 
                     var data = {
                         'IsSuggestion': true,
-                        'Name': scope.suggestion
+                        "name": scope.suggestion
                     };
 
                     $http.post(scope.url, data).success(function (result) {
@@ -40,7 +40,7 @@
 
                     var data = {
                         'IsSuggestion': true,
-                        'Name': scope.suggestion,
+                        "name": scope.suggestion,
                         'HasReadAccess': true,
                         'HasWriteAccess': scope.writeAccess
                     };
@@ -71,7 +71,7 @@
                     _.each(result.Response, function (v) {
                         scope.list.push({
                             id: v.Id,
-                            name: v.Name,
+                            name: v.name,
                             note: v.Note
                         });
                     });
@@ -110,11 +110,11 @@
                         });
 
                         var isNew = _.isUndefined(locale);
-                        var localeName = isNew ? '' : locale.Name;
+                        var localeName = isNew ? '' : locale.name;
 
                         scope.list.push({
                             id: v.Id,
-                            name: v.Name,
+                            name: v.name,
                             note: v.Note,
                             localeName: localeName,
                             isNew: isNew
@@ -136,7 +136,7 @@
                         var method = option.isNew ? 'POST' : 'PUT';
 
                         var data = {
-                            'Name': value,
+                            "name": value,
                             'Original_Id': oId,
                             'Municipality_Id': orgId
                         };

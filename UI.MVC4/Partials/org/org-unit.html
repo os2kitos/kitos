@@ -5,7 +5,7 @@
                 <i class="glyphicon" data-ng-class="{'glyphicon-chevron-down': node.isOpen, 'glyphicon-chevron-right': !node.isOpen}"></i>
             </a>
         </span>
-        <a data-ng-click="chooseOrgUnit(node)">{{node.Name}}</a>
+        <a data-ng-click="chooseOrgUnit(node)">{{node.name}}</a>
     </span>
     <ul data-ng-show="node.isOpen">
         <li data-ng-repeat="node in node.Children">

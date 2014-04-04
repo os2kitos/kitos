@@ -117,7 +117,7 @@
                 node.OrgRights = data.Response;
 
                 _.each(node.OrgRights, function (right) {
-                    right.userForSelect = { id: right.User.Id, text: right.User.Name };
+                    right.userForSelect = { id: right.User.Id, text: right.User.name };
                     right.roleForSelect = right.Role_Id;
                     right.show = true;
                 });
@@ -143,14 +143,14 @@
             };
 
             $http.post("api/organizationright", data).success(function (result) {
-                growl.addSuccessMessage(result.Response.User.Name + " er knyttet i rollen");
+                growl.addSuccessMessage(result.Response.User.name + " er knyttet i rollen");
 
                 $scope.chosenOrgUnit.OrgRights.push({
                     'Object_Id': result.Response.Object_Id,
                     'Role_Id': result.Response.Role_Id,
                     'User_Id': result.Response.User_Id,
                     'User': result.Response.User,
-                    'userForSelect': { id: result.Response.User_Id, text: result.Response.User.Name },
+                    'userForSelect': { id: result.Response.User_Id, text: result.Response.User.name },
                     'roleForSelect': result.Response.Role_Id,
                     show: true
                 });
@@ -217,7 +217,7 @@
 
                     right.edit = false;
 
-                    growl.addSuccessMessage(right.User.Name + " er knyttet i rollen");
+                    growl.addSuccessMessage(right.User.name + " er knyttet i rollen");
 
                 }).error(function (result) {
 
@@ -232,7 +232,7 @@
             }).error(function (deleteResult) {
                 
                 //couldn't delete the old entry, just reset select options
-                right.userForSelect = { id: right.User.id, text: right.User.Name };
+                right.userForSelect = { id: right.User.id, text: right.User.name };
                 right.roleForSelect = right.Role_Id;
 
                 growl.addErrorMessage('Fejl!');
@@ -244,15 +244,15 @@
         $scope.rightSort = function(right) {
             switch ($scope.rightSortBy) {
                 case "orgUnitName":
-                    return $scope.orgUnits[right.Object_Id].Name;
+                    return $scope.orgUnits[right.Object_Id].name;
                 case "roleName":
-                    return $scope.orgRoles[right.Role_Id].Name;
+                    return $scope.orgRoles[right.Role_Id].name;
                 case "userName":
-                    return right.User.Name;
+                    return right.User.name;
                 case "userEmail":
-                    return right.User.Email;
+                    return right.User.email;
                 default:
-                    return $scope.orgUnits[right.Object_Id].Name;
+                    return $scope.orgUnits[right.Object_Id].name;
             }
         };
 
@@ -296,8 +296,8 @@
                     //format the selected unit for editing
                     $modalScope.orgUnit = {
                         'id': unit.Id,
-                        'oldName': unit.Name,
-                        'newName': unit.Name,
+                        'oldName': unit.name,
+                        'newName': unit.name,
                         'newParent': unit.Parent_Id,
                         'orgId': unit.Organization_Id,
                         'isRoot': unit.Parent_Id == 0
@@ -317,7 +317,7 @@
                         if (!name) return;
 
                         var data = {
-                            'Name': name
+                            "name": name
                         };
 
                         if ($modalScope.canChangeParent && parent) data['Parent_Id'] = parent;
@@ -348,7 +348,7 @@
                         var orgId = $modalScope.newOrgUnit.orgId;
 
                         var data = {
-                            'Name': name,
+                            "name": name,
                             'Parent_Id': parent,
                             'Organization_Id': orgId
                         };
@@ -384,12 +384,12 @@
 
                         $http.delete("api/organizationUnit/" + unit.Id).success(function() {
                             $modalInstance.close();
-                            growl.addSuccessMessage(unit.Name + " er slettet!");
+                            growl.addSuccessMessage(unit.name + " er slettet!");
                             
                         }).error(function() {
                             $modalScope.submitting = false;
 
-                            growl.addErrorMessage("Fejl! " + unit.Name + " kunne ikke slettes!");
+                            growl.addErrorMessage("Fejl! " + unit.name + " kunne ikke slettes!");
                         });
 
                     };

@@ -11,10 +11,10 @@ app.config(['growlProvider', 'RestangularProvider', function (growlProvider, Res
     //Restangular config
     RestangularProvider.setBaseUrl('/api');
     RestangularProvider.setRestangularFields({
-        id: 'Id'
+        id: 'id'
     });
     RestangularProvider.setResponseExtractor(function (response, operation) {
-        return response.Response;
+        return response.response;
     });
 }]);
 
@@ -39,18 +39,18 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
     };
 
     $rootScope.saveUser = function (result) {
-        var isLocalAdmin = _.some(result.Response.AdminRights, function(userRight) {
-            return userRight.RoleName == "LocalAdmin";
+        var isLocalAdmin = _.some(result.response.adminRights, function(userRight) {
+            return userRight.roleName == "LocalAdmin";
         });
 
         $rootScope.user = {
-            id: result.Response.Id,
+            id: result.response.id,
             authStatus: 'authorized',
-            name: result.Response.Name,
-            email: result.Response.Email,
-            isGlobalAdmin: result.Response.IsGlobalAdmin,
+            name: result.response.name,
+            email: result.response.email,
+            isGlobalAdmin: result.response.isGlobalAdmin,
             isLocalAdmin: isLocalAdmin,
-            isLocalAdminFor: _.pluck(result.Response.AdminRights, 'Organization_Id')
+            isLocalAdminFor: _.pluck(result.response.adminRights, 'organization_id')
         };
 
     };
@@ -71,6 +71,7 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
         //go through each of the roles on the state
         return _.some(adminRoles, function (role) {
             //if the state role is global admin, and the user is global admin, it's cool
+            //same for local admin
             return (role == "GlobalAdmin" && user.isGlobalAdmin) || (role == "LocalAdmin" && user.isLocalAdmin);
         });
     }

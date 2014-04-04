@@ -48,8 +48,8 @@
                                 var email = $scope.newUser.email;
 
                                 var data = {
-                                    'Name': name,
-                                    'Email': email
+                                    "name": name,
+                                    "email": email
                                 };
 
                                 $scope.newUser.submitting = true;
@@ -75,7 +75,7 @@
 
                         scope.selectResult = {
                             id: userResult.Id,
-                            text: userResult.Name
+                            text: userResult.name
                         };
                     }, function() {
                         scope.userResult = null;
@@ -121,7 +121,7 @@
 
                                 results.push({
                                     id: user.Id,
-                                    text: user.Name
+                                    text: user.name
                                 });
                             });
 

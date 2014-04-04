@@ -50,7 +50,7 @@
             if ($scope.loginForm.$invalid) return;
 
             var data = {
-                'Email': $scope.email,
+                "email": $scope.email,
                 'Password': $scope.password,
                 'RememberMe': $scope.remember
             };
@@ -81,7 +81,7 @@
             if ($scope.loginForm.$invalid) return;
 
             var data = {
-                'Email': $scope.email,
+                'email': $scope.email,
                 'Password': $scope.password,
                 'RememberMe': $scope.remember
             };
@@ -109,7 +109,7 @@
         $scope.submit = function() {
             if ($scope.requestForm.$invalid) return;
 
-            var data = { 'Email': $scope.email };
+            var data = { "email": $scope.email };
 
             $scope.requestSuccess = $scope.requestFailure = false;
             
