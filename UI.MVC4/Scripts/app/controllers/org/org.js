@@ -19,41 +19,75 @@
 
     }]);
 
-    app.controller('org.OrgViewCtrl', ['$rootScope', '$scope', '$http', 'growl', 'orgRolesHttp', function ($rootScope, $scope, $http, growl, orgRolesHttp) {
+    app.controller('org.OrgViewCtrl', ['$rootScope', '$scope', '$http', '$modal', 'growl', 'orgRolesHttp', function ($rootScope, $scope, $http, $modal, growl, orgRolesHttp) {
         $rootScope.page.title = 'Organisation';
         $rootScope.page.subnav = subnav;
 
         var userId = $rootScope.user.id;
-        
+
         //cache
         var orgs = [];
 
-        $scope.users = [];
+        //$scope.users = [];
 
         //flatten map of all loaded orgUnits
-        $scope.orgUnits = [];
+        $scope.orgUnits = {};
 
         $scope.orgRoles = {};
         _.each(orgRolesHttp.data.Response, function(orgRole) {
             $scope.orgRoles[orgRole.Id] = orgRole;
         });
 
-        console.log($scope.orgRoles);
-        
-        
-        function flatten(orgUnit) {
+
+        function flattenAndSave(orgUnit, inheritWriteAccess) {
+            if ($scope.orgUnits[orgUnit.Id]) {
+
+                var old = $scope.orgUnits[orgUnit.Id];
+                orgUnit.isOpen = old.isOpen;
+
+            }
+            
             $scope.orgUnits[orgUnit.Id] = orgUnit;
 
-            _.each(orgUnit.Children, flatten);
+            if (!inheritWriteAccess) {
+                $http.get('api/organizationRight?hasWriteAccess&orgUnitId=' + orgUnit.Id + '&userId=' + userId).success(function (result) {
+                    orgUnit.hasWriteAccess = result.Response;
+                    
+                    _.each(orgUnit.Children, function(u) {
+                        return flattenAndSave(u, result.Response);
+                    });
+
+                });
+                
+            } else {
+                
+                orgUnit.hasWriteAccess = true;
+
+                _.each(orgUnit.Children, function (u) {
+                    return flattenAndSave(u, true);
+                });
+
+            }
         }
-        
-        $http.get('api/organizationunit?userId=' + userId).success(function(result) {
-            $scope.nodes = result.Response;
 
-            _.each(result.Response, flatten);
-        });
+        function loadUnits() {
 
-        
+            return $http.get('api/organizationunit?userId=' + userId).success(function(result) {
+                $scope.nodes = result.Response;
+
+                _.each(result.Response, flattenAndSave);
+
+                if ($scope.chosenOrgUnit) {
+                    
+                    var chosenId = $scope.chosenOrgUnit.Id;
+                    var newChosen = $scope.orgUnits[chosenId];
+                    $scope.chooseOrgUnit(newChosen);
+                }
+            });
+        }
+
+        loadUnits();
+
         $scope.chosenOrgUnit = null;
         
         $scope.chooseOrgUnit = function (node) {
@@ -77,24 +111,6 @@
                     });
                 }
             }
-
-            if (!node.writeAccessChecked) {
-                
-                //this url is waaay too long
-                $http.get('api/organizationRight?hasWriteAccess&orgUnitId=' + node.Id + '&userId=' + userId)
-                    .success(function (result) {
-
-                        function flag(node) {
-                            node.hasWriteAccessChecked = true;
-                            node.hasWriteAccess = result.Response;
-
-                            if (result.Response) _.each(node.Children, flag);
-                        }
-
-                        flag(node);
-                    }
-                );
-            }
             
             //get org rights on the org unit and subtree
             $http.get('api/organizationRight?organizationUnitId=' + node.Id).success(function(data) {
@@ -104,9 +120,6 @@
                     right.userForSelect = { id: right.User.Id, text: right.User.Name };
                     right.roleForSelect = right.Role_Id;
                     right.show = true;
-                    
-                    //save user for later
-                    $rootScope.users[right.User.Id] = right.User;
                 });
 
             });
@@ -119,26 +132,26 @@
 
             if (!$scope.selectedUser || !$scope.newRole) return;
 
-            var unitId = $scope.chosenOrgUnit.Id;
-            var role = $scope.orgRoles[parseInt($scope.newRole)];
-            var user = $rootScope.users[$scope.selectedUser.id];
+            var oId = $scope.chosenOrgUnit.Id;
+            var rId = parseInt($scope.newRole);
+            var uId = $scope.selectedUser.id;
 
             var data = {
-                'Object_Id': unitId,
-                'Role_Id': role.Id,
-                'User_Id': user.Id
+                'Object_Id': oId,
+                'Role_Id': rId,
+                'User_Id': uId
             };
 
-            $http.post("api/organizationright", data).success(function(result) {
-                growl.addSuccessMessage(user.Name + " er knyttet i rollen " + role.Name);
+            $http.post("api/organizationright", data).success(function (result) {
+                growl.addSuccessMessage(result.Response.User.Name + " er knyttet i rollen");
 
                 $scope.chosenOrgUnit.OrgRights.push({
-                    'Object_Id': unitId,
-                    'Role_Id': role.Id,
-                    'User_Id': user.Id,
-                    'User': user,
-                    'userForSelect': { id: user.Id, text: user.Name },
-                    'roleForSelect': role.Id,
+                    'Object_Id': result.Response.Object_Id,
+                    'Role_Id': result.Response.Role_Id,
+                    'User_Id': result.Response.User_Id,
+                    'User': result.Response.User,
+                    'userForSelect': { id: result.Response.User_Id, text: result.Response.User.Name },
+                    'roleForSelect': result.Response.Role_Id,
                     show: true
                 });
                 
@@ -147,7 +160,7 @@
                 
             }).error(function (result) {
                 
-                growl.addErrorMessage('Kunne ikke knytte ' + user.Name + ' i rollen!');
+                growl.addErrorMessage('Fejl!');
             });
         };
 
@@ -172,39 +185,39 @@
             if (!right.roleForSelect || !right.userForSelect) return;
             
             //old values
-            var oId = right.Object_Id;
-            var rId = right.Role_Id;
-            var uId = right.User_Id;
+            var oIdOld = right.Object_Id;
+            var rIdOld = right.Role_Id;
+            var uIdOld = right.User_Id;
             
             //new values
-            var unitId = right.Object_Id;
-            var role = $scope.orgRoles[right.roleForSelect];
-            var user = $rootScope.users[right.userForSelect.id];
-
+            var oIdNew = right.Object_Id;
+            var rIdNew = right.roleForSelect;
+            var uIdNew = right.userForSelect.id;
+            
             //if nothing was changed, just exit edit-mode
-            if (oId == unitId && rId == role.Id && uId == user.Id) {
+            if (oIdOld == oIdNew && rIdOld == rIdNew && uIdOld == uIdNew) {
                 right.edit = false;
             }
 
             //otherwise, we should delete the old entry, then add a new one
 
-            $http.delete("api/organizationright?oId=" + oId + "&rId=" + rId + "&uId=" + uId).success(function(deleteResult) {
+            $http.delete("api/organizationright?oId=" + oIdOld + "&rId=" + rIdOld + "&uId=" + uIdOld).success(function(deleteResult) {
 
                 var data = {
-                    'Object_Id': unitId,
-                    'Role_Id': role.Id,
-                    'User_Id': user.Id
+                    'Object_Id': oIdNew,
+                    'Role_Id': rIdNew,
+                    'User_Id': uIdNew
                 };
 
                 $http.post("api/organizationright", data).success(function (result) {
 
-                    right.Role_Id = role.Id;
-                    right.User = user;
-                    right.User_Id = user.Id;
+                    right.Role_Id = result.Response.Role_Id;
+                    right.User = result.Response.User;
+                    right.User_Id = result.Response.User_Id;
 
                     right.edit = false;
 
-                    growl.addSuccessMessage(user.Name + " er knyttet i rollen " + role.Name);
+                    growl.addSuccessMessage(right.User.Name + " er knyttet i rollen");
 
                 }).error(function (result) {
 
@@ -213,7 +226,7 @@
 
                     right.show = false;
                     
-                    growl.addErrorMessage('Kunne ikke knytte ' + user.Name + ' i rollen!');
+                    growl.addErrorMessage('Fejl!');
                 });
                 
             }).error(function (deleteResult) {
@@ -222,7 +235,7 @@
                 right.userForSelect = { id: right.User.id, text: right.User.Name };
                 right.roleForSelect = right.Role_Id;
 
-                growl.addErrorMessage('Kunne ikke knytte ' + user.Name + ' i rollen!');
+                growl.addErrorMessage('Fejl!');
             });
         };
 
@@ -251,6 +264,147 @@
             }
 
             $scope.rightSortBy = val;
+        };
+        
+        $scope.editUnit = function (unit) {
+            
+            var modal = $modal.open({
+                templateUrl: 'partials/org/edit-org-unit-modal.html',
+                controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
+
+                    //edit or create-new mode
+                    $modalScope.isNew = false;
+                    
+                    //holds a list of org units, which the user can select as the parent
+                    $modalScope.orgUnits = [];
+                    
+                    //filter out those orgunits, that are outside the organisation
+                    //or is currently a subdepartment of the unit
+                    function filter(node) {
+                        if (node.Organization_Id != unit.Organization_Id) return;
+                        
+                        //this avoid every subdepartment
+                        if (node.Id == unit.Id) return;
+
+                        $modalScope.orgUnits.push(node);
+                        
+                        _.each(node.Children, filter);
+                    }
+                    _.each($scope.nodes, filter);
+
+
+                    //format the selected unit for editing
+                    $modalScope.orgUnit = {
+                        'id': unit.Id,
+                        'oldName': unit.Name,
+                        'newName': unit.Name,
+                        'newParent': unit.Parent_Id,
+                        'orgId': unit.Organization_Id,
+                        'isRoot': unit.Parent_Id == 0
+                    };
+                    
+                    //only allow changing the parent if user is admin, and the unit isn't at the root
+                    $modalScope.isAdmin = $rootScope.user.isGlobalAdmin || _.contains($rootScope.user.isLocalAdminFor, unit.Organization_Id);
+                    $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot;
+
+                    $modalScope.patch = function () {
+                        //don't allow duplicate submitting
+                        if ($modalScope.submitting) return;
+                        
+                        var name = $modalScope.orgUnit.newName;
+                        var parent = $modalScope.orgUnit.newParent;
+                        
+                        if (!name) return;
+
+                        var data = {
+                            'Name': name
+                        };
+
+                        if ($modalScope.canChangeParent && parent) data['Parent_Id'] = parent;
+
+                        $modalScope.submitting = true;
+
+                        var id = unit.Id;
+
+                        $http({ method: 'PATCH', url: "api/organizationUnit/" + id, data: data }).success(function(result) {
+                            growl.addSuccessMessage(name + " er ændret.");
+
+                            $modalInstance.close(result.Response);
+                        }).error(function(result) {
+                            $modalScope.submitting = false;
+                            growl.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
+                        });
+
+                    };
+
+                    $modalScope.post = function () {
+                        //don't allow duplicate submitting
+                        if ($modalScope.submitting) return;
+
+                        var name = $modalScope.newOrgUnit.name;
+                        if (!name) return;
+
+                        var parent = $modalScope.newOrgUnit.parent;
+                        var orgId = $modalScope.newOrgUnit.orgId;
+
+                        var data = {
+                            'Name': name,
+                            'Parent_Id': parent,
+                            'Organization_Id': orgId
+                        };
+
+                        $modalScope.submitting = true;
+                        
+                        $http({ method: 'POST', url: "api/organizationUnit/", data: data }).success(function (result) {
+                            growl.addSuccessMessage(name + " er gemt.");
+
+                            $modalInstance.close(result.Response);
+                        }).error(function (result) {
+                            $modalScope.submitting = false;
+                            growl.addErrorMessage("Fejl! " + name + " kunne ikke gemmes!");
+                        });
+                    };
+
+                    $modalScope.new = function () {
+                        $modalScope.createNew = true;
+                        $modalScope.newOrgUnit = {
+                            name: 'Ny afdeling',
+                            parent: $modalScope.orgUnit.id,
+                            orgId: $modalScope.orgUnit.orgId
+                        };
+
+                        console.log($modalScope.newOrgUnit);
+                    };
+
+                    $modalScope.delete = function () {
+                        //don't allow duplicate submitting
+                        if ($modalScope.submitting) return;
+
+                        $modalScope.submitting = true;
+
+                        $http.delete("api/organizationUnit/" + unit.Id).success(function() {
+                            $modalInstance.close();
+                            growl.addSuccessMessage(unit.Name + " er slettet!");
+                            
+                        }).error(function() {
+                            $modalScope.submitting = false;
+
+                            growl.addErrorMessage("Fejl! " + unit.Name + " kunne ikke slettes!");
+                        });
+
+                    };
+
+                    $modalScope.cancel = function () {
+                        $modalInstance.dismiss('cancel');
+                    };
+                }]
+            });
+
+            modal.result.then(function(returnedUnit) {
+
+                loadUnits();
+
+            });
         };
 
     }]);

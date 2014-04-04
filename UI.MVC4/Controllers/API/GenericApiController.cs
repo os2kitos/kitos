@@ -129,9 +129,9 @@ namespace UI.MVC4.Controllers.API
 
                 return Ok();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return NoContent(); // TODO catch correct expection
+                return Error(e); // TODO catch correct expection
             }
         }
 
@@ -178,7 +178,7 @@ namespace UI.MVC4.Controllers.API
                 PatchQuery(item);
 
                 //pretty sure we'll get a merge conflict here???
-                return Ok(); // TODO correct?
+                return Ok(Map(item)); // TODO correct?
             }
             catch (Exception)
             {

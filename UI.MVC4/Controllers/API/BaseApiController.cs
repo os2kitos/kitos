@@ -94,6 +94,16 @@ namespace UI.MVC4.Controllers.API
             return CreateResponse(HttpStatusCode.NotFound);
         }
 
+        protected HttpResponseMessage Conflict(string msg)
+        {
+            return CreateResponse(HttpStatusCode.Conflict, msg);
+        }
+
+        protected HttpResponseMessage NotAllowed()
+        {
+            return CreateResponse(HttpStatusCode.MethodNotAllowed);
+        }
+
         protected bool IsGlobalAdmin()
         {
             try
@@ -122,6 +132,11 @@ namespace UI.MVC4.Controllers.API
                     throw new SecurityException();
                 }
             }
+        }
+
+        protected bool IsAuthenticated
+        {
+            get { return User.Identity.IsAuthenticated; }
         }
     }
 }

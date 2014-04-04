@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 
@@ -8,22 +9,34 @@ namespace Core.DomainServices
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
+        private readonly IAdminService _adminService;
 
-        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<OrganizationRight> orgRightRepository)
+        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<OrganizationRight> orgRightRepository, IAdminService adminService)
         {
             _orgUnitRepository = orgUnitRepository;
             _orgRightRepository = orgRightRepository;
+            _adminService = adminService;
         }
 
         public ICollection<OrganizationUnit> GetByUser(User user)
         {
-            //add the OrgUnits that the user is directly connected to, through OrgRights
-            var units = user.OrganizationRights.Select(orgRight => orgRight.Object).ToList();
+            List<OrganizationUnit> units;
 
-            //add the OrgUnits that the user is indirectly connected to, through an Admin role on an organization
-            foreach (var adminRights in user.AdminRights)
+            if (user.IsGlobalAdmin)
             {
-                units.Add(adminRights.Object.OrgUnits.First());
+                units = _orgUnitRepository.Get().ToList();
+            }
+            else
+            {
+                //add the OrgUnits that the user is directly connected to, through OrgRights
+                units = user.OrganizationRights.Select(orgRight => orgRight.Object).ToList();
+
+                //add the OrgUnits that the user is indirectly connected to, through an Admin role on an organization
+                foreach (var adminRights in user.AdminRights)
+                {
+                    units.Add(adminRights.Object.OrgUnits.First());
+                }
+
             }
 
             var roots = units.Select(GetRoot);
@@ -32,8 +45,15 @@ namespace Core.DomainServices
 
         public OrganizationUnit GetRoot(OrganizationUnit unit)
         {
-            //TODO: this will fuck up if there's a loop!
-            while (unit.Parent != null) unit = unit.Parent;
+            var whereWeStarted = unit;
+
+            while (unit.Parent != null)
+            {
+                unit = unit.Parent;
+
+                //did we get a loop?
+                if(unit.Id == whereWeStarted.Id) throw new Exception("Loop in Organization Units");
+            }
 
             return unit;
         }
@@ -65,6 +85,30 @@ namespace Core.DomainServices
 
             return reached;
         }
+
+        public bool IsAncestorOf(OrganizationUnit unit, OrganizationUnit ancestor)
+        {
+            if (unit == null || ancestor == null) return false;
+
+            do
+            {
+                if (unit.Id == ancestor.Id) return true;
+
+                unit = unit.Parent;
+
+            } while (unit != null);
+
+            return false;
+        }
+
+        public bool IsAncestorOf(int unitId, int ancestorId)
+        {
+            var unit = _orgUnitRepository.GetByKey(unitId);
+            var ancestor = _orgUnitRepository.GetByKey(ancestorId);
+
+            return IsAncestorOf(unit, ancestor);
+        }
+
         public bool HasWriteAccess(User user, int orgUnitId)
         {
             var orgUnit = _orgUnitRepository.GetByKey(orgUnitId);
@@ -98,6 +142,17 @@ namespace Core.DomainServices
             } while (unit != null);
 
             return false;
+        }
+
+        public bool IsLocalAdminFor(User user, int orgUnitId)
+        {
+            var orgUnit = _orgUnitRepository.GetByKey(orgUnitId);
+            return IsLocalAdminFor(user, orgUnit);
+        }
+
+        public bool IsLocalAdminFor(User user, OrganizationUnit unit)
+        {
+            return _adminService.IsLocalAdmin(user, unit.Organization);
         }
     }
 }

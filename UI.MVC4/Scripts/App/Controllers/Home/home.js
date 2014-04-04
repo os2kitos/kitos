@@ -3,14 +3,9 @@
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
         
         $stateProvider.state('index', {
-            url: '/',
+            url: '/?login?to',
             templateUrl: 'partials/home/index.html',
             controller: 'home.IndexCtrl',
-            noAuth: true
-        }).state('login', {
-            url: '/login?to',
-            templateUrl: 'partials/home/login.html',
-            controller: 'home.LoginCtrl',
             noAuth: true
         }).state('forgot-password', {
             url: '/forgot-password',
@@ -26,10 +21,10 @@
 
     }]);
 
-    app.controller('home.IndexCtrl', ['$rootScope', '$scope', 'Restangular', function ($rootScope, $scope, Restangular) {
+    app.controller('home.IndexCtrl', ['$rootScope', '$scope', '$http', '$state', '$stateParams', 'growl', 'Restangular', function ($rootScope, $scope, $http, $state, $stateParams, growl, Restangular) {
         $rootScope.page.title = 'Index';
         $rootScope.page.subnav = [];
-
+        
         Restangular.one('text', 'intro-head').get().then(function (data) {
             $scope.introhead = data.Value;
 
@@ -47,9 +42,37 @@
                 data.put();
             };
         });
+
+        $scope.highlightLogin = $stateParams.login;
+
+        //login
+        $scope.submitLogin = function () {
+            if ($scope.loginForm.$invalid) return;
+
+            var data = {
+                'Email': $scope.email,
+                'Password': $scope.password,
+                'RememberMe': $scope.remember
+            };
+
+            $http.post('api/authorize', data).success(function (result) {
+                growl.addSuccessMessage("Du er nu logget ind!");
+
+                $rootScope.saveUser(result);
+
+                //redirect to another state or to the org-view state by default
+                var to = $stateParams.to ? $stateParams.to : 'org-view';
+
+                $state.go(to);
+            }).error(function (result) {
+                growl.addErrorMessage("Forkert brugernavn eller password!");
+            });
+
+        };
     }]);
     
-    app.controller('home.LoginCtrl', ['$rootScope', '$scope', '$http', '$state', '$stateParams', function ($rootScope, $scope, $http, $state, $stateParams) {
+    /*
+    app.controller('home.LoginCtrl', ['$rootScope', '$scope', '$http', '$state', '$stateParams', 'growl', function ($rootScope, $scope, $http, $state, $stateParams, growl) {
         $rootScope.page.title = 'Log ind';
         $rootScope.page.subnav = [];
         
@@ -64,16 +87,19 @@
             };
 
             $http.post('api/authorize', data).success(function (result) {
+                growl.addSuccessMessage("Du er nu logget ind!");
 
                 $rootScope.saveUser(result);
 
                 var to = $stateParams.to ? $stateParams.to : 'index';
 
                 $state.go(to);
+            }).error(function (result) {
+                growl.addErrorMessage("Forkert brugernavn eller password!");
             });
 
         };
-    }]);
+    }]);*/
 
     app.controller('home.ForgotPasswordCtrl', ['$rootScope', '$scope', '$http', 'growl', function ($rootScope, $scope, $http, growl) {
         $rootScope.page.title = 'Glemt password';

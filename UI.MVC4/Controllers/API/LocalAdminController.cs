@@ -26,13 +26,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var user = new User()
-                    {
-                        Name = item.Name,
-                        Email = item.Email
-                    };
-
-                user = _userService.AddUser(user);
+                var user = UserRepository.GetByKey(item.User_Id);
 
                 var organization = _organizationRepository.GetByKey(item.Organization_Id);
 
