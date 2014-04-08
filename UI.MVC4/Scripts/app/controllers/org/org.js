@@ -15,7 +15,16 @@
                     return $http.get('api/organizationRole');
                 }]
             }
-        });
+        }).state('org-overview', {
+            url: '/organization/overview',
+            templateUrl: 'partials/org/overview.html',
+            controller: 'org.OverviewCtrl',
+            resolve: {
+                /*orgUnitsHttp: ['$rootScope', '$http', function ($rootScope, $http) {
+                    return $http.get('api/organizationUnits?userId=' + $rootScope.user.id);
+                }]*/
+            }
+        });;
 
     }]);
 
@@ -47,22 +56,22 @@
                 var old = $scope.orgUnits[orgUnit.id];
                 orgUnit.isOpen = old.isOpen;
 
-        }
-        
+            }
+
             $scope.orgUnits[orgUnit.id] = orgUnit;
 
             if (!inheritWriteAccess) {
                 $http.get('api/organizationRight?hasWriteAccess&orgUnitId=' + orgUnit.id + '&userId=' + userId).success(function (result) {
                     orgUnit.hasWriteAccess = result.response;
-                    
-                    _.each(orgUnit.children, function(u) {
+
+                    _.each(orgUnit.children, function (u) {
                         flattenAndSave(u, result.response);
-        });
+                    });
 
                 });
-        
+
             } else {
-                
+
                 orgUnit.hasWriteAccess = true;
 
                 _.each(orgUnit.children, function (u) {
@@ -74,15 +83,15 @@
 
         function loadUnits() {
 
-            return $http.get('api/organizationunit?userId=' + userId).success(function(result) {
+            return $http.get('api/organizationunit?userId=' + userId).success(function (result) {
                 $scope.nodes = result.response;
 
-                _.each(result.response, function(u) {
+                _.each(result.response, function (u) {
                     flattenAndSave(u, false);
                 });
 
                 if ($scope.chosenOrgUnit) {
-                    
+
                     var chosenId = $scope.chosenOrgUnit.id;
                     var newChosen = $scope.orgUnits[chosenId];
                     $scope.chooseOrgUnit(newChosen);
@@ -645,6 +654,97 @@
                 delete task.handledByOrgUnit;
             });
         }
+    }]);
+
+
+    app.controller('org.OverviewCtrl', ['$rootScope', '$scope', '$http', function($rootScope, $scope, $http) {
+        $rootScope.page.title = 'Organisation';
+        $rootScope.page.subnav = subnav;
+        
+        var userId = $rootScope.user.id;
+
+        $scope.orgUnits = {};
+        loadUnits();
+        
+        function flattenAndSave(orgUnit, inheritWriteAccess) {
+            $scope.orgUnits[orgUnit.id] = orgUnit;
+
+            if (!inheritWriteAccess) {
+                $http.get('api/organizationRight?hasWriteAccess&orgUnitId=' + orgUnit.id + '&userId=' + userId).success(function (result) {
+                    orgUnit.hasWriteAccess = result.response;
+
+                    _.each(orgUnit.children, function (u) {
+                        flattenAndSave(u, result.response);
+                    });
+
+                });
+
+            } else {
+
+                orgUnit.hasWriteAccess = true;
+
+                _.each(orgUnit.children, function (u) {
+                    return flattenAndSave(u, true);
+                });
+
+            }
+        }
+
+        function loadUnits() {
+
+            return $http.get('api/organizationunit?userId=' + userId).success(function (result) {
+                $scope.nodes = result.response;
+
+                _.each(result.response, function (u) {
+                    flattenAndSave(u, false);
+                });
+            });
+        }
+        
+        $scope.loadUsages = function() {
+            console.log($scope.orgUnitId);
+
+            if (!$scope.orgUnitId) return;
+
+            $scope.taskUsages = {};
+            $http.get('api/taskusage?orgUnitId=' + $scope.orgUnitId).success(function(result) {
+                $scope.taskUsages = result.response;
+
+                _.each($scope.taskUsages, function (usage) {
+                    usage.isRoot = true;
+                    if (usage.hasDelegations) usage.isFolded = true;
+
+                    $http.get('api/taskref/' + usage.usage.taskRefId).success(function (result) {
+                        usage.usage.task = result.response;
+                    });
+                });
+            });
+        };
+
+
+        $scope.calculateTechStatus = function(usage) {
+
+            if (!usage.hasDelegations) return usage.usage.technologyStatus;
+
+            var sum = _.reduce(usage.delegations, function (memo, delegation) {
+                return memo + $scope.calculateTechStatus(delegation);
+            }, 0);
+
+            return sum / usage.delegations.length;
+        };
+
+        $scope.calculateUsageStatus = function (usage) {
+
+            if (!usage.hasDelegations) return usage.usage.usageStatus;
+
+            var sum = _.reduce(usage.delegations, function (memo, delegation) {
+                return memo + $scope.calculateUsageStatus(delegation);
+            }, 0);
+
+            return sum / usage.delegations.length;
+        };
+        
+
     }]);
 
 })(angular, app);

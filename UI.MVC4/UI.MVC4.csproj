@@ -372,6 +372,7 @@
     <Content Include="Images\logo.png" />
     <Content Include="Partials\directives\add-user-button.html" />
     <Content Include="Partials\directives\add-user-modal.html" />
+    <Content Include="Partials\directives\select-status.html" />
     <Content Include="Partials\directives\select-user.html" />
     <Content Include="Partials\global-config\system.html" />
     <Content Include="Partials\global-admin\new-global-admin.html" />
@@ -395,9 +396,11 @@
     <Content Include="Partials\local-config\support.html" />
     <Content Include="Partials\local-config\system.html" />
     <Content Include="Partials\org\edit-org-unit-modal.html" />
+    <Content Include="Partials\org\overview.html" />
     <Content Include="Partials\org\task.html" />
     <Content Include="Partials\org\org-unit.html" />
     <Content Include="Partials\org\org.html" />
+    <Content Include="Partials\org\task-usage.html" />
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />
     <Content Include="Partials\topnav\unauthorized.html" />

@@ -3,7 +3,7 @@ namespace Infrastructure.DataAccess.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class Initial : DbMigration
+    public partial class TaskOverviewInitial : DbMigration
     {
         public override void Up()
         {
@@ -701,6 +701,23 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ParentId);
             
             CreateTable(
+                "dbo.TaskUsage",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        TaskRefId = c.Int(nullable: false),
+                        OrgUnitId = c.Int(nullable: false),
+                        Starred = c.Boolean(nullable: false),
+                        TechnologyStatus = c.Int(nullable: false),
+                        UsageStatus = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.OrganizationUnit", t => t.OrgUnitId, cascadeDelete: true)
+                .ForeignKey("dbo.TaskRef", t => t.TaskRefId, cascadeDelete: true)
+                .Index(t => t.TaskRefId)
+                .Index(t => t.OrgUnitId);
+            
+            CreateTable(
                 "dbo.OrganizationUnit",
                 c => new
                     {
@@ -1005,19 +1022,6 @@ namespace Infrastructure.DataAccess.Migrations
                     })
                 .PrimaryKey(t => t.Id);
             
-            CreateTable(
-                "dbo.OrganizationUnitTaskRefs",
-                c => new
-                    {
-                        OrganizationUnit_Id = c.Int(nullable: false),
-                        TaskRef_Id = c.Int(nullable: false),
-                    })
-                .PrimaryKey(t => new { t.OrganizationUnit_Id, t.TaskRef_Id })
-                .ForeignKey("dbo.OrganizationUnit", t => t.OrganizationUnit_Id, cascadeDelete: true)
-                .ForeignKey("dbo.TaskRef", t => t.TaskRef_Id, cascadeDelete: true)
-                .Index(t => t.OrganizationUnit_Id)
-                .Index(t => t.TaskRef_Id);
-            
         }
         
         public override void Down()
@@ -1055,14 +1059,14 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.ItSystem", "ProtocolTypeId", "dbo.ProtocolType");
             DropForeignKey("dbo.ItSystem", "ParentItSystemId", "dbo.ItSystem");
             DropForeignKey("dbo.ItSystem", "MunicipalityId", "dbo.Organization");
-            DropForeignKey("dbo.TaskRef", "ParentId", "dbo.TaskRef");
-            DropForeignKey("dbo.OrganizationUnitTaskRefs", "TaskRef_Id", "dbo.TaskRef");
-            DropForeignKey("dbo.OrganizationUnitTaskRefs", "OrganizationUnit_Id", "dbo.OrganizationUnit");
+            DropForeignKey("dbo.TaskUsage", "TaskRefId", "dbo.TaskRef");
+            DropForeignKey("dbo.TaskUsage", "OrgUnitId", "dbo.OrganizationUnit");
             DropForeignKey("dbo.OrganizationRight", "UserId", "dbo.User");
             DropForeignKey("dbo.OrganizationRight", "RoleId", "dbo.OrganizationRole");
             DropForeignKey("dbo.OrganizationRight", "ObjectId", "dbo.OrganizationUnit");
             DropForeignKey("dbo.OrganizationUnit", "ParentId", "dbo.OrganizationUnit");
             DropForeignKey("dbo.OrganizationUnit", "OrganizationId", "dbo.Organization");
+            DropForeignKey("dbo.TaskRef", "ParentId", "dbo.TaskRef");
             DropForeignKey("dbo.TaskRef", "ItSystemId", "dbo.ItSystem");
             DropForeignKey("dbo.TaskRef", "ItProjectId", "dbo.ItProject");
             DropForeignKey("dbo.ItSystem", "InterfaceTypeId", "dbo.InterfaceType");
@@ -1110,8 +1114,6 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.Config", "ItSupportModuleNameId", "dbo.ItSupportName");
             DropForeignKey("dbo.Config", "ItProjectModuleNameId", "dbo.ItProjectName");
             DropForeignKey("dbo.Config", "ItContractModuleNameId", "dbo.ItContractName");
-            DropIndex("dbo.OrganizationUnitTaskRefs", new[] { "TaskRef_Id" });
-            DropIndex("dbo.OrganizationUnitTaskRefs", new[] { "OrganizationUnit_Id" });
             DropIndex("dbo.Stakeholder", new[] { "ItProjectId" });
             DropIndex("dbo.Risk", new[] { "ItProjectId" });
             DropIndex("dbo.PasswordResetRequest", new[] { "UserId" });
@@ -1130,6 +1132,8 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.OrganizationRight", new[] { "ObjectId" });
             DropIndex("dbo.OrganizationUnit", new[] { "OrganizationId" });
             DropIndex("dbo.OrganizationUnit", new[] { "ParentId" });
+            DropIndex("dbo.TaskUsage", new[] { "OrgUnitId" });
+            DropIndex("dbo.TaskUsage", new[] { "TaskRefId" });
             DropIndex("dbo.TaskRef", new[] { "ParentId" });
             DropIndex("dbo.TaskRef", new[] { "ItSystemId" });
             DropIndex("dbo.TaskRef", new[] { "ItProjectId" });
@@ -1198,7 +1202,6 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.AdminRight", new[] { "UserId" });
             DropIndex("dbo.AdminRight", new[] { "RoleId" });
             DropIndex("dbo.AdminRight", new[] { "ObjectId" });
-            DropTable("dbo.OrganizationUnitTaskRefs");
             DropTable("dbo.Text");
             DropTable("dbo.Localization");
             DropTable("dbo.HandoverTrial");
@@ -1222,6 +1225,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropTable("dbo.OrganizationRole");
             DropTable("dbo.OrganizationRight");
             DropTable("dbo.OrganizationUnit");
+            DropTable("dbo.TaskUsage");
             DropTable("dbo.TaskRef");
             DropTable("dbo.InterfaceType");
             DropTable("dbo.Method");

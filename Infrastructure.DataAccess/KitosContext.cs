@@ -58,7 +58,6 @@ namespace Infrastructure.DataAccess
         public DbSet<ItSystem> ItSystems { get; set; }
         public DbSet<ItSystemRight> ItSystemRights { get; set; }
         public DbSet<ItSystemRole> ItSystemRoles { get; set; }
-        public DbSet<TaskRef> TaskRefs { get; set; }
         public DbSet<Localization> Localizations { get; set; }
         public DbSet<Method> Methods { get; set; }
         public DbSet<Milestone> Milestones { get; set; }
@@ -87,6 +86,8 @@ namespace Infrastructure.DataAccess
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<SystemType> SystemTypes { get; set; }
         public DbSet<TaskSupport> TaskSupports { get; set; }
+        public DbSet<TaskRef> TaskRefs { get; set; }
+        public DbSet<TaskUsage> TaskUsages { get; set; }
         public DbSet<Technology> Technologys { get; set; }
         public DbSet<Text> Texts { get; set; }
         public DbSet<UserAdministration> UserAdministrations { get; set; }
@@ -134,7 +135,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemRightMap());
             modelBuilder.Configurations.Add(new ItSystemRoleMap());
             modelBuilder.Configurations.Add(new ItSystemModuleNameMap());
-            modelBuilder.Configurations.Add(new TaskRefMap());
             modelBuilder.Configurations.Add(new LocalizationMap());
             modelBuilder.Configurations.Add(new MethodMap());
             modelBuilder.Configurations.Add(new MilestoneMap());
@@ -163,6 +163,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new SupplierMap());
             modelBuilder.Configurations.Add(new SystemTypeMap());
             modelBuilder.Configurations.Add(new TaskSupportMap());
+            modelBuilder.Configurations.Add(new TaskRefMap());
+            modelBuilder.Configurations.Add(new TaskUsageMap());
             modelBuilder.Configurations.Add(new TechnologyMap());
             modelBuilder.Configurations.Add(new TextMap());
             modelBuilder.Configurations.Add(new UserAdministrationMap());

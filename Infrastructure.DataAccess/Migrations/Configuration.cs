@@ -213,19 +213,19 @@ namespace Infrastructure.DataAccess.Migrations
             #region Roskilde OrgUnits
 
             //LEVEL 0
-            var rootUnit = roskilde.OrgUnits.First();
+            var roskildeRoot = roskilde.OrgUnits.First();
 
             //LEVEL 1
             var munChief = new OrganizationUnit()
                 {
                     Organization = roskilde,
-                    Parent = rootUnit,
+                    Parent = roskildeRoot,
                     Name = "Kommunaldirektøren"
                 };
             var wellfare = new OrganizationUnit()
             {
                 Organization = roskilde,
-                Parent = rootUnit,
+                Parent = roskildeRoot,
                 Name = "Velfærd"
             };
 
@@ -305,13 +305,13 @@ namespace Infrastructure.DataAccess.Migrations
             #region Sorø OrgUnits
 
             //LEVEL 0
-            var rootUnit2 = sorø.OrgUnits.First();
+            var sorøRoot = sorø.OrgUnits.First();
 
             //LEVEL 1
             var level1a = new OrganizationUnit()
             {
                 Organization = sorø,
-                Parent = rootUnit2,
+                Parent = sorøRoot,
                 Name = "Direktørområde"
             };
 
@@ -583,6 +583,40 @@ namespace Infrastructure.DataAccess.Migrations
                                              });
 
             #endregion
+
+
+            #region KLE usage
+
+            context.TaskUsages.AddOrUpdate(x => new { x.TaskRefId, x.OrgUnitId },
+                                           new TaskUsage()
+                                               {
+                                                   OrgUnit = roskildeRoot,
+                                                   TaskRef = task00,
+                                                   Starred = true
+                                               },
+                                           new TaskUsage()
+                                               {
+                                                   OrgUnit = munChief,
+                                                   TaskRef = task00,
+                                                   Starred = true
+                                               },
+                                            new TaskUsage()
+                                                {
+                                                    OrgUnit = digi,
+                                                    TaskRef = task00
+                                                },
+                                           new TaskUsage()
+                                                {
+                                                    OrgUnit = roskildeRoot,
+                                                    TaskRef = task0003,
+                                                    Starred = true
+                                                });
+
+
+
+            #endregion
+
+            
 
             context.ProjectPhaseLocales.AddOrUpdate(x => new { x.MunicipalityId, x.OriginalId },
                                                     new ProjPhaseLocale()

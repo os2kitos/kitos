@@ -1,0 +1,47 @@
+﻿<div class="row task-usage-leaf" data-ng-if="!usage.hasDelegations">
+    
+    <div class="col-md-2">{{ orgUnits[usage.usage.orgUnitId].name }}</div>
+    <div class="col-md-1">{{ usage.usage.task.taskKey }}</div>
+    <div class="col-md-3">{{ usage.usage.task.description }}</div>
+    <div class="col-md-2">
+        <span class="pull-left">
+            <input data-select-status="" data-ng-model="usage.usage.technologyStatus"></input>
+        </span>
+        <span class="pull-right">
+            <input data-select-status="" data-ng-model="usage.usage.usageStatus"></input>
+        </span>
+    </div>
+    <div class="col-md-1"></div>
+    <div class="col-md-1"></div>
+    <div class="col-md-1"></div>
+    <div class="col-md-1"></div>
+</div>
+
+<div data-ng-if="usage.hasDelegations">
+    
+    <div class="task-usage-node">
+        <div class="row" data-ng-click="usage.isFolded = !usage.isFolded">
+            <div class="col-md-2">{{ orgUnits[usage.usage.orgUnitId].name }}</div>
+            <div class="col-md-1">{{ usage.usage.task.taskKey }}</div>
+            <div class="col-md-3">{{ usage.usage.task.description }}</div>
+            <div class="col-md-2">
+                <span class="pull-left">
+                    {{ calculateTechStatus(usage) }}
+                </span>
+                <span class="pull-right">
+                    {{ calculateUsageStatus(usage) }}
+                </span>
+            </div>
+            <div class="col-md-1"></div>
+            <div class="col-md-1"></div>
+            <div class="col-md-1"></div>
+            <div class="col-md-1"></div>
+        </div>
+        <div data-ng-hide="usage.isRoot && usage.isFolded">
+            <div class="row container-fluid" data-ng-repeat="usage in usage.delegations">
+                <div data-ng-include="'partials/org/task-usage.html'"></div>
+            </div>
+        </div>
+
+    </div>
+</div>

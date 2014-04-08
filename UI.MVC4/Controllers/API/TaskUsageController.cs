@@ -19,24 +19,56 @@ namespace UI.MVC4.Controllers.API
 
         public HttpResponseMessage Get(int orgUnitId)
         {
-            var usages = Repository.Get(x => x.OrgUnitId == orgUnitId);
+            return Get(orgUnitId, false);
+        }
 
-            var delegations = new List<TaskDelegationDTO>();
-            foreach (var usage in usages)
+        public HttpResponseMessage Get(int orgUnitId, bool onlyStarred)
+        {
+            var usages = Repository.Get(u => u.OrgUnitId == orgUnitId);
+
+            if (onlyStarred) usages = usages.Where(u => u.Starred);
+
+            var result = usages.Select(CompileDelegation);
+
+
+            return Ok(result);
+        }
+
+        //Given a task usage, compile the task delegation down the org unit tree
+        private TaskDelegationDTO CompileDelegation(TaskUsage usage)
+        {
+            if (usage == null) throw new ArgumentNullException();
+
+            var delegations = usage.OrgUnit.Children.Select(child => CompileDelegation(child, usage.TaskRef))
+                                   .Where(childDelegation => childDelegation != null).ToList();
+
+            var delegation = new TaskDelegationDTO()
             {
-                //access to foreach closure ...
-                var temp = usage;
+                Usage = Map(usage),
+                Delegations = delegations,
+                HasDelegations = delegations.Any()
+            };
 
-                var childUsages = Repository.Get(x => x.TaskRefId == temp.TaskRefId && x.OrgUnit.ParentId == orgUnitId);
+            return delegation;
+        }
 
-                delegations.Add(new TaskDelegationDTO
-                    {
-                        ParentUsage = Map(usage),
-                        ChildrenUsage = Map<IEnumerable<TaskUsage>, IEnumerable<TaskUsageDTO>>(childUsages)
-                    });                
-            }
+        //Given a unit and a task, compile the task delegation down the org unit tree
+        private TaskDelegationDTO CompileDelegation(OrganizationUnit unit, TaskRef task)
+        {
+            var usage = Repository.Get(u => u.OrgUnitId == unit.Id && u.TaskRefId == task.Id).FirstOrDefault();
+            if (usage == null) return null;
 
-            return Ok(delegations);
+            var delegations = unit.Children.Select(child => CompileDelegation(child, task))
+                                  .Where(childDelegation => childDelegation != null).ToList();
+
+            var delegation = new TaskDelegationDTO()
+                {
+                    Usage = Map(usage),
+                    Delegations = delegations,
+                    HasDelegations = delegations.Any()
+                };
+
+            return delegation;
         }
     }
 }

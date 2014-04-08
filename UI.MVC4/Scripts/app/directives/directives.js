@@ -147,4 +147,11 @@
         };
     }]);
 
+    app.directive('selectStatus', ['$http', '$modal', function($http, $modal) {
+        return {
+            replace: true,
+            templateUrl: 'partials/directives/select-status.html'
+        };
+    }]);
+
 })(angular, app);

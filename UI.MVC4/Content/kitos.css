@@ -271,3 +271,15 @@ div.popover
 .highlight {
     background-color: rgb(255, 255, 177);
 }
+
+div.task-usage {
+    padding: 10px 5px;
+    margin: 5px 0;
+
+    border-radius: 5px;
+
+    background-color: rgba(164, 234, 255, 0.2);
+}
+div.task-usage:nth-of-type(even) {
+    background-color: rgba(130, 206, 255, 0.5);
+}
