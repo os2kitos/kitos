@@ -15,14 +15,12 @@ namespace UI.MVC4.Controllers.API
 {
     public class OrganizationUnitController : GenericApiController<OrganizationUnit, int, OrgUnitDTO>
     {
-        private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IOrgUnitService _orgUnitService;
         private readonly IAdminService _adminService;
 
         public OrganizationUnitController(IGenericRepository<OrganizationUnit> repository, IGenericRepository<TaskRef> taskRepository, IOrgUnitService orgUnitService, IAdminService adminService) 
             : base(repository)
         {
-            _taskRepository = taskRepository;
             _orgUnitService = orgUnitService;
             _adminService = adminService;
         }
