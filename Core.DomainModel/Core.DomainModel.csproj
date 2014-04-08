@@ -119,6 +119,7 @@
     <Compile Include="Supplier.cs" />
     <Compile Include="AdminRole.cs" />
     <Compile Include="IEntity.cs" />
+    <Compile Include="TaskUsage.cs" />
     <Compile Include="Text.cs" />
     <Compile Include="User.cs" />
   </ItemGroup>

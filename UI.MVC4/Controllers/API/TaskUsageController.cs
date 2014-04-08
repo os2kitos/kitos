@@ -3,114 +3,65 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Security;
-using System.Web;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
-using Newtonsoft.Json.Linq;
 using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class OrganizationUnitController : GenericApiController<OrganizationUnit, int, OrgUnitDTO>
+    public class TaskUsageController : GenericApiController<TaskUsage, int, TaskUsageDTO>
     {
         private readonly IGenericRepository<TaskRef> _taskRepository;
-        private readonly IOrgUnitService _orgUnitService;
-        private readonly IAdminService _adminService;
+        private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
 
-        public OrganizationUnitController(IGenericRepository<OrganizationUnit> repository, IGenericRepository<TaskRef> taskRepository, IOrgUnitService orgUnitService, IAdminService adminService) 
-            : base(repository)
+        public TaskUsageController(IGenericRepository<TaskUsage> repository, IGenericRepository<TaskRef> taskRepository, IGenericRepository<OrganizationUnit> orgUnitRepository) : base(repository)
         {
             _taskRepository = taskRepository;
-            _orgUnitService = orgUnitService;
-            _adminService = adminService;
+            _orgUnitRepository = orgUnitRepository;
         }
 
-        public HttpResponseMessage GetByUser(int userId)
+        public HttpResponseMessage Get(int orgUnitId)
         {
-            try
+            var usages = Repository.Get(x => x.OrgUnitId == orgUnitId);
+
+            var delegations = new List<TaskDelegationDTO>();
+            foreach (var usage in usages)
             {
-                var user = KitosUser;
+                //access to foreach closure ...
+                var temp = usage;
 
-                if(user.Id != userId) throw new SecurityException();
+                var childUsages = Repository.Get(x => x.TaskRefId == temp.TaskRefId && x.OrgUnit.ParentId == orgUnitId);
 
-                var orgUnits = _orgUnitService.GetByUser(user);
-
-                return Ok(Map<ICollection<OrganizationUnit>, ICollection<OrgUnitDTO>>(orgUnits));
-
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
-
-        public HttpResponseMessage GetByOrganization(int organization)
-        {
-            try
-            {
-                var orgUnit = Repository.Get(o => o.OrganizationId == organization && o.Parent == null).FirstOrDefault();
-
-                if (orgUnit == null) return NotFound();
-
-                var item = Map<OrganizationUnit, OrgUnitDTO>(orgUnit);
-
-                return Ok(item);
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
-
-        public override HttpResponseMessage Patch(int id, Newtonsoft.Json.Linq.JObject obj)
-        {
-            try
-            {
-                JToken jtoken;
-                if (obj.TryGetValue("parentId", out jtoken))
-                {
-                    //You have to be local or global admin to change parent
-                    if (!_adminService.IsGlobalAdmin(KitosUser) && !_orgUnitService.IsLocalAdminFor(KitosUser, id))
-                        return Unauthorized();
-
-                    var parentId = jtoken.Value<int>();
-                    
-                    //if the new parent is actually a descendant of the item, don't update - this would create a loop!
-                    if (_orgUnitService.IsAncestorOf(parentId, id))
+                delegations.Add(new TaskDelegationDTO
                     {
-                        return Conflict("OrgUnit loop detected");
-                    }
-                }
+                        ParentUsage = Map(usage),
+                        ChildrenUsage = Map<IEnumerable<TaskUsage>, IEnumerable<TaskUsageDTO>>(childUsages)
+                    });                
+            }
 
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-            return base.Patch(id, obj);
+            return Ok(delegations);
         }
 
-        public HttpResponseMessage PostTaskRef(int id, [FromUri] int taskRef)
+        public override HttpResponseMessage Post(TaskUsageDTO dto)
         {
             try
             {
-                var task = _taskRepository.GetByKey(taskRef);
-                var orgUnit = Repository.GetByKey(id);
+                var task = _taskRepository.GetByKey(dto.TaskRefId);
+                var orgUnit = _orgUnitRepository.GetByKey(dto.OrgUnitId);
 
                 //only add a task, if the parent org unit also has it
                 if (orgUnit.Parent != null && !HasTaskRecursive(orgUnit.Parent, task))
                 {
-                    return Unauthorized(); //TODO this should be Conflict(), 
+                    return Conflict("Parent OrgUnit must have task usage, before it can be applied to this OrgUnit");
                 }
 
                 //removed every selected subtask
                 RemoveTaskTree(orgUnit, task);
-                //add this task
-                AddTask(orgUnit, task);
+                //add this task - using the dto, so we can persist extra values like starred and statuses
+                AddUsage(dto);
                 //notify parent
-                TaskRefNotifyParentAdd(orgUnit, task);
+                AddedUsageNotifyParent(orgUnit, task);
 
                 Repository.Save();
                 return Ok(); // TODO figure out what to return when refs are posted
@@ -126,7 +77,7 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 var task = _taskRepository.GetByKey(taskRef);
-                var orgUnit = Repository.GetByKey(id);
+                var orgUnit = _orgUnitRepository.GetByKey(id);
 
                 //we gotta remove the task on this unit and every sub orgUnit, so
                 //breadth first traversal of the org unit tree
@@ -140,14 +91,14 @@ namespace UI.MVC4.Controllers.API
                     //removed this task and all subtasks
                     RemoveTaskTree(unit, task);
                     //notify parent
-                    TaskRefNotifyParentRemove(unit, task);
+                    RemovedUsageNotifyParent(unit, task);
 
                     //do the same for every org unit child
                     foreach (var child in unit.Children)
                     {
                         unvisitedUnits.Enqueue(child);
                     }
-                    
+
 
                     Repository.Save();
 
@@ -161,32 +112,59 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        private void AddUsage(OrganizationUnit unit, TaskRef task)
+        {
+            if (Repository.Get(usage => usage.OrgUnitId == unit.Id && usage.TaskRefId == task.Id).Any()) return;
 
-        //call this when removing a task to notify the parent-task, that the child has changed
-        private void TaskRefNotifyParentRemove(OrganizationUnit unit, TaskRef task)
+            Repository.Insert(new TaskUsage()
+            {
+                OrgUnit = unit,
+                TaskRef = task
+            });
+            Repository.Save();
+        }
+
+        private void AddUsage(TaskUsageDTO dto)
+        {
+            if (Repository.Get(u => u.OrgUnitId == dto.OrgUnitId && u.TaskRefId == dto.TaskRefId).Any()) return;
+
+            Repository.Insert(Map(dto));
+            Repository.Save();
+        }
+
+        private void RemoveUsage(OrganizationUnit unit, TaskRef task)
+        {
+            var usage = Repository.Get(u => u.OrgUnitId == unit.Id && u.TaskRefId == task.Id).First();
+
+            Repository.DeleteByKey(usage.Id);
+        }
+
+
+        //call this when removing a task usage to notify the parent-task, that the child has changed
+        private void RemovedUsageNotifyParent(OrganizationUnit unit, TaskRef task)
         {
             var parent = task.Parent;
             if (parent == null) return;
 
-            //remove the parent task
+            //since a child of the parent has been deselected, the parent is deselected as well,
+            //so remove the parent task if it was previously selected (directly or indirectly through an ancestor)
             if (HasTaskRecursive(unit, parent))
             {
-                unit.TaskRefs.Remove(parent);
+                RemoveUsage(unit, parent);
 
                 //add every child task - except the one, which was just removed
                 foreach (var child in parent.Children)
                 {
-                    if (child != task) AddTask(unit, child);
+                    if (child != task) AddUsage(unit, child);
                 }
 
                 //since the parent was now removed, we should notify the parent's parent
-                TaskRefNotifyParentRemove(unit, parent);
+                RemovedUsageNotifyParent(unit, parent);
             }
         }
 
-
-        //call this when adding a task to notify the parent-task, that the child has changed
-        private void TaskRefNotifyParentAdd(OrganizationUnit unit, TaskRef task)
+        //call this when adding a task usage to notify the parent-task, that the child has changed
+        private void AddedUsageNotifyParent(OrganizationUnit unit, TaskRef task)
         {
             var parent = task.Parent;
             if (parent == null) return;
@@ -198,7 +176,7 @@ namespace UI.MVC4.Controllers.API
 
             //if we get this far, every child of parent has been selected
             //add parent task
-            AddTask(unit, parent);
+            AddUsage(unit, parent);
 
             //remove children task, which are now superfluous
             foreach (var child in parent.Children)
@@ -209,15 +187,7 @@ namespace UI.MVC4.Controllers.API
             Repository.Update(unit);
 
             //next, notify parent's parent
-            TaskRefNotifyParentAdd(unit, parent);
-        }
-
-        //add a task 
-        private void AddTask(OrganizationUnit unit, TaskRef task)
-        {
-            if(!HasTask(unit, task)) unit.TaskRefs.Add(task);
-
-            Repository.Update(unit);
+            AddedUsageNotifyParent(unit, parent);
         }
 
         //remove a task and all its children.
@@ -231,7 +201,7 @@ namespace UI.MVC4.Controllers.API
                 var taskRef = unvisited.Dequeue();
 
                 //remove task ref on the unit, if it exist
-                if (unit.TaskRefs.Contains(taskRef))
+                if (HasTask(unit, taskRef))
                 {
                     unit.TaskRefs.Remove(taskRef);
                     //since taskref is on the unit, we know that none of its children will be, so we're done with this subtree
@@ -247,36 +217,27 @@ namespace UI.MVC4.Controllers.API
             Repository.Update(unit);
         }
 
-        //check if a given unit has selected that task
+        //return true if a given unit has selected that task
         private bool HasTask(OrganizationUnit unit, TaskRef task)
         {
-            return unit.TaskRefs.Contains(task);
+            return Repository.Get(usage => usage.TaskRef == task && usage.OrgUnit == unit).Any();
         }
 
+        //return true if a given unit has selected that task, or an ancestor task
         private bool HasTaskRecursive(OrganizationUnit unit, TaskRef task)
         {
             while (task != null)
             {
-                if (unit.TaskRefs.Contains(task)) return true;
+                //access to modified closure
+                var tmp = task;
+
+                if (Repository.Get(usage => usage.TaskRef == tmp && usage.OrgUnit == unit).Any()) 
+                    return true;
 
                 task = task.Parent;
             }
 
             return false;
         }
-
-        public override HttpResponseMessage Put(int id, OrgUnitDTO dto)
-        {
-            return NotAllowed();
-        }
-
-        protected override void DeleteQuery(int id)
-        {
-            if(!_orgUnitService.HasWriteAccess(KitosUser, id))
-                throw new SecurityException();
-
-            base.DeleteQuery(id);
-        }
-
     }
 }

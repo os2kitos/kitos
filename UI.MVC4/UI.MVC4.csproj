@@ -223,6 +223,7 @@
     <Compile Include="Controllers\API\ContractTemplateController.cs" />
     <Compile Include="Controllers\API\ContractTypeController.cs" />
     <Compile Include="Controllers\API\OrganizationRightController.cs" />
+    <Compile Include="Controllers\API\TaskUsageController.cs" />
     <Compile Include="Models\CreateGlobalAdminDTO.cs" />
     <Compile Include="Models\CreateLocalAdminDTO.cs" />
     <Compile Include="Controllers\API\DatabaseTypeController.cs" />
@@ -293,7 +294,8 @@
     <Compile Include="Models\RightOutputDTO.cs" />
     <Compile Include="Models\RightInputDTO.cs" />
     <Compile Include="Models\RoleDTO.cs" />
-    <Compile Include="Models\TaskOrgUnitRefDTO.cs" />
+    <Compile Include="Models\TaskDelegationDTO.cs" />
+    <Compile Include="Models\TaskUsageDTO.cs" />
     <Compile Include="Models\TaskRefDTO.cs" />
     <Compile Include="Models\UserDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
