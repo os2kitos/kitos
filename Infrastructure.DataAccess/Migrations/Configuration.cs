@@ -458,7 +458,7 @@ namespace Infrastructure.DataAccess.Migrations
                                                 {
                                                     Object = kl,
                                                     Role = localAdmin,
-                                                    User = roskildeUser6
+                                                    User = roskildeUser7
                                                 });
 
             context.SaveChanges();
