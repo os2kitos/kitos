@@ -1,5 +1,5 @@
 ﻿<div class="dropdown">
-    <a class="dropdown-toggle status-circle" data-ng-class="{'red': model == 0, 'yellow': model == 1, 'green': model == 2}"></a>
+    <a class="dropdown-toggle select-status"><span class="status-circle" data-ng-class="{'red': model == 0, 'yellow': model == 1, 'green': model == 2}"></span><span class="status-arrow-down"></span></a>
     <ul class="dropdown-menu stop-light">
         <li><a data-ng-click="setModel(0)" class="status-circle red"></a></li>
         <li><a data-ng-click="setModel(1)" class="status-circle yellow"></a></li>

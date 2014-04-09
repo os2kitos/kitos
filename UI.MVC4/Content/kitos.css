@@ -320,7 +320,10 @@ a.task-fold {
 a.task-fold:hover {
     color: black;
 }
-a.status-circle {
+a.select-status {
+    display: inline-block;
+}
+.status-circle {
     width: 18px;
     height: 18px;
     border-radius: 12px;
@@ -329,16 +332,16 @@ a.status-circle {
     display: inline-block;
     background: gray;
 }
-a.status-circle:hover {
-    border-color: rgb(170, 170, 170);
+a.select-status:hover .status-circle {
+    border: 2px solid rgb(108, 108, 108);
 }
-a.status-circle.red, .progress-bar-danger {
+.status-circle.red, .progress-bar-danger {
     background: rgb(208, 67, 67);
 }
-a.status-circle.yellow, .progress-bar-warning {
+.status-circle.yellow, .progress-bar-warning {
     background: rgb(254, 232, 34);
 }
-a.status-circle.green, .progress-bar-success {
+.status-circle.green, .progress-bar-success {
     background: rgb(54, 164, 54);
 }
 .status-bar {
@@ -363,4 +366,18 @@ a.status-circle.green, .progress-bar-success {
     display: inline-block;
     text-align: center;
     width: 32%;
+}
+.status-arrow-down {
+    display: inline-block;
+    margin-bottom: 5px;
+    margin-left: 5px;
+
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid rgb(52, 52, 52);
+}
+a.select-status:hover .status-arrow-down {
+    border-top: 5px solid rgb(108, 108, 108);
 }
