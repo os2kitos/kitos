@@ -2,6 +2,7 @@
 {
     public class TaskUsageDTO
     {
+        public int Id { get; set; }
         public int TaskRefId { get; set; }
         public int OrgUnitId { get; set; }
 

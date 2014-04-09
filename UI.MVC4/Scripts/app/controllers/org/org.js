@@ -657,13 +657,14 @@
     }]);
 
 
-    app.controller('org.OverviewCtrl', ['$rootScope', '$scope', '$http', function($rootScope, $scope, $http) {
+    app.controller('org.OverviewCtrl', ['$rootScope', '$scope', '$http', 'growl', function($rootScope, $scope, $http, growl) {
         $rootScope.page.title = 'Organisation';
         $rootScope.page.subnav = subnav;
         
         var userId = $rootScope.user.id;
 
         $scope.orgUnits = {};
+        
         loadUnits();
         
         function flattenAndSave(orgUnit, inheritWriteAccess) {
@@ -704,7 +705,7 @@
         /* load task usages */
         $scope.loadUsages = function() {
             if (!$scope.orgUnitId) return;
-
+            
             $scope.taskUsages = {};
             $http.get('api/taskusage?orgUnitId=' + $scope.orgUnitId).success(function(result) {
                 $scope.taskUsages = result.response;
@@ -718,11 +719,15 @@
                     /* if this task hasn't been delegated, it's a leaf. A leaf can select and update the statuses
                      * at which point we need to update the parents statuses as well */
                     if (!usage.hasDelegations) {
-                        $scope.$watch(function () { return usage.usage.technologyStatus; }, function () {
+                        $scope.$watch(function () { return usage.usage.technologyStatus; }, function (newVal, oldVal) {
                             updateTechStatus(usage);
+                            
+                            if(newVal !== oldVal) patchTechStatus(usage);
                         });
-                        $scope.$watch(function () { return usage.usage.usageStatus; }, function () {
+                        $scope.$watch(function () { return usage.usage.usageStatus; }, function (newVal, oldVal) {
                             updateUsageStatus(usage);
+                            
+                            if (newVal !== oldVal) patchUsageStatus(usage);
                         });
                     }
 
@@ -831,6 +836,31 @@
             for (var i = 0; i < level; i++) result += ".....";
 
             return result;
+        };
+        
+        function patchUsage(usage, data) {
+            $http({
+                method: 'PATCH',
+                url: 'api/taskusage/' + usage.usage.id,
+                data: data
+            }).success(function () {
+                growl.addSuccessMessage("Feltet er opdateret!");
+            }).error(function (result) {
+                growl.addErrorMessage("Fejl!");
+                console.log(result);
+            });
+        };
+        
+        function patchTechStatus(usage) {
+            patchUsage(usage, {
+                "technologyStatus": usage.usage.technologyStatus
+            });
+        };
+
+        function patchUsageStatus(usage) {
+            patchUsage(usage, {
+                "usageStatus": usage.usage.usageStatus
+            });
         };
 
 

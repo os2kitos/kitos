@@ -280,6 +280,10 @@ div.popover
     cursor: pointer;
 }
 
+.faded {
+    opacity: 0.3;
+}
+
 .no-min-width {
     min-width: initial;
 }
@@ -309,7 +313,13 @@ div.task-usage-row {
     padding: 5px;
     margin: 5px;
 }
-
+a.task-fold {
+    color: inherit;
+    text-decoration: none;
+}
+a.task-fold:hover {
+    color: black;
+}
 a.status-circle {
     width: 18px;
     height: 18px;
@@ -339,4 +349,18 @@ a.status-circle.green, .progress-bar-success {
     border-radius: 9px;
 
     margin-bottom: 0;
+}
+.supertext {
+    position: absolute;
+    top: -8px;
+}
+.subtext {
+    position: absolute;
+    top: 8px;
+    width: 100%;
+}
+.status-column {
+    display: inline-block;
+    text-align: center;
+    width: 32%;
 }
