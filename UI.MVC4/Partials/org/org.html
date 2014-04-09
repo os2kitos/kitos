@@ -117,13 +117,14 @@
                     </table>
                 </div>
                 
-                <div class="panel panel-primary" data-ng-switch="isTasksEditable">
+                <div class="panel panel-primary">
                     <div class="panel-heading">Tilknyttede opgaver</div>
                     <div>
                         <div data-ng-repeat="task in allTasksTree">
                             <div data-ng-include="'partials/org/task.html'"></div>
                         </div>
                     </div>
+                    <button type="button" data-ng-click="modalAddTaskClick()">Opret opgave</button>
                 </div>
             </div>              
         </div>

@@ -645,6 +645,48 @@
                 delete task.handledByOrgUnit;
             });
         }
-    }]);
+        
+        $scope.modalAddTaskClick = function () {
+            var modal = $modal.open({
+                templateUrl: 'partials/org/add-task-modal.html',
+                controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
+                    $modalScope.orgName = $scope.chosenOrgUnit.organization.name;
+                    $modalScope.allTasks = $scope.allTasksFlat;
+                    $modalScope.task = {
+                        ownedByOrganizationUnitId: $scope.chosenOrgUnit.organization.id,
+                        uuid: '00000000-0000-0000-0000-000000000000',
+                        type: 'KLE',
+                        activeFrom: null,
+                        activeTo: null
+                    };
 
+                    $modalScope.ok = function () {
+                        var task = $modalScope.task;
+                        $http.post('api/taskref', task)
+                            .success(function () {
+                                growl.addSuccessMessage(task.taskKey + ' er oprettet');
+                                $modalInstance.close();
+                            })
+                            .error(function() {
+                                growl.addErrorMessage('Fejl');
+                            });
+                    };
+
+                    $modalScope.cancel = function () {
+                        $modalInstance.dismiss('cancel');
+                    };
+                }]
+            });
+            
+            modal.result.then(
+                //close
+                function(result) {
+                    console.log(result);
+                },
+                //dismiss
+                function(result) {
+                    var a = result;
+                });
+        };
+    }]);
 })(angular, app);

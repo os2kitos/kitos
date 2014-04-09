@@ -25,5 +25,6 @@ namespace Core.DomainModel
         public virtual ICollection<Infrastructure> Infrastructures { get; set; }
         public virtual ICollection<OrganizationRight> Rights { get; set; }
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
+        public virtual ICollection<TaskRef> OwnedTasks { get; set; }
     }
 }
