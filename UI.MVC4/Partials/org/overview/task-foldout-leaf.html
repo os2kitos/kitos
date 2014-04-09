@@ -1,0 +1,16 @@
+﻿<div class="row task-usage-row task-foldout-leaf">
+    <div class="col-md-7">
+        <span class="indent">{{ indent(usage.level) }}</span>
+        <i class="glyphicon glyphicon-asterisk invisible"></i>
+        {{ orgUnits[usage.usage.orgUnitId].name }}
+    </div>
+    <div class="col-md-1">
+        <input data-select-status="usage.usage.technologyStatus" />
+    </div>
+    <div class="col-md-1">
+        <input data-select-status="usage.usage.usageStatus" />
+    </div>
+    <div class="col-md-1"></div>
+    <div class="col-md-1"></div>
+    <div class="col-md-1"></div>
+</div>

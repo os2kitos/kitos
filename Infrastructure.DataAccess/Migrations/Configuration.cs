@@ -605,6 +605,21 @@ namespace Infrastructure.DataAccess.Migrations
                                                     OrgUnit = digi,
                                                     TaskRef = task00
                                                 },
+                                            new TaskUsage()
+                                            {
+                                                OrgUnit = hrcouncil,
+                                                TaskRef = task00
+                                            },
+                                            new TaskUsage()
+                                            {
+                                                OrgUnit = itservice,
+                                                TaskRef = task00
+                                            },
+                                            new TaskUsage()
+                                            {
+                                                OrgUnit = projectunit,
+                                                TaskRef = task00
+                                            },
                                            new TaskUsage()
                                                 {
                                                     OrgUnit = roskildeRoot,

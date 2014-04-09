@@ -701,49 +701,138 @@
             });
         }
         
+        /* load task usages */
         $scope.loadUsages = function() {
-            console.log($scope.orgUnitId);
-
             if (!$scope.orgUnitId) return;
 
             $scope.taskUsages = {};
             $http.get('api/taskusage?orgUnitId=' + $scope.orgUnitId).success(function(result) {
                 $scope.taskUsages = result.response;
+                
+                /* visit every task usage and delegation */
+                function visit(usage, parent, level, altStyle) {
+                    usage.parent = parent;
+                    usage.level = level;
+                    usage.altStyle = altStyle;
+                    
+                    /* if this task hasn't been delegated, it's a leaf. A leaf can select and update the statuses
+                     * at which point we need to update the parents statuses as well */
+                    if (!usage.hasDelegations) {
+                        $scope.$watch(function () { return usage.usage.technologyStatus; }, function () {
+                            updateTechStatus(usage);
+                        });
+                        $scope.$watch(function () { return usage.usage.usageStatus; }, function () {
+                            updateUsageStatus(usage);
+                        });
+                    }
 
+                    /* visit children */
+                    _.each(usage.delegations, function (del) {
+                        visit(del, usage, level + 1, !altStyle);
+                    });
+                }
+
+                /* each of these are root usages */
                 _.each($scope.taskUsages, function (usage) {
                     usage.isRoot = true;
-                    if (usage.hasDelegations) usage.isFolded = true;
 
                     $http.get('api/taskref/' + usage.usage.taskRefId).success(function (result) {
                         usage.usage.task = result.response;
                     });
+
+                    updateTechStatus(usage);
+                    updateUsageStatus(usage);
+
+                    visit(usage, null, 0, false);
                 });
             });
         };
+        
+        function updateTechStatus(usage) {
+            if (usage.parent) updateTechStatus(usage.parent);
 
-
-        $scope.calculateTechStatus = function(usage) {
-
-            if (!usage.hasDelegations) return usage.usage.technologyStatus;
-
-            var sum = _.reduce(usage.delegations, function (memo, delegation) {
-                return memo + $scope.calculateTechStatus(delegation);
-            }, 0);
-
-            return sum / usage.delegations.length;
-        };
-
-        $scope.calculateUsageStatus = function (usage) {
-
-            if (!usage.hasDelegations) return usage.usage.usageStatus;
-
-            var sum = _.reduce(usage.delegations, function (memo, delegation) {
-                return memo + $scope.calculateUsageStatus(delegation);
-            }, 0);
-
-            return sum / usage.delegations.length;
+            calculateTechStatus(usage);
         };
         
+        function updateUsageStatus(usage) {
+            if (usage.parent) updateUsageStatus(usage.parent);
+
+            calculateUsageStatus(usage);
+        };
+
+        function addToStatusResult(status, result) {
+            if (status == 2) result.green++;
+            else if (status == 1) result.yellow++;
+            else result.red++;
+
+            result.max++;
+
+            return result;
+        }
+        
+        function sumStatusResult(result1, result2) {
+            return {
+                max: result1.max + result2.max,
+                red: result1.red + result2.red,
+                yellow: result1.yellow + result2.yellow,
+                green: result1.green + result2.green
+            };
+        }
+
+        function calculateTechStatus(usage) {
+            
+            var result = {
+                max: 0,
+                red: 0,
+                yellow: 0,
+                green: 0
+            };
+            
+            if (!usage.hasDelegations) {
+                return addToStatusResult(usage.usage.technologyStatus, result);
+            }
+
+            _.each(usage.delegations, function (delegation) {
+                var delegationResult = calculateTechStatus(delegation);
+                result = sumStatusResult(result, delegationResult);
+            });
+
+            usage.calculatedTechStatus = result;
+
+            return result;
+        };
+
+
+        function calculateUsageStatus(usage) {
+
+            var result = {
+                max: 0,
+                red: 0,
+                yellow: 0,
+                green: 0
+            };
+
+            if (!usage.hasDelegations) {
+                return addToStatusResult(usage.usage.usageStatus, result);
+            }
+
+            _.each(usage.delegations, function (delegation) {
+                var delegationResult = calculateUsageStatus(delegation);
+                result = sumStatusResult(result, delegationResult);
+            });
+
+            usage.calculatedUsageStatus = result;
+
+            return result;
+        };
+        
+        $scope.indent = function(level) {
+            var result = "";
+            for (var i = 0; i < level; i++) result += ".....";
+
+            return result;
+        };
+
 
     }]);
 

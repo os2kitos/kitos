@@ -272,14 +272,71 @@ div.popover
     background-color: rgb(255, 255, 177);
 }
 
-div.task-usage {
-    padding: 10px 5px;
-    margin: 5px 0;
+.indent {
+    visibility: hidden;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.no-min-width {
+    min-width: initial;
+}
+
+div.task-usage-root {
+    background-color: rgb(242, 242, 242);
+
+    margin-top: 5px;
+
+    padding-top: 5px;
+    padding-bottom: 5px;
 
     border-radius: 5px;
-
-    background-color: rgba(164, 234, 255, 0.2);
+    border: 2px solid rgb(195, 195, 195);
 }
-div.task-usage:nth-of-type(even) {
-    background-color: rgba(130, 206, 255, 0.5);
+
+div.task-usage-row {
+    padding: 2px 0;
+}
+
+.dropdown-menu.stop-light {
+    min-width: initial;
+    padding: 0;
+}
+
+.dropdown-menu.stop-light a {
+    padding: 5px;
+    margin: 5px;
+}
+
+a.status-circle {
+    width: 18px;
+    height: 18px;
+    border-radius: 12px;
+    border: 2px solid rgb(52, 52, 52);
+
+    display: inline-block;
+    background: gray;
+}
+a.status-circle:hover {
+    border-color: rgb(170, 170, 170);
+}
+a.status-circle.red, .progress-bar-danger {
+    background: rgb(208, 67, 67);
+}
+a.status-circle.yellow, .progress-bar-warning {
+    background: rgb(254, 232, 34);
+}
+a.status-circle.green, .progress-bar-success {
+    background: rgb(54, 164, 54);
+}
+.status-bar {
+    display: inline-block;
+    width: 36px;
+    height: 18px;
+    border: 2px solid rgb(52, 52, 52);
+    border-radius: 9px;
+
+    margin-bottom: 0;
 }

@@ -1,5 +1,8 @@
-﻿<select>
-    <option value="0" class="statusRed">0</option>
-    <option value="1" class="statusYellow">1</option>
-    <option value="2" class="statusGreen">2</option>
-</select>
+﻿<div class="dropdown">
+    <a class="dropdown-toggle status-circle" data-ng-class="{'red': model == 0, 'yellow': model == 1, 'green': model == 2}"></a>
+    <ul class="dropdown-menu stop-light">
+        <li><a data-ng-click="setModel(0)" class="status-circle red"></a></li>
+        <li><a data-ng-click="setModel(1)" class="status-circle yellow"></a></li>
+        <li><a data-ng-click="setModel(2)" class="status-circle green"></a></li>
+    </ul>
+</div>

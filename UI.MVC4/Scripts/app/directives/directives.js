@@ -147,10 +147,33 @@
         };
     }]);
 
-    app.directive('selectStatus', ['$http', '$modal', function($http, $modal) {
+    app.directive('selectStatus', [function() {
         return {
+            scope: {
+                model: '=selectStatus',
+                onStatusChange: '&?'
+            },
             replace: true,
-            templateUrl: 'partials/directives/select-status.html'
+            templateUrl: 'partials/directives/select-status.html',
+            
+            link: function(scope, element, attr) {
+                scope.setModel = function(n) {
+                    if (scope.model == n) return;
+
+                    scope.model = n;
+
+                };
+            }
+        };
+    }]);
+    
+    app.directive('showStatus', [function () {
+        return {
+            scope: {
+                status: '=showStatus'
+            },
+            replace: false,
+            templateUrl: 'partials/directives/show-status.html'
         };
     }]);
 
