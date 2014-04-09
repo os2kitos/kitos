@@ -30,7 +30,6 @@ namespace UI.MVC4.Controllers.API
 
             var result = usages.Select(CompileDelegation);
 
-
             return Ok(result);
         }
 

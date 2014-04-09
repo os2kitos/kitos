@@ -48,14 +48,13 @@
         });
         
         
-        function flattenAndSave(orgUnit, inheritWriteAccess) {
+        function flattenAndSave(orgUnit, inheritWriteAccess, parentOrgunit) {
+            orgUnit.parent = parentOrgunit;
 
             //restore previously saved settings
             if ($scope.orgUnits[orgUnit.id]) {
-
                 var old = $scope.orgUnits[orgUnit.id];
                 orgUnit.isOpen = old.isOpen;
-
             }
 
             $scope.orgUnits[orgUnit.id] = orgUnit;
@@ -65,7 +64,7 @@
                     orgUnit.hasWriteAccess = result.response;
 
                     _.each(orgUnit.children, function (u) {
-                        flattenAndSave(u, result.response);
+                        flattenAndSave(u, result.response, orgUnit);
                     });
 
                 });
@@ -75,7 +74,7 @@
                 orgUnit.hasWriteAccess = true;
 
                 _.each(orgUnit.children, function (u) {
-                    return flattenAndSave(u, true);
+                    return flattenAndSave(u, true, orgUnit);
                 });
 
             }
@@ -87,7 +86,7 @@
                 $scope.nodes = result.response;
 
                 _.each(result.response, function (u) {
-                    flattenAndSave(u, false);
+                    flattenAndSave(u, false, null);
                 });
 
                 if ($scope.chosenOrgUnit) {
@@ -430,14 +429,25 @@
             task.selected = !task.selected;
             var orgUnitId = $scope.chosenOrgUnit.id;
 
-            task.setChildrenState(task.selected);
-            task.setParentState();
+            //task.setChildrenState(task.selected);
+            //task.setParentState();
 
             if (task.selected === true) {
-                $http.post('api/organizationUnit/' + orgUnitId + '?taskref=' + task.id);
+                var data = {
+                    taskRefId: task.id,
+                    OrgUnitId: orgUnitId
+                };
+                $http.post('api/taskusage/', data).success(function(result) {
+                    task.usageId = result.response.id;
+                });
             } else {
-                $http.delete('api/organizationUnit/' + orgUnitId + '?taskref=' + task.id);
+                $http.delete('api/taskusage/' + task.usageId);
             }
+        };
+
+        $scope.updateStar = function(task) {
+            task.starred = !task.starred;
+            $http({ method: 'PATCH', url: 'api/taskusage/' + task.usageId, data: { starred: task.starred }});
         };
 
         function filterTasks() {
@@ -451,11 +461,11 @@
                 });
             } else {
                 // node tree, show selected from parent
-                $http.get('api/organizationUnit/' + orgUnitParentId + '?taskrefs').success(function (result) {
+                $http.get('api/taskusage/?orgUnitId=' + orgUnitParentId).success(function (result) {
                     var selectedTasksOnParent = result.response;
                     _.each(selectedTasksOnParent, function (selectedTask) {
                         var foundTask = _.find($scope.allTasksFlat, function (task) {
-                            return task.id === selectedTask.id;
+                            return task.id === selectedTask.usage.taskRefId;
                         });
                         if (foundTask) {
                             foundTask.show = true;
@@ -471,31 +481,42 @@
         function selectTasks() {
             var orgUnitId = $scope.chosenOrgUnit.id;
 
-            $http.get('api/organizationUnit/' + orgUnitId + '?taskrefs').success(function(result) {
+            $http.get('api/taskusage/?orgUnitId=' + orgUnitId).success(function (result) {
                 var selectedTasks = result.response;
                 _.each(selectedTasks, function (selectTask) {
                     var foundTask = _.find($scope.allTasksFlat, function(task) {
-                        return task.id === selectTask.id;
+                        return task.id === selectTask.usage.taskRefId;
                     });
                     if (foundTask) {
+                        foundTask.usageId = selectTask.usage.id;
                         foundTask.selected = true;
-                        foundTask.setChildrenState(true);
-                        foundTask.setParentState();
+                        foundTask.starred = selectTask.usage.starred;
+                        //foundTask.setChildrenState(true);
+                        //foundTask.setParentState();
 
-                        foundTask.handledByOrgUnit = mapIdToOrgUnit(selectTask.handledByOrgUnit);
+                        foundTask.delegatedTo = mapIdToOrgUnit(_.map(selectTask.delegations, function(delegation) {
+                            return delegation.usage.orgUnitId;
+                        }));
                     }
                 });
             });
         }
         
         function mapIdToOrgUnit(idList) {
+            if (idList.length === 0) {
+                return [];
+            }
+
             return _.map(idList, function (id) {
                 var foundOrgUnit = _.find($scope.orgUnits, function (orgUnit) {
                     if (angular.isUndefined(orgUnit))
                         return false;
-                    return orgUnit.id == id;
+                    return orgUnit.id === id;
                 });
-                return foundOrgUnit.name;
+                if (foundOrgUnit) {
+                    return foundOrgUnit.name;
+                }
+                return 'Ukendt';
             });
         };
 
@@ -619,29 +640,49 @@
 
         $scope.$watch('chosenOrgUnit', function (newOrgUnit, oldOrgUnit) {
             if (newOrgUnit !== null) {
-                getAllTasks().then(function () {
-                    resetTasks();
-                    filterTasks();
-                    selectTasks();
-                });
+                var newRootOrgUnitId = getRootOrg(newOrgUnit).id;
+                var oldRootOrgUnitId;
+                if (oldOrgUnit === null) {
+                    oldRootOrgUnitId = null;
+                } else {
+                    oldRootOrgUnitId = getRootOrg(oldOrgUnit).id;
+                }
+
+                if (newRootOrgUnitId !== oldRootOrgUnitId) {
+                    getAllTasks(newRootOrgUnitId).then(function () {
+                        cleanup();
+                    });
+                } else {
+                    cleanup();
+                }
             }
         });
 
-        function getAllTasks() {
-            var deferred = $q.defer();
-            // only get if not previously set
-            if (!$scope.allTasksFlat) {
-                $http.get('api/taskref').success(function (result) {
-                    var tasks = result.response;
-                    // flat array for easy searching
-                    $scope.allTasksFlat = tasks;
-                    // nested array for angular to generate tree in a repeat
-                    $scope.allTasksTree = toHierarchy(tasks, 'id', 'parentId');
-                    deferred.resolve();
-                });
+        function cleanup() {
+            resetTasks();
+            filterTasks();
+            selectTasks();
+        }
+
+        function getRootOrg(orgUnit) {
+            if (orgUnit.parent === null) {
+                return orgUnit;
             } else {
-                deferred.resolve();
+                return getRootOrg(orgUnit.parent);
             }
+            throw Error('Should never reach this point');
+        }
+
+        function getAllTasks(rootOrgUnitId) {
+            var deferred = $q.defer();
+            $http.get('api/taskref').success(function(result) { // TODO ?orgUnitId=' + rootOrgUnitId
+                var tasks = result.response;
+                // flat array for easy searching
+                $scope.allTasksFlat = tasks;
+                // nested array for angular to generate tree in a repeat
+                $scope.allTasksTree = toHierarchy(tasks, 'id', 'parentId');
+                deferred.resolve();
+            });
             return deferred.promise;
         }
 
@@ -651,7 +692,8 @@
                 task.selected = false;
                 task.indeterminate = false;
                 task.canWrite = false;
-                delete task.handledByOrgUnit;
+                delete task.delegatedTo;
+                delete task.usageId;
             });
         }
     }]);
@@ -696,7 +738,7 @@
                 $scope.nodes = result.response;
 
                 _.each(result.response, function (u) {
-                    flattenAndSave(u, false);
+                    flattenAndSave(u, false, null);
                 });
             });
         }
