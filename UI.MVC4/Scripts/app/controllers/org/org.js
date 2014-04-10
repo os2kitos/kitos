@@ -3,7 +3,7 @@
     var subnav = [
             { state: 'org-view', text: 'Organisation' }
     ];
-
+    
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
 
         $stateProvider.state('org-view', {
@@ -46,16 +46,15 @@
         _.each(orgRolesHttp.data.response, function (orgRole) {
             $scope.orgRoles[orgRole.id] = orgRole;
         });
-
-
-        function flattenAndSave(orgUnit, inheritWriteAccess) {
+        
+        
+        function flattenAndSave(orgUnit, inheritWriteAccess, parentOrgunit) {
+            orgUnit.parent = parentOrgunit;
 
             //restore previously saved settings
             if ($scope.orgUnits[orgUnit.id]) {
-
                 var old = $scope.orgUnits[orgUnit.id];
                 orgUnit.isOpen = old.isOpen;
-
             }
 
             $scope.orgUnits[orgUnit.id] = orgUnit;
@@ -65,7 +64,7 @@
                     orgUnit.hasWriteAccess = result.response;
 
                     _.each(orgUnit.children, function (u) {
-                        flattenAndSave(u, result.response);
+                        flattenAndSave(u, result.response, orgUnit);
                     });
 
                 });
@@ -75,7 +74,7 @@
                 orgUnit.hasWriteAccess = true;
 
                 _.each(orgUnit.children, function (u) {
-                    return flattenAndSave(u, true);
+                    return flattenAndSave(u, true, orgUnit);
                 });
 
             }
@@ -87,7 +86,7 @@
                 $scope.nodes = result.response;
 
                 _.each(result.response, function (u) {
-                    flattenAndSave(u, false);
+                    flattenAndSave(u, false, null);
                 });
 
                 if ($scope.chosenOrgUnit) {
@@ -102,23 +101,23 @@
         loadUnits();
 
         $scope.chosenOrgUnit = null;
-
+        
         $scope.chooseOrgUnit = function (node) {
-
+            
             //get organization related to the org unit
             if (!node.organization) {
 
                 //try get from cache
                 if (orgs[node.organizationId]) {
-
+                    
                     node.organization = orgs[node.organizationId];
-
+                    
                 } else {
                     //else get from server
-
+                    
                     $http.get('api/organization/' + node.organizationId).success(function (data) {
                         node.organization = data.response;
-
+                        
                         //save to cache
                         orgs[node.organizationId] = data.response;
                     });
@@ -136,7 +135,7 @@
                 });
 
             });
-
+            
             $scope.chosenOrgUnit = node;
         };
 
@@ -172,12 +171,12 @@
                     'roleForSelect': result.response.roleId,
                     show: true
                 });
-
+                
                 $scope.newRole = "";
                 $scope.selectedUser = "";
-
+                
             }).error(function (result) {
-
+                
                 growl.addErrorMessage('Fejl!');
             });
         };
@@ -201,17 +200,17 @@
         $scope.updateRight = function (right) {
 
             if (!right.roleForSelect || !right.userForSelect) return;
-
+            
             //old values
             var oIdOld = right.objectId;
             var rIdOld = right.roleId;
             var uIdOld = right.userId;
-
+            
             //new values
             var oIdNew = right.objectId;
             var rIdNew = right.roleForSelect;
             var uIdNew = right.userForSelect.id;
-
+            
             //if nothing was changed, just exit edit-mode
             if (oIdOld == oIdNew && rIdOld == rIdNew && uIdOld == uIdNew) {
                 right.edit = false;
@@ -243,12 +242,12 @@
                     //fuck
 
                     right.show = false;
-
+                    
                     growl.addErrorMessage('Fejl!');
                 });
-
+                
             }).error(function (deleteResult) {
-
+                
                 //couldn't delete the old entry, just reset select options
                 right.userForSelect = { id: right.user.id, text: right.user.name };
                 right.roleForSelect = right.roleId;
@@ -285,27 +284,27 @@
         };
 
         $scope.editUnit = function (unit) {
-
+            
             var modal = $modal.open({
                 templateUrl: 'partials/org/edit-org-unit-modal.html',
                 controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
 
                     //edit or create-new mode
                     $modalScope.isNew = false;
-
+                    
                     //holds a list of org units, which the user can select as the parent
                     $modalScope.orgUnits = [];
-
+                    
                     //filter out those orgunits, that are outside the organisation
                     //or is currently a subdepartment of the unit
                     function filter(node) {
                         if (node.organizationId != unit.organizationId) return;
-
+                        
                         //this avoid every subdepartment
                         if (node.id == unit.id) return;
 
                         $modalScope.orgUnits.push(node);
-
+                        
                         _.each(node.children, filter);
                     }
                     _.each($scope.nodes, filter);
@@ -320,7 +319,7 @@
                         'orgId': unit.organizationId,
                         'isRoot': unit.parentId == 0
                     };
-
+                    
                     //only allow changing the parent if user is admin, and the unit isn't at the root
                     $modalScope.isAdmin = $rootScope.user.isGlobalAdmin || _.contains($rootScope.user.isLocalAdminFor, unit.organizationId);
                     $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot;
@@ -328,10 +327,10 @@
                     $modalScope.patch = function () {
                         //don't allow duplicate submitting
                         if ($modalScope.submitting) return;
-
+                        
                         var name = $modalScope.orgUnit.newName;
                         var parent = $modalScope.orgUnit.newParent;
-
+                        
                         if (!name) return;
 
                         var data = {
@@ -373,7 +372,7 @@
                         };
 
                         $modalScope.submitting = true;
-
+                        
                         $http({ method: 'POST', url: "api/organizationUnit/", data: data }).success(function (result) {
                             growl.addSuccessMessage(name + " er gemt.");
 
@@ -404,7 +403,7 @@
                         $http.delete("api/organizationUnit/" + unit.id).success(function () {
                             $modalInstance.close();
                             growl.addSuccessMessage(unit.name + " er slettet!");
-
+                            
                         }).error(function () {
                             $modalScope.submitting = false;
 
@@ -430,14 +429,25 @@
             task.selected = !task.selected;
             var orgUnitId = $scope.chosenOrgUnit.id;
 
-            task.setChildrenState(task.selected);
-            task.setParentState();
+            //task.setChildrenState(task.selected);
+            //task.setParentState();
 
             if (task.selected === true) {
-                $http.post('api/organizationUnit/' + orgUnitId + '?taskref=' + task.id);
+                var data = {
+                    taskRefId: task.id,
+                    OrgUnitId: orgUnitId
+                };
+                $http.post('api/taskusage/', data).success(function(result) {
+                    task.usageId = result.response.id;
+                });
             } else {
-                $http.delete('api/organizationUnit/' + orgUnitId + '?taskref=' + task.id);
+                $http.delete('api/taskusage/' + task.usageId);
             }
+        };
+
+        $scope.updateStar = function(task) {
+            task.starred = !task.starred;
+            $http({ method: 'PATCH', url: 'api/taskusage/' + task.usageId, data: { starred: task.starred }});
         };
 
         function filterTasks() {
@@ -451,11 +461,11 @@
                 });
             } else {
                 // node tree, show selected from parent
-                $http.get('api/organizationUnit/' + orgUnitParentId + '?taskrefs').success(function (result) {
+                $http.get('api/taskusage/?orgUnitId=' + orgUnitParentId).success(function (result) {
                     var selectedTasksOnParent = result.response;
                     _.each(selectedTasksOnParent, function (selectedTask) {
                         var foundTask = _.find($scope.allTasksFlat, function (task) {
-                            return task.id === selectedTask.id;
+                            return task.id === selectedTask.usage.taskRefId;
                         });
                         if (foundTask) {
                             foundTask.show = true;
@@ -471,31 +481,42 @@
         function selectTasks() {
             var orgUnitId = $scope.chosenOrgUnit.id;
 
-            $http.get('api/organizationUnit/' + orgUnitId + '?taskrefs').success(function (result) {
+            $http.get('api/taskusage/?orgUnitId=' + orgUnitId).success(function (result) {
                 var selectedTasks = result.response;
                 _.each(selectedTasks, function (selectTask) {
-                    var foundTask = _.find($scope.allTasksFlat, function (task) {
-                        return task.id === selectTask.id;
+                    var foundTask = _.find($scope.allTasksFlat, function(task) {
+                        return task.id === selectTask.usage.taskRefId;
                     });
                     if (foundTask) {
+                        foundTask.usageId = selectTask.usage.id;
                         foundTask.selected = true;
-                        foundTask.setChildrenState(true);
-                        foundTask.setParentState();
+                        foundTask.starred = selectTask.usage.starred;
+                        //foundTask.setChildrenState(true);
+                        //foundTask.setParentState();
 
-                        foundTask.handledByOrgUnit = mapIdToOrgUnit(selectTask.handledByOrgUnit);
+                        foundTask.delegatedTo = mapIdToOrgUnit(_.map(selectTask.delegations, function(delegation) {
+                            return delegation.usage.orgUnitId;
+                        }));
                     }
                 });
             });
         }
-
+        
         function mapIdToOrgUnit(idList) {
+            if (idList.length === 0) {
+                return [];
+            }
+
             return _.map(idList, function (id) {
                 var foundOrgUnit = _.find($scope.orgUnits, function (orgUnit) {
                     if (angular.isUndefined(orgUnit))
                         return false;
-                    return orgUnit.id == id;
+                    return orgUnit.id === id;
                 });
+                if (foundOrgUnit) {
                 return foundOrgUnit.name;
+                }
+                return 'Ukendt';
             });
         };
 
@@ -511,7 +532,7 @@
             });
 
             function search(nestedAry, id) {
-                if (!nestedAry || !id)
+                if (!nestedAry || !id) 
                     throw new Error("Invalid argument(s)"); // abort if not valid input
 
                 for (var i = 0; i < nestedAry.length; i++) {
@@ -619,19 +640,42 @@
 
         $scope.$watch('chosenOrgUnit', function (newOrgUnit, oldOrgUnit) {
             if (newOrgUnit !== null) {
-                getAllTasks().then(function () {
-                    resetTasks();
-                    filterTasks();
-                    selectTasks();
-                });
+                var newRootOrgUnitId = getRootOrg(newOrgUnit).id;
+                var oldRootOrgUnitId;
+                if (oldOrgUnit === null) {
+                    oldRootOrgUnitId = null;
+                } else {
+                    oldRootOrgUnitId = getRootOrg(oldOrgUnit).id;
+                }
+
+                if (newRootOrgUnitId !== oldRootOrgUnitId) {
+                    getAllTasks(newRootOrgUnitId).then(function () {
+                        cleanup();
+                    });
+                } else {
+                    cleanup();
+                }
             }
         });
 
-        function getAllTasks() {
+        function cleanup() {
+                    resetTasks();
+                    filterTasks();
+                    selectTasks();
+        }
+
+        function getRootOrg(orgUnit) {
+            if (orgUnit.parent === null) {
+                return orgUnit;
+            } else {
+                return getRootOrg(orgUnit.parent);
+            }
+            throw Error('Should never reach this point');
+            }
+
+        function getAllTasks(rootOrgUnitId) {
             var deferred = $q.defer();
-            // only get if not previously set
-            if (!$scope.allTasksFlat) {
-                $http.get('api/taskref').success(function (result) {
+            $http.get('api/taskref').success(function(result) { // TODO ?orgUnitId=' + rootOrgUnitId
                     var tasks = result.response;
                     // flat array for easy searching
                     $scope.allTasksFlat = tasks;
@@ -639,9 +683,6 @@
                     $scope.allTasksTree = toHierarchy(tasks, 'id', 'parentId');
                     deferred.resolve();
                 });
-            } else {
-                deferred.resolve();
-            }
             return deferred.promise;
         }
 
@@ -651,7 +692,8 @@
                 task.selected = false;
                 task.indeterminate = false;
                 task.canWrite = false;
-                delete task.handledByOrgUnit;
+                delete task.delegatedTo;
+                delete task.usageId;
             });
         }
     }]);
@@ -660,13 +702,13 @@
     app.controller('org.OverviewCtrl', ['$rootScope', '$scope', '$http', 'growl', '$modal', function ($rootScope, $scope, $http, growl, $modal) {
         $rootScope.page.title = 'Organisation';
         $rootScope.page.subnav = subnav;
-
+        
         var userId = $rootScope.user.id;
 
         $scope.orgUnits = {};
 
         loadUnits();
-
+        
         function flattenAndSave(orgUnit, inheritWriteAccess) {
             $scope.orgUnits[orgUnit.id] = orgUnit;
 
@@ -697,11 +739,11 @@
                 $scope.nodes = result.response;
 
                 _.each(result.response, function (u) {
-                    flattenAndSave(u, false);
+                    flattenAndSave(u, false, null);
                 });
             });
         }
-
+        
         /* load task usages */
         $scope.loadUsages = function () {
             if (!$scope.orgUnitId) return;
@@ -881,14 +923,14 @@
                 controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
                     $modalScope.comment = {
                         text: usage.usage.comment
-                    };
+        };
                     $modalScope.taskKey = usage.usage.task.taskKey;
                     $modalScope.taskDescription = usage.usage.task.description;
                     $modalScope.orgUnitName = usage.usage.orgUnit.name;
 
                     $modalScope.saveComment = function () {
                         $modalScope.submitting = true;
-                        
+
                         patchUsageComplex(usage,
                             {
                                 'comment': $modalScope.comment.text
@@ -924,7 +966,7 @@
                 }]
             });
         };
-
+        
 
     }]);
 
