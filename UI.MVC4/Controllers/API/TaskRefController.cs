@@ -15,7 +15,7 @@ namespace UI.MVC4.Controllers.API
 
         public HttpResponseMessage GetByOrgUnit(int orgUnitId)
         {
-            var items = Repository.Get(x => x.OwnedByOrganizationUnitId == orgUnitId);
+            var items = Repository.Get(x => x.OwnedByOrganizationUnitId == orgUnitId || x.IsPublic);
             return Ok(Map(items));
         }
     }

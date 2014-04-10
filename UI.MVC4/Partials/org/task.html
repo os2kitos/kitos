@@ -1,31 +1,42 @@
 ﻿<div class="row">
-    <div class="col-md-6">
-    <span>
+    <!--<span>
             <a data-ng-show="task.children" data-ng-click="task.isOpen = !task.isOpen">
                 <i class="glyphicon" data-ng-class="{'glyphicon-chevron-down': task.isOpen, 'glyphicon-chevron-right': !task.isOpen}"></i>
             </a>
-        </span>
-        <label data-ng-show="task.canWrite">
-            <input type="checkbox" data-ng-checked="task.selected" data-ui-indeterminate="task.indeterminate" data-ng-click="updateTask(task)" data-ng-disabled="!chosenOrgUnit.editTasks"/>
-            {{ task.taskKey }} {{ task.description }}
-        </label>
-        <span data-ng-show="!task.canWrite">{{ task.taskKey }} {{ task.description }} </span>
+        </span>-->
+    <div class="col-md-1">
     </div>
-        <span data-ng-show="!task.canWrite">{{ task.taskKey }} {{ task.description }} </span>
-        <span data-ng-show="task.delegatedTo">{{ task.delegatedTo }}</span>
-        <label data-ng-show="task.canWrite && task.selected">
-            <input type="checkbox" data-ng-checked="task.starred" data-ng-click="updateStar(task)"/>
-            Oversigt
+    <div class="col-md-1">
+        {{ task.taskKey }}
+    </div>
+    <div class="col-md-6">
+        {{ task.description }}
+        <a data-ng-show="task.children" data-ng-click="task.isOpen = !task.isOpen">
+            <i class="glyphicon" data-ng-class="{'glyphicon-chevron-down': task.isOpen, 'glyphicon-chevron-right': !task.isOpen}"></i>
+        </a>
+    </div>
+    <!--
+        <label data-ng-show="task.canWrite">
+            <input type="checkbox" data-ng-checked="task.selected" data-ng-click="updateTask(task)" data-ng-hide="!chosenOrgUnit.editTasks" />
+            {{ task.taskKey }} <small>{{ task.description }}</small>
         </label>
-        <span data-ng-show="task.children">
-            <a data-ng-click="task.isOpen = !task.isOpen">
-                <i class="glyphicon" data-ng-class="{'glyphicon-chevron-down': task.isOpen, 'glyphicon-chevron-right': !task.isOpen}"></i>
-            </a>
+        <span data-ng-show="!task.canWrite">{{ task.taskKey }} {{ task.description }} </span>-->
+    
+    <div class="col-md-2 text-center">
+        <span data-ng-show="task.delegatedTo">
+            <i class="glyphicon glyphicon-ok" data-tooltip="{{ task.delegatedTo | joinBy:', ' }}"></i>
         </span>
-    </span>
-    <div data-ng-show="task.isOpen">
-        <div data-ng-repeat="task in task.children" data-ng-show="task.show">
-            <div data-ng-include="'partials/org/task.html'"></div>
-        </div>
+        <span class="text-danger" data-ng-hide="task.delegatedTo">
+            <i class="glyphicon glyphicon-remove" data-tooltip="Ikke deligeret"></i>
+        </span>
+    </div>
+
+    <div class="col-md-2 text-center" data-ng-show="task.canWrite && task.selected">
+        <input type="checkbox" data-ng-checked="task.starred" data-ng-click="updateStar(task)" data-ng-disabled="!chosenOrgUnit.editTasks" />
+    </div>
+</div>
+<div data-ng-show="task.isOpen">
+    <div data-ng-repeat="task in task.children" data-ng-show="task.show">
+        <div data-ng-include="'partials/org/task.html'"></div>
     </div>
 </div>

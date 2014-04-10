@@ -675,7 +675,7 @@
 
         function getAllTasks(rootOrgUnitId) {
             var deferred = $q.defer();
-            $http.get('api/taskref').success(function (result) { // TODO ?orgUnitId=' + rootOrgUnitId
+            $http.get('api/taskref?orgUnitId=' + rootOrgUnitId).success(function (result) {
                 var tasks = result.response;
                 // flat array for easy searching
                 $scope.allTasksFlat = tasks;

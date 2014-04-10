@@ -176,5 +176,12 @@
             templateUrl: 'partials/directives/show-status.html'
         };
     }]);
+    
+    /* from http://stackoverflow.com/questions/11540157/using-comma-as-list-separator-with-angularjs */
+    app.filter('joinBy', function () {
+        return function (input, delimiter) {
+            return (input || []).join(delimiter || ',');
+        };
+    });
 
 })(angular, app);
