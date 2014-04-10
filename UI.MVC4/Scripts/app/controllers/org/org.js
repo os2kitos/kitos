@@ -658,6 +658,13 @@
             }
         });
 
+        function updateTree(rootOrgUnitId) {
+            rootOrgUnitId = typeof rootOrgUnitId !== 'undefined' ? rootOrgUnitId : getRootOrg($scope.chosenOrgUnit).id;
+            getAllTasks(rootOrgUnitId).then(function () {
+                cleanup();
+            });
+        }
+
         function cleanup() {
             resetTasks();
             filterTasks();
@@ -692,6 +699,7 @@
                 task.selected = false;
                 task.indeterminate = false;
                 task.canWrite = false;
+                task.starred = false;
                 delete task.delegatedTo;
                 delete task.usageId;
             });
@@ -716,6 +724,7 @@
                         $http.post('api/taskref', task)
                             .success(function () {
                                 growl.addSuccessMessage(task.taskKey + ' er oprettet');
+                                updateTree();
                                 $modalInstance.close();
                             })
                             .error(function () {
