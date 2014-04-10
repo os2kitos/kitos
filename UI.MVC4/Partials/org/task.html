@@ -5,11 +5,11 @@
                 <i class="glyphicon" data-ng-class="{'glyphicon-chevron-down': task.isOpen, 'glyphicon-chevron-right': !task.isOpen}"></i>
             </a>
         </span>
-        <label data-ng-show="task.canWrite && chosenOrgUnit.editTasks">
-            <input type="checkbox" data-ng-checked="task.selected" data-ui-indeterminate="task.indeterminate" data-ng-click="updateTask(task)"/>
+        <label data-ng-show="task.canWrite">
+            <input type="checkbox" data-ng-checked="task.selected" data-ui-indeterminate="task.indeterminate" data-ng-click="updateTask(task)" data-ng-disabled="!chosenOrgUnit.editTasks"/>
             {{ task.taskKey }} {{ task.description }}
         </label>
-        <span data-ng-show="!task.canWrite && !chosenOrgUnit.editTasks">{{ task.taskKey }} {{ task.description }} </span>
+        <span data-ng-show="!task.canWrite">{{ task.taskKey }} {{ task.description }} </span>
     </div>
     <span class="col-md-3">{{ task.handledByOrgUnit }}</span>
     <label data-ng-show="task.canWrite && chosenOrgUnit.editTasks" class="col-md-2">
