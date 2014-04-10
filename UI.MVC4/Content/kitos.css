@@ -381,3 +381,20 @@ a.select-status:hover .status-circle {
 a.select-status:hover .status-arrow-down {
     border-top: 5px solid rgb(108, 108, 108);
 }
+
+.btn-star {
+    color: rgb(255, 141, 0);
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+.btn-star.unstarred {
+    color: rgb(181, 181, 181);
+}
+.btn-star:hover, .btn-star:active {
+    color: rgb(188, 104, 0);
+}
+
+.task-table .row {
+    padding: 3px 0px;
+}

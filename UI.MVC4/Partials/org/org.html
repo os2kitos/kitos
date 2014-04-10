@@ -125,16 +125,22 @@
                             Rediger
                         </a>
                     </div>
-                    <div data-ng-repeat="task in allTasksTree">
+                    <div class="container-fluid task-table">
                         <div class="row">
-                            <span class="col-md-1 col-md-offset-1"><strong>ID</strong></span>
-                            <span class="col-md-6"><strong>KLE Navn</strong></span>
+                            <span class="col-md-1 text-center"><strong>Valgt</strong></span>
+                            <span class="col-md-9"><strong>Opgave</strong></span>
                             <span class="col-md-2 text-center"><strong>Delegeret</strong></span>
-                            <span class="col-md-2 text-center"><strong>Overblik</strong></span>
                         </div>
-                        <div data-ng-include="'partials/org/task.html'"></div>
+                        <div data-ng-repeat="task in allTasksTree">
+                            <div data-ng-include="'partials/org/task.html'"></div>
+                        </div>
                     </div>
-                    <button type="button" data-ng-click="modalAddTaskClick()">Opret opgave</button>
+                    <div class="panel-footer" data-ng-hide="!chosenOrgUnit.editTasks">
+                        <button type="button" class="btn btn-success btn-sm" data-ng-click="modalAddTaskClick()">
+                            <i class="glyphicon glyphicon-plus"></i>
+                            Opret opgave
+                        </button>
+                    </div>
                 </div>
             </div>              
         </div>

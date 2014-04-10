@@ -4,6 +4,13 @@
             { state: 'org-view', text: 'Organisation' }
     ];
 
+    function indent(level) {
+        var result = "";
+        for (var i = 0; i < level; i++) result += ".....";
+
+        return result;
+    };
+    
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
 
         $stateProvider.state('org-view', {
@@ -623,13 +630,15 @@
                     parent.setParentState();
                 };
 
-                if (obj[parentIdPropetyName] === null) // is root
+                if (obj[parentIdPropetyName] === null) { // is root
+                    obj.level = 0;
                     hierarchy.push(obj);
-                else {
+                } else {
                     var parentObj = search(hierarchy, obj[parentIdPropetyName]);
                     if (!parentObj.hasOwnProperty(childPropertyName))
                         parentObj[childPropertyName] = [];
 
+                    obj.level = parentObj.level + 1;
                     obj[parentPropetyName] = parentObj;
                     parentObj[childPropertyName].push(obj);
                 }
@@ -738,6 +747,14 @@
                 function (result) {
                     var a = result;
                 });
+        };
+
+        $scope.indent = indent;
+
+        var altRow = false;
+        $scope.getAltRow = function () {
+            altRow = !altRow;
+            return altRow;
         };
     }]);
 
@@ -925,12 +942,7 @@
             return result;
         };
 
-        $scope.indent = function (level) {
-            var result = "";
-            for (var i = 0; i < level; i++) result += ".....";
-
-            return result;
-        };
+        $scope.indent = indent;
 
         function patchUsageComplex(usage, data, onSuccess, onError) {
             $http({
@@ -1011,7 +1023,6 @@
                 }]
             });
         };
-
-
+        
     }]);
 })(angular, app);
