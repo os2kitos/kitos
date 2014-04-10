@@ -431,6 +431,14 @@
 
             });
         };
+        
+        function growlSuccess() {
+            growl.addSuccessMessage("Feltet er opdateret");
+        }
+        
+        function growlError() {
+            growl.addErrorMessage("Fejl!");
+        }
 
         $scope.updateTask = function (task) {
             task.selected = !task.selected;
@@ -446,15 +454,24 @@
                 };
                 $http.post('api/taskusage/', data).success(function (result) {
                     task.usageId = result.response.id;
-                });
+                    growlSuccess();
+                }).error(growlError);
             } else {
-                $http.delete('api/taskusage/' + task.usageId);
+                $http.delete('api/taskusage/' + task.usageId).success(function () {
+                    task.starred = false;
+                    delete task.delegatedTo;
+                    growlSuccess();
+                }).error(growlError);
             }
         };
 
         $scope.updateStar = function (task) {
             task.starred = !task.starred;
-            $http({ method: 'PATCH', url: 'api/taskusage/' + task.usageId, data: { starred: task.starred } });
+            $http({
+                method: 'PATCH',
+                url: 'api/taskusage/' + task.usageId,
+                data: { starred: task.starred }
+            }).success(growlSuccess).error(growlError);
         };
 
         function filterTasks() {

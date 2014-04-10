@@ -69,5 +69,34 @@ namespace UI.MVC4.Controllers.API
 
             return delegation;
         }
+
+        private void DeleteTaskOnChildren(OrganizationUnit orgUnit, int taskRefId)
+        {
+            foreach (var unit in orgUnit.Children)
+            {
+                var temp = unit;
+                var usages = Repository.Get(u => u.TaskRefId == taskRefId && u.OrgUnitId == temp.Id);
+
+                foreach (var taskUsage in usages)
+                {
+                    Repository.DeleteByKey(taskUsage.Id);
+                }
+
+                DeleteTaskOnChildren(unit, taskRefId);
+            }
+        }
+
+        protected override void DeleteQuery(int id)
+        {
+            var entity = Repository.GetByKey(id);
+
+            var taskRefId = entity.TaskRefId;
+            var unit = entity.OrgUnit;
+
+            Repository.DeleteByKey(entity.Id);
+            DeleteTaskOnChildren(unit, taskRefId);
+
+            Repository.Save();
+        }
     }
 }
