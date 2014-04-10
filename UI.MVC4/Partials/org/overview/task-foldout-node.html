@@ -1,0 +1,42 @@
+﻿<div>
+    <div class="row task-usage-row">
+        <div class="col-md-7">
+            <span class="indent">{{ indent(usage.level) }}</span>
+            <a class="task-fold" data-ng-click="usage.isOpen = !usage.isOpen">
+                <i class="glyphicon text-muted small"
+                    data-ng-class="{'glyphicon-chevron-down': usage.isOpen, 'glyphicon-chevron-right': !usage.isOpen}"></i>
+                {{ orgUnits[usage.usage.orgUnitId].name }}
+            </a>
+        </div>
+
+        <div class="col-md-2">
+            <div class="status-column" data-show-status="usage.calculatedTechStatus"></div>
+            <div class="status-column" data-show-status="usage.calculatedUsageStatus"></div>
+            <div class="status-column">
+                <button class="btn btn-link btn-xs"
+                    data-tooltip-html-unsafe="<small>{{ usage.usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
+                    data-tooltip-trigger="mouseenter"
+                    data-tooltip-placement="right"
+                    data-ng-click="openComment(usage)">
+                    <i class="glyphicon glyphicon-comment" data-ng-class="{'faded': !usage.usage.comment}"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="col-md-1 text-center"></div>
+        <div class="col-md-1 text-center"></div>
+        <div class="col-md-1 text-center"></div>
+
+    </div>
+
+    <div data-ng-show="usage.isOpen">
+        <div data-ng-repeat="usage in usage.delegations">
+            <div data-ng-if="usage.hasDelegations">
+                <div data-ng-include="'partials/org/overview/task-foldout-node.html'"></div>
+            </div>
+            <div data-ng-if="!usage.hasDelegations">
+                <div data-ng-include="'partials/org/overview/task-foldout-leaf.html'"></div>
+            </div>
+        </div>
+    </div>
+</div>

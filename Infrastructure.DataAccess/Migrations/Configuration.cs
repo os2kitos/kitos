@@ -211,19 +211,19 @@ namespace Infrastructure.DataAccess.Migrations
             #region Roskilde OrgUnits
 
             //LEVEL 0
-            var rootUnit = roskilde.OrgUnits.First();
+            var roskildeRoot = roskilde.OrgUnits.First();
 
             //LEVEL 1
             var munChief = new OrganizationUnit()
                 {
                     Organization = roskilde,
-                    Parent = rootUnit,
+                    Parent = roskildeRoot,
                     Name = "Kommunaldirektøren"
                 };
             var wellfare = new OrganizationUnit()
             {
                 Organization = roskilde,
-                Parent = rootUnit,
+                Parent = roskildeRoot,
                 Name = "Velfærd"
             };
 
@@ -303,13 +303,13 @@ namespace Infrastructure.DataAccess.Migrations
             #region Sorø OrgUnits
 
             //LEVEL 0
-            var rootUnit2 = sorø.OrgUnits.First();
+            var sorøRoot = sorø.OrgUnits.First();
 
             //LEVEL 1
             var level1a = new OrganizationUnit()
             {
                 Organization = sorø,
-                Parent = rootUnit2,
+                Parent = sorøRoot,
                 Name = "Direktørområde"
             };
 
@@ -360,6 +360,12 @@ namespace Infrastructure.DataAccess.Migrations
             context.OrganizationUnits.AddOrUpdate(o => o.Name, level1a, level2a, level2b, level2c, level3a, level3b,
                                                   level3c);
             context.SaveChanges();
+
+            #endregion
+
+            #region KL OrgUnits
+
+            var klRootUnit = kl.OrgUnits.First();
 
             #endregion
 
@@ -528,15 +534,25 @@ namespace Infrastructure.DataAccess.Migrations
 
             var task00 = new TaskRef()
                 {
-                    TaskKey = "00", Description = "Kommunens styrelse", Type = "KLE"
+                    TaskKey = "00", Description = "Kommunens styrelse", Type = "KLE", IsPublic = true, OwnedByOrganizationUnit = klRootUnit
                 };
             var task0001 = new TaskRef()
                 {
-                    TaskKey = "00.01", Description = "Kommunens styrelse", Type = "KLE", Parent = task00
+                    TaskKey = "00.01",
+                    Description = "Kommunens styrelse",
+                    Type = "KLE",
+                    Parent = task00,
+                    IsPublic = true,
+                    OwnedByOrganizationUnit = klRootUnit
                 };
             var task0003 = new TaskRef()
                 {
-                    TaskKey = "00.03", Description = "International virksomhed og EU", Type = "KLE", Parent = task00
+                    TaskKey = "00.03",
+                    Description = "International virksomhed og EU",
+                    Type = "KLE",
+                    Parent = task00,
+                    IsPublic = true,
+                    OwnedByOrganizationUnit = klRootUnit
                 };
             context.TaskRefs.AddOrUpdate(x => x.TaskKey,
                                          task00,
@@ -546,14 +562,18 @@ namespace Infrastructure.DataAccess.Migrations
                                                  TaskKey = "00.01.00",
                                                  Description = "Kommunens styrelse i almindelighed",
                                                  Type = "KLE",
-                                                 Parent = task0001
+                                                 Parent = task0001,
+                                                 IsPublic = true,
+                                                 OwnedByOrganizationUnit = klRootUnit
                                              },
                                          new TaskRef()
                                              {
                                                  TaskKey = "00.01.10",
                                                  Description = "Opgaver der dækker flere hovedgrupper",
                                                  Type = "KLE",
-                                                 Parent = task0001
+                                                 Parent = task0001,
+                                                 IsPublic = true,
+                                                 OwnedByOrganizationUnit = klRootUnit
                                              },
                                          task0003,
                                          new TaskRef()
@@ -561,38 +581,49 @@ namespace Infrastructure.DataAccess.Migrations
                                                  TaskKey = "00.03.00",
                                                  Description = "International virksomhed og EU i almindelighed",
                                                  Type = "KLE",
-                                                 Parent = task0003
+                                                 Parent = task0003,
+                                                 IsPublic = true,
+                                                 OwnedByOrganizationUnit = klRootUnit
                                              },
                                          new TaskRef()
                                              {
                                                  TaskKey = "00.03.02",
                                                  Description = "Internationale organisationers virksomhed",
                                                  Type = "KLE",
-                                                 Parent = task0003
+                                                 Parent = task0003,
+                                                 IsPublic = true,
+                                                 OwnedByOrganizationUnit = klRootUnit
                                              },
                                          new TaskRef()
                                              {
                                                  TaskKey = "00.03.04",
                                                  Description = "Regionaludvikling EU",
                                                  Type = "KLE",
-                                                 Parent = task0003
+                                                 Parent = task0003,
+                                                 IsPublic = true,
+                                                 OwnedByOrganizationUnit = klRootUnit
                                              },
                                          new TaskRef()
                                              {
                                                  TaskKey = "00.03.08",
                                                  Description = "EU-interessevaretagelse",
                                                  Type = "KLE",
-                                                 Parent = task0003
+                                                 Parent = task0003,
+                                                 IsPublic = true,
+                                                 OwnedByOrganizationUnit = klRootUnit
                                              },
                                          new TaskRef()
                                              {
                                                  TaskKey = "00.03.10",
                                                  Description = "Internationalt samarbejde",
                                                  Type = "KLE",
-                                                 Parent = task0003
+                                                 Parent = task0003,
+                                                 IsPublic = true,
+                                                 OwnedByOrganizationUnit = klRootUnit
                                              });
 
             #endregion
+            
 
             context.ProjectPhaseLocales.AddOrUpdate(x => new { x.MunicipalityId, x.OriginalId },
                                                     new ProjPhaseLocale()

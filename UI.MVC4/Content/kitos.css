@@ -271,3 +271,130 @@ div.popover
 .highlight {
     background-color: rgb(255, 255, 177);
 }
+
+.indent {
+    visibility: hidden;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.faded {
+    opacity: 0.3;
+}
+
+.no-min-width {
+    min-width: initial;
+}
+
+div.task-usage-root {
+    background-color: rgb(242, 242, 242);
+
+    margin-top: 5px;
+
+    padding-top: 5px;
+    padding-bottom: 5px;
+
+    border-radius: 5px;
+    border: 2px solid rgb(195, 195, 195);
+}
+
+div.task-usage-row {
+    padding: 2px 0;
+}
+
+.dropdown-menu.stop-light {
+    min-width: initial;
+    padding: 0;
+}
+
+.dropdown-menu.stop-light a {
+    padding: 5px;
+    margin: 5px;
+}
+a.task-fold {
+    color: inherit;
+    text-decoration: none;
+}
+a.task-fold:hover {
+    color: black;
+}
+a.select-status {
+    display: inline-block;
+}
+.status-circle {
+    width: 18px;
+    height: 18px;
+    border-radius: 12px;
+    border: 2px solid rgb(52, 52, 52);
+
+    display: inline-block;
+    background: gray;
+}
+a.select-status:hover .status-circle {
+    border: 2px solid rgb(108, 108, 108);
+}
+.status-circle.red, .progress-bar-danger {
+    background: rgb(208, 67, 67);
+}
+.status-circle.yellow, .progress-bar-warning {
+    background: rgb(254, 232, 34);
+}
+.status-circle.green, .progress-bar-success {
+    background: rgb(54, 164, 54);
+}
+.status-bar {
+    display: inline-block;
+    width: 36px;
+    height: 18px;
+    border: 2px solid rgb(52, 52, 52);
+    border-radius: 9px;
+
+    margin-bottom: 0;
+}
+.supertext {
+    position: absolute;
+    top: -8px;
+}
+.subtext {
+    position: absolute;
+    top: 8px;
+    width: 100%;
+}
+.status-column {
+    display: inline-block;
+    text-align: center;
+    width: 32%;
+}
+.status-arrow-down {
+    display: inline-block;
+    margin-bottom: 5px;
+    margin-left: 5px;
+
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid rgb(52, 52, 52);
+}
+a.select-status:hover .status-arrow-down {
+    border-top: 5px solid rgb(108, 108, 108);
+}
+
+.btn-star {
+    color: rgb(255, 141, 0);
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+.btn-star.unstarred {
+    color: rgb(181, 181, 181);
+}
+.btn-star:hover, .btn-star:active {
+    color: rgb(188, 104, 0);
+}
+
+.task-table .row {
+    padding: 3px 0px;
+}

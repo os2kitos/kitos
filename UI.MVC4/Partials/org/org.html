@@ -117,12 +117,29 @@
                     </table>
                 </div>
                 
-                <div class="panel panel-primary" data-ng-switch="isTasksEditable">
-                    <div class="panel-heading">Tilknyttede opgaver</div>
-                    <div>
-                        <div data-ng-repeat="task in allTasksTree">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <i class="glyphicon glyphicon-tasks"></i> 
+                        Tilknyttede opgaver
+                        <a class="pull-right" data-ng-show="chosenOrgUnit.hasWriteAccess" data-ng-click="chosenOrgUnit.editTasks = !chosenOrgUnit.editTasks">
+                            Rediger
+                        </a>
+                    </div>
+                    <div class="container-fluid task-table">
+                        <div class="row">
+                            <span class="col-md-1 text-center"><strong>Valgt</strong></span>
+                            <span class="col-md-9"><strong>Opgave</strong></span>
+                            <span class="col-md-2 text-center"><strong>Delegeret</strong></span>
+                        </div>
+                        <div data-ng-repeat="task in allTasksTree" data-ng-show="task.show">
                             <div data-ng-include="'partials/org/task.html'"></div>
                         </div>
+                    </div>
+                    <div class="panel-footer" data-ng-hide="!chosenOrgUnit.editTasks">
+                        <button type="button" class="btn btn-success btn-sm" data-ng-click="modalAddTaskClick()">
+                            <i class="glyphicon glyphicon-plus"></i>
+                            Opret opgave
+                        </button>
                     </div>
                 </div>
             </div>              

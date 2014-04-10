@@ -223,6 +223,7 @@
     <Compile Include="Controllers\API\ContractTemplateController.cs" />
     <Compile Include="Controllers\API\ContractTypeController.cs" />
     <Compile Include="Controllers\API\OrganizationRightController.cs" />
+    <Compile Include="Controllers\API\TaskUsageController.cs" />
     <Compile Include="Models\CreateGlobalAdminDTO.cs" />
     <Compile Include="Models\CreateLocalAdminDTO.cs" />
     <Compile Include="Controllers\API\DatabaseTypeController.cs" />
@@ -293,7 +294,8 @@
     <Compile Include="Models\RightOutputDTO.cs" />
     <Compile Include="Models\RightInputDTO.cs" />
     <Compile Include="Models\RoleDTO.cs" />
-    <Compile Include="Models\TaskOrgUnitRefDTO.cs" />
+    <Compile Include="Models\TaskDelegationDTO.cs" />
+    <Compile Include="Models\TaskUsageDTO.cs" />
     <Compile Include="Models\TaskRefDTO.cs" />
     <Compile Include="Models\UserDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -370,7 +372,9 @@
     <Content Include="Images\logo.png" />
     <Content Include="Partials\directives\add-user-button.html" />
     <Content Include="Partials\directives\add-user-modal.html" />
+    <Content Include="Partials\directives\select-status.html" />
     <Content Include="Partials\directives\select-user.html" />
+    <Content Include="Partials\directives\show-status.html" />
     <Content Include="Partials\global-config\system.html" />
     <Content Include="Partials\global-admin\new-global-admin.html" />
     <Content Include="Partials\global-admin\new-local-admin.html" />
@@ -392,10 +396,16 @@
     <Content Include="Partials\local-config\suggest-new.html" />
     <Content Include="Partials\local-config\support.html" />
     <Content Include="Partials\local-config\system.html" />
+    <Content Include="Partials\org\add-task-modal.html" />
     <Content Include="Partials\org\edit-org-unit-modal.html" />
+    <Content Include="Partials\org\overview.html" />
+    <Content Include="Partials\org\overview\comment-modal.html" />
+    <Content Include="Partials\org\overview\task-foldout-leaf.html" />
+    <Content Include="Partials\org\overview\task-foldout-node.html" />
     <Content Include="Partials\org\task.html" />
     <Content Include="Partials\org\org-unit.html" />
     <Content Include="Partials\org\org.html" />
+    <Content Include="Partials\org\overview\task-usage.html" />
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />
     <Content Include="Partials\topnav\unauthorized.html" />

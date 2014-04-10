@@ -1,0 +1,29 @@
+﻿<div class="col-md-12 container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+            <select data-ui-select2="" data-ng-model="orgUnitId" class="form-control input-sm" data-ng-change="loadUsages()" data-placeholder="Vælg afdeling">
+                <option></option>
+                <option data-ng-repeat="orgUnit in orgUnits" value="{{orgUnit.id}}">{{orgUnit.name}} {{ orgUnit.hasWriteAccess && "*" }}
+                </option>
+            </select>
+        </div>
+        <div class="col-md-1">KLE ID</div>
+        <div class="col-md-3">KLE Navn</div>
+        <div class="col-md-2">
+            <div class="supertext">Digitaliseringsgrad</div>
+            <div class="subtext">
+                <span class="small">Teknologi</span>
+                <span class="small">Anvendelse</span>
+            </div>
+
+        </div>
+        <div class="col-md-1 text-center">IT Projekt</div>
+        <div class="col-md-1 text-center">IT System</div>
+        <div class="col-md-1 text-center">OBS</div>
+    </div>
+
+    <div data-ng-repeat="usage in taskUsages" class="task-usage-container">
+        <div data-ng-include="'partials/org/overview/task-usage.html'"></div>
+    </div>
+
+</div>

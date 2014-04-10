@@ -1,0 +1,35 @@
+﻿<div class="row task-usage-row task-foldout-leaf">
+    
+    <!-- org unit name -->
+    <div class="col-md-7">
+        <span class="indent">{{ indent(usage.level) }}</span>
+        <i class="glyphicon glyphicon-asterisk invisible"></i>
+        {{ usage.usage.orgUnit.name }}
+    </div>
+    
+    <!-- status -->
+    <div class="col-md-2">
+        <div class="status-column">
+            <input data-select-status="usage.usage.technologyStatus" />
+        </div>
+        <div class="status-column">
+            <input data-select-status="usage.usage.usageStatus" />
+        </div>
+            <div class="status-column">
+                <button class="btn btn-link btn-xs"
+                    data-tooltip-html-unsafe="<small>{{ usage.usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
+                    data-tooltip-trigger="mouseenter"
+                    data-tooltip-placement="right"
+                    data-ng-click="openComment(usage)">
+                    <i class="glyphicon glyphicon-comment" data-ng-class="{'faded': !usage.usage.comment}"></i>
+                </button>
+            </div>
+    </div>
+    
+    <!-- it project / it system -->
+    <div class="col-md-1 text-center"></div>
+    <div class="col-md-1 text-center"><i class="glyphicon glyphicon-ok"></i></div>
+    
+    <!-- not used (OBS) -->
+    <!--<div class="col-md-1 text-center"></div>-->
+</div>

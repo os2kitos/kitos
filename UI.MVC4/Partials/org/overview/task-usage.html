@@ -1,0 +1,88 @@
+﻿<div class="row task-usage-root" data-ng-if="!usage.hasDelegations">
+
+    <!-- org unit name -->
+    <div class="col-md-3">
+        <i class="glyphicon glyphicon-asterisk small"></i>
+        {{ orgUnits[usage.usage.orgUnitId].name }}
+    </div>
+
+    <!-- task description -->
+    <div class="col-md-1">{{ usage.usage.task.taskKey }}</div>
+    <div class="col-md-3">{{ usage.usage.task.description }}</div>
+
+    <!-- statuses -->
+    <div class="col-md-2">
+        <div class="status-column">
+            <input data-select-status="usage.usage.technologyStatus" />
+        </div>
+        <div class="status-column">
+            <input data-select-status="usage.usage.usageStatus" />
+        </div>
+        <div class="status-column">
+            <button class="btn btn-link btn-xs"
+                data-tooltip-html-unsafe="<small>{{ usage.usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
+                data-tooltip-trigger="mouseenter"
+                data-tooltip-placement="right"
+                data-ng-click="openComment(usage)">
+                <i class="glyphicon glyphicon-comment" data-ng-class="{'faded': !usage.usage.comment}"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- extra info -->
+    <div class="col-md-1 text-center"></div>
+    <div class="col-md-1 text-center"></div>
+    <div class="col-md-1 text-center"></div>
+</div>
+
+<div data-ng-if="usage.hasDelegations">
+    <div class="row task-usage-root">
+
+        <!-- org unit name -->
+        <div class="col-md-3">
+            <a class="task-fold" data-ng-click="usage.isOpen = !usage.isOpen">
+                <i class="glyphicon small"
+                    data-ng-class="{'glyphicon-chevron-down': usage.isOpen, 'glyphicon-chevron-right': !usage.isOpen}"></i>
+                {{ orgUnits[usage.usage.orgUnitId].name }}
+            </a>
+        </div>
+
+        <!-- task description -->
+        <div class="col-md-1">{{ usage.usage.task.taskKey }}</div>
+        <div class="col-md-3">{{ usage.usage.task.description }}</div>
+
+        <!-- statuses -->
+        <div class="col-md-2">
+            <div class="status-column" data-show-status="usage.calculatedTechStatus"></div>
+            <div class="status-column" data-show-status="usage.calculatedUsageStatus"></div>
+
+            <div class="status-column">
+                <button class="btn btn-link btn-xs"
+                    data-tooltip-html-unsafe="<small>{{ usage.usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
+                    data-tooltip-trigger="mouseenter"
+                    data-tooltip-placement="right"
+                    data-ng-click="openComment(usage)">
+                    <i class="glyphicon glyphicon-comment" data-ng-class="{'faded': !usage.usage.comment}"></i>
+                </button>
+            </div>
+        </div>
+
+
+        <!-- extra info -->
+        <div class="col-md-1 text-center"></div>
+        <div class="col-md-1 text-center"></div>
+        <div class="col-md-1 text-center"></div>
+    </div>
+
+    <!-- delegations -->
+    <div data-ng-show="usage.isOpen" class="task-usage task-usage-foldout">
+        <div data-ng-repeat="usage in usage.delegations">
+            <div data-ng-if="usage.hasDelegations">
+                <div data-ng-include="'partials/org/overview/task-foldout-node.html'"></div>
+            </div>
+            <div data-ng-if="!usage.hasDelegations">
+                <div data-ng-include="'partials/org/overview/task-foldout-leaf.html'"></div>
+            </div>
+        </div>
+    </div>
+</div>

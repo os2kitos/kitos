@@ -147,4 +147,41 @@
         };
     }]);
 
+    app.directive('selectStatus', [function() {
+        return {
+            scope: {
+                model: '=selectStatus',
+                onStatusChange: '&?'
+            },
+            replace: true,
+            templateUrl: 'partials/directives/select-status.html',
+            
+            link: function(scope, element, attr) {
+                scope.setModel = function(n) {
+                    if (scope.model == n) return;
+
+                    scope.model = n;
+
+                };
+            }
+        };
+    }]);
+    
+    app.directive('showStatus', [function () {
+        return {
+            scope: {
+                status: '=showStatus'
+            },
+            replace: false,
+            templateUrl: 'partials/directives/show-status.html'
+        };
+    }]);
+    
+    /* from http://stackoverflow.com/questions/11540157/using-comma-as-list-separator-with-angularjs */
+    app.filter('joinBy', function () {
+        return function (input, delimiter) {
+            return (input || []).join(delimiter || ',');
+        };
+    });
+
 })(angular, app);
