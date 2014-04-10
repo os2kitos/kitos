@@ -1,19 +1,24 @@
-﻿<div>
-    <span>
-        <label data-ng-show="task.canWrite">
-            <input type="checkbox" data-ng-checked="task.selected" data-ui-indeterminate="task.indeterminate" data-ng-click="updateTask(task)"/>
-            {{ task.taskKey }} {{ task.description }} {{ task.handledByOrgUnit }}
-        </label>
-        <span data-ng-show="!task.canWrite">{{ task.taskKey }} {{ task.description }} </span>
-        <span data-ng-show="task.children">
-            <a data-ng-click="task.isOpen = !task.isOpen">
+﻿<div class="row">
+    <div class="col-md-6">
+        <span>
+            <a data-ng-show="task.children" data-ng-click="task.isOpen = !task.isOpen">
                 <i class="glyphicon" data-ng-class="{'glyphicon-chevron-down': task.isOpen, 'glyphicon-chevron-right': !task.isOpen}"></i>
             </a>
         </span>
-    </span>
-    <ul data-ng-show="task.isOpen">
-        <li data-ng-repeat="task in task.children" data-ng-show="task.show">
-            <div data-ng-include="'partials/org/task.html'"></div>
-        </li>
-    </ul>
+        <label data-ng-show="task.canWrite && chosenOrgUnit.editTasks">
+            <input type="checkbox" data-ng-checked="task.selected" data-ui-indeterminate="task.indeterminate" data-ng-click="updateTask(task)"/>
+            {{ task.taskKey }} {{ task.description }}
+        </label>
+        <span data-ng-show="!task.canWrite && !chosenOrgUnit.editTasks">{{ task.taskKey }} {{ task.description }} </span>
+    </div>
+    <span class="col-md-3">{{ task.handledByOrgUnit }}</span>
+    <label data-ng-show="task.canWrite && chosenOrgUnit.editTasks" class="col-md-2">
+        <input type="checkbox" data-ng-checked="task.selected" data-ui-indeterminate="task.indeterminate" data-ng-click="updateTask(task)"/>
+        {{ task.taskKey }}
+    </label>
+</div>
+<div data-ng-show="task.isOpen">
+    <div data-ng-repeat="task in task.children" data-ng-show="task.show">
+        <div data-ng-include="'partials/org/task.html'"></div>
+    </div>
 </div>
