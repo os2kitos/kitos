@@ -818,7 +818,7 @@
             if (!$scope.orgUnitId) return;
 
             $scope.taskUsages = {};
-            $http.get('api/taskusage?orgUnitId=' + $scope.orgUnitId).success(function (result) {
+            $http.get('api/taskusage?orgUnitId=' + $scope.orgUnitId + "&onlyStarred=true").success(function (result) {
                 $scope.taskUsages = result.response;
 
                 /* visit every task usage and delegation */
