@@ -196,15 +196,13 @@ namespace Infrastructure.DataAccess.Migrations
 
             #endregion
 
-            #region Municipalities
-
-            //var globalMunicipality = municipalityService.CreateMunicipality("Fælleskommune");
+            #region Organizations
 
             var roskilde = municipalityService.CreateMunicipality("Roskilde");
-
             var sorø = municipalityService.CreateMunicipality("Sorø");
+            var kl = municipalityService.CreateMunicipality("KL");
 
-            context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø);
+            context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø, kl);
 
             context.SaveChanges();
 
@@ -427,15 +425,21 @@ namespace Infrastructure.DataAccess.Migrations
             var simon = SimpleUser("Simon Lynn-Pedersen", "slp@it-minds.dk", "slp123", cryptoService);
             simon.IsGlobalAdmin = true;
 
-            var eskild = SimpleUser("Eskild", "esd@it-minds.dk", "arne123", cryptoService);
-            
+            var globalUser = SimpleUser("Global Test Bruger", "g@test", "123", cryptoService);
+            globalUser.IsGlobalAdmin = true;
+
+            var localUser = SimpleUser("Local Test Bruger", "l@test", "123", cryptoService);
+
             var roskildeUser1 = SimpleUser("Pia", "pia@it-minds.dk", "arne123", cryptoService);
             var roskildeUser2 = SimpleUser("Morten", "morten@it-minds.dk", "arne123", cryptoService);
             var roskildeUser3 = SimpleUser("Anders", "anders@it-minds.dk", "arne123", cryptoService);
             var roskildeUser4 = SimpleUser("Peter", "peter@it-minds.dk", "arne123", cryptoService);
             var roskildeUser5 = SimpleUser("Jesper", "jesper@it-minds.dk", "arne123", cryptoService);
+            var roskildeUser6 = SimpleUser("Brian", "briana@roskilde.dk", "123", cryptoService);
+            roskildeUser6.IsGlobalAdmin = true;
+            var roskildeUser7 = SimpleUser("Erik", "ehl@kl.dk", "123", cryptoService);
 
-            context.Users.AddOrUpdate(x => x.Email, simon, eskild, roskildeUser1, roskildeUser2, roskildeUser3, roskildeUser4, roskildeUser5);
+            context.Users.AddOrUpdate(x => x.Email, simon, globalUser, localUser, roskildeUser1, roskildeUser2, roskildeUser3, roskildeUser4, roskildeUser5, roskildeUser6, roskildeUser7);
 
             context.SaveChanges();
 
@@ -449,6 +453,12 @@ namespace Infrastructure.DataAccess.Migrations
                                                     Object = roskilde,
                                                     Role = localAdmin,
                                                     User = roskildeUser1
+                                                },
+                                            new AdminRight()
+                                                {
+                                                    Object = kl,
+                                                    Role = localAdmin,
+                                                    User = roskildeUser7
                                                 });
 
             context.SaveChanges();
