@@ -10,13 +10,13 @@
                     data-ng-class="{'unstarred': !task.starred, 'invisible': !task.selected}"
                     data-ng-click="updateStar(task)"
                     data-ng-disabled="!task.selected"
-                    data-tooltip="Vis under oversigt?">
+                    data-tooltip="Vis under overblik?">
                 <i class="glyphicon glyphicon-star"></i>
             </button>
         </div>
         <div data-ng-if="!(task.canWrite && chosenOrgUnit.editTasks)">
             <i class="glyphicon glyphicon-ok text-success" data-ng-class="{'invisible': !task.selected}"></i>
-            <i class="glyphicon glyphicon-star text-warning" data-ng-class="{'invisible': !task.starred}" data-tooltip="Vist under oversigt"></i>
+            <i class="glyphicon glyphicon-star text-warning" data-ng-class="{'invisible': !task.starred}" data-tooltip="Vist under overblik"></i>
         </div>
         
     </div>

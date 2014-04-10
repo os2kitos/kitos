@@ -623,54 +623,6 @@ namespace Infrastructure.DataAccess.Migrations
                                              });
 
             #endregion
-
-
-            #region KLE usage
-
-            context.TaskUsages.AddOrUpdate(x => new { x.TaskRefId, x.OrgUnitId },
-                                           new TaskUsage()
-                                               {
-                                                   OrgUnit = roskildeRoot,
-                                                   TaskRef = task00,
-                                                   Starred = true
-                                               },
-                                           new TaskUsage()
-                                               {
-                                                   OrgUnit = munChief,
-                                                   TaskRef = task00,
-                                                   Starred = true
-                                               },
-                                            new TaskUsage()
-                                                {
-                                                    OrgUnit = digi,
-                                                    TaskRef = task00
-                                                },
-                                            new TaskUsage()
-                                            {
-                                                OrgUnit = hrcouncil,
-                                                TaskRef = task00
-                                            },
-                                            new TaskUsage()
-                                            {
-                                                OrgUnit = itservice,
-                                                TaskRef = task00
-                                            },
-                                            new TaskUsage()
-                                            {
-                                                OrgUnit = projectunit,
-                                                TaskRef = task00
-                                            },
-                                           new TaskUsage()
-                                                {
-                                                    OrgUnit = roskildeRoot,
-                                                    TaskRef = task0003,
-                                                    Starred = true
-                                                });
-
-
-
-            #endregion
-
             
 
             context.ProjectPhaseLocales.AddOrUpdate(x => new { x.MunicipalityId, x.OriginalId },

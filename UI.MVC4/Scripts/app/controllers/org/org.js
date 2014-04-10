@@ -1,7 +1,9 @@
 ﻿(function (ng, app) {
 
     var subnav = [
-            { state: 'org-view', text: 'Organisation' }
+            { state: 'org-overview', text: 'Overblik' },
+            { state: 'org-view', text: 'Organisation' },
+            { state: '', text: 'Rapport' }
     ];
 
     function indent(level) {
