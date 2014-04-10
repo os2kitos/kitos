@@ -2,8 +2,8 @@
 
     <!-- org unit name -->
     <div class="col-md-3">
-            <i class="glyphicon glyphicon-asterisk small"></i>
-            {{ orgUnits[usage.usage.orgUnitId].name }}
+        <i class="glyphicon glyphicon-asterisk small"></i>
+        {{ orgUnits[usage.usage.orgUnitId].name }}
     </div>
 
     <!-- task description -->
@@ -18,7 +18,15 @@
         <div class="status-column">
             <input data-select-status="usage.usage.usageStatus" />
         </div>
-        <div class="status-column"><i class="glyphicon glyphicon-comment small" data-ng-class="{'faded': !usage.usage.comment}"></i></div>
+        <div class="status-column">
+            <button class="btn btn-link btn-xs"
+                data-tooltip-html-unsafe="<small>{{ usage.usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
+                data-tooltip-trigger="mouseenter"
+                data-tooltip-placement="right"
+                data-ng-click="openComment(usage)">
+                <i class="glyphicon glyphicon-comment" data-ng-class="{'faded': !usage.usage.comment}"></i>
+            </button>
+        </div>
     </div>
 
     <!-- extra info -->
@@ -47,7 +55,16 @@
         <div class="col-md-2">
             <div class="status-column" data-show-status="usage.calculatedTechStatus"></div>
             <div class="status-column" data-show-status="usage.calculatedUsageStatus"></div>
-            <div class="status-column"><i class="glyphicon glyphicon-comment small" data-ng-class="{'faded': !usage.usage.comment}"></i></div>
+
+            <div class="status-column">
+                <button class="btn btn-link btn-xs"
+                    data-tooltip-html-unsafe="<small>{{ usage.usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
+                    data-tooltip-trigger="mouseenter"
+                    data-tooltip-placement="right"
+                    data-ng-click="openComment(usage)">
+                    <i class="glyphicon glyphicon-comment" data-ng-class="{'faded': !usage.usage.comment}"></i>
+                </button>
+            </div>
         </div>
 
 

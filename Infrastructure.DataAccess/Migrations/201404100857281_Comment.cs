@@ -3,7 +3,7 @@ namespace Infrastructure.DataAccess.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class TaskOverviewInitial : DbMigration
+    public partial class Comment : DbMigration
     {
         public override void Up()
         {
@@ -710,6 +710,7 @@ namespace Infrastructure.DataAccess.Migrations
                         Starred = c.Boolean(nullable: false),
                         TechnologyStatus = c.Int(nullable: false),
                         UsageStatus = c.Int(nullable: false),
+                        Comment = c.String(unicode: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.OrganizationUnit", t => t.OrgUnitId, cascadeDelete: true)

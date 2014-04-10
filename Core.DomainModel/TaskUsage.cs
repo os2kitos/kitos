@@ -17,5 +17,6 @@ namespace Core.DomainModel
         public bool Starred { get; set; }
         public int TechnologyStatus { get; set; }
         public int UsageStatus { get; set; }
+        public string Comment { get; set; }
     }
 }

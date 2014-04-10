@@ -398,6 +398,7 @@
     <Content Include="Partials\local-config\system.html" />
     <Content Include="Partials\org\edit-org-unit-modal.html" />
     <Content Include="Partials\org\overview.html" />
+    <Content Include="Partials\org\overview\comment-modal.html" />
     <Content Include="Partials\org\overview\task-foldout-leaf.html" />
     <Content Include="Partials\org\overview\task-foldout-node.html" />
     <Content Include="Partials\org\task.html" />
