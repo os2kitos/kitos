@@ -20,6 +20,8 @@ namespace UI.MVC4.Controllers.API
             Repository = repository;
         }
 
+        #region mapping functions
+
         //for easy access
         protected virtual TDto Map(TModel model)
         {
@@ -32,10 +34,24 @@ namespace UI.MVC4.Controllers.API
             return Map<TDto, TModel>(dto);
         }
 
+        //for easy access (list)
+        protected virtual IEnumerable<TDto> Map(IEnumerable<TModel> models)
+        {
+            return Map<IEnumerable<TModel>, IEnumerable<TDto>>(models);
+        }
+
+        //for easy access (list)
+        protected virtual IEnumerable<TModel> Map(IEnumerable<TDto> dtos)
+        {
+            return Map<IEnumerable<TDto>, IEnumerable<TModel>>(dtos);
+        }
+
         protected virtual TDest Map<TSource, TDest>(TSource item)
         {
             return AutoMapper.Mapper.Map<TDest>(item);
         }
+
+        #endregion
 
         protected virtual IEnumerable<TModel> GetAllQuery()
         {

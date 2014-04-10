@@ -117,13 +117,23 @@
                     </table>
                 </div>
                 
-                <div class="panel panel-primary" data-ng-switch="isTasksEditable">
-                    <div class="panel-heading">Tilknyttede opgaver</div>
-                    <div>
-                        <div data-ng-repeat="task in allTasksTree">
-                            <div data-ng-include="'partials/org/task.html'"></div>
-                        </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <i class="glyphicon glyphicon-tasks"></i>
+                        Tilknyttede opgaver
+                        <a class="pull-right" data-ng-show="chosenOrgUnit.hasWriteAccess" data-ng-click="chosenOrgUnit.editTasks = !chosenOrgUnit.editTasks">
+                            Rediger
+                        </a>
                     </div>
+                    <div data-ng-repeat="task in allTasksTree">
+                        <div class="row">
+                            <span class="col-md-6"><strong>KLE</strong></span>
+                            <span class="col-md-3"><strong>Delegeret</strong></span>
+                            <span class="col-md-2"><strong>Overblik</strong></span>
+                        </div>
+                        <div data-ng-include="'partials/org/task.html'"></div>
+                    </div>
+                    <button type="button" data-ng-click="modalAddTaskClick()">Opret opgave</button>
                 </div>
             </div>              
         </div>

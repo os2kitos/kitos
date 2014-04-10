@@ -363,6 +363,12 @@ namespace Infrastructure.DataAccess.Migrations
 
             #endregion
 
+            #region KL OrgUnits
+
+            var klRootUnit = kl.OrgUnits.First();
+
+            #endregion
+
             #region OrganizationUnit roles
 
             var boss = new OrganizationRole()
@@ -528,15 +534,25 @@ namespace Infrastructure.DataAccess.Migrations
 
             var task00 = new TaskRef()
                 {
-                    TaskKey = "00", Description = "Kommunens styrelse", Type = "KLE"
+                    TaskKey = "00", Description = "Kommunens styrelse", Type = "KLE", IsPublic = true, OwnedByOrganizationUnit = klRootUnit
                 };
             var task0001 = new TaskRef()
                 {
-                    TaskKey = "00.01", Description = "Kommunens styrelse", Type = "KLE", Parent = task00
+                    TaskKey = "00.01",
+                    Description = "Kommunens styrelse",
+                    Type = "KLE",
+                    Parent = task00,
+                    IsPublic = true,
+                    OwnedByOrganizationUnit = klRootUnit
                 };
             var task0003 = new TaskRef()
                 {
-                    TaskKey = "00.03", Description = "International virksomhed og EU", Type = "KLE", Parent = task00
+                    TaskKey = "00.03",
+                    Description = "International virksomhed og EU",
+                    Type = "KLE",
+                    Parent = task00,
+                    IsPublic = true,
+                    OwnedByOrganizationUnit = klRootUnit
                 };
             context.TaskRefs.AddOrUpdate(x => x.TaskKey,
                                          task00,
@@ -546,14 +562,18 @@ namespace Infrastructure.DataAccess.Migrations
                                                  TaskKey = "00.01.00",
                                                  Description = "Kommunens styrelse i almindelighed",
                                                  Type = "KLE",
-                                                 Parent = task0001
+                                                 Parent = task0001,
+                                                 IsPublic = true,
+                                                 OwnedByOrganizationUnit = klRootUnit
                                              },
                                          new TaskRef()
                                              {
                                                  TaskKey = "00.01.10",
                                                  Description = "Opgaver der dækker flere hovedgrupper",
                                                  Type = "KLE",
-                                                 Parent = task0001
+                                                 Parent = task0001,
+                                                 IsPublic = true,
+                                                 OwnedByOrganizationUnit = klRootUnit
                                              },
                                          task0003,
                                          new TaskRef()
@@ -561,35 +581,45 @@ namespace Infrastructure.DataAccess.Migrations
                                                  TaskKey = "00.03.00",
                                                  Description = "International virksomhed og EU i almindelighed",
                                                  Type = "KLE",
-                                                 Parent = task0003
+                                                 Parent = task0003,
+                                                 IsPublic = true,
+                                                 OwnedByOrganizationUnit = klRootUnit
                                              },
                                          new TaskRef()
                                              {
                                                  TaskKey = "00.03.02",
                                                  Description = "Internationale organisationers virksomhed",
                                                  Type = "KLE",
-                                                 Parent = task0003
+                                                 Parent = task0003,
+                                                 IsPublic = true,
+                                                 OwnedByOrganizationUnit = klRootUnit
                                              },
                                          new TaskRef()
                                              {
                                                  TaskKey = "00.03.04",
                                                  Description = "Regionaludvikling EU",
                                                  Type = "KLE",
-                                                 Parent = task0003
+                                                 Parent = task0003,
+                                                 IsPublic = true,
+                                                 OwnedByOrganizationUnit = klRootUnit
                                              },
                                          new TaskRef()
                                              {
                                                  TaskKey = "00.03.08",
                                                  Description = "EU-interessevaretagelse",
                                                  Type = "KLE",
-                                                 Parent = task0003
+                                                 Parent = task0003,
+                                                 IsPublic = true,
+                                                 OwnedByOrganizationUnit = klRootUnit
                                              },
                                          new TaskRef()
                                              {
                                                  TaskKey = "00.03.10",
                                                  Description = "Internationalt samarbejde",
                                                  Type = "KLE",
-                                                 Parent = task0003
+                                                 Parent = task0003,
+                                                 IsPublic = true,
+                                                 OwnedByOrganizationUnit = klRootUnit
                                              });
 
             #endregion

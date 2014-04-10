@@ -12,5 +12,11 @@ namespace UI.MVC4.Controllers.API
             : base(repository)
         {
         }
+
+        public HttpResponseMessage GetByOrgUnit(int orgUnitId)
+        {
+            var items = Repository.Get(x => x.OwnedByOrganizationUnitId == orgUnitId);
+            return Ok(Map(items));
+        }
     }
 }

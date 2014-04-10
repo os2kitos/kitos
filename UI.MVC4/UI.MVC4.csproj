@@ -396,6 +396,7 @@
     <Content Include="Partials\local-config\suggest-new.html" />
     <Content Include="Partials\local-config\support.html" />
     <Content Include="Partials\local-config\system.html" />
+    <Content Include="Partials\org\add-task-modal.html" />
     <Content Include="Partials\org\edit-org-unit-modal.html" />
     <Content Include="Partials\org\overview.html" />
     <Content Include="Partials\org\overview\comment-modal.html" />
