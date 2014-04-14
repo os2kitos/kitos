@@ -68,14 +68,14 @@
         local['update' + namePlural]();
     }
 
-    app.controller('globalConfig.OrgCtrl', ['$rootScope', '$scope', 'Restangular', 'growl', function($rootScope, $scope, Restangular, growl) {
+    app.controller('globalConfig.OrgCtrl', ['$rootScope', '$scope', 'Restangular', 'notify', function($rootScope, $scope, Restangular, notify) {
         $rootScope.page.title = 'Global konfiguration';
         $rootScope.page.subnav = subnav;
 
         handler($scope, Restangular, 'OrganizationRole', 'OrganizationRoles');
     }]);
 
-    app.controller('globalConfig.ProjectCtrl', ['$rootScope', '$scope', 'Restangular', 'growl', function ($rootScope, $scope, Restangular, growl) {
+    app.controller('globalConfig.ProjectCtrl', ['$rootScope', '$scope', 'Restangular', 'notify', function ($rootScope, $scope, Restangular, notify) {
         $rootScope.page.title = 'Global konfiguration';
         $rootScope.page.subnav = subnav;
         
@@ -112,7 +112,7 @@
         handler($scope, Restangular, 'ItProjectRole', 'ItProjectRoles');
     }]);
 
-    app.controller('globalConfig.SystemCtrl', ['$rootScope', '$scope', 'Restangular', 'growl', function($rootScope, $scope, Restangular, growl) {
+    app.controller('globalConfig.SystemCtrl', ['$rootScope', '$scope', 'Restangular', 'notify', function($rootScope, $scope, Restangular, notify) {
         $rootScope.page.title = 'Global konfiguration';
         $rootScope.page.subnav = subnav;
         
@@ -135,7 +135,7 @@
         handler($scope, Restangular, 'Environment', 'Environments');
     }]);
 
-    app.controller('globalConfig.ContractCtrl', ['$rootScope', '$scope', 'Restangular', 'growl', function ($rootScope, $scope, Restangular, growl) {
+    app.controller('globalConfig.ContractCtrl', ['$rootScope', '$scope', 'Restangular', 'notify', function ($rootScope, $scope, Restangular, notify) {
         $rootScope.page.title = 'Global konfiguration';
         $rootScope.page.subnav = subnav;
 

@@ -28,7 +28,7 @@
 
     }]);
     
-    app.controller('globalAdmin.NewOrganizationCtrl', ['$rootScope', '$scope', '$http', 'growl', function ($rootScope, $scope, $http, growl) {
+    app.controller('globalAdmin.NewOrganizationCtrl', ['$rootScope', '$scope', '$http', 'notify', function ($rootScope, $scope, $http, notify) {
         $rootScope.page.title = 'Ny organisation';
         $rootScope.page.subnav = subnav;
 
@@ -38,16 +38,16 @@
             var data = { "name": $scope.name };
             
             $http.post('api/organization', data).success(function (result) {
-                growl.addSuccessMessage("Organisationen " + $scope.name + " er blevet oprettet!");
+                notify.addSuccessMessage("Organisationen " + $scope.name + " er blevet oprettet!");
 
                 $scope.name = "";
             }).error(function (result) {
-                growl.addErrorMessage("Organisationen " + $scope.name + " kunne ikke oprettes!");
+                notify.addErrorMessage("Organisationen " + $scope.name + " kunne ikke oprettes!");
             });
         };
     }]);
 
-    app.controller('globalAdmin.NewLocalAdminCtrl', ['$rootScope', '$scope', '$http', 'growl', function ($rootScope, $scope, $http, growl) {
+    app.controller('globalAdmin.NewLocalAdminCtrl', ['$rootScope', '$scope', '$http', 'notify', function ($rootScope, $scope, $http, notify) {
         $rootScope.page.title = 'Ny lokal admin';
         $rootScope.page.subnav = subnav;
 
@@ -68,18 +68,18 @@
             };
 
             $http.post('api/localadmin', data).success(function (result) {
-                growl.addSuccessMessage(selectedUser.text + " er blevet lokal admin!");
+                notify.addSuccessMessage(selectedUser.text + " er blevet lokal admin!");
 
                 $scope.selectedUser = null;
                 $scope.organization = ""; 
                 
             }).error(function (result) {
-                growl.addErrorMessage("Fejl! " + selectedUser.text + " blev ikke lokal admin!");
+                notify.addErrorMessage("Fejl! " + selectedUser.text + " blev ikke lokal admin!");
             });
         };
     }]);
 
-    app.controller('globalAdmin.NewGlobalAdminCtrl', ['$rootScope', '$scope', '$http', 'growl', function ($rootScope, $scope, $http, growl) {
+    app.controller('globalAdmin.NewGlobalAdminCtrl', ['$rootScope', '$scope', '$http', 'notify', function ($rootScope, $scope, $http, notify) {
         $rootScope.page.title = 'Ny global admin';
         $rootScope.page.subnav = subnav;
 
@@ -93,12 +93,12 @@
             };
 
             $http.post('api/globaladmin', data).success(function (result) {
-                growl.addSuccessMessage(selectedUser.text + " er blevet global admin!");
+                notify.addSuccessMessage(selectedUser.text + " er blevet global admin!");
 
                 $scope.selectedUser = null;
 
             }).error(function (result) {
-                growl.addErrorMessage("Fejl! " + selectedUser.text + " blev ikke global admin!");
+                notify.addErrorMessage("Fejl! " + selectedUser.text + " blev ikke global admin!");
             });
         };
     }]);

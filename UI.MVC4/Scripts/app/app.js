@@ -1,19 +1,21 @@
-﻿var app = angular.module('app', ['ui.router', 'ui.bootstrap', 'ui.select2', 'ngAnimate', 'angular-growl', 'xeditable', 'restangular', 'ui.utils']);
+﻿var app = angular.module('app', ['ui.router', 'ui.bootstrap', 'ui.select2', 'ngAnimate', 'notify', 'xeditable', 'restangular', 'ui.utils']);
 
 app.config(['$urlRouterProvider', function ($urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
 }]);
 
-app.config(['growlProvider', 'RestangularProvider', function (growlProvider, RestangularProvider) {
-    growlProvider.globalTimeToLive(5000);
-    growlProvider.onlyUniqueMessages(false);
+app.config(['$httpProvider', 'notifyProvider', 'RestangularProvider', function ($httpProvider, notifyProvider, restangularProvider) {
+    $httpProvider.interceptors.push("httpBusyInterceptor");
+
+    notifyProvider.globalTimeToLive(5000);
+    notifyProvider.onlyUniqueMessages(false);
     
     //Restangular config
-    RestangularProvider.setBaseUrl('/api');
-    RestangularProvider.setRestangularFields({
+    restangularProvider.setBaseUrl('/api');
+    restangularProvider.setRestangularFields({
         id: 'id'
     });
-    RestangularProvider.setResponseExtractor(function (response, operation) {
+    restangularProvider.setResponseExtractor(function (response, operation) {
         return response.response;
     });
 }]);

@@ -37,14 +37,15 @@
                     var modal = $modal.open({
                         backdrop: "static", //modal can't be closed by clicking outside modal
                         templateUrl: 'partials/directives/add-user-modal.html',
-                        controller: ['$scope', 'growl', '$modalInstance', function($scope, growl, $modalInstance) {
+                        controller: ['$scope', 'notify', '$modalInstance', function($scope, notify, $modalInstance) {
 
                             $scope.newUser = {};
 
                             $scope.addUser = function () {
 
-                                if ($scope.newUser.email != $scope.newUser.repeatEmail)
-                                    growl.addErrorMessage("Email addresserne er ikke overens.");
+                                if ($scope.newUser.email != $scope.newUser.repeatEmail) {
+                                    notify.addErrorMessage("Email addresserne er ikke ens.");
+                                }
 
                                 if ($scope.newUser.form.$invalid) return;
 
@@ -56,20 +57,14 @@
                                     "email": email
                                 };
 
-                                $scope.newUser.submitting = true;
+                                var msg = notify.addInfoMessage("Arbejder ...", false);
 
-                                growl.addInfoMessage("Arbejder...");
-                                waitCursor();
-
-                                $http.post("api/user", data).success(function(result) {
-                                    growl.addSuccessMessage(name + " er oprettet i KITOS");
+                                $http.post("api/user", data, { handleBusy: true }).success(function(result) {
+                                    msg.toSuccessMessage(name + " er oprettet i KITOS");
 
                                     $modalInstance.close(result.response);
                                 }).error(function(result) {
-                                    $scope.newUser.submitting = false;
-                                    growl.addErrorMessage("Fejl! " + name + " blev ikke oprettet i KITOS!");
-                                }).finally(function() {
-                                    normalCursor();
+                                    msg.toErrorMessage("Fejl! " + name + " blev ikke oprettet i KITOS!");
                                 });
                             };
 
@@ -192,5 +187,17 @@
             return (input || []).join(delimiter || ',');
         };
     });
+
+    app.directive('disabledOnBusy', [function() {
+        return function(scope, elem, attr) {
+            scope.$on('httpBusy', function (e) {
+                elem[0].disabled = true;
+            });
+
+            scope.$on('httpUnbusy', function(e) {
+                elem[0].disabled = false;
+            });
+        };
+    }]);
 
 })(angular, app);
