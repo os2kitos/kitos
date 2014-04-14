@@ -1,4 +1,4 @@
-﻿<div data-ng-hide="createNew">
+﻿<div data-ng-if="!createNew">
     <div class="modal-header">
         <h3>Rediger {{ orgUnit.oldName }}</h3>
     </div>
@@ -10,7 +10,7 @@
                           Overordnet enhed
                       </label>
                       <div class="col-md-8">
-                          <select type="text" data-ui-select2="" name="parent" data-ng-model="orgUnit.newParent" class="form-control" data-placeholder="Vælg overordnet" data-ng-required="true" data-ng-disabled="!canChangeParent">
+                          <select type="text" data-ui-select2="" name="parent" data-ng-model="orgUnit.newParent" class="form-control" data-placeholder="Vælg overordnet" data-ng-required="true" data-ng-disabled="!canChangeParent" tabindex="1">
                               <option></option>
                               <option data-ng-repeat="unit in orgUnits" value="{{unit.id}}">{{unit.name}}</option>
                           </select>
@@ -30,33 +30,33 @@
                     Enhedens navn
                 </label>
                 <div class="col-md-8">
-                    <input type="text" name="name" data-ng-model="orgUnit.newName" class="form-control" data-ng-required="true" />
+                    <input type="text" name="name" data-ng-model="orgUnit.newName" class="form-control" data-ng-required="true" tabindex="2" data-autofocus=""/>
                 </div>
             </div>
             
         </form>
 
-        <button class="btn btn-primary btn-sm pull-left" data-ng-click="new()" data-ng-disabled="submitting" >
+        <button class="btn btn-primary btn-sm pull-left" data-ng-click="new()" data-ng-disabled="submitting" tabindex="5">
             <i class="glyphicon glyphicon-plus"></i> 
             Opret ny underenhed
         </button>
         <button class="btn btn-danger btn-sm pull-right"
             data-ng-disabled="submitting" 
             data-confirmed-click="delete()"
-            data-confirm-click="Er du sikker på at du vil slette denne enhed? Dette vil også slette alle underenheder!" data-ng-hide="orgUnit.isRoot">
+            data-confirm-click="Er du sikker på at du vil slette denne enhed? Dette vil også slette alle underenheder!" data-ng-hide="orgUnit.isRoot" tabindex="6">
             <i class="glyphicon glyphicon-trash"></i> 
             Slet enhed
         </button>
     </div>
 
     <div class="modal-footer text-center">
-        <button class="btn btn-primary" data-ng-disabled="submitting" data-ng-click="patch()">Gem</button>
-        <button class="btn btn-warning" data-ng-disabled="submitting" data-ng-click="cancel()">Annuller</button>
+        <button class="btn btn-primary" data-ng-disabled="submitting" data-ng-click="patch()" tabindex="3">Gem</button>
+        <button class="btn btn-warning" data-ng-disabled="submitting" data-ng-click="cancel()" tabindex="4">Annuller</button>
     </div>
 </div>
 
 <!-- create new -->
-<div data-ng-show="createNew">
+<div data-ng-if="createNew">
     <div class="modal-header">
         <h3>Ny underenhed</h3>
     </div>
@@ -76,14 +76,14 @@
                     Enhedens navn
                 </label>
                 <div class="col-md-8">
-                    <input type="text" name="name" data-ng-model="newOrgUnit.name" class="form-control" data-ng-required="true" />
+                    <input type="text" name="name" data-ng-model="newOrgUnit.name" class="form-control" data-ng-required="true" tabindex="1" data-autofocus=""/>
                 </div>
             </div>
         </form>
     </div>
 
     <div class="modal-footer">
-        <button class="btn btn-primary" data-ng-disabled="submitting" data-ng-click="post()">Opret underenhed</button>
-        <button class="btn btn-warning" data-ng-click="cancel()">Annuller</button>
+        <button class="btn btn-primary" data-ng-disabled="submitting" data-ng-click="post()" tabindex="2">Opret underenhed</button>
+        <button class="btn btn-warning" data-ng-disabled="submitting" data-ng-click="cancel()" tabindex="3">Annuller</button>
     </div>
 </div>
