@@ -81,14 +81,21 @@
 
             var data = { "email": $scope.email };
 
+            $scope.submitting = true;
+
+            growl.addInfoMessage("Sender email...");
+
             $scope.requestSuccess = $scope.requestFailure = false;
             
             $http.post('api/passwordresetrequest', data).success(function(result) {
                 growl.addSuccessMessage("En email er blevet sent til " + $scope.email);
                 $scope.email = '';
 
+                $scope.submitting = false;
+
             }).error(function (result) {
                 growl.addErrorMessage("Emailadressen kunne ikke findes i systemet!");
+                $scope.submitting = false;
             });
         };
     }]);
