@@ -1,12 +1,12 @@
-angular.module("angular-growl").provider("growl", function() {
+angular.module("notify").provider("notify", function() {
 	"use strict";
 
-	var _ttl = null,
+    var _ttl = null,
         _enableHtml = false,
-		_messagesKey = 'messages',
-		_messageTextKey = 'text',
-		_messageSeverityKey = 'severity',
-		_onlyUniqueMessages = true;
+        _messagesKey = 'messages',
+        _messageTextKey = 'text',
+        _messageSeverityKey = 'severity',
+        _onlyUniqueMessages = true;
 
 	/**
 	 * set a global timeout (time to live) after which messages will be automatically closed
@@ -63,10 +63,10 @@ angular.module("angular-growl").provider("growl", function() {
 	 * via $httpProvider.responseInterceptors.push(...)
 	 *
 	 */
-	this.serverMessagesInterceptor = ['$q', 'growl', function ($q, growl) {
+	this.serverMessagesInterceptor = ['$q', 'notify', function ($q, notify) {
 		function checkResponse(response) {
 			if (response.data[_messagesKey] && response.data[_messagesKey].length > 0) {
-				growl.addServerMessages(response.data[_messagesKey]);
+				notify.addServerMessages(response.data[_messagesKey]);
 			}
 		}
 
@@ -85,7 +85,7 @@ angular.module("angular-growl").provider("growl", function() {
 		};
 	}];
 
-	this.$get = ["$rootScope", "$filter", function ($rootScope, $filter) {
+	this.$get = ["$rootScope", "$filter", '$timeout', function ($rootScope, $filter, $timeout) {
 		var translate;
 
 		try {
@@ -93,25 +93,80 @@ angular.module("angular-growl").provider("growl", function() {
 		} catch (e) {
 			//
 		}
+	    
+		function closeMessage(message) {
+		    message.closed = true;
+            $rootScope.$broadcast("notifyDeleteMessage", message);
+        }
 
-		function broadcastMessage(message) {
+        function setMessageTimeout(message) {
+            if (message.ttl && message.ttl !== -1) {
+
+                if (message.timeout) {
+                    $timeout.cancel(message.timeout);
+                    delete message.timeout;
+                }
+                
+                message.timeout = $timeout(function () {
+                    closeMessage(message);
+                }, message.ttl);
+            }
+        }
+	    
+        function broadcastMessage(message) {
+            message.closed = false;
 			if (translate) {
 				message.text = translate(message.text);
 			}
-			$rootScope.$broadcast("growlMessage", message);
+		    
+			$rootScope.$broadcast("notifyNewMessage", message);
+		    setMessageTimeout(message);
 		}
+	    
+		function addMessage(text, config, severity) {
 
-		function sendMessage(text, config, severity) {
-			var _config = config || {}, message;
+		    var cfg = config || {};
 
-			message = {
+		    var message = {
 				text: text,
 				severity: severity,
-				ttl: _config.ttl || _ttl,
-				enableHtml: _config.enableHtml || _enableHtml
-			};
+				ttl: cfg.ttl || _ttl,
+				enableHtml: cfg.enableHtml || _enableHtml,
+				config: cfg,
+				
+				update: function(newText, newSeverity) {
+				    this.text = newText;
+				    this.severity = newSeverity;
+				    
+				    if (message.closed) {
+				        broadcastMessage(message);
+                    }
 
-			broadcastMessage(message);
+				    setMessageTimeout(message);
+				},
+				
+				toWarnMessage: function(newText) {
+				    this.update(newText, "warn");
+				},
+				toErrorMessage: function(newText) {
+				    this.update(newText, "error");
+				},
+				toInfoMessage: function(newText) {
+				    this.update(newText, "info");
+				},
+				toSuccessMessage: function(newText) {
+				    this.update(newText, "success");
+				},
+				
+				
+                close: function() {
+                    closeMessage(this);
+                }
+		    };
+
+		    broadcastMessage(message);
+
+		    return message;
 		}
 
 		/**
@@ -121,7 +176,7 @@ angular.module("angular-growl").provider("growl", function() {
 		 * @param {{ttl: number}} config
 		 */
 		function addWarnMessage(text, config) {
-			sendMessage(text, config, "warn");
+			return addMessage(text, config, "warn");
 		}
 
 		/**
@@ -131,7 +186,7 @@ angular.module("angular-growl").provider("growl", function() {
 		 * @param {{ttl: number}} config
 		 */
 		function addErrorMessage(text, config) {
-			sendMessage(text, config, "error");
+			return addMessage(text, config, "error");
 		}
 
 		/**
@@ -141,7 +196,7 @@ angular.module("angular-growl").provider("growl", function() {
 		 * @param {{ttl: number}} config
 		 */
 		function addInfoMessage(text, config) {
-			sendMessage(text, config, "info");
+			return addMessage(text, config, "info");
 		}
 
 		/**
@@ -151,7 +206,7 @@ angular.module("angular-growl").provider("growl", function() {
 		 * @param {{ttl: number}} config
 		 */
 		function addSuccessMessage(text, config) {
-			sendMessage(text, config, "success");
+			return addMessage(text, config, "success");
 		}
 
 		/**
@@ -180,7 +235,7 @@ angular.module("angular-growl").provider("growl", function() {
 							severity = "error";
 							break;
 					}
-					sendMessage(message[_messageTextKey], undefined, severity);
+					addMessage(message[_messageTextKey], undefined, severity);
 				}
 			}
 		}

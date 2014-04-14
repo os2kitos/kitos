@@ -41,7 +41,7 @@ namespace UI.MVC4
                 "~/Scripts/ui-bootstrap-tpls-{version}.js",
                 "~/Scripts/ui-select2.js",
                 "~/Scripts/restangular.js",
-                "~/Scripts/angular-growl/*.js",
+                "~/Scripts/notify/*.js",
                 "~/Scripts/xeditable.js",
                 "~/Scripts/angular-ui-util/ui-utils.js"));
 
@@ -53,7 +53,7 @@ namespace UI.MVC4
             bundles.Add(new StyleBundle("~/Content/css").Include(
                 "~/Content/bootstrap-cosmo.*",
                 "~/Content/carousel.css",
-                "~/Content/angular-growl/growl.css",
+                "~/Content/notify/notify.css",
                 "~/Content/css/select2.css",
                 "~/Content/css/bootstrap-wysihtml5.css",
                 "~/Content/select2-bootstrap.css",

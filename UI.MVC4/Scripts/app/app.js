@@ -1,14 +1,14 @@
-﻿var app = angular.module('app', ['ui.router', 'ui.bootstrap', 'ui.select2', 'ngAnimate', 'angular-growl', 'xeditable', 'restangular', 'ui.utils']);
+﻿var app = angular.module('app', ['ui.router', 'ui.bootstrap', 'ui.select2', 'ngAnimate', 'notify', 'xeditable', 'restangular', 'ui.utils']);
 
 app.config(['$urlRouterProvider', function ($urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
 }]);
 
-app.config(['$httpProvider', 'growlProvider', 'RestangularProvider', function ($httpProvider, growlProvider, restangularProvider) {
+app.config(['$httpProvider', 'notifyProvider', 'RestangularProvider', function ($httpProvider, notifyProvider, restangularProvider) {
     $httpProvider.interceptors.push("httpBusyInterceptor");
 
-    growlProvider.globalTimeToLive(5000);
-    growlProvider.onlyUniqueMessages(false);
+    notifyProvider.globalTimeToLive(5000);
+    notifyProvider.onlyUniqueMessages(false);
     
     //Restangular config
     restangularProvider.setBaseUrl('/api');
