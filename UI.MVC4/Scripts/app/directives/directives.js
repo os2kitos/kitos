@@ -57,10 +57,7 @@
                                     "email": email
                                 };
 
-                                //$scope.newUser.submitting = true;
-
                                 var msg = notify.addInfoMessage("Arbejder ...", false);
-                                //waitCursor();
 
                                 $http.post("api/user", data, { handleBusy: true }).success(function(result) {
                                     msg.toSuccessMessage(name + " er oprettet i KITOS");
@@ -192,7 +189,7 @@
         };
     });
 
-    app.directive('disabledOnBusy', ['$timeout', function() {
+    app.directive('disabledOnBusy', [function() {
         return function(scope, elem, attr) {
             scope.$on('httpBusy', function (e) {
                 elem[0].disabled = true;
