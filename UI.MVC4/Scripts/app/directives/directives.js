@@ -64,7 +64,6 @@
 
                                     $modalInstance.close(result.response);
                                 }).error(function(result) {
-                                    $scope.newUser.submitting = false;
                                     msg.toErrorMessage("Fejl! " + name + " blev ikke oprettet i KITOS!");
                                 });
                             };

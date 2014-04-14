@@ -26,7 +26,7 @@
                     if (cfg.method !== 'GET') {
                         if (cfg.handleBusy) {
                             if (isBusy) {
-                                qConfig.reject("Busy");
+                                return $q.reject("BUSY");
                             } else {
                                 makeBusy();
                             }
