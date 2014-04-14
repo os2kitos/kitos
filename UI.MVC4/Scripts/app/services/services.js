@@ -2,9 +2,7 @@
     app.factory("httpBusyInterceptor", ['$q', '$rootScope', function ($q, $rootScope) {
         var isBusy = false;
         
-        function makeBusy(msg) {
-            msg = msg || "Arbejder...";
-
+        function makeBusy() {
             isBusy = true;
             waitCursor();
 
@@ -30,7 +28,7 @@
                             if (isBusy) {
                                 qConfig.reject("Busy");
                             } else {
-                                makeBusy(cfg.handleBusyMsg);
+                                makeBusy();
                             }
                         }
                     }
