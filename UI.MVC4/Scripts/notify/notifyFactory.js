@@ -1,8 +1,8 @@
 angular.module("notify").provider("notify", function() {
 	"use strict";
 
-    var _ttl = null,
-        _enableHtml = false,
+    var _ttl = 5000,
+        _autoclose = true,
         _messagesKey = 'messages',
         _messageTextKey = 'text',
         _messageSeverityKey = 'severity',
@@ -11,81 +11,17 @@ angular.module("notify").provider("notify", function() {
 	/**
 	 * set a global timeout (time to live) after which messages will be automatically closed
 	 *
-	 * @param ttl in seconds
+	 * @param ttl in millisseconds
 	 */
 	this.globalTimeToLive = function(ttl) {
 		_ttl = ttl;
-	};
-
-	/**
-	 * set whether HTML in message content should be escaped (default) or binded as-is
-	 *
-	 * @param {bool} enableHtml true to make all messages not escapes
-	 */
-	this.globalEnableHtml = function(enableHtml) {
-		_enableHtml = enableHtml;
-	};
-
-	/**
-	 * sets the key in $http response the serverMessagesInterecptor is looking for server-sent messages, value of key
-	 * needs to be an array of objects
-	 *
-	 * @param {string} messagesKey default: messages
-	 */
-	this.messagesKey = function(messagesKey) {
-		_messagesKey = messagesKey;
-	};
-
-	/**
-	 * sets the key in server sent messages the serverMessagesInterecptor is looking for text of message
-	 *
-	 * @param {string} messageTextKey default: text
-	 */
-	this.messageTextKey = function(messageTextKey) {
-		_messageTextKey = messageTextKey;
-	};
-
-	/**
-	 * sets the key in server sent messages the serverMessagesInterecptor is looking for severity of message
-	 *
-	 * @param {string} messageSeverityKey default: severity
-	 */
-	this.messageSeverityKey = function(messageSeverityKey) {
-		_messageSeverityKey = messageSeverityKey;
 	};
 
 	this.onlyUniqueMessages = function(onlyUniqueMessages) {
 		_onlyUniqueMessages = onlyUniqueMessages;
 	};
 
-	/**
-	 * $http interceptor that can be added to array of $http interceptors during config phase of application
-	 * via $httpProvider.responseInterceptors.push(...)
-	 *
-	 */
-	this.serverMessagesInterceptor = ['$q', 'notify', function ($q, notify) {
-		function checkResponse(response) {
-			if (response.data[_messagesKey] && response.data[_messagesKey].length > 0) {
-				notify.addServerMessages(response.data[_messagesKey]);
-			}
-		}
-
-		function success(response) {
-			checkResponse(response);
-			return response;
-		}
-
-		function error(response) {
-			checkResponse(response);
-			return $q.reject(response);
-		}
-
-		return function (promise) {
-			return promise.then(success, error);
-		};
-	}];
-
-	this.$get = ["$rootScope", "$filter", '$timeout', function ($rootScope, $filter, $timeout) {
+	this.$get = ["$rootScope", "$filter", '$timeout', '$sce', function ($rootScope, $filter, $timeout, $sce) {
 		var translate;
 
 		try {
@@ -95,12 +31,11 @@ angular.module("notify").provider("notify", function() {
 		}
 	    
 		function closeMessage(message) {
-		    message.closed = true;
             $rootScope.$broadcast("notifyDeleteMessage", message);
         }
 
         function setMessageTimeout(message) {
-            if (message.ttl && message.ttl !== -1) {
+            if (message.autoclose) {
 
                 if (message.timeout) {
                     $timeout.cancel(message.timeout);
@@ -109,55 +44,55 @@ angular.module("notify").provider("notify", function() {
                 
                 message.timeout = $timeout(function () {
                     closeMessage(message);
-                }, message.ttl);
+                }, _ttl);
             }
         }
 	    
         function broadcastMessage(message) {
-            message.closed = false;
 			if (translate) {
 				message.text = translate(message.text);
 			}
 		    
 			$rootScope.$broadcast("notifyNewMessage", message);
 		    setMessageTimeout(message);
-		}
+        }
 	    
-		function addMessage(text, config, severity) {
+        function addMessage(text, severity, autoclose) {
 
-		    var cfg = config || {};
-
+            if (typeof autoclose === 'undefined') autoclose = _autoclose;
+            
 		    var message = {
-				text: text,
+				text: $sce.trustAsHtml(text),
 				severity: severity,
-				ttl: cfg.ttl || _ttl,
-				enableHtml: cfg.enableHtml || _enableHtml,
-				config: cfg,
+				autoclose: autoclose,
 				
-				update: function(newText, newSeverity) {
-				    this.text = newText;
-				    this.severity = newSeverity;
+				update: function (text, severity, autoclose) {
+				    if (typeof autoclose === 'undefined') autoclose = _autoclose;
+				    
+				    this.text = $sce.trustAsHtml(text);
+				    this.severity = severity;
+				    this.autoclose = autoclose;
 				    
 				    if (message.closed) {
 				        broadcastMessage(message);
-                    }
-
-				    setMessageTimeout(message);
+				    } else {
+				        setMessageTimeout(message);
+				    }
+				    
 				},
 				
-				toWarnMessage: function(newText) {
-				    this.update(newText, "warn");
+				toWarnMessage: function(text, autoclose) {
+				    this.update(text, "warn", autoclose);
 				},
-				toErrorMessage: function(newText) {
-				    this.update(newText, "error");
+				toErrorMessage: function (text, autoclose) {
+				    this.update(text, "error", autoclose);
 				},
-				toInfoMessage: function(newText) {
-				    this.update(newText, "info");
+				toInfoMessage: function (text, autoclose) {
+				    this.update(text, "info", autoclose);
 				},
-				toSuccessMessage: function(newText) {
-				    this.update(newText, "success");
-				},
-				
+				toSuccessMessage: function (text, autoclose) {
+				    this.update(text, "success", autoclose);
+				},				
 				
                 close: function() {
                     closeMessage(this);
@@ -173,83 +108,51 @@ angular.module("notify").provider("notify", function() {
 		 * add one warn message with bootstrap class: alert
 		 *
 		 * @param {string} text
-		 * @param {{ttl: number}} config
-		 */
-		function addWarnMessage(text, config) {
-			return addMessage(text, config, "warn");
+		 * @param {boolean} autoclose
+         */
+		function addWarnMessage(text, autoclose) {
+			return addMessage(text, "warn", autoclose);
 		}
 
 		/**
 		 * add one error message with bootstrap classes: alert, alert-error
 		 *
 		 * @param {string} text
-		 * @param {{ttl: number}} config
+		 * @param {boolean} autoclose
 		 */
-		function addErrorMessage(text, config) {
-			return addMessage(text, config, "error");
+		function addErrorMessage(text, autoclose) {
+		    return addMessage(text, "error", autoclose);
 		}
 
 		/**
 		 * add one info message with bootstrap classes: alert, alert-info
 		 *
 		 * @param {string} text
-		 * @param {{ttl: number}} config
+		 * @param {boolean} autoclose
 		 */
-		function addInfoMessage(text, config) {
-			return addMessage(text, config, "info");
+		function addInfoMessage(text, autoclose) {
+		    return addMessage(text, "info", autoclose);
 		}
 
 		/**
 		 * add one success message with bootstrap classes: alert, alert-success
 		 *
 		 * @param {string} text
-		 * @param {{ttl: number}} config
+		 * @param {boolean} autoclose
 		 */
-		function addSuccessMessage(text, config) {
-			return addMessage(text, config, "success");
+		function addSuccessMessage(text, autoclose) {
+			return addMessage(text, "success", autoclose);
 		}
-
-		/**
-		 * add a indefinite number of messages that a backend server may have sent as a validation result
-		 *
-		 * @param {Array.<object>} messages
-		 */
-		function addServerMessages(messages) {
-			var i, message, severity, length;
-			length = messages.length;
-			for (i = 0; i < length; i++) {
-				message = messages[i];
-
-				if (message[_messageTextKey] && message[_messageSeverityKey]) {
-					switch (message[_messageSeverityKey]) {
-						case "warn":
-							severity = "warn";
-							break;
-						case "success":
-							severity = "success";
-							break;
-						case "info":
-							severity = "info";
-							break;
-						case "error":
-							severity = "error";
-							break;
-					}
-					addMessage(message[_messageTextKey], undefined, severity);
-				}
-			}
-		}
-
-		function onlyUnique() {
-			return _onlyUniqueMessages;
-		}
-
+	    
+        function onlyUnique() {
+            return _onlyUniqueMessages;
+        }
+        
 		return {
 			addWarnMessage: addWarnMessage,
 			addErrorMessage: addErrorMessage,
 			addInfoMessage: addInfoMessage,
 			addSuccessMessage: addSuccessMessage,
-			addServerMessages: addServerMessages,
 			onlyUnique: onlyUnique
 		};
 	}];

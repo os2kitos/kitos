@@ -59,7 +59,7 @@
 
                                 //$scope.newUser.submitting = true;
 
-                                var msg = notify.addInfoMessage("Arbejder...");
+                                var msg = notify.addInfoMessage("Arbejder ...", false);
                                 //waitCursor();
 
                                 $http.post("api/user", data, { handleBusy: true }).success(function(result) {
@@ -195,12 +195,10 @@
     app.directive('disabledOnBusy', ['$timeout', function() {
         return function(scope, elem, attr) {
             scope.$on('httpBusy', function (e) {
-                console.log(elem);
                 elem[0].disabled = true;
             });
 
             scope.$on('httpUnbusy', function(e) {
-                //elem[0].prop('disabled', false);
                 elem[0].disabled = false;
             });
         };

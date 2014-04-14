@@ -6,20 +6,19 @@ angular.module("notify").directive("notify", ["$rootScope", function ($rootScope
 		template:   '<div class="notify">' +
 					'	<div class="notify-item alert" ng-repeat="message in messages" ng-class="computeClasses(message)">' +
 					'		<button type="button" class="close" ng-click="deleteMessage(message)">&times;</button>' +
-					'       <div ng-switch="message.enableHtml">' +
-					'           <div ng-switch-when="true" ng-bind-html="message.text"></div>' +
-					'           <div ng-switch-default ng-bind="message.text"></div>' +
-					'       </div>' +
+					'       <div ng-bind-html="message.text"></div>' +
 					'	</div>' +
 					'</div>',
 		replace: false,
 		scope: true,
-		controller: ['$scope', '$timeout', 'notify', function ($scope, $timeout, notify) {
+		controller: ['$scope', '$sce', '$timeout', 'notify', function ($scope, $sce, $timeout, notify) {
 			var onlyUnique = notify.onlyUnique();
 
 			$scope.messages = [];
+		    
+            function addMessage(message) {
+			    message.closed = false;
 
-			function addMessage(message) {
 				$scope.messages.push(message);
 			}
 
@@ -40,13 +39,14 @@ angular.module("notify").directive("notify", ["$rootScope", function ($rootScope
 				}
 			});
 
-		    $rootScope.$on("notifyDeleteMessage", function(event, message) {
+			$rootScope.$on("notifyDeleteMessage", function (event, message) {
 		        $scope.deleteMessage(message);
 		    });
 
 			$scope.deleteMessage = function (message) {
 				var index = $scope.messages.indexOf(message);
 				if (index > -1) {
+			        message.closed = true;
 					$scope.messages.splice(index, 1);
 				}
 
