@@ -177,27 +177,28 @@
         };
     }]);
     
-    /* http://stackoverflow.com/questions/14833326/how-to-set-focus-in-angularjs */
-    app.directive('focusOn', ['$timeout', function ($timeout) {
-        return function (scope, elem, attr) {
-            scope.$on('focusOn', function (e, name) {
-                if (name === attr.focusOn) {
-                    $timeout(function() {
-                        elem[0].focus();
-                    });
-                }
-            });
-        };
-    }]);
+    //// http://stackoverflow.com/questions/14833326/how-to-set-focus-in-angularjs
+    //// use autofocus instead
+    //app.directive('focusOn', ['$timeout', function ($timeout) {
+    //    return function (scope, elem, attr) {
+    //        scope.$on('focusOn', function (e, name) {
+    //            if (name === attr.focusOn) {
+    //                $timeout(function() {
+    //                    elem[0].focus();
+    //                });
+    //            }
+    //        });
+    //    };
+    //}]);
 
-    /* http://stackoverflow.com/questions/14833326/how-to-set-focus-in-angularjs */
-    app.factory('focus', function ($rootScope, $timeout) {
-        return function(name) {
-            $timeout(function() {
-                $rootScope.$broadcast('focusOn', name);
-            });
-        };
-    });
+    //// http://stackoverflow.com/questions/14833326/how-to-set-focus-in-angularjs
+    //app.factory('focus', function ($rootScope, $timeout) {
+    //    return function(name) {
+    //        $timeout(function() {
+    //            $rootScope.$broadcast('focusOn', name);
+    //        });
+    //    };
+    //});
 
 
     app.directive('autofocus', ['$timeout', function($timeout) {

@@ -3,7 +3,7 @@
     var subnav = [
             { state: 'org-overview', text: 'Overblik' },
             { state: 'org-view', text: 'Organisation' },
-            { state: '', text: 'Rapport' }
+            { state: 'index', text: 'Rapport' }
     ];
 
     function indent(level) {
