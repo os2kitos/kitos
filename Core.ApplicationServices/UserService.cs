@@ -45,8 +45,11 @@ namespace Core.ApplicationServices
             user.Password = _cryptoService.Encrypt(DateTime.Now + user.Salt);
 #endif
             user = _userRepository.Insert(user);
-            IssuePasswordReset(user);
 
+            IssuePasswordReset(user);
+            
+            _userRepository.Save();
+            
             return user;
         }
 
@@ -56,14 +59,7 @@ namespace Core.ApplicationServices
                 throw new ArgumentNullException("user");
 
             var now = DateTime.Now;
-
             var hash = _cryptoService.Encrypt(now + user.Email);
-
-            var request = new PasswordResetRequest {Id = hash, Time = now, UserId = user.Id};
-
-            _passwordResetRequestRepository.Insert(request);
-            _passwordResetRequestRepository.Save();
-
             var resetLink = "http://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(hash);
 
             const string mailSubject = "Nulstilning af dit KITOS password";
@@ -81,6 +77,12 @@ namespace Core.ApplicationServices
             message.To.Add(user.Email);
 
             _mailClient.Send(message);
+
+
+            var request = new PasswordResetRequest {Id = hash, Time = now, UserId = user.Id};
+
+            _passwordResetRequestRepository.Insert(request);
+            _passwordResetRequestRepository.Save();
 
             return request;
         }

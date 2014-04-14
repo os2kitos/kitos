@@ -398,3 +398,7 @@ a.select-status:hover .status-arrow-down {
 .task-table .row {
     padding: 3px 0px;
 }
+
+body.wait, body.wait * {
+    cursor: wait !important;
+}
