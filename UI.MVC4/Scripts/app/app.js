@@ -4,16 +4,18 @@ app.config(['$urlRouterProvider', function ($urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
 }]);
 
-app.config(['growlProvider', 'RestangularProvider', function (growlProvider, RestangularProvider) {
+app.config(['$httpProvider', 'growlProvider', 'RestangularProvider', function ($httpProvider, growlProvider, restangularProvider) {
+    $httpProvider.interceptors.push("httpBusyInterceptor");
+
     growlProvider.globalTimeToLive(5000);
     growlProvider.onlyUniqueMessages(false);
     
     //Restangular config
-    RestangularProvider.setBaseUrl('/api');
-    RestangularProvider.setRestangularFields({
+    restangularProvider.setBaseUrl('/api');
+    restangularProvider.setRestangularFields({
         id: 'id'
     });
-    RestangularProvider.setResponseExtractor(function (response, operation) {
+    restangularProvider.setResponseExtractor(function (response, operation) {
         return response.response;
     });
 }]);

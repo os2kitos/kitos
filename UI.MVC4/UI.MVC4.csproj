@@ -444,6 +444,7 @@
     <Content Include="Scripts\app\directives\directives.js" />
     <Content Include="Scripts\app\directives\form-validation.js" />
     <Content Include="Scripts\app\app.js" />
+    <Content Include="Scripts\app\services\services.js" />
     <Content Include="Scripts\bootstrap3-wysihtml5.js" />
     <Content Include="Scripts\errors.json" />
     <Content Include="Scripts\angular-touch.min.js.map" />
