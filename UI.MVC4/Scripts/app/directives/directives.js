@@ -35,12 +35,16 @@
 
                 scope.open = function() {
                     var modal = $modal.open({
+                        backdrop: "static", //modal can't be closed by clicking outside modal
                         templateUrl: 'partials/directives/add-user-modal.html',
                         controller: ['$scope', 'growl', '$modalInstance', function($scope, growl, $modalInstance) {
 
                             $scope.newUser = {};
 
-                            $scope.addUser = function() {
+                            $scope.addUser = function () {
+
+                                if ($scope.newUser.email != $scope.newUser.repeatEmail)
+                                    growl.addErrorMessage("Email addresserne er ikke overens.");
 
                                 if ($scope.newUser.form.$invalid) return;
 
@@ -54,6 +58,9 @@
 
                                 $scope.newUser.submitting = true;
 
+                                growl.addInfoMessage("Arbejder...");
+                                waitCursor();
+
                                 $http.post("api/user", data).success(function(result) {
                                     growl.addSuccessMessage(name + " er oprettet i KITOS");
 
@@ -61,6 +68,8 @@
                                 }).error(function(result) {
                                     $scope.newUser.submitting = false;
                                     growl.addErrorMessage("Fejl! " + name + " blev ikke oprettet i KITOS!");
+                                }).finally(function() {
+                                    normalCursor();
                                 });
                             };
 
