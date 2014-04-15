@@ -298,13 +298,14 @@
     <Compile Include="Models\TaskUsageDTO.cs" />
     <Compile Include="Models\TaskRefDTO.cs" />
     <Compile Include="Models\UserDTO.cs" />
+    <Compile Include="Models\UserProfileDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\angular-growl\growl.css" />
     <Content Include="Content\bootstrap-cosmo.css" />
     <Content Include="Content\bootstrap3-wysihtml5\bootstrap3-wysihtml5.css" />
     <Content Include="Content\carousel.css" />
+    <Content Include="Content\notify\notify.css" />
     <Content Include="Content\css\select2-spinner.gif" />
     <Content Include="Content\css\select2.css" />
     <Content Include="Content\css\select2.png" />
@@ -408,6 +409,7 @@
     <Content Include="Partials\org\overview\task-usage.html" />
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />
+    <Content Include="Partials\topnav\profileModal.html" />
     <Content Include="Partials\topnav\unauthorized.html" />
     <Content Include="Partials\topnav\topnav.html" />
     <Content Include="Scripts\angular-animate.js" />
@@ -415,9 +417,6 @@
     <Content Include="Scripts\angular-cookies.js" />
     <Content Include="Scripts\angular-cookies.min.js" />
     <Content Include="Scripts\angular-csp.css" />
-    <Content Include="Scripts\angular-growl\growl.js" />
-    <Content Include="Scripts\angular-growl\growlDirective.js" />
-    <Content Include="Scripts\angular-growl\growlFactory.js" />
     <Content Include="Scripts\angular-loader.js" />
     <Content Include="Scripts\angular-loader.min.js" />
     <Content Include="Scripts\angular-mocks.js" />
@@ -444,6 +443,8 @@
     <Content Include="Scripts\app\directives\directives.js" />
     <Content Include="Scripts\app\directives\form-validation.js" />
     <Content Include="Scripts\app\app.js" />
+    <Content Include="Scripts\app\utility\utility.js" />
+    <Content Include="Scripts\app\services\services.js" />
     <Content Include="Scripts\bootstrap3-wysihtml5.js" />
     <Content Include="Scripts\errors.json" />
     <Content Include="Scripts\angular-touch.min.js.map" />
@@ -713,6 +714,9 @@
     <Content Include="Scripts\lodash.js" />
     <Content Include="Scripts\lodash.min.js" />
     <Content Include="Scripts\form.control.js" />
+    <Content Include="Scripts\notify\notify.js" />
+    <Content Include="Scripts\notify\notifyDirective.js" />
+    <Content Include="Scripts\notify\notifyFactory.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ar.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_bg.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ca.js" />

@@ -1,4 +1,4 @@
-﻿<div data-ng-hide="createNew">
+﻿<div data-ng-if="!createNew">
     <div class="modal-header">
         <h3>Rediger {{ orgUnit.oldName }}</h3>
     </div>
@@ -6,70 +6,63 @@
         <h4>Rediger info</h4>
         <form name="editForm" novalidate="novalidate" class="form-horizontal">
             <div class="form-group">
+                      <label for="parent" class="col-md-3 control-label">
+                          Overordnet enhed
+                      </label>
+                      <div class="col-md-8">
+                          <select type="text" data-ui-select2="" name="parent" data-ng-model="orgUnit.newParent" class="form-control" data-placeholder="Vælg overordnet" data-ng-required="true" data-ng-disabled="!canChangeParent" tabindex="1">
+                              <option></option>
+                              <option data-ng-repeat="unit in orgUnits" value="{{unit.id}}">{{unit.name}}</option>
+                          </select>
+                      </div>
+                      <div class="col-md-8 col-md-offset-3">
+                          <p class="help-block" data-ng-show="canChangeParent">
+                              Der kan kun vælges blandt de organisationsenheder som er indenfor samme organisation, og som ikke er en underenhed til {{orgUnit.oldName}}.
+                          </p>
+                          <p class="help-block" data-ng-hide="canChangeParent">
+                              Du kan ikke ændre {{ orgUnit.oldName + 's' }} overordnet organisationsenhed.  
+                              <span data-ng-show="!isAdmin">Kontakt en lokal administrator.</span>
+                          </p>
+                      </div>
+                  </div>
+            <div class="form-group">
                 <label for="name" class="col-md-3 control-label">
                     Enhedens navn
                 </label>
                 <div class="col-md-8">
-                    <input type="text" name="name" data-ng-model="orgUnit.newName" class="form-control" data-ng-required="true" />
+                    <input type="text" name="name" data-ng-model="orgUnit.newName" class="form-control" data-ng-required="true" tabindex="2" data-autofocus=""/>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="parent" class="col-md-3 control-label">
-                    Overordnet enhed
-                </label>
-                <div class="col-md-8">
-                    <select type="text" data-ui-select2="" name="parent" data-ng-model="orgUnit.newParent" class="form-control" data-placeholder="Vælg overordnet" data-ng-required="true" data-ng-disabled="!canChangeParent">
-                        <option></option>
-                        <option data-ng-repeat="unit in orgUnits" value="{{unit.id}}">{{unit.name}}</option>
-                    </select>
-                </div>
-                <div class="col-md-8 col-md-offset-3">
-                    <p class="help-block" data-ng-show="canChangeParent">
-                        Der kan kun vælges blandt de organisationsenheder som er indenfor samme organisation, og som ikke er en underafdeling til {{orgUnit.oldName}}.
-                    </p>
-                    <p class="help-block" data-ng-hide="canChangeParent">
-                        Du kan ikke ændre {{ orgUnit.oldName + 's' }} overordnet organisationsenhed.  
-                        <span data-ng-show="!isAdmin">Kontakt en lokal administrator.</span>
-                    </p>
-                </div>
-            </div>
+            
         </form>
 
-        <button class="btn btn-primary btn-sm pull-left" data-ng-click="new()" data-ng-disabled="submitting" >
+        <button class="btn btn-primary btn-sm pull-left" data-ng-click="new()" data-ng-disabled="submitting" tabindex="5">
             <i class="glyphicon glyphicon-plus"></i> 
-            Opret ny underafdeling
+            Opret ny underenhed
         </button>
         <button class="btn btn-danger btn-sm pull-right"
             data-ng-disabled="submitting" 
             data-confirmed-click="delete()"
-            data-confirm-click="Er du sikker på at du vil slette denne afdeling? Dette vil også slette alle underafdelinger!" data-ng-hide="orgUnit.isRoot">
+            data-confirm-click="Er du sikker på at du vil slette denne enhed? Dette vil også slette alle underenheder!" data-ng-hide="orgUnit.isRoot" tabindex="6">
             <i class="glyphicon glyphicon-trash"></i> 
-            Slet afdeling
+            Slet enhed
         </button>
     </div>
 
     <div class="modal-footer text-center">
-        <button class="btn btn-primary" data-ng-disabled="submitting" data-ng-click="patch()">Gem</button>
-        <button class="btn btn-warning" data-ng-click="cancel()">Annuller</button>
+        <button class="btn btn-primary" data-ng-disabled="submitting" data-ng-click="patch()" tabindex="3">Gem</button>
+        <button class="btn btn-warning" data-ng-disabled="submitting" data-ng-click="cancel()" tabindex="4">Annuller</button>
     </div>
 </div>
 
 <!-- create new -->
-<div data-ng-show="createNew">
+<div data-ng-if="createNew">
     <div class="modal-header">
-        <h3>Ny afdeling</h3>
+        <h3>Ny underenhed</h3>
     </div>
     <div class="modal-body">
         <h4>Rediger info</h4>
         <form name="newForm" novalidate="novalidate" class="form-horizontal">
-            <div class="form-group">
-                <label for="name" class="col-md-3 control-label">
-                    Enhedens navn
-                </label>
-                <div class="col-md-8">
-                    <input type="text" name="name" data-ng-model="newOrgUnit.name" class="form-control" data-ng-required="true" />
-                </div>
-            </div>
             <div class="form-group">
                 <label for="parent" class="col-md-3 control-label">
                     Overordnet enhed
@@ -78,11 +71,19 @@
                     <input type="text" value="{{orgUnit.oldName}}" class="form-control" disabled="disabled"/>
                 </div>
             </div>
+            <div class="form-group">
+                <label for="name" class="col-md-3 control-label">
+                    Enhedens navn
+                </label>
+                <div class="col-md-8">
+                    <input type="text" name="name" data-ng-model="newOrgUnit.name" class="form-control" data-ng-required="true" tabindex="1" data-autofocus=""/>
+                </div>
+            </div>
         </form>
     </div>
 
     <div class="modal-footer">
-        <button class="btn btn-primary" data-ng-disabled="submitting" data-ng-click="post()">Opret afdeling</button>
-        <button class="btn btn-warning" data-ng-click="cancel()">Annuller</button>
+        <button class="btn btn-primary" data-ng-disabled="submitting" data-ng-click="post()" tabindex="2">Opret underenhed</button>
+        <button class="btn btn-warning" data-ng-disabled="submitting" data-ng-click="cancel()" tabindex="3">Annuller</button>
     </div>
 </div>
