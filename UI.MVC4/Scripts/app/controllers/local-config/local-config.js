@@ -2,7 +2,7 @@
     
     var subnav = [];
     
-    app.directive('suggestNew', ['$http', 'growl', function ($http, growl) {
+    app.directive('suggestNew', ['$http', 'notify', function ($http, notify) {
         return {
             scope: {
                 url: '@'
@@ -18,17 +18,17 @@
                     };
 
                     $http.post(scope.url, data).success(function (result) {
-                        growl.addSuccessMessage('Foreslag sendt!');
+                        notify.addSuccessMessage('Foreslag sendt!');
                         scope.suggestion = "";
                     }).error(function (result) {
-                        growl.addErrorMessage('Kunne ikke sende foreslag!');
+                        notify.addErrorMessage('Kunne ikke sende foreslag!');
                     });
                 };
             }
         };
     }]);
     
-    app.directive('suggestNewRole', ['$http', 'growl', function ($http, growl) {
+    app.directive('suggestNewRole', ['$http', 'notify', function ($http, notify) {
         return {
             scope: {
                 url: '@'
@@ -46,10 +46,10 @@
                     };
 
                     $http.post(scope.url, data).success(function (result) {
-                        growl.addSuccessMessage('Foreslag sendt!');
+                        notify.addSuccessMessage('Foreslag sendt!');
                         scope.suggestion = "";
                     }).error(function (result) {
-                        growl.addErrorMessage('Kunne ikke sende foreslag!');
+                        notify.addErrorMessage('Kunne ikke sende foreslag!');
                     });
                 };
             }
@@ -80,7 +80,7 @@
         };
     }]);
 
-    app.directive('optionLocaleList', ['$rootScope', '$q', '$http', 'growl', function ($rootScope, $q, $http, growl) {
+    app.directive('optionLocaleList', ['$rootScope', '$q', '$http', 'notify', function ($rootScope, $q, $http, notify) {
         return {
             scope: {
                 optionsUrl: '@',
@@ -143,9 +143,9 @@
 
                         return $http({ method: method, url: scope.localesUrl, data: data })
                             .success(function (result) {
-                                growl.addSuccessMessage('Felt opdateret');
+                                notify.addSuccessMessage('Felt opdateret');
                             }).error(function (result) {
-                                growl.addErrorMessage('Kunne ikke opdatere feltet med værdien: ' + value + '!');
+                                notify.addErrorMessage('Kunne ikke opdatere feltet med værdien: ' + value + '!');
                             });
                     }
                 };
@@ -200,14 +200,14 @@
 
     }]);
 
-    var patch = function ($http, growl, url, value, fieldName) {
+    var patch = function ($http, notify, url, value, fieldName) {
         var data = {};
         data[fieldName] = value;
 
         $http({ method: 'PATCH', url: url, data: data }).success(function (result) {
-            growl.addSuccessMessage("Feltet er opdateret!");
+            notify.addSuccessMessage("Feltet er opdateret!");
         }).error(function (result) {
-            growl.addErrorMessage("Feltet blev ikke opdateret!");
+            notify.addErrorMessage("Feltet blev ikke opdateret!");
         });
     };
 
@@ -231,8 +231,8 @@
         }]);
 
     app.controller('localConfig.EditCtrl',
-        ['$rootScope', '$scope', '$http', '$stateParams', 'growl', 'organizationHttp', 'supportNamesHttp', 'projectNamesHttp', 'systemNamesHttp', 'contractNamesHttp', 'configHttp',
-            function ($rootScope, $scope, $http, $stateParams, growl, organizationHttp, supportNamesHttp, projectNamesHttp, systemNamesHttp, contractNamesHttp, configHttp) {
+        ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'organizationHttp', 'supportNamesHttp', 'projectNamesHttp', 'systemNamesHttp', 'contractNamesHttp', 'configHttp',
+            function ($rootScope, $scope, $http, $stateParams, notify, organizationHttp, supportNamesHttp, projectNamesHttp, systemNamesHttp, contractNamesHttp, configHttp) {
                 $rootScope.page.title = 'Konfiguration';
                 $rootScope.page.subnav = [];
                 
@@ -243,7 +243,7 @@
 
                 var config = configHttp.data.response;
                 $scope.updateConfig = function (value, fieldName) {
-                    return patch($http, growl, 'api/config/' + config.id, value, fieldName);
+                    return patch($http, notify, 'api/config/' + config.id, value, fieldName);
                 };
                 
                 $scope.support = {

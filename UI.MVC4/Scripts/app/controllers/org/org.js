@@ -37,7 +37,7 @@
 
     }]);
 
-    app.controller('org.OrgViewCtrl', ['$rootScope', '$scope', '$http', '$modal', 'growl', 'orgRolesHttp', '$q', function ($rootScope, $scope, $http, $modal, growl, orgRolesHttp, $q) {
+    app.controller('org.OrgViewCtrl', ['$rootScope', '$scope', '$http', '$modal', 'notify', 'orgRolesHttp', '$q', function ($rootScope, $scope, $http, $modal, notify, orgRolesHttp, $q) {
         $rootScope.page.title = 'Organisation';
         $rootScope.page.subnav = subnav;
 
@@ -169,7 +169,7 @@
             };
 
             $http.post("api/organizationright", data).success(function (result) {
-                growl.addSuccessMessage(result.response.user.name + " er knyttet i rollen");
+                notify.addSuccessMessage(result.response.user.name + " er knyttet i rollen");
 
                 $scope.chosenOrgUnit.orgRights.push({
                     "objectId": result.response.objectId,
@@ -186,7 +186,7 @@
 
             }).error(function (result) {
 
-                growl.addErrorMessage('Fejl!');
+                notify.addErrorMessage('Fejl!');
             });
         };
 
@@ -198,10 +198,10 @@
 
             $http.delete("api/organizationright?oId=" + oId + "&rId=" + rId + "&uId=" + uId).success(function (deleteResult) {
                 right.show = false;
-                growl.addSuccessMessage('Rollen er slettet!');
+                notify.addSuccessMessage('Rollen er slettet!');
             }).error(function (deleteResult) {
 
-                growl.addErrorMessage('Kunne ikke slette rollen!');
+                notify.addErrorMessage('Kunne ikke slette rollen!');
             });
 
         };
@@ -243,7 +243,7 @@
 
                     right.edit = false;
 
-                    growl.addSuccessMessage(right.user.name + " er knyttet i rollen");
+                    notify.addSuccessMessage(right.user.name + " er knyttet i rollen");
 
                 }).error(function (result) {
 
@@ -252,7 +252,7 @@
 
                     right.show = false;
 
-                    growl.addErrorMessage('Fejl!');
+                    notify.addErrorMessage('Fejl!');
                 });
 
             }).error(function (deleteResult) {
@@ -261,7 +261,7 @@
                 right.userForSelect = { id: right.user.id, text: right.user.name };
                 right.roleForSelect = right.roleId;
 
-                growl.addErrorMessage('Fejl!');
+                notify.addErrorMessage('Fejl!');
             });
         };
 
@@ -354,12 +354,12 @@
                         var id = unit.id;
 
                         $http({ method: 'PATCH', url: "api/organizationUnit/" + id, data: data }).success(function (result) {
-                            growl.addSuccessMessage(name + " er ændret.");
+                            notify.addSuccessMessage(name + " er ændret.");
 
                             $modalInstance.close(result.response);
                         }).error(function (result) {
                             $modalScope.submitting = false;
-                            growl.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
+                            notify.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
                         });
 
                     };
@@ -383,12 +383,12 @@
                         $modalScope.submitting = true;
 
                         $http({ method: 'POST', url: "api/organizationUnit/", data: data }).success(function (result) {
-                            growl.addSuccessMessage(name + " er gemt.");
+                            notify.addSuccessMessage(name + " er gemt.");
 
                             $modalInstance.close(result.response);
                         }).error(function (result) {
                             $modalScope.submitting = false;
-                            growl.addErrorMessage("Fejl! " + name + " kunne ikke gemmes!");
+                            notify.addErrorMessage("Fejl! " + name + " kunne ikke gemmes!");
                         });
                     };
 
@@ -411,12 +411,12 @@
 
                         $http.delete("api/organizationUnit/" + unit.id).success(function () {
                             $modalInstance.close();
-                            growl.addSuccessMessage(unit.name + " er slettet!");
+                            notify.addSuccessMessage(unit.name + " er slettet!");
 
                         }).error(function () {
                             $modalScope.submitting = false;
 
-                            growl.addErrorMessage("Fejl! " + unit.name + " kunne ikke slettes!");
+                            notify.addErrorMessage("Fejl! " + unit.name + " kunne ikke slettes!");
                         });
 
                     };
@@ -434,12 +434,12 @@
             });
         };
         
-        function growlSuccess() {
-            growl.addSuccessMessage("Feltet er opdateret");
+        function notifySuccess() {
+            notify.addSuccessMessage("Feltet er opdateret");
         }
         
-        function growlError() {
-            growl.addErrorMessage("Fejl!");
+        function notifyError() {
+            notify.addErrorMessage("Fejl!");
         }
 
         $scope.updateTask = function (task) {
@@ -456,14 +456,14 @@
                 };
                 $http.post('api/taskusage/', data).success(function (result) {
                     task.usageId = result.response.id;
-                    growlSuccess();
-                }).error(growlError);
+                    notifySuccess();
+                }).error(notifyError);
             } else {
                 $http.delete('api/taskusage/' + task.usageId).success(function () {
                     task.starred = false;
                     delete task.delegatedTo;
-                    growlSuccess();
-                }).error(growlError);
+                    notifySuccess();
+                }).error(notifyError);
             }
         };
 
@@ -473,7 +473,7 @@
                 method: 'PATCH',
                 url: 'api/taskusage/' + task.usageId,
                 data: { starred: task.starred }
-            }).success(growlSuccess).error(growlError);
+            }).success(notifySuccess).error(notifyError);
         };
 
         function filterTasks() {
@@ -751,12 +751,12 @@
                         var task = $modalScope.task;
                         $http.post('api/taskref', task)
                             .success(function () {
-                                growl.addSuccessMessage(task.taskKey + ' er oprettet');
+                                notify.addSuccessMessage(task.taskKey + ' er oprettet');
                                 updateTree();
                                 $modalInstance.close();
                             })
                             .error(function () {
-                                growl.addErrorMessage('Fejl');
+                                notify.addErrorMessage('Fejl');
                             });
                     };
 
@@ -787,7 +787,7 @@
     }]);
 
 
-    app.controller('org.OverviewCtrl', ['$rootScope', '$scope', '$http', 'growl', '$modal', function ($rootScope, $scope, $http, growl, $modal) {
+    app.controller('org.OverviewCtrl', ['$rootScope', '$scope', '$http', 'notify', '$modal', function ($rootScope, $scope, $http, notify, $modal) {
         $rootScope.page.title = 'Organisation';
         $rootScope.page.subnav = subnav;
 
@@ -982,9 +982,9 @@
 
         function patchUsage(usage, data) {
             return patchUsageComplex(usage, data, function (result) {
-                growl.addSuccessMessage("Feltet er opdateret!");
+                notify.addSuccessMessage("Feltet er opdateret!");
             }, function (result) {
-                growl.addErrorMessage("Fejl!");
+                notify.addErrorMessage("Fejl!");
                 console.log(result);
 
             });
@@ -1020,12 +1020,12 @@
                             {
                                 'comment': $modalScope.comment.text
                             }, function (result) {
-                                growl.addSuccessMessage("Kommentaren er gemt");
+                                notify.addSuccessMessage("Kommentaren er gemt");
                                 usage.usage.comment = $modalScope.comment.text;
                                 $modalInstance.close();
                             }, function (error) {
                                 $modalScope.submitting = false;
-                                growl.addSuccessMessage("Fejl!");
+                                notify.addSuccessMessage("Fejl!");
                             });
                     };
 
@@ -1036,12 +1036,12 @@
                             {
                                 'comment': ""
                             }, function (result) {
-                                growl.addSuccessMessage("Kommentaren er slettet");
+                                notify.addSuccessMessage("Kommentaren er slettet");
                                 usage.usage.comment = $modalScope.comment.text;
                                 $modalInstance.close();
                             }, function (error) {
                                 $modalScope.submitting = false;
-                                growl.addSuccessMessage("Fejl!");
+                                notify.addSuccessMessage("Fejl!");
                             });
                     };
 
