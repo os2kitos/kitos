@@ -103,7 +103,6 @@
                                 <td><input type="text" disabled="disabled" class="form-control input-sm" value="{{ chosenOrgUnit.name }}"/></td>
                                 <td>
                                     <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en organisationsrolle" class="form-control input-sm" data-ng-change="submitRight()">
-                                        <option value=""></option>
                                         <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.id}}">
                                             {{orgRole.name}} ({{orgRole.hasWriteAccess && "skriv" || "læs" }})
                                         </option>
