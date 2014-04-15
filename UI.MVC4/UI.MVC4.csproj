@@ -298,6 +298,7 @@
     <Compile Include="Models\TaskUsageDTO.cs" />
     <Compile Include="Models\TaskRefDTO.cs" />
     <Compile Include="Models\UserDTO.cs" />
+    <Compile Include="Models\UserProfileDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -408,6 +409,7 @@
     <Content Include="Partials\org\overview\task-usage.html" />
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />
+    <Content Include="Partials\topnav\profileModal.html" />
     <Content Include="Partials\topnav\unauthorized.html" />
     <Content Include="Partials\topnav\topnav.html" />
     <Content Include="Scripts\angular-animate.js" />
@@ -883,7 +885,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>0</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:6466/</IISUrl>
+		  <IISUrl>http://localhost:6466/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

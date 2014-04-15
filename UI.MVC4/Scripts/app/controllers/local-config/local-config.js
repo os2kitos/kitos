@@ -212,10 +212,12 @@
     };
 
     app.controller('localConfig.InitCtrl',
-        ['$rootScope', '$scope', '$http', '$state', 'organizationsHttp',
-            function($rootScope, $scope, $http, $state, organizationsHttp) {
+        ['$rootScope', '$scope', '$http', '$state', 'organizationsHttp', 'autofocus',
+            function($rootScope, $scope, $http, $state, organizationsHttp, autofocus) {
                 $rootScope.page.title = 'Konfiguration';
                 $rootScope.page.subnav = [];
+
+                autofocus();
 
                 $scope.orgChooser = {
                     options: _.filter(organizationsHttp.data.response,

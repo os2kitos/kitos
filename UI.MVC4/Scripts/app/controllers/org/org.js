@@ -3,7 +3,7 @@
     var subnav = [
             { state: 'org-overview', text: 'Overblik' },
             { state: 'org-view', text: 'Organisation' },
-            { state: '', text: 'Rapport' }
+            { state: 'index', text: 'Rapport' }
     ];
 
     function indent(level) {
@@ -152,6 +152,13 @@
             $scope.submitRight();
         });
 
+        /* the role of "medarbejder", mmm, the taste of hardcode */
+        function getDefaultNewRole() {
+            return 3;
+        }
+
+        $scope.newRole = getDefaultNewRole();
+
         $scope.submitRight = function () {
 
             if (!$scope.selectedUser || !$scope.newRole) return;
@@ -181,7 +188,7 @@
                     show: true
                 });
 
-                $scope.newRole = "";
+                $scope.newRole = getDefaultNewRole();
                 $scope.selectedUser = "";
 
             }).error(function (result) {
@@ -296,8 +303,10 @@
 
             var modal = $modal.open({
                 templateUrl: 'partials/org/edit-org-unit-modal.html',
-                controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
+                controller: ['$scope', '$modalInstance', 'autofocus', function ($modalScope, $modalInstance, autofocus) {
 
+                    autofocus();
+                    
                     //edit or create-new mode
                     $modalScope.isNew = false;
 
@@ -393,14 +402,14 @@
                     };
 
                     $modalScope.new = function () {
+                        autofocus();
+                        
                         $modalScope.createNew = true;
                         $modalScope.newOrgUnit = {
-                            name: 'Ny afdeling',
+                            name: '',
                             parent: $modalScope.orgUnit.id,
                             orgId: $modalScope.orgUnit.orgId
                         };
-
-                        console.log($modalScope.newOrgUnit);
                     };
 
                     $modalScope.delete = function () {
@@ -686,13 +695,6 @@
             }
         });
 
-        function updateTree(rootOrgUnitId) {
-            rootOrgUnitId = typeof rootOrgUnitId !== 'undefined' ? rootOrgUnitId : getRootOrg($scope.chosenOrgUnit).id;
-            getAllTasks(rootOrgUnitId).then(function () {
-                cleanup();
-            });
-        }
-
         function cleanup() {
             resetTasks();
             filterTasks();
@@ -705,7 +707,6 @@
             } else {
                 return getRootOrg(orgUnit.parent);
             }
-            throw Error('Should never reach this point');
         }
 
         function getAllTasks(rootOrgUnitId) {
@@ -733,49 +734,56 @@
             });
         }
 
-        $scope.modalAddTaskClick = function () {
-            var modal = $modal.open({
-                templateUrl: 'partials/org/add-task-modal.html',
-                controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
-                    $modalScope.orgName = $scope.chosenOrgUnit.organization.name;
-                    $modalScope.allTasks = $scope.allTasksFlat;
-                    $modalScope.task = {
-                        ownedByOrganizationUnitId: $scope.chosenOrgUnit.organization.id,
-                        uuid: '00000000-0000-0000-0000-000000000000',
-                        type: 'KLE',
-                        activeFrom: null,
-                        activeTo: null
-                    };
+        //function updateTree(rootOrgUnitId) {
+        //    rootOrgUnitId = typeof rootOrgUnitId !== 'undefined' ? rootOrgUnitId : getRootOrg($scope.chosenOrgUnit).id;
+        //    getAllTasks(rootOrgUnitId).then(function () {
+        //        cleanup();
+        //    });
+        //}
 
-                    $modalScope.ok = function () {
-                        var task = $modalScope.task;
-                        $http.post('api/taskref', task)
-                            .success(function () {
-                                notify.addSuccessMessage(task.taskKey + ' er oprettet');
-                                updateTree();
-                                $modalInstance.close();
-                            })
-                            .error(function () {
-                                notify.addErrorMessage('Fejl');
-                            });
-                    };
+        //$scope.modalAddTaskClick = function () {
+        //    var modal = $modal.open({
+        //        templateUrl: 'partials/org/add-task-modal.html',
+        //        controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
+        //            $modalScope.orgName = $scope.chosenOrgUnit.organization.name;
+        //            $modalScope.allTasks = $scope.allTasksFlat;
+        //            $modalScope.task = {
+        //                ownedByOrganizationUnitId: $scope.chosenOrgUnit.organization.id,
+        //                uuid: '00000000-0000-0000-0000-000000000000',
+        //                type: 'KLE',
+        //                activeFrom: null,
+        //                activeTo: null
+        //            };
 
-                    $modalScope.cancel = function () {
-                        $modalInstance.dismiss('cancel');
-                    };
-                }]
-            });
+        //            $modalScope.ok = function () {
+        //                var task = $modalScope.task;
+        //                $http.post('api/taskref', task)
+        //                    .success(function () {
+        //                        notify.addSuccessMessage(task.taskKey + ' er oprettet');
+        //                        updateTree();
+        //                        $modalInstance.close();
+        //                    })
+        //                    .error(function () {
+        //                        notify.addErrorMessage('Fejl');
+        //                    });
+        //            };
 
-            modal.result.then(
-                //close
-                function (result) {
-                    console.log(result);
-                },
-                //dismiss
-                function (result) {
-                    var a = result;
-                });
-        };
+        //            $modalScope.cancel = function () {
+        //                $modalInstance.dismiss('cancel');
+        //            };
+        //        }]
+        //    });
+
+        //    modal.result.then(
+        //        //close
+        //        function (result) {
+        //            console.log(result);
+        //        },
+        //        //dismiss
+        //        function (result) {
+        //            var a = result;
+        //        });
+        //};
 
         $scope.indent = indent;
 
@@ -876,10 +884,10 @@
                     usage.isRoot = true;
 
                     $http.get('api/taskref/' + usage.usage.taskRefId).success(function (result) {
+                        visit(usage, null, 0, false, result.response);
+
                         updateTechStatus(usage);
                         updateUsageStatus(usage);
-
-                        visit(usage, null, 0, false, result.response);
                     });
                 });
             });
@@ -891,7 +899,7 @@
         }
 
         function updateTechStatus(usage) {
-            if (usage.parent) updateTechStatus(usage.parent);
+            if (usage.parent) return updateTechStatus(usage.parent);
 
             calculateTechStatus(usage);
         };
@@ -902,6 +910,7 @@
             calculateUsageStatus(usage);
         };
 
+        /* helper function to aggregate status-trafficlight */
         function addToStatusResult(status, result) {
             if (status == 2) result.green++;
             else if (status == 1) result.yellow++;
@@ -912,6 +921,7 @@
             return result;
         }
 
+        /* helper function to sum two status-trafficlights */
         function sumStatusResult(result1, result2) {
             return {
                 max: result1.max + result2.max,
@@ -923,6 +933,7 @@
 
         function calculateTechStatus(usage) {
 
+            /* this will hold the aggregated tech status of this node */
             var result = {
                 max: 0,
                 red: 0,
@@ -930,14 +941,15 @@
                 green: 0
             };
 
+            /* if the usage isn't delegated, the agg result is just this tech status */
             if (!usage.hasDelegations) {
-                return addToStatusResult(usage.usage.technologyStatus, result);
+                result = addToStatusResult(usage.usage.technologyStatus, result);
+            } else {
+                _.each(usage.delegations, function(delegation) {
+                    var delegationResult = calculateTechStatus(delegation);
+                    result = sumStatusResult(result, delegationResult);
+                });
             }
-
-            _.each(usage.delegations, function (delegation) {
-                var delegationResult = calculateTechStatus(delegation);
-                result = sumStatusResult(result, delegationResult);
-            });
 
             usage.calculatedTechStatus = result;
 

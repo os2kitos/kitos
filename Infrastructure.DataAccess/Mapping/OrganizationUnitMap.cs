@@ -15,6 +15,7 @@ namespace Infrastructure.DataAccess.Mapping
             this.ToTable("OrganizationUnit");
             this.Property(t => t.Id).HasColumnName("Id");
 
+            // Relationships
             this.HasOptional(o => o.Parent)
                 .WithMany(p => p.Children)
                 .HasForeignKey(o => o.ParentId)

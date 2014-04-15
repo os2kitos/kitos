@@ -20,7 +20,7 @@ app.config(['$httpProvider', 'notifyProvider', 'RestangularProvider', function (
     });
 }]);
 
-app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScope, $http, $state, editableOptions) {
+app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify', function ($rootScope, $http, $state, editableOptions, $modal, notify) {
     //init info
     $rootScope.page = {
         title: 'Index',
@@ -31,6 +31,50 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
     editableOptions.theme = 'bs3'; // bootstrap3 theme.
 
     $rootScope.user = {};
+
+    $rootScope.openProfileModal = function() {
+        $modal.open({
+            templateUrl: 'partials/topnav/profileModal.html',
+            resolve: {
+                user: function() {
+                    return $rootScope.user;
+                },
+                orgUnits: function() {
+                    return $http.get('api/organizationunit/?userid2=' + $rootScope.user.id);
+                }
+            },
+            controller: ['$scope', '$modalInstance', 'user', 'orgUnits', function ($modalScope, $modalInstance, user, orgUnits) {
+                $modalScope.user = user;
+                $modalScope.orgUnits = orgUnits.data.response;
+
+                $modalScope.ok = function () {
+                    var userData = {};
+                    if ($modalScope.user.name) 
+                        userData.name = $modalScope.user.name;
+                    if ($modalScope.user.defaultOrganizationUnitId)
+                        userData.defaultOrganizationUnitId = $modalScope.user.defaultOrganizationUnitId;
+                    if ($modalScope.user.email)
+                        userData.email = $modalScope.user.email;
+
+                    $http({
+                        method: 'PATCH',
+                        url: 'api/user/' + user.id,
+                        data: userData
+                    }).success(function() {
+                        notify.addSuccessMessage('OK');
+                        $modalInstance.close();
+                    }).error(function() {
+                        notify.addErrorMessage('Fejl');
+                    });
+                };
+
+                $modalScope.cancel = function () {
+                    $modalInstance.dismiss('cancel');
+                };
+            }]
+        });
+    };
+    
 
     //logout function for top navigation bar
     $rootScope.logout = function () {
