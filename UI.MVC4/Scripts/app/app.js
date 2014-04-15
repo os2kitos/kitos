@@ -47,12 +47,12 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'growl', 
 
                 $modalScope.ok = function () {
                     var userData = {};
-                    if ($modalScope.name) 
-                        userData.name = $modalScope.name;
-                    if ($modalScope.defaultOrgUnit)
-                        userData.defaultOrg = $modalScope.defaultOrg;
-                    if ($modalScope.email)
-                        userData.email = $modalScope.email;
+                    if ($modalScope.user.name) 
+                        userData.name = $modalScope.user.name;
+                    if ($modalScope.user.defaultOrganizationUnitId)
+                        userData.defaultOrganizationUnitId = $modalScope.user.defaultOrganizationUnitId;
+                    if ($modalScope.user.email)
+                        userData.email = $modalScope.user.email;
 
                     $http({
                         method: 'PATCH',

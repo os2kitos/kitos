@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
+using Newtonsoft.Json.Linq;
 using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
@@ -94,6 +95,48 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
             
+        }
+
+        public virtual HttpResponseMessage Patch(int id, JObject obj)
+        {
+            var item = _repository.GetByKey(id);
+            var itemType = item.GetType();
+
+            foreach (var valuePair in obj)
+            {
+                // get name of mapped property
+                var map =
+                    AutoMapper.Mapper.FindTypeMapFor<UserProfileDTO, User>()
+                              .GetPropertyMaps();
+                var nonNullMaps = map.Where(x => x.SourceMember != null);
+                var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name.Equals(valuePair.Key, StringComparison.InvariantCultureIgnoreCase));
+                if (mapMember == null)
+                    continue; // abort if no map found
+
+                var destName = mapMember.DestinationProperty.Name;
+                var jToken = valuePair.Value;
+
+                var propRef = itemType.GetProperty(destName);
+                var t = propRef.PropertyType;
+                // use reflection to call obj.Value<t>("keyName");
+                var genericMethod = jToken.GetType().GetMethod("Value").MakeGenericMethod(new Type[] { t });
+                var value = genericMethod.Invoke(obj, new object[] { valuePair.Key });
+                // update the entity
+                propRef.SetValue(item, value);
+            }
+
+            try
+            {
+                _repository.Update(item);
+                _repository.Save();
+
+                //pretty sure we'll get a merge conflict here???
+                return Ok(AutoMapper.Mapper.Map<User, UserProfileDTO>(item)); // TODO correct?
+            }
+            catch (Exception)
+            {
+                return NoContent(); // TODO catch correct expection
+            }
         }
     }
 
