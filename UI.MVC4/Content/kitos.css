@@ -135,17 +135,35 @@ div.org-node
         margin: 0;
         padding: 4px 10px;
         background: rgb(219, 229, 241);
-}
+    }
 
     div.org-node.selected span.org-node-info
     {
         background-color: rgb(177, 207, 243);
-}
+    }
 
     div.org-node.selected > span.org-node-info
     {
         background-color: rgb(125, 154, 189);
-}
+    }
+
+    div.org-node.hasWriteAccess span.org-node-info
+    {
+        display: inline-block;
+        margin: 0;
+        padding: 4px 10px;
+        background: rgb(201, 251, 201);
+    }
+
+    div.org-node.selected.hasWriteAccess span.org-node-info, div.org-node.selected div.org-node.hasWriteAccess > span.org-node-info
+    {
+        background: rgb(185, 236, 185);
+    }
+
+    div.org-node.selected.hasWriteAccess > span.org-node-info
+    {
+        background: rgb(143, 199, 143);
+    }
 
 
     div.org-node li
@@ -193,7 +211,7 @@ div.org-node
 
     div.org-node.selected li::after
     {
-        border-color: #aaaaaa;
+        border-color: #767676;
     }
 /* TODO: Style these? */
 .alert-danger
@@ -397,4 +415,8 @@ a.select-status:hover .status-arrow-down {
 
 .task-table .row {
     padding: 3px 0px;
+}
+
+body.wait, body.wait * {
+    cursor: wait !important;
 }

@@ -35,12 +35,17 @@
 
                 scope.open = function() {
                     var modal = $modal.open({
+                        backdrop: "static", //modal can't be closed by clicking outside modal
                         templateUrl: 'partials/directives/add-user-modal.html',
-                        controller: ['$scope', 'growl', '$modalInstance', function($scope, growl, $modalInstance) {
+                        controller: ['$scope', 'notify', '$modalInstance', function($scope, notify, $modalInstance) {
 
                             $scope.newUser = {};
 
-                            $scope.addUser = function() {
+                            $scope.addUser = function () {
+
+                                if ($scope.newUser.email != $scope.newUser.repeatEmail) {
+                                    notify.addErrorMessage("Email addresserne er ikke ens.");
+                                }
 
                                 if ($scope.newUser.form.$invalid) return;
 
@@ -52,15 +57,14 @@
                                     "email": email
                                 };
 
-                                $scope.newUser.submitting = true;
+                                var msg = notify.addInfoMessage("Arbejder ...", false);
 
-                                $http.post("api/user", data).success(function(result) {
-                                    growl.addSuccessMessage(name + " er oprettet i KITOS");
+                                $http.post("api/user", data, { handleBusy: true }).success(function(result) {
+                                    msg.toSuccessMessage(name + " er oprettet i KITOS");
 
                                     $modalInstance.close(result.response);
                                 }).error(function(result) {
-                                    $scope.newUser.submitting = false;
-                                    growl.addErrorMessage("Fejl! " + name + " blev ikke oprettet i KITOS!");
+                                    msg.toErrorMessage("Fejl! " + name + " blev ikke oprettet i KITOS!");
                                 });
                             };
 
@@ -167,21 +171,99 @@
         };
     }]);
     
-    app.directive('showStatus', [function () {
+    app.directive('showStatus', ['$timeout', function ($timeout) {
         return {
             scope: {
                 status: '=showStatus'
             },
             replace: false,
-            templateUrl: 'partials/directives/show-status.html'
+            templateUrl: 'partials/directives/show-status.html',
+            
+            link: function (scope, element, attr) {
+                scope.ready = false;
+                update();
+
+                function update() {
+                    $timeout(function () {
+                        if (!scope.status) {
+                            update();
+                            return;
+                        }
+                        scope.ready = true;
+                    });
+                }
+
+
+                scope.$watch("status", function (newval, oldval) {
+                    if (newval === oldval) return;
+
+                    update();
+                });
+            }
         };
     }]);
     
+    //// http://stackoverflow.com/questions/14833326/how-to-set-focus-in-angularjs
+    //// use autofocus instead
+    //app.directive('focusOn', ['$timeout', function ($timeout) {
+    //    return function (scope, elem, attr) {
+    //        scope.$on('focusOn', function (e, name) {
+    //            if (name === attr.focusOn) {
+    //                $timeout(function() {
+    //                    elem[0].focus();
+    //                });
+    //            }
+    //        });
+    //    };
+    //}]);
+
+    //// http://stackoverflow.com/questions/14833326/how-to-set-focus-in-angularjs
+    //app.factory('focus', function ($rootScope, $timeout) {
+    //    return function(name) {
+    //        $timeout(function() {
+    //            $rootScope.$broadcast('focusOn', name);
+    //        });
+    //    };
+    //});
+
+
+    app.directive('autofocus', ['$timeout', function($timeout) {
+        return function (scope, elem, attr) {
+            scope.$on('autofocus', function (e) {
+                $timeout(function () {
+                    elem[0].focus();
+                });
+            });
+        };
+    }]);
+    
+    /* http://stackoverflow.com/questions/14833326/how-to-set-focus-in-angularjs */
+    app.factory('autofocus', function ($rootScope, $timeout) {
+        return function () {
+            $timeout(function () {
+                $rootScope.$broadcast('autofocus');
+            });
+        };
+    });
+
+
     /* from http://stackoverflow.com/questions/11540157/using-comma-as-list-separator-with-angularjs */
     app.filter('joinBy', function () {
         return function (input, delimiter) {
             return (input || []).join(delimiter || ',');
         };
     });
+
+    app.directive('disabledOnBusy', [function() {
+        return function(scope, elem, attr) {
+            scope.$on('httpBusy', function (e) {
+                elem[0].disabled = true;
+            });
+
+            scope.$on('httpUnbusy', function(e) {
+                elem[0].disabled = false;
+            });
+        };
+    }]);
 
 })(angular, app);

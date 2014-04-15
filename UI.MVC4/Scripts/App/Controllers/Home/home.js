@@ -21,7 +21,7 @@
 
     }]);
 
-    app.controller('home.IndexCtrl', ['$rootScope', '$scope', '$http', '$state', '$stateParams', 'growl', 'Restangular', function ($rootScope, $scope, $http, $state, $stateParams, growl, Restangular) {
+    app.controller('home.IndexCtrl', ['$rootScope', '$scope', '$http', '$state', '$stateParams', 'notify', 'Restangular', function ($rootScope, $scope, $http, $state, $stateParams, notify, Restangular) {
         $rootScope.page.title = 'Index';
         $rootScope.page.subnav = [];
         
@@ -56,7 +56,7 @@
             };
 
             $http.post('api/authorize', data).success(function (result) {
-                growl.addSuccessMessage("Du er nu logget ind!");
+                notify.addSuccessMessage("Du er nu logget ind!");
 
                 $rootScope.saveUser(result);
 
@@ -65,13 +65,13 @@
 
                 $state.go(to);
             }).error(function (result) {
-                growl.addErrorMessage("Forkert brugernavn eller password!");
+                notify.addErrorMessage("Forkert brugernavn eller password!");
             });
 
         };
     }]);
     
-    app.controller('home.ForgotPasswordCtrl', ['$rootScope', '$scope', '$http', 'growl', function ($rootScope, $scope, $http, growl) {
+    app.controller('home.ForgotPasswordCtrl', ['$rootScope', '$scope', '$http', 'notify', function ($rootScope, $scope, $http, notify) {
         $rootScope.page.title = 'Glemt password';
         $rootScope.page.subnav = [];
         
@@ -79,23 +79,19 @@
         $scope.submit = function() {
             if ($scope.requestForm.$invalid) return;
 
-            var data = { "email": $scope.email };
+            var email = $scope.email;
+            var data = { "email": email };
 
-            $scope.submitting = true;
-
-            growl.addInfoMessage("Sender email...");
-
-            $scope.requestSuccess = $scope.requestFailure = false;
+            var msg = notify.addInfoMessage("Sender email ...", false);
             
-            $http.post('api/passwordresetrequest', data).success(function(result) {
-                growl.addSuccessMessage("En email er blevet sent til " + $scope.email);
+            $http.post('api/passwordresetrequest', data, {handleBusy: true}).success(function(result) {
+                msg.toSuccessMessage("En email er blevet sent til " + email);
                 $scope.email = '';
 
                 $scope.submitting = false;
 
             }).error(function (result) {
-                growl.addErrorMessage("Emailadressen kunne ikke findes i systemet!");
-                $scope.submitting = false;
+                msg.toErrorMessage("Emailen kunne ikke sendes. Prøv igen eller kontakt en lokal administrator");
             });
         };
     }]);
