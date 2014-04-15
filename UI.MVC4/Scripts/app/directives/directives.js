@@ -155,6 +155,7 @@
         return {
             scope: {
                 model: '=selectStatus',
+                canWrite: '=',
                 onStatusChange: '&?'
             },
             replace: true,

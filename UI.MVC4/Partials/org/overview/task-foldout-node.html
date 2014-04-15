@@ -17,8 +17,17 @@
                     data-tooltip-html-unsafe="<small>{{ usage.usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
                     data-tooltip-trigger="mouseenter"
                     data-tooltip-placement="right"
-                    data-ng-click="openComment(usage)">
+                    data-ng-click="openComment(usage)"
+                    data-ng-if="usage.usage.orgUnit.hasWriteAccess">
                     <i class="glyphicon glyphicon-comment" data-ng-class="{'faded': !usage.usage.comment}"></i>
+                </button>
+                <button class="btn btn-link btn-xs"
+                    data-tooltip-html-unsafe="<small>'Læs kommentar'</small>"
+                    data-tooltip-trigger="mouseenter"
+                    data-tooltip-placement="right"
+                    data-ng-click="openComment(usage)"
+                    data-ng-if="!usage.usage.orgUnit.hasWriteAccess && usage.usage.comment">
+                    <i class="glyphicon glyphicon-comment"></i>
                 </button>
             </div>
         </div>

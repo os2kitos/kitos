@@ -7,8 +7,11 @@
             <label for="comment" class="col-md-3 control-label">
                 Bemærkning
             </label>
-            <div class="col-md-8">
+            <div class="col-md-8" data-ng-if="hasWriteAccess">
                 <textarea class="form-control" name="comment" id="comment" data-ng-model="comment.text"></textarea>
+            </div>
+            <div class="col-md-8" data-ng-if="!hasWriteAccess">
+                <p class="help-block">{{ comment.text }}</p>
             </div>
         </div>
         <div class="form-group">
@@ -18,7 +21,10 @@
         </div>
     </form>
 </div>
-<div class="modal-footer">
+<div class="modal-footer" data-ng-if="hasWriteAccess">
     <button type="submit" class="btn btn-primary" data-ng-disabled="submitting" form="commentForm">Gem</button>
     <button class="btn btn-default" data-ng-click="cancel()">Tilbage</button>
+</div>
+<div class="modal-footer" data-ng-if="!hasWriteAccess">
+    <button class="btn btn-default" data-ng-click="cancel()">OK</button>
 </div>
