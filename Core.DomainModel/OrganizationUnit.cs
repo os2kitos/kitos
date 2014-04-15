@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
@@ -10,6 +11,9 @@ namespace Core.DomainModel
             this.Infrastructures = new List<Infrastructure>();
             this.Rights = new List<OrganizationRight>();
             this.TaskUsages = new List<TaskUsage>();
+            this.TaskRefs = new List<TaskRef>();
+            this.OwnedTasks = new List<TaskRef>();
+            this.DefaultUsers = new List<User>();
         }
 
         public int Id { get; set; }
@@ -27,5 +31,9 @@ namespace Core.DomainModel
         public virtual ICollection<TaskUsage> TaskUsages { get; set; }
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
         public virtual ICollection<TaskRef> OwnedTasks { get; set; }
+        /// <summary>
+        /// Users which have set this as their default OrganizationUnit
+        /// </summary>
+        public ICollection<User> DefaultUsers { get; set; }
     }
 }
