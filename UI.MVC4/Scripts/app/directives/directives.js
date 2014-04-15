@@ -92,15 +92,55 @@
     }]);
     
     app.directive('selectUser', ['$rootScope', '$http', function ($rootScope, $http) {
+        function userToString(user) {
+            var result = user.name;
+
+            if (user.defaultOrganizationUnitName)
+                result += " <span class='pull-right'>" + user.defaultOrganizationUnitName + "</span>";
+
+            result += "</small>";
+
+            return result;
+        }
+        
+        function formatUser(obj) {
+            var result = "<div>" + obj.text + "</div>";
+
+            if (obj.user) {
+                result += "<div class='small'>" + obj.user.email;
+
+                if(obj.user.defaultOrganizationUnitName)
+                result += ", " + obj.user.defaultOrganizationUnitName;
+
+                result += "</div>";
+
+            }
+
+            return result;
+        }
+
         return {
             scope: {
                 inputName: '@?name',
-                userModel: '='
+                userModel: '=',
+                addUser: "="
             },
+            
+
             replace: true,
             templateUrl: 'partials/directives/select-user.html',
             controller: ['$scope', function($scope) {
                 $scope.selectUserOptions = {
+                    
+                    //don't escape markup
+                    escapeMarkup: function (m) { return m; },
+                    
+                    formatResultCssClass: function(object) {
+                        return "";
+                    },
+                    formatResult: formatUser,
+                    formatSelection: formatUser,
+                    
                     minimumInputLength: 1,
                     initSelection: function(elem, callback) {
                     },
@@ -124,7 +164,8 @@
 
                                 results.push({
                                     id: user.id,
-                                    text: user.name
+                                    text: user.name,
+                                    user: user
                                 });
                             });
 

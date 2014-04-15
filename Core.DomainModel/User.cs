@@ -32,6 +32,6 @@ namespace Core.DomainModel
         public virtual ICollection<ItSystemRight> SystemRights { get; set; }
         public virtual ICollection<ItContractRight> ContractRights { get; set; }
         public virtual ICollection<AdminRight> AdminRights { get; set; }
-        public OrganizationUnit DefaultOrganizationUnit { get; set; }
+        public virtual OrganizationUnit DefaultOrganizationUnit { get; set; }
     }
 }
