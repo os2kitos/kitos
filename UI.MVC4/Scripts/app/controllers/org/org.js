@@ -151,7 +151,7 @@
         $scope.$watch("selectedUser", function () {
             $scope.submitRight();
         });
-        
+
         /* the role of "medarbejder", mmm, the taste of hardcode */
         function getDefaultNewRole() {
             return 3;
@@ -695,13 +695,6 @@
             }
         });
 
-        function updateTree(rootOrgUnitId) {
-            rootOrgUnitId = typeof rootOrgUnitId !== 'undefined' ? rootOrgUnitId : getRootOrg($scope.chosenOrgUnit).id;
-            getAllTasks(rootOrgUnitId).then(function () {
-                cleanup();
-            });
-        }
-
         function cleanup() {
             resetTasks();
             filterTasks();
@@ -714,7 +707,6 @@
             } else {
                 return getRootOrg(orgUnit.parent);
             }
-            throw Error('Should never reach this point');
         }
 
         function getAllTasks(rootOrgUnitId) {
@@ -742,49 +734,56 @@
             });
         }
 
-        $scope.modalAddTaskClick = function () {
-            var modal = $modal.open({
-                templateUrl: 'partials/org/add-task-modal.html',
-                controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
-                    $modalScope.orgName = $scope.chosenOrgUnit.organization.name;
-                    $modalScope.allTasks = $scope.allTasksFlat;
-                    $modalScope.task = {
-                        ownedByOrganizationUnitId: $scope.chosenOrgUnit.organization.id,
-                        uuid: '00000000-0000-0000-0000-000000000000',
-                        type: 'KLE',
-                        activeFrom: null,
-                        activeTo: null
-                    };
+        //function updateTree(rootOrgUnitId) {
+        //    rootOrgUnitId = typeof rootOrgUnitId !== 'undefined' ? rootOrgUnitId : getRootOrg($scope.chosenOrgUnit).id;
+        //    getAllTasks(rootOrgUnitId).then(function () {
+        //        cleanup();
+        //    });
+        //}
 
-                    $modalScope.ok = function () {
-                        var task = $modalScope.task;
-                        $http.post('api/taskref', task)
-                            .success(function () {
-                                notify.addSuccessMessage(task.taskKey + ' er oprettet');
-                                updateTree();
-                                $modalInstance.close();
-                            })
-                            .error(function () {
-                                notify.addErrorMessage('Fejl');
-                            });
-                    };
+        //$scope.modalAddTaskClick = function () {
+        //    var modal = $modal.open({
+        //        templateUrl: 'partials/org/add-task-modal.html',
+        //        controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
+        //            $modalScope.orgName = $scope.chosenOrgUnit.organization.name;
+        //            $modalScope.allTasks = $scope.allTasksFlat;
+        //            $modalScope.task = {
+        //                ownedByOrganizationUnitId: $scope.chosenOrgUnit.organization.id,
+        //                uuid: '00000000-0000-0000-0000-000000000000',
+        //                type: 'KLE',
+        //                activeFrom: null,
+        //                activeTo: null
+        //            };
 
-                    $modalScope.cancel = function () {
-                        $modalInstance.dismiss('cancel');
-                    };
-                }]
-            });
+        //            $modalScope.ok = function () {
+        //                var task = $modalScope.task;
+        //                $http.post('api/taskref', task)
+        //                    .success(function () {
+        //                        notify.addSuccessMessage(task.taskKey + ' er oprettet');
+        //                        updateTree();
+        //                        $modalInstance.close();
+        //                    })
+        //                    .error(function () {
+        //                        notify.addErrorMessage('Fejl');
+        //                    });
+        //            };
 
-            modal.result.then(
-                //close
-                function (result) {
-                    console.log(result);
-                },
-                //dismiss
-                function (result) {
-                    var a = result;
-                });
-        };
+        //            $modalScope.cancel = function () {
+        //                $modalInstance.dismiss('cancel');
+        //            };
+        //        }]
+        //    });
+
+        //    modal.result.then(
+        //        //close
+        //        function (result) {
+        //            console.log(result);
+        //        },
+        //        //dismiss
+        //        function (result) {
+        //            var a = result;
+        //        });
+        //};
 
         $scope.indent = indent;
 
@@ -931,9 +930,9 @@
                 green: result1.green + result2.green
             };
         }
-        
+
         function calculateTechStatus(usage) {
-            
+
             /* this will hold the aggregated tech status of this node */
             var result = {
                 max: 0,
@@ -951,7 +950,7 @@
                     result = sumStatusResult(result, delegationResult);
                 });
             }
-            
+
             usage.calculatedTechStatus = result;
 
             return result;
