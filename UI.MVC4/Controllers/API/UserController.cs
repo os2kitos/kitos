@@ -14,11 +14,13 @@ namespace UI.MVC4.Controllers.API
     {
         private readonly IGenericRepository<User> _repository;
         private readonly IUserService _userService;
+        private readonly IOrgService _orgService;
 
-        public UserController(IGenericRepository<User> repository, IUserService userService)
+        public UserController(IGenericRepository<User> repository, IUserService userService, IOrgService orgService)
         {
             _repository = repository;
             _userService = userService;
+            _orgService = orgService;
         }
 
         public HttpResponseMessage Post(UserDTO item)
@@ -58,6 +60,19 @@ namespace UI.MVC4.Controllers.API
             {
                 var user = _repository.GetByKey(id);
                 return Ok(AutoMapper.Mapper.Map<User, UserDTO>(user));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage Get(int id, bool? organizations)
+        {
+            try
+            {
+                var orgs = _orgService.GetByUserId(id);
+                return Ok(AutoMapper.Mapper.Map<IEnumerable<Organization>, IEnumerable<OrganizationDTO>>(orgs));
             }
             catch (Exception e)
             {

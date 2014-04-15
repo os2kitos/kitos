@@ -18,7 +18,7 @@ app.config(['growlProvider', 'RestangularProvider', function (growlProvider, Res
     });
 }]);
 
-app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScope, $http, $state, editableOptions) {
+app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'growl', function ($rootScope, $http, $state, editableOptions, $modal, growl) {
     //init info
     $rootScope.page = {
         title: 'Index',
@@ -29,6 +29,37 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', function ($rootScop
     editableOptions.theme = 'bs3'; // bootstrap3 theme.
 
     $rootScope.user = {};
+
+    $rootScope.openProfileModal = function() {
+        $modal.open({
+            templateUrl: 'partials/topnav/profileModal.html',
+            controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
+                $modalScope.user = $rootScope.user;
+
+                $http.get('api/user/' + $modalScope.user.id + '?organizations').success(function (data) {
+                    $modalScope.organizations = data;
+                });
+
+                $modalScope.ok = function () {
+                    $http({
+                        method: 'PATCH',
+                        url: 'api/user/' + $rootScope.user.id,
+                        data: data
+                    }).success(function() {
+                        growl.addSuccessMessage('OK');
+                        $modalInstance.close();
+                    }).error(function() {
+                        growl.addErrorMessage('Fejl');
+                    });
+                };
+
+                $modalScope.cancel = function () {
+                    $modalInstance.dismiss('cancel');
+                };
+            }]
+        });
+    };
+    
 
     //logout function for top navigation bar
     $rootScope.logout = function () {
