@@ -876,10 +876,10 @@
                     usage.isRoot = true;
 
                     $http.get('api/taskref/' + usage.usage.taskRefId).success(function (result) {
+                        visit(usage, null, 0, false, result.response);
+
                         updateTechStatus(usage);
                         updateUsageStatus(usage);
-
-                        visit(usage, null, 0, false, result.response);
                     });
                 });
             });
@@ -891,7 +891,7 @@
         }
 
         function updateTechStatus(usage) {
-            if (usage.parent) updateTechStatus(usage.parent);
+            if (usage.parent) return updateTechStatus(usage.parent);
 
             calculateTechStatus(usage);
         };
@@ -902,6 +902,7 @@
             calculateUsageStatus(usage);
         };
 
+        /* helper function to aggregate status-trafficlight */
         function addToStatusResult(status, result) {
             if (status == 2) result.green++;
             else if (status == 1) result.yellow++;
@@ -912,6 +913,7 @@
             return result;
         }
 
+        /* helper function to sum two status-trafficlights */
         function sumStatusResult(result1, result2) {
             return {
                 max: result1.max + result2.max,
@@ -920,9 +922,10 @@
                 green: result1.green + result2.green
             };
         }
-
+        
         function calculateTechStatus(usage) {
-
+            
+            /* this will hold the aggregated tech status of this node */
             var result = {
                 max: 0,
                 red: 0,
@@ -930,15 +933,16 @@
                 green: 0
             };
 
+            /* if the usage isn't delegated, the agg result is just this tech status */
             if (!usage.hasDelegations) {
-                return addToStatusResult(usage.usage.technologyStatus, result);
+                result = addToStatusResult(usage.usage.technologyStatus, result);
+            } else {
+                _.each(usage.delegations, function(delegation) {
+                    var delegationResult = calculateTechStatus(delegation);
+                    result = sumStatusResult(result, delegationResult);
+                });
             }
-
-            _.each(usage.delegations, function (delegation) {
-                var delegationResult = calculateTechStatus(delegation);
-                result = sumStatusResult(result, delegationResult);
-            });
-
+            
             usage.calculatedTechStatus = result;
 
             return result;

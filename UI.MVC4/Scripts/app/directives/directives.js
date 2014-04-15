@@ -171,13 +171,35 @@
         };
     }]);
     
-    app.directive('showStatus', [function () {
+    app.directive('showStatus', ['$timeout', function ($timeout) {
         return {
             scope: {
                 status: '=showStatus'
             },
             replace: false,
-            templateUrl: 'partials/directives/show-status.html'
+            templateUrl: 'partials/directives/show-status.html',
+            
+            link: function (scope, element, attr) {
+                scope.ready = false;
+                update();
+
+                function update() {
+                    $timeout(function () {
+                        if (!scope.status) {
+                            update();
+                            return;
+                        }
+                        scope.ready = true;
+                    });
+                }
+
+
+                scope.$watch("status", function (newval, oldval) {
+                    if (newval === oldval) return;
+
+                    update();
+                });
+            }
         };
     }]);
     
