@@ -1,10 +1,13 @@
 ﻿<div class="col-md-12">
 
     <div class="col-md-4 container-fluid">
-        <h2>Organisation</h2>
-        <p>Du er tilknyttet disse organisationer:</p>
+        <h2>Enheder</h2>
+        <p>Du er tilknyttet disse organisationsenheder:</p>
         <div data-ng-repeat="node in nodes">
             <div data-ng-include="'partials/org/org-unit.html'"></div>
+        </div>
+        <div data-ng-if="nodes.length == 0">
+            <strong>Du er ikke tilknyttet nogen enheder.</strong>
         </div>
     </div>
 
