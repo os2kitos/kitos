@@ -10,20 +10,29 @@
     <!-- status -->
     <div class="col-md-2">
         <div class="status-column">
-            <input data-select-status="usage.usage.technologyStatus" />
+            <input data-select-status="usage.usage.technologyStatus" data-can-write="usage.usage.orgUnit.hasWriteAccess"/>
         </div>
         <div class="status-column">
-            <input data-select-status="usage.usage.usageStatus" />
+            <input data-select-status="usage.usage.usageStatus" data-can-write="usage.usage.orgUnit.hasWriteAccess"/>
         </div>
-            <div class="status-column">
-                <button class="btn btn-link btn-xs"
-                    data-tooltip-html-unsafe="<small>{{ usage.usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
-                    data-tooltip-trigger="mouseenter"
-                    data-tooltip-placement="right"
-                    data-ng-click="openComment(usage)">
-                    <i class="glyphicon glyphicon-comment" data-ng-class="{'faded': !usage.usage.comment}"></i>
-                </button>
-            </div>
+        <div class="status-column">
+            <button class="btn btn-link btn-xs"
+                data-tooltip-html-unsafe="<small>{{ usage.usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
+                data-tooltip-trigger="mouseenter"
+                data-tooltip-placement="right"
+                data-ng-click="openComment(usage)"
+                data-ng-if="usage.usage.orgUnit.hasWriteAccess">
+                <i class="glyphicon glyphicon-comment" data-ng-class="{'faded': !usage.usage.comment}"></i>
+            </button>
+            <button class="btn btn-link btn-xs"
+                data-tooltip-html-unsafe="<small>Læs kommentar</small>"
+                data-tooltip-trigger="mouseenter"
+                data-tooltip-placement="right"
+                data-ng-click="openComment(usage)"
+                data-ng-if="!usage.usage.orgUnit.hasWriteAccess && usage.usage.comment">
+                <i class="glyphicon glyphicon-comment"></i>
+            </button>
+        </div>
     </div>
     
     <!-- it project / it system -->

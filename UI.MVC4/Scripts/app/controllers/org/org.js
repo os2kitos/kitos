@@ -1024,6 +1024,7 @@
                     $modalScope.taskKey = usage.usage.task.taskKey;
                     $modalScope.taskDescription = usage.usage.task.description;
                     $modalScope.orgUnitName = usage.usage.orgUnit.name;
+                    $modalScope.hasWriteAccess = usage.usage.orgUnit.hasWriteAccess;
 
                     $modalScope.saveComment = function () {
                         $modalScope.submitting = true;
