@@ -20,7 +20,7 @@ app.config(['$httpProvider', 'notifyProvider', 'RestangularProvider', function (
     });
 }]);
 
-app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'growl', function ($rootScope, $http, $state, editableOptions, $modal, growl) {
+app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify', function ($rootScope, $http, $state, editableOptions, $modal, notify) {
     //init info
     $rootScope.page = {
         title: 'Index',
@@ -61,10 +61,10 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'growl', 
                         url: 'api/user/' + user.id,
                         data: userData
                     }).success(function() {
-                        growl.addSuccessMessage('OK');
+                        notify.addSuccessMessage('OK');
                         $modalInstance.close();
                     }).error(function() {
-                        growl.addErrorMessage('Fejl');
+                        notify.addErrorMessage('Fejl');
                     });
                 };
 
