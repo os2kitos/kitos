@@ -23,7 +23,7 @@ namespace Core.DomainModel
         public string Password { get; set; }
         public string Salt { get; set; }
         public bool IsGlobalAdmin { get; set; }
-        public int DefaultOrganizationUnitId { get; set; }
+        public int? DefaultOrganizationUnitId { get; set; }
 
         public virtual ICollection<PasswordResetRequest> PasswordResetRequests { get; set; }
 
