@@ -151,6 +151,13 @@
         $scope.$watch("selectedUser", function () {
             $scope.submitRight();
         });
+        
+        /* the role of "medarbejder", mmm, the taste of hardcode */
+        function getDefaultNewRole() {
+            return 3;
+        }
+
+        $scope.newRole = getDefaultNewRole();
 
         $scope.submitRight = function () {
 
@@ -181,7 +188,7 @@
                     show: true
                 });
 
-                $scope.newRole = "";
+                $scope.newRole = getDefaultNewRole();
                 $scope.selectedUser = "";
 
             }).error(function (result) {
