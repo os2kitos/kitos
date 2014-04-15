@@ -5,12 +5,10 @@
     <form name="profileForm" id="profileForm" class="form-horizontal" data-ng-submit="ok()">
         <div class="form-group">
             <label for="parent" class="col-md-3 control-label">
-                Standard valgt organisation
+                Standard valgt enhed
             </label>
             <div class="col-md-8">
-                <select data-ui-select2="" id="parent" data-ng-model="defaultOrg" class="form-control" data-placeholder="Vælg standard organisation" required>
-                    <option></option>
-                    <option data-ng-repeat="org in organizations" value="{{org.id}}">{{ org.name }}</option>
+                <select id="parent" data-ng-model="defaultOrgUnit" class="form-control" data-ng-options="orgUnit.id as orgUnit.name for orgUnit in orgUnits" required>
                 </select>
             </div>
         </div>

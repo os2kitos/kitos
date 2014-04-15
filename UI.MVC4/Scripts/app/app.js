@@ -33,18 +33,31 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'growl', 
     $rootScope.openProfileModal = function() {
         $modal.open({
             templateUrl: 'partials/topnav/profileModal.html',
-            controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
-                $modalScope.user = $rootScope.user;
-
-                $http.get('api/user/' + $modalScope.user.id + '?organizations').success(function (data) {
-                    $modalScope.organizations = data;
-                });
+            resolve: {
+                user: function() {
+                    return $rootScope.user;
+                },
+                orgUnits: function() {
+                    return $http.get('api/organizationunit/?userid2=' + $rootScope.user.id);
+                }
+            },
+            controller: ['$scope', '$modalInstance', 'user', 'orgUnits', function ($modalScope, $modalInstance, user, orgUnits) {
+                $modalScope.user = user;
+                $modalScope.orgUnits = orgUnits.data.response;
 
                 $modalScope.ok = function () {
+                    var userData = {};
+                    if ($modalScope.name) 
+                        userData.name = $modalScope.name;
+                    if ($modalScope.defaultOrgUnit)
+                        userData.defaultOrg = $modalScope.defaultOrg;
+                    if ($modalScope.email)
+                        userData.email = $modalScope.email;
+
                     $http({
                         method: 'PATCH',
-                        url: 'api/user/' + $rootScope.user.id,
-                        data: data
+                        url: 'api/user/' + user.id,
+                        data: userData
                     }).success(function() {
                         growl.addSuccessMessage('OK');
                         $modalInstance.close();
