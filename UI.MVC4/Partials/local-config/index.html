@@ -7,7 +7,7 @@
 
         <div class="col-md-4">
             Vælg en organisation:
-            <select data-ui-select2="" data-ng-model="orgChooser.chosen" class="form-control" data-placeholder="Vælg organisation" data-ng-required="true" data-ng-click="choose()">
+            <select data-ui-select2="" data-ng-model="orgChooser.chosen" class="form-control" data-placeholder="Vælg organisation" data-ng-required="true" data-ng-click="choose()" tabindex="1" data-autofocus="">
                 <option></option>
                 <option data-ng-repeat="org in orgChooser.options" value="{{org.id}}">{{org.name}}</option>
             </select>
