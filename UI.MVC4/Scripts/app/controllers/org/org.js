@@ -3,7 +3,7 @@
     var subnav = [
             { state: 'org-overview', text: 'Overblik' },
             { state: 'org-view', text: 'Organisation' },
-            { state: '', text: 'Rapport' }
+            { state: 'index', text: 'Rapport' }
     ];
 
     function indent(level) {
@@ -296,8 +296,10 @@
 
             var modal = $modal.open({
                 templateUrl: 'partials/org/edit-org-unit-modal.html',
-                controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
+                controller: ['$scope', '$modalInstance', 'autofocus', function ($modalScope, $modalInstance, autofocus) {
 
+                    autofocus();
+                    
                     //edit or create-new mode
                     $modalScope.isNew = false;
 
@@ -393,14 +395,14 @@
                     };
 
                     $modalScope.new = function () {
+                        autofocus();
+                        
                         $modalScope.createNew = true;
                         $modalScope.newOrgUnit = {
-                            name: 'Ny afdeling',
+                            name: '',
                             parent: $modalScope.orgUnit.id,
                             orgId: $modalScope.orgUnit.orgId
                         };
-
-                        console.log($modalScope.newOrgUnit);
                     };
 
                     $modalScope.delete = function () {
