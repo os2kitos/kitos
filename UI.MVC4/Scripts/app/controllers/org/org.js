@@ -946,9 +946,9 @@
                 result = addToStatusResult(usage.usage.technologyStatus, result);
             } else {
                 _.each(usage.delegations, function(delegation) {
-                var delegationResult = calculateTechStatus(delegation);
-                result = sumStatusResult(result, delegationResult);
-            });
+                    var delegationResult = calculateTechStatus(delegation);
+                    result = sumStatusResult(result, delegationResult);
+                });
             }
 
             usage.calculatedTechStatus = result;
