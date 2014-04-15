@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
@@ -12,9 +13,12 @@ namespace UI.MVC4.Controllers.API
 {
     public class TaskUsageController : GenericApiController<TaskUsage, int, TaskUsageDTO>
     {
-        public TaskUsageController(IGenericRepository<TaskUsage> repository) 
+        private readonly IOrgUnitService _orgUnitService;
+
+        public TaskUsageController(IGenericRepository<TaskUsage> repository,IOrgUnitService orgUnitService) 
             : base(repository)
         {
+            _orgUnitService = orgUnitService;
         }
 
         public HttpResponseMessage Get(int orgUnitId)
@@ -93,10 +97,36 @@ namespace UI.MVC4.Controllers.API
             var taskRefId = entity.TaskRefId;
             var unit = entity.OrgUnit;
 
+            if (!_orgUnitService.HasWriteAccess(KitosUser, unit)) throw new SecurityException();
+
             Repository.DeleteByKey(entity.Id);
             DeleteTaskOnChildren(unit, taskRefId);
 
             Repository.Save();
+        }
+
+        protected override TaskUsage PostQuery(TaskUsage item)
+        {
+
+            var unit = item.OrgUnit;
+
+            if (!_orgUnitService.HasWriteAccess(KitosUser, unit)) throw new SecurityException();
+
+            return base.PostQuery(item);
+        }
+
+        public override HttpResponseMessage Put(int id, TaskUsageDTO dto)
+        {
+            return NotAllowed();
+        }
+
+        public override HttpResponseMessage Patch(int id, Newtonsoft.Json.Linq.JObject obj)
+        {
+
+            var entity = Repository.GetByKey(id);
+            if (!_orgUnitService.HasWriteAccess(KitosUser, entity.OrgUnit)) return Unauthorized();
+
+            return base.Patch(id, obj);
         }
     }
 }
