@@ -212,13 +212,12 @@
     };
 
     app.controller('localConfig.InitCtrl',
-        ['$rootScope', '$scope', '$http', '$state', 'organizationsHttp', //'autofocus', TODO outcomment this after merge
+        ['$rootScope', '$scope', '$http', '$state', 'organizationsHttp', 'autofocus',
             function($rootScope, $scope, $http, $state, organizationsHttp, autofocus) {
                 $rootScope.page.title = 'Konfiguration';
                 $rootScope.page.subnav = [];
 
-                //TODO outcomment this after merge
-                //autofocus();
+                autofocus();
 
                 $scope.orgChooser = {
                     options: _.filter(organizationsHttp.data.response,
@@ -238,8 +237,6 @@
             function ($rootScope, $scope, $http, $stateParams, notify, organizationHttp, supportNamesHttp, projectNamesHttp, systemNamesHttp, contractNamesHttp, configHttp) {
                 $rootScope.page.title = 'Konfiguration';
                 $rootScope.page.subnav = [];
-
-                $scope.keepOpen = true;
                 
                 $scope.orgId = $stateParams.chosenId;
                 $scope.orgChooser.chosen = $stateParams.chosenId;
