@@ -1,26 +1,28 @@
 ﻿<div class="col-md-12">
-    <div class="form-group row">
-        <label class="col-md-2 control-label">
-            Modulnavn
-        </label>
-        <div class="col-md-10">
-            <a href="#" data-editable-select="support.chosenNameId" data-buttons="no" data-e-ng-options="name.id as name.name for name in support.moduleNames" data-onbeforesave="updateConfig($data, 'itSupportModuleNameId')">
-                {{ support.moduleNames[support.chosenNameId - 1].name; }}
-            </a>
+    <!--    <div class="form-group row">
+                <label class="col-md-2 control-label">
+                    Modulnavn
+                </label>
+                <div class="col-md-10">
+                    <a href="#" data-editable-select="support.chosenNameId" data-buttons="no" data-e-ng-options="name.id as name.name for name in support.moduleNames" data-onbeforesave="updateConfig($data, 'itSupportModuleNameId')">
+                        {{ support.moduleNames[support.chosenNameId - 1].name; }}
+                    </a>
+                </div>
+            </div>
+        <div class="form-group row">
+            <label class="col-md-2 control-label">
+                Vejledning
+            </label>
+            <div class="col-md-10">
+                <a href="#" data-editable-text="support.guideUrl" data-buttons="no" data-onbeforesave="updateConfig($data, 'itSupportGuide')">
+                    {{ support.guideUrl || 'Ingen guide' }}
+                </a>
+            </div>
         </div>
-    </div>
-    <div class="form-group row">
-        <label class="col-md-2 control-label">
-            Vejledning
-        </label>
-        <div class="col-md-10">
-            <a href="#" data-editable-text="support.guideUrl" data-buttons="no" data-onbeforesave="updateConfig($data, 'itSupportGuide')">
-                {{ support.guideUrl || 'Ingen guide' }}
-            </a>
-        </div>
-    </div>
+        -->
     
-    <div data-option-locale-list="" title="Referencer" data-locales-url="api/extReferenceTypeLocale" data-options-url="api/extReferenceType" data-org-id="orgId"></div>
+<!--    Referencer-->
+    <!--    <div data-option-locale-list="" title="Referencer" data-locales-url="api/extReferenceTypeLocale" data-options-url="api/extReferenceType" data-org-id="orgId"></div>-->
 
     <div class="form-group row">
         <label class="col-md-2 control-label">
@@ -28,28 +30,55 @@
         </label>
         <div class="col-md-10">
             <div>
-                <a href="#" data-editable-checkbox="support.showTabOverview" data-e-title="Medtag fanen 'Overblik'?" data-onbeforesave="updateConfig($data, 'showTabOverview')" data-buttons="no">
+                <label>
+                    <input type="checkbox" data-ng-model="support.showTabOverview" data-ng-change="updateConfig(support.showTabOverview, 'showTabOverview')" tabindex="1"/>
+                    Medtag fanen 'Overblik'
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="checkbox" data-ng-model="support.showTechnology" data-ng-change="updateConfig(support.showTechnology, 'showColumnTechnology')" tabindex="2"/>
+                    Medtag kolonnen 'Teknologi'
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="checkbox" data-ng-model="support.showUsage" data-ng-change="updateConfig(support.showUsage, 'showColumnUsage')" tabindex="3"/>
+                    Medtag kolonnen 'Anvendelse'
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="checkbox" data-ng-model="support.showMandatory" data-ng-change="updateConfig(support.showMandatory, 'showColumnMandatory')" tabindex="4"/>
+                    Medtag kolonnen 'SKAL'
+                </label>
+            </div>
+            
+            
+            <!--
+            <div>
+                <a href="#" data-editable-checkbox="support.showTabOverview" data-e-title="Medtag fanen 'Overblik'?" data-onbeforesave="updateConfig($data, 'showTabOverview')" data-buttons="no" data-e-form="keepOpen">
                     {{support.showTabOverview && "Medtager fanen 'Overblik'" || "Medtager IKKE fanen 'Overblik'" }}
                 </a>
             </div>
 
             <div>
-                <a href="#" data-editable-checkbox="support.showTechnology" data-e-title="Medtag kolonnen 'Teknologi'?" data-onbeforesave="updateConfig($data, 'showColumnTechnology')" data-buttons="no">
+                <a href="#" data-editable-checkbox="support.showTechnology" data-e-title="Medtag kolonnen 'Teknologi'?" data-onbeforesave="updateConfig($data, 'showColumnTechnology')" data-buttons="no" data-e-form="keepOpen">
                     {{support.showTechnology && "Medtager kolonnen 'Teknologi'" || "Medtager IKKE kolonnen 'Teknologi'" }}
                 </a>
             </div>
 
             <div>
-                <a href="#" data-editable-checkbox="support.showUsage" data-e-title="Medtag kolonnen 'Anvendelse'?" data-onbeforesave="updateConfig($data, 'showColumnUsage')" data-buttons="no">
+                <a href="#" data-editable-checkbox="support.showUsage" data-e-title="Medtag kolonnen 'Anvendelse'?" data-onbeforesave="updateConfig($data, 'showColumnUsage')" data-buttons="no" data-e-form="keepOpen">
                     {{support.showUsage && "Medtager kolonnen 'Anvendelse'" || "Medtager IKKE kolonnen 'Anvendelse'" }}
                 </a>
             </div>
 
             <div>
-                <a href="#" data-editable-checkbox="support.showMandatory" data-e-title="Medtag kolonnen 'SKAL'?" data-onbeforesave="updateConfig($data, 'showColumnMandatory')" data-buttons="no">
+                <a href="#" data-editable-checkbox="support.showMandatory" data-e-title="Medtag kolonnen 'SKAL'?" data-onbeforesave="updateConfig($data, 'showColumnMandatory')" data-buttons="no"  data-e-form="keepOpen">
                     {{support.showMandatory && "Medtager kolonnen 'SKAL'" || "Medtager IKKE kolonnen 'SKAL'" }}
                 </a>
-            </div>
+            </div>-->
 
         </div>
     </div>
