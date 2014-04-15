@@ -25,14 +25,10 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("User");
 
-            /* This is handled automatically??
-            this.Property(t => t.Id).HasColumnName("Id");
-            this.Property(t => t.Name).HasColumnName("Name");
-            this.Property(t => t.Email).HasColumnName("Email");
-            this.Property(t => t.Password).HasColumnName("Password");
-             */
-
             // Relationships
+            this.HasOptional(t => t.DefaultOrganizationUnit)
+                .WithMany(t => t.DefaultUsers)
+                .HasForeignKey(d => d.DefaultOrganizationUnitId);
         }
     }
 }

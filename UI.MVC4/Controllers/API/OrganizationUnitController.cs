@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Security;
-using System.Web;
-using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
@@ -18,7 +15,7 @@ namespace UI.MVC4.Controllers.API
         private readonly IOrgUnitService _orgUnitService;
         private readonly IAdminService _adminService;
 
-        public OrganizationUnitController(IGenericRepository<OrganizationUnit> repository, IGenericRepository<TaskRef> taskRepository, IOrgUnitService orgUnitService, IAdminService adminService) 
+        public OrganizationUnitController(IGenericRepository<OrganizationUnit> repository, IOrgUnitService orgUnitService, IAdminService adminService) 
             : base(repository)
         {
             _orgUnitService = orgUnitService;
@@ -35,8 +32,24 @@ namespace UI.MVC4.Controllers.API
 
                 var orgUnits = _orgUnitService.GetByUser(user);
 
-                return Ok(Map<ICollection<OrganizationUnit>, ICollection<OrgUnitDTO>>(orgUnits));
+                return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(orgUnits));
 
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetByUser2(int userId2)
+        {
+            try
+            {
+                var user = KitosUser;
+                if(user.Id != userId2) throw new SecurityException();
+
+                var orgUnits = Repository.Get(x => x.Rights.Any(y => y.UserId == userId2));
+                return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(orgUnits));
             }
             catch (Exception e)
             {
@@ -62,7 +75,7 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public override HttpResponseMessage Patch(int id, Newtonsoft.Json.Linq.JObject obj)
+        public override HttpResponseMessage Patch(int id, JObject obj)
         {
             try
             {
