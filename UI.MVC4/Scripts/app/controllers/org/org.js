@@ -55,7 +55,7 @@
         _.each(orgRolesHttp.data.response, function (orgRole) {
             $scope.orgRoles[orgRole.id] = orgRole;
         });
-
+        
 
         function flattenAndSave(orgUnit, inheritWriteAccess, parentOrgunit) {
             orgUnit.parent = parentOrgunit;
@@ -65,6 +65,8 @@
                 var old = $scope.orgUnits[orgUnit.id];
                 orgUnit.isOpen = old.isOpen;
             }
+
+            checkForDefaultUnit(orgUnit);
 
             $scope.orgUnits[orgUnit.id] = orgUnit;
 
@@ -86,6 +88,20 @@
                     return flattenAndSave(u, true, orgUnit);
                 });
 
+            }
+        }
+        
+        function checkForDefaultUnit(unit) {
+            if (!$rootScope.user.defaultOrganizationUnitId) return;
+            
+            if (!unit || unit.id !== $rootScope.user.defaultOrganizationUnitId) return;
+
+            open(unit);
+            $scope.chooseOrgUnit(unit);
+
+            function open(u) {
+                u.isOpen = true;
+                if (u.parent) open(u.parent);
             }
         }
 
@@ -795,7 +811,7 @@
     }]);
 
 
-    app.controller('org.OverviewCtrl', ['$rootScope', '$scope', '$http', 'notify', '$modal', function ($rootScope, $scope, $http, notify, $modal) {
+    app.controller('org.OverviewCtrl', ['$rootScope', '$scope', '$http', 'notify', '$modal', '$timeout', function ($rootScope, $scope, $http, notify, $modal, $timeout) {
         $rootScope.page.title = 'Organisation';
         $rootScope.page.subnav = subnav;
 
@@ -807,6 +823,8 @@
 
         function flattenAndSave(orgUnit, inheritWriteAccess) {
             $scope.orgUnits[orgUnit.id] = orgUnit;
+
+            checkForDefaultUnit(orgUnit);
 
             if (!inheritWriteAccess) {
                 $http.get('api/organizationRight?hasWriteAccess&orgUnitId=' + orgUnit.id + '&userId=' + userId).success(function (result) {
@@ -827,6 +845,19 @@
                 });
 
             }
+        }
+        
+        function checkForDefaultUnit(unit) {
+            if (!$rootScope.user.defaultOrganizationUnitId) return;
+
+            if (!unit || unit.id !== $rootScope.user.defaultOrganizationUnitId) return;
+
+            $timeout(function() {
+                $scope.orgUnitId = unit.id;
+                $scope.loadUsages();
+            });
+
+            console.log($scope.orgUnitId);
         }
 
         function loadUnits() {
