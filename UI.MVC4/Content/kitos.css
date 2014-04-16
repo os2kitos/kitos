@@ -420,3 +420,9 @@ a.select-status:hover .status-arrow-down {
 body.wait, body.wait * {
     cursor: wait !important;
 }
+
+.btn-header {
+    padding: 2px;
+    width: 100%;
+    text-align: left;
+}

@@ -9,13 +9,12 @@
         <table class="full-width table">
             <thead>
                 <tr>
-                    <th><a data-ng-click="rightSortChange('userName')">Navn</a></th>
-                    <th><a data-ng-click="rightSortChange('userEmail')">Email</a></th>
-                    <th></th>
+                    <th><button class="btn btn-link btn-header" data-ng-click="adminSortChange('userName')">Navn</button></th>
+                    <th colspan="2"><button class="btn btn-link btn-header" data-ng-click="adminSortChange('userEmail')">Email</button></th>
                 </tr>
             </thead>
             <!-- for each admin -->
-            <tbody data-ng-repeat="admin in globalAdmins | filter : { show: true } | orderBy : rightSort : rightSortReverse">
+            <tbody data-ng-repeat="admin in globalAdmins | filter : { show: true } | orderBy : adminSort : adminSortReverse">
 
                 <!-- show -->
                 <tr data-ng-hide="admin.edit">

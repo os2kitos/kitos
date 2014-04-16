@@ -48,63 +48,6 @@
             });
         };
     }]);
-
-    /*
-    app.controller('globalAdmin.NewLocalAdminCtrl', ['$rootScope', '$scope', '$http', 'notify', function ($rootScope, $scope, $http, notify) {
-        $rootScope.page.title = 'Ny lokal admin';
-        $rootScope.page.subnav = subnav;
-
-        $scope.organizations = [];
-        $http.get("api/organization").success(function(result) {
-            $scope.organizations = result.response;
-        });
-
-        $scope.submit = function () {
-            if ($scope.addForm.$invalid) return;
-
-            var selectedUser = $scope.selectedUser;
-            var orgId = $scope.organization;
-
-            var data = {
-                "userId": selectedUser.id,
-                "organizationId": orgId
-            };
-
-            $http.post('api/localadmin', data).success(function (result) {
-                notify.addSuccessMessage(selectedUser.text + " er blevet lokal admin!");
-
-                $scope.selectedUser = null;
-                $scope.organization = ""; 
-                
-            }).error(function (result) {
-                notify.addErrorMessage("Fejl! " + selectedUser.text + " blev ikke lokal admin!");
-            });
-        };
-    }]);
-
-    app.controller('globalAdmin.NewGlobalAdminCtrl', ['$rootScope', '$scope', '$http', 'notify', function ($rootScope, $scope, $http, notify) {
-        $rootScope.page.title = 'Ny global admin';
-        $rootScope.page.subnav = subnav;
-
-        $scope.submit = function () {
-            if ($scope.addForm.$invalid) return;
-
-            var selectedUser = $scope.selectedUser;
-
-            var data = {
-                "userId": selectedUser.id,
-            };
-
-            $http.post('api/globaladmin', data).success(function (result) {
-                notify.addSuccessMessage(selectedUser.text + " er blevet global admin!");
-
-                $scope.selectedUser = null;
-
-            }).error(function (result) {
-                notify.addErrorMessage("Fejl! " + selectedUser.text + " blev ikke global admin!");
-            });
-        };
-    }]);*/
     
     app.controller('globalAdmin.LocalAdminsCtrl', ['$rootScope', '$scope', '$http', 'notify', function ($rootScope, $scope, $http, notify) {
         $rootScope.page.title = 'Lokal administratorer';
@@ -264,6 +207,30 @@
                 msg.toErrorMessage("Fejl!");
             });
         };
+        $scope.rightSortBy = "userName";
+        $scope.rightSortReverse = false;
+        $scope.rightSort = function (right) {
+            switch ($scope.rightSortBy) {
+                case "orgName":
+                    return $scope.organizations[right.objectId].name;
+                case "userName":
+                    return right.user.name;
+                case "userEmail":
+                    return right.user.email;
+                default:
+                    return $scope.organizations[right.objectId].name;
+            }
+        };
+
+        $scope.rightSortChange = function (val) {
+            if ($scope.rightSortBy == val) {
+                $scope.rightSortReverse = !$scope.rightSortReverse;
+            } else {
+                $scope.rightSortReverse = false;
+            }
+
+            $scope.rightSortBy = val;
+        };
     }]);
         
         /* GLOBAL ADMIN */
@@ -398,6 +365,30 @@
 
                     msg.toErrorMessage("Fejl!");
                 });
+            };
+            
+
+            $scope.adminSortBy = "userName";
+            $scope.adminSortReverse = false;
+            $scope.adminSort = function (admin) {
+                switch ($scope.adminSortBy) {
+                    case "userName":
+                        return admin.user.name;
+                    case "userEmail":
+                        return admin.user.email;
+                    default:
+                        return admin.user.name;
+                }
+            };
+
+            $scope.adminSortChange = function (val) {
+                if ($scope.adminSortBy == val) {
+                    $scope.adminSortReverse = !$scope.adminSortReverse;
+                } else {
+                    $scope.adminSortReverse = false;
+                }
+
+                $scope.adminSortBy = val;
             };
 
     }]);
