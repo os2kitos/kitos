@@ -23,7 +23,7 @@
         }]);
 
 
-    app.directive('addUser', ['$http', '$modal', function($http, $modal) {
+    app.directive('addUserButton', ['$http', '$modal', function($http, $modal) {
         return {
             scope: {
                 userResult: '=?addUser',
@@ -92,15 +92,45 @@
     }]);
     
     app.directive('selectUser', ['$rootScope', '$http', function ($rootScope, $http) {
+        
+        //format of dropdown options
+        function formatResult(obj) {
+            var result = "<div>" + obj.text + "</div>";
+
+            //obj.user might contain more info about the user
+            if (obj.user) {
+                result += "<div class='small'>" + obj.user.email;
+
+                if(obj.user.defaultOrganizationUnitName)
+                result += ", " + obj.user.defaultOrganizationUnitName;
+
+                result += "</div>";
+            }
+
+            return result;
+        }
+        
+        //format of the selected user
+        function formatSelection(obj) {
+            return obj.text;
+        }
+
         return {
             scope: {
                 inputName: '@?name',
-                userModel: '='
+                userModel: '=',
+                addUser: "@?"
             },
             replace: true,
             templateUrl: 'partials/directives/select-user.html',
             controller: ['$scope', function($scope) {
                 $scope.selectUserOptions = {
+                    
+                    //don't escape markup, otherwise formatResult will be bugged
+                    escapeMarkup: function (m) { return m; },
+                    formatResult: formatResult,
+                    formatSelection: formatSelection,
+                    
                     minimumInputLength: 1,
                     initSelection: function(elem, callback) {
                     },
@@ -117,14 +147,16 @@
 
                             return res;
                         },
+                        
                         results: function(data, page) {
                             var results = [];
 
                             _.each(data.data.response, function(user) {
 
                                 results.push({
-                                    id: user.id,
-                                    text: user.name
+                                    id: user.id, //select2 mandatory
+                                    text: user.name, //select2 mandatory
+                                    user: user //not mandatory, for extra info when formatting
                                 });
                             });
 

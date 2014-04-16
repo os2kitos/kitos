@@ -96,7 +96,8 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
             email: result.response.email,
             isGlobalAdmin: result.response.isGlobalAdmin,
             isLocalAdmin: isLocalAdmin,
-            isLocalAdminFor: _.pluck(result.response.adminRights, 'organizationId')
+            isLocalAdminFor: _.pluck(result.response.adminRights, 'organizationId'),
+            defaultOrganizationUnitId: result.response.defaultOrganizationUnitId
         };
 
     };
