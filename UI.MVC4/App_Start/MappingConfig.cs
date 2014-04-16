@@ -128,6 +128,10 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
+            Mapper.CreateMap<AdminRole, RoleDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
             Mapper.CreateMap<ProjPhaseLocale, LocaleDTO>().ReverseMap();
             Mapper.CreateMap<ExtRefTypeLocale, LocaleDTO>().ReverseMap();
 
@@ -173,6 +177,9 @@ namespace UI.MVC4.App_Start
 
             Mapper.CreateMap<OrganizationRight, RightOutputDTO>();
             Mapper.CreateMap<RightInputDTO, OrganizationRight>();
+
+            Mapper.CreateMap<AdminRight, RightOutputDTO>();
+            Mapper.CreateMap<RightInputDTO, AdminRight>();
         }
     }
 }

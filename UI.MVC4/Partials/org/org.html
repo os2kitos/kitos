@@ -51,11 +51,10 @@
                     <table class="full-width table">
                         <thead>
                             <tr>
-                                <th><a ng-click="rightSortChange('orgUnitName')">Organisationsenhed</a></th>
-                                <th><a ng-click="rightSortChange('roleName')">Organisationsrolle</a></th>
-                                <th><a ng-click="rightSortChange('userName')">Navn</a></th>
-                                <th><a ng-click="rightSortChange('userEmail')">Email</a></th>
-                                <th></th>
+                                <th><button class="btn btn-link btn-header" data-ng-click="rightSortChange('orgUnitName')">Organisationsenhed</button></th>
+                                <th><button class="btn btn-link btn-header" data-ng-click="rightSortChange('roleName')">Organisationsrolle</button></th>
+                                <th><button class="btn btn-link btn-header" data-ng-click="rightSortChange('userName')">Navn</button></th>
+                                <th colspan="2"><button class="btn btn-link btn-header" data-ng-click="rightSortChange('userEmail')">Email</button></th>
                             </tr>
                         </thead>
                         <!-- for each right -->
