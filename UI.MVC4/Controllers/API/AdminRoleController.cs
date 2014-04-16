@@ -12,8 +12,18 @@ namespace UI.MVC4.Controllers.API
 {
     public class AdminRoleController : GenericOptionApiController<AdminRole, AdminRight, RoleDTO>
     {
-        public AdminRoleController(IGenericRepository<AdminRole> repository) : base(repository)
+        private readonly IAdminService _adminService;
+
+        public AdminRoleController(IGenericRepository<AdminRole> repository, IAdminService adminService) : base(repository)
         {
+            _adminService = adminService;
+        }
+
+        public HttpResponseMessage GetLocalAdminRole(bool? getLocalAdminRole)
+        {
+            var dto = Map(_adminService.GetLocalAdminRole());
+
+            return Ok(dto);
         }
 
         public override HttpResponseMessage Delete(int id)

@@ -44,7 +44,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region AdminRoles
 
-            var localAdmin = new AdminRole { Name = "LocalAdmin" };
+            var localAdmin = new AdminRole { Name = "LocalAdmin", IsActive = true};
             context.AdminRoles.AddOrUpdate(x => x.Name, localAdmin);
 
             #endregion

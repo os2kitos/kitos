@@ -69,15 +69,19 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage Delete(RightInputDTO inputDTO)
+        public HttpResponseMessage Delete([FromUri] int oId, [FromUri] int rId, [FromUri] int uId)
         {
             try
             {
                 //gotta be global admin to do this
                 if (!IsGlobalAdmin()) return Unauthorized();
 
-                var org = _organizationRepository.GetByKey(inputDTO.ObjectId);
-                var user = UserRepository.GetByKey(inputDTO.UserId);
+                //we only allow posting a local admin role
+                var localAdminRole = AdminService.GetLocalAdminRole();
+                if (rId != localAdminRole.Id) return NotAllowed();
+
+                var org = _organizationRepository.GetByKey(oId);
+                var user = UserRepository.GetByKey(uId);
 
                 _adminService.RemoveLocalAdmin(user, org);
 

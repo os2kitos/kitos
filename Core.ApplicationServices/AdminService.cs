@@ -34,8 +34,9 @@ namespace Core.ApplicationServices
         {
             var role = GetLocalAdminRole();
             _adminRights.DeleteByKey(organization.Id, role.Id, user.Id);
+            _adminRights.Save();
         }
-
+        
         public bool IsGlobalAdmin(User user)
         {
             return user.IsGlobalAdmin;
