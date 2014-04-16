@@ -134,17 +134,9 @@
     <Compile Include="Mapping\UserAdministrationMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
-    <Compile Include="Migrations\201404101543524_Initial.cs" />
-    <Compile Include="Migrations\201404101543524_Initial.Designer.cs">
-      <DependentUpon>201404101543524_Initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201404151112221_DefaultOrgUnit.cs" />
-    <Compile Include="Migrations\201404151112221_DefaultOrgUnit.Designer.cs">
-      <DependentUpon>201404151112221_DefaultOrgUnit.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201404161128133_AdminRoleModified.cs" />
-    <Compile Include="Migrations\201404161128133_AdminRoleModified.Designer.cs">
-      <DependentUpon>201404161128133_AdminRoleModified.cs</DependentUpon>
+    <Compile Include="Migrations\201404161759557_Initial.cs" />
+    <Compile Include="Migrations\201404161759557_Initial.Designer.cs">
+      <DependentUpon>201404161759557_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -169,14 +161,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201404101543524_Initial.resx">
-      <DependentUpon>201404101543524_Initial.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201404151112221_DefaultOrgUnit.resx">
-      <DependentUpon>201404151112221_DefaultOrgUnit.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201404161128133_AdminRoleModified.resx">
-      <DependentUpon>201404161128133_AdminRoleModified.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201404161759557_Initial.resx">
+      <DependentUpon>201404161759557_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

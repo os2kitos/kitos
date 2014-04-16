@@ -401,8 +401,11 @@ namespace Infrastructure.DataAccess.Migrations
                         Password = c.String(nullable: false, unicode: false),
                         Salt = c.String(nullable: false, unicode: false),
                         IsGlobalAdmin = c.Boolean(nullable: false),
+                        DefaultOrganizationUnitId = c.Int(),
                     })
-                .PrimaryKey(t => t.Id);
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.OrganizationUnit", t => t.DefaultOrganizationUnitId)
+                .Index(t => t.DefaultOrganizationUnitId);
             
             CreateTable(
                 "dbo.ItContractRight",
@@ -961,6 +964,8 @@ namespace Infrastructure.DataAccess.Migrations
                         IsActive = c.Boolean(nullable: false),
                         IsSuggestion = c.Boolean(nullable: false),
                         Note = c.String(unicode: false),
+                        HasReadAccess = c.Boolean(nullable: false),
+                        HasWriteAccess = c.Boolean(nullable: false),
                     })
                 .PrimaryKey(t => t.Id);
             
@@ -1056,6 +1061,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.Risk", "ItProjectId", "dbo.ItProject");
             DropForeignKey("dbo.ItProjectRight", "UserId", "dbo.User");
             DropForeignKey("dbo.PasswordResetRequest", "UserId", "dbo.User");
+            DropForeignKey("dbo.User", "DefaultOrganizationUnitId", "dbo.OrganizationUnit");
             DropForeignKey("dbo.ItContractRight", "UserId", "dbo.User");
             DropForeignKey("dbo.ItContractRight", "RoleId", "dbo.ItContractRole");
             DropForeignKey("dbo.ItContractRight", "ObjectId", "dbo.ItContract");
@@ -1191,6 +1197,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ItContractRight", new[] { "UserId" });
             DropIndex("dbo.ItContractRight", new[] { "RoleId" });
             DropIndex("dbo.ItContractRight", new[] { "ObjectId" });
+            DropIndex("dbo.User", new[] { "DefaultOrganizationUnitId" });
             DropIndex("dbo.ItProjectRight", new[] { "UserId" });
             DropIndex("dbo.ItProjectRight", new[] { "RoleId" });
             DropIndex("dbo.ItProjectRight", new[] { "ObjectId" });
