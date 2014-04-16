@@ -23,7 +23,7 @@
         }]);
 
 
-    app.directive('addUser', ['$http', '$modal', function($http, $modal) {
+    app.directive('addUserButton', ['$http', '$modal', function($http, $modal) {
         return {
             scope: {
                 userResult: '=?addUser',
