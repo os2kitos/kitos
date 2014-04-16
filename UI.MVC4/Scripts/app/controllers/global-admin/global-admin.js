@@ -19,6 +19,11 @@
             templateUrl: 'partials/global-admin/new-local-admin.html',
             controller: 'globalAdmin.NewLocalAdminCtrl',
             authRoles: ['GlobalAdmin']
+        }).state('local-admins', {
+            url: '/global-admin/local-admins',
+            templateUrl: 'partials/global-admin/local-admins.html',
+            controller: 'globalAdmin.LocalAdminsCtrl',
+            authRoles: ['GlobalAdmin']
         }).state('new-global-admin', {
             url: '/global-admin/new-global-admin',
             templateUrl: 'partials/global-admin/new-global-admin.html',
@@ -101,6 +106,27 @@
                 notify.addErrorMessage("Fejl! " + selectedUser.text + " blev ikke global admin!");
             });
         };
+    }]);
+    
+    app.controller('globalAdmin.LocalAdminsCtrl', ['$rootScope', '$scope', '$http', 'notify', function ($rootScope, $scope, $http, notify) {
+        $rootScope.page.title = 'Lokal administratorer';
+        $rootScope.page.subnav = subnav;
+
+        $scope.organizations = {};
+        $http.get("api/organization").success(function (result) {
+            _.each(result.response, function (org) {
+                $scope.organizations[org.id] = org;
+            });
+        });
+
+        $scope.adminRights = [];
+        $http.get("api/adminright").success(function(result) {
+            _.each(result.response, function (right) {
+                right.show = true;
+                $scope.adminRights.push(right);
+            });
+        });
+
     }]);
 
 })(angular, app);

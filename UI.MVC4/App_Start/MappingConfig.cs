@@ -173,6 +173,9 @@ namespace UI.MVC4.App_Start
 
             Mapper.CreateMap<OrganizationRight, RightOutputDTO>();
             Mapper.CreateMap<RightInputDTO, OrganizationRight>();
+
+            Mapper.CreateMap<AdminRight, RightOutputDTO>();
+            Mapper.CreateMap<RightInputDTO, AdminRight>();
         }
     }
 }
