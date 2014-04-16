@@ -92,20 +92,12 @@
     }]);
     
     app.directive('selectUser', ['$rootScope', '$http', function ($rootScope, $http) {
-        function userToString(user) {
-            var result = user.name;
-
-            if (user.defaultOrganizationUnitName)
-                result += " <span class='pull-right'>" + user.defaultOrganizationUnitName + "</span>";
-
-            result += "</small>";
-
-            return result;
-        }
         
-        function formatUser(obj) {
+        //format of dropdown options
+        function formatResult(obj) {
             var result = "<div>" + obj.text + "</div>";
 
+            //obj.user might contain more info about the user
             if (obj.user) {
                 result += "<div class='small'>" + obj.user.email;
 
@@ -113,33 +105,31 @@
                 result += ", " + obj.user.defaultOrganizationUnitName;
 
                 result += "</div>";
-
             }
 
             return result;
+        }
+        
+        //format of the selected user
+        function formatSelection(obj) {
+            return obj.text;
         }
 
         return {
             scope: {
                 inputName: '@?name',
                 userModel: '=',
-                addUser: "="
+                addUser: "@?"
             },
-            
-
             replace: true,
             templateUrl: 'partials/directives/select-user.html',
             controller: ['$scope', function($scope) {
                 $scope.selectUserOptions = {
                     
-                    //don't escape markup
+                    //don't escape markup, otherwise formatResult will be bugged
                     escapeMarkup: function (m) { return m; },
-                    
-                    formatResultCssClass: function(object) {
-                        return "";
-                    },
-                    formatResult: formatUser,
-                    formatSelection: formatUser,
+                    formatResult: formatResult,
+                    formatSelection: formatSelection,
                     
                     minimumInputLength: 1,
                     initSelection: function(elem, callback) {
@@ -157,15 +147,16 @@
 
                             return res;
                         },
+                        
                         results: function(data, page) {
                             var results = [];
 
                             _.each(data.data.response, function(user) {
 
                                 results.push({
-                                    id: user.id,
-                                    text: user.name,
-                                    user: user
+                                    id: user.id, //select2 mandatory
+                                    text: user.name, //select2 mandatory
+                                    user: user //not mandatory, for extra info when formatting
                                 });
                             });
 
