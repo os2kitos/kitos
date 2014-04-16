@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainServices;
@@ -16,15 +17,23 @@ namespace Core.ApplicationServices
             _adminRoles = adminRoles;
         }
 
-        public void MakeLocalAdmin(User user, Organization organization)
+        public AdminRight MakeLocalAdmin(User user, Organization organization)
         {
-            _adminRights.Insert(new AdminRight
+            var result = _adminRights.Insert(new AdminRight
                 {
                     Object = organization,
                     User = user,
                     Role = GetLocalAdminRole()
                 });
             _adminRights.Save();
+
+            return result;
+        }
+
+        public void RemoveLocalAdmin(User user, Organization organization)
+        {
+            var role = GetLocalAdminRole();
+            _adminRights.DeleteByKey(organization.Id, role.Id, user.Id);
         }
 
         public bool IsGlobalAdmin(User user)
@@ -40,6 +49,11 @@ namespace Core.ApplicationServices
         public AdminRole GetLocalAdminRole()
         {
             return _adminRoles.Get(role => role.Name == "LocalAdmin").First();
+        }
+
+        public IEnumerable<AdminRight> GetAdminRights()
+        {
+            return _adminRights.Get();
         }
     }
 }

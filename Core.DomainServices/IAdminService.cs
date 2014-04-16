@@ -1,14 +1,18 @@
-﻿using Core.DomainModel;
+﻿using System.Collections.Generic;
+using Core.DomainModel;
 
 namespace Core.DomainServices
 {
     public interface IAdminService
     {
-        void MakeLocalAdmin(User user, Organization organization);
+        AdminRight MakeLocalAdmin(User user, Organization organization);
+        void RemoveLocalAdmin(User user, Organization organization);
 
         bool IsGlobalAdmin(User user);
         bool IsLocalAdmin(User user, Organization organization);
 
         AdminRole GetLocalAdminRole();
+
+        IEnumerable<AdminRight> GetAdminRights();
     }
 }
