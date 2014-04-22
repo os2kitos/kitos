@@ -91,7 +91,6 @@
     <Compile Include="ItProject\Stakeholder.cs" />
     <Compile Include="ItSupportModuleName.cs" />
     <Compile Include="ItSystemModuleName.cs" />
-    <Compile Include="ItSystem\Host.cs" />
     <Compile Include="ItSystem\Infrastructure.cs" />
     <Compile Include="ItSystem\Interface.cs" />
     <Compile Include="ItSystem\InterfaceType.cs" />

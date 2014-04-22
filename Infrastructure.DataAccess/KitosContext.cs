@@ -37,7 +37,6 @@ namespace Infrastructure.DataAccess
         public DbSet<Handover> Handovers { get; set; }
         public DbSet<HandoverTrial> HandoverTrials { get; set; }
         public DbSet<Hierarchy> Hierarchies { get; set; }
-        public DbSet<Host> Hosts { get; set; }
         public DbSet<Core.DomainModel.ItSystem.Infrastructure> Infrastructures { get; set; }
         public DbSet<Interface> Interfaces { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
@@ -78,7 +77,6 @@ namespace Infrastructure.DataAccess
         public DbSet<ShipNotice> ShipNotices { get; set; }
         public DbSet<Stakeholder> Stakeholders { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
-        public DbSet<AppType> SystemTypes { get; set; }
         public DbSet<TaskRef> TaskRefs { get; set; }
         public DbSet<TaskUsage> TaskUsages { get; set; }
         public DbSet<Text> Texts { get; set; }
@@ -105,7 +103,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new HandoverMap());
             modelBuilder.Configurations.Add(new HandoverTrialMap());
             modelBuilder.Configurations.Add(new HierarchyMap());
-            modelBuilder.Configurations.Add(new HostMap());
             modelBuilder.Configurations.Add(new InfrastructureMap());
             modelBuilder.Configurations.Add(new InterfaceMap());
             modelBuilder.Configurations.Add(new InterfaceTypeMap());
