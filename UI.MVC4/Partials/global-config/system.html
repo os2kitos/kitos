@@ -50,10 +50,10 @@
         <div class="well">
             <h4>Systemtyper</h4>
             
-            <div class="form-group" data-ng-repeat="item in SystemTypes">
+            <div class="form-group" data-ng-repeat="item in AppTypes">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.isActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchSystemType($data, $index)">
+                        <a href="#" data-editable-checkbox="item.isActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchAppType($data, $index)">
                             {{ item.isActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>
@@ -64,10 +64,10 @@
             
             <h5>Systemtype forslag</h5>
             
-            <div class="form-group" data-ng-repeat="item in SystemTypeSuggestions">
+            <div class="form-group" data-ng-repeat="item in AppTypeSuggestions">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="!item.isSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchSystemTypeSuggestion(!$data, $index)">
+                        <a href="#" data-editable-checkbox="!item.isSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchAppTypeSuggestion(!$data, $index)">
                             {{ item.isSuggestion && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>

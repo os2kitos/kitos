@@ -228,10 +228,8 @@
     <Compile Include="Controllers\API\TaskUsageController.cs" />
     <Compile Include="Models\CreateGlobalAdminDTO.cs" />
     <Compile Include="Models\CreateLocalAdminDTO.cs" />
-    <Compile Include="Controllers\API\DatabaseTypeController.cs" />
     <Compile Include="Controllers\API\ConfigController.cs" />
     <Compile Include="Controllers\API\OrganizationRoleController.cs" />
-    <Compile Include="Controllers\API\EnvironmentController.cs" />
     <Compile Include="Controllers\API\ExtReferenceTypeLocaleController.cs" />
     <Compile Include="Controllers\API\ExtReferenceTypeController.cs" />
     <Compile Include="Controllers\API\GenericLocaleApiController.cs" />
@@ -254,7 +252,7 @@
     <Compile Include="Controllers\API\ProjectTypeController.cs" />
     <Compile Include="Controllers\API\ProtocolTypeController.cs" />
     <Compile Include="Controllers\API\PurchaseFormController.cs" />
-    <Compile Include="Controllers\API\SystemTypeController.cs" />
+    <Compile Include="Controllers\API\AppTypeController.cs" />
     <Compile Include="Controllers\API\GlobalAdminController.cs" />
     <Compile Include="Controllers\API\LocalAdminController.cs" />
     <Compile Include="Controllers\API\OrganizationController.cs" />

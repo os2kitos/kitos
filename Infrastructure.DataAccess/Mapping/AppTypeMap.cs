@@ -3,16 +3,16 @@ using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class SystemTypeMap : EntityTypeConfiguration<SystemType>
+    public class AppTypeMap : EntityTypeConfiguration<AppType>
     {
-        public SystemTypeMap()
+        public AppTypeMap()
         {
             // Primary Key
             this.HasKey(t => t.Id);
 
             // Properties
             // Table & Column Mappings
-            this.ToTable("SystemType");
+            this.ToTable("AppType");
             this.Property(t => t.Id).HasColumnName("Id");
 
         }

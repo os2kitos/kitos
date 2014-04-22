@@ -63,9 +63,9 @@ namespace Infrastructure.DataAccess.Migrations
                                              new ProjectType() { IsActive = true, Note = "En samlebetegnelse for projekter, som ikke er et IT Program", Name = "Indsatsområde" });
 
             context.SystemTypes.AddOrUpdate(x => x.Name,
-                                            new SystemType() { IsActive = true, Note = "...", Name = "Fag" },
-                                            new SystemType() { IsActive = true, Note = "...", Name = "ESDH" },
-                                            new SystemType() { IsActive = true, Note = "...", Name = "Støttesystemer" });
+                                            new AppType() { IsActive = true, Note = "...", Name = "Fag" },
+                                            new AppType() { IsActive = true, Note = "...", Name = "ESDH" },
+                                            new AppType() { IsActive = true, Note = "...", Name = "Støttesystemer" });
 
             context.InterfaceTypes.AddOrUpdate(x => x.Name,
                                                new InterfaceType() { IsActive = true, Note = "...", Name = "WS" });
@@ -78,6 +78,7 @@ namespace Infrastructure.DataAccess.Migrations
                                         new Method() { IsActive = true, Note = "...", Name = "Batch" },
                                         new Method() { IsActive = true, Note = "...", Name = "Request-Response" });
 
+            /*
             context.DatabaseTypes.AddOrUpdate(x => x.Name,
                                               new DatabaseType() { IsActive = true, Note = "...", Name = "MSSQL" },
                                               new DatabaseType() { IsActive = true, Note = "...", Name = "MySQL" });
@@ -88,7 +89,7 @@ namespace Infrastructure.DataAccess.Migrations
                                                  IsActive = true,
                                                  Note = "...",
                                                  Name = "Citrix"
-                                             });
+                                             });*/
 
             context.ContractTypes.AddOrUpdate(x => x.Name,
                                               new ContractType() { IsActive = true, Note = "...", Name = "Hovedkontrakt" },

@@ -1,13 +1,13 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class Environment : IOptionEntity<Technology>
+    public class AppType : IOptionEntity<ItSystem>
     {
-        public Environment()
+        public AppType()
         {
-            References = new List<Technology>();
+            References = new List<ItSystem>();
         }
 
         public int Id { get; set; }
@@ -15,6 +15,6 @@ namespace Core.DomainModel.ItSystem
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }
         public string Note { get; set; }
-        public virtual ICollection<Technology> References { get; set; }
+        public virtual ICollection<ItSystem> References { get; set; }
     }
 }

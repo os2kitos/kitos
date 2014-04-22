@@ -23,19 +23,15 @@ namespace Infrastructure.DataAccess
         public DbSet<AdminRole> AdminRoles { get; set; }
         public DbSet<Agreement> Agreements { get; set; }
         public DbSet<AgreementElement> AgreementElements { get; set; }
-        public DbSet<BasicData> BasicDatas { get; set; }
+        public DbSet<AppType> AppTypes { get; set; }
         public DbSet<Communication> Communications { get; set; }
-        public DbSet<Component> Components { get; set; }
         public DbSet<Config> Configs { get; set; }
         public DbSet<ContractTemplate> ContractTemplates { get; set; }
         public DbSet<ContractType> ContractTypes { get; set; }
-        public DbSet<DatabaseType> DatabaseTypes { get; set; }
         public DbSet<Economy> Economies { get; set; }
-        public DbSet<Environment> Environments { get; set; }
         public DbSet<ExtReference> ExtReferences { get; set; }
         public DbSet<ExtReferenceType> ExtReferenceTypes { get; set; }
         public DbSet<ExtRefTypeLocale> ExtRefTypeLocales { get; set; }
-        public DbSet<Functionality> Functionalities { get; set; }
         public DbSet<Goal> Goals { get; set; }
         public DbSet<GoalStatus> GoalStatus { get; set; }
         public DbSet<Handover> Handovers { get; set; }
@@ -70,7 +66,6 @@ namespace Infrastructure.DataAccess
         public DbSet<PaymentModel> PaymentModels { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<PreAnalysis> PreAnalysis { get; set; }
-        public DbSet<ProgLanguage> ProgLanguages { get; set; }
         public DbSet<ProjectCategory> ProjectCategories { get; set; }
         public DbSet<ProjectPhase> ProjectPhases { get; set; }
         public DbSet<ProjPhaseLocale> ProjectPhaseLocales { get; set; }
@@ -82,16 +77,13 @@ namespace Infrastructure.DataAccess
         public DbSet<Risk> Risks { get; set; }
         public DbSet<ShipNotice> ShipNotices { get; set; }
         public DbSet<Stakeholder> Stakeholders { get; set; }
-        public DbSet<SuperUser> SuperUsers { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
-        public DbSet<SystemType> SystemTypes { get; set; }
-        public DbSet<TaskSupport> TaskSupports { get; set; }
+        public DbSet<AppType> SystemTypes { get; set; }
         public DbSet<TaskRef> TaskRefs { get; set; }
         public DbSet<TaskUsage> TaskUsages { get; set; }
-        public DbSet<Technology> Technologys { get; set; }
         public DbSet<Text> Texts { get; set; }
-        public DbSet<UserAdministration> UserAdministrations { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<UsageType> UsageTypes { get; set; }
         public DbSet<Wish> Wishes { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -100,19 +92,14 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new AdminRoleMap());
             modelBuilder.Configurations.Add(new AgreementMap());
             modelBuilder.Configurations.Add(new AgreementElementMap());
-            modelBuilder.Configurations.Add(new BasicDataMap());
             modelBuilder.Configurations.Add(new CommunicationMap());
-            modelBuilder.Configurations.Add(new ComponentsMap());
             modelBuilder.Configurations.Add(new ConfigMap());
             modelBuilder.Configurations.Add(new ContractTemplateMap());
             modelBuilder.Configurations.Add(new ContractTypeMap());
-            modelBuilder.Configurations.Add(new DatabaseTypeMap());
             modelBuilder.Configurations.Add(new EconomyMap());
-            modelBuilder.Configurations.Add(new EnvironmentMap());
             modelBuilder.Configurations.Add(new ExtReferenceMap());
             modelBuilder.Configurations.Add(new ExtReferenceTypeMap());
             modelBuilder.Configurations.Add(new ExtRefTypeLocaleMap());
-            modelBuilder.Configurations.Add(new FunctionalityMap());
             modelBuilder.Configurations.Add(new GoalMap());
             modelBuilder.Configurations.Add(new GoalStatusMap());
             modelBuilder.Configurations.Add(new HandoverMap());
@@ -147,7 +134,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new PaymentModelMap());
             modelBuilder.Configurations.Add(new PaymentMap());
             modelBuilder.Configurations.Add(new PreAnalysisMap());
-            modelBuilder.Configurations.Add(new ProgLanguageMap());
             modelBuilder.Configurations.Add(new ProjectCategoryMap());
             modelBuilder.Configurations.Add(new ProjectPhaseMap());
             modelBuilder.Configurations.Add(new ProjectPhaseLocaleMap());
@@ -159,15 +145,11 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new RiskMap());
             modelBuilder.Configurations.Add(new ShipNoticeMap());
             modelBuilder.Configurations.Add(new StakeholdersMap());
-            modelBuilder.Configurations.Add(new SuperUserMap());
             modelBuilder.Configurations.Add(new SupplierMap());
-            modelBuilder.Configurations.Add(new SystemTypeMap());
-            modelBuilder.Configurations.Add(new TaskSupportMap());
+            modelBuilder.Configurations.Add(new AppTypeMap());
             modelBuilder.Configurations.Add(new TaskRefMap());
             modelBuilder.Configurations.Add(new TaskUsageMap());
-            modelBuilder.Configurations.Add(new TechnologyMap());
             modelBuilder.Configurations.Add(new TextMap());
-            modelBuilder.Configurations.Add(new UserAdministrationMap());
             modelBuilder.Configurations.Add(new UserMap());
             modelBuilder.Configurations.Add(new WishMap());
         }

@@ -74,8 +74,6 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<PasswordResetRequest>>().To<GenericRepository<PasswordResetRequest>>().InRequestScope();
             kernel.Bind<IGenericRepository<ContractTemplate>>().To<GenericRepository<ContractTemplate>>().InRequestScope();
             kernel.Bind<IGenericRepository<ContractType>>().To<GenericRepository<ContractType>>().InRequestScope();
-            kernel.Bind<IGenericRepository<DatabaseType>>().To<GenericRepository<DatabaseType>>().InRequestScope();
-            kernel.Bind<IGenericRepository<Core.DomainModel.ItSystem.Environment>>().To<GenericRepository<Core.DomainModel.ItSystem.Environment>>().InRequestScope();
             kernel.Bind<IGenericRepository<InterfaceType>>().To<GenericRepository<InterfaceType>>().InRequestScope();
             kernel.Bind<IGenericRepository<Method>>().To<GenericRepository<Method>>().InRequestScope();
             kernel.Bind<IGenericRepository<PaymentModel>>().To<GenericRepository<PaymentModel>>().InRequestScope();
@@ -85,7 +83,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<ProjectType>>().To<GenericRepository<ProjectType>>().InRequestScope();
             kernel.Bind<IGenericRepository<ProtocolType>>().To<GenericRepository<ProtocolType>>().InRequestScope();
             kernel.Bind<IGenericRepository<PurchaseForm>>().To<GenericRepository<PurchaseForm>>().InRequestScope();
-            kernel.Bind<IGenericRepository<SystemType>>().To<GenericRepository<SystemType>>().InRequestScope();
+            kernel.Bind<IGenericRepository<AppType>>().To<GenericRepository<AppType>>().InRequestScope();
             kernel.Bind<IGenericRepository<HandoverTrial>>().To<GenericRepository<HandoverTrial>>().InRequestScope();
             kernel.Bind<IGenericRepository<AgreementElement>>().To<GenericRepository<AgreementElement>>().InRequestScope();
             kernel.Bind<IGenericRepository<ExtReferenceType>>().To<GenericRepository<ExtReferenceType>>().InRequestScope();

@@ -1,18 +1,19 @@
 ﻿using System.Collections.Generic;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class EnvironmentController : GenericOptionApiController<Environment, Technology, OptionDTO>
+    public class AppTypeController : GenericOptionApiController<AppType, ItSystem, OptionDTO>
     {
-        public EnvironmentController(IGenericRepository<Environment> repository)
+        public AppTypeController(IGenericRepository<AppType> repository) 
             : base(repository)
         {
         }
 
-        protected override IEnumerable<Environment> GetAllQuery()
+        protected override IEnumerable<AppType> GetAllQuery()
         {
             return Repository.Get(x => x.IsActive);
         }

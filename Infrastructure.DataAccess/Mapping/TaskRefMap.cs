@@ -25,9 +25,9 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.ItProject)
                 .WithMany(t => t.TaskRefs)
                 .HasForeignKey(d => d.ItProjectId);
-            this.HasOptional(t => t.ItSystem)
+            /*this.HasOptional(t => t.ItSystem)
                 .WithMany(t => t.KLEs)
-                .HasForeignKey(d => d.ItSystemId);
+                .HasForeignKey(d => d.ItSystemId);*/
             this.HasRequired(t => t.OwnedByOrganizationUnit)
                 .WithMany(t => t.OwnedTasks)
                 .HasForeignKey(d => d.OwnedByOrganizationUnitId);

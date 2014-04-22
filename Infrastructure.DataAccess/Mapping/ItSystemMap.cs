@@ -16,29 +16,28 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.Id).HasColumnName("Id");
 
             // Relationships
-            this.HasRequired(t => t.ParentItSystem)
-                .WithMany(t => t.ItSystems1)
-                .HasForeignKey(d => d.ParentItSystemId);
+            this.HasRequired(t => t.Parent)
+                .WithMany(t => t.Children)
+                .HasForeignKey(d => d.ParentId);
 
             this.HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystems)
-                .HasForeignKey(d => d.MunicipalityId)
+                .HasForeignKey(d => d.OrganizationId)
                 .WillCascadeOnDelete(false);
 
-            this.HasRequired(t => t.SystemType)
+            this.HasRequired(t => t.AppType)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.SystemTypeId)
                 .WillCascadeOnDelete(false);
 
-            this.HasRequired(t => t.InterfaceType)
+            this.HasRequired(t => t.UsageType)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.InterfaceTypeId)
                 .WillCascadeOnDelete(false);
 
-            this.HasRequired(t => t.ProtocolType)
-                .WithMany(t => t.References)
-                .HasForeignKey(d => d.ProtocolTypeId)
-                .WillCascadeOnDelete(false);
+            this.HasMany(t => t.CanUseInterfaces)
+                .WithMany(d => d.CanBeUsedBy);
+
+            this.HasMany(t => t.ExposedInterfaces)
+                .WithMany(d => d.ExposedBy);
         }
     }
 }
