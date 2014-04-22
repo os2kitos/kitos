@@ -1,7 +1,12 @@
 ﻿namespace Core.DomainModel
 {
+    public enum AccessModifier
+    {
+        Normal, Public, Private
+    }
+
     public interface IHasAccessModifier //LOL
     {
-        bool IsPublic { get; set; }
+        AccessModifier AccessModifier { get; set; }
     }
 }

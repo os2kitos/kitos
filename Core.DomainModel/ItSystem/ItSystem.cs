@@ -16,13 +16,15 @@ namespace Core.DomainModel.ItSystem
         public int Id { get; set; }
         public int ParentId { get; set; }
 
-        public bool IsPublic { get; set; }
+        public bool IsInterface { get; set; }
 
-        public int Version { get; set; } //TODO: this should probably be a reference to a version instead
+        public AccessModifier AccessModifier { get; set; }
+
+        //TODO: this should probably be a reference to a version instead
+        public int Version { get; set; }
 
         public int OrganizationId { get; set; }
 
-        public bool IsInterface { get; set; }
 
         public virtual ICollection<ItSystem> ExposedBy { get; set; }
         public virtual ICollection<ItSystem> ExposedInterfaces { get; set; }
