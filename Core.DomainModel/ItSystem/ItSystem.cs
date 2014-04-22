@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ItSystem : IEntity<int>, IHasRights<ItSystemRight>
+    public class ItSystem : IEntity<int>, IHasRights<ItSystemRight>, IHasAccessModifier
     {
         public ItSystem()
         {
@@ -15,6 +15,8 @@ namespace Core.DomainModel.ItSystem
 
         public int Id { get; set; }
         public int ParentId { get; set; }
+
+        public bool IsPublic { get; set; }
 
         public int Version { get; set; } //TODO: this should probably be a reference to a version instead
 
@@ -38,6 +40,6 @@ namespace Core.DomainModel.ItSystem
         public virtual AppType AppType { get; set; }
         public virtual UsageType UsageType { get; set; }
 
-        public virtual ICollection<Wish> Wishes { get; set; } 
+        public virtual ICollection<Wish> Wishes { get; set; }
     }
 }

@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="AdminRight.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="IHasAccessModifier.cs" />
     <Compile Include="ItSystem\AppType.cs" />
     <Compile Include="OrganizationUnit.cs" />
     <Compile Include="OrganizationRight.cs" />
