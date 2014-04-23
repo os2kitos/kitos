@@ -1,0 +1,171 @@
+﻿<form class="form-horizontal fix-label-padding">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="col-md-7">
+
+                <!--Name-->
+                <div class="form-group">
+                    <label for="system-name" class="control-label col-md-5">IT System</label>
+                    <div class="col-md-7">
+                        <input type="text" id="system-name" class="form-control input-sm" />
+                    </div>
+                </div>
+
+                <!--ID-->
+                <div class="form-group">
+                    <label for="system-id" class="control-label col-md-5">System ID</label>
+                    <div class="col-md-7">
+                        <input type="text" id="system-id" class="form-control input-sm" />
+                    </div>
+                </div>
+
+                <!--Parent system-->
+                <div class="form-group">
+                    <label for="parent-system" class="control-label col-md-5">Overordnet system</label>
+                    <div class="col-md-7">
+                        <input type="text" id="parent-system" class="form-control input-sm" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <!--Version-->
+                <div class="form-group">
+                    <label for="system-version" class="control-label col-md-4">Version</label>
+                    <div class="col-md-8">
+                        <input type="text" id="system-version" class="form-control input-sm" />
+                    </div>
+                </div>
+
+                <!--Access modifier -->
+                <div class="form-group">
+                    <label for="system-access" class="control-label col-md-4">Public</label>
+                    <div class="col-md-8">
+                        <input type="text" id="system-access" class="form-control input-sm" />
+                    </div>
+                </div>
+
+                <!--Application type -->
+                <div class="form-group">
+                    <label for="system-app-type" class="control-label col-md-4">App. type</label>
+                    <div class="col-md-8">
+                        <input type="text" id="system-app-type" class="form-control input-sm" />
+                    </div>
+                </div>
+
+                <!--Usage type-->
+                <div class="form-group">
+                    <label for="system-usage-type" class="control-label col-md-4">Anvendelse</label>
+                    <div class="col-md-8">
+                        <input type="text" id="system-usage-type" class="form-control input-sm" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+
+            <!--Description-->
+            <div class="form-group">
+                <label for="system-description" class="control-label col-md-4">Beskrivelse</label>
+                <div class="col-md-8">
+                    <textarea id="system-description" class="form-control input-sm" rows="7"></textarea>
+                </div>
+            </div>
+
+            <!--Further description-->
+            <div class="form-group">
+                <label for="system-url" class="control-label col-md-4">Yderligere beskrivelse</label>
+                <div class="col-md-8">
+                    <input type="text" id="system-url" class="form-control input-sm" placeholder="URL" />
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">&nbsp;</div>
+    
+    <!-- interface specific data -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="system-tsa" class="control-label col-md-4">TSA</label>
+                <div class="col-md-8">
+                    <input type="text" id="system-tsa" class="form-control input-sm" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="system-interface-type" class="control-label col-md-4">Snitfladetype</label>
+                <div class="col-md-8">
+                    <input type="text" id="system-interface-type" class="form-control input-sm" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="system-interface" class="control-label col-md-4">Grænseflade</label>
+                <div class="col-md-8">
+                    <input type="text" id="system-interface" class="form-control input-sm" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="system-method" class="control-label col-md-4">Metode</label>
+                <div class="col-md-8">
+                    <input type="text" id="system-method" class="form-control input-sm" />
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Datatype</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <input type="text" class="form-control input-sm" />
+                        </td>
+                        <td>
+                            <input type="text" class="form-control input-sm" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="text" class="form-control input-sm" />
+                        </td>
+                        <td>
+                            <input type="text" class="form-control input-sm" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</form>
+
+<div class="row">
+    <div data-tabset="">
+        <div data-tab="">
+            <div data-tab-heading="">
+                Snitflader
+            </div>
+
+            <!-- Interfaces -->
+            Snitflader
+        </div>
+<div data-tab="">
+            <div data-tab-heading="">
+                KLE
+            </div>
+
+            <!-- Tasks -->
+            Opgaver
+        </div>
+
+    </div>
+</div>

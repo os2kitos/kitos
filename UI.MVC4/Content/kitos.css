@@ -426,3 +426,7 @@ body.wait, body.wait * {
     width: 100%;
     text-align: left;
 }
+
+form.form-horizontal.fix-label-padding label.control-label {
+    padding-top: 3px !important;
+}
