@@ -122,17 +122,22 @@
                     <div class="panel-heading">
                         <i class="glyphicon glyphicon-tasks"></i> 
                         Tilknyttede opgaver
-                        <a class="pull-right" data-ng-show="chosenOrgUnit.hasWriteAccess" data-ng-click="chosenOrgUnit.editTasks = !chosenOrgUnit.editTasks">
+                        <a class="pull-right" data-ng-show="chosenOrgUnit.hasWriteAccess" data-ng-click="editTasks()">
                             Rediger
                         </a>
                     </div>
                     <div class="container-fluid task-table">
                         <div class="row">
+                            <select data-ng-model="chosenOrgUnit.kleFilter.parentId" data-ng-options="t.id as t.taskKey group by t.parent.taskKey for t in allTasksFlat | filter:{ type:'KLE-Gruppe', show: true }" data-ng-change="cleanKleFilter()">
+                                <option value="">-- Gruppe --</option>
+                            </select>
+                        </div>
+                        <div class="row">
                             <span class="col-md-1 text-center"><strong>Valgt</strong></span>
                             <span class="col-md-9"><strong>Opgave</strong></span>
                             <span class="col-md-2 text-center"><strong>Delegeret</strong></span>
                         </div>
-                        <div data-ng-repeat="task in allTasksTree" data-ng-show="task.show">
+                        <div data-ng-repeat="task in allTasksFlat | filter:chosenOrgUnit.kleFilter" data-ng-show="task.show">
                             <div data-ng-include="'partials/org/task.html'"></div>
                         </div>
                     </div>

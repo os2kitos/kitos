@@ -1,11 +1,11 @@
 ﻿<div class="row">
-
     <div class="col-md-1 text-center">
-        <div data-ng-if="task.canWrite && chosenOrgUnit.editTasks">
+        <div data-ng-if="task.canWrite && chosenOrgUnit.editTasks && task.type == 'KLE-Emne'">
             <input type="checkbox"
                data-ng-checked="task.selected"
                data-ng-click="updateTask(task)" />
-        
+        </div>
+        <div data-ng-if="task.canWrite && !chosenOrgUnit.editTasks && task.type == 'KLE-Emne'">
             <button class="btn btn-link btn-star"
                     data-ng-class="{'unstarred': !task.starred, 'invisible': !task.selected}"
                     data-ng-click="updateStar(task)"
@@ -13,10 +13,7 @@
                     data-tooltip="Vis under overblik?">
                 <i class="glyphicon glyphicon-star"></i>
             </button>
-        </div>
-        <div data-ng-if="!(task.canWrite && chosenOrgUnit.editTasks)">
-            <i class="glyphicon glyphicon-ok text-success" data-ng-class="{'invisible': !task.selected}"></i>
-            <i class="glyphicon glyphicon-star text-warning" data-ng-class="{'invisible': !task.starred}" data-tooltip="Vist under overblik"></i>
+            
         </div>
         
     </div>
@@ -39,7 +36,7 @@
                 <i class="glyphicon glyphicon-ok" data-tooltip="{{ task.delegatedTo | joinBy:', ' }}" data-tooltip-placement="right"></i>
             </span>
             <span class="text-danger" data-ng-hide="task.delegatedTo">
-                <i class="glyphicon glyphicon-flag" data-tooltip="Ikke deligeret" data-tooltip-placement="right"></i>
+                <i class="glyphicon glyphicon-remove" data-tooltip="Ikke deligeret" data-tooltip-placement="right"></i>
             </span>
         </span>
     </div>

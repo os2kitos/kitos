@@ -553,6 +553,12 @@
             });
         }
 
+        $scope.cleanKleFilter = function() {
+            if ($scope.chosenOrgUnit.kleFilter.parentId === null) {
+                delete $scope.chosenOrgUnit.kleFilter.parentId;
+            }
+        };
+
         function mapIdToOrgUnit(idList) {
             if (idList.length === 0) {
                 return [];
@@ -691,8 +697,19 @@
             return hierarchy;
         }
 
+        $scope.editTasks = function () {
+            $scope.chosenOrgUnit.editTasks = !$scope.chosenOrgUnit.editTasks;
+
+            if ($scope.chosenOrgUnit.editTasks) {
+                delete $scope.chosenOrgUnit.kleFilter.selected;
+            } else {
+                $scope.chosenOrgUnit.kleFilter.selected = true;
+            }
+        };
+
         $scope.$watch('chosenOrgUnit', function (newOrgUnit, oldOrgUnit) {
-            if (newOrgUnit !== null) {
+            if (newOrgUnit) {
+                newOrgUnit.kleFilter = { type: 'KLE-Emne', selected: true };
                 var newRootOrgUnitId = getRootOrg(newOrgUnit).id;
                 var oldRootOrgUnitId;
                 if (oldOrgUnit === null) {
