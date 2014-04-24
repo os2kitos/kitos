@@ -42,10 +42,12 @@
     <Compile Include="IAdminService.cs" />
     <Compile Include="ICryptoService.cs" />
     <Compile Include="IGenericRepository.cs" />
+    <Compile Include="IItSystemService.cs" />
     <Compile Include="IMailClient.cs" />
     <Compile Include="IOrganizationService.cs" />
     <Compile Include="IOrgService.cs" />
     <Compile Include="IOrgUnitService.cs" />
+    <Compile Include="ItSystemService.cs" />
     <Compile Include="IUserRepository.cs" />
     <Compile Include="IUserService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
