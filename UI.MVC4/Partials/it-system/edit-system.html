@@ -7,7 +7,7 @@
                 <div class="form-group">
                     <label for="system-name" class="control-label col-md-5 small">IT System</label>
                     <div class="col-md-7">
-                        <input type="text" id="system-name" class="form-control input-sm" />
+                        <input type="text" id="system-name" data-ng-model="newSystem.systemName" class="form-control input-sm" />
                     </div>
                 </div>
 
@@ -15,7 +15,7 @@
                 <div class="form-group">
                     <label for="system-id" class="control-label col-md-5 small">System ID</label>
                     <div class="col-md-7">
-                        <input type="text" id="system-id" class="form-control input-sm" />
+                        <input type="text" id="system-id" data-ng-model="newSystem.systemId" class="form-control input-sm" />
                     </div>
                 </div>
 
@@ -23,44 +23,40 @@
                 <div class="form-group">
                     <label for="system-parent" class="control-label col-md-5 small">Overordnet system</label>
                     <div class="col-md-7">
-                        <input type="text" id="system-parent" class="form-control input-sm" />
+                        <input type="text" id="system-parent" data-ng-model="newSystem.systemParent" class="form-control input-sm" />
                     </div>
                 </div>
                 <!--Interfaces can-use-->
                 <div class="form-group">
                     <label for="system-interfaces-can-use" class="control-label col-md-5 small">Snitflader (kan anvende)</label>
                     <div class="col-md-7">
-                        <input type="text" id="system-interfaces-can-use" class="form-control input-sm" />
+                        <input type="text" id="system-interfaces-can-use" data-ng-model="newSystem.interfacesCanUse" class="form-control input-sm" />
                     </div>
                 </div>
             </div>
+
             <div class="col-md-6">
+                <!--Version-->
                 <div class="form-group">
-                    <!--Version-->
                     <label for="system-version" class="control-label col-md-5 small">Version</label>
                     <div class="col-md-7">
-                        <input type="text" id="system-version" class="form-control input-sm" />
+                        <input type="text" id="system-version" data-ng-model="newSystem.systemVersion" class="form-control input-sm" />
                     </div>
                 </div>
-                <div class="form-group"><!--Access modifier -->
-                <label for="system-access" class="control-label col-md-5 small">Public</label>
-                <div class="col-md-7">
-                    <input type="text" id="system-access" class="form-control input-sm" />
-                </div></div>
 
-                <!--Access modifier 
+                <!--Access modifier -->
                 <div class="form-group">
                     <label for="system-access" class="control-label col-md-5 small">Public</label>
                     <div class="col-md-7">
-                        <input type="text" id="system-access" class="form-control input-sm" />
+                        <input type="text" id="system-access" data-ng-model="newSystem.systemAccess" class="form-control input-sm" />
                     </div>
-                </div>-->
+                </div>
 
                 <!--Application type -->
                 <div class="form-group">
                     <label for="system-app-type" class="control-label col-md-5 small">Applikationstype</label>
                     <div class="col-md-7">
-                        <input type="text" id="system-app-type" class="form-control input-sm" />
+                        <input type="text" id="system-app-type" data-ng-model="newSystem.systemAppType" class="form-control input-sm" />
                     </div>
                 </div>
 
@@ -68,7 +64,7 @@
                 <div class="form-group">
                     <label for="system-business-type" class="control-label col-md-5 small">Forretningstype</label>
                     <div class="col-md-7">
-                        <input type="text" id="system-business-type" class="form-control input-sm" />
+                        <input type="text" id="system-business-type" data-ng-model="newSystem.systemBusinessType" class="form-control input-sm" />
                     </div>
                 </div>
             </div>
@@ -80,7 +76,7 @@
             <div class="form-group">
                 <label for="system-description" class="control-label col-md-4 small">Beskrivelse</label>
                 <div class="col-md-8">
-                    <textarea id="system-description" class="form-control input-sm" rows="7"></textarea>
+                    <textarea id="system-description" data-ng-model="newSystem.systemDescription" class="form-control input-sm" rows="7"></textarea>
                 </div>
             </div>
 
@@ -88,14 +84,14 @@
             <div class="form-group">
                 <label for="system-url" class="control-label col-md-4 small">Link til yderligere beskrivelse</label>
                 <div class="col-md-8">
-                    <input type="text" id="system-url" class="form-control input-sm" placeholder="URL" />
+                    <input type="text" id="system-url" data-ng-model="newSystem.systemUrl" class="form-control input-sm" placeholder="URL" />
                 </div>
             </div>
         </div>
     </div>
-    
+
     <div class="row">&nbsp;</div>
-    
+
     <!-- interface specific data -->
     <div class="row panel panel-default" data-ng-if="true">
         <div class="panel-heading small">Snitflade egenskaber</div>
@@ -103,29 +99,29 @@
             <div class="form-group">
                 <label for="interface-tsa" class="control-label col-md-2 small">TSA</label>
                 <div class="col-md-4">
-                    <input type="text" id="interface-tsa" class="form-control input-sm" />
+                    <input type="text" id="interface-tsa" data-ng-model="newSystem.interfaceTsa" class="form-control input-sm" />
                 </div>
                 <label for="interface-type" class="control-label col-md-2 small">Snitfladetype</label>
                 <div class="col-md-4">
-                    <input type="text" id="interface-type" class="form-control input-sm" />
+                    <input type="text" id="interface-type" data-ng-model="newSystem.interfaceType" class="form-control input-sm" />
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="interface-interface" class="control-label col-md-2 small">Grænseflade</label>
                 <div class="col-md-4">
-                    <input type="text" id="interface-interface" class="form-control input-sm" />
+                    <input type="text" id="interface-interface" data-ng-model="newSystem.interfaceInterface" class="form-control input-sm" />
                 </div>
                 <label for="interface-method" class="control-label col-md-2 small">Metode</label>
                 <div class="col-md-4">
-                    <input type="text" id="interface-method" class="form-control input-sm" />
+                    <input type="text" id="interface-method" data-ng-model="newSystem.interfaceMethod" class="form-control input-sm" />
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="interface-exposing-system" class="control-label col-md-2 small">Udstillet af</label>
                 <div class="col-md-4">
-                    <input type="text" id="interface-exposing-system" class="form-control input-sm" />
+                    <input type="text" id="interface-exposing-system" data-ng-model="newSystem.interfaceExposingSystem" class="form-control input-sm" />
                 </div>
             </div>
         </div>

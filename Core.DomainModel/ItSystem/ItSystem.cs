@@ -14,8 +14,8 @@ namespace Core.DomainModel.ItSystem
         }
 
         public int Id { get; set; }
-        public int ParentId { get; set; }
-        public int ExposedById { get; set; }
+        public int? ParentId { get; set; }
+        public int? ExposedById { get; set; }
         public int OrganizationId { get; set; }
         public int Version { get; set; }
 
