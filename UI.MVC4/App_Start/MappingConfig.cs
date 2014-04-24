@@ -1,6 +1,4 @@
-﻿
-using System.Linq;
-using AutoMapper;
+﻿using AutoMapper;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;

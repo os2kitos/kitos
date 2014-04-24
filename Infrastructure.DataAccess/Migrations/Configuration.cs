@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
@@ -8,8 +6,6 @@ using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Migrations
 {
-    using System;
-    using System.Data.Entity;
     using System.Data.Entity.Migrations;
     using System.Linq;
 
