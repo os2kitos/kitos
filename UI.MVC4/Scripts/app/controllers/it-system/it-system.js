@@ -34,6 +34,9 @@
                 }],
                 methods: ['$http', function ($http) {
                     return $http.get("api/method");
+                }],
+                dataTypes: ['$http', function ($http) {
+                    return $http.get("api/datatype");
                 }]
             }
         });
@@ -43,9 +46,9 @@
 
     app.controller('system.AddCtrl',
         ['$rootScope', '$scope', '$http', 'notify',
-            'appTypes', 'interfaceAppType', 'businessTypes', 'tsas', 'interfaces', 'interfaceTypes', 'methods',
+            'appTypes', 'interfaceAppType', 'businessTypes', 'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes',
             function ($rootScope, $scope, $http, notify,
-            appTypes, interfaceAppType, businessTypes, tsas, interfaces, interfaceTypes, methods) {
+            appTypes, interfaceAppType, businessTypes, tsas, interfaces, interfaceTypes, methods, dataTypes) {
                 $rootScope.page.title = 'Opret IT system';
                 $rootScope.page.subnav = subnav;
 
@@ -58,9 +61,19 @@
                 $scope.interfaceTypes = interfaceTypes.data.response;
                 $scope.methods = methods.data.response;
 
+                $scope.dataTypes = dataTypes.data.response;
+
                 $scope.itSystemsSelectOptions = systemLazyLoading('nonInterfaces');
                 $scope.itSystemsInterfacesOptions = systemLazyLoading('interfaces');
-                
+
+                $scope.addDataRow = function(newDataRow) {
+                    if (!newDataRow.data || !newDataRow.dataType) return;
+
+                    console.log(newDataRow);
+                };
+
+                $scope.system = {};
+                $scope.interface = {};
 
                 function systemLazyLoading(urlExtra) {
                     return {
@@ -97,6 +110,8 @@
                         }
                     };
                 }
+                
+
             }]);
 
 

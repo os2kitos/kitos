@@ -225,6 +225,7 @@
     <Compile Include="Controllers\API\BusinessTypeController.cs" />
     <Compile Include="Controllers\API\ContractTemplateController.cs" />
     <Compile Include="Controllers\API\ContractTypeController.cs" />
+    <Compile Include="Controllers\API\DataTypeController.cs" />
     <Compile Include="Controllers\API\InterfaceController.cs" />
     <Compile Include="Controllers\API\ItSystemController.cs" />
     <Compile Include="Controllers\API\TsaController.cs" />

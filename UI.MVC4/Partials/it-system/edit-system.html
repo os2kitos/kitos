@@ -1,4 +1,4 @@
-﻿<form class="form-horizontal fix-label-padding">
+﻿<div class="form-horizontal fix-label-padding">
     <div class="row">
         <div class="col-md-7">
             <div class="col-md-6">
@@ -147,20 +147,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    <tr data-ng-repeat="dataRow in interface.dataRows">
                         <td>
-                            <input type="text" class="form-control input-sm" />
+                            <input type="text" class="form-control input-sm" data-ng-model="dataRow.data" />
                         </td>
                         <td>
-                            <input type="text" class="form-control input-sm" />
+                            <select data-ui-select2="" data-ng-model="dataRow.dataType" class="form-control input-sm" >
+                                <option data-ng-repeat="dataType in dataTypes" value="{{dataType.id}}">{{dataType.name}}</option>
+                            </select>
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <input type="text" class="form-control input-sm" />
+                            <input type="text" class="form-control input-sm" data-ng-model="newDataRow.data" data-ng-change="addDataRow(newDataRow)"/>
                         </td>
                         <td>
-                            <input type="text" class="form-control input-sm" />
+                            <select data-ui-select2="" data-ng-model="newDataRow.dataType" class="form-control input-sm" data-ng-change="addDataRow(newDataRow)" >
+                                <option data-ng-repeat="dataType in dataTypes" value="{{dataType.id}}">{{dataType.name}}</option>
+                            </select>
                         </td>
                     </tr>
                 </tbody>
@@ -169,4 +173,4 @@
 
     </div>
 
-</form>
+</div>
