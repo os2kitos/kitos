@@ -74,6 +74,15 @@ namespace Infrastructure.DataAccess.Migrations
             context.BusinessTypes.AddOrUpdate(x => x.Name,
                                               businessType1, businessType2);
 
+            context.Interfaces.AddOrUpdate(x => x.Name,
+                                           new Interface() {IsActive = true, Note = "...", Name = "Grænseflade 1"},
+                                           new Interface() {IsActive = true, Note = "...", Name = "Grænseflade 2"},
+                                           new Interface() { IsActive = true, Note = "...", Name = "Grænseflade 3" });
+
+            context.Tsas.AddOrUpdate(x => x.Name,
+                                     new Tsa() {IsActive = true, Note = "...", Name = "Ja"},
+                                     new Tsa() {IsActive = true, Note = "...", Name = "Nej"});
+
             context.InterfaceTypes.AddOrUpdate(x => x.Name,
                                                new InterfaceType() { IsActive = true, Note = "...", Name = "WS" });
 
@@ -632,6 +641,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             #endregion
 
+            #region IT systems
 
             var system1 = new ItSystem()
                 {
@@ -648,21 +658,23 @@ namespace Infrastructure.DataAccess.Migrations
                 };
 
             var system2 = new ItSystem()
-            {
-                AccessModifier = AccessModifier.Public,
-                AppType = appType1,
-                BusinessType = businessType1,
-                Organization = roskilde,
-                User = roskildeUser1,
-                Version = "0.1",
-                Name = "Vækstkurver",
-                Description = "Snitflade for ...",
-                Url = "http://kitos.dk",
-                Parent = null,
-                ExposedBy = system1
-            };
+                {
+                    AccessModifier = AccessModifier.Public,
+                    AppType = appType1,
+                    BusinessType = businessType1,
+                    Organization = roskilde,
+                    User = roskildeUser1,
+                    Version = "0.1",
+                    Name = "Vækstkurver",
+                    Description = "Snitflade for ...",
+                    Url = "http://kitos.dk",
+                    Parent = null,
+                    ExposedBy = system1
+                };
 
             context.ItSystems.AddOrUpdate(x => x.Name, system1, system2);
+
+            #endregion
 
 
 

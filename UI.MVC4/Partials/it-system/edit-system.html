@@ -103,29 +103,37 @@
             <div class="form-group">
                 <label for="interface-tsa" class="control-label col-md-2 small">TSA</label>
                 <div class="col-md-4">
-                    <input type="text" id="interface-tsa" data-ng-model="interface.tsa" class="form-control input-sm" />
+                    <select data-ui-select2="" id="interface-tsa" data-ng-model="interface.tsa" class="form-control input-sm" >
+                        <option data-ng-repeat="tsa in tsas" value="{{tsa.id}}">{{tsa.name}}</option>
+                    </select>
                 </div>
                 <label for="interface-type" class="control-label col-md-2 small">Snitfladetype</label>
                 <div class="col-md-4">
-                    <input type="text" id="interface-type" data-ng-model="interface.type" class="form-control input-sm" />
+                    <select data-ui-select2="" id="interface-type" data-ng-model="interface.type" class="form-control input-sm" >
+                        <option data-ng-repeat="interfaceType in interfaceTypes" value="{{interfaceType.id}}">{{interfaceType.name}}</option>
+                    </select>
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="interface-interface" class="control-label col-md-2 small">Grænseflade</label>
                 <div class="col-md-4">
-                    <input type="text" id="interface-interface" data-ng-model="interface.interface" class="form-control input-sm" />
+                    <select data-ui-select2="" id="interface-interface" data-ng-model="interface.interface" class="form-control input-sm" >
+                        <option data-ng-repeat="_interface in interfaces" value="{{_interface.id}}">{{_interface.name}}</option>
+                    </select>
                 </div>
                 <label for="interface-method" class="control-label col-md-2 small">Metode</label>
                 <div class="col-md-4">
-                    <input type="text" id="interface-method" data-ng-model="interface.method" class="form-control input-sm" />
+                    <select data-ui-select2="" id="interface-method" data-ng-model="interface.method" class="form-control input-sm" >
+                        <option data-ng-repeat="method in methods" value="{{method.id}}">{{method.name}}</option>
+                    </select>
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="interface-exposing-system" class="control-label col-md-2 small">Udstillet af</label>
                 <div class="col-md-4">
-                        <input type="text" data-ui-select2="itSystemsSelectOptions" id="interface-exposing-system" data-ng-model="interface.exposingSystem" class="form-control input-sm" >
+                    <input type="text" data-ui-select2="itSystemsSelectOptions" id="interface-exposing-system" data-ng-model="interface.exposingSystem" class="form-control input-sm" >
                 </div>
             </div>
         </div>
