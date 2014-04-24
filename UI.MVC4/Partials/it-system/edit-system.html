@@ -1,4 +1,4 @@
-﻿<div class="form-horizontal fix-label-padding">
+﻿<form class="form-horizontal fix-label-padding" data-ng-submit="saveSystem()">
     <div class="row">
         <div class="col-md-7">
             <div class="col-md-6">
@@ -103,13 +103,13 @@
             <div class="form-group">
                 <label for="interface-tsa" class="control-label col-md-2 small">TSA</label>
                 <div class="col-md-4">
-                    <select data-ui-select2="" id="interface-tsa" data-ng-model="interface.tsa" class="form-control input-sm" >
+                    <select data-ui-select2="" id="interface-tsa" data-ng-model="system.tsa" class="form-control input-sm" >
                         <option data-ng-repeat="tsa in tsas" value="{{tsa.id}}">{{tsa.name}}</option>
                     </select>
                 </div>
                 <label for="interface-type" class="control-label col-md-2 small">Snitfladetype</label>
                 <div class="col-md-4">
-                    <select data-ui-select2="" id="interface-type" data-ng-model="interface.type" class="form-control input-sm" >
+                    <select data-ui-select2="" id="interface-type" data-ng-model="system.interfaceType" class="form-control input-sm" >
                         <option data-ng-repeat="interfaceType in interfaceTypes" value="{{interfaceType.id}}">{{interfaceType.name}}</option>
                     </select>
                 </div>
@@ -118,13 +118,13 @@
             <div class="form-group">
                 <label for="interface-interface" class="control-label col-md-2 small">Grænseflade</label>
                 <div class="col-md-4">
-                    <select data-ui-select2="" id="interface-interface" data-ng-model="interface.interface" class="form-control input-sm" >
+                    <select data-ui-select2="" id="interface-interface" data-ng-model="system.interface" class="form-control input-sm" >
                         <option data-ng-repeat="_interface in interfaces" value="{{_interface.id}}">{{_interface.name}}</option>
                     </select>
                 </div>
                 <label for="interface-method" class="control-label col-md-2 small">Metode</label>
                 <div class="col-md-4">
-                    <select data-ui-select2="" id="interface-method" data-ng-model="interface.method" class="form-control input-sm" >
+                    <select data-ui-select2="" id="interface-method" data-ng-model="system.method" class="form-control input-sm" >
                         <option data-ng-repeat="method in methods" value="{{method.id}}">{{method.name}}</option>
                     </select>
                 </div>
@@ -147,7 +147,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-ng-repeat="dataRow in interface.dataRows">
+                    <tr data-ng-repeat="dataRow in system.dataRows">
                         <td>
                             <input type="text" class="form-control input-sm" data-ng-model="dataRow.data" />
                         </td>
@@ -157,20 +157,28 @@
                             </select>
                         </td>
                     </tr>
+                </tbody>
+                <tfoot>
                     <tr>
                         <td>
-                            <input type="text" class="form-control input-sm" data-ng-model="newDataRow.data" data-ng-change="addDataRow(newDataRow)"/>
+                            <input type="text" class="form-control input-sm" id="newData" data-ng-model="newDataRow.data" data-ng-change="addDataRow(newDataRow)" placeholder="Ny række"/>
                         </td>
                         <td>
-                            <select data-ui-select2="" data-ng-model="newDataRow.dataType" class="form-control input-sm" data-ng-change="addDataRow(newDataRow)" >
+                            <select data-ui-select2="" data-ng-model="newDataRow.dataType" class="form-control input-sm" data-ng-change="addDataRow(newDataRow)" data-placeholder="Vælg datatype">
+                                <option></option>
                                 <option data-ng-repeat="dataType in dataTypes" value="{{dataType.id}}">{{dataType.name}}</option>
                             </select>
                         </td>
                     </tr>
-                </tbody>
+
+                </tfoot>
             </table>
         </div>
 
     </div>
+    
+    <div class="row">
+        <input type="submit" value="Gem IT system" class="btn btn-success full-width"/>
+    </div>
 
-</div>
+</form>

@@ -66,14 +66,24 @@
                 $scope.itSystemsSelectOptions = systemLazyLoading('nonInterfaces');
                 $scope.itSystemsInterfacesOptions = systemLazyLoading('interfaces');
 
+                $scope.system = {dataRows: []};
+
+                $scope.newDataRow = {};
+
+                $scope.saveSystem = function() {
+
+                    console.log($scope.system);
+
+                };
+
                 $scope.addDataRow = function(newDataRow) {
                     if (!newDataRow.data || !newDataRow.dataType) return;
 
-                    console.log(newDataRow);
-                };
+                    $scope.system.dataRows.push({ data: newDataRow.data, dataType: newDataRow.dataType });
 
-                $scope.system = {};
-                $scope.interface = {};
+                    $scope.newDataRow.data = "";
+                    $scope.newDataRow.dataType = "";
+                };
 
                 function systemLazyLoading(urlExtra) {
                     return {
