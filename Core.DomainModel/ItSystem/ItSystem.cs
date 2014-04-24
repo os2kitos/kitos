@@ -15,19 +15,16 @@ namespace Core.DomainModel.ItSystem
 
         public int Id { get; set; }
         public int ParentId { get; set; }
-
-        public bool IsInterface { get; set; }
+        public int ExposedById { get; set; }
+        public int OrganizationId { get; set; }
+        public int Version { get; set; }
 
         public AccessModifier AccessModifier { get; set; }
 
-        public int Version { get; set; } //TODO: this should probably be a reference to a version instead
-
-        public int OrganizationId { get; set; }
-
         public string Description { get; set; }
-        public string Url { get; set; } // for futher description
+        public string Url { get; set; }
 
-        public virtual ICollection<ItSystem> ExposedBy { get; set; }
+        public virtual ItSystem ExposedBy { get; set; }
         public virtual ICollection<ItSystem> ExposedInterfaces { get; set; }
 
         public virtual ICollection<ItSystem> CanBeUsedBy { get; set; }
@@ -41,8 +38,10 @@ namespace Core.DomainModel.ItSystem
         public virtual ICollection<ItSystemRight> Rights { get; set; }
 
         public virtual AppType AppType { get; set; }
-        public virtual UsageType UsageType { get; set; }
+        public virtual BusinessType BusinessType { get; set; }
 
         public virtual ICollection<Wish> Wishes { get; set; }
+
+        //TODO KLE!!
     }
 }

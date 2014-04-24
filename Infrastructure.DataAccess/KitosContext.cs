@@ -81,7 +81,7 @@ namespace Infrastructure.DataAccess
         public DbSet<TaskUsage> TaskUsages { get; set; }
         public DbSet<Text> Texts { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<UsageType> UsageTypes { get; set; }
+        public DbSet<BusinessType> UsageTypes { get; set; }
         public DbSet<Wish> Wishes { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)

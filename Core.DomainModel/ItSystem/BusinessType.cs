@@ -3,9 +3,9 @@ using System.Collections.ObjectModel;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class UsageType : IOptionEntity<ItSystem>
+    public class BusinessType : IOptionEntity<ItSystem>
     {
-        public UsageType()
+        public BusinessType()
         {
             References = new List<ItSystem>();
         }

@@ -29,15 +29,15 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.References)
                 .WillCascadeOnDelete(false);
 
-            this.HasRequired(t => t.UsageType)
+            this.HasRequired(t => t.BusinessType)
                 .WithMany(t => t.References)
                 .WillCascadeOnDelete(false);
 
             this.HasMany(t => t.CanUseInterfaces)
                 .WithMany(d => d.CanBeUsedBy);
 
-            this.HasMany(t => t.ExposedInterfaces)
-                .WithMany(d => d.ExposedBy);
+            this.HasOptional(t => t.ExposedBy)
+                .WithMany(d => d.ExposedInterfaces);
         }
     }
 }
