@@ -20,11 +20,23 @@
                 businessTypes: ['$http', function ($http) {
                     return $http.get("api/businesstype");
                 }],
-                systemsHttp: ['$http', function($http) {
+                itSystems: ['$http', function($http) {
                     return $http.get("api/itsystem?nonInterfaces");
                 }],
-                interfacesHttp: ['$http', function ($http) {
+                itSystemInterfaces: ['$http', function ($http) {
                     return $http.get("api/itsystem?interfaces");
+                }],
+                tsas: ['$http', function ($http) {
+                    return $http.get("api/tsa");
+                }],
+                interfaces: ['$http', function ($http) {
+                    return $http.get("api/interface");
+                }],
+                interfaceTypes: ['$http', function ($http) {
+                    return $http.get("api/interfacetype");
+                }],
+                methods: ['$http', function ($http) {
+                    return $http.get("api/method");
                 }]
             }
         });
