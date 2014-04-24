@@ -14,11 +14,14 @@ namespace Core.DomainModel.ItSystem
         }
 
         public int Id { get; set; }
+        public string Version { get; set; }
+        public string Name { get; set; }
+
         public int? ParentId { get; set; }
         public int? ExposedById { get; set; }
+
         public int OrganizationId { get; set; }
-        public int Version { get; set; }
-        public string Name { get; set; }
+        public int UserId { get; set; }
 
         public AccessModifier AccessModifier { get; set; }
 
@@ -34,7 +37,8 @@ namespace Core.DomainModel.ItSystem
         public virtual ICollection<ItSystem> Children { get; set; }
         public virtual ItSystem Parent { get; set; }
 
-        public virtual Organization Organization { get; set; }
+        public virtual Organization Organization { get; set; } //created inside which organization?
+        public virtual User User { get; set; } //created by
 
         public virtual ICollection<ItSystemRight> Rights { get; set; }
 

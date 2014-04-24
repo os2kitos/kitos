@@ -23,14 +23,14 @@
                 <div class="form-group">
                     <label for="system-parent" class="control-label col-md-5 small">Overordnet system</label>
                     <div class="col-md-7">
-                        <input type="text" data-ui-select2="itSystemsSelectOptions" id="system-parent" data-ng-model="system.systemParent" class="form-control input-sm" >
+                        <input type="hidden" data-ui-select2="itSystemsSelectOptions" id="system-parent" data-ng-model="system.systemParent" class="form-control input-sm" >
                     </div>
                 </div>
                 <!--Interfaces can-use-->
                 <div class="form-group">
                     <label for="system-interfaces-can-use" class="control-label col-md-5 small">Snitflader (kan anvende)</label>
                     <div class="col-md-7">
-                        <input type="text" data-ui-select2="itSystemsInterfacesOptions" id="system-interfaces-can-use" data-ng-model="system.interfacesCanUse" class="form-control input-sm" >
+                        <input type="hidden" data-ui-select2="itSystemsInterfacesOptions" id="system-interfaces-can-use" data-ng-model="system.interfacesCanUse" class="form-control input-sm" multiple="multiple">
                     </div>
                 </div>
             </div>
@@ -97,7 +97,7 @@
     <div class="row">&nbsp;</div>
 
     <!-- interface specific data -->
-    <div class="row panel panel-default" data-ng-if="true">
+    <div class="row panel panel-default" data-ng-if="system.systemAppType == interfaceAppType.id">
         <div class="panel-heading small">Snitflade egenskaber</div>
         <div class="col-md-6 panel-body">
             <div class="form-group">
@@ -125,7 +125,7 @@
             <div class="form-group">
                 <label for="interface-exposing-system" class="control-label col-md-2 small">Udstillet af</label>
                 <div class="col-md-4">
-                    <input type="text" id="interface-exposing-system" data-ng-model="interface.exposingSystem" class="form-control input-sm" />
+                        <input type="text" data-ui-select2="itSystemsSelectOptions" id="interface-exposing-system" data-ng-model="interface.exposingSystem" class="form-control input-sm" >
                 </div>
             </div>
         </div>

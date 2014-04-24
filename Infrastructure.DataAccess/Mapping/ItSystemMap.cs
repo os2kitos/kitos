@@ -16,7 +16,7 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.Id).HasColumnName("Id");
 
             // Relationships
-            this.HasRequired(t => t.Parent)
+            this.HasOptional(t => t.Parent)
                 .WithMany(t => t.Children)
                 .HasForeignKey(d => d.ParentId);
 
@@ -24,6 +24,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.ItSystems)
                 .HasForeignKey(d => d.OrganizationId)
                 .WillCascadeOnDelete(false);
+
+            this.HasRequired(t => t.User)
+                .WithMany(user => user.CreatedSystems);
 
             this.HasRequired(t => t.AppType)
                 .WithMany(t => t.References)

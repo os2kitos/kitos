@@ -8,7 +8,9 @@ namespace UI.MVC4.Models
         public int? ParentId { get; set; }
         public int? ExposedById { get; set; }
         public int OrganizationId { get; set; }
-        public int Version { get; set; }
+        public string Version { get; set; }
+        public string Name { get; set; }
+        public int UserId { get; set; }
 
         public AccessModifier AccessModifier { get; set; }
 

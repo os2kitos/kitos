@@ -63,11 +63,16 @@ namespace Infrastructure.DataAccess.Migrations
                                              new ProjectType() { IsActive = true, Note = "En samlebetegnelse for projekter, som ikke er et IT Program", Name = "Indsatsområde" });
 
             var appType1 = new AppType() {IsActive = true, Note = "...", Name = "Snitflade"};
-            var appType2 = new AppType() {IsActive = true, Note = "...", Name = "Selvbetjening"};
+            var appType2 = new AppType() {IsActive = true, Note = "...", Name = "Fagsystem"};
             context.AppTypes.AddOrUpdate(x => x.Name,
                                             appType1, appType2,
-                                            new AppType() { IsActive = true, Note = "...", Name = "Fagsystem" }
-                                            ); 
+                                            new AppType() { IsActive = true, Note = "...", Name = "Selvbetjening" }
+                                            );
+
+            var businessType1 = new BusinessType() { IsActive = true, Note = "...", Name = "Forretningstype 1" };
+            var businessType2 = new BusinessType() { IsActive = true, Note = "...", Name = "Forretningstype 2" };
+            context.BusinessTypes.AddOrUpdate(x => x.Name,
+                                              businessType1, businessType2);
 
             context.InterfaceTypes.AddOrUpdate(x => x.Name,
                                                new InterfaceType() { IsActive = true, Note = "...", Name = "WS" });
@@ -626,7 +631,40 @@ namespace Infrastructure.DataAccess.Migrations
                                              });
 
             #endregion
-            
+
+
+            var system1 = new ItSystem()
+                {
+                    AccessModifier = AccessModifier.Public,
+                    AppType = appType2,
+                    BusinessType = businessType1,
+                    Organization = kl,
+                    User = simon,
+                    Version = "7.0",
+                    Name = "TM Sund",
+                    Description = "TM Sund er en ...",
+                    Url = "http://kitos.dk",
+                    Parent = null
+                };
+
+            var system2 = new ItSystem()
+            {
+                AccessModifier = AccessModifier.Public,
+                AppType = appType1,
+                BusinessType = businessType1,
+                Organization = roskilde,
+                User = roskildeUser1,
+                Version = "0.1",
+                Name = "Vækstkurver",
+                Description = "Snitflade for ...",
+                Url = "http://kitos.dk",
+                Parent = null,
+                ExposedBy = system1
+            };
+
+            context.ItSystems.AddOrUpdate(x => x.Name, system1, system2);
+
+
 
             context.ProjectPhaseLocales.AddOrUpdate(x => new { x.MunicipalityId, x.OriginalId },
                                                     new ProjPhaseLocale()

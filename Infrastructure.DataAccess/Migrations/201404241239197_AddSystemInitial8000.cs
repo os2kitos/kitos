@@ -3,7 +3,7 @@ namespace Infrastructure.DataAccess.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class AddSystemInitial4000 : DbMigration
+    public partial class AddSystemInitial8000 : DbMigration
     {
         public override void Up()
         {
@@ -569,11 +569,12 @@ namespace Infrastructure.DataAccess.Migrations
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
-                        ParentId = c.Int(nullable: false),
+                        Version = c.String(unicode: false),
+                        Name = c.String(unicode: false),
+                        ParentId = c.Int(),
                         ExposedById = c.Int(),
                         OrganizationId = c.Int(nullable: false),
-                        Version = c.Int(nullable: false),
-                        Name = c.String(unicode: false),
+                        UserId = c.Int(nullable: false),
                         AccessModifier = c.Int(nullable: false),
                         Description = c.String(unicode: false),
                         Url = c.String(unicode: false),
@@ -586,10 +587,11 @@ namespace Infrastructure.DataAccess.Migrations
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.AppType", t => t.AppType_Id)
-                .ForeignKey("dbo.BusinessTypes", t => t.BusinessType_Id)
+                .ForeignKey("dbo.BusinessType", t => t.BusinessType_Id)
                 .ForeignKey("dbo.ItSystem", t => t.ExposedById)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)
                 .ForeignKey("dbo.ItSystem", t => t.ParentId)
+                .ForeignKey("dbo.User", t => t.UserId, cascadeDelete: true)
                 .ForeignKey("dbo.Interface", t => t.Interface_Id)
                 .ForeignKey("dbo.InterfaceType", t => t.InterfaceType_Id)
                 .ForeignKey("dbo.ProtocolType", t => t.ProtocolType_Id)
@@ -597,6 +599,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ParentId)
                 .Index(t => t.ExposedById)
                 .Index(t => t.OrganizationId)
+                .Index(t => t.UserId)
                 .Index(t => t.AppType_Id)
                 .Index(t => t.BusinessType_Id)
                 .Index(t => t.Interface_Id)
@@ -617,7 +620,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .PrimaryKey(t => t.Id);
             
             CreateTable(
-                "dbo.BusinessTypes",
+                "dbo.BusinessType",
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
@@ -1021,6 +1024,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.Infrastructure", "ItSystem_Id", "dbo.ItSystem");
             DropForeignKey("dbo.Wish", "User_Id", "dbo.User");
             DropForeignKey("dbo.Wish", "ItSystem_Id", "dbo.ItSystem");
+            DropForeignKey("dbo.ItSystem", "UserId", "dbo.User");
             DropForeignKey("dbo.ItSystemRight", "UserId", "dbo.User");
             DropForeignKey("dbo.ItSystemRight", "RoleId", "dbo.ItSystemRole");
             DropForeignKey("dbo.ItSystemRight", "ObjectId", "dbo.ItSystem");
@@ -1029,7 +1033,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.ItSystem", "ExposedById", "dbo.ItSystem");
             DropForeignKey("dbo.ItSystemItSystems", "ItSystem_Id1", "dbo.ItSystem");
             DropForeignKey("dbo.ItSystemItSystems", "ItSystem_Id", "dbo.ItSystem");
-            DropForeignKey("dbo.ItSystem", "BusinessType_Id", "dbo.BusinessTypes");
+            DropForeignKey("dbo.ItSystem", "BusinessType_Id", "dbo.BusinessType");
             DropForeignKey("dbo.ItSystem", "AppType_Id", "dbo.AppType");
             DropForeignKey("dbo.ShipNotice", "ItContractId", "dbo.ItContract");
             DropForeignKey("dbo.ItContract", "PurchaseFormId", "dbo.PurchaseForm");
@@ -1097,6 +1101,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ItSystem", new[] { "Interface_Id" });
             DropIndex("dbo.ItSystem", new[] { "BusinessType_Id" });
             DropIndex("dbo.ItSystem", new[] { "AppType_Id" });
+            DropIndex("dbo.ItSystem", new[] { "UserId" });
             DropIndex("dbo.ItSystem", new[] { "OrganizationId" });
             DropIndex("dbo.ItSystem", new[] { "ExposedById" });
             DropIndex("dbo.ItSystem", new[] { "ParentId" });
@@ -1177,7 +1182,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropTable("dbo.Wish");
             DropTable("dbo.ItSystemRole");
             DropTable("dbo.ItSystemRight");
-            DropTable("dbo.BusinessTypes");
+            DropTable("dbo.BusinessType");
             DropTable("dbo.AppType");
             DropTable("dbo.ItSystem");
             DropTable("dbo.Infrastructure");

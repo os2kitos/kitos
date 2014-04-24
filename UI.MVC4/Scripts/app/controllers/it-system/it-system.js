@@ -17,6 +17,9 @@
                 appTypes: ['$http', function($http) {
                     return $http.get("api/apptype");
                 }],
+                interfaceAppType: ['$http', function ($http) {
+                    return $http.get("api/apptype?interfaceAppType");
+                }],
                 businessTypes: ['$http', function ($http) {
                     return $http.get("api/businesstype");
                 }],
@@ -40,13 +43,14 @@
 
     app.controller('system.AddCtrl',
         ['$rootScope', '$scope', '$http', 'notify',
-            'appTypes', 'businessTypes', 'tsas', 'interfaces', 'interfaceTypes', 'methods',
+            'appTypes', 'interfaceAppType', 'businessTypes', 'tsas', 'interfaces', 'interfaceTypes', 'methods',
             function ($rootScope, $scope, $http, notify,
-            appTypes, businessTypes, tsas, interfaces, interfaceTypes, methods) {
+            appTypes, interfaceAppType, businessTypes, tsas, interfaces, interfaceTypes, methods) {
                 $rootScope.page.title = 'Opret IT system';
                 $rootScope.page.subnav = subnav;
 
                 $scope.appTypes = appTypes.data.response;
+                $scope.interfaceAppType = interfaceAppType.data.response;
                 $scope.businessTypes = businessTypes.data.response;
                 
                 $scope.tsas = tsas.data.response;
@@ -55,12 +59,11 @@
                 $scope.methods = methods.data.response;
 
                 $scope.itSystemsSelectOptions = systemLazyLoading('nonInterfaces');
-                $scope.itSystemsInterfacesOptions = systemLazyLoading('interfaces', true);
+                $scope.itSystemsInterfacesOptions = systemLazyLoading('interfaces');
                 
 
-                function systemLazyLoading(urlExtra, multiple) {
+                function systemLazyLoading(urlExtra) {
                     return {
-                        multiple: multiple,
                         minimumInputLength: 1,
                         initSelection: function (elem, callback) {
                         },

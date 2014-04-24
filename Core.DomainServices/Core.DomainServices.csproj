@@ -47,7 +47,6 @@
     <Compile Include="IOrganizationService.cs" />
     <Compile Include="IOrgService.cs" />
     <Compile Include="IOrgUnitService.cs" />
-    <Compile Include="ItSystemService.cs" />
     <Compile Include="IUserRepository.cs" />
     <Compile Include="IUserService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

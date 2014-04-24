@@ -24,6 +24,7 @@ namespace Infrastructure.DataAccess
         public DbSet<Agreement> Agreements { get; set; }
         public DbSet<AgreementElement> AgreementElements { get; set; }
         public DbSet<AppType> AppTypes { get; set; }
+        public DbSet<BusinessType> BusinessTypes { get; set; }
         public DbSet<Communication> Communications { get; set; }
         public DbSet<Config> Configs { get; set; }
         public DbSet<ContractTemplate> ContractTemplates { get; set; }
@@ -82,7 +83,6 @@ namespace Infrastructure.DataAccess
         public DbSet<Text> Texts { get; set; }
         public DbSet<Tsa> Tsas { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<BusinessType> UsageTypes { get; set; }
         public DbSet<Wish> Wishes { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -91,6 +91,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new AdminRoleMap());
             modelBuilder.Configurations.Add(new AgreementMap());
             modelBuilder.Configurations.Add(new AgreementElementMap());
+            modelBuilder.Configurations.Add(new AppTypeMap());
+            modelBuilder.Configurations.Add(new BusinessTypeMap());
             modelBuilder.Configurations.Add(new CommunicationMap());
             modelBuilder.Configurations.Add(new ConfigMap());
             modelBuilder.Configurations.Add(new ContractTemplateMap());
@@ -144,7 +146,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ShipNoticeMap());
             modelBuilder.Configurations.Add(new StakeholdersMap());
             modelBuilder.Configurations.Add(new SupplierMap());
-            modelBuilder.Configurations.Add(new AppTypeMap());
             modelBuilder.Configurations.Add(new TaskRefMap());
             modelBuilder.Configurations.Add(new TaskUsageMap());
             modelBuilder.Configurations.Add(new TextMap());

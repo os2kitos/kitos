@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.0-30225")]
-    public sealed partial class AddSystemInitial4000 : IMigrationMetadata
+    public sealed partial class AddSystemInitial8000 : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddSystemInitial4000));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddSystemInitial8000));
         
         string IMigrationMetadata.Id
         {
-            get { return "201404241146364_AddSystemInitial4000"; }
+            get { return "201404241239197_AddSystemInitial8000"; }
         }
         
         string IMigrationMetadata.Source

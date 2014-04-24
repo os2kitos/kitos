@@ -2,10 +2,11 @@
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
+using Core.DomainServices;
 
-namespace Core.DomainServices
+namespace Core.ApplicationServices
 {
-    class ItSystemService : IItSystemService
+    public class ItSystemService : IItSystemService
     {
         private readonly IGenericRepository<ItSystem> _repository;
         private readonly IGenericRepository<AppType> _appTypeRepository;
