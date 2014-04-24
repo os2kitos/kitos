@@ -580,6 +580,7 @@ namespace Infrastructure.DataAccess.Migrations
                         Url = c.String(unicode: false),
                         AppType_Id = c.Int(nullable: false),
                         BusinessType_Id = c.Int(nullable: false),
+                        DataType_Id = c.Int(),
                         Interface_Id = c.Int(),
                         InterfaceType_Id = c.Int(),
                         ProtocolType_Id = c.Int(),
@@ -592,6 +593,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)
                 .ForeignKey("dbo.ItSystem", t => t.ParentId)
                 .ForeignKey("dbo.User", t => t.UserId, cascadeDelete: true)
+                .ForeignKey("dbo.DataType", t => t.DataType_Id)
                 .ForeignKey("dbo.Interface", t => t.Interface_Id)
                 .ForeignKey("dbo.InterfaceType", t => t.InterfaceType_Id)
                 .ForeignKey("dbo.ProtocolType", t => t.ProtocolType_Id)
@@ -602,6 +604,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.UserId)
                 .Index(t => t.AppType_Id)
                 .Index(t => t.BusinessType_Id)
+                .Index(t => t.DataType_Id)
                 .Index(t => t.Interface_Id)
                 .Index(t => t.InterfaceType_Id)
                 .Index(t => t.ProtocolType_Id)
@@ -841,6 +844,18 @@ namespace Infrastructure.DataAccess.Migrations
                 .PrimaryKey(t => t.Id);
             
             CreateTable(
+                "dbo.DataType",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        Name = c.String(unicode: false),
+                        IsActive = c.Boolean(nullable: false),
+                        IsSuggestion = c.Boolean(nullable: false),
+                        Note = c.String(unicode: false),
+                    })
+                .PrimaryKey(t => t.Id);
+            
+            CreateTable(
                 "dbo.HandoverTrial",
                 c => new
                     {
@@ -990,6 +1005,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.ItSystem", "InterfaceType_Id", "dbo.InterfaceType");
             DropForeignKey("dbo.ItSystem", "Interface_Id", "dbo.Interface");
             DropForeignKey("dbo.ItContract", "HandoverTrial_Id", "dbo.HandoverTrial");
+            DropForeignKey("dbo.ItSystem", "DataType_Id", "dbo.DataType");
             DropForeignKey("dbo.Agreement", "AgreementElement_Id", "dbo.AgreementElement");
             DropForeignKey("dbo.AdminRight", "UserId", "dbo.User");
             DropForeignKey("dbo.AdminRight", "RoleId", "dbo.AdminRole");
@@ -1099,6 +1115,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ItSystem", new[] { "ProtocolType_Id" });
             DropIndex("dbo.ItSystem", new[] { "InterfaceType_Id" });
             DropIndex("dbo.ItSystem", new[] { "Interface_Id" });
+            DropIndex("dbo.ItSystem", new[] { "DataType_Id" });
             DropIndex("dbo.ItSystem", new[] { "BusinessType_Id" });
             DropIndex("dbo.ItSystem", new[] { "AppType_Id" });
             DropIndex("dbo.ItSystem", new[] { "UserId" });
@@ -1168,6 +1185,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropTable("dbo.InterfaceType");
             DropTable("dbo.Interface");
             DropTable("dbo.HandoverTrial");
+            DropTable("dbo.DataType");
             DropTable("dbo.AgreementElement");
             DropTable("dbo.AdminRole");
             DropTable("dbo.Stakeholder");

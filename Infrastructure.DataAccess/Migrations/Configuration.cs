@@ -86,6 +86,11 @@ namespace Infrastructure.DataAccess.Migrations
             context.InterfaceTypes.AddOrUpdate(x => x.Name,
                                                new InterfaceType() { IsActive = true, Note = "...", Name = "WS" });
 
+            context.DataTypes.AddOrUpdate(x => x.Name,
+                                          new DataType() {IsActive = true, Note = "...", Name = "Datatype 1"},
+                                          new DataType() {IsActive = true, Note = "...", Name = "Datatype 2"},
+                                          new DataType() {IsActive = true, Note = "...", Name = "Datatype 3"});
+
             context.ProtocolTypes.AddOrUpdate(x => x.Name,
                                               new ProtocolType() { IsActive = true, Note = "...", Name = "OIORES" },
                                               new ProtocolType() { IsActive = true, Note = "...", Name = "WS SOAP" });
