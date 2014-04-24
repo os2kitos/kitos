@@ -11,10 +11,5 @@ namespace UI.MVC4.Controllers.API
             : base(repository)
         {
         }
-
-        protected override IEnumerable<Method> GetAllQuery()
-        {
-            return Repository.Get(x => x.IsActive);
-        }
     }
 }
