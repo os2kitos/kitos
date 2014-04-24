@@ -68,6 +68,7 @@
     <Compile Include="Mapping\ContractTypeMap.cs" />
     <Compile Include="Mapping\AdminRightMap.cs" />
     <Compile Include="Mapping\AdminRoleMap.cs" />
+    <Compile Include="Mapping\TsaMap.cs" />
     <Compile Include="Mapping\TaskUsageMap.cs" />
     <Compile Include="Mapping\HandoverTrialMap.cs" />
     <Compile Include="Mapping\OrganizationUnitMap.cs" />

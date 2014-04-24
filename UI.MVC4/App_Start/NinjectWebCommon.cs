@@ -76,6 +76,8 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<ContractType>>().To<GenericRepository<ContractType>>().InRequestScope();
             kernel.Bind<IGenericRepository<InterfaceType>>().To<GenericRepository<InterfaceType>>().InRequestScope();
             kernel.Bind<IGenericRepository<Method>>().To<GenericRepository<Method>>().InRequestScope();
+            kernel.Bind<IGenericRepository<Tsa>>().To<GenericRepository<Tsa>>().InRequestScope();
+            kernel.Bind<IGenericRepository<Interface>>().To<GenericRepository<Interface>>().InRequestScope();
             kernel.Bind<IGenericRepository<PaymentModel>>().To<GenericRepository<PaymentModel>>().InRequestScope();
             kernel.Bind<IGenericRepository<ProjectPhase>>().To<GenericRepository<ProjectPhase>>().InRequestScope();
             kernel.Bind<IGenericRepository<ProjPhaseLocale>>().To<GenericRepository<ProjPhaseLocale>>().InRequestScope();

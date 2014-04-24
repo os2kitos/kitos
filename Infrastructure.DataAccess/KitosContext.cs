@@ -80,6 +80,7 @@ namespace Infrastructure.DataAccess
         public DbSet<TaskRef> TaskRefs { get; set; }
         public DbSet<TaskUsage> TaskUsages { get; set; }
         public DbSet<Text> Texts { get; set; }
+        public DbSet<Tsa> Tsas { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<BusinessType> UsageTypes { get; set; }
         public DbSet<Wish> Wishes { get; set; }
@@ -147,6 +148,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new TaskRefMap());
             modelBuilder.Configurations.Add(new TaskUsageMap());
             modelBuilder.Configurations.Add(new TextMap());
+            modelBuilder.Configurations.Add(new TsaMap());
             modelBuilder.Configurations.Add(new UserMap());
             modelBuilder.Configurations.Add(new WishMap());
         }

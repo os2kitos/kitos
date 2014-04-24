@@ -227,6 +227,7 @@
     <Compile Include="Controllers\API\ContractTypeController.cs" />
     <Compile Include="Controllers\API\InterfaceController.cs" />
     <Compile Include="Controllers\API\ItSystemController.cs" />
+    <Compile Include="Controllers\API\TsaController.cs" />
     <Compile Include="Models\ItSystemDTO.cs" />
     <Compile Include="Controllers\API\OrganizationRightController.cs" />
     <Compile Include="Controllers\API\TaskUsageController.cs" />
