@@ -124,9 +124,9 @@
     <Compile Include="Mapping\TextMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
-    <Compile Include="Migrations\201404241125112_InitialSystem3014.cs" />
-    <Compile Include="Migrations\201404241125112_InitialSystem3014.Designer.cs">
-      <DependentUpon>201404241125112_InitialSystem3014.cs</DependentUpon>
+    <Compile Include="Migrations\201404241146364_AddSystemInitial4000.cs" />
+    <Compile Include="Migrations\201404241146364_AddSystemInitial4000.Designer.cs">
+      <DependentUpon>201404241146364_AddSystemInitial4000.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -151,8 +151,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201404241125112_InitialSystem3014.resx">
-      <DependentUpon>201404241125112_InitialSystem3014.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201404241146364_AddSystemInitial4000.resx">
+      <DependentUpon>201404241146364_AddSystemInitial4000.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

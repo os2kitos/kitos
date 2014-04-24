@@ -62,8 +62,12 @@ namespace Infrastructure.DataAccess.Migrations
                                              new ProjectType() { IsActive = true, Note = "...", Name = "IT Program" },
                                              new ProjectType() { IsActive = true, Note = "En samlebetegnelse for projekter, som ikke er et IT Program", Name = "Indsatsområde" });
 
+            var appType1 = new AppType() {IsActive = true, Note = "...", Name = "Snitflade"};
+            var appType2 = new AppType() {IsActive = true, Note = "...", Name = "Selvbetjening"};
             context.AppTypes.AddOrUpdate(x => x.Name,
-                                            new AppType() { IsActive = true, Note = "...", Name = "Snitflade" });
+                                            appType1, appType2,
+                                            new AppType() { IsActive = true, Note = "...", Name = "Fagsystem" }
+                                            ); 
 
             context.InterfaceTypes.AddOrUpdate(x => x.Name,
                                                new InterfaceType() { IsActive = true, Note = "...", Name = "WS" });

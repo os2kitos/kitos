@@ -19,11 +19,11 @@ namespace UI.MVC4.Controllers.API
             _systemService = systemService;
         }
 
-        public HttpResponseMessage GetAllInterfaces(bool? interfaces)
+        public HttpResponseMessage GetInterfaces(string q, bool? interfaces)
         {
             try
             {
-                var systems = _systemService.GetAllInterfaces(null);
+                var systems = _systemService.GetInterfaces(null, q);
                 var dtos = Map(systems);
                 return Ok(dtos);
             }
@@ -33,11 +33,11 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetAllNonInterfaces(bool? nonInterfaces)
+        public HttpResponseMessage GetNonInterfaces(string q, bool? nonInterfaces)
         {
             try
             {
-                var systems = _systemService.GetAllNonInterfaces(null);
+                var systems = _systemService.GetNonInterfaces(null, q);
                 var dtos = Map(systems);
                 return Ok(dtos);
             }

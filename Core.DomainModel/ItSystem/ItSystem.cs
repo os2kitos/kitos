@@ -18,6 +18,7 @@ namespace Core.DomainModel.ItSystem
         public int? ExposedById { get; set; }
         public int OrganizationId { get; set; }
         public int Version { get; set; }
+        public string Name { get; set; }
 
         public AccessModifier AccessModifier { get; set; }
 
@@ -41,6 +42,8 @@ namespace Core.DomainModel.ItSystem
         public virtual BusinessType BusinessType { get; set; }
 
         public virtual ICollection<Wish> Wishes { get; set; }
+
+
 
         //TODO KLE!!
     }

@@ -20,20 +20,20 @@ namespace Core.DomainServices
         public AppType InterfaceAppType { get; private set; }
 
 
-        public IEnumerable<ItSystem> GetAllSystems(Organization organization)
+        public IEnumerable<ItSystem> GetSystems(Organization organization, string nameSearch)
         {
             //TODO filter by organization or public
             return _repository.Get();
         }
 
-        public IEnumerable<ItSystem> GetAllNonInterfaces(Organization organization)
+        public IEnumerable<ItSystem> GetNonInterfaces(Organization organization, string nameSearch)
         {
-            return GetAllSystems(organization).Where(system => system.AppType.Id != InterfaceAppType.Id);
+            return GetSystems(organization, TODO).Where(system => system.AppType.Id != InterfaceAppType.Id);
         }
 
-        public IEnumerable<ItSystem> GetAllInterfaces(Organization organization)
+        public IEnumerable<ItSystem> GetInterfaces(Organization organization, string nameSearch)
         {
-            return GetAllSystems(organization).Where(system => system.AppType.Id == InterfaceAppType.Id);
+            return GetSystems(organization, TODO).Where(system => system.AppType.Id == InterfaceAppType.Id);
         }
     }
 }

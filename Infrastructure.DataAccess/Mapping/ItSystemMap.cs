@@ -37,7 +37,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(d => d.CanBeUsedBy);
 
             this.HasOptional(t => t.ExposedBy)
-                .WithMany(d => d.ExposedInterfaces);
+                .WithMany(d => d.ExposedInterfaces)
+                .WillCascadeOnDelete(false);
         }
     }
 }

@@ -8,8 +8,8 @@ namespace Core.DomainServices
     {
         AppType InterfaceAppType { get; }
 
-        IEnumerable<ItSystem> GetAllSystems(Organization organization);
-        IEnumerable<ItSystem> GetAllNonInterfaces(Organization organization);
-        IEnumerable<ItSystem> GetAllInterfaces(Organization organization);
+        IEnumerable<ItSystem> GetSystems(Organization organization, string nameSearch);
+        IEnumerable<ItSystem> GetNonInterfaces(Organization organization, string nameSearch);
+        IEnumerable<ItSystem> GetInterfaces(Organization organization, string nameSearch);
     }
 }
