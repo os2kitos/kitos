@@ -25,8 +25,6 @@ namespace Core.DomainModel.ItSystem
         public int OrganizationId { get; set; }
         public int UserId { get; set; }
 
-        public int AppTypeId { get; set; }
-        public int BusinessTypeId { get; set; }
 
         public AccessModifier AccessModifier { get; set; }
 
@@ -71,12 +69,28 @@ namespace Core.DomainModel.ItSystem
         /// </value>
         public virtual ICollection<ItSystemUsage> LocalParentUsages { get; set; }
 
+        public int AppTypeId { get; set; }
         public virtual AppType AppType { get; set; }
+
+        public int BusinessTypeId { get; set; }
         public virtual BusinessType BusinessType { get; set; }
+
+        #region Interface "Snitflade" data
+        public int? InterfaceId { get; set; }
         public virtual Interface Interface { get; set; }
+
+        public int? InterfaceTypeId { get; set; }
         public virtual InterfaceType InterfaceType { get; set; }
+
+        public int? TsaId { get; set; }
         public virtual Tsa Tsa { get; set; }
+
+        public int? MethodId { get; set; }
+        public virtual Method Method { get; set; }
+
         public virtual ICollection<DataRow> DataRows { get; set; } 
+
+        #endregion
 
         public virtual ICollection<Wish> Wishes { get; set; }
 
