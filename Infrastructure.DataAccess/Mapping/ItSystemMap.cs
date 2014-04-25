@@ -46,6 +46,7 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasOptional(t => t.ExposedBy)
                 .WithMany(d => d.ExposedInterfaces)
+                .HasForeignKey(d => d.ExposedById)
                 .WillCascadeOnDelete(false);
         }
     }

@@ -6,7 +6,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class DataTypeController : GenericOptionApiController<DataType, ItSystem, OptionDTO>
+    public class DataTypeController : GenericOptionApiController<DataType, DataRow, OptionDTO>
     {
 
         public DataTypeController(IGenericRepository<DataType> repository) 
