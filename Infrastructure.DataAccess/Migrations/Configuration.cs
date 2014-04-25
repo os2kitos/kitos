@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
@@ -8,8 +6,6 @@ using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Migrations
 {
-    using System;
-    using System.Data.Entity;
     using System.Data.Entity.Migrations;
     using System.Linq;
 
@@ -534,13 +530,13 @@ namespace Infrastructure.DataAccess.Migrations
 
             var task00 = new TaskRef()
                 {
-                    TaskKey = "00", Description = "Kommunens styrelse", Type = "KLE", IsPublic = true, OwnedByOrganizationUnit = klRootUnit
+                    TaskKey = "00", Description = "Kommunens styrelse", Type = "KLE-Hovedgruppe", IsPublic = true, OwnedByOrganizationUnit = klRootUnit
                 };
             var task0001 = new TaskRef()
                 {
                     TaskKey = "00.01",
                     Description = "Kommunens styrelse",
-                    Type = "KLE",
+                    Type = "KLE-Gruppe",
                     Parent = task00,
                     IsPublic = true,
                     OwnedByOrganizationUnit = klRootUnit
@@ -549,7 +545,7 @@ namespace Infrastructure.DataAccess.Migrations
                 {
                     TaskKey = "00.03",
                     Description = "International virksomhed og EU",
-                    Type = "KLE",
+                    Type = "KLE-Gruppe",
                     Parent = task00,
                     IsPublic = true,
                     OwnedByOrganizationUnit = klRootUnit
@@ -561,7 +557,7 @@ namespace Infrastructure.DataAccess.Migrations
                                              {
                                                  TaskKey = "00.01.00",
                                                  Description = "Kommunens styrelse i almindelighed",
-                                                 Type = "KLE",
+                                                 Type = "KLE-Emne",
                                                  Parent = task0001,
                                                  IsPublic = true,
                                                  OwnedByOrganizationUnit = klRootUnit
@@ -570,7 +566,7 @@ namespace Infrastructure.DataAccess.Migrations
                                              {
                                                  TaskKey = "00.01.10",
                                                  Description = "Opgaver der dækker flere hovedgrupper",
-                                                 Type = "KLE",
+                                                 Type = "KLE-Emne",
                                                  Parent = task0001,
                                                  IsPublic = true,
                                                  OwnedByOrganizationUnit = klRootUnit
@@ -580,7 +576,7 @@ namespace Infrastructure.DataAccess.Migrations
                                              {
                                                  TaskKey = "00.03.00",
                                                  Description = "International virksomhed og EU i almindelighed",
-                                                 Type = "KLE",
+                                                 Type = "KLE-Emne",
                                                  Parent = task0003,
                                                  IsPublic = true,
                                                  OwnedByOrganizationUnit = klRootUnit
@@ -589,7 +585,7 @@ namespace Infrastructure.DataAccess.Migrations
                                              {
                                                  TaskKey = "00.03.02",
                                                  Description = "Internationale organisationers virksomhed",
-                                                 Type = "KLE",
+                                                 Type = "KLE-Emne",
                                                  Parent = task0003,
                                                  IsPublic = true,
                                                  OwnedByOrganizationUnit = klRootUnit
@@ -598,7 +594,7 @@ namespace Infrastructure.DataAccess.Migrations
                                              {
                                                  TaskKey = "00.03.04",
                                                  Description = "Regionaludvikling EU",
-                                                 Type = "KLE",
+                                                 Type = "KLE-Emne",
                                                  Parent = task0003,
                                                  IsPublic = true,
                                                  OwnedByOrganizationUnit = klRootUnit
@@ -607,7 +603,7 @@ namespace Infrastructure.DataAccess.Migrations
                                              {
                                                  TaskKey = "00.03.08",
                                                  Description = "EU-interessevaretagelse",
-                                                 Type = "KLE",
+                                                 Type = "KLE-Emne",
                                                  Parent = task0003,
                                                  IsPublic = true,
                                                  OwnedByOrganizationUnit = klRootUnit
@@ -616,7 +612,7 @@ namespace Infrastructure.DataAccess.Migrations
                                              {
                                                  TaskKey = "00.03.10",
                                                  Description = "Internationalt samarbejde",
-                                                 Type = "KLE",
+                                                 Type = "KLE-Emne",
                                                  Parent = task0003,
                                                  IsPublic = true,
                                                  OwnedByOrganizationUnit = klRootUnit
