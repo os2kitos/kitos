@@ -177,8 +177,22 @@
 
     </div>
     
+    <div class="row">&nbsp;</div>
+
+    <!-- KLE -->
+    <div class="row panel panel-default">
+        <div class="panel-heading small">Tilknyt KLE</div>
+        <div class="col-md-6 panel-body">
+            <div data-ng-repeat="task in allTasksFlat">
+                <label>
+                    <input type="checkbox" name="kle" value="{{task.id}}" />
+                    {{task.taskKey}} {{task.description}}
+                </label>
+            </div>
+        </div>
+    </div>
+    
     <div class="row">
         <input type="submit" value="Gem IT system" class="btn btn-success full-width"/>
     </div>
-
 </form>

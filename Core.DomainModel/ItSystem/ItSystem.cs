@@ -9,7 +9,7 @@ namespace Core.DomainModel.ItSystem
             this.ExposedInterfaces = new List<ItSystem>();
             this.CanUseInterfaces = new List<ItSystem>();
             this.Children = new List<ItSystem>();
-            
+            this.TaskRefs = new List<TaskRef>();
             this.Rights = new List<ItSystemRight>();
         }
 
@@ -47,8 +47,6 @@ namespace Core.DomainModel.ItSystem
 
         public virtual ICollection<Wish> Wishes { get; set; }
 
-
-
-        //TODO KLE!!
+        public virtual ICollection<TaskRef> TaskRefs { get; set; }
     }
 }

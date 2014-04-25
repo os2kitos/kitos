@@ -31,6 +31,8 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasRequired(t => t.OwnedByOrganizationUnit)
                 .WithMany(t => t.OwnedTasks)
                 .HasForeignKey(d => d.OwnedByOrganizationUnitId);
+            this.HasMany(t => t.ItSystems)
+                .WithMany(t => t.TaskRefs);
         }
     }
 }

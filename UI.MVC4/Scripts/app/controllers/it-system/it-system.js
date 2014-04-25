@@ -120,8 +120,10 @@
                         }
                     };
                 }
-                
 
+                $http.get('api/taskref').success(function (result) {
+                    $scope.allTasksFlat = result.response;
+                });
             }]);
 
 

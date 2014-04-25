@@ -46,5 +46,11 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
         }
+
+        public HttpResponseMessage PostItSystem(ItSystemDTO dto)
+        {
+            // TODO
+            return Created(dto);
+        }
     }
 }

@@ -8,6 +8,7 @@ namespace Core.DomainModel
         public TaskRef()
         {
             this.Children = new List<TaskRef>();
+            this.ItSystems = new List<ItSystem.ItSystem>();
             //this.OrganizationUnits = new List<OrganizationUnit>();
         }
 
@@ -27,10 +28,10 @@ namespace Core.DomainModel
         public virtual TaskRef Parent { get; set; }
         public virtual ICollection<TaskRef> Children { get; set; }
         public virtual ItProject.ItProject ItProject { get; set; }
-        public virtual ItSystem.ItSystem ItSystem { get; set; }
         
         public virtual ICollection<TaskUsage> Usages { get; set; }
         public virtual ICollection<OrganizationUnit> OrganizationUnits { get; set; }
         public virtual OrganizationUnit OwnedByOrganizationUnit { get; set; }
+        public virtual ICollection<ItSystem.ItSystem> ItSystems { get; set; }
     }
 }
