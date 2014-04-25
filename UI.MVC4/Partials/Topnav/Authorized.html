@@ -5,6 +5,15 @@
     <li><a>IT Projekter</a></li>
     <li><a>IT Systemer</a></li>
     <li><a>IT Kontrakter</a></li>
+    <li data-ng-if="user.isLocalAdmin">
+        <a data-ui-sref="local-config" data-ui-sref-active="active">Lokal admin</a>
+    </li>
+    <li data-ng-if="user.isGlobalAdmin">
+        <a data-ui-sref="global-admin" data-ui-sref-active="active">Global admin</a>
+    </li>
+    <li data-ng-if="user.isGlobalAdmin">
+        <a data-ui-sref="config-org" data-ui-sref-active="active">Global konfig</a>
+    </li>
 </ul>
 
 <div class="navbar-text navbar-text-small navbar-right navbar-complex">
@@ -14,13 +23,9 @@
     </div>
     
     <div>
-        <div data-ng-show="user.isLocalAdmin">
-            <a data-ui-sref="local-config" data-ui-sref-active="active">Lokal admin</a>
-        </div>
-        <div data-ng-show="user.isGlobalAdmin">
-            <a data-ui-sref="global-admin" data-ui-sref-active="active">Global admin</a>
-            <a data-ui-sref="config-org" data-ui-sref-active="active">Global konfig</a>
-        </div>
+        <select class="form-control input-sm org-selector" data-ng-model="user.currentOrganization" >
+            <option data-ng-repeat="org in user.organizations" value="{{org.id}}">{{org.name}}</option>
+        </select>
     </div>
 
     <!-- TODO: Vidensdeling -->                        

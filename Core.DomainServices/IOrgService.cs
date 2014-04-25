@@ -5,6 +5,6 @@ namespace Core.DomainServices
 {
     public interface IOrgService
     {
-        IEnumerable<Organization> GetByUserId(int userId);
+        ICollection<Organization> GetByUser(User user);
     }
 }
