@@ -192,6 +192,12 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.TaskRefIds, opt => opt.MapFrom(src => src.TaskRefs.Select(x => x.Id)))
                   .ReverseMap()
                   .ForMember(dest => dest.TaskRefs, opt => opt.Ignore());
+
+            Mapper.CreateMap<ItSystemUsage, ItSystemUsageDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.SystemRoles, opt => opt.UseValue(null))
+                  .ForMember(dest => dest.OrgUnits, opt => opt.UseValue(null))
+                  .ForMember(dest => dest.TaskRefs, opt => opt.UseValue(null));
         }
     }
 }

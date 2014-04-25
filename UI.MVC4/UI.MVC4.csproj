@@ -228,6 +228,7 @@
     <Compile Include="Controllers\API\DataTypeController.cs" />
     <Compile Include="Controllers\API\InterfaceController.cs" />
     <Compile Include="Controllers\API\ItSystemController.cs" />
+    <Compile Include="Controllers\API\ItSystemUsageController.cs" />
     <Compile Include="Controllers\API\TsaController.cs" />
     <Compile Include="Models\ItSystemDTO.cs" />
     <Compile Include="Controllers\API\OrganizationRightController.cs" />
@@ -289,6 +290,7 @@
     <Compile Include="Models\ApiReturnDTO.cs" />
     <Compile Include="Models\AuthorizeViewModels.cs" />
     <Compile Include="Models\ConfigDTO.cs" />
+    <Compile Include="Models\ItSystemUsageDTO.cs" />
     <Compile Include="Models\LocaleDTO.cs" />
     <Compile Include="Models\LoginDTO.cs" />
     <Compile Include="Models\OptionDTO.cs" />

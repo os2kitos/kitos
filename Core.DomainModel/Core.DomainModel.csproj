@@ -44,6 +44,7 @@
     <Compile Include="IHasAccessModifier.cs" />
     <Compile Include="ItSystem\AppType.cs" />
     <Compile Include="ItSystem\DataType.cs" />
+    <Compile Include="ItSystem\ItSystemUsage.cs" />
     <Compile Include="ItSystem\Tsa.cs" />
     <Compile Include="OrganizationUnit.cs" />
     <Compile Include="OrganizationRight.cs" />

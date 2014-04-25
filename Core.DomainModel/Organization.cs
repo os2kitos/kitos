@@ -17,6 +17,7 @@ namespace Core.DomainModel
             this.ItProjects = new List<ItProject.ItProject>();
             this.ItSystems = new List<ItSystem.ItSystem>();
             this.ItContracts = new List<ItContract.ItContract>();
+            this.ItSystemUsages = new List<ItSystem.ItSystemUsage>();
 
             this.ProjectPhaseLocales = new List<ProjPhaseLocale>();
             this.OrgUnits = new List<OrganizationUnit>();
@@ -32,7 +33,8 @@ namespace Core.DomainModel
         public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
         public virtual ICollection<ItSystem.ItSystem> ItSystems { get; set; } //TODO: Fix this
         public virtual ICollection<ItContract.ItContract> ItContracts { get; set; }
-        public virtual ICollection<AdminRight> AdminRights { get; set; } 
+        public virtual ICollection<AdminRight> AdminRights { get; set; }
+        public virtual ICollection<ItSystem.ItSystemUsage> ItSystemUsages { get; set; }
 
         #region Config and localization
 
