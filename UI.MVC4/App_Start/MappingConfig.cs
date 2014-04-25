@@ -190,6 +190,11 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<RightInputDTO, AdminRight>();
 
             Mapper.CreateMap<ItSystem, ItSystemDTO>();
+            Mapper.CreateMap<ItSystemUsage, ItSystemUsageDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.SystemRoles, opt => opt.UseValue(null))
+                  .ForMember(dest => dest.OrgUnits, opt => opt.UseValue(null))
+                  .ForMember(dest => dest.TaskRefs, opt => opt.UseValue(null));
         }
     }
 }
