@@ -3,7 +3,7 @@ namespace Infrastructure.DataAccess.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class AddSystemInitial8000 : DbMigration
+    public partial class Initial : DbMigration
     {
         public override void Up()
         {
@@ -665,36 +665,6 @@ namespace Infrastructure.DataAccess.Migrations
                 .PrimaryKey(t => t.Id);
             
             CreateTable(
-                "dbo.Wish",
-                c => new
-                    {
-                        Id = c.Int(nullable: false, identity: true),
-                        Text = c.String(unicode: false),
-                        ItSystem_Id = c.Int(nullable: false),
-                        User_Id = c.Int(nullable: false),
-                    })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.ItSystem", t => t.ItSystem_Id, cascadeDelete: true)
-                .ForeignKey("dbo.User", t => t.User_Id, cascadeDelete: true)
-                .Index(t => t.ItSystem_Id)
-                .Index(t => t.User_Id);
-            
-            CreateTable(
-                "dbo.OrganizationUnit",
-                c => new
-                    {
-                        Id = c.Int(nullable: false, identity: true),
-                        Name = c.String(unicode: false),
-                        ParentId = c.Int(),
-                        OrganizationId = c.Int(nullable: false),
-                    })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.Organization", t => t.OrganizationId, cascadeDelete: true)
-                .ForeignKey("dbo.OrganizationUnit", t => t.ParentId, cascadeDelete: true)
-                .Index(t => t.ParentId)
-                .Index(t => t.OrganizationId);
-            
-            CreateTable(
                 "dbo.TaskRef",
                 c => new
                     {
@@ -710,34 +680,32 @@ namespace Infrastructure.DataAccess.Migrations
                         ItSystemId = c.Int(),
                         ParentId = c.Int(),
                         OwnedByOrganizationUnitId = c.Int(nullable: false),
+                        OrganizationUnit_Id = c.Int(),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.ItProject", t => t.ItProjectId)
-                .ForeignKey("dbo.ItSystem", t => t.ItSystemId)
+                .ForeignKey("dbo.OrganizationUnit", t => t.OrganizationUnit_Id)
                 .ForeignKey("dbo.OrganizationUnit", t => t.OwnedByOrganizationUnitId, cascadeDelete: true)
                 .ForeignKey("dbo.TaskRef", t => t.ParentId)
                 .Index(t => t.ItProjectId)
-                .Index(t => t.ItSystemId)
                 .Index(t => t.ParentId)
-                .Index(t => t.OwnedByOrganizationUnitId);
+                .Index(t => t.OwnedByOrganizationUnitId)
+                .Index(t => t.OrganizationUnit_Id);
             
             CreateTable(
-                "dbo.TaskUsage",
+                "dbo.OrganizationUnit",
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
-                        TaskRefId = c.Int(nullable: false),
-                        OrgUnitId = c.Int(nullable: false),
-                        Starred = c.Boolean(nullable: false),
-                        TechnologyStatus = c.Int(nullable: false),
-                        UsageStatus = c.Int(nullable: false),
-                        Comment = c.String(unicode: false),
+                        Name = c.String(unicode: false),
+                        ParentId = c.Int(),
+                        OrganizationId = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.OrganizationUnit", t => t.OrgUnitId, cascadeDelete: true)
-                .ForeignKey("dbo.TaskRef", t => t.TaskRefId, cascadeDelete: true)
-                .Index(t => t.TaskRefId)
-                .Index(t => t.OrgUnitId);
+                .ForeignKey("dbo.Organization", t => t.OrganizationId, cascadeDelete: true)
+                .ForeignKey("dbo.OrganizationUnit", t => t.ParentId, cascadeDelete: true)
+                .Index(t => t.ParentId)
+                .Index(t => t.OrganizationId);
             
             CreateTable(
                 "dbo.OrganizationRight",
@@ -768,6 +736,39 @@ namespace Infrastructure.DataAccess.Migrations
                         Note = c.String(unicode: false),
                     })
                 .PrimaryKey(t => t.Id);
+            
+            CreateTable(
+                "dbo.TaskUsage",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        TaskRefId = c.Int(nullable: false),
+                        OrgUnitId = c.Int(nullable: false),
+                        Starred = c.Boolean(nullable: false),
+                        TechnologyStatus = c.Int(nullable: false),
+                        UsageStatus = c.Int(nullable: false),
+                        Comment = c.String(unicode: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.OrganizationUnit", t => t.OrgUnitId, cascadeDelete: true)
+                .ForeignKey("dbo.TaskRef", t => t.TaskRefId, cascadeDelete: true)
+                .Index(t => t.TaskRefId)
+                .Index(t => t.OrgUnitId);
+            
+            CreateTable(
+                "dbo.Wish",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        Text = c.String(unicode: false),
+                        ItSystem_Id = c.Int(nullable: false),
+                        User_Id = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.ItSystem", t => t.ItSystem_Id, cascadeDelete: true)
+                .ForeignKey("dbo.User", t => t.User_Id, cascadeDelete: true)
+                .Index(t => t.ItSystem_Id)
+                .Index(t => t.User_Id);
             
             CreateTable(
                 "dbo.ItContractRole",
@@ -864,8 +865,6 @@ namespace Infrastructure.DataAccess.Migrations
                         IsActive = c.Boolean(nullable: false),
                         IsSuggestion = c.Boolean(nullable: false),
                         Note = c.String(unicode: false),
-                        HasReadAccess = c.Boolean(nullable: false),
-                        HasWriteAccess = c.Boolean(nullable: false),
                     })
                 .PrimaryKey(t => t.Id);
             
@@ -985,17 +984,17 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ItSystem_Id1);
             
             CreateTable(
-                "dbo.TaskRefOrganizationUnits",
+                "dbo.TaskRefItSystems",
                 c => new
                     {
                         TaskRef_Id = c.Int(nullable: false),
-                        OrganizationUnit_Id = c.Int(nullable: false),
+                        ItSystem_Id = c.Int(nullable: false),
                     })
-                .PrimaryKey(t => new { t.TaskRef_Id, t.OrganizationUnit_Id })
+                .PrimaryKey(t => new { t.TaskRef_Id, t.ItSystem_Id })
                 .ForeignKey("dbo.TaskRef", t => t.TaskRef_Id, cascadeDelete: true)
-                .ForeignKey("dbo.OrganizationUnit", t => t.OrganizationUnit_Id, cascadeDelete: true)
+                .ForeignKey("dbo.ItSystem", t => t.ItSystem_Id, cascadeDelete: true)
                 .Index(t => t.TaskRef_Id)
-                .Index(t => t.OrganizationUnit_Id);
+                .Index(t => t.ItSystem_Id);
             
         }
         
@@ -1026,23 +1025,23 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.ItContract", "SupplierId", "dbo.Supplier");
             DropForeignKey("dbo.Infrastructure", "SupplierId", "dbo.Supplier");
             DropForeignKey("dbo.Infrastructure", "DepartmentId", "dbo.OrganizationUnit");
-            DropForeignKey("dbo.OrganizationRight", "UserId", "dbo.User");
-            DropForeignKey("dbo.OrganizationRight", "RoleId", "dbo.OrganizationRole");
-            DropForeignKey("dbo.OrganizationRight", "ObjectId", "dbo.OrganizationUnit");
-            DropForeignKey("dbo.OrganizationUnit", "ParentId", "dbo.OrganizationUnit");
-            DropForeignKey("dbo.TaskUsage", "TaskRefId", "dbo.TaskRef");
-            DropForeignKey("dbo.TaskUsage", "OrgUnitId", "dbo.OrganizationUnit");
-            DropForeignKey("dbo.TaskRef", "ParentId", "dbo.TaskRef");
-            DropForeignKey("dbo.TaskRef", "OwnedByOrganizationUnitId", "dbo.OrganizationUnit");
-            DropForeignKey("dbo.TaskRefOrganizationUnits", "OrganizationUnit_Id", "dbo.OrganizationUnit");
-            DropForeignKey("dbo.TaskRefOrganizationUnits", "TaskRef_Id", "dbo.TaskRef");
-            DropForeignKey("dbo.TaskRef", "ItSystemId", "dbo.ItSystem");
-            DropForeignKey("dbo.TaskRef", "ItProjectId", "dbo.ItProject");
-            DropForeignKey("dbo.OrganizationUnit", "OrganizationId", "dbo.Organization");
             DropForeignKey("dbo.Infrastructure", "ItSystem_Id", "dbo.ItSystem");
             DropForeignKey("dbo.Wish", "User_Id", "dbo.User");
             DropForeignKey("dbo.Wish", "ItSystem_Id", "dbo.ItSystem");
             DropForeignKey("dbo.ItSystem", "UserId", "dbo.User");
+            DropForeignKey("dbo.TaskRef", "ParentId", "dbo.TaskRef");
+            DropForeignKey("dbo.TaskRef", "OwnedByOrganizationUnitId", "dbo.OrganizationUnit");
+            DropForeignKey("dbo.TaskUsage", "TaskRefId", "dbo.TaskRef");
+            DropForeignKey("dbo.TaskUsage", "OrgUnitId", "dbo.OrganizationUnit");
+            DropForeignKey("dbo.TaskRef", "OrganizationUnit_Id", "dbo.OrganizationUnit");
+            DropForeignKey("dbo.OrganizationRight", "UserId", "dbo.User");
+            DropForeignKey("dbo.OrganizationRight", "RoleId", "dbo.OrganizationRole");
+            DropForeignKey("dbo.OrganizationRight", "ObjectId", "dbo.OrganizationUnit");
+            DropForeignKey("dbo.OrganizationUnit", "ParentId", "dbo.OrganizationUnit");
+            DropForeignKey("dbo.OrganizationUnit", "OrganizationId", "dbo.Organization");
+            DropForeignKey("dbo.TaskRefItSystems", "ItSystem_Id", "dbo.ItSystem");
+            DropForeignKey("dbo.TaskRefItSystems", "TaskRef_Id", "dbo.TaskRef");
+            DropForeignKey("dbo.TaskRef", "ItProjectId", "dbo.ItProject");
             DropForeignKey("dbo.ItSystemRight", "UserId", "dbo.User");
             DropForeignKey("dbo.ItSystemRight", "RoleId", "dbo.ItSystemRole");
             DropForeignKey("dbo.ItSystemRight", "ObjectId", "dbo.ItSystem");
@@ -1089,27 +1088,27 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.Config", "ItSupportModuleNameId", "dbo.ItSupportName");
             DropForeignKey("dbo.Config", "ItProjectModuleNameId", "dbo.ItProjectName");
             DropForeignKey("dbo.Config", "ItContractModuleNameId", "dbo.ItContractName");
-            DropIndex("dbo.TaskRefOrganizationUnits", new[] { "OrganizationUnit_Id" });
-            DropIndex("dbo.TaskRefOrganizationUnits", new[] { "TaskRef_Id" });
+            DropIndex("dbo.TaskRefItSystems", new[] { "ItSystem_Id" });
+            DropIndex("dbo.TaskRefItSystems", new[] { "TaskRef_Id" });
             DropIndex("dbo.ItSystemItSystems", new[] { "ItSystem_Id1" });
             DropIndex("dbo.ItSystemItSystems", new[] { "ItSystem_Id" });
             DropIndex("dbo.Interface", new[] { "Method_Id" });
             DropIndex("dbo.Stakeholder", new[] { "ItProjectId" });
             DropIndex("dbo.Risk", new[] { "ItProjectId" });
             DropIndex("dbo.PasswordResetRequest", new[] { "UserId" });
+            DropIndex("dbo.Wish", new[] { "User_Id" });
+            DropIndex("dbo.Wish", new[] { "ItSystem_Id" });
+            DropIndex("dbo.TaskUsage", new[] { "OrgUnitId" });
+            DropIndex("dbo.TaskUsage", new[] { "TaskRefId" });
             DropIndex("dbo.OrganizationRight", new[] { "UserId" });
             DropIndex("dbo.OrganizationRight", new[] { "RoleId" });
             DropIndex("dbo.OrganizationRight", new[] { "ObjectId" });
-            DropIndex("dbo.TaskUsage", new[] { "OrgUnitId" });
-            DropIndex("dbo.TaskUsage", new[] { "TaskRefId" });
-            DropIndex("dbo.TaskRef", new[] { "OwnedByOrganizationUnitId" });
-            DropIndex("dbo.TaskRef", new[] { "ParentId" });
-            DropIndex("dbo.TaskRef", new[] { "ItSystemId" });
-            DropIndex("dbo.TaskRef", new[] { "ItProjectId" });
             DropIndex("dbo.OrganizationUnit", new[] { "OrganizationId" });
             DropIndex("dbo.OrganizationUnit", new[] { "ParentId" });
-            DropIndex("dbo.Wish", new[] { "User_Id" });
-            DropIndex("dbo.Wish", new[] { "ItSystem_Id" });
+            DropIndex("dbo.TaskRef", new[] { "OrganizationUnit_Id" });
+            DropIndex("dbo.TaskRef", new[] { "OwnedByOrganizationUnitId" });
+            DropIndex("dbo.TaskRef", new[] { "ParentId" });
+            DropIndex("dbo.TaskRef", new[] { "ItProjectId" });
             DropIndex("dbo.ItSystemRight", new[] { "UserId" });
             DropIndex("dbo.ItSystemRight", new[] { "RoleId" });
             DropIndex("dbo.ItSystemRight", new[] { "ObjectId" });
@@ -1177,7 +1176,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.AdminRight", new[] { "UserId" });
             DropIndex("dbo.AdminRight", new[] { "RoleId" });
             DropIndex("dbo.AdminRight", new[] { "ObjectId" });
-            DropTable("dbo.TaskRefOrganizationUnits");
+            DropTable("dbo.TaskRefItSystems");
             DropTable("dbo.ItSystemItSystems");
             DropTable("dbo.Tsa");
             DropTable("dbo.Text");
@@ -1194,12 +1193,12 @@ namespace Infrastructure.DataAccess.Migrations
             DropTable("dbo.Risk");
             DropTable("dbo.PasswordResetRequest");
             DropTable("dbo.ItContractRole");
+            DropTable("dbo.Wish");
+            DropTable("dbo.TaskUsage");
             DropTable("dbo.OrganizationRole");
             DropTable("dbo.OrganizationRight");
-            DropTable("dbo.TaskUsage");
-            DropTable("dbo.TaskRef");
             DropTable("dbo.OrganizationUnit");
-            DropTable("dbo.Wish");
+            DropTable("dbo.TaskRef");
             DropTable("dbo.ItSystemRole");
             DropTable("dbo.ItSystemRight");
             DropTable("dbo.BusinessType");

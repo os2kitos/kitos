@@ -1,5 +1,5 @@
 ﻿(function (ng, app) {
-    
+
     var subnav = [
             { state: 'index', text: 'Overblik' },
             { state: 'index', text: 'Tilknyt IT system' },
@@ -14,7 +14,7 @@
             templateUrl: 'partials/it-system/edit-system.html',
             controller: 'system.AddCtrl',
             resolve: {
-                appTypes: ['$http', function($http) {
+                appTypes: ['$http', function ($http) {
                     return $http.get("api/apptype");
                 }],
                 interfaceAppType: ['$http', function ($http) {
@@ -55,7 +55,7 @@
                 $scope.appTypes = appTypes.data.response;
                 $scope.interfaceAppType = interfaceAppType.data.response;
                 $scope.businessTypes = businessTypes.data.response;
-                
+
                 $scope.tsas = tsas.data.response;
                 $scope.interfaces = interfaces.data.response;
                 $scope.interfaceTypes = interfaceTypes.data.response;
@@ -66,17 +66,28 @@
                 $scope.itSystemsSelectOptions = systemLazyLoading('nonInterfaces');
                 $scope.itSystemsInterfacesOptions = systemLazyLoading('interfaces');
 
-                $scope.system = {dataRows: []};
+                $scope.system = { dataRows: [] };
 
                 $scope.newDataRow = {};
 
-                $scope.saveSystem = function() {
+                $scope.formData = {};
 
-                    console.log($scope.system);
+                // submit function
+                $scope.saveSystem = function () {
+                    var checkedTasks = _.filter($scope.allTasksFlat, function(task) {
+                        return task.isChecked;
+                    });
+                    var checkedTaskIds = _.map(checkedTasks, function(task) {
+                        return task.id;
+                    });
+                    $scope.formData.taskRefIds = checkedTaskIds;
 
+                    $http.post('api/itsystem', $scope.formData).success(function() {
+                        console.log('success');
+                    });
                 };
 
-                $scope.addDataRow = function(newDataRow) {
+                $scope.addDataRow = function (newDataRow) {
                     if (!newDataRow.data || !newDataRow.dataType) return;
 
                     $scope.system.dataRows.push({ data: newDataRow.data, dataType: newDataRow.dataType });
@@ -122,9 +133,14 @@
                 }
 
                 $http.get('api/taskref').success(function (result) {
+                    $scope.kleFilter = {type:'KLE-Emne'}
                     $scope.allTasksFlat = result.response;
                 });
+
+                $scope.cleanKleFilter = function () {
+                    if ($scope.kleFilter.parentId === null) {
+                        delete $scope.kleFilter.parentId;
+                    }
+                };
             }]);
-
-
 })(angular, app);

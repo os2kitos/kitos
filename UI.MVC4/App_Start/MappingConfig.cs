@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using AutoMapper;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -187,7 +188,10 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<AdminRight, RightOutputDTO>();
             Mapper.CreateMap<RightInputDTO, AdminRight>();
 
-            Mapper.CreateMap<ItSystem, ItSystemDTO>();
+            Mapper.CreateMap<ItSystem, ItSystemDTO>()
+                  .ForMember(dest => dest.TaskRefIds, opt => opt.MapFrom(src => src.TaskRefs.Select(x => x.Id)))
+                  .ReverseMap()
+                  .ForMember(dest => dest.TaskRefs, opt => opt.Ignore());
         }
     }
 }
