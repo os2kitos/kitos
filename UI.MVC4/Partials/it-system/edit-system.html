@@ -7,7 +7,7 @@
                 <div class="form-group">
                     <label for="system-name" class="control-label col-md-5 small">IT System</label>
                     <div class="col-md-7">
-                        <input type="text" id="system-name" data-ng-model="system.systemName" class="form-control input-sm" />
+                        <input type="text" id="system-name" data-ng-model="system.name" class="form-control input-sm" required="required"/>
                     </div>
                 </div>
 
@@ -15,7 +15,7 @@
                 <div class="form-group">
                     <label for="system-id" class="control-label col-md-5 small">System ID</label>
                     <div class="col-md-7">
-                        <input type="text" id="system-id" data-ng-model="system.systemId" class="form-control input-sm" />
+                        <input type="text" id="system-id" data-ng-model="system.systemId" class="form-control input-sm" required="required"/>
                     </div>
                 </div>
 
@@ -23,14 +23,14 @@
                 <div class="form-group">
                     <label for="system-parent" class="control-label col-md-5 small">Overordnet system</label>
                     <div class="col-md-7">
-                        <input type="hidden" data-ui-select2="itSystemsSelectOptions" id="system-parent" data-ng-model="system.systemParent" class="form-control input-sm" >
+                        <input type="hidden" data-ui-select2="itSystemsSelectOptions" id="system-parent" data-ng-model="system.parent" class="form-control input-sm" >
                     </div>
                 </div>
                 <!--Interfaces can-use-->
                 <div class="form-group">
                     <label for="system-interfaces-can-use" class="control-label col-md-5 small">Snitflader (kan anvende)</label>
                     <div class="col-md-7">
-                        <input type="hidden" data-ui-select2="itSystemsInterfacesOptions" id="system-interfaces-can-use" data-ng-model="system.interfacesCanUse" class="form-control input-sm" multiple="multiple">
+                        <input type="hidden" data-ui-select2="itSystemsInterfacesOptions" id="system-interfaces-can-use" data-ng-model="system.canUseInterfaces" class="form-control input-sm" multiple="multiple">
                     </div>
                 </div>
             </div>
@@ -40,7 +40,7 @@
                 <div class="form-group">
                     <label for="system-version" class="control-label col-md-5 small">Version</label>
                     <div class="col-md-7">
-                        <input type="text" id="system-version" data-ng-model="system.systemVersion" class="form-control input-sm" />
+                        <input type="text" id="system-version" data-ng-model="system.version" class="form-control input-sm" required="required"/>
                     </div>
                 </div>
 
@@ -48,7 +48,7 @@
                 <div class="form-group">
                     <label for="system-access" class="control-label col-md-5 small">Public</label>
                     <div class="col-md-7">
-                        <input type="text" id="system-access" data-ng-model="system.systemAccess" class="form-control input-sm" />
+                        <input type="text" id="system-access" data-ng-model="system.accessModifier" class="form-control input-sm" />
                     </div>
                 </div>
 
@@ -56,7 +56,7 @@
                 <div class="form-group">
                     <label for="system-app-type" class="control-label col-md-5 small">Applikationstype</label>
                     <div class="col-md-7">
-                        <select data-ui-select2="" id="system-app-type" data-ng-model="system.systemAppType" class="form-control input-sm" >
+                        <select data-ui-select2="" id="system-app-type" data-ng-model="system.appTypeId" class="form-control input-sm" required="required">
                             <option data-ng-repeat="appType in appTypes" value="{{appType.id}}">{{appType.name}}</option>
                         </select>
                     </div>
@@ -66,7 +66,7 @@
                 <div class="form-group">
                     <label for="system-business-type" class="control-label col-md-5 small">Forretningstype</label>
                     <div class="col-md-7">
-                        <select data-ui-select2="" id="system-business-type" data-ng-model="system.systemBusinessType" class="form-control input-sm" >
+                        <select data-ui-select2="" id="system-business-type" data-ng-model="system.businessTypeId" class="form-control input-sm" required="required">
                             <option data-ng-repeat="businessType in businessTypes" value="{{businessType.id}}">{{businessType.name}}</option>
                         </select>
                     </div>

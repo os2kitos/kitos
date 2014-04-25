@@ -70,19 +70,16 @@
 
                 $scope.newDataRow = {};
 
-                $scope.formData = {};
-
                 // submit function
                 $scope.saveSystem = function () {
                     var checkedTasks = _.filter($scope.allTasksFlat, function(task) {
                         return task.isChecked;
                     });
-                    var checkedTaskIds = _.map(checkedTasks, function(task) {
-                        return task.id;
-                    });
-                    $scope.formData.taskRefIds = checkedTaskIds;
-
-                    $http.post('api/itsystem', $scope.formData).success(function() {
+                    var checkedTaskIds = _.pluck(checkedTasks, 'id');
+                    
+                    $scope.system.taskRefIds = checkedTaskIds;
+                    
+                    $http.post('api/itsystem', $scope.system, {handleBusy: true}).success(function() {
                         console.log('success');
                     });
                 };
@@ -133,7 +130,7 @@
                 }
 
                 $http.get('api/taskref').success(function (result) {
-                    $scope.kleFilter = {type:'KLE-Emne'}
+                    $scope.kleFilter = { type: 'KLE-Emne' };
                     $scope.allTasksFlat = result.response;
                 });
 

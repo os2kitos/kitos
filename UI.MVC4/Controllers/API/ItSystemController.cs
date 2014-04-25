@@ -52,6 +52,9 @@ namespace UI.MVC4.Controllers.API
 
         public override HttpResponseMessage Post(ItSystemDTO dto)
         {
+            return Ok(dto);
+
+
             try
             {
                 var item = Map(dto);

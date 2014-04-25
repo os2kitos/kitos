@@ -18,5 +18,8 @@ namespace UI.MVC4.Models
         public string Description { get; set; }
         public string Url { get; set; }
         public IEnumerable<int> TaskRefIds { get; set; }
+
+        public int AppTypeId { get; set; }
+        public int BusinessTypeId { get; set; }
     }
 }
