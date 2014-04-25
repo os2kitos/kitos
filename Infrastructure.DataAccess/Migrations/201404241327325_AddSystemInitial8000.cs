@@ -864,6 +864,8 @@ namespace Infrastructure.DataAccess.Migrations
                         IsActive = c.Boolean(nullable: false),
                         IsSuggestion = c.Boolean(nullable: false),
                         Note = c.String(unicode: false),
+                        HasReadAccess = c.Boolean(nullable: false),
+                        HasWriteAccess = c.Boolean(nullable: false),
                     })
                 .PrimaryKey(t => t.Id);
             
