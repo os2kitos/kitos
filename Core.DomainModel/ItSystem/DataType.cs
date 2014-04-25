@@ -3,11 +3,11 @@ using System.Collections.ObjectModel;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class DataType : IOptionEntity<ItSystem>
+    public class DataType : IOptionEntity<DataRow>
     {
         public DataType()
         {
-            References = new List<ItSystem>();
+            References = new List<DataRow>();
         }
 
         public int Id { get; set; }
@@ -15,6 +15,6 @@ namespace Core.DomainModel.ItSystem
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }
         public string Note { get; set; }
-        public virtual ICollection<ItSystem> References { get; set; }
+        public virtual ICollection<DataRow> References { get; set; }
     }
 }

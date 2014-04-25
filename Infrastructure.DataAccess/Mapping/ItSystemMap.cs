@@ -17,30 +17,30 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Relationships
             this.HasOptional(t => t.Parent)
-                .WithMany(t => t.Children)
-                .HasForeignKey(d => d.ParentId)
+                .WithMany(d => d.Children)
+                .HasForeignKey(t => t.ParentId)
                 .WillCascadeOnDelete(false);
 
             this.HasRequired(t => t.Organization)
-                .WithMany(t => t.ItSystems)
-                .HasForeignKey(d => d.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .WithMany(d => d.ItSystems)
+                .HasForeignKey(t => t.OrganizationId);
+
+            this.HasRequired(t => t.BelongsTo)
+                .WithMany(d => d.BelongingSystems)
+                .HasForeignKey(t => t.BelongsToId);
 
             this.HasRequired(t => t.User)
                 .WithMany(user => user.CreatedSystems)
-                .HasForeignKey(t => t.UserId)
-                .WillCascadeOnDelete(false);
+                .HasForeignKey(t => t.UserId);
 
             this.HasRequired(t => t.AppType)
                 .WithMany(t => t.References)
-                .HasForeignKey(t => t.AppTypeId)
-                .WillCascadeOnDelete(false);
+                .HasForeignKey(t => t.AppTypeId);
 
             this.HasRequired(t => t.BusinessType)
                 .WithMany(t => t.References)
-                .HasForeignKey(t => t.BusinessTypeId)
-                .WillCascadeOnDelete(false);
-
+                .HasForeignKey(t => t.BusinessTypeId);
+            
             this.HasMany(t => t.CanUseInterfaces)
                 .WithMany(d => d.CanBeUsedBy);
 

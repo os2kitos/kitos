@@ -69,6 +69,7 @@
     <Compile Include="Mapping\AdminRightMap.cs" />
     <Compile Include="Mapping\AdminRoleMap.cs" />
     <Compile Include="Mapping\BusinessTypeMap.cs" />
+    <Compile Include="Mapping\DataRowMap.cs" />
     <Compile Include="Mapping\DataTypeMap.cs" />
     <Compile Include="Mapping\ItSystemUsageMap.cs" />
     <Compile Include="Mapping\TsaMap.cs" />

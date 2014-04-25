@@ -20,6 +20,8 @@ namespace Core.DomainModel.ItSystem
         public int? ParentId { get; set; }
         public int? ExposedById { get; set; }
 
+        public int BelongsToId { get; set; }
+
         public int OrganizationId { get; set; }
         public int UserId { get; set; }
 
@@ -45,6 +47,8 @@ namespace Core.DomainModel.ItSystem
         public virtual ICollection<ItSystem> Children { get; set; }
         /* super systems */
         public virtual ItSystem Parent { get; set; }
+
+        public virtual Organization BelongsTo { get; set; } //the organization the system belongs to (OIO term - think "produced by")
 
         public virtual Organization Organization { get; set; } //which organization the it system was created under
         public virtual User User { get; set; } //created by
@@ -72,6 +76,7 @@ namespace Core.DomainModel.ItSystem
         public virtual Interface Interface { get; set; }
         public virtual InterfaceType InterfaceType { get; set; }
         public virtual Tsa Tsa { get; set; }
+        public virtual ICollection<DataRow> DataRows { get; set; } 
 
         public virtual ICollection<Wish> Wishes { get; set; }
 

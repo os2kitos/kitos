@@ -31,7 +31,10 @@ namespace Core.DomainModel
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
 
         public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
-        public virtual ICollection<ItSystem.ItSystem> ItSystems { get; set; } //TODO: Fix this
+
+        public virtual ICollection<ItSystem.ItSystem> BelongingSystems { get; set; } //Systems that belongs to this organization (OIO term - think "produced by IRL")
+        public virtual ICollection<ItSystem.ItSystem> ItSystems { get; set; } //KITOS term - which organization was this system created under in KITOS
+
         public virtual ICollection<ItContract.ItContract> ItContracts { get; set; }
         public virtual ICollection<AdminRight> AdminRights { get; set; }
         public virtual ICollection<ItSystem.ItSystemUsage> ItSystemUsages { get; set; }
