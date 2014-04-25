@@ -73,7 +73,6 @@ namespace Infrastructure.DataAccess
         public DbSet<ProjPhaseLocale> ProjectPhaseLocales { get; set; }
         public DbSet<ProjectStatus> ProjectStatus { get; set; }
         public DbSet<ProjectType> ProjectTypes { get; set; }
-        public DbSet<ProtocolType> ProtocolTypes { get; set; }
         public DbSet<PurchaseForm> PurchaseForms { get; set; }
         public DbSet<Resource> Resources { get; set; }
         public DbSet<Risk> Risks { get; set; }
@@ -143,7 +142,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ProjectPhaseLocaleMap());
             modelBuilder.Configurations.Add(new ProjectStatusMap());
             modelBuilder.Configurations.Add(new ProjectTypeMap());
-            modelBuilder.Configurations.Add(new ProtocolTypeMap());
             modelBuilder.Configurations.Add(new PurchaseFormMap());
             modelBuilder.Configurations.Add(new ResourcesMap());
             modelBuilder.Configurations.Add(new RiskMap());

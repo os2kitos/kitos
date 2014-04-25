@@ -79,10 +79,6 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<ProtocolType, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
-
             Mapper.CreateMap<PurchaseForm, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
