@@ -46,7 +46,7 @@ namespace Core.DomainModel.ItSystem
         /* super systems */
         public virtual ItSystem Parent { get; set; }
 
-        public virtual Organization Organization { get; set; } //created inside which organization?
+        public virtual Organization Organization { get; set; } //which organization the it system was created under
         public virtual User User { get; set; } //created by
 
         public virtual ICollection<ItSystemRight> Rights { get; set; }
@@ -69,6 +69,9 @@ namespace Core.DomainModel.ItSystem
 
         public virtual AppType AppType { get; set; }
         public virtual BusinessType BusinessType { get; set; }
+        public virtual Interface Interface { get; set; }
+        public virtual InterfaceType InterfaceType { get; set; }
+        public virtual Tsa Tsa { get; set; }
 
         public virtual ICollection<Wish> Wishes { get; set; }
 
