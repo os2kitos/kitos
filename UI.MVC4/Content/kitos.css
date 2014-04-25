@@ -125,7 +125,7 @@ div.org-node
 }
     div.org-node a
     {
-        color: black;
+        color: white;
         text-decoration: none;
     }
 
@@ -137,14 +137,29 @@ div.org-node
         background: rgb(219, 229, 241);
     }
 
-    div.org-node.selected span.org-node-info
-    {
-        background-color: rgb(177, 207, 243);
-    }
+     div.org-node span.org-node-info > a 
+     {
+         color: rgb(55, 96, 146);
+     }
+
+     div.org-node span.org-node-info i
+     {   
+         color: rgb(55, 96, 146);
+     }
 
     div.org-node.selected > span.org-node-info
     {
-        background-color: rgb(125, 154, 189);
+        background-color: rgb(55, 96, 146);
+    }
+
+     div.org-node.selected > span.org-node-info > a
+    {
+        color: white;
+    }
+
+      div.org-node.selected > span.org-node-info i
+    {
+        color: white;
     }
 
     div.org-node.hasWriteAccess span.org-node-info
@@ -152,17 +167,22 @@ div.org-node
         display: inline-block;
         margin: 0;
         padding: 4px 10px;
-        background: rgb(201, 251, 201);
-    }
-
-    div.org-node.selected.hasWriteAccess span.org-node-info, div.org-node.selected div.org-node.hasWriteAccess > span.org-node-info
-    {
-        background: rgb(185, 236, 185);
+        background: rgb(177, 207, 243);
     }
 
     div.org-node.selected.hasWriteAccess > span.org-node-info
     {
-        background: rgb(143, 199, 143);
+        background: rgb(55, 96, 146);
+    }
+
+    div.org-node.selected.hasWriteAccess > span.org-node-info > a
+    {
+        color: white;
+    }
+
+     div.org-node.selected.hasWriteAccess > span.org-node-info i
+    {
+        color: white;
     }
 
 
@@ -425,4 +445,29 @@ body.wait, body.wait * {
     padding: 2px;
     width: 100%;
     text-align: left;
+}
+
+.org-role-table 
+{
+    table-layout: fixed;
+}
+
+.org-role-table thead > tr th:nth-child(1) 
+{
+    width: 30%;
+}
+
+.org-role-table thead > tr th:nth-child(2) 
+{
+    width: 20%;
+}
+
+.org-role-table thead > tr th:nth-child(3) 
+{
+    width: 20%;
+}
+
+.org-role-table thead > tr th:nth-child(4) 
+{
+    width: 30%;
 }

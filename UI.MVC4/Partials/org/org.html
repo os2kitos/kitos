@@ -2,7 +2,27 @@
 
     <div class="col-md-4 container-fluid">
         <h2>Enheder</h2>
+        
+         <div class="org-node" style="display: inline;">
+            <span class="org-node-info">
+                <a>Læserettighed</a>
+            </span>
+        </div>
+        
+        <div class="org-node hasWriteAccess" style="display: inline;">
+            <span class="org-node-info">
+                <a>Skriverettighed</a>
+            </span>
+        </div>
+
+        <div class="org-node hasWriteAccess selected" style="display: inline;">
+            <span class="org-node-info">
+                <a>Valgt</a>
+            </span>
+        </div>
+
         <p>Du er tilknyttet disse organisationsenheder:</p>
+        
         <div data-ng-repeat="node in nodes">
             <div data-ng-include="'partials/org/org-unit.html'"></div>
         </div>
@@ -48,13 +68,13 @@
                             Rediger
                         </a>
                     </div>
-                    <table class="full-width table">
+                    <table class="full-width table org-role-table">
                         <thead>
                             <tr>
                                 <th><button class="btn btn-link btn-header" data-ng-click="rightSortChange('orgUnitName')">Organisationsenhed</button></th>
                                 <th><button class="btn btn-link btn-header" data-ng-click="rightSortChange('roleName')">Organisationsrolle</button></th>
                                 <th><button class="btn btn-link btn-header" data-ng-click="rightSortChange('userName')">Navn</button></th>
-                                <th colspan="2"><button class="btn btn-link btn-header" data-ng-click="rightSortChange('userEmail')">Email</button></th>
+                                <th><button class="btn btn-link btn-header" data-ng-click="rightSortChange('userEmail')">Email</button></th>
                             </tr>
                         </thead>
                         <!-- for each right -->
@@ -65,9 +85,8 @@
                                 <td>{{ orgUnits[right.objectId].name }}</td>
                                 <td>{{ orgRoles[right.roleId].name }}</td>
                                 <td>{{ right.user.name }}</td>
-                                <td>{{ right.user.email }}</td>
-                                <td>
-                                    <div data-ng-show="chosenOrgUnit.hasWriteAccess && chosenOrgUnit.editRights">
+                                <td>{{ right.user.email }}
+                                    <div data-ng-show="chosenOrgUnit.hasWriteAccess && chosenOrgUnit.editRights" class="pull-right">
                                         <a data-ng-click="right.edit = true" class="btn btn-link btn-sm"><i class="glyphicon glyphicon-pencil"></i></a>
                                         <a class="btn btn-link btn-sm" 
                                            data-confirmed-click="deleteRight(right)" 
@@ -92,9 +111,7 @@
                                 </td>
                                 <td colspan="2">
                                     <input data-select-user="foo" data-user-model="right.userForSelect" />
-                                </td>
-                                <td>
-                                    <input type="submit" class="btn btn-primary btn-sm" data-ng-click="updateRight(right)" value="Gem" />
+                                    <input type="submit" class="btn btn-primary btn-sm pull-right" data-ng-click="updateRight(right)" value="Gem" />
                                 </td>
                             </tr>
                         </tbody>
