@@ -23,8 +23,9 @@
     </div>
     
     <div>
-        <select class="form-control input-sm org-selector" data-ng-model="user.currentOrganization" >
-            <option data-ng-repeat="org in user.organizations" value="{{org.id}}">{{org.name}}</option>
+        <select class="form-control input-sm org-selector" 
+                data-ng-model="user.currentOrganizationId" 
+                data-ng-options="org.id as org.name for org in user.organizations">
         </select>
     </div>
 
