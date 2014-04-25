@@ -3,7 +3,7 @@ namespace Infrastructure.DataAccess.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class Initial : DbMigration
+    public partial class InitialMigration9014 : DbMigration
     {
         public override void Up()
         {
@@ -578,11 +578,11 @@ namespace Infrastructure.DataAccess.Migrations
                         ExposedById = c.Int(),
                         OrganizationId = c.Int(nullable: false),
                         UserId = c.Int(nullable: false),
+                        AppTypeId = c.Int(nullable: false),
+                        BusinessTypeId = c.Int(nullable: false),
                         AccessModifier = c.Int(nullable: false),
                         Description = c.String(unicode: false),
                         Url = c.String(unicode: false),
-                        AppType_Id = c.Int(nullable: false),
-                        BusinessType_Id = c.Int(nullable: false),
                         DataType_Id = c.Int(),
                         Interface_Id = c.Int(),
                         InterfaceType_Id = c.Int(),
@@ -590,12 +590,12 @@ namespace Infrastructure.DataAccess.Migrations
                         Tsa_Id = c.Int(),
                     })
                 .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.AppType", t => t.AppType_Id)
-                .ForeignKey("dbo.BusinessType", t => t.BusinessType_Id)
+                .ForeignKey("dbo.AppType", t => t.AppTypeId)
+                .ForeignKey("dbo.BusinessType", t => t.BusinessTypeId)
                 .ForeignKey("dbo.ItSystem", t => t.ExposedById)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)
                 .ForeignKey("dbo.ItSystem", t => t.ParentId)
-                .ForeignKey("dbo.User", t => t.UserId, cascadeDelete: true)
+                .ForeignKey("dbo.User", t => t.UserId)
                 .ForeignKey("dbo.DataType", t => t.DataType_Id)
                 .ForeignKey("dbo.Interface", t => t.Interface_Id)
                 .ForeignKey("dbo.InterfaceType", t => t.InterfaceType_Id)
@@ -605,8 +605,8 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ExposedById)
                 .Index(t => t.OrganizationId)
                 .Index(t => t.UserId)
-                .Index(t => t.AppType_Id)
-                .Index(t => t.BusinessType_Id)
+                .Index(t => t.AppTypeId)
+                .Index(t => t.BusinessTypeId)
                 .Index(t => t.DataType_Id)
                 .Index(t => t.Interface_Id)
                 .Index(t => t.InterfaceType_Id)
@@ -1113,8 +1113,8 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.ItSystem", "ExposedById", "dbo.ItSystem");
             DropForeignKey("dbo.ItSystemItSystems", "ItSystem_Id1", "dbo.ItSystem");
             DropForeignKey("dbo.ItSystemItSystems", "ItSystem_Id", "dbo.ItSystem");
-            DropForeignKey("dbo.ItSystem", "BusinessType_Id", "dbo.BusinessType");
-            DropForeignKey("dbo.ItSystem", "AppType_Id", "dbo.AppType");
+            DropForeignKey("dbo.ItSystem", "BusinessTypeId", "dbo.BusinessType");
+            DropForeignKey("dbo.ItSystem", "AppTypeId", "dbo.AppType");
             DropForeignKey("dbo.ShipNotice", "ItContractId", "dbo.ItContract");
             DropForeignKey("dbo.ItContract", "PurchaseFormId", "dbo.PurchaseForm");
             DropForeignKey("dbo.ItContract", "PaymentModelId", "dbo.PaymentModel");
@@ -1189,8 +1189,8 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ItSystem", new[] { "InterfaceType_Id" });
             DropIndex("dbo.ItSystem", new[] { "Interface_Id" });
             DropIndex("dbo.ItSystem", new[] { "DataType_Id" });
-            DropIndex("dbo.ItSystem", new[] { "BusinessType_Id" });
-            DropIndex("dbo.ItSystem", new[] { "AppType_Id" });
+            DropIndex("dbo.ItSystem", new[] { "BusinessTypeId" });
+            DropIndex("dbo.ItSystem", new[] { "AppTypeId" });
             DropIndex("dbo.ItSystem", new[] { "UserId" });
             DropIndex("dbo.ItSystem", new[] { "OrganizationId" });
             DropIndex("dbo.ItSystem", new[] { "ExposedById" });

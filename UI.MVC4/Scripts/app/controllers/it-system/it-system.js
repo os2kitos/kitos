@@ -72,6 +72,14 @@
 
                 // submit function
                 $scope.saveSystem = function () {
+                    if (!$rootScope.user.currentOrganizationId) {
+                        notify.addErrorMessage("Du har ikke valgt en organisation! Vælg en organisation i øverste højre hjørne");
+                    } else {
+                        $scope.system.organizationId = $rootScope.user.currentOrganizationId;
+                    }
+
+                    $scope.system.userId = $rootScope.user.id;
+
                     var checkedTasks = _.filter($scope.allTasksFlat, function(task) {
                         return task.isChecked;
                     });

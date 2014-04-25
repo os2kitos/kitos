@@ -18,7 +18,8 @@ namespace Infrastructure.DataAccess.Mapping
             // Relationships
             this.HasOptional(t => t.Parent)
                 .WithMany(t => t.Children)
-                .HasForeignKey(d => d.ParentId);
+                .HasForeignKey(d => d.ParentId)
+                .WillCascadeOnDelete(false);
 
             this.HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystems)
@@ -26,14 +27,18 @@ namespace Infrastructure.DataAccess.Mapping
                 .WillCascadeOnDelete(false);
 
             this.HasRequired(t => t.User)
-                .WithMany(user => user.CreatedSystems);
+                .WithMany(user => user.CreatedSystems)
+                .HasForeignKey(t => t.UserId)
+                .WillCascadeOnDelete(false);
 
             this.HasRequired(t => t.AppType)
                 .WithMany(t => t.References)
+                .HasForeignKey(t => t.AppTypeId)
                 .WillCascadeOnDelete(false);
 
             this.HasRequired(t => t.BusinessType)
                 .WithMany(t => t.References)
+                .HasForeignKey(t => t.BusinessTypeId)
                 .WillCascadeOnDelete(false);
 
             this.HasMany(t => t.CanUseInterfaces)

@@ -23,6 +23,9 @@ namespace Core.DomainModel.ItSystem
         public int OrganizationId { get; set; }
         public int UserId { get; set; }
 
+        public int AppTypeId { get; set; }
+        public int BusinessTypeId { get; set; }
+
         public AccessModifier AccessModifier { get; set; }
 
         public string Description { get; set; }

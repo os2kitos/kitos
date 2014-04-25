@@ -14,7 +14,6 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("AppType");
             this.Property(t => t.Id).HasColumnName("Id");
-
         }
     }
 }
