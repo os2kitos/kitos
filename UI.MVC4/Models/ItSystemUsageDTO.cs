@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace UI.MVC4.Models
+﻿namespace UI.MVC4.Models
 {
     public class ItSystemUsageDTO
     {

@@ -41,7 +41,6 @@ namespace Infrastructure.DataAccess.Migrations
                         Id = c.Int(nullable: false, identity: true),
                         Version = c.String(unicode: false),
                         Name = c.String(unicode: false),
-                        ParentId = c.Int(),
                         ExposedById = c.Int(),
                         BelongsToId = c.Int(nullable: false),
                         OrganizationId = c.Int(nullable: false),
@@ -49,6 +48,7 @@ namespace Infrastructure.DataAccess.Migrations
                         AccessModifier = c.Int(nullable: false),
                         Description = c.String(unicode: false),
                         Url = c.String(unicode: false),
+                        ParentId = c.Int(),
                         AppTypeId = c.Int(nullable: false),
                         BusinessTypeId = c.Int(nullable: false),
                         InterfaceId = c.Int(),
@@ -68,11 +68,11 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.ItSystem", t => t.ParentId)
                 .ForeignKey("dbo.Tsa", t => t.TsaId)
                 .ForeignKey("dbo.User", t => t.UserId, cascadeDelete: true)
-                .Index(t => t.ParentId)
                 .Index(t => t.ExposedById)
                 .Index(t => t.BelongsToId)
                 .Index(t => t.OrganizationId)
                 .Index(t => t.UserId)
+                .Index(t => t.ParentId)
                 .Index(t => t.AppTypeId)
                 .Index(t => t.BusinessTypeId)
                 .Index(t => t.InterfaceId)
@@ -160,28 +160,45 @@ namespace Infrastructure.DataAccess.Migrations
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
+                        IsStatusActive = c.Boolean(nullable: false),
                         Note = c.String(unicode: false),
                         SystemId = c.String(unicode: false),
-                        PersonSensitiveData = c.Boolean(nullable: false),
-                        Archive = c.Boolean(nullable: false),
                         EsdhRef = c.String(unicode: false),
                         CmdbRef = c.String(unicode: false),
                         DirectoryOrUrlRef = c.String(unicode: false),
                         AdOrIdmRef = c.String(unicode: false),
                         ResponsibleUnitId = c.Int(),
-                        ParentId = c.Int(nullable: false),
                         OrganizationId = c.Int(nullable: false),
                         ItSystemId = c.Int(nullable: false),
+                        ArchiveTypeId = c.Int(),
+                        SensitiveDataTypeId = c.Int(),
+                        ItSystem_Id = c.Int(),
                     })
                 .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.ArchiveType", t => t.ArchiveTypeId)
                 .ForeignKey("dbo.ItSystem", t => t.ItSystemId, cascadeDelete: true)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId, cascadeDelete: true)
-                .ForeignKey("dbo.ItSystem", t => t.ParentId, cascadeDelete: true)
                 .ForeignKey("dbo.OrganizationUnit", t => t.ResponsibleUnitId)
+                .ForeignKey("dbo.SensitiveDataType", t => t.SensitiveDataTypeId)
+                .ForeignKey("dbo.ItSystem", t => t.ItSystem_Id)
                 .Index(t => t.ResponsibleUnitId)
-                .Index(t => t.ParentId)
                 .Index(t => t.OrganizationId)
-                .Index(t => t.ItSystemId);
+                .Index(t => t.ItSystemId)
+                .Index(t => t.ArchiveTypeId)
+                .Index(t => t.SensitiveDataTypeId)
+                .Index(t => t.ItSystem_Id);
+            
+            CreateTable(
+                "dbo.ArchiveType",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        Name = c.String(unicode: false),
+                        IsActive = c.Boolean(nullable: false),
+                        IsSuggestion = c.Boolean(nullable: false),
+                        Note = c.String(unicode: false),
+                    })
+                .PrimaryKey(t => t.Id);
             
             CreateTable(
                 "dbo.ItContract",
@@ -809,6 +826,18 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ItContractId);
             
             CreateTable(
+                "dbo.SensitiveDataType",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        Name = c.String(unicode: false),
+                        IsActive = c.Boolean(nullable: false),
+                        IsSuggestion = c.Boolean(nullable: false),
+                        Note = c.String(unicode: false),
+                    })
+                .PrimaryKey(t => t.Id);
+            
+            CreateTable(
                 "dbo.Wish",
                 c => new
                     {
@@ -1068,13 +1097,14 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.ItSystem", "ParentId", "dbo.ItSystem");
             DropForeignKey("dbo.ItSystem", "OrganizationId", "dbo.Organization");
             DropForeignKey("dbo.ItSystem", "MethodId", "dbo.Method");
+            DropForeignKey("dbo.ItSystemUsage", "ItSystem_Id", "dbo.ItSystem");
             DropForeignKey("dbo.Wish", "ItSystemUsage_Id", "dbo.ItSystemUsage");
             DropForeignKey("dbo.Wish", "User_Id", "dbo.User");
             DropForeignKey("dbo.Wish", "ItSystem_Id", "dbo.ItSystem");
             DropForeignKey("dbo.TaskRef", "ItSystemUsage_Id", "dbo.ItSystemUsage");
             DropForeignKey("dbo.ItSystemRole", "ItSystemUsage_Id", "dbo.ItSystemUsage");
+            DropForeignKey("dbo.ItSystemUsage", "SensitiveDataTypeId", "dbo.SensitiveDataType");
             DropForeignKey("dbo.ItSystemUsage", "ResponsibleUnitId", "dbo.OrganizationUnit");
-            DropForeignKey("dbo.ItSystemUsage", "ParentId", "dbo.ItSystem");
             DropForeignKey("dbo.OrgUnitSystemUsage", "OrganizationUnit_Id", "dbo.OrganizationUnit");
             DropForeignKey("dbo.OrgUnitSystemUsage", "ItSystemUsage_Id", "dbo.ItSystemUsage");
             DropForeignKey("dbo.ItSystemUsage", "OrganizationId", "dbo.Organization");
@@ -1142,6 +1172,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.ItContract", "ContractTypeId", "dbo.ContractType");
             DropForeignKey("dbo.ItContract", "ContractTemplateId", "dbo.ContractTemplate");
             DropForeignKey("dbo.Agreement", "Id", "dbo.ItContract");
+            DropForeignKey("dbo.ItSystemUsage", "ArchiveTypeId", "dbo.ArchiveType");
             DropForeignKey("dbo.ItSystem", "InterfaceTypeId", "dbo.InterfaceType");
             DropForeignKey("dbo.ItSystem", "InterfaceId", "dbo.Interface");
             DropForeignKey("dbo.ItSystem", "ExposedById", "dbo.ItSystem");
@@ -1231,9 +1262,11 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ItContract", new[] { "PurchaseFormId" });
             DropIndex("dbo.ItContract", new[] { "ContractTemplateId" });
             DropIndex("dbo.ItContract", new[] { "ContractTypeId" });
+            DropIndex("dbo.ItSystemUsage", new[] { "ItSystem_Id" });
+            DropIndex("dbo.ItSystemUsage", new[] { "SensitiveDataTypeId" });
+            DropIndex("dbo.ItSystemUsage", new[] { "ArchiveTypeId" });
             DropIndex("dbo.ItSystemUsage", new[] { "ItSystemId" });
             DropIndex("dbo.ItSystemUsage", new[] { "OrganizationId" });
-            DropIndex("dbo.ItSystemUsage", new[] { "ParentId" });
             DropIndex("dbo.ItSystemUsage", new[] { "ResponsibleUnitId" });
             DropIndex("dbo.DataRows", new[] { "DataTypeId" });
             DropIndex("dbo.DataRows", new[] { "ItSystemId" });
@@ -1243,11 +1276,11 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ItSystem", new[] { "InterfaceId" });
             DropIndex("dbo.ItSystem", new[] { "BusinessTypeId" });
             DropIndex("dbo.ItSystem", new[] { "AppTypeId" });
+            DropIndex("dbo.ItSystem", new[] { "ParentId" });
             DropIndex("dbo.ItSystem", new[] { "UserId" });
             DropIndex("dbo.ItSystem", new[] { "OrganizationId" });
             DropIndex("dbo.ItSystem", new[] { "BelongsToId" });
             DropIndex("dbo.ItSystem", new[] { "ExposedById" });
-            DropIndex("dbo.ItSystem", new[] { "ParentId" });
             DropIndex("dbo.AdminRight", new[] { "UserId" });
             DropIndex("dbo.AdminRight", new[] { "RoleId" });
             DropIndex("dbo.AdminRight", new[] { "ObjectId" });
@@ -1267,6 +1300,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropTable("dbo.Tsa");
             DropTable("dbo.Method");
             DropTable("dbo.Wish");
+            DropTable("dbo.SensitiveDataType");
             DropTable("dbo.ShipNotice");
             DropTable("dbo.ItSystemRole");
             DropTable("dbo.ItSystemRight");
@@ -1311,6 +1345,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropTable("dbo.ContractTemplate");
             DropTable("dbo.Agreement");
             DropTable("dbo.ItContract");
+            DropTable("dbo.ArchiveType");
             DropTable("dbo.ItSystemUsage");
             DropTable("dbo.InterfaceType");
             DropTable("dbo.Interface");

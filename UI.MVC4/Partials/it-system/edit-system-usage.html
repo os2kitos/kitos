@@ -6,16 +6,16 @@
     <span>{{ usage.system.id }}</span>
     
     <label>Applikationstype</label>
-    <span>{{ usage.systemAppType }}</span>
+    <select disabled data-ng-options="a.id as a.name for a in appTypes" data-ng-model="usage.itSystem.appTypeId"></select>
     
     <label>Forretningstype</label>
-    <span>{{ system.systemBusinessType }}</span>
+    <select disabled data-ng-options="a.id as a.name for a in businessTypes" data-ng-model="usage.itSystem.businessTypeId"></select>
 
     <label>Version</label>
-    <span>{{ system.systemVersion }}</span>
+    <span>{{ usage.itSystem.version }}</span>
     
     <label>Public</label>
-    <span>{{ system.systemAccess }}</span>
+    <span disabled data-ng-model="usage.itSystem.accessModifier" data-select-access-modifier=""></span>
     
     <label>Tilhører</label>
     <span>{{ system.systemBelongsTo }}</span> <!-- TODO -->
@@ -24,10 +24,10 @@
     <span>{{ system.systemParent }}</span>
     
     <label>Beskrivelse</label>
-    <span>{{ system.systemDescription }}</span>
+    <span>{{ usage.itSystem.description }}</span>
     
     <label>Link til yderligere beskrivelse</label>
-    <span>{{ system.systemUrl }}</span>
+    <span>{{ usage.itSystem.url }}</span>
 </div>
 
 <div class="row">

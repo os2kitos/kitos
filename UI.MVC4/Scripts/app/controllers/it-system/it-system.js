@@ -4,8 +4,8 @@
             { state: 'index', text: 'Overblik' },
             { state: 'index', text: 'Tilknyt IT system' },
             { state: 'add-it-system', text: 'Opret IT system' },
-        { state: 'index', text: 'Rapport' },
-        { state: 'it-system-usage', text: 'IT System' }
+            { state: 'index', text: 'Rapport' },
+            { state: 'it-system-usage', text: 'IT System' }
     ];
 
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
@@ -46,6 +46,18 @@
                 templateUrl: 'partials/it-system/edit-system-usage.html',
                 controller: 'system.EditUsage',
                 resolve: {
+                    appTypes: ['$http', function($http) {
+                        return $http.get("api/apptype")
+                            .then(function(result) {
+                                return result.data.response;
+                            });
+                    }],
+                    businessTypes: ['$http', function ($http) {
+                        return $http.get("api/businesstype")
+                            .then(function(result) {
+                                return result.data.response;
+                            });
+                    }],
                     itSystemUsage: ['$http', '$stateParams', function ($http, $stateParams) {
                         return $http.get('api/itsystemusage/' + $stateParams.id)
                             .then(function(result) {
@@ -196,7 +208,12 @@
                 };
             }]);
 
-    app.controller('system.EditUsage', ['$rootScope', '$scope', '$http', 'notify', 'itSystemUsage', function ($rootScope, $scope, $http, notify, itSystemUsage) {
+    app.controller('system.EditUsage', ['$rootScope', '$scope', '$http', 'notify', 'itSystemUsage', 'appTypes', 'businessTypes', function ($rootScope, $scope, $http, notify, itSystemUsage, appTypes, businessTypes) {
+        $rootScope.page.title = 'Opret IT system';
+        $rootScope.page.subnav = subnav;
+
+        $scope.appTypes = appTypes;
+        $scope.businessTypes = businessTypes;
         $scope.usage = itSystemUsage;
     }]);
 })(angular, app);
