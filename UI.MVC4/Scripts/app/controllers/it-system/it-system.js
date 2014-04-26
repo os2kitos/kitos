@@ -2,7 +2,7 @@
 
     var subnav = [
             { state: 'index', text: 'Overblik' },
-            { state: 'index', text: 'Tilknyt IT system' },
+            { state: 'assign-it-system', text: 'Tilknyt IT system' },
             { state: 'add-it-system', text: 'Opret IT system' },
             { state: 'index', text: 'Rapport' }
     ];
@@ -11,9 +11,10 @@
 
         $stateProvider.state('add-it-system', {
             url: '/system/add',
-            templateUrl: 'partials/it-system/edit-system.html',
+            templateUrl: 'partials/it-system/edit-it-system.html',
             controller: 'system.AddCtrl',
             resolve: {
+                //resolve drop down datas
                 appTypes: ['$http', function ($http) {
                     return $http.get("api/apptype");
                 }],
@@ -39,10 +40,18 @@
                     return $http.get("api/datatype");
                 }]
             }
+        }).state('assign-it-system', {
+            url: '/system/assign',
+            templateUrl: 'partials/it-system/assign-it-system.html',
+            controller: 'system.AssignCtrl',
+            resolve: {
+                systems: ['$http', function ($http) {
+                    return $http.get("api/itsystem");
+                }]
+            }
         });
 
     }]);
-
 
     app.controller('system.AddCtrl',
         ['$rootScope', '$scope', '$http', 'notify',
@@ -86,14 +95,10 @@
 
                     var system = $scope.system;
 
-                    var checkedTasks = _.filter($scope.allTasksFlat, function(task) {
+                    var checkedTasks = _.filter($scope.allTasksFlat, function (task) {
                         return task.isChecked;
                     });
 
-                    /*var dataRows = _.map(system.dataRows, function(row) {
-                        return { data: row.data, dataTypeId: row.dataType.id };
-                    });*/
-                    
                     var data = {
                         parentId: system.parent ? system.parent.id : null,
                         exposedById: system.exposedBy ? system.exposedBy.id : null,
@@ -111,7 +116,7 @@
 
                         appTypeId: system.appTypeId,
                         businessTypeId: system.businessTypeId,
-                        
+
                         interfaceId: system.interfaceId,
                         interfaceTypeId: system.interfaceTypeId,
                         tsaId: system.tsaId,
@@ -119,8 +124,8 @@
                         dataRows: system.dataRows,
                     };
 
-                    
-                    $http.post('api/itsystem', data, {handleBusy: true}).success(function() {
+
+                    $http.post('api/itsystem', data, { handleBusy: true }).success(function () {
                         console.log('success');
                     });
                 };
@@ -180,5 +185,17 @@
                         delete $scope.kleFilter.parentId;
                     }
                 };
+            }]);
+
+
+    app.controller('system.AssignCtrl',
+        ['$rootScope', '$scope', '$http', 'notify',
+            'systems',
+            function ($rootScope, $scope, $http, notify,
+            systems) {
+                $rootScope.page.title = 'Tilknyt IT system';
+                $rootScope.page.subnav = subnav;
+
+                $scope.systems = systems.data.response;
             }]);
 })(angular, app);
