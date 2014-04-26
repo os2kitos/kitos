@@ -97,8 +97,30 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
             isGlobalAdmin: result.response.isGlobalAdmin,
             isLocalAdmin: isLocalAdmin,
             isLocalAdminFor: _.pluck(result.response.adminRights, 'organizationId'),
-            defaultOrganizationUnitId: result.response.defaultOrganizationUnitId
+            defaultOrganizationUnitId: result.response.defaultOrganizationUnitId,
+            
+            //which orgs do the user belong to - for the select box - fetched below
+            organizations: null, 
+            defaultOrganizationId: null,
+            currentOrganizationId: null
         };
+        
+        //which orgs do the user belong to - for the select box
+        $http.get("api/user?organizations").success(function (result) {
+            var orgs = result.response.organizations;
+            $rootScope.user.organizations = orgs;
+            
+            var defaultOrgId = result.response.defaultOrganizationId;
+
+            $rootScope.user.defaultOrganizationId = defaultOrgId;
+
+            if (defaultOrgId != 0) {
+                $rootScope.user.currentOrganizationId = defaultOrgId;
+            } else if(orgs.length > 0){
+                $rootScope.user.currentOrganizationId = orgs[0].id;
+            } 
+
+        });
 
     };
 

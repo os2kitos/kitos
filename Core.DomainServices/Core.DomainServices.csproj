@@ -42,6 +42,7 @@
     <Compile Include="IAdminService.cs" />
     <Compile Include="ICryptoService.cs" />
     <Compile Include="IGenericRepository.cs" />
+    <Compile Include="IItSystemService.cs" />
     <Compile Include="IMailClient.cs" />
     <Compile Include="IOrganizationService.cs" />
     <Compile Include="IOrgService.cs" />

@@ -3,11 +3,11 @@ using System.Collections.ObjectModel;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class Method : IOptionEntity<Interface>
+    public class Method : IOptionEntity<ItSystem>
     {
         public Method()
         {
-            References = new List<Interface>();
+            References = new List<ItSystem>();
         }
 
         public int Id { get; set; }
@@ -15,6 +15,6 @@ namespace Core.DomainModel.ItSystem
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }
         public string Note { get; set; }
-        public virtual ICollection<Interface> References { get; set; }
+        public virtual ICollection<ItSystem> References { get; set; }
     }
 }

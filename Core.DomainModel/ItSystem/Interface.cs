@@ -2,19 +2,18 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class Interface
+    public class Interface : IOptionEntity<ItSystem>
     {
         public Interface()
         {
-            this.Wishes = new List<Wish>();
+            References = new List<ItSystem>();
         }
 
         public int Id { get; set; }
-        public int ItSystemId { get; set; }
-        public int MethodId { get; set; }
-        
-        public virtual ICollection<Wish> Wishes { get; set; }
-        public virtual ItSystem ItSystem { get; set; }
-        public virtual Method Method { get; set; }
+        public string Name { get; set; }
+        public bool IsActive { get; set; }
+        public bool IsSuggestion { get; set; }
+        public string Note { get; set; }
+        public virtual ICollection<ItSystem> References { get; set; }
     }
 }

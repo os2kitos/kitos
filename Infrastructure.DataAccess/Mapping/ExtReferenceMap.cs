@@ -29,9 +29,6 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasRequired(t => t.ItProject)
                 .WithMany(t => t.ExtReferences)
                 .HasForeignKey(d => d.ItProjectId);
-            this.HasRequired(t => t.ItSystem)
-                .WithMany(t => t.ExtReferences)
-                .HasForeignKey(d => d.ItSystemId);
 
         }
     }

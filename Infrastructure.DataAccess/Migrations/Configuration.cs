@@ -58,22 +58,40 @@ namespace Infrastructure.DataAccess.Migrations
                                              new ProjectType() { IsActive = true, Note = "...", Name = "IT Program" },
                                              new ProjectType() { IsActive = true, Note = "En samlebetegnelse for projekter, som ikke er et IT Program", Name = "Indsatsområde" });
 
-            context.SystemTypes.AddOrUpdate(x => x.Name,
-                                            new SystemType() { IsActive = true, Note = "...", Name = "Fag" },
-                                            new SystemType() { IsActive = true, Note = "...", Name = "ESDH" },
-                                            new SystemType() { IsActive = true, Note = "...", Name = "Støttesystemer" });
+            var appType1 = new AppType() {IsActive = true, Note = "...", Name = "Snitflade"};
+            var appType2 = new AppType() {IsActive = true, Note = "...", Name = "Fagsystem"};
+            context.AppTypes.AddOrUpdate(x => x.Name,
+                                            appType1, appType2,
+                                            new AppType() { IsActive = true, Note = "...", Name = "Selvbetjening" }
+                                            );
+
+            var businessType1 = new BusinessType() { IsActive = true, Note = "...", Name = "Forretningstype 1" };
+            var businessType2 = new BusinessType() { IsActive = true, Note = "...", Name = "Forretningstype 2" };
+            context.BusinessTypes.AddOrUpdate(x => x.Name,
+                                              businessType1, businessType2);
+
+            context.Interfaces.AddOrUpdate(x => x.Name,
+                                           new Interface() {IsActive = true, Note = "...", Name = "Grænseflade 1"},
+                                           new Interface() {IsActive = true, Note = "...", Name = "Grænseflade 2"},
+                                           new Interface() { IsActive = true, Note = "...", Name = "Grænseflade 3" });
+
+            context.Tsas.AddOrUpdate(x => x.Name,
+                                     new Tsa() {IsActive = true, Note = "...", Name = "Ja"},
+                                     new Tsa() {IsActive = true, Note = "...", Name = "Nej"});
 
             context.InterfaceTypes.AddOrUpdate(x => x.Name,
                                                new InterfaceType() { IsActive = true, Note = "...", Name = "WS" });
 
-            context.ProtocolTypes.AddOrUpdate(x => x.Name,
-                                              new ProtocolType() { IsActive = true, Note = "...", Name = "OIORES" },
-                                              new ProtocolType() { IsActive = true, Note = "...", Name = "WS SOAP" });
+            context.DataTypes.AddOrUpdate(x => x.Name,
+                                          new DataType() {IsActive = true, Note = "...", Name = "Datatype 1"},
+                                          new DataType() {IsActive = true, Note = "...", Name = "Datatype 2"},
+                                          new DataType() {IsActive = true, Note = "...", Name = "Datatype 3"});
 
             context.Methods.AddOrUpdate(x => x.Name,
                                         new Method() { IsActive = true, Note = "...", Name = "Batch" },
                                         new Method() { IsActive = true, Note = "...", Name = "Request-Response" });
 
+            /*
             context.DatabaseTypes.AddOrUpdate(x => x.Name,
                                               new DatabaseType() { IsActive = true, Note = "...", Name = "MSSQL" },
                                               new DatabaseType() { IsActive = true, Note = "...", Name = "MySQL" });
@@ -84,7 +102,7 @@ namespace Infrastructure.DataAccess.Migrations
                                                  IsActive = true,
                                                  Note = "...",
                                                  Name = "Citrix"
-                                             });
+                                             });*/
 
             context.ContractTypes.AddOrUpdate(x => x.Name,
                                               new ContractType() { IsActive = true, Note = "...", Name = "Hovedkontrakt" },
@@ -619,7 +637,45 @@ namespace Infrastructure.DataAccess.Migrations
                                              });
 
             #endregion
-            
+
+            #region IT systems
+
+            var system1 = new ItSystem()
+                {
+                    AccessModifier = AccessModifier.Public,
+                    AppType = appType2,
+                    BusinessType = businessType1,
+                    Organization = kl,
+                    BelongsTo = kl,
+                    User = simon,
+                    Version = "7.0",
+                    Name = "TM Sund",
+                    Description = "TM Sund er en ...",
+                    Url = "http://kitos.dk",
+                    Parent = null
+                };
+
+            var system2 = new ItSystem()
+                {
+                    AccessModifier = AccessModifier.Public,
+                    AppType = appType1,
+                    BusinessType = businessType1,
+                    Organization = roskilde,
+                    BelongsTo = kl,
+                    User = roskildeUser1,
+                    Version = "0.1",
+                    Name = "Vækstkurver",
+                    Description = "Snitflade for ...",
+                    Url = "http://kitos.dk",
+                    Parent = null,
+                    ExposedBy = system1
+                };
+
+            context.ItSystems.AddOrUpdate(x => x.Name, system1, system2);
+
+            #endregion
+
+
 
             context.ProjectPhaseLocales.AddOrUpdate(x => new { x.MunicipalityId, x.OriginalId },
                                                     new ProjPhaseLocale()

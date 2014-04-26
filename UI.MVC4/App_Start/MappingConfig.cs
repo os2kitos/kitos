@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using AutoMapper;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -11,14 +12,14 @@ namespace UI.MVC4.App_Start
 {
     public class MappingConfig
     {
-         public static void Start()
-         {
-             Mapper.Initialize(cfg =>
-                 {
-                     cfg.AddProfile(new MappingProfile());
-                     cfg.AddProfile(new DropdownProfile());
-                 });
-         }
+        public static void Start()
+        {
+            Mapper.Initialize(cfg =>
+                {
+                    cfg.AddProfile(new MappingProfile());
+                    cfg.AddProfile(new DropdownProfile());
+                });
+        }
     }
 
     public class DropdownProfile : Profile
@@ -46,15 +47,15 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<DatabaseType, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
-
-            Mapper.CreateMap<Environment, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
-
             Mapper.CreateMap<InterfaceType, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
+            Mapper.CreateMap<Interface, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
+            Mapper.CreateMap<DataType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
@@ -78,15 +79,19 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<ProtocolType, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
-
             Mapper.CreateMap<PurchaseForm, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<SystemType, OptionDTO>()
+            Mapper.CreateMap<Tsa, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
+            Mapper.CreateMap<AppType, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
+            Mapper.CreateMap<BusinessType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
@@ -137,7 +142,7 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<ExtRefTypeLocale, LocaleInputDTO>().ReverseMap();
 
             Mapper.CreateMap<Config, ConfigDTO>().ReverseMap();
-            
+
         }
     }
 
@@ -178,6 +183,21 @@ namespace UI.MVC4.App_Start
 
             Mapper.CreateMap<AdminRight, RightOutputDTO>();
             Mapper.CreateMap<RightInputDTO, AdminRight>();
+
+            Mapper.CreateMap<DataRow, DataRowDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.DataType, opt => opt.Ignore());
+
+            Mapper.CreateMap<ItSystem, ItSystemDTO>()
+                  .ForMember(dest => dest.TaskRefIds, opt => opt.MapFrom(src => src.TaskRefs.Select(x => x.Id)))
+                  .ReverseMap()
+                  .ForMember(dest => dest.TaskRefs, opt => opt.Ignore());
+
+            Mapper.CreateMap<ItSystemUsage, ItSystemUsageDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.SystemRoles, opt => opt.UseValue(null))
+                  .ForMember(dest => dest.OrgUnits, opt => opt.UseValue(null))
+                  .ForMember(dest => dest.TaskRefs, opt => opt.UseValue(null));
         }
     }
 }
