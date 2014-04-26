@@ -8,6 +8,8 @@ namespace UI.MVC4.Models
         public int Id { get; set; }
         public int? ParentId { get; set; }
         public int? ExposedById { get; set; }
+        public IEnumerable<int> CanUseInterfaceIds { get; set; } 
+        public int BelongsToId { get; set; }
         public int OrganizationId { get; set; }
         public string Version { get; set; }
         public string Name { get; set; }
@@ -21,5 +23,12 @@ namespace UI.MVC4.Models
 
         public int AppTypeId { get; set; }
         public int BusinessTypeId { get; set; }
+
+        public int? InterfaceId { get; set; }
+        public int? InterfaceTypeId { get; set; }
+        public int? TsaId { get; set; }
+        public int? MethodId { get; set; }
+
+        public IEnumerable<DataRowDTO> DataRows { get; set; } 
     }
 }

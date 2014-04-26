@@ -30,7 +30,13 @@
                 <div class="form-group">
                     <label for="system-interfaces-can-use" class="control-label col-md-5 small">Snitflader (kan anvende)</label>
                     <div class="col-md-7">
-                        <input type="hidden" data-ui-select2="itSystemsInterfacesOptions" id="system-interfaces-can-use" data-ng-model="system.canUseInterfaces" class="form-control input-sm" multiple="multiple">
+                        <input type="hidden" data-ui-select2="interfacesSelectOptions" id="system-interfaces-can-use" data-ng-model="system.canUseInterfaces" class="form-control input-sm" multiple="multiple">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="system-belongs-to" class="control-label col-md-5 small">Tilhører</label>
+                    <div class="col-md-7">
+                         <input type="hidden" data-ui-select2="organizationSelectOptions" id="system-belongs-to" data-ng-model="system.belongsTo" class="form-control input-sm" required="required">
                     </div>
                 </div>
             </div>
@@ -48,7 +54,7 @@
                 <div class="form-group">
                     <label for="system-access" class="control-label col-md-5 small">Public</label>
                     <div class="col-md-7">
-                        <input type="text" id="system-access" data-ng-model="system.accessModifier" class="form-control input-sm" />
+                        <input id="system-access" data-ng-model="system.accessModifier" class="form-control input-sm" data-select-access-modifier="" />
                     </div>
                 </div>
 
@@ -97,16 +103,18 @@
     <div class="row">&nbsp;</div>
 
     <!-- interface specific data -->
-    <div class="row panel panel-default" data-ng-if="system.systemAppType == interfaceAppType.id">
+    <div class="row panel panel-default" data-ng-if="system.appTypeId == interfaceAppType.id">
         <div class="panel-heading small">Snitflade egenskaber</div>
         <div class="col-md-6 panel-body">
             <div class="form-group">
+                <!-- TSA -->
                 <label for="interface-tsa" class="control-label col-md-2 small">TSA</label>
                 <div class="col-md-4">
                     <select data-ui-select2="" id="interface-tsa" data-ng-model="system.tsaId" class="form-control input-sm" >
                         <option data-ng-repeat="tsa in tsas" value="{{tsa.id}}">{{tsa.name}}</option>
                     </select>
                 </div>
+                <!-- Interface type -->
                 <label for="interface-type" class="control-label col-md-2 small">Snitfladetype</label>
                 <div class="col-md-4">
                     <select data-ui-select2="" id="interface-type" data-ng-model="system.interfaceTypeId" class="form-control input-sm" >
@@ -114,14 +122,16 @@
                     </select>
                 </div>
             </div>
-
+            
+                <!-- Interface  -->
             <div class="form-group">
                 <label for="interface-interface" class="control-label col-md-2 small">Grænseflade</label>
                 <div class="col-md-4">
                     <select data-ui-select2="" id="interface-interface" data-ng-model="system.interfaceId" class="form-control input-sm" >
-                        <option data-ng-repeat="_interface in interfaces" value="{{_interface.id}}">{{_interface.name}}</option>
+                        <option data-ng-repeat="interface in interfaces" value="{{interface.id}}">{{interface.name}}</option>
                     </select>
                 </div>
+                <!-- Method -->
                 <label for="interface-method" class="control-label col-md-2 small">Metode</label>
                 <div class="col-md-4">
                     <select data-ui-select2="" id="interface-method" data-ng-model="system.methodId" class="form-control input-sm" >
@@ -131,9 +141,9 @@
             </div>
 
             <div class="form-group">
-                <label for="interface-exposing-system" class="control-label col-md-2 small">Udstillet af</label>
+                <label for="interface-exposed-by" class="control-label col-md-2 small">Udstillet af</label>
                 <div class="col-md-4">
-                    <input type="text" data-ui-select2="itSystemsSelectOptions" id="interface-exposing-system" data-ng-model="interface.exposingSystem" class="form-control input-sm" >
+                    <input type="text" data-ui-select2="itSystemsSelectOptions" id="interface-exposed-by" data-ng-model="system.exposedBy" class="form-control input-sm" data-ng-required="system.appTypeId == interfaceAppType.id">
                 </div>
             </div>
         </div>
@@ -152,7 +162,7 @@
                             <input type="text" class="form-control input-sm" data-ng-model="dataRow.data" />
                         </td>
                         <td>
-                            <select data-ui-select2="" data-ng-model="dataRow.dataType" class="form-control input-sm" >
+                            <select data-ui-select2="" data-ng-model="dataRow.dataTypeId" class="form-control input-sm" >
                                 <option data-ng-repeat="dataType in dataTypes" value="{{dataType.id}}">{{dataType.name}}</option>
                             </select>
                         </td>
@@ -164,7 +174,7 @@
                             <input type="text" class="form-control input-sm" id="newData" data-ng-model="newDataRow.data" data-ng-change="addDataRow(newDataRow)" placeholder="Ny række"/>
                         </td>
                         <td>
-                            <select data-ui-select2="" data-ng-model="newDataRow.dataType" class="form-control input-sm" data-ng-change="addDataRow(newDataRow)" data-placeholder="Vælg datatype">
+                            <select data-ui-select2="" data-ng-model="newDataRow.dataTypeId" class="form-control input-sm" data-ng-change="addDataRow(newDataRow)" data-placeholder="Vælg datatype">
                                 <option></option>
                                 <option data-ng-repeat="dataType in dataTypes" value="{{dataType.id}}">{{dataType.name}}</option>
                             </select>
@@ -198,6 +208,6 @@
     </div>
     
     <div class="row">
-        <input type="submit" value="Gem IT system" class="btn btn-success full-width"/>
+        <input type="submit" value="Gem IT system" class="btn btn-success full-width" data-disable-on-busy=""/>
     </div>
 </form>

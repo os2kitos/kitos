@@ -230,6 +230,7 @@
     <Compile Include="Controllers\API\ItSystemController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageController.cs" />
     <Compile Include="Controllers\API\TsaController.cs" />
+    <Compile Include="Models\DataRowDTO.cs" />
     <Compile Include="Models\ItSystemDTO.cs" />
     <Compile Include="Controllers\API\OrganizationRightController.cs" />
     <Compile Include="Controllers\API\TaskUsageController.cs" />
@@ -381,6 +382,7 @@
     <Content Include="Images\logo.png" />
     <Content Include="Partials\directives\add-user-button.html" />
     <Content Include="Partials\directives\add-user-modal.html" />
+    <Content Include="Partials\directives\select-access-modifier.html" />
     <Content Include="Partials\directives\select-status.html" />
     <Content Include="Partials\directives\select-user.html" />
     <Content Include="Partials\directives\show-status.html" />

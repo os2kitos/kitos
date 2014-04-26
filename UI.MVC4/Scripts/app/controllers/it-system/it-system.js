@@ -63,45 +63,78 @@
 
                 $scope.dataTypes = dataTypes.data.response;
 
-                $scope.itSystemsSelectOptions = systemLazyLoading('nonInterfaces');
-                $scope.itSystemsInterfacesOptions = systemLazyLoading('interfaces');
+                $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem?nonInterfaces');
+                $scope.interfacesSelectOptions = selectLazyLoading('api/itsystem?interfaces');
+                $scope.organizationSelectOptions = selectLazyLoading('api/organization?');
 
-                $scope.system = { dataRows: [] };
+                //default values of a system
+                $scope.system =
+                {
+                    accessModifier: 0,
+                    dataRows: []
+                };
 
                 $scope.newDataRow = {};
 
                 // submit function
                 $scope.saveSystem = function () {
+
                     if (!$rootScope.user.currentOrganizationId) {
                         notify.addErrorMessage("Du har ikke valgt en organisation! Vælg en organisation i øverste højre hjørne");
-                    } else {
-                        $scope.system.organizationId = $rootScope.user.currentOrganizationId;
+                        return;
                     }
 
-                    $scope.system.userId = $rootScope.user.id;
+                    var system = $scope.system;
 
                     var checkedTasks = _.filter($scope.allTasksFlat, function(task) {
                         return task.isChecked;
                     });
-                    var checkedTaskIds = _.pluck(checkedTasks, 'id');
+
+                    /*var dataRows = _.map(system.dataRows, function(row) {
+                        return { data: row.data, dataTypeId: row.dataType.id };
+                    });*/
                     
-                    $scope.system.taskRefIds = checkedTaskIds;
+                    var data = {
+                        parentId: system.parent ? system.parent.id : null,
+                        exposedById: system.exposedBy ? system.exposedBy.id : null,
+                        canUseInterfaceIds: _.pluck(system.canUseInterfaces, 'id'),
+                        belongsToId: system.belongsTo.id,
+                        organizationId: $rootScope.user.currentOrganizationId,
+
+                        version: system.version,
+                        name: system.name,
+                        userId: $rootScope.user.id,
+                        accessModifier: system.accessModifier,
+                        description: system.description,
+                        url: system.url,
+                        taskRefIds: _.pluck(checkedTasks, 'id'),
+
+                        appTypeId: system.appTypeId,
+                        businessTypeId: system.businessTypeId,
+                        
+                        interfaceId: system.interfaceId,
+                        interfaceTypeId: system.interfaceTypeId,
+                        tsaId: system.tsaId,
+                        methodId: system.methodId,
+                        dataRows: system.dataRows,
+                    };
+
                     
-                    $http.post('api/itsystem', $scope.system, {handleBusy: true}).success(function() {
+                    $http.post('api/itsystem', data, {handleBusy: true}).success(function() {
                         console.log('success');
                     });
                 };
 
                 $scope.addDataRow = function (newDataRow) {
-                    if (!newDataRow.data || !newDataRow.dataType) return;
+                    if (!newDataRow.data || !newDataRow.dataTypeId) return;
 
-                    $scope.system.dataRows.push({ data: newDataRow.data, dataType: newDataRow.dataType });
+                    $scope.system.dataRows.push({ data: newDataRow.data, dataTypeId: newDataRow.dataTypeId });
 
                     $scope.newDataRow.data = "";
-                    $scope.newDataRow.dataType = "";
+                    $scope.newDataRow.dataTypeId = "";
                 };
 
-                function systemLazyLoading(urlExtra) {
+                function selectLazyLoading(url) {
                     return {
                         minimumInputLength: 1,
                         initSelection: function (elem, callback) {
@@ -112,7 +145,7 @@
                             },
                             quietMillis: 500,
                             transport: function (queryParams) {
-                                var res = $http.get('api/itsystem?q=' + queryParams.data.query + "&" + urlExtra).then(queryParams.success);
+                                var res = $http.get(url + '&q=' + queryParams.data.query).then(queryParams.success);
                                 res.abort = function () {
                                     return null;
                                 };
@@ -123,11 +156,11 @@
                             results: function (data, page) {
                                 var results = [];
 
-                                _.each(data.data.response, function (system) {
+                                _.each(data.data.response, function (obj) {
 
                                     results.push({
-                                        id: system.id,
-                                        text: system.name
+                                        id: obj.id,
+                                        text: obj.name
                                     });
                                 });
 

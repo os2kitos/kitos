@@ -14,7 +14,7 @@ namespace Core.DomainModel.ItSystem
 
         public string Data { get; set; }
         public virtual DataType DataType { get; set; }
-
+        
         public virtual ItSystem ItSystem { get; set; }
     }
 }
