@@ -3,7 +3,7 @@ namespace Infrastructure.DataAccess.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class InitialMigration9015 : DbMigration
+    public partial class Initial : DbMigration
     {
         public override void Up()
         {
