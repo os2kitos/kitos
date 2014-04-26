@@ -62,6 +62,12 @@ namespace UI.MVC4.Controllers.API
                     item.TaskRefs.Add(task);
                 }
 
+                foreach (var id in dto.CanUseInterfaceIds)
+                {
+                    var intrface = Repository.GetByKey(id);
+                    item.CanUseInterfaces.Add(intrface);
+                }
+
                 PostQuery(item);
 
                 return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));

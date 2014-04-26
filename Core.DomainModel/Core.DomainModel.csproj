@@ -43,6 +43,7 @@
     <Compile Include="Config.cs" />
     <Compile Include="IHasAccessModifier.cs" />
     <Compile Include="ItSystem\AppType.cs" />
+    <Compile Include="ItSystem\DataRow.cs" />
     <Compile Include="ItSystem\ArchiveType.cs" />
     <Compile Include="ItSystem\DataType.cs" />
     <Compile Include="ItSystem\ItSystemUsage.cs" />
@@ -103,7 +104,6 @@
     <Compile Include="ItSystem\ItSystemRight.cs" />
     <Compile Include="ItSystem\ItSystemRole.cs" />
     <Compile Include="ItSystem\Method.cs" />
-    <Compile Include="ItSystem\ProtocolType.cs" />
     <Compile Include="ItSystem\BusinessType.cs" />
     <Compile Include="ItSystem\Wish.cs" />
     <Compile Include="TaskRef.cs" />

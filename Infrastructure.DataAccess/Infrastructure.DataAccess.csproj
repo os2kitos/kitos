@@ -70,6 +70,7 @@
     <Compile Include="Mapping\AdminRightMap.cs" />
     <Compile Include="Mapping\AdminRoleMap.cs" />
     <Compile Include="Mapping\BusinessTypeMap.cs" />
+    <Compile Include="Mapping\DataRowMap.cs" />
     <Compile Include="Mapping\DataTypeMap.cs" />
     <Compile Include="Mapping\ItSystemUsageMap.cs" />
     <Compile Include="Mapping\SensitiveDataTypeMap.cs" />
@@ -118,7 +119,6 @@
     <Compile Include="Mapping\ProjectPhaseMap.cs" />
     <Compile Include="Mapping\ProjectStatusMap.cs" />
     <Compile Include="Mapping\ProjectTypeMap.cs" />
-    <Compile Include="Mapping\ProtocolTypeMap.cs" />
     <Compile Include="Mapping\PurchaseFormMap.cs" />
     <Compile Include="Mapping\ResourcesMap.cs" />
     <Compile Include="Mapping\RiskMap.cs" />
@@ -129,6 +129,10 @@
     <Compile Include="Mapping\TextMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
+    <Compile Include="Migrations\201404261250080_Initial.cs" />
+    <Compile Include="Migrations\201404261250080_Initial.Designer.cs">
+      <DependentUpon>201404261250080_Initial.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
     <Compile Include="UserRepository.cs" />
@@ -150,6 +154,11 @@
       <Project>{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}</Project>
       <Name>Core.DomainServices</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201404261250080_Initial.resx">
+      <DependentUpon>201404261250080_Initial.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

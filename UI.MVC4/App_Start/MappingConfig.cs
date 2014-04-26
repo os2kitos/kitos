@@ -12,14 +12,14 @@ namespace UI.MVC4.App_Start
 {
     public class MappingConfig
     {
-         public static void Start()
-         {
-             Mapper.Initialize(cfg =>
-                 {
-                     cfg.AddProfile(new MappingProfile());
-                     cfg.AddProfile(new DropdownProfile());
-                 });
-         }
+        public static void Start()
+        {
+            Mapper.Initialize(cfg =>
+                {
+                    cfg.AddProfile(new MappingProfile());
+                    cfg.AddProfile(new DropdownProfile());
+                });
+        }
     }
 
     public class DropdownProfile : Profile
@@ -80,10 +80,6 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
             Mapper.CreateMap<ProjectType, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
-
-            Mapper.CreateMap<ProtocolType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
@@ -154,7 +150,7 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<ExtRefTypeLocale, LocaleInputDTO>().ReverseMap();
 
             Mapper.CreateMap<Config, ConfigDTO>().ReverseMap();
-            
+
         }
     }
 
@@ -195,6 +191,10 @@ namespace UI.MVC4.App_Start
 
             Mapper.CreateMap<AdminRight, RightOutputDTO>();
             Mapper.CreateMap<RightInputDTO, AdminRight>();
+
+            Mapper.CreateMap<DataRow, DataRowDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.DataType, opt => opt.Ignore());
 
             Mapper.CreateMap<ItSystem, ItSystemDTO>()
                   .ForMember(dest => dest.TaskRefIds, opt => opt.MapFrom(src => src.TaskRefs.Select(x => x.Id)))

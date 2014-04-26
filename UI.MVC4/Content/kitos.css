@@ -430,3 +430,11 @@ body.wait, body.wait * {
 .form-horizontal.fix-label-padding label.control-label {
     padding-top: 3px !important;
 }
+
+.org-selector {
+    color: black;
+    font-size: 12px !important;
+    line-height: 10px !important;
+    height: auto !important;
+    padding: 2px;
+}

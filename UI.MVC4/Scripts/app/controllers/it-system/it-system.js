@@ -1,9 +1,9 @@
 ﻿(function (ng, app) {
 
     var subnav = [
-        { state: 'index', text: 'Overblik' },
-        { state: 'index', text: 'Tilknyt IT system' },
-        { state: 'add-it-system', text: 'Opret IT system' },
+            { state: 'index', text: 'Overblik' },
+            { state: 'index', text: 'Tilknyt IT system' },
+            { state: 'add-it-system', text: 'Opret IT system' },
         { state: 'index', text: 'Rapport' },
         { state: 'it-system-usage', text: 'IT System' }
     ];
@@ -11,35 +11,35 @@
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
         $stateProvider
             .state('add-it-system', {
-                url: '/system/add',
-                templateUrl: 'partials/it-system/edit-system.html',
-                controller: 'system.AddCtrl',
-                resolve: {
+            url: '/system/add',
+            templateUrl: 'partials/it-system/edit-system.html',
+            controller: 'system.AddCtrl',
+            resolve: {
                     appTypes: ['$http', function($http) {
-                        return $http.get("api/apptype");
-                    }],
+                    return $http.get("api/apptype");
+                }],
                     interfaceAppType: ['$http', function($http) {
-                        return $http.get("api/apptype?interfaceAppType");
-                    }],
+                    return $http.get("api/apptype?interfaceAppType");
+                }],
                     businessTypes: ['$http', function($http) {
-                        return $http.get("api/businesstype");
-                    }],
+                    return $http.get("api/businesstype");
+                }],
                     tsas: ['$http', function($http) {
-                        return $http.get("api/tsa");
-                    }],
+                    return $http.get("api/tsa");
+                }],
                     interfaces: ['$http', function($http) {
-                        return $http.get("api/interface");
-                    }],
+                    return $http.get("api/interface");
+                }],
                     interfaceTypes: ['$http', function($http) {
-                        return $http.get("api/interfacetype");
-                    }],
+                    return $http.get("api/interfacetype");
+                }],
                     methods: ['$http', function($http) {
-                        return $http.get("api/method");
-                    }],
+                    return $http.get("api/method");
+                }],
                     dataTypes: ['$http', function($http) {
-                        return $http.get("api/datatype");
-                    }]
-                }
+                    return $http.get("api/datatype");
+                }]
+            }
             })
             .state('it-system-usage', {
                 url: '/system/usage/{id:[0-9]+}',
@@ -53,7 +53,7 @@
                             });
                     }]
                 }
-            });
+        });
 
     }]);
 
@@ -77,40 +77,78 @@
 
                 $scope.dataTypes = dataTypes.data.response;
 
-                $scope.itSystemsSelectOptions = systemLazyLoading('nonInterfaces');
-                $scope.itSystemsInterfacesOptions = systemLazyLoading('interfaces');
+                $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem?nonInterfaces');
+                $scope.interfacesSelectOptions = selectLazyLoading('api/itsystem?interfaces');
+                $scope.organizationSelectOptions = selectLazyLoading('api/organization?');
 
-                $scope.system = { dataRows: [] };
+                //default values of a system
+                $scope.system =
+                {
+                    accessModifier: 0,
+                    dataRows: []
+                };
 
                 $scope.newDataRow = {};
 
-                $scope.formData = {};
-
                 // submit function
                 $scope.saveSystem = function () {
+
+                    if (!$rootScope.user.currentOrganizationId) {
+                        notify.addErrorMessage("Du har ikke valgt en organisation! Vælg en organisation i øverste højre hjørne");
+                        return;
+                    }
+
+                    var system = $scope.system;
+
                     var checkedTasks = _.filter($scope.allTasksFlat, function(task) {
                         return task.isChecked;
                     });
-                    var checkedTaskIds = _.map(checkedTasks, function(task) {
-                        return task.id;
-                    });
-                    $scope.formData.taskRefIds = checkedTaskIds;
 
-                    $http.post('api/itsystem', $scope.formData).success(function() {
+                    /*var dataRows = _.map(system.dataRows, function(row) {
+                        return { data: row.data, dataTypeId: row.dataType.id };
+                    });*/
+                    
+                    var data = {
+                        parentId: system.parent ? system.parent.id : null,
+                        exposedById: system.exposedBy ? system.exposedBy.id : null,
+                        canUseInterfaceIds: _.pluck(system.canUseInterfaces, 'id'),
+                        belongsToId: system.belongsTo.id,
+                        organizationId: $rootScope.user.currentOrganizationId,
+
+                        version: system.version,
+                        name: system.name,
+                        userId: $rootScope.user.id,
+                        accessModifier: system.accessModifier,
+                        description: system.description,
+                        url: system.url,
+                        taskRefIds: _.pluck(checkedTasks, 'id'),
+
+                        appTypeId: system.appTypeId,
+                        businessTypeId: system.businessTypeId,
+                        
+                        interfaceId: system.interfaceId,
+                        interfaceTypeId: system.interfaceTypeId,
+                        tsaId: system.tsaId,
+                        methodId: system.methodId,
+                        dataRows: system.dataRows,
+                    };
+
+
+                    $http.post('api/itsystem', data, {handleBusy: true}).success(function() {
                         console.log('success');
                     });
                 };
 
                 $scope.addDataRow = function (newDataRow) {
-                    if (!newDataRow.data || !newDataRow.dataType) return;
+                    if (!newDataRow.data || !newDataRow.dataTypeId) return;
 
-                    $scope.system.dataRows.push({ data: newDataRow.data, dataType: newDataRow.dataType });
+                    $scope.system.dataRows.push({ data: newDataRow.data, dataTypeId: newDataRow.dataTypeId });
 
                     $scope.newDataRow.data = "";
-                    $scope.newDataRow.dataType = "";
+                    $scope.newDataRow.dataTypeId = "";
                 };
 
-                function systemLazyLoading(urlExtra) {
+                function selectLazyLoading(url) {
                     return {
                         minimumInputLength: 1,
                         initSelection: function (elem, callback) {
@@ -121,7 +159,7 @@
                             },
                             quietMillis: 500,
                             transport: function (queryParams) {
-                                var res = $http.get('api/itsystem?q=' + queryParams.data.query + "&" + urlExtra).then(queryParams.success);
+                                var res = $http.get(url + '&q=' + queryParams.data.query).then(queryParams.success);
                                 res.abort = function () {
                                     return null;
                                 };
@@ -132,11 +170,11 @@
                             results: function (data, page) {
                                 var results = [];
 
-                                _.each(data.data.response, function (system) {
+                                _.each(data.data.response, function (obj) {
 
                                     results.push({
-                                        id: system.id,
-                                        text: system.name
+                                        id: obj.id,
+                                        text: obj.name
                                     });
                                 });
 

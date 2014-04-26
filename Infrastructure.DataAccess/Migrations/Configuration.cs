@@ -87,10 +87,6 @@ namespace Infrastructure.DataAccess.Migrations
                                           new DataType() {IsActive = true, Note = "...", Name = "Datatype 2"},
                                           new DataType() {IsActive = true, Note = "...", Name = "Datatype 3"});
 
-            context.ProtocolTypes.AddOrUpdate(x => x.Name,
-                                              new ProtocolType() { IsActive = true, Note = "...", Name = "OIORES" },
-                                              new ProtocolType() { IsActive = true, Note = "...", Name = "WS SOAP" });
-
             context.Methods.AddOrUpdate(x => x.Name,
                                         new Method() { IsActive = true, Note = "...", Name = "Batch" },
                                         new Method() { IsActive = true, Note = "...", Name = "Request-Response" });
@@ -674,6 +670,7 @@ namespace Infrastructure.DataAccess.Migrations
                     AppType = appType2,
                     BusinessType = businessType1,
                     Organization = kl,
+                    BelongsTo = kl,
                     User = simon,
                     Version = "7.0",
                     Name = "TM Sund",
@@ -688,6 +685,7 @@ namespace Infrastructure.DataAccess.Migrations
                     AppType = appType1,
                     BusinessType = businessType1,
                     Organization = roskilde,
+                    BelongsTo = kl,
                     User = roskildeUser1,
                     Version = "0.1",
                     Name = "Vækstkurver",

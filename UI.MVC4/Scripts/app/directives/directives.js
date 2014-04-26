@@ -183,7 +183,14 @@
         };
     }]);
 
-    app.directive('selectStatus', [function() {
+    app.directive('selectAccessModifier', [function() {
+        return {
+            replace: true,
+            templateUrl: 'partials/directives/select-access-modifier.html'
+        };
+    }]);
+    
+    app.directive('selectStatus', [function () {
         return {
             scope: {
                 model: '=selectStatus',
@@ -192,9 +199,9 @@
             },
             replace: true,
             templateUrl: 'partials/directives/select-status.html',
-            
-            link: function(scope, element, attr) {
-                scope.setModel = function(n) {
+
+            link: function (scope, element, attr) {
+                scope.setModel = function (n) {
                     if (scope.model == n) return;
 
                     scope.model = n;
