@@ -224,6 +224,23 @@
                         });
                 }
                 
+                function loadTaskRef(system) {
+                    if (system.taskRefIds.length == 0) return null;
+
+                    return $http.get("api/taskref/" + system.taskRefIds[0])
+                        .success(function(result) {
+                            system.taskId = result.response.taskKey;
+                            system.taskName = result.response.description;
+                        });
+                }
+                
+                function loadUsage(system) {
+                    return $http.get("api/itsystemusage?systemId=" + systemId + "&organizationId=" + $rootScope.user.currentOrganizationId)
+                        .success(function(result) {
+                            system.isSelected = true;
+                        });
+                }
+                
                 $scope.systems = [];
                 _.each(systems.data.response, function (system) {
                     
@@ -234,6 +251,7 @@
 
                     loadUser(system);
                     loadOrganization(system);
+                    loadTaskRef(system);
 
                     $scope.systems.push(system);
                 });

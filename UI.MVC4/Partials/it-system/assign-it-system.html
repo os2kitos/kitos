@@ -57,16 +57,19 @@
                 <span data-ng-switch-when="businessType">{{system.businessType.name}}</span>
             </td>
             <td>
-                {{system.kleId}}
+                {{system.taskId}}
             </td>
             <td>
-                {{system.kleName}}
+                {{system.taskName}}
             </td>
             <td>
+                <!-- name of organization -->
                 {{system.belongsTo.name}}
             </td>
             <td>
-                <a data-popover-placement="right" data-popover="Oprettet i {{system.organization.name}}" data-popover-trigger="mouseenter">{{system.user.name}}</a>
+                <span data-popover-placement="right" data-popover="Oprettet i {{system.organization.name}}" data-popover-trigger="mouseenter">
+                    {{system.user.name}}
+                </span>
             </td>
         </tr>
 

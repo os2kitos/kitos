@@ -16,5 +16,19 @@ namespace UI.MVC4.Controllers.API
             : base(repository)
         {
         }
+
+        public HttpResponseMessage GetByItSystemAndOrganization(int systemId, int organizationId)
+        {
+            try
+            {
+                var usage = Repository.Get(u => u.ItSystemId == systemId && u.OrganizationId == organizationId).FirstOrDefault();
+
+                return usage == null ? NotFound() : Ok(Map(usage));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
     }
 }
