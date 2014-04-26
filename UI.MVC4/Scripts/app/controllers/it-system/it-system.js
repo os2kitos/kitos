@@ -117,6 +117,7 @@
 
                         version: system.version,
                         name: system.name,
+                        systemId: system.systemId,
                         userId: $rootScope.user.id,
                         accessModifier: system.accessModifier,
                         description: system.description,

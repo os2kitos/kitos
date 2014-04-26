@@ -131,6 +131,10 @@
     <Compile Include="Migrations\201404261250080_Initial.Designer.cs">
       <DependentUpon>201404261250080_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201404261416491_AddedSystemId.cs" />
+    <Compile Include="Migrations\201404261416491_AddedSystemId.Designer.cs">
+      <DependentUpon>201404261416491_AddedSystemId.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
     <Compile Include="UserRepository.cs" />
@@ -156,6 +160,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201404261250080_Initial.resx">
       <DependentUpon>201404261250080_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201404261416491_AddedSystemId.resx">
+      <DependentUpon>201404261416491_AddedSystemId.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
