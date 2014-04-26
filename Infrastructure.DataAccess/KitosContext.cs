@@ -24,6 +24,7 @@ namespace Infrastructure.DataAccess
         public DbSet<Agreement> Agreements { get; set; }
         public DbSet<AgreementElement> AgreementElements { get; set; }
         public DbSet<AppType> AppTypes { get; set; }
+        public DbSet<ArchiveType> ArchiveTypes { get; set; }
         public DbSet<BusinessType> BusinessTypes { get; set; }
         public DbSet<Communication> Communications { get; set; }
         public DbSet<Config> Configs { get; set; }
@@ -77,6 +78,7 @@ namespace Infrastructure.DataAccess
         public DbSet<PurchaseForm> PurchaseForms { get; set; }
         public DbSet<Resource> Resources { get; set; }
         public DbSet<Risk> Risks { get; set; }
+        public DbSet<SensitiveDataType> SensitiveDataTypes { get; set; }
         public DbSet<ShipNotice> ShipNotices { get; set; }
         public DbSet<Stakeholder> Stakeholders { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
@@ -94,6 +96,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new AgreementMap());
             modelBuilder.Configurations.Add(new AgreementElementMap());
             modelBuilder.Configurations.Add(new AppTypeMap());
+            modelBuilder.Configurations.Add(new ArchiveTypeMap());
             modelBuilder.Configurations.Add(new BusinessTypeMap());
             modelBuilder.Configurations.Add(new CommunicationMap());
             modelBuilder.Configurations.Add(new ConfigMap());
@@ -147,6 +150,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new PurchaseFormMap());
             modelBuilder.Configurations.Add(new ResourcesMap());
             modelBuilder.Configurations.Add(new RiskMap());
+            modelBuilder.Configurations.Add(new SensitiveDataTypeMap());
             modelBuilder.Configurations.Add(new ShipNoticeMap());
             modelBuilder.Configurations.Add(new StakeholdersMap());
             modelBuilder.Configurations.Add(new SupplierMap());

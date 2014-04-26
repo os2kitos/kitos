@@ -1,10 +1,5 @@
 ﻿using Core.DomainModel.ItSystem;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity.ModelConfiguration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -28,11 +23,20 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasMany(t => t.OrgUnits)
                  .WithMany(t => t.ItSystemUsages)
                  .Map(t => t.ToTable("OrgUnitSystemUsage"));
+
             this.HasOptional(t => t.ResponsibleUnit)
                  .WithMany(t => t.DelegatedSystemUsages);
 
             this.HasRequired(t => t.ItSystem)
                 .WithMany(t => t.Usages);
+
+            this.HasOptional(t => t.ArchiveType)
+                .WithMany(t => t.References)
+                .HasForeignKey(d => d.ArchiveTypeId);
+
+            this.HasOptional(t => t.SensitiveDataType)
+                .WithMany(t => t.References)
+                .HasForeignKey(d => d.SensitiveDataTypeId);
         }
     }
 }

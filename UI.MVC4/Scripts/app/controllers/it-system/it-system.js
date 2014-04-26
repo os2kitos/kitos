@@ -1,45 +1,60 @@
 ﻿(function (ng, app) {
 
     var subnav = [
-            { state: 'index', text: 'Overblik' },
-            { state: 'index', text: 'Tilknyt IT system' },
-            { state: 'add-it-system', text: 'Opret IT system' },
-            { state: 'index', text: 'Rapport' }
+        { state: 'index', text: 'Overblik' },
+        { state: 'index', text: 'Tilknyt IT system' },
+        { state: 'add-it-system', text: 'Opret IT system' },
+        { state: 'index', text: 'Rapport' },
+        { state: 'it-system-usage', text: 'IT System' }
     ];
 
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
 
-        $stateProvider.state('add-it-system', {
-            url: '/system/add',
-            templateUrl: 'partials/it-system/edit-system.html',
-            controller: 'system.AddCtrl',
-            resolve: {
-                appTypes: ['$http', function ($http) {
-                    return $http.get("api/apptype");
-                }],
-                interfaceAppType: ['$http', function ($http) {
-                    return $http.get("api/apptype?interfaceAppType");
-                }],
-                businessTypes: ['$http', function ($http) {
-                    return $http.get("api/businesstype");
-                }],
-                tsas: ['$http', function ($http) {
-                    return $http.get("api/tsa");
-                }],
-                interfaces: ['$http', function ($http) {
-                    return $http.get("api/interface");
-                }],
-                interfaceTypes: ['$http', function ($http) {
-                    return $http.get("api/interfacetype");
-                }],
-                methods: ['$http', function ($http) {
-                    return $http.get("api/method");
-                }],
-                dataTypes: ['$http', function ($http) {
-                    return $http.get("api/datatype");
-                }]
-            }
-        });
+        $stateProvider
+            .state('add-it-system', {
+                url: '/system/add',
+                templateUrl: 'partials/it-system/edit-system.html',
+                controller: 'system.AddCtrl',
+                resolve: {
+                    appTypes: ['$http', function($http) {
+                        return $http.get("api/apptype");
+                    }],
+                    interfaceAppType: ['$http', function($http) {
+                        return $http.get("api/apptype?interfaceAppType");
+                    }],
+                    businessTypes: ['$http', function($http) {
+                        return $http.get("api/businesstype");
+                    }],
+                    tsas: ['$http', function($http) {
+                        return $http.get("api/tsa");
+                    }],
+                    interfaces: ['$http', function($http) {
+                        return $http.get("api/interface");
+                    }],
+                    interfaceTypes: ['$http', function($http) {
+                        return $http.get("api/interfacetype");
+                    }],
+                    methods: ['$http', function($http) {
+                        return $http.get("api/method");
+                    }],
+                    dataTypes: ['$http', function($http) {
+                        return $http.get("api/datatype");
+                    }]
+                }
+            })
+            .state('it-system-usage', {
+                url: '/system/usage/{id:d+}',
+                templateUrl: 'partials/it-system/edit-system-usage.html',
+                controller: 'system.AddUsage',
+                resolve: {
+                    itSystemUsage: ['$http', '$stateParams', function ($http, $stateParams) {
+                        return $http.get('api/itsystemusage/' + $stateParams.id)
+                            .then(function(result) {
+                                return result.data.response;
+                            });
+                    }]
+                }
+            });
 
     }]);
 
@@ -133,7 +148,7 @@
                 }
 
                 $http.get('api/taskref').success(function (result) {
-                    $scope.kleFilter = {type:'KLE-Emne'}
+                    $scope.kleFilter = { type: 'KLE-Emne' };
                     $scope.allTasksFlat = result.response;
                 });
 
@@ -143,4 +158,8 @@
                     }
                 };
             }]);
+
+    app.controller('system.AddUsage', ['$rootScope', '$scope', '$http', 'notify', 'itSystemUsage', function ($rootScope, $scope, $http, notify, itSystemUsage) {
+        $scope.usage = itSystemUsage;
+    }]);
 })(angular, app);

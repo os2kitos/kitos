@@ -2,11 +2,11 @@
 
 namespace Core.DomainModel.ItSystem
 {
-    public class AppType : IOptionEntity<ItSystem>
+    public class ArchiveType : IOptionEntity<ItSystemUsage>
     {
-        public AppType()
+        public ArchiveType()
         {
-            References = new List<ItSystem>();
+            this.References = new List<ItSystemUsage>();
         }
 
         public int Id { get; set; }
@@ -14,6 +14,6 @@ namespace Core.DomainModel.ItSystem
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }
         public string Note { get; set; }
-        public virtual ICollection<ItSystem> References { get; set; }
+        public virtual ICollection<ItSystemUsage> References { get; set; }
     }
 }

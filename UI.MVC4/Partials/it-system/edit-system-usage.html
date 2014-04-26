@@ -1,0 +1,78 @@
+﻿<div class="row">
+    <label>IT System</label>
+    <span>{{ system.systemName }}</span>
+    
+    <label>System ID</label>
+    <span>{{ system.systemId }}</span>
+    
+    <label>Applikationstype</label>
+    <span>{{ system.systemAppType }}</span>
+    
+    <label>Forretningstype</label>
+    <span>{{ system.systemBusinessType }}</span>
+
+    <label>Version</label>
+    <span>{{ system.systemVersion }}</span>
+    
+    <label>Public</label>
+    <span>{{ system.systemAccess }}</span>
+    
+    <label>Tilhører</label>
+    <span>{{ system.systemBelongsTo }}</span> <!-- TODO -->
+       
+    <label>Overordnet system</label>
+    <span>{{ system.systemParent }}</span>
+    
+    <label>Beskrivelse</label>
+    <span>{{ system.systemDescription }}</span>
+    
+    <label>Link til yderligere beskrivelse</label>
+    <span>{{ system.systemUrl }}</span>
+</div>
+
+<div class="row">
+    <label for="status">Status</label>
+    <select id="status" data-ng-model="systemUsage.isContractActive">
+        <option value="true">Aktiv</option>
+        <option value="false">Inaktiv</option>
+    </select>
+    
+    <label for="sysId">Lokal SystemID</label>
+    <input id="sysId" type="text" data-ng-model="systemUsage.systemId" />
+    
+    <label>Systemansvarlig</label>
+    <select data-ng-model="systemUsage.responsibleOrgUnit"></select>
+
+    <label>Kontrakt(er)</label>
+    <span>[Hentes fra kontrakter]</span>
+    
+    <label>Leverandør</label>
+    <span>[Hentes fra kontrakter]</span>
+    
+    <label for="sensitive">Personfølsomme data</label>
+    <select id="sensitive"></select>
+
+    <label>Hosting</label>
+    <span>[Hentes fra kontrakter]</span>
+    
+    <label for="archive">Arkivering</label>
+    <select id="archive"></select>
+
+    <label for="esdh">ESDH Ref.</label>
+    <input id="esdh" type="text" data-ng-model="systemUsage.esdhRef" />
+    
+    <label for="cmdb">CMDB Ref.</label>
+    <input id="cmdb" type="text" data-ng-model="systemUsage.cmdbRef" />
+    
+    <label for="url">Mappe/URL Ref.</label>
+    <input id="url" type="text" data-ng-model="systemUsage.urlRef" />
+    
+    <label for="adidm">AD/IDM Ref.</label>
+    <input id="adidm" type="text" data-ng-model="systemUsage.AdRef" />
+    
+    <label for="note">Note</label>
+    <input id="note" type="text" data-ng-model="systemUsage.note" />
+    
+    <label for="overview">Overblik</label>
+    <input id="overview" data-ng-model="systemUsage.overview" />
+</div>
