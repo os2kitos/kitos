@@ -53,8 +53,8 @@
                 {{system.systemId}}
             </td>
             <td data-ng-switch="showType">
-                <span data-ng-switch-when="appType">{{system.appTypeId}}</span>
-                <span data-ng-switch-when="businessType">{{system.businessTypeId}}</span>
+                <span data-ng-switch-when="appType">{{system.appType.name}}</span>
+                <span data-ng-switch-when="businessType">{{system.businessType.name}}</span>
             </td>
             <td>
                 {{system.kleId}}
@@ -63,7 +63,7 @@
                 {{system.kleName}}
             </td>
             <td>
-                {{system.belongsTo}}
+                {{system.belongsTo.name}}
             </td>
             <td>
                 {{system.createdBy}}

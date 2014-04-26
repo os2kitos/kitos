@@ -45,6 +45,15 @@
             templateUrl: 'partials/it-system/assign-it-system.html',
             controller: 'system.AssignCtrl',
             resolve: {
+                appTypes: ['$http', function ($http) {
+                    return $http.get("api/apptype");
+                }],
+                businessTypes: ['$http', function ($http) {
+                    return $http.get("api/businesstype");
+                }],
+                organizations: ['$http', function ($http) {
+                    return $http.get("api/organization");
+                }],
                 systems: ['$http', function ($http) {
                     return $http.get("api/itsystem");
                 }]
@@ -190,12 +199,28 @@
 
     app.controller('system.AssignCtrl',
         ['$rootScope', '$scope', '$http', 'notify',
-            'systems',
+            'appTypes', 'businessTypes', 'systems', 'organizations',
             function ($rootScope, $scope, $http, notify,
-            systems) {
+             appTypesHttp, businessTypesHttp, systems, organizationsHttp) {
                 $rootScope.page.title = 'Tilknyt IT system';
                 $rootScope.page.subnav = subnav;
 
-                $scope.systems = systems.data.response;
+                var appTypes = appTypesHttp.data.response;
+                var businessTypes = businessTypesHttp.data.response;
+                var organizations = organizationsHttp.data.response;
+
+                $scope.systems = [];
+                _.each(systems.data.response, function (system) {
+                    
+                    system.appType = _.findWhere(appTypes, { id: system.appTypeId });
+                    system.businessType = _.findWhere(businessTypes, { id: system.businessTypeId });
+
+                    system.belongsTo = _.findWhere(organizations, { id: system.belongsToId });
+
+                    $scope.systems.push(system);
+                });
+
+                $scope.showType = 'appType';
+
             }]);
 })(angular, app);
