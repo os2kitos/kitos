@@ -95,7 +95,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<TaskRef>>().To<GenericRepository<TaskRef>>().InRequestScope();
             kernel.Bind<IGenericRepository<TaskUsage>>().To<GenericRepository<TaskUsage>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItSystem>>().To<GenericRepository<ItSystem>>().InRequestScope();
-
+            kernel.Bind<IGenericRepository<ItSystemUsage>>().To<GenericRepository<ItSystemUsage>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItProjectRole>>().To<GenericRepository<ItProjectRole>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItContractRole>>().To<GenericRepository<ItContractRole>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItSystemRole>>().To<GenericRepository<ItSystemRole>>().InRequestScope();

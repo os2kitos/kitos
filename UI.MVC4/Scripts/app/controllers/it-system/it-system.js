@@ -9,7 +9,6 @@
     ];
 
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
-
         $stateProvider
             .state('add-it-system', {
                 url: '/system/add',
@@ -43,9 +42,9 @@
                 }
             })
             .state('it-system-usage', {
-                url: '/system/usage/{id:d+}',
+                url: '/system/usage/{id:[0-9]+}',
                 templateUrl: 'partials/it-system/edit-system-usage.html',
-                controller: 'system.AddUsage',
+                controller: 'system.EditUsage',
                 resolve: {
                     itSystemUsage: ['$http', '$stateParams', function ($http, $stateParams) {
                         return $http.get('api/itsystemusage/' + $stateParams.id)
@@ -159,7 +158,7 @@
                 };
             }]);
 
-    app.controller('system.AddUsage', ['$rootScope', '$scope', '$http', 'notify', 'itSystemUsage', function ($rootScope, $scope, $http, notify, itSystemUsage) {
+    app.controller('system.EditUsage', ['$rootScope', '$scope', '$http', 'notify', 'itSystemUsage', function ($rootScope, $scope, $http, notify, itSystemUsage) {
         $scope.usage = itSystemUsage;
     }]);
 })(angular, app);

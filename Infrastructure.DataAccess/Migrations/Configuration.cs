@@ -714,7 +714,10 @@ namespace Infrastructure.DataAccess.Migrations
                     Note = "note...",
                     ItSystem = system1,
                     IsStatusActive = true,
+                    Organization = roskilde,
                 };
+
+            context.ItSystemUsages.AddOrUpdate(x => x.Note, systemUsage1); // TODO probably not the best identifier
 
             #endregion
 
