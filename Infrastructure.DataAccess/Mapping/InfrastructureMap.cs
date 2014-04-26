@@ -21,11 +21,6 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasRequired(t => t.OrganizationUnit)
                 .WithMany(t => t.Infrastructures)
                 .HasForeignKey(d => d.DepartmentId);
-            this.HasRequired(t => t.Host)
-                .WithMany(t => t.Infrastructures)
-                .HasForeignKey(d => d.HostId);
-            this.HasRequired(t => t.ItSystem)
-                .WithOptional(t => t.Infrastructure);
             this.HasRequired(t => t.Supplier)
                 .WithMany(t => t.Infrastructures)
                 .HasForeignKey(d => d.SupplierId);

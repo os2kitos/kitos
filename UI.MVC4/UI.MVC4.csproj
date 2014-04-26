@@ -222,16 +222,22 @@
     <Compile Include="Controllers\API\AgreementElementController.cs" />
     <Compile Include="Controllers\API\AuthorizeController.cs" />
     <Compile Include="Controllers\API\BaseApiController.cs" />
+    <Compile Include="Controllers\API\BusinessTypeController.cs" />
     <Compile Include="Controllers\API\ContractTemplateController.cs" />
     <Compile Include="Controllers\API\ContractTypeController.cs" />
+    <Compile Include="Controllers\API\DataTypeController.cs" />
+    <Compile Include="Controllers\API\InterfaceController.cs" />
+    <Compile Include="Controllers\API\ItSystemController.cs" />
+    <Compile Include="Controllers\API\ItSystemUsageController.cs" />
+    <Compile Include="Controllers\API\TsaController.cs" />
+    <Compile Include="Models\DataRowDTO.cs" />
+    <Compile Include="Models\ItSystemDTO.cs" />
     <Compile Include="Controllers\API\OrganizationRightController.cs" />
     <Compile Include="Controllers\API\TaskUsageController.cs" />
     <Compile Include="Models\CreateGlobalAdminDTO.cs" />
     <Compile Include="Models\CreateLocalAdminDTO.cs" />
-    <Compile Include="Controllers\API\DatabaseTypeController.cs" />
     <Compile Include="Controllers\API\ConfigController.cs" />
     <Compile Include="Controllers\API\OrganizationRoleController.cs" />
-    <Compile Include="Controllers\API\EnvironmentController.cs" />
     <Compile Include="Controllers\API\ExtReferenceTypeLocaleController.cs" />
     <Compile Include="Controllers\API\ExtReferenceTypeController.cs" />
     <Compile Include="Controllers\API\GenericLocaleApiController.cs" />
@@ -252,9 +258,8 @@
     <Compile Include="Controllers\API\ProjectPhaseController.cs" />
     <Compile Include="Controllers\API\ProjectPhaseLocaleController.cs" />
     <Compile Include="Controllers\API\ProjectTypeController.cs" />
-    <Compile Include="Controllers\API\ProtocolTypeController.cs" />
     <Compile Include="Controllers\API\PurchaseFormController.cs" />
-    <Compile Include="Controllers\API\SystemTypeController.cs" />
+    <Compile Include="Controllers\API\AppTypeController.cs" />
     <Compile Include="Controllers\API\GlobalAdminController.cs" />
     <Compile Include="Controllers\API\LocalAdminController.cs" />
     <Compile Include="Controllers\API\OrganizationController.cs" />
@@ -285,6 +290,7 @@
     <Compile Include="Models\ApiReturnDTO.cs" />
     <Compile Include="Models\AuthorizeViewModels.cs" />
     <Compile Include="Models\ConfigDTO.cs" />
+    <Compile Include="Models\ItSystemUsageDTO.cs" />
     <Compile Include="Models\LocaleDTO.cs" />
     <Compile Include="Models\LoginDTO.cs" />
     <Compile Include="Models\OptionDTO.cs" />
@@ -300,6 +306,7 @@
     <Compile Include="Models\TaskUsageDTO.cs" />
     <Compile Include="Models\TaskRefDTO.cs" />
     <Compile Include="Models\UserDTO.cs" />
+    <Compile Include="Models\UserOrganizationsDTO.cs" />
     <Compile Include="Models\UserProfileDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -375,6 +382,7 @@
     <Content Include="Images\logo.png" />
     <Content Include="Partials\directives\add-user-button.html" />
     <Content Include="Partials\directives\add-user-modal.html" />
+    <Content Include="Partials\directives\select-access-modifier.html" />
     <Content Include="Partials\directives\select-status.html" />
     <Content Include="Partials\directives\select-user.html" />
     <Content Include="Partials\directives\show-status.html" />
@@ -390,6 +398,7 @@
     <Content Include="Partials\home\reset-password.html" />
     <Content Include="Partials\home\forgot-password.html" />
     <Content Include="Partials\home\index.html" />
+    <Content Include="Partials\it-system\edit-system.html" />
     <Content Include="Partials\local-config\config.html" />
     <Content Include="Partials\local-config\suggest-new-role.html" />
     <Content Include="Partials\local-config\index.html" />
@@ -442,6 +451,7 @@
     <Content Include="Scripts\app\controllers\global-admin\global-admin.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-config.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
+    <Content Include="Scripts\app\controllers\it-system\it-system.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config.js" />
     <Content Include="Scripts\app\controllers\org\org.js" />
     <Content Include="Scripts\app\directives\directives.js" />

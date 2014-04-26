@@ -426,3 +426,15 @@ body.wait, body.wait * {
     width: 100%;
     text-align: left;
 }
+
+.form-horizontal.fix-label-padding label.control-label {
+    padding-top: 3px !important;
+}
+
+.org-selector {
+    color: black;
+    font-size: 12px !important;
+    line-height: 10px !important;
+    height: auto !important;
+    padding: 2px;
+}

@@ -62,31 +62,30 @@
     <Compile Include="KitosContext.cs" />
     <Compile Include="Mapping\AgreementElementMap.cs" />
     <Compile Include="Mapping\AgreementMap.cs" />
-    <Compile Include="Mapping\BasicDataMap.cs" />
     <Compile Include="Mapping\CommunicationMap.cs" />
-    <Compile Include="Mapping\ComponentsMap.cs" />
     <Compile Include="Mapping\ConfigMap.cs" />
     <Compile Include="Mapping\ContractTemplateMap.cs" />
     <Compile Include="Mapping\ContractTypeMap.cs" />
     <Compile Include="Mapping\AdminRightMap.cs" />
     <Compile Include="Mapping\AdminRoleMap.cs" />
+    <Compile Include="Mapping\BusinessTypeMap.cs" />
+    <Compile Include="Mapping\DataRowMap.cs" />
+    <Compile Include="Mapping\DataTypeMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageMap.cs" />
+    <Compile Include="Mapping\TsaMap.cs" />
     <Compile Include="Mapping\TaskUsageMap.cs" />
     <Compile Include="Mapping\HandoverTrialMap.cs" />
-    <Compile Include="Mapping\DatabaseTypeMap.cs" />
     <Compile Include="Mapping\OrganizationUnitMap.cs" />
     <Compile Include="Mapping\OrganizationRightMap.cs" />
     <Compile Include="Mapping\OrganizationRoleMap.cs" />
     <Compile Include="Mapping\EconomyMap.cs" />
-    <Compile Include="Mapping\EnvironmentMap.cs" />
     <Compile Include="Mapping\ExtReferenceMap.cs" />
     <Compile Include="Mapping\ExtReferenceTypeMap.cs" />
     <Compile Include="Mapping\ExtRefTypeLocaleMap.cs" />
-    <Compile Include="Mapping\FunctionalityMap.cs" />
     <Compile Include="Mapping\GoalMap.cs" />
     <Compile Include="Mapping\GoalStatusMap.cs" />
     <Compile Include="Mapping\HandoverMap.cs" />
     <Compile Include="Mapping\HierarchyMap.cs" />
-    <Compile Include="Mapping\HostMap.cs" />
     <Compile Include="Mapping\InfrastructureMap.cs" />
     <Compile Include="Mapping\InterfaceMap.cs" />
     <Compile Include="Mapping\InterfaceTypeMap.cs" />
@@ -113,30 +112,24 @@
     <Compile Include="Mapping\PaymentMap.cs" />
     <Compile Include="Mapping\PaymentModelMap.cs" />
     <Compile Include="Mapping\PreAnalysisMap.cs" />
-    <Compile Include="Mapping\ProgLanguageMap.cs" />
     <Compile Include="Mapping\ProjectCategoryMap.cs" />
     <Compile Include="Mapping\ProjectPhaseLocaleMap.cs" />
     <Compile Include="Mapping\ProjectPhaseMap.cs" />
     <Compile Include="Mapping\ProjectStatusMap.cs" />
     <Compile Include="Mapping\ProjectTypeMap.cs" />
-    <Compile Include="Mapping\ProtocolTypeMap.cs" />
     <Compile Include="Mapping\PurchaseFormMap.cs" />
     <Compile Include="Mapping\ResourcesMap.cs" />
     <Compile Include="Mapping\RiskMap.cs" />
     <Compile Include="Mapping\ShipNoticeMap.cs" />
     <Compile Include="Mapping\StakeholdersMap.cs" />
-    <Compile Include="Mapping\SuperUserMap.cs" />
     <Compile Include="Mapping\SupplierMap.cs" />
-    <Compile Include="Mapping\SystemTypeMap.cs" />
-    <Compile Include="Mapping\TaskSupportMap.cs" />
-    <Compile Include="Mapping\TechnologyMap.cs" />
+    <Compile Include="Mapping\AppTypeMap.cs" />
     <Compile Include="Mapping\TextMap.cs" />
-    <Compile Include="Mapping\UserAdministrationMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
-    <Compile Include="Migrations\201404261246276_Initial.cs" />
-    <Compile Include="Migrations\201404261246276_Initial.Designer.cs">
-      <DependentUpon>201404261246276_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201404251556510_InitialMigration9015.cs" />
+    <Compile Include="Migrations\201404251556510_InitialMigration9015.Designer.cs">
+      <DependentUpon>201404251556510_InitialMigration9015.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -161,8 +154,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201404261246276_Initial.resx">
-      <DependentUpon>201404261246276_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201404251556510_InitialMigration9015.resx">
+      <DependentUpon>201404251556510_InitialMigration9015.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

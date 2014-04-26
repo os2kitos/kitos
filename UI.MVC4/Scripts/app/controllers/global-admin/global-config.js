@@ -127,7 +127,7 @@
         };
 
         handler($scope, Restangular, 'ItSystemRole', 'ItSystemRoles');        
-        handler($scope, Restangular, 'SystemType', 'SystemTypes');
+        handler($scope, Restangular, 'AppType', 'AppTypes');
         handler($scope, Restangular, 'InterfaceType', 'InterfaceTypes');
         handler($scope, Restangular, 'ProtocolType', 'ProtocolTypes');
         handler($scope, Restangular, 'Method', 'Methods');
