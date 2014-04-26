@@ -209,7 +209,21 @@
                 var appTypes = appTypesHttp.data.response;
                 var businessTypes = businessTypesHttp.data.response;
                 var organizations = organizationsHttp.data.response;
+                
+                function loadUser(system) {
+                    return $http.get("api/user/" + system.userId, { cache: true })
+                        .success(function(result) {
+                            system.user = result.response;
+                        });
+                }
 
+                function loadOrganization(system) {
+                    return $http.get("api/organization/" + system.organizationId, { cache: true })
+                        .success(function (result) {
+                            system.organization = result.response;
+                        });
+                }
+                
                 $scope.systems = [];
                 _.each(systems.data.response, function (system) {
                     
@@ -217,6 +231,9 @@
                     system.businessType = _.findWhere(businessTypes, { id: system.businessTypeId });
 
                     system.belongsTo = _.findWhere(organizations, { id: system.belongsToId });
+
+                    loadUser(system);
+                    loadOrganization(system);
 
                     $scope.systems.push(system);
                 });
