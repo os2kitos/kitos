@@ -41,6 +41,14 @@
   <ItemGroup>
     <Compile Include="AdminRight.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="IHasAccessModifier.cs" />
+    <Compile Include="ItSystem\AppType.cs" />
+    <Compile Include="ItSystem\DataRow.cs" />
+    <Compile Include="ItSystem\ArchiveType.cs" />
+    <Compile Include="ItSystem\DataType.cs" />
+    <Compile Include="ItSystem\ItSystemUsage.cs" />
+    <Compile Include="ItSystem\SensitiveDataType.cs" />
+    <Compile Include="ItSystem\Tsa.cs" />
     <Compile Include="OrganizationUnit.cs" />
     <Compile Include="OrganizationRight.cs" />
     <Compile Include="ExtReference.cs" />
@@ -89,12 +97,6 @@
     <Compile Include="ItProject\Stakeholder.cs" />
     <Compile Include="ItSupportModuleName.cs" />
     <Compile Include="ItSystemModuleName.cs" />
-    <Compile Include="ItSystem\BasicData.cs" />
-    <Compile Include="ItSystem\Component.cs" />
-    <Compile Include="ItSystem\DatabaseType.cs" />
-    <Compile Include="ItSystem\Environment.cs" />
-    <Compile Include="ItSystem\Functionality.cs" />
-    <Compile Include="ItSystem\Host.cs" />
     <Compile Include="ItSystem\Infrastructure.cs" />
     <Compile Include="ItSystem\Interface.cs" />
     <Compile Include="ItSystem\InterfaceType.cs" />
@@ -102,13 +104,7 @@
     <Compile Include="ItSystem\ItSystemRight.cs" />
     <Compile Include="ItSystem\ItSystemRole.cs" />
     <Compile Include="ItSystem\Method.cs" />
-    <Compile Include="ItSystem\ProgLanguage.cs" />
-    <Compile Include="ItSystem\ProtocolType.cs" />
-    <Compile Include="ItSystem\SuperUser.cs" />
-    <Compile Include="ItSystem\SystemType.cs" />
-    <Compile Include="ItSystem\TaskSupport.cs" />
-    <Compile Include="ItSystem\Technology.cs" />
-    <Compile Include="ItSystem\UserAdministration.cs" />
+    <Compile Include="ItSystem\BusinessType.cs" />
     <Compile Include="ItSystem\Wish.cs" />
     <Compile Include="TaskRef.cs" />
     <Compile Include="Localization.cs" />

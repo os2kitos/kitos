@@ -1,0 +1,213 @@
+﻿<form class="form-horizontal fix-label-padding" data-ng-submit="saveSystem()">
+    <div class="row">
+        <div class="col-md-7">
+            <div class="col-md-6">
+
+                <!--Name-->
+                <div class="form-group">
+                    <label for="system-name" class="control-label col-md-5 small">IT System</label>
+                    <div class="col-md-7">
+                        <input type="text" id="system-name" data-ng-model="system.name" class="form-control input-sm" required="required"/>
+                    </div>
+                </div>
+
+                <!--ID-->
+                <div class="form-group">
+                    <label for="system-id" class="control-label col-md-5 small">System ID</label>
+                    <div class="col-md-7">
+                        <input type="text" id="system-id" data-ng-model="system.systemId" class="form-control input-sm" required="required"/>
+                    </div>
+                </div>
+
+                <!--Parent system-->
+                <div class="form-group">
+                    <label for="system-parent" class="control-label col-md-5 small">Overordnet system</label>
+                    <div class="col-md-7">
+                        <input type="hidden" data-ui-select2="itSystemsSelectOptions" id="system-parent" data-ng-model="system.parent" class="form-control input-sm" >
+                    </div>
+                </div>
+                <!--Interfaces can-use-->
+                <div class="form-group">
+                    <label for="system-interfaces-can-use" class="control-label col-md-5 small">Snitflader (kan anvende)</label>
+                    <div class="col-md-7">
+                        <input type="hidden" data-ui-select2="interfacesSelectOptions" id="system-interfaces-can-use" data-ng-model="system.canUseInterfaces" class="form-control input-sm" multiple="multiple">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="system-belongs-to" class="control-label col-md-5 small">Tilhører</label>
+                    <div class="col-md-7">
+                         <input type="hidden" data-ui-select2="organizationSelectOptions" id="system-belongs-to" data-ng-model="system.belongsTo" class="form-control input-sm" required="required">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <!--Version-->
+                <div class="form-group">
+                    <label for="system-version" class="control-label col-md-5 small">Version</label>
+                    <div class="col-md-7">
+                        <input type="text" id="system-version" data-ng-model="system.version" class="form-control input-sm" required="required"/>
+                    </div>
+                </div>
+
+                <!--Access modifier -->
+                <div class="form-group">
+                    <label for="system-access" class="control-label col-md-5 small">Public</label>
+                    <div class="col-md-7">
+                        <input id="system-access" data-ng-model="system.accessModifier" class="form-control input-sm" data-select-access-modifier="" />
+                    </div>
+                </div>
+
+                <!--Application type -->
+                <div class="form-group">
+                    <label for="system-app-type" class="control-label col-md-5 small">Applikationstype</label>
+                    <div class="col-md-7">
+                        <select data-ui-select2="" id="system-app-type" data-ng-model="system.appTypeId" class="form-control input-sm" required="required">
+                            <option data-ng-repeat="appType in appTypes" value="{{appType.id}}">{{appType.name}}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!--Usage type-->
+                <div class="form-group">
+                    <label for="system-business-type" class="control-label col-md-5 small">Forretningstype</label>
+                    <div class="col-md-7">
+                        <select data-ui-select2="" id="system-business-type" data-ng-model="system.businessTypeId" class="form-control input-sm" required="required">
+                            <option data-ng-repeat="businessType in businessTypes" value="{{businessType.id}}">{{businessType.name}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+
+            <!--Description-->
+            <div class="form-group">
+                <label for="system-description" class="control-label col-md-4 small">Beskrivelse</label>
+                <div class="col-md-8">
+                    <textarea id="system-description" data-ng-model="system.description" class="form-control input-sm" rows="7"></textarea>
+                </div>
+            </div>
+
+            <!--Further description-->
+            <div class="form-group">
+                <label for="system-url" class="control-label col-md-4 small">Link til yderligere beskrivelse</label>
+                <div class="col-md-8">
+                    <input type="text" id="system-url" data-ng-model="system.url" class="form-control input-sm" placeholder="URL" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">&nbsp;</div>
+
+    <!-- interface specific data -->
+    <div class="row panel panel-default" data-ng-if="system.appTypeId == interfaceAppType.id">
+        <div class="panel-heading small">Snitflade egenskaber</div>
+        <div class="col-md-6 panel-body">
+            <div class="form-group">
+                <!-- TSA -->
+                <label for="interface-tsa" class="control-label col-md-2 small">TSA</label>
+                <div class="col-md-4">
+                    <select data-ui-select2="" id="interface-tsa" data-ng-model="system.tsaId" class="form-control input-sm" >
+                        <option data-ng-repeat="tsa in tsas" value="{{tsa.id}}">{{tsa.name}}</option>
+                    </select>
+                </div>
+                <!-- Interface type -->
+                <label for="interface-type" class="control-label col-md-2 small">Snitfladetype</label>
+                <div class="col-md-4">
+                    <select data-ui-select2="" id="interface-type" data-ng-model="system.interfaceTypeId" class="form-control input-sm" >
+                        <option data-ng-repeat="interfaceType in interfaceTypes" value="{{interfaceType.id}}">{{interfaceType.name}}</option>
+                    </select>
+                </div>
+            </div>
+            
+                <!-- Interface  -->
+            <div class="form-group">
+                <label for="interface-interface" class="control-label col-md-2 small">Grænseflade</label>
+                <div class="col-md-4">
+                    <select data-ui-select2="" id="interface-interface" data-ng-model="system.interfaceId" class="form-control input-sm" >
+                        <option data-ng-repeat="interface in interfaces" value="{{interface.id}}">{{interface.name}}</option>
+                    </select>
+                </div>
+                <!-- Method -->
+                <label for="interface-method" class="control-label col-md-2 small">Metode</label>
+                <div class="col-md-4">
+                    <select data-ui-select2="" id="interface-method" data-ng-model="system.methodId" class="form-control input-sm" >
+                        <option data-ng-repeat="method in methods" value="{{method.id}}">{{method.name}}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="interface-exposed-by" class="control-label col-md-2 small">Udstillet af</label>
+                <div class="col-md-4">
+                    <input type="text" data-ui-select2="itSystemsSelectOptions" id="interface-exposed-by" data-ng-model="system.exposedBy" class="form-control input-sm" data-ng-required="system.appTypeId == interfaceAppType.id">
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 panel-body">
+            <table class="table table-condensed table-bordered">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Datatype</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="dataRow in system.dataRows">
+                        <td>
+                            <input type="text" class="form-control input-sm" data-ng-model="dataRow.data" />
+                        </td>
+                        <td>
+                            <select data-ui-select2="" data-ng-model="dataRow.dataTypeId" class="form-control input-sm" >
+                                <option data-ng-repeat="dataType in dataTypes" value="{{dataType.id}}">{{dataType.name}}</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>
+                            <input type="text" class="form-control input-sm" id="newData" data-ng-model="newDataRow.data" data-ng-change="addDataRow(newDataRow)" placeholder="Ny række"/>
+                        </td>
+                        <td>
+                            <select data-ui-select2="" data-ng-model="newDataRow.dataTypeId" class="form-control input-sm" data-ng-change="addDataRow(newDataRow)" data-placeholder="Vælg datatype">
+                                <option></option>
+                                <option data-ng-repeat="dataType in dataTypes" value="{{dataType.id}}">{{dataType.name}}</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                </tfoot>
+            </table>
+        </div>
+
+    </div>
+    
+    <div class="row">&nbsp;</div>
+    
+    <!-- KLE -->
+    <div class="row panel panel-default">
+        <div class="panel-heading small">Tilknyt KLE</div>
+        <div>
+            <select data-ng-model="kleFilter.parentId" data-ng-options="t.id as t.taskKey for t in allTasksFlat | filter:{ type:'KLE-Gruppe' }" data-ng-change="cleanKleFilter()">
+                <option value="">-- Gruppe --</option>
+            </select>
+        </div>
+        <div class="col-md-6 panel-body">
+            <div data-ng-repeat="task in allTasksFlat | filter:kleFilter">
+                <label>
+                    <input type="checkbox" name="taskRefs[]" data-ng-model="task.isChecked" value="{{task.id}}" />
+                    {{task.taskKey}} {{task.description}}
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <input type="submit" value="Gem IT system" class="btn btn-success full-width" data-disable-on-busy=""/>
+    </div>
+</form>

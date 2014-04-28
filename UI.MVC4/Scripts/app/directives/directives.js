@@ -183,7 +183,14 @@
         };
     }]);
 
-    app.directive('selectStatus', [function() {
+    app.directive('selectAccessModifier', [function() {
+        return {
+            replace: true,
+            templateUrl: 'partials/directives/select-access-modifier.html'
+        };
+    }]);
+    
+    app.directive('selectStatus', [function () {
         return {
             scope: {
                 model: '=selectStatus',
@@ -192,9 +199,9 @@
             },
             replace: true,
             templateUrl: 'partials/directives/select-status.html',
-            
-            link: function(scope, element, attr) {
-                scope.setModel = function(n) {
+
+            link: function (scope, element, attr) {
+                scope.setModel = function (n) {
                     if (scope.model == n) return;
 
                     scope.model = n;
@@ -296,6 +303,28 @@
             scope.$on('httpUnbusy', function(e) {
                 elem[0].disabled = false;
             });
+        };
+    }]);
+
+    app.directive('autosave', ['$http', 'notify', function ($http, notify) {
+        'use strict';
+        return {
+            restrict: 'A',
+            require: 'ngModel',
+            link: function (scope, element, attrs, ctrl) {
+                element.bind('blur', function() {
+                    var payload = new Object();
+                    payload[attrs.field] = ctrl.$viewValue;
+
+                    $http({ method: 'PATCH', url: attrs.autosave, data: payload })
+                        .success(function(result) {
+                            notify.addSuccessMessage("Feltet er opdateret.");
+                        })
+                        .error(function(result) {
+                            notify.addErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                        });
+                });
+            }
         };
     }]);
 

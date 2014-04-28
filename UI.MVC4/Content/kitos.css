@@ -143,9 +143,9 @@ div.org-node
      }
 
      div.org-node span.org-node-info i
-     {   
+    {
          color: rgb(55, 96, 146);
-     }
+    }
 
     div.org-node.selected > span.org-node-info
     {
@@ -470,4 +470,16 @@ body.wait, body.wait * {
 .org-role-table thead > tr th:nth-child(4) 
 {
     width: 30%;
+}
+
+.form-horizontal.fix-label-padding label.control-label {
+    padding-top: 3px !important;
+}
+
+.org-selector {
+    color: black;
+    font-size: 12px !important;
+    line-height: 10px !important;
+    height: auto !important;
+    padding: 2px;
 }
