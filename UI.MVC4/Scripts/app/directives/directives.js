@@ -312,17 +312,24 @@
             restrict: 'A',
             require: 'ngModel',
             link: function (scope, element, attrs, ctrl) {
-                element.bind('blur', function() {
+                var oldValue;
+                element.bind('focus', function() {
+                    oldValue = ctrl.$viewValue;
+                });
+                element.bind('blur', function () {
+                    var newValue = ctrl.$viewValue;
                     var payload = new Object();
-                    payload[attrs.field] = ctrl.$viewValue;
+                    payload[attrs.field] = newValue;
 
-                    $http({ method: 'PATCH', url: attrs.autosave, data: payload })
-                        .success(function(result) {
-                            notify.addSuccessMessage("Feltet er opdateret.");
-                        })
-                        .error(function(result) {
-                            notify.addErrorMessage("Fejl! Feltet kunne ikke ændres!");
-                        });
+                    if (newValue != oldValue) {
+                        $http({ method: 'PATCH', url: attrs.autosave, data: payload })
+                            .success(function(result) {
+                                notify.addSuccessMessage("Feltet er opdateret.");
+                            })
+                            .error(function(result) {
+                                notify.addErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                            });
+                    }
                 });
             }
         };
