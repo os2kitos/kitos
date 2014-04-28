@@ -674,6 +674,7 @@ namespace Infrastructure.DataAccess.Migrations
                     User = simon,
                     Version = "7.0",
                     Name = "TM Sund",
+                    SystemId = "TMSUND1",
                     Description = "TM Sund er en ...",
                     Url = "http://kitos.dk",
                     Parent = null
@@ -689,6 +690,7 @@ namespace Infrastructure.DataAccess.Migrations
                     User = roskildeUser1,
                     Version = "0.1",
                     Name = "Vækstkurver",
+                    SystemId = "VÆKST",
                     Description = "Snitflade for ...",
                     Url = "http://kitos.dk",
                     Parent = null,

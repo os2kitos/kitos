@@ -16,6 +16,7 @@ namespace Core.DomainModel.ItSystem
         public int Id { get; set; }
         public string Version { get; set; }
         public string Name { get; set; }
+        public string SystemId { get; set; }
 
         public int? ExposedById { get; set; }
 

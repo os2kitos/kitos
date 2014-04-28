@@ -5,7 +5,7 @@
         public int Id { get; set; }
         public bool IsStatusActive { get; set; }
         public string Note { get; set; }
-        public string SystemId { get; set; }
+        public string LocalSystemId { get; set; }
 
         public string EsdhRef { get; set; }
         public string CmdbRef { get; set; }

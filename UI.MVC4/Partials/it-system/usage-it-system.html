@@ -35,7 +35,7 @@
     <select id="status" data-ng-options="o.id as o.name for o in status" data-ng-model="usage.isStatusActive" data-field="isStatusActive" data-autosave="api/itsystemusage/{{usageId}}"></select>
     
     <label for="sysId">Lokal SystemID</label>
-    <input id="sysId" type="text" data-ng-model="usage.systemId" data-field="systemId" data-autosave="api/itsystemusage/{{usageId}}" />
+    <input id="sysId" type="text" data-ng-model="usage.localSystemId" data-field="localSystemId" data-autosave="api/itsystemusage/{{usageId}}" />
     
     <label for="responsible">Systemansvarlig</label>
     <select id="responsible" data-ng-options="o.id as o.name for o in orgUnits" data-ng-model="usage.responsibleOrgUnitId" data-field="responsibleOrgUnitId" data-autosave="api/itsystemusage/{{usageId}}"></select>
