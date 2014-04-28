@@ -235,9 +235,9 @@
                 }
                 
                 function loadUsage(system) {
-                    return $http.get("api/itsystemusage?systemId=" + systemId + "&organizationId=" + $rootScope.user.currentOrganizationId)
+                    return $http.get(system.usageUrl)
                         .success(function(result) {
-                            system.isSelected = true;
+                            system.selected = true;
                         });
                 }
                 
@@ -245,13 +245,22 @@
                     return $http.post("api/itsystemusage", {
                         systemId: system.id,
                         organizationId: $rootScope.user.currentOrganizationId
+                    }).success(function(result) {
+                        notify.addSuccessMessage("Systemet er tilknyttet");
+                        system.selected = true;
+                    }).error(function(result) {
+                        notify.addSuccessMessage("Systemet kunne ikke tilknyttes!");
                     });
                 }
                 
                 function deleteUsage(system) {
-                    var sysId = system.id,
-                        orgId = $rootScope.user.currentOrganizationId;
-                    return $http.delete("api/itsystemusage?" +)
+                    
+                    return $http.delete(system.usageUrl).success(function (result) {
+                            notify.addSuccessMessage("Systemet er fjernet");
+                            system.selected = false;
+                    }).error(function (result) {
+                        notify.addSuccessMessage("Systemet kunne ikke fjernes!");
+                    });
                 }
                 
                 $scope.systems = [];
@@ -261,10 +270,21 @@
                     system.businessType = _.findWhere(businessTypes, { id: system.businessTypeId });
 
                     system.belongsTo = _.findWhere(organizations, { id: system.belongsToId });
+                    
+                    system.usageUrl = "api/itsystemusage?systemId=" + system.id + "&organizationId=" + $rootScope.user.currentOrganizationId;
 
                     loadUser(system);
                     loadOrganization(system);
                     loadTaskRef(system);
+                    loadUsage(system);
+
+                    system.toggle = function() {
+                        if (system.selected) {
+                            return deleteUsage(system);
+                        } else {
+                            return addUsage(system);
+                        }
+                    };
 
                     $scope.systems.push(system);
                 });

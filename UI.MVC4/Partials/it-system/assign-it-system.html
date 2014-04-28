@@ -44,7 +44,7 @@
     <tbody>
         <tr data-ng-repeat="system in systems">
             <td>
-                <input type="checkbox" data-ng-model="system.isSelected"/>
+                <input type="checkbox" data-ng-model="system.selected" data-ng-change="system.toggle"/>
             </td>
             <td>
                 {{system.name}}
