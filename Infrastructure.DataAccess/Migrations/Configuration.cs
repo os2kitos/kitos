@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
@@ -714,10 +715,54 @@ namespace Infrastructure.DataAccess.Migrations
                     Note = "note...",
                     ItSystem = system1,
                     IsStatusActive = true,
-                    Organization = roskilde,
+                    Organization = roskilde
                 };
 
             context.ItSystemUsages.AddOrUpdate(x => x.Note, systemUsage1); // TODO probably not the best identifier
+
+            #endregion
+
+            #region IT System roles
+
+            var systemRole1 = new ItSystemRole()
+                {
+                    HasReadAccess = true,
+                    HasWriteAccess = true,
+                    IsActive = true,
+                    Name = "Systemrolle 1"
+                };
+
+            var systemRole2 = new ItSystemRole()
+                {
+                    HasReadAccess = true,
+                    HasWriteAccess = false,
+                    IsActive = true,
+                    Name = "Systemrolle 2"
+                };
+
+            context.ItSystemRoles.AddOrUpdate(x => x.Name, systemRole1, systemRole2);
+            context.SaveChanges();
+
+            #endregion
+
+            #region IT system rights
+
+            var sysRight1 = new ItSystemRight()
+                {
+                    Object = systemUsage1,
+                    Role = systemRole1,
+                    User = roskildeUser1
+                };
+
+            var sysRight2 = new ItSystemRight()
+                {
+                    Object = systemUsage1,
+                    Role = systemRole2,
+                    User = roskildeUser2
+                };
+
+            context.ItSystemRights.AddOrUpdate(x => x.UserId, sysRight1, sysRight2);
+            context.SaveChanges();
 
             #endregion
 
