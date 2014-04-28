@@ -23,5 +23,7 @@
         
         public int ItSystemId { get; set; }
         public ItSystemDTO ItSystem { get; set; }
+
+        public int? OverviewItSystemId { get; set; }
     }
 }

@@ -10,6 +10,7 @@ namespace UI.MVC4.Models
         public int? ExposedById { get; set; }
         public IEnumerable<int> CanUseInterfaceIds { get; set; } 
         public int BelongsToId { get; set; }
+        public string BelongsToName { get; set; }
         public int OrganizationId { get; set; }
         public string Version { get; set; }
         public string Name { get; set; }

@@ -37,6 +37,11 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.SensitiveDataType)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.SensitiveDataTypeId);
+
+            this.HasOptional(t => t.OverviewItSystem)
+                .WithMany(t => t.Overviews)
+                .HasForeignKey(d => d.OverviewItSystemId)
+                .WillCascadeOnDelete(false);
         }
     }
 }

@@ -119,5 +119,7 @@ namespace Core.DomainModel.ItSystem
         public virtual ICollection<Wish> Wishes { get; set; }
 
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
+
+        public virtual ICollection<ItSystemUsage> Overviews { get; set; }
     }
 }

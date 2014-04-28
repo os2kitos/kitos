@@ -18,10 +18,10 @@
     <span disabled data-ng-model="usage.itSystem.accessModifier" data-select-access-modifier=""></span>
     
     <label>Tilhører</label>
-    <span>{{ system.systemBelongsTo }}</span> <!-- TODO -->
+    <span>{{ usage.itSystem.belongsToName }}</span>
        
     <label>Overordnet system</label>
-    <span>{{ system.systemParent }}</span>
+    <span>{{ parentSystem.name }}</span>
     
     <label>Beskrivelse</label>
     <span>{{ usage.itSystem.description }}</span>
@@ -32,16 +32,13 @@
 
 <div class="row">
     <label for="status">Status</label>
-    <select id="status" data-ng-model="systemUsage.isContractActive">
-        <option value="true">Aktiv</option>
-        <option value="false">Inaktiv</option>
-    </select>
+    <select id="status" data-ng-options="o.id as o.name for o in status" data-ng-model="usage.isStatusActive" data-field="isStatusActive" data-autosave="api/itsystemusage/{{usageId}}"></select>
     
     <label for="sysId">Lokal SystemID</label>
-    <input id="sysId" type="text" data-ng-model="systemUsage.systemId" />
+    <input id="sysId" type="text" data-ng-model="usage.systemId" data-field="systemId" data-autosave="api/itsystemusage/{{usageId}}" />
     
-    <label>Systemansvarlig</label>
-    <select data-ng-model="systemUsage.responsibleOrgUnit"></select>
+    <label for="responsible">Systemansvarlig</label>
+    <select id="responsible" data-ng-options="o.id as o.name for o in orgUnits" data-ng-model="usage.responsibleOrgUnitId" data-field="responsibleOrgUnitId" data-autosave="api/itsystemusage/{{usageId}}"></select>
 
     <label>Kontrakt(er)</label>
     <span>[Hentes fra kontrakter]</span>
@@ -50,29 +47,29 @@
     <span>[Hentes fra kontrakter]</span>
     
     <label for="sensitive">Personfølsomme data</label>
-    <select id="sensitive"></select>
+    <select id="sensitive" data-ng-options="a.id as a.name for a in sensitiveDataTypes" data-ng-model="usage.sensitiveDataTypeId" data-field="sensitiveDataTypeId" data-autosave="api/itsystemusage/{{usageId}}"></select>
 
     <label>Hosting</label>
     <span>[Hentes fra kontrakter]</span>
     
     <label for="archive">Arkivering</label>
-    <select id="archive"></select>
+    <select id="archive" data-ng-options="a.id as a.name for a in archiveTypes" data-ng-model="usage.archiveTypeId" data-field="archiveTypeId" data-autosave="api/itsystemusage/{{usageId}}"></select>
 
     <label for="esdh">ESDH Ref.</label>
-    <input id="esdh" type="text" data-ng-model="systemUsage.esdhRef" />
+    <input id="esdh" type="text" data-ng-model="usage.esdhRef" data-field="esdhRef" data-autosave="api/itsystemusage/{{usageId}}" />
     
     <label for="cmdb">CMDB Ref.</label>
-    <input id="cmdb" type="text" data-ng-model="systemUsage.cmdbRef" />
+    <input id="cmdb" type="text" data-ng-model="usage.cmdbRef" data-field="cmdbRef" data-autosave="api/itsystemusage/{{usageId}}" />
     
     <label for="url">Mappe/URL Ref.</label>
-    <input id="url" type="text" data-ng-model="systemUsage.urlRef" />
+    <input id="url" type="text" data-ng-model="usage.directoryOrUrlRef" data-field="directoryOrUrlRef" data-autosave="api/itsystemusage/{{usageId}}" />
     
     <label for="adidm">AD/IDM Ref.</label>
-    <input id="adidm" type="text" data-ng-model="systemUsage.AdRef" />
+    <input id="adidm" type="text" data-ng-model="usage.adOrIdmRef" data-field="adOrIdmRef" data-autosave="api/itsystemusage/{{usageId}}" />
     
     <label for="note">Note</label>
-    <input id="note" type="text" data-ng-model="systemUsage.note" />
+    <input id="note" type="text" data-ng-model="usage.note" data-field="note" data-autosave="api/itsystemusage/{{usageId}}" />
     
     <label for="overview">Overblik</label>
-    <input id="overview" data-ng-model="systemUsage.overview" />
+    <select id="overview" data-ng-options="a.id as a.name for a in itSystems" data-ng-model="usage.overviewSystemId" data-field="overviewSystemId" data-autosave="api/itsystemusage/{{usageId}}"></select>
 </div>

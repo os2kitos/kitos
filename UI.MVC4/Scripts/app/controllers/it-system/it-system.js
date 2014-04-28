@@ -58,6 +58,30 @@
                                 return result.data.response;
                             });
                     }],
+                    archiveTypes: ['$http', function ($http) {
+                        return $http.get("api/archivetype")
+                            .then(function (result) {
+                                return result.data.response;
+                            });
+                    }],
+                    sensitiveDataTypes: ['$http', function ($http) {
+                        return $http.get("api/sensitivedatatype")
+                            .then(function (result) {
+                                return result.data.response;
+                            });
+                    }],
+                    orgUnits: ['$http', '$rootScope', function ($http, $rootScope) {
+                        return $http.get("api/organizationunit/?userid=" + $rootScope.user.id)
+                            .then(function (result) {
+                                return result.data.response;
+                            });
+                    }],
+                    itSystems: ['$http', function ($http) {
+                        return $http.get("api/itsystem/")
+                            .then(function (result) {
+                                return result.data.response;
+                            });
+                    }],
                     itSystemUsage: ['$http', '$stateParams', function ($http, $stateParams) {
                         return $http.get('api/itsystemusage/' + $stateParams.id)
                             .then(function(result) {
@@ -208,12 +232,26 @@
                 };
             }]);
 
-    app.controller('system.EditUsage', ['$rootScope', '$scope', '$http', 'notify', 'itSystemUsage', 'appTypes', 'businessTypes', function ($rootScope, $scope, $http, notify, itSystemUsage, appTypes, businessTypes) {
-        $rootScope.page.title = 'Opret IT system';
-        $rootScope.page.subnav = subnav;
+    app.controller('system.EditUsage', ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'itSystemUsage', 'appTypes', 'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'orgUnits', 'itSystems',
+        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, appTypes, businessTypes, archiveTypes, sensitiveDataTypes, orgUnits, itSystems) {
+            $rootScope.page.title = 'Opret IT system';
+            $rootScope.page.subnav = subnav;
 
-        $scope.appTypes = appTypes;
-        $scope.businessTypes = businessTypes;
-        $scope.usage = itSystemUsage;
-    }]);
+            $scope.usageId = $stateParams.id;
+            $scope.status = [{ id: true, name: 'Aktiv' }, { id: false, name: 'Inaktiv' }];
+            $scope.appTypes = appTypes;
+            $scope.businessTypes = businessTypes;
+            $scope.archiveTypes = archiveTypes;
+            $scope.sensitiveDataTypes = sensitiveDataTypes;
+            $scope.orgUnits = orgUnits;
+            $scope.itSystems = itSystems;
+            $scope.usage = itSystemUsage;
+
+            if (itSystemUsage.itSystem.parentId) {
+                $scope.parentSystem = $http.get('api/itsystem/' + itSystemUsage.itSystem.parentId).then(function(result) {
+                    return result.data.response;
+                });
+            }
+        }
+    ]);
 })(angular, app);

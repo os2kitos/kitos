@@ -29,6 +29,9 @@ namespace Core.DomainModel.ItSystem
         public int? SensitiveDataTypeId { get; set; }
         public virtual SensitiveDataType SensitiveDataType { get; set; }
 
+        public int? OverviewItSystemId { get; set; }
+        public virtual ItSystem OverviewItSystem { get; set; }
+
         public virtual ICollection<ItContract.ItContract> Contracts { get; set; }
         public virtual ICollection<ItSystemRole> SystemRoles { get; set; }
         public virtual ICollection<Wish> Wishes { get; set; }
