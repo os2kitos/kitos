@@ -1,4 +1,6 @@
-﻿namespace UI.MVC4.Models
+﻿using System.Collections.Generic;
+
+namespace UI.MVC4.Models
 {
     public class ItSystemUsageDTO
     {
@@ -25,5 +27,7 @@
         public ItSystemDTO ItSystem { get; set; }
 
         public int? OverviewItSystemId { get; set; }
+
+        public IEnumerable<RightOutputDTO> Rights { get; set; }
     }
 }

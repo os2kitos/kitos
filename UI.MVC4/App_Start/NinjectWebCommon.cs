@@ -105,6 +105,8 @@ namespace UI.MVC4.App_Start
 
             kernel.Bind<IGenericRepository<OrganizationRight>>().To<GenericRepository<OrganizationRight>>().InRequestScope();
 
+            kernel.Bind<IGenericRepository<ItSystemRight>>().To<GenericRepository<ItSystemRight>>().InRequestScope();
+
             kernel.Bind<IGenericRepository<AdminRight>>().To<GenericRepository<AdminRight>>().InRequestScope();
             kernel.Bind<IGenericRepository<AdminRole>>().To<GenericRepository<AdminRole>>().InRequestScope();
 

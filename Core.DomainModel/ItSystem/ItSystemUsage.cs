@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ItSystemUsage : IEntity<int>
+    public class ItSystemUsage : IEntity<int>, IHasRights<ItSystemRight>
     {
         public int Id { get; set; }
         public bool IsStatusActive { get; set; }
@@ -33,9 +33,10 @@ namespace Core.DomainModel.ItSystem
         public virtual ItSystem OverviewItSystem { get; set; }
 
         public virtual ICollection<ItContract.ItContract> Contracts { get; set; }
-        public virtual ICollection<ItSystemRole> SystemRoles { get; set; }
         public virtual ICollection<Wish> Wishes { get; set; }
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
+
+        public virtual ICollection<ItSystemRight> Rights { get; set; }
     }
 }
