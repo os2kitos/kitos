@@ -6,15 +6,27 @@
             <th>OrgEnhed</th>
             <th>Ændringsønske</th>
             <th>Public</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
         <tr data-ng-repeat="wish in wishes">
-            <td>{{ wish.user.name }}</td>
-            <td>{{ wish.user.email }}</td>
-            <td>{{ wish.user.defaultOrganizationUnitName }}</td>
-            <td>{{ wish.text }}</td>
-            <td>{{ wish.isPublic }}</td>
+            <td data-ng-bind="wish.user.name"></td>
+            <td data-ng-bind="wish.user.email"></td>
+            <td data-ng-bind="wish.user.defaultOrganizationUnitName"></td>
+            <td data-ng-bind="wish.text"></td>
+            <td><input type="checkbox" disabled data-ng-model="wish.isPublic"/></td>
+            <td></td>
         </tr>
     </tbody>
+    <tfoot>
+        <tr>
+            <td data-ng-bind="user.name"></td>
+            <td data-ng-bind="user.email"></td>
+            <td data-ng-bind="user.defaultOrganizationUnit"></td>
+            <td><textarea data-ng-model="text"></textarea></td>
+            <td><input type="checkbox" data-ng-model="isPublic"/></td>
+            <td><button data-ng-click="save()">Gem</button></td>
+        </tr>
+    </tfoot>
 </table>

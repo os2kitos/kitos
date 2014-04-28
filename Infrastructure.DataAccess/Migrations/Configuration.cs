@@ -732,7 +732,7 @@ namespace Infrastructure.DataAccess.Migrations
                 };
             var wish2 = new Wish()
             {
-                IsPublic = true,
+                IsPublic = false,
                 Text = "Ikke public test ønske",
                 User = globalUser,
                 ItSystemUsage = systemUsage1

@@ -15,7 +15,35 @@
         });
     }]);
 
-    app.controller('system.EditWishes', ['$scope', 'wishes', function ($scope, wishes) {
+    app.controller('system.EditWishes', ['$rootScope', '$scope', '$http', '$state', '$stateParams', 'notify', 'wishes', function ($rootScope, $scope, $http, $state, $stateParams, notify, wishes) {
+        $scope.user = $rootScope.user;
         $scope.wishes = wishes;
+
+        function clear() {
+            $scope.text = '';
+            $scope.isPublic = false;
+        }
+
+        $scope.save = function () {
+            var payload = {
+                text: $scope.text,
+                isPublic: $scope.isPublic,
+                userId: $rootScope.user.id,
+                itSystemUsageId: $stateParams.id
+            };
+
+            var msg = notify.addInfoMessage("Gemmer... ");
+            $http.post('api/wish', payload).success(function() {
+                msg.toSuccessMessage("Ønsket er gemt!");
+                clear();
+                $state.transitionTo($state.current, $stateParams, {
+                    reload: true,
+                    inherit: false,
+                    notify: true
+                });
+            }).error(function() {
+                msg.toErrorMessage("Fejl! Ønsket kunne ikke gemmes!");
+            });
+        };
     }]);
 })(angular, app);

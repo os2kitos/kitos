@@ -166,7 +166,9 @@ namespace UI.MVC4.App_Start
                   .ReverseMap();
 
             Mapper.CreateMap<Wish, WishDTO>()
-                  .ReverseMap();
+                  .ReverseMap()
+                  .ForMember(dest => dest.User, opt => opt.Ignore())
+                  .ForMember(dest => dest.ItSystemUsage, opt => opt.Ignore());
 
             Mapper.CreateMap<Organization, OrganizationDTO>().ReverseMap();
             Mapper.CreateMap<OrganizationUnit, OrgUnitDTO>().ReverseMap();
