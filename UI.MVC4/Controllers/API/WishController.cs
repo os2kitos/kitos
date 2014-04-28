@@ -15,7 +15,7 @@ namespace UI.MVC4.Controllers.API
 
         public HttpResponseMessage GetWishes([FromUri] int userId, [FromUri] int usageId)
         {          
-            var wishes = Repository.Get(x => x.UserId == userId && x.ItSystemUsageId == usageId);
+            var wishes = Repository.Get(x => x.ItSystemUsageId == usageId && (x.IsPublic || x.UserId == userId));
             return Ok(Map(wishes));
         }
     }
