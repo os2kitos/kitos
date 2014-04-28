@@ -18,10 +18,13 @@ namespace Core.DomainModel.ItSystem
         public string Name { get; set; }
         public string SystemId { get; set; }
 
-        public int? ParentId { get; set; }
         public int? ExposedById { get; set; }
 
         public int BelongsToId { get; set; }
+        /// <summary>
+        /// The organization the system belongs to (OIO term - think "produced by")
+        /// </summary>
+        public virtual Organization BelongsTo { get; set; }
 
         public int OrganizationId { get; set; }
         public int UserId { get; set; }
@@ -32,25 +35,46 @@ namespace Core.DomainModel.ItSystem
         public string Description { get; set; }
         public string Url { get; set; }
 
-        /* if this system is an interface, which system exposed it */
+        /// <summary>
+        /// If this system is an interface, which system exposed it
+        /// </summary>
         public virtual ItSystem ExposedBy { get; set; }
-        /* which interfaces does this system expose */
+        
+        /// <summary>
+        /// Which interfaces does this system expose
+        /// </summary>
         public virtual ICollection<ItSystem> ExposedInterfaces { get; set; }
 
-        /* if this system is an interface, which system can use it? */
+        /// <summary>
+        /// If this system is an interface, which system can use it?
+        /// </summary>
         public virtual ICollection<ItSystem> CanBeUsedBy { get; set; }
-        /* which interfaces can this system use */
+        
+        /// <summary>
+        /// Which interfaces can this system use
+        /// </summary>
         public virtual ICollection<ItSystem> CanUseInterfaces { get; set; }
 
-        /* sub systems*/
+        /// <summary>
+        /// Sub system
+        /// </summary>
         public virtual ICollection<ItSystem> Children { get; set; }
-        /* super systems */
+        
+        public int? ParentId { get; set; }
+        /// <summary>
+        /// Super systems
+        /// </summary>
         public virtual ItSystem Parent { get; set; }
 
-        public virtual Organization BelongsTo { get; set; } //the organization the system belongs to (OIO term - think "produced by")
-
-        public virtual Organization Organization { get; set; } //which organization the it system was created under
-        public virtual User User { get; set; } //created by
+        /// <summary>
+        /// which organization the it system was created under
+        /// </summary>
+        public virtual Organization Organization { get; set; }
+        
+        /// <summary>
+        /// Created by
+        /// </summary>
+        public virtual User User { get; set; }
 
         public virtual ICollection<ItSystemRight> Rights { get; set; }
 
@@ -61,14 +85,6 @@ namespace Core.DomainModel.ItSystem
         /// The usages.
         /// </value>
         public virtual ICollection<ItSystemUsage> Usages { get; set; }
-
-        /// <summary>
-        /// an usage can specify an alternative parent system
-        /// </summary>
-        /// <value>
-        /// The local parent usages.
-        /// </value>
-        public virtual ICollection<ItSystemUsage> LocalParentUsages { get; set; }
 
         public int AppTypeId { get; set; }
         public virtual AppType AppType { get; set; }
@@ -96,5 +112,7 @@ namespace Core.DomainModel.ItSystem
         public virtual ICollection<Wish> Wishes { get; set; }
 
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
+
+        public virtual ICollection<ItSystemUsage> Overviews { get; set; }
     }
 }

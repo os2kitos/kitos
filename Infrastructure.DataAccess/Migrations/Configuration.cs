@@ -208,6 +208,30 @@ namespace Infrastructure.DataAccess.Migrations
                     }
                 );
 
+            var archiveTypeYes = new ArchiveType()
+                {
+                    IsActive = true,
+                    Name = "Arkiveret",
+                };
+            var archiveTypeNo = new ArchiveType()
+                {
+                    IsActive = true,
+                    Name = "Ikke arkiveret",
+                };
+            context.ArchiveTypes.AddOrUpdate(x => x.Name, archiveTypeYes, archiveTypeNo);
+
+            var sensitiveDataYes = new SensitiveDataType()
+                {
+                    IsActive = true,
+                    Name = "Ja"
+                };
+            var sensitiveDataNo = new SensitiveDataType()
+            {
+                IsActive = true,
+                Name = "Nej"
+            };
+            context.SensitiveDataTypes.AddOrUpdate(x => x.Name, sensitiveDataYes, sensitiveDataNo);
+
             #endregion
 
             #region Organizations
@@ -677,6 +701,25 @@ namespace Infrastructure.DataAccess.Migrations
 
             #endregion
 
+            #region IT System Usage
+
+            var systemUsage1 = new ItSystemUsage()
+                {
+                    ArchiveType = archiveTypeNo,
+                    SensitiveDataType = sensitiveDataNo,
+                    AdOrIdmRef = "ad",
+                    CmdbRef = "cmdb",
+                    EsdhRef = "esdh",
+                    DirectoryOrUrlRef = "x:/foo/bar",
+                    Note = "note...",
+                    ItSystem = system1,
+                    IsStatusActive = true,
+                    Organization = roskilde,
+                };
+
+            context.ItSystemUsages.AddOrUpdate(x => x.Note, systemUsage1); // TODO probably not the best identifier
+
+            #endregion
 
 
             context.ProjectPhaseLocales.AddOrUpdate(x => new { x.MunicipalityId, x.OriginalId },

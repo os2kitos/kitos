@@ -220,6 +220,7 @@
     <Compile Include="Controllers\API\AdminRightController.cs" />
     <Compile Include="Controllers\API\AdminRoleController.cs" />
     <Compile Include="Controllers\API\AgreementElementController.cs" />
+    <Compile Include="Controllers\API\ArchiveTypeController.cs" />
     <Compile Include="Controllers\API\AuthorizeController.cs" />
     <Compile Include="Controllers\API\BaseApiController.cs" />
     <Compile Include="Controllers\API\BusinessTypeController.cs" />
@@ -229,6 +230,7 @@
     <Compile Include="Controllers\API\InterfaceController.cs" />
     <Compile Include="Controllers\API\ItSystemController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageController.cs" />
+    <Compile Include="Controllers\API\SensitiveDataTypeController.cs" />
     <Compile Include="Controllers\API\TsaController.cs" />
     <Compile Include="Models\DataRowDTO.cs" />
     <Compile Include="Models\ItSystemDTO.cs" />
@@ -401,6 +403,7 @@
     <Content Include="Partials\it-system\assign-it-system.html" />
     <Content Include="Partials\it-system\edit-it-system.html" />
     <Content Include="Partials\it-system\overview-it-system.html" />
+    <Content Include="Partials\it-system\usage-it-system.html" />
     <Content Include="Partials\local-config\config.html" />
     <Content Include="Partials\local-config\suggest-new-role.html" />
     <Content Include="Partials\local-config\index.html" />

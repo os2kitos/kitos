@@ -306,4 +306,26 @@
         };
     }]);
 
+    app.directive('autosave', ['$http', 'notify', function ($http, notify) {
+        'use strict';
+        return {
+            restrict: 'A',
+            require: 'ngModel',
+            link: function (scope, element, attrs, ctrl) {
+                element.bind('blur', function() {
+                    var payload = new Object();
+                    payload[attrs.field] = ctrl.$viewValue;
+
+                    $http({ method: 'PATCH', url: attrs.autosave, data: payload })
+                        .success(function(result) {
+                            notify.addSuccessMessage("Feltet er opdateret.");
+                        })
+                        .error(function(result) {
+                            notify.addErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                        });
+                });
+            }
+        };
+    }]);
+
 })(angular, app);
