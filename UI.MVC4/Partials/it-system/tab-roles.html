@@ -20,14 +20,14 @@
             </tr>
         </thead>
         <!-- for each right -->
-        <tbody data-ng-repeat="right in usage.orgRights | filter : { show: true } | orderBy : rightSort : rightSortReverse">
+        <tbody data-ng-repeat="right in rights | filter : { show: true } | orderBy : rightSort : rightSortReverse">
 
             <!-- show -->
             <tr data-ng-hide="right.edit">
                 <td>{{ right.role.name }}</td>
                 <td>{{ right.user.name }}</td>
                 <td>{{ right.user.email }}
-                    <div data-ng-show="chosenOrgUnit.hasWriteAccess && chosenOrgUnit.editRights" class="pull-right">
+                    <div data-ng-show="editRights" class="pull-right">
                         <a data-ng-click="right.edit = true" class="btn btn-info btn-xs">
                             <i class="glyphicon glyphicon-pencil"></i>
                         </a>
@@ -43,8 +43,8 @@
             <!-- edit -->
             <tr data-ng-show="right.edit">
                 <td>
-                    <select data-ui-select2="" name="selectRole" data-ng-model="right.roleForSelect" class="form-control input-sm">
-                        <option data-ng-repeat="systemRole in systemRoles" value="{{systemRole.id}}">{{systemRole.name}} ({{systemRole.hasWriteAccess && "skriv" || "læs" }})
+                    <select data-ui-select2="" name="selectRole" data-ng-model="right.roleForSelect" class="form-control input-sm" >
+                        <option data-ng-repeat="systemRole in itSystemRoles" value="{{systemRole.id}}">{{systemRole.name}} ({{systemRole.hasWriteAccess && "skriv" || "læs" }})
                         </option>
                     </select>
                 </td>
@@ -62,7 +62,8 @@
             <tr>
                 <td>
                     <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en systemrolle" class="form-control input-sm" data-ng-change="submitRight()">
-                        <option data-ng-repeat="systemRole in systemRoles" value="{{systemRole.id}}">{{systemRole.name}} ({{systemRole.hasWriteAccess && "skriv" || "læs" }})
+                        <option value=""></option>
+                        <option data-ng-repeat="systemRole in itSystemRoles" value="{{systemRole.id}}">{{systemRole.name}} ({{systemRole.hasWriteAccess && "skriv" || "læs" }})
                         </option>
                     </select>
                 </td>

@@ -229,6 +229,7 @@
     <Compile Include="Controllers\API\DataTypeController.cs" />
     <Compile Include="Controllers\API\InterfaceController.cs" />
     <Compile Include="Controllers\API\ItSystemController.cs" />
+    <Compile Include="Controllers\API\ItSystemRightController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageController.cs" />
     <Compile Include="Controllers\API\SensitiveDataTypeController.cs" />
     <Compile Include="Controllers\API\TsaController.cs" />

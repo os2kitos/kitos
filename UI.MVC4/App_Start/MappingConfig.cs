@@ -189,6 +189,9 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<AdminRight, RightOutputDTO>();
             Mapper.CreateMap<RightInputDTO, AdminRight>();
 
+            Mapper.CreateMap<ItSystemRight, RightOutputDTO>();
+            Mapper.CreateMap<RightInputDTO, ItSystemRight>();
+
             Mapper.CreateMap<DataRow, DataRowDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.DataType, opt => opt.Ignore());
