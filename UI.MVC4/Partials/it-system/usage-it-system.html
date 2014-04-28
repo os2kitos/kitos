@@ -1,5 +1,5 @@
 ﻿<form class="form-horizontal fix-label-padding">
-    <div class="row">
+<div class="row">
         <div class="col-md-6">
             <div class="row">
                 <div class="col-md-6">
@@ -10,7 +10,7 @@
                             <input type="text" id="system-name" data-ng-model="usage.itSystem.name" class="form-control input-sm" disabled="disabled" />
                         </div>
                     </div>
-
+    
                     <!--ID-->
                     <div class="form-group">
                         <label for="system-id" class="control-label col-md-5 small">System ID</label>
@@ -18,7 +18,7 @@
                             <input type="text" id="system-id" data-ng-model="usage.itSystem.systemId" class="form-control input-sm" disabled="disabled" />
                         </div>
                     </div>
-
+    
                     <!--Parent system-->
                     <div class="form-group">
                         <label for="system-parent" class="control-label col-md-5 small">Overordnet system</label>
@@ -26,7 +26,7 @@
                             <input type="text" id="system-parent" data-ng-model="parentSystem.name" class="form-control input-sm" disabled="disabled">
                         </div>
                     </div>
-
+    
                     <!--Belongs to-->
                     <div class="form-group">
                         <label for="system-belongs-to" class="control-label col-md-5 small">Tilhører</label>
@@ -51,7 +51,7 @@
                             <span id="system-access" data-ng-model="usage.itSystem.accessModifier" class="form-control input-sm" data-select-access-modifier="" disabled="disabled" />
                         </div>
                     </div>
-
+    
                     <!--Application type -->
                     <div class="form-group">
                         <label for="system-app-type" class="control-label col-md-5 small">Applikationstype</label>
@@ -61,7 +61,7 @@
                             </select>
                         </div>
                     </div>
-
+    
                     <!--Usage type-->
                     <div class="form-group">
                         <label for="system-business-type" class="control-label col-md-5 small">Forretningstype</label>
@@ -98,7 +98,7 @@
                         </select>
                     </div>
                 </div>
-
+       
                 <!-- local sys id -->
                 <div class="form-group">
                     <label for="sysId" class="col-md-4 control-label small">Lokal SystemID</label>
@@ -106,7 +106,7 @@
                         <input id="sysId" type="text" class="form-control input-sm" data-ng-model="usage.localSystemId" data-field="localSystemId" data-autosave="api/itsystemusage/{{usageId}}" />
                     </div>
                 </div>
-                
+    
                 <!-- provider -->
                 <div class="form-group">
                     <label for="provider" class="col-md-4 control-label small">Leverandør</label>
@@ -114,7 +114,7 @@
                         <input type="text" id="provider" class="form-control input-sm" value="[Hentes fra kontrakt]" disabled="disabled"/>
                     </div>
                 </div>
-                
+    
                 <!-- sensitive data -->
                 <div class="form-group">
                     <label for="sensitive" class="col-md-4 control-label small">Personfølsom data</label>
@@ -124,8 +124,8 @@
                                 data-autosave="api/itsystemusage/{{usageId}}" class="form-control input-sm">
                         </select>
                     </div>
-                </div>
-                
+</div>
+
                 <!-- esdh ref --> 
                 <div class="form-group">
                     <label for="esdh" class="col-md-4 control-label small">ESDH ref.</label>
@@ -134,7 +134,7 @@
                                class="form-control input-sm" />
                     </div>
                 </div>
-                
+
                 <!-- link ref -->
                 <div class="form-group">
                     <label for="url" class="col-md-4 control-label small">Mappe/URL ref.</label>
@@ -143,7 +143,7 @@
                                class="form-control input-sm"/>
                     </div>
                 </div>
-                
+    
                 <!-- overview system -->
                 <div class="form-group">
                     <label for="overview" class="col-md-4 control-label small">Overblik</label>
@@ -166,7 +166,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <!-- contract -->
                 <div class="form-group">
                     <label for="contract" class="col-md-4 control-label small">Kontrakt</label>
@@ -174,7 +174,7 @@
                         <input type="text" id="contract" class="form-control input-sm" value="[Internt link]" disabled="disabled"/>
                     </div>
                 </div>
-                
+    
                 <!-- hosting -->
                 <div class="form-group">
                     <label for="hosting" class="col-md-4 control-label small">Hosting</label>
@@ -182,7 +182,7 @@
                         <input type="text" id="hosting" class="form-control input-sm" value="[Hentes fra kontrakt]" disabled="disabled"/>
                     </div>
                 </div>
-
+    
                 <!-- hosting -->
                 <div class="form-group">
                     <label for="archive" class="col-md-4 control-label small">Arkivering</label>
@@ -191,7 +191,7 @@
                                 class="form-control input-sm"></select>
                     </div>
                 </div>
-
+    
                 <!-- CMDB ref -->
                 <div class="form-group">
                     <label for="cmdb" class="col-md-4 control-label small">CMDB ref.</label>
@@ -200,7 +200,7 @@
                                class="form-control input-sm" />
                     </div>
                 </div>
-
+    
                 <!-- ad/idm ref -->
                 <div class="form-group">
                     <label for="adidm" class="col-md-4 control-label small">AD/IDM ref</label>
@@ -209,7 +209,7 @@
                                class="form-control input-sm" />
                     </div>
                 </div>
-
+    
                 <!-- note -->
                 <div class="form-group">
                     <label for="note" class="col-md-4 control-label small">Note</label>
@@ -219,5 +219,12 @@
                 </div>
             </div>
         </div>
-    </div>
+</div>
 </form>
+
+<ul class="nav nav-tabs">
+  <li data-ui-sref-active="active"><a data-ui-sref="it-system-usage.roles">IT System roller</a></li>
+  <li data-ui-sref-active="active"><a data-ui-sref="it-system-usage.wishes">Ændringsønske</a></li>
+</ul>
+
+<div ui-view></div>
