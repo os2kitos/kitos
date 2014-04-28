@@ -89,6 +89,7 @@
                 var businessTypes = businessTypesHttp.data.response;
                 var organizations = organizationsHttp.data.response;
 
+                $scope.showSystemId = 'global';
                 $scope.showType = 'appType';
 
                 $scope.systemUsages = {};
@@ -106,6 +107,8 @@
                     });
                     
                     function loadOverviewSystem(usage) {
+                        if (!usage.overviewItSystem) return null;
+
                         return $http.get("api/itsystem/" + usage.overviewItSystemId).success(function (result) {
                             usage.overviewItSystem = result.response;
                         });
