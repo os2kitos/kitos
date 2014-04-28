@@ -20,8 +20,6 @@ namespace UI.MVC4.Models
 
         public int? ResponsibleUnitId { get; set; }
         public virtual OrgUnitDTO ResponsibleUnit { get; set; }
-        public int? ParentId { get; set; }
-        public virtual ItSystemDTO Parent { get; set; }
         public int OrganizationId { get; set; }
         public virtual OrganizationDTO Organization { get; set; }
         public int ItSystemId { get; set; }
