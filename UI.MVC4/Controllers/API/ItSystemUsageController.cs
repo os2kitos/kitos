@@ -16,5 +16,61 @@ namespace UI.MVC4.Controllers.API
             : base(repository)
         {
         }
+
+        public HttpResponseMessage GetByItSystemAndOrganization(int itSystemId, int organizationId)
+        {
+            try
+            {
+                var usage = Repository.Get(u => u.ItSystemId == itSystemId && u.OrganizationId == organizationId).FirstOrDefault();
+
+                return usage == null ? NotFound() : Ok(Map(usage));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public override HttpResponseMessage Post(ItSystemUsageDTO dto)
+        {
+            try
+            {
+                if (Repository.Get(usage => usage.ItSystemId == dto.ItSystemId 
+                    && usage.OrganizationId == dto.OrganizationId).Any())
+                    return Conflict("Usage already exist");
+
+                var item = Map(dto);
+                Repository.Insert(item);
+                Repository.Save();
+
+                return Created(item, new Uri(Request.RequestUri + "?itSystemId=" + dto.ItSystemId + "&organizationId" + dto.OrganizationId));
+
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage Delete(int itSystemId, int organizationId)
+        {
+            try
+            {
+                var usage = Repository.Get(u => u.ItSystemId == itSystemId && u.OrganizationId == organizationId).FirstOrDefault();
+
+                if (usage == null) return NotFound();
+
+                Repository.DeleteByKey(usage.Id);
+                Repository.Save();
+
+                return Ok();
+
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
     }
 }

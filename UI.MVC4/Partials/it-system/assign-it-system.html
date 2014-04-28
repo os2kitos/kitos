@@ -1,0 +1,77 @@
+﻿<table class="table full-width">
+    <thead>
+        <tr>
+            <td>
+                <!-- empty - for checkboxes -->
+            </td>
+            <td>
+                IT System
+            </td>
+            <td>
+                <select>
+                    <option value="global">
+                        Globalt SystemID
+                    </option>
+                    <option value="local">
+                        Lokalt SystemID
+                    </option>
+                </select>
+            </td>
+            <td>
+                <select data-ng-model="showType">
+                    <option value="appType">
+                        Applikationstype
+                    </option>
+                    <option value="businessType">
+                        Forretningstype
+                    </option>
+                </select>
+            </td>
+            <td>
+                KLE ID
+            </td>
+            <td>
+                KLE Navn
+            </td>
+            <td>
+                Tilhører
+            </td>
+            <td>
+                Oprettet af
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr data-ng-repeat="system in systems" >
+            <td data-ng-click="system.toggle()">
+                <input type="checkbox" data-ng-checked="system.selected"/>
+            </td>
+            <td>
+                <label data-ng-click="system.toggle()">{{system.name}}</label>
+            </td>
+            <td>
+                {{system.systemId}}
+            </td>
+            <td data-ng-switch="showType">
+                <span data-ng-switch-when="appType">{{system.appType.name}}</span>
+                <span data-ng-switch-when="businessType">{{system.businessType.name}}</span>
+            </td>
+            <td>
+                {{system.taskId}}
+            </td>
+            <td>
+                {{system.taskName}}
+            </td>
+            <td>
+                <!-- name of organization -->
+                {{system.belongsTo.name}}
+            </td>
+            <td>
+                <span data-popover-placement="right" data-popover="Oprettet i {{system.organization.name}}" data-popover-trigger="mouseenter">
+                    {{system.user.name}}
+                </span>
+            </td>
+        </tr>
+
+    </tbody>
+</table>

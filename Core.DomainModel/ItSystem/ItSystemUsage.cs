@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Core.DomainModel.ItSystem
 {
@@ -11,7 +7,7 @@ namespace Core.DomainModel.ItSystem
         public int Id { get; set; }
 
         public string Note { get; set; }
-        public string SystemId { get; set; }
+        public string LocalSystemId { get; set; }
         public bool PersonSensitiveData { get; set; }
         public bool Archive { get; set; }
         public string EsdhRef { get; set; }
@@ -21,8 +17,6 @@ namespace Core.DomainModel.ItSystem
 
         public int? ResponsibleUnitId { get; set; }
         public virtual OrganizationUnit ResponsibleUnit { get; set; }
-        public int ParentId { get; set; }
-        public virtual ItSystem Parent { get; set; }
         public int OrganizationId { get; set; }
         public virtual Organization Organization { get; set; }
         public int ItSystemId { get; set; }
