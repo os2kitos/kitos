@@ -400,6 +400,7 @@
     <Content Include="Partials\home\index.html" />
     <Content Include="Partials\it-system\assign-it-system.html" />
     <Content Include="Partials\it-system\edit-it-system.html" />
+    <Content Include="Partials\it-system\overview-it-system.html" />
     <Content Include="Partials\local-config\config.html" />
     <Content Include="Partials\local-config\suggest-new-role.html" />
     <Content Include="Partials\local-config\index.html" />

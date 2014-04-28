@@ -1,0 +1,61 @@
+﻿<table class="table full-width">
+    <thead>
+        <tr>
+            <td>IT System
+            </td>
+            <td>
+                <select>
+                    <option value="global">Globalt SystemID
+                    </option>
+                    <option value="local">Lokalt SystemID
+                    </option>
+                </select>
+            </td>
+            <td>
+                <select data-ng-model="showType">
+                    <option value="appType">Applikationstype
+                    </option>
+                    <option value="businessType">Forretningstype
+                    </option>
+                </select>
+            </td>
+            <td>Anvender
+            </td>
+            <td>Udstiller
+            </td>
+            <td>Overblik
+            </td>
+            <td>Ansv. organisationsenhed
+            </td>
+            <td>Leverandør
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr data-ng-repeat="usage in systemUsages">
+            <td>
+                <a>{{usage.itSystem.name}}</a>
+                <span data-ng-if="usage.itSystem.accessModifier == 1" class="small text-muted">(P)
+                </span>
+            </td>
+            <td>{{usage.itSystem.systemId}}
+            </td>
+            <td data-ng-switch="showType">
+                <span data-ng-switch-when="appType">{{usage.itSystem.appType.name}}</span>
+                <span data-ng-switch-when="businessType">{{usage.itSystem.businessType.name}}</span>
+            </td>
+            <td>0 
+                ({{ usage.itSystem.canUseInterfaceIds.length }})
+            </td>
+            <td>{{ usage.itSystem.exposedInterfaceIds.length }}
+            </td>
+            <td>{{ usage.overview.name }}
+            </td>
+            <td>{{ usage.responsibleUnit.name }}
+            </td>
+            <td>{{ usage.provider.name }}
+            </td>
+        </tr>
+
+    </tbody>
+</table>
