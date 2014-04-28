@@ -134,9 +134,11 @@
                         dataRows: system.dataRows,
                     };
 
-
+                    var msg = notify.addInfoMessage("Gemmer... ");
                     $http.post('api/itsystem', data, { handleBusy: true }).success(function () {
-                        console.log('success');
+                        msg.toSuccessMessage("Systemet er gemt!");
+                    }).error(function() {
+                        msg.toErrorMessage("Fejl! Systemet kunne ikke gemmes!");
                     });
                 };
 
