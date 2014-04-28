@@ -86,14 +86,6 @@ namespace Core.DomainModel.ItSystem
         /// </value>
         public virtual ICollection<ItSystemUsage> Usages { get; set; }
 
-        /// <summary>
-        /// an usage can specify an alternative parent system
-        /// </summary>
-        /// <value>
-        /// The local parent usages.
-        /// </value>
-        public virtual ICollection<ItSystemUsage> LocalParentUsages { get; set; }
-
         public int AppTypeId { get; set; }
         public virtual AppType AppType { get; set; }
 
