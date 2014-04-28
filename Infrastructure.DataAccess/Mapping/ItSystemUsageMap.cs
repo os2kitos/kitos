@@ -33,10 +33,6 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasRequired(t => t.ItSystem)
                 .WithMany(t => t.Usages);
-
-            this.HasOptional(t => t.Parent)
-                .WithMany(d => d.LocalChildren)
-                .HasForeignKey(t => t.ParentId);
         }
     }
 }
