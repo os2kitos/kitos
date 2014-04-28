@@ -17,6 +17,21 @@ namespace UI.MVC4.Controllers.API
         {
         }
 
+        public HttpResponseMessage GetByOrganization(int organizationId)
+        {
+            try
+            {
+                var usages = Repository.Get(u => u.OrganizationId == organizationId);
+                
+                return Ok(Map(usages));
+
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetByItSystemAndOrganization(int itSystemId, int organizationId)
         {
             try

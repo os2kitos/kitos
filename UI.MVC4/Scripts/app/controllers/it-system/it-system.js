@@ -1,7 +1,7 @@
 ﻿(function (ng, app) {
 
     var subnav = [
-            { state: 'index', text: 'Overblik' },
+            { state: 'overview-it-system', text: 'Overblik' },
             { state: 'assign-it-system', text: 'Tilknyt IT system' },
             { state: 'add-it-system', text: 'Opret IT system' },
             { state: 'index', text: 'Rapport' }
@@ -9,41 +9,10 @@
 
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
 
-        $stateProvider.state('add-it-system', {
-            url: '/system/add',
-            templateUrl: 'partials/it-system/edit-it-system.html',
-            controller: 'system.AddCtrl',
-            resolve: {
-                //resolve drop down datas
-                appTypes: ['$http', function ($http) {
-                    return $http.get("api/apptype");
-                }],
-                interfaceAppType: ['$http', function ($http) {
-                    return $http.get("api/apptype?interfaceAppType");
-                }],
-                businessTypes: ['$http', function ($http) {
-                    return $http.get("api/businesstype");
-                }],
-                tsas: ['$http', function ($http) {
-                    return $http.get("api/tsa");
-                }],
-                interfaces: ['$http', function ($http) {
-                    return $http.get("api/interface");
-                }],
-                interfaceTypes: ['$http', function ($http) {
-                    return $http.get("api/interfacetype");
-                }],
-                methods: ['$http', function ($http) {
-                    return $http.get("api/method");
-                }],
-                dataTypes: ['$http', function ($http) {
-                    return $http.get("api/datatype");
-                }]
-            }
-        }).state('assign-it-system', {
-            url: '/system/assign',
-            templateUrl: 'partials/it-system/assign-it-system.html',
-            controller: 'system.AssignCtrl',
+        $stateProvider.state('overview-it-system', {
+            url: '/system/overview',
+            templateUrl: 'partials/it-system/overview-it-system.html',
+            controller: 'system.OverviewCtrl',
             resolve: {
                 appTypes: ['$http', function ($http) {
                     return $http.get("api/apptype");
@@ -53,14 +22,100 @@
                 }],
                 organizations: ['$http', function ($http) {
                     return $http.get("api/organization");
+                }]
+            }
+        }).state('add-it-system', {
+            url: '/system/add',
+            templateUrl: 'partials/it-system/edit-it-system.html',
+            controller: 'system.AddCtrl',
+            resolve: {
+                //resolve drop down datas
+                appTypes: ['$http', function($http) {
+                    return $http.get("api/apptype");
                 }],
-                systems: ['$http', function ($http) {
+                interfaceAppType: ['$http', function($http) {
+                    return $http.get("api/apptype?interfaceAppType");
+                }],
+                businessTypes: ['$http', function($http) {
+                    return $http.get("api/businesstype");
+                }],
+                tsas: ['$http', function($http) {
+                    return $http.get("api/tsa");
+                }],
+                interfaces: ['$http', function($http) {
+                    return $http.get("api/interface");
+                }],
+                interfaceTypes: ['$http', function($http) {
+                    return $http.get("api/interfacetype");
+                }],
+                methods: ['$http', function($http) {
+                    return $http.get("api/method");
+                }],
+                dataTypes: ['$http', function($http) {
+                    return $http.get("api/datatype");
+                }]
+            }
+        }).state('assign-it-system', {
+            url: '/system/assign',
+            templateUrl: 'partials/it-system/assign-it-system.html',
+            controller: 'system.AssignCtrl',
+            resolve: {
+                appTypes: ['$http', function($http) {
+                    return $http.get("api/apptype");
+                }],
+                businessTypes: ['$http', function($http) {
+                    return $http.get("api/businesstype");
+                }],
+                organizations: ['$http', function($http) {
+                    return $http.get("api/organization");
+                }],
+                systems: ['$http', function($http) {
                     return $http.get("api/itsystem");
                 }]
             }
         });
 
     }]);
+
+    app.controller('system.OverviewCtrl',
+        ['$rootScope', '$scope', '$http', 'notify',
+            'appTypes', 'businessTypes', 'organizations',
+            function ($rootScope, $scope, $http, notify,
+             appTypesHttp, businessTypesHttp, organizationsHttp) {
+                $rootScope.page.title = 'IT Systemer overblik';
+                $rootScope.page.subnav = subnav;
+
+                var appTypes = appTypesHttp.data.response;
+                var businessTypes = businessTypesHttp.data.response;
+                var organizations = organizationsHttp.data.response;
+
+                $scope.showSystemId = 'global';
+                $scope.showType = 'appType';
+
+                $scope.systemUsages = {};
+
+                $http.get("api/itSystemUsage?organizationId=" + $rootScope.user.currentOrganizationId).success(function(result) {
+                    $scope.systemUsages = result.response;
+
+                    _.each(result.response, function(usage) {
+
+                        usage.itSystem.appType = _.findWhere(appTypes, { id: usage.itSystem.appTypeId });
+                        usage.itSystem.businessType = _.findWhere(businessTypes, { id: usage.itSystem.businessTypeId });
+
+                        loadOverviewSystem(usage);
+
+                    });
+                    
+                    function loadOverviewSystem(usage) {
+                        if (!usage.overviewItSystem) return null;
+
+                        return $http.get("api/itsystem/" + usage.overviewItSystemId).success(function (result) {
+                            usage.overviewItSystem = result.response;
+                        });
+                    }
+
+                });
+            }]);
 
     app.controller('system.AddCtrl',
         ['$rootScope', '$scope', '$http', 'notify',
@@ -208,6 +263,8 @@
                 $rootScope.page.title = 'Tilknyt IT system';
                 $rootScope.page.subnav = subnav;
 
+                $scope.showType = 'appType';
+                
                 var appTypes = appTypesHttp.data.response;
                 var businessTypes = businessTypesHttp.data.response;
                 var organizations = organizationsHttp.data.response;
@@ -291,7 +348,6 @@
                     $scope.systems.push(system);
                 });
 
-                $scope.showType = 'appType';
 
             }]);
 })(angular, app);

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 
 namespace UI.MVC4.Models
 {
@@ -8,7 +9,8 @@ namespace UI.MVC4.Models
         public int Id { get; set; }
         public int? ParentId { get; set; }
         public int? ExposedById { get; set; }
-        public IEnumerable<int> CanUseInterfaceIds { get; set; } 
+        public IEnumerable<int> CanUseInterfaceIds { get; set; }
+        public IEnumerable<int> ExposedInterfaceIds { get; set; }
         public int BelongsToId { get; set; }
         public int OrganizationId { get; set; }
         public string Version { get; set; }
