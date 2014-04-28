@@ -17,11 +17,11 @@ namespace UI.MVC4.Controllers.API
         {
         }
 
-        public HttpResponseMessage GetByItSystemAndOrganization(int systemId, int organizationId)
+        public HttpResponseMessage GetByItSystemAndOrganization(int itSystemId, int organizationId)
         {
             try
             {
-                var usage = Repository.Get(u => u.ItSystemId == systemId && u.OrganizationId == organizationId).FirstOrDefault();
+                var usage = Repository.Get(u => u.ItSystemId == itSystemId && u.OrganizationId == organizationId).FirstOrDefault();
 
                 return usage == null ? NotFound() : Ok(Map(usage));
             }
@@ -43,7 +43,7 @@ namespace UI.MVC4.Controllers.API
                 Repository.Insert(item);
                 Repository.Save();
 
-                return Created(item, new Uri(Request.RequestUri + "?systemId=" + dto.ItSystemId + "&organizationId" + dto.OrganizationId));
+                return Created(item, new Uri(Request.RequestUri + "?itSystemId=" + dto.ItSystemId + "&organizationId" + dto.OrganizationId));
 
             }
             catch (Exception e)
@@ -52,11 +52,11 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage Delete(int systemId, int organizationId)
+        public HttpResponseMessage Delete(int itSystemId, int organizationId)
         {
             try
             {
-                var usage = Repository.Get(u => u.ItSystemId == systemId && u.OrganizationId == organizationId).FirstOrDefault();
+                var usage = Repository.Get(u => u.ItSystemId == itSystemId && u.OrganizationId == organizationId).FirstOrDefault();
 
                 if (usage == null) return NotFound();
 

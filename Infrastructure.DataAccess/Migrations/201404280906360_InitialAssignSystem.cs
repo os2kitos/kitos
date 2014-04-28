@@ -162,7 +162,7 @@ namespace Infrastructure.DataAccess.Migrations
                     {
                         Id = c.Int(nullable: false, identity: true),
                         Note = c.String(unicode: false),
-                        SystemId = c.String(unicode: false),
+                        LocalSystemId = c.String(unicode: false),
                         PersonSensitiveData = c.Boolean(nullable: false),
                         Archive = c.Boolean(nullable: false),
                         EsdhRef = c.String(unicode: false),

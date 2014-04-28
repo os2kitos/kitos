@@ -42,12 +42,12 @@
         </tr>
     </thead>
     <tbody>
-        <tr data-ng-repeat="system in systems">
-            <td>
-                <input type="checkbox" data-ng-model="system.selected" data-ng-change="system.toggle"/>
+        <tr data-ng-repeat="system in systems" >
+            <td data-ng-click="system.toggle()">
+                <input type="checkbox" data-ng-model="system.selected"/>
             </td>
             <td>
-                {{system.name}}
+                <label data-ng-click="system.toggle()">{{system.name}}</label>
             </td>
             <td>
                 {{system.systemId}}

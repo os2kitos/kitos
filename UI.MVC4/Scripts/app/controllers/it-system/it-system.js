@@ -243,13 +243,13 @@
                 
                 function addUsage(system) {
                     return $http.post("api/itsystemusage", {
-                        systemId: system.id,
+                        itSystemId: system.id,
                         organizationId: $rootScope.user.currentOrganizationId
                     }).success(function(result) {
                         notify.addSuccessMessage("Systemet er tilknyttet");
                         system.selected = true;
                     }).error(function(result) {
-                        notify.addSuccessMessage("Systemet kunne ikke tilknyttes!");
+                        notify.addErrorMessage("Systemet kunne ikke tilknyttes!");
                     });
                 }
                 
@@ -259,7 +259,7 @@
                             notify.addSuccessMessage("Systemet er fjernet");
                             system.selected = false;
                     }).error(function (result) {
-                        notify.addSuccessMessage("Systemet kunne ikke fjernes!");
+                        notify.addErrorMessage("Systemet kunne ikke fjernes!");
                     });
                 }
                 
@@ -271,7 +271,7 @@
 
                     system.belongsTo = _.findWhere(organizations, { id: system.belongsToId });
                     
-                    system.usageUrl = "api/itsystemusage?systemId=" + system.id + "&organizationId=" + $rootScope.user.currentOrganizationId;
+                    system.usageUrl = "api/itsystemusage?itSystemId=" + system.id + "&organizationId=" + $rootScope.user.currentOrganizationId;
 
                     loadUser(system);
                     loadOrganization(system);
