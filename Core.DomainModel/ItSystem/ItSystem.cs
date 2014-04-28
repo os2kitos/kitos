@@ -44,6 +44,8 @@ namespace Core.DomainModel.ItSystem
 
         /* sub systems*/
         public virtual ICollection<ItSystem> Children { get; set; }
+        /* local sub systems - assigned via system usage*/
+        public virtual ICollection<ItSystemUsage> LocalChildren { get; set; }
         /* super systems */
         public virtual ItSystem Parent { get; set; }
 

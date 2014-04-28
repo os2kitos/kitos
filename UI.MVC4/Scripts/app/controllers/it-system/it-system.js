@@ -241,6 +241,10 @@
                         });
                 }
                 
+                function addUsage(system) {
+                    return $http.post("api/itsystemusage")
+                }
+                
                 $scope.systems = [];
                 _.each(systems.data.response, function (system) {
                     

@@ -21,7 +21,7 @@ namespace Core.DomainModel.ItSystem
 
         public int? ResponsibleUnitId { get; set; }
         public virtual OrganizationUnit ResponsibleUnit { get; set; }
-        public int ParentId { get; set; }
+        public int? ParentId { get; set; }
         public virtual ItSystem Parent { get; set; }
         public int OrganizationId { get; set; }
         public virtual Organization Organization { get; set; }

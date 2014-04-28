@@ -127,13 +127,9 @@
     <Compile Include="Mapping\TextMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
-    <Compile Include="Migrations\201404261250080_Initial.cs" />
-    <Compile Include="Migrations\201404261250080_Initial.Designer.cs">
-      <DependentUpon>201404261250080_Initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201404261416491_AddedSystemId.cs" />
-    <Compile Include="Migrations\201404261416491_AddedSystemId.Designer.cs">
-      <DependentUpon>201404261416491_AddedSystemId.cs</DependentUpon>
+    <Compile Include="Migrations\201404280814411_InitialAssignItSystem.cs" />
+    <Compile Include="Migrations\201404280814411_InitialAssignItSystem.Designer.cs">
+      <DependentUpon>201404280814411_InitialAssignItSystem.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -158,11 +154,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201404261250080_Initial.resx">
-      <DependentUpon>201404261250080_Initial.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201404261416491_AddedSystemId.resx">
-      <DependentUpon>201404261416491_AddedSystemId.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201404280814411_InitialAssignItSystem.resx">
+      <DependentUpon>201404280814411_InitialAssignItSystem.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -3,7 +3,7 @@ namespace Infrastructure.DataAccess.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class Initial : DbMigration
+    public partial class InitialAssignItSystem : DbMigration
     {
         public override void Up()
         {
@@ -41,6 +41,7 @@ namespace Infrastructure.DataAccess.Migrations
                         Id = c.Int(nullable: false, identity: true),
                         Version = c.String(unicode: false),
                         Name = c.String(unicode: false),
+                        SystemId = c.String(unicode: false),
                         ParentId = c.Int(),
                         ExposedById = c.Int(),
                         BelongsToId = c.Int(nullable: false),
@@ -169,14 +170,14 @@ namespace Infrastructure.DataAccess.Migrations
                         DirectoryOrUrlRef = c.String(unicode: false),
                         AdOrIdmRef = c.String(unicode: false),
                         ResponsibleUnitId = c.Int(),
-                        ParentId = c.Int(nullable: false),
+                        ParentId = c.Int(),
                         OrganizationId = c.Int(nullable: false),
                         ItSystemId = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.ItSystem", t => t.ItSystemId, cascadeDelete: true)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId, cascadeDelete: true)
-                .ForeignKey("dbo.ItSystem", t => t.ParentId, cascadeDelete: true)
+                .ForeignKey("dbo.ItSystem", t => t.ParentId)
                 .ForeignKey("dbo.OrganizationUnit", t => t.ResponsibleUnitId)
                 .Index(t => t.ResponsibleUnitId)
                 .Index(t => t.ParentId)
