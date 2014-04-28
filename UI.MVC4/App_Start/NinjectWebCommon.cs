@@ -101,6 +101,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<OrganizationRole>>().To<GenericRepository<OrganizationRole>>().InRequestScope();
             kernel.Bind<IGenericRepository<ArchiveType>>().To<GenericRepository<ArchiveType>>().InRequestScope();
             kernel.Bind<IGenericRepository<SensitiveDataType>>().To<GenericRepository<SensitiveDataType>>().InRequestScope();
+            kernel.Bind<IGenericRepository<Wish>>().To<GenericRepository<Wish>>().InRequestScope();
 
             kernel.Bind<IGenericRepository<OrganizationRight>>().To<GenericRepository<OrganizationRight>>().InRequestScope();
 

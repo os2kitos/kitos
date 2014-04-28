@@ -9,8 +9,12 @@
         </tr>
     </thead>
     <tbody>
-        <tr>
-            
+        <tr data-ng-repeat="wish in wishes">
+            <td>{{ wish.user.name }}</td>
+            <td>{{ wish.user.email }}</td>
+            <td>{{ wish.user.defaultOrganizationUnitName }}</td>
+            <td>{{ wish.text }}</td>
+            <td>{{ wish.isPublic }}</td>
         </tr>
     </tbody>
 </table>

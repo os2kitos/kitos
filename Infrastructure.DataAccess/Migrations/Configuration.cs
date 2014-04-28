@@ -469,10 +469,10 @@ namespace Infrastructure.DataAccess.Migrations
             var simon = SimpleUser("Simon Lynn-Pedersen", "slp@it-minds.dk", "slp123", cryptoService);
             simon.IsGlobalAdmin = true;
 
-            var globalUser = SimpleUser("Global Test Bruger", "g@test", "123", cryptoService);
+            var globalUser = SimpleUser("Global Test Bruger", "g@test", "test", cryptoService);
             globalUser.IsGlobalAdmin = true;
 
-            var localUser = SimpleUser("Local Test Bruger", "l@test", "123", cryptoService);
+            var localUser = SimpleUser("Local Test Bruger", "l@test", "test", cryptoService);
 
             var roskildeUser1 = SimpleUser("Pia", "pia@it-minds.dk", "arne123", cryptoService);
             var roskildeUser2 = SimpleUser("Morten", "morten@it-minds.dk", "arne123", cryptoService);
@@ -721,6 +721,26 @@ namespace Infrastructure.DataAccess.Migrations
 
             #endregion
 
+            #region Wishes
+
+            var wish1 = new Wish()
+                {
+                    IsPublic = true,
+                    Text = "Public test ønske",
+                    User = globalUser,
+                    ItSystemUsage = systemUsage1
+                };
+            var wish2 = new Wish()
+            {
+                IsPublic = true,
+                Text = "Ikke public test ønske",
+                User = globalUser,
+                ItSystemUsage = systemUsage1
+            };
+
+            context.Wishes.AddOrUpdate(x => x.Text, wish1, wish2); // TODO probably not the best identifier
+
+            #endregion
 
             context.ProjectPhaseLocales.AddOrUpdate(x => new { x.MunicipalityId, x.OriginalId },
                                                     new ProjPhaseLocale()

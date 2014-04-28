@@ -165,6 +165,9 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<User, UserProfileDTO>()
                   .ReverseMap();
 
+            Mapper.CreateMap<Wish, WishDTO>()
+                  .ReverseMap();
+
             Mapper.CreateMap<Organization, OrganizationDTO>().ReverseMap();
             Mapper.CreateMap<OrganizationUnit, OrgUnitDTO>().ReverseMap();
 
@@ -174,13 +177,7 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<TaskRef, TaskRefDTO>()
                   .ReverseMap();
 
-
             Mapper.CreateMap<TaskUsage, TaskUsageDTO>().ReverseMap();
-
-            /*
-            Mapper.CreateMap<TaskRef, TaskUsageDTO>()
-                  .ForMember(dest => dest.HandledByOrgUnit, opt => opt.MapFrom(src => src.OrganizationUnits.Select(x => x.Id)));
-             * */
 
             Mapper.CreateMap<AdminRight, AdminRightDTO>()
                   .ForMember(dto => dto.OrganizationId, opt => opt.MapFrom(src => src.ObjectId))

@@ -25,15 +25,14 @@ namespace Core.DomainModel
         public bool IsGlobalAdmin { get; set; }
         public int? DefaultOrganizationUnitId { get; set; }
 
+        public virtual OrganizationUnit DefaultOrganizationUnit { get; set; }
         public virtual ICollection<PasswordResetRequest> PasswordResetRequests { get; set; }
-
         public virtual ICollection<OrganizationRight> OrganizationRights { get; set; }
         public virtual ICollection<ItProjectRight> ProjectRights { get; set; }
         public virtual ICollection<ItSystemRight> SystemRights { get; set; }
         public virtual ICollection<ItContractRight> ContractRights { get; set; }
         public virtual ICollection<AdminRight> AdminRights { get; set; }
-        public virtual OrganizationUnit DefaultOrganizationUnit { get; set; }
-
-        public virtual ICollection<ItSystem.ItSystem> CreatedSystems { get; set; } 
+        public virtual ICollection<ItSystem.ItSystem> CreatedSystems { get; set; }
+        public virtual ICollection<Wish> Wishes { get; set; }
     }
 }

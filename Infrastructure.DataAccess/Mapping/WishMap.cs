@@ -15,11 +15,14 @@ namespace Infrastructure.DataAccess.Mapping
             this.ToTable("Wish");
             this.Property(t => t.Id).HasColumnName("Id");
 
-            this.HasRequired(t => t.User); 
-            //TODO .WithMany(d => d.Wishes)??
+            this.HasRequired(t => t.User)
+                .WithMany(t => t.Wishes)
+                .HasForeignKey(d => d.UserId);
+            
 
-            this.HasRequired(t => t.ItSystem)
-                .WithMany(d => d.Wishes);
+            this.HasRequired(t => t.ItSystemUsage)
+                .WithMany(t => t.Wishes)
+                .HasForeignKey(d => d.ItSystemUsageId);
 
         }
     }
