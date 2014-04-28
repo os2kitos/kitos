@@ -3,7 +3,7 @@ namespace Infrastructure.DataAccess.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class InitialAssignItSystem : DbMigration
+    public partial class InitialAssignSystem : DbMigration
     {
         public override void Up()
         {
@@ -173,16 +173,19 @@ namespace Infrastructure.DataAccess.Migrations
                         ParentId = c.Int(),
                         OrganizationId = c.Int(nullable: false),
                         ItSystemId = c.Int(nullable: false),
+                        ItSystem_Id = c.Int(),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.ItSystem", t => t.ItSystemId, cascadeDelete: true)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId, cascadeDelete: true)
                 .ForeignKey("dbo.ItSystem", t => t.ParentId)
                 .ForeignKey("dbo.OrganizationUnit", t => t.ResponsibleUnitId)
+                .ForeignKey("dbo.ItSystem", t => t.ItSystem_Id)
                 .Index(t => t.ResponsibleUnitId)
                 .Index(t => t.ParentId)
                 .Index(t => t.OrganizationId)
-                .Index(t => t.ItSystemId);
+                .Index(t => t.ItSystemId)
+                .Index(t => t.ItSystem_Id);
             
             CreateTable(
                 "dbo.ItContract",
@@ -1069,6 +1072,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.ItSystem", "ParentId", "dbo.ItSystem");
             DropForeignKey("dbo.ItSystem", "OrganizationId", "dbo.Organization");
             DropForeignKey("dbo.ItSystem", "MethodId", "dbo.Method");
+            DropForeignKey("dbo.ItSystemUsage", "ItSystem_Id", "dbo.ItSystem");
             DropForeignKey("dbo.Wish", "ItSystemUsage_Id", "dbo.ItSystemUsage");
             DropForeignKey("dbo.Wish", "User_Id", "dbo.User");
             DropForeignKey("dbo.Wish", "ItSystem_Id", "dbo.ItSystem");
@@ -1232,6 +1236,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ItContract", new[] { "PurchaseFormId" });
             DropIndex("dbo.ItContract", new[] { "ContractTemplateId" });
             DropIndex("dbo.ItContract", new[] { "ContractTypeId" });
+            DropIndex("dbo.ItSystemUsage", new[] { "ItSystem_Id" });
             DropIndex("dbo.ItSystemUsage", new[] { "ItSystemId" });
             DropIndex("dbo.ItSystemUsage", new[] { "OrganizationId" });
             DropIndex("dbo.ItSystemUsage", new[] { "ParentId" });

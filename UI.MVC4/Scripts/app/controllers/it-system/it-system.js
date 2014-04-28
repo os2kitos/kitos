@@ -242,7 +242,16 @@
                 }
                 
                 function addUsage(system) {
-                    return $http.post("api/itsystemusage")
+                    return $http.post("api/itsystemusage", {
+                        systemId: system.id,
+                        organizationId: $rootScope.user.currentOrganizationId
+                    });
+                }
+                
+                function deleteUsage(system) {
+                    var sysId = system.id,
+                        orgId = $rootScope.user.currentOrganizationId;
+                    return $http.delete("api/itsystemusage?" +)
                 }
                 
                 $scope.systems = [];

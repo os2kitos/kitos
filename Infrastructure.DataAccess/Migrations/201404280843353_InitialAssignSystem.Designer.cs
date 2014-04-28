@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.0-30225")]
-    public sealed partial class InitialAssignItSystem : IMigrationMetadata
+    public sealed partial class InitialAssignSystem : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(InitialAssignItSystem));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(InitialAssignSystem));
         
         string IMigrationMetadata.Id
         {
-            get { return "201404280814411_InitialAssignItSystem"; }
+            get { return "201404280843353_InitialAssignSystem"; }
         }
         
         string IMigrationMetadata.Source
