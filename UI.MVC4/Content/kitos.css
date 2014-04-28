@@ -118,6 +118,10 @@ div#page-body
         }
 
 
+
+        div.org-node-top {
+            margin-top: 20px;
+        }
 div.org-node
 {
     display: block;
@@ -482,4 +486,18 @@ body.wait, body.wait * {
     line-height: 10px !important;
     height: auto !important;
     padding: 2px;
+}
+
+.relative-position {
+    position: relative;
+}
+
+div.pull-outside-table {
+    position: absolute;
+    right: -50px;
+    top: 8px;
+}
+
+.margin-top {
+    margin-top: 50px;
 }
