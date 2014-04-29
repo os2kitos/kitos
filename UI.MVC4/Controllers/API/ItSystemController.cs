@@ -18,6 +18,26 @@ namespace UI.MVC4.Controllers.API
             _systemService = systemService;
         }
 
+        /// <summary>
+        /// Returns the interfaces that a given system exposes
+        /// </summary>
+        /// <param name="itSystemId">The id of the exposing system</param>
+        /// <param name="getExposedInterfaces">flag</param>
+        /// <returns>List of interfaces</returns>
+        public HttpResponseMessage GetExposedInterfaces(int itSystemId, bool? getExposedInterfaces)
+        {
+            try
+            {
+                var interfaces = Repository.Get(system => system.ExposedById == itSystemId);
+                var dtos = Map(interfaces);
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetInterfaces(string q, bool? interfaces)
         {
             try

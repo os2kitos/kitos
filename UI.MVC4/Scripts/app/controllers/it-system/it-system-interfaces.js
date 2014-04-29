@@ -29,6 +29,12 @@
                     return $http.get("api/datatype").then(function (result) {
                         return result.data.response;
                     });
+                }],
+                exposedInterfaces: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itsystem?itSystemId=" + $stateParams.id + "&getExposedInterfaces")
+                        .then(function (result) {
+                            return result.data.response;
+                        });
                 }]
             }
         });
@@ -36,13 +42,22 @@
 
     app.controller('system.EditInterfaces',
         ['$rootScope', '$scope', '$http', 'notify',
-            'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes',
+            'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'exposedInterfaces',
             function ($rootScope, $scope, $http, notify,                 
-            tsas, interfaces, interfaceTypes, methods, dataTypes) {
+            tsas, interfaces, interfaceTypes, methods, dataTypes, exposedInterfaces) {
+
+                $scope.exposedInterfaces = exposedInterfaces;
+                _.each(exposedInterfaces, function (system) {
+                    system.interfaceType = _.findWhere(interfaceTypes, { id: system.interfaceTypeId });
+                    system.interface = _.findWhere(interfaces, { id: system.interfaceId });
+                    system.method = _.findWhere(methods, { id: system.methodId });
+                    system.tsa = _.findWhere(tsas, { id: system.tsaId });
+
+                    _.each(system.dataRows, function(dataRow) {
+                        dataRow.dataType = _.findWhere(dataTypes, { id: dataRow.dataTypeId });
+                    });
+                });
 
 
-
-
-
-    }]);
+            }]);
 })(angular, app);

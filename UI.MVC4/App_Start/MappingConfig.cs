@@ -206,7 +206,8 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
                   .ForMember(dest => dest.CanUseInterfaces, opt => opt.Ignore())
-                  .ForMember(dest => dest.ExposedInterfaces, opt => opt.Ignore());
+                  .ForMember(dest => dest.ExposedInterfaces, opt => opt.Ignore())
+                  .ForMember(dest => dest.CanBeUsedBy, opt => opt.Ignore());
 
             Mapper.CreateMap<ItSystemUsage, ItSystemUsageDTO>()
                   .ReverseMap()
