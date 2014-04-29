@@ -49,7 +49,15 @@ namespace UI.MVC4.Controllers.API
 
         public HttpResponseMessage GetHierarchy(int id, [FromUri] bool hierarchy)
         {
-            
+            try
+            {
+                var systems = _systemService.GetHierarchy(id);
+                return Ok(Map(systems));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
         }
 
         public override HttpResponseMessage Post(ItSystemDTO dto)

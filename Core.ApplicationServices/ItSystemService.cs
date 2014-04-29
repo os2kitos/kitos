@@ -50,10 +50,12 @@ namespace Core.ApplicationServices
 
         private IEnumerable<ItSystem> GetHierarchyChildren(ItSystem itSystem)
         {
-            var systems = itSystem.Children;
-            foreach (var system in itSystem.Children.Select(GetHierarchyChildren).SelectMany(children => children))
+            var systems = new List<ItSystem>();
+            systems.AddRange(itSystem.Children);
+            foreach (var child in itSystem.Children)
             {
-                systems.Add(system);
+                var children = GetHierarchyChildren(child);
+                systems.AddRange(children);
             }
             return systems;
         }

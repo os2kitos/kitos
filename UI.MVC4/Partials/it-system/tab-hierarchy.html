@@ -1,1 +1,10 @@
-﻿<h1>Hierarchy</h1>
+﻿<script type="text/ng-template"  id="tree_item_renderer.html">
+    {{ system.name }}
+    <ul>
+        <li ng-repeat="system in system.children" ng-include="'tree_item_renderer.html'"></li>
+    </ul>
+</script>
+
+<ul>
+    <li data-ng-repeat="system in systems" data-ng-include="'tree_item_renderer.html'"></li>
+</ul>
