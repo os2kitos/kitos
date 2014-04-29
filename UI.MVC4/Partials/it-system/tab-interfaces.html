@@ -1,0 +1,68 @@
+﻿<div class="panel panel-default">
+    <div class="panel-heading">IT systemet udstiller følgende snitflader:</div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Snitflade</th>
+                <th>Snitfladetype</th>
+                <th>Grænseflade</th>
+                <th>Metode</th>
+                <th>Anvendes af</th>
+                <th>TSA</th>
+                <th>Kontrakt ID</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="interface in exposedInterfaces">
+                <td>{{interface.name}}</td>
+                <td>{{interface.interfaceType.name}}</td>
+                <td>{{interface.interface.name}}</td>
+                <td>{{interface.method.name}}</td>
+                <td>{{interface.canBeUsedByIds.length}}</td>
+                <td>{{interface.tsa.name}}</td>
+                <td><small>[Hentes fra kontrakt]</small></td>
+                <td>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>
+                                    Data
+                                </th>
+                                <th>
+                                    Datatype
+                                </th>
+                                <!--
+                                <th>
+                                    Frekvens
+                                </th>
+                                <th>
+                                    Pris
+                                </th>
+                                <th>
+                                    Mængde
+                                </th>
+                                <th>
+                                    Økonomi
+                                </th>
+                                -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="dataRow in interface.dataRows">
+                                <td>
+                                    {{dataRow.data}}
+                                </td>
+                                <td>
+                                    {{dataRow.dataType.name}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>

@@ -202,6 +202,7 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.TaskRefIds, opt => opt.MapFrom(src => src.TaskRefs.Select(x => x.Id)))
                   .ForMember(dest => dest.CanUseInterfaceIds, opt => opt.MapFrom(src => src.CanUseInterfaces.Select(x => x.Id)))
                   .ForMember(dest => dest.ExposedInterfaceIds, opt => opt.MapFrom(src => src.ExposedInterfaces.Select(x => x.Id)))
+                  .ForMember(dest => dest.CanBeUsedByIds, opt => opt.MapFrom(src => src.CanBeUsedBy.Select(x => x.Id)))
                   .ReverseMap()
                   .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
                   .ForMember(dest => dest.CanUseInterfaces, opt => opt.Ignore())

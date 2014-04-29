@@ -9,6 +9,7 @@ namespace UI.MVC4.Models
         public int Id { get; set; }
         public int? ParentId { get; set; }
         public int? ExposedById { get; set; }
+        public IEnumerable<int> CanBeUsedByIds { get; set; }
         public IEnumerable<int> CanUseInterfaceIds { get; set; }
         public IEnumerable<int> ExposedInterfaceIds { get; set; }
         public int BelongsToId { get; set; }
