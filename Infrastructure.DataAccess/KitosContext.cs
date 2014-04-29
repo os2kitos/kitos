@@ -31,6 +31,8 @@ namespace Infrastructure.DataAccess
         public DbSet<ContractTemplate> ContractTemplates { get; set; }
         public DbSet<ContractType> ContractTypes { get; set; }
         public DbSet<DataType> DataTypes { get; set; }
+        public DbSet<DataRow> DataRows { get; set; }
+        public DbSet<DataRowUsage> DataRowUsages { get; set; }
         public DbSet<Economy> Economies { get; set; }
         public DbSet<ExtReference> ExtReferences { get; set; }
         public DbSet<ExtReferenceType> ExtReferenceTypes { get; set; }
@@ -103,6 +105,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ContractTemplateMap());
             modelBuilder.Configurations.Add(new ContractTypeMap());
             modelBuilder.Configurations.Add(new DataTypeMap());
+            modelBuilder.Configurations.Add(new DataRowMap());
+            modelBuilder.Configurations.Add(new DataRowUsageMap());
             modelBuilder.Configurations.Add(new EconomyMap());
             modelBuilder.Configurations.Add(new ExtReferenceMap());
             modelBuilder.Configurations.Add(new ExtReferenceTypeMap());
