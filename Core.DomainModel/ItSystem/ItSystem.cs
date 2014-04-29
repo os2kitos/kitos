@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Core.DomainModel.ItSystem
 {
@@ -8,9 +9,15 @@ namespace Core.DomainModel.ItSystem
         {
             this.ExposedInterfaces = new List<ItSystem>();
             this.CanUseInterfaces = new List<ItSystem>();
+            this.CanBeUsedBy = new List<ItSystem>();
             this.Children = new List<ItSystem>();
             this.TaskRefs = new List<TaskRef>();
             this.Rights = new List<ItSystemRight>();
+            this.Usages = new List<ItSystemUsage>();
+            this.Wishes = new List<Wish>();
+            this.TaskRefs = new List<TaskRef>();
+            this.Overviews = new List<ItSystemUsage>();
+            this.DataRows = new List<DataRow>();
         }
 
         public int Id { get; set; }
