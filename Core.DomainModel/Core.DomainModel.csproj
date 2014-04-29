@@ -45,7 +45,9 @@
     <Compile Include="ItSystem\AppType.cs" />
     <Compile Include="ItSystem\DataRow.cs" />
     <Compile Include="ItSystem\ArchiveType.cs" />
+    <Compile Include="ItSystem\DataRowUsage.cs" />
     <Compile Include="ItSystem\DataType.cs" />
+    <Compile Include="ItSystem\InterfaceUsage.cs" />
     <Compile Include="ItSystem\ItSystemUsage.cs" />
     <Compile Include="ItSystem\SensitiveDataType.cs" />
     <Compile Include="ItSystem\Tsa.cs" />

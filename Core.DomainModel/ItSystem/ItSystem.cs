@@ -18,6 +18,7 @@ namespace Core.DomainModel.ItSystem
             this.TaskRefs = new List<TaskRef>();
             this.Overviews = new List<ItSystemUsage>();
             this.DataRows = new List<DataRow>();
+            this.InterfaceUsages = new List<InterfaceUsage>();
         }
 
         public int Id { get; set; }
@@ -121,5 +122,10 @@ namespace Core.DomainModel.ItSystem
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
 
         public virtual ICollection<ItSystemUsage> Overviews { get; set; }
+
+        /// <summary>
+        /// Local usages of the system, in case the system is an interface
+        /// </summary>
+        public virtual ICollection<InterfaceUsage> InterfaceUsages { get; set; }
     }
 }
