@@ -37,6 +37,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ExtReference> ExtReferences { get; set; }
         public DbSet<ExtReferenceType> ExtReferenceTypes { get; set; }
         public DbSet<ExtRefTypeLocale> ExtRefTypeLocales { get; set; }
+        public DbSet<Frequency> Frequencies { get; set; }
         public DbSet<Goal> Goals { get; set; }
         public DbSet<GoalStatus> GoalStatus { get; set; }
         public DbSet<Handover> Handovers { get; set; }
@@ -111,6 +112,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ExtReferenceMap());
             modelBuilder.Configurations.Add(new ExtReferenceTypeMap());
             modelBuilder.Configurations.Add(new ExtRefTypeLocaleMap());
+            modelBuilder.Configurations.Add(new FrequencyMap());
             modelBuilder.Configurations.Add(new GoalMap());
             modelBuilder.Configurations.Add(new GoalStatusMap());
             modelBuilder.Configurations.Add(new HandoverMap());

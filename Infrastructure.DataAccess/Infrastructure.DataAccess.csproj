@@ -70,8 +70,11 @@
     <Compile Include="Mapping\AdminRightMap.cs" />
     <Compile Include="Mapping\AdminRoleMap.cs" />
     <Compile Include="Mapping\BusinessTypeMap.cs" />
-    <Compile Include="Mapping\DataRowMap.cs" />
     <Compile Include="Mapping\DataTypeMap.cs" />
+    <Compile Include="Mapping\DataRowUsageMap.cs" />
+    <Compile Include="Mapping\DataRowMap.cs" />
+    <Compile Include="Mapping\FrequencyMap.cs" />
+    <Compile Include="Mapping\InterfaceUsageMap.cs" />
     <Compile Include="Mapping\ItSystemUsageMap.cs" />
     <Compile Include="Mapping\SensitiveDataTypeMap.cs" />
     <Compile Include="Mapping\TsaMap.cs" />

@@ -25,6 +25,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(t => t.DataRowId)
                 .WillCascadeOnDelete(true);
 
+            this.HasOptional(t => t.Frequency)
+                .WithMany(d => d.References)
+                .HasForeignKey(t => t.FrequencyId);
+
         }
     }
 }
