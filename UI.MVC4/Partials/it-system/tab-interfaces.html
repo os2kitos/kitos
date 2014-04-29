@@ -73,10 +73,10 @@
 </div>
 
 <div class="panel panel-default">
-    <div class="panel-heading"><strong>IT systemet udstiller følgende snitflader:</strong></div>
+    <div class="panel-heading"><strong>IT systemet kan anvende følgende snitflader:</strong></div>
     
     <table class="table table-striped">
-        <thead data-ng-if="exposedInterfaces.length > 0">
+        <thead data-ng-if="canUseInterfaces.length > 0">
             <tr>
                 <th>Snitflade</th>
                 <th>Snitfladetype</th>
@@ -89,7 +89,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr data-ng-repeat="system in exposedInterfaces">
+            <tr data-ng-repeat="system in canUseInterfaces">
                 <td>{{system.name}}</td>
                 <td>{{system.interfaceType.name}}</td>
                 <td>{{system.interface.name}}</td>
@@ -101,26 +101,24 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th style="width: 50%">
+                                <th>
                                     Data
                                 </th>
-                                <th style="width: 50%">
+                                <th>
                                     Datatype
                                 </th>
-                                <!--
-                                    <th>
-                                        Frekvens
-                                    </th>
-                                    <th>
-                                        Pris
-                                    </th>
-                                    <th>
-                                        Mængde
-                                    </th>
-                                    <th>
-                                        Økonomi
-                                    </th>
-                                    -->
+                                <th>
+                                    Frekvens
+                                </th>
+                                <th>
+                                    Pris
+                                </th>
+                                <th>
+                                    Mængde
+                                </th>
+                                <th>
+                                    Økonomi
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -131,16 +129,28 @@
                                 <td>
                                     {{dataRow.dataType.name}}
                                 </td>
+                                <td>
+                                    
+                                </td>
+                                <td>
+                                    
+                                </td>
+                                <td>
+                                    
+                                </td>
+                                <td>
+                                    
+                                </td>
                             </tr>
                             <tr data-ng-if="system.dataRows.length == 0">
-                                <td colspan="2" class="text-center">Snitfladen har ingen data</td>
+                                <td colspan="6" class="text-center">Snitfladen har ingen data</td>
                             </tr>
                         </tbody>
                     </table>
                 </td>
             </tr>
-            <tr data-ng-if="exposedInterfaces.length == 0">
-               <td colspan="8" class="text-center">Systemet udstiller ingen snitflader</td> 
+            <tr data-ng-if="canUseInterfaces.length == 0">
+               <td colspan="8" class="text-center">Systemet kan ikke anvende nogen snitflader</td> 
             </tr>
         </tbody>
     </table>

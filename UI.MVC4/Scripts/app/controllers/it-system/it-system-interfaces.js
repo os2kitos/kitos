@@ -29,12 +29,6 @@
                     return $http.get("api/datatype").then(function (result) {
                         return result.data.response;
                     });
-                }],
-                exposedInterfaces: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itsystem?itSystemId=" + $stateParams.id + "&getExposedInterfaces")
-                        .then(function (result) {
-                            return result.data.response;
-                        });
                 }]
             }
         });
@@ -42,22 +36,53 @@
 
     app.controller('system.EditInterfaces',
         ['$rootScope', '$scope', '$http', 'notify',
-            'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'exposedInterfaces',
+            'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'itSystemUsage',
             function ($rootScope, $scope, $http, notify,                 
-            tsas, interfaces, interfaceTypes, methods, dataTypes, exposedInterfaces) {
+            tsas, interfaces, interfaceTypes, methods, dataTypes, itSystemUsage) {
 
-                $scope.exposedInterfaces = exposedInterfaces;
-                _.each(exposedInterfaces, function (system) {
-                    system.interfaceType = _.findWhere(interfaceTypes, { id: system.interfaceTypeId });
-                    system.interface = _.findWhere(interfaces, { id: system.interfaceId });
-                    system.method = _.findWhere(methods, { id: system.methodId });
-                    system.tsa = _.findWhere(tsas, { id: system.tsaId });
+                $scope.exposedInterfaces = [];
+                $scope.canUseInterfaces = [];
 
-                    _.each(system.dataRows, function(dataRow) {
-                        dataRow.dataType = _.findWhere(dataTypes, { id: dataRow.dataTypeId });
+                console.log(itSystemUsage);
+
+                $http.get("api/itsystem?itSystemId=" + itSystemUsage.itSystemId + "&getExposedInterfaces").success(function(result) {
+
+                    var exposedInterfaces = result.response;
+
+                    _.each(exposedInterfaces, function(system) {
+                        system.interfaceType = _.findWhere(interfaceTypes, { id: system.interfaceTypeId });
+                        system.interface = _.findWhere(interfaces, { id: system.interfaceId });
+                        system.method = _.findWhere(methods, { id: system.methodId });
+                        system.tsa = _.findWhere(tsas, { id: system.tsaId });
+
+                        _.each(system.dataRows, function(dataRow) {
+                            dataRow.dataType = _.findWhere(dataTypes, { id: dataRow.dataTypeId });
+                        });
+
                     });
-                });
 
+                    $scope.exposedInterfaces = exposedInterfaces;
+                });
+                
+
+                $http.get("api/itsystem?itSystemId=" + itSystemUsage.itSystemId + "&getCanUseInterfaces").success(function (result) {
+
+                    var canUseInterfaces = result.response;
+
+                    _.each(canUseInterfaces, function (system) {
+                        system.interfaceType = _.findWhere(interfaceTypes, { id: system.interfaceTypeId });
+                        system.interface = _.findWhere(interfaces, { id: system.interfaceId });
+                        system.method = _.findWhere(methods, { id: system.methodId });
+                        system.tsa = _.findWhere(tsas, { id: system.tsaId });
+
+                        _.each(system.dataRows, function (dataRow) {
+                            dataRow.dataType = _.findWhere(dataTypes, { id: dataRow.dataTypeId });
+                        });
+
+                    });
+
+                    $scope.canUseInterfaces = canUseInterfaces;
+                });
 
             }]);
 })(angular, app);

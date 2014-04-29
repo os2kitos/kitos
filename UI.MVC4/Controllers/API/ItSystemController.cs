@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
@@ -29,6 +30,29 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 var interfaces = Repository.Get(system => system.ExposedById == itSystemId);
+                var dtos = Map(interfaces);
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+
+        /// <summary>
+        /// Returns the interfaces that a given system can use
+        /// </summary>
+        /// <param name="itSystemId">The id of the system</param>
+        /// <param name="getCanUseInterfaces">flag</param>
+        /// <returns>List of interfaces</returns>
+        public HttpResponseMessage GetCanUseInterfaces(int itSystemId, bool? getCanUseInterfaces)
+        {
+            try
+            {
+                var system = Repository.GetByKey(itSystemId);
+                var interfaces = system.CanUseInterfaces;
+
                 var dtos = Map(interfaces);
                 return Ok(dtos);
             }
