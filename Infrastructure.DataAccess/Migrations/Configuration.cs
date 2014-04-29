@@ -152,6 +152,13 @@ namespace Infrastructure.DataAccess.Migrations
                 itContractName,
                 new ItContractModuleName() { Name = "Kontrakter" });
 
+            var frequency1 = new Frequency() { IsActive = true, Note = "...", Name = "Dagligt" };
+            var frequency2 = new Frequency() { IsActive = true, Note = "...", Name = "Ugentligt" };
+            var frequency3 = new Frequency() { IsActive = true, Note = "...", Name = "Månedligt" };
+            var frequency4 = new Frequency() { IsActive = true, Note = "...", Name = "Årligt" };
+
+            context.Frequencies.AddOrUpdate(x => x.Name, frequency1, frequency2, frequency3, frequency4);
+
             context.SaveChanges();
 
 
