@@ -24,6 +24,9 @@ namespace Core.ApplicationServices
         public IEnumerable<ItSystem> GetSystems(Organization organization, string nameSearch)
         {
             //TODO filter by organization or public
+
+            if (nameSearch == null) return _repository.Get();
+
             return _repository.Get(system => system.Name.StartsWith(nameSearch));
         }
 
