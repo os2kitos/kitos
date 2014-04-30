@@ -19,17 +19,17 @@ namespace UI.MVC4.Models
         public int? ArchiveTypeId { get; set; }
         
         public int? ResponsibleUnitId { get; set; }
-        public virtual OrgUnitDTO ResponsibleUnit { get; set; }
+        public OrgUnitDTO ResponsibleUnit { get; set; }
 
         public int OrganizationId { get; set; }
-        public virtual OrganizationDTO Organization { get; set; }
+        public OrganizationDTO Organization { get; set; }
 
-        public  int ItSystemId { get; set; }
-        public virtual ItSystemDTO ItSystem { get; set; }
+        public int ItSystemId { get; set; }
+        public ItSystemDTO ItSystem { get; set; }
 
         public int? OverviewItSystemId { get; set; }
 
-        public virtual IEnumerable<RightOutputDTO> Rights { get; set; }
-        public virtual IEnumerable<InterfaceUsageDTO> InterfaceUsages { get; set; } 
+        public IEnumerable<RightOutputDTO> Rights { get; set; }
+        public IEnumerable<InterfaceUsageDTO> InterfaceUsages { get; set; } 
     }
 }
