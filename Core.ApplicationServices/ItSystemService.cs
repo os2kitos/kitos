@@ -24,6 +24,9 @@ namespace Core.ApplicationServices
         public IEnumerable<ItSystem> GetSystems(Organization organization, string nameSearch)
         {
             //TODO filter by organization or public
+
+            if (nameSearch == null) return _repository.Get();
+
             return _repository.Get(system => system.Name.StartsWith(nameSearch));
         }
 
@@ -35,6 +38,40 @@ namespace Core.ApplicationServices
         public IEnumerable<ItSystem> GetInterfaces(Organization organization, string nameSearch)
         {
             return GetSystems(organization, nameSearch).Where(system => system.AppType.Id == InterfaceAppType.Id);
+        }
+
+        public IEnumerable<ItSystem> GetHierarchy(int systemId)
+        {
+            var result = new List<ItSystem>();
+            var system = _repository.GetByKey(systemId);         
+            result.Add(system);
+            result.AddRange(GetHierarchyChildren(system));
+            result.AddRange(GetHierarchyParents(system));
+
+            return result;
+        }
+
+        private IEnumerable<ItSystem> GetHierarchyChildren(ItSystem itSystem)
+        {
+            var systems = new List<ItSystem>();
+            systems.AddRange(itSystem.Children);
+            foreach (var child in itSystem.Children)
+            {
+                var children = GetHierarchyChildren(child);
+                systems.AddRange(children);
+            }
+            return systems;
+        }
+
+        private IEnumerable<ItSystem> GetHierarchyParents(ItSystem itSystem)
+        {
+            var parents = new List<ItSystem>();
+            if (itSystem.Parent != null)
+            {
+                parents.Add(itSystem.Parent);
+                parents.AddRange(GetHierarchyParents(itSystem.Parent));
+            }
+            return parents;
         }
     }
 }

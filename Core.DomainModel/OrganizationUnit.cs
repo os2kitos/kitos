@@ -8,7 +8,6 @@ namespace Core.DomainModel
     {
         public OrganizationUnit()
         {
-            this.Infrastructures = new List<Infrastructure>();
             this.Rights = new List<OrganizationRight>();
             this.TaskUsages = new List<TaskUsage>();
             this.TaskRefs = new List<TaskRef>();
@@ -27,7 +26,6 @@ namespace Core.DomainModel
 
         public virtual Organization Organization { get; set; }
 
-        public virtual ICollection<Infrastructure> Infrastructures { get; set; }
         public virtual ICollection<OrganizationRight> Rights { get; set; }
         public virtual ICollection<TaskUsage> TaskUsages { get; set; }
         public virtual ICollection<TaskRef> TaskRefs { get; set; }

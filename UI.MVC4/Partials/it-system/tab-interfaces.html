@@ -1,0 +1,209 @@
+﻿<div class="panel panel-default">
+    <div class="panel-heading"><strong>IT systemet udstiller følgende snitflader:</strong></div>
+    
+    <table class="table table-striped table-condensed">
+        <thead data-ng-if="exposedInterfaces.length > 0">
+            <tr>
+                <th>Snitflade</th>
+                <th>Snitfladetype</th>
+                <th>Grænseflade</th>
+                <th>Metode</th>
+                <th>Anvendes af</th>
+                <th>TSA</th>
+                <th>Kontrakt ID</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="system in exposedInterfaces">
+                <td>{{system.name}}</td>
+                <td>{{system.interfaceType.name}}</td>
+                <td>{{system.interface.name}}</td>
+                <td>{{system.method.name}}</td>
+                <td>{{system.canBeUsedByIds.length}}</td>
+                <td>{{system.tsa.name}}</td>
+                <td><small class="text-muted">[Hentes fra kontrakt]</small></td>
+                <td>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="width: 50%">
+                                    Data
+                                </th>
+                                <th style="width: 50%">
+                                    Datatype
+                                </th>
+                                <!--
+                                    <th>
+                                        Frekvens
+                                    </th>
+                                    <th>
+                                        Pris
+                                    </th>
+                                    <th>
+                                        Mængde
+                                    </th>
+                                    <th>
+                                        Økonomi
+                                    </th>
+                                    -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="dataRow in system.dataRows">
+                                <td>
+                                    {{dataRow.data}}
+                                </td>
+                                <td>
+                                    {{dataRow.dataType.name}}
+                                </td>
+                            </tr>
+                            <tr data-ng-if="system.dataRows.length == 0">
+                                <td colspan="2" class="text-center">Snitfladen har ingen data</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <tr data-ng-if="exposedInterfaces.length == 0">
+               <td colspan="8" class="text-center">Systemet udstiller ingen snitflader</td> 
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading"><strong>IT systemet kan anvende følgende snitflader:</strong></div>
+    
+    <table class="table table-striped table-condensed">
+        <thead data-ng-if="interfaces.length > 0">
+            <tr>
+                <th style="width: 10%">Snitflade</th>
+                <th style="width: 10%">Snitfladetype</th>
+                <th style="width: 10%">Udstillet af</th>
+                <th style="width: 10%">Infrastruktur</th>
+                <th style="width: 10%">Kategori</th>
+                <th style="width: 5%">TSA</th>
+                <th style="width: 5%">Kontrakt</th>
+                <th style="width: 40%"></th>
+            </tr>
+        </thead>
+        <tbody class="small">
+            <tr data-ng-repeat="system in interfaces | orderBy:'rank'" data-ng-class="{'strong': system.usage, 'faded': !system.usage && !system.canBeUsed } ">
+                <!-- name + checkbox -->
+                <td>
+                    <label>
+                        <input type="checkbox" data-ng-checked="system.usage" data-ng-click="toggleInterface(system)">
+                        {{system.name}}
+                    </label>
+                </td>
+
+                <!-- interface type -->
+                <td>{{system.interfaceType.name}}</td>
+                
+                <!-- exposed by -->
+                <td>{{system.exposedBy.name}}</td>
+                <td>
+                    <input type="hidden" data-ui-select2="itSystemsSelectOptions" data-ng-model="system.usage.infrastructure" 
+                           class="form-control input-sm" data-ng-disabled="!system.usage" data-ng-change="updateInfrastructure(system.usage)">
+                </td>
+                
+                <!-- interface category -->
+                <td>
+                    <select data-ui-select2="" data-ng-model="system.usage.interfaceCategoryId" class="form-control input-sm" data-ng-disabled="!system.usage" data-ng-change="updateCategory(system.usage)">
+                        <option data-ng-repeat="category in interfaceCategories" value="{{category.id}}">{{category.name}}</option>
+                    </select>
+                </td>
+                
+                <!-- tsa -->
+                <td>
+                    {{system.tsa.name}}
+                </td>
+                
+                <!-- contract -->
+                <td>
+                    <small class="text-muted">[Hentes fra kontrakt]</small>
+                </td>
+                
+                <!-- interface data -->
+                <td>
+                    <table class="table table-bordered table-condensed small table-fixed table-no-margin">
+                        <thead>
+                            <tr class="info">
+                                <th style="width: 10%">
+                                    Data
+                                </th>
+                                <th style="width: 10%">
+                                    Datatype
+                                </th>
+                                <th style="width: 15%">
+                                    Frekvens
+                                </th>
+                                <th style="width: 15%">
+                                    Pris
+                                </th>
+                                <th style="width: 15%">
+                                    Mængde
+                                </th>
+                                <th style="width: 15%">
+                                    Økonomi
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-if="system.showDataRows" data-ng-repeat="dataRow in system.dataRows">
+                                <td>
+                                    {{dataRow.data}}
+                                </td>
+                                <td>
+                                    {{dataRow.dataType.name}}
+                                </td>
+
+                                <!-- frequency -->
+                                <td>
+                                    <select data-ng-model="dataRow.usage.frequencyId" 
+                                            class="form-control input-sm" 
+                                            data-ng-disabled="!system.usage"
+                                            data-ng-options="freq.id as freq.name for freq in frequencies"
+                                            data-ng-change="updateFrequency(dataRow.usage)">
+                                    </select>
+                                </td>
+
+                                <!-- price -->
+                                <td>
+                                    <input type="text" data-ng-model="dataRow.usage.price" class="form-control input-sm" data-ng-disabled="!system.usage" data-ng-blur="updatePrice(dataRow.usage)" />
+                                </td>
+
+                                <!-- amount -->
+                                <td>
+                                    <input type="text" data-ng-model="dataRow.usage.amount" class="form-control input-sm" data-ng-disabled="!system.usage" data-ng-blur="updateAmount(dataRow.usage)" />
+                                </td>
+
+                                <!-- economy -->
+                                <td>
+                                    <input type="text" data-ng-model="dataRow.usage.economy" class="form-control input-sm" data-ng-disabled="!system.usage" data-ng-blur="updateEconomy(dataRow.usage)" />
+                                </td>
+                            </tr>
+                            <tr data-ng-if="system.dataRows.length == 0">
+                                <td colspan="6" class="text-center">Snitfladen har ingen data</td>
+                            </tr>
+                            
+                            <tr data-ng-if="system.dataRows.length > 0 && !system.showDataRows">
+                                <td colspan="6" class="text-center">
+                                    <button class="full-width btn-link btn-xs" data-ng-click="system.showDataRows = true">
+                                        <i class="glyphicon glyphicon-chevron-right small"></i>
+                                        Fold ud
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <tr data-ng-if="interfaces.length == 0">
+               <td colspan="8" class="text-center">Ingen snitflader tilgængelige!</td> 
+            </tr>
+        </tbody>
+    </table>
+</div>
+

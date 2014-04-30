@@ -31,18 +31,22 @@ namespace Infrastructure.DataAccess
         public DbSet<ContractTemplate> ContractTemplates { get; set; }
         public DbSet<ContractType> ContractTypes { get; set; }
         public DbSet<DataType> DataTypes { get; set; }
+        public DbSet<DataRow> DataRows { get; set; }
+        public DbSet<DataRowUsage> DataRowUsages { get; set; }
         public DbSet<Economy> Economies { get; set; }
         public DbSet<ExtReference> ExtReferences { get; set; }
         public DbSet<ExtReferenceType> ExtReferenceTypes { get; set; }
         public DbSet<ExtRefTypeLocale> ExtRefTypeLocales { get; set; }
+        public DbSet<Frequency> Frequencies { get; set; }
         public DbSet<Goal> Goals { get; set; }
         public DbSet<GoalStatus> GoalStatus { get; set; }
         public DbSet<Handover> Handovers { get; set; }
         public DbSet<HandoverTrial> HandoverTrials { get; set; }
         public DbSet<Hierarchy> Hierarchies { get; set; }
-        public DbSet<Core.DomainModel.ItSystem.Infrastructure> Infrastructures { get; set; }
         public DbSet<Interface> Interfaces { get; set; }
+        public DbSet<InterfaceUsage> InterfaceUsages { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
+        public DbSet<InterfaceCategory> InterfaceCategories { get; set; }
         public DbSet<ItContractModuleName> ItContractModuleNames { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
         public DbSet<ItContractRight> ItContractRights { get; set; }
@@ -102,18 +106,22 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ContractTemplateMap());
             modelBuilder.Configurations.Add(new ContractTypeMap());
             modelBuilder.Configurations.Add(new DataTypeMap());
+            modelBuilder.Configurations.Add(new DataRowMap());
+            modelBuilder.Configurations.Add(new DataRowUsageMap());
             modelBuilder.Configurations.Add(new EconomyMap());
             modelBuilder.Configurations.Add(new ExtReferenceMap());
             modelBuilder.Configurations.Add(new ExtReferenceTypeMap());
             modelBuilder.Configurations.Add(new ExtRefTypeLocaleMap());
+            modelBuilder.Configurations.Add(new FrequencyMap());
             modelBuilder.Configurations.Add(new GoalMap());
             modelBuilder.Configurations.Add(new GoalStatusMap());
             modelBuilder.Configurations.Add(new HandoverMap());
             modelBuilder.Configurations.Add(new HandoverTrialMap());
             modelBuilder.Configurations.Add(new HierarchyMap());
-            modelBuilder.Configurations.Add(new InfrastructureMap());
             modelBuilder.Configurations.Add(new InterfaceMap());
+            modelBuilder.Configurations.Add(new InterfaceUsageMap());
             modelBuilder.Configurations.Add(new InterfaceTypeMap());
+            modelBuilder.Configurations.Add(new InterfaceCategoryMap());
             modelBuilder.Configurations.Add(new ItContractMap());
             modelBuilder.Configurations.Add(new ItContractRightMap());
             modelBuilder.Configurations.Add(new ItContractRoleMap());

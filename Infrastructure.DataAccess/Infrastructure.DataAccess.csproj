@@ -70,8 +70,12 @@
     <Compile Include="Mapping\AdminRightMap.cs" />
     <Compile Include="Mapping\AdminRoleMap.cs" />
     <Compile Include="Mapping\BusinessTypeMap.cs" />
-    <Compile Include="Mapping\DataRowMap.cs" />
+    <Compile Include="Mapping\InterfaceCategoryMap.cs" />
     <Compile Include="Mapping\DataTypeMap.cs" />
+    <Compile Include="Mapping\DataRowUsageMap.cs" />
+    <Compile Include="Mapping\DataRowMap.cs" />
+    <Compile Include="Mapping\FrequencyMap.cs" />
+    <Compile Include="Mapping\InterfaceUsageMap.cs" />
     <Compile Include="Mapping\ItSystemUsageMap.cs" />
     <Compile Include="Mapping\SensitiveDataTypeMap.cs" />
     <Compile Include="Mapping\TsaMap.cs" />
@@ -88,7 +92,6 @@
     <Compile Include="Mapping\GoalStatusMap.cs" />
     <Compile Include="Mapping\HandoverMap.cs" />
     <Compile Include="Mapping\HierarchyMap.cs" />
-    <Compile Include="Mapping\InfrastructureMap.cs" />
     <Compile Include="Mapping\InterfaceMap.cs" />
     <Compile Include="Mapping\InterfaceTypeMap.cs" />
     <Compile Include="Mapping\ItContractMap.cs" />

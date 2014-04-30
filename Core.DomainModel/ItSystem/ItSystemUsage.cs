@@ -4,6 +4,17 @@ namespace Core.DomainModel.ItSystem
 {
     public class ItSystemUsage : IEntity<int>, IHasRights<ItSystemRight>
     {
+        public ItSystemUsage()
+        {
+            this.Contracts = new List<ItContract.ItContract>();
+            this.Wishes = new List<Wish>();
+            this.OrgUnits = new List<OrganizationUnit>();
+            this.TaskRefs = new List<TaskRef>();
+            this.Rights = new List<ItSystemRight>();
+            this.InterfaceUsages = new List<InterfaceUsage>();
+            this.UsedBy = new List<OrganizationUnit>();
+        }
+
         public int Id { get; set; }
         public bool IsStatusActive { get; set; }
         public string Note { get; set; }
@@ -35,7 +46,6 @@ namespace Core.DomainModel.ItSystem
         public virtual ICollection<ItContract.ItContract> Contracts { get; set; }
         public virtual ICollection<Wish> Wishes { get; set; }
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
-        public virtual ICollection<ItSystemRight> Rights { get; set; }
 
         /// <summary>
         /// These Organization Units are using this system
@@ -46,5 +56,9 @@ namespace Core.DomainModel.ItSystem
         /// IT System support these tasks
         /// </summary>
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
+
+        public virtual ICollection<ItSystemRight> Rights { get; set; }
+
+        public virtual ICollection<InterfaceUsage> InterfaceUsages { get; set; } 
     }
 }

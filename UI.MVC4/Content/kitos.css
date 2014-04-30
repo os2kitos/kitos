@@ -27,6 +27,13 @@ div#page-body
 }
 
 /************ NAVIGATION BAR TOP **************/
+.navbar-nav {
+    width: 70%;
+}
+.navbar-nav > li {
+    width: 16%;
+}
+
 #navbar-top
 {
     height: 100px;
@@ -39,6 +46,7 @@ div#page-body
     #navbar-top .navbar-nav li a,
     #navbar-top .navbar-text
     {
+        font-size: 1vw;
         line-height: 70px;
         height: 70px;
         padding: 0px 10px;
@@ -48,7 +56,7 @@ div#page-body
 
     #navbar-top li a
     {
-        width: 180px;
+        width: 100%;
     }
 
     #navbar-top li.double-line a
@@ -500,4 +508,11 @@ div.pull-outside-table {
 
 .margin-top {
     margin-top: 50px;
+}
+
+table.table-fixed {
+    table-layout: fixed;
+}
+table.table-no-margin {
+    margin: 0px;
 }

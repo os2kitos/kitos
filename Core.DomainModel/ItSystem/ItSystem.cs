@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Core.DomainModel.ItSystem
 {
@@ -8,9 +9,16 @@ namespace Core.DomainModel.ItSystem
         {
             this.ExposedInterfaces = new List<ItSystem>();
             this.CanUseInterfaces = new List<ItSystem>();
+            this.CanBeUsedBy = new List<ItSystem>();
             this.Children = new List<ItSystem>();
             this.TaskRefs = new List<TaskRef>();
             this.Rights = new List<ItSystemRight>();
+            this.Usages = new List<ItSystemUsage>();
+            this.Wishes = new List<Wish>();
+            this.TaskRefs = new List<TaskRef>();
+            this.Overviews = new List<ItSystemUsage>();
+            this.DataRows = new List<DataRow>();
+            this.InterfaceUsages = new List<InterfaceUsage>();
         }
 
         public int Id { get; set; }
@@ -18,7 +26,6 @@ namespace Core.DomainModel.ItSystem
         public string Name { get; set; }
         public string SystemId { get; set; }
 
-        public int? ExposedById { get; set; }
 
         public int BelongsToId { get; set; }
         /// <summary>
@@ -35,6 +42,7 @@ namespace Core.DomainModel.ItSystem
         public string Description { get; set; }
         public string Url { get; set; }
 
+        public int? ExposedById { get; set; }
         /// <summary>
         /// If this system is an interface, which system exposed it
         /// </summary>
@@ -114,5 +122,15 @@ namespace Core.DomainModel.ItSystem
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
 
         public virtual ICollection<ItSystemUsage> Overviews { get; set; }
+
+        /// <summary>
+        /// Local usages of the system, in case the system is an interface
+        /// </summary>
+        public virtual ICollection<InterfaceUsage> InterfaceUsages { get; set; }
+
+        /// <summary>
+        /// Local infrastructure usages of the system, in case the system is not an interface
+        /// </summary>
+        public virtual ICollection<InterfaceUsage> InfrastructureUsage { get; set; }
     }
 }

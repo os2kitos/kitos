@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Core.DomainModel.ItSystem;
 
 namespace UI.MVC4.Models
 {
@@ -22,7 +23,7 @@ namespace UI.MVC4.Models
 
         public int OrganizationId { get; set; }
         public OrganizationDTO Organization { get; set; }
-
+        
         
         
         public int ItSystemId { get; set; }
@@ -34,5 +35,6 @@ namespace UI.MVC4.Models
         
         public IEnumerable<OrgUnitDTO> UsedBy { get; set; }
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
+        public IEnumerable<InterfaceUsageDTO> InterfaceUsages { get; set; } 
     }
 }
