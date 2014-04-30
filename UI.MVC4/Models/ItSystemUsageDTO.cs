@@ -33,5 +33,6 @@ namespace UI.MVC4.Models
         public IEnumerable<RightOutputDTO> Rights { get; set; }
         
         public IEnumerable<OrgUnitDTO> UsedBy { get; set; }
+        public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
     }
 }

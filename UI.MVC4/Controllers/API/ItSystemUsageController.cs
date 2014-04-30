@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
@@ -12,11 +13,13 @@ namespace UI.MVC4.Controllers.API
     public class ItSystemUsageController : GenericApiController<ItSystemUsage, int, ItSystemUsageDTO> 
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
+        private readonly IGenericRepository<TaskRef> _taskRepository;
 
-        public ItSystemUsageController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository) 
+        public ItSystemUsageController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository) 
             : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
+            _taskRepository = taskRepository;
         }
 
         public HttpResponseMessage GetByOrganization(int organizationId)
@@ -97,7 +100,7 @@ namespace UI.MVC4.Controllers.API
 
                 if (usage == null) return NotFound();
 
-                return Ok(usage.UsedBy);
+                return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(usage.UsedBy));
             }
             catch (Exception e)
             {
@@ -137,6 +140,62 @@ namespace UI.MVC4.Controllers.API
                 usage.UsedBy.Remove(orgUnit);
                 Repository.Save();
                 
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetTasksUsedByThisSystem(int id, [FromUri] int taskId)
+        {
+            try
+            {
+                var usage = Repository.GetByKey(id);
+
+                if (usage == null) return NotFound();
+
+                return Ok(Map<IEnumerable<TaskRef>, IEnumerable<TaskRefDTO>>(usage.TaskRefs));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage PostTasksUsedByThisSystem(int id, [FromUri] int taskId)
+        {
+            try
+            {
+                var usage = Repository.GetByKey(id);
+                var task = _taskRepository.GetByKey(taskId);
+
+                if (usage == null || task == null) return NotFound();
+
+                usage.TaskRefs.Add(task);
+                Repository.Save();
+
+                return Created(Map<TaskRef, TaskRefDTO>(task));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage DeleteTasksUsedByThisSystem(int id, [FromUri] int taskId)
+        {
+            try
+            {
+                var usage = Repository.GetByKey(id);
+                var task = _taskRepository.GetByKey(taskId);
+
+                if (usage == null || task == null) return NotFound();
+
+                usage.TaskRefs.Remove(task);
+                Repository.Save();
+
                 return Ok();
             }
             catch (Exception e)

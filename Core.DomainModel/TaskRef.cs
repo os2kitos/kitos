@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
 {
@@ -20,7 +21,6 @@ namespace Core.DomainModel
         public DateTime? ActiveFrom { get; set; }
         public DateTime? ActiveTo { get; set; }
         public int? ItProjectId { get; set; }
-        public int? ItSystemId { get; set; }
         public int? ParentId { get; set; }
         public int OwnedByOrganizationUnitId { get; set; }
 
@@ -31,5 +31,6 @@ namespace Core.DomainModel
         public virtual ICollection<TaskUsage> Usages { get; set; }
         public virtual OrganizationUnit OwnedByOrganizationUnit { get; set; }
         public virtual ICollection<ItSystem.ItSystem> ItSystems { get; set; }
+        public virtual ICollection<ItSystemUsage> ItSystemUsages { get; set; }
     }
 }

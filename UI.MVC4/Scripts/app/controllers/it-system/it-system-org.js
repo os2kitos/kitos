@@ -8,7 +8,7 @@
                 selectedOrgUnits: ['itSystemUsage', function (itSystemUsage) {
                     return _.pluck(itSystemUsage.usedBy, 'id');
                 }],
-                orgUnitsTree: ['itSystemUsage', '$http', function (itSystemUsage, $http) {
+                orgUnitsTree: ['$http', 'itSystemUsage', function ($http, itSystemUsage) {
                     return $http.get('api/organizationunit/?organization=' + itSystemUsage.organizationId)
                         .then(function(result) {
                             return [result.data.response]; // to array for ngRepeat to work
