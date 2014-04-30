@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
+using System.Web.Http;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using UI.MVC4.Models;
@@ -9,9 +11,12 @@ namespace UI.MVC4.Controllers.API
 {
     public class ItSystemUsageController : GenericApiController<ItSystemUsage, int, ItSystemUsageDTO> 
     {
-        public ItSystemUsageController(IGenericRepository<ItSystemUsage> repository) 
+        private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
+
+        public ItSystemUsageController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository) 
             : base(repository)
         {
+            _orgUnitRepository = orgUnitRepository;
         }
 
         public HttpResponseMessage GetByOrganization(int organizationId)
@@ -84,5 +89,60 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        public HttpResponseMessage GetOrganizationUnitsUsingThisSystem(int id, [FromUri] int organizationUnit)
+        {
+            try
+            {
+                var usage = Repository.GetByKey(id);
+
+                if (usage == null) return NotFound();
+
+                return Ok(usage.UsedBy);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage PostOrganizationUnitsUsingThisSystem(int id, [FromUri] int organizationUnit)
+        {
+            try
+            {
+                var usage = Repository.GetByKey(id);
+                var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
+
+                if (usage == null || orgUnit == null) return NotFound();
+
+                usage.UsedBy.Add(orgUnit);
+                Repository.Save();
+
+                return Created(Map<OrganizationUnit, OrgUnitDTO>(orgUnit));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage DeleteOrganizationUnitsUsingThisSystem(int id, [FromUri] int organizationUnit)
+        {
+            try
+            {
+                var usage = Repository.GetByKey(id);
+                var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
+
+                if (usage == null || orgUnit == null) return NotFound();
+
+                usage.UsedBy.Remove(orgUnit);
+                Repository.Save();
+                
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
     }
 }

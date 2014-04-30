@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
@@ -13,6 +14,7 @@ namespace Core.DomainModel
             this.TaskRefs = new List<TaskRef>();
             this.OwnedTasks = new List<TaskRef>();
             this.DefaultUsers = new List<User>();
+            this.Using = new List<ItSystemUsage>();
         }
 
         public int Id { get; set; }
@@ -36,6 +38,11 @@ namespace Core.DomainModel
         /// <summary>
         /// Users which have set this as their default OrganizationUnit
         /// </summary>
-        public ICollection<User> DefaultUsers { get; set; }
+        public virtual ICollection<User> DefaultUsers { get; set; }
+
+        /// <summary>
+        /// This Organization Unit is using these IT Systems (Via ItSystemUsage)
+        /// </summary>
+        public virtual ICollection<ItSystemUsage> Using { get; set; }
     }
 }

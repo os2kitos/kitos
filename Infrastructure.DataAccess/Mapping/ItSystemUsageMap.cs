@@ -42,6 +42,14 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.Overviews)
                 .HasForeignKey(d => d.OverviewItSystemId)
                 .WillCascadeOnDelete(false);
+
+            this.HasMany(t => t.UsedBy)
+                .WithMany(t => t.Using)
+                .Map(mc =>
+                    {
+                        mc.MapLeftKey("UsageId");
+                        mc.MapRightKey("OrgUnitId");
+                    });
         }
     }
 }
