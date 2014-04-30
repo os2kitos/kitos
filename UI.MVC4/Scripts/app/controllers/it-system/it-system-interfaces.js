@@ -96,7 +96,7 @@
                     //is the interface currently used?
                     interfaceSystem.usage = _.findWhere(itSystemUsage.interfaceUsages, { interfaceId: interfaceSystem.id });
                     
-                    if (interfaceSystem.usage.infrastructureId) {
+                    if (interfaceSystem.usage && interfaceSystem.usage.infrastructureId) {
                         interfaceSystem.usage.infrastructure = {
                             id: interfaceSystem.usage.infrastructureId,
                             text: interfaceSystem.usage.infrastructureName
@@ -183,8 +183,8 @@
                     return patchUsage(usage, "infrastructureId", usage.infrastructure.id);
                 };
                 
-                $scope.updateInfrastructure = function (usage) {
-                    return patchUsage(usage, "infrastructureId", usage.infrastructure.id);
+                $scope.updateCategory = function (usage) {
+                    return patchUsage(usage, "interfaceCategoryId", usage.interfaceCategoryId);
                 };
 
 

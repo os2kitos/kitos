@@ -502,6 +502,9 @@ div.pull-outside-table {
     margin-top: 50px;
 }
 
-table.fixed {
+table.table-fixed {
     table-layout: fixed;
+}
+table.table-no-margin {
+    margin: 0px;
 }

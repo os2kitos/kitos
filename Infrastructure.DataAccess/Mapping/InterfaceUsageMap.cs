@@ -33,6 +33,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(d => d.InfrastructureUsage)
                 .HasForeignKey(t => t.InfrastructureId);
 
+            this.HasOptional(t => t.InterfaceCategory)
+                .WithMany(d => d.References)
+                .HasForeignKey(t => t.InterfaceCategoryId);
+
         }
     }
 }

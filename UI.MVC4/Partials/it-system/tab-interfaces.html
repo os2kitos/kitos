@@ -110,7 +110,7 @@
                 
                 <!-- interface category -->
                 <td>
-                    <select data-ui-select2="" data-ng-model="system.interfaceCategoryId" class="form-control input-sm" data-ng-disabled="!system.usage" data-ng-change="updateCategory(system.usage)">
+                    <select data-ui-select2="" data-ng-model="system.usage.interfaceCategoryId" class="form-control input-sm" data-ng-disabled="!system.usage" data-ng-change="updateCategory(system.usage)">
                         <option data-ng-repeat="category in interfaceCategories" value="{{category.id}}">{{category.name}}</option>
                     </select>
                 </td>
@@ -127,7 +127,7 @@
                 
                 <!-- interface data -->
                 <td>
-                    <table class="table table-bordered table-condensed small fixed">
+                    <table class="table table-bordered table-condensed small table-fixed table-no-margin">
                         <thead>
                             <tr class="info">
                                 <th style="width: 10%">
@@ -151,7 +151,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr data-ng-repeat="dataRow in system.dataRows">
+                            <tr data-ng-if="system.showDataRows" data-ng-repeat="dataRow in system.dataRows">
                                 <td>
                                     {{dataRow.data}}
                                 </td>
@@ -185,6 +185,15 @@
                             </tr>
                             <tr data-ng-if="system.dataRows.length == 0">
                                 <td colspan="6" class="text-center">Snitfladen har ingen data</td>
+                            </tr>
+                            
+                            <tr data-ng-if="system.dataRows.length > 0 && !system.showDataRows">
+                                <td colspan="6" class="text-center">
+                                    <button class="full-width btn-link btn-xs" data-ng-click="system.showDataRows = true">
+                                        <i class="glyphicon glyphicon-chevron-right small"></i>
+                                        Fold ud
+                                    </button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
