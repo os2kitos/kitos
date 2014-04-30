@@ -48,6 +48,7 @@
     <Compile Include="ItSystem\DataRowUsage.cs" />
     <Compile Include="ItSystem\DataType.cs" />
     <Compile Include="ItSystem\Frequency.cs" />
+    <Compile Include="ItSystem\InterfaceCategory.cs" />
     <Compile Include="ItSystem\InterfaceUsage.cs" />
     <Compile Include="ItSystem\ItSystemUsage.cs" />
     <Compile Include="ItSystem\SensitiveDataType.cs" />
@@ -100,7 +101,6 @@
     <Compile Include="ItProject\Stakeholder.cs" />
     <Compile Include="ItSupportModuleName.cs" />
     <Compile Include="ItSystemModuleName.cs" />
-    <Compile Include="ItSystem\Infrastructure.cs" />
     <Compile Include="ItSystem\Interface.cs" />
     <Compile Include="ItSystem\InterfaceType.cs" />
     <Compile Include="ItSystem\ItSystem.cs" />

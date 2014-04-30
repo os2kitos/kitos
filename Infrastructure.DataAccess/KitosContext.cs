@@ -43,10 +43,10 @@ namespace Infrastructure.DataAccess
         public DbSet<Handover> Handovers { get; set; }
         public DbSet<HandoverTrial> HandoverTrials { get; set; }
         public DbSet<Hierarchy> Hierarchies { get; set; }
-        public DbSet<Core.DomainModel.ItSystem.Infrastructure> Infrastructures { get; set; }
         public DbSet<Interface> Interfaces { get; set; }
         public DbSet<InterfaceUsage> InterfaceUsages { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
+        public DbSet<InterfaceCategory> InterfaceCategories { get; set; }
         public DbSet<ItContractModuleName> ItContractModuleNames { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
         public DbSet<ItContractRight> ItContractRights { get; set; }
@@ -118,10 +118,10 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new HandoverMap());
             modelBuilder.Configurations.Add(new HandoverTrialMap());
             modelBuilder.Configurations.Add(new HierarchyMap());
-            modelBuilder.Configurations.Add(new InfrastructureMap());
             modelBuilder.Configurations.Add(new InterfaceMap());
             modelBuilder.Configurations.Add(new InterfaceUsageMap());
             modelBuilder.Configurations.Add(new InterfaceTypeMap());
+            modelBuilder.Configurations.Add(new InterfaceCategoryMap());
             modelBuilder.Configurations.Add(new ItContractMap());
             modelBuilder.Configurations.Add(new ItContractRightMap());
             modelBuilder.Configurations.Add(new ItContractRoleMap());
