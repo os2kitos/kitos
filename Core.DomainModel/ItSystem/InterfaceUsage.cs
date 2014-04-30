@@ -21,6 +21,9 @@ namespace Core.DomainModel.ItSystem
         public int InterfaceId { get; set; }
         public virtual ItSystem Interface { get; set; }
 
-        public virtual ICollection<DataRowUsage> DataRowUsages { get; set; } 
+        public virtual ICollection<DataRowUsage> DataRowUsages { get; set; }
+
+        public int InfrastructureId { get; set; }
+        public virtual ItSystem Infrastructure { get; set; }
     }
 }
