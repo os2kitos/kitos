@@ -104,13 +104,13 @@
                 <!-- exposed by -->
                 <td>{{system.exposedBy.name}}</td>
                 <td>
-                    <input type="hidden" data-ui-select2="itSystemsSelectOptions" data-ng-model="system.usage.infrastructure" 
-                           class="form-control input-sm" data-ng-disabled="!system.usage">
+                    <input type="hidden" data-ui-select2="itSystemsSelectOptions" data-ng-model="system.usage.infrastructureId" 
+                           class="form-control input-sm" data-ng-disabled="!system.usage" data-ng-change="updateInfrastructure(system.usage)">
                 </td>
                 
                 <!-- interface category -->
                 <td>
-                    <select data-ui-select2="" data-ng-model="system.interfaceCategoryId" class="form-control input-sm" data-ng-disabled="!system.usage">
+                    <select data-ui-select2="" data-ng-model="system.interfaceCategoryId" class="form-control input-sm" data-ng-disabled="!system.usage" data-ng-change="updateCategory(system.usage)">
                         <option data-ng-repeat="category in interfaceCategories" value="{{category.id}}">{{category.name}}</option>
                     </select>
                 </td>
@@ -127,25 +127,25 @@
                 
                 <!-- interface data -->
                 <td>
-                    <table class="table table-bordered table-condensed small">
+                    <table class="table table-bordered table-condensed small fixed">
                         <thead>
                             <tr class="info">
-                                <th>
+                                <th style="width: 10%">
                                     Data
                                 </th>
-                                <th>
+                                <th style="width: 10%">
                                     Datatype
                                 </th>
-                                <th>
+                                <th style="width: 15%">
                                     Frekvens
                                 </th>
-                                <th>
+                                <th style="width: 15%">
                                     Pris
                                 </th>
-                                <th>
+                                <th style="width: 15%">
                                     Mængde
                                 </th>
-                                <th>
+                                <th style="width: 15%">
                                     Økonomi
                                 </th>
                             </tr>
@@ -170,17 +170,17 @@
 
                                 <!-- price -->
                                 <td>
-                                    <input type="number" data-ng-model="dataRow.usage.price" class="form-control input-sm" data-ng-disabled="!system.usage"/>
+                                    <input data-ng-model="dataRow.usage.price" class="form-control input-sm" data-ng-disabled="!system.usage"/>
                                 </td>
 
                                 <!-- amount -->
                                 <td>
-                                    <input type="number" data-ng-model="dataRow.usage.amount" class="form-control input-sm" data-ng-disabled="!system.usage"/>
+                                    <input data-ng-model="dataRow.usage.amount" class="form-control input-sm" data-ng-disabled="!system.usage"/>
                                 </td>
 
                                 <!-- economy -->
                                 <td>
-                                    <input type="number" data-ng-model="dataRow.usage.economy" class="form-control input-sm" data-ng-disabled="!system.usage"/>
+                                    <input data-ng-model="dataRow.usage.economy" class="form-control input-sm" data-ng-disabled="!system.usage"/>
                                 </td>
                             </tr>
                             <tr data-ng-if="system.dataRows.length == 0">

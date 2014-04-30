@@ -53,6 +53,8 @@
                 tsas, interfaces, interfaceTypes, methods, dataTypes,
                 interfaceCategories, interfaceSystems, itSystemUsage) {
 
+                $scope.interfaceCategories = interfaceCategories;
+
                 $scope.exposedInterfaces = [];
 
                 //EXPOSED INTERFACES
@@ -138,6 +140,35 @@
                             notify.addSuccessMessage("Fejl!");
                         });
                     }
+
+                };
+                
+                function patch(url, field, value) {
+
+                    var data = {};
+                    data[field] = value;
+
+                    console.log("patch: " + url + ", data: " + JSON.stringify(data));
+
+                    /*
+                    return $http({ method: 'PATCH', url: url, data: data }).success(function(result) {
+                        notify.addSuccessMessage("Feltet er opdateret");
+                    }).error(function(result) {
+                        notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!");
+                    });
+                     */
+                }
+                
+                function patchUsage(usage, field, value) {
+
+                    var url = "api/itsystemusage/" + usage.id;
+
+                    return patch(url, field, value);
+                }
+
+                $scope.updateInfrastructure = function(usage) {
+                    
+                    return patchUsage(usage, "infrastructure", usage.infrastructure);
 
                 };
 
