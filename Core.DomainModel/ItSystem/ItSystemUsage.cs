@@ -12,6 +12,7 @@ namespace Core.DomainModel.ItSystem
             this.TaskRefs = new List<TaskRef>();
             this.Rights = new List<ItSystemRight>();
             this.InterfaceUsages = new List<InterfaceUsage>();
+            this.UsedBy = new List<OrganizationUnit>();
         }
 
         public int Id { get; set; }
@@ -45,6 +46,15 @@ namespace Core.DomainModel.ItSystem
         public virtual ICollection<ItContract.ItContract> Contracts { get; set; }
         public virtual ICollection<Wish> Wishes { get; set; }
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
+
+        /// <summary>
+        /// These Organization Units are using this system
+        /// </summary>
+        public virtual ICollection<OrganizationUnit> UsedBy { get; set; }
+        
+        /// <summary>
+        /// IT System support these tasks
+        /// </summary>
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
 
         public virtual ICollection<ItSystemRight> Rights { get; set; }

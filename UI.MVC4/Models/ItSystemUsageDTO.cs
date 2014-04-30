@@ -23,13 +23,18 @@ namespace UI.MVC4.Models
 
         public int OrganizationId { get; set; }
         public OrganizationDTO Organization { get; set; }
-
+        
+        
+        
         public int ItSystemId { get; set; }
         public ItSystemDTO ItSystem { get; set; }
 
         public int? OverviewItSystemId { get; set; }
 
         public IEnumerable<RightOutputDTO> Rights { get; set; }
+        
+        public IEnumerable<OrgUnitDTO> UsedBy { get; set; }
+        public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
         public IEnumerable<InterfaceUsageDTO> InterfaceUsages { get; set; } 
     }
 }

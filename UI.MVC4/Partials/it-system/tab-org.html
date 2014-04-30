@@ -1,0 +1,13 @@
+﻿<script type="text/ng-template"  id="tree_item_renderer.html">
+    <label>
+        <input type="checkbox" value="{{ orgUnit.id }}" data-ng-model="orgUnit.selected" data-ng-change="save(orgUnit)" />
+        {{ orgUnit.name }}
+    </label>
+    <ul>
+        <li data-ng-repeat="orgUnit in orgUnit.children" data-ng-include="'tree_item_renderer.html'"></li>
+    </ul>
+</script>
+
+<ul>
+    <li data-ng-repeat="orgUnit in orgUnitsTree" data-ng-include="'tree_item_renderer.html'"></li>
+</ul>

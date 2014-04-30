@@ -15,7 +15,6 @@ namespace Infrastructure.DataAccess.Mapping
             this.ToTable("TaskRef");
             this.Property(t => t.Id).HasColumnName("Id");
             this.Property(t => t.ItProjectId).HasColumnName("ItProjectId");
-            this.Property(t => t.ItSystemId).HasColumnName("ItSystemId");
 
             // Relationships
             this.HasOptional(t => t.Parent)
@@ -25,13 +24,12 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.ItProject)
                 .WithMany(t => t.TaskRefs)
                 .HasForeignKey(d => d.ItProjectId);
-            /*this.HasOptional(t => t.ItSystem)
-                .WithMany(t => t.KLEs)
-                .HasForeignKey(d => d.ItSystemId);*/
             this.HasRequired(t => t.OwnedByOrganizationUnit)
                 .WithMany(t => t.OwnedTasks)
                 .HasForeignKey(d => d.OwnedByOrganizationUnitId);
             this.HasMany(t => t.ItSystems)
+                .WithMany(t => t.TaskRefs);
+            this.HasMany(t => t.ItSystemUsages)
                 .WithMany(t => t.TaskRefs);
         }
     }

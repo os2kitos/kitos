@@ -1,0 +1,11 @@
+﻿ <select data-ng-model="kleFilter.parentId" data-ng-options="t.id as t.taskKey for t in kle | filter:{ type:'KLE-Gruppe' }" data-ng-change="cleanKleFilter()">
+     <option value="">-- Gruppe --</option>
+ </select>
+
+<div data-ng-repeat="task in kle | filter:kleFilter">
+    <label>
+        <input type="checkbox" data-ng-model="task.selected" data-ng-change="save(task)" data-ng-disabled="task.disabled" />
+        {{ task.taskKey }} {{ task.description }}
+    </label>
+</div>
+

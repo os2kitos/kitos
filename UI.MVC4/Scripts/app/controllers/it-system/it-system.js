@@ -102,12 +102,6 @@
                             return result.data.response;
                         });
                 }],
-                orgUnits: ['$http', '$rootScope', function($http, $rootScope) {
-                    return $http.get("api/organizationunit/?userid=" + $rootScope.user.id)
-                        .then(function(result) {
-                            return result.data.response;
-                        });
-                }],
                 itSystems: ['$http', function($http) {
                     return $http.get("api/itsystem/")
                         .then(function(result) {
@@ -398,8 +392,8 @@
 
             }]);
 
-    app.controller('system.EditUsage', ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'itSystemUsage', 'appTypes', 'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'orgUnits', 'itSystems',
-        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, appTypes, businessTypes, archiveTypes, sensitiveDataTypes, orgUnits, itSystems) {
+    app.controller('system.EditUsage', ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'itSystemUsage', 'appTypes', 'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'itSystems',
+        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, appTypes, businessTypes, archiveTypes, sensitiveDataTypes, itSystems) {
             $rootScope.page.title = 'Opret IT system';
             $rootScope.page.subnav = subnav.slice();
             $rootScope.page.subnav.push({ state: 'it-system-usage', text: 'IT System' });
@@ -410,7 +404,6 @@
             $scope.businessTypes = businessTypes;
             $scope.archiveTypes = archiveTypes;
             $scope.sensitiveDataTypes = sensitiveDataTypes;
-            $scope.orgUnits = orgUnits;
             $scope.itSystems = itSystems;
             $scope.usage = itSystemUsage;
 
@@ -419,6 +412,8 @@
                     return result.data.response;
                 });
             }
+
+            $scope.orgUnits = itSystemUsage.usedBy;
         }
     ]);
 })(angular, app);
