@@ -95,6 +95,13 @@
                     interfaceSystem.canBeUsed = _.contains(interfaceSystem.canBeUsedByIds, itSystemUsage.itSystemId);
                     //is the interface currently used?
                     interfaceSystem.usage = _.findWhere(itSystemUsage.interfaceUsages, { interfaceId: interfaceSystem.id });
+                    
+                    if (interfaceSystem.usage.infrastructureId) {
+                        interfaceSystem.usage.infrastructure = {
+                            id: interfaceSystem.usage.infrastructureId,
+                            text: interfaceSystem.usage.infrastructureName
+                        };
+                    }
 
                     var rank = 3;
                     if (interfaceSystem.usage) rank -= 2;
@@ -107,13 +114,14 @@
 
                     if (interfaceSystem.usage) {
                         $http.delete("api/interfaceUsage/" + interfaceSystem.usage.id).success(function(result) {
-                            notify.addSuccessMessage("Snitfladen anvendes ikke længere");
+                            
                             delete interfaceSystem.usage;
 
-                            var dataRowUsages = result.response.dataRows;
                             _.each(interfaceSystem.dataRows, function (dataRow) {
                                 delete dataRow.usage;
                             });
+
+                            notify.addSuccessMessage("Snitfladen anvendes ikke længere");
                             
                         }).error(function(result) {
                             notify.addSuccessMessage("Fejl!");
@@ -128,6 +136,13 @@
                         $http.post("api/interfaceUsage", data).success(function (result) {
                             notify.addSuccessMessage("Snitfladen er taget i lokal anvendelse");
                             interfaceSystem.usage = result.response;
+
+                            if (interfaceSystem.usage.infrastructureId) {
+                                interfaceSystem.usage.infrastructure = {
+                                    id: interfaceSystem.usage.infrastructureId,
+                                    text: interfaceSystem.usage.infrastructureName
+                                };
+                            }
 
                             var dataRowUsages = result.response.dataRowUsages;
                             _.each(interfaceSystem.dataRows, function(dataRow) {
@@ -150,26 +165,26 @@
 
                     console.log("patch: " + url + ", data: " + JSON.stringify(data));
 
-                    /*
                     return $http({ method: 'PATCH', url: url, data: data }).success(function(result) {
                         notify.addSuccessMessage("Feltet er opdateret");
                     }).error(function(result) {
                         notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!");
                     });
-                     */
                 }
                 
                 function patchUsage(usage, field, value) {
 
-                    var url = "api/itsystemusage/" + usage.id;
+                    var url = "api/interfaceusage/" + usage.id;
 
                     return patch(url, field, value);
                 }
 
                 $scope.updateInfrastructure = function(usage) {
-                    
-                    return patchUsage(usage, "infrastructure", usage.infrastructure);
-
+                    return patchUsage(usage, "infrastructureId", usage.infrastructure.id);
+                };
+                
+                $scope.updateInfrastructure = function (usage) {
+                    return patchUsage(usage, "infrastructureId", usage.infrastructure.id);
                 };
 
 
