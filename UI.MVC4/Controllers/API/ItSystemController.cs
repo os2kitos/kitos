@@ -62,7 +62,21 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetInterfaces(string q, bool? interfaces)
+        public HttpResponseMessage GetInterfaces(bool? interfaces)
+        {
+            try
+            {
+                var systems = _systemService.GetInterfaces(null, null);
+                var dtos = Map(systems);
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetInterfacesSearch(string q, bool? interfaces)
         {
             try
             {
@@ -76,7 +90,21 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetNonInterfaces(string q, bool? nonInterfaces)
+        public HttpResponseMessage GetNonInterfaces(bool? nonInterfaces)
+        {
+            try
+            {
+                var systems = _systemService.GetNonInterfaces(null, null);
+                var dtos = Map(systems);
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetNonInterfacesSearch(string q, bool? nonInterfaces)
         {
             try
             {

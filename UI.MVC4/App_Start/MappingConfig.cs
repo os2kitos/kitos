@@ -55,6 +55,10 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
+            Mapper.CreateMap<InterfaceCategory, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
             Mapper.CreateMap<Interface, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
@@ -208,6 +212,12 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.CanUseInterfaces, opt => opt.Ignore())
                   .ForMember(dest => dest.ExposedInterfaces, opt => opt.Ignore())
                   .ForMember(dest => dest.CanBeUsedBy, opt => opt.Ignore());
+
+            Mapper.CreateMap<DataRowUsage, DataRowUsageDTO>()
+                  .ReverseMap();
+
+            Mapper.CreateMap<InterfaceUsage, InterfaceUsageDTO>()
+                  .ReverseMap();
 
             Mapper.CreateMap<ItSystemUsage, ItSystemUsageDTO>()
                   .ReverseMap()

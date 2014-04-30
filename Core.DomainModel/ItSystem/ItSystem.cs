@@ -26,7 +26,6 @@ namespace Core.DomainModel.ItSystem
         public string Name { get; set; }
         public string SystemId { get; set; }
 
-        public int? ExposedById { get; set; }
 
         public int BelongsToId { get; set; }
         /// <summary>
@@ -43,6 +42,7 @@ namespace Core.DomainModel.ItSystem
         public string Description { get; set; }
         public string Url { get; set; }
 
+        public int? ExposedById { get; set; }
         /// <summary>
         /// If this system is an interface, which system exposed it
         /// </summary>
