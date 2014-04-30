@@ -23,7 +23,7 @@ namespace Core.DomainModel.ItSystem
 
         public virtual ICollection<DataRowUsage> DataRowUsages { get; set; }
 
-        public int InfrastructureId { get; set; }
+        public int? InfrastructureId { get; set; }
         public virtual ItSystem Infrastructure { get; set; }
     }
 }
