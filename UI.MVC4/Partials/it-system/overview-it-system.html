@@ -35,7 +35,8 @@
         <tr data-ng-repeat="usage in systemUsages">
             <td>
                 <a data-ui-sref="it-system-usage({id: usage.id})">{{usage.itSystem.name}}</a>
-                <span data-ng-if="usage.itSystem.accessModifier == 1" class="small text-muted">(P)
+                <span data-ng-if="usage.itSystem.accessModifier == 1" class="small text-muted" data-tooltip="Public">
+                    (P)
                 </span>
             </td>
             <td data-ng-switch="showSystemId">
@@ -46,12 +47,18 @@
                 <span data-ng-switch-when="appType">{{usage.itSystem.appType.name}}</span>
                 <span data-ng-switch-when="businessType">{{usage.itSystem.businessType.name}}</span>
             </td>
-            <td>0 
+            <td>{{ usage.interfaceUsages.length }}
                 ({{ usage.itSystem.canUseInterfaceIds.length }})
             </td>
-            <td>{{ usage.itSystem.exposedInterfaceIds.length }}
+            <td>
+                <span data-ng-if="usage.itSystem.exposedBy != null">
+                    {{ usage.itSystem.exposedBy.name }}
+                </span>
+                <span data-ng-if="usage.itSystem.exposedBy == null">
+                    {{ usage.itSystem.exposedInterfaceIds.length }}
+                </span>
             </td>
-            <td>{{ usage.overviewItSystem.name }}
+            <td>{{ usage.overviewItSystemName }}
             </td>
             <td>{{ usage.responsibleUnit.name }}
             </td>

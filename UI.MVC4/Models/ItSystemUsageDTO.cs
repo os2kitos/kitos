@@ -30,6 +30,7 @@ namespace UI.MVC4.Models
         public ItSystemDTO ItSystem { get; set; }
 
         public int? OverviewItSystemId { get; set; }
+        public string OverviewItSystemName { get; set; }
 
         public IEnumerable<RightOutputDTO> Rights { get; set; }
         
