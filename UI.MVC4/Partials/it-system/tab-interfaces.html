@@ -164,23 +164,24 @@
                                     <select data-ng-model="dataRow.usage.frequencyId" 
                                             class="form-control input-sm" 
                                             data-ng-disabled="!system.usage"
-                                            data-ng-options="freq.id as freq.name for freq in frequencies">
+                                            data-ng-options="freq.id as freq.name for freq in frequencies"
+                                            data-ng-change="updateFrequency(dataRow.usage)">
                                     </select>
                                 </td>
 
                                 <!-- price -->
                                 <td>
-                                    <input data-ng-model="dataRow.usage.price" class="form-control input-sm" data-ng-disabled="!system.usage"/>
+                                    <input type="text" data-ng-model="dataRow.usage.price" class="form-control input-sm" data-ng-disabled="!system.usage" data-ng-blur="updatePrice(dataRow.usage)" />
                                 </td>
 
                                 <!-- amount -->
                                 <td>
-                                    <input data-ng-model="dataRow.usage.amount" class="form-control input-sm" data-ng-disabled="!system.usage"/>
+                                    <input type="text" data-ng-model="dataRow.usage.amount" class="form-control input-sm" data-ng-disabled="!system.usage" data-ng-blur="updateAmount(dataRow.usage)" />
                                 </td>
 
                                 <!-- economy -->
                                 <td>
-                                    <input data-ng-model="dataRow.usage.economy" class="form-control input-sm" data-ng-disabled="!system.usage"/>
+                                    <input type="text" data-ng-model="dataRow.usage.economy" class="form-control input-sm" data-ng-disabled="!system.usage" data-ng-blur="updateEconomy(dataRow.usage)" />
                                 </td>
                             </tr>
                             <tr data-ng-if="system.dataRows.length == 0">

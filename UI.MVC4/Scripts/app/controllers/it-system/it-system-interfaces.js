@@ -30,6 +30,11 @@
                         return result.data.response;
                     });
                 }],
+                frequencies: ['$http', function ($http) {
+                    return $http.get("api/frequency").then(function (result) {
+                        return result.data.response;
+                    });
+                }],
                 interfaceCategories: ['$http', function ($http) {
                     return $http.get("api/interfaceCategory").then(function (result) {
                         return result.data.response;
@@ -47,13 +52,14 @@
 
     app.controller('system.EditInterfaces',
         ['$rootScope', '$scope', '$http', 'notify',
-            'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes',
+            'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'frequencies',
             'interfaceCategories', 'interfaceSystems', 'itSystemUsage',
             function ($rootScope, $scope, $http, notify,                 
-                tsas, interfaces, interfaceTypes, methods, dataTypes,
+                tsas, interfaces, interfaceTypes, methods, dataTypes, frequencies,
                 interfaceCategories, interfaceSystems, itSystemUsage) {
 
                 $scope.interfaceCategories = interfaceCategories;
+                $scope.frequencies = frequencies;
 
                 $scope.exposedInterfaces = [];
 
@@ -77,6 +83,24 @@
                     $scope.exposedInterfaces = exposedInterfaces;
                 });
 
+                
+                function attachUsage(interfaceSystem, usage) {
+                    if (usage == null) return;
+
+                    interfaceSystem.usage = usage;
+
+                    if (usage.infrastructureId) {
+                        interfaceSystem.usage.infrastructure = {
+                            id: usage.infrastructureId,
+                            text: usage.infrastructureName
+                        };
+                    }
+
+                    var dataRowUsages = usage.dataRowUsages;
+                    _.each(interfaceSystem.dataRows, function (dataRow) {
+                        dataRow.usage = _.findWhere(dataRowUsages, { 'dataRowId': dataRow.id });
+                    });
+                }
 
                 //(CAN-BE) USED INTERFACES
                 $scope.interfaces = interfaceSystems;
@@ -93,15 +117,10 @@
                     
                     //can the interface be used by the selected IT system
                     interfaceSystem.canBeUsed = _.contains(interfaceSystem.canBeUsedByIds, itSystemUsage.itSystemId);
-                    //is the interface currently used?
-                    interfaceSystem.usage = _.findWhere(itSystemUsage.interfaceUsages, { interfaceId: interfaceSystem.id });
                     
-                    if (interfaceSystem.usage && interfaceSystem.usage.infrastructureId) {
-                        interfaceSystem.usage.infrastructure = {
-                            id: interfaceSystem.usage.infrastructureId,
-                            text: interfaceSystem.usage.infrastructureName
-                        };
-                    }
+                    //is the interface currently used?
+                    var usage = _.findWhere(itSystemUsage.interfaceUsages, { interfaceId: interfaceSystem.id });
+                    attachUsage(interfaceSystem, usage);
 
                     var rank = 3;
                     if (interfaceSystem.usage) rank -= 2;
@@ -135,21 +154,9 @@
 
                         $http.post("api/interfaceUsage", data).success(function (result) {
                             notify.addSuccessMessage("Snitfladen er taget i lokal anvendelse");
-                            interfaceSystem.usage = result.response;
 
-                            if (interfaceSystem.usage.infrastructureId) {
-                                interfaceSystem.usage.infrastructure = {
-                                    id: interfaceSystem.usage.infrastructureId,
-                                    text: interfaceSystem.usage.infrastructureName
-                                };
-                            }
+                            attachUsage(interfaceSystem, result.response);
 
-                            var dataRowUsages = result.response.dataRowUsages;
-                            _.each(interfaceSystem.dataRows, function(dataRow) {
-                                dataRow.usage = _.findWhere(dataRowUsages, { 'dataRowId': dataRow.id });
-                            });
-
-                            console.log(interfaceSystem);
 
                         }).error(function (result) {
                             notify.addSuccessMessage("Fejl!");
@@ -185,6 +192,25 @@
                 
                 $scope.updateCategory = function (usage) {
                     return patchUsage(usage, "interfaceCategoryId", usage.interfaceCategoryId);
+                };
+
+                function patchDataRowUsage(dataRowUsage, field, value) {
+                    var url = "api/dataRowUsage/" + dataRowUsage.id;
+
+                    return patch(url, field, value);
+                }
+                
+                $scope.updateFrequency = function(dataRowUsage) {
+                    return patchDataRowUsage(dataRowUsage, "frequencyId", dataRowUsage.frequencyId);
+                };
+                $scope.updatePrice = function (dataRowUsage) {
+                    return patchDataRowUsage(dataRowUsage, "price", parseInt(dataRowUsage.price));
+                };
+                $scope.updateAmount = function (dataRowUsage) {
+                    return patchDataRowUsage(dataRowUsage, "amount", parseInt(dataRowUsage.amount));
+                };
+                $scope.updateEconomy = function (dataRowUsage) {
+                    return patchDataRowUsage(dataRowUsage, "economy", parseInt(dataRowUsage.economy));
                 };
 
 
