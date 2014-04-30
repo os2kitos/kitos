@@ -159,6 +159,10 @@ namespace Infrastructure.DataAccess.Migrations
 
             context.Frequencies.AddOrUpdate(x => x.Name, frequency1, frequency2, frequency3, frequency4);
 
+            context.InterfaceCategories.AddOrUpdate(x => x.Name, 
+                new InterfaceCategory(){ IsActive = true, Note = "...", Name = "Kategori 1" },
+                new InterfaceCategory(){ IsActive = true, Note = "...", Name = "Kategori 2" });
+
             context.SaveChanges();
 
 
