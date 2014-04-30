@@ -83,8 +83,9 @@ namespace Infrastructure.DataAccess.Migrations
             context.InterfaceTypes.AddOrUpdate(x => x.Name,
                                                new InterfaceType() { IsActive = true, Note = "...", Name = "WS" });
 
+            var dataType = new DataType {IsActive = true, Note = "...", Name = "Datatype 1"};
             context.DataTypes.AddOrUpdate(x => x.Name,
-                                          new DataType() {IsActive = true, Note = "...", Name = "Datatype 1"},
+                                          dataType,
                                           new DataType() {IsActive = true, Note = "...", Name = "Datatype 2"},
                                           new DataType() {IsActive = true, Note = "...", Name = "Datatype 3"});
 
@@ -706,7 +707,15 @@ namespace Infrastructure.DataAccess.Migrations
                     Description = "Snitflade for ...",
                     Url = "http://kitos.dk",
                     Parent = null,
-                    ExposedBy = system1
+                    ExposedBy = system1,
+                    DataRows = new List<DataRow>()
+                        {
+                            new DataRow(){Data = "Højde på barn", DataType = dataType}
+                        },
+                    MethodId = 1,
+                    InterfaceId = 1,
+                    InterfaceTypeId = 1,
+                    TsaId = 1
                 };
 
             var system3 = new ItSystem()
