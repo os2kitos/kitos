@@ -11,5 +11,6 @@ namespace Core.DomainServices
         IEnumerable<ItSystem> GetSystems(Organization organization, string nameSearch);
         IEnumerable<ItSystem> GetNonInterfaces(Organization organization, string nameSearch);
         IEnumerable<ItSystem> GetInterfaces(Organization organization, string nameSearch);
+        IEnumerable<ItSystem> GetHierarchy(int systemId);
     }
 }

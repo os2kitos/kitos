@@ -709,7 +709,83 @@ namespace Infrastructure.DataAccess.Migrations
                     ExposedBy = system1
                 };
 
-            context.ItSystems.AddOrUpdate(x => x.Name, system1, system2);
+            var system3 = new ItSystem()
+                {
+                    AccessModifier = AccessModifier.Public,
+                    AppType = appType2,
+                    BusinessType = businessType1,
+                    Organization = kl,
+                    BelongsTo = kl,
+                    User = simon,
+                    Version = "1.0",
+                    Name = "A",
+                    SystemId = "Root",
+                    Description = "...",
+                    Url = "http://kitos.dk",
+                    Parent = null
+                };
+            var system31 = new ItSystem()
+            {
+                AccessModifier = AccessModifier.Public,
+                AppType = appType2,
+                BusinessType = businessType1,
+                Organization = kl,
+                BelongsTo = kl,
+                User = simon,
+                Version = "1.0",
+                Name = "AA",
+                SystemId = "Barn til root",
+                Description = "...",
+                Url = "http://kitos.dk",
+                Parent = system3
+            };
+            var system32 = new ItSystem()
+            {
+                AccessModifier = AccessModifier.Public,
+                AppType = appType2,
+                BusinessType = businessType1,
+                Organization = kl,
+                BelongsTo = kl,
+                User = simon,
+                Version = "1.0",
+                Name = "AB",
+                SystemId = "Barn til root",
+                Description = "...",
+                Url = "http://kitos.dk",
+                Parent = system3
+            };
+            var system311 = new ItSystem()
+            {
+                AccessModifier = AccessModifier.Public,
+                AppType = appType2,
+                BusinessType = businessType1,
+                Organization = kl,
+                BelongsTo = kl,
+                User = simon,
+                Version = "1.0",
+                Name = "AAA",
+                SystemId = "Barn til AA",
+                Description = "...",
+                Url = "http://kitos.dk",
+                Parent = system31
+            };
+            var system3111 = new ItSystem()
+            {
+                AccessModifier = AccessModifier.Public,
+                AppType = appType2,
+                BusinessType = businessType1,
+                Organization = kl,
+                BelongsTo = kl,
+                User = simon,
+                Version = "1.0",
+                Name = "AAAA",
+                SystemId = "Barn til AAA",
+                Description = "...",
+                Url = "http://kitos.dk",
+                Parent = system311
+            };
+
+            context.ItSystems.AddOrUpdate(x => x.Name, system1, system2, system3, system31, system311, system3111, system32);
 
             #endregion
 

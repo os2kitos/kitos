@@ -413,6 +413,7 @@
     <Content Include="Partials\it-system\edit-it-system.html" />
     <Content Include="Partials\it-system\overview-it-system.html" />
     <Content Include="Partials\it-system\tab-interfaces.html" />
+    <Content Include="Partials\it-system\tab-hierarchy.html" />
     <Content Include="Partials\it-system\tab-roles.html" />
     <Content Include="Partials\it-system\tab-wishes.html" />
     <Content Include="Partials\it-system\usage-it-system.html" />
@@ -468,6 +469,7 @@
     <Content Include="Scripts\app\controllers\global-admin\global-admin.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-config.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
+    <Content Include="Scripts\app\controllers\it-system\it-system-hierarchy.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-roles.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-wishes.js" />

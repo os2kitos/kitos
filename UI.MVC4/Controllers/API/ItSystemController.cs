@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
+using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
@@ -111,6 +112,19 @@ namespace UI.MVC4.Controllers.API
                 var systems = _systemService.GetNonInterfaces(null, q);
                 var dtos = Map(systems);
                 return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetHierarchy(int id, [FromUri] bool hierarchy)
+        {
+            try
+            {
+                var systems = _systemService.GetHierarchy(id);
+                return Ok(Map(systems));
             }
             catch (Exception e)
             {
