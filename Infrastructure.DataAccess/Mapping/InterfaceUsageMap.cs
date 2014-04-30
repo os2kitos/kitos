@@ -29,6 +29,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(t => t.InterfaceId)
                 .WillCascadeOnDelete(true);
 
+            this.HasOptional(t => t.Infrastructure)
+                .WithMany(d => d.InfrastructureUsage)
+                .HasForeignKey(t => t.InfrastructureId);
+
         }
     }
 }

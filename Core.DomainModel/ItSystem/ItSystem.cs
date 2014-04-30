@@ -127,5 +127,10 @@ namespace Core.DomainModel.ItSystem
         /// Local usages of the system, in case the system is an interface
         /// </summary>
         public virtual ICollection<InterfaceUsage> InterfaceUsages { get; set; }
+
+        /// <summary>
+        /// Local infrastructure usages of the system, in case the system is not an interface
+        /// </summary>
+        public virtual ICollection<InterfaceUsage> InfrastructureUsage { get; set; }
     }
 }
