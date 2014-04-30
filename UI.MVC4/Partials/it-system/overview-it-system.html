@@ -50,7 +50,13 @@
             <td>{{ usage.interfaceUsages.length }}
                 ({{ usage.itSystem.canUseInterfaceIds.length }})
             </td>
-            <td>{{ usage.itSystem.exposedInterfaceIds.length }}
+            <td>
+                <span data-ng-if="usage.itSystem.exposedBy != null">
+                    {{ usage.itSystem.exposedBy.name }}
+                </span>
+                <span data-ng-if="usage.itSystem.exposedBy == null">
+                    {{ usage.itSystem.exposedInterfaceIds.length }}
+                </span>
             </td>
             <td>{{ usage.overviewItSystemName }}
             </td>
