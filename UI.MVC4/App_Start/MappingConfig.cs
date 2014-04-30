@@ -55,6 +55,10 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
+            Mapper.CreateMap<InterfaceCategory, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
             Mapper.CreateMap<Interface, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
@@ -88,6 +92,10 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
             Mapper.CreateMap<Tsa, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
+            Mapper.CreateMap<Frequency, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
@@ -202,10 +210,18 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.TaskRefIds, opt => opt.MapFrom(src => src.TaskRefs.Select(x => x.Id)))
                   .ForMember(dest => dest.CanUseInterfaceIds, opt => opt.MapFrom(src => src.CanUseInterfaces.Select(x => x.Id)))
                   .ForMember(dest => dest.ExposedInterfaceIds, opt => opt.MapFrom(src => src.ExposedInterfaces.Select(x => x.Id)))
+                  .ForMember(dest => dest.CanBeUsedByIds, opt => opt.MapFrom(src => src.CanBeUsedBy.Select(x => x.Id)))
                   .ReverseMap()
                   .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
                   .ForMember(dest => dest.CanUseInterfaces, opt => opt.Ignore())
-                  .ForMember(dest => dest.ExposedInterfaces, opt => opt.Ignore());
+                  .ForMember(dest => dest.ExposedInterfaces, opt => opt.Ignore())
+                  .ForMember(dest => dest.CanBeUsedBy, opt => opt.Ignore());
+
+            Mapper.CreateMap<DataRowUsage, DataRowUsageDTO>()
+                  .ReverseMap();
+
+            Mapper.CreateMap<InterfaceUsage, InterfaceUsageDTO>()
+                  .ReverseMap();
 
             Mapper.CreateMap<ItSystemUsage, ItSystemUsageDTO>()
                   .ReverseMap()
