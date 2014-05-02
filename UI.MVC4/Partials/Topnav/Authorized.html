@@ -6,15 +6,6 @@
     <li>
         <a data-ui-sref="add-it-system" data-ui-sref-active="active">IT Systemer</a></li>
     <li><a>IT Kontrakter</a></li>
-    <li data-ng-if="user.isLocalAdmin">
-        <a data-ui-sref="local-config" data-ui-sref-active="active">Lokal admin</a>
-    </li>
-    <li data-ng-if="user.isGlobalAdmin">
-        <a data-ui-sref="global-admin" data-ui-sref-active="active">Global admin</a>
-    </li>
-    <li data-ng-if="user.isGlobalAdmin">
-        <a data-ui-sref="config-org" data-ui-sref-active="active">Global konfig</a>
-    </li>
 </ul>
 
 <div class="navbar-text navbar-text-small navbar-right navbar-complex">
@@ -23,6 +14,13 @@
         <a data-ng-click="logout()">Log ud</a>
     </div>
     
+    <div>
+        <a data-ng-if="user.isLocalAdmin" data-ui-sref="local-config" data-ui-sref-active="active">Lokal admin</a>
+        <a data-ng-if="user.isGlobalAdmin" data-ui-sref="global-admin" data-ui-sref-active="active">Global admin</a>
+        <a data-ng-if="user.isGlobalAdmin" data-ui-sref="config-org" data-ui-sref-active="active">Global konfig</a>
+    </div>
+    
+
     <div>
         <select class="form-control input-sm org-selector" 
                 data-ng-model="user.currentOrganizationId" 
