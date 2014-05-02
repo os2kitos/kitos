@@ -18,7 +18,8 @@
                 isGlobalAdmin: response.isGlobalAdmin,
                 isLocalAdmin: isLocalAdmin,
                 isLocalAdminFor: _.pluck(response.adminRights, 'organizationId'),
-                defaultOrganizationUnitId: response.defaultOrganizationUnitId
+                defaultOrganizationUnitId: response.defaultOrganizationUnitId,
+                currentOrganizationId: 1
             };
 
             $rootScope.user = _user;

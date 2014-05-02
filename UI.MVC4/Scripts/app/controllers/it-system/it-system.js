@@ -22,6 +22,9 @@
                 }],
                 organizations: ['$http', function($http) {
                     return $http.get("api/organization");
+                }],
+                user: ['userService', function (userService) {
+                    return userService.getUser();
                 }]
             }
         }).state('add-it-system', {
@@ -53,6 +56,9 @@
                 }],
                 dataTypes: ['$http', function($http) {
                     return $http.get("api/datatype");
+                }],
+                user: ['userService', function (userService) {
+                    return userService.getUser();
                 }]
             }
         }).state('assign-it-system', {
@@ -71,6 +77,9 @@
                 }],
                 systems: ['$http', function($http) {
                     return $http.get("api/itsystem");
+                }],
+                user: ['userService', function (userService) {
+                    return userService.getUser();
                 }]
             }
         }).state('it-system-usage', {
@@ -120,9 +129,9 @@
 
     app.controller('system.OverviewCtrl',
         ['$rootScope', '$scope', '$http', 'notify',
-            'appTypes', 'businessTypes', 'organizations',
+            'appTypes', 'businessTypes', 'organizations', 'user',
             function ($rootScope, $scope, $http, notify,
-             appTypesHttp, businessTypesHttp, organizationsHttp) {
+             appTypesHttp, businessTypesHttp, organizationsHttp, user) {
                 $rootScope.page.title = 'IT Systemer overblik';
                 $rootScope.page.subnav = subnav;
 
@@ -135,7 +144,7 @@
 
                 $scope.systemUsages = {};
 
-                $http.get("api/itSystemUsage?organizationId=" + $rootScope.user.currentOrganizationId).success(function(result) {
+                $http.get("api/itSystemUsage?organizationId=" + user.currentOrganizationId).success(function(result) {
                     $scope.systemUsages = result.response;
 
                     _.each(result.response, function(usage) {
@@ -160,9 +169,9 @@
 
     app.controller('system.AddCtrl',
         ['$rootScope', '$scope', '$http', 'notify',
-            'appTypes', 'interfaceAppType', 'businessTypes', 'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes',
+            'appTypes', 'interfaceAppType', 'businessTypes', 'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'user',
             function ($rootScope, $scope, $http, notify,
-            appTypes, interfaceAppType, businessTypes, tsas, interfaces, interfaceTypes, methods, dataTypes) {
+            appTypes, interfaceAppType, businessTypes, tsas, interfaces, interfaceTypes, methods, dataTypes, user) {
                 $rootScope.page.title = 'Opret IT system';
                 $rootScope.page.subnav = subnav;
 
@@ -193,7 +202,7 @@
                 // submit function
                 $scope.saveSystem = function () {
 
-                    if (!$rootScope.user.currentOrganizationId) {
+                    if (user.currentOrganizationId) {
                         notify.addErrorMessage("Du har ikke valgt en organisation! Vælg en organisation i øverste højre hjørne");
                         return;
                     }
@@ -209,12 +218,12 @@
                         exposedById: system.exposedBy ? system.exposedBy.id : null,
                         canUseInterfaceIds: _.pluck(system.canUseInterfaces, 'id'),
                         belongsToId: system.belongsTo.id,
-                        organizationId: $rootScope.user.currentOrganizationId,
+                        organizationId: user.currentOrganizationId,
 
                         version: system.version,
                         name: system.name,
                         systemId: system.systemId,
-                        userId: $rootScope.user.id,
+                        userId: user.id,
                         accessModifier: system.accessModifier,
                         description: system.description,
                         url: system.url,
@@ -298,9 +307,9 @@
 
     app.controller('system.AssignCtrl',
         ['$rootScope', '$scope', '$http', 'notify',
-            'appTypes', 'businessTypes', 'systems', 'organizations',
+            'appTypes', 'businessTypes', 'systems', 'organizations', 'user',
             function ($rootScope, $scope, $http, notify,
-             appTypesHttp, businessTypesHttp, systems, organizationsHttp) {
+             appTypesHttp, businessTypesHttp, systems, organizationsHttp, user) {
                 $rootScope.page.title = 'Tilknyt IT system';
                 $rootScope.page.subnav = subnav;
 
@@ -344,7 +353,7 @@
                 function addUsage(system) {
                     return $http.post("api/itsystemusage", {
                         itSystemId: system.id,
-                        organizationId: $rootScope.user.currentOrganizationId
+                        organizationId: user.currentOrganizationId
                     }).success(function(result) {
                         notify.addSuccessMessage("Systemet er tilknyttet");
                         system.selected = true;
@@ -371,7 +380,7 @@
 
                     system.belongsTo = _.findWhere(organizations, { id: system.belongsToId });
                     
-                    system.usageUrl = "api/itsystemusage?itSystemId=" + system.id + "&organizationId=" + $rootScope.user.currentOrganizationId;
+                    system.usageUrl = "api/itsystemusage?itSystemId=" + system.id + "&organizationId=" + user.currentOrganizationId;
 
                     loadUser(system);
                     loadOrganization(system);
@@ -392,7 +401,8 @@
 
             }]);
 
-    app.controller('system.EditUsage', ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'itSystemUsage', 'appTypes', 'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'itSystems',
+    app.controller('system.EditUsage', ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'itSystemUsage', 'appTypes',
+        'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'itSystems',
         function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, appTypes, businessTypes, archiveTypes, sensitiveDataTypes, itSystems) {
             $rootScope.page.title = 'Opret IT system';
             $rootScope.page.subnav = subnav.slice();
