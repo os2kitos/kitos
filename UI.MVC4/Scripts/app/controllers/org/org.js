@@ -32,6 +32,9 @@
             templateUrl: 'partials/org/overview.html',
             controller: 'org.OverviewCtrl',
             resolve: {
+                user: ['userService', function (userService) {
+                    return userService.getUser();
+                }]
             }
         });
 
@@ -831,11 +834,11 @@
         }]);
 
 
-    app.controller('org.OverviewCtrl', ['$rootScope', '$scope', '$http', 'notify', '$modal', '$timeout', function ($rootScope, $scope, $http, notify, $modal, $timeout) {
+    app.controller('org.OverviewCtrl', ['$rootScope', '$scope', '$http', 'notify', '$modal', '$timeout', 'user', function ($rootScope, $scope, $http, notify, $modal, $timeout, user) {
         $rootScope.page.title = 'Organisation';
         $rootScope.page.subnav = subnav;
 
-        var userId = $rootScope.user.id;
+        var userId = user.id;
 
         $scope.orgUnits = {};
 
@@ -868,9 +871,9 @@
         }
 
         function checkForDefaultUnit(unit) {
-            if (!$rootScope.user.defaultOrganizationUnitId) return;
+            if (!user.defaultOrganizationUnitId) return;
 
-            if (!unit || unit.id !== $rootScope.user.defaultOrganizationUnitId) return;
+            if (!unit || unit.id !== user.defaultOrganizationUnitId) return;
 
             $timeout(function () {
                 $scope.orgUnitId = unit.id;
