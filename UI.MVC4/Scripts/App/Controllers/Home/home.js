@@ -3,7 +3,7 @@
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
         
         $stateProvider.state('index', {
-            url: '/?login?to',
+            url: '/?to',
             templateUrl: 'partials/home/index.html',
             controller: 'home.IndexCtrl',
             noAuth: true
@@ -21,7 +21,8 @@
 
     }]);
 
-    app.controller('home.IndexCtrl', ['$rootScope', '$scope', '$http', '$state', '$stateParams', 'notify', 'Restangular', function ($rootScope, $scope, $http, $state, $stateParams, notify, Restangular) {
+    app.controller('home.IndexCtrl', ['$rootScope', '$scope', '$http', '$state', '$stateParams', 'notify', 'Restangular', 'userService',
+        function ($rootScope, $scope, $http, $state, $stateParams, notify, Restangular, userService) {
         $rootScope.page.title = 'Index';
         $rootScope.page.subnav = [];
         
@@ -43,30 +44,23 @@
             };
         });
 
-        $scope.highlightLogin = $stateParams.login;
-
         //login
         $scope.submitLogin = function () {
+            
             if ($scope.loginForm.$invalid) return;
 
-            var data = {
-                "email": $scope.email,
-                "password": $scope.password,
-                "rememberMe": $scope.remember
-            };
+            userService.login($scope.email, $scope.password, $scope.remember)
+                .then(function() {
+                    notify.addSuccessMessage("Du er nu logget ind!");
+                    
+                    var to = $stateParams.to ? $stateParams.to : 'org-view';
 
-            $http.post('api/authorize', data).success(function (result) {
-                notify.addSuccessMessage("Du er nu logget ind!");
-
-                $rootScope.saveUser(result);
-
-                //redirect to another state or to the org-view state by default
-                var to = $stateParams.to ? $stateParams.to : 'org-view';
-
-                $state.go(to);
-            }).error(function (result) {
-                notify.addErrorMessage("Forkert brugernavn eller password!");
-            });
+                    $state.go(to);
+                    
+                }, function () {
+                    notify.addErrorMessage("Forkert brugernavn eller password!");
+                    
+                });
 
         };
     }]);
