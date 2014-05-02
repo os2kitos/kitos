@@ -37,7 +37,7 @@
 
     }]);
 
-    app.controller('org.OrgViewCtrl', ['$rootScope', '$scope', '$http', '$modal', 'notify', 'orgRolesHttp', '$q', function ($rootScope, $scope, $http, $modal, notify, orgRolesHttp, $q) {
+    app.controller('org.OrgViewCtrl', ['$rootScope', '$scope', '$http', '$modal', '$filter', 'notify', 'orgRolesHttp', '$q', function ($rootScope, $scope, $http, $modal, $filter, notify, orgRolesHttp, $q) {
         $rootScope.page.title = 'Organisation';
         $rootScope.page.subnav = subnav;
 
@@ -824,6 +824,17 @@
         $scope.getAltRow = function () {
             altRow = !altRow;
             return altRow;
+        };
+
+        $scope.selectAll = function(toState) {
+            var filter = $filter('filter');
+            var filteredTasks = filter($scope.allTasksFlat, $scope.chosenOrgUnit.kleFilter);
+
+            angular.forEach(filteredTasks, function(task) {
+                if (task.selected !== toState) {
+                    $scope.updateTask(task);
+                }
+            });
         };
     }]);
 
