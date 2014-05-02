@@ -161,7 +161,7 @@
                     </div>
                     <div class="container-fluid task-table">
                         <div class="row">
-                            <select data-ng-model="chosenOrgUnit.kleFilter.parentId" data-ng-options="t.id as t.taskKey group by t.parent.taskKey for t in allTasksFlat | filter:{ type:'KLE-Gruppe', show: true }" data-ng-change="cleanKleFilter()">
+                            <select data-ng-model="chosenOrgUnit.kleFilter.parentId" data-ng-options="t.id as (t.taskKey + ' ' + t.description) group by (t.parent.taskKey + ' ' + t.parent.description) for t in allTasksFlat | filter:{ type:'KLE-Gruppe', show: true }" data-ng-change="cleanKleFilter()">
                                 <option value="">-- Gruppe --</option>
                             </select>
                         </div>
