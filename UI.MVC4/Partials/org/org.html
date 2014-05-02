@@ -11,9 +11,9 @@
                 </a>
             </span>
         </h2>
-
+        
         <div data-ng-if="nodes.length != 0">
-
+            
             <p>Du er tilknyttet disse organisationsenheder:</p>
 
             <div data-ng-repeat="node in nodes" class="org-node-top">
@@ -23,29 +23,29 @@
         <div data-ng-if="nodes.length == 0">
             <strong>Du er ikke tilknyttet nogen enheder.</strong>
         </div>
-                      
+
         <!--
-            <div class="well well-sm margin-top">
-                Forklaring:
+        <div class="well well-sm margin-top">
+            Forklaring:
 
-                <div class="org-node" style="display: inline;">
-                    <span class="org-node-info small">
-                        <a>Læserettighed</a>
-                    </span>
-                </div>
-
-                <div class="org-node hasWriteAccess" style="display: inline;">
-                    <span class="org-node-info small">
-                        <a>Skriverettighed</a>
-                    </span>
-                </div>
-
-                <div class="org-node hasWriteAccess selected" style="display: inline;">
-                    <span class="org-node-info small">
-                        <a>Valgt</a>
-                    </span>
-                </div>
+            <div class="org-node" style="display: inline;">
+                <span class="org-node-info small">
+                    <a>Læserettighed</a>
+                </span>
             </div>
+
+            <div class="org-node hasWriteAccess" style="display: inline;">
+                <span class="org-node-info small">
+                    <a>Skriverettighed</a>
+                </span>
+            </div>
+
+            <div class="org-node hasWriteAccess selected" style="display: inline;">
+                <span class="org-node-info small">
+                    <a>Valgt</a>
+                </span>
+            </div>
+        </div>
             -->
     </div>
 
@@ -73,9 +73,11 @@
                         <i class="glyphicon glyphicon-user"></i>
                         Organisationsroller
 
-                        <a class="pull-right"
-                            data-ng-show="chosenOrgUnit.hasWriteAccess"
-                            data-ng-click="chosenOrgUnit.editRights = !chosenOrgUnit.editRights">Rediger
+                        <a class="pull-right" 
+                           data-ng-show="chosenOrgUnit.hasWriteAccess" 
+                            data-ng-click="chosenOrgUnit.editRights = !chosenOrgUnit.editRights">
+                            <span data-ng-if="!chosenOrgUnit.editRights">Rediger</span>
+                            <span data-ng-if="chosenOrgUnit.editRights">Afslut rediger</span>                           
                         </a>
                     </div>
                     <table class="full-width table org-role-table">
@@ -93,7 +95,7 @@
                         </thead>
                         <!-- for each right -->
                         <tbody data-ng-repeat="right in chosenOrgUnit.orgRights | filter : { show: true } | orderBy : rightSort : rightSortReverse">
-
+                            
                             <!-- show -->
                             <tr data-ng-hide="right.edit">
                                 <td>{{ orgUnits[right.objectId].name }}</td>
@@ -104,9 +106,9 @@
                                         <a data-ng-click="right.edit = true" class="btn btn-info btn-xs">
                                             <i class="glyphicon glyphicon-pencil"></i>
                                         </a>
-                                        <a class="btn btn-danger btn-xs"
-                                            data-confirmed-click="deleteRight(right)"
-                                            data-confirm-click="Er du sikker på at du vil slette?">
+                                        <a class="btn btn-danger btn-xs" 
+                                           data-confirmed-click="deleteRight(right)" 
+                                           data-confirm-click="Er du sikker på at du vil slette?">
                                             <i class="glyphicon glyphicon-trash"></i>
                                         </a>
                                     </div>
@@ -142,7 +144,7 @@
                                     <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en organisationsrolle" class="form-control input-sm" data-ng-change="submitRight()">
                                         <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.id}}">{{orgRole.name}} ({{orgRole.hasWriteAccess && "skriv" || "læs" }})
                                         </option>
-                                    </select>
+                                    </select>   
                                 </td>
                                 <td colspan="2" class="form-group">
                                     <input data-select-user="foo" data-user-model="selectedUser" data-add-user="true" />
@@ -151,12 +153,14 @@
                         </tbody>
                     </table>
                 </div>
-
+                
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <i class="glyphicon glyphicon-tasks"></i>
+                        <i class="glyphicon glyphicon-tasks"></i> 
                         Tilknyttede opgaver
-                        <a class="pull-right" data-ng-show="chosenOrgUnit.hasWriteAccess" data-ng-click="editTasks()">Rediger
+                        <a class="pull-right" data-ng-show="chosenOrgUnit.hasWriteAccess" data-ng-click="editTasks()">
+                            <span data-ng-if="!chosenOrgUnit.editTasks">Rediger</span>
+                            <span data-ng-if="chosenOrgUnit.editTasks">Afslut rediger</span>
                         </a>
                     </div>
                     <div class="container-fluid task-table">
@@ -179,7 +183,7 @@
                         <button data-ng-click="selectAll(false)">Ryd alle</button>
                     </div>
                 </div>
-            </div>
+            </div>              
         </div>
     </div>
 </div>
