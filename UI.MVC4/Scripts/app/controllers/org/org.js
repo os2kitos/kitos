@@ -557,7 +557,10 @@
             });
         }
 
-            $scope.cleanKleFilter = function () {
+        $scope.cleanKleFilter = function () {
+            if ($scope.chosenOrgUnit.kleFilter.parent && $scope.chosenOrgUnit.kleFilter.parent.parentId === null) {
+                delete $scope.chosenOrgUnit.kleFilter.parent;
+            }
             if ($scope.chosenOrgUnit.kleFilter.parentId === null) {
                 delete $scope.chosenOrgUnit.kleFilter.parentId;
             }
