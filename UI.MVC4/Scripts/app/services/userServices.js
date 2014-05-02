@@ -47,6 +47,8 @@
 
                 }).error(function(result) {
                     deferred.reject("Not authorized");
+                    clearSavedOrg();
+
                 });
 
             }
