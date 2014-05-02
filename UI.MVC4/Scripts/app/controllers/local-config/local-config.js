@@ -212,8 +212,8 @@
     };
 
     app.controller('localConfig.InitCtrl',
-        ['$rootScope', '$scope', '$http', '$state', 'organizationsHttp', 'autofocus',
-            function($rootScope, $scope, $http, $state, organizationsHttp, autofocus) {
+        ['$rootScope', '$scope', '$http', '$state', 'organizationsHttp', 'autofocus', 'user',
+            function($rootScope, $scope, $http, $state, organizationsHttp, autofocus, user) {
                 $rootScope.page.title = 'Konfiguration';
                 $rootScope.page.subnav = [];
 
@@ -222,7 +222,7 @@
                 $scope.orgChooser = {
                     options: _.filter(organizationsHttp.data.response,
                         function(org) {
-                            return _.contains($rootScope.user.isLocalAdminFor,
+                            return _.contains(user.isLocalAdminFor,
                                 org.id);
                         })
                 };

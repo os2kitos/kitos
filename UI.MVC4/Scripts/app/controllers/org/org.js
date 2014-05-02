@@ -22,6 +22,9 @@
             resolve: {
                 orgRolesHttp: ['$http', function ($http) {
                     return $http.get('api/organizationRole');
+                }],
+                user: ['userService', function (userService) {
+                    return userService.getUser();
                 }]
             }
         }).state('org-overview', {
@@ -29,19 +32,20 @@
             templateUrl: 'partials/org/overview.html',
             controller: 'org.OverviewCtrl',
             resolve: {
-                /*orgUnitsHttp: ['$rootScope', '$http', function ($rootScope, $http) {
-                    return $http.get('api/organizationUnits?userId=' + $rootScope.user.id);
-                }]*/
+                user: ['userService', function (userService) {
+                    return userService.getUser();
+                }]
             }
-        });;
+        });
 
     }]);
 
-    app.controller('org.OrgViewCtrl', ['$rootScope', '$scope', '$http', '$modal', '$filter', 'notify', 'orgRolesHttp', '$q', function ($rootScope, $scope, $http, $modal, $filter, notify, orgRolesHttp, $q) {
+    app.controller('org.OrgViewCtrl', ['$rootScope', '$scope', '$http', '$q', '$filter', '$modal', 'notify', 'orgRolesHttp', 'user',
+        function ($rootScope, $scope, $http, $q, $filter, $modal, notify, orgRolesHttp, user) {
         $rootScope.page.title = 'Organisation';
         $rootScope.page.subnav = subnav;
-
-        var userId = $rootScope.user.id;
+            
+            var userId = user.id;
 
         //cache
         var orgs = [];
@@ -92,9 +96,9 @@
         }
         
         function checkForDefaultUnit(unit) {
-            if (!$rootScope.user.defaultOrganizationUnitId) return;
+                if (!user.defaultOrganizationUnitId) return;
             
-            if (!unit || unit.id !== $rootScope.user.defaultOrganizationUnitId) return;
+                if (!unit || unit.id !== user.defaultOrganizationUnitId) return;
 
             open(unit);
             $scope.chooseOrgUnit(unit);
@@ -355,7 +359,7 @@
                     };
 
                     //only allow changing the parent if user is admin, and the unit isn't at the root
-                    $modalScope.isAdmin = $rootScope.user.isGlobalAdmin || _.contains($rootScope.user.isLocalAdminFor, unit.organizationId);
+                        $modalScope.isAdmin = user.isGlobalAdmin || _.contains(user.isLocalAdminFor, unit.organizationId);
                     $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot;
 
                     $modalScope.patch = function () {
@@ -553,7 +557,7 @@
             });
         }
 
-        $scope.cleanKleFilter = function() {
+            $scope.cleanKleFilter = function () {
             if ($scope.chosenOrgUnit.kleFilter.parentId === null) {
                 delete $scope.chosenOrgUnit.kleFilter.parentId;
             }
@@ -839,11 +843,11 @@
     }]);
 
 
-    app.controller('org.OverviewCtrl', ['$rootScope', '$scope', '$http', 'notify', '$modal', '$timeout', function ($rootScope, $scope, $http, notify, $modal, $timeout) {
+    app.controller('org.OverviewCtrl', ['$rootScope', '$scope', '$http', 'notify', '$modal', '$timeout', 'user', function ($rootScope, $scope, $http, notify, $modal, $timeout, user) {
         $rootScope.page.title = 'Organisation';
         $rootScope.page.subnav = subnav;
 
-        var userId = $rootScope.user.id;
+        var userId = user.id;
 
         $scope.orgUnits = {};
 
@@ -876,11 +880,11 @@
         }
         
         function checkForDefaultUnit(unit) {
-            if (!$rootScope.user.defaultOrganizationUnitId) return;
+            if (!user.defaultOrganizationUnitId) return;
 
-            if (!unit || unit.id !== $rootScope.user.defaultOrganizationUnitId) return;
+            if (!unit || unit.id !== user.defaultOrganizationUnitId) return;
 
-            $timeout(function() {
+            $timeout(function () {
                 $scope.orgUnitId = unit.id;
                 $scope.loadUsages();
             });
@@ -1004,7 +1008,7 @@
             if (!usage.hasDelegations) {
                 result = addToStatusResult(usage.usage.technologyStatus, result);
             } else {
-                _.each(usage.delegations, function(delegation) {
+                _.each(usage.delegations, function (delegation) {
                     var delegationResult = calculateTechStatus(delegation);
                     result = sumStatusResult(result, delegationResult);
                 });

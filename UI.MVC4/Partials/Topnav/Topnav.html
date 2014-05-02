@@ -2,10 +2,14 @@
     <div class="container-fluid">
         <nav id="navbar-top" class="navbar navbar-inverse navbar-static-top" role="navigation">
             <div class="container-fluid">
+                
                 <div class="navbar-header">
                     <a class="navbar-brand" data-ui-sref="index">KITOS</a>
                 </div>
-                <div data-ng-if="user.authStatus === 'authorized'" data-ng-include="'partials/topnav/authorized.html'"></div>
+                
+                <div data-ng-if="user.isAuth">
+                    <div data-ng-include="'partials/topnav/authorized.html'"></div>
+                </div>
             </div>
         </nav>
     </div>
