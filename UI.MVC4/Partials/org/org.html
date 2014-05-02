@@ -165,8 +165,8 @@
                             <span class="col-md-9"><strong>Opgave</strong></span>
                             <span class="col-md-2 text-center"><strong>Delegeret</strong></span>
                         </div>
-                        <div data-ng-repeat="task in allTasksFlat | filter:chosenOrgUnit.kleFilter" data-ng-show="task.show">
-                            <div data-ng-include="'partials/org/task.html'"></div>
+                        <div data-ng-repeat="task in allTasksFlat | filter:chosenOrgUnit.kleFilter" data-ng-show="task.show" data-ng-include="'partials/org/task.html'">
+                            
                         </div>
                     </div>
                 </div>

@@ -17,7 +17,6 @@
     </div>
 
     <div class="col-md-9">
-        <span class="indent">{{ indent(task.level) }} </span>
         <a class="task-fold" data-ng-show="task.children" data-ng-click="task.isOpen = !task.isOpen">
             <i class="glyphicon small" data-ng-class="{'glyphicon-chevron-down': task.isOpen, 'glyphicon-chevron-right': !task.isOpen}"></i>
             {{ task.taskKey }} {{ task.description }}
@@ -39,8 +38,4 @@
         </span>
     </div>
 </div>
-<div data-ng-show="task.isOpen">
-    <div data-ng-repeat="task in task.children" data-ng-show="task.show">
-        <div data-ng-include="'partials/org/task.html'"></div>
-    </div>
-</div>
+
