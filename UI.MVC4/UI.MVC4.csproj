@@ -444,7 +444,6 @@
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />
     <Content Include="Partials\topnav\profileModal.html" />
-    <Content Include="Partials\topnav\unauthorized.html" />
     <Content Include="Partials\topnav\topnav.html" />
     <Content Include="Scripts\angular-animate.js" />
     <Content Include="Scripts\angular-animate.min.js" />
