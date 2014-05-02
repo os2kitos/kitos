@@ -9,7 +9,7 @@
             <button class="btn btn-link btn-star"
                     data-ng-class="{'unstarred': !task.starred, 'invisible': !task.selected}"
                     data-ng-click="updateStar(task)"
-                    data-ng-disabled="!task.selected"
+                    data-ng-disabled="!task.selected || !chosenOrgUnit.hasWriteAccess"
                     data-tooltip="Vis under overblik?">
                 <i class="glyphicon glyphicon-star"></i>
             </button>
