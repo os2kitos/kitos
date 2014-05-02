@@ -36,15 +36,13 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
                 $modal.open({
                     templateUrl: 'partials/topnav/profileModal.html',
                     resolve: {
-                        orgUnits: ['userService', function () {
-                            return userService.getUser().then(function (user) {
-                                return $http.get('api/organizationunit/?userid2=' + user.id).success(function (result) {
-                                    return result.response;
-                                });
+                        orgUnits: [function () {
+                            return $http.get('api/organizationunit/?userid2=' + user.id).success(function (result) {
+                                return result.response;
                             });
                         }]
                     },
-                    controller: ['$scope', '$modalInstance', 'userService', 'orgUnits', function ($modalScope, $modalInstance, userService, orgUnits) {
+                    controller: ['$scope', '$modalInstance', 'orgUnits', function ($modalScope, $modalInstance, orgUnits) {
                         $modalScope.user = user;
                         $modalScope.orgUnits = orgUnits;
 
@@ -109,7 +107,7 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
 
         $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
             console.log(error);
-            $state.go('index', {}, { notify: false });
+            $state.go('index');
         });
 
 

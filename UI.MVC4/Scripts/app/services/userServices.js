@@ -19,7 +19,7 @@
                 isLocalAdmin: isLocalAdmin,
                 isLocalAdminFor: _.pluck(response.adminRights, 'organizationId'),
                 defaultOrganizationUnitId: response.defaultOrganizationUnitId,
-                currentOrganizationId: 1
+                currentOrganizationId: 1 //TODO: don't hardcode this
             };
 
             $rootScope.user = _user;
@@ -28,7 +28,6 @@
         }
         
         function getUser() {
-            console.log("GET USER");
             var deferred = $q.defer();
             
             if (_user !== null) {
@@ -53,7 +52,7 @@
 
             if (!email || !password) {
 
-                deferred.reject("Invalid credentials");
+                deferred.reject("Email or password cannot be empty");
 
             } else {
                 
@@ -70,7 +69,7 @@
 
                 }).error(function (result) {
 
-                    deferred.reject("Bad credentials");
+                    deferred.reject("Invalid credentials");
 
                 });
 
@@ -108,7 +107,7 @@
                         return (role == "GlobalAdmin" && user.isGlobalAdmin) || (role == "LocalAdmin" && user.isLocalAdmin);
                     });
 
-                    if (!hasRequiredRole) return $q.reject();
+                    if (!hasRequiredRole) return $q.reject("User doesn't have the required permissions");
                 }
 
                 return true;

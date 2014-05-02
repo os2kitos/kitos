@@ -8,7 +8,7 @@
                 user: ['userService', function (userService) {
                     return userService.getUser();
                 }],
-                wishes: ['$rootScope', '$http', '$stateParams', 'userService', function ($rootScope, $http, $stateParams, userService) {
+                wishes: ['$http', '$stateParams', 'userService', function ($http, $stateParams, userService) {
                     return userService.getUser().then(function (user) {
                         return $http.get('api/wish/?userId=' + user.id + '&usageId=' + $stateParams.id)
                             .then(function (result) {
