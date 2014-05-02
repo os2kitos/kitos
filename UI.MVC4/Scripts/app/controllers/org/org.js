@@ -843,42 +843,55 @@
     }]);
 
 
-    app.controller('org.OverviewCtrl', ['$rootScope', '$scope', '$http', 'notify', '$modal', '$timeout', 'user', function ($rootScope, $scope, $http, notify, $modal, $timeout, user) {
+    app.controller('org.OverviewCtrl', ['$rootScope', '$scope', '$http', 'notify', '$modal', '$timeout', '$sce', 'user', function ($rootScope, $scope, $http, notify, $modal, $timeout, $sce, user) {
         $rootScope.page.title = 'Organisation';
         $rootScope.page.subnav = subnav;
 
         var userId = user.id;
 
         $scope.orgUnits = {};
+        $scope.orgUnitTree = [];
 
         loadUnits();
 
-        function flattenAndSave(orgUnit, inheritWriteAccess) {
-            $scope.orgUnits[orgUnit.id] = orgUnit;
+        $scope.selectOrgUnitOptions = {
+            escapeMarkup: function(m) { return m; }
+        };
 
+        function visitOrgUnit(orgUnit, indentation) {
+
+            orgUnit.indentation = $sce.trustAsHtml(indentation);
+            
             checkForDefaultUnit(orgUnit);
 
-            if (!inheritWriteAccess) {
-                $http.get('api/organizationRight?hasWriteAccess&orgUnitId=' + orgUnit.id + '&userId=' + userId).success(function (result) {
+            $scope.orgUnits[orgUnit.id] = orgUnit;
+            $scope.orgUnitTree.push(orgUnit);
+
+            _.each(orgUnit.children, function(child) {
+                return visitOrgUnit(child, indentation + "&nbsp;&nbsp;&nbsp;");
+            });
+        }
+
+        function hasWriteAccess(orgUnit, inherit) {
+            if (inherit) {
+                orgUnit.hasWriteAccess = true;
+
+                _.each(orgUnit.children, function(child) {
+                    hasWriteAccess(child, true);
+                });
+            } else {
+                $http.get('api/organizationRight?hasWriteAccess&orgUnitId=' + orgUnit.id + '&userId=' + userId).success(function(result) {
                     orgUnit.hasWriteAccess = result.response;
 
-                    _.each(orgUnit.children, function (u) {
-                        flattenAndSave(u, result.response);
+                    _.each(orgUnit.children, function(child) {
+                        hasWriteAccess(child, result.response);
                     });
 
                 });
 
-            } else {
-
-                orgUnit.hasWriteAccess = true;
-
-                _.each(orgUnit.children, function (u) {
-                    return flattenAndSave(u, true);
-                });
-
             }
         }
-        
+
         function checkForDefaultUnit(unit) {
             if (!user.defaultOrganizationUnitId) return;
 
@@ -897,8 +910,9 @@
             return $http.get('api/organizationunit?userId=' + userId).success(function (result) {
                 $scope.nodes = result.response;
 
-                _.each(result.response, function (u) {
-                    flattenAndSave(u, false, null);
+                _.each(result.response, function (unit) {
+                    visitOrgUnit(unit, "");
+                    hasWriteAccess(unit, false);
                 });
             });
         }
