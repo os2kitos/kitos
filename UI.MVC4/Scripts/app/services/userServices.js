@@ -42,7 +42,7 @@
             return deferred;
         }
         
-        function logIn(email, password, rememberMe) {
+        function login(email, password, rememberMe) {
             var deferred = $q.defer();
 
             if (!email || !password) {
@@ -73,9 +73,26 @@
             return deferred;
         }
 
+        function logout() {
+            
+            var deferred = $q.defer();
+
+            $http.post('api/authorize?logout').success(function (result) {
+                user = null;
+                deferred.resolve();
+
+            }).error(function(result) {
+                deferred.reject("Could not log out");
+
+            });
+            
+            return deferred;
+        }
+
         return {
             getUser: getUser,
-            logIn: logIn
+            login: login,
+            logout: logout
         };
 
     }]);
