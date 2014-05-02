@@ -1,7 +1,16 @@
 ﻿<div class="col-md-12">
 
     <div class="col-md-4 container-fluid">
-        <h2>Enheder</h2>
+        <h2>Enheder
+            <span class="pull-right small" data-ng-hide="true || chosenOrgUnit.hasWriteAccess">Låst
+                <!--<i class="glyphicon glyphicon-lock" title="Du har ikke skriveadgang til denne organisationsenhed"></i>-->
+            </span>
+            <span class="pull-right small" data-ng-show="chosenOrgUnit.hasWriteAccess">
+                <a data-ng-click="editUnit(chosenOrgUnit)">Rediger 
+                  <!--          <i class="glyphicon glyphicon-cog" title="Rediger {{chosenOrgUnit.name}}"></i> -->
+                </a>
+            </span>
+        </h2>
         
         <div data-ng-if="nodes.length != 0">
             
@@ -15,6 +24,7 @@
             <strong>Du er ikke tilknyttet nogen enheder.</strong>
         </div>
 
+        <!--
         <div class="well well-sm margin-top">
             Forklaring:
 
@@ -36,6 +46,7 @@
                 </span>
             </div>
         </div>
+            -->
     </div>
 
     <div class="col-md-8 container-fluid">
@@ -52,15 +63,8 @@
 
             <!-- if an org unit has been selected -->
             <div class="col-md-12" data-ng-show="chosenOrgUnit">
-                <h3>
-                    {{ chosenOrgUnit.name }} 
-                    <span class="text-muted"> ({{ chosenOrgUnit.organization.name }})</span>
-                    <span class="pull-right small" data-ng-hide="chosenOrgUnit.hasWriteAccess">
-                        <i class="glyphicon glyphicon-lock" title="Du har ikke skriveadgang til denne organisationsenhed"></i>
-                    </span>
-                    <span class="pull-right small" data-ng-show="chosenOrgUnit.hasWriteAccess">
-                        <a data-ng-click="editUnit(chosenOrgUnit)"><i class="glyphicon glyphicon-cog" title="Rediger {{chosenOrgUnit.name}}"></i></a>
-                    </span>
+                <h3>{{ chosenOrgUnit.name }} 
+                    <span class="text-muted">({{ chosenOrgUnit.organization.name }})</span>
                 </h3>
 
                 <!-- Organization Roles -->
@@ -72,16 +76,21 @@
                         <a class="pull-right" 
                            data-ng-show="chosenOrgUnit.hasWriteAccess" 
                             data-ng-click="chosenOrgUnit.editRights = !chosenOrgUnit.editRights">
-                            Rediger
+                            <span data-ng-if="!chosenOrgUnit.editRights">Rediger</span>
+                            <span data-ng-if="chosenOrgUnit.editRights">Afslut rediger</span>                           
                         </a>
                     </div>
                     <table class="full-width table org-role-table">
                         <thead>
                             <tr>
-                                <th><button class="btn btn-link btn-header" data-ng-click="rightSortChange('orgUnitName')">Organisationsenhed</button></th>
-                                <th><button class="btn btn-link btn-header" data-ng-click="rightSortChange('roleName')">Organisationsrolle</button></th>
-                                <th><button class="btn btn-link btn-header" data-ng-click="rightSortChange('userName')">Navn</button></th>
-                                <th><button class="btn btn-link btn-header" data-ng-click="rightSortChange('userEmail')">Email</button></th>
+                                <th>
+                                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('orgUnitName')">Organisationsenhed</button></th>
+                                <th>
+                                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('roleName')">Organisationsrolle</button></th>
+                                <th>
+                                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('userName')">Navn</button></th>
+                                <th>
+                                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('userEmail')">Email</button></th>
                             </tr>
                         </thead>
                         <!-- for each right -->
@@ -109,12 +118,11 @@
                             <!-- edit -->
                             <tr data-ng-show="right.edit">
                                 <td>
-                                    <input type="text" disabled="disabled" class="form-control input-sm" value="{{ orgUnits[right.objectId].name }}"/>
+                                    <input type="text" disabled="disabled" class="form-control input-sm" value="{{ orgUnits[right.objectId].name }}" />
                                 </td>
                                 <td>
                                     <select data-ui-select2="" name="selectRole" data-ng-model="right.roleForSelect" class="form-control input-sm">
-                                        <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.id}}">
-                                            {{orgRole.name}} ({{orgRole.hasWriteAccess && "skriv" || "læs" }})
+                                        <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.id}}">{{orgRole.name}} ({{orgRole.hasWriteAccess && "skriv" || "læs" }})
                                         </option>
                                     </select>
                                 </td>
@@ -130,11 +138,11 @@
                         <!-- add-new-right row -->
                         <tbody data-ng-show="chosenOrgUnit.hasWriteAccess">
                             <tr>
-                                <td><input type="text" disabled="disabled" class="form-control input-sm" value="{{ chosenOrgUnit.name }}"/></td>
+                                <td>
+                                    <input type="text" disabled="disabled" class="form-control input-sm" value="{{ chosenOrgUnit.name }}" /></td>
                                 <td>
                                     <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en organisationsrolle" class="form-control input-sm" data-ng-change="submitRight()">
-                                        <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.id}}">
-                                            {{orgRole.name}} ({{orgRole.hasWriteAccess && "skriv" || "læs" }})
+                                        <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.id}}">{{orgRole.name}} ({{orgRole.hasWriteAccess && "skriv" || "læs" }})
                                         </option>
                                     </select>   
                                 </td>
@@ -151,12 +159,13 @@
                         <i class="glyphicon glyphicon-tasks"></i> 
                         Tilknyttede opgaver
                         <a class="pull-right" data-ng-show="chosenOrgUnit.hasWriteAccess" data-ng-click="editTasks()">
-                            Rediger
+                            <span data-ng-if="!chosenOrgUnit.editTasks">Rediger</span>
+                            <span data-ng-if="chosenOrgUnit.editTasks">Afslut rediger</span>
                         </a>
                     </div>
                     <div class="container-fluid task-table">
                         <div class="row">
-                            <select data-ng-model="chosenOrgUnit.kleFilter.parentId" data-ng-options="t.id as t.taskKey group by t.parent.taskKey for t in allTasksFlat | filter:{ type:'KLE-Gruppe', show: true }" data-ng-change="cleanKleFilter()">
+                            <select data-ng-model="chosenOrgUnit.kleFilter.parentId" data-ng-options="t.id as (t.taskKey + ' ' + t.description) group by (t.parent.taskKey + ' ' + t.parent.description) for t in allTasksFlat | filter:{ type:'KLE-Gruppe', show: true }" data-ng-change="cleanKleFilter()">
                                 <option value="">-- Gruppe --</option>
                             </select>
                         </div>
@@ -165,9 +174,13 @@
                             <span class="col-md-9"><strong>Opgave</strong></span>
                             <span class="col-md-2 text-center"><strong>Delegeret</strong></span>
                         </div>
-                        <div data-ng-repeat="task in allTasksFlat | filter:chosenOrgUnit.kleFilter" data-ng-show="task.show">
-                            <div data-ng-include="'partials/org/task.html'"></div>
+                        <div data-ng-repeat="task in allTasksFlat | filter:chosenOrgUnit.kleFilter" data-ng-show="task.show" data-ng-include="'partials/org/task.html'">
+                            
                         </div>
+                    </div>
+                    <div class="panel-footer" data-ng-if="chosenOrgUnit.editTasks">
+                        <button data-ng-click="selectAll(true)">Vælg alle</button>
+                        <button data-ng-click="selectAll(false)">Ryd alle</button>
                     </div>
                 </div>
             </div>              

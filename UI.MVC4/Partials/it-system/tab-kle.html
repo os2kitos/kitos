@@ -1,4 +1,4 @@
-﻿ <select data-ng-model="kleFilter.parentId" data-ng-options="t.id as t.taskKey for t in kle | filter:{ type:'KLE-Gruppe' }" data-ng-change="cleanKleFilter()">
+﻿ <select data-ng-model="kleFilter.parentId" data-ng-options="t.id as (t.taskKey + ' ' + t.description) for t in kle | filter:{ type:'KLE-Gruppe' }" data-ng-change="cleanKleFilter()">
      <option value="">-- Gruppe --</option>
  </select>
 

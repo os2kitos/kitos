@@ -193,7 +193,7 @@
     <div class="row panel panel-default">
         <div class="panel-heading small">Tilknyt KLE</div>
         <div>
-            <select data-ng-model="kleFilter.parentId" data-ng-options="t.id as t.taskKey for t in allTasksFlat | filter:{ type:'KLE-Gruppe' }" data-ng-change="cleanKleFilter()">
+            <select data-ng-model="kleFilter.parentId" data-ng-options="t.id as (t.taskKey + ' ' + t.description) for t in allTasksFlat | filter:{ type:'KLE-Gruppe' }" data-ng-change="cleanKleFilter()">
                 <option value="">-- Gruppe --</option>
             </select>
         </div>
