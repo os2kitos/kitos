@@ -1,7 +1,7 @@
 ﻿body
 {
     font-size: 15px;
-    background-color: #f0f0f0;
+    background-color: #d9d9d9;
 }
 
 div#page-wrapper
@@ -23,7 +23,7 @@ div#page-content
 div#page-body
 {
     background-color: white;
-    padding: 30px;
+    padding: 10px 5px 20px 5px;
 }
 
 /************ NAVIGATION BAR TOP **************/
@@ -31,7 +31,7 @@ div#page-body
     width: 70%;
 }
 .navbar-nav > li {
-    width: 16%;
+    width: 22%;
 }
 
 #navbar-top
