@@ -72,7 +72,8 @@
                         <a class="pull-right" 
                            data-ng-show="chosenOrgUnit.hasWriteAccess" 
                             data-ng-click="chosenOrgUnit.editRights = !chosenOrgUnit.editRights">
-                            Rediger
+                            <span class="glyphicon glyphicon-edit" data-ng-if="!chosenOrgUnit.editRights"></span>
+                            <span class="glyphicon glyphicon-remove" data-ng-if="chosenOrgUnit.editRights"></span>                           
                         </a>
                     </div>
                     <table class="full-width table org-role-table">
@@ -151,7 +152,8 @@
                         <i class="glyphicon glyphicon-tasks"></i> 
                         Tilknyttede opgaver
                         <a class="pull-right" data-ng-show="chosenOrgUnit.hasWriteAccess" data-ng-click="editTasks()">
-                            Rediger
+                            <span class="glyphicon glyphicon-edit" data-ng-if="!chosenOrgUnit.editTasks"></span>
+                            <span class="glyphicon glyphicon-remove" data-ng-if="chosenOrgUnit.editTasks"></span>                           
                         </a>
                     </div>
                     <div class="container-fluid task-table">
