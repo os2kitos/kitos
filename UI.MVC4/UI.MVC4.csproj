@@ -406,6 +406,7 @@
     <Content Include="Partials\global-config\org.html" />
     <Content Include="Partials\global-config\project.html" />
     <Content Include="Partials\global-admin\new-organization.html" />
+    <Content Include="Partials\home\choose-organization.html" />
     <Content Include="Partials\home\reset-password.html" />
     <Content Include="Partials\home\forgot-password.html" />
     <Content Include="Partials\home\index.html" />
