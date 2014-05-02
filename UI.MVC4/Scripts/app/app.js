@@ -20,7 +20,8 @@ app.config(['$httpProvider', 'notifyProvider', 'RestangularProvider', function (
     });
 }]);
 
-app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify', function ($rootScope, $http, $state, editableOptions, $modal, notify) {
+app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
+    function ($rootScope, $http, $state, editableOptions, $modal, notify) {
     //init info
     $rootScope.page = {
         title: 'Index',
