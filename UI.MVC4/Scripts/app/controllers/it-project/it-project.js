@@ -11,12 +11,12 @@
             templateUrl: 'partials/it-project/edit-it-project.html',
             controller: 'project.EditCtrl',
             resolve: {
-                //itProject: ['$http', '$stateParams', function($http, $stateParams) {
-                //    return $http.get("api/itproject/" + $stateParams.id)
-                //        .then(function(result) {
-                //            return result.data.response;
-                //        });
-                //}]
+                itProject: ['$http', '$stateParams', function($http, $stateParams) {
+                    return $http.get("api/itproject/" + $stateParams.id)
+                        .then(function(result) {
+                            return result.data.response;
+                        });
+                }]
             }
         });
 

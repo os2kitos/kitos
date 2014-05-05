@@ -63,7 +63,13 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.AssociatedProjects)
                 .HasForeignKey(d => d.AssociatedProgramId)
                 .WillCascadeOnDelete(false);
-
+            this.HasMany(t => t.UsedByOrgUnits)
+                .WithMany(t => t.UsingItProjects)
+                .Map(mc =>
+                {
+                    mc.MapLeftKey("ItProjectId");
+                    mc.MapRightKey("OrgUnitId");
+                });
         }
     }
 }

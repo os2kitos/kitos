@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Core.DomainModel.ItSystem;
 
 namespace UI.MVC4.Models
 {

@@ -3,14 +3,64 @@
         $stateProvider.state('edit-it-project.org', {
             url: '/org',
             templateUrl: 'partials/it-project/tab-org.html',
-            controller: 'project.EditOrg',
+            controller: 'project.EditOrgCtrl',
             resolve: {
-                
+                selectedOrgUnits: ['itProject', function (itProject) {
+                    return _.pluck(itProject.usedByOrgUnits, 'id');
+                }],
+                orgUnitsTree: ['$http', 'itProject', function ($http, itProject) {
+                    return $http.get('api/organizationunit/?organization=' + itProject.organizationId)
+                        .then(function (result) {
+                            return [result.data.response]; // to array for ngRepeat to work
+                        });
+                }]
             }
         });
     }]);
 
-    app.controller('project.EditOrg', ['$scope', '$http', '$stateParams', function ($scope, $http, $stateParams) {
+    app.controller('project.EditOrgCtrl', ['$scope', '$http', '$stateParams', 'notify', 'orgUnitsTree', 'selectedOrgUnits', function ($scope, $http, $stateParams, notify, orgUnitsTree, selectedOrgUnits) {
+        $scope.orgUnitsTree = orgUnitsTree;
+        var projectId = $stateParams.id;
         
+        $scope.save = function (obj) {
+            var msg = notify.addInfoMessage("Gemmer... ");
+            if (obj.selected) {
+                $http.post('api/itproject/' + projectId + '?organizationunit=' + obj.id)
+                    .success(function () {
+                        msg.toSuccessMessage("Gemt!");
+                    })
+                    .error(function() {
+                        msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
+                    });
+            } else {
+                $http.delete('api/itproject/' + projectId + '?organizationunit=' + obj.id)
+                    .success(function() {
+                        msg.toSuccessMessage("Gemt!");
+                    })
+                    .error(function() {
+                        msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
+                    });
+            }
+        };
+
+        function searchTree(element, matchingId) {
+            if (element.id == matchingId) {
+                return element;
+            } else if (element.children != null) {
+                var result = null;
+                for (var i = 0; result == null && i < element.children.length; i++) {
+                    result = searchTree(element.children[i], matchingId);
+                }
+                return result;
+            }
+            return null;
+        }
+
+        _.each(selectedOrgUnits, function (id) {
+            var found = searchTree(orgUnitsTree[0], id);
+            if (found) {
+                found.selected = true;
+            }
+        });
     }]);
 })(angular, app);
