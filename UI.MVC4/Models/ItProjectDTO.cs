@@ -1,4 +1,5 @@
-﻿using Core.DomainModel;
+﻿using System.Collections.Generic;
+using Core.DomainModel;
 
 namespace UI.MVC4.Models
 {
@@ -11,6 +12,7 @@ namespace UI.MVC4.Models
         public string Name { get; set; }
         public AccessModifier AccessModifier { get; set; }
         public int? AssociatedProgramId { get; set; }
+        public IEnumerable<int> AssociatedProjectIds { get; set; }
         public int ProjectTypeId { get; set; }
         public int ProjectCategoryId { get; set; }
         public int OrganizationId { get; set; }
