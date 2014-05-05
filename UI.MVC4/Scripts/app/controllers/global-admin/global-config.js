@@ -79,14 +79,14 @@
         $rootScope.page.title = 'Global konfiguration';
         $rootScope.page.subnav = subnav;
         
-        var baseCategories = Restangular.all('projectCategory');
+        var baseCategories = Restangular.all('ItProjectCategory');
         baseCategories.getList({nonsuggestions: true}).then(function (categories) {
             $scope.categories = categories;
         });
         
         $scope.patchProjectCategory = function (data, i) {
             var item = $scope.categories[i];
-            return Restangular.one('projectCategory', item.id).patch({isActive: data});
+            return Restangular.one('ItProjectCategory', item.id).patch({isActive: data});
         };
         
         var basePhases = Restangular.all('ProjectPhase');

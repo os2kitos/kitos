@@ -23,14 +23,6 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("ItProject");
             this.Property(t => t.Id).HasColumnName("Id");
-            this.Property(t => t.Background).HasColumnName("Background");
-            this.Property(t => t.IsTransversal).HasColumnName("IsTransversal");
-            this.Property(t => t.IsTermsOfReferenceApproved).HasColumnName("IsTermsOfReferenceApproved");
-            this.Property(t => t.Note).HasColumnName("Note");
-            this.Property(t => t.Name).HasColumnName("Name");
-            this.Property(t => t.ProjectTypeId).HasColumnName("ProjectTypeId");
-            this.Property(t => t.ProjectCategoryId).HasColumnName("ProjectCategoryId");
-            this.Property(t => t.MunicipalityId).HasColumnName("MunicipalityId");
 
             /*
             this.Property(t => t.ItProjectOwnerId).HasColumnName("ItProjectOwnerId");
@@ -59,14 +51,14 @@ namespace Infrastructure.DataAccess.Mapping
                 
             this.HasRequired(t => t.Organization)
                 .WithMany(t => t.ItProjects)
-                .HasForeignKey(d => d.MunicipalityId)
+                .HasForeignKey(d => d.OrganizationId)
                 .WillCascadeOnDelete(false);
-            this.HasRequired(t => t.ProjectCategory)
+            this.HasRequired(t => t.ItProjectCategory)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.ProjectCategoryId);
-            this.HasRequired(t => t.ProjectType)
+                .HasForeignKey(d => d.ItProjectCategoryId);
+            this.HasRequired(t => t.ItProjectType)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.ProjectTypeId);
+                .HasForeignKey(d => d.ItProjectTypeId);
 
         }
     }

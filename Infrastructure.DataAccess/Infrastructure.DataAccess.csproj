@@ -116,12 +116,11 @@
     <Compile Include="Mapping\PasswordResetRequestMap.cs" />
     <Compile Include="Mapping\PaymentMap.cs" />
     <Compile Include="Mapping\PaymentModelMap.cs" />
-    <Compile Include="Mapping\PreAnalysisMap.cs" />
-    <Compile Include="Mapping\ProjectCategoryMap.cs" />
+    <Compile Include="Mapping\ItProjectCategoryMap.cs" />
     <Compile Include="Mapping\ProjectPhaseLocaleMap.cs" />
     <Compile Include="Mapping\ProjectPhaseMap.cs" />
     <Compile Include="Mapping\ProjectStatusMap.cs" />
-    <Compile Include="Mapping\ProjectTypeMap.cs" />
+    <Compile Include="Mapping\ItProjectTypeMap.cs" />
     <Compile Include="Mapping\PurchaseFormMap.cs" />
     <Compile Include="Mapping\ResourcesMap.cs" />
     <Compile Include="Mapping\RiskMap.cs" />

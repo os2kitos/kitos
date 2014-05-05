@@ -2,11 +2,11 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ProjectCategory : IOptionEntity<ItProject>
+    public class ItProjectType : IOptionEntity<ItProject>
     {
-        public ProjectCategory()
+        public ItProjectType()
         {
-            References = new List<ItProject>();
+            this.References = new List<ItProject>();
         }
 
         public int Id { get; set; }
@@ -14,6 +14,7 @@ namespace Core.DomainModel.ItProject
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }
         public string Note { get; set; }
+
         public virtual ICollection<ItProject> References { get; set; }
     }
 }
