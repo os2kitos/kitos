@@ -7,24 +7,27 @@
             <div class="form-group">
                 <label for="project-name" class="control-label col-md-2 small">Projekt</label>
                 <div class="col-md-10">
-                    <input type="text" id="project-name" data-ng-model="project.name" class="form-control input-sm" />
-                    <!-- TODO
-                        data-field="name"
-                        data-autosave="api/itproject/{{project.id}}">
-                        -->
+                    <input type="text" id="project-name" data-ng-model="project.name" class="form-control input-sm" 
+                           data-field="name"
+                           data-autosave="{{autosaveUrl}}" />
                 </div>
             </div>
 
             <div class="form-group">
                 <!-- ID -->
-                <label for="project-id" class="control-label col-md-2 small">Projekt ID</label>
+                <label for="project-projectId" class="control-label col-md-2 small">Projekt ID</label>
                 <div class="col-md-4">
-                    <input type="text" id="project-id" data-ng-model="project.projectId" class="form-control input-sm" />
+                    <input type="text" id="project-projectId" data-ng-model="project.itProjectId" class="form-control input-sm" 
+                        data-field="itProjectId"
+                        data-autosave="{{autosaveUrl}}" />
                 </div>
                 
+                <!-- access modifier -->
                 <label for="project-access" class="control-label col-md-2 small">Public</label>
                 <div class="col-md-4">
-                    <input id="project-access" data-ng-model="project.accessModifier" class="form-control input-sm" data-select-access-modifier="" />
+                    <input id="project-access" data-ng-model="project.accessModifier" class="form-control input-sm" data-select-access-modifier=""
+                        data-field="accessModifier"
+                        data-autosave="{{autosaveUrl}}" />
                 </div>
             </div>
             
@@ -33,12 +36,10 @@
                 <label for="project-type" class="control-label col-md-2 small">Type</label>
                 <div class="col-md-4">
                     <select id="project-type" class="form-control input-sm"
-                            data-ng-options="o.id as o.name for o in projectTypes"
-                            data-ng-model="project.typeId">
-                        <!-- TODO
-                            data-field="categoryId"
-                            data-autosave="api/itproject/{{project.id}}">
-                            -->
+                            data-ng-options="o.id as o.name for o in itProjectTypes"
+                            data-ng-model="project.itProjectTypeId"
+                            data-field="itProjectTypeId"
+                            data-autosave="{{autosaveUrl}}">
                     </select>
                 </div>
 
@@ -46,40 +47,39 @@
                 <label for="project-category" class="control-label col-md-2 small">Kategori</label>
                 <div class="col-md-4">
                     <select id="project-category" class="form-control input-sm"
-                            data-ng-options="o.id as o.name for o in categories"
-                            data-ng-model="project.categoryId">
-                        <!-- TODO
-                            data-field="categoryId"
-                            data-autosave="api/itproject/{{project.id}}">
-                            -->
+                            data-ng-options="o.id as o.name for o in itProjectCategories"
+                            data-ng-model="project.itProjectCategoryId"
+                            data-field="itProjectCategoryId"
+                            data-autosave="{{autosaveUrl}}">
                     </select>
                 </div>
             </div>
-
+            
+            <!-- TODO: ARE THESE OBSOLETE??
             <div class="form-group">
-                <!-- esdh ref -->
+                <!-- esdh ref 
                 <label for="project-esdh" class="col-md-2 control-label small">ESDH ref.</label>
                 <div class="col-md-4">
                     <input id="project-esdh" class="form-control input-sm" type="text" data-ng-model="project.esdhRef" />
                     <!-- TODO
                         data-field="esdhRef" 
                         data-autosave="api/itproject/{{project.id}}" /> 
-                        -->
+                       
 
                 </div>
 
-                <!-- cmdb ref -->
+                <!-- cmdb ref 
                 <label for="project-cmdb" class="col-md-2 control-label small">CMDB ref.</label>
                 <div class="col-md-4">
                     <input id="project-cmdb" class="form-control input-sm" type="text" data-ng-model="project.cmdbRef" />
                     <!-- TODO
                         data-field="cmdbRef" 
                         data-autosave="api/itproject/{{project.id}}" /> 
-                        -->
+                        
                 </div>
             </div>
 
-            <!-- link ref -->
+            <!-- link ref 
             <div class="form-group">
                 <label for="project-url" class="col-md-2 control-label small">Mappe/URL ref.</label>
                 <div class="col-md-10">
@@ -87,13 +87,13 @@
                     <!-- TODO
                         data-field="directoryOrUrlRef" 
                         data-autosave="api/itproject/{{project.id}}" />
-                        -->
+                        
                 </div>
-            </div>
+            </div>-->
             
             <!-- associated program -->
             <!-- TODO: only show this if project isn't of type 'program' -->
-            <div class="form-group" data-ng-if="true">
+            <div class="form-group" data-ng-if="project.itProjectTypeId != itProgramType.id">
                 <label class="col-md-2 control-label small" for="associated-program">
                     Tilknyttet program
                 </label>
@@ -107,7 +107,7 @@
             
             <!-- associated projects -->
             <!--TODO: only show this if project _is_ of type 'program' -->
-            <div class="form-group" data-ng-if="true">
+            <div class="form-group"  data-ng-if="project.itProjectTypeId == itProgramType.id">
                 <label class="col-md-2 control-label small" for="associated-projects">
                     Tilknyttede projekter
                 </label>
@@ -119,35 +119,31 @@
         </div>
 
         <div class="col-md-6">
-            <!-- motivation/background -->
+            <!-- background -->
             <div class="form-group">
                 <label for="project-background" class="col-md-2 control-label small">Formål/baggrund</label>
                 <div class="col-md-10">
 
                     <textarea id="project-background" data-ng-model="project.background"
-                        class="form-control input-sm" rows="7">
+                        class="form-control input-sm" rows="7"
+                        data-field="background" 
+                        data-autosave="{{autosaveUrl}}">>
                                           
                     </textarea>
-                    <!-- TODO
-                        data-field="background" 
-                        data-autosave="api/itproject/{{project.id}}" />
-                        -->
                 </div>
             </div>
 
             <!-- notes -->
             <div class="form-group">
-                <label for="project-notes" class="col-md-2 control-label small">Noter</label>
+                <label for="project-note" class="col-md-2 control-label small">Noter</label>
                 <div class="col-md-10">
 
-                    <textarea id="project-notes" data-ng-model="project.notes"
-                        class="form-control input-sm" rows="7">
+                    <textarea id="project-note" data-ng-model="project.note"
+                        class="form-control input-sm" rows="7" 
+                        data-field="note" 
+                        data-autosave="{{autosaveUrl}}">
                                           
                     </textarea>
-                    <!-- TODO
-                        data-field="background" 
-                        data-autosave="api/itproject/{{project.id}}" />
-                        -->
                 </div>
             </div>
         </div>
