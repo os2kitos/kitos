@@ -212,7 +212,7 @@
                         parentId: system.parent ? system.parent.id : null,
                         exposedById: system.exposedBy ? system.exposedBy.id : null,
                         canUseInterfaceIds: _.pluck(system.canUseInterfaces, 'id'),
-                        belongsToId: system.belongsTo.id,
+                        belongsToId: system.belongsTo ? system.belongsTo.id : null,
                         organizationId: user.currentOrganizationId,
 
                         version: system.version,

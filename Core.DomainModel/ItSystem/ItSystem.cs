@@ -27,7 +27,7 @@ namespace Core.DomainModel.ItSystem
         public string SystemId { get; set; }
 
 
-        public int BelongsToId { get; set; }
+        public int? BelongsToId { get; set; }
         /// <summary>
         /// The organization the system belongs to (OIO term - think "produced by")
         /// </summary>
