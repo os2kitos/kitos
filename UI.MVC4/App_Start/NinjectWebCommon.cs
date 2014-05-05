@@ -86,8 +86,8 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<PaymentModel>>().To<GenericRepository<PaymentModel>>().InRequestScope();
             kernel.Bind<IGenericRepository<ProjectPhase>>().To<GenericRepository<ProjectPhase>>().InRequestScope();
             kernel.Bind<IGenericRepository<ProjPhaseLocale>>().To<GenericRepository<ProjPhaseLocale>>().InRequestScope();
-            kernel.Bind<IGenericRepository<ProjectCategory>>().To<GenericRepository<ProjectCategory>>().InRequestScope();
-            kernel.Bind<IGenericRepository<ProjectType>>().To<GenericRepository<ProjectType>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ItProjectCategory>>().To<GenericRepository<ItProjectCategory>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ItProjectType>>().To<GenericRepository<ItProjectType>>().InRequestScope();
             kernel.Bind<IGenericRepository<PurchaseForm>>().To<GenericRepository<PurchaseForm>>().InRequestScope();
             kernel.Bind<IGenericRepository<AppType>>().To<GenericRepository<AppType>>().InRequestScope();
             kernel.Bind<IGenericRepository<BusinessType>>().To<GenericRepository<BusinessType>>().InRequestScope();
@@ -106,6 +106,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<ArchiveType>>().To<GenericRepository<ArchiveType>>().InRequestScope();
             kernel.Bind<IGenericRepository<SensitiveDataType>>().To<GenericRepository<SensitiveDataType>>().InRequestScope();
             kernel.Bind<IGenericRepository<Wish>>().To<GenericRepository<Wish>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ItProject>>().To<GenericRepository<ItProject>>().InRequestScope();
 
             kernel.Bind<IGenericRepository<OrganizationRight>>().To<GenericRepository<OrganizationRight>>().InRequestScope();
 

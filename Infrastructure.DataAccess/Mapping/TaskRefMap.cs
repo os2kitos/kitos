@@ -21,9 +21,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.Children)
                 .HasForeignKey(d => d.ParentId)
                 .WillCascadeOnDelete(false);
-            this.HasOptional(t => t.ItProject)
-                .WithMany(t => t.TaskRefs)
-                .HasForeignKey(d => d.ItProjectId);
+            //this.HasOptional(t => t.ItProject)
+            //    .WithMany(t => t.TaskRefs)
+            //    .HasForeignKey(d => d.ItProjectId);
             this.HasRequired(t => t.OwnedByOrganizationUnit)
                 .WithMany(t => t.OwnedTasks)
                 .HasForeignKey(d => d.OwnedByOrganizationUnitId);

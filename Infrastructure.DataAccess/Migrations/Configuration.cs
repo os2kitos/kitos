@@ -48,16 +48,16 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Drop Down Data
 
-            context.ProjectCategories.AddOrUpdate(x => x.Name,
-                                             new ProjectCategory() { IsActive = true, Note = "...", Name = "Light" },
-                                             new ProjectCategory() { IsActive = true, Note = "...", Name = "Lokal" },
-                                             new ProjectCategory() { IsActive = true, Note = "...", Name = "Tværkommunalt" },
-                                             new ProjectCategory() { IsActive = true, Note = "...", Name = "SKAL" });
+            var itProjectCategoryPublic = new ItProjectCategory() {IsActive = true, Note = "...", Name = "Fællesoffentlig"};
+            var itProjectCategoryMunipalicity = new ItProjectCategory() { IsActive = true, Note = "...", Name = "Fælleskommunal" };
+            context.ProjectCategories.AddOrUpdate(x => x.Name, itProjectCategoryPublic, itProjectCategoryMunipalicity);
 
+            var itProjectTypeProject = new ItProjectType() {IsActive = true, Note = "...", Name = "IT Projekt"};
+            var itProjectTypeProgram = new ItProjectType() {IsActive = true, Note = "...", Name = "IT Program"};
             context.ProjectTypes.AddOrUpdate(x => x.Name,
-                                             new ProjectType() { IsActive = true, Note = "...", Name = "IT Projekt" },
-                                             new ProjectType() { IsActive = true, Note = "...", Name = "IT Program" },
-                                             new ProjectType() { IsActive = true, Note = "En samlebetegnelse for projekter, som ikke er et IT Program", Name = "Indsatsområde" });
+                                             itProjectTypeProject,
+                                             itProjectTypeProgram,
+                                             new ItProjectType() { IsActive = true, Note = "En samlebetegnelse for projekter, som ikke er et IT Program", Name = "Indsatsområde" });
 
             var appType1 = new AppType() {IsActive = true, Note = "...", Name = "Snitflade"};
             var appType2 = new AppType() {IsActive = true, Note = "...", Name = "Fagsystem"};
@@ -880,6 +880,24 @@ namespace Infrastructure.DataAccess.Migrations
             };
 
             context.Wishes.AddOrUpdate(x => x.Text, wish1, wish2); // TODO probably not the best identifier
+
+            #endregion
+
+            #region IT Project
+
+            var itProject1 = new ItProject()
+                {
+                    ObjectOwner = globalUser,
+                    Name = "Test Projekt",
+                    AccessModifier = AccessModifier.Normal,
+                    Note = "Test",
+                    Background = "Baggrund",
+                    ItProjectCategory = itProjectCategoryPublic,
+                    ItProjectType = itProjectTypeProject,
+                    Organization = roskilde
+                };
+
+            context.ItProjects.AddOrUpdate(itProject1);
 
             #endregion
 

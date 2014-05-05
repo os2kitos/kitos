@@ -5,9 +5,9 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class ProjectCategoryController : GenericOptionApiController<ProjectCategory, ItProject, OptionDTO>
+    public class ProjectCategoryController : GenericOptionApiController<ItProjectCategory, ItProject, OptionDTO>
     {
-        public ProjectCategoryController(IGenericRepository<ProjectCategory> repository) 
+        public ProjectCategoryController(IGenericRepository<ItProjectCategory> repository) 
             : base(repository)
         {
         }

@@ -3,7 +3,7 @@ using Core.DomainModel.ItProject;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ProjectTypeMap : EntityTypeConfiguration<ProjectType>
+    public class ProjectTypeMap : EntityTypeConfiguration<ItProjectType>
     {
         public ProjectTypeMap()
         {
@@ -15,7 +15,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired();
 
             // Table & Column Mappings
-            this.ToTable("ProjectType");
+            this.ToTable("ItProjectType");
             this.Property(t => t.Id).HasColumnName("Id");
             this.Property(t => t.Name).HasColumnName("Name");
         }
