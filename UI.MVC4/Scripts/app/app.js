@@ -37,8 +37,8 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
                     templateUrl: 'partials/topnav/profileModal.html',
                     resolve: {
                         orgUnits: [function () {
-                            return $http.get('api/organizationunit/?userid2=' + user.id).success(function (result) {
-                                return result.response;
+                            return $http.get('api/organizationunit/?userid2=' + user.id).then(function (result) {
+                                return result.data.response;
                             });
                         }]
                     },
@@ -86,18 +86,15 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
 
         };
 
+        //when changing states, we might need to authorize the user
         $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
 
             if (toState.noAuth) return; //no need to auth
             
             userService.auth(toState.adminRoles).then(function (val) {
-                console.log("AUTH OK");
-                
                 //Authentication OK!
                 
             }, function () {
-                console.log("AUTH BAD");
-                
                 event.preventDefault();
 
                 //Bad authentication
