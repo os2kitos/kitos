@@ -122,6 +122,11 @@
                         .then(function(result) {
                             return result.data.response;
                         });
+                }],
+                interfaceAppType: ['$http', function ($http) {
+                    return $http.get("api/apptype?interfaceAppType").then(function(result) {
+                        return result.data.response;
+                    });
                 }]
             }
         });
@@ -397,11 +402,13 @@
             }]);
 
     app.controller('system.EditUsage', ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'itSystemUsage', 'appTypes',
-        'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'itSystems',
-        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, appTypes, businessTypes, archiveTypes, sensitiveDataTypes, itSystems) {
+        'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'itSystems', 'interfaceAppType',
+        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, appTypes, businessTypes, archiveTypes, sensitiveDataTypes, itSystems, interfaceAppType) {
             $rootScope.page.title = 'Opret IT system';
             $rootScope.page.subnav = subnav.slice();
             $rootScope.page.subnav.push({ state: 'it-system-usage', text: 'IT System' });
+
+            $scope.interfaceAppType = interfaceAppType;
 
             $scope.usageId = $stateParams.id;
             $scope.status = [{ id: true, name: 'Aktiv' }, { id: false, name: 'Inaktiv' }];
