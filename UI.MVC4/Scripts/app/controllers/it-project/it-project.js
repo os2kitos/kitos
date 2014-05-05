@@ -11,12 +11,12 @@
             templateUrl: 'partials/it-project/edit-it-project.html',
             controller: 'project.EditCtrl',
             resolve: {
-                //itProject: ['$http', '$stateParams', function($http, $stateParams) {
-                //    return $http.get("api/itproject/" + $stateParams.id)
-                //        .then(function(result) {
-                //            return result.data.response;
-                //        });
-                //}]
+                itProject: ['$http', '$stateParams', function($http, $stateParams) {
+                    return $http.get("api/itproject/" + $stateParams.id)
+                        .then(function(result) {
+                            return result.data.response;
+                        });
+                }]
             }
         });
 
@@ -24,11 +24,12 @@
 
 
     app.controller('project.EditCtrl',
-        ['$rootScope', '$scope',
-            function ($rootScope, $scope){
+        ['$rootScope', '$scope', 'itProject',
+            function ($rootScope, $scope, itProject){
                 $rootScope.page.title = 'IT Projekt';
                 $rootScope.page.subnav = subnav;
 
+                $scope.project = itProject;
 
 
             }]);

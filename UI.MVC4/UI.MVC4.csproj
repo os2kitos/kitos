@@ -241,6 +241,8 @@
     <Compile Include="Controllers\API\WishController.cs" />
     <Compile Include="Models\DataRowDTO.cs" />
     <Compile Include="Models\DataRowUsageDTO.cs" />
+    <Compile Include="Models\EconomyRowDTO.cs" />
+    <Compile Include="Models\EconomySetDTO.cs" />
     <Compile Include="Models\InterfaceUsageDTO.cs" />
     <Compile Include="Models\ItProjectDTO.cs" />
     <Compile Include="Models\ItSystemDTO.cs" />
@@ -413,6 +415,7 @@
     <Content Include="Partials\home\forgot-password.html" />
     <Content Include="Partials\home\index.html" />
     <Content Include="Partials\it-project\edit-it-project.html" />
+    <Content Include="Partials\it-project\tab-economy.html" />
     <Content Include="Partials\it-system\assign-it-system.html" />
     <Content Include="Partials\it-system\tab-proj.html" />
     <Content Include="Partials\it-system\tab-kle.html" />
@@ -475,6 +478,7 @@
     <Content Include="Scripts\app\controllers\global-admin\global-admin.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-config.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
+    <Content Include="Scripts\app\controllers\it-project\it-project-economy.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-proj.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-kle.js" />
