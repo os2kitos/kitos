@@ -21,13 +21,33 @@
                 <div class="col-md-4">
                     <input type="text" id="project-id" data-ng-model="project.projectId" class="form-control input-sm" />
                 </div>
+                
+                <label for="project-access" class="control-label col-md-2 small">Public</label>
+                <div class="col-md-4">
+                    <input id="project-access" data-ng-model="project.accessModifier" class="form-control input-sm" data-select-access-modifier="" />
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <!-- type -->
+                <label for="project-type" class="control-label col-md-2 small">Type</label>
+                <div class="col-md-4">
+                    <select id="project-type" class="form-control input-sm"
+                            data-ng-options="o.id as o.name for o in projectTypes"
+                            data-ng-model="project.typeId">
+                        <!-- TODO
+                            data-field="categoryId"
+                            data-autosave="api/itproject/{{project.id}}">
+                            -->
+                    </select>
+                </div>
 
                 <!-- category -->
                 <label for="project-category" class="control-label col-md-2 small">Kategori</label>
                 <div class="col-md-4">
                     <select id="project-category" class="form-control input-sm"
-                        data-ng-options="o.id as o.name for o in categories"
-                        data-ng-model="project.categoryId">
+                            data-ng-options="o.id as o.name for o in categories"
+                            data-ng-model="project.categoryId">
                         <!-- TODO
                             data-field="categoryId"
                             data-autosave="api/itproject/{{project.id}}">
@@ -42,9 +62,9 @@
                 <div class="col-md-4">
                     <input id="project-esdh" class="form-control input-sm" type="text" data-ng-model="project.esdhRef" />
                     <!-- TODO
-                            data-field="esdhRef" 
-                            data-autosave="api/itproject/{{project.id}}" /> 
-                            -->
+                        data-field="esdhRef" 
+                        data-autosave="api/itproject/{{project.id}}" /> 
+                        -->
 
                 </div>
 
@@ -53,9 +73,9 @@
                 <div class="col-md-4">
                     <input id="project-cmdb" class="form-control input-sm" type="text" data-ng-model="project.cmdbRef" />
                     <!-- TODO
-                            data-field="cmdbRef" 
-                            data-autosave="api/itproject/{{project.id}}" /> 
-                            -->
+                        data-field="cmdbRef" 
+                        data-autosave="api/itproject/{{project.id}}" /> 
+                        -->
                 </div>
             </div>
 
@@ -65,14 +85,40 @@
                 <div class="col-md-10">
                     <input id="project-url" class="form-control input-sm" type="text" data-ng-model="project.directoryOrUrlRef" />
                     <!-- TODO
-                            data-field="directoryOrUrlRef" 
-                            data-autosave="api/itproject/{{project.id}}" />
-                            -->
+                        data-field="directoryOrUrlRef" 
+                        data-autosave="api/itproject/{{project.id}}" />
+                        -->
                 </div>
             </div>
-        </div>
-        <div class="col-md-6">
+            
+            <!-- associated program -->
+            <!-- TODO: only show this if project isn't of type 'program' -->
+            <div class="form-group" data-ng-if="true">
+                <label class="col-md-2 control-label small" for="associated-program">
+                    Tilknyttet program
+                </label>
+                <div id="associated-program" class="col-md-10">
+                    <!-- TODO -->
+                    <select class="form-control input-sm">
+                        <option></option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- associated projects -->
+            <!--TODO: only show this if project _is_ of type 'program' -->
+            <div class="form-group" data-ng-if="true">
+                <label class="col-md-2 control-label small" for="associated-projects">
+                    Tilknyttede projekter
+                </label>
+                <div id="associated-projects" class="col-md-10">
+                    <!-- TODO: list projects as links -->
+                </div>
+            </div>
 
+        </div>
+
+        <div class="col-md-6">
             <!-- motivation/background -->
             <div class="form-group">
                 <label for="project-background" class="col-md-2 control-label small">Formål/baggrund</label>
