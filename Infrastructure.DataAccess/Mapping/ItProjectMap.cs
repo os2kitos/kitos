@@ -59,6 +59,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasRequired(t => t.ItProjectType)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ItProjectTypeId);
+            this.HasOptional(t => t.AssociatedProgram)
+                .WithMany(t => t.AssociatedPrograms)
+                .HasForeignKey(d => d.AssociatedProgramId)
+                .WillCascadeOnDelete(false);
 
         }
     }

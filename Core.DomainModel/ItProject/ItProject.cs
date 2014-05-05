@@ -34,6 +34,7 @@ namespace Core.DomainModel.ItProject
 
         public int? AssociatedProgramId { get; set; }
         public virtual ItProject AssociatedProgram { get; set; }
+        public virtual ICollection<ItProject> AssociatedPrograms { get; set; }
 
         public int ItProjectTypeId { get; set; }
         public virtual ItProjectType ItProjectType { get; set; }
