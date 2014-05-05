@@ -63,6 +63,12 @@
 
                 $scope.exposedInterfaces = [];
 
+                $scope.filterInterfaces = function(interfaceSystem) {
+
+                    return interfaceSystem.canBeUsed || interfaceSystem.usage || $scope.showAllInterfaces;
+
+                };
+
                 //EXPOSED INTERFACES
                 $http.get("api/itsystem?itSystemId=" + itSystemUsage.itSystemId + "&getExposedInterfaces").success(function (result) {
 
@@ -169,9 +175,7 @@
 
                     var data = {};
                     data[field] = value;
-
-                    console.log("patch: " + url + ", data: " + JSON.stringify(data));
-
+                    
                     return $http({ method: 'PATCH', url: url, data: data }).success(function(result) {
                         notify.addSuccessMessage("Feltet er opdateret");
                     }).error(function(result) {
