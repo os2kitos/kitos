@@ -25,7 +25,8 @@
         $scope.orgUnitsTree = orgUnitsTree;
         $scope.isTransversal = isTransversal;
         var projectId = $stateParams.id;
-        
+        $scope.patchUrl = 'api/itproject/' + projectId;
+
         $scope.save = function (obj) {
             var msg = notify.addInfoMessage("Gemmer... ");
             if (obj.selected) {

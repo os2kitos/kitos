@@ -290,9 +290,7 @@
             restrict: 'A',
             require: 'ngModel',
             link: function (scope, element, attrs, ctrl) {
-                
                 function parseValue(value) {
-
                     switch(attrs.fieldtype) {
                         case "int":
                             return parseInt(value);
@@ -306,27 +304,40 @@
                     oldValue = parseValue(ctrl.$viewValue);
                 });
 
-                function save() {
+                function saveIfNew() {
                     var newValue = parseValue(ctrl.$viewValue);
-                    
-                    if (newValue !== oldValue) {
-                        var payload = {};
-                        payload[attrs.field] = newValue;
-                        
-                        $http({ method: 'PATCH', url: attrs.autosave, data: payload })
-                            .success(function(result) {
-                                notify.addSuccessMessage("Feltet er opdateret.");
-                            })
-                            .error(function(result) {
-                                notify.addErrorMessage("Fejl! Feltet kunne ikke ændres!");
-                            });
-                    }
+                    var payload = {};
+                    payload[attrs.field] = newValue;
 
+                    if (newValue !== oldValue) {
+                        save(payload);
+                    }
                 }
 
-                var bindOn = attrs.type == "checkbox" ? "change" : "blur";
+                function saveCheckbox() {
+                    // ctrl.$viewValue reflects the old state, so having to invert
+                    var newValue = !parseValue(ctrl.$viewValue);
+                    var payload = {};
+                    payload[attrs.field] = newValue;
+                    save(payload);
+                }
 
-                element.bind(bindOn, save);
+                function save(payload) {
+                    var msg = notify.addInfoMessage("Gemmer...", false);
+                    $http({ method: 'PATCH', url: attrs.autosave, data: payload })
+                        .success(function() {
+                            msg.toSuccessMessage("Feltet er opdateret.");
+                        })
+                        .error(function() {
+                            msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                        });
+                }
+
+                if (attrs.type === "checkbox") {
+                    element.bind('change', saveCheckbox);
+                } else {
+                    element.bind('blur', saveIfNew);
+                }
             }
         };
     }]);
