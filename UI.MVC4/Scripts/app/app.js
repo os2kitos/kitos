@@ -37,14 +37,15 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
                     templateUrl: 'partials/topnav/profileModal.html',
                     resolve: {
                         orgUnits: [function () {
-                            return $http.get('api/organizationunit/?userid2=' + user.id).success(function (result) {
-                                return result.response;
+                            return $http.get('api/organizationunit/?userid2=' + user.id).then(function (result) {
+                                return result.data.response;
                             });
                         }]
                     },
                     controller: ['$scope', '$modalInstance', 'orgUnits', function ($modalScope, $modalInstance, orgUnits) {
                         $modalScope.user = user;
                         $modalScope.orgUnits = orgUnits;
+                        console.log(orgUnits);
 
                         $modalScope.ok = function () {
                             var userData = {};
