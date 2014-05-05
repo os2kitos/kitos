@@ -17,6 +17,6 @@ namespace UI.MVC4.Models
         public int ProjectCategoryId { get; set; }
         public int OrganizationId { get; set; }
 
-        public IEnumerable<EconomyRowDTO> EconomyRows { get; set; } 
+        public IEnumerable<EconomyYearDTO> EconomyYears { get; set; } 
     }
 }

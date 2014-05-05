@@ -60,28 +60,58 @@ namespace Core.DomainModel.ItProject
         //public virtual ICollection<Stakeholder> Stakeholders { get; set; }
         public virtual ICollection<ItProjectRight> Rights { get; set; }
 
-        public virtual ICollection<EconomyRow> EconomyRows { get; set; }
+        public virtual ICollection<EconomyYear> EconomyYears { get; set; }
     }
 
-    public class EconomyRow : IEntity<int>
+    public class EconomyYear : IEntity<int>
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-
-        public virtual ICollection<EconomySet> Values { get; set; }
 
         public int ItProjectId { get; set; }
         public virtual ItProject ItProject { get; set; }
-    }
 
-    public class EconomySet : IEntity<int>
-    {
-        public int Id { get; set; }
+        //Business expenses
+        public int ConsultantBudget { get; set; }
+        public int ConsultantRea { get; set; }
 
-        public virtual EconomyRow EconomyRow { get; set; }
-        public int EconomyRowId { get; set; }
+        public int EducationBudget { get; set; }
+        public int EducationRea { get; set; }
 
-        public int Budget { get; set; }
-        public int Rea { get; set; }
+        public int OtherBusinessExpensesBudget { get; set; }
+        public int OtherBusinessExpensesRea { get; set; }
+
+        public int IncreasedBusinessExpensesBudget { get; set; }
+        public int IncreasedBusinessExpensesRea { get; set; }
+
+
+        //IT expenses
+        public int HardwareBudget { get; set; }
+        public int HardwareRea { get; set; }
+
+        public int SoftwareBudget { get; set; }
+        public int SoftwareRea { get; set; }
+
+        public int OtherItExpensesBudget { get; set; }
+        public int OtherItExpensesRea { get; set; }
+
+        public int IncreasedItExpensesBudget { get; set; }
+        public int IncreasedItExpensesRea { get; set; }
+
+        //Business savings
+        public int SalaryBudget { get; set; }
+        public int SalaryRea { get; set; }
+
+        public int OtherBusinessSavingsBudget { get; set; }
+        public int OtherBusinessSavingsRea { get; set; }
+
+        //IT savings
+        public int LicenseSavingsBudget { get; set; }
+        public int LicenseSavingsRea { get; set; }
+
+        public int SystemMaintenanceSavingsBudget { get; set; }
+        public int SystemMaintenanceSavingsRea { get; set; }
+
+        public int OtherItSavingsBudget { get; set; }
+        public int OtherItSavingsRea { get; set; }
     }
 }

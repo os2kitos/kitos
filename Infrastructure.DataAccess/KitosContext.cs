@@ -34,8 +34,7 @@ namespace Infrastructure.DataAccess
         public DbSet<DataRow> DataRows { get; set; }
         public DbSet<DataRowUsage> DataRowUsages { get; set; }
         public DbSet<Economy> Economies { get; set; }
-        public DbSet<EconomySet> EconomySets { get; set; }
-        public DbSet<EconomyRow> EconomyRows { get; set; }
+        public DbSet<EconomyYear> EconomyYears { get; set; }
         public DbSet<ExtReference> ExtReferences { get; set; }
         public DbSet<ExtReferenceType> ExtReferenceTypes { get; set; }
         public DbSet<ExtRefTypeLocale> ExtRefTypeLocales { get; set; }
@@ -110,8 +109,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new DataRowMap());
             modelBuilder.Configurations.Add(new DataRowUsageMap());
             modelBuilder.Configurations.Add(new EconomyMap());
-            modelBuilder.Configurations.Add(new EconomySetMap());
-            modelBuilder.Configurations.Add(new EconomyRowMap());
+            modelBuilder.Configurations.Add(new EconomyYearMap());
             modelBuilder.Configurations.Add(new ExtReferenceMap());
             modelBuilder.Configurations.Add(new ExtReferenceTypeMap());
             modelBuilder.Configurations.Add(new ExtRefTypeLocaleMap());

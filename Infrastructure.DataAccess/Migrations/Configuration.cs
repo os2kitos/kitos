@@ -889,19 +889,12 @@ namespace Infrastructure.DataAccess.Migrations
 
             #endregion
 
+
+
             #region IT Project
 
-            var itProject1 = new ItProject()
-                {
-                    ObjectOwner = globalUser,
-                    Name = "Test Projekt",
-                    AccessModifier = AccessModifier.Normal,
-                    Note = "Test",
-                    Background = "Baggrund",
-                    ItProjectCategory = itProjectCategoryPublic,
-                    ItProjectType = itProjectTypeProject,
-                    Organization = roskilde
-                };
+            var itProject1 = SimpleProject("Test projekt", globalUser, roskilde, itProjectCategoryPublic,
+                                           itProjectTypeProject);
 
             context.ItProjects.AddOrUpdate(itProject1);
 
@@ -929,6 +922,33 @@ namespace Infrastructure.DataAccess.Migrations
                     Salt = salt,
                     Password = cryptoService.Encrypt(password + salt)
                 };
+        }
+
+        private ItProject SimpleProject(string name, User owner, Organization organization, ItProjectCategory projectCategory, ItProjectType type)
+        {
+            var itProject = new ItProject()
+            {
+                ObjectOwner = owner,
+                Name = name,
+                AccessModifier = AccessModifier.Normal,
+                Note = "Note",
+                Background = "Baggrund",
+                ItProjectCategory = projectCategory,
+                ItProjectType = type,
+                Organization = organization,
+                EconomyYears = new List<EconomyYear>()
+                    {
+                        new EconomyYear(),
+                        new EconomyYear(),
+                        new EconomyYear(),
+                        new EconomyYear(),
+                        new EconomyYear(),
+                        new EconomyYear()
+                    },
+            };
+
+            return itProject;
+
         }
     }
 }

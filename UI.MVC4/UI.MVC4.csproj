@@ -241,8 +241,7 @@
     <Compile Include="Controllers\API\WishController.cs" />
     <Compile Include="Models\DataRowDTO.cs" />
     <Compile Include="Models\DataRowUsageDTO.cs" />
-    <Compile Include="Models\EconomyRowDTO.cs" />
-    <Compile Include="Models\EconomySetDTO.cs" />
+    <Compile Include="Models\EconomyYearDTO.cs" />
     <Compile Include="Models\InterfaceUsageDTO.cs" />
     <Compile Include="Models\ItProjectDTO.cs" />
     <Compile Include="Models\ItSystemDTO.cs" />

@@ -228,6 +228,9 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.OrgUnits, opt => opt.UseValue(null))
                   .ForMember(dest => dest.TaskRefs, opt => opt.UseValue(null));
 
+            Mapper.CreateMap<EconomyYear, EconomyYearDTO>()
+                  .ReverseMap();
+
             Mapper.CreateMap<ItProject, ItProjectDTO>()
                   .ForMember(dest => dest.AssociatedProjectIds,
                              opt => opt.MapFrom(x => x.AssociatedProjects.Select(y => y.Id)))

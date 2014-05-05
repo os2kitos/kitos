@@ -70,8 +70,7 @@
     <Compile Include="Mapping\AdminRightMap.cs" />
     <Compile Include="Mapping\AdminRoleMap.cs" />
     <Compile Include="Mapping\BusinessTypeMap.cs" />
-    <Compile Include="Mapping\EconomySetMap.cs" />
-    <Compile Include="Mapping\EconomyRowMap.cs" />
+    <Compile Include="Mapping\EconomyYearMap.cs" />
     <Compile Include="Mapping\InterfaceCategoryMap.cs" />
     <Compile Include="Mapping\DataTypeMap.cs" />
     <Compile Include="Mapping\DataRowUsageMap.cs" />

@@ -64,10 +64,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(d => d.AssociatedProgramId)
                 .WillCascadeOnDelete(false);
 
-            this.HasMany(t => t.EconomyRows)
+            this.HasMany(t => t.EconomyYears)
                 .WithRequired(d => d.ItProject)
-                .HasForeignKey(d => d.ItProjectId)
-                .WillCascadeOnDelete(true);
+                .HasForeignKey(d => d.ItProjectId);
 
         }
     }

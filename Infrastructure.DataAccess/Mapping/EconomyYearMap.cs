@@ -8,21 +8,16 @@ using Core.DomainModel.ItProject;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class EconomyRowMap : EntityTypeConfiguration<EconomyRow>
+    public class EconomyYearMap : EntityTypeConfiguration<EconomyYear>
     {
-        public EconomyRowMap()
+        public EconomyYearMap()
         {
             // Primary Key
             this.HasKey(t => t.Id);
 
             // Table & Column Mappings
-            this.ToTable("EconomyRow");
+            this.ToTable("EconomyYear");
             this.Property(t => t.Id).HasColumnName("Id");
-
-            this.HasMany(t => t.Values)
-                .WithRequired(d => d.EconomyRow)
-                .HasForeignKey(d => d.EconomyRowId)
-                .WillCascadeOnDelete(true);
         }
     }
 }
