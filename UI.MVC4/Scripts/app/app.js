@@ -45,7 +45,6 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
                     controller: ['$scope', '$modalInstance', 'orgUnits', function ($modalScope, $modalInstance, orgUnits) {
                         $modalScope.user = user;
                         $modalScope.orgUnits = orgUnits;
-                        console.log(orgUnits);
 
                         $modalScope.ok = function () {
                             var userData = {};
