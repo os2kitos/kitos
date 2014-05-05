@@ -27,7 +27,7 @@ namespace Core.DomainModel.ItSystem
         public string SystemId { get; set; }
 
 
-        public int BelongsToId { get; set; }
+        public int? BelongsToId { get; set; }
         /// <summary>
         /// The organization the system belongs to (OIO term - think "produced by")
         /// </summary>
@@ -35,7 +35,6 @@ namespace Core.DomainModel.ItSystem
 
         public int OrganizationId { get; set; }
         public int UserId { get; set; }
-
 
         public AccessModifier AccessModifier { get; set; }
 
@@ -97,7 +96,7 @@ namespace Core.DomainModel.ItSystem
         public int AppTypeId { get; set; }
         public virtual AppType AppType { get; set; }
 
-        public int BusinessTypeId { get; set; }
+        public int? BusinessTypeId { get; set; }
         public virtual BusinessType BusinessType { get; set; }
 
         #region Interface "Snitflade" data

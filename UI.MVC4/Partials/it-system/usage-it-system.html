@@ -20,7 +20,7 @@
                     </div>
     
                     <!--Parent system-->
-                    <div class="form-group">
+                    <div class="form-group" data-ng-if="usage.itSystem.appTypeId != interfaceAppType.id">
                         <label for="system-parent" class="control-label col-md-5 small">Overordnet system</label>
                         <div class="col-md-7">
                             <input type="text" id="system-parent" data-ng-model="parentSystem.name" class="form-control input-sm" disabled="disabled">
@@ -28,7 +28,7 @@
                     </div>
     
                     <!--Belongs to-->
-                    <div class="form-group">
+                    <div class="form-group" data-ng-if="usage.itSystem.appTypeId != interfaceAppType.id">
                         <label for="system-belongs-to" class="control-label col-md-5 small">Tilhører</label>
                         <div class="col-md-7">
                             <input type="text" id="system-belongs-to" data-ng-model="usage.itSystem.belongsToName" class="form-control input-sm" disabled="disabled">
@@ -63,7 +63,7 @@
                     </div>
     
                     <!--Usage type-->
-                    <div class="form-group">
+                    <div class="form-group" data-ng-if="usage.itSystem.appTypeId != interfaceAppType.id">
                         <label for="system-business-type" class="control-label col-md-5 small">Forretningstype</label>
                         <div class="col-md-7">
                             <select data-ui-select2="" id="system-business-type" data-ng-model="usage.itSystem.businessTypeId" class="form-control input-sm" disabled="disabled">
@@ -223,12 +223,18 @@
 </form>
 
 <ul class="nav nav-tabs">
-  <li data-ui-sref-active="active"><a data-ui-sref="it-system-usage.interfaces">Snitflader</a></li>
-  <li data-ui-sref-active="active"><a data-ui-sref="it-system-usage.hierarchy">Hierarki</a></li>
+    <li data-ui-sref-active="active" data-ng-if="usage.itSystem.appTypeId != interfaceAppType.id">
+        <a data-ui-sref="it-system-usage.interfaces">Snitflader</a>
+    </li>
+    <li data-ui-sref-active="active" data-ng-if="usage.itSystem.appTypeId != interfaceAppType.id">
+        <a data-ui-sref="it-system-usage.hierarchy">Hierarki</a>
+    </li>
   <li data-ui-sref-active="active"><a data-ui-sref="it-system-usage.roles">Roller</a></li>
   <li data-ui-sref-active="active"><a data-ui-sref="it-system-usage.wishes">Ændringsønske</a></li>
   <li data-ui-sref-active="active"><a data-ui-sref="it-system-usage.org">Organisation</a></li>
-  <li data-ui-sref-active="active"><a data-ui-sref="it-system-usage.kle">KLE</a></li>
+    <li data-ui-sref-active="active" data-ng-if="usage.itSystem.appTypeId != interfaceAppType.id">
+        <a data-ui-sref="it-system-usage.kle">KLE</a>
+    </li>
   <li data-ui-sref-active="active"><a data-ui-sref="it-system-usage.proj">IT Projekter</a></li>
 </ul>
 
