@@ -46,8 +46,9 @@
 
                 $scope.itProjectTypes = itProjectTypes;
                 $scope.itProjectCategories = itProjectCategories;
-
-                $scope.itProgramType = _.findWhere(itProjectTypes, { name: "IT Program" });
+                
+                //ItProgram type TODO: don't hardcode this?
+                $scope.itProgramType = _.findWhere(itProjectTypes, { name: "IT Program" }); 
 
 
             }]);
