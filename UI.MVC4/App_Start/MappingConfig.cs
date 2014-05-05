@@ -229,7 +229,10 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.TaskRefs, opt => opt.UseValue(null));
 
             Mapper.CreateMap<ItProject, ItProjectDTO>()
-                  .ReverseMap();
+                  .ForMember(dest => dest.AssociatedProjectIds,
+                             opt => opt.MapFrom(x => x.AssociatedProjects.Select(y => y.Id)))
+                  .ReverseMap()
+                  .ForMember(dest => dest.AssociatedProjects, opt => opt.Ignore());
         }
     }
 }

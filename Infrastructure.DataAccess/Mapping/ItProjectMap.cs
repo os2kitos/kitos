@@ -60,7 +60,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ItProjectTypeId);
             this.HasOptional(t => t.AssociatedProgram)
-                .WithMany(t => t.AssociatedPrograms)
+                .WithMany(t => t.AssociatedProjects)
                 .HasForeignKey(d => d.AssociatedProgramId)
                 .WillCascadeOnDelete(false);
 
