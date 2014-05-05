@@ -266,7 +266,7 @@
     <Compile Include="Controllers\API\MethodController.cs" />
     <Compile Include="Controllers\API\OrganizationUnitController.cs" />
     <Compile Include="Controllers\API\PaymentModelController.cs" />
-    <Compile Include="Controllers\API\ProjectCategoryController.cs" />
+    <Compile Include="Controllers\API\ItProjectCategoryController.cs" />
     <Compile Include="Controllers\API\ProjectPhaseController.cs" />
     <Compile Include="Controllers\API\ProjectPhaseLocaleController.cs" />
     <Compile Include="Controllers\API\ProjectTypeController.cs" />
