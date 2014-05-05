@@ -70,6 +70,11 @@ namespace Infrastructure.DataAccess.Mapping
                     mc.MapLeftKey("ItProjectId");
                     mc.MapRightKey("OrgUnitId");
                 });
+
+            this.HasMany(t => t.EconomyYears)
+                .WithRequired(d => d.ItProject)
+                .HasForeignKey(d => d.ItProjectId);
+
         }
     }
 }
