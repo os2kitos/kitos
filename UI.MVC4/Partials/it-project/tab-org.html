@@ -1,4 +1,9 @@
-﻿<script type="text/ng-template"  id="tree_item_renderer.html">
+﻿<label>
+    <input type="checkbox" data-ng-model="isTransversal" data-ng-change="saveState()" />
+    Projektet er tværgående
+</label>
+
+<script type="text/ng-template"  id="tree_item_renderer.html">
     <label>
         <input type="checkbox" value="{{ orgUnit.id }}" data-ng-model="orgUnit.selected" data-ng-change="save(orgUnit)" />
         {{ orgUnit.name }}

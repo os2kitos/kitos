@@ -5,6 +5,9 @@
             templateUrl: 'partials/it-project/tab-org.html',
             controller: 'project.EditOrgCtrl',
             resolve: {
+                isTransversal: ['itProject', function (itProject) {
+                    return itProject.isTransversal;
+                }],
                 selectedOrgUnits: ['itProject', function (itProject) {
                     return _.pluck(itProject.usedByOrgUnits, 'id');
                 }],
@@ -18,8 +21,9 @@
         });
     }]);
 
-    app.controller('project.EditOrgCtrl', ['$scope', '$http', '$stateParams', 'notify', 'orgUnitsTree', 'selectedOrgUnits', function ($scope, $http, $stateParams, notify, orgUnitsTree, selectedOrgUnits) {
+    app.controller('project.EditOrgCtrl', ['$scope', '$http', '$stateParams', 'notify', 'isTransversal', 'orgUnitsTree', 'selectedOrgUnits', function ($scope, $http, $stateParams, notify, isTransversal, orgUnitsTree, selectedOrgUnits) {
         $scope.orgUnitsTree = orgUnitsTree;
+        $scope.isTransversal = isTransversal;
         var projectId = $stateParams.id;
         
         $scope.save = function (obj) {
@@ -41,6 +45,11 @@
                         msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                     });
             }
+        };
+
+        $scope.saveState = function() {
+            console.log($scope.isTransversal);
+            $http
         };
 
         function searchTree(element, matchingId) {
