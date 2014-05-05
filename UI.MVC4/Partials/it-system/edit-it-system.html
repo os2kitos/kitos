@@ -20,20 +20,20 @@
                 </div>
 
                 <!--Parent system-->
-                <div class="form-group">
+                <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
                     <label for="system-parent" class="control-label col-md-5 small">Overordnet system</label>
                     <div class="col-md-7">
                         <input type="hidden" data-ui-select2="itSystemsSelectOptions" id="system-parent" data-ng-model="system.parent" class="form-control input-sm" >
                     </div>
                 </div>
                 <!--Interfaces can-use-->
-                <div class="form-group">
+                <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
                     <label for="system-interfaces-can-use" class="control-label col-md-5 small">Snitflader (kan anvende)</label>
                     <div class="col-md-7">
                         <input type="hidden" data-ui-select2="interfacesSelectOptions" id="system-interfaces-can-use" data-ng-model="system.canUseInterfaces" class="form-control input-sm" multiple="multiple">
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
                     <label for="system-belongs-to" class="control-label col-md-5 small">Tilhører</label>
                     <div class="col-md-7">
                          <input type="hidden" data-ui-select2="organizationSelectOptions" id="system-belongs-to" data-ng-model="system.belongsTo" class="form-control input-sm" required="required">
@@ -69,7 +69,7 @@
                 </div>
 
                 <!--Usage type-->
-                <div class="form-group">
+                <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
                     <label for="system-business-type" class="control-label col-md-5 small">Forretningstype</label>
                     <div class="col-md-7">
                         <select data-ui-select2="" id="system-business-type" data-ng-model="system.businessTypeId" class="form-control input-sm" required="required">
@@ -190,7 +190,7 @@
     <div class="row">&nbsp;</div>
     
     <!-- KLE -->
-    <div class="row panel panel-default">
+    <div class="row panel panel-default" data-ng-if="system.appTypeId != interfaceAppType.id">
         <div class="panel-heading small">Tilknyt KLE</div>
         <div>
             <select data-ng-model="kleFilter.parentId" data-ng-options="t.id as (t.taskKey + ' ' + t.description) for t in allTasksFlat | filter:{ type:'KLE-Gruppe' }" data-ng-change="cleanKleFilter()">

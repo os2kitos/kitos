@@ -199,13 +199,8 @@
 
                 $scope.newDataRow = {};
 
-                // submit function
+                // submit system
                 $scope.saveSystem = function () {
-
-                    if (user.currentOrganizationId) {
-                        notify.addErrorMessage("Du har ikke valgt en organisation! Vælg en organisation i øverste højre hjørne");
-                        return;
-                    }
 
                     var system = $scope.system;
 

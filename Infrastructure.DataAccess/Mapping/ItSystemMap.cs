@@ -25,7 +25,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(d => d.ItSystems)
                 .HasForeignKey(t => t.OrganizationId);
 
-            this.HasRequired(t => t.BelongsTo)
+            this.HasOptional(t => t.BelongsTo)
                 .WithMany(d => d.BelongingSystems)
                 .HasForeignKey(t => t.BelongsToId);
 
@@ -37,7 +37,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.References)
                 .HasForeignKey(t => t.AppTypeId);
 
-            this.HasRequired(t => t.BusinessType)
+            this.HasOptional(t => t.BusinessType)
                 .WithMany(t => t.References)
                 .HasForeignKey(t => t.BusinessTypeId);
 
