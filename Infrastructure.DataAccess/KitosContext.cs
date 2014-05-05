@@ -146,11 +146,11 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new PasswordResetRequestMap());
             modelBuilder.Configurations.Add(new PaymentModelMap());
             modelBuilder.Configurations.Add(new PaymentMap());
-            modelBuilder.Configurations.Add(new ProjectCategoryMap());
+            modelBuilder.Configurations.Add(new ItProjectCategoryMap());
             modelBuilder.Configurations.Add(new ProjectPhaseMap());
             modelBuilder.Configurations.Add(new ProjectPhaseLocaleMap());
             modelBuilder.Configurations.Add(new ProjectStatusMap());
-            modelBuilder.Configurations.Add(new ProjectTypeMap());
+            modelBuilder.Configurations.Add(new ItProjectTypeMap());
             modelBuilder.Configurations.Add(new PurchaseFormMap());
             modelBuilder.Configurations.Add(new ResourcesMap());
             modelBuilder.Configurations.Add(new RiskMap());

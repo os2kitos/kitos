@@ -55,10 +55,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .WillCascadeOnDelete(false);
             this.HasRequired(t => t.ItProjectCategory)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.ProjectCategoryId);
+                .HasForeignKey(d => d.ItProjectCategoryId);
             this.HasRequired(t => t.ItProjectType)
                 .WithMany(t => t.References)
-                .HasForeignKey(d => d.ProjectTypeId);
+                .HasForeignKey(d => d.ItProjectTypeId);
 
         }
     }

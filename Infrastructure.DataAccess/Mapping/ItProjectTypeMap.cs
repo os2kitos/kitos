@@ -3,9 +3,9 @@ using Core.DomainModel.ItProject;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ProjectTypeMap : EntityTypeConfiguration<ItProjectType>
+    public class ItProjectTypeMap : EntityTypeConfiguration<ItProjectType>
     {
-        public ProjectTypeMap()
+        public ItProjectTypeMap()
         {
             // Primary Key
             this.HasKey(t => t.Id);

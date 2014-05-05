@@ -516,6 +516,12 @@ namespace Infrastructure.DataAccess.Migrations
                                                     Object = kl,
                                                     Role = localAdmin,
                                                     User = roskildeUser7
+                                                },
+                                            new AdminRight()
+                                                {
+                                                    Object = roskilde,
+                                                    Role = localAdmin,
+                                                    User = localUser
                                                 });
 
             context.SaveChanges();

@@ -35,10 +35,10 @@ namespace Core.DomainModel.ItProject
         public int? AssociatedProgramId { get; set; }
         public virtual ItProject AssociatedProgram { get; set; }
 
-        public int ProjectTypeId { get; set; }
+        public int ItProjectTypeId { get; set; }
         public virtual ItProjectType ItProjectType { get; set; }
 
-        public int ProjectCategoryId { get; set; }
+        public int ItProjectCategoryId { get; set; }
         public virtual ItProjectCategory ItProjectCategory { get; set; }
 
         public int OrganizationId { get; set; }
