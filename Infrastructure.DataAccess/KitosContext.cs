@@ -72,12 +72,11 @@ namespace Infrastructure.DataAccess
         public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
         public DbSet<PaymentModel> PaymentModels { get; set; }
         public DbSet<Payment> Payments { get; set; }
-        public DbSet<PreAnalysis> PreAnalysis { get; set; }
-        public DbSet<ProjectCategory> ProjectCategories { get; set; }
+        public DbSet<ItProjectCategory> ProjectCategories { get; set; }
         public DbSet<ProjectPhase> ProjectPhases { get; set; }
         public DbSet<ProjPhaseLocale> ProjectPhaseLocales { get; set; }
         public DbSet<ProjectStatus> ProjectStatus { get; set; }
-        public DbSet<ProjectType> ProjectTypes { get; set; }
+        public DbSet<ItProjectType> ProjectTypes { get; set; }
         public DbSet<PurchaseForm> PurchaseForms { get; set; }
         public DbSet<Resource> Resources { get; set; }
         public DbSet<Risk> Risks { get; set; }
@@ -147,12 +146,11 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new PasswordResetRequestMap());
             modelBuilder.Configurations.Add(new PaymentModelMap());
             modelBuilder.Configurations.Add(new PaymentMap());
-            modelBuilder.Configurations.Add(new PreAnalysisMap());
-            modelBuilder.Configurations.Add(new ProjectCategoryMap());
+            modelBuilder.Configurations.Add(new ItProjectCategoryMap());
             modelBuilder.Configurations.Add(new ProjectPhaseMap());
             modelBuilder.Configurations.Add(new ProjectPhaseLocaleMap());
             modelBuilder.Configurations.Add(new ProjectStatusMap());
-            modelBuilder.Configurations.Add(new ProjectTypeMap());
+            modelBuilder.Configurations.Add(new ItProjectTypeMap());
             modelBuilder.Configurations.Add(new PurchaseFormMap());
             modelBuilder.Configurations.Add(new ResourcesMap());
             modelBuilder.Configurations.Add(new RiskMap());

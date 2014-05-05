@@ -1,6 +1,4 @@
-﻿using System.Net;
-using System.Net.Http;
-using System.Web.Http;
+﻿using System.Net.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 using UI.MVC4.Models;

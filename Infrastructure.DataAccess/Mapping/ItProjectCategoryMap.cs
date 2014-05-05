@@ -3,9 +3,9 @@ using Core.DomainModel.ItProject;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ProjectCategoryMap : EntityTypeConfiguration<ProjectCategory>
+    public class ItProjectCategoryMap : EntityTypeConfiguration<ItProjectCategory>
     {
-        public ProjectCategoryMap()
+        public ItProjectCategoryMap()
         {
             // Primary Key
             this.HasKey(t => t.Id);
@@ -15,7 +15,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired();
 
             // Table & Column Mappings
-            this.ToTable("ProjectCategory");
+            this.ToTable("ItProjectCategory");
             this.Property(t => t.Id).HasColumnName("Id");
             this.Property(t => t.Name).HasColumnName("Name");
         }

@@ -3,22 +3,21 @@ using Core.DomainModel.ItProject;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class PreAnalysisMap : EntityTypeConfiguration<PreAnalysis>
+    public class ItProjectTypeMap : EntityTypeConfiguration<ItProjectType>
     {
-        public PreAnalysisMap()
+        public ItProjectTypeMap()
         {
             // Primary Key
             this.HasKey(t => t.Id);
 
             // Properties
+            this.Property(t => t.Name)
+                .IsRequired();
+
             // Table & Column Mappings
-            this.ToTable("PreAnalysis");
+            this.ToTable("ItProjectType");
             this.Property(t => t.Id).HasColumnName("Id");
-
-            // Relationships
-            this.HasRequired(t => t.ItProject)
-                .WithOptional(t => t.PreAnalysis);
-
+            this.Property(t => t.Name).HasColumnName("Name");
         }
     }
 }

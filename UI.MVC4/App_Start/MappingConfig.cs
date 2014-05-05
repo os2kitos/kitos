@@ -75,7 +75,7 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<ProjectCategory, OptionDTO>()
+            Mapper.CreateMap<ItProjectCategory, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
@@ -83,7 +83,7 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
-            Mapper.CreateMap<ProjectType, OptionDTO>()
+            Mapper.CreateMap<ItProjectType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
@@ -227,6 +227,12 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.OrgUnits, opt => opt.UseValue(null))
                   .ForMember(dest => dest.TaskRefs, opt => opt.UseValue(null));
+
+            Mapper.CreateMap<ItProject, ItProjectDTO>()
+                  .ForMember(dest => dest.AssociatedProjectIds,
+                             opt => opt.MapFrom(x => x.AssociatedProjects.Select(y => y.Id)))
+                  .ReverseMap()
+                  .ForMember(dest => dest.AssociatedProjects, opt => opt.Ignore());
         }
     }
 }
