@@ -12,7 +12,7 @@
         });
     }]);
 
-    app.controller('project.EditCtrl',
+    app.controller('project.EditEconomyCtrl',
     ['$rootScope', '$scope', 'itProject',
         function($rootScope, $scope, itProject) {
 
