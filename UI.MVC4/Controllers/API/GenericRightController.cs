@@ -30,9 +30,8 @@ namespace UI.MVC4.Controllers.API
 
         protected virtual bool HasWriteAccess(int objId, User user)
         {
-            return
-                RightRepository.Get(
-                    right => right.ObjectId == objId && right.UserId == user.Id && right.Role.HasWriteAccess).Any();
+            var rights = RightRepository.Get(right => right.ObjectId == objId && right.UserId == user.Id).ToList();
+            return rights.Any(right => right.Role.HasWriteAccess);
         }
 
         private bool HasWriteAccess(int objId, int userId)
@@ -41,11 +40,11 @@ namespace UI.MVC4.Controllers.API
             return HasWriteAccess(objId, user);
         }
 
-        public HttpResponseMessage Get(int oId)
+        public HttpResponseMessage Get(int id)
         {
             try
             {
-                var rights = GetAll(oId);
+                var rights = GetAll(id);
                 var dtos = AutoMapper.Mapper.Map<IEnumerable<TRight>, IEnumerable<RightOutputDTO>>(rights);
 
                 return Ok(dtos);
