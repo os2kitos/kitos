@@ -13,6 +13,8 @@ namespace Core.ApplicationServices
         public ItProjectService(IGenericRepository<ItProject> projectRepository, IGenericRepository<ItProjectType> projectTypeRepository )
         {
             _projectRepository = projectRepository;
+
+            //TODO: dont hardcode this
             ProgramType = projectTypeRepository.Get(type => type.Name == "IT Program").Single();
         }
 
