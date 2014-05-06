@@ -23,16 +23,22 @@ namespace UI.MVC4.Controllers.API
             RightRepository = rightRepository;
         }
 
-        protected virtual bool HasWriteAccess(int objId, int userId)
+        protected virtual bool HasWriteAccess(int objId, User user)
         {
             return false;
         }
 
-        public HttpResponseMessage GetHasWriteAccess(bool? hasWriteAccess, int objId, int userId)
+        private bool HasWriteAccess(int objId, int userId)
+        {
+            var user = UserRepository.GetByKey(userId);
+            return HasWriteAccess(objId, user);
+        }
+
+        public HttpResponseMessage GetHasWriteAccess(bool? hasWriteAccess, int oId, int uId)
         {
             try
             {
-                return Ok(HasWriteAccess(objId, userId));
+                return Ok(HasWriteAccess(oId, uId));
             }
             catch (Exception e)
             {
@@ -44,7 +50,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                if (!HasWriteAccess(KitosUser.Id, inputDTO.ObjectId))
+                if (!HasWriteAccess(inputDTO.ObjectId, KitosUser))
                     return Unauthorized();
 
                 var right = AutoMapper.Mapper.Map<RightInputDTO, TRight>(inputDTO);
