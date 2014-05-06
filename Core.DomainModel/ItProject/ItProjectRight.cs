@@ -5,8 +5,8 @@
         public int UserId { get; set; }
         public int RoleId { get; set; }
         public int ObjectId { get; set; }
-        public User User { get; set; }
-        public ItProjectRole Role { get; set; }
-        public ItProject Object { get; set; }
+        public virtual User User { get; set; }
+        public virtual ItProjectRole Role { get; set; }
+        public virtual ItProject Object { get; set; }
     }
 }

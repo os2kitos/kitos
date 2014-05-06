@@ -75,7 +75,7 @@
             $scope.orgUnits[orgUnit.id] = orgUnit;
 
             if (!inheritWriteAccess) {
-                $http.get('api/organizationRight?hasWriteAccess&orgUnitId=' + orgUnit.id + '&userId=' + userId).success(function (result) {
+                $http.get('api/organizationRight?hasWriteAccess&oId=' + orgUnit.id + '&uId=' + userId).success(function (result) {
                     orgUnit.hasWriteAccess = result.response;
 
                     _.each(orgUnit.children, function (u) {
@@ -883,7 +883,7 @@
                     hasWriteAccess(child, true);
                 });
             } else {
-                $http.get('api/organizationRight?hasWriteAccess&orgUnitId=' + orgUnit.id + '&userId=' + userId).success(function(result) {
+                $http.get('api/organizationRight?hasWriteAccess&oId=' + orgUnit.id + '&uId=' + userId).success(function(result) {
                     orgUnit.hasWriteAccess = result.response;
 
                     _.each(orgUnit.children, function(child) {

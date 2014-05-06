@@ -152,20 +152,18 @@
             });
         };
 
-        $scope.rightSortBy = "orgUnitName";
+        $scope.rightSortBy = "roleName";
         $scope.rightSortReverse = false;
         $scope.rightSort = function (right) {
             switch ($scope.rightSortBy) {
-                case "orgUnitName":
-                    return $scope.orgUnits[right.objectId].name;
                 case "roleName":
-                    return $scope.orgRoles[right.roleId].name;
+                    return right.role.name;
                 case "userName":
                     return right.user.name;
                 case "userEmail":
                     return right.user.email;
                 default:
-                    return $scope.orgUnits[right.objectId].name;
+                    return right.role.name;
             }
         };
 

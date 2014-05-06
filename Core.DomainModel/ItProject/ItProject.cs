@@ -3,7 +3,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProject : IEntity<int>, IHasRights<ItProjectRight>, IHasAccessModifier
+    public class ItProject : IEntity<int>, IHasRights<ItProjectRight>, IHasAccessModifier, IHasOwner
     {
         public ItProject()
         {

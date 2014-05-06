@@ -5,7 +5,7 @@
         $stateProvider.state('edit-it-project.economy', {
             url: '/economy',
             templateUrl: 'partials/it-project/tab-economy.html',
-            controller: 'project.EditEconomy',
+            controller: 'project.EditEconomyCtrl',
             resolve: {
                                 
             }

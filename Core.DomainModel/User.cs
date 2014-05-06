@@ -33,6 +33,7 @@ namespace Core.DomainModel
         public virtual ICollection<ItContractRight> ContractRights { get; set; }
         public virtual ICollection<AdminRight> AdminRights { get; set; }
         public virtual ICollection<ItSystem.ItSystem> CreatedSystems { get; set; }
+        public virtual ICollection<ItSystem.ItSystemUsage> CreatedSystemUsages { get; set; }
         public virtual ICollection<Wish> Wishes { get; set; }
     }
 }

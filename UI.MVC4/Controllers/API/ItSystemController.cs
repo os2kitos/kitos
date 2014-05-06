@@ -139,6 +139,8 @@ namespace UI.MVC4.Controllers.API
             {
                 var item = Map(dto);
 
+                item.ObjectOwner = KitosUser;
+
                 foreach (var id in dto.TaskRefIds)
                 {
                     var task = _taskRepository.GetByKey(id);
