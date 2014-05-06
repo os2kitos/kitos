@@ -17,6 +17,7 @@ namespace Core.DomainModel.ItProject
         }
 
         public int Id { get; set; }
+        public string ItProjectId { get; set; }
         public string Background { get; set; }
         public bool IsTransversal { get; set; }
         public string Note { get; set; }
@@ -58,5 +59,7 @@ namespace Core.DomainModel.ItProject
         //public virtual ICollection<Risk> Risks { get; set; }
         //public virtual ICollection<Stakeholder> Stakeholders { get; set; }
         public virtual ICollection<ItProjectRight> Rights { get; set; }
+
+        public virtual ICollection<EconomyYear> EconomyYears { get; set; }
     }
 }

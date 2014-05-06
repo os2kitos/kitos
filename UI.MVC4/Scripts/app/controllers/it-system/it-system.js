@@ -4,7 +4,7 @@
             { state: 'overview-it-system', text: 'Overblik' },
             { state: 'assign-it-system', text: 'Tilknyt IT system' },
             { state: 'add-it-system', text: 'Opret IT system' },
-            { state: 'index', text: 'Rapport' },
+            { state: 'index', text: 'Rapport' }
     ];
 
     app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
@@ -404,7 +404,7 @@
     app.controller('system.EditUsage', ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'itSystemUsage', 'appTypes',
         'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'itSystems', 'interfaceAppType',
         function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, appTypes, businessTypes, archiveTypes, sensitiveDataTypes, itSystems, interfaceAppType) {
-            $rootScope.page.title = 'Opret IT system';
+            $rootScope.page.title = 'IT system';
             $rootScope.page.subnav = subnav.slice();
             $rootScope.page.subnav.push({ state: 'it-system-usage', text: 'IT System' });
 

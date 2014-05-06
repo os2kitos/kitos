@@ -1,4 +1,6 @@
 ﻿(function (ng, app) {
+    'use strict';
+    
     app.directive('holderFix', function () {
         return {
             link: function (scope, element, attrs) {
@@ -185,6 +187,7 @@
 
     app.directive('selectAccessModifier', [function() {
         return {
+            priority: 1,
             replace: true,
             templateUrl: 'partials/directives/select-access-modifier.html'
         };
@@ -243,30 +246,6 @@
         };
     }]);
     
-    //// http://stackoverflow.com/questions/14833326/how-to-set-focus-in-angularjs
-    //// use autofocus instead
-    //app.directive('focusOn', ['$timeout', function ($timeout) {
-    //    return function (scope, elem, attr) {
-    //        scope.$on('focusOn', function (e, name) {
-    //            if (name === attr.focusOn) {
-    //                $timeout(function() {
-    //                    elem[0].focus();
-    //                });
-    //            }
-    //        });
-    //    };
-    //}]);
-
-    //// http://stackoverflow.com/questions/14833326/how-to-set-focus-in-angularjs
-    //app.factory('focus', function ($rootScope, $timeout) {
-    //    return function(name) {
-    //        $timeout(function() {
-    //            $rootScope.$broadcast('focusOn', name);
-    //        });
-    //    };
-    //});
-
-
     app.directive('autofocus', ['$timeout', function($timeout) {
         return function (scope, elem, attr) {
             scope.$on('autofocus', function (e) {
@@ -307,21 +286,33 @@
     }]);
 
     app.directive('autosave', ['$http', 'notify', function ($http, notify) {
-        'use strict';
         return {
             restrict: 'A',
             require: 'ngModel',
             link: function (scope, element, attrs, ctrl) {
+                
+                function parseValue(value) {
+
+                    switch(attrs.fieldtype) {
+                        case "int":
+                            return parseInt(value);
+                        default:
+                            return value;
+                    }
+                }
+
                 var oldValue;
                 element.bind('focus', function() {
-                    oldValue = ctrl.$viewValue;
+                    oldValue = parseValue(ctrl.$viewValue);
                 });
-                element.bind('blur', function () {
-                    var newValue = ctrl.$viewValue;
-                    var payload = new Object();
-                    payload[attrs.field] = newValue;
 
-                    if (newValue != oldValue) {
+                function save() {
+                    var newValue = parseValue(ctrl.$viewValue);
+                    
+                    if (newValue !== oldValue) {
+                        var payload = {};
+                        payload[attrs.field] = newValue;
+                        
                         $http({ method: 'PATCH', url: attrs.autosave, data: payload })
                             .success(function(result) {
                                 notify.addSuccessMessage("Feltet er opdateret.");
@@ -330,7 +321,12 @@
                                 notify.addErrorMessage("Fejl! Feltet kunne ikke ændres!");
                             });
                     }
-                });
+
+                }
+
+                var bindOn = attrs.type == "checkbox" ? "change" : "blur";
+
+                element.bind(bindOn, save);
             }
         };
     }]);

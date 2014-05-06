@@ -182,11 +182,22 @@ namespace UI.MVC4.Controllers.API
 
                 var propRef = itemType.GetProperty(destName);
                 var t = propRef.PropertyType;
-                // use reflection to call obj.Value<t>("keyName");
-                var genericMethod = jToken.GetType().GetMethod("Value").MakeGenericMethod(new Type[] { t });
-                var value = genericMethod.Invoke(obj, new object[] { valuePair.Key });
-                // update the entity
-                propRef.SetValue(item, value);
+
+                //We have to handle enums separately
+                if (t.BaseType != null && t.BaseType.Name == "Enum")
+                {
+                    var value = valuePair.Value.Value<int>();
+
+                    propRef.SetValue(item, value);
+                }
+                else
+                {
+                    // use reflection to call obj.Value<t>("keyName");
+                    var genericMethod = jToken.GetType().GetMethod("Value").MakeGenericMethod(new Type[] {t});
+                    var value = genericMethod.Invoke(obj, new object[] {valuePair.Key});
+                    // update the entity
+                    propRef.SetValue(item, value);
+                }
             }
 
             try
@@ -196,9 +207,9 @@ namespace UI.MVC4.Controllers.API
                 //pretty sure we'll get a merge conflict here???
                 return Ok(Map(item)); // TODO correct?
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return NoContent(); // TODO catch correct expection
+                return Error(e); // TODO catch correct expection
             }
         }
 

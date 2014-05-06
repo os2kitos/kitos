@@ -889,21 +889,22 @@ namespace Infrastructure.DataAccess.Migrations
 
             #endregion
 
+
+
             #region IT Project
+             
+            var itProject1 = SimpleProject("Test program", globalUser, roskilde, itProjectCategoryPublic, 
+                itProjectTypeProgram);
 
-            var itProject1 = new ItProject()
-                {
-                    ObjectOwner = globalUser,
-                    Name = "Test Projekt",
-                    AccessModifier = AccessModifier.Normal,
-                    Note = "Test",
-                    Background = "Baggrund",
-                    ItProjectCategory = itProjectCategoryPublic,
-                    ItProjectType = itProjectTypeProject,
-                    Organization = roskilde
-                };
+            var itProject2 = SimpleProject("Test projekt", simon, roskilde, itProjectCategoryMunipalicity, 
+                itProjectTypeProject);
+            itProject2.AssociatedProgram = itProject1;
 
-            context.ItProjects.AddOrUpdate(itProject1);
+            var itProject3 = SimpleProject("Test program 2000", globalUser, roskilde, itProjectCategoryPublic,
+                itProjectTypeProgram);
+
+            context.ItProjects.AddOrUpdate(itProject1, itProject2, itProject3);
+            context.SaveChanges();
 
             #endregion
 
@@ -929,6 +930,33 @@ namespace Infrastructure.DataAccess.Migrations
                     Salt = salt,
                     Password = cryptoService.Encrypt(password + salt)
                 };
+        }
+
+        private ItProject SimpleProject(string name, User owner, Organization organization, ItProjectCategory projectCategory, ItProjectType type)
+        {
+            var itProject = new ItProject()
+            {
+                ObjectOwner = owner,
+                Name = name,
+                AccessModifier = AccessModifier.Normal,
+                Note = "Note",
+                Background = "Baggrund",
+                ItProjectCategory = projectCategory,
+                ItProjectType = type,
+                Organization = organization,
+                EconomyYears = new List<EconomyYear>()
+                    {
+                        new EconomyYear(),
+                        new EconomyYear(),
+                        new EconomyYear(),
+                        new EconomyYear(),
+                        new EconomyYear(),
+                        new EconomyYear()
+                    },
+            };
+
+            return itProject;
+
         }
     }
 }
