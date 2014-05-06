@@ -1,23 +1,92 @@
-﻿<table>
-    <thead>
-        <tr>
-            <th>Risiko</th>
-            <th>Konsekvens</th>
-            <th>Sandsynlighed</th>
-            <th>Produkt</th>
-            <th>Handling</th>
-            <th>Ansvarlig</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            
-        </tr>
-    </tbody>
-    <tfoot>
-        <tr>
-            
-
-        </tr>
-    </tfoot>
-</table>
+﻿<!-- System Roles -->
+<div class="panel panel-default">
+    <table class="table table-condensed table-striped small table-fixed">
+        <thead>
+            <tr>
+                <th class="col-md-3">Risiko</th>
+                <th class="col-md-1">Konsekvens</th>
+                <th class="col-md-1">Sandsynlighed</th>
+                <th class="col-md-1">Produkt</th>
+                <th class="col-md-3">Handling</th>
+                <th class="col-md-2">Ansvarlig</th>
+                <th class="col-md-1"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="risk in risks | filter : { show: true }">
+                <td>
+                    <input type="text" class="form-control input-sm" data-ng-model="risk.name" /></td>
+                <td>
+                    <select class="form-control input-sm" data-ng-model="risk.consequence">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="form-control input-sm" data-ng-model="risk.probability">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="text" class="form-control input-sm" value="{{ product(newRisk) }}" readonly="readonly" />
+                </td>
+                <td>
+                    <input type="text" class="form-control input-sm" data-ng-model="risk.action" />
+                </td>
+                <td>
+                    <input data-select-user="foo" data-user-model="risk.userForSelect" />
+                </td>
+                <td>
+                    <button class="btn btn-danger btn-sm">
+                        <i class="glyphicon glyphicon-trash small"></i>
+                        Slet
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="text" class="form-control input-sm" data-ng-model="newRisk.name" />
+                </td>
+                <td>
+                    <input type="number" class="form-control input-sm" min="1" max="5" data-ng-model="newRisk.consequence">
+                </td>
+                <td>
+                    <input type="number" class="form-control input-sm" min="1" max="5" data-ng-model="newRisk.probability">
+                </td>
+                <td>
+                    <input type="text" class="form-control input-sm" value="{{ product(newRisk) }}" readonly="readonly" />
+                </td>
+                <td>
+                    <input type="text" class="form-control input-sm" data-ng-model="newRisk.action" />
+                </td>
+                <td>
+                    <input data-select-user="foo" data-user-model="newRisk.userForSelect" />
+                </td>
+                <td>
+                    <button class="btn btn-success btn-sm">
+                        <i class="glyphicon glyphicon-plus small"></i>
+                        Gem
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
