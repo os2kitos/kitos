@@ -9,7 +9,7 @@ namespace Core.DomainModel.ItProject
             //this.Communications = new List<Communication>();
             //this.Economies = new List<Economy>();
             //this.ExtReferences = new List<ExtReference>();
-            //this.TaskRefs = new List<TaskRef>();
+            this.TaskRefs = new List<TaskRef>();
             //this.Resources = new List<Resource>();
             //this.Risks = new List<Risk>();
             //this.Stakeholders = new List<Stakeholder>();
@@ -54,11 +54,16 @@ namespace Core.DomainModel.ItProject
         //public virtual ICollection<Communication> Communications { get; set; }
         //public virtual ICollection<Economy> Economies { get; set; }
         //public virtual ICollection<ExtReference> ExtReferences { get; set; } // TODO
-        //public virtual ICollection<TaskRef> TaskRefs { get; set; } // TODO      
+        public virtual ICollection<TaskRef> TaskRefs { get; set; }
         //public virtual ICollection<Resource> Resources { get; set; }
         //public virtual ICollection<Risk> Risks { get; set; }
         //public virtual ICollection<Stakeholder> Stakeholders { get; set; }
         public virtual ICollection<ItProjectRight> Rights { get; set; }
+
+        /// <summary>
+        /// These Organization Units are using this project
+        /// </summary>
+        public virtual ICollection<OrganizationUnit> UsedByOrgUnits { get; set; }
 
         public virtual ICollection<EconomyYear> EconomyYears { get; set; }
     }
