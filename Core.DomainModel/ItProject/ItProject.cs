@@ -60,6 +60,11 @@ namespace Core.DomainModel.ItProject
         //public virtual ICollection<Stakeholder> Stakeholders { get; set; }
         public virtual ICollection<ItProjectRight> Rights { get; set; }
 
+        /// <summary>
+        /// These Organization Units are using this project
+        /// </summary>
+        public virtual ICollection<OrganizationUnit> UsedByOrgUnits { get; set; }
+
         public virtual ICollection<EconomyYear> EconomyYears { get; set; }
     }
 }
