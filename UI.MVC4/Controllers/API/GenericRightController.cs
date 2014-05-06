@@ -13,7 +13,7 @@ namespace UI.MVC4.Controllers.API
 {
     public abstract class GenericRightController<TRight, TObject, TRole> : BaseApiController
         where TObject : IEntity<int>
-        where TRole : IEntity<int>
+        where TRole : IRoleEntity, IEntity<int>
         where TRight : class, IRight<TObject, TRole>
     {
         protected readonly IGenericRepository<TRight> RightRepository;
@@ -23,15 +23,37 @@ namespace UI.MVC4.Controllers.API
             RightRepository = rightRepository;
         }
 
+        protected virtual IEnumerable<TRight> GetAll(int oId)
+        {
+            return RightRepository.Get(right => right.ObjectId == oId);
+        } 
+
         protected virtual bool HasWriteAccess(int objId, User user)
         {
-            return false;
+            return
+                RightRepository.Get(
+                    right => right.ObjectId == objId && right.UserId == user.Id && right.Role.HasWriteAccess).Any();
         }
 
         private bool HasWriteAccess(int objId, int userId)
         {
             var user = UserRepository.GetByKey(userId);
             return HasWriteAccess(objId, user);
+        }
+
+        public HttpResponseMessage Get(int oId)
+        {
+            try
+            {
+                var rights = GetAll(oId);
+                var dtos = AutoMapper.Mapper.Map<IEnumerable<TRight>, IEnumerable<RightOutputDTO>>(rights);
+
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
         }
 
         public HttpResponseMessage GetHasWriteAccess(bool? hasWriteAccess, int oId, int uId)

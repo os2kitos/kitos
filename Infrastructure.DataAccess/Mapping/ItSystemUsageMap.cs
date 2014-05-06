@@ -20,6 +20,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystemUsages);
 
+            this.HasRequired(t => t.ObjectOwner)
+                .WithMany(user => user.CreatedSystemUsages)
+                .HasForeignKey(t => t.ObjectOwnerId);
+
             this.HasMany(t => t.OrgUnits)
                  .WithMany(t => t.ItSystemUsages)
                  .Map(t => t.ToTable("OrgUnitSystemUsage"));

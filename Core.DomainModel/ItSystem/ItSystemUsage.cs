@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ItSystemUsage : IEntity<int>, IHasRights<ItSystemRight>
+    public class ItSystemUsage : IEntity<int>, IHasRights<ItSystemRight>, IHasOwner
     {
         public ItSystemUsage()
         {
@@ -59,6 +59,9 @@ namespace Core.DomainModel.ItSystem
 
         public virtual ICollection<ItSystemRight> Rights { get; set; }
 
-        public virtual ICollection<InterfaceUsage> InterfaceUsages { get; set; } 
+        public virtual ICollection<InterfaceUsage> InterfaceUsages { get; set; }
+
+        public int ObjectOwnerId { get; set; }
+        public virtual User ObjectOwner { get; set; }
     }
 }

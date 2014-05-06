@@ -37,8 +37,7 @@ namespace UI.MVC4.Controllers.API
                 var rights = new List<OrganizationRight>();
                 foreach (var orgUnit in orgUnits)
                 {
-                    var unit = orgUnit;
-                    rights.AddRange(RightRepository.Get(right => right.ObjectId == unit.Id));
+                    rights.AddRange(GetAll(orgUnit.Id));
                 }
 
                 var dtos = AutoMapper.Mapper.Map<ICollection<OrganizationRight>, ICollection<RightOutputDTO>>(rights);

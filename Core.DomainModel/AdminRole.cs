@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel
 {
-    public class AdminRole : IRoleEntity<AdminRight>
+    public class AdminRole : IRoleEntity, IOptionEntity<AdminRight>
     {
         public AdminRole()
         {

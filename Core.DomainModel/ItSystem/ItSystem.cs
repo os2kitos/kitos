@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ItSystem : IEntity<int>, IHasRights<ItSystemRight>, IHasAccessModifier
+    public class ItSystem : IEntity<int>, IHasRights<ItSystemRight>, IHasAccessModifier, IHasOwner
     {
         public ItSystem()
         {
@@ -34,7 +34,9 @@ namespace Core.DomainModel.ItSystem
         public virtual Organization BelongsTo { get; set; }
 
         public int OrganizationId { get; set; }
-        public int UserId { get; set; }
+
+        public int ObjectOwnerId { get; set; }
+        public virtual User ObjectOwner { get; set; }
 
         public AccessModifier AccessModifier { get; set; }
 
@@ -78,10 +80,6 @@ namespace Core.DomainModel.ItSystem
         /// </summary>
         public virtual Organization Organization { get; set; }
         
-        /// <summary>
-        /// Created by
-        /// </summary>
-        public virtual User User { get; set; }
 
         public virtual ICollection<ItSystemRight> Rights { get; set; }
 

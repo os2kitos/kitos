@@ -29,9 +29,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(d => d.BelongingSystems)
                 .HasForeignKey(t => t.BelongsToId);
 
-            this.HasRequired(t => t.User)
+            this.HasRequired(t => t.ObjectOwner)
                 .WithMany(user => user.CreatedSystems)
-                .HasForeignKey(t => t.UserId);
+                .HasForeignKey(t => t.ObjectOwnerId);
 
             this.HasRequired(t => t.AppType)
                 .WithMany(t => t.References)
