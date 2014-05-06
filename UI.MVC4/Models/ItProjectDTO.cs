@@ -23,7 +23,7 @@ namespace UI.MVC4.Models
         public int OrganizationId { get; set; }
         public IEnumerable<OrgUnitDTO> UsedByOrgUnits { get; set; }
         public IEnumerable<EconomyYearDTO> EconomyYears { get; set; } 
-        public IEnumerable<ItSystemUsageDTO> ItSystemUsages { get; set; }
+        public IEnumerable<ItSystemDTO> ItSystems { get; set; }
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
     }
 }

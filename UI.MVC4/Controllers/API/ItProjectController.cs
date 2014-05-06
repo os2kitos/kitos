@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using UI.MVC4.Models;
 
@@ -13,15 +15,17 @@ namespace UI.MVC4.Controllers.API
     {
         private readonly IItProjectService _itProjectService;
         private readonly IGenericRepository<TaskRef> _taskRepository;
+        private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
         private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
 
-        public ItProjectController(IGenericRepository<ItProject> repository, IItProjectService itProjectService, IGenericRepository<Organization> orgRepository, IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository) 
+        public ItProjectController(IGenericRepository<ItProject> repository, IItProjectService itProjectService, IGenericRepository<Organization> orgRepository, IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository, IGenericRepository<ItSystemUsage> itSystemUsageRepository) 
             : base(repository)
         {
             _itProjectService = itProjectService;
             _orgRepository = orgRepository;
             _taskRepository = taskRepository;
+            _itSystemUsageRepository = itSystemUsageRepository;
             _orgUnitRepository = orgUnitRepository;
         }
 
@@ -166,6 +170,106 @@ namespace UI.MVC4.Controllers.API
                 Repository.Save();
 
                 return Ok();
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetItSystemsUsedByThisProject(int id, [FromUri] bool itSystems)
+        {
+            try
+            {
+                var itProject = Repository.GetByKey(id);
+
+                if (itProject == null) return NotFound();
+
+                return Ok(Map<IEnumerable<ItSystem>, IEnumerable<ItSystemDTO>>(itProject.ItSystemUsages.Select(x => x.ItSystem)));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage PostItSystemsUsedByThisProject(int id, [FromUri] int usageId)
+        {
+            try
+            {
+                var itProject = Repository.GetByKey(id);
+                var usage = _itSystemUsageRepository.GetByKey(usageId);
+
+                if (itProject == null || usage == null) return NotFound();
+
+                itProject.ItSystemUsages.Add(usage);
+                Repository.Save();
+
+                return Created(Map<ItSystemUsage, ItSystemUsageDTO>(usage));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage DeleteItSystemsUsedByThisProject(int id, [FromUri] int usageId)
+        {
+            try
+            {
+                var itProject = Repository.GetByKey(id);
+                var usage = _itSystemUsageRepository.GetByKey(usageId);
+
+                if (itProject == null || usage == null) return NotFound();
+
+                itProject.ItSystemUsages.Remove(usage);
+                Repository.Save();
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        /// <summary>
+        /// Used to list all available projects
+        /// </summary>
+        /// <param name="orgId"></param>
+        /// <param name="itProjects"></param>
+        /// <returns></returns>
+        public HttpResponseMessage GetItProjectsUsedByOrg([FromUri] int orgId, [FromUri] bool itProjects)
+        {
+            try
+            {
+                var projects = Repository.Get(x => x.OrganizationId == orgId || x.UsedByOrgUnits.Any(y => y.OrganizationId == orgId));
+
+                if (projects == null) return NotFound();
+
+                return Ok(Map(projects));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        /// <summary>
+        /// Used to set checked state in available project list
+        /// </summary>
+        /// <param name="orgId"></param>
+        /// <param name="usageId"></param>
+        /// <returns></returns>
+        public HttpResponseMessage GetItProjectsUsedByOrg([FromUri] int orgId, [FromUri] int usageId)
+        {
+            try
+            {
+                var projects = Repository.Get(x => x.OrganizationId == orgId && x.ItSystemUsages.Any(y => y.Id == usageId));
+
+                if (projects == null) return NotFound();
+
+                return Ok(Map(projects));
             }
             catch (Exception e)
             {

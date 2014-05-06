@@ -66,6 +66,6 @@ namespace Core.DomainModel.ItProject
         /// </summary>
         public virtual ICollection<OrganizationUnit> UsedByOrgUnits { get; set; }
         public virtual ICollection<ItSystemUsage> ItSystemUsages { get; set; }
-                public virtual ICollection<EconomyYear> EconomyYears { get; set; }
+        public virtual ICollection<EconomyYear> EconomyYears { get; set; }
     }
 }
