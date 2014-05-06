@@ -68,6 +68,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithRequired(d => d.ItProject)
                 .HasForeignKey(d => d.ItProjectId);
 
+            this.HasMany(t => t.ItSystemUsages)
+                .WithMany(t => t.ItProjects);
         }
     }
 }

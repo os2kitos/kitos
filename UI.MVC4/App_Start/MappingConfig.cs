@@ -225,8 +225,9 @@ namespace UI.MVC4.App_Start
 
             Mapper.CreateMap<ItSystemUsage, ItSystemUsageDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.OrgUnits, opt => opt.UseValue(null))
-                  .ForMember(dest => dest.TaskRefs, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.OrgUnits, opt => opt.Ignore())
+                  .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
+                  .ForMember(dest => dest.ItProjects, opt => opt.Ignore());
 
             Mapper.CreateMap<EconomyYear, EconomyYearDTO>()
                   .ReverseMap();
@@ -235,7 +236,8 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.AssociatedProjectIds,
                              opt => opt.MapFrom(x => x.AssociatedProjects.Select(y => y.Id)))
                   .ReverseMap()
-                  .ForMember(dest => dest.AssociatedProjects, opt => opt.Ignore());
+                  .ForMember(dest => dest.AssociatedProjects, opt => opt.Ignore())
+                  .ForMember(dest => dest.ItSystemUsages, opt => opt.Ignore());
         }
     }
 }
