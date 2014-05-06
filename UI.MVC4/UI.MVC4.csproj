@@ -226,9 +226,11 @@
     <Compile Include="Controllers\API\BusinessTypeController.cs" />
     <Compile Include="Controllers\API\ContractTemplateController.cs" />
     <Compile Include="Controllers\API\ContractTypeController.cs" />
+    <Compile Include="Controllers\API\ItProjectRightController.cs" />
     <Compile Include="Controllers\API\DataRowUsageController.cs" />
     <Compile Include="Controllers\API\DataTypeController.cs" />
     <Compile Include="Controllers\API\FrequencyController.cs" />
+    <Compile Include="Controllers\API\GenericRightController.cs" />
     <Compile Include="Controllers\API\InterfaceCategoryController.cs" />
     <Compile Include="Controllers\API\InterfaceController.cs" />
     <Compile Include="Controllers\API\InterfaceUsageController.cs" />
@@ -413,6 +415,7 @@
     <Content Include="Partials\home\reset-password.html" />
     <Content Include="Partials\home\forgot-password.html" />
     <Content Include="Partials\home\index.html" />
+    <Content Include="Partials\it-project\tab-roles.html" />
     <Content Include="Partials\it-project\edit-it-project.html" />
     <Content Include="Partials\it-project\tab-org.html" />
     <Content Include="Partials\it-project\tab-economy.html" />
@@ -479,6 +482,7 @@
     <Content Include="Scripts\app\controllers\global-admin\global-admin.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-config.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
+    <Content Include="Scripts\app\controllers\it-project\it-project-roles.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-org.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-economy.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-kle.js" />

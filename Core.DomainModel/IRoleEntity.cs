@@ -1,6 +1,6 @@
 ﻿namespace Core.DomainModel
 {
-    public interface IRoleEntity<T> : IOptionEntity<T>
+    public interface IRoleEntity
     {
         bool HasReadAccess { get; set; }
         bool HasWriteAccess { get; set; }

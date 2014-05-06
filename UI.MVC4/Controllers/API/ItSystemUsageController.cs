@@ -60,10 +60,11 @@ namespace UI.MVC4.Controllers.API
                     return Conflict("Usage already exist");
 
                 var item = Map(dto);
+                item.ObjectOwner = KitosUser;
                 Repository.Insert(item);
                 Repository.Save();
 
-                return Created(item, new Uri(Request.RequestUri + "?itSystemId=" + dto.ItSystemId + "&organizationId" + dto.OrganizationId));
+                return Created(Map(item), new Uri(Request.RequestUri + "?itSystemId=" + dto.ItSystemId + "&organizationId" + dto.OrganizationId));
 
             }
             catch (Exception e)
