@@ -14,6 +14,7 @@ namespace Core.DomainModel
             this.OwnedTasks = new List<TaskRef>();
             this.DefaultUsers = new List<User>();
             this.Using = new List<ItSystemUsage>();
+            this.UsingItProjects = new List<ItProject.ItProject>();
         }
 
         public int Id { get; set; }
@@ -42,5 +43,10 @@ namespace Core.DomainModel
         /// This Organization Unit is using these IT Systems (Via ItSystemUsage)
         /// </summary>
         public virtual ICollection<ItSystemUsage> Using { get; set; }
+
+        /// <summary>
+        /// This Organization Unit is using these IT Systems (Via ItSystemUsage)
+        /// </summary>
+        public virtual ICollection<ItProject.ItProject> UsingItProjects { get; set; }
     }
 }

@@ -53,22 +53,36 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.ItProjects)
                 .HasForeignKey(d => d.OrganizationId)
                 .WillCascadeOnDelete(false);
+
             this.HasRequired(t => t.ItProjectCategory)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ItProjectCategoryId);
+
             this.HasRequired(t => t.ItProjectType)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ItProjectTypeId);
+
             this.HasOptional(t => t.AssociatedProgram)
                 .WithMany(t => t.AssociatedProjects)
                 .HasForeignKey(d => d.AssociatedProgramId)
                 .WillCascadeOnDelete(false);
+
+            this.HasMany(t => t.UsedByOrgUnits)
+                .WithMany(t => t.UsingItProjects)
+                .Map(mc =>
+                {
+                    mc.MapLeftKey("ItProjectId");
+                    mc.MapRightKey("OrgUnitId");
+                });
 
             this.HasMany(t => t.EconomyYears)
                 .WithRequired(d => d.ItProject)
                 .HasForeignKey(d => d.ItProjectId);
 
             this.HasMany(t => t.ItSystemUsages)
+                .WithMany(t => t.ItProjects);
+
+            this.HasMany(t => t.TaskRefs)
                 .WithMany(t => t.ItProjects);
         }
     }

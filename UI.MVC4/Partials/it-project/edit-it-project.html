@@ -97,11 +97,13 @@
                 <label class="col-md-2 control-label small" for="associated-program">
                     Tilknyttet program
                 </label>
-                <div id="associated-program" class="col-md-10">
+                <div class="col-md-10">
                     <!-- TODO -->
-                    <select class="form-control input-sm">
-                        <option></option>
-                    </select>
+                    <input type="hidden"  id="associated-program" class="form-control input-sm"
+                           data-ng-model="project.associatedProgram" data-ui-select2="programSelectOptions"
+                           data-ng-change="updateAssociatedProgram()"
+                        />
+                           
                 </div>
             </div>
             
@@ -153,8 +155,12 @@
 <!-- sub tab buttons -->
 <ul class="nav nav-tabs">
     <!-- 
-        <li data-ui-sref-active="active"><a data-ui-sref=""></a></li>
-        -->
+    <li data-ui-sref-active="active"><a data-ui-sref=""></a></li>
+    -->
+    <li data-ui-sref-active="active">
+        <a data-ui-sref="edit-it-project.org">Organisation</a>
+    </li>
+    <li data-ui-sref-active="active"><a data-ui-sref="edit-it-project.kle">KLE</a></li>
     <li data-ui-sref-active="active"><a data-ui-sref="edit-it-project.itsys">IT Systemer</a></li>
 </ul>
 
