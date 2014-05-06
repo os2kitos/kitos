@@ -20,7 +20,7 @@ namespace UI.MVC4.Controllers.API
             _repository = repository;
         }
 
-        /* TODO: this is not very RESTful (just look at the verbs 'get-has') */
+        // TODO: this is copied from org unit controller and should be modified to work with it systems
         //returns true if the user with userId has writeAccess to the orgUnit with organizationUnitId
         //public HttpResponseMessage GetHasWriteAccess(bool? hasWriteAccess, int orgUnitId, int userId)
         //{
