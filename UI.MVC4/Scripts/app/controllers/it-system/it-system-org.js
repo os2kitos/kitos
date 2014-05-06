@@ -47,7 +47,7 @@
                 return element;
             } else if (element.children != null) {
                 var result = null;
-                for (i = 0; result == null && i < element.children.length; i++) {
+                for (var i = 0; result == null && i < element.children.length; i++) {
                     result = searchTree(element.children[i], matchingId);
                 }
                 return result;
