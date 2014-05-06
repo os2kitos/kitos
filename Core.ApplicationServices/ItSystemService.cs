@@ -9,13 +9,11 @@ namespace Core.ApplicationServices
     public class ItSystemService : IItSystemService
     {
         private readonly IGenericRepository<ItSystem> _repository;
-        private readonly IGenericRepository<AppType> _appTypeRepository;
 
         public ItSystemService(IGenericRepository<ItSystem> repository, IGenericRepository<AppType> appTypeRepository)
         {
             _repository = repository;
-            _appTypeRepository = appTypeRepository;
-            InterfaceAppType = _appTypeRepository.Get(appType => appType.Name == "Snitflade").Single();
+            InterfaceAppType = appTypeRepository.Get(appType => appType.Name == "Snitflade").Single();
         }
 
         public AppType InterfaceAppType { get; private set; }

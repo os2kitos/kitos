@@ -892,11 +892,19 @@ namespace Infrastructure.DataAccess.Migrations
 
 
             #region IT Project
+             
+            var itProject1 = SimpleProject("Test program", globalUser, roskilde, itProjectCategoryPublic, 
+                itProjectTypeProgram);
 
-            var itProject1 = SimpleProject("Test projekt", globalUser, roskilde, itProjectCategoryPublic,
-                                           itProjectTypeProject);
+            var itProject2 = SimpleProject("Test projekt", simon, roskilde, itProjectCategoryMunipalicity, 
+                itProjectTypeProject);
+            itProject2.AssociatedProgram = itProject1;
 
-            context.ItProjects.AddOrUpdate(itProject1);
+            var itProject3 = SimpleProject("Test program 2000", globalUser, roskilde, itProjectCategoryPublic,
+                itProjectTypeProgram);
+
+            context.ItProjects.AddOrUpdate(itProject1, itProject2, itProject3);
+            context.SaveChanges();
 
             #endregion
 
