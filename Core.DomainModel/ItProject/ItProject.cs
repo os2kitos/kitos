@@ -11,7 +11,7 @@ namespace Core.DomainModel.ItProject
             //this.ExtReferences = new List<ExtReference>();
             this.TaskRefs = new List<TaskRef>();
             //this.Resources = new List<Resource>();
-            //this.Risks = new List<Risk>();
+            this.Risks = new List<Risk>();
             //this.Stakeholders = new List<Stakeholder>();
             this.Rights = new List<ItProjectRight>();
         }
@@ -56,7 +56,7 @@ namespace Core.DomainModel.ItProject
         //public virtual ICollection<ExtReference> ExtReferences { get; set; } // TODO
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
         //public virtual ICollection<Resource> Resources { get; set; }
-        //public virtual ICollection<Risk> Risks { get; set; }
+        public virtual ICollection<Risk> Risks { get; set; }
         //public virtual ICollection<Stakeholder> Stakeholders { get; set; }
         public virtual ICollection<ItProjectRight> Rights { get; set; }
 

@@ -80,6 +80,11 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasMany(t => t.TaskRefs)
                 .WithMany(t => t.ItProjects);
+
+            this.HasMany(t => t.Risks)
+                .WithRequired(d => d.ItProject)
+                .HasForeignKey(d => d.ItProjectId)
+                .WillCascadeOnDelete(true);
         }
     }
 }
