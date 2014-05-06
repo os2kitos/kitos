@@ -238,6 +238,8 @@
     <Compile Include="Controllers\API\ItSystemController.cs" />
     <Compile Include="Controllers\API\ItSystemRightController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageController.cs" />
+    <Compile Include="Controllers\API\RiskController.cs" />
+    <Compile Include="Models\RiskDTO.cs" />
     <Compile Include="Controllers\API\SensitiveDataTypeController.cs" />
     <Compile Include="Controllers\API\TsaController.cs" />
     <Compile Include="Controllers\API\WishController.cs" />
@@ -415,6 +417,7 @@
     <Content Include="Partials\home\reset-password.html" />
     <Content Include="Partials\home\forgot-password.html" />
     <Content Include="Partials\home\index.html" />
+    <Content Include="Partials\it-project\tab-risk.html" />
     <Content Include="Partials\it-project\tab-roles.html" />
     <Content Include="Partials\it-project\edit-it-project.html" />
     <Content Include="Partials\it-project\tab-org.html" />
@@ -482,6 +485,7 @@
     <Content Include="Scripts\app\controllers\global-admin\global-admin.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-config.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
+    <Content Include="Scripts\app\controllers\it-project\it-project-risk.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-roles.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-org.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-economy.js" />

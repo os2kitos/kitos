@@ -232,7 +232,10 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.TaskRefs, opt => opt.UseValue(null));
 
             Mapper.CreateMap<EconomyYear, EconomyYearDTO>()
-                  .ReverseMap();
+                  .ReverseMap();    
+
+            Mapper.CreateMap<Risk, RiskDTO>()
+                .ReverseMap();
 
             Mapper.CreateMap<ItProject, ItProjectDTO>()
                   .ForMember(dest => dest.AssociatedProjectIds,
