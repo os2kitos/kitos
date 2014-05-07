@@ -415,6 +415,7 @@
     <Content Include="Partials\home\reset-password.html" />
     <Content Include="Partials\home\forgot-password.html" />
     <Content Include="Partials\home\index.html" />
+    <Content Include="Partials\it-project\tab-description.html" />
     <Content Include="Partials\it-project\tab-roles.html" />
     <Content Include="Partials\it-project\edit-it-project.html" />
     <Content Include="Partials\it-project\tab-org.html" />
@@ -483,6 +484,7 @@
     <Content Include="Scripts\app\controllers\global-admin\global-admin.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-config.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
+    <Content Include="Scripts\app\controllers\it-project\it-project-description.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-roles.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-org.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-economy.js" />
