@@ -17,6 +17,9 @@ namespace Core.DomainModel.ItProject
             //this.Stakeholders = new List<Stakeholder>();
             this.Rights = new List<ItProjectRight>();
             this.ItSystemUsages = new List<ItSystemUsage>();
+            this.UsedByOrgUnits = new List<OrganizationUnit>();
+            this.ItSystemUsages = new List<ItSystemUsage>();
+            this.EconomyYears = new List<EconomyYear>();
         }
 
         public int Id { get; set; }
