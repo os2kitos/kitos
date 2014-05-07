@@ -1,34 +1,106 @@
 ﻿<div>
     <form class="form-horizontal fix-label-padding">
-        <div class="col-md-6">
-            
-            <!-- Status traffic light -->
-            <div class="form-group">
-                <label class="col-md-5 control-label small" for="statusProject">Status projekt (økonomi, tid og kvalitet):</label>
-                <div class="col-md-7">
-                    <input id="statusProject" data-select-status="project.statusProject" data-can-write="true"/>
+        <div class="row">
+            <div class="col-md-6">
+
+                <!-- Status traffic light -->
+                <div class="form-group">
+                    <label class="col-md-5 control-label small" for="statusProject">Status projekt (økonomi, tid og kvalitet):</label>
+                    <div class="col-md-7">
+                        <input id="statusProject" data-select-status="project.statusProject" data-can-write="true" />
+                    </div>
+                </div>
+
+                <!-- Date for status update -->
+                <div class="form-group">
+                    <label class="col-md-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
+                    <div class="col-md-7">
+                        <input type="date" class="input-sm form-control" id="statusDate" data-ng-model="project.statusDate" />
+                    </div>
                 </div>
             </div>
-            
-            <!-- Date for status update -->
-            <div class="form-group">
-                <label class="col-md-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
-                <div class="col-md-4">
-                    <input type="date" class="input-sm form-control" id="statusDate" data-ng-model="project.statusDate"/>
+            <div class="col-md-6">
+                <!-- TODO: Notes to status of project -->
+                <div class="form-group">
+                    <label class="col-md-5 control-label small" for="statusDate">Bemærkning til samlet status på projekt:</label>
+                    <div class="col-md-7">
+                        <textarea class="form-control" rows="4"></textarea>
+                    </div>
                 </div>
             </div>
-            
-            <!-- TODO: Notes to status of project -->
-            <div class="form-group">
-                <label class="col-md-5 control-label small" for="statusDate">Bemærkning til samlet status på projekt:</label>
-                <div class="col-md-7">
-                    <textarea class="form-control" rows="4"></textarea>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            
 
         </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="row">
+                            <!-- Phases names -->
+                            <div class="col-md-2 small"></div>
+                            <div ng-repeat="phase in project.phases" class="col-md-2">
+                                <p class="text-center full-width small">{{phase.name}}</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <!-- Phases buttons -->
+                            <div class="col-md-2 small">Aktuel fase:</div>
+                            <span ng-repeat="phase in project.phases" class="col-md-2">
+                                <button class="btn btn-xs full-width text-center">
+                                    <i class="glyphicon glyphicon-ok" data-ng-class="{'invisible': phase.id != project.currentPhaseId}"></i>
+                                </button>
+                            </span>
+                        </div>
+
+                        <div class="form-group">
+                            <!-- Phases buttons -->
+                            <div class="col-md-3 small">Forventet slut/start:</div>
+                            <span ng-repeat="phase in project.phases" class="col-md-2" data-ng-hide="$first">
+                                <input type="date" class="input-sm form-control" data-ng-model="phase.foo" />
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table class="table table-condensed table-striped">
+            <thead>
+                <tr>
+                    <th>Fase</th>
+                    <th>Aktivitetstype</th>
+                    <th>ID</th>
+                    <th>Aktivitet</th>
+                    <th>Start</th>
+                    <th>Slut</th>
+                    <th>Status</th>
+                    <th>Navn</th>
+                    <th>Projektrolle</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Fase</td>
+                    <td>Aktivitetstype</td>
+                    <td>ID</td>
+                    <td>Aktivitet</td>
+                    <td>Start</td>
+                    <td>Slut</td>
+                    <td>Status</td>
+                    <td>Navn</td>
+                    <td>Projektrolle</td>
+                    <td></td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="10">
+                        <div class="pull-right">
+                            <button class="btn btn-success btn-sm">Tilføj</button>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
     </form>
 </div>
