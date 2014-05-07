@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.DomainModel;
 
 namespace UI.MVC4.Models
@@ -26,5 +27,29 @@ namespace UI.MVC4.Models
         public IEnumerable<EconomyYearDTO> EconomyYears { get; set; } 
         public IEnumerable<ItSystemDTO> ItSystems { get; set; }
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
+
+
+        #region Status project tab
+
+        /// <summary>
+        /// Traffic-light dropdown for overall status
+        /// </summary>
+        public int StatusProject { get; set; }
+        /// <summary>
+        /// Date-for-status-update field
+        /// </summary>
+        public DateTime StatusDate { get; set; }
+
+        /// <summary>
+        /// The phases of the project
+        /// </summary>
+        public IEnumerable<ActivityDTO> Phases { get; set; }
+
+        /// <summary>
+        /// The id of current selected phase
+        /// </summary>
+        public int? CurrentPhaseId { get; set; }
+
+        #endregion
     }
 }
