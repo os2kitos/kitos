@@ -82,7 +82,16 @@ namespace Core.DomainModel.ItProject
         /// </summary>
         public DateTime StatusDate { get; set; }
 
-
+        // Phases
+        public virtual Activity Phase1 { get; set; }
+        public virtual Activity Phase2 { get; set; }
+        public virtual Activity Phase3 { get; set; }
+        public virtual Activity Phase4 { get; set; }
+        public virtual Activity Phase5 { get; set; }
+        /// <summary>
+        /// The current selected phase
+        /// </summary>
+        public int CurrentPhase { get; set; }
 
         #endregion
     }

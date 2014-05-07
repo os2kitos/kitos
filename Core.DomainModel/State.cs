@@ -6,30 +6,30 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel
 {
-    public class Activity : IEntity<int>
+    public class State : IEntity<int>
     {
         public int Id { get; set; }
 
         /// <summary>
         /// Human readable ID ("brugervendt noegle" in OIO)
         /// </summary>
-        public string ActivityId { get; set; }
+        public string StateId { get; set; }
         public string Name { get; set; }
 
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        /// <summary>
+        /// Which date, the state should be reached
+        /// </summary>
+        public DateTime Date { get; set; }
 
         /// <summary>
-        /// Associated activities
+        /// Trafic light status for the state
         /// </summary>
-        public virtual ICollection<Activity> AssociatedActivities { get; set; }
-
-        /// <summary>
-        /// Associated states (such as milestones, etc)
-        /// </summary>
-        public virtual ICollection<State> AssociatedStates { get; set; }
+        public int Status { get; set; }
 
         public int? AssociatedUserId { get; set; }
         public virtual User AssociatedUser { get; set; }
+
+        public int? AssociatedActivityId { get; set; }
+        public virtual Activity AssociatedActivity { get; set; }
     }
 }

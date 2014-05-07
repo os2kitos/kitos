@@ -35,5 +35,7 @@ namespace Core.DomainModel
         public virtual ICollection<ItSystem.ItSystem> CreatedSystems { get; set; }
         public virtual ICollection<ItSystem.ItSystemUsage> CreatedSystemUsages { get; set; }
         public virtual ICollection<Wish> Wishes { get; set; }
+        public virtual ICollection<Activity> Activities { get; set; }
+        public virtual ICollection<State> States { get; set; }  
     }
 }
