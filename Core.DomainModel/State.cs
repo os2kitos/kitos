@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel
 {
-    public class State : IEntity<int>
+    public class State : IEntity<int>, IHasOwner
     {
         public int Id { get; set; }
 
@@ -31,5 +31,8 @@ namespace Core.DomainModel
 
         public int? AssociatedActivityId { get; set; }
         public virtual Activity AssociatedActivity { get; set; }
+
+        public int ObjectOwnerId { get; set; }
+        public virtual User ObjectOwner { get; set; }
     }
 }

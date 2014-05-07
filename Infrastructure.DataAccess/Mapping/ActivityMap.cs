@@ -21,6 +21,10 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasMany(t => t.AssociatedActivities)
                 .WithMany();
+
+            this.HasRequired(t => t.ObjectOwner)
+                .WithMany(d => d.CreatedActivities)
+                .HasForeignKey(t => t.ObjectOwnerId);
         }
     }
 }

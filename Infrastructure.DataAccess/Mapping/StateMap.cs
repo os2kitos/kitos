@@ -22,6 +22,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.AssociatedActivity)
                 .WithMany(d => d.AssociatedStates)
                 .HasForeignKey(t => t.AssociatedActivityId);
+
+            this.HasRequired(t => t.ObjectOwner)
+                .WithMany(d => d.CreatedStates)
+                .HasForeignKey(t => t.ObjectOwnerId);
         }
     }
 }
