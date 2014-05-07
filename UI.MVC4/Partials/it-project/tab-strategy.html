@@ -6,11 +6,11 @@
 </label>
 
 Fælleskommunel digitaliseringsstrategi
-<select>
+<select data-ng-model="jointMunicipalProjectId" data-ng-options="project.id as project.name for project in jointMunicipalProjects">
     <option value="">-- Fælleskommunel projekt --</option>
 </select>
 
 Fællesoffentlig digitaliseringsstrategi
-<select>
+<select data-ng-model="commonPublicProjectId" data-ng-options="project.id as project.name for project in commonPublicProjects">
     <option value="">-- Fællesoffentlig projekt --</option>
 </select>

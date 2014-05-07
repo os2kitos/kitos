@@ -3,13 +3,39 @@
         $stateProvider.state('edit-it-project.strategy', {
             url: '/strategy',
             templateUrl: 'partials/it-project/tab-strategy.html',
-            controller: 'project.EditStrategyCtrl'
+            controller: 'project.EditStrategyCtrl',
+            resolve: {
+                jointMunicipalProjects: ['$http', 'itProject', 'itProjectCategories', function ($http, itProject, itProjectCategories) {
+                    var category = _.find(itProjectCategories, function(cat) {
+                        return cat.name == 'Fælleskommunal'; // TODO hardcoded literal... find better solution!
+                    });
+                    var catId = category.id;
+                    var orgId = itProject.organizationId;
+                    return $http.get('api/itproject/?orgId=' + orgId + '&catId=' + catId).then(function(result) {
+                        return result.data.response;
+                    });
+                }],
+                commonPublicProjects: ['$http', 'itProject', 'itProjectCategories', function ($http, itProject, itProjectCategories) {
+                    var category = _.find(itProjectCategories, function (cat) {
+                        return cat.name == 'Fællesoffentlig'; // TODO hardcoded literal... find better solution!
+                    });
+                    var catId = category.id;
+                    var orgId = itProject.organizationId;
+                    return $http.get('api/itproject/?orgId=' + orgId + '&catId=' + catId).then(function (result) {
+                        return result.data.response;
+                    });
+                }]
+            }
         });
     }]);
 
     app.controller('project.EditStrategyCtrl',
-    ['$scope', 'itProject',
-        function ($scope, itProject) {
+    ['$scope', 'itProject', 'jointMunicipalProjects', 'commonPublicProjects',
+        function ($scope, itProject, jointMunicipalProjects, commonPublicProjects) {
+            $scope.jointMunicipalProjectId = itProject.jointMunicipalProjectId;
+            $scope.jointMunicipalProjects = jointMunicipalProjects;
+            $scope.commonPublicProjectId = itProject.commonPublicProjectId;
+            $scope.commonPublicProjects = commonPublicProjects;
             
         }]);
 })(angular, app);
