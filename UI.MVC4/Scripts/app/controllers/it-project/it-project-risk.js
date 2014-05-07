@@ -70,8 +70,8 @@
             _.each(risks, pushRisk);
 
             $scope.product = function (risk) {
-
-                return risk.consequence * risk.probability;
+                risk.product = risk.consequence * risk.probability;
+                return risk.product;
             };
 
             $scope.delete = function(risk) {
@@ -83,6 +83,17 @@
 
                     notify.addErrorMessage("Fejl! Kunne ikke slette!");
                 });
+            };
+
+            $scope.averageProduct = function() {
+
+                if ($scope.risks.length == 0) return 0;
+
+                var sum = _.reduce($scope.risks, function(memo, risk) {
+                    return memo + risk.product;
+                }, 0);
+
+                return sum / $scope.risks.length;
             };
 
             function resetNewRisk() {

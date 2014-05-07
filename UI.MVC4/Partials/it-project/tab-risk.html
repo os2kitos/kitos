@@ -3,12 +3,12 @@
     <table class="table table-condensed table-striped small">
         <thead>
             <tr>
-                <th class="col-md-4">Risiko</th>
+                <th>Risiko</th>
                 <th>Konsekvens</th>
                 <th>Sandsynlighed</th>
                 <th>Produkt</th>
-                <th class="col-md-4">Handling</th>
-                <th class="col-md-2">Ansvarlig</th>
+                <th>Handling</th>
+                <th>Ansvarlig</th>
                 <th></th>
             </tr>
         </thead>
@@ -45,8 +45,8 @@
                         <i class="glyphicon glyphicon-trash small"></i>
                     </button>
                 </td>
-            </tr>
-            <tr>
+            </tr>                     
+            <tr class="active">
                 <td>
                     <input type="text" class="form-control input-sm" data-ng-model="newRisk.name" />
                 </td>
@@ -57,7 +57,7 @@
                     <input type="number" class="form-control input-sm" min="1" max="5" data-ng-model="newRisk.probability">
                 </td>
                 <td>
-                    <p class="form-control-static input-sm">{{ product(newRisk) }}</p>
+                    <p class="form-control-static input-sm text-muted">{{ product(newRisk) }}</p>
                 </td>
                 <td>
                     <input type="text" class="form-control input-sm" data-ng-model="newRisk.action" />
@@ -67,21 +67,26 @@
                 </td>
                 <td>
                     <button class="btn btn-success btn-sm" data-ng-click="saveNewRisk()">
-                        <i class="glyphicon glyphicon-plus small"></i>
+                        <i class="glyphicon glyphicon-plus small"></i> Ny
                     </button>
                 </td>
-            </tr>
-        </tbody>
-        <tfoot>
+            </tr>  
             <tr>
                 <td></td>
                 <td></td>
-                <td></td>
+                <td><p class="form-control-static input-sm text-right">Gennemsnit:</td>
+                <td>
+                    <p class="form-control-static input-sm">{{ averageProduct() }}
+                </td>
                 <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
             </tr>
+            
+        </tbody>
+        <tfoot>
+ 
         </tfoot>
     </table>
 </div>
