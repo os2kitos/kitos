@@ -14,28 +14,39 @@
                 <!-- Date for status update -->
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
-                    <div class="col-md-7">
-                        <input type="date" class="input-sm form-control" id="statusDate" data-ng-model="project.statusDate" />
+                    <div class="col-md-3">
+                        <input id="statusDate" data-ng-model="project.statusDateDate" data-datewriter="" data-ng-change="updateStatusDate()" />
                     </div>
                 </div>
 
                 <!-- TODO: Notes to status of project -->
                 <div class="form-group">
-                    <label class="col-md-5 control-label small" for="statusDate">Bemærkning til samlet status på projekt:</label>
+                    <label class="col-md-5 control-label small" for="note">Bemærkning til samlet status på projekt:</label>
                     <div class="col-md-7">
-                        <textarea class="form-control" rows="4"></textarea>
+                        <textarea id="note" class="form-control" rows="4"></textarea>
                     </div>
                 </div>
             </div>
             <div class="col-md-7">
                 <div class="panel panel-default">
-                    <div class="panel-heading small">Faseplan</div>
+                    <div class="panel-heading">
+                        <span class="small">
+                            Faseplan
+                        </span>
+                            <a class="btn btn-sm btn-link pull-right" data-ng-click="editPhaseNames = !editPhaseNames">
+                                {{ editPhaseNames && "Afslut redigering" || "Rediger fasenavne" }}
+                            </a>
+                    </div>
                     <div class="panel-body">
                         <div class="row">
                             <!-- Phases names -->
                             <div class="col-md-2 small"></div>
                             <div ng-repeat="phase in project.phases" class="col-md-2">
-                                <p class="text-center full-width small">{{phase.name}}</p>
+                                <input type="text" class="input-sm form-control" data-ng-show="editPhaseNames" data-ng-model="phase.name"
+                                    data-field="name" 
+                                    data-autosave="{{phase.updateUrl}}"/>
+
+                                <p class="text-center full-width small" data-ng-hide="editPhaseNames">{{phase.name}}</p>
                             </div>
                         </div>
 
@@ -53,7 +64,7 @@
                             <!-- Phases buttons -->
                             <div class="col-md-3 small">Forventet slut/start:</div>
                             <span ng-repeat="phase in project.phases" class="col-md-2" data-ng-hide="$first">
-                                <input data-ng-model="phase.startDateDate" data-datewriter="" data-ng-change="updateDate(phase)" />
+                                <input data-ng-model="phase.startDateDate" data-datewriter="" data-ng-change="updatePhaseDate(phase)" />
                             </span>
                         </div>
                     </div>
@@ -61,9 +72,12 @@
             </div>
         </div>
         <div class="panel panel-default">
+            <div class="panel-heading small">
+                Milepæle og opgaver
+            </div>
             <table class="table table-condensed table-striped">
                 <thead>
-                    <tr>
+                    <tr class="small">
                         <th>Fase</th>
                         <th>Aktivitetstype</th>
                         <th>ID</th>

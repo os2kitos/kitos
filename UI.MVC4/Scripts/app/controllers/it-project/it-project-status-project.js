@@ -19,6 +19,8 @@
 
             $scope.project.phases = [itProject.phase1, itProject.phase2, itProject.phase3, itProject.phase4, itProject.phase5];
 
+            $scope.project.statusDateDate = parseDate($scope.project.statusDate);
+
             var prevPhase = null;
             _.each($scope.project.phases, function (phase) {
                 phase.updateUrl = "api/activity/" + phase.id;
@@ -43,38 +45,41 @@
                 });
             };
 
-            $scope.updateDate = function(phase) {
+            function patchDate(url, fieldName, dateObj) {
+                var data = {};
+                data[fieldName] = dateObj.toISOString();
 
-                var dateStr = phase.startDateDate.toISOString();
-
-                //Update start date of the current phase
-                $http({
+                return $http({
                     method: 'PATCH',
-                    url: phase.updateUrl,
-                    data: {
-                        startDate: dateStr
-                    }
-                }).success(function (result) {
+                    url: url,
+                    data: data
+                });
+            }
 
-                    //Also update end date of the previous phase
-                    $http({
-                        method: 'PATCH',
-                        url: phase.prevPhase.updateUrl,
-                        data: {
-                            endDate: dateStr
-                        }
-                    }).success(function() {
+            $scope.updatePhaseDate = function(phase) {
+                
+                //Update start date of the current phase
+                patchDate(phase.updateUrl, "startDate", phase.startDateDate)
+                    .success(function (result) {
+                        //Also update end date of the previous phase
+                        patchDate(phase.prevPhase.updateUrl, "endDate", phase.startDateDate).success(function () {
+                            notify.addSuccessMessage("Feltet er opdateret");
+                        }).error(function () {
+                            notify.addErrorMessage("Fejl!");
+                        });
 
-                        notify.addSuccessMessage("Feltet er opdateret");
-
-                    }).error(function() {
+                    }).error(function () {
                         notify.addErrorMessage("Fejl!");
                     });
+            };
 
-                }).error(function () {
-                    notify.addErrorMessage("Fejl!");
-                });
-
+            $scope.updateStatusDate = function() {
+                patchDate($scope.updateUrl, "StatusDate", $scope.project.statusDateDate)
+                    .success(function () {
+                        notify.addSuccessMessage("Feltet er opdateret");
+                    }).error(function () {
+                        notify.addErrorMessage("Fejl!");
+                    });
             };
 
         }]);
