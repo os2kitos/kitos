@@ -13,6 +13,7 @@ namespace Core.DomainModel.ItSystem
             this.Rights = new List<ItSystemRight>();
             this.InterfaceUsages = new List<InterfaceUsage>();
             this.UsedBy = new List<OrganizationUnit>();
+            this.ItProjects = new List<ItProject.ItProject>();
         }
 
         public int Id { get; set; }
@@ -59,9 +60,11 @@ namespace Core.DomainModel.ItSystem
 
         public virtual ICollection<ItSystemRight> Rights { get; set; }
 
-        public virtual ICollection<InterfaceUsage> InterfaceUsages { get; set; }
+        public virtual ICollection<InterfaceUsage> InterfaceUsages { get; set; } 
 
         public int ObjectOwnerId { get; set; }
         public virtual User ObjectOwner { get; set; }
+
+        public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
     }
 }

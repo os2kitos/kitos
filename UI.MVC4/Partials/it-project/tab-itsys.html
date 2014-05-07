@@ -1,0 +1,8 @@
+﻿<h1>IT System</h1>
+
+<div data-ng-repeat="usage in itSystemUsages">
+    <label>
+        <input type="checkbox" data-ng-model="usage.selected" data-ng-change="save(usage)" />
+        {{ usage.itSystem.name }}
+    </label>
+</div>

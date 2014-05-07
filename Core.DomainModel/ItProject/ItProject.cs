@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel.ItProject
 {
@@ -64,7 +65,7 @@ namespace Core.DomainModel.ItProject
         /// These Organization Units are using this project
         /// </summary>
         public virtual ICollection<OrganizationUnit> UsedByOrgUnits { get; set; }
-
+        public virtual ICollection<ItSystemUsage> ItSystemUsages { get; set; }
         public virtual ICollection<EconomyYear> EconomyYears { get; set; }
     }
 }
