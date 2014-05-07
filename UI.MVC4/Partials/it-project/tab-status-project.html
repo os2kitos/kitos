@@ -1,7 +1,7 @@
 ﻿<div>
     <form class="form-horizontal fix-label-padding">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-5">
 
                 <!-- Status traffic light -->
                 <div class="form-group">
@@ -18,8 +18,7 @@
                         <input type="date" class="input-sm form-control" id="statusDate" data-ng-model="project.statusDate" />
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6">
+
                 <!-- TODO: Notes to status of project -->
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusDate">Bemærkning til samlet status på projekt:</label>
@@ -28,11 +27,9 @@
                     </div>
                 </div>
             </div>
-
-        </div>
-        <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-7">
                 <div class="panel panel-default">
+                    <div class="panel-heading small">Faseplan</div>
                     <div class="panel-body">
                         <div class="row">
                             <!-- Phases names -->
@@ -46,8 +43,8 @@
                             <!-- Phases buttons -->
                             <div class="col-md-2 small">Aktuel fase:</div>
                             <span ng-repeat="phase in project.phases" class="col-md-2">
-                                <button class="btn btn-xs full-width text-center">
-                                    <i class="glyphicon glyphicon-ok" data-ng-class="{'invisible': phase.id != project.currentPhaseId}"></i>
+                                <button class="btn btn-xs full-width text-center" data-ng-click="updateSelectedPhase(phase)">
+                                    <i class="glyphicon glyphicon-ok text-success" data-ng-class="{'invisible': phase.id != project.currentPhaseId}"></i>
                                 </button>
                             </span>
                         </div>
@@ -56,51 +53,53 @@
                             <!-- Phases buttons -->
                             <div class="col-md-3 small">Forventet slut/start:</div>
                             <span ng-repeat="phase in project.phases" class="col-md-2" data-ng-hide="$first">
-                                <input type="date" class="input-sm form-control" data-ng-model="phase.foo" />
+                                <input data-ng-model="phase.startDateDate" data-datewriter="" data-ng-change="updateDate(phase)" />
                             </span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <table class="table table-condensed table-striped">
-            <thead>
-                <tr>
-                    <th>Fase</th>
-                    <th>Aktivitetstype</th>
-                    <th>ID</th>
-                    <th>Aktivitet</th>
-                    <th>Start</th>
-                    <th>Slut</th>
-                    <th>Status</th>
-                    <th>Navn</th>
-                    <th>Projektrolle</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Fase</td>
-                    <td>Aktivitetstype</td>
-                    <td>ID</td>
-                    <td>Aktivitet</td>
-                    <td>Start</td>
-                    <td>Slut</td>
-                    <td>Status</td>
-                    <td>Navn</td>
-                    <td>Projektrolle</td>
-                    <td></td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="10">
-                        <div class="pull-right">
-                            <button class="btn btn-success btn-sm">Tilføj</button>
-                        </div>
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
+        <div class="panel panel-default">
+            <table class="table table-condensed table-striped">
+                <thead>
+                    <tr>
+                        <th>Fase</th>
+                        <th>Aktivitetstype</th>
+                        <th>ID</th>
+                        <th>Aktivitet</th>
+                        <th>Start</th>
+                        <th>Slut</th>
+                        <th>Status</th>
+                        <th>Navn</th>
+                        <th>Projektrolle</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Fase</td>
+                        <td>Aktivitetstype</td>
+                        <td>ID</td>
+                        <td>Aktivitet</td>
+                        <td>Start</td>
+                        <td>Slut</td>
+                        <td>Status</td>
+                        <td>Navn</td>
+                        <td>Projektrolle</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="10">
+                            <div class="pull-right">
+                                <button class="btn btn-success btn-sm">Tilføj</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
     </form>
 </div>

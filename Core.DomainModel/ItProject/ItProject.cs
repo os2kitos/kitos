@@ -97,6 +97,11 @@ namespace Core.DomainModel.ItProject
         /// </summary>
         public int? CurrentPhaseId { get; set; }
 
+        /// <summary>
+        /// The tasks for "milestones and tasks" table. 
+        /// </summary>
+        public virtual ICollection<Activity> TaskActivities { get; set; } 
+
         #endregion
     }
 }

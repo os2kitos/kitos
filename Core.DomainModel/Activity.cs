@@ -27,6 +27,11 @@ namespace Core.DomainModel
         public DateTime EndDate { get; set; }
 
         /// <summary>
+        /// Procentage of activity status
+        /// </summary>
+        public int StatusProcentage { get; set; }
+
+        /// <summary>
         /// Associated activities
         /// </summary>
         public virtual ICollection<Activity> AssociatedActivities { get; set; }
@@ -47,5 +52,11 @@ namespace Core.DomainModel
         public virtual ItProject.ItProject Phase3ForProject { get; set; }
         public virtual ItProject.ItProject Phase4ForProject { get; set; }
         public virtual ItProject.ItProject Phase5ForProject { get; set; }
+
+        /// <summary>
+        /// The activity might be a task for an IT project
+        /// </summary>
+        public virtual ItProject.ItProject TaskForProject { get; set; }
+        public int? TaskForProjectId { get; set; }
     }
 }

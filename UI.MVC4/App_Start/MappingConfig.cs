@@ -236,6 +236,7 @@ namespace UI.MVC4.App_Start
                   .ReverseMap();
 
             Mapper.CreateMap<Activity, ActivityDTO>()
+                .ReverseMap()
                 .ForMember(dest => dest.AssociatedUser, opt => opt.Ignore())
                 .ForMember(dest => dest.ObjectOwner, opt => opt.Ignore());
 

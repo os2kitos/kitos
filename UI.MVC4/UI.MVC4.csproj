@@ -217,6 +217,7 @@
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\API\ActivityController.cs" />
     <Compile Include="Controllers\API\AdminRightController.cs" />
     <Compile Include="Controllers\API\AdminRoleController.cs" />
     <Compile Include="Controllers\API\AgreementElementController.cs" />
@@ -399,6 +400,7 @@
     <Content Include="Images\logo.png" />
     <Content Include="Partials\directives\add-user-button.html" />
     <Content Include="Partials\directives\add-user-modal.html" />
+    <Content Include="Partials\directives\datewriter.html" />
     <Content Include="Partials\directives\select-access-modifier.html" />
     <Content Include="Partials\directives\select-status.html" />
     <Content Include="Partials\directives\select-user.html" />

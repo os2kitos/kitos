@@ -52,6 +52,12 @@ namespace UI.MVC4.Models
         /// </summary>
         public int? CurrentPhaseId { get; set; }
 
+        /// <summary>
+        /// The tasks for "milestones and tasks" table. 
+        /// </summary>
+        public IEnumerable<ActivityDTO> TaskActivities { get; set; } 
+
+
         #endregion
     }
 }

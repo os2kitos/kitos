@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Core.ApplicationServices;
 using Core.DomainModel;
@@ -959,27 +960,56 @@ namespace Infrastructure.DataAccess.Migrations
                 Phase1 = new Activity()
                 {
                     Name = "Afventer",
-                    ObjectOwner = owner
+                    ObjectOwner = owner,
+                    StartDate = DateTime.Now,
+                    EndDate = DateTime.Now.AddDays(76)
                 },
                 Phase2 = new Activity()
                 {
                     Name = "Foranalyse",
-                    ObjectOwner = owner
+                    ObjectOwner = owner,
+                    StartDate = DateTime.Now.AddDays(76),
+                    EndDate = DateTime.Now.AddDays(102)
                 },
                 Phase3 = new Activity()
                 {
                     Name = "Gennemførsel",
-                    ObjectOwner = owner
+                    ObjectOwner = owner,
+                    StartDate = DateTime.Now.AddDays(102),
+                    EndDate = DateTime.Now.AddDays(223)
                 },
                 Phase4 = new Activity()
                 {
                     Name = "Overlevering",
-                    ObjectOwner = owner
+                    ObjectOwner = owner,
+                    StartDate = DateTime.Now.AddDays(223),
+                    EndDate = DateTime.Now.AddDays(250)
                 },
                 Phase5 = new Activity()
                 {
                     Name = "Drift",
-                    ObjectOwner = owner
+                    ObjectOwner = owner,
+                    StartDate = DateTime.Now.AddDays(250),
+                    EndDate = DateTime.Now.AddDays(450)
+                },
+                TaskActivities = new List<Activity>()
+                {
+                    new Activity()
+                    {
+                        Name = "Interviewe byggesagsbehandling",
+                        StartDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddDays(36),
+                        StatusProcentage = 10,
+                        ObjectOwner = owner
+                    },
+                    new Activity()
+                    {
+                        Name = "Gøre noget andet",
+                        StartDate = DateTime.Now.AddDays(79),
+                        EndDate = DateTime.Now.AddDays(200),
+                        StatusProcentage = 30,
+                        ObjectOwner = owner
+                    }
                 }
             };
 

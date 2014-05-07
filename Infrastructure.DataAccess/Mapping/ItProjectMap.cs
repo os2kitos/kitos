@@ -105,9 +105,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithOptional(d => d.Phase5ForProject)
                 .Map(mc => mc.MapKey("Phase5Id"));
 
-            /*this.HasMany(t => t.Phases)
-                .WithOptional(d => d.PhaseForProject)
-                .HasForeignKey(d => d.PhaseForProjectId);*/
+            this.HasMany(t => t.TaskActivities)
+                .WithOptional(d => d.TaskForProject)
+                .HasForeignKey(d => d.TaskForProjectId);
 
         }
     }
