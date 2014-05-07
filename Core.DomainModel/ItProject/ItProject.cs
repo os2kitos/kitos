@@ -65,9 +65,14 @@ namespace Core.DomainModel.ItProject
         //public virtual ICollection<Stakeholder> Stakeholders { get; set; }
         public virtual ICollection<ItProjectRight> Rights { get; set; }
 
+        /// <summary>
+        /// Determines if this project is an IT digitization strategy
+        /// </summary>
+        public bool IsStrategy { get; set; }
+
         public int? JointMunicipalProjectId { get; set; }
         public virtual ItProject JointMunicipalProject { get; set; }
-        public ICollection<ItProject> JointMunicipalProjects { get; set; }
+        public virtual ICollection<ItProject> JointMunicipalProjects { get; set; }
 
         public int? CommonPublicProjectId { get; set; }
         public virtual ItProject CommonPublicProject { get; set; }
