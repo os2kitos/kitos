@@ -35,6 +35,7 @@ namespace UI.MVC4.Models
         
         public IEnumerable<OrgUnitDTO> UsedBy { get; set; }
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
-        public IEnumerable<InterfaceUsageDTO> InterfaceUsages { get; set; } 
+        public IEnumerable<InterfaceUsageDTO> InterfaceUsages { get; set; }
+        public IEnumerable<ItProjectDTO> ItProjects { get; set; }
     }
 }

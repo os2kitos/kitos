@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
@@ -13,7 +14,8 @@ namespace UI.MVC4.Controllers.API
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemService _systemService;
 
-        public ItSystemController(IGenericRepository<ItSystem> repository, IGenericRepository<TaskRef> taskRepository, IItSystemService systemService) : base(repository)
+        public ItSystemController(IGenericRepository<ItSystem> repository, IGenericRepository<TaskRef> taskRepository, IItSystemService systemService) 
+            : base(repository)
         {
             _taskRepository = taskRepository;
             _systemService = systemService;
@@ -154,6 +156,20 @@ namespace UI.MVC4.Controllers.API
                 PostQuery(item);
 
                 return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetItSystemsUsedByOrg([FromUri] int orgId)
+        {
+            try
+            {
+                var systems = Repository.Get(x => x.OrganizationId == orgId || x.Usages.Any(y => y.OrganizationId == orgId));
+
+                return systems == null ? NotFound() : Ok(Map(systems));
             }
             catch (Exception e)
             {

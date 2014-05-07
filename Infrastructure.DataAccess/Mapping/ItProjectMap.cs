@@ -66,6 +66,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.AssociatedProjects)
                 .HasForeignKey(d => d.AssociatedProgramId)
                 .WillCascadeOnDelete(false);
+
             this.HasMany(t => t.UsedByOrgUnits)
                 .WithMany(t => t.UsingItProjects)
                 .Map(mc =>
@@ -77,6 +78,9 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasMany(t => t.EconomyYears)
                 .WithRequired(d => d.ItProject)
                 .HasForeignKey(d => d.ItProjectId);
+
+            this.HasMany(t => t.ItSystemUsages)
+                .WithMany(t => t.ItProjects);
 
             this.HasMany(t => t.TaskRefs)
                 .WithMany(t => t.ItProjects);

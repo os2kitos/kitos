@@ -11,6 +11,7 @@ namespace UI.MVC4.Models
         public bool IsTransversal { get; set; }
         public string Note { get; set; }
         public string Name { get; set; }
+        public string Description { get; set; }
         public AccessModifier AccessModifier { get; set; }
 
         public int? AssociatedProgramId { get; set; }
@@ -23,6 +24,7 @@ namespace UI.MVC4.Models
         public int OrganizationId { get; set; }
         public IEnumerable<OrgUnitDTO> UsedByOrgUnits { get; set; }
         public IEnumerable<EconomyYearDTO> EconomyYears { get; set; } 
+        public IEnumerable<ItSystemDTO> ItSystems { get; set; }
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
     }
 }
