@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Core.DomainModel.ItSystem;
 
@@ -69,5 +70,20 @@ namespace Core.DomainModel.ItProject
         public virtual ICollection<OrganizationUnit> UsedByOrgUnits { get; set; }
         public virtual ICollection<ItSystemUsage> ItSystemUsages { get; set; }
         public virtual ICollection<EconomyYear> EconomyYears { get; set; }
+
+        #region Status project tab
+
+        /// <summary>
+        /// Traffic-light dropdown for overall status
+        /// </summary>
+        public int StatusProject { get; set; }
+        /// <summary>
+        /// Date-for-status-update field
+        /// </summary>
+        public DateTime StatusDate { get; set; }
+
+
+
+        #endregion
     }
 }
