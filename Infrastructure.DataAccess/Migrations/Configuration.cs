@@ -894,16 +894,13 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region IT Project
 
-            var phases1 = SimplePhases(globalUser);
             var itProject1 = SimpleProject("Test program", globalUser, roskilde, 
                 itProjectCategoryPublic, itProjectTypeProgram);
 
-            var phases2 = SimplePhases(globalUser);
             var itProject2 = SimpleProject("Test projekt", simon, roskilde, itProjectCategoryMunipalicity, 
                 itProjectTypeProject);;
             itProject2.AssociatedProgram = itProject1;
 
-            var phases3 = SimplePhases(globalUser);
             var itProject3 = SimpleProject("Test program 2000", globalUser, roskilde, itProjectCategoryPublic,
                 itProjectTypeProgram);
 
@@ -958,43 +955,36 @@ namespace Infrastructure.DataAccess.Migrations
                         new EconomyYear(),
                         new EconomyYear()
                     },
-                Phases = SimplePhases(owner)
-            };
-
-            return itProject;
-
-        }
-
-        private ICollection<Activity> SimplePhases(User owner)
-        {
-            return new List<Activity>()
-            {
-                new Activity()
+                //Phases = SimplePhases(owner)
+                Phase1 = new Activity()
                 {
                     Name = "Afventer",
                     ObjectOwner = owner
                 },
-                new Activity()
+                Phase2 = new Activity()
                 {
                     Name = "Foranalyse",
                     ObjectOwner = owner
                 },
-                new Activity()
+                Phase3 = new Activity()
                 {
                     Name = "Gennemførsel",
                     ObjectOwner = owner
                 },
-                new Activity()
+                Phase4 = new Activity()
                 {
                     Name = "Overlevering",
                     ObjectOwner = owner
                 },
-                new Activity()
+                Phase5 = new Activity()
                 {
                     Name = "Drift",
                     ObjectOwner = owner
                 }
             };
+
+            return itProject;
+
         }
     }
 }

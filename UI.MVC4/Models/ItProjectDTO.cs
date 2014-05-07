@@ -40,10 +40,12 @@ namespace UI.MVC4.Models
         /// </summary>
         public DateTime StatusDate { get; set; }
 
-        /// <summary>
-        /// The phases of the project
-        /// </summary>
-        public IEnumerable<ActivityDTO> Phases { get; set; }
+        // The phases of the project
+        public ActivityDTO Phase1 { get; set; }
+        public ActivityDTO Phase2 { get; set; }
+        public ActivityDTO Phase3 { get; set; }
+        public ActivityDTO Phase4 { get; set; }
+        public ActivityDTO Phase5 { get; set; } 
 
         /// <summary>
         /// The id of current selected phase
