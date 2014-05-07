@@ -236,7 +236,9 @@ namespace UI.MVC4.App_Start
                   .ReverseMap();    
 
             Mapper.CreateMap<Risk, RiskDTO>()
-                .ReverseMap();
+                .ReverseMap()
+                .ForMember(dest => dest.ItProject, opt => opt.Ignore())
+                .ForMember(dest => dest.ResponsibleUser, opt => opt.Ignore());
 
             Mapper.CreateMap<ItProject, ItProjectDTO>()
                   .ForMember(dest => dest.AssociatedProjectIds,
