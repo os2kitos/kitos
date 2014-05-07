@@ -1,16 +1,23 @@
 ﻿Projektet knytter an til:
-
-<label>
-    <input type="checkbox"  />
-    Kommuens IT/digitaliseringsstrategi
-</label>
-
-Fælleskommunel digitaliseringsstrategi
-<select data-ng-model="jointMunicipalProjectId" data-ng-options="project.id as project.name for project in jointMunicipalProjects">
-    <option value="">-- Fælleskommunel projekt --</option>
-</select>
-
-Fællesoffentlig digitaliseringsstrategi
-<select data-ng-model="commonPublicProjectId" data-ng-options="project.id as project.name for project in commonPublicProjects">
-    <option value="">-- Fællesoffentlig projekt --</option>
-</select>
+<form role="form">
+    <div class="form-group">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" data-ng-model="isStrategy" data-autosave="{{ autosaveUrl }}" data-field="isStrategy" />
+                Kommuens IT/digitaliseringsstrategi
+            </label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="jointDrop" class="control-label">Fælleskommunel digitaliseringsstrategi</label>
+        <select class="form-control" id="jointDrop" data-ng-model="jointMunicipalProjectId" data-ng-options="project.id as project.name for project in jointMunicipalProjects" data-autosave="{{ autosaveUrl }}" data-field="jointMunicipalProjectId">
+            <option value="">-- Fælleskommunel projekt --</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="commonDrop" class="control-label">Fællesoffentlig digitaliseringsstrategi</label>
+        <select class="form-control" id="commonDrop" data-ng-model="commonPublicProjectId" data-ng-options="project.id as project.name for project in commonPublicProjects" data-autosave="{{ autosaveUrl }}" data-field="commonPublicProjectId">
+            <option value="">-- Fællesoffentlig projekt --</option>
+        </select>
+    </div>
+</form>

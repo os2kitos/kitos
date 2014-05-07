@@ -32,10 +32,12 @@
     app.controller('project.EditStrategyCtrl',
     ['$scope', 'itProject', 'jointMunicipalProjects', 'commonPublicProjects',
         function ($scope, itProject, jointMunicipalProjects, commonPublicProjects) {
+            $scope.isStrategy = itProject.isStrategy;
             $scope.jointMunicipalProjectId = itProject.jointMunicipalProjectId;
             $scope.jointMunicipalProjects = jointMunicipalProjects;
             $scope.commonPublicProjectId = itProject.commonPublicProjectId;
             $scope.commonPublicProjects = commonPublicProjects;
-            
+
+            $scope.autosaveUrl = 'api/itproject/' + itProject.id;
         }]);
 })(angular, app);
