@@ -50,21 +50,21 @@ namespace Infrastructure.DataAccess.Mapping
                 .WillCascadeOnDelete(false);*/
                 
             this.HasRequired(t => t.Organization)
-                .WithMany(t => t.ItProjects)
-                .HasForeignKey(d => d.OrganizationId)
+                .WithMany(d => d.ItProjects)
+                .HasForeignKey(t => t.OrganizationId)
                 .WillCascadeOnDelete(false);
 
             this.HasRequired(t => t.ItProjectCategory)
-                .WithMany(t => t.References)
-                .HasForeignKey(d => d.ItProjectCategoryId);
+                .WithMany(d => d.References)
+                .HasForeignKey(t => t.ItProjectCategoryId);
 
             this.HasRequired(t => t.ItProjectType)
-                .WithMany(t => t.References)
-                .HasForeignKey(d => d.ItProjectTypeId);
+                .WithMany(d => d.References)
+                .HasForeignKey(t => t.ItProjectTypeId);
 
             this.HasOptional(t => t.AssociatedProgram)
-                .WithMany(t => t.AssociatedProjects)
-                .HasForeignKey(d => d.AssociatedProgramId)
+                .WithMany(d => d.AssociatedProjects)
+                .HasForeignKey(t => t.AssociatedProgramId)
                 .WillCascadeOnDelete(false);
 
             this.HasMany(t => t.UsedByOrgUnits)
@@ -84,6 +84,11 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasMany(t => t.TaskRefs)
                 .WithMany(t => t.ItProjects);
+
+            this.HasMany(t => t.Phases)
+                .WithOptional(d => d.PhaseForProject)
+                .HasForeignKey(d => d.PhaseForProjectId);
+
         }
     }
 }

@@ -41,5 +41,11 @@ namespace Core.DomainModel
 
         public int ObjectOwnerId { get; set; }
         public virtual User ObjectOwner { get; set; }
+
+        /// <summary>
+        /// The activity might be a phase for an IT project
+        /// </summary>
+        public int? PhaseForProjectId { get; set; }
+        public virtual ItProject.ItProject PhaseForProject { get; set; }
     }
 }

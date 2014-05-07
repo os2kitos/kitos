@@ -85,16 +85,15 @@ namespace Core.DomainModel.ItProject
         /// </summary>
         public DateTime StatusDate { get; set; }
 
-        // Phases
-        public virtual Activity Phase1 { get; set; }
-        public virtual Activity Phase2 { get; set; }
-        public virtual Activity Phase3 { get; set; }
-        public virtual Activity Phase4 { get; set; }
-        public virtual Activity Phase5 { get; set; }
         /// <summary>
-        /// The current selected phase
+        /// The phases of the project
         /// </summary>
-        public int CurrentPhase { get; set; }
+        public virtual ICollection<Activity> Phases { get; set; } 
+
+        /// <summary>
+        /// The id of current selected phase
+        /// </summary>
+        public int? CurrentPhaseId { get; set; }
 
         #endregion
     }
