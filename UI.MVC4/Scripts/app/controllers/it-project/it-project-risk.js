@@ -25,7 +25,9 @@
             function watchUser(risk) {
 
                 function getUserId() {
-                    return risk.userForSelect.id;
+                    if (risk.userForSelect) return risk.userForSelect.id;
+
+                    return null;
                 }
 
                 $scope.$watch(getUserId, function (newVal, oldVal) {
@@ -54,10 +56,10 @@
 
             function pushRisk(risk) {
                 risk.show = true;
-                risk.userForSelect = {
+                risk.userForSelect = risk.responsibleUserId ? {
                     id: risk.responsibleUserId,
                     text: risk.responsibleUser.name
-                };
+                } : null;
 
                 risk.updateUrl = "api/risk/" + risk.id;
 
