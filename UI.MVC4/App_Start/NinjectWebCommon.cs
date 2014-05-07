@@ -107,6 +107,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<SensitiveDataType>>().To<GenericRepository<SensitiveDataType>>().InRequestScope();
             kernel.Bind<IGenericRepository<Wish>>().To<GenericRepository<Wish>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItProject>>().To<GenericRepository<ItProject>>().InRequestScope();
+            kernel.Bind<IGenericRepository<Risk>>().To<GenericRepository<Risk>>().InRequestScope();
 
             kernel.Bind<IGenericRepository<OrganizationRight>>().To<GenericRepository<OrganizationRight>>().InRequestScope();
 
