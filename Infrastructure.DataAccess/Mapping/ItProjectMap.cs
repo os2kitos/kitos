@@ -85,6 +85,16 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasMany(t => t.TaskRefs)
                 .WithMany(t => t.ItProjects);
 
+            this.HasOptional(t => t.JointMunicipalProject)
+                .WithMany(t => t.JointMunicipalProjects)
+                .HasForeignKey(d => d.JointMunicipalProjectId)
+                .WillCascadeOnDelete(false);
+
+            this.HasOptional(t => t.CommonPublicProject)
+                .WithMany(t => t.CommonPublicProjects)
+                .HasForeignKey(d => d.CommonPublicProjectId)
+                .WillCascadeOnDelete(false);
+
             this.HasMany(t => t.Risks)
                 .WithRequired(d => d.ItProject)
                 .HasForeignKey(d => d.ItProjectId)
