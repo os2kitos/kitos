@@ -1,11 +1,10 @@
-namespace Core.DomainModel.ItProject
+﻿namespace UI.MVC4.Models
 {
-    public class Risk : IEntity<int>
+    public class RiskDTO
     {
         public int Id { get; set; }
 
         public int ItProjectId { get; set; }
-        public virtual ItProject ItProject { get; set; }
 
         public string Name { get; set; }
         public string Action { get; set; }
@@ -14,6 +13,6 @@ namespace Core.DomainModel.ItProject
         public int Consequence { get; set; }
 
         public int? ResponsibleUserId { get; set; }
-        public virtual User ResponsibleUser { get; set; }
+        public UserDTO ResponsibleUser { get; set; }
     }
 }

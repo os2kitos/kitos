@@ -94,6 +94,11 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.CommonPublicProjects)
                 .HasForeignKey(d => d.CommonPublicProjectId)
                 .WillCascadeOnDelete(false);
+
+            this.HasMany(t => t.Risks)
+                .WithRequired(d => d.ItProject)
+                .HasForeignKey(d => d.ItProjectId)
+                .WillCascadeOnDelete(true);
         }
     }
 }

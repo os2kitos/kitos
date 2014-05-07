@@ -233,7 +233,12 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.ItProjects, opt => opt.Ignore());
 
             Mapper.CreateMap<EconomyYear, EconomyYearDTO>()
-                  .ReverseMap();
+                  .ReverseMap();    
+
+            Mapper.CreateMap<Risk, RiskDTO>()
+                .ReverseMap()
+                .ForMember(dest => dest.ItProject, opt => opt.Ignore())
+                .ForMember(dest => dest.ResponsibleUser, opt => opt.Ignore());
 
             Mapper.CreateMap<ItProject, ItProjectDTO>()
                   .ForMember(dest => dest.AssociatedProjectIds,
