@@ -422,6 +422,7 @@
     <Content Include="Partials\it-project\tab-economy.html" />
     <Content Include="Partials\it-project\tab-itsys.html" />
     <Content Include="Partials\it-project\tab-kle.html" />
+    <Content Include="Partials\it-project\tab-strategy.html" />
     <Content Include="Partials\it-system\assign-it-system.html" />
     <Content Include="Partials\it-system\tab-proj.html" />
     <Content Include="Partials\it-system\tab-kle.html" />
@@ -490,6 +491,7 @@
     <Content Include="Scripts\app\controllers\it-project\it-project-economy.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-itsys.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-kle.js" />
+    <Content Include="Scripts\app\controllers\it-project\it-project-strategy.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-proj.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-kle.js" />
