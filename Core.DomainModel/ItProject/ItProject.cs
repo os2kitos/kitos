@@ -15,6 +15,7 @@ namespace Core.DomainModel.ItProject
             //this.Risks = new List<Risk>();
             //this.Stakeholders = new List<Stakeholder>();
             this.Rights = new List<ItProjectRight>();
+            this.ItSystemUsages = new List<ItSystemUsage>();
         }
 
         public int Id { get; set; }
@@ -23,6 +24,7 @@ namespace Core.DomainModel.ItProject
         public bool IsTransversal { get; set; }
         public string Note { get; set; }
         public string Name { get; set; }
+        public string Description { get; set; }
         public AccessModifier AccessModifier { get; set; }
 
         //public bool IsTermsOfReferenceApproved { get; set; }
