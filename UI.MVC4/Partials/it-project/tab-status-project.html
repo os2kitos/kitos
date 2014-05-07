@@ -1,0 +1,34 @@
+﻿<div>
+    <form class="form-horizontal fix-label-padding">
+        <div class="col-md-6">
+            
+            <!-- Status traffic light -->
+            <div class="form-group">
+                <label class="col-md-5 control-label small" for="statusProject">Status projekt (økonomi, tid og kvalitet):</label>
+                <div class="col-md-7">
+                    <input id="statusProject" data-select-status="project.statusProject" data-can-write="true"/>
+                </div>
+            </div>
+            
+            <!-- Date for status update -->
+            <div class="form-group">
+                <label class="col-md-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
+                <div class="col-md-4">
+                    <input type="date" class="input-sm form-control" id="statusDate" data-ng-model="project.statusDate"/>
+                </div>
+            </div>
+            
+            <!-- TODO: Notes to status of project -->
+            <div class="form-group">
+                <label class="col-md-5 control-label small" for="statusDate">Bemærkning til samlet status på projekt:</label>
+                <div class="col-md-7">
+                    <textarea class="form-control" rows="4"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            
+
+        </div>
+    </form>
+</div>
