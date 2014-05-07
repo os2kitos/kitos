@@ -16,6 +16,8 @@ namespace Core.DomainModel.ItProject
             //this.Stakeholders = new List<Stakeholder>();
             this.Rights = new List<ItProjectRight>();
             this.ItSystemUsages = new List<ItSystemUsage>();
+            this.JointMunicipalProjects = new List<ItProject>();
+            this.CommonPublicProjects = new List<ItProject>();
         }
 
         public int Id { get; set; }
@@ -62,6 +64,14 @@ namespace Core.DomainModel.ItProject
         //public virtual ICollection<Risk> Risks { get; set; }
         //public virtual ICollection<Stakeholder> Stakeholders { get; set; }
         public virtual ICollection<ItProjectRight> Rights { get; set; }
+
+        public int? JointMunicipalProjectId { get; set; }
+        public virtual ItProject JointMunicipalProject { get; set; }
+        public ICollection<ItProject> JointMunicipalProjects { get; set; }
+
+        public int? CommonPublicProjectId { get; set; }
+        public virtual ItProject CommonPublicProject { get; set; }
+        public virtual ICollection<ItProject> CommonPublicProjects { get; set; }
 
         /// <summary>
         /// These Organization Units are using this project
