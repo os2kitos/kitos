@@ -29,6 +29,20 @@ namespace UI.MVC4.Controllers.API
             _orgUnitRepository = orgUnitRepository;
         }
 
+        public HttpResponseMessage GetByOrg([FromUri] int orgId)
+        {
+            try
+            {
+                var programs = Repository.Get(x => x.AccessModifier == AccessModifier.Public || x.OrganizationId == orgId);
+
+                return Ok(Map(programs));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetPrograms(string q, int orgId, bool? programs)
         {
             try

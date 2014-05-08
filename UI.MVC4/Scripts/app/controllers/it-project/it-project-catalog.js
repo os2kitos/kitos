@@ -7,13 +7,23 @@
             resolve: {
                 user: ['userService', function(userService) {
                     return userService.getUser();
+                }],
+                programs: ['$http', 'userService', function ($http, userService) {
+                    return userService.getUser().then(function(user) {
+                        var orgId = user.currentOrganizationId;
+                        return $http.get('api/itproject?orgId=' + orgId).then(function (result) {
+                            return result.data.response;
+                        });
+                    });
                 }]
             }
         });
     }]);
 
     app.controller('project.CatalogCtrl',
-        ['$scope', '$http', '$state', 'user', function ($scope, $http, $state, user) {
+        ['$scope', '$http', '$state', 'user', 'programs', function ($scope, $http, $state, user, programs) {
+            $scope.programs = programs;
+            
             $scope.create = function () {
                 var orgUnitId = user.defaultOrganizationUnitId;
                 var payload = {

@@ -6,6 +6,7 @@ namespace UI.MVC4.Models
     public class ItProjectDTO
     {
         public int Id { get; set; }
+        public string ObjectOwnerName { get; set; }
         public string ItProjectId { get; set; }
         public string Background { get; set; }
         public bool IsTransversal { get; set; }
@@ -21,7 +22,9 @@ namespace UI.MVC4.Models
         public IEnumerable<int> AssociatedProjectIds { get; set; }
 
         public int ItProjectTypeId { get; set; }
+        public string ItProjectTypeName { get; set; }
         public int ItProjectCategoryId { get; set; }
+        public string ItProjectCategoryName { get; set; }
         public int OrganizationId { get; set; }
         public IEnumerable<OrgUnitDTO> UsedByOrgUnits { get; set; }
         public IEnumerable<EconomyYearDTO> EconomyYears { get; set; } 
