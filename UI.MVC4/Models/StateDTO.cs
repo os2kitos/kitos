@@ -35,5 +35,7 @@ namespace UI.MVC4.Models
 
         public int ObjectOwnerId { get; set; }
         public virtual UserDTO ObjectOwner { get; set; }
+
+        public int? MilestoneForProjectId { get; set; }
     }
 }

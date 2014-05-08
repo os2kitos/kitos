@@ -240,6 +240,7 @@
     <Compile Include="Controllers\API\ItSystemRightController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageController.cs" />
     <Compile Include="Controllers\API\RiskController.cs" />
+    <Compile Include="Controllers\API\StateController.cs" />
     <Compile Include="Models\RiskDTO.cs" />
     <Compile Include="Controllers\API\SensitiveDataTypeController.cs" />
     <Compile Include="Controllers\API\TsaController.cs" />

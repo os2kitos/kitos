@@ -32,5 +32,7 @@ namespace UI.MVC4.Models
         public UserDTO ObjectOwner { get; set; }
 
         public int? AssociatedActivityId { get; set; }
+
+        public int? TaskForProjectId { get; set; }
     }
 }

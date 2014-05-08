@@ -1,6 +1,6 @@
 ﻿(function (ng, app) {
     app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('edit-it-project.status-project', {
+        $stateProvider.state('it-project.edit.status-project', {
             url: '/status-project',
             templateUrl: 'partials/it-project/tab-status-project.html',
             controller: 'project.EditStatusProjectCtrl',
@@ -52,6 +52,8 @@
                 }
 
                 $scope.milestonesActivities.push(activity);
+
+                return activity;
             }
 
 
@@ -153,12 +155,17 @@
                     return getRoleName(right.roleId);
                 });
             }
-            
-            function addMilestone() {
-                
-                
 
-            }
+            $scope.addMilestone = function() {
+
+                $http.post("api/state", { milestoneForProjectId: itProject.id }).success(function(result) {
+                    console.log(result.response);
+                }).error(function(result) {
+
+                });
+
+
+            };
 
             function editActivity(activity) {
                 var modal = $modal.open({
