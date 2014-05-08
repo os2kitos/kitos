@@ -33,7 +33,7 @@
             $scope.updateSelectedPhase = function(phase) {
                 $http({
                     method: 'PATCH',
-                    url: $scope.updateUrl,
+                    url: $scope.project.updateUrl,
                     data: {
                         currentPhaseId: phase.id
                     }
