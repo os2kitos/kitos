@@ -3,18 +3,32 @@
         $stateProvider.state('edit-it-project.status-project', {
             url: '/status-project',
             templateUrl: 'partials/it-project/tab-status-project.html',
-            controller: 'project.EditStatusProjectCtrl'
+            controller: 'project.EditStatusProjectCtrl',
+            resolve: {
+                itProjectRights: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itprojectright/" + $stateParams.id)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }],
+                itProjectRoles: ['$http', function ($http) {
+                    return $http.get("api/itprojectrole/")
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }]
+            }
         });
     }]);
 
     app.controller('project.EditStatusProjectCtrl',
-    ['$scope', '$http', 'notify', 'itProject',
-        function ($scope, $http, notify, itProject) {
+    ['$scope', '$http', 'notify', 'itProject', 'itProjectRights', 'itProjectRoles',
+        function ($scope, $http, notify, itProject, itProjectRights, itProjectRoles) {
             $scope.project = itProject;
             $scope.project.updateUrl = "api/itproject/" + itProject.id;
 
+            //Setup phases
             $scope.project.phases = [itProject.phase1, itProject.phase2, itProject.phase3, itProject.phase4, itProject.phase5];
-
             var prevPhase = null;
             _.each($scope.project.phases, function (phase) {
                 phase.updateUrl = "api/activity/" + phase.id;
@@ -22,6 +36,25 @@
                 prevPhase = phase;
             });
             
+            //Returns a phase (activity) given an id
+            function findPhase(id) {
+                return _.findWhere($scope.project.phases, { id: id });
+            }
+            
+            //All activities - both activities ("opgaver") and milestones
+            $scope.milestonesActivities = [];
+
+            //Activities "opgaver"
+            _.each(itProject.taskActivities, function(taskActivity) {
+
+                taskActivity.type = "Opgave";
+                taskActivity.phase = findPhase(taskActivity.associatedActivityId);
+
+                if (taskActivity.associatedUser) taskActivity.associatedUserRoleNames = getUserRoles(taskActivity.associatedUser.id);
+
+                $scope.milestonesActivities.push(taskActivity);
+            });
+
             function patch(url, field, value) {
                 var payload = {};
                 payload[field] = value;
@@ -88,6 +121,19 @@
             autoSaveTrafficLight($scope.project.updateUrl, "statusProject", function() {
                 return $scope.project.statusProject;
             });
+            
+            function getRoleName(roleId) {
+                var role = _.findWhere(itProjectRoles, { id: roleId });
+                if (role) return role.name;
+            }
+            
+            function getUserRoles(userId) {
+
+                var rights = _.where(itProjectRights, { userId: userId });
+                return _.map(rights, function(right) {
+                    return getRoleName(right.roleId);
+                });
+            }
 
         }]);
 })(angular, app);

@@ -93,16 +93,22 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Fase</td>
-                        <td>Aktivitetstype</td>
-                        <td>ID</td>
-                        <td>Aktivitet</td>
-                        <td>Start</td>
-                        <td>Slut</td>
-                        <td>Status</td>
-                        <td>Navn</td>
-                        <td>Projektrolle</td>
+                    <tr data-ng-repeat="activity in milestonesActivities" class="small">
+                        <td>{{activity.phase.name}}</td>
+                        <td>{{activity.type}}</td>
+                        <td>{{activity.activityId}}</td>
+                        <td>{{activity.name}}</td>
+                        <td>
+                            <span data-datereader="" data-ng-model="activity.startDate"></span>
+                        </td>
+                        <td>
+                            <span data-datereader="" data-ng-model="activity.endDate"></span>
+                        </td>
+                        <td>
+                            {{activity.statusProcentage}}%
+                        </td>
+                        <td>{{activity.associatedUser.name}}</td>
+                        <td>{{activity.associatedUserRoleNames | joinBy:', '}}</td>
                         <td></td>
                     </tr>
                 </tbody>

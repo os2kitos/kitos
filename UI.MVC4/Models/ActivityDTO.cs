@@ -11,6 +11,11 @@ namespace UI.MVC4.Models
         /// </summary>
         public string ActivityId { get; set; }
         public string Name { get; set; }
+        
+        /// <summary>
+        /// Procentage of activity status
+        /// </summary>
+        public int StatusProcentage { get; set; }
 
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
@@ -20,5 +25,7 @@ namespace UI.MVC4.Models
 
         public int ObjectOwnerId { get; set; }
         public UserDTO ObjectOwner { get; set; }
+
+        public int? AssociatedActivityId { get; set; }
     }
 }

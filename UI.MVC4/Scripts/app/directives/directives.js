@@ -303,6 +303,25 @@
                     scope.write = write;
                 }
             };
-        }]);
+    }]);
+    
+    app.directive('datereader', [function () {
+        return {
+            scope: true,
+            template: '<span>{{dateStr}}</span>',
+            require: 'ngModel',
+            link: function (scope, element, attr, ngModel) {
+
+                scope.date = {};
+
+                function read() {
+                    scope.dateStr = moment(ngModel.$modelValue).format("DD-MM-YY", "da", true);
+                }
+
+                read();
+                ngModel.$render = read;
+            }
+        };
+    }]);
 
 })(angular, app);
