@@ -22,8 +22,8 @@
     }]);
 
     app.controller('project.EditStatusProjectCtrl',
-    ['$scope', '$http', 'notify', 'itProject', 'itProjectRights', 'itProjectRoles',
-        function ($scope, $http, notify, itProject, itProjectRights, itProjectRoles) {
+    ['$scope', '$http', 'notify', '$modal', 'itProject', 'itProjectRights', 'itProjectRoles',
+        function ($scope, $http, notify, $modal, itProject, itProjectRights, itProjectRoles) {
             $scope.project = itProject;
             $scope.project.updateUrl = "api/itproject/" + itProject.id;
 
@@ -153,6 +153,25 @@
                     return getRoleName(right.roleId);
                 });
             }
+            
+            function addMilestone() {
+                
+                
+
+            }
+
+            function editActivity(activity) {
+                var modal = $modal.open({
+                    templateUrl: 'partials/it-project/modal-milestone-task-edit.html',
+                    controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
+
+                        $modalScope.activity = activity;
+
+                    }]
+                });
+            }
+            
+
 
         }]);
 })(angular, app);

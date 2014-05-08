@@ -11,6 +11,11 @@ namespace UI.MVC4.Models
         /// </summary>
         public string HumanReadableId { get; set; }
         public string Name { get; set; }
+
+        public string Description { get; set; }
+        public string Note { get; set; }
+        
+        public int TimeEstimate { get; set; }
         
         /// <summary>
         /// Procentage of activity status

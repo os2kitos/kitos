@@ -1,0 +1,60 @@
+﻿<div class="modal-header">
+    <span data-ng-hide="activity.isNew">
+        {{ activity.isTask && "Opgave:" || "Milepæl:" }} {{ activity.name }}
+    </span>
+    <span data-ng-show="activity.isNew">
+        {{ activity.isTask && "Ny opgave" || "Ny milepæl" }}
+    </span>
+</div>
+<div class="modal-body">
+    <form name="modal.form" novalidate="novalidate" class="form-horizontal">
+        <div class="form-group">
+            <label for="name" class="col-md-3 control-label small">
+                Navn
+            </label>
+            <div class="col-md-8">
+                <input type="text" id="name" data-ng-model="activity.name" class="form-control input-sm" 
+                    data-field="name"
+                    data-autosave="{{activity.updateUrl}}"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="note" class="col-md-3 control-label small">
+                Note
+            </label>
+            <div class="col-md-8">
+                <textarea id="note" class="form-control input-sm" data-ng-model="activity.note" rows="4"
+                    data-field="note"
+                    data-autosave="{{activity.updateUrl}}"></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="description" class="col-md-3 control-label small">
+                Note
+            </label>
+            <div class="col-md-8">
+                <textarea id="description" class="form-control input-sm" data-ng-model="activity.description" rows="4"
+                    data-field="description"
+                    data-autosave="{{activity.updateUrl}}"></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="time-estimate" class="col-md-3 control-label small">
+                Tidsestimat:
+            </label>
+            <div class="col-md-8">
+                <input id="time-estimate" type="number" data-ng-model="activity.timeEstimate" class="form-control input-sm" 
+                    data-field="timeEstimate"
+                    data-autosave="{{activity.updateUrl}}"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <p class="help-block col-md-offset-3">
+                Oprettet af {{ activity.objectOwner.name }}
+            </p>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" data-ng-click="$close()" data-disabled-on-busy="">Færdig</button>
+</div>

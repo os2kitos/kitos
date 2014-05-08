@@ -419,6 +419,7 @@
     <Content Include="Partials\home\reset-password.html" />
     <Content Include="Partials\home\forgot-password.html" />
     <Content Include="Partials\home\index.html" />
+    <Content Include="Partials\it-project\modal-milestone-task-edit.html" />
     <Content Include="Partials\it-project\tab-description.html" />
     <Content Include="Partials\it-project\tab-roles.html" />
     <Content Include="Partials\it-project\edit-it-project.html" />
