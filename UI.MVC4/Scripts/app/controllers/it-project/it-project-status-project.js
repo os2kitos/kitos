@@ -13,56 +13,44 @@
             $scope.project = itProject;
             $scope.project.updateUrl = "api/itproject/" + itProject.id;
 
-            function parseDate(dateStr) {
-                return new Date(dateStr);
-            }
-
             $scope.project.phases = [itProject.phase1, itProject.phase2, itProject.phase3, itProject.phase4, itProject.phase5];
-
-            $scope.project.statusDateDate = parseDate($scope.project.statusDate);
 
             var prevPhase = null;
             _.each($scope.project.phases, function (phase) {
                 phase.updateUrl = "api/activity/" + phase.id;
-                phase.startDateDate = parseDate(phase.startDate);
-                phase.endDateDate = parseDate(phase.endDate);
                 phase.prevPhase = prevPhase;
                 prevPhase = phase;
             });
-
-            $scope.updateSelectedPhase = function(phase) {
-                $http({
-                    method: 'PATCH',
-                    url: $scope.project.updateUrl,
-                    data: {
-                        currentPhaseId: phase.id
-                    }
-                }).success(function (result) {
-                    notify.addSuccessMessage("Feltet er opdateret");
-                    $scope.project.currentPhaseId = phase.id;
-                }).error(function () {
-                    notify.addErrorMessage("Fejl!");
-                });
-            };
-
-            function patchDate(url, fieldName, dateObj) {
-                var data = {};
-                data[fieldName] = dateObj.toISOString();
+            
+            function patch(url, field, value) {
+                var payload = {};
+                payload[field] = value;
 
                 return $http({
                     method: 'PATCH',
                     url: url,
-                    data: data
+                    data: payload
                 });
             }
 
+            $scope.updateSelectedPhase = function (phase) {
+                patch($scope.project.updateUrl, "currentPhaseId", phase.id)
+                    .success(function (result) {
+                        notify.addSuccessMessage("Feltet er opdateret");
+                        $scope.project.currentPhaseId = phase.id;
+                    })
+                    .error(function () {
+                        notify.addErrorMessage("Fejl!");
+                    });
+            };
+
+
             $scope.updatePhaseDate = function(phase) {
-                
                 //Update start date of the current phase
-                patchDate(phase.updateUrl, "startDate", phase.startDateDate)
+                patch(phase.updateUrl, "startDate", phase.startDate)
                     .success(function (result) {
                         //Also update end date of the previous phase
-                        patchDate(phase.prevPhase.updateUrl, "endDate", phase.startDateDate).success(function () {
+                        patch(phase.prevPhase.updateUrl, "endDate", phase.startDate).success(function () {
                             notify.addSuccessMessage("Feltet er opdateret");
                         }).error(function () {
                             notify.addErrorMessage("Fejl!");
@@ -74,17 +62,13 @@
             };
 
             $scope.updateStatusDate = function() {
-                patchDate($scope.project.updateUrl, "StatusDate", $scope.project.statusDateDate)
+                patch($scope.project.updateUrl, "statusDate", $scope.project.statusDate)
                     .success(function () {
                         notify.addSuccessMessage("Feltet er opdateret");
                     }).error(function () {
                         notify.addErrorMessage("Fejl!");
                     });
             };
-            
-            $scope.foo = function() {
-                console.log("FOO");
-            }
 
         }]);
 })(angular, app);

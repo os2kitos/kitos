@@ -15,11 +15,11 @@
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
                     <div class="col-md-3">
-                        <input id="statusDate" data-ng-model="project.statusDateDate" data-datewriter="" data-ng-change="updateStatusDate()" />
+                        <span id="statusDate" data-ng-model="project.statusDate" data-datewriter="" data-ng-change="updateStatusDate()"></span>
                     </div>
                 </div>
 
-                <!-- TODO: Notes to status of project -->
+                <!-- Notes to status of project -->
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="note">Bemærkning til samlet status på projekt:</label>
                     <div class="col-md-7">
@@ -66,7 +66,7 @@
                             <!-- Phases buttons -->
                             <div class="col-md-3 small">Forventet slut/start:</div>
                             <span data-ng-repeat="phase in project.phases" class="col-md-2" data-ng-hide="$first">
-                                <input data-ng-model="phase.startDateDate" data-datewriter="" data-ng-change="updatePhaseDate(phase)" />
+                                <span data-ng-model="phase.startDate" data-datewriter="" data-ng-change="updatePhaseDate(phase)"></span>
                             </span>
                         </div>
                     </div>

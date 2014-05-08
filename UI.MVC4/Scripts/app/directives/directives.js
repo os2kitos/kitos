@@ -220,17 +220,16 @@
             };
         }
     ]);
-
-
+    
     app.directive('autosave', [
-        '$http', 'notify', function($http, notify) {
+        '$http', 'notify', function ($http, notify) {
             return {
                 restrict: 'A',
                 require: 'ngModel',
-                link: function(scope, element, attrs, ctrl) {
+                link: function (scope, element, attrs, ctrl) {
 
                     var oldValue;
-                    element.bind('focus', function() {
+                    element.bind('focus', function () {
                         oldValue = ctrl.$viewValue;
                     });
 
@@ -255,10 +254,10 @@
                     function save(payload) {
                         var msg = notify.addInfoMessage("Gemmer...", false);
                         $http({ method: 'PATCH', url: attrs.autosave, data: payload })
-                            .success(function() {
+                            .success(function () {
                                 msg.toSuccessMessage("Feltet er opdateret.");
                             })
-                            .error(function() {
+                            .error(function () {
                                 msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                             });
                     }
@@ -273,23 +272,35 @@
         }
     ]);
 
-
-    app.directive('datewriter', ['$timeout',
-        function($timeout) {
-            return {
-                replace: true,
+    app.directive('datewriter', [function() {
+        return {
+                scope: true,
                 templateUrl: 'partials/directives/datewriter.html',
-                link: function (scope, elem, attr) {
-                    scope.opened = false;
+                require: 'ngModel',
+                link: function (scope, element, attr, ngModel) {
 
-                    elem.bind('focus',
-                        function(e) {
-                            scope.opened = true;
-                        });
+                    scope.date = {};
 
-                    elem.bind('blur', function(e) {
-                        scope.opened = false;
-                    });
+                    function read() {
+                        scope.date.dateStr = moment(ngModel.$modelValue).format("DD-MM-YY", "da", true);
+                    }
+
+                    read();
+                    ngModel.$render = read;
+                    
+                    function write() {
+                        scope.dateInvalid = false;
+
+                        var newDate = moment(scope.date.dateStr, "DD-MM-YY", "da", true);
+                        if (!newDate.isValid()) {
+                            scope.dateInvalid = true;
+                            return;
+                        }
+                        
+                        ngModel.$setViewValue(newDate.format("YYYY-MM-DD HH:mm:ss"));
+                    }
+
+                    scope.write = write;
                 }
             };
         }]);
