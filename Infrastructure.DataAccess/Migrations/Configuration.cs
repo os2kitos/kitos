@@ -895,15 +895,38 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region IT Project
 
+            var phase11 = new Activity()
+                {
+                    Name = "Afventer",
+                    ObjectOwner = globalUser,
+                    StartDate = DateTime.Now.AddDays(76),
+                    EndDate = DateTime.Now.AddDays(102)
+                };
+            var phase12 = new Activity()
+                {
+                    Name = "Afventer",
+                    ObjectOwner = simon,
+                    StartDate = DateTime.Now.AddDays(76),
+                    EndDate = DateTime.Now.AddDays(102)
+                };
+            var phase13 = new Activity()
+                {
+                    Name = "Afventer",
+                    ObjectOwner = globalUser,
+                    StartDate = DateTime.Now.AddDays(76),
+                    EndDate = DateTime.Now.AddDays(102)
+                };
+            context.Activities.AddOrUpdate(x => x.Id, phase11, phase12, phase13);
+
             var itProject1 = SimpleProject("Test program", globalUser, roskilde, 
-                itProjectCategoryPublic, itProjectTypeProgram);
+                itProjectCategoryPublic, itProjectTypeProgram, phase11);
 
             var itProject2 = SimpleProject("Test projekt", simon, roskilde, itProjectCategoryMunipalicity, 
-                itProjectTypeProject);;
+                itProjectTypeProject, phase12);
             itProject2.AssociatedProgram = itProject1;
 
             var itProject3 = SimpleProject("Test program 2000", globalUser, roskilde, itProjectCategoryPublic,
-                itProjectTypeProgram);
+                itProjectTypeProgram, phase13);
 
             context.ItProjects.AddOrUpdate(itProject1, itProject2, itProject3);
             
@@ -935,7 +958,7 @@ namespace Infrastructure.DataAccess.Migrations
                 };
         }
 
-        private ItProject SimpleProject(string name, User owner, Organization organization, ItProjectCategory projectCategory, ItProjectType type)
+        private ItProject SimpleProject(string name, User owner, Organization organization, ItProjectCategory projectCategory, ItProjectType type, Activity phase1)
         {
             var itProject = new ItProject()
             {
@@ -957,13 +980,7 @@ namespace Infrastructure.DataAccess.Migrations
                         new EconomyYear()
                     },
                 //Phases = SimplePhases(owner)
-                Phase1 = new Activity()
-                {
-                    Name = "Afventer",
-                    ObjectOwner = owner,
-                    StartDate = DateTime.Now,
-                    EndDate = DateTime.Now.AddDays(76)
-                },
+                Phase1 = phase1,
                 Phase2 = new Activity()
                 {
                     Name = "Foranalyse",
@@ -992,6 +1009,8 @@ namespace Infrastructure.DataAccess.Migrations
                     StartDate = DateTime.Now.AddDays(250),
                     EndDate = DateTime.Now.AddDays(450)
                 },
+                CurrentPhaseId = phase1.Id,
+
                 TaskActivities = new List<Activity>()
                 {
                     new Activity()
@@ -1002,7 +1021,8 @@ namespace Infrastructure.DataAccess.Migrations
                         EndDate = DateTime.Now.AddDays(36),
                         StatusProcentage = 10,
                         ObjectOwner = owner,
-                        AssociatedUser = owner
+                        AssociatedUser = owner,
+                        AssociatedActivity = phase1
                     },
                     new Activity()
                     {
@@ -1012,7 +1032,8 @@ namespace Infrastructure.DataAccess.Migrations
                         EndDate = DateTime.Now.AddDays(200),
                         StatusProcentage = 30,
                         ObjectOwner = owner,
-                        AssociatedUser = owner
+                        AssociatedUser = owner,
+                        AssociatedActivity = phase1
                     }
                 }
             };

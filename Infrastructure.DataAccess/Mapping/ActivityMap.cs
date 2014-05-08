@@ -19,8 +19,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(t => t.AssociatedUserId)
                 .WillCascadeOnDelete(false);
 
-            this.HasMany(t => t.AssociatedActivities)
-                .WithMany();
+            this.HasOptional(t => t.AssociatedActivity)
+                .WithMany(d => d.AssociatedActivities)
+                .HasForeignKey(t => t.AssociatedActivityId);
 
             this.HasRequired(t => t.ObjectOwner)
                 .WithMany(d => d.CreatedActivities)

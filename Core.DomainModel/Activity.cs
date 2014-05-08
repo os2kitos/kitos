@@ -31,6 +31,9 @@ namespace Core.DomainModel
         /// </summary>
         public int StatusProcentage { get; set; }
 
+        public int? AssociatedActivityId { get; set; }
+        public virtual Activity AssociatedActivity { get; set; }
+
         /// <summary>
         /// Associated activities
         /// </summary>

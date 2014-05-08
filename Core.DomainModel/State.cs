@@ -34,5 +34,11 @@ namespace Core.DomainModel
 
         public int ObjectOwnerId { get; set; }
         public virtual User ObjectOwner { get; set; }
+
+        /// <summary>
+        /// The state might be a milestone for an IT project
+        /// </summary>
+        public virtual ItProject.ItProject MilestoneForProject { get; set; }
+        public int? MilestoneForProjectId { get; set; }
     }
 }

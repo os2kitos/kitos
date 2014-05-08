@@ -105,7 +105,8 @@ namespace Core.DomainModel.ItProject
         /// <summary>
         /// The tasks for "milestones and tasks" table. 
         /// </summary>
-        public virtual ICollection<Activity> TaskActivities { get; set; } 
+        public virtual ICollection<Activity> TaskActivities { get; set; }
+        public virtual ICollection<State> MilestoneStates { get; set; } 
 
         #endregion
     }

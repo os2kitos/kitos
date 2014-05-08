@@ -23,32 +23,7 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("ItProject");
             this.Property(t => t.Id).HasColumnName("Id");
-
-            /*
-            this.Property(t => t.ItProjectOwnerId).HasColumnName("ItProjectOwnerId");
-            this.Property(t => t.ItProjectLeaderId).HasColumnName("ItProjectLeaderId");
-            this.Property(t => t.PartItProjectLeaderId).HasColumnName("PartItProjectLeaderId");
-            this.Property(t => t.ConsultantId).HasColumnName("ConsultantId");
-             */
-
-            // Relationships
-            /*this.HasOptional(t => t.ItProjectOwner)
-                .WithMany(t => t.OwnerOfItProjects)
-                .HasForeignKey(d => d.ItProjectOwnerId)
-                .WillCascadeOnDelete(false);
-            this.HasOptional(t => t.ItProjectLeader)
-                .WithMany(t => t.LeaderOfItProjects)
-                .HasForeignKey(d => d.ItProjectLeaderId)
-                .WillCascadeOnDelete(false);
-            this.HasOptional(t => t.PartItProjectLeader)
-                .WithMany(t => t.LeaderOfPartItProjects)
-                .HasForeignKey(d => d.PartItProjectLeaderId)
-                .WillCascadeOnDelete(false);
-            this.HasOptional(t => t.Consultant)
-                .WithMany(t => t.ConsultantOnItProjects)
-                .HasForeignKey(d => d.ConsultantId)
-                .WillCascadeOnDelete(false);*/
-                
+            
             this.HasRequired(t => t.Organization)
                 .WithMany(d => d.ItProjects)
                 .HasForeignKey(t => t.OrganizationId)
@@ -108,6 +83,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasMany(t => t.TaskActivities)
                 .WithOptional(d => d.TaskForProject)
                 .HasForeignKey(d => d.TaskForProjectId);
+
+            this.HasMany(t => t.MilestoneStates)
+                .WithOptional(d => d.MilestoneForProject)
+                .HasForeignKey(d => d.MilestoneForProjectId);
 
         }
     }
