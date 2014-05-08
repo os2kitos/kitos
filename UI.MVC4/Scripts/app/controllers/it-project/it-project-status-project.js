@@ -11,7 +11,7 @@
     ['$scope', '$http', 'notify', 'itProject',
         function ($scope, $http, notify, itProject) {
             $scope.project = itProject;
-            $scope.updateUrl = "api/itproject/" + itProject.id;
+            $scope.project.updateUrl = "api/itproject/" + itProject.id;
 
             function parseDate(dateStr) {
                 return new Date(dateStr);
@@ -74,13 +74,17 @@
             };
 
             $scope.updateStatusDate = function() {
-                patchDate($scope.updateUrl, "StatusDate", $scope.project.statusDateDate)
+                patchDate($scope.project.updateUrl, "StatusDate", $scope.project.statusDateDate)
                     .success(function () {
                         notify.addSuccessMessage("Feltet er opdateret");
                     }).error(function () {
                         notify.addErrorMessage("Fejl!");
                     });
             };
+            
+            $scope.foo = function() {
+                console.log("FOO");
+            }
 
         }]);
 })(angular, app);

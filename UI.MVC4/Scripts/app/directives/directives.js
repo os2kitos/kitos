@@ -1,31 +1,6 @@
 ﻿(function(ng, app) {
     'use strict';
 
-    app.directive('holderFix', function() {
-        return {
-            link: function(scope, element, attrs) {
-                Holder.run({ images: element[0], nocss: true });
-            }
-        };
-    });
-
-    app.directive('confirmClick', [
-        function() {
-            return {
-                link: function(scope, element, attr) {
-                    var msg = attr.confirmClick || "Er du sikker?";
-                    var clickAction = attr.confirmedClick;
-                    element.bind('click', function(event) {
-                        if (window.confirm(msg)) {
-                            scope.$eval(clickAction);
-                        }
-                    });
-                }
-            };
-        }
-    ]);
-
-
     app.directive('addUserButton', [
         '$http', '$modal', function($http, $modal) {
             return {
@@ -179,23 +154,6 @@
         }
     ]);
 
-    app.directive('highlight', [
-        function() {
-            return {
-                link: function(scope, element, attr) {
-
-                    scope.$watch(attr.on, function(newVal, oldVal) {
-                        if (!newVal) return;
-
-                        element.addClass("highlight", 10).removeClass("highlight", 1000);
-
-                    });
-
-                }
-            };
-        }
-    ]);
-
     app.directive('selectAccessModifier', [
         function() {
             return {
@@ -263,48 +221,6 @@
         }
     ]);
 
-    app.directive('autofocus', [
-        '$timeout', function($timeout) {
-            return function(scope, elem, attr) {
-                scope.$on('autofocus', function(e) {
-                    $timeout(function() {
-                        elem[0].focus();
-                    });
-                });
-            };
-        }
-    ]);
-
-    /* http://stackoverflow.com/questions/14833326/how-to-set-focus-in-angularjs */
-    app.factory('autofocus', function($rootScope, $timeout) {
-        return function() {
-            $timeout(function() {
-                $rootScope.$broadcast('autofocus');
-            });
-        };
-    });
-
-
-    /* from http://stackoverflow.com/questions/11540157/using-comma-as-list-separator-with-angularjs */
-    app.filter('joinBy', function() {
-        return function(input, delimiter) {
-            return (input || []).join(delimiter || ',');
-        };
-    });
-
-    app.directive('disabledOnBusy', [
-        function() {
-            return function(scope, elem, attr) {
-                scope.$on('httpBusy', function(e) {
-                    elem[0].disabled = true;
-                });
-
-                scope.$on('httpUnbusy', function(e) {
-                    elem[0].disabled = false;
-                });
-            };
-        }
-    ]);
 
     app.directive('autosave', [
         '$http', 'notify', function($http, notify) {
@@ -313,22 +229,13 @@
                 require: 'ngModel',
                 link: function(scope, element, attrs, ctrl) {
 
-                    function parseValue(value) {
-                        switch (attrs.fieldtype) {
-                        case "int":
-                            return parseInt(value);
-                        default:
-                            return value;
-                        }
-                    }
-
                     var oldValue;
                     element.bind('focus', function() {
-                        oldValue = parseValue(ctrl.$viewValue);
+                        oldValue = ctrl.$viewValue;
                     });
 
                     function saveIfNew() {
-                        var newValue = parseValue(ctrl.$viewValue);
+                        var newValue = ctrl.$viewValue;
                         var payload = {};
                         payload[attrs.field] = newValue;
 
@@ -339,7 +246,7 @@
 
                     function saveCheckbox() {
                         // ctrl.$viewValue reflects the old state, so having to invert
-                        var newValue = !parseValue(ctrl.$viewValue);
+                        var newValue = !ctrl.$viewValue;
                         var payload = {};
                         payload[attrs.field] = newValue;
                         save(payload);

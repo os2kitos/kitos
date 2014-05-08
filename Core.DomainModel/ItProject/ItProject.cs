@@ -85,6 +85,11 @@ namespace Core.DomainModel.ItProject
         /// </summary>
         public DateTime StatusDate { get; set; }
 
+        /// <summary>
+        /// Notes on collected status on project    
+        /// </summary>
+        public string StatusNote { get; set; }
+
         // The phases of the project
         public virtual Activity Phase1 { get; set; }
         public virtual Activity Phase2 { get; set; } 

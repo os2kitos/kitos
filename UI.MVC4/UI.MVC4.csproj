@@ -507,8 +507,9 @@
     <Content Include="Scripts\app\controllers\local-config\local-config.js" />
     <Content Include="Scripts\app\controllers\org\org.js" />
     <Content Include="Scripts\app\directives\directives.js" />
-    <Content Include="Scripts\app\directives\form-validation.js" />
+    <Content Include="Scripts\app\directives\form-directives.js" />
     <Content Include="Scripts\app\app.js" />
+    <Content Include="Scripts\app\directives\utils-directives.js" />
     <Content Include="Scripts\app\services\userServices.js" />
     <Content Include="Scripts\app\utility\utility.js" />
     <Content Include="Scripts\app\services\httpServices.js" />

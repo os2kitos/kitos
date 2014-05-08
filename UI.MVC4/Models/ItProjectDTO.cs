@@ -40,6 +40,11 @@ namespace UI.MVC4.Models
         /// </summary>
         public DateTime StatusDate { get; set; }
 
+        /// <summary>
+        /// Notes on collected status on project    
+        /// </summary>
+        public string StatusNote { get; set; }
+
         // The phases of the project
         public ActivityDTO Phase1 { get; set; }
         public ActivityDTO Phase2 { get; set; }

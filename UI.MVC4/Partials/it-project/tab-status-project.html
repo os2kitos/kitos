@@ -7,7 +7,7 @@
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusProject">Status projekt (økonomi, tid og kvalitet):</label>
                     <div class="col-md-7">
-                        <input id="statusProject" data-select-status="project.statusProject" data-can-write="true" />
+                        <input id="statusProject" data-select-status="project.statusProject" data-can-write="true" data-on-status-change="foo" />
                     </div>
                 </div>
 
@@ -23,7 +23,9 @@
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="note">Bemærkning til samlet status på projekt:</label>
                     <div class="col-md-7">
-                        <textarea id="note" class="form-control" rows="4"></textarea>
+                        <textarea id="note" class="form-control input-sm" rows="4" data-ng-model="project.statusNote"
+                            data-field="statusNote"
+                            data-autosave="{{project.updateUrl}}"></textarea>
                     </div>
                 </div>
             </div>
@@ -41,7 +43,7 @@
                         <div class="row">
                             <!-- Phases names -->
                             <div class="col-md-2 small"></div>
-                            <div ng-repeat="phase in project.phases" class="col-md-2">
+                            <div data-ng-repeat="phase in project.phases" class="col-md-2">
                                 <input type="text" class="input-sm form-control" data-ng-show="editPhaseNames" data-ng-model="phase.name"
                                     data-field="name" 
                                     data-autosave="{{phase.updateUrl}}"/>
@@ -53,7 +55,7 @@
                         <div class="form-group">
                             <!-- Phases buttons -->
                             <div class="col-md-2 small">Aktuel fase:</div>
-                            <span ng-repeat="phase in project.phases" class="col-md-2">
+                            <span data-ng-repeat="phase in project.phases" class="col-md-2">
                                 <button class="btn btn-xs full-width text-center" data-ng-click="updateSelectedPhase(phase)">
                                     <i class="glyphicon glyphicon-ok text-success" data-ng-class="{'invisible': phase.id != project.currentPhaseId}"></i>
                                 </button>
@@ -63,7 +65,7 @@
                         <div class="form-group">
                             <!-- Phases buttons -->
                             <div class="col-md-3 small">Forventet slut/start:</div>
-                            <span ng-repeat="phase in project.phases" class="col-md-2" data-ng-hide="$first">
+                            <span data-ng-repeat="phase in project.phases" class="col-md-2" data-ng-hide="$first">
                                 <input data-ng-model="phase.startDateDate" data-datewriter="" data-ng-change="updatePhaseDate(phase)" />
                             </span>
                         </div>
