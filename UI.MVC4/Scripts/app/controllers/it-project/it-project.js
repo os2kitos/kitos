@@ -1,13 +1,8 @@
 ﻿(function(ng, app) {
+    app.config(['$stateProvider', function($stateProvider) {
 
-    var subnav = [
-            { state: 'edit-it-project', text: 'IT Projekt' }
-    ];
-
-    app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
-
-        $stateProvider.state('edit-it-project', {
-            url: '/project/edit/{id:[0-9]+}',
+        $stateProvider.state('it-project.edit', {
+            url: '/edit/{id:[0-9]+}',
             templateUrl: 'partials/it-project/edit-it-project.html',
             controller: 'project.EditCtrl',
             resolve: {
@@ -34,17 +29,12 @@
                 }]
             }
         });
-
     }]);
 
 
-    app.controller('project.EditCtrl', ['$rootScope', '$scope', '$http', 'notify',
+    app.controller('project.EditCtrl', ['$scope', '$http', 'notify',
             'itProject', 'itProjectTypes', 'itProjectCategories', 'user',
-            function ($rootScope, $scope, $http, notify,
-                itProject, itProjectTypes, itProjectCategories, user) {
-                $rootScope.page.title = 'IT Projekt';
-                $rootScope.page.subnav = subnav;
-
+            function ($scope, $http, notify, itProject, itProjectTypes, itProjectCategories, user) {
                 $scope.project = itProject;
                 if ($scope.project.associatedProgramId) {
                     $scope.project.associatedProgram = {

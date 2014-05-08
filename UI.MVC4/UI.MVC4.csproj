@@ -487,6 +487,7 @@
     <Content Include="Scripts\app\controllers\global-admin\global-admin.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-config.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
+    <Content Include="Scripts\app\controllers\it-project\it-project-catalog.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-description.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-roles.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-org.js" />
@@ -495,6 +496,7 @@
     <Content Include="Scripts\app\controllers\it-project\it-project-kle.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-strategy.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project.js" />
+    <Content Include="Scripts\app\controllers\it-project\subnav.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-proj.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-kle.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-org.js" />
