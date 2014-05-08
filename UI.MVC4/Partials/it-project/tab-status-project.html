@@ -93,30 +93,49 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-ng-repeat="activity in milestonesActivities" class="small">
+                    <tr data-ng-repeat="activity in milestonesActivities | orderBy:'humanReadableId'" class="small">
                         <td>{{activity.phase.name}}</td>
-                        <td>{{activity.type}}</td>
-                        <td>{{activity.activityId}}</td>
+                        <td>
+                            <span data-ng-show="activity.isTask">Opgave</span>
+                            <span data-ng-show="activity.isMilestone">Milepæl</span>
+                        </td>
+                        <td>{{activity.humanReadableId}}</td>
                         <td>{{activity.name}}</td>
                         <td>
-                            <span data-datereader="" data-ng-model="activity.startDate"></span>
+                            <span data-datereader="" data-ng-show="activity.isTask"
+                                  data-ng-model="activity.startDate">
+                            </span>
+                            <span data-ng-show="activity.isMilestone">
+                                -
+                            </span>
                         </td>
                         <td>
-                            <span data-datereader="" data-ng-model="activity.endDate"></span>
+                            <span data-datereader="" data-ng-show="activity.isTask" data-ng-model="activity.endDate"></span>
+                            <span data-datereader="" data-ng-show="activity.isMilestone" data-ng-model="activity.date"></span>
                         </td>
                         <td>
-                            {{activity.statusProcentage}}%
+                            <span data-ng-show="activity.isTask">
+                                {{activity.statusProcentage}}%
+                            </span>
+                            <span data-ng-show="activity.isMilestone">
+                                <input data-select-status="activity.status"/>
+                            </span>
                         </td>
                         <td>{{activity.associatedUser.name}}</td>
                         <td>{{activity.associatedUserRoleNames | joinBy:', '}}</td>
-                        <td></td>
+                        <td>
+                            <a data-ng-click="" class="btn btn-link btn-xs">
+                                <i class="glyphicon glyphicon-pencil"></i>
+                            </a>
+                        </td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
                         <td colspan="10">
                             <div class="pull-right">
-                                <button class="btn btn-success btn-sm">Tilføj</button>
+                                <button class="btn btn-success btn-sm">Tilføj opgave</button>
+                                <button class="btn btn-primary btn-sm">Tilføj milepæl</button>
                             </div>
                         </td>
                     </tr>

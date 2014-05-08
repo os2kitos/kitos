@@ -13,7 +13,7 @@ namespace Core.DomainModel
         /// <summary>
         /// Human readable ID ("brugervendt noegle" in OIO)
         /// </summary>
-        public string StateId { get; set; }
+        public string HumanReadableId { get; set; }
         public string Name { get; set; }
 
         /// <summary>

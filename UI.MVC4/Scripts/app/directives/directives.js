@@ -315,7 +315,8 @@
                 scope.date = {};
 
                 function read() {
-                    scope.dateStr = moment(ngModel.$modelValue).format("DD-MM-YY", "da", true);
+                    if (angular.isUndefined(ngModel.$modelValue) || ngModel.$modelValue == null) scope.dateStr = "";
+                    else scope.dateStr = moment(ngModel.$modelValue).format("DD-MM-YY", "da", true);
                 }
 
                 read();

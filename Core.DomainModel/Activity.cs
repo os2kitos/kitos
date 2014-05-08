@@ -20,7 +20,7 @@ namespace Core.DomainModel
         /// <summary>
         /// Human readable ID ("brugervendt noegle" in OIO)
         /// </summary>
-        public string ActivityId { get; set; }
+        public string HumanReadableId { get; set; }
         public string Name { get; set; }
 
         public DateTime StartDate { get; set; }
@@ -61,5 +61,7 @@ namespace Core.DomainModel
         /// </summary>
         public virtual ItProject.ItProject TaskForProject { get; set; }
         public int? TaskForProjectId { get; set; }
+
+
     }
 }

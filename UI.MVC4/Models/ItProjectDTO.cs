@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.DomainModel;
+using Core.DomainModel.ItProject;
 
 namespace UI.MVC4.Models
 {
@@ -60,8 +61,8 @@ namespace UI.MVC4.Models
         /// <summary>
         /// The tasks for "milestones and tasks" table. 
         /// </summary>
-        public IEnumerable<ActivityDTO> TaskActivities { get; set; } 
-
+        public IEnumerable<ActivityDTO> TaskActivities { get; set; }
+        public virtual ICollection<StateDTO> MilestoneStates { get; set; } 
 
         #endregion
     }

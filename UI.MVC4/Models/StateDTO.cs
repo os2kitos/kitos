@@ -1,8 +1,9 @@
 ﻿using System;
+using Core.DomainModel;
 
 namespace UI.MVC4.Models
 {
-    public class ActivityDTO
+    public class StateDTO
     {
         public int Id { get; set; }
 
@@ -11,21 +12,23 @@ namespace UI.MVC4.Models
         /// </summary>
         public string HumanReadableId { get; set; }
         public string Name { get; set; }
-        
-        /// <summary>
-        /// Procentage of activity status
-        /// </summary>
-        public int StatusProcentage { get; set; }
 
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        /// <summary>
+        /// Which date, the state should be reached
+        /// </summary>
+        public DateTime Date { get; set; }
+
+        /// <summary>
+        /// Trafic light status for the state
+        /// </summary>
+        public int Status { get; set; }
 
         public int? AssociatedUserId { get; set; }
-        public UserDTO AssociatedUser { get; set; }
-
-        public int ObjectOwnerId { get; set; }
-        public UserDTO ObjectOwner { get; set; }
+        public virtual UserDTO AssociatedUser { get; set; }
 
         public int? AssociatedActivityId { get; set; }
+
+        public int ObjectOwnerId { get; set; }
+        public virtual UserDTO ObjectOwner { get; set; }
     }
 }

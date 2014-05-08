@@ -1015,7 +1015,7 @@ namespace Infrastructure.DataAccess.Migrations
                 {
                     new Activity()
                     {
-                        ActivityId = "1.2",
+                        HumanReadableId = "1.2",
                         Name = "Interviewe byggesagsbehandling",
                         StartDate = DateTime.Now,
                         EndDate = DateTime.Now.AddDays(36),
@@ -1026,7 +1026,7 @@ namespace Infrastructure.DataAccess.Migrations
                     },
                     new Activity()
                     {
-                        ActivityId = "1.3",
+                        HumanReadableId = "1.3",
                         Name = "Gøre noget andet",
                         StartDate = DateTime.Now.AddDays(79),
                         EndDate = DateTime.Now.AddDays(200),
@@ -1035,7 +1035,30 @@ namespace Infrastructure.DataAccess.Migrations
                         AssociatedUser = owner,
                         AssociatedActivity = phase1
                     }
-                }
+                },
+                MilestoneStates = new List<State>()
+                    {
+                        new State()
+                            {
+                                AssociatedActivity = phase1,
+                                AssociatedUser = owner,
+                                Date = DateTime.Now.AddDays(20),
+                                HumanReadableId = "1",
+                                Name = "Rapport om byggesagsbehandling",
+                                ObjectOwner = owner,
+                                Status = 1
+                            },
+                        new State()
+                            {
+                                AssociatedActivity = phase1,
+                                AssociatedUser = owner,
+                                Date = DateTime.Now.AddDays(50),
+                                HumanReadableId = "2",
+                                Name = "Noget andet",
+                                ObjectOwner = owner,
+                                Status = 0
+                            }
+                    }
             };
 
             return itProject;

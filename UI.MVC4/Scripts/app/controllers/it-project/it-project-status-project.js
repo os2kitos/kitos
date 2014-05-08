@@ -43,16 +43,31 @@
             
             //All activities - both activities ("opgaver") and milestones
             $scope.milestonesActivities = [];
+            
+            function addMilestoneActivity(activity) {
+                activity.phase = findPhase(activity.associatedActivityId);
 
-            //Activities "opgaver"
-            _.each(itProject.taskActivities, function(taskActivity) {
+                if (activity.associatedUser) {
+                    activity.associatedUserRoleNames = getUserRoles(activity.associatedUser.id);
+                }
 
-                taskActivity.type = "Opgave";
-                taskActivity.phase = findPhase(taskActivity.associatedActivityId);
+                $scope.milestonesActivities.push(activity);
+            }
 
-                if (taskActivity.associatedUser) taskActivity.associatedUserRoleNames = getUserRoles(taskActivity.associatedUser.id);
 
-                $scope.milestonesActivities.push(taskActivity);
+            //TaskActivities ("opgaver")
+            _.each(itProject.taskActivities, function(task) {
+                task.isTask = true;
+
+                addMilestoneActivity(task);
+            });
+
+            _.each(itProject.milestoneStates, function(milestone) {
+
+                milestone.isMilestone = true;
+
+                addMilestoneActivity(milestone);
+
             });
 
             function patch(url, field, value) {
@@ -130,6 +145,10 @@
             function getUserRoles(userId) {
 
                 var rights = _.where(itProjectRights, { userId: userId });
+                
+                if (rights.length == 0) {
+                    return ["-"];
+                }
                 return _.map(rights, function(right) {
                     return getRoleName(right.roleId);
                 });
