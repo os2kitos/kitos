@@ -78,6 +78,12 @@ namespace Core.DomainModel.ItProject
         public virtual ItProject CommonPublicProject { get; set; }
         public virtual ICollection<ItProject> CommonPublicProjects { get; set; }
 
+        public int? ResponsibleOrgUnitId { get; set; }
+        /// <summary>
+        /// Organization Unit responsible for this project
+        /// </summary>
+        public OrganizationUnit ResponsibleOrgUnit { get; set; }
+
         /// <summary>
         /// These Organization Units are using this project
         /// </summary>

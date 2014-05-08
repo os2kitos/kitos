@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
@@ -48,5 +47,10 @@ namespace Core.DomainModel
         /// This Organization Unit is using these IT Systems (Via ItSystemUsage)
         /// </summary>
         public virtual ICollection<ItProject.ItProject> UsingItProjects { get; set; }
+
+        /// <summary>
+        /// This Organization Unit is responsible for these IT Projects
+        /// </summary>
+        public virtual ICollection<ItProject.ItProject> ResponsibleForItProjects { get; set; }
     }
 }
