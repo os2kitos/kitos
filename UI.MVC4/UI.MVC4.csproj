@@ -419,6 +419,7 @@
     <Content Include="Partials\home\index.html" />
     <Content Include="Partials\it-project\catalog.html" />
     <Content Include="Partials\it-project\tab-description.html" />
+    <Content Include="Partials\it-project\tab-risk.html" />
     <Content Include="Partials\it-project\tab-roles.html" />
     <Content Include="Partials\it-project\edit-it-project.html" />
     <Content Include="Partials\it-project\tab-org.html" />
@@ -490,6 +491,7 @@
     <Content Include="Scripts\app\controllers\home\home.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-catalog.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-description.js" />
+    <Content Include="Scripts\app\controllers\it-project\it-project-risk.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-roles.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-org.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-economy.js" />

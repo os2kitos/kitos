@@ -13,17 +13,23 @@
     }]);
 
     app.controller('project.CatalogCtrl',
-        ['$scope', '$http', 'user', function ($scope, $http, user) {
+        ['$scope', '$http', '$state', 'user', function ($scope, $http, $state, user) {
             $scope.create = function () {
                 var orgUnitId = user.defaultOrganizationUnitId;
                 var payload = {
-                    responsibleOrgUnitId: orgUnitId
+                    itProjectTypeId: 1,
+                    ItProjectCategoryId: 1,
+                    responsibleOrgUnitId: orgUnitId,
+                    organizationId: user.currentOrganizationId,
                 };
                 $http.post('api/itproject', payload)
-                    .sucess(function (result) {
-                        var projectId = result.id;
-                        // add users default org unit to the new project
-                        $http.post('api/itproject/' + projectId + '?organizationunit=' + orgUnitId);
+                    .success(function (result) {
+                        var projectId = result.response.id;
+                        if (orgUnitId) {
+                            // add users default org unit to the new project
+                            $http.post('api/itproject/' + projectId + '?organizationunit=' + orgUnitId);
+                        }
+                        $state.go('it-project.edit', { id: projectId });
                     })
                     .error(function() {
                         
