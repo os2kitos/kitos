@@ -13,13 +13,16 @@ namespace Core.DomainModel.ItProject
             //this.ExtReferences = new List<ExtReference>();
             this.TaskRefs = new List<TaskRef>();
             //this.Resources = new List<Resource>();
-            //this.Risks = new List<Risk>();
+            this.Risks = new List<Risk>();
             //this.Stakeholders = new List<Stakeholder>();
             this.Rights = new List<ItProjectRight>();
             this.ItSystemUsages = new List<ItSystemUsage>();
             this.UsedByOrgUnits = new List<OrganizationUnit>();
             this.ItSystemUsages = new List<ItSystemUsage>();
             this.EconomyYears = new List<EconomyYear>();
+            this.JointMunicipalProjects = new List<ItProject>();
+            this.CommonPublicProjects = new List<ItProject>();
+            this.AssociatedProjects = new List<ItProject>();
         }
 
         public int Id { get; set; }
@@ -63,9 +66,28 @@ namespace Core.DomainModel.ItProject
         //public virtual ICollection<ExtReference> ExtReferences { get; set; } // TODO
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
         //public virtual ICollection<Resource> Resources { get; set; }
-        //public virtual ICollection<Risk> Risks { get; set; }
+        public virtual ICollection<Risk> Risks { get; set; }
         //public virtual ICollection<Stakeholder> Stakeholders { get; set; }
         public virtual ICollection<ItProjectRight> Rights { get; set; }
+
+        /// <summary>
+        /// Determines if this project is an IT digitization strategy
+        /// </summary>
+        public bool IsStrategy { get; set; }
+
+        public int? JointMunicipalProjectId { get; set; }
+        public virtual ItProject JointMunicipalProject { get; set; }
+        public virtual ICollection<ItProject> JointMunicipalProjects { get; set; }
+
+        public int? CommonPublicProjectId { get; set; }
+        public virtual ItProject CommonPublicProject { get; set; }
+        public virtual ICollection<ItProject> CommonPublicProjects { get; set; }
+
+        public int? ResponsibleOrgUnitId { get; set; }
+        /// <summary>
+        /// Organization Unit responsible for this project
+        /// </summary>
+        public OrganizationUnit ResponsibleOrgUnit { get; set; }
 
         /// <summary>
         /// These Organization Units are using this project

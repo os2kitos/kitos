@@ -10,20 +10,35 @@ namespace Infrastructure.DataAccess.Mapping
             // Primary Key
             this.HasKey(t => t.Id);
 
-            // Properties
-            this.Property(t => t.Background)
-                .IsRequired();
-
-            this.Property(t => t.Note)
-                .IsRequired();
-
-            this.Property(t => t.Name)
-                .IsRequired();
-
             // Table & Column Mappings
             this.ToTable("ItProject");
             this.Property(t => t.Id).HasColumnName("Id");
-            
+
+            /*
+            this.Property(t => t.ItProjectOwnerId).HasColumnName("ItProjectOwnerId");
+            this.Property(t => t.ItProjectLeaderId).HasColumnName("ItProjectLeaderId");
+            this.Property(t => t.PartItProjectLeaderId).HasColumnName("PartItProjectLeaderId");
+            this.Property(t => t.ConsultantId).HasColumnName("ConsultantId");
+             */
+
+            // Relationships
+            /*this.HasOptional(t => t.ItProjectOwner)
+                .WithMany(t => t.OwnerOfItProjects)
+                .HasForeignKey(d => d.ItProjectOwnerId)
+                .WillCascadeOnDelete(false);
+            this.HasOptional(t => t.ItProjectLeader)
+                .WithMany(t => t.LeaderOfItProjects)
+                .HasForeignKey(d => d.ItProjectLeaderId)
+                .WillCascadeOnDelete(false);
+            this.HasOptional(t => t.PartItProjectLeader)
+                .WithMany(t => t.LeaderOfPartItProjects)
+                .HasForeignKey(d => d.PartItProjectLeaderId)
+                .WillCascadeOnDelete(false);
+            this.HasOptional(t => t.Consultant)
+                .WithMany(t => t.ConsultantOnItProjects)
+                .HasForeignKey(d => d.ConsultantId)
+                .WillCascadeOnDelete(false);*/
+                
             this.HasRequired(t => t.Organization)
                 .WithMany(d => d.ItProjects)
                 .HasForeignKey(t => t.OrganizationId)
@@ -88,6 +103,26 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithOptional(d => d.MilestoneForProject)
                 .HasForeignKey(d => d.MilestoneForProjectId);
 
+
+            this.HasOptional(t => t.JointMunicipalProject)
+                .WithMany(t => t.JointMunicipalProjects)
+                .HasForeignKey(d => d.JointMunicipalProjectId)
+                .WillCascadeOnDelete(false);
+
+            this.HasOptional(t => t.CommonPublicProject)
+                .WithMany(t => t.CommonPublicProjects)
+                .HasForeignKey(d => d.CommonPublicProjectId)
+                .WillCascadeOnDelete(false);
+
+            this.HasMany(t => t.Risks)
+                .WithRequired(d => d.ItProject)
+                .HasForeignKey(d => d.ItProjectId)
+                .WillCascadeOnDelete(true);
+
+            this.HasOptional(t => t.ResponsibleOrgUnit)
+                .WithMany(t => t.ResponsibleForItProjects)
+                .HasForeignKey(d => d.ResponsibleOrgUnitId)
+                .WillCascadeOnDelete(false);
         }
     }
 }

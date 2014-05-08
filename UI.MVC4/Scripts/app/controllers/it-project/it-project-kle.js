@@ -1,6 +1,6 @@
 ﻿(function (ng, app) {
     app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('edit-it-project.kle', {
+        $stateProvider.state('it-project.edit.kle', {
             url: '/kle',
             templateUrl: 'partials/it-project/tab-kle.html',
             controller: 'project.EditKleCtrl',

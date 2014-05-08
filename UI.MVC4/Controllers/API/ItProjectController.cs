@@ -65,6 +65,20 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        public HttpResponseMessage GetProjectsByCategory([FromUri] int orgId, [FromUri] int catId)
+        {
+            try
+            {
+                var projects = Repository.Get(x => x.OrganizationId == orgId && x.ItProjectCategoryId == catId);
+
+                return projects == null ? NotFound() : Ok(Map(projects));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetOrganizationUnitsUsingThisProject(int id, [FromUri] int organizationUnit)
         {
             try

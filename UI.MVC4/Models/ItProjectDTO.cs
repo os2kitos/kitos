@@ -11,6 +11,7 @@ namespace UI.MVC4.Models
         public string ItProjectId { get; set; }
         public string Background { get; set; }
         public bool IsTransversal { get; set; }
+        public bool IsStrategy { get; set; }
         public string Note { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }

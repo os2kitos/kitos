@@ -1,0 +1,92 @@
+﻿<!-- System Roles -->
+<div class="panel panel-default">
+    <table class="table table-condensed table-striped small">
+        <thead>
+            <tr>
+                <th>Risiko</th>
+                <th>Konsekvens</th>
+                <th>Sandsynlighed</th>
+                <th>Produkt</th>
+                <th>Handling</th>
+                <th>Ansvarlig</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="risk in risks | filter : { show: true }">
+                <td>
+                    <input type="text" class="form-control input-sm" data-ng-model="risk.name" 
+                           data-field="name"
+                           data-autosave="{{risk.updateUrl}}" />
+                </td>
+                <td>
+                    <input type="number" class="form-control input-sm" min="1" max="5" data-ng-model="risk.consequence"
+                           data-field="consequence"
+                           data-autosave="{{risk.updateUrl}}" />
+                </td>
+                <td>
+                    <input type="number" class="form-control input-sm" min="1" max="5" data-ng-model="risk.probability"
+                           data-field="probability"
+                           data-autosave="{{risk.updateUrl}}" />
+                </td>
+                <td>
+                    <p class="form-control-static input-sm">{{ product(risk) }}</p>
+                </td>
+                <td>
+                    <input type="text" class="form-control input-sm" data-ng-model="risk.action" 
+                           data-field="action"
+                           data-autosave="{{risk.updateUrl}}" />
+                </td>
+                <td>
+                    <input data-select-user="foo" data-user-model="risk.userForSelect" />
+                </td>
+                <td>
+                    <button class="btn btn-danger btn-sm" data-ng-click="delete(risk)">
+                        <i class="glyphicon glyphicon-trash small"></i>
+                    </button>
+                </td>
+            </tr>                     
+            <tr class="active">
+                <td>
+                    <input type="text" class="form-control input-sm" data-ng-model="newRisk.name" />
+                </td>
+                <td>
+                    <input type="number" class="form-control input-sm" min="1" max="5" data-ng-model="newRisk.consequence">
+                </td>
+                <td>
+                    <input type="number" class="form-control input-sm" min="1" max="5" data-ng-model="newRisk.probability">
+                </td>
+                <td>
+                    <p class="form-control-static input-sm text-muted">{{ product(newRisk) }}</p>
+                </td>
+                <td>
+                    <input type="text" class="form-control input-sm" data-ng-model="newRisk.action" />
+                </td>
+                <td>
+                    <input data-select-user="foo" data-user-model="newRisk.userForSelect" />
+                </td>
+                <td>
+                    <button class="btn btn-success btn-sm" data-ng-click="saveNewRisk()">
+                        <i class="glyphicon glyphicon-plus small"></i> Ny
+                    </button>
+                </td>
+            </tr>  
+            <tr>
+                <td></td>
+                <td></td>
+                <td><p class="form-control-static input-sm text-right">Gennemsnit:</td>
+                <td>
+                    <p class="form-control-static input-sm">{{ averageProduct() }}
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            
+        </tbody>
+        <tfoot>
+ 
+        </tfoot>
+    </table>
+</div>

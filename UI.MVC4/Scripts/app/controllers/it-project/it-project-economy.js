@@ -2,7 +2,7 @@
 
     app.config(['$stateProvider', function($stateProvider) {
 
-        $stateProvider.state('edit-it-project.economy', {
+        $stateProvider.state('it-project.edit.economy', {
             url: '/economy',
             templateUrl: 'partials/it-project/tab-economy.html',
             controller: 'project.EditEconomyCtrl',
