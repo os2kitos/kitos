@@ -10,26 +10,9 @@ namespace Infrastructure.DataAccess.Mapping
             // Primary Key
             this.HasKey(t => t.Id);
 
-            // Properties
-            this.Property(t => t.Background)
-                .IsRequired();
-
-            this.Property(t => t.Note)
-                .IsRequired();
-
-            this.Property(t => t.Name)
-                .IsRequired();
-
             // Table & Column Mappings
             this.ToTable("ItProject");
             this.Property(t => t.Id).HasColumnName("Id");
-
-            /*
-            this.Property(t => t.ItProjectOwnerId).HasColumnName("ItProjectOwnerId");
-            this.Property(t => t.ItProjectLeaderId).HasColumnName("ItProjectLeaderId");
-            this.Property(t => t.PartItProjectLeaderId).HasColumnName("PartItProjectLeaderId");
-            this.Property(t => t.ConsultantId).HasColumnName("ConsultantId");
-             */
 
             // Relationships
             /*this.HasOptional(t => t.ItProjectOwner)

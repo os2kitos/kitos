@@ -18,6 +18,7 @@ namespace Core.DomainModel.ItProject
             this.ItSystemUsages = new List<ItSystemUsage>();
             this.JointMunicipalProjects = new List<ItProject>();
             this.CommonPublicProjects = new List<ItProject>();
+            this.AssociatedProjects = new List<ItProject>();
         }
 
         public int Id { get; set; }

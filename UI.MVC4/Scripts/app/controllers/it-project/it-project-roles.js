@@ -2,7 +2,7 @@
 
     app.config(['$stateProvider', function($stateProvider) {
 
-        $stateProvider.state('edit-it-project.roles', {
+        $stateProvider.state('it-project.edit.roles', {
             url: '/roles',
             templateUrl: 'partials/it-project/tab-roles.html',
             controller: 'project.EditRolesCtrl',
