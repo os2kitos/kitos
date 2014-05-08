@@ -1,6 +1,6 @@
 ﻿(function (ng, app) {
     app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('edit-it-project.risk', {
+        $stateProvider.state('it-project.edit.risk', {
             url: '/risk',
             templateUrl: 'partials/it-project/tab-risk.html',
             controller: 'project.EditRiskCtrl',
