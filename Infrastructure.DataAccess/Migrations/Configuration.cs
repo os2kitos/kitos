@@ -996,19 +996,23 @@ namespace Infrastructure.DataAccess.Migrations
                 {
                     new Activity()
                     {
+                        ActivityId = "1.2",
                         Name = "Interviewe byggesagsbehandling",
                         StartDate = DateTime.Now,
                         EndDate = DateTime.Now.AddDays(36),
                         StatusProcentage = 10,
-                        ObjectOwner = owner
+                        ObjectOwner = owner,
+                        AssociatedUser = owner
                     },
                     new Activity()
                     {
+                        ActivityId = "1.3",
                         Name = "Gøre noget andet",
                         StartDate = DateTime.Now.AddDays(79),
                         EndDate = DateTime.Now.AddDays(200),
                         StatusProcentage = 30,
-                        ObjectOwner = owner
+                        ObjectOwner = owner,
+                        AssociatedUser = owner
                     }
                 }
             };
