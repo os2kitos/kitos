@@ -9,7 +9,7 @@
                     return itProject.isTransversal;
                 }],
                 selectedOrgUnits: ['itProject', function (itProject) {
-                    return _.pluck(itProject.usedByOrgUnits, 'id');
+                    return itProject.usedByOrgUnits;
                 }],
                 orgUnitsTree: ['$http', 'itProject', function ($http, itProject) {
                     return $http.get('api/organizationunit/?organization=' + itProject.organizationId)
@@ -24,6 +24,7 @@
     app.controller('project.EditOrgCtrl', ['$scope', '$http', '$stateParams', 'notify', 'isTransversal', 'orgUnitsTree', 'selectedOrgUnits', function ($scope, $http, $stateParams, notify, isTransversal, orgUnitsTree, selectedOrgUnits) {
         $scope.orgUnitsTree = orgUnitsTree;
         $scope.isTransversal = isTransversal;
+        $scope.selectedOrgUnits = selectedOrgUnits;
         var projectId = $stateParams.id;
         $scope.patchUrl = 'api/itproject/' + projectId;
 
@@ -48,11 +49,6 @@
             }
         };
 
-        $scope.saveState = function() {
-            console.log($scope.isTransversal);
-            $http
-        };
-
         function searchTree(element, matchingId) {
             if (element.id == matchingId) {
                 return element;
@@ -66,7 +62,8 @@
             return null;
         }
 
-        _.each(selectedOrgUnits, function (id) {
+        var selectedOrgUnitIds = _.pluck(selectedOrgUnits, 'id');
+        _.each(selectedOrgUnitIds, function (id) {
             var found = searchTree(orgUnitsTree[0], id);
             if (found) {
                 found.selected = true;

@@ -247,7 +247,8 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.AssociatedProjects, opt => opt.Ignore())
                   .ForMember(dest => dest.ItSystemUsages, opt => opt.Ignore())
-                  .ForMember(dest => dest.TaskRefs, opt => opt.Ignore());
+                  .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
+                  .ForMember(dest => dest.ResponsibleOrgUnit, opt => opt.Ignore());
         }
     }
 }
