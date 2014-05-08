@@ -42,6 +42,8 @@ namespace Core.DomainModel
         public virtual ICollection<AdminRight> AdminRights { get; set; }
         public virtual ICollection<ItSystem.ItSystem> CreatedSystems { get; set; }
         public virtual ICollection<ItSystem.ItSystemUsage> CreatedSystemUsages { get; set; }
+        public virtual ICollection<Activity> CreatedActivities { get; set; }
+        public virtual ICollection<State> CreatedStates { get; set; }
         public virtual ICollection<Risk> ResponsibleForRisks { get; set; }
         public virtual ICollection<Wish> Wishes { get; set; }
         public virtual ICollection<Activity> Activities { get; set; }
