@@ -30,5 +30,8 @@ namespace UI.MVC4.Models
 
         public int? JointMunicipalProjectId { get; set; }
         public int? CommonPublicProjectId { get; set; }
+
+        public int? ResponsibleOrgUnitId { get; set; }
+        public OrgUnitDTO ResponsibleOrgUnit { get; set; }
     }
 }
