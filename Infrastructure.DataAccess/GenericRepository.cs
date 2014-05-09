@@ -39,7 +39,7 @@ namespace Infrastructure.DataAccess
             {
                 query = query.Include(includeProperty);
             }
-
+            
             return orderBy != null ? orderBy(query).ToList() : query.ToList();
         }
 

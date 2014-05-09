@@ -29,6 +29,25 @@ namespace UI.MVC4.Controllers.API
             _orgUnitRepository = orgUnitRepository;
         }
 
+        public HttpResponseMessage GetByOrg([FromUri] int orgId)
+        {
+            try
+            {
+                var projects = Repository.Get(x => x.AccessModifier == AccessModifier.Public || x.OrganizationId == orgId).ToList();
+
+                var clonedParentIds = projects.Where(x => x.ParentItProjectId.HasValue).Select(x => x.ParentItProjectId);
+
+                // remove cloned parents
+                projects.RemoveAll(x => clonedParentIds.Contains(x.Id));
+                
+                return Ok(Map(projects));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetPrograms(string q, int orgId, bool? programs)
         {
             try
@@ -58,6 +77,60 @@ namespace UI.MVC4.Controllers.API
                 var projects = _itProjectService.GetProjects(org, q);
 
                 return Ok(Map(projects));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage PostCloneProject(int id, [FromBody] ItProjectDTO dto)
+        {
+            try
+            {
+                var project = Repository.GetByKey(id);
+
+                // TODO find a better approach, this is silly
+                var clonedProject = new ItProject()
+                    {
+                        OrganizationId = dto.OrganizationId,
+                        ObjectOwnerId = KitosUser.Id,
+                        ParentItProjectId = project.Id,
+                        
+                        ItProjectId = project.ItProjectId,
+                        Background = project.Background,
+                        IsTransversal = project.IsTransversal,
+                        Name = project.Name,
+                        Note = project.Note,
+                        Description = project.Description,
+                        AccessModifier = project.AccessModifier,
+                        IsStrategy = project.IsStrategy,
+
+                        // TODO AssociatedProgramId = project.AssociatedProgramId,
+                        // TODO AssociatedProjects = project.AssociatedProjects,
+                        ItProjectTypeId = project.ItProjectTypeId,
+                        ItProjectCategoryId = project.ItProjectCategoryId,
+                        TaskRefs = project.TaskRefs,
+                        // TODO Risk
+                        // TODO Rights
+                        // TODO JointMunicipalProjectId = project.JointMunicipalProjectId,
+                        // TODO JointMunicipalProjects = project.JointMunicipalProjects,
+                        // TODO CommonPublicProjectId = project.CommonPublicProjectId,
+                        // TODO CommonPublicProjects = project.CommonPublicProjects,
+                        // TODO EconomyYears = project.EconomyYears
+                        // TODO MilestoneStates = project.MilestoneStates,
+                        // TODO Phase1 = project.Phase1,
+                        // TODO Phase2 = project.Phase2,
+                        // TODO Phase3 = project.Phase3,
+                        // TODO Phase4 = project.Phase4,
+                        // TODO Phase5 = project.Phase5,
+                        // TODO TaskActivities = project.TaskActivities,
+                        CurrentPhaseId = null,
+                    };
+
+                var entity = base.PostQuery(clonedProject);
+
+                return Created(Map(entity), new Uri(Request.RequestUri + "/" + entity.Id));
             }
             catch (Exception e)
             {
