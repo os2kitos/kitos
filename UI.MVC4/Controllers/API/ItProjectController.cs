@@ -118,6 +118,14 @@ namespace UI.MVC4.Controllers.API
                         // TODO CommonPublicProjectId = project.CommonPublicProjectId,
                         // TODO CommonPublicProjects = project.CommonPublicProjects,
                         // TODO EconomyYears = project.EconomyYears
+                        // TODO MilestoneStates = project.MilestoneStates,
+                        // TODO Phase1 = project.Phase1,
+                        // TODO Phase2 = project.Phase2,
+                        // TODO Phase3 = project.Phase3,
+                        // TODO Phase4 = project.Phase4,
+                        // TODO Phase5 = project.Phase5,
+                        // TODO TaskActivities = project.TaskActivities,
+                        CurrentPhaseId = null,
                     };
 
                 var entity = base.PostQuery(clonedProject);
