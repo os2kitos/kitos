@@ -1,0 +1,169 @@
+﻿<div class="modal-header">
+    <span data-ng-hide="activity.isNew">{{ activity.isTask && "Opgave:" || "Milepæl:" }} {{ activity.name }}
+    </span>
+    <span data-ng-show="activity.isNew">{{ activity.isTask && "Ny opgave" || "Ny milepæl" }}
+    </span>
+</div>
+<div class="modal-body">
+    <form name="modal.form" novalidate="novalidate" class="form-horizontal">
+
+
+        <div class="form-group">
+            <!-- Name -->
+            <label for="name" class="col-md-2 control-label small">
+                Aktivitetsnavn:
+            </label>
+            <div class="col-md-10">
+                <input type="text" id="name" data-ng-model="activity.name" class="form-control input-sm"
+                       data-field="name"
+                       data-autosave="{{activity.updateUrl}}" />
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <!-- Human readable ID -->
+            <label for="humanReadableId" class="col-md-2 control-label small">
+                ID
+            </label>
+            <div class="col-md-4">
+                <input type="text" id="humanReadableId" data-ng-model="activity.humanReadableId" class="form-control input-sm"
+                       data-field="humanReadableId"
+                       data-autosave="{{activity.updateUrl}}" />
+            </div>
+
+            <!-- Phase -->
+            <label for="phase" class="col-md-2 control-label small">
+                Fase
+            </label>
+            <div class="col-md-4">
+                <select id="phase" class="form-control input-sm" 
+                        data-field="associatedActivityId"
+                        data-autosave="{{activity.updateUrl}}"
+                        data-ng-change="updatePhase()"
+                        data-ng-model="activity.associatedActivityId" 
+                        data-ng-options="phase.id as phase.name for phase in phases">
+                    <option value=""></option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Start/end date if activity is task -->
+        <div class="form-group" data-ng-if="activity.isTask">
+            <!-- Start date -->
+            <label for="startDate" class="col-md-2 control-label small">
+                Start
+            </label>
+            <div class="col-md-4">
+                <span id="startDate" data-ng-model="activity.startDate" data-datewriter="" data-ng-change="updateDate('startDate')" />
+            </div>
+
+            <!-- End date -->
+            <label for="endDate" class="col-md-2 control-label small">
+                Slut
+            </label>
+            <div class="col-md-4">
+                <span id="endDate" data-ng-model="activity.endDate" data-datewriter="" data-ng-change="updateDate('endDate')" />
+            </div>
+        </div>
+
+        <!-- just Date if activity is milestone -->
+        <div class="form-group" data-ng-if="activity.isMilestone">
+            <!-- Start date -->
+            <label for="date" class="col-md-2 control-label small">
+                Dato
+            </label>
+            <div class="col-md-4">
+                <span id="date" data-ng-model="activity.date" data-datewriter="" data-ng-change="updateDate('date')" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <!-- Time estimate -->
+            <label for="timeEstimate" class="col-md-2 control-label small">
+                Tidsestimat <small>(timer)</small>
+            </label>
+            <div class="col-md-4">
+                <input id="timeEstimate" type="number" data-ng-model="activity.timeEstimate" class="form-control input-sm"
+                       data-field="timeEstimate"
+                       data-autosave="{{activity.updateUrl}}" />
+            </div>
+
+            <!-- Status estimate -->
+            <label for="status" class="col-md-2 control-label small">
+                Status
+            </label>
+            <div class="col-md-4" data-ng-if="activity.isTask">
+                <select id="status" class="form-control input-sm" data-ng-model="activity.statusProcentage"
+                    data-field="statusProcentage"
+                    data-autosave="{{activity.updateUrl}}">
+                    <option value="0">0%</option>
+                    <option value="10">10%</option>
+                    <option value="20">20%</option>
+                    <option value="30">30%</option>
+                    <option value="40">40%</option>
+                    <option value="50">50%</option>
+                    <option value="60">60%</option>
+                    <option value="70">70%</option>
+                    <option value="80">80%</option>
+                    <option value="90">90%</option>
+                    <option value="100">100%</option>
+                </select>
+            </div>
+            <div class="col-md-4" data-ng-if="activity.isMilestone">
+                <input id="status" data-select-status="activity.status" data-can-write="true" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            
+            <!-- Description -->
+            <label for="description" class="col-md-2 control-label small">
+                Beskrivelse
+            </label>
+            <div class="col-md-10">
+                <textarea id="description" class="form-control input-sm" data-ng-model="activity.description" rows="4"
+                    data-field="description"
+                    data-autosave="{{activity.updateUrl}}"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            
+            <!-- Note -->
+            <label for="note" class="col-md-2 control-label small">
+                Note
+            </label>
+            <div class="col-md-10">
+                <textarea id="note" class="form-control input-sm" data-ng-model="activity.note" rows="4"
+                          data-field="note"
+                          data-autosave="{{activity.updateUrl}}"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <!-- Associated User -->
+            <label for="associatedUserId" class="col-md-2 control-label small">
+                Navn
+            </label>
+            <div class="col-md-10">
+                <select id="associatedUserId" class="form-control input-sm" 
+                        data-field="associatedUserId"
+                        data-autosave="{{activity.updateUrl}}"
+                        data-ng-change="updateUserName()"
+                        data-ng-model="activity.associatedUserId" 
+                        data-ng-options="user.id as user.name for user in usersWithRoles">
+                    <option value=""></option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <p class="help-block text-center">
+                Oprettet af {{ activity.objectOwner.name }}
+            </p>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" data-ng-click="$close()" data-disabled-on-busy="">Færdig</button>
+</div>

@@ -17,6 +17,9 @@ namespace Core.DomainModel.ItProject
             //this.Stakeholders = new List<Stakeholder>();
             this.Rights = new List<ItProjectRight>();
             this.ItSystemUsages = new List<ItSystemUsage>();
+            this.UsedByOrgUnits = new List<OrganizationUnit>();
+            this.ItSystemUsages = new List<ItSystemUsage>();
+            this.EconomyYears = new List<EconomyYear>();
             this.JointMunicipalProjects = new List<ItProject>();
             this.CommonPublicProjects = new List<ItProject>();
             this.AssociatedProjects = new List<ItProject>();
@@ -86,13 +89,49 @@ namespace Core.DomainModel.ItProject
         /// Organization Unit responsible for this project
         /// </summary>
         public OrganizationUnit ResponsibleOrgUnit { get; set; }
-        
+
         /// <summary>
         /// These Organization Units are using this project
         /// </summary>
         public virtual ICollection<OrganizationUnit> UsedByOrgUnits { get; set; }
         public virtual ICollection<ItSystemUsage> ItSystemUsages { get; set; }
         public virtual ICollection<EconomyYear> EconomyYears { get; set; }
+
+        #region Status project tab
+
+        /// <summary>
+        /// Traffic-light dropdown for overall status
+        /// </summary>
+        public int StatusProject { get; set; }
+        /// <summary>
+        /// Date-for-status-update field
+        /// </summary>
+        public DateTime StatusDate { get; set; }
+
+        /// <summary>
+        /// Notes on collected status on project    
+        /// </summary>
+        public string StatusNote { get; set; }
+
+        // The phases of the project
+        public virtual Activity Phase1 { get; set; }
+        public virtual Activity Phase2 { get; set; } 
+        public virtual Activity Phase3 { get; set; } 
+        public virtual Activity Phase4 { get; set; } 
+        public virtual Activity Phase5 { get; set; } 
+        
+        /// <summary>
+        /// The id of current selected phase
+        /// </summary>
+        public int? CurrentPhaseId { get; set; }
+
+        /// <summary>
+        /// The tasks for "milestones and tasks" table. 
+        /// </summary>
+        public virtual ICollection<Activity> TaskActivities { get; set; }
+        public virtual ICollection<State> MilestoneStates { get; set; } 
+
+        #endregion
 
         public virtual int? ParentItProjectId { get; set; }
         public virtual ItProject ParentItProject { get; set; }

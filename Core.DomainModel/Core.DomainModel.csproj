@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Activity.cs" />
     <Compile Include="AdminRight.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="IHasAccessModifier.cs" />
@@ -110,6 +111,7 @@
     <Compile Include="ItSystem\Method.cs" />
     <Compile Include="ItSystem\BusinessType.cs" />
     <Compile Include="ItSystem\Wish.cs" />
+    <Compile Include="State.cs" />
     <Compile Include="TaskRef.cs" />
     <Compile Include="Localization.cs" />
     <Compile Include="Organization.cs" />

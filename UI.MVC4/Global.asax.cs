@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
 namespace UI.MVC4
@@ -31,6 +32,16 @@ namespace UI.MVC4
 
             // Set JSON serialization in WEB API to use camelCase (javascript) instead of PascalCase (C#)
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+
+
+            //Format datetime correctly. From: http://stackoverflow.com/questions/20143739/date-format-in-mvc-4-api-controller
+            var dateTimeConverter = new IsoDateTimeConverter
+            {
+                DateTimeFormat = "yyyy-MM-dd HH:mm:ss"
+            };
+
+            GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings
+                               .Converters.Add(dateTimeConverter);
         }
     }
 }

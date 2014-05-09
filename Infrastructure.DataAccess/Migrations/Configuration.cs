@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Core.ApplicationServices;
 using Core.DomainModel;
@@ -893,18 +894,42 @@ namespace Infrastructure.DataAccess.Migrations
 
 
             #region IT Project
-             
-            var itProject1 = SimpleProject("Test program", globalUser, roskilde, itProjectCategoryPublic, 
-                itProjectTypeProgram);
+
+            var phase11 = new Activity()
+                {
+                    Name = "Afventer",
+                    ObjectOwner = globalUser,
+                    StartDate = DateTime.Now.AddDays(76),
+                    EndDate = DateTime.Now.AddDays(102)
+                };
+            var phase12 = new Activity()
+                {
+                    Name = "Afventer",
+                    ObjectOwner = simon,
+                    StartDate = DateTime.Now.AddDays(76),
+                    EndDate = DateTime.Now.AddDays(102)
+                };
+            var phase13 = new Activity()
+                {
+                    Name = "Afventer",
+                    ObjectOwner = globalUser,
+                    StartDate = DateTime.Now.AddDays(76),
+                    EndDate = DateTime.Now.AddDays(102)
+                };
+            context.Activities.AddOrUpdate(x => x.Id, phase11, phase12, phase13);
+
+            var itProject1 = SimpleProject("Test program", globalUser, roskilde, 
+                itProjectCategoryPublic, itProjectTypeProgram, phase11);
 
             var itProject2 = SimpleProject("Test projekt", simon, roskilde, itProjectCategoryMunipalicity, 
-                itProjectTypeProject);
+                itProjectTypeProject, phase12);
             itProject2.AssociatedProgram = itProject1;
 
             var itProject3 = SimpleProject("Test program 2000", globalUser, roskilde, itProjectCategoryPublic,
-                itProjectTypeProgram);
+                itProjectTypeProgram, phase13);
 
             context.ItProjects.AddOrUpdate(itProject1, itProject2, itProject3);
+            
             context.SaveChanges();
 
             #endregion
@@ -933,7 +958,7 @@ namespace Infrastructure.DataAccess.Migrations
                 };
         }
 
-        private ItProject SimpleProject(string name, User owner, Organization organization, ItProjectCategory projectCategory, ItProjectType type)
+        private ItProject SimpleProject(string name, User owner, Organization organization, ItProjectCategory projectCategory, ItProjectType type, Activity phase1)
         {
             var itProject = new ItProject()
             {
@@ -954,6 +979,86 @@ namespace Infrastructure.DataAccess.Migrations
                         new EconomyYear(),
                         new EconomyYear()
                     },
+                //Phases = SimplePhases(owner)
+                Phase1 = phase1,
+                Phase2 = new Activity()
+                {
+                    Name = "Foranalyse",
+                    ObjectOwner = owner,
+                    StartDate = DateTime.Now.AddDays(76),
+                    EndDate = DateTime.Now.AddDays(102)
+                },
+                Phase3 = new Activity()
+                {
+                    Name = "Gennemførsel",
+                    ObjectOwner = owner,
+                    StartDate = DateTime.Now.AddDays(102),
+                    EndDate = DateTime.Now.AddDays(223)
+                },
+                Phase4 = new Activity()
+                {
+                    Name = "Overlevering",
+                    ObjectOwner = owner,
+                    StartDate = DateTime.Now.AddDays(223),
+                    EndDate = DateTime.Now.AddDays(250)
+                },
+                Phase5 = new Activity()
+                {
+                    Name = "Drift",
+                    ObjectOwner = owner,
+                    StartDate = DateTime.Now.AddDays(250),
+                    EndDate = DateTime.Now.AddDays(450)
+                },
+                CurrentPhaseId = phase1.Id,
+
+                TaskActivities = new List<Activity>()
+                {
+                    new Activity()
+                    {
+                        HumanReadableId = "1.2",
+                        Name = "Interviewe byggesagsbehandling",
+                        StartDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddDays(36),
+                        StatusProcentage = 10,
+                        ObjectOwner = owner,
+                        AssociatedUser = owner,
+                        AssociatedActivity = phase1
+                    },
+                    new Activity()
+                    {
+                        HumanReadableId = "1.3",
+                        Name = "Gøre noget andet",
+                        StartDate = DateTime.Now.AddDays(79),
+                        EndDate = DateTime.Now.AddDays(200),
+                        StatusProcentage = 30,
+                        ObjectOwner = owner,
+                        AssociatedUser = owner,
+                        AssociatedActivity = phase1
+                    }
+                },
+                MilestoneStates = new List<State>()
+                    {
+                        new State()
+                            {
+                                AssociatedActivity = phase1,
+                                AssociatedUser = owner,
+                                Date = DateTime.Now.AddDays(20),
+                                HumanReadableId = "1",
+                                Name = "Rapport om byggesagsbehandling",
+                                ObjectOwner = owner,
+                                Status = 1
+                            },
+                        new State()
+                            {
+                                AssociatedActivity = phase1,
+                                AssociatedUser = owner,
+                                Date = DateTime.Now.AddDays(50),
+                                HumanReadableId = "2",
+                                Name = "Noget andet",
+                                ObjectOwner = owner,
+                                Status = 0
+                            }
+                    }
             };
 
             return itProject;

@@ -14,6 +14,13 @@ namespace Infrastructure.DataAccess.Mapping
             this.ToTable("ItProject");
             this.Property(t => t.Id).HasColumnName("Id");
 
+            /*
+            this.Property(t => t.ItProjectOwnerId).HasColumnName("ItProjectOwnerId");
+            this.Property(t => t.ItProjectLeaderId).HasColumnName("ItProjectLeaderId");
+            this.Property(t => t.PartItProjectLeaderId).HasColumnName("PartItProjectLeaderId");
+            this.Property(t => t.ConsultantId).HasColumnName("ConsultantId");
+             */
+
             // Relationships
             /*this.HasOptional(t => t.ItProjectOwner)
                 .WithMany(t => t.OwnerOfItProjects)
@@ -33,21 +40,21 @@ namespace Infrastructure.DataAccess.Mapping
                 .WillCascadeOnDelete(false);*/
                 
             this.HasRequired(t => t.Organization)
-                .WithMany(t => t.ItProjects)
-                .HasForeignKey(d => d.OrganizationId)
+                .WithMany(d => d.ItProjects)
+                .HasForeignKey(t => t.OrganizationId)
                 .WillCascadeOnDelete(false);
 
             this.HasRequired(t => t.ItProjectCategory)
-                .WithMany(t => t.References)
-                .HasForeignKey(d => d.ItProjectCategoryId);
+                .WithMany(d => d.References)
+                .HasForeignKey(t => t.ItProjectCategoryId);
 
             this.HasRequired(t => t.ItProjectType)
-                .WithMany(t => t.References)
-                .HasForeignKey(d => d.ItProjectTypeId);
+                .WithMany(d => d.References)
+                .HasForeignKey(t => t.ItProjectTypeId);
 
             this.HasOptional(t => t.AssociatedProgram)
-                .WithMany(t => t.AssociatedProjects)
-                .HasForeignKey(d => d.AssociatedProgramId)
+                .WithMany(d => d.AssociatedProjects)
+                .HasForeignKey(t => t.AssociatedProgramId)
                 .WillCascadeOnDelete(false);
 
             this.HasMany(t => t.UsedByOrgUnits)
@@ -67,6 +74,35 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasMany(t => t.TaskRefs)
                 .WithMany(t => t.ItProjects);
+
+            this.HasRequired(t => t.Phase1)
+                .WithOptional(d => d.Phase1ForProject)
+                .Map(mc => mc.MapKey("Phase1Id"));
+
+            this.HasRequired(t => t.Phase2)
+                .WithOptional(d => d.Phase2ForProject)
+                .Map(mc => mc.MapKey("Phase2Id"));
+            
+            this.HasRequired(t => t.Phase3)
+                .WithOptional(d => d.Phase3ForProject)
+                .Map(mc => mc.MapKey("Phase3Id"));
+
+            this.HasRequired(t => t.Phase4)
+                .WithOptional(d => d.Phase4ForProject)
+                .Map(mc => mc.MapKey("Phase4Id"));
+
+            this.HasRequired(t => t.Phase5)
+                .WithOptional(d => d.Phase5ForProject)
+                .Map(mc => mc.MapKey("Phase5Id"));
+
+            this.HasMany(t => t.TaskActivities)
+                .WithOptional(d => d.TaskForProject)
+                .HasForeignKey(d => d.TaskForProjectId);
+
+            this.HasMany(t => t.MilestoneStates)
+                .WithOptional(d => d.MilestoneForProject)
+                .HasForeignKey(d => d.MilestoneForProjectId);
+
 
             this.HasOptional(t => t.JointMunicipalProject)
                 .WithMany(t => t.JointMunicipalProjects)
