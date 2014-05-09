@@ -93,7 +93,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-ng-repeat="activity in milestonesActivities | orderBy:'humanReadableId'" class="small">
+                    <tr data-ng-repeat="activity in milestonesActivities | filter:{show:true} | orderBy:'humanReadableId'" class="small">
                         <td>{{activity.phase.name}}</td>
                         <td>
                             <span data-ng-show="activity.isTask">Opgave</span>
@@ -122,11 +122,18 @@
                             </span>
                         </td>
                         <td>{{activity.associatedUser.name}}</td>
-                        <td>{{activity.associatedUserRoleNames | joinBy:', '}}</td>
+                        <td>{{activity.associatedUser.roleNames | joinBy:', '}}</td>
                         <td>
-                            <a data-ng-click="" class="btn btn-link btn-xs">
-                                <i class="glyphicon glyphicon-pencil"></i>
-                            </a>
+                            <span class="pull-right">
+                                <a class="btn btn-link btn-xs" data-ng-click="activity.edit()">
+                                    <i class="glyphicon glyphicon-pencil"></i>
+                                </a>
+                                <a class="btn btn-link btn-xs"
+                                    data-confirmed-click="activity.delete()"
+                                    data-confirm-click="Er du sikker på at du vil slette?">
+                                    <i class="glyphicon glyphicon-trash"></i>
+                                </a>
+                            </span>
                         </td>
                     </tr>
                 </tbody>
@@ -134,7 +141,7 @@
                     <tr>
                         <td colspan="10">
                             <div class="pull-right">
-                                <button class="btn btn-success btn-sm">Tilføj opgave</button>
+                                <button class="btn btn-success btn-sm" data-ng-click="addTask()">Tilføj opgave</button>
                                 <button class="btn btn-primary btn-sm" data-ng-click="addMilestone()">Tilføj milepæl</button>
                             </div>
                         </td>

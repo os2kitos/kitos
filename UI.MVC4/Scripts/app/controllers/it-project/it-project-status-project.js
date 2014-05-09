@@ -5,25 +5,51 @@
             templateUrl: 'partials/it-project/tab-status-project.html',
             controller: 'project.EditStatusProjectCtrl',
             resolve: {
-                itProjectRights: ['$http', '$stateParams', function ($http, $stateParams) {
+               
+                //returns a map with those users who have a role in this project.
+                //the names of the roles is saved in user.roleNames
+                usersWithRoles: ['$http', '$stateParams', function ($http, $stateParams) {
+
+                    //get the rights of the projects
                     return $http.get("api/itprojectright/" + $stateParams.id)
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }],
-                itProjectRoles: ['$http', function ($http) {
-                    return $http.get("api/itprojectrole/")
-                        .then(function (result) {
-                            return result.data.response;
+                        .then(function (rightResult) {
+                            var rights = rightResult.data.response;
+
+                            //get the role names
+                            return $http.get("api/itprojectrole/")
+                                .then(function (roleResult) {
+                                    var roles = roleResult.data.response;
+
+                                    //the resulting map
+                                    var users = {};
+                                    _.each(rights, function (right) {
+
+                                        //use the user from the map if possible
+                                        var user = users[right.userId] || right.user;
+                                        
+                                        var role = _.findWhere(roles, { id: right.roleId });
+
+                                        var roleNames = user.roleNames || [];
+                                        roleNames.push(role.name);
+                                        user.roleNames = roleNames;
+                                        
+                                        users[right.userId] = user;
+                                    });
+                                    
+                                    return users;
+
+                                });
+
                         });
                 }]
+                
             }
         });
     }]);
 
     app.controller('project.EditStatusProjectCtrl',
-    ['$scope', '$http', 'notify', '$modal', 'itProject', 'itProjectRights', 'itProjectRoles',
-        function ($scope, $http, notify, $modal, itProject, itProjectRights, itProjectRoles) {
+    ['$scope', '$http', 'notify', '$modal', 'itProject', 'usersWithRoles',
+        function ($scope, $http, notify, $modal, itProject, usersWithRoles) {
             $scope.project = itProject;
             $scope.project.updateUrl = "api/itproject/" + itProject.id;
 
@@ -45,32 +71,69 @@
             $scope.milestonesActivities = [];
             
             function addMilestoneActivity(activity) {
-                activity.phase = findPhase(activity.associatedActivityId);
+                activity.show = true;
 
-                if (activity.associatedUser) {
-                    activity.associatedUserRoleNames = getUserRoles(activity.associatedUser.id);
-                }
+                activity.updatePhase = function(id) {
+                    activity.phase = _.findWhere($scope.project.phases, { id: activity.associatedActivityId });
+                };
+
+                activity.updatePhase();
+
+                activity.updateUser = function() {
+                    if (activity.associatedUserId) {
+                        activity.associatedUser = _.findWhere(usersWithRoles, { id: activity.associatedUserId });
+                    }
+                };
+
+                activity.updateUser();
+
+                activity.edit = function() {
+                    return editActivity(activity);
+                };
+
+                activity.delete = function() {
+
+                    var msg = notify.addInfoMessage("Sletter... ");
+                    $http.delete(activity.updateUrl).success(function() {
+
+                        activity.show = false;
+
+                        msg.toSuccessMessage("Slettet!");
+
+                    }).error(function() {
+
+                        msg.toErrorMessage("Fejl! Kunne ikke slette!");
+                    });
+
+                };
 
                 $scope.milestonesActivities.push(activity);
 
                 return activity;
             }
 
-
-            //TaskActivities ("opgaver")
-            _.each(itProject.taskActivities, function(task) {
-                task.isTask = true;
-
-                addMilestoneActivity(task);
-            });
-
-            _.each(itProject.milestoneStates, function(milestone) {
-
+            //Add a taskActivity ("opgaver")
+            function addMilestone(milestone) {
                 milestone.isMilestone = true;
+                milestone.updateUrl = "api/state/" + milestone.id;
 
-                addMilestoneActivity(milestone);
+                autoSaveTrafficLight(milestone.updateUrl, "status", function() {
+                    return milestone.status;
+                });
 
-            });
+                return addMilestoneActivity(milestone);
+            }
+
+            //Add a milestoneState ("milepæle")
+            function addTask(task) {
+                task.isTask = true;
+                task.updateUrl = "api/activity/" + task.id;
+
+                return addMilestoneActivity(task);
+            }
+
+            _.each(itProject.taskActivities, addTask);
+            _.each(itProject.milestoneStates, addMilestone);
 
             function patch(url, field, value) {
                 var payload = {};
@@ -139,32 +202,24 @@
                 return $scope.project.statusProject;
             });
             
-            function getRoleName(roleId) {
-                var role = _.findWhere(itProjectRoles, { id: roleId });
-                if (role) return role.name;
-            }
-            
-            function getUserRoles(userId) {
-
-                var rights = _.where(itProjectRights, { userId: userId });
-                
-                if (rights.length == 0) {
-                    return ["-"];
-                }
-                return _.map(rights, function(right) {
-                    return getRoleName(right.roleId);
-                });
-            }
-
             $scope.addMilestone = function() {
-
                 $http.post("api/state", { milestoneForProjectId: itProject.id }).success(function(result) {
-                    console.log(result.response);
-                }).error(function(result) {
+                    var activity = result.response;
+
+                    addMilestone(activity);
+                    editActivity(activity);
 
                 });
+            };
+            
+            $scope.addTask = function () {
+                $http.post("api/activity", { taskForProjectId: itProject.id }).success(function (result) {
+                    var activity = result.response;
 
+                    addTask(activity);
+                    editActivity(activity);
 
+                });
             };
 
             function editActivity(activity) {
@@ -174,6 +229,21 @@
 
                         $modalScope.activity = activity;
 
+                        $modalScope.updateDate = function(field) {
+                            patch(activity.updateUrl, field, activity[field]).success(function() {
+                                notify.addSuccessMessage("Feltet er opdateret");
+                            }).error(function() {
+                                notify.addErrorMessage("Fejl!");
+                            });
+                        };
+
+                        $modalScope.phases = $scope.project.phases;
+
+                        $modalScope.usersWithRoles = _.values(usersWithRoles);
+
+                        $modalScope.updateUserName = $modalScope.activity.updateUser;
+
+                        $modalScope.updatePhase = $modalScope.activity.updatePhase;
                     }]
                 });
             }
