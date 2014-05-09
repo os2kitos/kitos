@@ -217,6 +217,7 @@
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\API\ActivityController.cs" />
     <Compile Include="Controllers\API\AdminRightController.cs" />
     <Compile Include="Controllers\API\AdminRoleController.cs" />
     <Compile Include="Controllers\API\AgreementElementController.cs" />
@@ -239,10 +240,12 @@
     <Compile Include="Controllers\API\ItSystemRightController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageController.cs" />
     <Compile Include="Controllers\API\RiskController.cs" />
+    <Compile Include="Controllers\API\StateController.cs" />
     <Compile Include="Models\RiskDTO.cs" />
     <Compile Include="Controllers\API\SensitiveDataTypeController.cs" />
     <Compile Include="Controllers\API\TsaController.cs" />
     <Compile Include="Controllers\API\WishController.cs" />
+    <Compile Include="Models\ActivityDTO.cs" />
     <Compile Include="Models\DataRowDTO.cs" />
     <Compile Include="Models\DataRowUsageDTO.cs" />
     <Compile Include="Models\EconomyYearDTO.cs" />
@@ -319,6 +322,7 @@
     <Compile Include="Models\RightOutputDTO.cs" />
     <Compile Include="Models\RightInputDTO.cs" />
     <Compile Include="Models\RoleDTO.cs" />
+    <Compile Include="Models\StateDTO.cs" />
     <Compile Include="Models\TaskDelegationDTO.cs" />
     <Compile Include="Models\TaskUsageDTO.cs" />
     <Compile Include="Models\TaskRefDTO.cs" />
@@ -400,6 +404,7 @@
     <Content Include="Images\logo.png" />
     <Content Include="Partials\directives\add-user-button.html" />
     <Content Include="Partials\directives\add-user-modal.html" />
+    <Content Include="Partials\directives\datewriter.html" />
     <Content Include="Partials\directives\select-access-modifier.html" />
     <Content Include="Partials\directives\select-status.html" />
     <Content Include="Partials\directives\select-user.html" />
@@ -418,6 +423,7 @@
     <Content Include="Partials\home\forgot-password.html" />
     <Content Include="Partials\home\index.html" />
     <Content Include="Partials\it-project\catalog.html" />
+    <Content Include="Partials\it-project\modal-milestone-task-edit.html" />
     <Content Include="Partials\it-project\tab-description.html" />
     <Content Include="Partials\it-project\tab-risk.html" />
     <Content Include="Partials\it-project\tab-roles.html" />
@@ -427,6 +433,7 @@
     <Content Include="Partials\it-project\tab-itsys.html" />
     <Content Include="Partials\it-project\tab-kle.html" />
     <Content Include="Partials\it-project\tab-strategy.html" />
+    <Content Include="Partials\it-project\tab-status-project.html" />
     <Content Include="Partials\it-system\assign-it-system.html" />
     <Content Include="Partials\it-system\tab-proj.html" />
     <Content Include="Partials\it-system\tab-kle.html" />
@@ -489,6 +496,7 @@
     <Content Include="Scripts\app\controllers\global-admin\global-admin.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-config.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
+    <Content Include="Scripts\app\controllers\it-project\it-project-status-project.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-catalog.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-description.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-risk.js" />
@@ -511,8 +519,9 @@
     <Content Include="Scripts\app\controllers\local-config\local-config.js" />
     <Content Include="Scripts\app\controllers\org\org.js" />
     <Content Include="Scripts\app\directives\directives.js" />
-    <Content Include="Scripts\app\directives\form-validation.js" />
+    <Content Include="Scripts\app\directives\form-directives.js" />
     <Content Include="Scripts\app\app.js" />
+    <Content Include="Scripts\app\directives\utils-directives.js" />
     <Content Include="Scripts\app\services\userServices.js" />
     <Content Include="Scripts\app\utility\utility.js" />
     <Content Include="Scripts\app\services\httpServices.js" />
@@ -785,6 +794,10 @@
     <Content Include="Scripts\lodash.js" />
     <Content Include="Scripts\lodash.min.js" />
     <Content Include="Scripts\form.control.js" />
+    <Content Include="Scripts\moment-with-langs.js" />
+    <Content Include="Scripts\moment-with-langs.min.js" />
+    <Content Include="Scripts\moment.js" />
+    <Content Include="Scripts\moment.min.js" />
     <Content Include="Scripts\notify\notify.js" />
     <Content Include="Scripts\notify\notifyDirective.js" />
     <Content Include="Scripts\notify\notifyFactory.js" />

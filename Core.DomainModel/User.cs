@@ -15,6 +15,14 @@ namespace Core.DomainModel
             this.SystemRights = new List<ItSystemRight>();
             this.ContractRights = new List<ItContractRight>();
             this.AdminRights = new List<AdminRight>();
+            this.CreatedSystems = new List<ItSystem.ItSystem>();
+            this.CreatedSystemUsages = new List<ItSystemUsage>();
+            this.CreatedActivities = new List<Activity>();
+            this.CreatedStates = new List<State>();
+            this.Wishes = new List<Wish>();
+            this.Activities = new List<Activity>();
+            this.States = new List<State>();
+            this.ResponsibleForRisks = new List<Risk>();
         }
 
         public int Id { get; set; }
@@ -34,7 +42,11 @@ namespace Core.DomainModel
         public virtual ICollection<AdminRight> AdminRights { get; set; }
         public virtual ICollection<ItSystem.ItSystem> CreatedSystems { get; set; }
         public virtual ICollection<ItSystem.ItSystemUsage> CreatedSystemUsages { get; set; }
+        public virtual ICollection<Activity> CreatedActivities { get; set; }
+        public virtual ICollection<State> CreatedStates { get; set; }
         public virtual ICollection<Risk> ResponsibleForRisks { get; set; }
         public virtual ICollection<Wish> Wishes { get; set; }
+        public virtual ICollection<Activity> Activities { get; set; }
+        public virtual ICollection<State> States { get; set; }  
     }
 }

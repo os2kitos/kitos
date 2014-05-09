@@ -25,6 +25,7 @@ namespace Infrastructure.DataAccess
         public DbSet<AgreementElement> AgreementElements { get; set; }
         public DbSet<AppType> AppTypes { get; set; }
         public DbSet<ArchiveType> ArchiveTypes { get; set; }
+        public DbSet<Activity> Activities { get; set; }
         public DbSet<BusinessType> BusinessTypes { get; set; }
         public DbSet<Communication> Communications { get; set; }
         public DbSet<Config> Configs { get; set; }
@@ -84,6 +85,7 @@ namespace Infrastructure.DataAccess
         public DbSet<SensitiveDataType> SensitiveDataTypes { get; set; }
         public DbSet<ShipNotice> ShipNotices { get; set; }
         public DbSet<Stakeholder> Stakeholders { get; set; }
+        public DbSet<State> States { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<TaskRef> TaskRefs { get; set; }
         public DbSet<TaskUsage> TaskUsages { get; set; }
@@ -99,6 +101,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new AgreementMap());
             modelBuilder.Configurations.Add(new AgreementElementMap());
             modelBuilder.Configurations.Add(new AppTypeMap());
+            modelBuilder.Configurations.Add(new ActivityMap());
             modelBuilder.Configurations.Add(new ArchiveTypeMap());
             modelBuilder.Configurations.Add(new BusinessTypeMap());
             modelBuilder.Configurations.Add(new CommunicationMap());
@@ -159,6 +162,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new SensitiveDataTypeMap());
             modelBuilder.Configurations.Add(new ShipNoticeMap());
             modelBuilder.Configurations.Add(new StakeholdersMap());
+            modelBuilder.Configurations.Add(new StateMap());
             modelBuilder.Configurations.Add(new SupplierMap());
             modelBuilder.Configurations.Add(new TaskRefMap());
             modelBuilder.Configurations.Add(new TaskUsageMap());

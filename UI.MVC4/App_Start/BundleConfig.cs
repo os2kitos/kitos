@@ -13,7 +13,8 @@ namespace UI.MVC4
                 "~/Scripts/jquery-{version}.js",
                 "~/Scripts/jquery-ui-{version}.js",
                 "~/Scripts/holder.js",
-                "~/Scripts/select2.js"));
+                "~/Scripts/select2.js",
+                "~/Scripts/moment.js"));
 
             /*
             bundles.Add(new ScriptBundle("~/bundles/jqueryui").Include(
