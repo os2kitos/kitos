@@ -1,0 +1,40 @@
+﻿<div>
+    <form class="form-horizontal fix-label-padding">
+        <div class="row">
+            <div class="col-md-3">
+
+                <!-- Status traffic light -->
+                <div class="form-group">
+                    <label class="col-md-6 control-label small" for="statusGoal">Status mål (samlet):</label>
+                    <div class="col-md-6">
+                        <input id="statusGoal" data-select-status="statusGoal.status" data-can-write="true" />
+                    </div>
+                </div>
+
+                <!-- Date for status update -->
+                <div class="form-group">
+                    <label class="col-md-6 control-label small" for="statusDate">Dato for statusopdatering:</label>
+                    <div class="col-md-6">
+                        <span id="statusDate" data-ng-model="statusGoal.statusDate" data-datewriter="" data-ng-change="updateStatusDate()"></span>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col-md-9">
+                <!-- Notes to status of project -->
+                <div class="form-group">
+                    <label class="col-md-2 control-label small" for="note">Bemærkning til samlet status på projekt:</label>
+                    <div class="col-md-10">
+                        <textarea id="note" class="form-control input-sm" rows="4" data-ng-model="statusGoal.statusNote"
+                                  data-field="statusNote"
+                                  data-autosave="{{statusGoal.updateUrl}}"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    
+    
+
+</div>
