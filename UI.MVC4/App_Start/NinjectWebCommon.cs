@@ -111,6 +111,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<Activity>>().To<GenericRepository<Activity>>().InRequestScope();
             kernel.Bind<IGenericRepository<State>>().To<GenericRepository<State>>().InRequestScope();
             kernel.Bind<IGenericRepository<GoalStatus>>().To<GenericRepository<GoalStatus>>().InRequestScope();
+            kernel.Bind<IGenericRepository<Goal>>().To<GenericRepository<Goal>>().InRequestScope();
 
             kernel.Bind<IGenericRepository<OrganizationRight>>().To<GenericRepository<OrganizationRight>>().InRequestScope();
 

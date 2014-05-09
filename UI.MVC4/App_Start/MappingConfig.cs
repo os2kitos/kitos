@@ -257,6 +257,11 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.ItProject, opt => opt.Ignore())
                   .ForMember(dest => dest.Goals, opt => opt.Ignore());
 
+            Mapper.CreateMap<Goal, GoalDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.GoalStatus, opt => opt.Ignore())
+                  .ForMember(dest => dest.GoalType, opt => opt.Ignore());
+
             Mapper.CreateMap<ItProject, ItProjectDTO>()
                   .ForMember(dest => dest.AssociatedProjectIds,
                              opt => opt.MapFrom(x => x.AssociatedProjects.Select(y => y.Id)))

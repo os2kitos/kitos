@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace UI.MVC4.Models
 {
@@ -21,5 +22,8 @@ namespace UI.MVC4.Models
         /// Notes on collected status on project    
         /// </summary>
         public string StatusNote { get; set; }
+
+
+        public IEnumerable<GoalDTO> Goals { get; set; }
     }
 }
