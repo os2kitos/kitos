@@ -13,8 +13,8 @@
     app.controller('project.EditStatusGoalCtrl',
     ['$scope', '$http', 'notify', '$modal', 'itProject', 
         function ($scope, $http, notify, $modal, itProject) {
-            $scope.project = itProject;
-            $scope.project.updateUrl = "api/statusgoal/" + itProject.id;
+            $scope.goalStatus = itProject.goalStatus;
+            $scope.goalStatus.updateUrl = "api/goalStatus/" + itProject.goalStatus.id;
 
 
             function patch(url, field, value) {
@@ -29,7 +29,7 @@
             }
             
             $scope.updateStatusDate = function () {
-                patch($scope.project.updateUrl, "statusDate", $scope.project.statusDate)
+                patch($scope.goalStatus.updateUrl, "statusDate", $scope.project.statusDate)
                     .success(function () {
                         notify.addSuccessMessage("Feltet er opdateret");
                     }).error(function () {
@@ -52,8 +52,8 @@
                 });
             }
 
-            autoSaveTrafficLight($scope.project.updateUrl, "statusProject", function () {
-                return $scope.project.statusProject;
+            autoSaveTrafficLight($scope.goalStatus.updateUrl, "statusProject", function () {
+                return $scope.goalStatus.statusProject;
             });
 
         }]);

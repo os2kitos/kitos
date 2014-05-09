@@ -227,6 +227,7 @@
     <Compile Include="Controllers\API\BusinessTypeController.cs" />
     <Compile Include="Controllers\API\ContractTemplateController.cs" />
     <Compile Include="Controllers\API\ContractTypeController.cs" />
+    <Compile Include="Controllers\API\GoalStatusController.cs" />
     <Compile Include="Controllers\API\ItProjectRightController.cs" />
     <Compile Include="Controllers\API\DataRowUsageController.cs" />
     <Compile Include="Controllers\API\DataTypeController.cs" />

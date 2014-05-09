@@ -131,5 +131,7 @@ namespace Core.DomainModel.ItProject
         public virtual ICollection<State> MilestoneStates { get; set; } 
 
         #endregion
+
+        public virtual GoalStatus GoalStatus { get; set; }
     }
 }

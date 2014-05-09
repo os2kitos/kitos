@@ -7,7 +7,7 @@
                 <div class="form-group">
                     <label class="col-md-6 control-label small" for="statusGoal">Status mål (samlet):</label>
                     <div class="col-md-6">
-                        <input id="statusGoal" data-select-status="statusGoal.status" data-can-write="true" />
+                        <input id="statusGoal" data-select-status="goalStatus.status" data-can-write="true" />
                     </div>
                 </div>
 
@@ -15,7 +15,7 @@
                 <div class="form-group">
                     <label class="col-md-6 control-label small" for="statusDate">Dato for statusopdatering:</label>
                     <div class="col-md-6">
-                        <span id="statusDate" data-ng-model="statusGoal.statusDate" data-datewriter="" data-ng-change="updateStatusDate()"></span>
+                        <span id="statusDate" data-ng-model="goalStatus.statusDate" data-datewriter="" data-ng-change="updateStatusDate()"></span>
                     </div>
                 </div>
 
@@ -26,9 +26,9 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label small" for="note">Bemærkning til samlet status på projekt:</label>
                     <div class="col-md-10">
-                        <textarea id="note" class="form-control input-sm" rows="4" data-ng-model="statusGoal.statusNote"
+                        <textarea id="note" class="form-control input-sm" rows="4" data-ng-model="goalStatus.statusNote"
                                   data-field="statusNote"
-                                  data-autosave="{{statusGoal.updateUrl}}"></textarea>
+                                  data-autosave="{{goalStatus.updateUrl}}"></textarea>
                     </div>
                 </div>
             </div>
