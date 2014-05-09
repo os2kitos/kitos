@@ -21,9 +21,36 @@
     }]);
 
     app.controller('project.CatalogCtrl',
-        ['$scope', '$http', '$state', 'user', 'programs', function ($scope, $http, $state, user, programs) {
+        ['$scope', '$http', '$state', '$stateParams', '$timeout', 'user', 'programs', function ($scope, $http, $state, $stateParams, $timeout, user, programs) {
             $scope.programs = programs;
-            
+
+            $scope.clone = function (project) {
+                var isParent = project.parentItProjectId != null;
+                if (!isParent) {
+                    $http.post('api/itproject/' + project.id, { organizationId: project.organizationId }).success(function (result) {
+                        reload();
+                    });
+                } else {
+                    $http.delete('api/itproject/' + project.id).success(function(result) {
+                        reload();
+                    });
+                }
+                
+            };
+
+            // work around for $state.reload() not updating scope
+            // https://github.com/angular-ui/ui-router/issues/582
+            function reload() {
+                return $state.transitionTo($state.current, $stateParams, {
+                    reload: true
+                }).then(function () {
+                    $scope.hideContent = true;
+                    return $timeout(function () {
+                        return $scope.hideContent = false;
+                    }, 1);
+                });
+            };
+
             $scope.create = function () {
                 var orgUnitId = user.defaultOrganizationUnitId;
                 var payload = {

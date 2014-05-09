@@ -36,5 +36,8 @@ namespace UI.MVC4.Models
 
         public int? ResponsibleOrgUnitId { get; set; }
         public OrgUnitDTO ResponsibleOrgUnit { get; set; }
+
+        public int? ParentItProjectId { get; set; }
+        public ItProjectDTO ParentItProject { get; set; }
     }
 }

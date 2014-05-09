@@ -14,10 +14,10 @@
     </thead>
     <tbody>
         <tr data-ng-repeat="p in programs">
-            <td><input type="checkbox" /></td>
+            <td><input type="checkbox" data-ng-click="clone(p)" data-ng-checked="p.parentItProjectId != null" /></td>
             <td>{{ p.itProjectTypeName }}</td>
             <td>{{ p.itProjectId }}</td>
-            <td>?</td>
+            <td>{{ p.parentItProject ? p.parentItProject.itProjectId : '' }}</td>
             <td><a data-ui-sref="it-project.edit({id: p.id})">{{ p.name ? p.name : 'intet navn' }}</a></td>
             <td>{{ p.itProjectCategoryName }}</td>
             <td>{{ p.accessModifier == 1 ? 'P' : '' }}</td>

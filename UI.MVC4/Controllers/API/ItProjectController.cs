@@ -33,9 +33,14 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var programs = Repository.Get(x => x.AccessModifier == AccessModifier.Public || x.OrganizationId == orgId);
+                var projects = Repository.Get(x => x.AccessModifier == AccessModifier.Public || x.OrganizationId == orgId).ToList();
 
-                return Ok(Map(programs));
+                var clonedParentIds = projects.Where(x => x.ParentItProjectId.HasValue).Select(x => x.ParentItProjectId);
+
+                // remove cloned parents
+                projects.RemoveAll(x => clonedParentIds.Contains(x.Id));
+                
+                return Ok(Map(projects));
             }
             catch (Exception e)
             {
@@ -85,6 +90,7 @@ namespace UI.MVC4.Controllers.API
             {
                 var project = Repository.GetByKey(id);
 
+                // TODO find a better approach, this is silly
                 var clonedProject = new ItProject()
                     {
                         OrganizationId = dto.OrganizationId,
@@ -100,21 +106,23 @@ namespace UI.MVC4.Controllers.API
                         AccessModifier = project.AccessModifier,
                         IsStrategy = project.IsStrategy,
 
-                        AssociatedProgramId = project.AssociatedProgramId,
-                        AssociatedProjects = project.AssociatedProjects,
+                        // TODO AssociatedProgramId = project.AssociatedProgramId,
+                        // TODO AssociatedProjects = project.AssociatedProjects,
                         ItProjectTypeId = project.ItProjectTypeId,
                         ItProjectCategoryId = project.ItProjectCategoryId,
                         TaskRefs = project.TaskRefs,
                         // TODO Risk
                         // TODO Rights
-                        JointMunicipalProjectId = project.JointMunicipalProjectId,
-                        JointMunicipalProjects = project.JointMunicipalProjects,
-                        CommonPublicProjectId = project.CommonPublicProjectId,
-                        CommonPublicProjects = project.CommonPublicProjects,
-                        EconomyYears = project.EconomyYears
+                        // TODO JointMunicipalProjectId = project.JointMunicipalProjectId,
+                        // TODO JointMunicipalProjects = project.JointMunicipalProjects,
+                        // TODO CommonPublicProjectId = project.CommonPublicProjectId,
+                        // TODO CommonPublicProjects = project.CommonPublicProjects,
+                        // TODO EconomyYears = project.EconomyYears
                     };
 
-                return Created(Map(clonedProject));
+                var entity = base.PostQuery(clonedProject);
+
+                return Created(Map(entity), new Uri(Request.RequestUri + "/" + entity.Id));
             }
             catch (Exception e)
             {
