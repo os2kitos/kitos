@@ -48,6 +48,7 @@
                         <th colspan="3" class="text-center">Delmål 3</th>
                         <th rowspan="2">Note</th>
                         <th rowspan="2">Status</th>
+                        <th rowspan="2"></th>
                     </tr>
                     <tr class="small active">
                         <th>Dato</th>
@@ -62,7 +63,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-ng-repeat="goal in goals">
+                    <tr data-ng-repeat="goal in goals | filter:{show:true} | orderBy:'humanReadableId'" class="small">
                         <!-- Goal type -->
                         <td>
                             {{ goal.goalTypeName }}
@@ -151,12 +152,24 @@
                         <td>
                             <input data-select-status="goal.status" />
                         </td>
+                        <td>
+                            <div class="pull-right">
+                                <a class="btn btn-link btn-xs" data-ng-click="goal.edit()">
+                                    <i class="glyphicon glyphicon-pencil"></i>
+                                </a>
+                                <a class="btn btn-link btn-xs"
+                                   data-confirmed-click="goal.delete()"
+                                   data-confirm-click="Er du sikker på at du vil slette?">
+                                    <i class="glyphicon glyphicon-trash"></i>
+                                </a>
+                            </div>
+                        </td>
 
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="16">
+                        <td colspan="17">
                             <div class="pull-right">
                                 <button class="btn btn-success btn-sm" data-ng-click="addGoal()">Tilføj mål</button>
                             </div>

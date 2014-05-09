@@ -428,6 +428,7 @@
     <Content Include="Partials\home\forgot-password.html" />
     <Content Include="Partials\home\index.html" />
     <Content Include="Partials\it-project\catalog.html" />
+    <Content Include="Partials\it-project\modal-goal-edit.html" />
     <Content Include="Partials\it-project\modal-milestone-task-edit.html" />
     <Content Include="Partials\it-project\tab-description.html" />
     <Content Include="Partials\it-project\tab-risk.html" />

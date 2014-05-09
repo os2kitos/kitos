@@ -18,13 +18,33 @@
 
             $scope.goals = [];
             function addGoal(goal) {
+                
+                goal.show = true;
+
                 var prevEntry = _.findWhere($scope.goals, { id: goal.id });
                 if (prevEntry) {
                     prevEntry = goal;
                     return;
                 }
+                goal.edit = function() {
+                    editGoal(goal);
+                };
                 
+                goal.delete = function() {
 
+                    var msg = notify.addInfoMessage("Sletter... ");
+                    $http.delete(goal.updateUrl).success(function() {
+
+                        goal.show = false;
+
+                        msg.toSuccessMessage("Slettet!");
+
+                    }).error(function() {
+
+                        msg.toErrorMessage("Fejl! Kunne ikke slette!");
+                    });
+
+                };
                 
                 goal.updateUrl = "api/goal/" + goal.id;
                 $scope.goals.push(goal);
@@ -85,6 +105,19 @@
                 });
 
             };
+            
+
+
+            function editGoal(goal) {
+                var modal = $modal.open({
+                    templateUrl: 'partials/it-project/modal-goal-edit.html',
+                    controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
+
+                        $modalScope.goal = goal;
+                    }]
+                });
+            }
+
 
         }]);
 })(angular, app);
