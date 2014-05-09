@@ -62,7 +62,97 @@
                     </tr>
                 </thead>
                 <tbody>
-                    
+                    <tr data-ng-repeat="goal in goals">
+                        <!-- Goal type -->
+                        <td>
+                            {{ goal.goalTypeName }}
+                        </td>
+                        
+                        <!-- Human readable ID -->
+                        <td>
+                            {{goal.humanReadableId}}
+                        </td>
+                        
+                        <!-- Goal name -->
+                        <td>
+                            {{goal.name}}
+                        </td>
+                        
+                        <!-- Description -->
+                        <td>
+                        <!--<input type="text" class="form-control input-sm" 
+                                   data-field="description" 
+                                   data-autosave="{{goal.updateUrl}}"   
+                                   data-ng-model="goal.description"/>
+                            -->
+                        </td>
+
+                        <!-- Measurable -->
+                        <td>
+                            {{ goal.measurable && "Ja" || "Nej" }}
+                        </td>
+
+                        <!-- Subgoal 1 date -->
+                        <td>
+                            <span data-ng-model="goal.subGoalDate1" data-datereader="">
+                            </span>
+                        </td>
+                        
+                        <!-- Subgoal 1 name -->
+                        <td>
+                            {{goal.subGoal1}}
+                        </td>
+                        <!-- Subgoal 1 Rea -->
+                        <td>
+                            {{goal.subGoalRea1}}
+                        </td>
+
+                        <!-- Subgoal 2 date -->
+                        <td>
+                            <span data-ng-model="goal.subGoalDate2" data-datereader="">
+                            </span>
+                        </td>
+                        
+                        <!-- Subgoal 2 name -->
+                        <td>
+                            {{goal.subGoal2}}
+                        </td>
+                        <!-- Subgoal 2 Rea -->
+                        <td>
+                            {{goal.subGoalRea2}}
+                        </td>
+
+                        <!-- Subgoal 3 date -->
+                        <td>
+                            <span data-ng-model="goal.subGoalDate3" data-datereader="">
+                            </span>
+                        </td>
+                        
+                        <!-- Subgoal 3 name -->
+                        <td>
+                            {{goal.subGoal3}}
+                        </td>
+                        <!-- Subgoal 3 Rea -->
+                        <td>
+                            {{goal.subGoalRea3}}
+                        </td>
+                        
+                        <!-- Note -->
+                        <td>
+                        <!--
+                            <input type="text" class="form-control input-sm" 
+                                   data-field="note" 
+                                   data-autosave="{{goal.updateUrl}}"   
+                                   data-ng-model="goal.note"/>
+                            -->
+                        </td>
+                        
+                        <!-- Status -->
+                        <td>
+                            <input data-select-status="goal.status" />
+                        </td>
+
+                    </tr>
                 </tbody>
                 <tfoot>
                     <tr>

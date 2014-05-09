@@ -18,7 +18,7 @@ namespace UI.MVC4.Models
         public string Note { get; set; }
 
         public int GoalTypeId { get; set; }
-        public OptionDTO GoalType { get; set; }
+        public string GoalTypeName { get; set; }
 
         public bool Measurable { get; set; }
 

@@ -16,6 +16,21 @@
             $scope.goalStatus = itProject.goalStatus;
             $scope.goalStatus.updateUrl = "api/goalStatus/" + itProject.goalStatus.id;
 
+            $scope.goals = [];
+            function addGoal(goal) {
+                var prevEntry = _.findWhere($scope.goals, { id: goal.id });
+                if (prevEntry) {
+                    prevEntry = goal;
+                    return;
+                }
+                
+
+                
+                goal.updateUrl = "api/goal/" + goal.id;
+                $scope.goals.push(goal);
+            }
+
+            _.each($scope.goalStatus.goals, addGoal);
 
             function patch(url, field, value) {
                 var payload = {};
@@ -55,6 +70,21 @@
             autoSaveTrafficLight($scope.goalStatus.updateUrl, "status", function () {
                 return $scope.goalStatus.status;
             });
+
+            $scope.addGoal = function() {
+                $http.post("api/goal", {
+                    goalStatusId: itProject.goalStatus.id,
+                    goalTypeId: 1
+                }).success(function(result) {
+                    notify.addSuccessMessage("Nyt mål tilføjet!");
+
+                    addGoal(result.response);
+
+                }).error(function() {
+                    notify.addErrorMessage("Kunne ikke oprette nyt mål!");
+                });
+
+            };
 
         }]);
 })(angular, app);
