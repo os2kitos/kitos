@@ -52,8 +52,8 @@
                 });
             }
 
-            autoSaveTrafficLight($scope.goalStatus.updateUrl, "statusProject", function () {
-                return $scope.goalStatus.statusProject;
+            autoSaveTrafficLight($scope.goalStatus.updateUrl, "status", function () {
+                return $scope.goalStatus.status;
             });
 
         }]);

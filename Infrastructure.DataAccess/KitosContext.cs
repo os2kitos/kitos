@@ -42,6 +42,7 @@ namespace Infrastructure.DataAccess
         public DbSet<Frequency> Frequencies { get; set; }
         public DbSet<Goal> Goals { get; set; }
         public DbSet<GoalStatus> GoalStatus { get; set; }
+        public DbSet<GoalType> GoalTypes { get; set; }
         public DbSet<Handover> Handovers { get; set; }
         public DbSet<HandoverTrial> HandoverTrials { get; set; }
         public DbSet<Hierarchy> Hierarchies { get; set; }
@@ -119,6 +120,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new FrequencyMap());
             modelBuilder.Configurations.Add(new GoalMap());
             modelBuilder.Configurations.Add(new GoalStatusMap());
+            modelBuilder.Configurations.Add(new GoalTypeMap());
             modelBuilder.Configurations.Add(new HandoverMap());
             modelBuilder.Configurations.Add(new HandoverTrialMap());
             modelBuilder.Configurations.Add(new HierarchyMap());

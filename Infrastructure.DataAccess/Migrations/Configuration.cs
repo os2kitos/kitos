@@ -245,7 +245,7 @@ namespace Infrastructure.DataAccess.Migrations
                 Name = "Nej"
             };
             context.SensitiveDataTypes.AddOrUpdate(x => x.Name, sensitiveDataYes, sensitiveDataNo);
-
+            
             #endregion
 
             #region Organizations
@@ -1058,7 +1058,8 @@ namespace Infrastructure.DataAccess.Migrations
                                 ObjectOwner = owner,
                                 Status = 0
                             }
-                    }
+                    },
+                    GoalStatus = new GoalStatus()
             };
 
             return itProject;
