@@ -79,13 +79,40 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage PostCloneProject(int id, [FromUri] bool clone)
+        public HttpResponseMessage PostCloneProject(int id, [FromBody] ItProjectDTO dto)
         {
             try
             {
                 var project = Repository.GetByKey(id);
 
-                var clonedProject = project.Clone() as ItProject;
+                var clonedProject = new ItProject()
+                    {
+                        OrganizationId = dto.OrganizationId,
+                        ObjectOwnerId = KitosUser.Id,
+                        ParentItProjectId = project.Id,
+                        
+                        ItProjectId = project.ItProjectId,
+                        Background = project.Background,
+                        IsTransversal = project.IsTransversal,
+                        Name = project.Name,
+                        Note = project.Note,
+                        Description = project.Description,
+                        AccessModifier = project.AccessModifier,
+                        IsStrategy = project.IsStrategy,
+
+                        AssociatedProgramId = project.AssociatedProgramId,
+                        AssociatedProjects = project.AssociatedProjects,
+                        ItProjectTypeId = project.ItProjectTypeId,
+                        ItProjectCategoryId = project.ItProjectCategoryId,
+                        TaskRefs = project.TaskRefs,
+                        // TODO Risk
+                        // TODO Rights
+                        JointMunicipalProjectId = project.JointMunicipalProjectId,
+                        JointMunicipalProjects = project.JointMunicipalProjects,
+                        CommonPublicProjectId = project.CommonPublicProjectId,
+                        CommonPublicProjects = project.CommonPublicProjects,
+                        EconomyYears = project.EconomyYears
+                    };
 
                 return Created(Map(clonedProject));
             }

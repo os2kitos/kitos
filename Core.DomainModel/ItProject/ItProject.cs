@@ -4,7 +4,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProject : IEntity<int>, IHasRights<ItProjectRight>, IHasAccessModifier, IHasOwner, ICloneable
+    public class ItProject : IEntity<int>, IHasRights<ItProjectRight>, IHasAccessModifier, IHasOwner
     {
         public ItProject()
         {
@@ -97,18 +97,5 @@ namespace Core.DomainModel.ItProject
         public virtual int? ParentItProjectId { get; set; }
         public virtual ItProject ParentItProject { get; set; }
         public virtual ICollection<ItProject> ChildItProjects { get; set; }
-
-        public object Clone()
-        {
-            var obj = this.MemberwiseClone();
-            
-            var clone = obj as ItProject;
-            if (clone != null)
-            {
-                clone.Id = 0;
-            }
-                
-            return obj;
-        }
     }
 }
