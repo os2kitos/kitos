@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
 using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProject : IEntity<int>, IHasRights<ItProjectRight>, IHasAccessModifier, IHasOwner
+    public class ItProject : IEntity<int>, IHasRights<ItProjectRight>, IHasAccessModifier, IHasOwner, ICloneable
     {
         public ItProject()
         {
@@ -19,6 +20,7 @@ namespace Core.DomainModel.ItProject
             this.JointMunicipalProjects = new List<ItProject>();
             this.CommonPublicProjects = new List<ItProject>();
             this.AssociatedProjects = new List<ItProject>();
+            this.ChildItProjects = new List<ItProject>();
         }
 
         public int Id { get; set; }
@@ -84,12 +86,29 @@ namespace Core.DomainModel.ItProject
         /// Organization Unit responsible for this project
         /// </summary>
         public OrganizationUnit ResponsibleOrgUnit { get; set; }
-
+        
         /// <summary>
         /// These Organization Units are using this project
         /// </summary>
         public virtual ICollection<OrganizationUnit> UsedByOrgUnits { get; set; }
         public virtual ICollection<ItSystemUsage> ItSystemUsages { get; set; }
         public virtual ICollection<EconomyYear> EconomyYears { get; set; }
+
+        public virtual int? ParentItProjectId { get; set; }
+        public virtual ItProject ParentItProject { get; set; }
+        public virtual ICollection<ItProject> ChildItProjects { get; set; }
+
+        public object Clone()
+        {
+            var obj = this.MemberwiseClone();
+            
+            var clone = obj as ItProject;
+            if (clone != null)
+            {
+                clone.Id = 0;
+            }
+                
+            return obj;
+        }
     }
 }

@@ -79,6 +79,22 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        public HttpResponseMessage PostCloneProject(int id, [FromUri] bool clone)
+        {
+            try
+            {
+                var project = Repository.GetByKey(id);
+
+                var clonedProject = project.Clone() as ItProject;
+
+                return Created(Map(clonedProject));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetProjectsByCategory([FromUri] int orgId, [FromUri] int catId)
         {
             try
