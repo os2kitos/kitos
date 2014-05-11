@@ -27,33 +27,31 @@
 
             return _user;
         }
-        
-        function getUser() {
-            var deferred = $q.defer();
-            
-            if (_user !== null) {
-                deferred.resolve(_user);
 
-            } else {
-                $http.get('api/authorize').success(function (result) {
-                    
-                    resolveOrganization().then(function (currOrg) {
+        var getUserDeferred = null;
+        function getUser() {
+            if (!getUserDeferred) {
+
+                getUserDeferred = $q.defer();
+
+                $http.get('api/authorize').success(function(result) {
+
+                    resolveOrganization().then(function(currOrg) {
                         saveUser(result.response, currOrg);
-                        deferred.resolve(_user);
+                        getUserDeferred.resolve(_user);
                     }, function() {
-                        deferred.reject("No organization selected");
+                        getUserDeferred.reject("No organization selected");
                     });
-                    
+
 
                 }).error(function(result) {
-                    deferred.reject("Not authorized");
+                    getUserDeferred.reject("Not authorized");
                     clearSavedOrg();
 
                 });
-
             }
 
-            return deferred.promise;
+            return getUserDeferred.promise;
         }
         
         function login(email, password, rememberMe) {
@@ -93,9 +91,11 @@
 
         function logout() {
             
+
             var deferred = $q.defer();
 
             $http.post('api/authorize?logout').success(function (result) {
+                getUserDeferred = null;
                 _user = null;
                 $rootScope.user = null;
 
