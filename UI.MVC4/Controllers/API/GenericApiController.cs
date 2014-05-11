@@ -93,7 +93,7 @@ namespace UI.MVC4.Controllers.API
                 var item = Map<TDto, TModel>(dto);
 
                 if (item is IHasOwner)
-                    (item as IHasOwner).ObjectOwnerId = KitosUser.Id;
+                    (item as IHasOwner).ObjectOwner = KitosUser;
 
                 PostQuery(item);
 
