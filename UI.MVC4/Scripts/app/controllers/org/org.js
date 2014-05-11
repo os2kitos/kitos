@@ -50,7 +50,6 @@
         //cache
             var orgs = [];
 
-            console.log(user);
 
         //$scope.users = [];
 

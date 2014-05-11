@@ -34,10 +34,6 @@
 
             deferred.resolve(loadUser());
 
-            loadUser().then(function(user) {
-                console.log(user);
-            });
-
             return deferred.promise;
         }
 
