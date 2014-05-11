@@ -1,27 +1,27 @@
 ﻿<div>
     <form class="form-horizontal fix-label-padding">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
 
                 <!-- Status traffic light -->
                 <div class="form-group">
-                    <label class="col-md-6 control-label small" for="statusGoal">Status mål (samlet):</label>
-                    <div class="col-md-6">
+                    <label class="col-md-5 control-label small" for="statusGoal">Status mål (samlet):</label>
+                    <div class="col-md-7">
                         <input id="statusGoal" data-select-status="goalStatus.status" data-can-write="true" />
                     </div>
                 </div>
 
                 <!-- Date for status update -->
                 <div class="form-group">
-                    <label class="col-md-6 control-label small" for="statusDate">Dato for statusopdatering:</label>
-                    <div class="col-md-6">
+                    <label class="col-md-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
+                    <div class="col-md-3">
                         <span id="statusDate" data-ng-model="goalStatus.statusDate" data-datewriter="" data-ng-change="updateStatusDate()"></span>
                     </div>
                 </div>
 
 
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7">
                 <!-- Notes to status of project -->
                 <div class="form-group">
                     <label class="col-md-2 control-label small" for="note">Bemærkning til samlet status på projekt:</label>
