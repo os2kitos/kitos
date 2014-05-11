@@ -48,7 +48,9 @@
             var userId = user.id;
 
         //cache
-        var orgs = [];
+            var orgs = [];
+
+            console.log(user);
 
         //$scope.users = [];
 
