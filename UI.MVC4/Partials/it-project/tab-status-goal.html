@@ -66,7 +66,7 @@
                     <tr data-ng-repeat="goal in goals | filter:{show:true} | orderBy:'humanReadableId'" class="small">
                         <!-- Goal type -->
                         <td>
-                            {{ goal.goalTypeName }}
+                            {{ getGoalTypeName(goal.goalTypeId) }}
                         </td>
                         
                         <!-- Human readable ID -->
@@ -81,11 +81,7 @@
                         
                         <!-- Description -->
                         <td>
-                        <!--<input type="text" class="form-control input-sm" 
-                                   data-field="description" 
-                                   data-autosave="{{goal.updateUrl}}"   
-                                   data-ng-model="goal.description"/>
-                            -->
+                            <div data-simple-comment="" data-ng-model="goal.description"></div>
                         </td>
 
                         <!-- Measurable -->
@@ -140,12 +136,7 @@
                         
                         <!-- Note -->
                         <td>
-                        <!--
-                            <input type="text" class="form-control input-sm" 
-                                   data-field="note" 
-                                   data-autosave="{{goal.updateUrl}}"   
-                                   data-ng-model="goal.note"/>
-                            -->
+                            <div data-simple-comment="" data-ng-model="goal.note"></div>
                         </td>
                         
                         <!-- Status -->

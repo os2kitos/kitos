@@ -10,33 +10,51 @@
             <label for="name" class="col-md-2 control-label small">
                 Målnavn:
             </label>
-            <div class="col-md-10">
+            <div class="col-md-6">
                 <input type="text" id="name" data-ng-model="goal.name" class="form-control input-sm"
                        data-field="name"
+                       data-autosave="{{goal.updateUrl}}" />
+            </div>
+            
+            <!-- Human readable ID -->
+            <label for="humanReadableId" class="col-md-1 control-label small">
+                ID:
+            </label>
+            <div class="col-md-3">
+                <input type="text" id="humanReadableId" data-ng-model="goal.humanReadableId" class="form-control input-sm"
+                       data-field="humanReadableId"
                        data-autosave="{{goal.updateUrl}}" />
             </div>
         </div>
         
         <div class="form-group">
-            <!-- Human readable ID -->
-            <label for="humanReadableId" class="col-md-2 control-label small">
-                ID
+            <!-- Goal type -->
+            <label for="type" class="col-md-2 control-label small">
+                Type:
             </label>
             <div class="col-md-4">
-                <input type="text" id="humanReadableId" data-ng-model="goal.humanReadableId" class="form-control input-sm"
-                       data-field="humanReadableId"
-                       data-autosave="{{goal.updateUrl}}" />
+                <select id="type" class="input-sm form-control" data-ng-model="goal.goalTypeId" data-ng-options="type.id as type.name for type in goalTypes"
+                    data-field="goalTypeId"
+                    data-autosave="{{goal.updateUrl}}"/>
             </div>
 
             <!-- Measurable -->
-            <label for="measurable" class="col-md-2 control-label small">
-                Målbart
+            <div class="col-md-2">
+                <label class="checkbox checkbox-inline">
+                    <input type="checkbox" id="measurable"
+                           data-field="measurable"
+                           data-autosave="{{goal.updateUrl}}"
+                           data-ng-model="goal.measurable" />
+                    <strong>Målbart</strong>
+                </label>
+            </div>
+           
+            <!-- Status traffic light -->
+            <label class="control-label col-md-1">
+                Status:
             </label>
-            <div class="col-md-4">
-                <input type="checkbox" id="measurable"
-                    data-field="measurable"
-                    data-autosave="{{goal.updateUrl}}"
-                    data-ng-model="goal.measurable" />
+            <div class="col-md-3">
+                    <input id="statusGoal" data-select-status="goal.status" data-can-write="true" />
             </div>
         </div>
         
@@ -48,7 +66,7 @@
                 Beskrivelse
             </label>
             <div class="col-md-10">
-                <textarea id="description" class="form-control input-sm" data-ng-model="activity.description" rows="4"
+                <textarea id="description" class="form-control input-sm" data-ng-model="goal.description" rows="4"
                           data-field="description"
                           data-autosave="{{goal.updateUrl}}"></textarea>
             </div>
@@ -61,7 +79,7 @@
             <div class="form-group">
                 <label for="subGoalDate1" class="col-md-1 control-label small">Dato</label>
                 <div class="col-md-3">
-                    <span id="subGoalDate1" data-ng-model="goal.subGoalDate1" data-datewriter="" data-ng-change="goal.updateSubGoalDate(1)"></span>
+                    <span id="subGoalDate1" data-ng-model="goal.subGoalDate1" data-datewriter="" data-ng-change="updateSubGoalDate(1)"></span>
                 </div>
                 <label for="subGoal1" class="col-md-1 control-label small">Mål</label>
                 <div class="col-md-3">
@@ -89,7 +107,7 @@
             <div class="form-group">
                 <label for="subGoalDate2" class="col-md-1 control-label small">Dato</label>
                 <div class="col-md-3">
-                    <span id="subGoalDate2" data-ng-model="goal.subGoalDate2" data-datewriter="" data-ng-change="goal.updateSubGoalDate(2)"></span>
+                    <span id="subGoalDate2" data-ng-model="goal.subGoalDate2" data-datewriter="" data-ng-change="updateSubGoalDate(2)"></span>
                 </div>
                 <label for="subGoal2" class="col-md-1 control-label small">Mål</label>
                 <div class="col-md-3">
@@ -119,7 +137,7 @@
             <div class="form-group">
                 <label for="subGoalDate3" class="col-md-1 control-label small">Dato</label>
                 <div class="col-md-3">
-                    <span id="subGoalDate3" data-ng-model="goal.subGoalDate3" data-datewriter="" data-ng-change="goal.updateSubGoalDate(3)"></span>
+                    <span id="subGoalDate3" data-ng-model="goal.subGoalDate3" data-datewriter="" data-ng-change="updateSubGoalDate(3)"></span>
                 </div>
                 <label for="subGoal3" class="col-md-1 control-label small">Mål</label>
                 <div class="col-md-3">

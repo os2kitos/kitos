@@ -5,27 +5,42 @@
             templateUrl: 'partials/it-project/tab-status-goal.html',
             controller: 'project.EditStatusGoalCtrl',
             resolve: {
-
+                goalTypes: ['$http', function($http) {
+                    return $http.get("api/goalType").then(function(result) {
+                        return result.data.response;
+                    });
+                }]
             }
         });
     }]);
 
     app.controller('project.EditStatusGoalCtrl',
-    ['$scope', '$http', 'notify', '$modal', 'itProject', 
-        function ($scope, $http, notify, $modal, itProject) {
+    ['$scope', '$http', 'notify', '$modal', 'itProject', 'goalTypes',
+        function ($scope, $http, notify, $modal, itProject, goalTypes) {
             $scope.goalStatus = itProject.goalStatus;
             $scope.goalStatus.updateUrl = "api/goalStatus/" + itProject.goalStatus.id;
 
+            $scope.getGoalTypeName = function(goalTypeId) {
+                var type = _.findWhere(goalTypes, { id: goalTypeId });
+
+                return type && type.name;
+            };
+
             $scope.goals = [];
             function addGoal(goal) {
-                
+                //add goals means show goal in list
                 goal.show = true;
 
+                //see if goal already in list - in that case, just update it
                 var prevEntry = _.findWhere($scope.goals, { id: goal.id });
                 if (prevEntry) {
                     prevEntry = goal;
                     return;
                 }
+                
+                //otherwise:
+
+                //easy-access functions
                 goal.edit = function() {
                     editGoal(goal);
                 };
@@ -72,8 +87,10 @@
                     });
             };
 
-            function autoSaveTrafficLight(url, field, watchExp) {
-                $scope.$watch(watchExp, function (newVal, oldVal) {
+            function autoSaveTrafficLight(url, field, watchExp, scope) {
+                var theScope = scope || $scope;
+
+                theScope.$watch(watchExp, function (newVal, oldVal) {
 
                     if (angular.isUndefined(newVal) || newVal == null || newVal == oldVal) return;
 
@@ -105,8 +122,6 @@
                 });
 
             };
-            
-
 
             function editGoal(goal) {
                 var modal = $modal.open({
@@ -114,6 +129,23 @@
                     controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
 
                         $modalScope.goal = goal;
+                        $modalScope.goalTypes = goalTypes;
+
+                        autoSaveTrafficLight(goal.updateUrl, "status", function() {
+                            return goal.status;
+                        }, $modalScope);
+                        
+                        //update the i'th date of a subgoal
+                        $modalScope.updateSubGoalDate = function (i) {
+                            var fieldStr = "subGoalDate" + i;
+                            
+                            patch(goal.updateUrl, fieldStr, goal[fieldStr])
+                                .success(function() {
+                                    notify.addSuccessMessage("Feltet er opdateret");
+                                }).error(function() {
+                                    notify.addErrorMessage("Fejl!");
+                                });
+                        };
                     }]
                 });
             }
