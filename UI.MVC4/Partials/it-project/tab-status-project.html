@@ -7,7 +7,7 @@
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusProject">Status projekt (økonomi, tid og kvalitet):</label>
                     <div class="col-md-7">
-                        <input id="statusProject" data-select-status="project.statusProject" data-can-write="true" />
+                        <input id="statusProject" data-select-status="project.statusProject" data-can-write="hasWriteAccess" />
                     </div>
                 </div>
 
@@ -15,7 +15,7 @@
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
                     <div class="col-md-3">
-                        <span id="statusDate" data-ng-model="project.statusDate" data-datewriter="" data-ng-change="updateStatusDate()"></span>
+                        <span id="statusDate" data-ng-model="project.statusDate" data-datewriter=""  data-is-disabled="!hasWriteAccess"  data-ng-change="updateStatusDate()" data-ng-disabled="!hasWriteAccess"></span>
                     </div>
                 </div>
 
@@ -25,7 +25,7 @@
                     <div class="col-md-7">
                         <textarea id="note" class="form-control input-sm" rows="4" data-ng-model="project.statusNote"
                             data-field="statusNote"
-                            data-autosave="{{project.updateUrl}}"></textarea>
+                            data-autosave="{{project.updateUrl}}" data-ng-disabled="!hasWriteAccess"></textarea>
                     </div>
                 </div>
             </div>
@@ -35,7 +35,7 @@
                         <span class="small">
                             Faseplan
                         </span>
-                            <a class="btn btn-sm btn-link pull-right" data-ng-click="editPhaseNames = !editPhaseNames">
+                            <a class="btn btn-sm btn-link pull-right" data-ng-click="editPhaseNames = !editPhaseNames" data-ng-hide="!hasWriteAccess">
                                 {{ editPhaseNames && "Afslut redigering" || "Rediger fasenavne" }}
                             </a>
                     </div>
@@ -46,7 +46,7 @@
                             <div data-ng-repeat="phase in project.phases" class="col-md-2">
                                 <input type="text" class="input-sm form-control" data-ng-show="editPhaseNames" data-ng-model="phase.name"
                                     data-field="name" 
-                                    data-autosave="{{phase.updateUrl}}"/>
+                                    data-autosave="{{phase.updateUrl}}" data-ng-disabled="!hasWriteAccess"/>
 
                                 <p class="text-center full-width small" data-ng-hide="editPhaseNames">{{phase.name}}</p>
                             </div>
@@ -56,7 +56,7 @@
                             <!-- Phases buttons -->
                             <div class="col-md-2 small">Aktuel fase:</div>
                             <span data-ng-repeat="phase in project.phases" class="col-md-2">
-                                <button class="btn btn-xs full-width text-center" data-ng-click="updateSelectedPhase(phase)">
+                                <button class="btn btn-xs full-width text-center" data-ng-click="updateSelectedPhase(phase)" data-ng-disabled="!hasWriteAccess">
                                     <i class="glyphicon glyphicon-ok text-success" data-ng-class="{'invisible': phase.id != project.currentPhaseId}"></i>
                                 </button>
                             </span>
@@ -66,7 +66,7 @@
                             <!-- Phases buttons -->
                             <div class="col-md-3 small">Forventet slut/start:</div>
                             <span data-ng-repeat="phase in project.phases" class="col-md-2" data-ng-hide="$first">
-                                <span data-ng-model="phase.startDate" data-datewriter="" data-ng-change="updatePhaseDate(phase)"></span>
+                                <span data-ng-model="phase.startDate" data-datewriter="" data-is-disabled="!hasWriteAccess" data-ng-change="updatePhaseDate(phase)"></span>
                             </span>
                         </div>
                     </div>
@@ -125,12 +125,12 @@
                         <td>{{activity.associatedUser.roleNames | joinBy:', '}}</td>
                         <td>
                             <span class="pull-right">
-                                <a class="btn btn-link btn-xs" data-ng-click="activity.edit()">
+                                <a class="btn btn-link btn-xs" data-ng-click="activity.edit()" data-ng-hide="!hasWriteAccess">
                                     <i class="glyphicon glyphicon-pencil"></i>
                                 </a>
                                 <a class="btn btn-link btn-xs"
                                     data-confirmed-click="activity.delete()"
-                                    data-confirm-click="Er du sikker på at du vil slette?">
+                                    data-confirm-click="Er du sikker på at du vil slette?" data-ng-hide="!hasWriteAccess">
                                     <i class="glyphicon glyphicon-trash"></i>
                                 </a>
                             </span>
@@ -141,8 +141,8 @@
                     <tr>
                         <td colspan="10">
                             <div class="pull-right">
-                                <button class="btn btn-success btn-sm" data-ng-click="addTask()">Tilføj opgave</button>
-                                <button class="btn btn-primary btn-sm" data-ng-click="addMilestone()">Tilføj milepæl</button>
+                                <button class="btn btn-success btn-sm" data-ng-click="addTask()" data-ng-hide="!hasWriteAccess">Tilføj opgave</button>
+                                <button class="btn btn-primary btn-sm" data-ng-click="addMilestone()" data-ng-hide="!hasWriteAccess">Tilføj milepæl</button>
                             </div>
                         </td>
                     </tr>

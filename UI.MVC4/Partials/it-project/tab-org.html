@@ -1,11 +1,11 @@
 ﻿<label>
-    <input type="checkbox" data-ng-model="isTransversal" data-autosave="{{patchUrl}}" data-field="isTransversal" />
+    <input type="checkbox" data-ng-model="isTransversal" data-autosave="{{patchUrl}}" data-field="isTransversal"  data-ng-disabled="!hasWriteAccess"/>
     Projektet er tværgående
 </label>
 
 <script type="text/ng-template" id="tree_item_renderer.html">
     <label>
-        <input type="checkbox" value="{{ orgUnit.id }}" data-ng-model="orgUnit.selected" data-ng-change="save(orgUnit)" />
+        <input type="checkbox" value="{{ orgUnit.id }}" data-ng-model="orgUnit.selected" data-ng-change="save(orgUnit)" data-ng-disabled="!hasWriteAccess" />
         {{ orgUnit.name }}
     </label>
     <ul>
@@ -20,6 +20,6 @@
 <label for="responsible">Ansvarlig enhed</label>
 <select id="responsible" data-ng-options="o.id as o.name for o in selectedOrgUnits" 
         data-ng-model="responsibleOrgUnitId" data-field="ResponsibleOrgUnitId" 
-        data-autosave="{{patchUrl}}">
+        data-autosave="{{patchUrl}}" data-ng-disabled="!hasWriteAccess">
     <option value="">-- Ansvarlig enhed --</option>
 </select>
