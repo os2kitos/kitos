@@ -90,47 +90,9 @@ namespace UI.MVC4.Controllers.API
             {
                 var project = Repository.GetByKey(id);
 
-                // TODO find a better approach, this is silly
-                var clonedProject = new ItProject()
-                    {
-                        OrganizationId = dto.OrganizationId,
-                        ObjectOwnerId = KitosUser.Id,
-                        ParentItProjectId = project.Id,
-                        
-                        ItProjectId = project.ItProjectId,
-                        Background = project.Background,
-                        IsTransversal = project.IsTransversal,
-                        Name = project.Name,
-                        Note = project.Note,
-                        Description = project.Description,
-                        AccessModifier = project.AccessModifier,
-                        IsStrategy = project.IsStrategy,
+                var clonedProject = _itProjectService.CloneProject(project, KitosUser, dto.OrganizationId);
 
-                        // TODO AssociatedProgramId = project.AssociatedProgramId,
-                        // TODO AssociatedProjects = project.AssociatedProjects,
-                        ItProjectTypeId = project.ItProjectTypeId,
-                        ItProjectCategoryId = project.ItProjectCategoryId,
-                        TaskRefs = project.TaskRefs,
-                        // TODO Risk
-                        // TODO Rights
-                        // TODO JointMunicipalProjectId = project.JointMunicipalProjectId,
-                        // TODO JointMunicipalProjects = project.JointMunicipalProjects,
-                        // TODO CommonPublicProjectId = project.CommonPublicProjectId,
-                        // TODO CommonPublicProjects = project.CommonPublicProjects,
-                        // TODO EconomyYears = project.EconomyYears
-                        // TODO MilestoneStates = project.MilestoneStates,
-                        // TODO Phase1 = project.Phase1,
-                        // TODO Phase2 = project.Phase2,
-                        // TODO Phase3 = project.Phase3,
-                        // TODO Phase4 = project.Phase4,
-                        // TODO Phase5 = project.Phase5,
-                        // TODO TaskActivities = project.TaskActivities,
-                        CurrentPhaseId = null,
-                    };
-
-                var entity = base.PostQuery(clonedProject);
-
-                return Created(Map(entity), new Uri(Request.RequestUri + "/" + entity.Id));
+                return Created(Map(clonedProject), new Uri(Request.RequestUri + "/" + clonedProject.Id));
             }
             catch (Exception e)
             {
@@ -362,6 +324,13 @@ namespace UI.MVC4.Controllers.API
             {
                 return Error(e);
             }
+        }
+
+        protected override ItProject PostQuery(ItProject item)
+        {
+            //Makes sure to create the necessary properties, like phases
+            _itProjectService.AddProject(item);
+            return item;
         }
     }
 }
