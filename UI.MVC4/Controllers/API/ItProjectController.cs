@@ -34,7 +34,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var projects = _itProjectService.GetAll(null);
+                var projects = _itProjectService.GetAll();
 
                 return Ok(Map(projects));
             }
@@ -48,8 +48,8 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var organization = _orgRepository.GetByKey(orgId);
-                var projects = _itProjectService.GetAll(organization).ToList();
+                //Get all projects inside the organizaton OR public
+                var projects = _itProjectService.GetAll(orgId, includePublic: true).ToList();
 
                 var clonedParentIds = projects.Where(x => x.ParentItProjectId.HasValue).Select(x => x.ParentItProjectId);
 
@@ -68,11 +68,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                //TODO: check for user read access rights
-
-                var org = _orgRepository.GetByKey(orgId);
-
-                var thePrograms = _itProjectService.GetPrograms(org, q);
+                var thePrograms = _itProjectService.GetPrograms(orgId, nameSearch: q);
 
                 return Ok(Map(thePrograms));
             }
@@ -86,11 +82,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                //TODO: check for user read access rights
-
-                var org = _orgRepository.GetByKey(orgId);
-
-                var projects = _itProjectService.GetProjects(org, q);
+                var projects = _itProjectService.GetProjects(orgId, nameSearch: q);
 
                 return Ok(Map(projects));
             }
@@ -104,7 +96,8 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var project = Repository.GetByKey(id);
+                //make sure we only clone projects that the is accessible from the organization
+                var project = _itProjectService.GetAll(dto.OrganizationId).FirstOrDefault(p => p.Id == id);
 
                 var clonedProject = _itProjectService.CloneProject(project, KitosUser, dto.OrganizationId);
 
@@ -120,9 +113,9 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var projects = Repository.Get(x => x.OrganizationId == orgId && x.ItProjectCategoryId == catId);
+                var projects = _itProjectService.GetAll(orgId, includePublic:false).Where(p => p.ItProjectCategoryId == catId);
 
-                return projects == null ? NotFound() : Ok(Map(projects));
+                return Ok(Map(projects));
             }
             catch (Exception e)
             {
@@ -134,11 +127,13 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var usage = Repository.GetByKey(id);
+                var project = _itProjectService.GetAll().FirstOrDefault(p => p.Id == id);
 
-                if (usage == null) return NotFound();
+                if (project == null) return NotFound();
 
-                return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(usage.UsedByOrgUnits));
+                CheckReadAccess(project);
+
+                return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(project.UsedByOrgUnits));
             }
             catch (Exception e)
             {
@@ -150,12 +145,17 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var usage = Repository.GetByKey(id);
+                var project = Repository.GetByKey(id);
                 var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
 
-                if (usage == null || orgUnit == null) return NotFound();
+                if (project == null || orgUnit == null) return NotFound();
+                
+                CheckWriteAccess(project);
 
-                usage.UsedByOrgUnits.Add(orgUnit);
+                //we only allow adding an org unit from the same organization as the project
+                if (orgUnit.OrganizationId != project.OrganizationId) return Forbidden();
+
+                project.UsedByOrgUnits.Add(orgUnit);
                 Repository.Save();
 
                 return Created(Map<OrganizationUnit, OrgUnitDTO>(orgUnit));
@@ -166,16 +166,26 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        /// <summary>
+        /// Removes an Organization Unit from the project.UsedByOrgUnits list.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="organizationUnit"></param>
+        /// <returns></returns>
         public HttpResponseMessage DeleteOrganizationUnitsUsingThisProject(int id, [FromUri] int organizationUnit)
         {
             try
             {
-                var usage = Repository.GetByKey(id);
+                var project = Repository.GetByKey(id);
+                CheckWriteAccess(project);
+
                 var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
 
-                if (usage == null || orgUnit == null) return NotFound();
+                if (project == null || orgUnit == null) return NotFound();
 
-                usage.UsedByOrgUnits.Remove(orgUnit);
+                CheckWriteAccess(project);
+
+                project.UsedByOrgUnits.Remove(orgUnit);
                 Repository.Save();
 
                 return Ok();
@@ -190,11 +200,13 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var usage = Repository.GetByKey(id);
+                var project = Repository.GetByKey(id);
 
-                if (usage == null) return NotFound();
+                if (project == null) return NotFound();
 
-                return Ok(Map<IEnumerable<TaskRef>, IEnumerable<TaskRefDTO>>(usage.TaskRefs));
+                CheckReadAccess(project);
+
+                return Ok(Map<IEnumerable<TaskRef>, IEnumerable<TaskRefDTO>>(project.TaskRefs));
             }
             catch (Exception e)
             {
@@ -206,12 +218,14 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var usage = Repository.GetByKey(id);
+                var project = Repository.GetByKey(id);
                 var task = _taskRepository.GetByKey(taskId);
 
-                if (usage == null || task == null) return NotFound();
+                if (project == null || task == null) return NotFound();
 
-                usage.TaskRefs.Add(task);
+                CheckWriteAccess(project);
+
+                project.TaskRefs.Add(task);
                 Repository.Save();
 
                 return Created(Map<TaskRef, TaskRefDTO>(task));
@@ -226,12 +240,14 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var usage = Repository.GetByKey(id);
+                var project = Repository.GetByKey(id);
                 var task = _taskRepository.GetByKey(taskId);
 
-                if (usage == null || task == null) return NotFound();
+                if (project == null || task == null) return NotFound();
 
-                usage.TaskRefs.Remove(task);
+                CheckWriteAccess(project);
+
+                project.TaskRefs.Remove(task);
                 Repository.Save();
 
                 return Ok();
@@ -246,11 +262,13 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var itProject = Repository.GetByKey(id);
+                var project = Repository.GetByKey(id);
+                
+                if (project == null) return NotFound();
 
-                if (itProject == null) return NotFound();
+                CheckReadAccess(project);
 
-                return Ok(Map<IEnumerable<ItSystem>, IEnumerable<ItSystemDTO>>(itProject.ItSystemUsages.Select(x => x.ItSystem)));
+                return Ok(Map<IEnumerable<ItSystem>, IEnumerable<ItSystemDTO>>(project.ItSystemUsages.Select(x => x.ItSystem)));
             }
             catch (Exception e)
             {
@@ -262,15 +280,20 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var itProject = Repository.GetByKey(id);
-                var usage = _itSystemUsageRepository.GetByKey(usageId);
+                var project = Repository.GetByKey(id);
+                var systemUsage = _itSystemUsageRepository.GetByKey(usageId);
 
-                if (itProject == null || usage == null) return NotFound();
+                //TODO: should do some kind of write access check - but on what?
 
-                itProject.ItSystemUsages.Add(usage);
+                if (project == null || systemUsage == null) return NotFound();
+                
+                //we only allow adding an ItSystemUsage from the same organization as the project
+                if (systemUsage.OrganizationId != project.OrganizationId) return Forbidden();
+
+                project.ItSystemUsages.Add(systemUsage);
                 Repository.Save();
 
-                return Created(Map<ItSystemUsage, ItSystemUsageDTO>(usage));
+                return Created(Map<ItSystemUsage, ItSystemUsageDTO>(systemUsage));
             }
             catch (Exception e)
             {
@@ -282,12 +305,14 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var itProject = Repository.GetByKey(id);
-                var usage = _itSystemUsageRepository.GetByKey(usageId);
+                var project = Repository.GetByKey(id);
+                var systemUsage = _itSystemUsageRepository.GetByKey(usageId);
 
-                if (itProject == null || usage == null) return NotFound();
+                if (project == null || systemUsage == null) return NotFound();
 
-                itProject.ItSystemUsages.Remove(usage);
+                CheckWriteAccess(project);
+
+                project.ItSystemUsages.Remove(systemUsage);
                 Repository.Save();
 
                 return Ok();
@@ -308,8 +333,9 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var projects = Repository.Get(x => x.OrganizationId == orgId || x.UsedByOrgUnits.Any(y => y.OrganizationId == orgId));
+                var projects = _itProjectService.GetAll(orgId, includePublic: false);
 
+                //TODO: if list is empty, return empty list, not NotFound()
                 if (projects == null) return NotFound();
 
                 return Ok(Map(projects));
@@ -321,7 +347,7 @@ namespace UI.MVC4.Controllers.API
         }
 
         /// <summary>
-        /// Used to set checked state in available project list
+        /// Used to set checked state in available project list in ItSystemUsage
         /// </summary>
         /// <param name="orgId"></param>
         /// <param name="usageId"></param>
@@ -330,8 +356,10 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var projects = Repository.Get(x => x.OrganizationId == orgId && x.ItSystemUsages.Any(y => y.Id == usageId));
+                var projects = _itProjectService.GetAll(orgId, includePublic: false)
+                    .Where(project => project.ItSystemUsages.Any(usage => usage.Id == usageId));
 
+                //TODO: if list is empty, return empty list, not NotFound()
                 if (projects == null) return NotFound();
 
                 return Ok(Map(projects));
@@ -340,11 +368,6 @@ namespace UI.MVC4.Controllers.API
             {
                 return Error(e);
             }
-        }
-
-        private void CheckWriteAccess(ItProject item)
-        {
-            if(!_itProjectService.HasWriteAccess(KitosUser, item)) throw new SecurityException();
         }
         
         protected override ItProject PostQuery(ItProject item)
@@ -368,6 +391,16 @@ namespace UI.MVC4.Controllers.API
 
             _itProjectService.DeleteProject(project);
 
+        }
+
+        private void CheckWriteAccess(ItProject item)
+        {
+            if (!_itProjectService.HasWriteAccess(KitosUser, item)) throw new SecurityException();
+        }
+
+        private void CheckReadAccess(ItProject item)
+        {
+            if (!_itProjectService.HasReadAccess(KitosUser, item)) throw new SecurityException();
         }
     }
 }
