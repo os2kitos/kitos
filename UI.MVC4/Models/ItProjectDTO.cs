@@ -75,5 +75,9 @@ namespace UI.MVC4.Models
 
         public int? ParentItProjectId { get; set; }
         public ItProjectDTO ParentItProject { get; set; }
+
+
+
+        public virtual GoalStatusDTO GoalStatus { get; set; }
     }
 }

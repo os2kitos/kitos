@@ -1,13 +1,12 @@
-using System;
+﻿using System;
 
-namespace Core.DomainModel.ItProject
+namespace UI.MVC4.Models
 {
-    public class Goal : IEntity<int>
+    public class GoalDTO
     {
         public int Id { get; set; }
 
         public int GoalStatusId { get; set; }
-        public virtual GoalStatus GoalStatus { get; set; }
 
         /// <summary>
         /// Human readable ID ("brugervendt noegle" in OIO)
@@ -19,7 +18,7 @@ namespace Core.DomainModel.ItProject
         public string Note { get; set; }
 
         public int GoalTypeId { get; set; }
-        public virtual GoalType GoalType { get; set; }
+        public string GoalTypeName { get; set; }
 
         public bool Measurable { get; set; }
 
