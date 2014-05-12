@@ -109,6 +109,26 @@ namespace Core.ApplicationServices
             return clone;
         }
 
+        public void DeleteProject(ItProject project)
+        {
+            var phase1Id = project.Phase1.Id;
+            var phase2Id = project.Phase1.Id;
+            var phase3Id = project.Phase1.Id;
+            var phase4Id = project.Phase1.Id;
+            var phase5Id = project.Phase1.Id;
+
+            _projectRepository.DeleteByKey(project.Id);
+            _projectRepository.Save();
+
+            _activityRepository.DeleteByKey(phase1Id);
+            _activityRepository.DeleteByKey(phase2Id);
+            _activityRepository.DeleteByKey(phase3Id);
+            _activityRepository.DeleteByKey(phase4Id);
+            _activityRepository.DeleteByKey(phase5Id);
+            _activityRepository.Save();
+
+        }
+
         public bool HasWriteAccess(User user, ItProject project)
         {
             if (project.ObjectOwnerId == user.Id) return true;

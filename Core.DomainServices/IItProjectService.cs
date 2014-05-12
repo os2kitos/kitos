@@ -28,6 +28,8 @@ namespace Core.DomainServices
         /// <returns></returns>
         ItProject CloneProject(ItProject original, User newOwner, int newOrgId);
 
+        void DeleteProject(ItProject project);
+
         bool HasWriteAccess(User user, ItProject project);
     }
 }

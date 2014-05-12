@@ -78,28 +78,23 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasRequired(t => t.Phase1)
                 .WithOptional(d => d.Phase1ForProject)
-                .Map(mc => mc.MapKey("Phase1Id"))
-                .WillCascadeOnDelete(true);
+                .Map(mc => mc.MapKey("Phase1Id"));
 
             this.HasRequired(t => t.Phase2)
                 .WithOptional(d => d.Phase2ForProject)
-                .Map(mc => mc.MapKey("Phase2Id"))
-                .WillCascadeOnDelete(true);
-            
+                .Map(mc => mc.MapKey("Phase2Id"));
+
             this.HasRequired(t => t.Phase3)
                 .WithOptional(d => d.Phase3ForProject)
-                .Map(mc => mc.MapKey("Phase3Id"))
-                .WillCascadeOnDelete(true);
+                .Map(mc => mc.MapKey("Phase3Id"));
 
             this.HasRequired(t => t.Phase4)
                 .WithOptional(d => d.Phase4ForProject)
-                .Map(mc => mc.MapKey("Phase4Id"))
-                .WillCascadeOnDelete(true);
+                .Map(mc => mc.MapKey("Phase4Id"));
 
             this.HasRequired(t => t.Phase5)
                 .WithOptional(d => d.Phase5ForProject)
-                .Map(mc => mc.MapKey("Phase5Id"))
-                .WillCascadeOnDelete(true);
+                .Map(mc => mc.MapKey("Phase5Id"));
 
             this.HasMany(t => t.TaskActivities)
                 .WithOptional(d => d.TaskForProject)

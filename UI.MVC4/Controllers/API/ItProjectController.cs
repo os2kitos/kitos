@@ -346,7 +346,7 @@ namespace UI.MVC4.Controllers.API
         {
             if(!_itProjectService.HasWriteAccess(KitosUser, item)) throw new SecurityException();
         }
-
+        
         protected override ItProject PostQuery(ItProject item)
         {
             //Makes sure to create the necessary properties, like phases
@@ -359,6 +359,15 @@ namespace UI.MVC4.Controllers.API
             CheckWriteAccess(item);
 
             return base.PatchQuery(item);
+        }
+
+        protected override void DeleteQuery(int id)
+        {
+            var project = Repository.GetByKey(id);
+            CheckWriteAccess(project);
+
+            _itProjectService.DeleteProject(project);
+
         }
     }
 }
