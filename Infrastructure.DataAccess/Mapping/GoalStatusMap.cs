@@ -16,8 +16,8 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.Id).HasColumnName("Id");
 
             // Relationships
-            //this.HasRequired(t => t.ItProject)
-            //    .WithOptional(t => t.GoalStatus);
+            this.HasRequired(t => t.ItProject)
+                .WithOptional(t => t.GoalStatus);
 
         }
     }

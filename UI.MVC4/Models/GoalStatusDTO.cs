@@ -1,18 +1,13 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace Core.DomainModel.ItProject
+namespace UI.MVC4.Models
 {
-    public class GoalStatus : IEntity<int>
+    public class GoalStatusDTO
     {
-        public GoalStatus()
-        {
-            this.Goals = new List<Goal>();
-        }
-
         public int Id { get; set; }
 
-        public virtual ItProject ItProject { get; set; }
+        public int ItProjectId { get; set; }
 
         /// <summary>
         /// Traffic-light dropdown for overall status
@@ -28,7 +23,7 @@ namespace Core.DomainModel.ItProject
         /// </summary>
         public string StatusNote { get; set; }
 
-        public virtual ICollection<Goal> Goals { get; set; }
 
+        public IEnumerable<GoalDTO> Goals { get; set; }
     }
 }

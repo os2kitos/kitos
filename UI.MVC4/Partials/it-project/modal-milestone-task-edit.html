@@ -1,7 +1,5 @@
 ﻿<div class="modal-header">
-    <span data-ng-hide="activity.isNew">{{ activity.isTask && "Opgave:" || "Milepæl:" }} {{ activity.name }}
-    </span>
-    <span data-ng-show="activity.isNew">{{ activity.isTask && "Ny opgave" || "Ny milepæl" }}
+    <span>{{ activity.isTask && "Opgave:" || "Milepæl:" }} {{ activity.name }}
     </span>
 </div>
 <div class="modal-body">

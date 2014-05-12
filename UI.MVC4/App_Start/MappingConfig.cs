@@ -151,6 +151,10 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.UseValue(null));
 
+            Mapper.CreateMap<GoalType, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+
             Mapper.CreateMap<ProjPhaseLocale, LocaleDTO>().ReverseMap();
             Mapper.CreateMap<ExtRefTypeLocale, LocaleDTO>().ReverseMap();
 
@@ -251,6 +255,16 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.AssociatedUser, opt => opt.Ignore())
                   .ForMember(dest => dest.ObjectOwner, opt => opt.Ignore())
                   .ForMember(dest => dest.AssociatedActivity, opt => opt.Ignore());
+
+            Mapper.CreateMap<GoalStatus, GoalStatusDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.ItProject, opt => opt.Ignore())
+                  .ForMember(dest => dest.Goals, opt => opt.Ignore());
+
+            Mapper.CreateMap<Goal, GoalDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.GoalStatus, opt => opt.Ignore())
+                  .ForMember(dest => dest.GoalType, opt => opt.Ignore());
 
             Mapper.CreateMap<ItProject, ItProjectDTO>()
                   .ForMember(dest => dest.AssociatedProjectIds,

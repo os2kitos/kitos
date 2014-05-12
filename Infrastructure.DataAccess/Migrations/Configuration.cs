@@ -246,6 +246,19 @@ namespace Infrastructure.DataAccess.Migrations
             };
             context.SensitiveDataTypes.AddOrUpdate(x => x.Name, sensitiveDataYes, sensitiveDataNo);
 
+
+            context.GoalTypes.AddOrUpdate(x => x.Name, new GoalType()
+                {
+                    IsActive = true,
+                    Name = "Måltype 1"
+                }, new GoalType()
+                {
+                    IsActive = true,
+                    Name = "Måltype 2"
+                });
+
+            context.SaveChanges();
+            
             #endregion
 
             #region Organizations
@@ -1058,7 +1071,8 @@ namespace Infrastructure.DataAccess.Migrations
                                 ObjectOwner = owner,
                                 Status = 0
                             }
-                    }
+                    },
+                    GoalStatus = new GoalStatus()
             };
 
             return itProject;

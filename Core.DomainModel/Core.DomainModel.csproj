@@ -43,6 +43,7 @@
     <Compile Include="AdminRight.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="IHasAccessModifier.cs" />
+    <Compile Include="ItProject\GoalType.cs" />
     <Compile Include="ItProject\EconomyYear.cs" />
     <Compile Include="IHasOwner.cs" />
     <Compile Include="ItProject\ItProjectPriority.cs" />

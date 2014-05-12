@@ -1,0 +1,177 @@
+﻿<div class="modal-header">
+    Mål: {{ goal.name }}
+</div>
+<div class="modal-body">
+    <form name="modal.form" novalidate="novalidate" class="form-horizontal">
+
+
+        <div class="form-group">
+            <!-- Name -->
+            <label for="name" class="col-md-2 control-label small">
+                Målnavn:
+            </label>
+            <div class="col-md-6">
+                <input type="text" id="name" data-ng-model="goal.name" class="form-control input-sm"
+                       data-field="name"
+                       data-autosave="{{goal.updateUrl}}" />
+            </div>
+            
+            <!-- Human readable ID -->
+            <label for="humanReadableId" class="col-md-1 control-label small">
+                ID:
+            </label>
+            <div class="col-md-3">
+                <input type="text" id="humanReadableId" data-ng-model="goal.humanReadableId" class="form-control input-sm"
+                       data-field="humanReadableId"
+                       data-autosave="{{goal.updateUrl}}" />
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <!-- Goal type -->
+            <label for="type" class="col-md-2 control-label small">
+                Type:
+            </label>
+            <div class="col-md-4">
+                <select id="type" class="input-sm form-control" data-ng-model="goal.goalTypeId" data-ng-options="type.id as type.name for type in goalTypes"
+                    data-field="goalTypeId"
+                    data-autosave="{{goal.updateUrl}}"/>
+            </div>
+
+            <!-- Measurable -->
+            <div class="col-md-2">
+                <label class="checkbox checkbox-inline">
+                    <input type="checkbox" id="measurable"
+                           data-field="measurable"
+                           data-autosave="{{goal.updateUrl}}"
+                           data-ng-model="goal.measurable" />
+                    <strong>Målbart</strong>
+                </label>
+            </div>
+           
+            <!-- Status traffic light -->
+            <label class="control-label col-md-1">
+                Status:
+            </label>
+            <div class="col-md-3">
+                    <input id="statusGoal" data-select-status="goal.status" data-can-write="true" />
+            </div>
+        </div>
+        
+        
+        <div class="form-group">
+            
+            <!-- Description -->
+            <label for="description" class="col-md-2 control-label small">
+                Beskrivelse
+            </label>
+            <div class="col-md-10">
+                <textarea id="description" class="form-control input-sm" data-ng-model="goal.description" rows="4"
+                          data-field="description"
+                          data-autosave="{{goal.updateUrl}}"></textarea>
+            </div>
+        </div>
+        
+        <!-- sub goal 1 -->
+        <div class="well well-sm">
+            <p>Delmål 1</p>
+
+            <div class="form-group">
+                <label for="subGoalDate1" class="col-md-1 control-label small">Dato</label>
+                <div class="col-md-3">
+                    <span id="subGoalDate1" data-ng-model="goal.subGoalDate1" data-datewriter="" data-ng-change="updateSubGoalDate(1)"></span>
+                </div>
+                <label for="subGoal1" class="col-md-1 control-label small">Mål</label>
+                <div class="col-md-3">
+                    <input type="text" class="form-control input-sm" id="subGoal1"
+                           data-field="subGoal1"
+                           data-autosave="{{goal.updateUrl}}"
+                           data-ng-model="goal.subGoal1" />
+                </div>
+
+                <label for="subGoalRea1" class="col-md-1 control-label small">Rea</label>
+                <div class="col-md-3">
+                    <input type="text" class="form-control input-sm" id="subGoalRea1"
+                           data-field="subGoalRea1"
+                           data-autosave="{{goal.updateUrl}}"
+                           data-ng-model="goal.subGoalRea1" />
+                </div>
+
+            </div>
+        </div>
+        
+          <!-- sub goal 2 -->
+        <div class="well well-sm">
+            <p>Delmål 2</p>
+
+            <div class="form-group">
+                <label for="subGoalDate2" class="col-md-1 control-label small">Dato</label>
+                <div class="col-md-3">
+                    <span id="subGoalDate2" data-ng-model="goal.subGoalDate2" data-datewriter="" data-ng-change="updateSubGoalDate(2)"></span>
+                </div>
+                <label for="subGoal2" class="col-md-1 control-label small">Mål</label>
+                <div class="col-md-3">
+                    <input type="text" class="form-control input-sm" id="subGoal2"
+                           data-field="subGoal2"
+                           data-autosave="{{goal.updateUrl}}"
+                           data-ng-model="goal.subGoal2" />
+                </div>
+
+                <label for="subGoalRea2" class="col-md-1 control-label small">Rea</label>
+                <div class="col-md-3">
+                    <input type="text" class="form-control input-sm" id="subGoalRea2"
+                           data-field="subGoalRea2"
+                           data-autosave="{{goal.updateUrl}}"
+                           data-ng-model="goal.subGoalRea2" />
+                </div>
+
+            </div>
+        </div>
+        
+        
+        
+          <!-- sub goal 3 -->
+        <div class="well well-sm">
+            <p>Delmål 3</p>
+
+            <div class="form-group">
+                <label for="subGoalDate3" class="col-md-1 control-label small">Dato</label>
+                <div class="col-md-3">
+                    <span id="subGoalDate3" data-ng-model="goal.subGoalDate3" data-datewriter="" data-ng-change="updateSubGoalDate(3)"></span>
+                </div>
+                <label for="subGoal3" class="col-md-1 control-label small">Mål</label>
+                <div class="col-md-3">
+                    <input type="text" class="form-control input-sm" id="subGoal3"
+                           data-field="subGoal3"
+                           data-autosave="{{goal.updateUrl}}"
+                           data-ng-model="goal.subGoal3" />
+                </div>
+
+                <label for="subGoalRea3" class="col-md-1 control-label small">Rea</label>
+                <div class="col-md-3">
+                    <input type="text" class="form-control input-sm" id="subGoalRea3"
+                           data-field="subGoalRea3"
+                           data-autosave="{{goal.updateUrl}}"
+                           data-ng-model="goal.subGoalRea3" />
+                </div>
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            
+            <!-- Note -->
+            <label for="note" class="col-md-2 control-label small">
+                Note
+            </label>
+            <div class="col-md-10">
+                <textarea id="note" class="form-control input-sm" data-ng-model="goal.note" rows="4"
+                          data-field="note"
+                          data-autosave="{{goal.updateUrl}}"></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" data-ng-click="$close()" data-disabled-on-busy="">Færdig</button>
+</div>
