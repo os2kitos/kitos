@@ -88,7 +88,6 @@ namespace Core.ApplicationServices
                 Name = original.Name,
                 Note = original.Note,
                 Description = original.Description,
-                AccessModifier = AccessModifier.Normal,
                 IsStrategy = original.IsStrategy,
 
                 // TODO AssociatedProgramId = project.AssociatedProgramId,
