@@ -27,33 +27,45 @@
 
             return _user;
         }
-        
+
         function getUser() {
+
             var deferred = $q.defer();
-            
-            if (_user !== null) {
-                deferred.resolve(_user);
 
-            } else {
-                $http.get('api/authorize').success(function (result) {
-                    
-                    resolveOrganization().then(function (currOrg) {
-                        saveUser(result.response, currOrg);
-                        deferred.resolve(_user);
-                    }, function() {
-                        deferred.reject("No organization selected");
-                    });
-                    
-
-                }).error(function(result) {
-                    deferred.reject("Not authorized");
-                    clearSavedOrg();
-
-                });
-
-            }
+            deferred.resolve(loadUser());
 
             return deferred.promise;
+        }
+
+        var loadUserDeferred = null;
+        function loadUser(payload)
+        {
+            if (!loadUserDeferred) {
+                loadUserDeferred = $q.defer();
+
+                //login or re-auth?
+                var httpDeferred = payload ? $http.post('api/authorize', payload) : $http.get('api/authorize');
+
+                httpDeferred.success(function (result) {
+
+                    resolveOrganization().then(function(currOrg) {
+                        saveUser(result.response, currOrg);
+                        loadUserDeferred.resolve(_user);
+
+                    }, function() {
+                        loadUserDeferred.reject("No organization selected");
+                        loadUserDeferred = null;
+                    });
+
+
+                }).error(function(result) {
+                    loadUserDeferred.reject("Not authorized");
+                    loadUserDeferred = null;
+                    clearSavedOrg();
+                });
+            }
+
+            return loadUserDeferred.promise;
         }
         
         function login(email, password, rememberMe) {
@@ -69,23 +81,10 @@
                     "email": email,
                     "password": password,
                     "rememberMe": rememberMe
-                };
+                 };
 
-                $http.post('api/authorize', data).success(function (result) {
-                    
-                    resolveOrganization().then(function (currOrg) {
-                        saveUser(result.response, currOrg);
-                        deferred.resolve(_user);
-                    }, function() {
-                        deferred.reject("No organization selected");
-                    });
-
-                }).error(function (result) {
-
-                    deferred.reject("Invalid credentials");
-
-                });
-
+                deferred.resolve(loadUser(data));
+                
             };
 
             return deferred.promise;
@@ -93,9 +92,11 @@
 
         function logout() {
             
+
             var deferred = $q.defer();
 
             $http.post('api/authorize?logout').success(function (result) {
+                loadUserDeferred = null;
                 _user = null;
                 $rootScope.user = null;
 
