@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Security;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
@@ -29,11 +30,26 @@ namespace UI.MVC4.Controllers.API
             _orgUnitRepository = orgUnitRepository;
         }
 
+        public HttpResponseMessage GetPublic()
+        {
+            try
+            {
+                var projects = _itProjectService.GetAll(null);
+
+                return Ok(Map(projects));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetByOrg([FromUri] int orgId)
         {
             try
             {
-                var projects = Repository.Get(x => x.AccessModifier == AccessModifier.Public || x.OrganizationId == orgId).ToList();
+                var organization = _orgRepository.GetByKey(orgId);
+                var projects = _itProjectService.GetAll(organization).ToList();
 
                 var clonedParentIds = projects.Where(x => x.ParentItProjectId.HasValue).Select(x => x.ParentItProjectId);
 
@@ -326,11 +342,23 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        private void CheckWriteAccess(ItProject item)
+        {
+            if(!_itProjectService.HasWriteAccess(KitosUser, item)) throw new SecurityException();
+        }
+
         protected override ItProject PostQuery(ItProject item)
         {
             //Makes sure to create the necessary properties, like phases
             _itProjectService.AddProject(item);
             return item;
+        }
+
+        protected override ItProject PatchQuery(ItProject item)
+        {
+            CheckWriteAccess(item);
+
+            return base.PatchQuery(item);
         }
     }
 }

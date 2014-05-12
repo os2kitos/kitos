@@ -10,11 +10,13 @@ namespace Core.ApplicationServices
     {
         private readonly IGenericRepository<ItProject> _projectRepository;
         private readonly IGenericRepository<Activity> _activityRepository;
+        private readonly IGenericRepository<ItProjectRight> _rightRepository;
 
-        public ItProjectService(IGenericRepository<ItProject> projectRepository, IGenericRepository<ItProjectType> projectTypeRepository, IGenericRepository<Activity> activityRepository )
+        public ItProjectService(IGenericRepository<ItProject> projectRepository, IGenericRepository<ItProjectType> projectTypeRepository, IGenericRepository<Activity> activityRepository, IGenericRepository<ItProjectRight> rightRepository)
         {
             _projectRepository = projectRepository;
             _activityRepository = activityRepository;
+            _rightRepository = rightRepository;
 
             //TODO: dont hardcode this
             ProgramType = projectTypeRepository.Get(type => type.Name == "IT Program").Single();
@@ -22,19 +24,35 @@ namespace Core.ApplicationServices
 
         public ItProjectType ProgramType { get; private set; }
 
-        public IEnumerable<ItProject> GetAll(Organization organization, string nameSearch)
+        public IEnumerable<ItProject> GetAll(Organization organization, string nameSearch = null)
         {
-            if (nameSearch == null) return _projectRepository.Get();
+            var result = _projectRepository.Get();
 
-            return _projectRepository.Get(project => project.Name.StartsWith(nameSearch));
+            if (organization != null)
+            {
+                //filter by organisation or optionally by access modifier
+                result =
+                    result.Where(p => p.OrganizationId == organization.Id || p.AccessModifier == AccessModifier.Public);
+            }
+            else
+            {
+                //if no organisation is selected, only get public
+                result = result.Where(p => p.AccessModifier == AccessModifier.Public);
+            }
+
+
+            //optionally filter by name
+            if (nameSearch != null) result = result.Where(p => p.Name.Contains(nameSearch));
+
+            return result;
         }
 
-        public IEnumerable<ItProject> GetProjects(Organization organization, string nameSearch)
+        public IEnumerable<ItProject> GetProjects(Organization organization, string nameSearch = null)
         {
             return GetAll(organization, nameSearch).Where(project => project.ItProjectType.Id != ProgramType.Id);
         }
 
-        public IEnumerable<ItProject> GetPrograms(Organization organization, string nameSearch)
+        public IEnumerable<ItProject> GetPrograms(Organization organization, string nameSearch = null)
         {
             return GetAll(organization, nameSearch).Where(project => project.ItProjectType.Id == ProgramType.Id);
         }
@@ -89,6 +107,15 @@ namespace Core.ApplicationServices
             _projectRepository.Save();
 
             return clone;
+        }
+
+        public bool HasWriteAccess(User user, ItProject project)
+        {
+            if (project.ObjectOwnerId == user.Id) return true;
+
+            return
+                _rightRepository.Get(right => right.User.Id == user.Id && right.Object.Id == project.Id && right.Role.HasWriteAccess)
+                                .Any();
         }
 
         /// <summary>

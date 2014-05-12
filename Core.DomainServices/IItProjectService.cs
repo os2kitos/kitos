@@ -8,9 +8,9 @@ namespace Core.DomainServices
     {
         ItProjectType ProgramType { get; }
 
-        IEnumerable<ItProject> GetAll(Organization organization, string nameSearch);
-        IEnumerable<ItProject> GetProjects(Organization organization, string nameSearch);
-        IEnumerable<ItProject> GetPrograms(Organization organization, string nameSearch);
+        IEnumerable<ItProject> GetAll(Organization organization, string nameSearch = null);
+        IEnumerable<ItProject> GetProjects(Organization organization, string nameSearch = null);
+        IEnumerable<ItProject> GetPrograms(Organization organization, string nameSearch = null);
 
         /// <summary>
         /// Adds an IT project. It creates default phases and saves the project.
@@ -27,5 +27,7 @@ namespace Core.DomainServices
         /// <param name="newOrgId"></param>
         /// <returns></returns>
         ItProject CloneProject(ItProject original, User newOwner, int newOrgId);
+
+        bool HasWriteAccess(User user, ItProject project);
     }
 }
