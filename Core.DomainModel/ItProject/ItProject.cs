@@ -24,6 +24,7 @@ namespace Core.DomainModel.ItProject
             this.CommonPublicProjects = new List<ItProject>();
             this.AssociatedProjects = new List<ItProject>();
             this.ChildItProjects = new List<ItProject>();
+            this.AccessModifier = AccessModifier.Normal;
         }
 
         public int Id { get; set; }
