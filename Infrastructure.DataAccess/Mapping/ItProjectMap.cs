@@ -67,7 +67,8 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasMany(t => t.EconomyYears)
                 .WithRequired(d => d.ItProject)
-                .HasForeignKey(d => d.ItProjectId);
+                .HasForeignKey(d => d.ItProjectId)
+                .WillCascadeOnDelete(true);
 
             this.HasMany(t => t.ItSystemUsages)
                 .WithMany(t => t.ItProjects);
@@ -77,31 +78,38 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasRequired(t => t.Phase1)
                 .WithOptional(d => d.Phase1ForProject)
-                .Map(mc => mc.MapKey("Phase1Id"));
+                .Map(mc => mc.MapKey("Phase1Id"))
+                .WillCascadeOnDelete(true);
 
             this.HasRequired(t => t.Phase2)
                 .WithOptional(d => d.Phase2ForProject)
-                .Map(mc => mc.MapKey("Phase2Id"));
+                .Map(mc => mc.MapKey("Phase2Id"))
+                .WillCascadeOnDelete(true);
             
             this.HasRequired(t => t.Phase3)
                 .WithOptional(d => d.Phase3ForProject)
-                .Map(mc => mc.MapKey("Phase3Id"));
+                .Map(mc => mc.MapKey("Phase3Id"))
+                .WillCascadeOnDelete(true);
 
             this.HasRequired(t => t.Phase4)
                 .WithOptional(d => d.Phase4ForProject)
-                .Map(mc => mc.MapKey("Phase4Id"));
+                .Map(mc => mc.MapKey("Phase4Id"))
+                .WillCascadeOnDelete(true);
 
             this.HasRequired(t => t.Phase5)
                 .WithOptional(d => d.Phase5ForProject)
-                .Map(mc => mc.MapKey("Phase5Id"));
+                .Map(mc => mc.MapKey("Phase5Id"))
+                .WillCascadeOnDelete(true);
 
             this.HasMany(t => t.TaskActivities)
                 .WithOptional(d => d.TaskForProject)
-                .HasForeignKey(d => d.TaskForProjectId);
+                .HasForeignKey(d => d.TaskForProjectId)
+                .WillCascadeOnDelete(true);
 
             this.HasMany(t => t.MilestoneStates)
                 .WithOptional(d => d.MilestoneForProject)
-                .HasForeignKey(d => d.MilestoneForProjectId);
+                .HasForeignKey(d => d.MilestoneForProjectId)
+                .WillCascadeOnDelete(true);
 
 
             this.HasOptional(t => t.JointMunicipalProject)

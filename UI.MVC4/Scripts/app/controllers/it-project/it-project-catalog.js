@@ -24,16 +24,19 @@
         ['$scope', '$http', '$state', '$stateParams', '$timeout', 'user', 'programs', function ($scope, $http, $state, $stateParams, $timeout, user, programs) {
             $scope.programs = programs;
 
-            $scope.clone = function (project) {
-                var isParent = project.parentItProjectId != null;
-                if (!isParent) {
-                    $http.post('api/itproject/' + project.id, { organizationId: project.organizationId }).success(function (result) {
-                        reload();
-                    });
+            function isSelected(project) {
+                //a project is selected if created inside the current organisation
+                return project.organizationId == user.currentOrganizationId;
+            };
+
+            $scope.isSelected = isSelected;
+                
+            
+            $scope.toggle = function (project) {
+                if (!isSelected(project)) {
+                    $http.post('api/itproject/' + project.id, { organizationId: user.currentOrganizationId }).finally(reload);
                 } else {
-                    $http.delete('api/itproject/' + project.id).success(function(result) {
-                        reload();
-                    });
+                    $http.delete('api/itproject/' + project.id).finally(reload);
                 }
                 
             };
