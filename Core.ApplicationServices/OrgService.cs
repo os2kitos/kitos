@@ -9,11 +9,13 @@ namespace Core.ApplicationServices
     {
         private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
         private readonly IGenericRepository<Organization> _orgRepository;
+        private readonly IGenericRepository<AdminRight> _admRightRepository;
 
-        public OrgService(IGenericRepository<OrganizationRight> orgRightRepository, IGenericRepository<Organization> orgRepository)
+        public OrgService(IGenericRepository<OrganizationRight> orgRightRepository, IGenericRepository<Organization> orgRepository, IGenericRepository<AdminRight> admRightRepository )
         {
             _orgRightRepository = orgRightRepository;
             _orgRepository = orgRepository;
+            _admRightRepository = admRightRepository;
         }
 
         public ICollection<Organization> GetByUser(User user)
@@ -23,9 +25,11 @@ namespace Core.ApplicationServices
 
             var orgs = _orgRightRepository
                 .Get(x => x.UserId == user.Id)
-                .Select(x => x.Object.Organization)
-                .Distinct()
-                .ToList();
+                .Select(x => x.Object.Organization).ToList();
+
+            orgs.AddRange(_admRightRepository.Get(x => x.UserId == user.Id).Select(x => x.Object));
+
+            orgs = orgs.Distinct().ToList();
 
             return orgs;
         }

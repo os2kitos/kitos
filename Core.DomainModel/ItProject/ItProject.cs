@@ -23,6 +23,7 @@ namespace Core.DomainModel.ItProject
             this.JointMunicipalProjects = new List<ItProject>();
             this.CommonPublicProjects = new List<ItProject>();
             this.AssociatedProjects = new List<ItProject>();
+            this.ChildItProjects = new List<ItProject>();
         }
 
         public int Id { get; set; }
@@ -131,6 +132,10 @@ namespace Core.DomainModel.ItProject
         public virtual ICollection<State> MilestoneStates { get; set; } 
 
         #endregion
+
+        public virtual int? ParentItProjectId { get; set; }
+        public virtual ItProject ParentItProject { get; set; }
+        public virtual ICollection<ItProject> ChildItProjects { get; set; }
 
         public virtual GoalStatus GoalStatus { get; set; }
     }

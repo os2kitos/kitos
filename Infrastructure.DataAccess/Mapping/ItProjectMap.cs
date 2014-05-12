@@ -123,6 +123,11 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.ResponsibleForItProjects)
                 .HasForeignKey(d => d.ResponsibleOrgUnitId)
                 .WillCascadeOnDelete(false);
+
+            this.HasOptional(t => t.ParentItProject)
+                .WithMany(t => t.ChildItProjects)
+                .HasForeignKey(d => d.ParentItProjectId)
+                .WillCascadeOnDelete(false);
         }
     }
 }

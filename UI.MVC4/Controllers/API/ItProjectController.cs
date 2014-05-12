@@ -29,6 +29,25 @@ namespace UI.MVC4.Controllers.API
             _orgUnitRepository = orgUnitRepository;
         }
 
+        public HttpResponseMessage GetByOrg([FromUri] int orgId)
+        {
+            try
+            {
+                var projects = Repository.Get(x => x.AccessModifier == AccessModifier.Public || x.OrganizationId == orgId).ToList();
+
+                var clonedParentIds = projects.Where(x => x.ParentItProjectId.HasValue).Select(x => x.ParentItProjectId);
+
+                // remove cloned parents
+                projects.RemoveAll(x => clonedParentIds.Contains(x.Id));
+                
+                return Ok(Map(projects));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetPrograms(string q, int orgId, bool? programs)
         {
             try
@@ -58,6 +77,22 @@ namespace UI.MVC4.Controllers.API
                 var projects = _itProjectService.GetProjects(org, q);
 
                 return Ok(Map(projects));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage PostCloneProject(int id, [FromBody] ItProjectDTO dto)
+        {
+            try
+            {
+                var project = Repository.GetByKey(id);
+
+                var clonedProject = _itProjectService.CloneProject(project, KitosUser, dto.OrganizationId);
+
+                return Created(Map(clonedProject), new Uri(Request.RequestUri + "/" + clonedProject.Id));
             }
             catch (Exception e)
             {
@@ -289,6 +324,13 @@ namespace UI.MVC4.Controllers.API
             {
                 return Error(e);
             }
+        }
+
+        protected override ItProject PostQuery(ItProject item)
+        {
+            //Makes sure to create the necessary properties, like phases
+            _itProjectService.AddProject(item);
+            return item;
         }
     }
 }

@@ -1,14 +1,28 @@
-﻿<div class="modal-header">
-    <h3 class="modal-title">Vælg organisation</h3>
-</div>
-<div class="modal-body">
-    <p>Du er medlem er flere organisationer. Vælg, hvilken en du vil arbejde i:</p>
-    
-    <select class="form-control" data-ng-model="orgChooser.selectedId" data-ng-options="org.id as org.name for org in organizations">
-        <option>Vælg organisation</option>
-    </select>
+﻿<div data-ng-if="organizations.length > 0">
+    <div class="modal-header">
+        <h3 class="modal-title">Vælg organisation</h3>
+    </div>
+    <div class="modal-body">
+        <p>Du er medlem er flere organisationer. Vælg, hvilken en du vil arbejde i:</p>
 
+        <select class="form-control" data-ng-model="orgChooser.selectedId" data-ng-options="org.id as org.name for org in organizations">
+        </select>
+
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" data-ng-click="ok()" data-ng-disabled="selectedId == 0">OK</button>
+    </div>
 </div>
-<div class="modal-footer">
-    <button class="btn btn-primary" data-ng-click="ok()" data-ng-disabled="selectedId == 0">OK</button>
+<div data-ng-if="organizations.length == 0">
+    <div class="modal-header">
+        <h3 class="modal-title">Du er ikke medlem af nogen organisationer!</h3>
+    </div>
+    <div class="modal-body">
+        <p>Du er ikke medlem af nogen organisationer. Dette kan skyldes at alle dine brugerroller er blevet fjernet.</p>
+        <strong>Kontakt din lokale administrator for at blive tilknyttet en ny rolle</strong>
+
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" data-ng-click="$dismiss()" data-ng-disabled="selectedId == 0">OK</button>
+    </div>
 </div>

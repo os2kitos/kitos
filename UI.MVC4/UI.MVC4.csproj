@@ -428,6 +428,8 @@
     <Content Include="Partials\home\forgot-password.html" />
     <Content Include="Partials\home\index.html" />
     <Content Include="Partials\it-project\catalog.html" />
+    <Content Include="Partials\it-project\overview.html" />
+    <Content Include="Partials\it-project\portfolio.html" />
     <Content Include="Partials\it-project\modal-goal-edit.html" />
     <Content Include="Partials\it-project\modal-milestone-task-edit.html" />
     <Content Include="Partials\it-project\tab-description.html" />
@@ -503,10 +505,12 @@
     <Content Include="Scripts\app\controllers\global-admin\global-admin.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-config.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
+    <Content Include="Scripts\app\controllers\it-project\it-project-overview.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-status-goal.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-status-project.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-catalog.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-description.js" />
+    <Content Include="Scripts\app\controllers\it-project\it-project-portfolio.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-risk.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-roles.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-org.js" />
