@@ -30,6 +30,19 @@ namespace UI.MVC4.Controllers.API
             _orgUnitRepository = orgUnitRepository;
         }
 
+        public HttpResponseMessage GetHasWriteAccess(int id, bool? hasWriteAccess)
+        {
+            try
+            {
+                var project = Repository.GetByKey(id);
+                return Ok(_itProjectService.HasWriteAccess(KitosUser, project));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetPublic()
         {
             try
