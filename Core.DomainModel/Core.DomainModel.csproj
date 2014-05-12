@@ -45,6 +45,7 @@
     <Compile Include="IHasAccessModifier.cs" />
     <Compile Include="ItProject\EconomyYear.cs" />
     <Compile Include="IHasOwner.cs" />
+    <Compile Include="ItProject\ItProjectPriority.cs" />
     <Compile Include="ItSystem\AppType.cs" />
     <Compile Include="ItSystem\DataRow.cs" />
     <Compile Include="ItSystem\ArchiveType.cs" />

@@ -24,6 +24,7 @@ namespace Core.DomainModel.ItProject
             this.CommonPublicProjects = new List<ItProject>();
             this.AssociatedProjects = new List<ItProject>();
             this.ChildItProjects = new List<ItProject>();
+            this.Priority = ItProjectPriority.None; // default value if not set
         }
 
         public int Id { get; set; }
@@ -34,6 +35,8 @@ namespace Core.DomainModel.ItProject
         public string Name { get; set; }
         public string Description { get; set; }
         public AccessModifier AccessModifier { get; set; }
+        public ItProjectPriority Priority { get; set; }
+        public bool IsArchived { get; set; }
 
         //public bool IsTermsOfReferenceApproved { get; set; }
         //public int? ItProjectOwnerId { get; set; }
