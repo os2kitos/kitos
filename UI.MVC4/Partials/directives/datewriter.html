@@ -4,8 +4,9 @@
                  data-tooltip-placement="bottom"
                  data-tooltip-trigger="focus"
                  data-ng-model="date.dateStr"
-           data-ng-blur="write()"
-                data-ng-class="{'ng-invalid': dateInvalid}"
+                data-ng-blur="write()"
+           data-ng-class="{'ng-invalid': dateInvalid}"
+        data-ng-disabled="isDisabled"
         
         />
 </span>

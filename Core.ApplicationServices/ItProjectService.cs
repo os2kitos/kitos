@@ -10,11 +10,19 @@ namespace Core.ApplicationServices
     {
         private readonly IGenericRepository<ItProject> _projectRepository;
         private readonly IGenericRepository<Activity> _activityRepository;
+        private readonly IGenericRepository<ItProjectRight> _rightRepository;
+        private readonly IOrgService _orgService;
 
-        public ItProjectService(IGenericRepository<ItProject> projectRepository, IGenericRepository<ItProjectType> projectTypeRepository, IGenericRepository<Activity> activityRepository )
+        public ItProjectService(IGenericRepository<ItProject> projectRepository, 
+            IGenericRepository<ItProjectType> projectTypeRepository, 
+            IGenericRepository<Activity> activityRepository, 
+            IGenericRepository<ItProjectRight> rightRepository,
+            IOrgService orgService)
         {
             _projectRepository = projectRepository;
             _activityRepository = activityRepository;
+            _rightRepository = rightRepository;
+            _orgService = orgService;
 
             //TODO: dont hardcode this
             ProgramType = projectTypeRepository.Get(type => type.Name == "IT Program").Single();
@@ -22,21 +30,37 @@ namespace Core.ApplicationServices
 
         public ItProjectType ProgramType { get; private set; }
 
-        public IEnumerable<ItProject> GetAll(Organization organization, string nameSearch)
+        public IEnumerable<ItProject> GetAll(int? orgId = null, string nameSearch = null, bool includePublic = true)
         {
-            if (nameSearch == null) return _projectRepository.Get();
+            var result = _projectRepository.Get();
 
-            return _projectRepository.Get(project => project.Name.StartsWith(nameSearch));
+            if (orgId != null)
+            {
+                //filter by organisation or optionally by access modifier
+                result =
+                    result.Where(p => p.OrganizationId == orgId.Value || (includePublic && p.AccessModifier == AccessModifier.Public));
+            }
+            else
+            {
+                //if no organisation is selected, only get public
+                result = result.Where(p => p.AccessModifier == AccessModifier.Public && includePublic);
+            }
+
+
+            //optionally filter by name
+            if (nameSearch != null) result = result.Where(p => p.Name.Contains(nameSearch));
+
+            return result;
         }
 
-        public IEnumerable<ItProject> GetProjects(Organization organization, string nameSearch)
+        public IEnumerable<ItProject> GetProjects(int? orgId = null, string nameSearch = null, bool includePublic = true)
         {
-            return GetAll(organization, nameSearch).Where(project => project.ItProjectType.Id != ProgramType.Id);
+            return GetAll(orgId, nameSearch: nameSearch, includePublic: includePublic).Where(project => project.ItProjectType.Id != ProgramType.Id);
         }
 
-        public IEnumerable<ItProject> GetPrograms(Organization organization, string nameSearch)
+        public IEnumerable<ItProject> GetPrograms(int? orgId = null, string nameSearch = null, bool includePublic = true)
         {
-            return GetAll(organization, nameSearch).Where(project => project.ItProjectType.Id == ProgramType.Id);
+            return GetAll(orgId, nameSearch: nameSearch, includePublic: includePublic).Where(project => project.ItProjectType.Id == ProgramType.Id);
         }
 
         public ItProject AddProject(ItProject project)
@@ -64,7 +88,6 @@ namespace Core.ApplicationServices
                 Name = original.Name,
                 Note = original.Note,
                 Description = original.Description,
-                AccessModifier = original.AccessModifier,
                 IsStrategy = original.IsStrategy,
 
                 // TODO AssociatedProgramId = project.AssociatedProgramId,
@@ -89,6 +112,55 @@ namespace Core.ApplicationServices
             _projectRepository.Save();
 
             return clone;
+        }
+
+        public void DeleteProject(ItProject project)
+        {
+            var phase1Id = project.Phase1.Id;
+            var phase2Id = project.Phase1.Id;
+            var phase3Id = project.Phase1.Id;
+            var phase4Id = project.Phase1.Id;
+            var phase5Id = project.Phase1.Id;
+
+            _projectRepository.DeleteByKey(project.Id);
+            _projectRepository.Save();
+
+            _activityRepository.DeleteByKey(phase1Id);
+            _activityRepository.DeleteByKey(phase2Id);
+            _activityRepository.DeleteByKey(phase3Id);
+            _activityRepository.DeleteByKey(phase4Id);
+            _activityRepository.DeleteByKey(phase5Id);
+            _activityRepository.Save();
+
+        }
+
+        public bool HasReadAccess(User user, ItProject project)
+        {
+            //if the project is public, the user has read access
+            if (project.AccessModifier == AccessModifier.Public) return true;
+
+            //if the user is object owner, the user has read access
+            if (project.ObjectOwnerId == user.Id) return true;
+
+            //if the user has read role, the user has read access
+            if (_rightRepository.Get(right => 
+                right.User.Id == user.Id &&
+                right.Object.Id == project.Id && 
+                right.Role.HasReadAccess).Any()) 
+                return true;
+
+            //if the user is part of an organization, which owns the project, the user has read access
+            var userOrganizations = _orgService.GetByUser(user);
+            return userOrganizations.Any(org => org.Id == project.OrganizationId);
+        }
+
+        public bool HasWriteAccess(User user, ItProject project)
+        {
+            if (project.ObjectOwnerId == user.Id) return true;
+
+            return
+                _rightRepository.Get(right => right.User.Id == user.Id && right.Object.Id == project.Id && right.Role.HasWriteAccess)
+                                .Any();
         }
 
         /// <summary>

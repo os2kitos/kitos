@@ -104,6 +104,11 @@ namespace UI.MVC4.Controllers.API
             return CreateResponse(HttpStatusCode.MethodNotAllowed);
         }
 
+        protected HttpResponseMessage Forbidden()
+        {
+            return CreateResponse(HttpStatusCode.Forbidden);
+        }
+
         protected bool IsGlobalAdmin()
         {
             try

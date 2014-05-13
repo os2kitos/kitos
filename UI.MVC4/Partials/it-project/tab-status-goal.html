@@ -7,7 +7,7 @@
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusGoal">Status mål (samlet):</label>
                     <div class="col-md-7">
-                        <input id="statusGoal" data-select-status="goalStatus.status" data-can-write="true" />
+                        <input id="statusGoal" data-select-status="goalStatus.status" data-can-write="hasWriteAccess" />
                     </div>
                 </div>
 
@@ -15,7 +15,7 @@
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
                     <div class="col-md-3">
-                        <span id="statusDate" data-ng-model="goalStatus.statusDate" data-datewriter="" data-ng-change="updateStatusDate()"></span>
+                        <span id="statusDate" data-ng-model="goalStatus.statusDate" data-datewriter="" data-is-disabled="!hasWriteAccess" data-ng-change="updateStatusDate()"></span>
                     </div>
                 </div>
 
@@ -28,7 +28,8 @@
                     <div class="col-md-10">
                         <textarea id="note" class="form-control input-sm" rows="4" data-ng-model="goalStatus.statusNote"
                             data-field="statusNote"
-                            data-autosave="{{goalStatus.updateUrl}}"></textarea>
+                            data-autosave="{{goalStatus.updateUrl}}"
+                            data-ng-disabled="!hasWriteAccess"></textarea>
                     </div>
                 </div>
             </div>
@@ -144,7 +145,7 @@
                             <input data-select-status="goal.status" />
                         </td>
                         <td>
-                            <div class="pull-right">
+                            <div class="pull-right" data-ng-hide="!hasWriteAccess">
                                 <a class="btn btn-link btn-xs" data-ng-click="goal.edit()">
                                     <i class="glyphicon glyphicon-pencil"></i>
                                 </a>
@@ -161,7 +162,7 @@
                 <tfoot>
                     <tr>
                         <td colspan="17">
-                            <div class="pull-right">
+                            <div class="pull-right" data-ng-hide="!hasWriteAccess">
                                 <button class="btn btn-success btn-sm" data-ng-click="addGoal()">Tilføj mål</button>
                             </div>
                         </td>

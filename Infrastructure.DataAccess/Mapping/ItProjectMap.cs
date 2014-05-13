@@ -67,7 +67,8 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasMany(t => t.EconomyYears)
                 .WithRequired(d => d.ItProject)
-                .HasForeignKey(d => d.ItProjectId);
+                .HasForeignKey(d => d.ItProjectId)
+                .WillCascadeOnDelete(true);
 
             this.HasMany(t => t.ItSystemUsages)
                 .WithMany(t => t.ItProjects);
@@ -82,7 +83,7 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasRequired(t => t.Phase2)
                 .WithOptional(d => d.Phase2ForProject)
                 .Map(mc => mc.MapKey("Phase2Id"));
-            
+
             this.HasRequired(t => t.Phase3)
                 .WithOptional(d => d.Phase3ForProject)
                 .Map(mc => mc.MapKey("Phase3Id"));
@@ -97,11 +98,13 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasMany(t => t.TaskActivities)
                 .WithOptional(d => d.TaskForProject)
-                .HasForeignKey(d => d.TaskForProjectId);
+                .HasForeignKey(d => d.TaskForProjectId)
+                .WillCascadeOnDelete(true);
 
             this.HasMany(t => t.MilestoneStates)
                 .WithOptional(d => d.MilestoneForProject)
-                .HasForeignKey(d => d.MilestoneForProjectId);
+                .HasForeignKey(d => d.MilestoneForProjectId)
+                .WillCascadeOnDelete(true);
 
 
             this.HasOptional(t => t.JointMunicipalProject)

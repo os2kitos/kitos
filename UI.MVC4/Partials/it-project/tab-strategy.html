@@ -3,20 +3,20 @@
     <div class="form-group">
         <div class="checkbox">
             <label>
-                <input type="checkbox" data-ng-model="isStrategy" data-autosave="{{ autosaveUrl }}" data-field="isStrategy" />
+                <input type="checkbox" data-ng-model="isStrategy" data-autosave="{{ autosaveUrl }}" data-field="isStrategy" data-ng-disabled="!hasWriteAccess"/>
                 Kommuens IT/digitaliseringsstrategi
             </label>
         </div>
     </div>
     <div class="form-group">
         <label for="jointDrop" class="control-label">Fælleskommunel digitaliseringsstrategi</label>
-        <select class="form-control" id="jointDrop" data-ng-model="jointMunicipalProjectId" data-ng-options="project.id as project.name for project in jointMunicipalProjects" data-autosave="{{ autosaveUrl }}" data-field="jointMunicipalProjectId">
+        <select class="form-control" id="jointDrop" data-ng-model="jointMunicipalProjectId" data-ng-options="project.id as project.name for project in jointMunicipalProjects" data-autosave="{{ autosaveUrl }}" data-field="jointMunicipalProjectId" data-ng-disabled="!hasWriteAccess">
             <option value="">-- Fælleskommunel projekt --</option>
         </select>
     </div>
     <div class="form-group">
         <label for="commonDrop" class="control-label">Fællesoffentlig digitaliseringsstrategi</label>
-        <select class="form-control" id="commonDrop" data-ng-model="commonPublicProjectId" data-ng-options="project.id as project.name for project in commonPublicProjects" data-autosave="{{ autosaveUrl }}" data-field="commonPublicProjectId">
+        <select class="form-control" id="commonDrop" data-ng-model="commonPublicProjectId" data-ng-options="project.id as project.name for project in commonPublicProjects" data-autosave="{{ autosaveUrl }}" data-field="commonPublicProjectId" data-ng-disabled="!hasWriteAccess">
             <option value="">-- Fællesoffentlig projekt --</option>
         </select>
     </div>

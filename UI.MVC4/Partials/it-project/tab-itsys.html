@@ -2,7 +2,7 @@
 
 <div data-ng-repeat="usage in itSystemUsages">
     <label>
-        <input type="checkbox" data-ng-model="usage.selected" data-ng-change="save(usage)" />
+        <input type="checkbox" data-ng-model="usage.selected" data-ng-change="save(usage)"  data-ng-disabled="!hasWriteAccess"/>
         {{ usage.itSystem.name }}
     </label>
 </div>

@@ -25,6 +25,7 @@ namespace Core.DomainModel.ItProject
             this.AssociatedProjects = new List<ItProject>();
             this.ChildItProjects = new List<ItProject>();
             this.Priority = ItProjectPriority.None; // default value if not set
+            this.AccessModifier = AccessModifier.Normal;
         }
 
         public int Id { get; set; }
