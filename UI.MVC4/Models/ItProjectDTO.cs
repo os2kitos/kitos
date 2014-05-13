@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 
@@ -79,5 +80,19 @@ namespace UI.MVC4.Models
 
 
         public virtual GoalStatusDTO GoalStatus { get; set; }
+
+        public int? Roi
+        {
+            get
+            {
+                var firstYear = EconomyYears.FirstOrDefault(dto => dto.TotalBudget >= 0);
+                return firstYear != null ? (int?) firstYear.YearNumber : null;
+            }
+        }
+
+        public int Bc
+        {
+            get { return EconomyYears.Sum(year => year.TotalBudget); }
+        }
     }
 }

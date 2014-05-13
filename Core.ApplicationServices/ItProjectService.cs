@@ -136,5 +136,36 @@ namespace Core.ApplicationServices
         {
             return new Activity() {Name = name, ObjectOwner = owner};
         }
+
+        private void AddEconomyYears(ItProject project)
+        {
+            project.EconomyYears = new List<EconomyYear>()
+                {
+                    new EconomyYear()
+                        {
+                            YearNumber = 0
+                        },
+                    new EconomyYear()
+                        {
+                            YearNumber = 1
+                        },
+                    new EconomyYear()
+                        {
+                            YearNumber = 2
+                        },
+                    new EconomyYear()
+                        {
+                            YearNumber = 3
+                        },
+                    new EconomyYear()
+                        {
+                            YearNumber = 4
+                        },
+                    new EconomyYear()
+                        {
+                            YearNumber = 5
+                        }
+                };
+        }
     }
 }
