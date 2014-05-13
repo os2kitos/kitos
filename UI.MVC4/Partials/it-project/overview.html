@@ -34,7 +34,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr data-ng-repeat="p in projects | filter:isArchived">
+        <tr data-ng-repeat="p in projects | filter:!isArchived | andChildren:'responsibleOrgUnitId':orgUnitTree:chosenOrgUnitId">
             <td>{{ p.responsibleOrgUnit.name }}</td>
             <td>{{ p.accessModifier == 1 ? 'P' : '' }}</td>
             <td>{{ p.roles | filter:{roleId:chosenRoleId} | joinBy:', ':'user.name' }}</td>

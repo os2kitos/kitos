@@ -30,8 +30,8 @@
     }]);
 
     app.controller('project.EditOverviewCtrl',
-    ['$scope', '$http', '$sce', 'projects', 'projectRoles', 'orgUnits', 'user',
-        function ($scope, $http, $sce, projects, projectRoles, orgUnits, user) {
+    ['$scope', '$http', '$sce', '$timeout', 'projects', 'projectRoles', 'orgUnits', 'user',
+        function ($scope, $http, $sce, $timeout, projects, projectRoles, orgUnits, user) {
             $scope.projects = projects;
             $scope.projectRoles = projectRoles;
             
@@ -76,9 +76,7 @@
                 if (!unit || unit.id !== user.defaultOrganizationUnitId) return;
 
                 $timeout(function () {
-                    $scope.orgUnitId = unit.id;
-                    //$scope.loadUsages();
-                    console.log('loadUsages');
+                    $scope.chosenOrgUnitId = unit.id;
                 });
             }
             
@@ -96,7 +94,6 @@
                         _.each(orgUnit.children, function (child) {
                             hasWriteAccess(child, result.response);
                         });
-
                     });
                 }
             }

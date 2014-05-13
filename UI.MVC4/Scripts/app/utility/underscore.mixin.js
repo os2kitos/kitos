@@ -83,3 +83,20 @@ _.mixin({
     }
 
 });
+
+_.mixin({   
+    resursivePluck: function self(obj, key, childPropertyName) {
+        // default values
+        childPropertyName = typeof childPropertyName !== 'undefined' ? childPropertyName : 'children';
+
+        var result = [];
+        result.push(obj[key]);
+
+        if (obj.hasOwnProperty(childPropertyName)) {
+            _.each(obj[childPropertyName], function(item) {
+                result.pushArray(self(item, key, childPropertyName));
+            });
+        }
+        return result;
+    }
+});
