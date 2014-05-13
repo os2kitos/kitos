@@ -183,7 +183,9 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.ItSystemUsage, opt => opt.Ignore());
 
             Mapper.CreateMap<Organization, OrganizationDTO>().ReverseMap();
-            Mapper.CreateMap<OrganizationUnit, OrgUnitDTO>().ReverseMap();
+            Mapper.CreateMap<OrganizationUnit, OrgUnitDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.Children, opt => opt.Ignore());
 
             Mapper.CreateMap<PasswordResetRequest, PasswordResetRequestDTO>()
                   .ForMember(dest => dest.UserEmail, opt => opt.MapFrom(src => src.User.Email));
