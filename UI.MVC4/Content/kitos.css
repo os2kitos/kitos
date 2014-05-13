@@ -268,6 +268,41 @@ input:disabled
     cursor: inherit !important;
 }
 
+input.input-cell {
+    padding: 1px 5px 1px 3px !important;
+    margin: 0px !important;
+    font-size: 11px;
+    border: none;
+    background: none;
+    box-shadow: none;
+
+    text-align: right;
+
+    height: 30px;
+}
+
+input.input-cell:focus {
+    box-shadow: none;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+input.input-cell:read-only {
+    background: none;
+    cursor: default;
+}
+input.input-cell:focus:read-only {
+    background: none;
+    box-shadow: none;
+}
+
+td.td-very-condensed {
+    padding: 0px !important;
+}
+
+td.border-left {
+    border-left: 2px solid gainsboro;
+}
+
 .full-width
 {
     width: 100%;
@@ -515,4 +550,22 @@ table.table-fixed {
 }
 table.table-no-margin {
     margin: 0px;
+}
+
+tr.sub-sum {
+    background-color: rgba(242, 208, 95, 0.37);
+}
+
+tr.sum {
+    background-color: rgba(142, 197, 245, 0.37);
+    border-width: 2px 0px;
+    border-color: gainsboro;
+    border-style: solid;
+}
+
+tr.super-sum {
+    background-color: rgba(80, 132, 178, 0.37);
+    border-width: 2px 0px;
+    border-color: gainsboro;
+    border-style: solid;
 }
