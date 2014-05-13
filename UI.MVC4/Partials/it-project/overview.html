@@ -49,7 +49,7 @@
             <td><span data-select-status="p.statusProject" data-can-write="false"></span></td>
             <td><span data-select-status="p.goalStatus.status" data-can-write="false"></span></td>
             <td>
-                <select data-ng-model="p.priority" data-autosave="api/itproject/{{p.id}}" data-field="priority">
+                <select data-ng-model="p.priority" data-autosave="api/itproject/{{p.id}}" data-field="priority" data-ng-disabled="p.isPriorityLocked">
                     <option value="0">-- Vælg prioritet --</option>
                     <option value="3">Høj</option>
                     <option value="2">Mellem</option>
