@@ -440,6 +440,7 @@
     <Content Include="Partials\it-project\tab-economy.html" />
     <Content Include="Partials\it-project\tab-itsys.html" />
     <Content Include="Partials\it-project\tab-kle.html" />
+    <Content Include="Partials\it-project\tab-stakeholders.html" />
     <Content Include="Partials\it-project\tab-status-goal.html" />
     <Content Include="Partials\it-project\tab-strategy.html" />
     <Content Include="Partials\it-project\tab-status-project.html" />
@@ -505,6 +506,7 @@
     <Content Include="Scripts\app\controllers\global-admin\global-admin.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-config.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
+    <Content Include="Scripts\app\controllers\it-project\it-project-stakeholders.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-overview.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-status-goal.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-status-project.js" />
