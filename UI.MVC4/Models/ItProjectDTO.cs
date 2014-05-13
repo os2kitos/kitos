@@ -32,6 +32,7 @@ namespace UI.MVC4.Models
         public IEnumerable<EconomyYearDTO> EconomyYears { get; set; } 
         public IEnumerable<ItSystemDTO> ItSystems { get; set; }
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
+        public IEnumerable<StakeholderDTO> Stakeholders { get; set; }
 
 
         #region Status project tab
