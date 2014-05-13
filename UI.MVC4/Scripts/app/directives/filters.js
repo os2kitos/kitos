@@ -1,7 +1,7 @@
 ﻿(function(ng, app) {
     'use strict';
 
-    /* from http://stackoverflow.com/questions/11540157/using-comma-as-list-separator-with-angularjs */
+    // http://stackoverflow.com/questions/11540157/using-comma-as-list-separator-with-angularjs
     app.filter('joinBy', function() {
         return function(input, delimiter, displayName) {
             // default values
@@ -17,6 +17,15 @@
         };
     });
 
+    /**
+     * filters input ids by a ids found in the sub-tree of the object specified by selectedId.
+     *
+     * input: list to filter
+     * inputIdPropertyName: the property name in input which relates to selectedId
+     * tree: an object with nested child objects of the same type, this tree also needs to be flat
+     * idPropertyName: the property name in tree which relates to selectedId
+     * childPropertyName: the property name of child objects in tree
+     */
     app.filter('andChildren', function() {
         return function (input, inputIdPropertyName, tree, selectedId, idPropertyName, childPropertyName) {
             // default values
