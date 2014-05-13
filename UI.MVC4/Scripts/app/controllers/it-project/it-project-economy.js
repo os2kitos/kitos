@@ -17,21 +17,36 @@
         function ($rootScope, $scope, itProject) {
             $scope.columns = _.range(6);
 
-            $scope.businessExpenses = [];
-            $scope.businessExpensesSumRow = createSimpleRow("Forretningsmæssige omkostninger");
-            
-            $scope.itExpenses = [];
-            $scope.itExpensesSumRow = createSimpleRow("IT omkostninger");
+            var expensesTitleRow = createTitleRow("OMKOSTNINGER");
 
-            $scope.expensesSumRow = createSimpleRow("OMKOSTNINGER TOTAL");
+            var businessExpenses = [];
+            var businessExpensesSumRow = createReadonlyRow("Forretningsmæssige omkostninger", "sub-sum");
             
-            $scope.businessSavings = [];
+            var itExpenses = [];
+            var itExpensesSumRow = createReadonlyRow("IT omkostninger", "sub-sum");
 
-            $scope.businessSavings = createSimpleRow("Forretningsmæssige omkostninger");
+            var expensesSumRow = createReadonlyRow("OMKOSTNINGER TOTAL", "sum");
 
-            $scope.itSavings = [];
+            var savingsTitleRow = createTitleRow("BESPARELSER");
             
-            function createSimpleRow(label) {
+            var businessSavings = [];
+            var businessSavingsSumRow = createReadonlyRow("Forretningsmæssige besparelser", "sub-sum");
+
+            var itSavings = [];
+            var itSavingsSumRow = createReadonlyRow("IT besparelser", "sub-sum");
+            
+            var savingsSumRow = createReadonlyRow("BESPARELSER TOTAL", "sum");
+
+            var diffRow = createReadonlyRow("Finansieringsbehov / besparelse", "super-sum");
+            
+            function createTitleRow(label) {
+                return {
+                    label: label,
+                    titlerow: true
+                };
+            }
+
+            function createReadonlyRow(label, classes) {
                 var columns = _.map(itProject.economyYears, function() {
                     return {
                         budget: 0,
@@ -45,7 +60,9 @@
                     total: {
                         budget: 0,
                         rea: 0
-                    }
+                    },
+                    readonly: true,
+                    classes: classes
                 };
             }
             
@@ -82,27 +99,39 @@
             }
             
             function addBusinessExpenses(field, label) {
-                return addRow(field, label, $scope.businessExpenses, function(row) {
+                return addRow(field, label, businessExpenses, function (row) {
                     calcTotalColumn(row);
-                    calcSumRow($scope.businessExpensesSumRow, $scope.businessExpenses);
-                    calcSumRow($scope.expensesSumRow, [$scope.businessExpensesSumRow, $scope.itExpensesSumRow]);
+                    sumRows(businessExpenses, businessExpensesSumRow);
+                    sumRows([businessExpensesSumRow, itExpensesSumRow], expensesSumRow);
+                    subtractRows(savingsSumRow, expensesSumRow, diffRow);
                 });
             }
 
             function addItExpenses(field, label) {
-                return addRow(field, label, $scope.itExpenses, function(row) {
+                return addRow(field, label, itExpenses, function (row) {
                     calcTotalColumn(row);
-                    calcSumRow($scope.itExpensesSumRow, $scope.itExpenses);
-                    calcSumRow($scope.expensesSumRow, [$scope.businessExpensesSumRow, $scope.itExpensesSumRow]);
+                    sumRows(itExpenses, itExpensesSumRow);
+                    sumRows([businessExpensesSumRow, itExpensesSumRow], expensesSumRow);
+                    subtractRows(savingsSumRow, expensesSumRow, diffRow);
                 });
             }
 
             function addBusinessSavings(field, label) {
-                return addRow(field, label, $scope.businessSavings);
+                return addRow(field, label, businessSavings, function (row) {
+                    calcTotalColumn(row);
+                    sumRows(businessSavings, businessSavingsSumRow);
+                    sumRows([businessSavingsSumRow, itSavingsSumRow], savingsSumRow);
+                    subtractRows(savingsSumRow, expensesSumRow, diffRow);
+                });
             }
 
             function addItSavings(field, label) {
-                return addRow(field, label, $scope.itSavings);
+                return addRow(field, label, itSavings, function (row) {
+                    calcTotalColumn(row);
+                    sumRows(itSavings, itSavingsSumRow);
+                    sumRows([businessSavingsSumRow, itSavingsSumRow], savingsSumRow);
+                    subtractRows(savingsSumRow, expensesSumRow, diffRow);
+                });
             }
 
             addBusinessExpenses("consultant", "Konsulentbistand");
@@ -115,6 +144,24 @@
             addItExpenses("otherItExpenses", "Andre IT omkostninger");
             addItExpenses("increasedItExpenses", "Øgede IT omkostninger");
 
+            addBusinessSavings("salary", "Lønbesparelser");
+            addBusinessSavings("otherBusinessSavings", "Andre forretningsmæssige besparelser");
+
+            addItSavings("licenseSavings", "Besparelser på licenser");
+            addItSavings("systemMaintenanceSavings", "Besparelser på systemvedligehold");
+            addItSavings("otherItSavings", "Andre IT driftsbesparelser");
+
+            $scope.rows = [].concat(
+                [expensesTitleRow],
+                businessExpenses, [businessExpensesSumRow],
+                itExpenses, [itExpensesSumRow],
+                [expensesSumRow],
+                [savingsTitleRow],
+                businessSavings, [businessSavingsSumRow], 
+                itSavings, [itSavingsSumRow],
+                [savingsSumRow],
+                [diffRow]);
+            
             
             //calculates the last column "total" for a given row
             function calcTotalColumn(row) {
@@ -130,10 +177,10 @@
             }
             
             //sums the rows and stores the result in sumRow
-            function calcSumRow(sumRow, rows) {
+            function sumRows(rows, resultRow) {
                 
                 //sum each of the year columns
-                _.each(sumRow.columns, function(column, index) {
+                _.each(resultRow.columns, function(column, index) {
                     var sums = _.reduce(rows, function(memo, row) {
                         return {
                             budget: memo.budget + parseInt(row.columns[index].budget),
@@ -146,12 +193,26 @@
                 });
 
                 //sum the total column
-                sumRow.total = _.reduce(rows, function(memo, row) {
+                resultRow.total = _.reduce(rows, function(memo, row) {
                     return {
                         budget: memo.budget + row.total.budget,
                         rea: memo.rea + row.total.rea
                     };
                 }, { budget: 0, rea: 0 });
+            }
+            
+            function subtractRows(rowA, rowB, resultRow) {
+                //subtract each of the year columns
+                _.each(resultRow.columns, function(column, index) {
+                    column.budget = rowA.columns[index].budget - rowB.columns[index].budget;
+                    column.rea = rowA.columns[index].rea - rowB.columns[index].rea;
+                });
+
+                //sum the total column
+                resultRow.total = {
+                    budget: rowA.total.budget - rowB.total.budget,
+                    rea: rowA.total.rea - rowB.total.rea
+                };
             }
             
             

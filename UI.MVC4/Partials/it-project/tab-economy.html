@@ -35,29 +35,28 @@
     </thead>
     <tbody>
         
-        <!--.------------------------ EXPENSES -------------------------->
-        <tr>
-            <td colspan="15">
-                <b>Omkostninger</b>
-            </td>
-        </tr>
-
-        <!-- businessExpenses -->
-        <tr data-ng-repeat="row in rows">
+        <tr data-ng-repeat="row in rows" data-ng-class="row.classes" class="excel-row">
             
+            <td colspan="15" data-ng-if="row.titlerow">
+                {{row.label}}
+            </td>
+
             <!-- label -->
-            <td class="small">
+            <td class="small" data-ng-if="!row.titlerow">
                 <span class="small">{{row.label}}</span>
             </td>
             
             <!-- years cols -->
             <td data-ng-repeat-start="column in row.columns" class="td-very-condensed border-left">
+                
+                <!-- if not-readonly -->
                 <input type="text" class="form-control input-sm input-cell" 
                        data-autosave="{{column.updateUrl}}" 
                        data-field="{{row.budgetName}}"
                        data-ng-model="column.budget" 
                        data-ng-change="row.update()" data-ng-if="!row.readonly"/>
                 
+                <!-- if readonly -->
                 <input type="text" class="form-control input-sm input-cell" 
                        data-ng-model="column.budget" readonly="readonly" data-ng-if="row.readonly" />
 
@@ -74,125 +73,11 @@
             </td>
             
             <!-- total col -->
-            <td class="td-very-condensed border-left">
+            <td class="td-very-condensed border-left" data-ng-if="!row.titlerow">
                 <input type="text" class="form-control input-sm input-cell" data-ng-model="row.total.budget" readonly="readonly" />
             </td>
-            <td class="td-very-condensed">
+            <td class="td-very-condensed" data-ng-if="!row.titlerow">
                 <input type="text" class="form-control input-sm input-cell" data-ng-model="row.total.rea" readonly="readonly" />
-            </td>
-        </tr>
-        
-        <!-- businessExpenses sum -->
-        <tr>
-            
-            <!-- label -->
-            <td class="small">
-                <span class="small"><strong>{{businessExpensesSumRow.label}}</strong></span>
-            </td>
-            
-            <!-- years cols -->
-            <td data-ng-repeat-start="column in businessExpensesSumRow.columns" class="td-very-condensed border-left">
-                <input type="text" class="form-control input-sm input-cell" 
-                       data-ng-model="column.budget" readonly="readonly" />
-            </td>
-            <td data-ng-repeat-end="" class="td-very-condensed">
-                <input type="text" class="form-control input-sm input-cell"
-                       data-ng-model="column.rea" readonly="readonly" />
-            </td>
-            
-            <!-- total col -->
-            <td class="td-very-condensed border-left">
-                <input type="text" class="form-control input-sm input-cell" data-ng-model="businessExpensesSumRow.total.budget" readonly="readonly" />
-            </td>
-            <td class="td-very-condensed">
-                <input type="text" class="form-control input-sm input-cell" data-ng-model="businessExpensesSumRow.total.rea" readonly="readonly" />
-            </td>
-        </tr>
-        
-        <!-- itExpenses -->
-        <tr data-ng-repeat="row in itExpenses">
-            
-            <!-- label -->
-            <td class="small">
-                <span class="small">{{row.label}}</span>
-            </td>
-            
-            <!-- years cols -->
-            <td data-ng-repeat-start="column in row.columns" class="td-very-condensed border-left">
-                <input type="text" class="form-control input-sm input-cell" 
-                       data-autosave="{{column.updateUrl}}" 
-                       data-field="{{row.budgetName}}"
-                       data-ng-model="column.budget" 
-                       data-ng-change="row.update()"/>
-            </td>
-            <td data-ng-repeat-end="" class="td-very-condensed">
-                <input type="text" class="form-control input-sm input-cell"
-                       data-autosave="{{column.updateUrl}}" 
-                       data-field="{{row.reaName}}"
-                       data-ng-model="column.rea" 
-                       data-ng-change="row.update()"/>
-            </td>
-            
-            <!-- total col -->
-            <td class="td-very-condensed border-left">
-                <input type="text" class="form-control input-sm input-cell" data-ng-model="row.total.budget" readonly="readonly" />
-            </td>
-            <td class="td-very-condensed">
-                <input type="text" class="form-control input-sm input-cell" data-ng-model="row.total.rea" readonly="readonly" />
-            </td>
-        </tr>
-        
-        <!-- itExpenses sum -->
-        <tr>
-            
-            <!-- label -->
-            <td class="small">
-                <span class="small"><strong>{{itExpensesSumRow.label}}</strong></span>
-            </td>
-            
-            <!-- years cols -->
-            <td data-ng-repeat-start="column in itExpensesSumRow.columns" class="td-very-condensed border-left">
-                <input type="text" class="form-control input-sm input-cell" 
-                       data-ng-model="column.budget" readonly="readonly" />
-            </td>
-            <td data-ng-repeat-end="" class="td-very-condensed">
-                <input type="text" class="form-control input-sm input-cell"
-                       data-ng-model="column.rea" readonly="readonly" />
-            </td>
-            
-            <!-- total col -->
-            <td class="td-very-condensed border-left">
-                <input type="text" class="form-control input-sm input-cell" data-ng-model="itExpensesSumRow.total.budget" readonly="readonly" />
-            </td>
-            <td class="td-very-condensed">
-                <input type="text" class="form-control input-sm input-cell" data-ng-model="itExpensesSumRow.total.rea" readonly="readonly" />
-            </td>
-        </tr>
-        
-        <!-- All expenses sum -->
-        <tr class="active">
-            
-            <!-- label -->
-            <td class="small">
-                <strong>{{expensesSumRow.label}}</strong>
-            </td>
-            
-            <!-- years cols -->
-            <td data-ng-repeat-start="column in expensesSumRow.columns" class="td-very-condensed border-left">
-                <input type="text" class="form-control input-sm input-cell" 
-                       data-ng-model="column.budget" readonly="readonly" />
-            </td>
-            <td data-ng-repeat-end="" class="td-very-condensed">
-                <input type="text" class="form-control input-sm input-cell"
-                       data-ng-model="column.rea" readonly="readonly" />
-            </td>
-            
-            <!-- total col -->
-            <td class="td-very-condensed border-left">
-                <input type="text" class="form-control input-sm input-cell" data-ng-model="expensesSumRow.total.budget" readonly="readonly" />
-            </td>
-            <td class="td-very-condensed">
-                <input type="text" class="form-control input-sm input-cell" data-ng-model="expensesSumRow.total.rea" readonly="readonly" />
             </td>
         </tr>
 
