@@ -35,7 +35,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr data-ng-repeat="p in projects | filter:!isArchived">
+        <tr data-ng-repeat="p in projects | filter:{isArchived: false}">
             <td>{{ p.responsibleOrgUnit.name }}</td>
             <td>{{ p.accessModifier == 1 ? 'P' : '' }}</td>
             <td>{{ p.roles | filter:{roleId:chosenRoleId} | joinBy:', ':'user.name' }}</td>
@@ -68,26 +68,25 @@
             Vis arkiverede IT Projekter <i class="pull-right glyphicon" data-ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
         </accordion-heading>
         
-        <table>
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <th>
-                        <select>
-                            <option>-- Vælg afdeling --</option>
-                        </select>
+                        Ansvarlig
                     </th>
                     <th><!-- public --></th>
                     <th>
-                        <select>
-                            <option>-- Vælg projektrolle --</option>
+                        <select data-ng-model="chosenRoleId" data-ng-init="chosenRoleId = 2" data-ng-options="r.id as r.name for r in projectRoles">
+                            <option value="">-- Vælg projektrolle --</option>
                         </select>
                     </th>
                     <th>Type</th>
                     <th><!-- tværgående --></th>
                     <th><!-- strategi --></th>
                     <th>
-                        <select>
-                            <option>-- Vælg id --</option>
+                        <select data-ng-model="chosenId" data-ng-init="chosenId = 0">
+                            <option value="0">Projekt id</option>
+                            <option value="1">Globalt id</option>
                         </select>
                     </th>
                     <th>Projektnavn</th>
@@ -99,25 +98,30 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td><!-- select-status --></td>
+                <tr data-ng-repeat="p in allProjects | filter:{isArchived: true}">
+                    <td>{{ p.responsibleOrgUnit.name }}</td>
+                    <td>{{ p.accessModifier == 1 ? 'P' : '' }}</td>
+                    <td>{{ p.roles | filter:{roleId:chosenRoleId} | joinBy:', ':'user.name' }}</td>
+                    <td>{{ p.itProjectTypeName }}</td>
+                    <td>{{ p.isTransversal ? '(T)' : '' }}</td>
+                    <td>{{ p.isStrategy ? '(S)' : '' }}</td>
+                    <td>{{ chosenId == 0 ? p.itProjectId : p.parentItProject.itProjectId }}</td>
+                    <td><a data-ui-sref="it-project.edit({id: p.id})">{{ p.name ? p.name : 'intet navn' }}</a></td>
+                    <td>{{ p.itProjectCategoryName }}</td>
+                    <td>{{ p.currentPhase.name }}</td>
+                    <td><span data-select-status="p.statusProject" data-can-write="false"></span></td>
+                    <td><span data-select-status="p.goalStatus.status" data-can-write="false"></span></td>
                     <td>
-                        <select>
-                            <option>-- Vælg prioritet --</option>
+                        <select data-ng-model="p.priority" data-ng-disabled="true">
+                            <option value="0">-- Vælg prioritet --</option>
+                            <option value="3">Høj</option>
+                            <option value="2">Mellem</option>
+                            <option value="1">Lav</option>
                         </select>
                     </td>
                 </tr>
             </tbody>
         </table>
+
     </accordion-group>
 </accordion>

@@ -33,6 +33,7 @@
     ['$scope', '$http', '$sce', '$timeout', '$filter', 'projects', 'projectRoles', 'orgUnits', 'user',
         function ($scope, $http, $sce, $timeout, $filter, projects, projectRoles, orgUnits, user) {
             $scope.projects = projects;
+            $scope.allProjects = projects;
             $scope.projectRoles = projectRoles;
             
             _.each(projects, function(project) {
