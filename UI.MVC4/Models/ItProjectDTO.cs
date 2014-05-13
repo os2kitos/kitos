@@ -37,6 +37,7 @@ namespace UI.MVC4.Models
         public IEnumerable<EconomyYearDTO> EconomyYears { get; set; } 
         public IEnumerable<ItSystemDTO> ItSystems { get; set; }
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
+        public IEnumerable<RiskDTO> Risks { get; set; }
 
 
         #region Status project tab
@@ -97,6 +98,11 @@ namespace UI.MVC4.Models
         public int Bc
         {
             get { return EconomyYears.Sum(year => year.TotalBudget); }
+        }
+
+        public double AverageRisk
+        {
+            get { return Risks.Average(risk => risk.Consequence*risk.Probability); }
         }
     }
 }
