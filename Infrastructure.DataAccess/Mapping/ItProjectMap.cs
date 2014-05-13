@@ -128,6 +128,11 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.ChildItProjects)
                 .HasForeignKey(d => d.ParentItProjectId)
                 .WillCascadeOnDelete(false);
+
+            this.HasMany(t => t.Stakeholders)
+                .WithRequired(d => d.ItProject)
+                .HasForeignKey(d => d.ItProjectId)
+                .WillCascadeOnDelete(true);
         }
     }
 }
