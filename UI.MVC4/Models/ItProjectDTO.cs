@@ -19,6 +19,8 @@ namespace UI.MVC4.Models
         public string Description { get; set; }
         public AccessModifier AccessModifier { get; set; }
         public ItProjectPriority Priority { get; set; }
+        public bool IsPriorityLocked { get; set; }
+        public ItProjectPriority PriorityPf { get; set; }
         public bool IsArchived { get; set; }
 
         public int? AssociatedProgramId { get; set; }
