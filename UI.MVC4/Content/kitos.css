@@ -561,17 +561,11 @@ tr.sum {
     border-width: 2px 0px;
     border-color: gainsboro;
     border-style: solid;
-
-    font-size: 1.3em;
-    font-weight: bold;
 }
 
 tr.super-sum {
-    background-color: rgba(96, 156, 209, 0.37);
+    background-color: rgba(80, 132, 178, 0.37);
     border-width: 2px 0px;
     border-color: gainsboro;
     border-style: solid;
-
-    font-size: 1.5em;
-    font-weight: bold;
 }
