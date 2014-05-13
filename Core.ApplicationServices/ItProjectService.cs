@@ -42,6 +42,7 @@ namespace Core.ApplicationServices
         public ItProject AddProject(ItProject project)
         {
             CreateDefaultPhases(project);
+            AddEconomyYears(project);
 
             _projectRepository.Insert(project);
             _projectRepository.Save();
@@ -84,6 +85,7 @@ namespace Core.ApplicationServices
             };
 
             ClonePhases(original, clone);
+            AddEconomyYears(clone);
 
             _projectRepository.Insert(clone);
             _projectRepository.Save();
