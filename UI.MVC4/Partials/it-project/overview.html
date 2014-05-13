@@ -3,8 +3,11 @@
     <thead>
         <tr>
             <th>
-                <select>
-                    <option value="">-- Vælg afdeling --</option>
+                <select data-ui-select2="selectOrgUnitOptions" data-ng-model="chosenOrgUnitId" class="form-control input-sm" data-placeholder="Vælg afdeling">
+                    <option></option>
+                    <option data-ng-repeat="orgUnit in orgUnitTree" value="{{orgUnit.id}}">
+                        {{orgUnit.indentation}} {{orgUnit.name}} {{ orgUnit.hasWriteAccess && "*" || "" }}
+                    </option>
                 </select>
             </th>
             <th><!-- public --></th>

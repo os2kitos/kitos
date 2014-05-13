@@ -14,17 +14,27 @@
                     return $http.get('api/itprojectrole').then(function (result) {
                         return result.data.response;
                     });
+                }],
+                orgUnits: ['$http', 'userService', function ($http, userService) {
+                    return userService.getUser().then(function(user) {
+                        return $http.get('api/organizationunit?userId=' + user.id).then(function(result) {
+                            return result.data.response;
+                        });
+                    });
+                }],
+                user: ['userService', function (userService) {
+                    return userService.getUser();
                 }]
             }
         });
     }]);
 
     app.controller('project.EditOverviewCtrl',
-    ['$scope', '$http', 'projects', 'projectRoles',
-        function ($scope, $http, projects, projectRoles) {
+    ['$scope', '$http', '$sce', 'projects', 'projectRoles', 'orgUnits', 'user',
+        function ($scope, $http, $sce, projects, projectRoles, orgUnits, user) {
             $scope.projects = projects;
             $scope.projectRoles = projectRoles;
-
+            
             _.each(projects, function(project) {
                 // fetch assigned roles for each project
                 $http.get('api/itprojectright/' + project.id).success(function (result) {
@@ -37,5 +47,63 @@
                     return phase.id == project.currentPhaseId;
                 });
             });
+
+            $scope.orgUnits = {};
+            $scope.orgUnitTree = [];
+
+            _.each(orgUnits, function(orgUnit) {
+                visitOrgUnit(orgUnit, "");
+                hasWriteAccess(orgUnit, false);
+            });
+            
+            function visitOrgUnit(orgUnit, indentation) {
+
+                orgUnit.indentation = $sce.trustAsHtml(indentation);
+
+                checkForDefaultUnit(orgUnit);
+
+                $scope.orgUnits[orgUnit.id] = orgUnit;
+                $scope.orgUnitTree.push(orgUnit);
+
+                _.each(orgUnit.children, function (child) {
+                    return visitOrgUnit(child, indentation + "&nbsp;&nbsp;&nbsp;");
+                });
+            }
+            
+            function checkForDefaultUnit(unit) {
+                if (!user.defaultOrganizationUnitId) return;
+
+                if (!unit || unit.id !== user.defaultOrganizationUnitId) return;
+
+                $timeout(function () {
+                    $scope.orgUnitId = unit.id;
+                    //$scope.loadUsages();
+                    console.log('loadUsages');
+                });
+            }
+            
+            function hasWriteAccess(orgUnit, inherit) {
+                if (inherit) {
+                    orgUnit.hasWriteAccess = true;
+
+                    _.each(orgUnit.children, function (child) {
+                        hasWriteAccess(child, true);
+                    });
+                } else {
+                    $http.get('api/organizationRight?hasWriteAccess&oId=' + orgUnit.id + '&uId=' + user.id).success(function (result) {
+                        orgUnit.hasWriteAccess = result.response;
+
+                        _.each(orgUnit.children, function (child) {
+                            hasWriteAccess(child, result.response);
+                        });
+
+                    });
+                }
+            }
+            
+            $scope.selectOrgUnitOptions = {
+                dropdownAutoWidth : true,
+                escapeMarkup: function (m) { return m; }
+            };
         }]);
 })(angular, app);
