@@ -30,8 +30,8 @@
     }]);
 
     app.controller('project.EditOverviewCtrl',
-    ['$scope', '$http', '$sce', '$timeout', 'projects', 'projectRoles', 'orgUnits', 'user',
-        function ($scope, $http, $sce, $timeout, projects, projectRoles, orgUnits, user) {
+    ['$scope', '$http', '$sce', '$timeout', '$filter', 'projects', 'projectRoles', 'orgUnits', 'user',
+        function ($scope, $http, $sce, $timeout, $filter, projects, projectRoles, orgUnits, user) {
             $scope.projects = projects;
             $scope.projectRoles = projectRoles;
             
@@ -55,7 +55,17 @@
                 visitOrgUnit(orgUnit, "");
                 hasWriteAccess(orgUnit, false);
             });
-            
+
+            $scope.$watch('chosenOrgUnitId', function (newValue) {
+                // this is so hacky... everytime this executes a kitten dies
+                if (newValue == 't') {
+                    // 'tværgående' has been selected
+                    $scope.projects = $filter('filter')(projects, { isTransversal: true });
+                } else {
+                    $scope.projects = $filter('andChildren')(projects, 'responsibleOrgUnitId', $scope.orgUnitTree, newValue);
+                }
+            });
+
             function visitOrgUnit(orgUnit, indentation) {
 
                 orgUnit.indentation = $sce.trustAsHtml(indentation);

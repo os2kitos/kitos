@@ -8,6 +8,7 @@
                     <option data-ng-repeat="orgUnit in orgUnitTree" value="{{orgUnit.id}}">
                         {{orgUnit.indentation}} {{orgUnit.name}} {{ orgUnit.hasWriteAccess && "*" || "" }}
                     </option>
+                    <option value="t">Tværgående</option>
                 </select>
             </th>
             <th><!-- public --></th>
@@ -34,7 +35,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr data-ng-repeat="p in projects | filter:!isArchived | andChildren:'responsibleOrgUnitId':orgUnitTree:chosenOrgUnitId">
+        <tr data-ng-repeat="p in projects | filter:!isArchived">
             <td>{{ p.responsibleOrgUnit.name }}</td>
             <td>{{ p.accessModifier == 1 ? 'P' : '' }}</td>
             <td>{{ p.roles | filter:{roleId:chosenRoleId} | joinBy:', ':'user.name' }}</td>
