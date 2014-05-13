@@ -137,5 +137,7 @@ namespace Core.DomainModel.ItProject
         public virtual int? ParentItProjectId { get; set; }
         public virtual ItProject ParentItProject { get; set; }
         public virtual ICollection<ItProject> ChildItProjects { get; set; }
+
+        public virtual GoalStatus GoalStatus { get; set; }
     }
 }
