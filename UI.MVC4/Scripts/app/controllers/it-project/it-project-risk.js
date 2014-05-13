@@ -10,60 +10,59 @@
                             .then(function (result) {
                                 return result.data.response;
                             });
-                    }]
+                }],
+                //returns a map with those users who have a role in this project.
+                //the names of the roles is saved in user.roleNames
+                usersWithRoles: ['$http', '$stateParams', function ($http, $stateParams) {
+
+                    //get the rights of the projects
+                    return $http.get("api/itprojectright/" + $stateParams.id)
+                        .then(function (rightResult) {
+                            var rights = rightResult.data.response;
+
+                            //get the role names
+                            return $http.get("api/itprojectrole/")
+                                .then(function (roleResult) {
+                                    var roles = roleResult.data.response;
+
+                                    //the resulting map
+                                    var users = {};
+                                    _.each(rights, function (right) {
+
+                                        //use the user from the map if possible
+                                        var user = users[right.userId] || right.user;
+
+                                        var role = _.findWhere(roles, { id: right.roleId });
+
+                                        var roleNames = user.roleNames || [];
+                                        roleNames.push(role.name);
+                                        user.roleNames = roleNames;
+
+                                        users[right.userId] = user;
+                                    });
+
+                                    return users;
+
+                                });
+
+                        });
+                }]
             }
         });
     }]);
 
-    app.controller('project.EditRiskCtrl', ['$scope', '$http', '$stateParams', 'notify', 'risks',
-        function($scope, $http, $stateParams, notify, risks) {
+    app.controller('project.EditRiskCtrl', ['$scope', '$http', '$stateParams', 'notify', 'risks', 'usersWithRoles',
+        function($scope, $http, $stateParams, notify, risks, usersWithRoles) {
 
             var projectId = $stateParams.id;
 
             $scope.risks = [];
-
-            function watchUser(risk) {
-
-                function getUserId() {
-                    if (risk.userForSelect) return risk.userForSelect.id;
-
-                    return null;
-                }
-
-                $scope.$watch(getUserId, function (newVal, oldVal) {
-
-                    if (!newVal || newVal === oldVal) return;
-
-                    $http({
-                        method: 'PATCH',
-                        url: risk.updateUrl,
-                        data: {
-                            'responsibleUserId': newVal
-                        }
-                    }).success(function() {
-                        risk.responsibleUserId = risk.userForSelect.id;
-                        risk.responsibleUser = risk.userForSelect.user;
-
-                        notify.addSuccessMessage("Feltet er opdateret.");
-                    }).error(function () {
-                        notify.addErrorMessage("Fejl! Feltet kunne ikke ændres!");
-                    });
-
-                });
-
-
-            }
-
+            $scope.usersWithRoles = _.values(usersWithRoles);
+            
             function pushRisk(risk) {
                 risk.show = true;
-                risk.userForSelect = risk.responsibleUserId ? {
-                    id: risk.responsibleUserId,
-                    text: risk.responsibleUser.name
-                } : null;
 
                 risk.updateUrl = "api/risk/" + risk.id;
-
-                watchUser(risk);
 
                 $scope.risks.push(risk);
             }
@@ -101,7 +100,6 @@
                     consequence: 1,
                     probability: 1
                 };
-                $scope.userForSelect = null;
             }
 
             resetNewRisk();
@@ -110,7 +108,7 @@
                 var risk = $scope.newRisk;
 
                 //name, action or user shouldn't be null or empty
-                if (!risk.name || !risk.action || !risk.userForSelect) return;
+                if (!risk.name || !risk.action || !risk.responsibleUserId) return;
                 
                 var data = {
                     itProjectId: projectId,
@@ -118,7 +116,7 @@
                     action: risk.action,
                     probability: risk.probability,
                     consequence: risk.consequence,
-                    responsibleUserId: risk.userForSelect.id
+                    responsibleUserId: risk.responsibleUserId
                 };
 
                 var msg = notify.addInfoMessage("Gemmer række", false);
@@ -126,7 +124,6 @@
                     .success(function (result) {
 
                         var responseRisk = result.response;
-                        responseRisk.responsibleUser = risk.userForSelect.user;
                         pushRisk(responseRisk);
                         resetNewRisk();
 
