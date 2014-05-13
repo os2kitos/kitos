@@ -48,9 +48,6 @@
             });
 
             $scope.submitRight = function () {
-
-                console.log("foo");
-
                 if (!$scope.selectedUser || !$scope.newRole) return;
 
                 var oId = projectId;
