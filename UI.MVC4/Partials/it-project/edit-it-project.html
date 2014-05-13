@@ -92,7 +92,6 @@
             </div>-->
             
             <!-- associated program -->
-            <!-- TODO: only show this if project isn't of type 'program' -->
             <div class="form-group" data-ng-if="project.itProjectTypeId != itProgramType.id">
                 <label class="col-md-2 control-label small" for="associated-program">
                     Tilknyttet program
@@ -116,7 +115,17 @@
                     <!-- TODO: list projects as links -->
                 </div>
             </div>
-
+            
+            <!-- archived -->
+            <div class="form-group">
+                <div class="col-md-offset-2">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" data-ng-model="project.isArchived" data-autosave="{{autosaveUrl}}" data-field="isArchived" /> Arkiveret
+                        </label>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="col-md-6">
