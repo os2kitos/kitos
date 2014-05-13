@@ -54,7 +54,7 @@
                        data-autosave="{{column.updateUrl}}" 
                        data-field="{{row.budgetName}}"
                        data-ng-model="column.budget" 
-                       data-ng-change="row.update()" data-ng-if="!row.readonly"/>
+                       data-ng-change="row.update()" data-ng-if="!row.readonly" data-ng-disabled="!hasWriteAccess"/>
                 
                 <!-- if readonly -->
                 <input type="text" class="form-control input-sm input-cell" 
@@ -66,7 +66,7 @@
                        data-autosave="{{column.updateUrl}}" 
                        data-field="{{row.reaName}}"
                        data-ng-model="column.rea" 
-                       data-ng-change="row.update()" data-ng-if="!row.readonly"/>
+                       data-ng-change="row.update()" data-ng-if="!row.readonly" data-ng-disabled="!hasWriteAccess"/>
                 
                 <input type="text" class="form-control input-sm input-cell" 
                        data-ng-model="column.rea" readonly="readonly" data-ng-if="row.readonly" />
