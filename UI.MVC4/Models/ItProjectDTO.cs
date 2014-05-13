@@ -102,7 +102,7 @@ namespace UI.MVC4.Models
 
         public double AverageRisk
         {
-            get { return Risks.Average(risk => risk.Consequence*risk.Probability); }
+            get { return Risks.Any() ? Risks.Average(risk => risk.Consequence * risk.Probability) : default(double); }
         }
     }
 }
