@@ -386,8 +386,7 @@ namespace UI.MVC4.Controllers.API
         protected override ItProject PostQuery(ItProject item)
         {
             //Makes sure to create the necessary properties, like phases
-            _itProjectService.AddProject(item);
-            return item;
+            return _itProjectService.AddProject(item);
         }
 
         protected override ItProject PatchQuery(ItProject item)
