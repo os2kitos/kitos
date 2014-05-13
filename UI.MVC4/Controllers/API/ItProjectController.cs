@@ -17,14 +17,12 @@ namespace UI.MVC4.Controllers.API
         private readonly IItProjectService _itProjectService;
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
-        private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
 
-        public ItProjectController(IGenericRepository<ItProject> repository, IItProjectService itProjectService, IGenericRepository<Organization> orgRepository, IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository, IGenericRepository<ItSystemUsage> itSystemUsageRepository) 
+        public ItProjectController(IGenericRepository<ItProject> repository, IItProjectService itProjectService, IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository, IGenericRepository<ItSystemUsage> itSystemUsageRepository) 
             : base(repository)
         {
             _itProjectService = itProjectService;
-            _orgRepository = orgRepository;
             _taskRepository = taskRepository;
             _itSystemUsageRepository = itSystemUsageRepository;
             _orgUnitRepository = orgUnitRepository;
@@ -36,20 +34,6 @@ namespace UI.MVC4.Controllers.API
             {
                 var project = Repository.GetByKey(id);
                 return Ok(_itProjectService.HasWriteAccess(KitosUser, project));
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
-
-        public HttpResponseMessage GetPublic()
-        {
-            try
-            {
-                var projects = _itProjectService.GetAll();
-
-                return Ok(Map(projects));
             }
             catch (Exception e)
             {
