@@ -246,6 +246,10 @@ namespace UI.MVC4.App_Start
                 .ForMember(dest => dest.ItProject, opt => opt.Ignore())
                 .ForMember(dest => dest.ResponsibleUser, opt => opt.Ignore());
 
+            Mapper.CreateMap<Stakeholder, StakeholderDTO>()
+                .ReverseMap()
+                .ForMember(dest => dest.ItProject, opt => opt.Ignore());
+
             Mapper.CreateMap<Activity, ActivityDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.AssociatedUser, opt => opt.Ignore())
