@@ -13,9 +13,59 @@
     }]);
 
     app.controller('project.EditStakeholdersCtrl',
-    ['$rootScope', '$scope', 'itProject',
-        function($rootScope, $scope, itProject) {
+    ['$rootScope', '$scope', '$http', 'notify', 'itProject',
+        function($rootScope, $scope, $http, notify, itProject) {
 
+            $scope.stakeholders = [];
+            $scope.new = {};
+
+            function addStakeholder(stakeholder) {
+                stakeholder.show = true;
+
+                stakeholder.updateUrl = "api/stakeholder/" + stakeholder.id;
+
+                stakeholder.delete = function() {
+                    var msg = notify.addInfoMessage("Sletter...");
+                    $http.delete(stakeholder.updateUrl).success(function() {
+                        stakeholder.show = false;
+                        msg.toSuccessMessage("Rækken er slettet");
+                    }).error(function() {
+                        msg.toErrorMessage("Kunne ikke slette!");
+                    });
+                };
+
+                $scope.stakeholders.push(stakeholder);
+            }
+
+            _.each(itProject.stakeholders, addStakeholder);
+
+            $scope.saveNewStakeholder = function() {
+
+                var row = $scope.new;
+
+                if (!(row.name && row.role && row.downsides && row.benefits && row.significance && row.howToHandle)) return;
+
+                if (row.significance < 1 || row.significance > 5) return;
+
+                var data = {
+                    itProjectId: itProject.id,
+                    name: row.name,
+                    role: row.role,
+                    downsides: row.downsides,
+                    benefits: row.benefits,
+                    significance: row.significance,
+                    howToHandle: row.howToHandle
+                };
+
+                var msg = notify.addInfoMessage("Gemmer... ");
+                $http.post("api/stakeholder", data).success(function(result) {
+                    msg.toSuccessMessage("Rækken er tilføjet.");
+                    addStakeholder(result.response);
+                }).error(function() {
+                    msg.toErrorMessage("Fejl! Kunne ikke gemme!");
+                });
+
+            };
 
 
         }]);
