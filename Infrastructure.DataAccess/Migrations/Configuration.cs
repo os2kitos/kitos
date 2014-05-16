@@ -985,12 +985,30 @@ namespace Infrastructure.DataAccess.Migrations
                 Organization = organization,
                 EconomyYears = new List<EconomyYear>()
                     {
-                        new EconomyYear(),
-                        new EconomyYear(),
-                        new EconomyYear(),
-                        new EconomyYear(),
-                        new EconomyYear(),
                         new EconomyYear()
+                            {
+                                YearNumber = 0
+                            },
+                        new EconomyYear()
+                            {
+                                YearNumber = 1
+                            },
+                        new EconomyYear()
+                            {
+                                YearNumber = 2
+                            },
+                        new EconomyYear()
+                            {
+                                YearNumber = 3
+                            },
+                        new EconomyYear()
+                            {
+                                YearNumber = 4
+                            },
+                        new EconomyYear()
+                            {
+                                YearNumber = 5
+                            }
                     },
                 //Phases = SimplePhases(owner)
                 Phase1 = phase1,

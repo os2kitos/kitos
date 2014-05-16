@@ -3,10 +3,8 @@
     <div class="panel-heading">
         <i class="glyphicon glyphicon-user"></i>
         Projektroller
-
-                        <a class="pull-right"
-                            data-ng-click="editRights = !editRights">Rediger
-                        </a>
+        
+        <a class="pull-right" data-ng-click="editRights = !editRights" data-ng-hide="!hasWriteAccess">Rediger</a>
     </div>
     <table class="full-width table org-role-table">
         <thead>
@@ -58,7 +56,7 @@
         </tbody>
 
         <!-- add-new-right row -->
-        <tbody data-ng-show="true">
+        <tbody data-ng-hide="!hasWriteAccess">
             <tr>
                 <td>
                     <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en projektrolle" class="form-control input-sm" data-ng-change="submitRight()">

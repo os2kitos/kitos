@@ -4,6 +4,8 @@
     {
         public int Id { get; set; }
 
+        public int YearNumber { get; set; }
+
         public int ItProjectId { get; set; }
         public virtual ItProjectDTO ItProject { get; set; }
 
@@ -20,6 +22,11 @@
         public int IncreasedBusinessExpensesBudget { get; set; }
         public int IncreasedBusinessExpensesRea { get; set; }
 
+        public int BusinessExpensesTotal
+        {
+            get { return ConsultantBudget + EducationBudget + OtherBusinessExpensesBudget + IncreasedBusinessExpensesBudget; }
+        }
+
 
         //IT expenses
         public int HardwareBudget { get; set; }
@@ -34,12 +41,22 @@
         public int IncreasedItExpensesBudget { get; set; }
         public int IncreasedItExpensesRea { get; set; }
 
+        public int ItExpensesTotal
+        {
+            get { return HardwareBudget + SoftwareBudget + OtherItExpensesBudget + IncreasedItExpensesBudget; }
+        }
+
         //Business savings
         public int SalaryBudget { get; set; }
         public int SalaryRea { get; set; }
 
         public int OtherBusinessSavingsBudget { get; set; }
         public int OtherBusinessSavingsRea { get; set; }
+
+        public int BusinessSavingsTotal 
+        {
+            get { return SalaryBudget + OtherBusinessSavingsBudget; } 
+        }
 
         //IT savings
         public int LicenseSavingsBudget { get; set; }
@@ -50,5 +67,16 @@
 
         public int OtherItSavingsBudget { get; set; }
         public int OtherItSavingsRea { get; set; }
+
+
+        public int ItSavingsTotal
+        {
+            get { return LicenseSavingsBudget + SystemMaintenanceSavingsBudget + OtherItSavingsBudget; }
+        }
+
+        public int TotalBudget
+        {
+            get { return BusinessSavingsTotal + ItSavingsTotal - BusinessExpensesTotal - ItExpensesTotal; }
+        }
     }
 }

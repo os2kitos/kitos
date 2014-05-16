@@ -17,17 +17,17 @@
                 <td>
                     <input type="text" class="form-control input-sm" data-ng-model="risk.name" 
                            data-field="name"
-                           data-autosave="{{risk.updateUrl}}" />
+                           data-autosave="{{risk.updateUrl}}" data-ng-disabled="!hasWriteAccess"/>
                 </td>
                 <td>
                     <input type="number" class="form-control input-sm" min="1" max="5" data-ng-model="risk.consequence"
                            data-field="consequence"
-                           data-autosave="{{risk.updateUrl}}" />
+                           data-autosave="{{risk.updateUrl}}" data-ng-disabled="!hasWriteAccess"/>
                 </td>
                 <td>
                     <input type="number" class="form-control input-sm" min="1" max="5" data-ng-model="risk.probability"
                            data-field="probability"
-                           data-autosave="{{risk.updateUrl}}" />
+                           data-autosave="{{risk.updateUrl}}" data-ng-disabled="!hasWriteAccess"/>
                 </td>
                 <td>
                     <p class="form-control-static input-sm">{{ product(risk) }}</p>
@@ -35,18 +35,24 @@
                 <td>
                     <input type="text" class="form-control input-sm" data-ng-model="risk.action" 
                            data-field="action"
-                           data-autosave="{{risk.updateUrl}}" />
+                           data-autosave="{{risk.updateUrl}}" data-ng-disabled="!hasWriteAccess"/>
                 </td>
                 <td>
-                    <input data-select-user="foo" data-user-model="risk.userForSelect" />
+                     <select class="form-control input-sm" 
+                        data-field="responsibleUserId"
+                        data-autosave="{{risk.updateUrl}}"
+                        data-ng-model="risk.responsibleUserId" 
+                        data-ng-options="user.id as user.name for user in usersWithRoles">
+                        <option value=""></option>
+                    </select>
                 </td>
                 <td>
-                    <button class="btn btn-danger btn-sm" data-ng-click="delete(risk)">
+                    <button class="btn btn-danger btn-sm" data-ng-click="delete(risk)" data-ng-disabled="!hasWriteAccess">
                         <i class="glyphicon glyphicon-trash small"></i>
                     </button>
                 </td>
             </tr>                     
-            <tr class="active">
+            <tr class="active" data-ng-hide="!hasWriteAccess">
                 <td>
                     <input type="text" class="form-control input-sm" data-ng-model="newRisk.name" />
                 </td>
@@ -63,7 +69,11 @@
                     <input type="text" class="form-control input-sm" data-ng-model="newRisk.action" />
                 </td>
                 <td>
-                    <input data-select-user="foo" data-user-model="newRisk.userForSelect" />
+                     <select class="form-control input-sm" 
+                        data-ng-model="newRisk.responsibleUserId" 
+                        data-ng-options="user.id as user.name for user in usersWithRoles">
+                        <option value=""></option>
+                    </select>
                 </td>
                 <td>
                     <button class="btn btn-success btn-sm" data-ng-click="saveNewRisk()">

@@ -274,7 +274,9 @@
 
     app.directive('datewriter', [function() {
         return {
-                scope: true,
+                scope: {
+                    'isDisabled': '=?isDisabled'
+                },
                 templateUrl: 'partials/directives/datewriter.html',
                 require: 'ngModel',
                 link: function (scope, element, attr, ngModel) {
