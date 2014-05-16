@@ -5,7 +5,10 @@ Overleveringsmøde afholdt den
 <input type="date" data-ng-model="handover.meetingDate" data-autosave="{{autosaveUrl}}" data-field="meetingDate" />
 
 Deltagere
-<input type="text"/>
+<select multiple="multiple" data-ui-select2="select2Options" data-ng-model="participants" data-placeholder="Vælg deltagere" data-ng-change="test()">
+    <option value=""></option>
+    <option value="{{ user.id }}" data-ng-repeat="user in usersWithRoles">{{user.name}}</option>
+</select>
 
 Resume af hvad der er aftalt ifm. overleveringsmødet
 <textarea data-ng-model="handover.summary" data-autosave="{{autosaveUrl}}" data-field="summary"></textarea>

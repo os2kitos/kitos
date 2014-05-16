@@ -55,7 +55,14 @@
         function ($scope, $stateParams, dateFilter, handover, usersWithRoles) {
             $scope.handover = handover;
             $scope.usersWithRoles = usersWithRoles;
-            //$scope.meetingDateObj = dateFilter(new Date(handover.meetingDate), 'yyyy-MM-dd'); // this is nessarcy for angular to 'get it'
             $scope.autosaveUrl = 'api/handover/' + $stateParams.id;
+            
+            $scope.select2Options = {
+                dropdownAutoWidth: true
+            };
+
+            $scope.test = function() {
+                console.log($scope.participants);
+            };
         }]);
 })(angular, app);
