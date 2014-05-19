@@ -195,11 +195,19 @@ namespace UI.MVC4.Controllers.API
                 }
                 else
                 {
-                    // use reflection to call obj.Value<t>("keyName");
-                    var genericMethod = jToken.GetType().GetMethod("Value").MakeGenericMethod(new Type[] {t});
-                    var value = genericMethod.Invoke(obj, new object[] {valuePair.Key});
-                    // update the entity
-                    propRef.SetValue(item, value);
+                    try
+                    {
+                        // use reflection to call obj.Value<t>("keyName");
+                        var genericMethod = jToken.GetType().GetMethod("Value").MakeGenericMethod(new Type[] { t });
+                        var value = genericMethod.Invoke(obj, new object[] { valuePair.Key });
+                        // update the entity
+                        propRef.SetValue(item, value);
+                    }
+                    catch (Exception)
+                    {
+                        // if obj.Value<t>("keyName") cast fails set to fallback value
+                        propRef.SetValue(item, null); // TODO this is could be dangerous, should probably also be default(t)
+                    }
                 }
             }
 
