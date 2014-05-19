@@ -540,6 +540,7 @@
     <Content Include="Scripts\app\controllers\it-system\it-system-interfaces.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config.js" />
     <Content Include="Scripts\app\controllers\org\org.js" />
+    <Content Include="Scripts\app\directives\angularjs-dropdown-multiselect.js" />
     <Content Include="Scripts\app\directives\directives.js" />
     <Content Include="Scripts\app\directives\filters.js" />
     <Content Include="Scripts\app\directives\form-directives.js" />
