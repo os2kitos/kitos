@@ -983,6 +983,7 @@ namespace Infrastructure.DataAccess.Migrations
                 ItProjectCategory = projectCategory,
                 ItProjectType = type,
                 Organization = organization,
+                Handover = new Handover(),
                 EconomyYears = new List<EconomyYear>()
                     {
                         new EconomyYear()
