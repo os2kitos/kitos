@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+using UI.MVC4.Filters;
 
 namespace UI.MVC4.Models
 {
@@ -9,7 +11,7 @@ namespace UI.MVC4.Models
         public string Purpose { get; set; }
         public string Message { get; set; }
         public string Media { get; set; }
-        // TODO add json converter
+        [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime? DueDate { get; set; }
 
         public int? ResponsibleUserId { get; set; }
