@@ -225,6 +225,7 @@
     <Compile Include="Controllers\API\AuthorizeController.cs" />
     <Compile Include="Controllers\API\BaseApiController.cs" />
     <Compile Include="Controllers\API\BusinessTypeController.cs" />
+    <Compile Include="Controllers\API\CommunicationController.cs" />
     <Compile Include="Controllers\API\ContractTemplateController.cs" />
     <Compile Include="Controllers\API\ContractTypeController.cs" />
     <Compile Include="Controllers\API\EconomyYearController.cs" />
@@ -245,6 +246,7 @@
     <Compile Include="Controllers\API\ItSystemUsageController.cs" />
     <Compile Include="Controllers\API\RiskController.cs" />
     <Compile Include="Controllers\API\StateController.cs" />
+    <Compile Include="Models\CommunicationDTO.cs" />
     <Compile Include="Models\GoalDTO.cs" />
     <Compile Include="Models\GoalStatusDTO.cs" />
     <Compile Include="Models\RiskDTO.cs" />
@@ -433,6 +435,7 @@
     <Content Include="Partials\it-project\portfolio.html" />
     <Content Include="Partials\it-project\modal-goal-edit.html" />
     <Content Include="Partials\it-project\modal-milestone-task-edit.html" />
+    <Content Include="Partials\it-project\tab-communication.html" />
     <Content Include="Partials\it-project\tab-description.html" />
     <Content Include="Partials\it-project\tab-risk.html" />
     <Content Include="Partials\it-project\tab-roles.html" />
@@ -506,6 +509,7 @@
     <Content Include="Scripts\app\controllers\global-admin\global-admin.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-config.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
+    <Content Include="Scripts\app\controllers\it-project\it-project-communication.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-overview.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-status-goal.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-status-project.js" />

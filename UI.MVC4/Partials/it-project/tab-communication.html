@@ -1,0 +1,47 @@
+﻿<table class="table">
+    <thead>
+        <tr>
+            <th>Målgruppe</th>
+            <th>Formål</th>
+            <th>Budskab</th>
+            <th>Medie</th>
+            <th>Hvornår</th>
+            <th colspan="2">Ansvarlig</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr data-ng-repeat="c in comms">
+            <td><input type="text" data-ng-model="c.targetAudiance" data-autosave="api/communication/{{c.id}}" data-field="targetAudiance" /></td>
+            <td><input type="text" data-ng-model="c.purpose" data-autosave="api/communication/{{c.id}}" data-field="purpose" /></td>
+            <td><input type="text" data-ng-model="c.message" data-autosave="api/communication/{{c.id}}" data-field="message" /></td>
+            <td><input type="text" data-ng-model="c.media" data-autosave="api/communication/{{c.id}}" data-field="media" /></td>
+            <td><input type="date" data-ng-model="c.dueDate" data-autosave="api/communication/{{c.id}}" data-field="dueDate" /></td>
+            <td colspan="2">
+                <select class="form-control input-sm" 
+                        data-field="responsibleUserId"
+                        data-autosave="api/communication/{{c.id}}"
+                        data-ng-model="c.responsibleUserId" 
+                        data-ng-options="user.id as user.name for user in usersWithRoles">
+                    <option value=""></option>
+                </select>
+            </td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td><input type="text" data-ng-model="comm.targetAudiance" /></td>
+            <td><input type="text" data-ng-model="comm.purpose" /></td>
+            <td><input type="text" data-ng-model="comm.message" /></td>
+            <td><input type="text" data-ng-model="comm.media"/></td>
+            <td><input type="date" data-ng-model="comm.dueDate"/></td>
+            <td>
+                <select class="form-control input-sm" 
+                        data-ng-model="comm.responsibleUserId" 
+                        data-ng-options="user.id as user.name for user in usersWithRoles">
+                    <option value=""></option>
+                </select>
+            </td>
+            <td><button class="btn btn-success" data-ng-click="save()">GEM</button></td>
+        </tr>
+    </tfoot>
+</table>

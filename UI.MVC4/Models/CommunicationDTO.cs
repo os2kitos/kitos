@@ -1,20 +1,19 @@
-using System;
+﻿using System;
 
-namespace Core.DomainModel.ItProject
+namespace UI.MVC4.Models
 {
-    public class Communication : IEntity<int>
+    public class CommunicationDTO
     {
         public int Id { get; set; }
         public string TargetAudiance { get; set; }
         public string Purpose { get; set; }
         public string Message { get; set; }
         public string Media { get; set; }
+        // TODO add json converter
         public DateTime? DueDate { get; set; }
 
         public int? ResponsibleUserId { get; set; }
-        public virtual User ResponsibleUser { get; set; }
-        
+        public string ResponsibleUserName { get; set; }
         public int ItProjectId { get; set; }
-        public virtual ItProject ItProject { get; set; }
     }
 }
