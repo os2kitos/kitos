@@ -41,8 +41,13 @@ namespace Core.DomainModel.ItProject
         public bool IsPriorityLocked { get; set; }
         public ItProjectPriority PriorityPf { get; set; }
         public bool IsArchived { get; set; }
-        
 
+        public bool IsStatusGoalVisible { get; set; }
+        public bool IsEconomyVisible { get; set; }
+        public bool IsStakeholdersVisible { get; set; }
+        public bool IsCommunicationVisible { get; set; }
+        public bool IsHandoverVisible { get; set; }
+        
         //public bool IsTermsOfReferenceApproved { get; set; }
         //public int? ItProjectOwnerId { get; set; }
         //public int? ItProjectLeaderId { get; set; }
