@@ -17,10 +17,13 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.ItProjectId).HasColumnName("ItProjectId");
 
             // Relationships
-            //this.HasRequired(t => t.ItProject)
-            //    .WithMany(t => t.Communications)
-            //    .HasForeignKey(d => d.ItProjectId);
+            this.HasRequired(t => t.ItProject)
+                .WithMany(t => t.Communications)
+                .HasForeignKey(d => d.ItProjectId);
 
+            this.HasOptional(t => t.ResponsibleUser)
+                .WithMany(t => t.ResponsibleForCommunications)
+                .HasForeignKey(d => d.ResponsibleUserId);
         }
     }
 }

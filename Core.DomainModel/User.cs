@@ -23,6 +23,7 @@ namespace Core.DomainModel
             this.Activities = new List<Activity>();
             this.States = new List<State>();
             this.ResponsibleForRisks = new List<Risk>();
+            this.ResponsibleForCommunications = new List<Communication>();
             this.HandoverParticipants = new List<Handover>();
         }
 
@@ -48,7 +49,8 @@ namespace Core.DomainModel
         public virtual ICollection<Risk> ResponsibleForRisks { get; set; }
         public virtual ICollection<Wish> Wishes { get; set; }
         public virtual ICollection<Activity> Activities { get; set; }
-        public virtual ICollection<State> States { get; set; }
+        public virtual ICollection<State> States { get; set; }  
+        public virtual ICollection<Communication> ResponsibleForCommunications { get; set; } 
         public virtual ICollection<Handover> HandoverParticipants { get; set; }
     }
 }

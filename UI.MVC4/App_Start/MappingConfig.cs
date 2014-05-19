@@ -281,6 +281,10 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<Handover, HandoverDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.ItProject, opt => opt.Ignore());
+
+            Mapper.CreateMap<Communication, CommunicationDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.ItProject, opt => opt.Ignore());
         }
     }
 }

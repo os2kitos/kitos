@@ -105,7 +105,8 @@ namespace Core.ApplicationServices
                 // TODO CommonPublicProjects = project.CommonPublicProjects,
                 // TODO EconomyYears = project.EconomyYears
                 // TODO MilestoneStates = project.MilestoneStates,
-                // TODO TaskActivities = project.TaskActivities
+                // TODO TaskActivities = project.TaskActivities,
+                // TODO Communcations = project.Communcations
             };
 
             ClonePhases(original, clone);
