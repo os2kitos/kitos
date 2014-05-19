@@ -51,18 +51,31 @@
     }]);
 
     app.controller('project.EditHandoverCtrl',
-    ['$scope', '$stateParams', 'dateFilter', 'handover', 'usersWithRoles',
-        function ($scope, $stateParams, dateFilter, handover, usersWithRoles) {
+    ['$scope', '$http', '$stateParams', 'dateFilter', 'handover', 'usersWithRoles',
+        function ($scope, $http, $stateParams, dateFilter, handover, usersWithRoles) {
             $scope.handover = handover;
             $scope.usersWithRoles = usersWithRoles;
             $scope.autosaveUrl = 'api/handover/' + $stateParams.id;
-            
+            $scope.participants = _.map(handover.participants, function(user) {
+                return user.id.toString();
+            });
+
             $scope.select2Options = {
                 dropdownAutoWidth: true
             };
 
-            $scope.test = function() {
-                console.log($scope.participants);
-            };
+            $scope.$watch('participants', function (newValue, oldValue) {
+                if (newValue.length > oldValue.length) {
+                    // something was added
+                    var addId = _.difference(newValue, oldValue);
+                    console.log(addId, newValue, oldValue);
+                    $http.post($scope.autosaveUrl + '?participantId=' + addId);
+                } else if (newValue.length < oldValue.length) {
+                    // something was removed
+                    var removeId = _.difference(oldValue, newValue);
+                    console.log(removeId, newValue, oldValue);
+                    $http.delete($scope.autosaveUrl + '?participantId=' + removeId);
+                }
+            });
         }]);
 })(angular, app);
