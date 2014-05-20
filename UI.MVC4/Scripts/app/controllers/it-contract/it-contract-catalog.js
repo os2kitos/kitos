@@ -2,7 +2,7 @@
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-contract.catalog', {
             url: '/catalog',
-            templateUrl: 'partials/it-contract/catalog.html',
+            templateUrl: 'partials/it-contract/it-contract-catalog.html',
             controller: 'contract.CatalogCtrl',
             resolve: {
 

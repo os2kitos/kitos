@@ -2,7 +2,7 @@
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-contract.overview', {
             url: '/overview',
-            templateUrl: 'partials/it-contract/overview.html',
+            templateUrl: 'partials/it-contract/it-contract-overview.html',
             controller: 'contract.OverviewCtrl',
             resolve: {
 
