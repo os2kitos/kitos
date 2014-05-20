@@ -25,7 +25,7 @@ namespace UI.MVC4.Models
 
         public bool IsStatusGoalVisible { get; set; }
         public bool IsEconomyVisible { get; set; }
-        public bool IsStakeholdersVisible { get; set; }
+        public bool IsStakeholderVisible { get; set; }
         public bool IsCommunicationVisible { get; set; }
         public bool IsHandoverVisible { get; set; }
 

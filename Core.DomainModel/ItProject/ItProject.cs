@@ -44,7 +44,7 @@ namespace Core.DomainModel.ItProject
 
         public bool IsStatusGoalVisible { get; set; }
         public bool IsEconomyVisible { get; set; }
-        public bool IsStakeholdersVisible { get; set; }
+        public bool IsStakeholderVisible { get; set; }
         public bool IsCommunicationVisible { get; set; }
         public bool IsHandoverVisible { get; set; }
         

@@ -16,7 +16,7 @@ directiveModule.directive('ngDropdownMultiselect', ['$filter', '$document', '$co
 			var checkboxes = attrs.checkboxes ? true : false;
 
 			var template = '<div class="multiselect-parent btn-group dropdown-multiselect" data-ng-class="{open: open}">';
-			template +='<button type="button" class="btn btn-default dropdown-toggle" ng-click="toggleDropdown()">{{getButtonText()}}<span class="caret"></span></button>';
+			template += '<button type="button" class="btn btn-default dropdown-toggle" ng-click="toggleDropdown()">{{getButtonText()}}<span class="caret"></span></button>';
 			template += '<ul class="dropdown-menu dropdown-menu-form">';
 			template += '<li><a data-ng-click="selectAll()"><span class="glyphicon glyphicon-ok"></span>  Check All</a>';
 			template += '<li><a data-ng-click="deselectAll();"><span class="glyphicon glyphicon-remove"></span>  Uncheck All</a></li>';
