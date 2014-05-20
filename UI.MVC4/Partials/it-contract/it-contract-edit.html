@@ -1,1 +1,178 @@
-﻿
+﻿<form class="form-horizontal fix-label-padding">
+    <!-- Name -->
+    <div class="form-group">
+        <label for="contract-name" class="control-label col-md-5 small">IT kontraktnavn</label>
+        <div class="col-md-7">
+            <input type="text" id="contract-name" data-ng-model="contract.name" class="form-control input-sm" />
+        </div>
+    </div>
+    
+    <!-- Id -->
+    <div class="form-group">
+        <label for="contract-id" class="control-label col-md-5 small">kontraktID</label>
+        <div class="col-md-7">
+            <input type="text" id="contract-id" data-ng-model="contract.id" class="form-control input-sm" />
+        </div>
+    </div>
+    
+    <!-- Parent -->
+    <div class="form-group">
+        <label for="contract-parent" class="control-label col-md-5 small">Overordent kontrakt</label>
+        <div class="col-md-7">
+            <select id="contract-parent"></select>
+        </div>
+    </div>
+    
+    <!-- Type -->
+    <div class="form-group">
+        <label for="contract-type" class="control-label col-md-5 small">Kontrakttype</label>
+        <div class="col-md-7">
+            <select id="contract-type"></select>
+        </div>
+    </div>
+    
+    <!-- ESDH -->
+    <div class="form-group">
+        <label for="contract-esdh" class="control-label col-md-5 small">ESDH ref.</label>
+        <div class="col-md-7">
+            <input type="text" id="contract-esdh" data-ng-model="contract.esdh" class="form-control input-sm" />
+        </div>
+    </div>
+    
+    <!-- Note -->
+    <div class="form-group">
+        <label for="contract-note" class="control-label col-md-5 small">Bemærkning</label>
+        <div class="col-md-7">
+            <textarea id="contract-note" data-ng-model="contract.note" class="form-control input-sm" />
+        </div>
+    </div>
+    
+    <!-- Purchase form -->
+    <div class="form-group">
+        <label for="contract-purchaseform" class="control-label col-md-5 small">Indkøbsform</label>
+        <div class="col-md-7">
+            <input type="text" id="contract-purchaseform" data-ng-model="contract.id" class="form-control input-sm" />
+        </div>
+    </div>
+    
+    <!-- Procurement strategy -->
+    <div class="form-group">
+        <label for="contract-strat" class="control-label col-md-5 small">Udbudsstrategi</label>
+        <div class="col-md-7">
+            <select id="contract-strat"></select>
+        </div>
+    </div>
+    
+    <!-- Procurement plan -->
+    <div class="form-group">
+        <label for="contract-plan" class="control-label col-md-5 small">Udbudsplan</label>
+        <div class="col-md-7">
+            <select id="contract-plan"></select>
+        </div>
+    </div>
+    
+    <!-- Contract template -->
+    <div class="form-group">
+        <label for="contract-template" class="control-label col-md-5 small">Kontratskabalon</label>
+        <div class="col-md-7">
+            <select id="contract-template"></select>
+        </div>
+    </div>
+    
+    <!-- Folder -->
+    <div class="form-group">
+        <label for="contract-folder" class="control-label col-md-5 small">Mappe</label>
+        <div class="col-md-7">
+            <select id="contract-folder"></select>
+        </div>
+    </div>
+    
+    <!-- Supplier -->
+    <div class="form-group">
+        <label for="contract-supplier" class="control-label col-md-5 small">Leverandør</label>
+        <div class="col-md-7">
+            <select id="contract-supplier"></select>
+        </div>
+    </div>
+    
+    <!-- CVR -->
+    <div class="form-group">
+        <label class="control-label col-md-5 small">CVR</label>
+        <div class="col-md-7">
+            
+        </div>
+    </div>
+    
+    <!-- Extern contract signer -->
+    <div class="form-group">
+        <label for="contract-ext-signer" class="control-label col-md-5 small">Kontraktunderskriver</label>
+        <div class="col-md-7">
+            <input type="text" id="contract-ext-signer"/>
+        </div>
+    </div>
+    
+    <!-- Extern contract is signed -->
+    <div class="form-group">
+        <label for="contract-ext-signed" class="control-label col-md-5 small">Underskrevet</label>
+        <div class="col-md-7">
+            <input type="checkbox" id="contract-ext-signed"/>
+        </div>
+    </div>
+    
+    <!-- Extern contract signed date -->
+    <div class="form-group">
+        <label for="contract-ext-date" class="control-label col-md-5 small">Dato</label>
+        <div class="col-md-7">
+            <input type="date" id="contract-ext-date"/>
+        </div>
+    </div>
+    
+    <!-- Intern contract signer -->
+    <div class="form-group">
+        <label for="contract-int-signer" class="control-label col-md-5 small">Kontraktunderskriver</label>
+        <div class="col-md-7">
+            <input type="text" id="contract-int-signer"/>
+        </div>
+    </div>
+    
+    <!-- Intern contract is signed -->
+    <div class="form-group">
+        <label for="contract-int-signed" class="control-label col-md-5 small">Underskrevet</label>
+        <div class="col-md-7">
+            <input type="checkbox" id="contract-int-signed"/>
+        </div>
+    </div>
+    
+    <!-- Intern contract signed date -->
+    <div class="form-group">
+        <label for="contract-int-date" class="control-label col-md-5 small">Dato</label>
+        <div class="col-md-7">
+            <input type="date" id="contract-int-date"/>
+        </div>
+    </div>
+    
+    <!-- Container -->
+    <div>
+        IT Kontrakten omfatter flg. aftaleelementer
+        <!-- Agreement elements -->
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <input type="checkbox">
+                </span>
+                <input type="text" class="form-control">
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- sub tab buttons -->
+<ul class="nav nav-tabs">
+    <li data-ui-sref-active="active">
+        <a data-ui-sref="it-contract.edit.overview">Placeholder</a>
+    </li>
+</ul>
+
+<!-- sub tabs view -->
+<div data-ui-view="">
+</div>
