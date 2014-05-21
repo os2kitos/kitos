@@ -31,7 +31,11 @@ namespace Core.ApplicationServices
                 };
 
             var system = _systemRepository.GetByKey(systemId);
-            
+
+            //Adding the interfaceUsages
+            usage.InterfaceUsages =
+                system.CanUseInterfaces.Select(CreateInterfaceUsage).ToList();
+
             //Adding the interfaceExposures
             usage.InterfaceExposures = system.ExposedInterfaces.Select(theInterface => new InterfaceExposure()
             {
@@ -41,33 +45,17 @@ namespace Core.ApplicationServices
             _usageRepository.Insert(usage);
             _usageRepository.Save();
 
-            //Adding the interfaceUsages
-            foreach (var canUseInterface in system.CanUseInterfaces)
-            {
-                AddInterfaceUsage(usage, canUseInterface, true);
-            }
-
             return usage;
         }
 
-        public InterfaceUsage AddInterfaceUsage(int systemUsageId, ItSystem theInterface, bool isDefault = false)
-        {
-            var systemUsage = _usageRepository.GetByKey(systemUsageId);
-            return AddInterfaceUsage(systemUsage, theInterface, isDefault);
-        }
-
-        public InterfaceUsage AddInterfaceUsage(ItSystemUsage systemUsage, ItSystem theInterface, bool isDefault = false)
+        private InterfaceUsage CreateInterfaceUsage(ItSystem theInterface)
         {
             var usage = new InterfaceUsage()
                 {
                     Interface = theInterface,
-                    IsDefault = isDefault,
                     DataRowUsages = theInterface.DataRows.Select(dataRow => new DataRowUsage(){ DataRowId = dataRow.Id}).ToList()
                 };
-
-            _usageRepository.Update(systemUsage);
-            _usageRepository.Save();
-
+            
             return usage;
         }
 

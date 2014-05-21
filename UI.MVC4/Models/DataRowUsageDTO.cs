@@ -5,7 +5,8 @@
         public int Id { get; set; }
 
         public int InterfaceUsageId { get; set; }
-        public int DataRowId { get; set; }
+
+        public DataRowDTO DataRow { get; set; }
 
         public int? FrequencyId { get; set; }
 

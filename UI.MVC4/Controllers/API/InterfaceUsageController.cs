@@ -20,11 +20,14 @@ namespace UI.MVC4.Controllers.API
             _itSystemUsageService = itSystemUsageService;
         }
 
-        protected override InterfaceUsage PostQuery(InterfaceUsage item)
+        public override System.Net.Http.HttpResponseMessage Delete(int id)
         {
-            var theInterface = _systemRepository.GetByKey(item.InterfaceId);
-            
-            return _itSystemUsageService.AddInterfaceUsage(item.ItSystemUsageId, theInterface);
+            return NotAllowed();
         }
+
+        public override System.Net.Http.HttpResponseMessage Post(InterfaceUsageDTO dto)
+        {
+            return NotAllowed();
+        }
     }
 }
