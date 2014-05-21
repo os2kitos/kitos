@@ -1,169 +1,175 @@
-﻿<form class="form-horizontal fix-label-padding">
-    <!-- Name -->
-    <div class="form-group">
-        <label for="contract-name" class="control-label col-md-5 small">IT kontraktnavn</label>
-        <div class="col-md-7">
-            <input type="text" id="contract-name" data-ng-model="contract.name" class="form-control input-sm" />
-        </div>
-    </div>
+﻿<form role="form">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Left side -->
+            <div class="col-md-6">
+                <div class="row">
+                    <!-- 1st column -->
+                    <div class="col-md-6">
+                        <!-- Name -->
+                        <div class="form-group">
+                            <label for="contract-name" class="control-label small">IT kontraktnavn</label>
+                            <input type="text" id="contract-name" data-ng-model="contract.name" class="form-control input-sm">
+                        </div>
     
-    <!-- Id -->
-    <div class="form-group">
-        <label for="contract-id" class="control-label col-md-5 small">kontraktID</label>
-        <div class="col-md-7">
-            <input type="text" id="contract-id" data-ng-model="contract.id" class="form-control input-sm" />
-        </div>
-    </div>
+                        <!-- Id -->
+                        <div class="form-group">
+                            <label for="contract-id" class="control-label small">KontraktID</label>
+                            <input type="text" id="contract-id" data-ng-model="contract.id" class="form-control input-sm">
+                        </div>
     
-    <!-- Parent -->
-    <div class="form-group">
-        <label for="contract-parent" class="control-label col-md-5 small">Overordent kontrakt</label>
-        <div class="col-md-7">
-            <select id="contract-parent"></select>
-        </div>
-    </div>
+                        <!-- Parent -->
+                        <div class="form-group">
+                            <label for="contract-parent" class="control-label small">Overordent kontrakt</label>
+                            <select id="contract-parent" class="form-control input-sm"></select>
+                        </div>
     
-    <!-- Type -->
-    <div class="form-group">
-        <label for="contract-type" class="control-label col-md-5 small">Kontrakttype</label>
-        <div class="col-md-7">
-            <select id="contract-type"></select>
-        </div>
-    </div>
+                        <!-- Type -->
+                        <div class="form-group">
+                            <label for="contract-type" class="control-label small">Kontrakttype</label>
+                            <select id="contract-type" class="form-control input-sm"></select>
+                        </div>
     
-    <!-- ESDH -->
-    <div class="form-group">
-        <label for="contract-esdh" class="control-label col-md-5 small">ESDH ref.</label>
-        <div class="col-md-7">
-            <input type="text" id="contract-esdh" data-ng-model="contract.esdh" class="form-control input-sm" />
-        </div>
-    </div>
-    
-    <!-- Note -->
-    <div class="form-group">
-        <label for="contract-note" class="control-label col-md-5 small">Bemærkning</label>
-        <div class="col-md-7">
-            <textarea id="contract-note" data-ng-model="contract.note" class="form-control input-sm" />
-        </div>
-    </div>
-    
-    <!-- Purchase form -->
-    <div class="form-group">
-        <label for="contract-purchaseform" class="control-label col-md-5 small">Indkøbsform</label>
-        <div class="col-md-7">
-            <input type="text" id="contract-purchaseform" data-ng-model="contract.id" class="form-control input-sm" />
-        </div>
-    </div>
-    
-    <!-- Procurement strategy -->
-    <div class="form-group">
-        <label for="contract-strat" class="control-label col-md-5 small">Udbudsstrategi</label>
-        <div class="col-md-7">
-            <select id="contract-strat"></select>
-        </div>
-    </div>
-    
-    <!-- Procurement plan -->
-    <div class="form-group">
-        <label for="contract-plan" class="control-label col-md-5 small">Udbudsplan</label>
-        <div class="col-md-7">
-            <select id="contract-plan"></select>
-        </div>
-    </div>
-    
-    <!-- Contract template -->
-    <div class="form-group">
-        <label for="contract-template" class="control-label col-md-5 small">Kontratskabalon</label>
-        <div class="col-md-7">
-            <select id="contract-template"></select>
-        </div>
-    </div>
-    
-    <!-- Folder -->
-    <div class="form-group">
-        <label for="contract-folder" class="control-label col-md-5 small">Mappe</label>
-        <div class="col-md-7">
-            <select id="contract-folder"></select>
-        </div>
-    </div>
-    
-    <!-- Supplier -->
-    <div class="form-group">
-        <label for="contract-supplier" class="control-label col-md-5 small">Leverandør</label>
-        <div class="col-md-7">
-            <select id="contract-supplier"></select>
-        </div>
-    </div>
-    
-    <!-- CVR -->
-    <div class="form-group">
-        <label class="control-label col-md-5 small">CVR</label>
-        <div class="col-md-7">
+                        <!-- ESDH -->
+                        <div class="form-group">
+                            <label for="contract-esdh" class="control-label small">ESDH ref.</label>
+                            <input type="text" id="contract-esdh" data-ng-model="contract.esdh" class="form-control input-sm">
+                        </div>
+                    </div>
             
-        </div>
-    </div>
+                    <!-- 2nd column -->
+                    <div class="col-md-6">
+                        <!-- Purchase form -->
+                        <div class="form-group">
+                            <label for="contract-purchaseform" class="control-label small">Indkøbsform</label>
+                            <select id="contract-purchaseform" class="form-control input-sm"></select>
+                        </div>
     
-    <!-- Extern contract signer -->
-    <div class="form-group">
-        <label for="contract-ext-signer" class="control-label col-md-5 small">Kontraktunderskriver</label>
-        <div class="col-md-7">
-            <input type="text" id="contract-ext-signer"/>
-        </div>
-    </div>
+                        <!-- Procurement strategy -->
+                        <div class="form-group">
+                            <label for="contract-strat" class="control-label small">Udbudsstrategi</label>
+                            <select id="contract-strat" class="form-control input-sm"></select>
+
+                        </div>
     
-    <!-- Extern contract is signed -->
-    <div class="form-group">
-        <label for="contract-ext-signed" class="control-label col-md-5 small">Underskrevet</label>
-        <div class="col-md-7">
-            <input type="checkbox" id="contract-ext-signed"/>
-        </div>
-    </div>
+                        <!-- Procurement plan -->
+                        <div class="form-group">
+                            <label for="contract-plan" class="control-label small">Udbudsplan</label>
+                            <select id="contract-plan" class="form-control input-sm"></select>
+                        </div>
     
-    <!-- Extern contract signed date -->
-    <div class="form-group">
-        <label for="contract-ext-date" class="control-label col-md-5 small">Dato</label>
-        <div class="col-md-7">
-            <input type="date" id="contract-ext-date"/>
-        </div>
-    </div>
+                        <!-- Contract template -->
+                        <div class="form-group">
+                            <label for="contract-template" class="control-label small">Kontratskabalon</label>
+                            <select id="contract-template" class="form-control input-sm"></select>
+                        </div>
     
-    <!-- Intern contract signer -->
-    <div class="form-group">
-        <label for="contract-int-signer" class="control-label col-md-5 small">Kontraktunderskriver</label>
-        <div class="col-md-7">
-            <input type="text" id="contract-int-signer"/>
-        </div>
-    </div>
+                        <!-- Folder -->
+                        <div class="form-group">
+                            <label for="contract-folder" class="control-label small">Mappe</label>
+                            <select id="contract-folder" class="form-control input-sm"></select>
+                        </div>
+                    </div>
+                
+                    <div class="col-md-12">
+                        <!-- Note -->
+                        <div class="form-group">
+                            <label for="contract-note" class="control-label small">Bemærkning</label>
+                            <textarea id="contract-note" data-ng-model="contract.note" class="form-control input-sm"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right side -->
+            <div class="col-md-6">
+                <div class="row">
+                    <!-- 3rd column -->
+                    <div class="col-md-6">
+                        <!-- Supplier -->
+                        <div class="form-group">
+                            <label for="contract-supplier" class="control-label small">Leverandør</label>
+                            <select id="contract-supplier" class="form-control input-sm"></select>
+                        </div>
+                
+                        <!-- Extern contract signer -->
+                        <div class="form-group">
+                            <label for="contract-ext-signer" class="control-label small">Kontraktunderskriver</label>
+                            <input type="text" id="contract-ext-signer" class="form-control input-sm">
+                        </div>
+                
+                        <!-- Responsible org unit -->
+                        <div class="form-group">
+                            <label for="contract-orgunit" class="control-label small">Ansvarlig endhed</label>
+                            <select id="contract-orgunit" class="form-control input-sm"></select>
+                        </div>
+
+                        <!-- Intern contract signer -->
+                        <div class="form-group">
+                            <label for="contract-int-signer" class="control-label small">Kontraktunderskriver</label>
+                            <select id="contract-int-signer" class="form-control input-sm"></select>
+                        </div>
+                    </div>
+
+                    <!-- 4th column -->
+                    <div class="col-md-6">
+                        <!-- CVR -->
+                        <div class="form-group">
+                            <label class="control-label small">CVR</label>
+                            <input type="text" class="form-control input-sm">
+                        </div>
     
-    <!-- Intern contract is signed -->
-    <div class="form-group">
-        <label for="contract-int-signed" class="control-label col-md-5 small">Underskrevet</label>
-        <div class="col-md-7">
-            <input type="checkbox" id="contract-int-signed"/>
-        </div>
-    </div>
+                        <!-- Extern contract is signed -->
+                        <div class="checkbox">
+                            <label class="small">
+                                <input type="checkbox"> Underskrevet
+                            </label>
+                        </div>
     
-    <!-- Intern contract signed date -->
-    <div class="form-group">
-        <label for="contract-int-date" class="control-label col-md-5 small">Dato</label>
-        <div class="col-md-7">
-            <input type="date" id="contract-int-date"/>
-        </div>
-    </div>
+                        <!-- Extern contract signed date -->
+                        <div class="form-group">
+                            <label for="contract-ext-date" class="control-label small">Dato</label>
+                            <input type="date" id="contract-ext-date" class="form-control input-sm">
+                        </div>
     
-    <!-- Container -->
-    <div>
-        IT Kontrakten omfatter flg. aftaleelementer
-        <!-- Agreement elements -->
-        <div class="form-group">
-            <div class="input-group">
-                <span class="input-group-addon">
-                    <input type="checkbox">
-                </span>
-                <input type="text" class="form-control">
+                        <!-- Intern contract is signed -->
+                        <div class="checkbox">
+                            <label class="small">
+                                <input type="checkbox"> Underskrevet
+                            </label>
+                        </div>
+    
+                        <!-- Intern contract signed date -->
+                        <div class="form-group">
+                            <label for="contract-int-date" class="control-label small">Dato</label>
+                            <input type="date" id="contract-int-date" class="form-control input-sm">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-12">
+                        <!-- Agreement elements -->
+                        <div class="form-group">
+                            <label class="control-label small">IT Kontrakten omfatter flg. aftaleelementer</label>
+                            <div>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-addon">
+                                        <input type="checkbox" class="">
+                                    </span>
+                                    <input type="text" class="form-control">
+                                </div>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-addon">
+                                        <input type="checkbox" class="">
+                                    </span>
+                                    <input type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </div>   
 </form>
 
 <!-- sub tab buttons -->
