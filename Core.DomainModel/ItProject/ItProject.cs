@@ -8,7 +8,7 @@ namespace Core.DomainModel.ItProject
     {
         public ItProject()
         {
-            //this.Communications = new List<Communication>();
+            this.Communications = new List<Communication>();
             //this.Economies = new List<Economy>();
             //this.ExtReferences = new List<ExtReference>();
             this.TaskRefs = new List<TaskRef>();
@@ -67,10 +67,10 @@ namespace Core.DomainModel.ItProject
 
         //public virtual ProjectStatus ProjectStatus { get; set; }
         //public virtual GoalStatus GoalStatus { get; set; }
-        //public virtual Handover Handover { get; set; }
+        public virtual Handover Handover { get; set; }
         //public virtual OrgTab OrgTab { get; set; }
         //public virtual Hierarchy Hierarchy { get; set; }
-        //public virtual ICollection<Communication> Communications { get; set; }
+        public virtual ICollection<Communication> Communications { get; set; }
         //public virtual ICollection<Economy> Economies { get; set; }
         //public virtual ICollection<ExtReference> ExtReferences { get; set; } // TODO
         public virtual ICollection<TaskRef> TaskRefs { get; set; }

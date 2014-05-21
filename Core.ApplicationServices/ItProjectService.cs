@@ -67,6 +67,7 @@ namespace Core.ApplicationServices
         {
             CreateDefaultPhases(project);
             AddEconomyYears(project);
+            project.Handover = new Handover();
 
             _projectRepository.Insert(project);
             _projectRepository.Save();
@@ -90,7 +91,7 @@ namespace Core.ApplicationServices
                 Note = original.Note,
                 Description = original.Description,
                 IsStrategy = original.IsStrategy,
-
+                Handover = new Handover(), // TODO clone actual data
                 // TODO AssociatedProgramId = project.AssociatedProgramId,
                 // TODO AssociatedProjects = project.AssociatedProjects,
                 ItProjectTypeId = original.ItProjectTypeId,
@@ -104,7 +105,8 @@ namespace Core.ApplicationServices
                 // TODO CommonPublicProjects = project.CommonPublicProjects,
                 // TODO EconomyYears = project.EconomyYears
                 // TODO MilestoneStates = project.MilestoneStates,
-                // TODO TaskActivities = project.TaskActivities
+                // TODO TaskActivities = project.TaskActivities,
+                // TODO Communcations = project.Communcations
             };
 
             ClonePhases(original, clone);
