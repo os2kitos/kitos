@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel.ItContract
 {
-    public class AgreementElement : ICustomOptionEntity<ItContract>
+    public class AgreementElement : IOptionEntity<ItContract>
     {
         public AgreementElement()
         {
@@ -15,13 +15,5 @@ namespace Core.DomainModel.ItContract
         public bool IsSuggestion { get; set; }
         public string Note { get; set; }
         public virtual ICollection<ItContract> References { get; set; }
-        public int? CreatedByOrganizationId { get; set; }
-        public Organization CreatedByOrganization { get; set; }
-    }
-
-    public interface ICustomOptionEntity<T> : IOptionEntity<T>
-    {
-        int? CreatedByOrganizationId { get; set; }
-        Organization CreatedByOrganization { get; set; }
     }
 }

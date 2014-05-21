@@ -34,7 +34,7 @@ namespace Core.DomainModel.ItContract
         public int SupplierId { get; set; }
         public virtual Organization Supplier { get; set; }
 
-        public virtual Agreement Agreement { get; set; } // TODO
+        public virtual ICollection<AgreementElement> AgreementElement { get; set; }
 
         public int ProcurementStrategyId { get; set; }
         public ProcurementStrategy ProcurementStrategy { get; set; }
