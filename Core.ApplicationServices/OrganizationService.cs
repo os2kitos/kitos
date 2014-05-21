@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Core.DomainModel;
+﻿using Core.DomainModel;
 using Core.DomainServices;
 
 namespace Core.ApplicationServices

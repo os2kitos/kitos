@@ -183,7 +183,9 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.ItSystemUsage, opt => opt.Ignore());
 
             Mapper.CreateMap<Organization, OrganizationDTO>().ReverseMap();
-            Mapper.CreateMap<OrganizationUnit, OrgUnitDTO>().ReverseMap();
+            Mapper.CreateMap<OrganizationUnit, OrgUnitDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.Children, opt => opt.Ignore());
 
             Mapper.CreateMap<PasswordResetRequest, PasswordResetRequestDTO>()
                   .ForMember(dest => dest.UserEmail, opt => opt.MapFrom(src => src.User.Email));
@@ -243,6 +245,10 @@ namespace UI.MVC4.App_Start
                 .ReverseMap()
                 .ForMember(dest => dest.ItProject, opt => opt.Ignore())
                 .ForMember(dest => dest.ResponsibleUser, opt => opt.Ignore());
+
+            Mapper.CreateMap<Stakeholder, StakeholderDTO>()
+                .ReverseMap()
+                .ForMember(dest => dest.ItProject, opt => opt.Ignore());
 
             Mapper.CreateMap<Activity, ActivityDTO>()
                   .ReverseMap()

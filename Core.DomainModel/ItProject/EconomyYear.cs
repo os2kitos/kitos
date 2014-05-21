@@ -4,6 +4,8 @@ namespace Core.DomainModel.ItProject
     {
         public int Id { get; set; }
 
+        public int YearNumber { get; set; }
+
         public int ItProjectId { get; set; }
         public virtual ItProject ItProject { get; set; }
 

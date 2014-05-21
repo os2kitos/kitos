@@ -9,7 +9,7 @@
                 <div class="col-md-10">
                     <input type="text" id="project-name" data-ng-model="project.name" class="form-control input-sm" 
                            data-field="name"
-                           data-autosave="{{autosaveUrl}}"/>
+                           data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess"/>
                 </div>
             </div>
 
@@ -19,7 +19,7 @@
                 <div class="col-md-4">
                     <input type="text" id="project-projectId" data-ng-model="project.itProjectId" class="form-control input-sm" 
                         data-field="itProjectId"
-                        data-autosave="{{autosaveUrl}}" />
+                        data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess"/>
                 </div>
                 
                 <!-- access modifier -->
@@ -27,7 +27,7 @@
                 <div class="col-md-4">
                     <input id="project-access" data-ng-model="project.accessModifier" class="form-control input-sm" data-select-access-modifier=""
                         data-field="accessModifier"
-                        data-autosave="{{autosaveUrl}}"/>
+                        data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess"/>
                 </div>
             </div>
             
@@ -39,7 +39,7 @@
                             data-ng-options="o.id as o.name for o in itProjectTypes"
                             data-ng-model="project.itProjectTypeId"
                             data-field="itProjectTypeId"
-                            data-autosave="{{autosaveUrl}}">
+                            data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess">
                     </select>
                 </div>
 
@@ -50,7 +50,7 @@
                             data-ng-options="o.id as o.name for o in itProjectCategories"
                             data-ng-model="project.itProjectCategoryId"
                             data-field="itProjectCategoryId"
-                            data-autosave="{{autosaveUrl}}">
+                            data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess">
                     </select>
                 </div>
             </div>
@@ -92,7 +92,6 @@
             </div>-->
             
             <!-- associated program -->
-            <!-- TODO: only show this if project isn't of type 'program' -->
             <div class="form-group" data-ng-if="project.itProjectTypeId != itProgramType.id">
                 <label class="col-md-2 control-label small" for="associated-program">
                     Tilknyttet program
@@ -101,8 +100,7 @@
                     <!-- TODO -->
                     <input type="hidden"  id="associated-program" class="form-control input-sm"
                            data-ng-model="project.associatedProgram" data-ui-select2="programSelectOptions"
-                           data-ng-change="updateAssociatedProgram()"
-                        />
+                           data-ng-change="updateAssociatedProgram()" data-ng-disabled="!hasWriteAccess"/>
                            
                 </div>
             </div>
@@ -118,6 +116,16 @@
                 </div>
             </div>
 
+            <!-- archived -->
+            <div class="form-group">
+                <div class="col-md-offset-2">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" data-ng-model="project.isArchived" data-autosave="{{autosaveUrl}}" data-field="isArchived" /> Arkiveret
+                        </label>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="col-md-6">
@@ -129,7 +137,8 @@
                     <textarea id="project-background" data-ng-model="project.background"
                         class="form-control input-sm" rows="7"
                         data-field="background" 
-                        data-autosave="{{autosaveUrl}}">
+                        data-autosave="{{autosaveUrl}}"
+                        data-ng-disabled="!hasWriteAccess">
                                           
                     </textarea>
                 </div>
@@ -143,7 +152,8 @@
                     <textarea id="project-note" data-ng-model="project.note"
                         class="form-control input-sm" rows="7" 
                         data-field="note" 
-                        data-autosave="{{autosaveUrl}}">
+                              data-autosave="{{autosaveUrl}}"
+                         data-ng-disabled="!hasWriteAccess">
                                           
                     </textarea>
                 </div>
@@ -168,6 +178,9 @@
     </li>
     <li data-ui-sref-active="active">
         <a data-ui-sref="it-project.edit.roles">Projektroller</a>
+    </li>
+    <li data-ui-sref-active="active">
+        <a data-ui-sref="it-project.edit.economy">Økonomi</a>
     </li>
     <li data-ui-sref-active="active">
         <a data-ui-sref="it-project.edit.stakeholders">Interessenter</a>

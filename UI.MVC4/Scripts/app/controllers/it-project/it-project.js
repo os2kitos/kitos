@@ -26,15 +26,21 @@
                 }],
                 user: ['userService', function (userService) {
                     return userService.getUser();
-                }]
+                }],
+                hasWriteAccess: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itproject/" + $stateParams.id + "?hasWriteAccess")
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }],
             }
         });
     }]);
 
 
     app.controller('project.EditCtrl', ['$scope', '$http', 'notify',
-            'itProject', 'itProjectTypes', 'itProjectCategories', 'user',
-            function ($scope, $http, notify, itProject, itProjectTypes, itProjectCategories, user) {
+            'itProject', 'itProjectTypes', 'itProjectCategories', 'user', 'hasWriteAccess',
+            function ($scope, $http, notify, itProject, itProjectTypes, itProjectCategories, user, hasWriteAccess) {
                 $scope.project = itProject;
                 if ($scope.project.associatedProgramId) {
                     $scope.project.associatedProgram = {
@@ -42,6 +48,8 @@
                         text: $scope.project.associatedProgramName
                     };
                 }
+
+                $scope.hasWriteAccess = hasWriteAccess;
 
                 $scope.autosaveUrl = "api/itproject/" + itProject.id;
 

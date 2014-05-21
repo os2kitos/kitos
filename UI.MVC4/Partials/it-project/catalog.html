@@ -14,7 +14,7 @@
     </thead>
     <tbody>
         <tr data-ng-repeat="p in programs">
-            <td><input type="checkbox" data-ng-click="clone(p)" data-ng-checked="p.parentItProjectId != null" /></td>
+            <td><input type="checkbox" data-ng-click="toggle(p)" data-ng-checked="isSelected(p)" /></td>
             <td>{{ p.itProjectTypeName }}</td>
             <td>{{ p.itProjectId }}</td>
             <td>{{ p.parentItProject ? p.parentItProject.itProjectId : '' }}</td>

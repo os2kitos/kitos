@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 
@@ -17,6 +18,10 @@ namespace UI.MVC4.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public AccessModifier AccessModifier { get; set; }
+        public ItProjectPriority Priority { get; set; }
+        public bool IsPriorityLocked { get; set; }
+        public ItProjectPriority PriorityPf { get; set; }
+        public bool IsArchived { get; set; }
 
         public int? AssociatedProgramId { get; set; }
         public string AssociatedProgramName { get; set; }
@@ -32,6 +37,7 @@ namespace UI.MVC4.Models
         public IEnumerable<EconomyYearDTO> EconomyYears { get; set; } 
         public IEnumerable<ItSystemDTO> ItSystems { get; set; }
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
+        public IEnumerable<RiskDTO> Risks { get; set; }
         public IEnumerable<StakeholderDTO> Stakeholders { get; set; }
 
 
@@ -80,5 +86,24 @@ namespace UI.MVC4.Models
 
 
         public virtual GoalStatusDTO GoalStatus { get; set; }
+
+        public int? Roi
+        {
+            get
+            {
+                var firstYear = EconomyYears.FirstOrDefault(dto => dto.TotalBudget >= 0);
+                return firstYear != null ? (int?) firstYear.YearNumber : null;
+            }
+        }
+
+        public int Bc
+        {
+            get { return EconomyYears.Sum(year => year.TotalBudget); }
+        }
+
+        public double AverageRisk
+        {
+            get { return Risks.Any() ? Risks.Average(risk => risk.Consequence * risk.Probability) : default(double); }
+        }
     }
 }
