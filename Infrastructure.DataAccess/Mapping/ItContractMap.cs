@@ -17,23 +17,42 @@ namespace Infrastructure.DataAccess.Mapping
             
 
             // Relationships
-            this.HasRequired(t => t.ContractTemplate)
+            this.HasRequired(t => t.ObjectOwner)
+                .WithMany(t => t.CreatedItContracts)
+                .HasForeignKey(d => d.ObjectOwnerId)
+                .WillCascadeOnDelete(false);
+
+            this.HasOptional(t => t.ContractTemplate)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ContractTemplateId);
-            this.HasRequired(t => t.ContractType)
+
+            this.HasOptional(t => t.ContractType)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ContractTypeId);
             
-            this.HasRequired(t => t.PurchaseForm)
+            this.HasOptional(t => t.PurchaseForm)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.PurchaseFormId);
-            this.HasRequired(t => t.Supplier)
+
+            this.HasOptional(t => t.Supplier)
                 .WithMany(t => t.ItContracts)
                 .HasForeignKey(d => d.SupplierId);
-            this.HasRequired(t => t.Supplier)
-                .WithMany(t => t.ItContracts)
-                .HasForeignKey(d => d.SupplierId)
+
+            this.HasOptional(t => t.ProcurementPlan)
+                .WithRequired(t => t.ItContract)
+                .WillCascadeOnDelete(true);
+
+            this.HasOptional(t => t.ProcurementStrategy)
+                .WithMany(t => t.References)
+                .HasForeignKey(d => d.ProcurementStrategyId);
+
+            this.HasOptional(t => t.Parent)
+                .WithMany(t => t.Children)
+                .HasForeignKey(d => d.ParentId)
                 .WillCascadeOnDelete(false);
+
+            this.HasMany(t => t.AgreementElements)
+                .WithMany(t => t.References);
         }
     }
 }

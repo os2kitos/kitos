@@ -8,6 +8,8 @@ namespace Core.DomainModel.ItContract
         public ItContract()
         {
             //this.ShipNotices = new List<ShipNotice>();
+            this.AgreementElements = new List<AgreementElement>();
+            this.Children = new List<ItContract>();
             this.Rights = new List<ItContractRight>();
         }
 
@@ -31,24 +33,22 @@ namespace Core.DomainModel.ItContract
         /// <summary>
         /// Id of the organization marked as supplier for this contract
         /// </summary>
-        public int SupplierId { get; set; }
+        public int? SupplierId { get; set; }
         public virtual Organization Supplier { get; set; }
 
-        public virtual ICollection<AgreementElement> AgreementElement { get; set; }
-
-        public int ProcurementStrategyId { get; set; }
+        public int? ProcurementStrategyId { get; set; }
         public ProcurementStrategy ProcurementStrategy { get; set; }
 
-        public int ProcurementPlanId { get; set; }
+        public int? ProcurementPlanId { get; set; }
         public virtual ProcurementPlan ProcurementPlan { get; set; }
 
-        public int ContractTemplateId { get; set; }
+        public int? ContractTemplateId { get; set; }
         public virtual ContractTemplate ContractTemplate { get; set; }
 
-        public int ContractTypeId { get; set; }
+        public int? ContractTypeId { get; set; }
         public virtual ContractType ContractType { get; set; }
 
-        public int PurchaseFormId { get; set; }
+        public int? PurchaseFormId { get; set; }
         public virtual PurchaseForm PurchaseForm { get; set; }
         
         /// <summary>
@@ -63,26 +63,6 @@ namespace Core.DomainModel.ItContract
 
         //public virtual ICollection<ShipNotice> ShipNotices { get; set; }
         public virtual ICollection<ItContractRight> Rights { get; set; }
-    }
-
-    public class ProcurementStrategy : IOptionEntity<ItContract>
-    {
-        public ProcurementStrategy()
-        {
-            References = new List<ItContract>();
-        }
-
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public bool IsActive { get; set; }
-        public bool IsSuggestion { get; set; }
-        public string Note { get; set; }
-        public virtual ICollection<ItContract> References { get; set; }
-    }
-
-    public class ProcurementPlan
-    {
-        public int Half { get; set; }
-        public int Year { get; set; }
+        public virtual ICollection<AgreementElement> AgreementElements { get; set; }
     }
 }
