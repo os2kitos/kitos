@@ -4,27 +4,57 @@
     <table class="table table-striped table-condensed">
         <thead data-ng-if="exposedInterfaces.length > 0">
             <tr>
+                <th>Ønske</th>
+                <th>Aktiv</th>
                 <th class="col-md-2">Snitflade</th>
+                <th class="col-md-1">TSA</th>
+                <th class="col-md-2">Kontrakt ID</th>
                 <th class="col-md-1">Snitfladetype</th>
                 <th class="col-md-1">Grænseflade</th>
                 <th class="col-md-1">Metode</th>
                 <th class="col-md-1">Anvendes af</th>
-                <th class="col-md-1">TSA</th>
-                <th class="col-md-2">Kontrakt ID</th>
                 <th class="col-md-offset-1"></th>
             </tr>
         </thead>
         <tbody class="small">
             <tr data-ng-repeat="system in exposedInterfaces">
+                <!-- wished to be used -->
+                <td>
+                    <input type="checkbox"/>
+                </td>
+
+                <!-- active (depends on contract) -->
+                <td>
+                    <i class="glyphicon glyphicon-ok text-success"></i>
+                </td>
+                
+                <!-- name of the system -->
                 <td>{{system.name}}</td>
-                <td>{{system.interfaceType.name}}</td>
-                <td>{{system.interface.name}}</td>
-                <td>{{system.method.name}}</td>
-                <td>{{system.canBeUsedByIds.length}}</td>
-                <td>{{system.tsa.name}}</td>
+                
+                <!-- tsa -->
+                <td>
+                    {{system.tsa.name}}
+                </td>
+
+                <!-- contract id -->
                 <td>
                     <small class="text-muted">[Hentes fra kontrakt]</small>
                 </td>
+                
+                <!-- inteface type -->
+                <td>{{system.interfaceType.name}}</td>
+                
+                <!-- interface (grænseflade) -->
+                <td>{{system.interface.name}}</td>
+                
+                <!-- method -->
+                <td>{{system.method.name}}</td>
+                
+                <!-- number of usages -->
+                <td>
+                    {{system.canBeUsedByIds.length}}
+                </td>
+
                 <td>
                     <!-- data row table -->
                     <table class="table table-bordered table-condensed small table-fixed table-no-margin" data-ng-if="system.dataRows.length > 0">
