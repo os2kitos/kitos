@@ -246,6 +246,7 @@
     <Compile Include="Controllers\API\ItSystemRightController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageController.cs" />
     <Compile Include="Controllers\API\RiskController.cs" />
+    <Compile Include="Controllers\API\StakeholderController.cs" />
     <Compile Include="Controllers\API\StateController.cs" />
     <Compile Include="Models\CommunicationDTO.cs" />
     <Compile Include="Filters\CustomDateTimeConverter.cs" />
@@ -333,6 +334,7 @@
     <Compile Include="Models\RightOutputDTO.cs" />
     <Compile Include="Models\RightInputDTO.cs" />
     <Compile Include="Models\RoleDTO.cs" />
+    <Compile Include="Models\StakeholderDTO.cs" />
     <Compile Include="Models\StateDTO.cs" />
     <Compile Include="Models\TaskDelegationDTO.cs" />
     <Compile Include="Models\TaskUsageDTO.cs" />
@@ -448,6 +450,7 @@
     <Content Include="Partials\it-project\tab-economy.html" />
     <Content Include="Partials\it-project\tab-itsys.html" />
     <Content Include="Partials\it-project\tab-kle.html" />
+    <Content Include="Partials\it-project\tab-stakeholders.html" />
     <Content Include="Partials\it-project\tab-status-goal.html" />
     <Content Include="Partials\it-project\tab-strategy.html" />
     <Content Include="Partials\it-project\tab-status-project.html" />
@@ -515,6 +518,7 @@
     <Content Include="Scripts\app\controllers\home\home.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-communication.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-handover.js" />
+    <Content Include="Scripts\app\controllers\it-project\it-project-stakeholders.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-overview.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-status-goal.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-status-project.js" />

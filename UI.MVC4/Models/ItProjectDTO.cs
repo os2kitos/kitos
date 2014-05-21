@@ -38,6 +38,7 @@ namespace UI.MVC4.Models
         public IEnumerable<ItSystemDTO> ItSystems { get; set; }
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
         public IEnumerable<RiskDTO> Risks { get; set; }
+        public IEnumerable<StakeholderDTO> Stakeholders { get; set; }
 
 
         #region Status project tab
