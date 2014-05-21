@@ -73,8 +73,6 @@ namespace Infrastructure.DataAccess
         public DbSet<OrganizationRight> OrganizationRights { get; set; }
         public DbSet<OrganizationRole> OrganizationRoles { get; set; }
         public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
-        public DbSet<PaymentModel> PaymentModels { get; set; }
-        public DbSet<Payment> Payments { get; set; }
         public DbSet<ItProjectCategory> ProjectCategories { get; set; }
         public DbSet<ProjectPhase> ProjectPhases { get; set; }
         public DbSet<ProjPhaseLocale> ProjectPhaseLocales { get; set; }
@@ -87,7 +85,6 @@ namespace Infrastructure.DataAccess
         public DbSet<ShipNotice> ShipNotices { get; set; }
         public DbSet<Stakeholder> Stakeholders { get; set; }
         public DbSet<State> States { get; set; }
-        public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<TaskRef> TaskRefs { get; set; }
         public DbSet<TaskUsage> TaskUsages { get; set; }
         public DbSet<Text> Texts { get; set; }
@@ -151,8 +148,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new OrganizationRightMap());
             modelBuilder.Configurations.Add(new OrganizationRoleMap());
             modelBuilder.Configurations.Add(new PasswordResetRequestMap());
-            modelBuilder.Configurations.Add(new PaymentModelMap());
-            modelBuilder.Configurations.Add(new PaymentMap());
             modelBuilder.Configurations.Add(new ItProjectCategoryMap());
             modelBuilder.Configurations.Add(new ProjectPhaseMap());
             modelBuilder.Configurations.Add(new ProjectPhaseLocaleMap());
@@ -165,7 +160,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ShipNoticeMap());
             modelBuilder.Configurations.Add(new StakeholdersMap());
             modelBuilder.Configurations.Add(new StateMap());
-            modelBuilder.Configurations.Add(new SupplierMap());
             modelBuilder.Configurations.Add(new TaskRefMap());
             modelBuilder.Configurations.Add(new TaskUsageMap());
             modelBuilder.Configurations.Add(new TextMap());

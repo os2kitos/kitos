@@ -38,7 +38,7 @@ namespace Infrastructure.DataAccess.Migrations
             //
 
             var cryptoService = new CryptoService();
-            var municipalityService = new OrganizationService();
+            var organizationService = new OrganizationService();
 
             #region AdminRoles
 
@@ -129,9 +129,6 @@ namespace Infrastructure.DataAccess.Migrations
                                               new PurchaseForm() { IsActive = true, Note = "...", Name = "SKI" },
                                               new PurchaseForm() { IsActive = true, Note = "...", Name = "SKI 02.19" },
                                               new PurchaseForm() { IsActive = true, Note = "...", Name = "Udbud" });
-
-            context.PaymentModels.AddOrUpdate(x => x.Name,
-                                              new PaymentModel() { IsActive = true, Note = "...", Name = "Licens" });
 
             var itSupportName = new ItSupportModuleName() { Name = "IT Understøttelse" };
             context.ItSupportModuleNames.AddOrUpdate(x => x.Name,
@@ -263,9 +260,9 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Organizations
 
-            var roskilde = municipalityService.CreateMunicipality("Roskilde");
-            var sorø = municipalityService.CreateMunicipality("Sorø");
-            var kl = municipalityService.CreateMunicipality("KL");
+            var roskilde = organizationService.CreateMunicipality("Roskilde");
+            var sorø = organizationService.CreateMunicipality("Sorø");
+            var kl = organizationService.CreateMunicipality("KL");
 
             context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø, kl);
 

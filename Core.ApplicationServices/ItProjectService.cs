@@ -11,18 +11,18 @@ namespace Core.ApplicationServices
         private readonly IGenericRepository<ItProject> _projectRepository;
         private readonly IGenericRepository<Activity> _activityRepository;
         private readonly IGenericRepository<ItProjectRight> _rightRepository;
-        private readonly IOrgService _orgService;
+        private readonly IOrganizationService _organizationService;
 
         public ItProjectService(IGenericRepository<ItProject> projectRepository, 
             IGenericRepository<ItProjectType> projectTypeRepository, 
             IGenericRepository<Activity> activityRepository, 
             IGenericRepository<ItProjectRight> rightRepository,
-            IOrgService orgService)
+            IOrganizationService organizationService)
         {
             _projectRepository = projectRepository;
             _activityRepository = activityRepository;
             _rightRepository = rightRepository;
-            _orgService = orgService;
+            _organizationService = organizationService;
 
             //TODO: dont hardcode this
             ProgramType = projectTypeRepository.Get(type => type.Name == "IT Program").Single();
@@ -154,7 +154,7 @@ namespace Core.ApplicationServices
                 return true;
 
             //if the user is part of an organization, which owns the project, the user has read access
-            var userOrganizations = _orgService.GetByUser(user);
+            var userOrganizations = _organizationService.GetByUser(user);
             return userOrganizations.Any(org => org.Id == project.OrganizationId);
         }
 

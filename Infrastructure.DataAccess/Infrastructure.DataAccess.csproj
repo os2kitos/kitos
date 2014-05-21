@@ -118,8 +118,6 @@
     <Compile Include="Mapping\OrganizationMap.cs" />
     <Compile Include="Mapping\OrgTabMap.cs" />
     <Compile Include="Mapping\PasswordResetRequestMap.cs" />
-    <Compile Include="Mapping\PaymentMap.cs" />
-    <Compile Include="Mapping\PaymentModelMap.cs" />
     <Compile Include="Mapping\ItProjectCategoryMap.cs" />
     <Compile Include="Mapping\ProjectPhaseLocaleMap.cs" />
     <Compile Include="Mapping\ProjectPhaseMap.cs" />
@@ -130,7 +128,6 @@
     <Compile Include="Mapping\RiskMap.cs" />
     <Compile Include="Mapping\ShipNoticeMap.cs" />
     <Compile Include="Mapping\StakeholdersMap.cs" />
-    <Compile Include="Mapping\SupplierMap.cs" />
     <Compile Include="Mapping\AppTypeMap.cs" />
     <Compile Include="Mapping\TextMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />

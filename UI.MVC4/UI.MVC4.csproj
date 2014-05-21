@@ -228,6 +228,7 @@
     <Compile Include="Controllers\API\CommunicationController.cs" />
     <Compile Include="Controllers\API\ContractTemplateController.cs" />
     <Compile Include="Controllers\API\ContractTypeController.cs" />
+    <Compile Include="Controllers\API\GenericCustomOptionApiController.cs" />
     <Compile Include="Controllers\API\HandoverController.cs" />
     <Compile Include="Controllers\API\EconomyYearController.cs" />
     <Compile Include="Controllers\API\GoalController.cs" />
@@ -284,7 +285,6 @@
     <Compile Include="Controllers\API\ItSystemRoleController.cs" />
     <Compile Include="Controllers\API\MethodController.cs" />
     <Compile Include="Controllers\API\OrganizationUnitController.cs" />
-    <Compile Include="Controllers\API\PaymentModelController.cs" />
     <Compile Include="Controllers\API\ItProjectCategoryController.cs" />
     <Compile Include="Controllers\API\ProjectPhaseController.cs" />
     <Compile Include="Controllers\API\ProjectPhaseLocaleController.cs" />

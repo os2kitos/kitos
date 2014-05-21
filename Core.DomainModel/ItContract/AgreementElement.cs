@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Core.DomainModel.ItContract
 {
-    public class AgreementElement : IOptionEntity<Agreement> //TODO: References to Agreement or ItContract?
+    public class AgreementElement : ICustomOptionEntity<ItContract>
     {
         public AgreementElement()
         {
-            References = new List<Agreement>();
+            References = new List<ItContract>();
         }
 
         public int Id { get; set; }
@@ -18,6 +14,14 @@ namespace Core.DomainModel.ItContract
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }
         public string Note { get; set; }
-        public virtual ICollection<Agreement> References { get; set; }
+        public virtual ICollection<ItContract> References { get; set; }
+        public int? CreatedByOrganizationId { get; set; }
+        public Organization CreatedByOrganization { get; set; }
+    }
+
+    public interface ICustomOptionEntity<T> : IOptionEntity<T>
+    {
+        int? CreatedByOrganizationId { get; set; }
+        Organization CreatedByOrganization { get; set; }
     }
 }
