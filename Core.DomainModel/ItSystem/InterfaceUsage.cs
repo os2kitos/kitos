@@ -44,7 +44,7 @@ namespace Core.DomainModel.ItSystem
         /// <summary>
         /// Whether local usage of the interface is wanted or not.
         /// </summary>
-        public bool WishedFor { get; set; }
+        public bool IsWishedFor { get; set; }
 
         /// <summary>
         /// Whether the local usage of the interface is default.

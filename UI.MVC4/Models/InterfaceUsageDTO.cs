@@ -14,6 +14,6 @@ namespace UI.MVC4.Models
 
         public int? InterfaceCategoryId { get; set; }
 
-        public bool WishedFor { get; set; }
+        public bool IsWishedFor { get; set; }
     }
 }

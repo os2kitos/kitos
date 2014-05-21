@@ -26,6 +26,6 @@ namespace Core.DomainModel.ItSystem
         /// <summary>
         /// Whether local exposure of the interface is wanted or not.
         /// </summary>
-        public bool WishedFor { get; set; }
+        public bool IsWishedFor { get; set; }
     }
 }
