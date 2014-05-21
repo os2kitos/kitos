@@ -33,9 +33,9 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.ItContractId).HasColumnName("ItContractId");
 
             // Relationships
-            this.HasRequired(t => t.ItContract)
-                .WithMany(t => t.ShipNotices)
-                .HasForeignKey(d => d.ItContractId);
+            //this.HasRequired(t => t.ItContract)
+            //    .WithMany(t => t.ShipNotices)
+            //    .HasForeignKey(d => d.ItContractId);
         }
     }
 }

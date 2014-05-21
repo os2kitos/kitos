@@ -7,7 +7,7 @@ namespace Core.DomainModel.ItContract
     {
         public ItContract()
         {
-            this.ShipNotices = new List<ShipNotice>();
+            //this.ShipNotices = new List<ShipNotice>();
             this.Rights = new List<ItContractRight>();
             this.AssociatedSystems = new List<ItSystemUsage>();
             this.InterfaceUsages = new List<InterfaceUsage>();
@@ -29,7 +29,8 @@ namespace Core.DomainModel.ItContract
         public virtual PurchaseForm PurchaseForm { get; set; }
         public virtual Supplier Supplier { get; set; }
         public virtual Organization Organization { get; set; }
-        public virtual ICollection<ShipNotice> ShipNotices { get; set; }
+
+        //public virtual ICollection<ShipNotice> ShipNotices { get; set; }
         public virtual ICollection<ItContractRight> Rights { get; set; }
 
         /// <summary>
