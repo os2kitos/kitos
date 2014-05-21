@@ -12,6 +12,7 @@ namespace Core.DomainModel.ItSystem
             this.TaskRefs = new List<TaskRef>();
             this.Rights = new List<ItSystemRight>();
             this.InterfaceUsages = new List<InterfaceUsage>();
+            this.InterfaceWishes = new List<ItSystem>();
             this.UsedBy = new List<OrganizationUnit>();
             this.ItProjects = new List<ItProject.ItProject>();
         }
@@ -60,7 +61,15 @@ namespace Core.DomainModel.ItSystem
 
         public virtual ICollection<ItSystemRight> Rights { get; set; }
 
-        public virtual ICollection<InterfaceUsage> InterfaceUsages { get; set; } 
+        /// <summary>
+        /// The usages of interfaces. These are created when a contract of the usage is registered.
+        /// </summary>
+        public virtual ICollection<InterfaceUsage> InterfaceUsages { get; set; }
+
+        /// <summary>
+        /// Collection of interfaces, that is wished to be used.
+        /// </summary>
+        public virtual ICollection<ItSystem> InterfaceWishes { get; set; }
 
         public int ObjectOwnerId { get; set; }
         public virtual User ObjectOwner { get; set; }

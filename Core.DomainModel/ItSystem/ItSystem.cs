@@ -18,6 +18,8 @@ namespace Core.DomainModel.ItSystem
             this.Overviews = new List<ItSystemUsage>();
             this.DataRows = new List<DataRow>();
             this.InterfaceUsages = new List<InterfaceUsage>();
+            this.InfrastructureUsage = new List<InterfaceUsage>();
+            this.InterfaceWishedBy = new List<ItSystemUsage>();
         }
 
         public int Id { get; set; }
@@ -123,6 +125,11 @@ namespace Core.DomainModel.ItSystem
         /// Local usages of the system, in case the system is an interface
         /// </summary>
         public virtual ICollection<InterfaceUsage> InterfaceUsages { get; set; }
+
+        /// <summary>
+        /// Local wishes to use the interface (in case the system is an interface)
+        /// </summary>
+        public virtual ICollection<ItSystemUsage> InterfaceWishedBy { get; set; }
 
         /// <summary>
         /// Local infrastructure usages of the system, in case the system is not an interface
