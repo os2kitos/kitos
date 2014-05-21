@@ -60,34 +60,36 @@
 
                 $scope.interfaceCategories = interfaceCategories;
                 $scope.frequencies = frequencies;
-
-                $scope.exposedInterfaces = [];
-
+                
                 $scope.filterInterfaces = function(interfaceSystem) {
-
                     return interfaceSystem.canBeUsed || interfaceSystem.usage || $scope.showAllInterfaces;
-
                 };
-
-                //EXPOSED INTERFACES
-                $http.get("api/itsystem?itSystemId=" + itSystemUsage.itSystemId + "&getExposedInterfaces").success(function (result) {
-
-                    var exposedInterfaces = result.response;
-
-                    _.each(exposedInterfaces, function (system) {
-                        system.interfaceType = _.findWhere(interfaceTypes, { id: system.interfaceTypeId });
-                        system.interface = _.findWhere(interfaces, { id: system.interfaceId });
-                        system.method = _.findWhere(methods, { id: system.methodId });
-                        system.tsa = _.findWhere(tsas, { id: system.tsaId });
-
-                        _.each(system.dataRows, function (dataRow) {
-                            dataRow.dataType = _.findWhere(dataTypes, { id: dataRow.dataTypeId });
-                        });
-
+                
+                function interfaceFindTypes(theInterface) {
+                    theInterface.interfaceType = _.findWhere(interfaceTypes, { id: theInterface.interfaceTypeId });
+                    theInterface.interface = _.findWhere(interfaces, { id: theInterface.interfaceId });
+                    theInterface.method = _.findWhere(methods, { id: theInterface.methodId });
+                    theInterface.tsa = _.findWhere(tsas, { id: theInterface.tsaId });
+                    
+                    _.each(theInterface.dataRows, function (dataRow) {
+                        dataRow.dataType = _.findWhere(dataTypes, { id: dataRow.dataTypeId });
                     });
+                }
+                
+                function attachInterface(localUsageOrExposure) {
+                    localUsageOrExposure.interface = _.findWhere(interfaceSystems, { id: localUsageOrExposure.interfaceId });
 
-                    $scope.exposedInterfaces = exposedInterfaces;
+                    interfaceFindTypes(localUsageOrExposure.interface);
+                }
+                
+
+                //Interface exposures
+                _.each(itSystemUsage.interfaceExposures, function (interfaceExposure) {
+                    interfaceExposure.updateUrl = "api/interfaceExposure/" + interfaceExposure.id;
+                    attachInterface(interfaceExposure);
                 });
+
+                $scope.interfaceExposures = itSystemUsage.interfaceExposures;
 
                 
                 function attachUsage(interfaceSystem, usage) {

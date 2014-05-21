@@ -143,6 +143,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IOrgService>().To<OrgService>().InRequestScope();
             kernel.Bind<IItSystemService>().To<ItSystemService>().InRequestScope();
             kernel.Bind<IItProjectService>().To<ItProjectService>().InRequestScope();
+            kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InRequestScope();
 
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
 
