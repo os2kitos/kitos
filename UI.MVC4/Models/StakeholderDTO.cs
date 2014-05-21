@@ -1,11 +1,9 @@
-namespace Core.DomainModel.ItProject
+﻿namespace UI.MVC4.Models
 {
-    public class Stakeholder : IEntity<int>
+    public class StakeholderDTO
     {
         public int Id { get; set; }
         public int ItProjectId { get; set; }
-
-        public virtual ItProject ItProject { get; set; }
 
         public string Name { get; set; }
         public string Role { get; set; }

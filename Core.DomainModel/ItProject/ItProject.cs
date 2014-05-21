@@ -14,7 +14,7 @@ namespace Core.DomainModel.ItProject
             this.TaskRefs = new List<TaskRef>();
             //this.Resources = new List<Resource>();
             this.Risks = new List<Risk>();
-            //this.Stakeholders = new List<Stakeholder>();
+            this.Stakeholders = new List<Stakeholder>();
             this.Rights = new List<ItProjectRight>();
             this.ItSystemUsages = new List<ItSystemUsage>();
             this.UsedByOrgUnits = new List<OrganizationUnit>();
@@ -81,7 +81,7 @@ namespace Core.DomainModel.ItProject
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
         //public virtual ICollection<Resource> Resources { get; set; }
         public virtual ICollection<Risk> Risks { get; set; }
-        //public virtual ICollection<Stakeholder> Stakeholders { get; set; }
+        public virtual ICollection<Stakeholder> Stakeholders { get; set; }
         public virtual ICollection<ItProjectRight> Rights { get; set; }
 
         /// <summary>
