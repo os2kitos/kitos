@@ -16,7 +16,7 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasKey(t => t.Id);
             
             // Table & Column Mappings
-            this.ToTable("InterfaceUsage");
+            this.ToTable("InterfaceExposure");
             this.Property(t => t.Id).HasColumnName("Id");
 
             this.HasRequired(t => t.ItSystemUsage)
