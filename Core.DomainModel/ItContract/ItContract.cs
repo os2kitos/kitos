@@ -9,6 +9,8 @@ namespace Core.DomainModel.ItContract
         {
             this.ShipNotices = new List<ShipNotice>();
             this.Rights = new List<ItContractRight>();
+            this.AssociatedSystems = new List<ItSystemUsage>();
+            this.AssociatedInterfaces = new List<InterfaceUsage>();
         }
 
         public int Id { get; set; }
