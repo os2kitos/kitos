@@ -5,6 +5,7 @@
         public int Id { get; set; }
         public int ItSystemUsageId { get; set; }
         public int InterfaceId { get; set; }
+        public int? ItContractId { get; set; }
 
         public bool IsWishedFor { get; set; }
     }

@@ -9,6 +9,8 @@ namespace UI.MVC4.Models
         public int InterfaceId { get; set; }
         public IEnumerable<DataRowUsageDTO> DataRowUsages { get; set; }
 
+        public int? ItContractId { get; set; }
+
         public int? InfrastructureId { get; set; }
         public string InfrastructureName { get; set; }
 
