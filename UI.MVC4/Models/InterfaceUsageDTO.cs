@@ -13,5 +13,7 @@ namespace UI.MVC4.Models
         public string InfrastructureName { get; set; }
 
         public int? InterfaceCategoryId { get; set; }
+
+        public bool WishedFor { get; set; }
     }
 }

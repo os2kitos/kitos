@@ -13,26 +13,20 @@ namespace UI.MVC4.Controllers.API
     public class InterfaceUsageController : GenericApiController<InterfaceUsage, int, InterfaceUsageDTO>
     {
         private readonly IGenericRepository<ItSystem> _systemRepository;
+        private readonly IItSystemUsageService _itSystemUsageService;
 
-        public InterfaceUsageController(IGenericRepository<InterfaceUsage> repository, IGenericRepository<ItSystem> systemRepository ) : base(repository)
+        public InterfaceUsageController(IGenericRepository<InterfaceUsage> repository, IGenericRepository<ItSystem> systemRepository, IItSystemUsageService itSystemUsageService) : base(repository)
         {
             _systemRepository = systemRepository;
+            _itSystemUsageService = itSystemUsageService;
         }
 
         protected override InterfaceUsage PostQuery(InterfaceUsage item)
         {
             /* adding data row usages */
             var theInterface = _systemRepository.GetByKey(item.InterfaceId);
-
-            foreach (var dataRow in theInterface.DataRows)
-            {
-                item.DataRowUsages.Add(new DataRowUsage()
-                    {
-                        DataRowId = dataRow.Id
-                    });
-            }
-
-            return base.PostQuery(item);
+            
+            return _itSystemUsageService.AddInterfaceUsage(item.ItSystemUsageId, theInterface);
         }
     }
 }

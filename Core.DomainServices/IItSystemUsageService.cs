@@ -7,6 +7,7 @@ namespace Core.DomainServices
     {
         ItSystemUsage Add(int systemId, int orgId, User owner);
 
-        void AddInterfaceUsage(ItSystemUsage systemUsage, int interfaceId);
+        InterfaceUsage AddInterfaceUsage(int systemUsageId, ItSystem theInterface, bool isDefault = false);
+        InterfaceUsage AddInterfaceUsage(ItSystemUsage systemUsage, ItSystem theInterface, bool isDefault = false);
     }
 }

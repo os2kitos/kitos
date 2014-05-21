@@ -47,8 +47,10 @@ namespace Core.DomainModel.ItSystem
         public bool WishedFor { get; set; }
 
         /// <summary>
-        /// Whether the local usage of the interface can be deleted.
+        /// Whether the local usage of the interface is default.
+        /// This means that the interface usage is created with the ItSystemUsage
+        /// and cannot be deleted.
         /// </summary>
-        public bool IsLocked { get; set; }
+        public bool IsDefault { get; set; }
     }
 }

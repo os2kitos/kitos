@@ -31,14 +31,6 @@ namespace Core.ApplicationServices
                 };
 
             var system = _systemRepository.GetByKey(systemId);
-
-            //Adding the interfaceUsages
-            usage.InterfaceUsages = system.CanUseInterfaces.Select(theInterface => new InterfaceUsage()
-                {
-                    Interface = theInterface,
-                    IsLocked = true //this interface usage should NOT be removable!
-                }).ToList();
-
             
             //Adding the interfaceExposures
             usage.InterfaceExposures = system.ExposedInterfaces.Select(theInterface => new InterfaceExposure()
@@ -49,22 +41,39 @@ namespace Core.ApplicationServices
             _usageRepository.Insert(usage);
             _usageRepository.Save();
 
+            //Adding the interfaceUsages
+            foreach (var canUseInterface in system.CanUseInterfaces)
+            {
+                AddInterfaceUsage(usage, canUseInterface, true);
+            }
+
             return usage;
         }
 
-        public void AddInterfaceUsage(ItSystemUsage systemUsage, int interfaceId)
+        public InterfaceUsage AddInterfaceUsage(int systemUsageId, ItSystem theInterface, bool isDefault = false)
+        {
+            var systemUsage = _usageRepository.GetByKey(systemUsageId);
+            return AddInterfaceUsage(systemUsage, theInterface, isDefault);
+        }
+
+        public InterfaceUsage AddInterfaceUsage(ItSystemUsage systemUsage, ItSystem theInterface, bool isDefault = false)
         {
             //if the interface usage already exist, this is a no-op
-            if (systemUsage.InterfaceUsages.Any(interfaceUsage => interfaceUsage.InterfaceId == interfaceId)) return;
-
-            systemUsage.InterfaceUsages.Add(new InterfaceUsage()
+            if (systemUsage.InterfaceUsages.Any(interfaceUsage => interfaceUsage.InterfaceId == theInterface.Id)) return;
+            
+            var usage = new InterfaceUsage()
                 {
-                    InterfaceId = interfaceId,
-                    IsLocked = false //this interface usage should be removable!
-                });
+                    Interface = theInterface,
+                    IsDefault = isDefault,
+                    DataRowUsages = theInterface.DataRows.Select(dataRow => new DataRowUsage(){ DataRowId = dataRow.Id}).ToList()
+                };
 
             _usageRepository.Update(systemUsage);
             _usageRepository.Save();
+
+            return usage;
         }
+
+
     }
 }
