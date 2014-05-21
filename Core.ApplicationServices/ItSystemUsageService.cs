@@ -58,9 +58,6 @@ namespace Core.ApplicationServices
 
         public InterfaceUsage AddInterfaceUsage(ItSystemUsage systemUsage, ItSystem theInterface, bool isDefault = false)
         {
-            //if the interface usage already exist, this is a no-op
-            if (systemUsage.InterfaceUsages.Any(interfaceUsage => interfaceUsage.InterfaceId == theInterface.Id)) return;
-            
             var usage = new InterfaceUsage()
                 {
                     Interface = theInterface,
