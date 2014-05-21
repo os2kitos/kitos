@@ -10,7 +10,7 @@ namespace Core.DomainModel.ItContract
             this.ShipNotices = new List<ShipNotice>();
             this.Rights = new List<ItContractRight>();
             this.AssociatedSystems = new List<ItSystemUsage>();
-            this.AssociatedInterfaces = new List<InterfaceUsage>();
+            this.InterfaceUsages = new List<InterfaceUsage>();
         }
 
         public int Id { get; set; }
@@ -39,8 +39,9 @@ namespace Core.DomainModel.ItContract
 
         /// <summary>
         /// The interface usages that the contract is associated to. 
-        /// A many-to-one relation - every InterfaceUsage must have a contract.
         /// </summary>
-        public virtual ICollection<InterfaceUsage> AssociatedInterfaces { get; set; } 
+        public virtual ICollection<InterfaceUsage> InterfaceUsages { get; set; } 
+
+        public virtual ICollection<InterfaceExposure> InterfaceExposures { get; set; } 
     }
 }

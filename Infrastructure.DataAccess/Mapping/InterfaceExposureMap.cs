@@ -8,9 +8,9 @@ using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    class InterfaceUsageMap : EntityTypeConfiguration<InterfaceUsage>
+    class InterfaceExposureMap : EntityTypeConfiguration<InterfaceExposure>
     {
-        public InterfaceUsageMap()
+        public InterfaceExposureMap()
         {
             // Primary Key
             this.HasKey(t => t.Id);
@@ -20,28 +20,19 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.Id).HasColumnName("Id");
 
             this.HasRequired(t => t.ItSystemUsage)
-                .WithMany(d => d.InterfaceUsages)
+                .WithMany(d => d.InterfaceExposures)
                 .HasForeignKey(t => t.ItSystemUsageId)
                 .WillCascadeOnDelete(true);
 
             this.HasRequired(t => t.Interface)
-                .WithMany(d => d.InterfaceLocalUsages)
+                .WithMany(d => d.InterfaceLocalExposure)
                 .HasForeignKey(t => t.InterfaceId)
                 .WillCascadeOnDelete(true);
 
             this.HasOptional(t => t.ItContract)
-                .WithMany(d => d.InterfaceUsages)
+                .WithMany(d => d.InterfaceExposures)
                 .HasForeignKey(t => t.ItContractId)
                 .WillCascadeOnDelete(true);
-
-            this.HasOptional(t => t.Infrastructure)
-                .WithMany(d => d.InfrastructureUsage)
-                .HasForeignKey(t => t.InfrastructureId);
-
-            this.HasOptional(t => t.InterfaceCategory)
-                .WithMany(d => d.References)
-                .HasForeignKey(t => t.InterfaceCategoryId);
-
         }
     }
 }

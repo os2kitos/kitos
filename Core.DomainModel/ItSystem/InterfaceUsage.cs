@@ -22,9 +22,9 @@ namespace Core.DomainModel.ItSystem
         public virtual ItSystemUsage ItSystemUsage { get; set; }
 
         /// <summary>
-        /// The required contract for this interface usage.
+        /// The contract for this interface usage.
         /// </summary>
-        public int ItContractId { get; set; }
+        public int? ItContractId { get; set; }
         public virtual ItContract.ItContract ItContract { get; set; }
 
         public int InterfaceId { get; set; }
@@ -40,5 +40,10 @@ namespace Core.DomainModel.ItSystem
 
         public int? InterfaceCategoryId { get; set; }
         public InterfaceCategory InterfaceCategory { get; set; }
+
+        /// <summary>
+        /// Whether local usage of the interface is wanted or not.
+        /// </summary>
+        public bool WishedFor { get; set; }
     }
 }
