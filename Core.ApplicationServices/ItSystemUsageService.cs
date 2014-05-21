@@ -35,7 +35,8 @@ namespace Core.ApplicationServices
             //Adding the interfaceUsages
             usage.InterfaceUsages = system.CanUseInterfaces.Select(theInterface => new InterfaceUsage()
                 {
-                    Interface = theInterface
+                    Interface = theInterface,
+                    IsLocked = true //this interface usage should NOT be removable!
                 }).ToList();
 
             
@@ -49,6 +50,21 @@ namespace Core.ApplicationServices
             _usageRepository.Save();
 
             return usage;
+        }
+
+        public void AddInterfaceUsage(ItSystemUsage systemUsage, int interfaceId)
+        {
+            //if the interface usage already exist, this is a no-op
+            if (systemUsage.InterfaceUsages.Any(interfaceUsage => interfaceUsage.InterfaceId == interfaceId)) return;
+
+            systemUsage.InterfaceUsages.Add(new InterfaceUsage()
+                {
+                    InterfaceId = interfaceId,
+                    IsLocked = false //this interface usage should be removable!
+                });
+
+            _usageRepository.Update(systemUsage);
+            _usageRepository.Save();
         }
     }
 }

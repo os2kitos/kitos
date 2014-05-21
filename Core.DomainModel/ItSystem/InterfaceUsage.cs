@@ -45,5 +45,10 @@ namespace Core.DomainModel.ItSystem
         /// Whether local usage of the interface is wanted or not.
         /// </summary>
         public bool WishedFor { get; set; }
+
+        /// <summary>
+        /// Whether the local usage of the interface can be deleted.
+        /// </summary>
+        public bool IsLocked { get; set; }
     }
 }
