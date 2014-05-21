@@ -38,7 +38,7 @@ namespace Infrastructure.DataAccess.Migrations
             //
 
             var cryptoService = new CryptoService();
-            var organizationService = new OrganizationService();
+            var organizationService = new OrganizationService(null, null, null); // TODO needs a refactor as this is a bit hacky!
 
             #region AdminRoles
 

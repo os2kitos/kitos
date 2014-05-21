@@ -52,7 +52,12 @@ namespace Infrastructure.DataAccess.Mapping
                 .WillCascadeOnDelete(false);
 
             this.HasMany(t => t.AgreementElements)
-                .WithMany(t => t.References);
+                .WithMany(t => t.References)
+                .Map(mc =>
+                    {
+                        mc.MapLeftKey("ItContractId");
+                        mc.MapRightKey("ElemId");
+                    });
         }
     }
 }

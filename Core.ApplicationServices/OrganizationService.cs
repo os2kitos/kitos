@@ -11,7 +11,7 @@ namespace Core.ApplicationServices
         private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IGenericRepository<AdminRight> _admRightRepository;
 
-        public OrganizationService(IGenericRepository<OrganizationRight> orgRightRepository, IGenericRepository<Organization> orgRepository, IGenericRepository<AdminRight> admRightRepository )
+        public OrganizationService(IGenericRepository<OrganizationRight> orgRightRepository, IGenericRepository<Organization> orgRepository, IGenericRepository<AdminRight> admRightRepository)
         {
             _orgRightRepository = orgRightRepository;
             _orgRepository = orgRepository;

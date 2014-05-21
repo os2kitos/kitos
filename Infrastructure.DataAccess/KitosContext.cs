@@ -72,6 +72,8 @@ namespace Infrastructure.DataAccess
         public DbSet<OrganizationRight> OrganizationRights { get; set; }
         public DbSet<OrganizationRole> OrganizationRoles { get; set; }
         public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
+        public DbSet<ProcurementPlan> ProcurementPlans { get; set; }
+        public DbSet<ProcurementStrategy> ProcurementStrategies { get; set; }
         public DbSet<ItProjectCategory> ProjectCategories { get; set; }
         public DbSet<ProjectPhase> ProjectPhases { get; set; }
         public DbSet<ProjPhaseLocale> ProjectPhaseLocales { get; set; }
@@ -147,6 +149,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new OrganizationRoleMap());
             modelBuilder.Configurations.Add(new PasswordResetRequestMap());
             modelBuilder.Configurations.Add(new ItProjectCategoryMap());
+            modelBuilder.Configurations.Add(new ProcurementPlanMap());
+            modelBuilder.Configurations.Add(new ProcurementStrategyMap());
             modelBuilder.Configurations.Add(new ProjectPhaseMap());
             modelBuilder.Configurations.Add(new ProjectPhaseLocaleMap());
             modelBuilder.Configurations.Add(new ProjectStatusMap());
