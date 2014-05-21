@@ -44,6 +44,7 @@
     <Compile Include="CryptoService.cs" />
     <Compile Include="ItProjectService.cs" />
     <Compile Include="ItSystemService.cs" />
+    <Compile Include="ItSystemUsageService.cs" />
     <Compile Include="OrganizationService.cs" />
     <Compile Include="OrgService.cs" />
     <Compile Include="OrgUnitService.cs" />
