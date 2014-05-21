@@ -17,7 +17,6 @@
         function($rootScope, $scope, $http, notify, itProject) {
 
             $scope.stakeholders = [];
-            $scope.new = {};
 
             function addStakeholder(stakeholder) {
                 stakeholder.show = true;
@@ -38,6 +37,12 @@
             }
 
             _.each(itProject.stakeholders, addStakeholder);
+
+            function resetNew() {
+                $scope.new = {};
+            }
+
+            resetNew();
 
             $scope.saveNewStakeholder = function() {
 
@@ -61,6 +66,7 @@
                 $http.post("api/stakeholder", data).success(function(result) {
                     msg.toSuccessMessage("Rækken er tilføjet.");
                     addStakeholder(result.response);
+                    resetNew();
                 }).error(function() {
                     msg.toErrorMessage("Fejl! Kunne ikke gemme!");
                 });
