@@ -16,9 +16,21 @@ namespace Core.DomainModel.ItSystem
         public int Id { get; set; }
 
         public int ItSystemUsageId { get; set; }
+        /// <summary>
+        /// The system that is using the interface.
+        /// </summary>
         public virtual ItSystemUsage ItSystemUsage { get; set; }
 
+        /// <summary>
+        /// The required contract for this interface usage.
+        /// </summary>
+        public int ItContractId { get; set; }
+        public virtual ItContract.ItContract ItContract { get; set; }
+
         public int InterfaceId { get; set; }
+        /// <summary>
+        /// The interface that is being used.
+        /// </summary>
         public virtual ItSystem Interface { get; set; }
 
         public virtual ICollection<DataRowUsage> DataRowUsages { get; set; }

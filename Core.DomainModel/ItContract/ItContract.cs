@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel.ItContract
 {
@@ -28,5 +29,16 @@ namespace Core.DomainModel.ItContract
         public virtual Organization Organization { get; set; }
         public virtual ICollection<ShipNotice> ShipNotices { get; set; }
         public virtual ICollection<ItContractRight> Rights { get; set; }
+
+        /// <summary>
+        /// The (local usages of) it systems, that this contract is associated to. 
+        /// </summary>
+        public virtual ICollection<ItSystemUsage> AssociatedSystems { get; set; }
+
+        /// <summary>
+        /// The interface usages that the contract is associated to. 
+        /// A many-to-one relation - every InterfaceUsage must have a contract.
+        /// </summary>
+        public virtual ICollection<InterfaceUsage> AssociatedInterfaces { get; set; } 
     }
 }
