@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
@@ -23,7 +22,6 @@ namespace UI.MVC4.Controllers.API
 
         protected override InterfaceUsage PostQuery(InterfaceUsage item)
         {
-            /* adding data row usages */
             var theInterface = _systemRepository.GetByKey(item.InterfaceId);
             
             return _itSystemUsageService.AddInterfaceUsage(item.ItSystemUsageId, theInterface);
