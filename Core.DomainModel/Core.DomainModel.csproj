@@ -70,7 +70,6 @@
     <Compile Include="IRoleEntity.cs" />
     <Compile Include="ItContractModuleName.cs" />
     <Compile Include="ILocaleEntity.cs" />
-    <Compile Include="ItContract\Agreement.cs" />
     <Compile Include="ItContract\AgreementElement.cs" />
     <Compile Include="ItContract\ContractTemplate.cs" />
     <Compile Include="ItContract\ContractType.cs" />

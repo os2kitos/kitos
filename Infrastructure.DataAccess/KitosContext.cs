@@ -21,7 +21,6 @@ namespace Infrastructure.DataAccess
 
         public DbSet<AdminRight> AdminRights { get; set; }
         public DbSet<AdminRole> AdminRoles { get; set; }
-        public DbSet<Agreement> Agreements { get; set; }
         public DbSet<AgreementElement> AgreementElements { get; set; }
         public DbSet<AppType> AppTypes { get; set; }
         public DbSet<ArchiveType> ArchiveTypes { get; set; }
@@ -96,7 +95,6 @@ namespace Infrastructure.DataAccess
         {
             modelBuilder.Configurations.Add(new AdminRightMap());
             modelBuilder.Configurations.Add(new AdminRoleMap());
-            modelBuilder.Configurations.Add(new AgreementMap());
             modelBuilder.Configurations.Add(new AgreementElementMap());
             modelBuilder.Configurations.Add(new AppTypeMap());
             modelBuilder.Configurations.Add(new ActivityMap());

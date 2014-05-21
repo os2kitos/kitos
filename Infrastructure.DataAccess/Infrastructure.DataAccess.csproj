@@ -61,7 +61,6 @@
     <Compile Include="GenericRepository.cs" />
     <Compile Include="KitosContext.cs" />
     <Compile Include="Mapping\AgreementElementMap.cs" />
-    <Compile Include="Mapping\AgreementMap.cs" />
     <Compile Include="Mapping\ArchiveTypeMap.cs" />
     <Compile Include="Mapping\CommunicationMap.cs" />
     <Compile Include="Mapping\ConfigMap.cs" />
