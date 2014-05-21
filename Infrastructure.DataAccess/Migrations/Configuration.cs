@@ -820,6 +820,9 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region IT System Usage
 
+            /* TODO: this should be created through ItSystemUsageService to ensure 
+             * that the local usages or exposure of interfaces are created.
+             * For now, it's better not to create any usage.
             var systemUsage1 = new ItSystemUsage()
                 {
                     ArchiveType = archiveTypeNo,
@@ -836,6 +839,8 @@ namespace Infrastructure.DataAccess.Migrations
                 };
 
             context.ItSystemUsages.AddOrUpdate(x => x.Note, systemUsage1); // TODO probably not the best identifier
+             * 
+             */
 
             #endregion
 
@@ -864,6 +869,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region IT system rights
 
+            /*
             var sysRight1 = new ItSystemRight()
                 {
                     Object = systemUsage1,
@@ -880,11 +886,13 @@ namespace Infrastructure.DataAccess.Migrations
 
             context.ItSystemRights.AddOrUpdate(x => x.UserId, sysRight1, sysRight2);
             context.SaveChanges();
+             * */
 
             #endregion
 
             #region Wishes
 
+            /*
             var wish1 = new Wish()
                 {
                     IsPublic = true,
@@ -901,6 +909,7 @@ namespace Infrastructure.DataAccess.Migrations
             };
 
             context.Wishes.AddOrUpdate(x => x.Text, wish1, wish2); // TODO probably not the best identifier
+            */
 
             #endregion
 
