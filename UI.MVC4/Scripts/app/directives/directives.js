@@ -235,6 +235,9 @@
 
                     function saveIfNew() {
                         var newValue = ctrl.$viewValue;
+                        if (attrs.pluck)
+                            newValue = _.pluck(newValue, attrs.pluck);
+                        
                         var payload = {};
                         payload[attrs.field] = newValue;
 

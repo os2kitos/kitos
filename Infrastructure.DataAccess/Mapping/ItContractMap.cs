@@ -35,7 +35,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(d => d.PurchaseFormId);
 
             this.HasOptional(t => t.Supplier)
-                .WithMany(t => t.ItContracts)
+                .WithMany(t => t.Supplier)
                 .HasForeignKey(d => d.SupplierId);
 
             this.HasOptional(t => t.ProcurementPlan)
@@ -62,6 +62,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.ResponsibleOrganizationUnit)
                 .WithMany(t => t.ResponsibleForItContracts)
                 .HasForeignKey(d => d.ResponsibleOrganizationUnitId);
+
+            this.HasRequired(t => t.Organization)
+                .WithMany(t => t.Contracts)
+                .HasForeignKey(d => d.OrganizationId);
         }
     }
 }

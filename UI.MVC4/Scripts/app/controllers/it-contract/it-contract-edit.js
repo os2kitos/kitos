@@ -30,17 +30,50 @@
                         return result.data.response;
                     });
                 }],
+                suppliers: ['$http', function ($http) {
+                    return $http.get('api/organization/?company').then(function (result) {
+                        return result.data.response;
+                    });
+                }],
+                orgUnits: ['$http', 'contract', function ($http, contract) {
+                    return $http.get('api/organizationunit/?organizationid=' + contract.organizationId).then(function (result) {
+                        return result.data.response;
+                    });
+                }],
+                contracts: ['$http', function($http) {
+                    return $http.get('api/itcontract/').then(function (result) {
+                        return result.data.response;
+                    });
+                }]
             }
         });
     }]);
 
-    app.controller('contract.EditCtrl', ['$scope', '$http', '$stateParams', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies',
-            function ($scope, $http, $stateParams, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies) {
-                $scope.autosaveUrl = 'api/itcontract/' + $stateParams.id;
+    app.controller('contract.EditCtrl',
+        ['$scope', '$http', '$stateParams', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'suppliers', 'orgUnits', 'contracts',
+            function ($scope, $http, $stateParams, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, suppliers, orgUnits, contracts) {
+                $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.contract = contract;
                 $scope.contractTypes = contractTypes;
                 $scope.contractTemplates = contractTemplates;
                 $scope.purchaseForms = purchaseForms;
                 $scope.procurementStrategies = procurementStrategies;
-            }]);
+                $scope.suppliers = suppliers;
+                $scope.orgUnits = orgUnits;
+                $scope.contracts = contracts;
+
+                $scope.procurementPlans = [];
+                var currentDate = moment();
+                for (var i = 0; i < 20; i++) {
+                    var half = Math.ceil(currentDate.month() / 6); // calcs 1 for the first 6 months, 2 for the rest
+                    var year = currentDate.year();
+                    var obj = { half: half, year: year };
+                    $scope.procurementPlans.push(obj);
+                    
+                    // add 6 months for next iter
+                    currentDate.add('months', 6);
+                }
+            }
+        ]
+    );
 })(angular, app);

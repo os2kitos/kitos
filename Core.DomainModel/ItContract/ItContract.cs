@@ -30,8 +30,17 @@ namespace Core.DomainModel.ItContract
         public bool IsSigned { get; set; }
         public DateTime? SignedDate { get; set; }
 
+        /// <summary>
+        /// The chosen responsible org unit for this contract
+        /// </summary>
         public int? ResponsibleOrganizationUnitId { get; set; }
         public virtual OrganizationUnit ResponsibleOrganizationUnit { get; set; }
+
+        /// <summary>
+        /// Id of the organization this contract was created under
+        /// </summary>
+        public int OrganizationId { get; set; }
+        public virtual Organization Organization { get; set; }
 
         /// <summary>
         /// Id of the organization marked as supplier for this contract
@@ -40,7 +49,7 @@ namespace Core.DomainModel.ItContract
         public virtual Organization Supplier { get; set; }
 
         public int? ProcurementStrategyId { get; set; }
-        public ProcurementStrategy ProcurementStrategy { get; set; }
+        public virtual ProcurementStrategy ProcurementStrategy { get; set; }
 
         public int? ProcurementPlanId { get; set; }
         public virtual ProcurementPlan ProcurementPlan { get; set; }

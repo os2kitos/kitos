@@ -34,26 +34,19 @@ namespace Core.ApplicationServices
             return orgs;
         }
 
-        public Organization CreateOrganization(string name)
+        public Organization CreateOrganization(string name, OrganizationType organizationType)
         {
             var org = new Organization
             {
                 Name = name,
-                Config = Config.Default
+                Config = Config.Default,
+                Type = organizationType
             };
 
             org.OrgUnits.Add(new OrganizationUnit()
             {
                 Name = org.Name,
             });
-
-            return org;
-        }
-
-        public Organization CreateMunicipality(string name)
-        {
-            var org = CreateOrganization(name);
-            org.Type = OrganizationType.Municipality;
 
             return org;
         }

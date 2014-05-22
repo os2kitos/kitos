@@ -16,9 +16,9 @@ namespace Core.DomainModel
         {
             this.ItProjects = new List<ItProject.ItProject>();
             this.ItSystems = new List<ItSystem.ItSystem>();
-            this.ItContracts = new List<ItContract.ItContract>();
+            this.Supplier = new List<ItContract.ItContract>();
             this.ItSystemUsages = new List<ItSystem.ItSystemUsage>();
-
+            this.Contracts = new List<ItContract.ItContract>();
             this.ProjectPhaseLocales = new List<ProjPhaseLocale>();
             this.OrgUnits = new List<OrganizationUnit>();
         }
@@ -37,7 +37,11 @@ namespace Core.DomainModel
         //KITOS term - which organization was this system created under in KITOS
         public virtual ICollection<ItSystem.ItSystem> ItSystems { get; set; }
 
-        public virtual ICollection<ItContract.ItContract> ItContracts { get; set; }
+        /// <summary>
+        /// Organization is marked as supplier in these contracts
+        /// </summary>
+        public virtual ICollection<ItContract.ItContract> Supplier { get; set; }
+        public virtual ICollection<ItContract.ItContract> Contracts { get; set; }
         public virtual ICollection<AdminRight> AdminRights { get; set; }
         public virtual ICollection<ItSystem.ItSystemUsage> ItSystemUsages { get; set; }
 

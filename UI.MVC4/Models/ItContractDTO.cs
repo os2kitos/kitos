@@ -8,6 +8,7 @@ namespace UI.MVC4.Models
     public class ItContractDTO
     {
         public int Id { get; set; }
+        public int OrganizationId { get; set; }
         public string Name { get; set; }
         public string Note { get; set; }
         public string ItContractId { get; set; }
@@ -24,7 +25,7 @@ namespace UI.MVC4.Models
         public int ResponsibleOrganizationUnitId { get; set; }
         public int? SupplierId { get; set; }
         public int? ProcurementStrategyId { get; set; }
-        public int? ProcurementPlanId { get; set; }
+        public ProcurementPlanDTO ProcurementPlan { get; set; }
         public int? ContractTemplateId { get; set; }
         public int? ContractTypeId { get; set; }
         public int? PurchaseFormId { get; set; }
