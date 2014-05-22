@@ -4,7 +4,7 @@
         <p class="h5">
             IT Kontrakten gælder flg. IT systemer
         </p>
-        <table class="table table-condensed small">
+        <table class="table table-condensed table-striped small">
             <thead>
                 <tr>
                     <th class="col-md-8">IT System
@@ -31,11 +31,13 @@
                     </td>
 
                     <td>
+                        <div class="pull-right">
                         <a class="btn btn-danger btn-xs"
-                            data-confirmed-click="associatedSystemUsage.delete()"
-                            data-confirm-click="Er du sikker på at du vil slette rækken?">
+                           data-confirmed-click="associatedSystemUsage.delete()"
+                           data-confirm-click="Er du sikker på at du vil slette rækken?">
                             <i class="glyphicon glyphicon-trash"></i>
                         </a>
+                            </div>
                     </td>
                 </tr>
 
@@ -60,7 +62,7 @@
         <p class="h5">
             IT Kontrakten gælder flg. snitfladerelationer
         </p>
-        <table class="table table-condensed small">
+        <table class="table table-condensed table-striped small">
             <thead>
                 <tr>
                     <th class="col-md-4">IT System
@@ -100,11 +102,14 @@
                     </td>
 
                     <td>
-                        <a class="btn btn-danger btn-xs"
-                            data-confirmed-click="associatedInterface.delete()"
-                            data-confirm-click="Er du sikker på at du vil slette rækken?">
-                            <i class="glyphicon glyphicon-trash"></i>
-                        </a>
+
+                        <div class="pull-right">
+                            <a class="btn btn-danger btn-xs"
+                                data-confirmed-click="associatedInterface.delete()"
+                                data-confirm-click="Er du sikker på at du vil slette rækken?">
+                                <i class="glyphicon glyphicon-trash"></i>
+                            </a>
+                        </div>
                     </td>
                 </tr>
             </tbody>
