@@ -137,11 +137,11 @@
                         //whether the user is looking for an exposed interface
                         //or a used interface depends on the relation field
                         if (newInterface.relation == "Exposure") {
-                            newInterface.usagesOrExposures = newInterface.selectedSystem.usage.interfaceExposures;
+                            newInterface.usagesOrExposures = _.where(newInterface.selectedSystem.usage.interfaceExposures, { itContractId: null });
                             newInterface.placeholder = "Vælg udstilte snitflade";
 
                         } else if (newInterface.relation == "Usage") {
-                            newInterface.usagesOrExposures = newInterface.selectedSystem.usage.interfaceUsages;
+                            newInterface.usagesOrExposures = _.where(newInterface.selectedSystem.usage.interfaceUsages, { itContractId: null });
                             newInterface.placeholder = "Vælg anvendte snitflade";
                         }
                     };
@@ -153,7 +153,7 @@
                     newInterface.save = function() {
                         if (!newInterface.interfaceId) return;
 
-                        newInterface.urlBase = newInterface.relation == "Exposure" ? "api/interfaceExposure/" : "api/interfaceUsage/";
+                        newInterface.baseUrl = newInterface.relation == "Exposure" ? "api/interfaceExposure/" : "api/interfaceUsage/";
                         newInterface.id = newInterface.interfaceId;
 
                         patchContractId(newInterface, contract.id).success(function(result) {
