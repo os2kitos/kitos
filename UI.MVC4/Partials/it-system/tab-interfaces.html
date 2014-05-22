@@ -41,8 +41,9 @@
 
                 <!-- contract id -->
                 <td>
-                    <!-- TODO -->
-                    <small class="text-muted">[Hentes fra kontrakt]</small>
+                    <a data-ng-if="exposure.itContractId != null" data-ui-sref="it-contract.edit({id: exposure.itContractId})">
+                        {{exposure.itContractItContractId}}
+                    </a>
                 </td>
                 
                 <!-- inteface type -->
@@ -140,8 +141,9 @@
 
                 <!-- contract id -->
                 <td>
-                    <!-- TODO -->
-                    <small class="text-muted">[Hentes fra kontrakt]</small>
+                    <a data-ng-if="usage.itContractId != null" data-ui-sref="it-contract.edit({id: usage.itContractId})">
+                        {{usage.itContractItContractId}}
+                    </a>
                 </td>
                 
                 <!-- interface type -->

@@ -91,13 +91,14 @@
                     //for the select2
                     if (interfaceUsage.infrastructureId) {
                         interfaceUsage.infrastructure = {
-                            id: usage.infrastructureId,
-                            text: usage.infrastructureName
+                            id: interfaceUsage.infrastructureId,
+                            text: interfaceUsage.infrastructureName
                         };
                     }
 
                     _.each(interfaceUsage.dataRowUsages, function(dataRowUsage) {
                         dataRowUsage.updateUrl = "api/dataRowUsage/" + dataRowUsage.id;
+                        dataRowUsage.dataRow.dataType = _.findWhere(dataTypes, { id: dataRowUsage.dataRow.dataTypeId });
                     });
 
                     resolveTypes(interfaceUsage.interface);
