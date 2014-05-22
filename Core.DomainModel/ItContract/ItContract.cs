@@ -80,8 +80,8 @@ namespace Core.DomainModel.ItContract
         /// The interface usages that the contract is associated to. 
         /// </summary>
         public virtual ICollection<InterfaceUsage> AssociatedInterfaceUsages { get; set; } 
-
         public virtual ICollection<InterfaceExposure> AssociatedInterfaceExposures { get; set; } 
+
         public virtual ICollection<AgreementElement> AgreementElements { get; set; }
         public virtual ICollection<CustomAgreementElement> CustomAgreementElements { get; set; }
     }

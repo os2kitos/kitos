@@ -4,6 +4,7 @@
     {
         public int Id { get; set; }
         public int ItSystemUsageId { get; set; }
+        public ItSystemUsageSimpleDTO ItSystemUsage { get; set; }
 
         public ItSystemDTO Interface { get; set; }
 

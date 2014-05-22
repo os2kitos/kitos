@@ -33,5 +33,7 @@ namespace UI.MVC4.Models
         public ICollection<CustomAgreementElementDTO> CustomAgreementElements { get; set; }
 
         public virtual IEnumerable<ItSystemUsageSimpleDTO> AssociatedSystemUsages { get; set; }
+        public virtual ICollection<InterfaceUsageDTO> AssociatedInterfaceUsages { get; set; }
+        public virtual ICollection<InterfaceExposureDTO> AssociatedInterfaceExposures { get; set; } 
     }
 }
