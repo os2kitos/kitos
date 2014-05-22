@@ -46,7 +46,6 @@
     <Compile Include="ItSystemService.cs" />
     <Compile Include="ItSystemUsageService.cs" />
     <Compile Include="OrganizationService.cs" />
-    <Compile Include="OrgService.cs" />
     <Compile Include="OrgUnitService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MailClient.cs" />

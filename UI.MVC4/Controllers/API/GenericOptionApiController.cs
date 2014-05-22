@@ -33,14 +33,6 @@ namespace UI.MVC4.Controllers.API
             return Ok(Map<IEnumerable<TModel>, IEnumerable<TDto>>(items));
         }
         
-        protected override TModel PostQuery(TModel item)
-        {
-            if(!item.IsSuggestion && !IsGlobalAdmin())
-                throw new SecurityException();
-
-            return base.PostQuery(item);
-        }
-
         protected override TModel PutQuery(TModel item)
         {
             if (!item.IsSuggestion && !IsGlobalAdmin())

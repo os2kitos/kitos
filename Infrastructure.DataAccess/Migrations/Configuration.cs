@@ -38,7 +38,7 @@ namespace Infrastructure.DataAccess.Migrations
             //
 
             var cryptoService = new CryptoService();
-            var municipalityService = new OrganizationService();
+            var organizationService = new OrganizationService(null, null, null); // TODO needs a refactor as this is a bit hacky!
 
             #region AdminRoles
 
@@ -107,31 +107,52 @@ namespace Infrastructure.DataAccess.Migrations
                                                  Name = "Citrix"
                                              });*/
 
+            var contractTypeMain = new ContractType() {IsActive = true, Note = "...", Name = "Hovedkontrakt"};
+            var contractTypeSupplementary = new ContractType()
+                {
+                    IsActive = true, Note = "...", Name = "Tilægskontrakt"
+                };
+            var contractTypeInterface = new ContractType() {IsActive = true, Note = "...", Name = "Snitflade"};
             context.ContractTypes.AddOrUpdate(x => x.Name,
-                                              new ContractType() { IsActive = true, Note = "...", Name = "Hovedkontrakt" },
-                                              new ContractType()
-                                              {
-                                                  IsActive = true,
-                                                  Note = "...",
-                                                  Name = "Tilægskontrakt"
-                                              },
-                                              new ContractType() { IsActive = true, Note = "...", Name = "Snitflade" },
+                                              contractTypeMain,
+                                              contractTypeSupplementary,
+                                              contractTypeInterface,
                                               new ContractType() { IsActive = false, Note = "...", Name = "Tidligere aktiv kontrakttype" },
                                               new ContractType() { IsSuggestion = true, Note = "...", Name = "Forslag1" },
                                               new ContractType() { IsSuggestion = true, Note = "...", Name = "Forslag2" });
 
+            var contractTemplateK1 = new ContractTemplate() {IsActive = true, Note = "...", Name = "K01"};
+            var contractTemplateK2 = new ContractTemplate() {IsActive = true, Note = "...", Name = "K02"};
+            var contractTemplateK3 = new ContractTemplate() {IsActive = true, Note = "...", Name = "K03"};
             context.ContractTemplates.AddOrUpdate(x => x.Name,
-                                                  new ContractTemplate() { IsActive = true, Note = "...", Name = "K01" },
-                                                  new ContractTemplate() { IsActive = true, Note = "...", Name = "K02" },
-                                                  new ContractTemplate() { IsActive = true, Note = "...", Name = "K03" });
+                                                  contractTemplateK1,
+                                                  contractTemplateK2,
+                                                  contractTemplateK3);
 
+            var purchaseForm1 = new PurchaseForm() {IsActive = true, Note = "...", Name = "SKI"};
+            var purchaseForm2 = new PurchaseForm() {IsActive = true, Note = "...", Name = "SKI 02.19"};
+            var purchaseForm3 = new PurchaseForm() {IsActive = true, Note = "...", Name = "Udbud"};
             context.PurchaseForms.AddOrUpdate(x => x.Name,
-                                              new PurchaseForm() { IsActive = true, Note = "...", Name = "SKI" },
-                                              new PurchaseForm() { IsActive = true, Note = "...", Name = "SKI 02.19" },
-                                              new PurchaseForm() { IsActive = true, Note = "...", Name = "Udbud" });
+                                              purchaseForm1,
+                                              purchaseForm2,
+                                              purchaseForm3);
 
-            context.PaymentModels.AddOrUpdate(x => x.Name,
-                                              new PaymentModel() { IsActive = true, Note = "...", Name = "Licens" });
+            var procurementStrategy1 = new ProcurementStrategy() { IsActive = true, Name = "Strategi 1" };
+            var procurementStrategy2 = new ProcurementStrategy() { IsActive = true, Name = "Strategi 2" };
+            var procurementStrategy3 = new ProcurementStrategy() { IsActive = true, Name = "Strategi 3" };
+            context.ProcurementStrategies.AddOrUpdate(x => x.Name, procurementStrategy1, procurementStrategy2, procurementStrategy3);
+
+            context.AgreementElements.AddOrUpdate(x => x.Name, 
+                new AgreementElement(){ IsActive = true, Name = "Licens" },
+                new AgreementElement(){ IsActive = true, Name = "Udvikling" },
+                new AgreementElement(){ IsActive = true, Name = "Drift" },
+                new AgreementElement(){ IsActive = true, Name = "Vedligehold" },
+                new AgreementElement(){ IsActive = true, Name = "Support" },
+                new AgreementElement(){ IsActive = true, Name = "Serverlicenser" },
+                new AgreementElement(){ IsActive = true, Name = "Serverdrift" },
+                new AgreementElement(){ IsActive = true, Name = "Databaselicenser" },
+                new AgreementElement(){ IsActive = true, Name = "Backup" },
+                new AgreementElement(){ IsActive = true, Name = "Overvågning" });
 
             var itSupportName = new ItSupportModuleName() { Name = "IT Understøttelse" };
             context.ItSupportModuleNames.AddOrUpdate(x => x.Name,
@@ -263,9 +284,9 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Organizations
 
-            var roskilde = municipalityService.CreateMunicipality("Roskilde");
-            var sorø = municipalityService.CreateMunicipality("Sorø");
-            var kl = municipalityService.CreateMunicipality("KL");
+            var roskilde = organizationService.CreateMunicipality("Roskilde");
+            var sorø = organizationService.CreateMunicipality("Sorø");
+            var kl = organizationService.CreateMunicipality("KL");
 
             context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø, kl);
 
@@ -913,8 +934,6 @@ namespace Infrastructure.DataAccess.Migrations
 
             #endregion
 
-
-
             #region IT Project
 
             var phase11 = new Activity()
@@ -953,6 +972,27 @@ namespace Infrastructure.DataAccess.Migrations
             context.ItProjects.AddOrUpdate(itProject1, itProject2, itProject3);
             
             context.SaveChanges();
+
+            #endregion
+
+            #region IT Contract
+
+            var itContractA = new ItContract()
+                {
+                    ObjectOwner = globalUser,
+                    Name = "Test kontrakt",
+                    Note = "En bemærkning!",
+                    ItContractId = "Et id",
+                    Esdh = "esdh",
+                    Folder = "mappe",
+                    SupplierContractSigner = "ext underskriver",
+                    ContractType = contractTypeMain,
+                    PurchaseForm = purchaseForm1,
+                    ProcurementStrategy = procurementStrategy1,
+                    ContractTemplate = contractTemplateK1,
+                };
+
+            context.ItContracts.AddOrUpdate(x => x.Name, itContractA);
 
             #endregion
 

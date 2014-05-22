@@ -52,5 +52,10 @@ namespace Core.DomainModel
         /// This Organization Unit is responsible for these IT Projects
         /// </summary>
         public virtual ICollection<ItProject.ItProject> ResponsibleForItProjects { get; set; }
+
+        /// <summary>
+        /// This Organization Unit is responsible for these IT Contracts
+        /// </summary>
+        public virtual ICollection<ItContract.ItContract> ResponsibleForItContracts { get; set; }
     }
 }
