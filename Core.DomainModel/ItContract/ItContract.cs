@@ -9,12 +9,13 @@ namespace Core.DomainModel.ItContract
         {
             //this.ShipNotices = new List<ShipNotice>();
             this.AgreementElements = new List<AgreementElement>();
+            this.CustomAgreementElements = new List<CustomAgreementElement>();
             this.Children = new List<ItContract>();
             this.Rights = new List<ItContractRight>();
         }
 
         public int ObjectOwnerId { get; set; }
-        public User ObjectOwner { get; set; }
+        public virtual User ObjectOwner { get; set; }
 
         public int Id { get; set; }
         public string Name { get; set; }
@@ -26,9 +27,11 @@ namespace Core.DomainModel.ItContract
         public bool HasSupplierSigned { get; set; }
         public DateTime? SupplierSignedDate { get; set; }
         public User ContractSigner { get; set; }
-        public OrganizationUnit ResponsibleOrganizationUnit { get; set; }
         public bool IsSigned { get; set; }
         public DateTime? SignedDate { get; set; }
+
+        public int? ResponsibleOrganizationUnitId { get; set; }
+        public virtual OrganizationUnit ResponsibleOrganizationUnit { get; set; }
 
         /// <summary>
         /// Id of the organization marked as supplier for this contract
@@ -64,5 +67,6 @@ namespace Core.DomainModel.ItContract
         //public virtual ICollection<ShipNotice> ShipNotices { get; set; }
         public virtual ICollection<ItContractRight> Rights { get; set; }
         public virtual ICollection<AgreementElement> AgreementElements { get; set; }
+        public virtual ICollection<CustomAgreementElement> CustomAgreementElements { get; set; }
     }
 }

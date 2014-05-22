@@ -92,6 +92,9 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<BusinessType>>().To<GenericRepository<BusinessType>>().InRequestScope();
             kernel.Bind<IGenericRepository<HandoverTrial>>().To<GenericRepository<HandoverTrial>>().InRequestScope();
             kernel.Bind<IGenericRepository<AgreementElement>>().To<GenericRepository<AgreementElement>>().InRequestScope();
+            kernel.Bind<IGenericRepository<CustomAgreementElement>>().To<GenericRepository<CustomAgreementElement>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ProcurementPlan>>().To<GenericRepository<ProcurementPlan>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ProcurementStrategy>>().To<GenericRepository<ProcurementStrategy>>().InRequestScope();
             kernel.Bind<IGenericRepository<ExtReferenceType>>().To<GenericRepository<ExtReferenceType>>().InRequestScope();
             kernel.Bind<IGenericRepository<ExtRefTypeLocale>>().To<GenericRepository<ExtRefTypeLocale>>().InRequestScope();
             kernel.Bind<IGenericRepository<TaskRef>>().To<GenericRepository<TaskRef>>().InRequestScope();
@@ -99,6 +102,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<ItSystem>>().To<GenericRepository<ItSystem>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItSystemUsage>>().To<GenericRepository<ItSystemUsage>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItProjectRole>>().To<GenericRepository<ItProjectRole>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ItContract>>().To<GenericRepository<ItContract>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItContractRole>>().To<GenericRepository<ItContractRole>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItSystemRole>>().To<GenericRepository<ItSystemRole>>().InRequestScope();
             kernel.Bind<IGenericRepository<OrganizationRole>>().To<GenericRepository<OrganizationRole>>().InRequestScope();

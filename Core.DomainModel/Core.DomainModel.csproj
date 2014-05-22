@@ -43,6 +43,7 @@
     <Compile Include="AdminRight.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="IHasAccessModifier.cs" />
+    <Compile Include="ItContract\CustomAgreementElement.cs" />
     <Compile Include="ItContract\ProcurementPlan.cs" />
     <Compile Include="ItContract\ProcurementStrategy.cs" />
     <Compile Include="ItProject\GoalType.cs" />
