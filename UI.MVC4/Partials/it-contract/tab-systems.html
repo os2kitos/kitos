@@ -1,40 +1,62 @@
 ﻿<div class="container-fluid">
-    
-    <div class="col-md-5"><div class="panel panel-default">
-                 <div class="panel-heading">
-                     IT Kontrakten gælder flg. IT systemer
-                 </div>
-                 <table class="table table-condensed small">
-                     <thead>
-                         <tr>
-                             <th class="col-md-9">
-                                 IT System
-                             </th>
-                             <th class="col-md-3">
-                                 Applikationstype
-                             </th>
-                         </tr>
-                     </thead>
-                     <tbody>
-                
-                         <!-- new row -->
-                         <tr>
-                             <!-- the system -->
-                             <td>
-                                 <input type="hidden" data-ui-select2="itSystemUsagesSelectOptions" data-ng-model="newSystem.system" class="form-control input-sm" data-ng-change="saveNewSystemRow()">
-                             </td>
-                    
-                             <!-- app type (read only) -->
-                             <td>
-                                 {{ newSystem.appType }}
-                             </td>
-                         </tr>
-                     </tbody>
 
-                 </table>
+    <div class="col-md-5">
+        <div class="h5">
+            IT Kontrakten gælder flg. IT systemer
+        </div>
+        <table class="table table-condensed small">
+            <thead>
+                <tr>
+                    <th class="col-md-8">IT System
+                    </th>
+                    <th class="col-md-3">Applikationstype
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
 
-             </div></div>
-    
+
+                <!-- new row -->
+                <tr data-ng-repeat="associatedSystemUsage in associatedSystemUsages | filter:{'show':true}">
+                    <!-- the system -->
+                    <td>
+                        <input type="hidden" data-ui-select2="itSystemUsagesSelectOptions" data-ng-model="associatedSystemUsage.selectedSystem" class="form-control input-sm" data-ng-change="associatedSystemUsage.update()">
+                    </td>
+
+                    <!-- app type (read only) -->
+                    <td>{{ associatedSystemUsage.itSystemAppTypeName }}
+                    </td>
+
+                    <td>
+                        <a class="btn btn-danger btn-xs"
+                           data-confirmed-click="associatedSystemUsage.delete()"
+                           data-confirm-click="Er du sikker på at du vil slette rækken?">
+                            <i class="glyphicon glyphicon-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+
+
+                <!-- new row -->
+                <tr>
+                    <!-- the system -->
+                    <td>
+                        <input type="hidden" data-ui-select2="itSystemUsagesSelectOptions" data-ng-model="newAssociatedSystemUsage.selectedSystem" class="form-control input-sm" data-ng-change="newAssociatedSystemUsage.save()">
+                    </td>
+
+                    <!-- app type (read only) -->
+                    <td>-
+                    </td>
+                    <td></td>
+                </tr>
+
+
+            </tbody>
+
+        </table>
+    </div>
+
     <div class="col-md-6">
         <div class="panel panel-heading">
             IT Kontrakten gælder flg. snitfladerelationer
@@ -42,19 +64,16 @@
         <table class="table table-condensed table-no-margin">
             <thead>
                 <tr>
-                    <th>
-                        IT System
+                    <th>IT System
                     </th>
                     <!-- 
                         <th>
                             Applikationstype
                         </th>
                         -->
-                    <th>
-                        Relation
+                    <th>Relation
                     </th>
-                    <th>
-                        Snitflade
+                    <th>Snitflade
                     </th>
                 </tr>
             </thead>

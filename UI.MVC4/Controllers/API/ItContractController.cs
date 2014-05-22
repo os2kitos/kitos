@@ -32,17 +32,17 @@ namespace UI.MVC4.Controllers.API
             {
                 var contract = Repository.GetByKey(id);
 
-                if (contract.AssociatedSystems.Any(usage => usage.Id == id))
+                if (contract.AssociatedSystemUsages.Any(usage => usage.Id == systemUsageId))
                     return Conflict("The IT system is already associated with the contract");
 
                 var systemUsage = _usageRepository.GetByKey(systemUsageId);
 
-                contract.AssociatedSystems.Add(systemUsage);
+                contract.AssociatedSystemUsages.Add(systemUsage);
 
                 Repository.Update(contract);
                 Repository.Save();
                 
-                return Ok(MapAssociatedSystems(contract));
+                return Ok(MapSystemUsages(contract));
             }
             catch (Exception e)
             {
@@ -62,17 +62,17 @@ namespace UI.MVC4.Controllers.API
             {
                 var contract = Repository.GetByKey(id);
 
-                if (contract.AssociatedSystems.All(usage => usage.Id != id))
+                if (contract.AssociatedSystemUsages.All(usage => usage.Id != systemUsageId))
                     return Conflict("The IT system is not associated with the contract");
 
                 var systemUsage = _usageRepository.GetByKey(systemUsageId);
 
-                contract.AssociatedSystems.Remove(systemUsage);
+                contract.AssociatedSystemUsages.Remove(systemUsage);
 
                 Repository.Update(contract);
                 Repository.Save();
                 
-                return Ok(MapAssociatedSystems(contract));
+                return Ok(MapSystemUsages(contract));
             }
             catch (Exception e)
             {
@@ -80,9 +80,9 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        private IEnumerable<ItSystemUsageSimpleDTO> MapAssociatedSystems(ItContract contract)
+        private IEnumerable<ItSystemUsageSimpleDTO> MapSystemUsages(ItContract contract)
         {
-            return Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageSimpleDTO>>(contract.AssociatedSystems);
+            return Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageSimpleDTO>>(contract.AssociatedSystemUsages);
         } 
     }
 }

@@ -13,7 +13,7 @@ namespace Core.DomainModel.ItContract
             this.CustomAgreementElements = new List<CustomAgreementElement>();
             this.Children = new List<ItContract>();
             this.Rights = new List<ItContractRight>();
-            this.AssociatedSystems = new List<ItSystemUsage>();
+            this.AssociatedSystemUsages = new List<ItSystemUsage>();
             this.AssociatedInterfaceUsages = new List<InterfaceUsage>();
             this.AssociatedInterfaceExposures = new List<InterfaceExposure>();
         }
@@ -74,7 +74,7 @@ namespace Core.DomainModel.ItContract
         /// <summary>
         /// The (local usages of) it systems, that this contract is associated to. 
         /// </summary>
-        public virtual ICollection<ItSystemUsage> AssociatedSystems { get; set; }
+        public virtual ICollection<ItSystemUsage> AssociatedSystemUsages { get; set; }
 
         /// <summary>
         /// The interface usages that the contract is associated to. 
