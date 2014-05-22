@@ -15,6 +15,7 @@ namespace Core.DomainModel.ItContract
             this.Rights = new List<ItContractRight>();
             this.AssociatedSystems = new List<ItSystemUsage>();
             this.AssociatedInterfaceUsages = new List<InterfaceUsage>();
+            this.AssociatedInterfaceExposures = new List<InterfaceExposure>();
         }
 
         public int ObjectOwnerId { get; set; }
