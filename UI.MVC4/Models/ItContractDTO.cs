@@ -31,5 +31,7 @@ namespace UI.MVC4.Models
         public int? ParentId { get; set; }
         public ICollection<OptionDTO> AgreementElements { get; set; }
         public ICollection<CustomAgreementElementDTO> CustomAgreementElements { get; set; }
+
+        public virtual IEnumerable<ItSystemUsageSimpleDTO> AssociatedSystems { get; set; }
     }
 }

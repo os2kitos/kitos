@@ -219,6 +219,7 @@
     <Compile Include="App_Start\MappingConfig.cs" />
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="Models\ItContractDTO.cs" />
+    <Compile Include="Models\ItSystemUsageSimpleDTO.cs" />
     <Compile Include="Models\ProcurementPlanDTO.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />

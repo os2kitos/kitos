@@ -240,6 +240,9 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
                   .ForMember(dest => dest.ItProjects, opt => opt.Ignore());
 
+            //Simplere mapping than the one above, only one way
+            Mapper.CreateMap<ItSystemUsage, ItSystemUsageSimpleDTO>();
+
             Mapper.CreateMap<EconomyYear, EconomyYearDTO>()
                   .ReverseMap();
 
