@@ -24,6 +24,20 @@ namespace UI.MVC4.Controllers.API
             _itSystemUsageService = itSystemUsageService;
         }
 
+        public HttpResponseMessage GetSearchByOrganization(int organizationId, string q)
+        {
+            try
+            {
+                var usages = Repository.Get(u => u.OrganizationId == organizationId && u.ItSystem.Name.StartsWith(q));
+
+                return Ok(Map(usages));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            } 
+        }
+
         public HttpResponseMessage GetByOrganization(int organizationId)
         {
             try
