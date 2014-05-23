@@ -102,18 +102,21 @@
                 scope: {
                     inputName: '@?name',
                     userModel: '=',
-                    addUser: "@?"
+                    addUser: '@?',
+                    allowClear: '@?'
                 },
                 replace: true,
                 templateUrl: 'partials/directives/select-user.html',
                 controller: [
-                    '$scope', function($scope) {
+                    '$scope', function ($scope) {
                         $scope.selectUserOptions = {
 
                             //don't escape markup, otherwise formatResult will be bugged
                             escapeMarkup: function(m) { return m; },
                             formatResult: formatResult,
                             formatSelection: formatSelection,
+
+                            allowClear: !!$scope.allowClear,
 
                             minimumInputLength: 1,
                             initSelection: function(elem, callback) {

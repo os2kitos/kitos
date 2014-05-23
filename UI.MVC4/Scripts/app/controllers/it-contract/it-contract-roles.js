@@ -26,6 +26,56 @@
 
             var contractId = contract.id;
 
+            function formatContractSigner(signer) {
+
+                var userForSelect = null;
+                if (signer) {
+                    userForSelect = {
+                        id: signer.id,
+                        text: signer.name
+                    };
+                }
+
+                $scope.contractSigner = {
+                    edit: false,
+                    signer: signer,
+                    userForSelect: userForSelect,
+                    update: function () {
+                        
+                        var msg = notify.addInfoMessage("Gemmer...", false);
+
+                        var selectedUser = $scope.contractSigner.userForSelect;
+                        var signerId = selectedUser ? selectedUser.id : null;
+                        var signerUser = selectedUser ? selectedUser.user : null;
+
+                        $http({
+                            method: 'PATCH',
+                            url: 'api/itContract/' + contractId,
+                            data: {
+                                contractSignerId: signerId
+                            }
+                        }).success(function (result) {
+
+                            msg.toSuccessMessage("Kontraktunderskriveren er gemt");
+
+                            formatContractSigner(signerUser);
+
+                        }).error(function() {
+                            msg.toErrorMessage("Fejl!");
+                        });
+                    }
+                };
+
+
+            }
+
+            formatContractSigner(contract.contractSigner);
+
+
+
+
+
+            //normal user roles
             $scope.itContractRoles = itContractRoles;
             $scope.newRole = itContractRoles.length > 0 ? 1 : 0;
 
