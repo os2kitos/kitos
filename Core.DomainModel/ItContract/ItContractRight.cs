@@ -5,8 +5,8 @@
         public int UserId { get; set; }
         public int RoleId { get; set; }
         public int ObjectId { get; set; }
-        public User User { get; set; }
-        public ItContractRole Role { get; set; }
-        public ItContract Object { get; set; }
+        public virtual User User { get; set; }
+        public virtual ItContractRole Role { get; set; }
+        public virtual ItContract Object { get; set; }
     }
 }

@@ -30,17 +30,24 @@
                         return result.data.response;
                     });
                 }],
+                hasWriteAccess: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itcontractright/" + $stateParams.id + "?hasWriteAccess")
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }]
             }
         });
     }]);
 
-    app.controller('contract.EditCtrl', ['$scope', '$http', '$stateParams', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies',
-            function ($scope, $http, $stateParams, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies) {
+    app.controller('contract.EditCtrl', ['$scope', '$http', '$stateParams', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'hasWriteAccess',
+            function ($scope, $http, $stateParams, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, hasWriteAccess) {
                 $scope.autosaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.contract = contract;
                 $scope.contractTypes = contractTypes;
                 $scope.contractTemplates = contractTemplates;
                 $scope.purchaseForms = purchaseForms;
                 $scope.procurementStrategies = procurementStrategies;
+                $scope.hasWriteAccess = hasWriteAccess;
             }]);
 })(angular, app);

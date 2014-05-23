@@ -1,4 +1,6 @@
-﻿using Core.DomainModel.ItContract;
+﻿using System;
+using System.Net.Http;
+using Core.DomainModel.ItContract;
 using Core.DomainServices;
 using UI.MVC4.Models;
 

@@ -16,8 +16,8 @@ namespace UI.MVC4.Controllers.API
     {
         private readonly IOrgUnitService _orgUnitService;
 
-        public OrganizationRightController(IGenericRepository<OrganizationRight> repository, IOrgUnitService orgUnitService) 
-            : base(repository)
+        public OrganizationRightController(IGenericRepository<OrganizationRight> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IOrgUnitService orgUnitService) 
+            : base(repository, orgUnitRepository)
         {
             _orgUnitService = orgUnitService;
         }
