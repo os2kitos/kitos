@@ -51,8 +51,8 @@ namespace Core.DomainModel.ItContract
         public int? ProcurementStrategyId { get; set; }
         public virtual ProcurementStrategy ProcurementStrategy { get; set; }
 
-        public int? ProcurementPlanId { get; set; }
-        public virtual ProcurementPlan ProcurementPlan { get; set; }
+        public int? ProcurementPlanHalf { get; set; }
+        public int? ProcurementPlanYear { get; set; }
 
         public int? ContractTemplateId { get; set; }
         public virtual ContractTemplate ContractTemplate { get; set; }

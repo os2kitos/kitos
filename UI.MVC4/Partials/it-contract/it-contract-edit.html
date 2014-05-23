@@ -60,7 +60,9 @@
                         <!-- Procurement plan -->
                         <div class="form-group">
                             <label for="contract-plan" class="control-label small">Udbudsplan</label>
-                            <select id="contract-plan" class="form-control input-sm" data-ng-model="contract.procurementPlan" data-ng-options="(o.half + ' | ' + o.year) for o in procurementPlans"></select>
+                            <select id="contract-plan" class="form-control input-sm" data-ng-model="contract.procurementPlan" data-ng-options="o as (o.half + ' | ' + o.year) for o in procurementPlans" data-ng-change="saveProcurement()">
+                                <option value=""></option>
+                            </select>
                         </div>
     
                         <!-- Contract template -->

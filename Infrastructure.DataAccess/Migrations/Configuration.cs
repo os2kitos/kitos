@@ -985,7 +985,8 @@ namespace Infrastructure.DataAccess.Migrations
                     ProcurementStrategy = procurementStrategy1,
                     ContractTemplate = contractTemplateK1,
                     Organization = roskilde,
-                    ProcurementPlan = new ProcurementPlan() { Half = 1, Year = 2016 }
+                    ProcurementPlanHalf = 1, 
+                    ProcurementPlanYear = 2016
                 };
 
             context.ItContracts.AddOrUpdate(x => x.Name, itContractA);

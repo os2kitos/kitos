@@ -25,7 +25,8 @@ namespace UI.MVC4.Models
         public int ResponsibleOrganizationUnitId { get; set; }
         public int? SupplierId { get; set; }
         public int? ProcurementStrategyId { get; set; }
-        public ProcurementPlanDTO ProcurementPlan { get; set; }
+        public int? ProcurementPlanHalf { get; set; }
+        public int? ProcurementPlanYear { get; set; }
         public int? ContractTemplateId { get; set; }
         public int? ContractTypeId { get; set; }
         public int? PurchaseFormId { get; set; }

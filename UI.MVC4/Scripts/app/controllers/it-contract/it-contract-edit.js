@@ -50,8 +50,8 @@
     }]);
 
     app.controller('contract.EditCtrl',
-        ['$scope', '$http', '$stateParams', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'suppliers', 'orgUnits', 'contracts',
-            function ($scope, $http, $stateParams, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, suppliers, orgUnits, contracts) {
+        ['$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'suppliers', 'orgUnits', 'contracts',
+            function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, suppliers, orgUnits, contracts) {
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.contract = contract;
                 $scope.contractTypes = contractTypes;
@@ -72,6 +72,33 @@
                     
                     // add 6 months for next iter
                     currentDate.add('months', 6);
+                }
+
+                var foundPlan = _.find($scope.procurementPlans, function(plan) {
+                    return plan.half == contract.procurementPlanHalf && plan.year == contract.procurementPlanYear;
+                });
+                if (foundPlan) {
+                    // plan is found in the list, replace it to get object equality
+                    $scope.contract.procurementPlan = foundPlan;
+                } else {
+                    // plan is not found, add missing plan to begining of list
+                    $scope.procurementPlans.unshift({ half: contract.procurementPlanHalf, year: contract.procurementPlanYear });
+                }
+
+                $scope.saveProcurement = function() {
+                    var payload = { procurementPlanHalf: $scope.contract.procurementPlan.half, procurementPlanYear: $scope.contract.procurementPlan.year };
+                    save(payload);
+                };
+
+                function save(payload) {
+                    var msg = notify.addInfoMessage("Gemmer...", false);
+                    $http({ method: 'PATCH', url: $scope.autoSaveUrl, data: payload })
+                        .success(function () {
+                            msg.toSuccessMessage("Feltet er opdateret.");
+                        })
+                        .error(function () {
+                            msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                        });
                 }
             }
         ]

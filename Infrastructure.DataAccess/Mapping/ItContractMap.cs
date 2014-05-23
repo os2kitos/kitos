@@ -38,10 +38,6 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.Supplier)
                 .HasForeignKey(d => d.SupplierId);
 
-            this.HasOptional(t => t.ProcurementPlan)
-                .WithRequired(t => t.ItContract)
-                .WillCascadeOnDelete(true);
-
             this.HasOptional(t => t.ProcurementStrategy)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ProcurementStrategyId);
