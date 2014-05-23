@@ -62,6 +62,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.ResponsibleOrganizationUnit)
                 .WithMany(t => t.ResponsibleForItContracts)
                 .HasForeignKey(d => d.ResponsibleOrganizationUnitId);
+
+            this.HasOptional(t => t.ContractSigner)
+                .WithMany(d => d.SignerForContracts)
+                .HasForeignKey(t => t.ContractSignerId);
         }
     }
 }

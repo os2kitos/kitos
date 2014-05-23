@@ -53,5 +53,6 @@ namespace Core.DomainModel
         public virtual ICollection<Communication> ResponsibleForCommunications { get; set; } 
         public virtual ICollection<Handover> HandoverParticipants { get; set; }
         public virtual ICollection<ItContract.ItContract> CreatedItContracts { get; set; }
+        public virtual ICollection<ItContract.ItContract> SignerForContracts { get; set; }
     }
 }

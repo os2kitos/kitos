@@ -17,7 +17,10 @@ namespace UI.MVC4.Models
         public bool HasSupplierSigned { get; set; }
         [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime? SupplierSignedDate { get; set; }
+
+        public int? ContractSignerId { get; set; }
         public UserDTO ContractSigner { get; set; }
+
         public bool IsSigned { get; set; }
         [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime? SignedDate { get; set; }
