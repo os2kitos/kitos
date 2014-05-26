@@ -213,6 +213,8 @@
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="Controllers\API\CustomAgreementElementController.cs" />
+    <Compile Include="Controllers\API\EconomyStreamController.cs" />
+    <Compile Include="Models\EconomyStreamDTO.cs" />
     <Compile Include="Controllers\API\ItContractController.cs" />
     <Compile Include="Controllers\API\ItContractRightController.cs" />
     <Compile Include="Controllers\API\ProcurementStrategyController.cs" />
