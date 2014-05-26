@@ -30,6 +30,7 @@ namespace Infrastructure.DataAccess
         public DbSet<Config> Configs { get; set; }
         public DbSet<ContractTemplate> ContractTemplates { get; set; }
         public DbSet<ContractType> ContractTypes { get; set; }
+        public DbSet<CustomAgreementElement> CustomAgreementElements { get; set; }
         public DbSet<DataType> DataTypes { get; set; }
         public DbSet<DataRow> DataRows { get; set; }
         public DbSet<DataRowUsage> DataRowUsages { get; set; }

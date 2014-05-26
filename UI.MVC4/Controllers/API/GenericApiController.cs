@@ -5,6 +5,7 @@ using System.Net.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using UI.MVC4.Models.Exceptions;
 
 namespace UI.MVC4.Controllers.API
 {
@@ -96,7 +97,11 @@ namespace UI.MVC4.Controllers.API
                 PostQuery(item);
 
                 //var msg = new HttpResponseMessage(HttpStatusCode.Created);
-                return Created(Map<TModel,TDto>(item), new Uri(Request.RequestUri + "/" + item.Id));
+                return Created(Map<TModel, TDto>(item), new Uri(Request.RequestUri + "/" + item.Id));
+            }
+            catch (ConflictException e)
+            {
+                return Conflict(e.Message);
             }
             catch (Exception e)
             {
