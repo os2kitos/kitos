@@ -55,7 +55,8 @@ namespace UI.MVC4.Controllers.API
 
         protected virtual IEnumerable<TModel> GetAllQuery()
         {
-            return Repository.Get();
+            //TODO: remove this hardcode and do some proper paging
+            return Repository.Get().Take(100);
         }
 
         public HttpResponseMessage GetAll()
