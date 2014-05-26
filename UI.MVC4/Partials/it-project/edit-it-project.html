@@ -167,7 +167,7 @@
     <li data-ui-sref-active="active">
         <a data-ui-sref="it-project.edit.status-project">Status: Projekt</a>
     </li>
-    <li data-ui-sref-active="active">
+    <li data-ui-sref-active="active" data-ng-show="project.isStatusGoalVisible">
         <a data-ui-sref="it-project.edit.status-goal">Status: Mål</a>
     </li>
     <li data-ui-sref-active="active">
@@ -179,26 +179,31 @@
     <li data-ui-sref-active="active">
         <a data-ui-sref="it-project.edit.roles">Projektroller</a>
     </li>
-    <li data-ui-sref-active="active">
+    <li data-ui-sref-active="active" data-ng-show="project.isEconomyVisible">
         <a data-ui-sref="it-project.edit.economy">Økonomi</a>
     </li>
-    <li data-ui-sref-active="active">
+    <li data-ui-sref-active="active" data-ng-show="project.isStakeholderVisible">
         <a data-ui-sref="it-project.edit.stakeholders">Interessenter</a>
     </li>
     <li data-ui-sref-active="active">
         <a data-ui-sref="it-project.edit.risk">Risiko</a>
     </li>
-    <li data-ui-sref-active="active">
+    <li data-ui-sref-active="active" data-ng-show="project.isCommunicationVisible">
         <a data-ui-sref="it-project.edit.communication">Kommunikation</a>
     </li>
-    <li data-ui-sref-active="active">
+    <li data-ui-sref-active="active" data-ng-show="project.isHandoverVisible">
         <a data-ui-sref="it-project.edit.handover">Overlevering</a>
     </li>
     <li data-ui-sref-active="active">
         <a data-ui-sref="it-project.edit.org">Organisation</a>
     </li>
-    <li data-ui-sref-active="active"><a data-ui-sref="it-project.edit.kle">KLE</a></li>
-    <li data-ui-sref-active="active"><a data-ui-sref="it-project.edit.itsys">IT Systemer</a></li>
+    <li data-ui-sref-active="active">
+        <a data-ui-sref="it-project.edit.kle">KLE</a>
+    </li>
+    <li data-ui-sref-active="active">
+        <a data-ui-sref="it-project.edit.itsys">IT Systemer</a>
+    </li>
+    <li class="pull-right" data-ng-dropdown-multiselect="" data-options="dropdownData" data-selected-model="selectedData" data-extra-settings="selectSettings"></li>
 </ul>
 
 <!-- sub tabs view -->

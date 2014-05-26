@@ -163,7 +163,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new RiskMap());
             modelBuilder.Configurations.Add(new SensitiveDataTypeMap());
             modelBuilder.Configurations.Add(new ShipNoticeMap());
-            modelBuilder.Configurations.Add(new StakeholdersMap());
+            modelBuilder.Configurations.Add(new StakeholderMap());
             modelBuilder.Configurations.Add(new StateMap());
             modelBuilder.Configurations.Add(new SupplierMap());
             modelBuilder.Configurations.Add(new TaskRefMap());

@@ -3,9 +3,9 @@ using Core.DomainModel.ItProject;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class StakeholdersMap : EntityTypeConfiguration<Stakeholder>
+    public class StakeholderMap : EntityTypeConfiguration<Stakeholder>
     {
-        public StakeholdersMap()
+        public StakeholderMap()
         {
             // Primary Key
             this.HasKey(t => t.Id);
