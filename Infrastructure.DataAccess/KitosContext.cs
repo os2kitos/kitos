@@ -68,12 +68,17 @@ namespace Infrastructure.DataAccess
         public DbSet<Localization> Localizations { get; set; }
         public DbSet<Method> Methods { get; set; }
         public DbSet<Milestone> Milestones { get; set; }
+        public DbSet<OptionExtend> OptionExtention { get; set; }
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<OrgTab> OrgTabs { get; set; }
         public DbSet<OrganizationUnit> OrganizationUnits { get; set; }
         public DbSet<OrganizationRight> OrganizationRights { get; set; }
         public DbSet<OrganizationRole> OrganizationRoles { get; set; }
         public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
+        public DbSet<PaymentFreqency> PaymentFreqencies { get; set; }
+        public DbSet<PaymentMilestone> PaymentMilestones { get; set; }
+        public DbSet<PaymentModel> PaymentModels { get; set; }
+        public DbSet<PriceRegulation> PriceRegulations { get; set; }
         public DbSet<ProcurementStrategy> ProcurementStrategies { get; set; }
         public DbSet<ItProjectCategory> ProjectCategories { get; set; }
         public DbSet<ProjectPhase> ProjectPhases { get; set; }
@@ -87,6 +92,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ShipNotice> ShipNotices { get; set; }
         public DbSet<Stakeholder> Stakeholders { get; set; }
         public DbSet<State> States { get; set; }
+        public DbSet<TerminationDeadline> TerminationDeadlines { get; set; }
         public DbSet<TaskRef> TaskRefs { get; set; }
         public DbSet<TaskUsage> TaskUsages { get; set; }
         public DbSet<Text> Texts { get; set; }

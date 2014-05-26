@@ -1,0 +1,140 @@
+﻿<form role="form">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Anskaffelse</div>
+                        <table class="table table-condensed small">
+                            <thead>
+                                <tr>
+                                    <th>Prøver</th>
+                                    <th>Forventet</th>
+                                    <th>Godkendt</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Funktionsprøve</td>
+                                    <td><input type="date" class="form-control input-sm"></td>
+                                    <td><input type="date" class="form-control input-sm"></td>
+                                </tr>
+                                <tr>
+                                    <td>Driftovertagelsesprøve</td>
+                                    <td><input type="date" class="form-control input-sm"></td>
+                                    <td><input type="date" class="form-control input-sm"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <table class="table table-condensed small">
+                            <thead>
+                                <tr>
+                                    <th>Betalingsmilepæle</th>
+                                    <th>Forventet</th>
+                                    <th>Godkendt</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="text" class="form-control input-sm"></td>
+                                    <td><input type="date" class="form-control input-sm"></td>
+                                    <td><input type="date" class="form-control input-sm"></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td><input type="text" class="form-control input-sm"></td>
+                                    <td><input type="date" class="form-control input-sm"></td>
+                                    <td><input type="date" class="form-control input-sm"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Aftalefrister</div>
+                        <div class="form-group">
+                            <label for="agreement-concluded" class="control-label small">Indgået</label>
+                            <input type="date" id="agreement-concluded" class="form-control input-sm" data-ng-model="">
+                        </div>
+                        <div class="form-group">
+                            <label for="agreement-duration" class="control-label small">Varighed</label>
+                            <input type="date" id="agreement-duration" class="form-control input-sm" data-ng-model="">
+                        </div>
+                        <div class="form-group">
+                            <label for="agreement-option-extend" class="control-label small">Option forlæng</label>
+                            <select id="agreement-option-extend" class="form-control input-sm" data-ng-model="">
+                                <option value=""></option>
+                            </select>
+                            <select class="form-control input-sm" data-ng-model="">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="agreement-notice" class="control-label small">Opsigelsesfrist</label>
+                            <select id="agreement-notice" class="form-control input-sm" data-ng-model="">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="agreement-irrevocable" class="control-label small">Uopsigelig til</label>
+                            <input type="date" id="agreement-irrevocable" class="form-control input-sm" data-ng-model="">
+                        </div>
+                        <div class="form-group">
+                            <label for="agreement-expiration" class="control-label small">Udløbsdato</label>
+                            <input type="date" id="agreement-expiration" class="form-control input-sm" data-ng-model="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Betalingsmodel</div>
+                        <div class="form-group">
+                            <label for="agreement-operation" class="control-label small">Driftsvederlag påbegyndt</label>
+                            <input type="date" id="agreement-operation" class="form-control input-sm" data-ng-model="">
+                        </div>
+                        <div class="form-group">
+                            <label for="agreement-freq" class="control-label small">Betalingsfrekvens</label>
+                            <select id="agreement-freq" class="form-control input-sm" data-ng-model="">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="agreement-payment" class="control-label small">Betalingsmodel</label>
+                            <select id="agreement-payment" class="form-control input-sm" data-ng-model="">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="agreement-price" class="control-label small">Prisregulering</label>
+                            <select id="agreement-price" class="form-control input-sm" data-ng-model="">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Opsigelse</div>
+                        <div class="form-group">
+                            <label for="agreement-terminated" class="control-label small">Kontrakten opsagt</label>
+                            <input type="date" id="agreement-terminated" class="form-control input-sm" data-ng-model="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
