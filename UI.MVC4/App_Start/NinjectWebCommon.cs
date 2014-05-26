@@ -76,6 +76,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<ContractType>>().To<GenericRepository<ContractType>>().InRequestScope();
             kernel.Bind<IGenericRepository<InterfaceType>>().To<GenericRepository<InterfaceType>>().InRequestScope();
             kernel.Bind<IGenericRepository<InterfaceUsage>>().To<GenericRepository<InterfaceUsage>>().InRequestScope();
+            kernel.Bind<IGenericRepository<InterfaceExposure>>().To<GenericRepository<InterfaceExposure>>().InRequestScope();
             kernel.Bind<IGenericRepository<InterfaceCategory>>().To<GenericRepository<InterfaceCategory>>().InRequestScope();
             kernel.Bind<IGenericRepository<Method>>().To<GenericRepository<Method>>().InRequestScope();
             kernel.Bind<IGenericRepository<Tsa>>().To<GenericRepository<Tsa>>().InRequestScope();
@@ -144,6 +145,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InRequestScope();
             kernel.Bind<IItSystemService>().To<ItSystemService>().InRequestScope();
             kernel.Bind<IItProjectService>().To<ItProjectService>().InRequestScope();
+            kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InRequestScope();
 
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
 

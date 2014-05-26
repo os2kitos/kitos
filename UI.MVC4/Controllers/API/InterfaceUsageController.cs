@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
@@ -13,26 +12,22 @@ namespace UI.MVC4.Controllers.API
     public class InterfaceUsageController : GenericApiController<InterfaceUsage, int, InterfaceUsageDTO>
     {
         private readonly IGenericRepository<ItSystem> _systemRepository;
+        private readonly IItSystemUsageService _itSystemUsageService;
 
-        public InterfaceUsageController(IGenericRepository<InterfaceUsage> repository, IGenericRepository<ItSystem> systemRepository ) : base(repository)
+        public InterfaceUsageController(IGenericRepository<InterfaceUsage> repository, IGenericRepository<ItSystem> systemRepository, IItSystemUsageService itSystemUsageService) : base(repository)
         {
             _systemRepository = systemRepository;
+            _itSystemUsageService = itSystemUsageService;
         }
 
-        protected override InterfaceUsage PostQuery(InterfaceUsage item)
+        public override System.Net.Http.HttpResponseMessage Delete(int id)
         {
-            /* adding data row usages */
-            var theInterface = _systemRepository.GetByKey(item.InterfaceId);
-
-            foreach (var dataRow in theInterface.DataRows)
-            {
-                item.DataRowUsages.Add(new DataRowUsage()
-                    {
-                        DataRowId = dataRow.Id
-                    });
-            }
-
-            return base.PostQuery(item);
+            return NotAllowed();
         }
+
+        public override System.Net.Http.HttpResponseMessage Post(InterfaceUsageDTO dto)
+        {
+            return NotAllowed();
+        }
     }
 }

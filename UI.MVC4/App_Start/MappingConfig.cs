@@ -231,11 +231,17 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<InterfaceUsage, InterfaceUsageDTO>()
                   .ReverseMap();
 
+            Mapper.CreateMap<InterfaceExposure, InterfaceExposureDTO>()
+                  .ReverseMap();
+
             Mapper.CreateMap<ItSystemUsage, ItSystemUsageDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.OrgUnits, opt => opt.Ignore())
                   .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
                   .ForMember(dest => dest.ItProjects, opt => opt.Ignore());
+
+            //Simplere mapping than the one above, only one way
+            Mapper.CreateMap<ItSystemUsage, ItSystemUsageSimpleDTO>();
 
             Mapper.CreateMap<EconomyYear, EconomyYearDTO>()
                   .ReverseMap();

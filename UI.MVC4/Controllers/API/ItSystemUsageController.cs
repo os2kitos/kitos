@@ -14,12 +14,28 @@ namespace UI.MVC4.Controllers.API
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<TaskRef> _taskRepository;
+        private readonly IItSystemUsageService _itSystemUsageService;
 
-        public ItSystemUsageController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository) 
+        public ItSystemUsageController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository, IItSystemUsageService itSystemUsageService) 
             : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
             _taskRepository = taskRepository;
+            _itSystemUsageService = itSystemUsageService;
+        }
+
+        public HttpResponseMessage GetSearchByOrganization(int organizationId, string q)
+        {
+            try
+            {
+                var usages = Repository.Get(u => u.OrganizationId == organizationId && u.ItSystem.Name.StartsWith(q));
+
+                return Ok(Map(usages));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            } 
         }
 
         public HttpResponseMessage GetByOrganization(int organizationId)
@@ -59,12 +75,9 @@ namespace UI.MVC4.Controllers.API
                     && usage.OrganizationId == dto.OrganizationId).Any())
                     return Conflict("Usage already exist");
 
-                var item = Map(dto);
-                item.ObjectOwner = KitosUser;
-                Repository.Insert(item);
-                Repository.Save();
+                var sysUsage = _itSystemUsageService.Add(dto.ItSystemId, dto.OrganizationId, KitosUser);
 
-                return Created(Map(item), new Uri(Request.RequestUri + "?itSystemId=" + dto.ItSystemId + "&organizationId" + dto.OrganizationId));
+                return Created(Map(sysUsage), new Uri(Request.RequestUri + "?itSystemId=" + dto.ItSystemId + "&organizationId" + dto.OrganizationId));
 
             }
             catch (Exception e)

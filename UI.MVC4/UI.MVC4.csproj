@@ -221,6 +221,7 @@
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="Models\Exceptions\ConflictException.cs" />
     <Compile Include="Models\ItContractDTO.cs" />
+    <Compile Include="Models\ItSystemUsageSimpleDTO.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\API\ActivityController.cs" />
@@ -239,6 +240,7 @@
     <Compile Include="Controllers\API\GoalController.cs" />
     <Compile Include="Controllers\API\GoalStatusController.cs" />
     <Compile Include="Controllers\API\GoalTypeController.cs" />
+    <Compile Include="Controllers\API\InterfaceExposureController.cs" />
     <Compile Include="Controllers\API\ItProjectRightController.cs" />
     <Compile Include="Controllers\API\DataRowUsageController.cs" />
     <Compile Include="Controllers\API\DataTypeController.cs" />
@@ -259,6 +261,7 @@
     <Compile Include="Models\GoalDTO.cs" />
     <Compile Include="Models\GoalStatusDTO.cs" />
     <Compile Include="Models\HandoverDTO.cs" />
+    <Compile Include="Models\InterfaceExposureDTO.cs" />
     <Compile Include="Models\RiskDTO.cs" />
     <Compile Include="Controllers\API\SensitiveDataTypeController.cs" />
     <Compile Include="Controllers\API\TsaController.cs" />
@@ -444,6 +447,7 @@
     <Content Include="Partials\it-contract\it-contract-edit.html" />
     <Content Include="Partials\it-contract\it-contract-overview.html" />
     <Content Include="Partials\it-contract\it-contract-plan.html" />
+    <Content Include="Partials\it-contract\tab-systems.html" />
     <Content Include="Partials\it-project\catalog.html" />
     <Content Include="Partials\it-project\overview.html" />
     <Content Include="Partials\it-project\portfolio.html" />
@@ -530,6 +534,7 @@
     <Content Include="Scripts\app\controllers\it-contract\it-contract-overview.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-plan.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-subnav.js" />
+    <Content Include="Scripts\app\controllers\it-contract\it-contract-systems.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-communication.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-handover.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-stakeholders.js" />

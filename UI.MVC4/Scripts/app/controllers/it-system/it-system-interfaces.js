@@ -60,117 +60,51 @@
 
                 $scope.interfaceCategories = interfaceCategories;
                 $scope.frequencies = frequencies;
-
-                $scope.exposedInterfaces = [];
-
-                $scope.filterInterfaces = function(interfaceSystem) {
-
-                    return interfaceSystem.canBeUsed || interfaceSystem.usage || $scope.showAllInterfaces;
-
-                };
-
-                //EXPOSED INTERFACES
-                $http.get("api/itsystem?itSystemId=" + itSystemUsage.itSystemId + "&getExposedInterfaces").success(function (result) {
-
-                    var exposedInterfaces = result.response;
-
-                    _.each(exposedInterfaces, function (system) {
-                        system.interfaceType = _.findWhere(interfaceTypes, { id: system.interfaceTypeId });
-                        system.interface = _.findWhere(interfaces, { id: system.interfaceId });
-                        system.method = _.findWhere(methods, { id: system.methodId });
-                        system.tsa = _.findWhere(tsas, { id: system.tsaId });
-
-                        _.each(system.dataRows, function (dataRow) {
-                            dataRow.dataType = _.findWhere(dataTypes, { id: dataRow.dataTypeId });
-                        });
-
-                    });
-
-                    $scope.exposedInterfaces = exposedInterfaces;
-                });
-
                 
-                function attachUsage(interfaceSystem, usage) {
-                    if (usage == null) return;
-
-                    interfaceSystem.usage = usage;
-
-                    if (usage.infrastructureId) {
-                        interfaceSystem.usage.infrastructure = {
-                            id: usage.infrastructureId,
-                            text: usage.infrastructureName
-                        };
-                    }
-
-                    var dataRowUsages = usage.dataRowUsages;
-                    _.each(interfaceSystem.dataRows, function (dataRow) {
-                        dataRow.usage = _.findWhere(dataRowUsages, { 'dataRowId': dataRow.id });
-                    });
-                }
-
-                //(CAN-BE) USED INTERFACES
-                $scope.interfaces = interfaceSystems;
-                _.each($scope.interfaces, function (interfaceSystem) {
+                $scope.filterInterfaces = function(interfaceSystem) {
+                    return interfaceSystem.canBeUsed || interfaceSystem.usage || $scope.showAllInterfaces;
+                };
+                
+                //resolving complex types from ids
+                function resolveTypes(theInterface) {
+                    theInterface.interfaceType = _.findWhere(interfaceTypes, { id: theInterface.interfaceTypeId });
+                    theInterface.interface = _.findWhere(interfaces, { id: theInterface.interfaceId });
+                    theInterface.method = _.findWhere(methods, { id: theInterface.methodId });
+                    theInterface.tsa = _.findWhere(tsas, { id: theInterface.tsaId });
                     
-                    interfaceSystem.interfaceType = _.findWhere(interfaceTypes, { id: interfaceSystem.interfaceTypeId });
-                    interfaceSystem.interface = _.findWhere(interfaces, { id: interfaceSystem.interfaceId });
-                    interfaceSystem.method = _.findWhere(methods, { id: interfaceSystem.methodId });
-                    interfaceSystem.tsa = _.findWhere(tsas, { id: interfaceSystem.tsaId });
-
-                    _.each(interfaceSystem.dataRows, function (dataRow) {
+                    _.each(theInterface.dataRows, function (dataRow) {
                         dataRow.dataType = _.findWhere(dataTypes, { id: dataRow.dataTypeId });
                     });
-                    
-                    //can the interface be used by the selected IT system
-                    interfaceSystem.canBeUsed = _.contains(interfaceSystem.canBeUsedByIds, itSystemUsage.itSystemId);
-                    
-                    //is the interface currently used?
-                    var usage = _.findWhere(itSystemUsage.interfaceUsages, { interfaceId: interfaceSystem.id });
-                    attachUsage(interfaceSystem, usage);
-
-                    var rank = 3;
-                    if (interfaceSystem.usage) rank -= 2;
-                    if (interfaceSystem.canBeUsed) rank -= 1;
-
-                    interfaceSystem.rank = rank;
+                }
+                
+                //Interface exposures
+                _.each(itSystemUsage.interfaceExposures, function (interfaceExposure) {
+                    interfaceExposure.updateUrl = "api/interfaceExposure/" + interfaceExposure.id;
+                    resolveTypes(interfaceExposure.interface);
                 });
+                $scope.interfaceExposures = itSystemUsage.interfaceExposures;
 
-                $scope.toggleInterface = function(interfaceSystem) {
-
-                    if (interfaceSystem.usage) {
-                        $http.delete("api/interfaceUsage/" + interfaceSystem.usage.id).success(function(result) {
-                            
-                            delete interfaceSystem.usage;
-
-                            _.each(interfaceSystem.dataRows, function (dataRow) {
-                                delete dataRow.usage;
-                            });
-
-                            notify.addSuccessMessage("Snitfladen anvendes ikke længere");
-                            
-                        }).error(function(result) {
-                            notify.addSuccessMessage("Fejl!");
-                        });
-                        
-                    } else {
-                        var data = {
-                            itSystemusageId: itSystemUsage.id,
-                            interfaceId: interfaceSystem.id
+                //Interface usages
+                _.each(itSystemUsage.interfaceUsages, function(interfaceUsage) {
+                    interfaceUsage.updateUrl = "api/interfaceUsage/" + interfaceUsage.id;
+                    
+                    //for the select2
+                    if (interfaceUsage.infrastructureId) {
+                        interfaceUsage.infrastructure = {
+                            id: interfaceUsage.infrastructureId,
+                            text: interfaceUsage.infrastructureName
                         };
-
-                        $http.post("api/interfaceUsage", data).success(function (result) {
-                            notify.addSuccessMessage("Snitfladen er taget i lokal anvendelse");
-
-                            attachUsage(interfaceSystem, result.response);
-
-
-                        }).error(function (result) {
-                            notify.addSuccessMessage("Fejl!");
-                        });
                     }
 
-                };
-                
+                    _.each(interfaceUsage.dataRowUsages, function(dataRowUsage) {
+                        dataRowUsage.updateUrl = "api/dataRowUsage/" + dataRowUsage.id;
+                        dataRowUsage.dataRow.dataType = _.findWhere(dataTypes, { id: dataRowUsage.dataRow.dataTypeId });
+                    });
+
+                    resolveTypes(interfaceUsage.interface);
+                });
+                $scope.interfaceUsages = itSystemUsage.interfaceUsages;
+               
                 function patch(url, field, value) {
 
                     var data = {};
@@ -193,30 +127,6 @@
                 $scope.updateInfrastructure = function(usage) {
                     return patchUsage(usage, "infrastructureId", usage.infrastructure.id);
                 };
-                
-                $scope.updateCategory = function (usage) {
-                    return patchUsage(usage, "interfaceCategoryId", usage.interfaceCategoryId);
-                };
-
-                function patchDataRowUsage(dataRowUsage, field, value) {
-                    var url = "api/dataRowUsage/" + dataRowUsage.id;
-
-                    return patch(url, field, value);
-                }
-                
-                $scope.updateFrequency = function(dataRowUsage) {
-                    return patchDataRowUsage(dataRowUsage, "frequencyId", dataRowUsage.frequencyId);
-                };
-                $scope.updatePrice = function (dataRowUsage) {
-                    return patchDataRowUsage(dataRowUsage, "price", parseInt(dataRowUsage.price));
-                };
-                $scope.updateAmount = function (dataRowUsage) {
-                    return patchDataRowUsage(dataRowUsage, "amount", parseInt(dataRowUsage.amount));
-                };
-                $scope.updateEconomy = function (dataRowUsage) {
-                    return patchDataRowUsage(dataRowUsage, "economy", parseInt(dataRowUsage.economy));
-                };
-
 
                 $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem?nonInterfaces');
                 function selectLazyLoading(url) {
