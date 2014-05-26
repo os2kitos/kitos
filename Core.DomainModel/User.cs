@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -25,6 +26,9 @@ namespace Core.DomainModel
             this.ResponsibleForRisks = new List<Risk>();
             this.ResponsibleForCommunications = new List<Communication>();
             this.HandoverParticipants = new List<Handover>();
+
+            this.CreatedItContracts = new Collection<ItContract.ItContract>();
+            this.SignerForContracts = new Collection<ItContract.ItContract>();
         }
 
         public int Id { get; set; }
@@ -46,10 +50,10 @@ namespace Core.DomainModel
         public virtual ICollection<ItSystem.ItSystemUsage> CreatedSystemUsages { get; set; }
         public virtual ICollection<Activity> CreatedActivities { get; set; }
         public virtual ICollection<State> CreatedStates { get; set; }
-        public virtual ICollection<Risk> ResponsibleForRisks { get; set; }
         public virtual ICollection<Wish> Wishes { get; set; }
         public virtual ICollection<Activity> Activities { get; set; }
         public virtual ICollection<State> States { get; set; }  
+        public virtual ICollection<Risk> ResponsibleForRisks { get; set; }
         public virtual ICollection<Communication> ResponsibleForCommunications { get; set; } 
         public virtual ICollection<Handover> HandoverParticipants { get; set; }
         public virtual ICollection<ItContract.ItContract> CreatedItContracts { get; set; }
