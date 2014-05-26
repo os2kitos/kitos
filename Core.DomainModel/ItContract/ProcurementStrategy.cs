@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItContract
 {
-    public class PaymentModel : IOptionEntity<ItContract>
+    public class ProcurementStrategy : IOptionEntity<ItContract>
     {
-        public PaymentModel()
+        public ProcurementStrategy()
         {
             References = new List<ItContract>();
         }

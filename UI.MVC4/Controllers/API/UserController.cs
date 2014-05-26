@@ -13,13 +13,13 @@ namespace UI.MVC4.Controllers.API
     {
         private readonly IGenericRepository<User> _repository;
         private readonly IUserService _userService;
-        private readonly IOrgService _orgService;
+        private readonly IOrganizationService _organizationService;
 
-        public UserController(IGenericRepository<User> repository, IUserService userService, IOrgService orgService)
+        public UserController(IGenericRepository<User> repository, IUserService userService, IOrganizationService organizationService)
         {
             _repository = repository;
             _userService = userService;
-            _orgService = orgService;
+            _organizationService = organizationService;
         }
 
         public HttpResponseMessage Post(UserDTO item)
@@ -72,7 +72,7 @@ namespace UI.MVC4.Controllers.API
             {
                 var user = KitosUser;
 
-                var orgs = _orgService.GetByUser(user);
+                var orgs = _organizationService.GetByUser(user);
                 var dtos = AutoMapper.Mapper.Map<ICollection<Organization>, ICollection<OrganizationDTO>>(orgs);
 
                 //if the user has selected a default org unit, use the responding organization as default organization

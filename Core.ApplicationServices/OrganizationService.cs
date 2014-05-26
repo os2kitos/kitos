@@ -1,30 +1,52 @@
-﻿using Core.DomainModel;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Core.DomainModel;
 using Core.DomainServices;
 
 namespace Core.ApplicationServices
 {
     public class OrganizationService : IOrganizationService
     {
-        public Organization CreateOrganization(string name)
+        private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
+        private readonly IGenericRepository<Organization> _orgRepository;
+        private readonly IGenericRepository<AdminRight> _admRightRepository;
+
+        public OrganizationService(IGenericRepository<OrganizationRight> orgRightRepository, IGenericRepository<Organization> orgRepository, IGenericRepository<AdminRight> admRightRepository)
+        {
+            _orgRightRepository = orgRightRepository;
+            _orgRepository = orgRepository;
+            _admRightRepository = admRightRepository;
+        }
+
+        public ICollection<Organization> GetByUser(User user)
+        {
+
+            if (user.IsGlobalAdmin) return _orgRepository.Get().ToList();
+
+            var orgs = _orgRightRepository
+                .Get(x => x.UserId == user.Id)
+                .Select(x => x.Object.Organization).ToList();
+
+            orgs.AddRange(_admRightRepository.Get(x => x.UserId == user.Id).Select(x => x.Object));
+
+            orgs = orgs.Distinct().ToList();
+
+            return orgs;
+        }
+
+        public Organization CreateOrganization(string name, OrganizationType organizationType)
         {
             var org = new Organization
             {
                 Name = name,
-                Config = Config.Default
+                Config = Config.Default,
+                Type = organizationType
             };
 
             org.OrgUnits.Add(new OrganizationUnit()
             {
                 Name = org.Name,
             });
-
-            return org;
-        }
-
-        public Organization CreateMunicipality(string name)
-        {
-            var org = CreateOrganization(name);
-            org.Type = OrganizationType.Municipality;
 
             return org;
         }

@@ -75,6 +75,20 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        public HttpResponseMessage GetByOrganizationFlat(int organizationId)
+        {
+            try
+            {
+                var orgUnit = Repository.Get(o => o.OrganizationId == organizationId);
+
+                return Ok(Map(orgUnit));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public override HttpResponseMessage Patch(int id, JObject obj)
         {
             try

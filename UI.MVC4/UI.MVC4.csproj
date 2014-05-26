@@ -212,9 +212,15 @@
   <ItemGroup>
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Controllers\API\CustomAgreementElementController.cs" />
+    <Compile Include="Controllers\API\ItContractController.cs" />
+    <Compile Include="Controllers\API\ProcurementStrategyController.cs" />
+    <Compile Include="Models\CustomAgreementElementDTO.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\MappingConfig.cs" />
     <Compile Include="App_Start\NinjectWebCommon.cs" />
+    <Compile Include="Models\Exceptions\ConflictException.cs" />
+    <Compile Include="Models\ItContractDTO.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\API\ActivityController.cs" />
@@ -285,7 +291,6 @@
     <Compile Include="Controllers\API\ItSystemRoleController.cs" />
     <Compile Include="Controllers\API\MethodController.cs" />
     <Compile Include="Controllers\API\OrganizationUnitController.cs" />
-    <Compile Include="Controllers\API\PaymentModelController.cs" />
     <Compile Include="Controllers\API\ItProjectCategoryController.cs" />
     <Compile Include="Controllers\API\ProjectPhaseController.cs" />
     <Compile Include="Controllers\API\ProjectPhaseLocaleController.cs" />
@@ -435,6 +440,10 @@
     <Content Include="Partials\home\reset-password.html" />
     <Content Include="Partials\home\forgot-password.html" />
     <Content Include="Partials\home\index.html" />
+    <Content Include="Partials\it-contract\it-contract-catalog.html" />
+    <Content Include="Partials\it-contract\it-contract-edit.html" />
+    <Content Include="Partials\it-contract\it-contract-overview.html" />
+    <Content Include="Partials\it-contract\it-contract-plan.html" />
     <Content Include="Partials\it-project\catalog.html" />
     <Content Include="Partials\it-project\overview.html" />
     <Content Include="Partials\it-project\portfolio.html" />
@@ -516,6 +525,11 @@
     <Content Include="Scripts\app\controllers\global-admin\global-admin.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-config.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
+    <Content Include="Scripts\app\controllers\it-contract\it-contract-catalog.js" />
+    <Content Include="Scripts\app\controllers\it-contract\it-contract-edit.js" />
+    <Content Include="Scripts\app\controllers\it-contract\it-contract-overview.js" />
+    <Content Include="Scripts\app\controllers\it-contract\it-contract-plan.js" />
+    <Content Include="Scripts\app\controllers\it-contract\it-contract-subnav.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-communication.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-handover.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-stakeholders.js" />

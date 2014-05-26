@@ -1,6 +1,5 @@
 ﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel;
-using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {

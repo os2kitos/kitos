@@ -21,7 +21,6 @@ namespace Infrastructure.DataAccess
 
         public DbSet<AdminRight> AdminRights { get; set; }
         public DbSet<AdminRole> AdminRoles { get; set; }
-        public DbSet<Agreement> Agreements { get; set; }
         public DbSet<AgreementElement> AgreementElements { get; set; }
         public DbSet<AppType> AppTypes { get; set; }
         public DbSet<ArchiveType> ArchiveTypes { get; set; }
@@ -31,6 +30,7 @@ namespace Infrastructure.DataAccess
         public DbSet<Config> Configs { get; set; }
         public DbSet<ContractTemplate> ContractTemplates { get; set; }
         public DbSet<ContractType> ContractTypes { get; set; }
+        public DbSet<CustomAgreementElement> CustomAgreementElements { get; set; }
         public DbSet<DataType> DataTypes { get; set; }
         public DbSet<DataRow> DataRows { get; set; }
         public DbSet<DataRowUsage> DataRowUsages { get; set; }
@@ -73,8 +73,7 @@ namespace Infrastructure.DataAccess
         public DbSet<OrganizationRight> OrganizationRights { get; set; }
         public DbSet<OrganizationRole> OrganizationRoles { get; set; }
         public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
-        public DbSet<PaymentModel> PaymentModels { get; set; }
-        public DbSet<Payment> Payments { get; set; }
+        public DbSet<ProcurementStrategy> ProcurementStrategies { get; set; }
         public DbSet<ItProjectCategory> ProjectCategories { get; set; }
         public DbSet<ProjectPhase> ProjectPhases { get; set; }
         public DbSet<ProjPhaseLocale> ProjectPhaseLocales { get; set; }
@@ -87,7 +86,6 @@ namespace Infrastructure.DataAccess
         public DbSet<ShipNotice> ShipNotices { get; set; }
         public DbSet<Stakeholder> Stakeholders { get; set; }
         public DbSet<State> States { get; set; }
-        public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<TaskRef> TaskRefs { get; set; }
         public DbSet<TaskUsage> TaskUsages { get; set; }
         public DbSet<Text> Texts { get; set; }
@@ -99,7 +97,6 @@ namespace Infrastructure.DataAccess
         {
             modelBuilder.Configurations.Add(new AdminRightMap());
             modelBuilder.Configurations.Add(new AdminRoleMap());
-            modelBuilder.Configurations.Add(new AgreementMap());
             modelBuilder.Configurations.Add(new AgreementElementMap());
             modelBuilder.Configurations.Add(new AppTypeMap());
             modelBuilder.Configurations.Add(new ActivityMap());
@@ -151,9 +148,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new OrganizationRightMap());
             modelBuilder.Configurations.Add(new OrganizationRoleMap());
             modelBuilder.Configurations.Add(new PasswordResetRequestMap());
-            modelBuilder.Configurations.Add(new PaymentModelMap());
-            modelBuilder.Configurations.Add(new PaymentMap());
             modelBuilder.Configurations.Add(new ItProjectCategoryMap());
+            modelBuilder.Configurations.Add(new ProcurementStrategyMap());
             modelBuilder.Configurations.Add(new ProjectPhaseMap());
             modelBuilder.Configurations.Add(new ProjectPhaseLocaleMap());
             modelBuilder.Configurations.Add(new ProjectStatusMap());
@@ -165,7 +161,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ShipNoticeMap());
             modelBuilder.Configurations.Add(new StakeholderMap());
             modelBuilder.Configurations.Add(new StateMap());
-            modelBuilder.Configurations.Add(new SupplierMap());
             modelBuilder.Configurations.Add(new TaskRefMap());
             modelBuilder.Configurations.Add(new TaskUsageMap());
             modelBuilder.Configurations.Add(new TextMap());

@@ -33,127 +33,127 @@ namespace UI.MVC4.App_Start
 
             Mapper.CreateMap<AgreementElement, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<ArchiveType, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<HandoverTrial, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<ContractTemplate, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<ContractType, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<InterfaceType, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<InterfaceCategory, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<Interface, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<DataType, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<Method, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
-
-            Mapper.CreateMap<PaymentModel, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<ItProjectCategory, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<ProjectPhase, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<ItProjectType, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<PurchaseForm, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<Tsa, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<Frequency, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<AppType, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<BusinessType, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<ItContractModuleName, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<ItProjectModuleName, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<ItSupportModuleName, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<ItSystemModuleName, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<ExtReferenceType, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<ItProjectRole, RoleDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<ItSystemRole, RoleDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<ItContractRole, RoleDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<OrganizationRole, RoleDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<AdminRole, RoleDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<SensitiveDataType, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<GoalType, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.UseValue(null));
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
+
+            Mapper.CreateMap<ProcurementStrategy, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<ProjPhaseLocale, LocaleDTO>().ReverseMap();
             Mapper.CreateMap<ExtRefTypeLocale, LocaleDTO>().ReverseMap();
@@ -162,7 +162,6 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<ExtRefTypeLocale, LocaleInputDTO>().ReverseMap();
 
             Mapper.CreateMap<Config, ConfigDTO>().ReverseMap();
-
         }
     }
 
@@ -294,6 +293,13 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<Communication, CommunicationDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.ItProject, opt => opt.Ignore());
+
+            Mapper.CreateMap<ItContract, ItContractDTO>()
+                  .ReverseMap();
+
+            Mapper.CreateMap<CustomAgreementElement, CustomAgreementElementDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.ItContract, opt => opt.Ignore());
         }
     }
 }

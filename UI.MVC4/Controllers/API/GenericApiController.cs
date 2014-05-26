@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using UI.MVC4.Models.Exceptions;
 
 namespace UI.MVC4.Controllers.API
 {
@@ -99,7 +98,11 @@ namespace UI.MVC4.Controllers.API
                 PostQuery(item);
 
                 //var msg = new HttpResponseMessage(HttpStatusCode.Created);
-                return Created(Map<TModel,TDto>(item), new Uri(Request.RequestUri + "/" + item.Id));
+                return Created(Map<TModel, TDto>(item), new Uri(Request.RequestUri + "/" + item.Id));
+            }
+            catch (ConflictException e)
+            {
+                return Conflict(e.Message);
             }
             catch (Exception e)
             {
@@ -187,19 +190,19 @@ namespace UI.MVC4.Controllers.API
                 var propRef = itemType.GetProperty(destName);
                 var t = propRef.PropertyType;
 
-                //We have to handle enums separately
-                if (t.BaseType != null && t.BaseType.Name == "Enum")
+                // we have to handle enums separately
+                if (t.IsEnum)
                 {
                     var value = valuePair.Value.Value<int>();
-
                     propRef.SetValue(item, value);
                 }
                 else
                 {
                     try
                     {
-                        // use reflection to call obj.Value<t>("keyName");
+                        // get reference to the generic method obj.Value<t>(parameter);
                         var genericMethod = jToken.GetType().GetMethod("Value").MakeGenericMethod(new Type[] { t });
+                        // use reflection to call obj.Value<t>("keyName");
                         var value = genericMethod.Invoke(obj, new object[] { valuePair.Key });
                         // update the entity
                         propRef.SetValue(item, value);
@@ -216,7 +219,7 @@ namespace UI.MVC4.Controllers.API
             {
                 PatchQuery(item);
 
-                //pretty sure we'll get a merge conflict here???
+                // pretty sure we'll get a merge conflict here???
                 return Ok(Map(item)); // TODO correct?
             }
             catch (Exception e)

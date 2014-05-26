@@ -19,11 +19,11 @@ namespace Core.DomainModel
         public int Id { get; set; }
         public string Name { get; set; }
         public int? ParentId { get; set; }
-        public int OrganizationId { get; set; }
 
         public virtual OrganizationUnit Parent { get; set; }
         public virtual ICollection<OrganizationUnit> Children { get; set; }
 
+        public int OrganizationId { get; set; }
         public virtual Organization Organization { get; set; }
 
         public virtual ICollection<OrganizationRight> Rights { get; set; }
@@ -52,5 +52,10 @@ namespace Core.DomainModel
         /// This Organization Unit is responsible for these IT Projects
         /// </summary>
         public virtual ICollection<ItProject.ItProject> ResponsibleForItProjects { get; set; }
+
+        /// <summary>
+        /// This Organization Unit is responsible for these IT Contracts
+        /// </summary>
+        public virtual ICollection<ItContract.ItContract> ResponsibleForItContracts { get; set; }
     }
 }
