@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 using UI.MVC4.Models;
@@ -10,7 +11,8 @@ namespace UI.MVC4.Controllers.API
     {
         private readonly IOrganizationService _organizationService;
 
-        public OrganizationController(IGenericRepository<Organization> repository, IOrganizationService organizationService) : base(repository)
+        public OrganizationController(IGenericRepository<Organization> repository, IOrganizationService organizationService) 
+            : base(repository)
         {
             _organizationService = organizationService;
         }
@@ -28,9 +30,22 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        public HttpResponseMessage GetCompanies([FromUri] bool? company)
+        {
+            try
+            {
+                var orgs = Repository.Get(org => org.Type == OrganizationType.Company);
+                return Ok(Map(orgs));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         protected override Organization PostQuery(Organization item)
         {
-            item = _organizationService.CreateMunicipality(item.Name);
+            item = _organizationService.CreateOrganization(item.Name, OrganizationType.Municipality);
             return base.PostQuery(item);
         }
     }

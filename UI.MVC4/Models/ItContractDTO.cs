@@ -8,6 +8,7 @@ namespace UI.MVC4.Models
     public class ItContractDTO
     {
         public int Id { get; set; }
+        public int OrganizationId { get; set; }
         public string Name { get; set; }
         public string Note { get; set; }
         public string ItContractId { get; set; }
@@ -24,16 +25,17 @@ namespace UI.MVC4.Models
         public int ResponsibleOrganizationUnitId { get; set; }
         public int? SupplierId { get; set; }
         public int? ProcurementStrategyId { get; set; }
-        public int? ProcurementPlanId { get; set; }
+        public int? ProcurementPlanHalf { get; set; }
+        public int? ProcurementPlanYear { get; set; }
         public int? ContractTemplateId { get; set; }
         public int? ContractTypeId { get; set; }
         public int? PurchaseFormId { get; set; }
         public int? ParentId { get; set; }
-        public ICollection<OptionDTO> AgreementElements { get; set; }
-        public ICollection<CustomAgreementElementDTO> CustomAgreementElements { get; set; }
+        public IEnumerable<OptionDTO> AgreementElements { get; set; }
+        public IEnumerable<CustomAgreementElementDTO> CustomAgreementElements { get; set; }
 
         public virtual IEnumerable<ItSystemUsageSimpleDTO> AssociatedSystemUsages { get; set; }
-        public virtual ICollection<InterfaceUsageDTO> AssociatedInterfaceUsages { get; set; }
-        public virtual ICollection<InterfaceExposureDTO> AssociatedInterfaceExposures { get; set; } 
+        public virtual IEnumerable<InterfaceUsageDTO> AssociatedInterfaceUsages { get; set; }
+        public virtual IEnumerable<InterfaceExposureDTO> AssociatedInterfaceExposures { get; set; } 
     }
 }

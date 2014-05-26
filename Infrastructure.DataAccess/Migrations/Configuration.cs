@@ -284,11 +284,14 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Organizations
 
-            var roskilde = organizationService.CreateMunicipality("Roskilde");
-            var sorø = organizationService.CreateMunicipality("Sorø");
-            var kl = organizationService.CreateMunicipality("KL");
+            var roskilde = organizationService.CreateOrganization("Roskilde", OrganizationType.Municipality);
+            var sorø = organizationService.CreateOrganization("Sorø", OrganizationType.Municipality);
+            var kl = organizationService.CreateOrganization("KL", OrganizationType.Municipality);
+            var companyA = organizationService.CreateOrganization("Firma A", OrganizationType.Company);
+            var companyB = organizationService.CreateOrganization("Firma B", OrganizationType.Company);
+            var companyC = organizationService.CreateOrganization("Firma C", OrganizationType.Company);
 
-            context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø, kl);
+            context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø, kl, companyA, companyB, companyC);
 
             context.SaveChanges();
 
@@ -990,6 +993,9 @@ namespace Infrastructure.DataAccess.Migrations
                     PurchaseForm = purchaseForm1,
                     ProcurementStrategy = procurementStrategy1,
                     ContractTemplate = contractTemplateK1,
+                    Organization = roskilde,
+                    ProcurementPlanHalf = 1, 
+                    ProcurementPlanYear = 2016
                 };
 
             context.ItContracts.AddOrUpdate(x => x.Name, itContractA);

@@ -12,12 +12,52 @@ namespace UI.MVC4.Controllers.API
 {
     public class ItContractController : GenericApiController<ItContract, int, ItContractDTO>
     {
-        private readonly IGenericRepository<ItSystemUsage> _usageRepository;
+        private readonly IGenericRepository<AgreementElement> _agreementElementRepository;
 
-        public ItContractController(IGenericRepository<ItContract> repository, IGenericRepository<ItSystemUsage> usageRepository) 
+        private readonly IGenericRepository<ItSystemUsage> _usageRepository;
+        public ItContractController(IGenericRepository<ItContract> repository, IGenericRepository<ItSystemUsage> usageRepository, IGenericRepository<AgreementElement> agreementElementRepository) 
             : base(repository)
         {
             _usageRepository = usageRepository;
+            _agreementElementRepository = agreementElementRepository;
+        }
+
+        public virtual HttpResponseMessage PostAgreementElement(int id, [FromUri] int elemId)
+        {
+            try
+            {
+                var itContract = Repository.GetByKey(id);
+                var elem = _agreementElementRepository.GetByKey(elemId);
+
+                itContract.AgreementElements.Add(elem);
+
+                Repository.Save();
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public virtual HttpResponseMessage DeleteAgreementElement(int id, [FromUri] int elemId)
+        {
+            try
+            {
+                var itContract = Repository.GetByKey(id);
+                var elem = _agreementElementRepository.GetByKey(elemId);
+
+                itContract.AgreementElements.Remove(elem);
+
+                Repository.Save();
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
         }
         
         /// <summary>
@@ -83,6 +123,6 @@ namespace UI.MVC4.Controllers.API
         private IEnumerable<ItSystemUsageSimpleDTO> MapSystemUsages(ItContract contract)
         {
             return Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageSimpleDTO>>(contract.AssociatedSystemUsages);
-        } 
+        }
     }
 }

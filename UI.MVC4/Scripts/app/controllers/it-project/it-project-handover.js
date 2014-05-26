@@ -68,12 +68,10 @@
                 if (newValue.length > oldValue.length) {
                     // something was added
                     var addId = _.difference(newValue, oldValue);
-                    console.log(addId, newValue, oldValue);
                     $http.post($scope.autosaveUrl + '?participantId=' + addId);
                 } else if (newValue.length < oldValue.length) {
                     // something was removed
                     var removeId = _.difference(oldValue, newValue);
-                    console.log(removeId, newValue, oldValue);
                     $http.delete($scope.autosaveUrl + '?participantId=' + removeId);
                 }
             });

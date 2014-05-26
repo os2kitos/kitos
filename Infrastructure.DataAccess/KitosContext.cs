@@ -30,6 +30,7 @@ namespace Infrastructure.DataAccess
         public DbSet<Config> Configs { get; set; }
         public DbSet<ContractTemplate> ContractTemplates { get; set; }
         public DbSet<ContractType> ContractTypes { get; set; }
+        public DbSet<CustomAgreementElement> CustomAgreementElements { get; set; }
         public DbSet<DataType> DataTypes { get; set; }
         public DbSet<DataRow> DataRows { get; set; }
         public DbSet<DataRowUsage> DataRowUsages { get; set; }
@@ -73,7 +74,6 @@ namespace Infrastructure.DataAccess
         public DbSet<OrganizationRight> OrganizationRights { get; set; }
         public DbSet<OrganizationRole> OrganizationRoles { get; set; }
         public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
-        public DbSet<ProcurementPlan> ProcurementPlans { get; set; }
         public DbSet<ProcurementStrategy> ProcurementStrategies { get; set; }
         public DbSet<ItProjectCategory> ProjectCategories { get; set; }
         public DbSet<ProjectPhase> ProjectPhases { get; set; }
@@ -151,7 +151,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new OrganizationRoleMap());
             modelBuilder.Configurations.Add(new PasswordResetRequestMap());
             modelBuilder.Configurations.Add(new ItProjectCategoryMap());
-            modelBuilder.Configurations.Add(new ProcurementPlanMap());
             modelBuilder.Configurations.Add(new ProcurementStrategyMap());
             modelBuilder.Configurations.Add(new ProjectPhaseMap());
             modelBuilder.Configurations.Add(new ProjectPhaseLocaleMap());
@@ -162,7 +161,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new RiskMap());
             modelBuilder.Configurations.Add(new SensitiveDataTypeMap());
             modelBuilder.Configurations.Add(new ShipNoticeMap());
-            modelBuilder.Configurations.Add(new StakeholdersMap());
+            modelBuilder.Configurations.Add(new StakeholderMap());
             modelBuilder.Configurations.Add(new StateMap());
             modelBuilder.Configurations.Add(new TaskRefMap());
             modelBuilder.Configurations.Add(new TaskUsageMap());

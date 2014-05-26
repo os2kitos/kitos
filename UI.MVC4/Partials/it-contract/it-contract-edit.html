@@ -21,7 +21,7 @@
                         <!-- Parent -->
                         <div class="form-group">
                             <label for="contract-parent" class="control-label small">Overordent kontrakt</label>
-                            <select id="contract-parent" class="form-control input-sm"></select>
+                            <select id="contract-parent" class="form-control input-sm" data-ng-model="contract.parentId" data-ng-options="o.id as o.name for o in contracts" data-autosave="{{ autoSaveUrl }}" data-field="parentId"></select>
                         </div>
     
                         <!-- Type -->
@@ -44,7 +44,7 @@
                         <!-- Purchase form -->
                         <div class="form-group">
                             <label for="contract-purchaseform" class="control-label small">Indkøbsform</label>
-                            <select id="contract-purchaseform" class="form-control input-sm" data-ng-model="contract.purchaseFormId" data-ng-options="o.id as o.name for o in purchaseForms">
+                            <select id="contract-purchaseform" class="form-control input-sm" data-ng-model="contract.purchaseFormId" data-ng-options="o.id as o.name for o in purchaseForms" data-autosave="{{ autoSaveUrl }}" data-field="purchaseFormId">
                                 <option value=""></option>
                             </select>
                         </div>
@@ -52,7 +52,7 @@
                         <!-- Procurement strategy -->
                         <div class="form-group">
                             <label for="contract-strat" class="control-label small">Udbudsstrategi</label>
-                            <select id="contract-strat" class="form-control input-sm" data-ng-model="contract.procurementStrategyId" data-ng-options="o.id as o.name for o in procurementStrategies">
+                            <select id="contract-strat" class="form-control input-sm" data-ng-model="contract.procurementStrategyId" data-ng-options="o.id as o.name for o in procurementStrategies" data-autosave="{{ autoSaveUrl }}" data-field="procurementStrategyId">
                                 <option value=""></option>
                             </select>
                         </div>
@@ -60,13 +60,15 @@
                         <!-- Procurement plan -->
                         <div class="form-group">
                             <label for="contract-plan" class="control-label small">Udbudsplan</label>
-                            <select id="contract-plan" class="form-control input-sm"></select>
+                            <select id="contract-plan" class="form-control input-sm" data-ng-model="contract.procurementPlan" data-ng-options="o as (o.half + ' | ' + o.year) for o in procurementPlans" data-ng-change="saveProcurement()">
+                                <option value=""></option>
+                            </select>
                         </div>
     
                         <!-- Contract template -->
                         <div class="form-group">
                             <label for="contract-template" class="control-label small">Kontratskabalon</label>
-                            <select id="contract-template" class="form-control input-sm" data-ng-model="contract.contractTemplateId" data-ng-options="o.id as o.name for o in contractTemplates">
+                            <select id="contract-template" class="form-control input-sm" data-ng-model="contract.contractTemplateId" data-ng-options="o.id as o.name for o in contractTemplates" data-autosave="{{ autoSaveUrl }}" data-field="contractTemplateId">
                                 <option value=""></option>
                             </select>
                         </div>
@@ -91,24 +93,29 @@
             <!-- Right side -->
             <div class="col-md-6">
                 <div class="row">
-                    <!-- 3rd column -->
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <!-- Supplier -->
                         <div class="form-group">
                             <label for="contract-supplier" class="control-label small">Leverandør</label>
-                            <select id="contract-supplier" class="form-control input-sm"></select>
+                            <select id="contract-supplier" class="form-control input-sm" data-ng-model="contract.supplierId" data-ng-options="o.id as (o.name + ' | ' + o.cvr) for o in suppliers" data-autosave="{{ autoSaveUrl }}" data-field="supplierId">
+                                <option value=""></option>
+                            </select>
                         </div>
-                
+                    </div>
+                </div>
+                <div class="row">
+                    <!-- 3rd column -->
+                    <div class="col-md-6">
                         <!-- Extern contract signer -->
                         <div class="form-group">
                             <label for="contract-ext-signer" class="control-label small">Kontraktunderskriver</label>
-                            <input type="text" id="contract-ext-signer" class="form-control input-sm" data-ng-model="contract.supplierContractSigner">
+                            <input type="text" id="contract-ext-signer" class="form-control input-sm" data-ng-model="contract.supplierContractSigner" data-autosave="{{ autoSaveUrl }}" data-field="supplierContractSigner">
                         </div>
                 
                         <!-- Responsible org unit -->
                         <div class="form-group">
                             <label for="contract-orgunit" class="control-label small">Ansvarlig endhed</label>
-                            <select id="contract-orgunit" class="form-control input-sm"></select>
+                            <select id="contract-orgunit" class="form-control input-sm" data-ng-model="contract.responsibleOrganizationUnitId" data-ng-options="o.id as o.name for o in orgUnits" data-autosave="{{ autoSaveUrl }}" data-field="responsibleOrganizationUnitId"></select>
                         </div>
 
                         <!-- Intern contract signer -->
@@ -120,36 +127,30 @@
 
                     <!-- 4th column -->
                     <div class="col-md-6">
-                        <!-- CVR -->
-                        <div class="form-group">
-                            <label class="control-label small">CVR</label>
-                            <p class="form-control-static small">...</p>
-                        </div>
-    
                         <!-- Extern contract is signed -->
                         <div class="checkbox">
                             <label class="small">
-                                <input type="checkbox" data-ng-model="hasSupplierSigned" data-autosave="{{ autoSaveUrl }}" data-field="hasSupplierSigned"> Underskrevet
+                                <input type="checkbox" data-ng-model="contract.hasSupplierSigned" data-autosave="{{ autoSaveUrl }}" data-field="hasSupplierSigned"> Underskrevet
                             </label>
                         </div>
     
                         <!-- Extern contract signed date -->
                         <div class="form-group">
                             <label for="contract-ext-date" class="control-label small">Dato</label>
-                            <input type="date" id="contract-ext-date" class="form-control input-sm" data-ng-model="supplierSignedDate" data-autosave="{{ autoSaveUrl }}" data-field="supplierSignedDate">
+                            <input type="date" id="contract-ext-date" class="form-control input-sm" data-ng-model="contract.supplierSignedDate" data-autosave="{{ autoSaveUrl }}" data-field="supplierSignedDate">
                         </div>
     
                         <!-- Intern contract is signed -->
                         <div class="checkbox">
                             <label class="small">
-                                <input type="checkbox" data-ng-model="isSigned" data-autosave="{{ autoSaveUrl }}" data-field="isSigned"> Underskrevet
+                                <input type="checkbox" data-ng-model="contract.isSigned" data-autosave="{{ autoSaveUrl }}" data-field="isSigned"> Underskrevet
                             </label>
                         </div>
     
                         <!-- Intern contract signed date -->
                         <div class="form-group">
                             <label for="contract-int-date" class="control-label small">Dato</label>
-                            <input type="date" id="contract-int-date" class="form-control input-sm" data-ng-model="signedDate" data-autosave="{{ autoSaveUrl }}" data-field="signedDate">
+                            <input type="date" id="contract-int-date" class="form-control input-sm" data-ng-model="contract.signedDate" data-autosave="{{ autoSaveUrl }}" data-field="signedDate">
                         </div>
                     </div>
                     
@@ -157,17 +158,24 @@
                         <!-- Agreement elements -->
                         <div class="form-group">
                             <label class="control-label small">IT Kontrakten omfatter flg. aftaleelementer</label>
-                            <div class="input-group input-group-sm col-md-4">
+                            <div class="checkbox col-md-4" data-ng-repeat="item in agreementElements">
+                                <label class="small">
+                                    <input type="checkbox" data-ng-model="item.isChecked" data-ng-change="updateElem(item)"> {{ item.name }}
+                                </label>
+                            </div>
+                            <div class="input-group input-group-sm col-md-4" data-ng-repeat="item in customAgreementElements">
+                                <input type="text" class="form-control" data-ng-model="item.name">
                                 <span class="input-group-addon">
-                                    <input type="checkbox">
+                                    <input type="checkbox" checked data-ng-click="deleteCustomElem(item.id)">
                                 </span>
-                                <input type="text" class="form-control">
                             </div>
                             <div class="input-group input-group-sm col-md-4">
-                                <span class="input-group-addon">
-                                    <input type="checkbox">
+                                <input type="text" class="form-control" data-ng-model="newElement">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-success" type="button" data-ng-click="saveCustomElem()">
+                                        Gem
+                                    </button>
                                 </span>
-                                <input type="text" class="form-control">
                             </div>
                         </div>
                     </div>
