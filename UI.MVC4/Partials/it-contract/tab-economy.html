@@ -16,7 +16,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr data-ng-repeat="stream in contract.externEconomyStreams">
+            <tr data-ng-repeat="stream in externEconomyStreams">
                 <!-- ORG UNIT TODO -->
                 <td>
                     
@@ -29,30 +29,50 @@
                 
                 <!-- ACQUISITION "Anskaffelse" -->
                 <td>
-                    <input type="number" class="input-sm form-control" data-ng-model="stream.acquisition"/>
+                    <input type="number" class="input-sm form-control" data-ng-model="stream.acquisition"
+                        data-field="acquisition"
+                        data-autosave="{{stream.updateUrl}}"/>
                 </td>
                 
                 <!-- Operation "drift" -->
                 <td>
-                    <input type="number" class="input-sm form-control" data-ng-model="stream.operation"/>
+                    <input type="number" class="input-sm form-control" data-ng-model="stream.operation"
+                        data-field="operation"
+                        data-autosave="{{stream.updateUrl}}"/>
                 </td>
                 
                 <!-- Other -->
                 <td>
-                    <input type="number" class="input-sm form-control" data-ng-model="stream.other"/>
+                    <input type="number" class="input-sm form-control" data-ng-model="stream.other"
+                        data-field="other"
+                        data-autosave="{{stream.updateUrl}}"/>
+                </td>
+
+                <!-- Accounting entry "kontering" -->
+                <td>
+                    <input type="text" class="input-sm form-control" data-ng-model="stream.accountingEntry"
+                        data-field="accountingEntry"
+                        data-autosave="{{stream.updateUrl}}"/>
                 </td>
                 
                 <!-- Audit trafficlight -->
                 <td>
-                    <input data-select-status="stream.auditStatus" data-can-write="hasWriteAccess" />
+                    <input data-select-status="stream.auditStatus" data-can-write="hasWriteAccess" data-on-status-change="stream.patch('auditStatus', stream.auditStatus)"/>
                 </td>
                 
                 <!-- Audit date -->
                 <td>
-                    <span id="statusDate" data-ng-model="stream.auditDate" data-datewriter="" 
-                          data-is-disabled="!hasWriteAccess" data-ng-change="stream.updateDate()">
+                    <span data-ng-model="stream.auditDate" data-datewriter="" 
+                          data-is-disabled="!hasWriteAccess" data-ng-change="stream.patch('auditDate', stream.auditDate)">
                     </span>
                 </td>
+
+                <!-- Note -->
+                <td>
+                    
+                </td>
+                
+                <!-- delete button -->
                 <td>
                     <div class="pull-right" data-ng-hide="!hasWriteAccess">
                         <a class="btn btn-link btn-xs"

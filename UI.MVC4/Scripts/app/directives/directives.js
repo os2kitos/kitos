@@ -180,8 +180,8 @@
         }
     ]);
 
-    app.directive('selectStatus', [
-        function() {
+    app.directive('selectStatus', ['$timeout',
+        function($timeout) {
             return {
                 scope: {
                     model: '=selectStatus',
@@ -194,9 +194,9 @@
                 link: function(scope, element, attr) {
                     scope.setModel = function(n) {
                         if (scope.model == n) return;
-
+                        
                         scope.model = n;
-
+                        $timeout(scope.onStatusChange);
                     };
                 }
             };
@@ -303,7 +303,10 @@
                     scope.date = {};
 
                     function read() {
-                        scope.date.dateStr = moment(ngModel.$modelValue).format("DD-MM-YY", "da", true);
+                        var parsedDate = moment(ngModel.$modelValue);
+                        
+
+                        scope.date.dateStr = parsedDate.isValid() ? moment(ngModel.$modelValue).format("DD-MM-YY", "da", true) : "dd-mm-åå";
                     }
 
                     read();
