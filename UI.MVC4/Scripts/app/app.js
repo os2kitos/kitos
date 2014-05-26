@@ -20,13 +20,15 @@ app.config(['$httpProvider', 'notifyProvider', 'RestangularProvider', function (
     });
 }]);
 
-app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify', 'userService',
-    function ($rootScope, $http, $state, editableOptions, $modal, notify, userService) {
+app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify', 'userService', 'uiSelect2Config',
+    function ($rootScope, $http, $state, editableOptions, $modal, notify, userService, uiSelect2Config) {
         //init info
         $rootScope.page = {
             title: 'Index',
             subnav: []
         };
+
+        uiSelect2Config.dropdownAutoWidth = true;
 
         //x-editable config
         editableOptions.theme = 'bs3'; // bootstrap3 theme.
