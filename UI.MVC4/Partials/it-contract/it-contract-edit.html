@@ -114,7 +114,7 @@
                 
                         <!-- Responsible org unit -->
                         <div class="form-group">
-                            <label for="contract-orgunit" class="control-label small">Ansvarlig endhed</label>
+                            <label for="contract-orgunit" class="control-label small">Ansvarlig enhed</label>
                             <select id="contract-orgunit" class="form-control input-sm" data-ng-model="contract.responsibleOrganizationUnitId" data-ng-options="o.id as o.name for o in orgUnits" data-autosave="{{ autoSaveUrl }}" data-field="responsibleOrganizationUnitId"></select>
                         </div>
 
@@ -156,10 +156,10 @@
                     
                     <div class="col-md-12">
                         <!-- Agreement elements -->
-                        <div class="form-group">
+                        <div class="form-group row form-inline">
                             <label class="control-label small">IT Kontrakten omfatter flg. aftaleelementer</label>
-                            <div class="checkbox col-md-4" data-ng-repeat="item in agreementElements">
-                                <label class="small">
+                            <div class="checkbox input-sm col-md-4" data-ng-repeat="item in agreementElements">
+                                <label>
                                     <input type="checkbox" data-ng-model="item.isChecked" data-ng-change="updateElem(item)"> {{ item.name }}
                                 </label>
                             </div>
@@ -169,7 +169,7 @@
                                     <input type="checkbox" checked data-ng-click="deleteCustomElem(item.id)">
                                 </span>
                             </div>
-                            <div class="input-group input-group-sm col-md-4">
+                            <div class="input-group input-group-sm col-md-3">
                                 <input type="text" class="form-control" data-ng-model="newElement">
                                 <span class="input-group-btn">
                                     <button class="btn btn-success" type="button" data-ng-click="saveCustomElem()">
