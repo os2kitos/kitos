@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-
-namespace UI.MVC4.Models
+﻿namespace UI.MVC4.Models
 {
-    public class InterfaceUsageDTO
+    public class InterfaceExposureDTO
     {
         public int Id { get; set; }
         public int ItSystemUsageId { get; set; }
@@ -10,15 +8,8 @@ namespace UI.MVC4.Models
 
         public ItSystemDTO Interface { get; set; }
 
-        public IEnumerable<DataRowUsageDTO> DataRowUsages { get; set; }
-
         public int? ItContractId { get; set; }
         public string ItContractItContractId { get; set; }
-
-        public int? InfrastructureId { get; set; }
-        public string InfrastructureName { get; set; }
-
-        public int? InterfaceCategoryId { get; set; }
 
         public bool IsWishedFor { get; set; }
     }

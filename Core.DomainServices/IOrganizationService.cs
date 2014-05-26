@@ -6,8 +6,7 @@ namespace Core.DomainServices
     public interface IOrganizationService
     {
         ICollection<Organization> GetByUser(User user);
-        Organization CreateOrganization(string name);
-        Organization CreateMunicipality(string name);
+        Organization CreateOrganization(string name, OrganizationType organizationType);
 
         bool IsUserMember(User user, Organization organization);
     }

@@ -12,6 +12,7 @@ namespace Core.DomainModel.ItSystem
             this.TaskRefs = new List<TaskRef>();
             this.Rights = new List<ItSystemRight>();
             this.InterfaceUsages = new List<InterfaceUsage>();
+            this.InterfaceExposures = new List<InterfaceExposure>();
             this.UsedBy = new List<OrganizationUnit>();
             this.ItProjects = new List<ItProject.ItProject>();
         }
@@ -60,7 +61,15 @@ namespace Core.DomainModel.ItSystem
 
         public virtual ICollection<ItSystemRight> Rights { get; set; }
 
-        public virtual ICollection<InterfaceUsage> InterfaceUsages { get; set; } 
+        /// <summary>
+        /// The local usages of interfaces. 
+        /// </summary>
+        public virtual ICollection<InterfaceUsage> InterfaceUsages { get; set; }
+
+        /// <summary>
+        /// The local exposures of interfaces.
+        /// </summary>
+        public virtual ICollection<InterfaceExposure> InterfaceExposures { get; set; }
 
         public int ObjectOwnerId { get; set; }
         public virtual User ObjectOwner { get; set; }

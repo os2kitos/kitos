@@ -234,11 +234,17 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<InterfaceUsage, InterfaceUsageDTO>()
                   .ReverseMap();
 
+            Mapper.CreateMap<InterfaceExposure, InterfaceExposureDTO>()
+                  .ReverseMap();
+
             Mapper.CreateMap<ItSystemUsage, ItSystemUsageDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.OrgUnits, opt => opt.Ignore())
                   .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
                   .ForMember(dest => dest.ItProjects, opt => opt.Ignore());
+
+            //Simplere mapping than the one above, only one way
+            Mapper.CreateMap<ItSystemUsage, ItSystemUsageSimpleDTO>();
 
             Mapper.CreateMap<EconomyYear, EconomyYearDTO>()
                   .ReverseMap();
@@ -247,6 +253,10 @@ namespace UI.MVC4.App_Start
                 .ReverseMap()
                 .ForMember(dest => dest.ItProject, opt => opt.Ignore())
                 .ForMember(dest => dest.ResponsibleUser, opt => opt.Ignore());
+
+            Mapper.CreateMap<Stakeholder, StakeholderDTO>()
+                .ReverseMap()
+                .ForMember(dest => dest.ItProject, opt => opt.Ignore());
 
             Mapper.CreateMap<Activity, ActivityDTO>()
                   .ReverseMap()
@@ -270,15 +280,20 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.GoalStatus, opt => opt.Ignore())
                   .ForMember(dest => dest.GoalType, opt => opt.Ignore());
 
+            Mapper.CreateMap<Stakeholder, StakeholderDTO>()
+                  .ReverseMap();
+
             Mapper.CreateMap<ItProject, ItProjectDTO>()
                   .ForMember(dest => dest.AssociatedProjectIds,
                              opt => opt.MapFrom(x => x.AssociatedProjects.Select(y => y.Id)))
-                  .ForMember(dest => dest.ItSystems, opt => opt.MapFrom(src => src.ItSystemUsages.Select(x => x.ItSystem)))
+                  .ForMember(dest => dest.ItSystems,
+                             opt => opt.MapFrom(src => src.ItSystemUsages.Select(x => x.ItSystem)))
                   .ReverseMap()
                   .ForMember(dest => dest.AssociatedProjects, opt => opt.Ignore())
                   .ForMember(dest => dest.ItSystemUsages, opt => opt.Ignore())
                   .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
-                  .ForMember(dest => dest.ResponsibleOrgUnit, opt => opt.Ignore());
+                  .ForMember(dest => dest.ResponsibleOrgUnit, opt => opt.Ignore())
+                  .ForMember(dest => dest.Stakeholders, opt => opt.Ignore());
 
             Mapper.CreateMap<Handover, HandoverDTO>()
                   .ReverseMap()
@@ -292,10 +307,6 @@ namespace UI.MVC4.App_Start
                   .ReverseMap();
 
             Mapper.CreateMap<CustomAgreementElement, CustomAgreementElementDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.ItContract, opt => opt.Ignore());
-
-            Mapper.CreateMap<ProcurementPlan, ProcurementPlanDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.ItContract, opt => opt.Ignore());
         }

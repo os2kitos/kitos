@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel.ItContract
 {
@@ -12,6 +13,9 @@ namespace Core.DomainModel.ItContract
             this.CustomAgreementElements = new List<CustomAgreementElement>();
             this.Children = new List<ItContract>();
             this.Rights = new List<ItContractRight>();
+            this.AssociatedSystemUsages = new List<ItSystemUsage>();
+            this.AssociatedInterfaceUsages = new List<InterfaceUsage>();
+            this.AssociatedInterfaceExposures = new List<InterfaceExposure>();
         }
 
         public int ObjectOwnerId { get; set; }
@@ -33,8 +37,17 @@ namespace Core.DomainModel.ItContract
         public bool IsSigned { get; set; }
         public DateTime? SignedDate { get; set; }
 
+        /// <summary>
+        /// The chosen responsible org unit for this contract
+        /// </summary>
         public int? ResponsibleOrganizationUnitId { get; set; }
         public virtual OrganizationUnit ResponsibleOrganizationUnit { get; set; }
+
+        /// <summary>
+        /// Id of the organization this contract was created under
+        /// </summary>
+        public int OrganizationId { get; set; }
+        public virtual Organization Organization { get; set; }
 
         /// <summary>
         /// Id of the organization marked as supplier for this contract
@@ -43,10 +56,10 @@ namespace Core.DomainModel.ItContract
         public virtual Organization Supplier { get; set; }
 
         public int? ProcurementStrategyId { get; set; }
-        public ProcurementStrategy ProcurementStrategy { get; set; }
+        public virtual ProcurementStrategy ProcurementStrategy { get; set; }
 
-        public int? ProcurementPlanId { get; set; }
-        public virtual ProcurementPlan ProcurementPlan { get; set; }
+        public int? ProcurementPlanHalf { get; set; }
+        public int? ProcurementPlanYear { get; set; }
 
         public int? ContractTemplateId { get; set; }
         public virtual ContractTemplate ContractTemplate { get; set; }
@@ -69,6 +82,18 @@ namespace Core.DomainModel.ItContract
 
         //public virtual ICollection<ShipNotice> ShipNotices { get; set; }
         public virtual ICollection<ItContractRight> Rights { get; set; }
+
+        /// <summary>
+        /// The (local usages of) it systems, that this contract is associated to. 
+        /// </summary>
+        public virtual ICollection<ItSystemUsage> AssociatedSystemUsages { get; set; }
+
+        /// <summary>
+        /// The interface usages that the contract is associated to. 
+        /// </summary>
+        public virtual ICollection<InterfaceUsage> AssociatedInterfaceUsages { get; set; } 
+        public virtual ICollection<InterfaceExposure> AssociatedInterfaceExposures { get; set; } 
+
         public virtual ICollection<AgreementElement> AgreementElements { get; set; }
         public virtual ICollection<CustomAgreementElement> CustomAgreementElements { get; set; }
     }

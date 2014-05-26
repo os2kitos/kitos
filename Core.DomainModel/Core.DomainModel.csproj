@@ -44,7 +44,6 @@
     <Compile Include="Config.cs" />
     <Compile Include="IHasAccessModifier.cs" />
     <Compile Include="ItContract\CustomAgreementElement.cs" />
-    <Compile Include="ItContract\ProcurementPlan.cs" />
     <Compile Include="ItContract\ProcurementStrategy.cs" />
     <Compile Include="ItProject\GoalType.cs" />
     <Compile Include="ItProject\EconomyYear.cs" />
@@ -57,6 +56,7 @@
     <Compile Include="ItSystem\DataType.cs" />
     <Compile Include="ItSystem\Frequency.cs" />
     <Compile Include="ItSystem\InterfaceCategory.cs" />
+    <Compile Include="ItSystem\InterfaceExposure.cs" />
     <Compile Include="ItSystem\InterfaceUsage.cs" />
     <Compile Include="ItSystem\ItSystemUsage.cs" />
     <Compile Include="ItSystem\SensitiveDataType.cs" />

@@ -23,6 +23,12 @@ namespace UI.MVC4.Models
         public ItProjectPriority PriorityPf { get; set; }
         public bool IsArchived { get; set; }
 
+        public bool IsStatusGoalVisible { get; set; }
+        public bool IsEconomyVisible { get; set; }
+        public bool IsStakeholderVisible { get; set; }
+        public bool IsCommunicationVisible { get; set; }
+        public bool IsHandoverVisible { get; set; }
+
         public int? AssociatedProgramId { get; set; }
         public string AssociatedProgramName { get; set; }
 
@@ -38,6 +44,7 @@ namespace UI.MVC4.Models
         public IEnumerable<ItSystemDTO> ItSystems { get; set; }
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
         public IEnumerable<RiskDTO> Risks { get; set; }
+        public IEnumerable<StakeholderDTO> Stakeholders { get; set; }
 
 
         #region Status project tab

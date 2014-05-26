@@ -284,11 +284,14 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Organizations
 
-            var roskilde = organizationService.CreateMunicipality("Roskilde");
-            var sorø = organizationService.CreateMunicipality("Sorø");
-            var kl = organizationService.CreateMunicipality("KL");
+            var roskilde = organizationService.CreateOrganization("Roskilde", OrganizationType.Municipality);
+            var sorø = organizationService.CreateOrganization("Sorø", OrganizationType.Municipality);
+            var kl = organizationService.CreateOrganization("KL", OrganizationType.Municipality);
+            var companyA = organizationService.CreateOrganization("Firma A", OrganizationType.Company);
+            var companyB = organizationService.CreateOrganization("Firma B", OrganizationType.Company);
+            var companyC = organizationService.CreateOrganization("Firma C", OrganizationType.Company);
 
-            context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø, kl);
+            context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø, kl, companyA, companyB, companyC);
 
             context.SaveChanges();
 
@@ -841,6 +844,9 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region IT System Usage
 
+            /* TODO: this should be created through ItSystemUsageService to ensure 
+             * that the local usages or exposure of interfaces are created.
+             * For now, it's better not to create any usage.
             var systemUsage1 = new ItSystemUsage()
                 {
                     ArchiveType = archiveTypeNo,
@@ -857,6 +863,8 @@ namespace Infrastructure.DataAccess.Migrations
                 };
 
             context.ItSystemUsages.AddOrUpdate(x => x.Note, systemUsage1); // TODO probably not the best identifier
+             * 
+             */
 
             #endregion
 
@@ -885,6 +893,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region IT system rights
 
+            /*
             var sysRight1 = new ItSystemRight()
                 {
                     Object = systemUsage1,
@@ -901,11 +910,13 @@ namespace Infrastructure.DataAccess.Migrations
 
             context.ItSystemRights.AddOrUpdate(x => x.UserId, sysRight1, sysRight2);
             context.SaveChanges();
+             * */
 
             #endregion
 
             #region Wishes
 
+            /*
             var wish1 = new Wish()
                 {
                     IsPublic = true,
@@ -922,6 +933,7 @@ namespace Infrastructure.DataAccess.Migrations
             };
 
             context.Wishes.AddOrUpdate(x => x.Text, wish1, wish2); // TODO probably not the best identifier
+            */
 
             #endregion
 
@@ -1002,6 +1014,9 @@ namespace Infrastructure.DataAccess.Migrations
                     PurchaseForm = purchaseForm1,
                     ProcurementStrategy = procurementStrategy1,
                     ContractTemplate = contractTemplateK1,
+                    Organization = roskilde,
+                    ProcurementPlanHalf = 1, 
+                    ProcurementPlanYear = 2016
                 };
 
             context.ItContracts.AddOrUpdate(x => x.Name, itContractA);

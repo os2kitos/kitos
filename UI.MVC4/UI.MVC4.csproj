@@ -212,6 +212,7 @@
   <ItemGroup>
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Controllers\API\CustomAgreementElementController.cs" />
     <Compile Include="Controllers\API\ItContractController.cs" />
     <Compile Include="Controllers\API\ItContractRightController.cs" />
     <Compile Include="Controllers\API\ProcurementStrategyController.cs" />
@@ -219,8 +220,9 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\MappingConfig.cs" />
     <Compile Include="App_Start\NinjectWebCommon.cs" />
+    <Compile Include="Models\Exceptions\ConflictException.cs" />
     <Compile Include="Models\ItContractDTO.cs" />
-    <Compile Include="Models\ProcurementPlanDTO.cs" />
+    <Compile Include="Models\ItSystemUsageSimpleDTO.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\API\ActivityController.cs" />
@@ -239,6 +241,7 @@
     <Compile Include="Controllers\API\GoalController.cs" />
     <Compile Include="Controllers\API\GoalStatusController.cs" />
     <Compile Include="Controllers\API\GoalTypeController.cs" />
+    <Compile Include="Controllers\API\InterfaceExposureController.cs" />
     <Compile Include="Controllers\API\ItProjectRightController.cs" />
     <Compile Include="Controllers\API\DataRowUsageController.cs" />
     <Compile Include="Controllers\API\DataTypeController.cs" />
@@ -252,12 +255,14 @@
     <Compile Include="Controllers\API\ItSystemRightController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageController.cs" />
     <Compile Include="Controllers\API\RiskController.cs" />
+    <Compile Include="Controllers\API\StakeholderController.cs" />
     <Compile Include="Controllers\API\StateController.cs" />
     <Compile Include="Models\CommunicationDTO.cs" />
     <Compile Include="Filters\CustomDateTimeConverter.cs" />
     <Compile Include="Models\GoalDTO.cs" />
     <Compile Include="Models\GoalStatusDTO.cs" />
     <Compile Include="Models\HandoverDTO.cs" />
+    <Compile Include="Models\InterfaceExposureDTO.cs" />
     <Compile Include="Models\RiskDTO.cs" />
     <Compile Include="Controllers\API\SensitiveDataTypeController.cs" />
     <Compile Include="Controllers\API\TsaController.cs" />
@@ -338,6 +343,7 @@
     <Compile Include="Models\RightOutputDTO.cs" />
     <Compile Include="Models\RightInputDTO.cs" />
     <Compile Include="Models\RoleDTO.cs" />
+    <Compile Include="Models\StakeholderDTO.cs" />
     <Compile Include="Models\StateDTO.cs" />
     <Compile Include="Models\TaskDelegationDTO.cs" />
     <Compile Include="Models\TaskUsageDTO.cs" />
@@ -442,6 +448,7 @@
     <Content Include="Partials\it-contract\it-contract-edit.html" />
     <Content Include="Partials\it-contract\it-contract-overview.html" />
     <Content Include="Partials\it-contract\it-contract-plan.html" />
+    <Content Include="Partials\it-contract\tab-systems.html" />
     <Content Include="Partials\it-contract\tab-roles.html" />
     <Content Include="Partials\it-project\catalog.html" />
     <Content Include="Partials\it-project\overview.html" />
@@ -458,6 +465,7 @@
     <Content Include="Partials\it-project\tab-economy.html" />
     <Content Include="Partials\it-project\tab-itsys.html" />
     <Content Include="Partials\it-project\tab-kle.html" />
+    <Content Include="Partials\it-project\tab-stakeholders.html" />
     <Content Include="Partials\it-project\tab-status-goal.html" />
     <Content Include="Partials\it-project\tab-strategy.html" />
     <Content Include="Partials\it-project\tab-status-project.html" />
@@ -529,8 +537,10 @@
     <Content Include="Scripts\app\controllers\it-contract\it-contract-plan.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-roles.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-subnav.js" />
+    <Content Include="Scripts\app\controllers\it-contract\it-contract-systems.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-communication.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-handover.js" />
+    <Content Include="Scripts\app\controllers\it-project\it-project-stakeholders.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-overview.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-status-goal.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-status-project.js" />
@@ -556,6 +566,7 @@
     <Content Include="Scripts\app\controllers\it-system\it-system-interfaces.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config.js" />
     <Content Include="Scripts\app\controllers\org\org.js" />
+    <Content Include="Scripts\app\directives\angularjs-dropdown-multiselect.js" />
     <Content Include="Scripts\app\directives\directives.js" />
     <Content Include="Scripts\app\directives\filters.js" />
     <Content Include="Scripts\app\directives\form-directives.js" />
