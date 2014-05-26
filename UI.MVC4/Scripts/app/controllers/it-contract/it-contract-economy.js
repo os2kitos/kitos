@@ -11,7 +11,7 @@
 
     app.controller('contract.EditEconomyCtrl', ['$scope', '$http', 'notify', 'contract',
         function ($scope, $http, notify, contract) {
-
+            
             var baseUrl = "api/economyStream";
 
             var externEconomyStreams = [];
@@ -29,6 +29,9 @@
                 stream.show = true;
                 stream.updateUrl = baseUrl + "/" + stream.id;
 
+                stream.test = function() {
+                    console.log(stream);
+                };
 
                 stream.delete = function () {
                     var msg = notify.addInfoMessage("Sletter række...");

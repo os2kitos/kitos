@@ -1,0 +1,9 @@
+﻿<select data-ui-select2="selectOrgUnitOptions" class="form-control input-sm" data-placeholder="Vælg afdeling">
+    <option value=""></option>
+    <option data-ng-repeat="extraOption in extraOptions" value="{{extraOption.id}}" data-just-name="{{extraOption.text}}">
+        {{extraOption.text}}
+    </option>
+    <option data-ng-repeat="orgUnit in orgUnits" value="{{orgUnit.id}}" data-just-name="{{orgUnit.name}}">
+        {{orgUnit.indentation}} {{orgUnit.name}}
+    </option>
+</select>

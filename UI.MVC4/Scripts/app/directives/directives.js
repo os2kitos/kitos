@@ -242,6 +242,7 @@
             return {
                 restrict: 'A',
                 require: 'ngModel',
+                priority: 0,
                 link: function (scope, element, attrs, ctrl) {
 
                     var oldValue;
@@ -250,6 +251,8 @@
                     });
 
                     function saveIfNew() {
+                        console.log("foo");
+
                         var newValue = ctrl.$viewValue;
                         if (attrs.pluck)
                             newValue = _.pluck(newValue, attrs.pluck);
@@ -371,5 +374,76 @@
             }
         };
     }]);
+
+    app.directive('selectOrgUnit', [
+        function () {
+            return {
+                scope: {
+                    extraOptions: '=?'
+                },
+                templateUrl: 'partials/directives/select-org-unit.html',
+                replace: true,
+                controller: ['$scope', '$element', '$http', '$timeout', '$sce', 'userService',
+                    function ($scope, $element, $http, $timeout, $sce, userService) {
+
+                        $element.bind('select2-selecting', function () {
+                            $timeout(function () {
+                                $element.triggerHandler("blur");
+                            });
+                        });
+
+
+                        //options for select2
+                        $scope.selectOrgUnitOptions = {
+                            //don't format markup in result
+                            escapeMarkup: function (m) { return m; },
+                            
+                            formatSelection: function (item) {
+                                if (!item.element) {
+                                    console.log(_.findWhere(orgUnits, { id: item }));
+                                    var orgUnit = _.findWhere(orgUnits, { id: item });
+                                    if (orgUnit) return orgUnit.name;
+                                    else return "";
+                                }
+
+                                //this is necessary to remove whitespace again
+                                return angular.element(item.element[0]).data('just-name');
+                            }
+                        };
+
+                        var orgUnits = [];
+                        $scope.orgUnits = orgUnits;
+
+                        //recursive function for added indentation, 
+                        //and pushing org units to the list in the right order (depth-first)
+                        function visitOrgUnit(orgUnit, indentation) {
+                            orgUnit.indentation = $sce.trustAsHtml(indentation);
+
+                            orgUnits.push(orgUnit);
+
+                            _.each(orgUnit.children, function (child) {
+                                return visitOrgUnit(child, indentation + "&nbsp;&nbsp;&nbsp;");
+                            });
+                        }
+
+                        //loads the org unit roots
+                        function loadUnits() {
+                            userService.getUser().then(function (user) {
+
+                                $http.get('api/organizationUnit?userId=' + user.id, { cache: true }).success(function (result) {
+                                    _.each(result.response, function (unit) {
+                                        visitOrgUnit(unit, "");
+                                    });
+                                });
+                            });
+                        }
+
+                        loadUnits();
+                    }]
+
+            };
+        }
+
+    ]);
 
 })(angular, app);
