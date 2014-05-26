@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
@@ -44,7 +45,7 @@ namespace Core.DomainModel
         public virtual ICollection<ItSystemUsage> Using { get; set; }
 
         /// <summary>
-        /// This Organization Unit is using these IT Systems (Via ItSystemUsage)
+        /// This Organization Unit is using these IT projects
         /// </summary>
         public virtual ICollection<ItProject.ItProject> UsingItProjects { get; set; }
 
@@ -57,5 +58,10 @@ namespace Core.DomainModel
         /// This Organization Unit is responsible for these IT Contracts
         /// </summary>
         public virtual ICollection<ItContract.ItContract> ResponsibleForItContracts { get; set; }
+
+        /// <summary>
+        /// The Organization Unit is listed in these economy streams
+        /// </summary>
+        public virtual ICollection<EconomyStream> EconomyStreams { get; set; }
     }
 }

@@ -44,6 +44,7 @@
     <Compile Include="Config.cs" />
     <Compile Include="IHasAccessModifier.cs" />
     <Compile Include="ItContract\CustomAgreementElement.cs" />
+    <Compile Include="ItContract\EconomyStream.cs" />
     <Compile Include="ItContract\ProcurementStrategy.cs" />
     <Compile Include="ItProject\GoalType.cs" />
     <Compile Include="ItProject\EconomyYear.cs" />

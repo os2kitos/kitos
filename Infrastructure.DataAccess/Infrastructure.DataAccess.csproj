@@ -70,6 +70,7 @@
     <Compile Include="Mapping\AdminRoleMap.cs" />
     <Compile Include="Mapping\BusinessTypeMap.cs" />
     <Compile Include="Mapping\ActivityMap.cs" />
+    <Compile Include="Mapping\EconomyStreamMap.cs" />
     <Compile Include="Mapping\CustomAgreementElementMap.cs" />
     <Compile Include="Mapping\ProcurementStrategyMap.cs" />
     <Compile Include="Mapping\InterfaceExposureMap.cs" />
