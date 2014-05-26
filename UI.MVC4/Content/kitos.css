@@ -569,3 +569,9 @@ tr.super-sum {
     border-color: gainsboro;
     border-style: solid;
 }
+
+/* remove margins in inline form groups */
+.form-inline .form-group{
+    margin-left: 0;
+    margin-right: 0;
+}

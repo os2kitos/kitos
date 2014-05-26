@@ -169,6 +169,13 @@
                     $http.delete('api/customagreementelement/' + id)
                         .success(function() {
                             msg.toSuccessMessage("Feltet er slettet.");
+                            var foundElem = _.find($scope.customAgreementElements, function (elem) {
+                                return elem.id == id;
+                            });
+                            if (foundElem) {
+                                var index = _.indexOf($scope.customAgreementElements, foundElem);
+                                $scope.customAgreementElements.splice(index, 1);
+                            }
                         })
                         .error(function() {
                             msg.toErrorMessage("Fejl! Feltet kunne ikke slettes!");
