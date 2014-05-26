@@ -54,7 +54,7 @@
                     return $http.get('api/customagreementelement/').then(function (result) {
                         return result.data.response;
                     });
-                }]
+                }],
                 hasWriteAccess: ['$http', '$stateParams', function ($http, $stateParams) {
                     return $http.get("api/itcontractright/" + $stateParams.id + "?hasWriteAccess")
                         .then(function (result) {

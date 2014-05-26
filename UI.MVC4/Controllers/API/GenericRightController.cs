@@ -30,19 +30,19 @@ namespace UI.MVC4.Controllers.API
             return RightRepository.Get(right => right.ObjectId == oId);
         } 
 
-        protected virtual bool HasWriteAccess(int objId, User user)
+        protected virtual bool HasWriteAccess(TObject theObject, User user)
         {
-            var theObject = _objectRepository.GetByKey(objId);
             if (theObject is IHasOwner && ((IHasOwner) theObject).ObjectOwnerId == user.Id) return true; 
 
-            var rights = RightRepository.Get(right => right.ObjectId == objId && right.UserId == user.Id).ToList();
+            var rights = RightRepository.Get(right => right.ObjectId == theObject.Id && right.UserId == user.Id).ToList();
             return rights.Any(right => right.Role.HasWriteAccess);
         }
 
         private bool HasWriteAccess(int objId, int userId)
         {
             var user = UserRepository.GetByKey(userId);
-            return HasWriteAccess(objId, user);
+            var theObject = _objectRepository.GetByKey(objId);
+            return HasWriteAccess(theObject, user);
         }
 
         public HttpResponseMessage Get(int id)
@@ -64,7 +64,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                return Ok(HasWriteAccess(id, KitosUser));
+                return Ok(HasWriteAccess(id, KitosUser.Id));
             }
             catch (Exception e)
             {
@@ -88,7 +88,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                if (!HasWriteAccess(inputDTO.ObjectId, KitosUser))
+                if (!HasWriteAccess(inputDTO.ObjectId, KitosUser.Id))
                     return Unauthorized();
 
                 var right = AutoMapper.Mapper.Map<RightInputDTO, TRight>(inputDTO);
