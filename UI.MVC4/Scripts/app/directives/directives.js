@@ -74,7 +74,7 @@
     ]);
 
     app.directive('selectUser', [
-        '$rootScope', '$http', function($rootScope, $http) {
+        '$rootScope', '$http', '$timeout', function($rootScope, $http, $timeout) {
 
             //format of dropdown options
             function formatResult(obj) {
@@ -102,18 +102,34 @@
                 scope: {
                     inputName: '@?name',
                     userModel: '=',
-                    addUser: "@?"
+                    addUser: '@?',
+                    allowClear: '@?',
+                    onSelect: '&?'
                 },
                 replace: true,
                 templateUrl: 'partials/directives/select-user.html',
                 controller: [
-                    '$scope', function($scope) {
+                    '$scope', function ($scope) {
+                        $scope.onChange = function () {
+
+                            //for some reason (probably a bugger in select2)
+                            //this is called 2 times, once with the original select value (like 1 or "")
+                            //and once with the object value of select2 {id, text}.
+                            //we only need the last one
+                            if (typeof $scope.userModel !== 'object') return;
+                            
+                            //timeout, otherwise we get the bad version of the model.
+                            $timeout($scope.onSelect);
+                        };
+
                         $scope.selectUserOptions = {
 
                             //don't escape markup, otherwise formatResult will be bugged
                             escapeMarkup: function(m) { return m; },
                             formatResult: formatResult,
                             formatSelection: formatSelection,
+
+                            allowClear: !!$scope.allowClear,
 
                             minimumInputLength: 1,
                             initSelection: function(elem, callback) {

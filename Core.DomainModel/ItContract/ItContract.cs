@@ -30,7 +30,10 @@ namespace Core.DomainModel.ItContract
         public string SupplierContractSigner { get; set; }
         public bool HasSupplierSigned { get; set; }
         public DateTime? SupplierSignedDate { get; set; }
-        public User ContractSigner { get; set; }
+
+        public int? ContractSignerId { get; set; }
+        public virtual User ContractSigner { get; set; }
+
         public bool IsSigned { get; set; }
         public DateTime? SignedDate { get; set; }
 

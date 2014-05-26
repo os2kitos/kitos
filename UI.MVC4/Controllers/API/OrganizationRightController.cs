@@ -16,15 +16,15 @@ namespace UI.MVC4.Controllers.API
     {
         private readonly IOrgUnitService _orgUnitService;
 
-        public OrganizationRightController(IGenericRepository<OrganizationRight> repository, IOrgUnitService orgUnitService) 
-            : base(repository)
+        public OrganizationRightController(IGenericRepository<OrganizationRight> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IOrgUnitService orgUnitService) 
+            : base(repository, orgUnitRepository)
         {
             _orgUnitService = orgUnitService;
         }
 
-        protected override bool HasWriteAccess(int objId, User user)
+        protected override bool HasWriteAccess(OrganizationUnit orgUnit, User user)
         {
-            return _orgUnitService.HasWriteAccess(user, objId);
+            return _orgUnitService.HasWriteAccess(user, orgUnit);
         }
 
         /* returns the organisations-rights for an organization unit and all units in the subtree */

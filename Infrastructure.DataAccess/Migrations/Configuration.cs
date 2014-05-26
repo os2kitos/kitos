@@ -978,6 +978,27 @@ namespace Infrastructure.DataAccess.Migrations
 
             #endregion
 
+            #region IT Contract roles
+
+            context.ItContractRoles.AddOrUpdate(x => x.Name, new ItContractRole()
+                {
+                    HasWriteAccess = true,
+                    Name = "Kontraktrolle A",
+                    IsActive = true
+                }, new ItContractRole(){
+                    HasWriteAccess = true,
+                    Name = "Kontraktrolle B",
+                    IsActive = true
+                }, new ItContractRole()
+                {
+                    HasWriteAccess = false,
+                    Name = "Kontraktrolle C",
+                    IsActive = true
+                });
+            context.SaveChanges();
+
+            #endregion
+
             #region IT Contract
 
             var itContractA = new ItContract()

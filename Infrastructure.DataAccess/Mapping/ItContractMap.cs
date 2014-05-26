@@ -65,6 +65,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasRequired(t => t.Organization)
                 .WithMany(t => t.Contracts)
                 .HasForeignKey(d => d.OrganizationId);
+
+            this.HasOptional(t => t.ContractSigner)
+                .WithMany(d => d.SignerForContracts)
+                .HasForeignKey(t => t.ContractSignerId);
         }
     }
 }

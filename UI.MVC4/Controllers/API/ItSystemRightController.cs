@@ -14,22 +14,8 @@ namespace UI.MVC4.Controllers.API
 {
     public class ItSystemRightController : GenericRightController<ItSystemRight, ItSystemUsage, ItSystemRole>
     {
-        private readonly IGenericRepository<ItSystemUsage> _usageRepository;
-
-        public ItSystemRightController(IGenericRepository<ItSystemRight> repository, IGenericRepository<ItSystemUsage> usageRepository) : base(repository)
+        public ItSystemRightController(IGenericRepository<ItSystemRight> repository, IGenericRepository<ItSystemUsage> usageRepository) : base(repository, usageRepository)
         {
-            _usageRepository = usageRepository;
-        }
-
-        protected override bool HasWriteAccess(int objId, User user)
-        {
-            //the it system usage object owner has write access
-            //i.e. the one who created the usage
-            var systemUsage = _usageRepository.GetByKey(objId);
-            if (systemUsage.ObjectOwner.Id == user.Id) return true;
-
-            //if not object owner, check for rights
-            return base.HasWriteAccess(objId, user);
         }
     }
 }

@@ -121,7 +121,7 @@
                         <!-- Intern contract signer -->
                         <div class="form-group">
                             <label for="contract-int-signer" class="control-label small">Kontraktunderskriver</label>
-                            <select id="contract-int-signer" class="form-control input-sm"></select>
+                            <input id="contract-int-signer" data-select-user="foo" data-user-model="contractSigner.userForSelect" data-allow-clear="true" data-on-select="contractSigner.update()" />
                         </div>
                     </div>
 
@@ -191,7 +191,7 @@
         <a data-ui-sref="it-contract.edit.systems">IT Systemer</a>
     </li>
     <li data-ui-sref-active="active">
-        <a data-ui-sref="it-contract.edit.overview">Placeholder</a>
+        <a data-ui-sref="it-contract.edit.roles">Roller</a>
     </li>
 </ul>
 

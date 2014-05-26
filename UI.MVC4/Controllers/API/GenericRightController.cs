@@ -12,15 +12,17 @@ using UI.MVC4.Models;
 namespace UI.MVC4.Controllers.API
 {
     public abstract class GenericRightController<TRight, TObject, TRole> : BaseApiController
-        where TObject : IEntity<int>
+        where TObject : class, IEntity<int>
         where TRole : IRoleEntity, IEntity<int>
         where TRight : class, IRight<TObject, TRole>
     {
         protected readonly IGenericRepository<TRight> RightRepository;
+        private readonly IGenericRepository<TObject> _objectRepository;
 
-        protected GenericRightController(IGenericRepository<TRight> rightRepository)
+        protected GenericRightController(IGenericRepository<TRight> rightRepository, IGenericRepository<TObject> objectRepository)
         {
             RightRepository = rightRepository;
+            _objectRepository = objectRepository;
         }
 
         protected virtual IEnumerable<TRight> GetAll(int oId)
@@ -28,16 +30,19 @@ namespace UI.MVC4.Controllers.API
             return RightRepository.Get(right => right.ObjectId == oId);
         } 
 
-        protected virtual bool HasWriteAccess(int objId, User user)
+        protected virtual bool HasWriteAccess(TObject theObject, User user)
         {
-            var rights = RightRepository.Get(right => right.ObjectId == objId && right.UserId == user.Id).ToList();
+            if (theObject is IHasOwner && ((IHasOwner) theObject).ObjectOwnerId == user.Id) return true; 
+
+            var rights = RightRepository.Get(right => right.ObjectId == theObject.Id && right.UserId == user.Id).ToList();
             return rights.Any(right => right.Role.HasWriteAccess);
         }
 
         private bool HasWriteAccess(int objId, int userId)
         {
             var user = UserRepository.GetByKey(userId);
-            return HasWriteAccess(objId, user);
+            var theObject = _objectRepository.GetByKey(objId);
+            return HasWriteAccess(theObject, user);
         }
 
         public HttpResponseMessage Get(int id)
@@ -48,6 +53,18 @@ namespace UI.MVC4.Controllers.API
                 var dtos = AutoMapper.Mapper.Map<IEnumerable<TRight>, IEnumerable<RightOutputDTO>>(rights);
 
                 return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetHasWriteAccess(int id, bool? hasWriteAccess)
+        {
+            try
+            {
+                return Ok(HasWriteAccess(id, KitosUser.Id));
             }
             catch (Exception e)
             {
@@ -71,7 +88,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                if (!HasWriteAccess(inputDTO.ObjectId, KitosUser))
+                if (!HasWriteAccess(inputDTO.ObjectId, KitosUser.Id))
                     return Unauthorized();
 
                 var right = AutoMapper.Mapper.Map<RightInputDTO, TRight>(inputDTO);

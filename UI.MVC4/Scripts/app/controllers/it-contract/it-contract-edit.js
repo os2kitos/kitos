@@ -54,14 +54,20 @@
                     return $http.get('api/customagreementelement/').then(function (result) {
                         return result.data.response;
                     });
+                }],
+                hasWriteAccess: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itcontractright/" + $stateParams.id + "?hasWriteAccess")
+                        .then(function (result) {
+                            return result.data.response;
+                        });
                 }]
             }
         });
     }]);
 
     app.controller('contract.EditCtrl',
-        ['$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'suppliers', 'orgUnits', 'contracts', 'agreementElements', 'customAgreementElements',
-            function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, suppliers, orgUnits, contracts, agreementElements, customAgreementElements) {
+        ['$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'suppliers', 'orgUnits', 'contracts', 'agreementElements', 'customAgreementElements', 'hasWriteAccess',
+            function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, suppliers, orgUnits, contracts, agreementElements, customAgreementElements, hasWriteAccess) {
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.contract = contract;
                 $scope.contractTypes = contractTypes;
@@ -174,7 +180,55 @@
                             msg.toErrorMessage("Fejl! Feltet kunne ikke slettes!");
                         });
                 };
-            }
-        ]
-    );
+            
+                $scope.hasWriteAccess = hasWriteAccess;
+                
+
+
+                function formatContractSigner(signer) {
+
+                    var userForSelect = null;
+                    if (signer) {
+                        userForSelect = {
+                            id: signer.id,
+                            text: signer.name
+                        };
+                    }
+
+                    $scope.contractSigner = {
+                        edit: false,
+                        signer: signer,
+                        userForSelect: userForSelect,
+                        update: function () {
+                            var msg = notify.addInfoMessage("Gemmer...", false);
+
+                            var selectedUser = $scope.contractSigner.userForSelect;
+                            var signerId = selectedUser ? selectedUser.id : null;
+                            var signerUser = selectedUser ? selectedUser.user : null;
+                            
+                            console.log($scope.contractSigner);
+
+                            $http({
+                                method: 'PATCH',
+                                url: 'api/itContract/' + contract.id,
+                                data: {
+                                    contractSignerId: signerId
+                                }
+                            }).success(function (result) {
+
+                                msg.toSuccessMessage("Kontraktunderskriveren er gemt");
+
+                                formatContractSigner(signerUser);
+
+                            }).error(function () {
+                                msg.toErrorMessage("Fejl!");
+                            });
+                        }
+                    };
+
+
+                }
+
+                formatContractSigner(contract.contractSigner);
+            }]);
 })(angular, app);

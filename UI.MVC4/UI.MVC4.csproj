@@ -214,6 +214,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="Controllers\API\CustomAgreementElementController.cs" />
     <Compile Include="Controllers\API\ItContractController.cs" />
+    <Compile Include="Controllers\API\ItContractRightController.cs" />
     <Compile Include="Controllers\API\ProcurementStrategyController.cs" />
     <Compile Include="Models\CustomAgreementElementDTO.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
@@ -448,6 +449,7 @@
     <Content Include="Partials\it-contract\it-contract-overview.html" />
     <Content Include="Partials\it-contract\it-contract-plan.html" />
     <Content Include="Partials\it-contract\tab-systems.html" />
+    <Content Include="Partials\it-contract\tab-roles.html" />
     <Content Include="Partials\it-project\catalog.html" />
     <Content Include="Partials\it-project\overview.html" />
     <Content Include="Partials\it-project\portfolio.html" />
@@ -533,6 +535,7 @@
     <Content Include="Scripts\app\controllers\it-contract\it-contract-edit.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-overview.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-plan.js" />
+    <Content Include="Scripts\app\controllers\it-contract\it-contract-roles.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-subnav.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-systems.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-communication.js" />
