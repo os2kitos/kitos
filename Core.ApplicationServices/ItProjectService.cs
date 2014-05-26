@@ -108,6 +108,9 @@ namespace Core.ApplicationServices
                 // TODO MilestoneStates = project.MilestoneStates,
                 // TODO TaskActivities = project.TaskActivities,
                 // TODO Communcations = project.Communcations
+
+                //TODO: clone this instead of creating new
+                GoalStatus = new GoalStatus()
             };
 
             ClonePhases(original, clone);
