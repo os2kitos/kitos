@@ -97,6 +97,8 @@ namespace UI.MVC4.Models
         {
             get
             {
+                if (EconomyYears == null) return null;
+
                 var firstYear = EconomyYears.FirstOrDefault(dto => dto.TotalBudget >= 0);
                 return firstYear != null ? (int?) firstYear.YearNumber : null;
             }
@@ -104,12 +106,22 @@ namespace UI.MVC4.Models
 
         public int Bc
         {
-            get { return EconomyYears.Sum(year => year.TotalBudget); }
+            get
+            {
+                if (EconomyYears == null) return 0;
+
+                return EconomyYears.Sum(year => year.TotalBudget);
+            }
         }
 
         public double AverageRisk
         {
-            get { return Risks.Any() ? Risks.Average(risk => risk.Consequence * risk.Probability) : default(double); }
+            get
+            {
+                if (Risks == null) return default(double);
+
+                return Risks.Any() ? Risks.Average(risk => risk.Consequence * risk.Probability) : default(double);
+            }
         }
     }
 }

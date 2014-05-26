@@ -68,6 +68,7 @@ namespace Core.ApplicationServices
             CreateDefaultPhases(project);
             AddEconomyYears(project);
             project.Handover = new Handover();
+            project.GoalStatus = new GoalStatus();
 
             _projectRepository.Insert(project);
             _projectRepository.Save();
