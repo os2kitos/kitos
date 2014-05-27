@@ -481,7 +481,7 @@
                     //loads the org unit roots
                     userService.getUser().then(function (user) {
 
-                        $http.get('api/organizationUnit?userId=' + user.id, { cache: true }).success(function (result) {
+                        $http.get('api/organizationUnit?organization=' + user.currentOrganizationId, { cache: true }).success(function (result) {
 
                             //recursive function for added indentation, 
                             //and pushing org units to the list in the right order (depth-first)
@@ -500,9 +500,7 @@
                                 });
                             }
 
-                            _.each(result.response, function (unit) {
-                                visit(unit, "");
-                            });
+                            visit(result.response, "");
 
                             scope.select.isReady = true;
                         });
