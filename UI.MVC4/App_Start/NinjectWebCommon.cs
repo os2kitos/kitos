@@ -120,6 +120,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<Communication>>().To<GenericRepository<Communication>>().InRequestScope();
             kernel.Bind<IGenericRepository<Handover>>().To<GenericRepository<Handover>>().InRequestScope();
             kernel.Bind<IGenericRepository<Stakeholder>>().To<GenericRepository<Stakeholder>>().InRequestScope();
+            kernel.Bind<IGenericRepository<Advice>>().To<GenericRepository<Advice>>().InRequestScope();
 
             kernel.Bind<IGenericRepository<OrganizationRight>>().To<GenericRepository<OrganizationRight>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItSystemRight>>().To<GenericRepository<ItSystemRight>>().InRequestScope();

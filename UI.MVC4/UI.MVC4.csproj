@@ -212,10 +212,12 @@
   <ItemGroup>
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Controllers\API\AdviceController.cs" />
     <Compile Include="Controllers\API\CustomAgreementElementController.cs" />
     <Compile Include="Controllers\API\ItContractController.cs" />
     <Compile Include="Controllers\API\ItContractRightController.cs" />
     <Compile Include="Controllers\API\ProcurementStrategyController.cs" />
+    <Compile Include="Models\AdviceDTO.cs" />
     <Compile Include="Models\CustomAgreementElementDTO.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\MappingConfig.cs" />

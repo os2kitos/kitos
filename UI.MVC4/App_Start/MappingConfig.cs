@@ -309,6 +309,9 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<CustomAgreementElement, CustomAgreementElementDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.ItContract, opt => opt.Ignore());
+
+            Mapper.CreateMap<Advice, AdviceDTO>()
+                  .ReverseMap();
         }
     }
 }

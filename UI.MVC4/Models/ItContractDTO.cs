@@ -39,6 +39,8 @@ namespace UI.MVC4.Models
 
         public IEnumerable<ItSystemUsageSimpleDTO> AssociatedSystemUsages { get; set; }
         public IEnumerable<InterfaceUsageDTO> AssociatedInterfaceUsages { get; set; }
-        public IEnumerable<InterfaceExposureDTO> AssociatedInterfaceExposures { get; set; } 
+        public IEnumerable<InterfaceExposureDTO> AssociatedInterfaceExposures { get; set; }
+
+        public IEnumerable<AdviceDTO> Advices { get; set; }
     }
 }
