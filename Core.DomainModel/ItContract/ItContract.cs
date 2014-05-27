@@ -112,7 +112,6 @@ namespace Core.DomainModel.ItContract
         public virtual ItContract Parent { get; set; }
         public virtual ICollection<ItContract> Children { get; set; }
 
-        //public virtual ICollection<Advice> ShipNotices { get; set; }
         public virtual ICollection<ItContractRight> Rights { get; set; }
 
         /// <summary>
