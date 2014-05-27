@@ -17,7 +17,6 @@
 
     app.controller('contract.EditAdviceCtrl', ['$scope', '$http', 'notify', 'contract', 'itContractRoles',
         function ($scope, $http, notify, contract, itContractRoles) {
-            console.log(itContractRoles);
             $scope.itContractRoles = itContractRoles;
 
             var baseUrl = "api/advice";
