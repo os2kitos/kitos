@@ -19,11 +19,9 @@
             <tr data-ng-repeat="stream in externEconomyStreams">
                 <!-- ORG UNIT TODO -->
                 <td>
-                    <input data-ng-model="stream.organizationUnitId" data-select-org-unit="" data-extra-options="extraOptions"
-                           data-field="organizationUnitId"
-                           data-autosave="{{stream.updateUrl}}"
-                        />
-                    {{stream.organizationUnitId}}
+                    <div data-ng-model="stream.organizationUnitId" data-select-org-unit="" data-extra-options="extraOptions"
+                         data-field="organizationUnitId"
+                         data-autosave="{{stream.updateUrl}}" data-allow-clear="true"></div>
                 </td>
                 
                 <!-- EAN # TODO -->
