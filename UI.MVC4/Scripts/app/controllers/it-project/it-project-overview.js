@@ -60,7 +60,6 @@
             checkForDefaultUnit();
 
             function filterProjects() {
-                console.log($scope.chosenOrgUnitId);
                 if ($scope.chosenOrgUnitId == 0) {
                     // 'alle' has been selected
                     $scope.projects = projects;
@@ -68,11 +67,9 @@
                     // 'tværgående' has been selected
                     $scope.projects = $filter('filter')(projects, { isTransversal: true });
                 } else {
-                    console.log("foo");
                     $scope.projects = $filter('andChildren')(projects, 'responsibleOrgUnitId', $scope.orgUnitTree, $scope.chosenOrgUnitId);
                 }
 
-                console.log($scope.projects);
             }
 
             $scope.filterProjects = filterProjects;

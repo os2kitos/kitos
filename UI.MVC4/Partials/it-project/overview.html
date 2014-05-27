@@ -6,13 +6,6 @@
                 <span data-ng-model="chosenOrgUnitId" data-select-org-unit="" data-ng-change="filterProjects()" 
                     data-extra-options="[{id: 0, text: 'Alle projekter'}, {id: -1, text: 'Tværgående projekter'}]">
                 </span>
-                <!--<select data-ui-select2="selectOrgUnitOptions" data-ng-model="chosenOrgUnitId" class="form-control input-sm" data-placeholder="Vælg afdeling">
-                    <option></option>
-                    <option data-ng-repeat="orgUnit in orgUnitTree" value="{{orgUnit.id}}">
-                        {{orgUnit.indentation}} {{orgUnit.name}} {{ orgUnit.hasWriteAccess && "*" || "" }}
-                    </option>
-                    <option value="t">Tværgående</option>
-                </select>-->
             </th>
             <th><!-- public --></th>
             <th>
