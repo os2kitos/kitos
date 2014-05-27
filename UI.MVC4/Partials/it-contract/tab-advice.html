@@ -1,0 +1,92 @@
+﻿<table class="table table-condensed">
+    <thead>
+        <tr>
+            <th>Aktiv</th>
+            <th>Advis navn</th>
+            <th>Dato</th>
+            <th>Modtager</th>
+            <th>Cc</th>
+            <th>Emne</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr data-ng-repeat="advice in advices | filter:{'show':true}">
+            <!-- active -->
+            <td>
+                <input type="checkbox" data-ng-model="advice.isActive"
+                    data-ng-disabled="!hasWriteAccess"
+                    data-autosave="{{advice.updateUrl}}"
+                    data-field="isActive" />
+            </td>
+
+            <!-- name -->
+            <td>
+                <input type="text" data-ng-model="advice.name" class="form-control input-sm"
+                    data-ng-disabled="!hasWriteAccess"
+                    data-autosave="{{advice.updateUrl}}"
+                    data-field="name" />
+            </td>
+
+            <!-- date -->
+            <td>
+                <span data-ng-model="advice.alarmDate" data-datewriter=""
+                    data-is-disabled="!hasWriteAccess"
+                    data-field="alarmDate"
+                    data-autosave="{{advice.updateUrl}}"></span>
+            </td>
+
+            <!-- receiver -->
+            <td>
+                <select data-ng-model="advice.receiverId" data-placeholder="Vælg rolle" class="form-control input-sm"
+                    data-ng-disabled="!hasWriteAccess"
+                    data-field="receiverId"
+                        data-autosave="{{advice.updateUrl}}"
+                    data-ng-options="role.id as role.name for role in itContractRoles">
+                    <option value="">Ingen modtager</option>
+                </select>
+            </td>
+
+            <!-- cc -->
+            <td>
+                <select data-ng-model="advice.carbonCopyReceiverId" data-placeholder="Vælg rolle" class="form-control input-sm"
+                    data-ng-disabled="!hasWriteAccess"
+                    data-field="carbonCopyReceiverId"
+                        data-autosave="{{advice.updateUrl}}"
+                    data-ng-options="role.id as role.name for role in itContractRoles">
+                    <option value="">Ingen cc</option>
+                </select>
+            </td>
+
+            <!-- subject -->
+            <td>
+                <input type="text" data-ng-model="advice.subject" class="form-control input-sm"
+                    data-ng-disabled="!hasWriteAccess"
+                    data-autosave="{{advice.updateUrl}}"
+                    data-field="subject" />
+            </td>
+
+            <!-- delete button -->
+            <td>
+                <div class="pull-right" data-ng-hide="!hasWriteAccess">
+                    <a class="btn btn-link btn-xs"
+                        data-confirmed-click="advice.delete()"
+                        data-confirm-click="Er du sikker på at du vil slette?">
+                        <i class="glyphicon glyphicon-trash"></i>
+                    </a>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+    <tfoot data-ng-if="hasWriteAccess">
+        <tr>
+            <td colspan="7">
+                <div class="pull-right">
+                    <button class="btn btn-success btn-sm" data-ng-click="newAdvice()">
+                        <i class="glyphicon glyphicon-plus small"></i>Ny
+                    </button>
+                </div>
+            </td>
+        </tr>
+    </tfoot>
+</table>

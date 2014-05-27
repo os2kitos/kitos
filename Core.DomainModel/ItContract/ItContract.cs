@@ -8,7 +8,6 @@ namespace Core.DomainModel.ItContract
     {
         public ItContract()
         {
-            //this.ShipNotices = new List<ShipNotice>();
             this.AgreementElements = new List<AgreementElement>();
             this.CustomAgreementElements = new List<CustomAgreementElement>();
             this.Children = new List<ItContract>();
@@ -20,6 +19,7 @@ namespace Core.DomainModel.ItContract
 
             this.InternEconomyStreams = new List<EconomyStream>();
             this.ExternEconomyStreams = new List<EconomyStream>();
+            this.Advices = new List<Advice>();
         }
 
         public int ObjectOwnerId { get; set; }
@@ -112,7 +112,6 @@ namespace Core.DomainModel.ItContract
         public virtual ItContract Parent { get; set; }
         public virtual ICollection<ItContract> Children { get; set; }
 
-        //public virtual ICollection<ShipNotice> ShipNotices { get; set; }
         public virtual ICollection<ItContractRight> Rights { get; set; }
 
         /// <summary>
@@ -132,5 +131,8 @@ namespace Core.DomainModel.ItContract
 
         public virtual ICollection<EconomyStream> InternEconomyStreams { get; set; }
         public virtual ICollection<EconomyStream> ExternEconomyStreams { get; set; }
+
+
+        public virtual ICollection<Advice> Advices { get; set; }
     }
 }

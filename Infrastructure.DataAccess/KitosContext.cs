@@ -21,6 +21,7 @@ namespace Infrastructure.DataAccess
 
         public DbSet<AdminRight> AdminRights { get; set; }
         public DbSet<AdminRole> AdminRoles { get; set; }
+        public DbSet<Advice> Advices { get; set; }
         public DbSet<AgreementElement> AgreementElements { get; set; }
         public DbSet<AppType> AppTypes { get; set; }
         public DbSet<ArchiveType> ArchiveTypes { get; set; }
@@ -90,7 +91,6 @@ namespace Infrastructure.DataAccess
         public DbSet<Resource> Resources { get; set; }
         public DbSet<Risk> Risks { get; set; }
         public DbSet<SensitiveDataType> SensitiveDataTypes { get; set; }
-        public DbSet<ShipNotice> ShipNotices { get; set; }
         public DbSet<Stakeholder> Stakeholders { get; set; }
         public DbSet<State> States { get; set; }
         public DbSet<TerminationDeadline> TerminationDeadlines { get; set; }
@@ -105,6 +105,7 @@ namespace Infrastructure.DataAccess
         {
             modelBuilder.Configurations.Add(new AdminRightMap());
             modelBuilder.Configurations.Add(new AdminRoleMap());
+            modelBuilder.Configurations.Add(new AdviceMap());
             modelBuilder.Configurations.Add(new AgreementElementMap());
             modelBuilder.Configurations.Add(new AppTypeMap());
             modelBuilder.Configurations.Add(new ActivityMap());
@@ -168,7 +169,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ResourcesMap());
             modelBuilder.Configurations.Add(new RiskMap());
             modelBuilder.Configurations.Add(new SensitiveDataTypeMap());
-            modelBuilder.Configurations.Add(new ShipNoticeMap());
             modelBuilder.Configurations.Add(new StakeholderMap());
             modelBuilder.Configurations.Add(new StateMap());
             modelBuilder.Configurations.Add(new TaskRefMap());

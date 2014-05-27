@@ -340,6 +340,9 @@ namespace UI.MVC4.App_Start
 
             Mapper.CreateMap<EconomyStream, EconomyStreamDTO>()
                 .ReverseMap();
-        }
+
+            Mapper.CreateMap<Advice, AdviceDTO>()
+                  .ReverseMap();
+            }
     }
 }
