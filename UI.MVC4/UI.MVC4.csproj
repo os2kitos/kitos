@@ -464,6 +464,7 @@
     <Content Include="Partials\it-contract\tab-deadlines.html" />
     <Content Include="Partials\it-contract\tab-economy.html" />
     <Content Include="Partials\it-contract\tab-advice.html" />
+    <Content Include="Partials\it-contract\tab-hierarchy.html" />
     <Content Include="Partials\it-contract\tab-systems.html" />
     <Content Include="Partials\it-contract\tab-roles.html" />
     <Content Include="Partials\it-project\catalog.html" />
@@ -547,6 +548,7 @@
     <Content Include="Scripts\app\controllers\global-admin\global-admin.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-config.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
+    <Content Include="Scripts\app\controllers\it-contract\it-contract-hierarchy.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-deadlines.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-advice.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-catalog.js" />

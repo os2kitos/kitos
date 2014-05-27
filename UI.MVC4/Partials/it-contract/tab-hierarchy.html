@@ -1,0 +1,10 @@
+﻿<script type="text/ng-template"  id="tree_item_renderer.html">
+    {{ contract.name }}
+    <ul>
+        <li ng-repeat="contract in contract.children" ng-include="'tree_item_renderer.html'"></li>
+    </ul>
+</script>
+
+<ul>
+    <li data-ng-repeat="contract in contracts" data-ng-include="'tree_item_renderer.html'"></li>
+</ul>
