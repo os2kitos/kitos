@@ -53,43 +53,44 @@
             $scope.orgUnitTree = [];
 
             _.each(orgUnits, function(orgUnit) {
-                visitOrgUnit(orgUnit, "");
+                visitOrgUnit(orgUnit);
                 hasWriteAccess(orgUnit, false);
             });
 
-            $scope.$watch('chosenOrgUnitId', function (newValue) {
-                // this is so hacky... everytime this executes a kitten dies
-                if (newValue == 't') {
+            checkForDefaultUnit();
+
+            function filterProjects() {
+                if ($scope.chosenOrgUnitId == 0) {
+                    // 'alle' has been selected
+                    $scope.projects = projects;
+                } else if ($scope.chosenOrgUnitId == -1) {
                     // 'tværgående' has been selected
                     $scope.projects = $filter('filter')(projects, { isTransversal: true });
                 } else {
-                    $scope.projects = $filter('andChildren')(projects, 'responsibleOrgUnitId', $scope.orgUnitTree, newValue);
+                    $scope.projects = $filter('andChildren')(projects, 'responsibleOrgUnitId', $scope.orgUnitTree, $scope.chosenOrgUnitId);
                 }
-            });
 
-            function visitOrgUnit(orgUnit, indentation) {
+            }
 
-                orgUnit.indentation = $sce.trustAsHtml(indentation);
+            $scope.filterProjects = filterProjects;
 
-                checkForDefaultUnit(orgUnit);
+            function visitOrgUnit(orgUnit) {
 
                 $scope.orgUnits[orgUnit.id] = orgUnit;
                 $scope.orgUnitTree.push(orgUnit);
 
                 _.each(orgUnit.children, function (child) {
-                    return visitOrgUnit(child, indentation + "&nbsp;&nbsp;&nbsp;");
+                    return visitOrgUnit(child);
                 });
             }
-            
-            function checkForDefaultUnit(unit) {
+
+            function checkForDefaultUnit() {
                 if (!user.defaultOrganizationUnitId) return;
 
-                if (!unit || unit.id !== user.defaultOrganizationUnitId) return;
-
-                $timeout(function () {
-                    $scope.chosenOrgUnitId = unit.id;
-                });
+                $scope.chosenOrgUnitId = user.defaultOrganizationUnitId;
+                filterProjects();
             }
+            
             
             function hasWriteAccess(orgUnit, inherit) {
                 if (inherit) {

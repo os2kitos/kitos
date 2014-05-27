@@ -324,7 +324,12 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.ItProject, opt => opt.Ignore());
 
             Mapper.CreateMap<ItContract, ItContractDTO>()
-                  .ReverseMap();
+                  .ReverseMap()
+                  .ForMember(contract => contract.AssociatedSystemUsages, opt => opt.Ignore())
+                  .ForMember(contract => contract.AssociatedInterfaceExposures, opt => opt.Ignore())
+                  .ForMember(contract => contract.AssociatedInterfaceUsages, opt => opt.Ignore())
+                  .ForMember(contract => contract.InternEconomyStreams, opt => opt.Ignore())
+                  .ForMember(contract => contract.ExternEconomyStreams, opt => opt.Ignore());
 
             Mapper.CreateMap<CustomAgreementElement, CustomAgreementElementDTO>()
                   .ReverseMap()
@@ -332,6 +337,9 @@ namespace UI.MVC4.App_Start
 
             Mapper.CreateMap<PaymentMilestone, PaymentMilestoneDTO>()
                   .ReverseMap();
+
+            Mapper.CreateMap<EconomyStream, EconomyStreamDTO>()
+                .ReverseMap();
         }
     }
 }

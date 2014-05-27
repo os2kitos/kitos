@@ -220,6 +220,8 @@
     <Compile Include="Controllers\API\PaymentMilestoneController.cs" />
     <Compile Include="Models\PaymentMilestoneDTO.cs" />
     <Compile Include="Controllers\API\CustomAgreementElementController.cs" />
+    <Compile Include="Controllers\API\EconomyStreamController.cs" />
+    <Compile Include="Models\EconomyStreamDTO.cs" />
     <Compile Include="Controllers\API\ItContractController.cs" />
     <Compile Include="Controllers\API\ItContractRightController.cs" />
     <Compile Include="Controllers\API\ProcurementStrategyController.cs" />
@@ -433,8 +435,10 @@
     <Content Include="Images\logo.png" />
     <Content Include="Partials\directives\add-user-button.html" />
     <Content Include="Partials\directives\add-user-modal.html" />
+    <Content Include="Partials\directives\select-status2.html" />
     <Content Include="Partials\directives\datewriter.html" />
     <Content Include="Partials\directives\select-access-modifier.html" />
+    <Content Include="Partials\directives\select-org-unit.html" />
     <Content Include="Partials\directives\select-status.html" />
     <Content Include="Partials\directives\select-user.html" />
     <Content Include="Partials\directives\show-status.html" />
@@ -456,6 +460,7 @@
     <Content Include="Partials\it-contract\it-contract-overview.html" />
     <Content Include="Partials\it-contract\it-contract-plan.html" />
     <Content Include="Partials\it-contract\tab-deadlines.html" />
+    <Content Include="Partials\it-contract\tab-economy.html" />
     <Content Include="Partials\it-contract\tab-systems.html" />
     <Content Include="Partials\it-contract\tab-roles.html" />
     <Content Include="Partials\it-project\catalog.html" />
@@ -547,6 +552,7 @@
     <Content Include="Scripts\app\controllers\it-contract\it-contract-roles.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-subnav.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-systems.js" />
+    <Content Include="Scripts\app\controllers\it-contract\it-contract-economy.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-communication.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-handover.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-stakeholders.js" />

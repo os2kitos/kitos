@@ -49,6 +49,7 @@
     <Compile Include="ItContract\PaymentMilestone.cs" />
     <Compile Include="ItContract\PaymentModel.cs" />
     <Compile Include="ItContract\PriceRegulation.cs" />
+    <Compile Include="ItContract\EconomyStream.cs" />
     <Compile Include="ItContract\ProcurementStrategy.cs" />
     <Compile Include="ItContract\TerminationDeadline.cs" />
     <Compile Include="ItProject\GoalType.cs" />
