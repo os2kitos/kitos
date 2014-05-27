@@ -202,6 +202,39 @@
             };
         }
     ]);
+    
+    app.directive('selectStatus2', ['$timeout',
+        function ($timeout) {
+            return {
+                scope: {
+                    canWrite: '=',
+                },
+                require: 'ngModel',
+                templateUrl: 'partials/directives/select-status2.html',
+
+                link: function (scope, element, attr, ngModel) {
+                    scope.setModel = function (n) {
+                        //only update on change
+                        if (scope.model == n) return;
+                        
+                        //save new value
+                        scope.model = n;
+                        
+                        $timeout(function () {
+                            //then trigger event
+                            ngModel.$setViewValue(scope.model);
+                            element.triggerHandler("blur");
+                        });
+                    };
+                    
+                    //read value from ngModel
+                    ngModel.$render = function () {
+                        scope.model = ngModel.$viewValue;
+                    };
+                }
+            };
+        }
+    ]);
 
     app.directive('showStatus', [
         '$timeout', function ($timeout) {
@@ -225,8 +258,6 @@
                             scope.ready = true;
                         });
                     }
-
-
                     scope.$watch("status", function (newval, oldval) {
                         if (newval === oldval) return;
 

@@ -59,7 +59,11 @@
                 
                 <!-- Audit trafficlight -->
                 <td>
-                    <input data-select-status="stream.auditStatus" data-can-write="hasWriteAccess" data-on-status-change="stream.patch('auditStatus', stream.auditStatus)"/>
+                    <span data-select-status2="" data-ng-model="stream.auditStatus" data-can-write="hasWriteAccess"
+                          data-field="auditStatus"
+                          data-autosave="{{stream.updateUrl}}"></span>
+                    <!--
+                           data-on-status-change="stream.patch('auditStatus', stream.auditStatus)"/> -->
                 </td>
                 
                 <!-- Audit date -->
