@@ -23,6 +23,10 @@ namespace UI.MVC4.Models
         [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime? OperationTestApproved { get; set; }
         [JsonConverter(typeof(CustomDateTimeConverter))]
+        public DateTime? OperationalAcceptanceTestExpected { get; set; }
+        [JsonConverter(typeof(CustomDateTimeConverter))]
+        public DateTime? OperationalAcceptanceTestApproved { get; set; }
+        [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime? Concluded { get; set; }
         public int Duration { get; set; }
         [JsonConverter(typeof(CustomDateTimeConverter))]

@@ -33,6 +33,8 @@ namespace Core.DomainModel.ItContract
         public DateTime? SupplierSignedDate { get; set; }
         public DateTime? OperationTestExpected { get; set; }
         public DateTime? OperationTestApproved { get; set; }
+        public DateTime? OperationalAcceptanceTestExpected { get; set; }
+        public DateTime? OperationalAcceptanceTestApproved { get; set; }
         public DateTime? Concluded { get; set; }
         public int Duration { get; set; }
         public DateTime? IrrevocableTo { get; set; }
@@ -127,59 +129,87 @@ namespace Core.DomainModel.ItContract
 
     public class OptionExtend : IOptionEntity<ItContract>
     {
+        public OptionExtend()
+        {
+            References = new List<ItContract>();
+        }
+
         public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }
         public string Note { get; set; }
-        public ICollection<ItContract> References { get; set; }
+        public virtual ICollection<ItContract> References { get; set; }
     }
 
     public class PriceRegulation : IOptionEntity<ItContract>
     {
+        public PriceRegulation()
+        {
+            References = new List<ItContract>();
+        }
+
         public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }
         public string Note { get; set; }
-        public ICollection<ItContract> References { get; set; }
+        public virtual ICollection<ItContract> References { get; set; }
     }
 
     public class PaymentModel : IOptionEntity<ItContract>
     {
+        public PaymentModel()
+        {
+            References = new List<ItContract>();
+        }
+
         public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }
         public string Note { get; set; }
-        public ICollection<ItContract> References { get; set; }
+        public virtual ICollection<ItContract> References { get; set; }
     }
 
     public class PaymentFreqency : IOptionEntity<ItContract>
     {
+        public PaymentFreqency()
+        {
+            References = new List<ItContract>();
+        }
+
         public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }
         public string Note { get; set; }
-        public ICollection<ItContract> References { get; set; }
+        public virtual ICollection<ItContract> References { get; set; }
     }
 
     public class TerminationDeadline : IOptionEntity<ItContract>
     {
+        public TerminationDeadline()
+        {
+            References = new List<ItContract>();
+        }
+
         public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }
         public string Note { get; set; }
-        public ICollection<ItContract> References { get; set; }
+        public virtual ICollection<ItContract> References { get; set; }
     }
 
     public class PaymentMilestone : IEntity<int>
     {
         public int Id { get; set; }
+        public string Title { get; set; }
         public DateTime? Expected { get; set; }
         public DateTime? Approved { get; set; }
+        
         public int ItContractId { get; set; }
+        public virtual ItContract ItContract { get; set; }
     }
 }

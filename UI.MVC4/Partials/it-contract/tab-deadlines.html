@@ -16,13 +16,13 @@
                             <tbody>
                                 <tr>
                                     <td>Funktionsprøve</td>
-                                    <td><input type="date" class="form-control input-sm"></td>
-                                    <td><input type="date" class="form-control input-sm"></td>
+                                    <td><input type="date" class="form-control input-sm" data-ng-model="contract.operationTestExpected" data-autosave="{{autosaveUrl}}" data-field="operationTestExpected"></td>
+                                    <td><input type="date" class="form-control input-sm" data-ng-model="contract.operationTestApproved" data-autosave="{{autosaveUrl}}" data-field="operationTestApproved"></td>
                                 </tr>
                                 <tr>
                                     <td>Driftovertagelsesprøve</td>
-                                    <td><input type="date" class="form-control input-sm"></td>
-                                    <td><input type="date" class="form-control input-sm"></td>
+                                    <td><input type="date" class="form-control input-sm" data-ng-model="contract.operationalAcceptanceTestExpected" data-autosave="{{autosaveUrl}}" data-field="operationalAcceptanceTestExpected"></td>
+                                    <td><input type="date" class="form-control input-sm" data-ng-model="contract.operationalAcceptanceTestApproved" data-autosave="{{autosaveUrl}}" data-field="operationalAcceptanceTestApproved"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -32,21 +32,22 @@
                                 <tr>
                                     <th>Betalingsmilepæle</th>
                                     <th>Forventet</th>
-                                    <th>Godkendt</th>
+                                    <th colspan="2">Godkendt</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td><input type="text" class="form-control input-sm"></td>
-                                    <td><input type="date" class="form-control input-sm"></td>
-                                    <td><input type="date" class="form-control input-sm"></td>
+                                <tr data-ng-repeat="item in paymentMilestones">
+                                    <td><input type="text" class="form-control input-sm" data-ng-model="item.title" data-autosave="TODO" data-field="title"></td>
+                                    <td><input type="date" class="form-control input-sm" data-ng-model="item.expected" data-autosave="TODO" data-field="expected"></td>
+                                    <td colspan="2"><input type="date" class="form-control input-sm" data-ng-model="item.approved" data-autosave="TODO" data-field="approved"></td>
                                 </tr>
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td><input type="text" class="form-control input-sm"></td>
-                                    <td><input type="date" class="form-control input-sm"></td>
-                                    <td><input type="date" class="form-control input-sm"></td>
+                                    <td><input type="text" class="form-control input-sm" data-ng-model="paymentMilestone.title"></td>
+                                    <td><input type="date" class="form-control input-sm" data-ng-model="paymentMilestone.expected"></td>
+                                    <td><input type="date" class="form-control input-sm" data-ng-model="paymentMilestone.approved"></td>
+                                    <td><button class="btn btn-success btn-sm" data-ng-click="save(paymentMilestone)">Gem</button></td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -59,34 +60,43 @@
                         <div class="panel-heading">Aftalefrister</div>
                         <div class="form-group">
                             <label for="agreement-concluded" class="control-label small">Indgået</label>
-                            <input type="date" id="agreement-concluded" class="form-control input-sm" data-ng-model="">
+                            <input type="date" id="agreement-concluded" class="form-control input-sm" data-ng-model="contract.concluded" data-autosave="{{autosaveUrl}}" data-field="concluded">
                         </div>
                         <div class="form-group">
                             <label for="agreement-duration" class="control-label small">Varighed</label>
-                            <input type="date" id="agreement-duration" class="form-control input-sm" data-ng-model="">
+                            <select id="agreement-duration" class="form-control input-sm" data-ng-model="contract.duration" data-autosave="{{autosaveUrl}}" data-field="duration">
+                                <option value="3">3</option>
+                                <option value="6">6</option>
+                                <option value="9">9</option>
+                                <option value="12">12</option>
+                                <option value="18">18</option>
+                                <option value="24">24</option>
+                                <option value="36">36</option>
+                                <option value="48">48</option>
+                                <option value="60">60</option>
+                                <option value="72">72</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="agreement-option-extend" class="control-label small">Option forlæng</label>
-                            <select id="agreement-option-extend" class="form-control input-sm" data-ng-model="">
+                            <select id="agreement-option-extend" class="form-control input-sm" data-ng-model="contract.optionExtendId" data-ng-options="o.id as o.name for o in optionExtensions" data-autosave="{{autosaveUrl}}" data-field="optionExtendId">
                                 <option value=""></option>
                             </select>
-                            <select class="form-control input-sm" data-ng-model="">
-                                <option value=""></option>
-                            </select>
+                            <input type="number" min="0" max="3" class="form-control input-sm" data-ng-model="contract.extendMultiplier" data-autosave="{{autosaveUrl}}" data-field="extendMultiplier">
                         </div>
                         <div class="form-group">
                             <label for="agreement-notice" class="control-label small">Opsigelsesfrist</label>
-                            <select id="agreement-notice" class="form-control input-sm" data-ng-model="">
+                            <select id="agreement-notice" class="form-control input-sm" data-ng-model="contract.terminationDeadlineId" data-ng-options="o.id as o.name for o in terminationDeadlines" data-autosave="{{autosaveUrl}}" data-field="terminationDeadlineId">
                                 <option value=""></option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="agreement-irrevocable" class="control-label small">Uopsigelig til</label>
-                            <input type="date" id="agreement-irrevocable" class="form-control input-sm" data-ng-model="">
+                            <input type="date" id="agreement-irrevocable" class="form-control input-sm" data-ng-model="contract.irrevocableTo" data-autosave="{{autosaveUrl}}" data-field="irrevocableTo">
                         </div>
                         <div class="form-group">
                             <label for="agreement-expiration" class="control-label small">Udløbsdato</label>
-                            <input type="date" id="agreement-expiration" class="form-control input-sm" data-ng-model="">
+                            <input type="date" id="agreement-expiration" class="form-control input-sm" data-ng-model="contract.expirationDate" data-autosave="{{autosaveUrl}}" data-field="expirationDate">
                         </div>
                     </div>
                 </div>
@@ -98,23 +108,23 @@
                         <div class="panel-heading">Betalingsmodel</div>
                         <div class="form-group">
                             <label for="agreement-operation" class="control-label small">Driftsvederlag påbegyndt</label>
-                            <input type="date" id="agreement-operation" class="form-control input-sm" data-ng-model="">
+                            <input type="date" id="agreement-operation" class="form-control input-sm" data-ng-model="contract.operationRemunerationBegun" data-autosave="{{autosaveUrl}}" data-field="operationRemunerationBegun">
                         </div>
                         <div class="form-group">
                             <label for="agreement-freq" class="control-label small">Betalingsfrekvens</label>
-                            <select id="agreement-freq" class="form-control input-sm" data-ng-model="">
+                            <select id="agreement-freq" class="form-control input-sm" data-ng-model="contract.paymentFreqencyId" data-ng-options="o.id as o.name for o in paymentFrequencies" data-autosave="{{autosaveUrl}}" data-field="paymentFreqencyId">
                                 <option value=""></option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="agreement-payment" class="control-label small">Betalingsmodel</label>
-                            <select id="agreement-payment" class="form-control input-sm" data-ng-model="">
+                            <select id="agreement-payment" class="form-control input-sm" data-ng-model="contract.paymentModelId" data-ng-options="o.id as o.name for o in paymentModels" data-autosave="{{autosaveUrl}}" data-field="paymentModelId">
                                 <option value=""></option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="agreement-price" class="control-label small">Prisregulering</label>
-                            <select id="agreement-price" class="form-control input-sm" data-ng-model="">
+                            <select id="agreement-price" class="form-control input-sm" data-ng-model="contract.priceRegulationId" data-ng-options="o.id as o.name for o in priceRegulations" data-autosave="{{autosaveUrl}}" data-field="priceRegulationId">
                                 <option value=""></option>
                             </select>
                         </div>
@@ -128,7 +138,7 @@
                         <div class="panel-heading">Opsigelse</div>
                         <div class="form-group">
                             <label for="agreement-terminated" class="control-label small">Kontrakten opsagt</label>
-                            <input type="date" id="agreement-terminated" class="form-control input-sm" data-ng-model="">
+                            <input type="date" id="agreement-terminated" class="form-control input-sm" data-ng-model="contract.terminated" data-autosave="{{autosaveUrl}}" data-field="terminated">
                         </div>
                     </div>
                 </div>
