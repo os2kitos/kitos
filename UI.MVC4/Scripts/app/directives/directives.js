@@ -388,11 +388,13 @@
 
                     //this is called when the user selects something from select2
                     element.bind('change', function () {
-                        //update the view value
-                        ngModel.$setViewValue(scope.select.selected);
+                        $timeout(function() {
+                            //update the view value
+                            ngModel.$setViewValue(scope.select.selected);
 
-                        //this triggers the autosave directive
-                        element.triggerHandler("blur");
+                            //this triggers the autosave directive
+                            element.triggerHandler("blur");
+                        });
                     });
 
                     //when the outer ngModel is changed, update the inner model
