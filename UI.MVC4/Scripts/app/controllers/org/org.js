@@ -354,6 +354,7 @@
                         'id': unit.id,
                         'oldName': unit.name,
                         'newName': unit.name,
+                        'newEan': unit.ean,
                         'newParent': unit.parentId,
                         'orgId': unit.organizationId,
                         'isRoot': unit.parentId == 0
@@ -369,11 +370,13 @@
 
                         var name = $modalScope.orgUnit.newName;
                         var parent = $modalScope.orgUnit.newParent;
+                        var ean = $modalScope.orgUnit.newEan;
 
                         if (!name) return;
 
                         var data = {
-                            "name": name
+                            "name": name,
+                            "ean": ean
                         };
 
                         //only allow changing the parent if user is admin, and the unit isn't at the root
@@ -403,11 +406,13 @@
 
                         var parent = $modalScope.newOrgUnit.parent;
                         var orgId = $modalScope.newOrgUnit.orgId;
+                        var ean = $modalScope.newOrgUnit.ean;
 
                         var data = {
                             "name": name,
                             "parentId": parent,
-                            "organizationId": orgId
+                            "organizationId": orgId,
+                            "ean": ean
                         };
 
                         $modalScope.submitting = true;
