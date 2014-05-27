@@ -10,7 +10,7 @@ namespace Core.DomainModel.ItContract
 
         public string Name { get; set; }
 
-        public DateTime AlarmDate { get; set; }
+        public DateTime? AlarmDate { get; set; }
 
         public int? ReceiverId { get; set; }
         public ItContractRole Receiver { get; set; }
