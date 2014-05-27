@@ -304,11 +304,19 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.ItProject, opt => opt.Ignore());
 
             Mapper.CreateMap<ItContract, ItContractDTO>()
-                  .ReverseMap();
+                  .ReverseMap()
+                  .ForMember(contract => contract.AssociatedSystemUsages, opt => opt.Ignore())
+                  .ForMember(contract => contract.AssociatedInterfaceExposures, opt => opt.Ignore())
+                  .ForMember(contract => contract.AssociatedInterfaceUsages, opt => opt.Ignore())
+                  .ForMember(contract => contract.InternEconomyStreams, opt => opt.Ignore())
+                  .ForMember(contract => contract.ExternEconomyStreams, opt => opt.Ignore());
 
             Mapper.CreateMap<CustomAgreementElement, CustomAgreementElementDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.ItContract, opt => opt.Ignore());
+
+            Mapper.CreateMap<EconomyStream, EconomyStreamDTO>()
+                .ReverseMap();
 
             Mapper.CreateMap<Advice, AdviceDTO>()
                   .ReverseMap();

@@ -1,8 +1,8 @@
-﻿(function(ng, app) {
+﻿(function (ng, app) {
     'use strict';
 
     app.directive('addUserButton', [
-        '$http', '$modal', function($http, $modal) {
+        '$http', '$modal', function ($http, $modal) {
             return {
                 scope: {
                     userResult: '=?addUser',
@@ -10,18 +10,18 @@
                 },
                 replace: true,
                 templateUrl: 'partials/directives/add-user-button.html',
-                link: function(scope, element, attr) {
+                link: function (scope, element, attr) {
 
-                    scope.open = function() {
+                    scope.open = function () {
                         var modal = $modal.open({
                             backdrop: "static", //modal can't be closed by clicking outside modal
                             templateUrl: 'partials/directives/add-user-modal.html',
                             controller: [
-                                '$scope', 'notify', '$modalInstance', function($scope, notify, $modalInstance) {
+                                '$scope', 'notify', '$modalInstance', function ($scope, notify, $modalInstance) {
 
                                     $scope.newUser = {};
 
-                                    $scope.addUser = function() {
+                                    $scope.addUser = function () {
 
                                         if ($scope.newUser.email != $scope.newUser.repeatEmail) {
                                             notify.addErrorMessage("Email addresserne er ikke ens.");
@@ -39,30 +39,30 @@
 
                                         var msg = notify.addInfoMessage("Arbejder ...", false);
 
-                                        $http.post("api/user", data, { handleBusy: true }).success(function(result) {
+                                        $http.post("api/user", data, { handleBusy: true }).success(function (result) {
                                             msg.toSuccessMessage(name + " er oprettet i KITOS");
 
                                             $modalInstance.close(result.response);
-                                        }).error(function(result) {
+                                        }).error(function (result) {
                                             msg.toErrorMessage("Fejl! " + name + " blev ikke oprettet i KITOS!");
                                         });
                                     };
 
-                                    $scope.cancel = function() {
+                                    $scope.cancel = function () {
                                         $modalInstance.dismiss('cancel');
                                     };
                                 }
                             ]
                         });
 
-                        modal.result.then(function(userResult) {
+                        modal.result.then(function (userResult) {
                             scope.userResult = userResult;
 
                             scope.selectResult = {
                                 id: userResult.id,
                                 text: userResult.name
                             };
-                        }, function() {
+                        }, function () {
                             scope.userResult = null;
                             scope.selectResult = null;
                         });
@@ -74,7 +74,7 @@
     ]);
 
     app.directive('selectUser', [
-        '$rootScope', '$http', '$timeout', function($rootScope, $http, $timeout) {
+        '$rootScope', '$http', '$timeout', function ($rootScope, $http, $timeout) {
 
             //format of dropdown options
             function formatResult(obj) {
@@ -117,7 +117,7 @@
                             //and once with the object value of select2 {id, text}.
                             //we only need the last one
                             if (typeof $scope.userModel !== 'object') return;
-                            
+
                             //timeout, otherwise we get the bad version of the model.
                             $timeout($scope.onSelect);
                         };
@@ -125,33 +125,33 @@
                         $scope.selectUserOptions = {
 
                             //don't escape markup, otherwise formatResult will be bugged
-                            escapeMarkup: function(m) { return m; },
+                            escapeMarkup: function (m) { return m; },
                             formatResult: formatResult,
                             formatSelection: formatSelection,
 
                             allowClear: !!$scope.allowClear,
 
                             minimumInputLength: 1,
-                            initSelection: function(elem, callback) {
+                            initSelection: function (elem, callback) {
                             },
                             ajax: {
-                                data: function(term, page) {
+                                data: function (term, page) {
                                     return { query: term };
                                 },
                                 quietMillis: 500,
-                                transport: function(queryParams) {
+                                transport: function (queryParams) {
                                     var res = $http.get('api/user?q=' + queryParams.data.query).then(queryParams.success);
-                                    res.abort = function() {
+                                    res.abort = function () {
                                         return null;
                                     };
 
                                     return res;
                                 },
 
-                                results: function(data, page) {
+                                results: function (data, page) {
                                     var results = [];
 
-                                    _.each(data.data.response, function(user) {
+                                    _.each(data.data.response, function (user) {
 
                                         results.push({
                                             id: user.id, //select2 mandatory
@@ -171,7 +171,7 @@
     ]);
 
     app.directive('selectAccessModifier', [
-        function() {
+        function () {
             return {
                 priority: 1,
                 replace: true,
@@ -180,8 +180,8 @@
         }
     ]);
 
-    app.directive('selectStatus', [
-        function() {
+    app.directive('selectStatus', ['$timeout',
+        function ($timeout) {
             return {
                 scope: {
                     model: '=selectStatus',
@@ -191,12 +191,47 @@
                 replace: true,
                 templateUrl: 'partials/directives/select-status.html',
 
-                link: function(scope, element, attr) {
-                    scope.setModel = function(n) {
+                link: function (scope, element, attr) {
+                    scope.setModel = function (n) {
                         if (scope.model == n) return;
 
                         scope.model = n;
+                        $timeout(scope.onStatusChange);
+                    };
+                }
+            };
+        }
+    ]);
+    
+    app.directive('selectStatus2', ['$timeout',
+        function ($timeout) {
+            return {
+                scope: {
+                    canWrite: '=',
+                },
+                require: 'ngModel',
+                templateUrl: 'partials/directives/select-status2.html',
 
+                link: function (scope, element, attr, ngModel) {
+                    scope.setModel = function (n) {
+                        //only update on change
+                        if (scope.model == n) return;
+                        
+                        //save new value
+                        scope.model = n;
+                        
+                        $timeout(function () {
+                            //then trigger event
+                            ngModel.$setViewValue(scope.model);
+                            
+                            //this triggers the autosave directive
+                            element.triggerHandler("blur");
+                        });
+                    };
+                    
+                    //read value from ngModel
+                    ngModel.$render = function () {
+                        scope.model = ngModel.$viewValue;
                     };
                 }
             };
@@ -204,7 +239,7 @@
     ]);
 
     app.directive('showStatus', [
-        '$timeout', function($timeout) {
+        '$timeout', function ($timeout) {
             return {
                 scope: {
                     status: '=showStatus'
@@ -212,12 +247,12 @@
                 replace: false,
                 templateUrl: 'partials/directives/show-status.html',
 
-                link: function(scope, element, attr) {
+                link: function (scope, element, attr) {
                     scope.ready = false;
                     update();
 
                     function update() {
-                        $timeout(function() {
+                        $timeout(function () {
                             if (!scope.status) {
                                 update();
                                 return;
@@ -225,9 +260,7 @@
                             scope.ready = true;
                         });
                     }
-
-
-                    scope.$watch("status", function(newval, oldval) {
+                    scope.$watch("status", function (newval, oldval) {
                         if (newval === oldval) return;
 
                         update();
@@ -236,12 +269,13 @@
             };
         }
     ]);
-    
+
     app.directive('autosave', [
         '$http', 'notify', function ($http, notify) {
             return {
                 restrict: 'A',
                 require: 'ngModel',
+                priority: 0,
                 link: function (scope, element, attrs, ctrl) {
 
                     var oldValue;
@@ -253,7 +287,7 @@
                         var newValue = ctrl.$viewValue;
                         if (attrs.pluck)
                             newValue = _.pluck(newValue, attrs.pluck);
-                        
+
                         var payload = {};
                         payload[attrs.field] = newValue;
 
@@ -291,68 +325,76 @@
         }
     ]);
 
-    app.directive('datewriter', [function() {
+    app.directive('datewriter', ['$timeout', function ($timeout) {
         return {
-                scope: {
-                    'isDisabled': '=?isDisabled'
-                },
-                templateUrl: 'partials/directives/datewriter.html',
-                require: 'ngModel',
-                link: function (scope, element, attr, ngModel) {
+            scope: {
+                'isDisabled': '=?isDisabled'
+            },
+            templateUrl: 'partials/directives/datewriter.html',
+            require: 'ngModel',
+            link: function (scope, element, attr, ctrl) {
 
-                    scope.date = {};
+                scope.date = {};
 
-                    function read() {
-                        scope.date.dateStr = moment(ngModel.$modelValue).format("DD-MM-YY", "da", true);
-                    }
+                function read() {
+                    var parsedDate = moment(ctrl.$modelValue);
 
-                    read();
-                    ngModel.$render = read;
-                    
-                    function write() {
-                        scope.dateInvalid = false;
 
-                        var newDate = moment(scope.date.dateStr, "DD-MM-YY", "da", true);
-                        if (!newDate.isValid()) {
-                            scope.dateInvalid = true;
-                            return;
-                        }
-                        
-                        ngModel.$setViewValue(newDate.format("YYYY-MM-DD HH:mm:ss"));
-                    }
-
-                    scope.write = write;
+                    scope.date.dateStr = parsedDate.isValid() ? moment(ctrl.$modelValue).format("DD-MM-YY", "da", true) : "dd-mm-åå";
                 }
-            };
+
+                read();
+                ctrl.$render = read;
+
+                function write() {
+                    scope.dateInvalid = false;
+
+                    var newDate = moment(scope.date.dateStr, "DD-MM-YY", "da", true);
+                    if (!newDate.isValid()) {
+                        scope.dateInvalid = true;
+                        return;
+                    }
+
+                    ctrl.$setViewValue(newDate.format("YYYY-MM-DD HH:mm:ss"));
+
+                    $timeout(function () {
+                        //this triggers the autosave directive
+                        element.triggerHandler("blur");
+                    });
+                }
+
+                scope.write = write;
+            }
+        };
     }]);
-    
+
     app.directive('datereader', [function () {
         return {
             scope: true,
             template: '<span>{{dateStr}}</span>',
             require: 'ngModel',
-            link: function (scope, element, attr, ngModel) {
+            link: function (scope, element, attr, ctrl) {
 
                 scope.date = {};
 
                 function read() {
-                    if (angular.isUndefined(ngModel.$modelValue) || ngModel.$modelValue == null) scope.dateStr = "";
-                    else scope.dateStr = moment(ngModel.$modelValue).format("DD-MM-YY", "da", true);
+                    if (angular.isUndefined(ctrl.$modelValue) || ctrl.$modelValue == null) scope.dateStr = "";
+                    else scope.dateStr = moment(ctrl.$modelValue).format("DD-MM-YY", "da", true);
                 }
 
                 read();
-                ngModel.$render = read;
+                ctrl.$render = read;
             }
         };
     }]);
 
-    app.directive('simpleComment', [function() {
+    app.directive('simpleComment', [function () {
         return {
             scope: true,
             require: 'ngModel',
             template: '<button class="btn btn-link btn-sm" data-ng-disabled="disabled" data-popover="{{comment}}"><i class="glyphicon glyphicon-comment small" data-ng-class="ngClassObj"></i></button>',
-            link: function (scope, element, attr, ngModel) {
-                
+            link: function (scope, element, attr, ctrl) {
+
                 function setDisabled(disabled) {
                     scope.disabled = disabled;
                     scope.ngClassObj = { 'faded': disabled };
@@ -360,13 +402,122 @@
 
                 setDisabled(true);
 
-                ngModel.$render = function () {
-                    setDisabled(!ngModel.$viewValue);
+                ctrl.$render = function () {
+                    setDisabled(!ctrl.$viewValue);
 
-                    scope.comment = ngModel.$viewValue;
+                    scope.comment = ctrl.$viewValue;
                 };
             }
         };
     }]);
+
+    app.directive('selectOrgUnit', ['$http', '$timeout', '$sce', 'userService',
+        function ($http, $timeout, $sce, userService) {
+            return {
+                scope: {
+                    extraOptions: '=?',
+                    allowClear: '@?',
+                    ngDisabled: '=?'
+                },
+                //we require ngModel to be available on the outer tag
+                require: 'ngModel',
+                priority: 0,
+                templateUrl: 'partials/directives/select-org-unit.html',
+                link: function (scope, element, attrs, ctrl) {
+                    //this is called when the user selects something from select2
+                    element.bind('change', function () {
+                        $timeout(function() {
+                            //update the view value
+                            ctrl.$setViewValue(scope.select.selected);
+
+                            //this triggers the autosave directive
+                            element.triggerHandler("blur");
+                        });
+                    });
+
+                    //when the outer ngModel is changed, update the inner model
+                    ctrl.$render = function() {
+                        scope.select.selected = ctrl.$viewValue;
+                    };
+
+                    //stores the <options> for the select
+                    var options = [];
+
+                    //settings for select2
+                    var settings = {
+                        
+                        allowClear: !!scope.allowClear,
+
+                        //don't format markup in result
+                        escapeMarkup: function (m) { return m; },
+
+                        //when an option has been selected, print the no-html version
+                        formatSelection: function (item) {
+                            
+                            var option;
+                            if (item.id) {
+                                option = _.findWhere(options, { id: parseInt(item.id) });
+                            } else {
+                                option = _.findWhere(options, { id: parseInt(item) });
+                            }
+
+                            if (option) {
+                                return option.selectedText;
+                            } else return null;
+                        }
+                    };
+
+                    if (scope.extraOptions) {
+                        _.each(scope.extraOptions, function (extraOption) {
+                            var option = {
+                                id: extraOption.id,
+                                text: extraOption.text,
+                                selectedText: extraOption.text
+                            };
+                            options.push(option);
+                        });
+                    }
+
+                    //loads the org unit roots
+                    userService.getUser().then(function (user) {
+
+                        $http.get('api/organizationUnit?organization=' + user.currentOrganizationId, { cache: true }).success(function (result) {
+
+                            //recursive function for added indentation, 
+                            //and pushing org units to the list in the right order (depth-first)
+                            function visit(orgUnit, indentation) {
+                                var option = {
+                                    id: orgUnit.id,
+                                    text: $sce.trustAsHtml(indentation + orgUnit.name),
+                                    selectedText: orgUnit.name
+                                };
+
+                                options.push(option);
+
+                                _.each(orgUnit.children, function (child) {
+                                    //indentation is non breaking spaces (alt+255)
+                                    return visit(child, indentation + "    ");
+                                });
+                            }
+
+                            visit(result.response, "");
+
+                            scope.select.isReady = true;
+                        });
+
+                    });
+
+                    scope.select = {
+                        settings: settings,
+                        options: options,
+                        isReady: false,
+                        selected: null
+                    };
+                }
+
+            };
+        }
+
+    ]);
 
 })(angular, app);

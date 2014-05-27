@@ -15,9 +15,12 @@ namespace Core.DomainModel.ItContract
             this.AssociatedSystemUsages = new List<ItSystemUsage>();
             this.AssociatedInterfaceUsages = new List<InterfaceUsage>();
             this.AssociatedInterfaceExposures = new List<InterfaceExposure>();
+
+            this.InternEconomyStreams = new List<EconomyStream>();
+            this.ExternEconomyStreams = new List<EconomyStream>();
             this.Advices = new List<Advice>();
         }
-        
+
         public int ObjectOwnerId { get; set; }
         public virtual User ObjectOwner { get; set; }
 
@@ -96,6 +99,10 @@ namespace Core.DomainModel.ItContract
 
         public virtual ICollection<AgreementElement> AgreementElements { get; set; }
         public virtual ICollection<CustomAgreementElement> CustomAgreementElements { get; set; }
+
+
+        public virtual ICollection<EconomyStream> InternEconomyStreams { get; set; }
+        public virtual ICollection<EconomyStream> ExternEconomyStreams { get; set; }
 
 
         public virtual ICollection<Advice> Advices { get; set; }

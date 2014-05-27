@@ -354,6 +354,7 @@
                         'id': unit.id,
                         'oldName': unit.name,
                         'newName': unit.name,
+                        'newEan': unit.ean,
                         'newParent': unit.parentId,
                         'orgId': unit.organizationId,
                         'isRoot': unit.parentId == 0
@@ -369,11 +370,13 @@
 
                         var name = $modalScope.orgUnit.newName;
                         var parent = $modalScope.orgUnit.newParent;
+                        var ean = $modalScope.orgUnit.newEan;
 
                         if (!name) return;
 
                         var data = {
-                            "name": name
+                            "name": name,
+                            "ean": ean
                         };
 
                         //only allow changing the parent if user is admin, and the unit isn't at the root
@@ -403,11 +406,13 @@
 
                         var parent = $modalScope.newOrgUnit.parent;
                         var orgId = $modalScope.newOrgUnit.orgId;
+                        var ean = $modalScope.newOrgUnit.ean;
 
                         var data = {
                             "name": name,
                             "parentId": parent,
-                            "organizationId": orgId
+                            "organizationId": orgId,
+                            "ean": ean
                         };
 
                         $modalScope.submitting = true;
@@ -857,22 +862,18 @@
         $scope.orgUnitTree = [];
 
         loadUnits();
+        checkForDefaultUnit();
 
         $scope.selectOrgUnitOptions = {
             escapeMarkup: function(m) { return m; }
         };
 
-        function visitOrgUnit(orgUnit, indentation) {
-
-            orgUnit.indentation = $sce.trustAsHtml(indentation);
+        function visitOrgUnit(orgUnit) {
             
-            checkForDefaultUnit(orgUnit);
-
             $scope.orgUnits[orgUnit.id] = orgUnit;
-            $scope.orgUnitTree.push(orgUnit);
 
             _.each(orgUnit.children, function(child) {
-                return visitOrgUnit(child, indentation + "&nbsp;&nbsp;&nbsp;");
+                return visitOrgUnit(child);
             });
         }
 
@@ -895,34 +896,28 @@
 
             }
         }
-
-        function checkForDefaultUnit(unit) {
+        
+        function checkForDefaultUnit() {
             if (!user.defaultOrganizationUnitId) return;
 
-            if (!unit || unit.id !== user.defaultOrganizationUnitId) return;
-
-            $timeout(function () {
-                $scope.orgUnitId = unit.id;
-                $scope.loadUsages();
-            });
-
-            console.log($scope.orgUnitId);
+            $scope.orgUnitId = user.defaultOrganizationUnitId;
+            loadUsages();
         }
-
+        
         function loadUnits() {
 
             return $http.get('api/organizationunit?userId=' + userId).success(function (result) {
                 $scope.nodes = result.response;
 
                 _.each(result.response, function (unit) {
-                    visitOrgUnit(unit, "");
+                    visitOrgUnit(unit);
                     hasWriteAccess(unit, false);
                 });
             });
         }
 
         /* load task usages */
-        $scope.loadUsages = function () {
+        function loadUsages() {
             if (!$scope.orgUnitId) return;
 
             $scope.taskUsages = {};
@@ -973,6 +968,7 @@
                 });
             });
         };
+        $scope.loadUsages = loadUsages;
 
         function getTask(usage) {
             if (usage.parent) return getTask(usage.parent);

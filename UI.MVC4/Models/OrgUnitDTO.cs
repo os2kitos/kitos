@@ -8,6 +8,8 @@ namespace UI.MVC4.Models
         public string Name { get; set; }
         public int OrganizationId { get; set; }
         public int ParentId { get; set; }
-        public List<OrgUnitDTO> Children { get; set; } 
+        public List<OrgUnitDTO> Children { get; set; }
+
+        public int? Ean { get; set; }
     }
 }
