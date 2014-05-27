@@ -332,19 +332,19 @@
             },
             templateUrl: 'partials/directives/datewriter.html',
             require: 'ngModel',
-            link: function (scope, element, attr, ngModel) {
+            link: function (scope, element, attr, ctrl) {
 
                 scope.date = {};
 
                 function read() {
-                    var parsedDate = moment(ngModel.$modelValue);
+                    var parsedDate = moment(ctrl.$modelValue);
 
 
-                    scope.date.dateStr = parsedDate.isValid() ? moment(ngModel.$modelValue).format("DD-MM-YY", "da", true) : "dd-mm-åå";
+                    scope.date.dateStr = parsedDate.isValid() ? moment(ctrl.$modelValue).format("DD-MM-YY", "da", true) : "dd-mm-åå";
                 }
 
                 read();
-                ngModel.$render = read;
+                ctrl.$render = read;
 
                 function write() {
                     scope.dateInvalid = false;
@@ -355,7 +355,7 @@
                         return;
                     }
 
-                    ngModel.$setViewValue(newDate.format("YYYY-MM-DD HH:mm:ss"));
+                    ctrl.$setViewValue(newDate.format("YYYY-MM-DD HH:mm:ss"));
 
                     $timeout(function () {
                         //this triggers the autosave directive
@@ -373,17 +373,17 @@
             scope: true,
             template: '<span>{{dateStr}}</span>',
             require: 'ngModel',
-            link: function (scope, element, attr, ngModel) {
+            link: function (scope, element, attr, ctrl) {
 
                 scope.date = {};
 
                 function read() {
-                    if (angular.isUndefined(ngModel.$modelValue) || ngModel.$modelValue == null) scope.dateStr = "";
-                    else scope.dateStr = moment(ngModel.$modelValue).format("DD-MM-YY", "da", true);
+                    if (angular.isUndefined(ctrl.$modelValue) || ctrl.$modelValue == null) scope.dateStr = "";
+                    else scope.dateStr = moment(ctrl.$modelValue).format("DD-MM-YY", "da", true);
                 }
 
                 read();
-                ngModel.$render = read;
+                ctrl.$render = read;
             }
         };
     }]);
@@ -393,7 +393,7 @@
             scope: true,
             require: 'ngModel',
             template: '<button class="btn btn-link btn-sm" data-ng-disabled="disabled" data-popover="{{comment}}"><i class="glyphicon glyphicon-comment small" data-ng-class="ngClassObj"></i></button>',
-            link: function (scope, element, attr, ngModel) {
+            link: function (scope, element, attr, ctrl) {
 
                 function setDisabled(disabled) {
                     scope.disabled = disabled;
@@ -402,10 +402,10 @@
 
                 setDisabled(true);
 
-                ngModel.$render = function () {
-                    setDisabled(!ngModel.$viewValue);
+                ctrl.$render = function () {
+                    setDisabled(!ctrl.$viewValue);
 
-                    scope.comment = ngModel.$viewValue;
+                    scope.comment = ctrl.$viewValue;
                 };
             }
         };
@@ -416,19 +416,19 @@
             return {
                 scope: {
                     extraOptions: '=?',
-                    allowClear: '@?'
+                    allowClear: '@?',
+                    ngDisabled: '=?'
                 },
                 //we require ngModel to be available on the outer tag
                 require: 'ngModel',
                 priority: 0,
                 templateUrl: 'partials/directives/select-org-unit.html',
-                link: function (scope, element, attrs, ngModel) {
-
+                link: function (scope, element, attrs, ctrl) {
                     //this is called when the user selects something from select2
                     element.bind('change', function () {
                         $timeout(function() {
                             //update the view value
-                            ngModel.$setViewValue(scope.select.selected);
+                            ctrl.$setViewValue(scope.select.selected);
 
                             //this triggers the autosave directive
                             element.triggerHandler("blur");
@@ -436,8 +436,8 @@
                     });
 
                     //when the outer ngModel is changed, update the inner model
-                    ngModel.$render = function() {
-                        scope.select.selected = ngModel.$viewValue;
+                    ctrl.$render = function() {
+                        scope.select.selected = ctrl.$viewValue;
                     };
 
                     //stores the <options> for the select
