@@ -8,7 +8,6 @@ namespace Core.DomainModel.ItContract
     {
         public ItContract()
         {
-            //this.ShipNotices = new List<ShipNotice>();
             this.AgreementElements = new List<AgreementElement>();
             this.CustomAgreementElements = new List<CustomAgreementElement>();
             this.Children = new List<ItContract>();
@@ -16,8 +15,9 @@ namespace Core.DomainModel.ItContract
             this.AssociatedSystemUsages = new List<ItSystemUsage>();
             this.AssociatedInterfaceUsages = new List<InterfaceUsage>();
             this.AssociatedInterfaceExposures = new List<InterfaceExposure>();
+            this.Advices = new List<Advice>();
         }
-
+        
         public int ObjectOwnerId { get; set; }
         public virtual User ObjectOwner { get; set; }
 
@@ -80,7 +80,7 @@ namespace Core.DomainModel.ItContract
         public virtual ItContract Parent { get; set; }
         public virtual ICollection<ItContract> Children { get; set; }
 
-        //public virtual ICollection<ShipNotice> ShipNotices { get; set; }
+        //public virtual ICollection<Advice> ShipNotices { get; set; }
         public virtual ICollection<ItContractRight> Rights { get; set; }
 
         /// <summary>
@@ -96,5 +96,8 @@ namespace Core.DomainModel.ItContract
 
         public virtual ICollection<AgreementElement> AgreementElements { get; set; }
         public virtual ICollection<CustomAgreementElement> CustomAgreementElements { get; set; }
+
+
+        public virtual ICollection<Advice> Advices { get; set; }
     }
 }

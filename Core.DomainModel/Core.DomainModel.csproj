@@ -81,7 +81,7 @@
     <Compile Include="ItContract\ItContractRight.cs" />
     <Compile Include="ItContract\ItContractRole.cs" />
     <Compile Include="ItContract\PurchaseForm.cs" />
-    <Compile Include="ItContract\ShipNotice.cs" />
+    <Compile Include="ItContract\Advice.cs" />
     <Compile Include="ItProjectModuleName.cs" />
     <Compile Include="ItProject\Communication.cs" />
     <Compile Include="ItProject\Economy.cs" />

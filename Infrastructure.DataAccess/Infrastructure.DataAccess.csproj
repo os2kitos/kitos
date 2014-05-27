@@ -128,7 +128,7 @@
     <Compile Include="Mapping\PurchaseFormMap.cs" />
     <Compile Include="Mapping\ResourcesMap.cs" />
     <Compile Include="Mapping\RiskMap.cs" />
-    <Compile Include="Mapping\ShipNoticeMap.cs" />
+    <Compile Include="Mapping\AdviceMap.cs" />
     <Compile Include="Mapping\StakeholderMap.cs" />
     <Compile Include="Mapping\AppTypeMap.cs" />
     <Compile Include="Mapping\TextMap.cs" />
