@@ -28,11 +28,7 @@
             function pushStream(stream, collection) {
                 stream.show = true;
                 stream.updateUrl = baseUrl + "/" + stream.id;
-
-                stream.test = function() {
-                    console.log(stream);
-                };
-
+                
                 stream.delete = function () {
                     var msg = notify.addInfoMessage("Sletter række...");
 
@@ -43,29 +39,6 @@
                     }).error(function() {
                         msg.toErrorMessage("Fejl! Kunne ikke slette rækken!");
                     });
-                };
-
-                stream.patch = function(field, value) {
-                    var data = {};
-                    data[field] = value;
-
-                    $http({
-                        method: 'PATCH',
-                        url: this.updateUrl,
-                        data: data
-                    }).success(function(result) {
-                        notify.addSuccessMessage("Feltet er opdateret!");
-                    }).error(function(result) {
-                        notify.addErrorMessage("Fejl! Feltet blev ikke opdateret!");
-                    });
-                };
-
-                stream.updateStatus = function () {
-                    patch("auditStatus", stream.auditStatus);
-                };
-
-                stream.updateDate = function() {
-                    patch("auditDate", stream.auditDate);
                 };
 
                 collection.push(stream);

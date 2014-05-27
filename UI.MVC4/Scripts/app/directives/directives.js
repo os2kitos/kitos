@@ -223,6 +223,8 @@
                         $timeout(function () {
                             //then trigger event
                             ngModel.$setViewValue(scope.model);
+                            
+                            //this triggers the autosave directive
                             element.triggerHandler("blur");
                         });
                     };
@@ -323,7 +325,7 @@
         }
     ]);
 
-    app.directive('datewriter', [function () {
+    app.directive('datewriter', ['$timeout', function ($timeout) {
         return {
             scope: {
                 'isDisabled': '=?isDisabled'
@@ -354,6 +356,11 @@
                     }
 
                     ngModel.$setViewValue(newDate.format("YYYY-MM-DD HH:mm:ss"));
+
+                    $timeout(function () {
+                        //this triggers the autosave directive
+                        element.triggerHandler("blur");
+                    });
                 }
 
                 scope.write = write;

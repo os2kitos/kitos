@@ -69,8 +69,11 @@
                 <!-- Audit date -->
                 <td>
                     <span data-ng-model="stream.auditDate" data-datewriter="" 
-                          data-is-disabled="!hasWriteAccess" data-ng-change="stream.patch('auditDate', stream.auditDate)">
-                    </span>
+                          data-is-disabled="!hasWriteAccess" 
+                          data-field="auditDate"
+                          data-autosave="{{stream.updateUrl}}"></span>
+                          
+                        <!--data-ng-change="stream.patch('auditDate', stream.auditDate)">-->
                 </td>
 
                 <!-- Note -->
