@@ -16,7 +16,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr data-ng-repeat="stream in externEconomyStreams">
+            <tr data-ng-repeat="stream in externEconomyStreams | filter:{'show':true}">
                 <!-- ORG UNIT TODO -->
                 <td>
                     <div data-ng-model="stream.organizationUnitId" data-select-org-unit="" data-extra-options="extraOptions"

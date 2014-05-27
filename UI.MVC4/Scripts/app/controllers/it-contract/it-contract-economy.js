@@ -37,10 +37,10 @@
                     var msg = notify.addInfoMessage("Sletter række...");
 
                     $http.delete(this.updateUrl).success(function() {
-                        this.show = false;
+                        stream.show = false;
 
                         msg.toSuccessMessage("Rækken er slettet!");
-                    }).errro(function() {
+                    }).error(function() {
                         msg.toErrorMessage("Fejl! Kunne ikke slette rækken!");
                     });
                 };
