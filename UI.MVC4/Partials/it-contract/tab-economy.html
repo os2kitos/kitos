@@ -21,13 +21,14 @@
                 <td>
                     <div data-ng-model="stream.organizationUnitId" data-select-org-unit="" data-extra-options="extraOptions"
                          data-ng-disabled="!hasWriteAccess" 
+                         data-ng-change="stream.updateEan()"
                          data-field="organizationUnitId"
                          data-autosave="{{stream.updateUrl}}" data-allow-clear="true"></div>
                 </td>
                 
                 <!-- EAN # TODO -->
                 <td>
-                    
+                    {{stream.ean}}
                 </td>
                 
                 <!-- ACQUISITION "Anskaffelse" -->
@@ -138,13 +139,14 @@
                 <td>
                     <div data-ng-model="stream.organizationUnitId" data-select-org-unit="" data-extra-options="extraOptions"
                          data-ng-disabled="!hasWriteAccess" 
+                         data-ng-change="stream.updateEan()"
                          data-field="organizationUnitId"
                          data-autosave="{{stream.updateUrl}}" data-allow-clear="true"></div>
                 </td>
                 
                 <!-- EAN # TODO -->
                 <td>
-                    
+                    {{stream.ean}}
                 </td>
                 
                 <!-- ACQUISITION "Anskaffelse" -->

@@ -5,12 +5,19 @@
             templateUrl: 'partials/it-contract/tab-economy.html',
             controller: 'contract.EditEconomyCtrl',
             resolve: {
+                orgUnits: ['$http', 'userService', function ($http, userService) {
+                    return userService.getUser().then(function (user) {
+                        return $http.get('api/organizationunit?organizationId=' + user.currentOrganizationId).then(function (result) {
+                            return result.data.response;
+                        });
+                    });
+                }]
             }
         });
     }]);
 
-    app.controller('contract.EditEconomyCtrl', ['$scope', '$http', 'notify', 'contract',
-        function ($scope, $http, notify, contract) {
+    app.controller('contract.EditEconomyCtrl', ['$scope', '$http', 'notify', 'contract', 'orgUnits',
+        function ($scope, $http, notify, contract, orgUnits) {
             
             var baseUrl = "api/economyStream";
 
@@ -43,6 +50,18 @@
                     });
                 };
 
+                function updateEan() {
+                    stream.ean = " - ";
+
+                    if (stream.organizationUnitId) {
+                        var orgUnit = _.findWhere(orgUnits, { id: parseInt(stream.organizationUnitId) });
+                        
+                        if (orgUnit && orgUnit.ean) stream.ean = orgUnit.ean;
+                    }
+                };
+                stream.updateEan = updateEan;
+
+                updateEan();
                 collection.push(stream);
             }
             
