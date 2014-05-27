@@ -16,12 +16,14 @@
 
             var externEconomyStreams = [];
             $scope.externEconomyStreams = externEconomyStreams;
+            _.each(contract.externEconomyStreams, function(stream) {
+                pushStream(stream, externEconomyStreams);
+            });
             
             var internEconomyStreams = [];
             $scope.internEconomyStreams = internEconomyStreams;
-
-            _.each(contract.externEconomyStreams, function(stream) {
-                pushStream(stream, externEconomyStreams);
+            _.each(contract.internEconomyStreams, function (stream) {
+                pushStream(stream, internEconomyStreams);
             });
 
             
@@ -44,9 +46,7 @@
                 collection.push(stream);
             }
             
-            function postNewStream(isExternStream) {
-                
-                var field = isExternStream ? "ExternPaymentForId" : "InternPaymentForId";
+            function postNewStream(field, collection) {
                 
                 var stream = {};
                 stream[field] = contract.id;
@@ -56,7 +56,6 @@
                     msg.toSuccessMessage("Rækken er tilføjet!");
 
                     //push result to view
-                    var collection = isExternStream ? externEconomyStreams : internEconomyStreams;
                     pushStream(result.response, collection);
 
                 }).error(function() {
@@ -65,7 +64,10 @@
             }
 
             $scope.newExtern = function() {
-                postNewStream(true);
+                postNewStream("ExternPaymentForId", externEconomyStreams);
+            };
+            $scope.newIntern = function () {
+                postNewStream("InternPaymentForId", internEconomyStreams);
             };
             
 
