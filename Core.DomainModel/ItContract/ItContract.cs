@@ -16,6 +16,7 @@ namespace Core.DomainModel.ItContract
             this.AssociatedSystemUsages = new List<ItSystemUsage>();
             this.AssociatedInterfaceUsages = new List<InterfaceUsage>();
             this.AssociatedInterfaceExposures = new List<InterfaceExposure>();
+            this.PaymentMilestones = new List<PaymentMilestone>();
         }
 
         public int ObjectOwnerId { get; set; }
@@ -30,6 +31,34 @@ namespace Core.DomainModel.ItContract
         public string SupplierContractSigner { get; set; }
         public bool HasSupplierSigned { get; set; }
         public DateTime? SupplierSignedDate { get; set; }
+        public DateTime? OperationTestExpected { get; set; }
+        public DateTime? OperationTestApproved { get; set; }
+        public DateTime? OperationalAcceptanceTestExpected { get; set; }
+        public DateTime? OperationalAcceptanceTestApproved { get; set; }
+        public DateTime? Concluded { get; set; }
+        public int Duration { get; set; }
+        public DateTime? IrrevocableTo { get; set; }
+        public DateTime? ExpirationDate { get; set; }
+        public DateTime? OperationRemunerationBegun { get; set; }
+        public DateTime? Terminated { get; set; }
+        public int ExtendMultiplier { get; set; }
+
+        public int? TerminationDeadlineId { get; set; }
+        public TerminationDeadline TerminationDeadline { get; set; }
+        
+        public ICollection<PaymentMilestone> PaymentMilestones { get; set; }
+
+        public int? PaymentFreqencyId { get; set; }
+        public PaymentFreqency PaymentFreqency { get; set; }
+
+        public int? PaymentModelId { get; set; }
+        public PaymentModel PaymentModel { get; set; }
+
+        public int? PriceRegulationId { get; set; }
+        public PriceRegulation PriceRegulation { get; set; }
+
+        public int? OptionExtendId { get; set; }
+        public OptionExtend OptionExtend { get; set; }
 
         public int? ContractSignerId { get; set; }
         public virtual User ContractSigner { get; set; }
