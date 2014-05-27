@@ -1,11 +1,15 @@
 ﻿<div class="col-md-12 container-fluid">
     <div class="row">
         <div class="col-md-3">
+            
+            <div data-ng-model="orgUnitId" data-ng-change="loadUsages()" data-select-org-unit=""></div>
+            
+            <!--
             <select data-ui-select2="selectOrgUnitOptions" data-ng-model="orgUnitId" class="form-control input-sm" data-ng-change="loadUsages()" data-placeholder="Vælg afdeling">
                 <option></option>
                 <option data-ng-repeat="orgUnit in orgUnitTree" value="{{orgUnit.id}}">{{orgUnit.indentation}} {{orgUnit.name}} {{ orgUnit.hasWriteAccess && "*" || "" }}
                 </option>
-            </select>
+            </select> -->
         </div>
         <div class="col-md-1">KLE ID</div>
         <div class="col-md-3">KLE Navn</div>
