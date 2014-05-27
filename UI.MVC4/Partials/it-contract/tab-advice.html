@@ -1,1 +1,33 @@
-﻿
+﻿<table class="table table-condensed">
+    <thead>
+        <tr>
+            <th>Aktiv</th>
+            <th>Advis navn</th>
+            <th>Dato</th>
+            <th>Modtager</th>
+            <th>Cc</th>
+            <th>Emne</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr data-ng-repeat="advice in advices">
+            <!-- Active -->
+            <td>
+                <input type="checkbox" data-ng-model="advice.isActive" 
+                       data-autosave="{{advice.updateUrl}}" 
+                       data-field="isActive"/>
+            </td>
+            
+            <!-- Name -->
+            <td>
+                <input type="text" data-ng-model="advice.name" 
+                       data-autosave="{{advice.updateUrl}}" 
+                       data-field="name"/>
+            </td>
+
+        </tr>
+        
+
+    </tbody>
+</table>
