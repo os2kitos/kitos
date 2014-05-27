@@ -8,6 +8,8 @@ namespace UI.MVC4.Models
 
         public bool IsActive { get; set; }
 
+        public string Name { get; set; }
+
         public DateTime AlarmDate { get; set; }
 
         public int? ReceiverId { get; set; }
