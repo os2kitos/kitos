@@ -114,7 +114,7 @@
                 
                         <!-- Responsible org unit -->
                         <div class="form-group">
-                            <label for="contract-orgunit" class="control-label small">Ansvarlig endhed</label>
+                            <label for="contract-orgunit" class="control-label small">Ansvarlig enhed</label>
                             <select id="contract-orgunit" class="form-control input-sm" data-ng-model="contract.responsibleOrganizationUnitId" data-ng-options="o.id as o.name for o in orgUnits" data-autosave="{{ autoSaveUrl }}" data-field="responsibleOrganizationUnitId"></select>
                         </div>
 
@@ -158,17 +158,20 @@
                         <!-- Agreement elements -->
                         <div class="form-group">
                             <label class="control-label small">IT Kontrakten omfatter flg. aftaleelementer</label>
-                            <div class="checkbox col-md-4" data-ng-repeat="item in agreementElements">
-                                <label class="small">
+                            <div class="form-inline">
+                                <div class="checkbox input-sm col-md-4" data-ng-repeat="item in agreementElements">
+                                    <label>
                                     <input type="checkbox" data-ng-model="item.isChecked" data-ng-change="updateElem(item)"> {{ item.name }}
                                 </label>
                             </div>
-                            <div class="input-group input-group-sm col-md-4" data-ng-repeat="item in customAgreementElements">
+                                <div class="col-md-4" data-ng-repeat="item in customAgreementElements">
+                                    <div class="input-group input-group-sm">
                                 <input type="text" class="form-control" data-ng-model="item.name">
                                 <span class="input-group-addon">
                                     <input type="checkbox" checked data-ng-click="deleteCustomElem(item.id)">
                                 </span>
                             </div>
+                                </div>
                             <div class="input-group input-group-sm col-md-4">
                                 <input type="text" class="form-control" data-ng-model="newElement">
                                 <span class="input-group-btn">
@@ -183,12 +186,16 @@
             </div>
         </div>
     </div>   
+    </div>   
 </form>
 
 <!-- sub tab buttons -->
 <ul class="nav nav-tabs">
     <li data-ui-sref-active="active">
         <a data-ui-sref="it-contract.edit.systems">IT Systemer</a>
+    </li>
+    <li data-ui-sref-active="active">
+        <a data-ui-sref="it-contract.edit.deadlines">Aftalefrister</a>
     </li>
     <li data-ui-sref-active="active">
         <a data-ui-sref="it-contract.edit.economy">Økonomi</a>

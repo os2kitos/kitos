@@ -212,6 +212,13 @@
   <ItemGroup>
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Controllers\API\OptionExtendController.cs" />
+    <Compile Include="Controllers\API\PriceRegulationController.cs" />
+    <Compile Include="Controllers\API\PaymentModelController.cs" />
+    <Compile Include="Controllers\API\PaymentFrequencyController.cs" />
+    <Compile Include="Controllers\API\TerminationDeadlineController.cs" />
+    <Compile Include="Controllers\API\PaymentMilestoneController.cs" />
+    <Compile Include="Models\PaymentMilestoneDTO.cs" />
     <Compile Include="Controllers\API\CustomAgreementElementController.cs" />
     <Compile Include="Controllers\API\EconomyStreamController.cs" />
     <Compile Include="Models\EconomyStreamDTO.cs" />
@@ -452,6 +459,7 @@
     <Content Include="Partials\it-contract\it-contract-edit.html" />
     <Content Include="Partials\it-contract\it-contract-overview.html" />
     <Content Include="Partials\it-contract\it-contract-plan.html" />
+    <Content Include="Partials\it-contract\tab-deadlines.html" />
     <Content Include="Partials\it-contract\tab-economy.html" />
     <Content Include="Partials\it-contract\tab-systems.html" />
     <Content Include="Partials\it-contract\tab-roles.html" />
@@ -536,6 +544,7 @@
     <Content Include="Scripts\app\controllers\global-admin\global-admin.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-config.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
+    <Content Include="Scripts\app\controllers\it-contract\it-contract-deadlines.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-catalog.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-edit.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-overview.js" />

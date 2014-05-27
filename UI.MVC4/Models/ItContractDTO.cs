@@ -18,7 +18,32 @@ namespace UI.MVC4.Models
         public bool HasSupplierSigned { get; set; }
         [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime? SupplierSignedDate { get; set; }
+        [JsonConverter(typeof(CustomDateTimeConverter))]
+        public DateTime? OperationTestExpected { get; set; }
+        [JsonConverter(typeof(CustomDateTimeConverter))]
+        public DateTime? OperationTestApproved { get; set; }
+        [JsonConverter(typeof(CustomDateTimeConverter))]
+        public DateTime? OperationalAcceptanceTestExpected { get; set; }
+        [JsonConverter(typeof(CustomDateTimeConverter))]
+        public DateTime? OperationalAcceptanceTestApproved { get; set; }
+        [JsonConverter(typeof(CustomDateTimeConverter))]
+        public DateTime? Concluded { get; set; }
+        public int Duration { get; set; }
+        [JsonConverter(typeof(CustomDateTimeConverter))]
+        public DateTime? IrrevocableTo { get; set; }
+        [JsonConverter(typeof(CustomDateTimeConverter))]
+        public DateTime? ExpirationDate { get; set; }
+        [JsonConverter(typeof(CustomDateTimeConverter))]
+        public DateTime? OperationRemunerationBegun { get; set; }
+        [JsonConverter(typeof(CustomDateTimeConverter))]
+        public DateTime? Terminated { get; set; }
+        public int ExtendMultiplier { get; set; }
 
+        public int? TerminationDeadlineId { get; set; }
+        public int? PaymentFreqencyId { get; set; }
+        public int? PaymentModelId { get; set; }
+        public int? PriceRegulationId { get; set; }
+        public int? OptionExtendId { get; set; }
         public int? ContractSignerId { get; set; }
         public UserDTO ContractSigner { get; set; }
 

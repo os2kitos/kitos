@@ -278,6 +278,31 @@ namespace Infrastructure.DataAccess.Migrations
                     Name = "Måltype 2"
                 });
 
+            context.OptionExtention.AddOrUpdate(x => x.Name,
+                                                new OptionExtend() {IsActive = true, Name = "Option A"},
+                                                new OptionExtend() {IsActive = true, Name = "Option B"},
+                                                new OptionExtend() {IsActive = true, Name = "Option C"});
+
+            context.TerminationDeadlines.AddOrUpdate(x => x.Name,
+                                                     new TerminationDeadline() {IsActive = true, Name = "Frist A"},
+                                                     new TerminationDeadline() {IsActive = true, Name = "Frist B"},
+                                                     new TerminationDeadline() {IsActive = true, Name = "Frist C"});
+
+            context.PaymentFreqencies.AddOrUpdate(x => x.Name,
+                                                  new PaymentFreqency() {IsActive = true, Name = "Frekvens A"},
+                                                  new PaymentFreqency() {IsActive = true, Name = "Frekvens B"},
+                                                  new PaymentFreqency() {IsActive = true, Name = "Frekvens C"});
+
+            context.PaymentModels.AddOrUpdate(x => x.Name,
+                                              new PaymentModel() {IsActive = true, Name = "Model A"},
+                                              new PaymentModel() {IsActive = true, Name = "Model B"},
+                                              new PaymentModel() {IsActive = true, Name = "Model C"});
+
+            context.PriceRegulations.AddOrUpdate(x => x.Name,
+                                                 new PriceRegulation() {IsActive = true, Name = "Pris regulering A"},
+                                                 new PriceRegulation() {IsActive = true, Name = "Pris regulering B"},
+                                                 new PriceRegulation() {IsActive = true, Name = "Pris regulering C"});
+
             context.SaveChanges();
             
             #endregion

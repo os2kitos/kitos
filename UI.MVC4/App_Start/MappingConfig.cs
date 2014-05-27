@@ -155,6 +155,26 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
+            Mapper.CreateMap<OptionExtend, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
+
+            Mapper.CreateMap<PriceRegulation, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
+
+            Mapper.CreateMap<PaymentModel, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
+
+            Mapper.CreateMap<PaymentFreqency, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
+
+            Mapper.CreateMap<TerminationDeadline, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
+
             Mapper.CreateMap<ProjPhaseLocale, LocaleDTO>().ReverseMap();
             Mapper.CreateMap<ExtRefTypeLocale, LocaleDTO>().ReverseMap();
 
@@ -315,8 +335,11 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.ItContract, opt => opt.Ignore());
 
+            Mapper.CreateMap<PaymentMilestone, PaymentMilestoneDTO>()
+                  .ReverseMap();
+
             Mapper.CreateMap<EconomyStream, EconomyStreamDTO>()
                 .ReverseMap();
-            }
+        }
     }
 }

@@ -120,6 +120,12 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<Communication>>().To<GenericRepository<Communication>>().InRequestScope();
             kernel.Bind<IGenericRepository<Handover>>().To<GenericRepository<Handover>>().InRequestScope();
             kernel.Bind<IGenericRepository<Stakeholder>>().To<GenericRepository<Stakeholder>>().InRequestScope();
+            kernel.Bind<IGenericRepository<OptionExtend>>().To<GenericRepository<OptionExtend>>().InRequestScope();
+            kernel.Bind<IGenericRepository<PriceRegulation>>().To<GenericRepository<PriceRegulation>>().InRequestScope();
+            kernel.Bind<IGenericRepository<PaymentModel>>().To<GenericRepository<PaymentModel>>().InRequestScope();
+            kernel.Bind<IGenericRepository<PaymentFreqency>>().To<GenericRepository<PaymentFreqency>>().InRequestScope();
+            kernel.Bind<IGenericRepository<TerminationDeadline>>().To<GenericRepository<TerminationDeadline>>().InRequestScope();
+            kernel.Bind<IGenericRepository<PaymentMilestone>>().To<GenericRepository<PaymentMilestone>>().InRequestScope();
             kernel.Bind<IGenericRepository<EconomyStream>>().To<GenericRepository<EconomyStream>>().InRequestScope();
 
             kernel.Bind<IGenericRepository<OrganizationRight>>().To<GenericRepository<OrganizationRight>>().InRequestScope();
