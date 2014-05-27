@@ -37,9 +37,9 @@
                             </thead>
                             <tbody>
                                 <tr data-ng-repeat="item in paymentMilestones">
-                                    <td><input type="text" class="form-control input-sm" data-ng-model="item.title" data-autosave="TODO" data-field="title"></td>
-                                    <td><input type="date" class="form-control input-sm" data-ng-model="item.expected" data-autosave="TODO" data-field="expected"></td>
-                                    <td colspan="2"><input type="date" class="form-control input-sm" data-ng-model="item.approved" data-autosave="TODO" data-field="approved"></td>
+                                    <td><input type="text" class="form-control input-sm" data-ng-model="item.title" data-autosave="api/paymentmilestone/{{item.id}}" data-field="title"></td>
+                                    <td><input type="date" class="form-control input-sm" data-ng-model="item.expected" data-autosave="api/paymentmilestone/{{item.id}}" data-field="expected"></td>
+                                    <td colspan="2"><input type="date" class="form-control input-sm" data-ng-model="item.approved" data-autosave="api/paymentmilestone/{{item.id}}" data-field="approved"></td>
                                 </tr>
                             </tbody>
                             <tfoot>
