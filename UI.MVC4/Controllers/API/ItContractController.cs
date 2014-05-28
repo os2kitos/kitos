@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
+using Core.ApplicationServices;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
@@ -123,6 +124,29 @@ namespace UI.MVC4.Controllers.API
         private IEnumerable<ItSystemUsageSimpleDTO> MapSystemUsages(ItContract contract)
         {
             return Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageSimpleDTO>>(contract.AssociatedSystemUsages);
+        }
+
+        public HttpResponseMessage GetHierarchy(int id, [FromUri] bool? hierarchy)
+        {
+            try
+            {
+                var itContract = Repository.GetQueryable().Single(x => x.Id == id);
+
+                if (itContract == null)
+                    return NotFound();
+
+                // this trick will put the first object in the result as well as the children
+                var children = new [] { itContract }.SelectNestedChildren(x => x.Children);
+                // gets parents only
+                var parents = itContract.SelectNestedParents(x => x.Parent);
+                // put it all in one result
+                var contracts = children.Union(parents);
+                return Ok(Map(contracts));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
         }
     }
 }

@@ -47,21 +47,21 @@ namespace Core.DomainModel.ItContract
         public int ExtendMultiplier { get; set; }
 
         public int? TerminationDeadlineId { get; set; }
-        public TerminationDeadline TerminationDeadline { get; set; }
-        
-        public ICollection<PaymentMilestone> PaymentMilestones { get; set; }
+        public virtual TerminationDeadline TerminationDeadline { get; set; }
+
+        public virtual ICollection<PaymentMilestone> PaymentMilestones { get; set; }
 
         public int? PaymentFreqencyId { get; set; }
-        public PaymentFreqency PaymentFreqency { get; set; }
+        public virtual PaymentFreqency PaymentFreqency { get; set; }
 
         public int? PaymentModelId { get; set; }
-        public PaymentModel PaymentModel { get; set; }
+        public virtual PaymentModel PaymentModel { get; set; }
 
         public int? PriceRegulationId { get; set; }
-        public PriceRegulation PriceRegulation { get; set; }
+        public virtual PriceRegulation PriceRegulation { get; set; }
 
         public int? OptionExtendId { get; set; }
-        public OptionExtend OptionExtend { get; set; }
+        public virtual OptionExtend OptionExtend { get; set; }
 
         public int? ContractSignerId { get; set; }
         public virtual User ContractSigner { get; set; }
