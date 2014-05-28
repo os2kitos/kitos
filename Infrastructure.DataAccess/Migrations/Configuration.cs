@@ -1044,7 +1044,15 @@ namespace Infrastructure.DataAccess.Migrations
                     ProcurementPlanYear = 2016
                 };
 
-            context.ItContracts.AddOrUpdate(x => x.Name, itContractA);
+            var itContractRoot = new ItContract() { ObjectOwner = globalUser, Organization = roskilde, Name = "root" };
+            var itContractNode1 = new ItContract() { ObjectOwner = globalUser, Organization = roskilde, Name = "node 1", Parent = itContractRoot };
+            var itContractNode2 = new ItContract() { ObjectOwner = globalUser, Organization = roskilde, Name = "node 2", Parent = itContractRoot };
+            var itContractNode11 = new ItContract() { ObjectOwner = globalUser, Organization = roskilde, Name = "node 11", Parent = itContractNode1 };
+            var itContractNode12 = new ItContract() { ObjectOwner = globalUser, Organization = roskilde, Name = "node 12", Parent = itContractNode1 };
+            var itContractNode111 = new ItContract() { ObjectOwner = globalUser, Organization = roskilde, Name = "node 111", Parent = itContractNode11 };
+            var itContractNode121 = new ItContract() { ObjectOwner = globalUser, Organization = roskilde, Name = "node 121", Parent = itContractNode12 };
+
+            context.ItContracts.AddOrUpdate(x => x.Name, itContractA, itContractNode1, itContractNode11, itContractNode111, itContractNode12, itContractNode121, itContractNode2);
 
             #endregion
 

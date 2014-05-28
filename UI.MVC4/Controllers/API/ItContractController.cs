@@ -124,5 +124,57 @@ namespace UI.MVC4.Controllers.API
         {
             return Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageSimpleDTO>>(contract.AssociatedSystemUsages);
         }
+
+        public HttpResponseMessage GetHierarchy(int id, [FromUri] bool? hierarchy)
+        {
+            try
+            {
+                var itContract = Repository.GetQueryable().Single(x => x.Id == id);
+
+                if (itContract == null)
+                    return NotFound();
+
+                // this trick will put the first object in the result as well as the children
+                var children = new [] { itContract }.SelectNestedChildren(x => x.Children);
+                // gets parents only
+                var parents = itContract.SelectNestedParents(x => x.Parent);
+                // put it all in one result
+                var contracts = children.Union(parents);
+                return Ok(Map(contracts));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+    }
+
+    public static class LinqTreeExtension
+    {
+        public static IEnumerable<T> SelectNestedChildren<T>
+            (this IEnumerable<T> source, Func<T, IEnumerable<T>> selector)
+        {
+            foreach (T item in source)
+            {
+                yield return item;
+                foreach (T subItem in SelectNestedChildren(selector(item), selector))
+                {
+                    yield return subItem;
+                }
+            }
+        }
+
+        public static IEnumerable<T> SelectNestedParents<T>
+            (this T source, Func<T, T> selector) 
+            where T : class
+        {
+            yield return source;
+            var parent = selector(source);
+            if (parent == null)
+                yield break;
+            yield return SelectNestedParents(parent, selector).FirstOrDefault();
+        }
+
+        
     }
 }
