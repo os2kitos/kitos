@@ -8,7 +8,10 @@ namespace UI.MVC4.Models
     public class RightOutputDTO
     {
         public int ObjectId { get; set; }
+
         public int RoleId { get; set; }
+        public string RoleName { get; set; }
+
         public int UserId { get; set; }
         public UserDTO User { get; set; }
     }
