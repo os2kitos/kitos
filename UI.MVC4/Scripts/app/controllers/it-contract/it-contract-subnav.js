@@ -9,7 +9,7 @@
                 $rootScope.page.subnav = [
                     { state: 'it-contract.overview', text: 'Oversigt' },
                     { state: 'it-contract.plan', text: 'Udbudsplan' },
-                    { state: 'it-contract.catalog', text: 'Opret IT Kontrakt' },
+                    { state: 'it-contract.create', text: 'Opret IT Kontrakt' },
                     { state: 'it-contract.edit', text: 'IT Kontrakt' }
                 ];
             }]

@@ -549,7 +549,7 @@
     <Content Include="Scripts\app\controllers\home\home.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-deadlines.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-advice.js" />
-    <Content Include="Scripts\app\controllers\it-contract\it-contract-catalog.js" />
+    <Content Include="Scripts\app\controllers\it-contract\it-contract-create.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-edit.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-overview.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-plan.js" />
