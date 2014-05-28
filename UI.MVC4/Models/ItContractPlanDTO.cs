@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace UI.MVC4.Models
 {
-    public class ItContractProcurementPlanDTO
+    public class ItContractPlanDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public IEnumerable<ItContractProcurementPlanDTO> Children { get; set; }
+        public IEnumerable<ItContractPlanDTO> Children { get; set; }
         
         //Second column
         public string ContractTypeName { get; set; }
