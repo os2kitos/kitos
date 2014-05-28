@@ -1,1 +1,120 @@
-﻿
+﻿<table class="table table-condensed table-striped">
+    <thead>
+        <tr>
+            <th>IT Kontrakt</th>
+
+            <th>
+                <select class="form-control input-sm" data-ng-model="chosenFilter" data-ng-init="chosenFilter = 'type'">
+                    <option value="type">Kontrakttype</option>
+                    <option value="template">Kontraktskabelon</option>
+                </select>
+            </th>
+
+            <th>
+                Indkøbsform
+            </th>
+
+            <th>
+                Indgået
+            </th>
+
+            <th>
+                Varighed
+            </th>
+
+            <th>
+                Udløbsdato
+            </th>
+
+            <th>
+                Option
+            </th>
+
+            <th>
+                Opsigelse
+            </th>
+            
+            <th>
+                Uopsigelig til
+            </th>
+            
+            <th>
+                Udbudsstrategi
+            </th>
+            
+            <th>
+                Udbudsplan
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr data-ng-repeat="contract in contracts | filter:{'show': true}">
+            <!-- name -->
+            <td>
+                {{ contract.indentation }}
+
+                <button class="btn btn-xs btn-link" data-ng-class="{'invisible': !contract.hasChildren}" data-ng-click="contract.toggleFold()">
+                    <i class="glyphicon" 
+                       data-ng-class="{'glyphicon-chevron-right': !contract.unfolded, 'glyphicon-chevron-down': contract.unfolded}">
+                    </i>
+                </button>
+
+                <a data-ui-sref="it-contract.edit({id: contract.id})">
+                    {{contract.name}}
+                </a>
+
+            </td>
+            
+            <!-- type or template -->
+            <td data-ng-switch="chosenFilter">
+                <span data-ng-switch-when="type">{{contract.contractTypeName}}</span>
+                <span data-ng-switch-when="template">{{contract.contractTemplateName}}</span>
+            </td>
+            
+            <!-- purchase form -->
+            <td>
+                {{ contract.purchaseFormName }}
+            </td>
+            
+            <!-- concluded -->
+            <td>
+                <span data-ng-model="contract.concluded" data-datereader=""></span>
+            </td>
+            
+            <!-- duration -->
+            <td>
+                {{contract.duration}} md.
+            </td>
+            
+            <!-- expiration -->
+            <td>
+                <span data-ng-model="contract.expirationDate" data-datereader=""></span>
+            </td>
+            
+            <!-- option -->
+            <td>
+                <span data-ng-if="contract.optionExtendName">
+                    {{ contract.optionExtendName }} ({{contract.extendMultiplier}})
+                </span>
+            </td>
+
+            <td>
+                {{ contract.terminationDeadlineName }}
+            </td>
+            
+            <td>
+                <span data-ng-model="contract.irrevocableTo" data-datereader=""></span>
+            </td>
+            
+            <td>
+                {{ contract.procurementStrategyName }}
+            </td>
+            
+            <td>
+                <span data-ng-if="contract.procurementPlanHalf && contract.procurementPlanYear">
+                    {{contract.procurementPlanHalf}} | {{contract.procurementPlanYear}}
+                </span>
+            </td>
+        </tr>
+    </tbody>
+</table>
