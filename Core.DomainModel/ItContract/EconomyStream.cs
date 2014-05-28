@@ -45,7 +45,7 @@ namespace Core.DomainModel.ItContract
         /// <summary>
         /// Traffic light for audit
         /// </summary>
-        public int AuditStatus { get; set; }
+        public TrafficLight AuditStatus { get; set; }
 
         /// <summary>
         /// DateTime for audit

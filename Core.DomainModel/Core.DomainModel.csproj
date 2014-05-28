@@ -131,6 +131,7 @@
     <Compile Include="IEntity.cs" />
     <Compile Include="TaskUsage.cs" />
     <Compile Include="Text.cs" />
+    <Compile Include="TrafficLight.cs" />
     <Compile Include="User.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

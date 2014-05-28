@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.DomainModel;
 
 namespace UI.MVC4.Models
 {
@@ -32,7 +33,7 @@ namespace UI.MVC4.Models
         /// <summary>
         /// Traffic light for audit
         /// </summary>
-        public int AuditStatus { get; set; }
+        public TrafficLight AuditStatus { get; set; }
 
         /// <summary>
         /// DateTime for audit
