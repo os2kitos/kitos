@@ -19,6 +19,34 @@ namespace UI.MVC4.Models
 
         public string PaymentModelName { get; set; }
         public string PaymentFreqencyName { get; set; }
+
+        /// <summary>
+        /// When the contract began (indgået)
+        /// </summary>
+        public DateTime? Concluded { get; set; }
+        /// <summary>
+        /// When the contract expires (udløbet)
+        /// </summary>
+        public DateTime? ExpirationDate { get; set; }
+
+        /// <summary>
+        /// When the contract ends (opsagt)
+        /// </summary>
+        public DateTime? Terminated { get; set; }
+
+        /// <summary>
+        /// Whether the 
+        /// </summary>
+        public bool IsActive
+        {
+            get { 
+                var today = DateTime.Now;
+                var startDate = Concluded ?? today;
+                var endDate = Terminated ?? ExpirationDate ?? DateTime.MaxValue;
+
+                return today >= startDate && today <= endDate;
+            }
+        }
         
         /// <summary>
         /// The sum of the acquisition column of extern economy streams.
@@ -44,16 +72,25 @@ namespace UI.MVC4.Models
             get { return ExternEconomyStreams.Min(stream => stream.AuditDate); }
         }
 
+        /// <summary>
+        /// The number of extern economy streams, that have red status
+        /// </summary>
         public int TotalRedStatuses 
         { 
             get { return ExternEconomyStreams.Count(stream => stream.AuditStatus == TrafficLight.Red); }
         }
 
+        /// <summary>
+        /// The number of extern economy streams, that have yellow status
+        /// </summary>
         public int TotalYellowStatuses
         {
             get { return ExternEconomyStreams.Count(stream => stream.AuditStatus == TrafficLight.Yellow); }
         }
 
+        /// <summary>
+        /// The number of extern economy streams, that have green status
+        /// </summary>
         public int TotalGreenStatuses
         {
             get { return ExternEconomyStreams.Count(stream => stream.AuditStatus == TrafficLight.Green); }

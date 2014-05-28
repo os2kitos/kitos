@@ -38,12 +38,24 @@ namespace Core.DomainModel.ItContract
         public DateTime? OperationTestApproved { get; set; }
         public DateTime? OperationalAcceptanceTestExpected { get; set; }
         public DateTime? OperationalAcceptanceTestApproved { get; set; }
+        /// <summary>
+        /// When the contract began (indgået)
+        /// </summary>
         public DateTime? Concluded { get; set; }
+
         public int Duration { get; set; }
         public DateTime? IrrevocableTo { get; set; }
+        /// <summary>
+        /// When the contract expires (udløbet)
+        /// </summary>
         public DateTime? ExpirationDate { get; set; }
         public DateTime? OperationRemunerationBegun { get; set; }
+
+        /// <summary>
+        /// When the contract ends (opsagt)
+        /// </summary>
         public DateTime? Terminated { get; set; }
+
         public int ExtendMultiplier { get; set; }
 
         public int? TerminationDeadlineId { get; set; }
