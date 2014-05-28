@@ -35,23 +35,37 @@
                 
                 //decorates the contracts and adds it to a collection.
                 //then repeats recursively for all children
-                function visit(contract, collection) {
+                function visit(contract, collection, indentation) {
                     contract.hasChildren = contract.children && contract.children.length > 0;
-
+                    contract.indentation = indentation;
+                    
                     contract.unfolded = false;
+
+                    contract.status = {
+                        max: contract.totalRedStatuses + contract.totalYellowStatuses + contract.totalGreenStatuses,
+                        red: contract.totalRedStatuses,
+                        yellow: contract.totalYellowStatuses,
+                        green: contract.totalGreenStatuses
+                    };
 
                     contract.toggleFold = function() {
                         contract.unfolded = !contract.unfolded;
 
+                        function hide(theContract) {
+                            theContract.show = theContract.unfolded = false;
+                            _.each(theContract.children, hide);
+                        }
+                        
                         _.each(contract.children, function(child) {
-                            child.show = contract.unfolded;
+                            if (contract.unfolded) child.show = true;
+                            else hide(child);
                         });
                     };
 
                     collection.push(contract);
 
                     _.each(contract.children, function(child) {
-                        visit(child, collection);
+                        visit(child, collection, indentation + "     ");
                     });
                 }
 
@@ -60,7 +74,7 @@
 
                     var collection = contract.isActive ? activeContracts : inactiveContracts;
 
-                    visit(contract, collection);
+                    visit(contract, collection, "");
                 });
 
             }]);

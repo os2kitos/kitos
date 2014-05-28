@@ -51,17 +51,27 @@ namespace UI.MVC4.Models
         /// <summary>
         /// The sum of the acquisition column of extern economy streams.
         /// </summary>
-        public int AcquisitionSum
+        public int? AcquisitionSum
         {
-            get { return ExternEconomyStreams.Sum(stream => stream.Acquisition); } 
+            get
+            {
+                if (!ExternEconomyStreams.Any()) return null;
+
+                return ExternEconomyStreams.Sum(stream => stream.Acquisition);
+            } 
         }
 
         /// <summary>
         /// The sum of the operation column of extern economy streams.
         /// </summary>
-        public int OperationSum 
+        public int? OperationSum 
         { 
-            get { return ExternEconomyStreams.Sum(stream => stream.Operation); }
+            get
+            {
+                if (!ExternEconomyStreams.Any()) return null;
+
+                return ExternEconomyStreams.Sum(stream => stream.Operation);
+            }
         }
 
         /// <summary>
