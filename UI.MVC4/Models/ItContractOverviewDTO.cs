@@ -35,7 +35,7 @@ namespace UI.MVC4.Models
         public DateTime? Terminated { get; set; }
 
         /// <summary>
-        /// Whether the 
+        /// Whether the contract is active or not
         /// </summary>
         public bool IsActive
         {

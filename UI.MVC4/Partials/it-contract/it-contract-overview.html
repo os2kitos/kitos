@@ -1,1 +1,92 @@
-﻿
+﻿<table class="table table-condensed table-striped">
+    <thead>
+        <tr>
+            <th>IT Kontrakt</th>
+
+            <th>Ansv. organisationsenhed</th>
+
+            <th>
+                <select class="form-control input-sm" data-ng-init="chosenRoleId = 2" 
+                        data-ng-model="chosenRoleId" data-ng-options="role.id as role.name for role in itContractRoles">
+                </select>
+            </th>
+            
+            <th>
+                Leverandør
+            </th>
+            
+            <th>
+                Anskaffelse
+            </th>
+            
+            <th>
+                Drift/år
+            </th>
+            
+            <th>
+                Betalings model
+            </th>
+            
+            <th>
+                Frekvens
+            </th>
+            
+            <th colspan="2">
+                Audit
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr data-ng-repeat="contract in activeContracts | filter:{'show': true}">
+            <!-- contract name -->
+            <td>
+                {{ contract.name }}
+            </td>
+            
+            <!-- responsible org unit name -->
+            <td>
+                {{ contract.reponsibleOrganizationUnitName }}
+            </td>
+            
+            <!-- name of users with the selected role -->
+            <td>
+                {{ contract.rights | filter:{roleId:chosenRoleId} | joinBy:', ':'user.name' }}
+            </td>
+            
+            <!-- supplier name -->
+            <td>
+                {{ contract.supplierName }}
+            </td>
+            
+            <!-- sum of acquisition column -->
+            <td>
+                {{ contract.acquisitionSum }}
+            </td>
+            
+            <!-- sum of operation column -->
+            <td>
+                {{ contract.operationSum }}
+            </td>
+            
+            <!-- payment model -->
+            <td>
+                {{ contract.paymentModelName }}
+            </td>
+            
+            <!-- frequency model -->
+            <td>
+                {{ contract.paymentFreqencyName }}
+            </td>
+            
+            <!-- first audit date -->
+            <td>
+                <div data-ng-model="contract.firstAuditDate" data-datereader=""></div>
+            </td>
+            
+            <!-- audit status aggregated TODO -->
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+</table>
