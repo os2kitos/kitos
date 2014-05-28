@@ -50,7 +50,7 @@ namespace UI.MVC4.Models
         public bool IsSigned { get; set; }
         [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime? SignedDate { get; set; }
-        public int ResponsibleOrganizationUnitId { get; set; }
+        public int? ResponsibleOrganizationUnitId { get; set; }
         public int? SupplierId { get; set; }
         public int? ProcurementStrategyId { get; set; }
         public int? ProcurementPlanHalf { get; set; }

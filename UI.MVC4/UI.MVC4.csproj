@@ -457,7 +457,6 @@
     <Content Include="Partials\home\reset-password.html" />
     <Content Include="Partials\home\forgot-password.html" />
     <Content Include="Partials\home\index.html" />
-    <Content Include="Partials\it-contract\it-contract-catalog.html" />
     <Content Include="Partials\it-contract\it-contract-edit.html" />
     <Content Include="Partials\it-contract\it-contract-overview.html" />
     <Content Include="Partials\it-contract\it-contract-plan.html" />
@@ -551,7 +550,7 @@
     <Content Include="Scripts\app\controllers\it-contract\it-contract-hierarchy.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-deadlines.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-advice.js" />
-    <Content Include="Scripts\app\controllers\it-contract\it-contract-catalog.js" />
+    <Content Include="Scripts\app\controllers\it-contract\it-contract-create.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-edit.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-overview.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-plan.js" />
