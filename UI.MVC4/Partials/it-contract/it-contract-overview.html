@@ -1,4 +1,4 @@
-﻿<table class="table table-condensed table-striped">
+﻿<table class="table table-condensed">
     <thead>
         <tr>
             <th>IT Kontrakt</th>
@@ -36,56 +36,41 @@
             </th>
         </tr>
     </thead>
+
     <tbody>
-        <tr data-ng-repeat="contract in activeContracts | filter:{'show': true}">
-            <!-- contract name -->
-            <td>
-                {{ contract.name }}
+        
+        <!-- for each active contract -->
+        <tr data-ng-repeat="contract in activeContracts | filter:{'show': true}" 
+            data-ng-include="'partials/it-contract/overview-row.html'">
+        </tr>
+        
+        <!-- when there are no active contracts to show -->
+        <tr data-ng-if="activeContracts.length == 0">
+            <td colspan="10" class="text-center">
+                <i>Ingen aktive kontrakter</i>
             </td>
-            
-            <!-- responsible org unit name -->
-            <td>
-                {{ contract.reponsibleOrganizationUnitName }}
+        </tr>
+        
+        <!-- "click to show inactive contracts"-row -->
+        <tr>
+            <td colspan="10">
+                <a class="full-width btn btn-link text-left" data-ng-click="showInactive = !showInactive">
+                    <i class="glyphicon" data-ng-class="{'glyphicon-chevron-right': !showInactive, 'glyphicon-chevron-down': showInactive}"></i>
+                    Klik for at {{ showInactive && 'skjule' || 'vise' }} inaktive IT kontrakter
+                </a>
             </td>
-            
-            <!-- name of users with the selected role -->
-            <td>
-                {{ contract.rights | filter:{roleId:chosenRoleId} | joinBy:', ':'user.name' }}
-            </td>
-            
-            <!-- supplier name -->
-            <td>
-                {{ contract.supplierName }}
-            </td>
-            
-            <!-- sum of acquisition column -->
-            <td>
-                {{ contract.acquisitionSum }}
-            </td>
-            
-            <!-- sum of operation column -->
-            <td>
-                {{ contract.operationSum }}
-            </td>
-            
-            <!-- payment model -->
-            <td>
-                {{ contract.paymentModelName }}
-            </td>
-            
-            <!-- frequency model -->
-            <td>
-                {{ contract.paymentFreqencyName }}
-            </td>
-            
-            <!-- first audit date -->
-            <td>
-                <div data-ng-model="contract.firstAuditDate" data-datereader=""></div>
-            </td>
-            
-            <!-- audit status aggregated TODO -->
-            <td>
-                
+        </tr>
+        
+        <!-- for each inactive contract -->
+        <tr data-ng-if="showInactive" data-ng-repeat="contract in inactiveContracts | filter:{'show': true}" 
+            data-ng-include="'partials/it-contract/overview-row.html'">
+        </tr>
+
+        
+        <!-- when there are no active contracts to show -->
+        <tr data-ng-if="showInactive && inactiveContracts.length == 0">
+            <td colspan="10" class="text-center">
+                <i>Ingen inaktive kontrakter</i>
             </td>
         </tr>
     </tbody>

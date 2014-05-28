@@ -1,0 +1,45 @@
+﻿<!-- contract name -->
+<td>
+    <i class="glyphicon" data-ng-class="{'invisible': !contract.hasChildren, 'glyphicon-chevron-right': !contract.unfolded, 'glyphicon-chevron-down': contract.unfolded}">
+    </i>
+
+    <a data-ui-sref="it-contract.edit({id: contract.id})">
+        {{contract.name}}
+    </a>
+</td>
+
+<!-- responsible org unit name -->
+<td>{{ contract.reponsibleOrganizationUnitName }}
+</td>
+
+<!-- name of users with the selected role -->
+<td>{{ contract.rights | filter:{roleId:chosenRoleId} | joinBy:', ':'user.name' }}
+</td>
+
+<!-- supplier name -->
+<td>{{ contract.supplierName }}
+</td>
+
+<!-- sum of acquisition column -->
+<td>{{ contract.acquisitionSum }}
+</td>
+
+<!-- sum of operation column -->
+<td>{{ contract.operationSum }}
+</td>
+
+<!-- payment model -->
+<td>{{ contract.paymentModelName }}
+</td>
+
+<!-- frequency model -->
+<td>{{ contract.paymentFreqencyName }}
+</td>
+
+<!-- first audit date -->
+<td>
+    <div data-ng-model="contract.firstAuditDate" data-datereader=""></div>
+</td>
+
+<!-- audit status aggregated TODO -->
+<td></td>

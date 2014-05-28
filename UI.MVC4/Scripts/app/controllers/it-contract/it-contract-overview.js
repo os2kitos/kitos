@@ -36,7 +36,7 @@
                 //decorates the contracts and adds it to a collection.
                 //then repeats recursively for all children
                 function visit(contract, collection) {
-                    contract.hasChildren = contract.children.length > 0;
+                    contract.hasChildren = contract.children && contract.children.length > 0;
 
                     contract.unfolded = false;
 
