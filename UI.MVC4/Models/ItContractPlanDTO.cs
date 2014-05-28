@@ -34,8 +34,12 @@ namespace UI.MVC4.Models
         public string TerminationDeadlineName { get; set; }
 
         //Ninth
-        public string ProcurementStrategyName { get; set; }
+        public DateTime? IrrevocableTo { get; set; }
 
+        //Tenth
+        public string ProcurementStrategyName { get; set; }
+       
+        //Eleventh
         public int? ProcurementPlanHalf { get; set; }
         public int? ProcurementPlanYear { get; set; }
     }
