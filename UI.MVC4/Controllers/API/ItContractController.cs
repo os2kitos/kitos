@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
+using Core.ApplicationServices;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
@@ -147,34 +148,5 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
         }
-    }
-
-    public static class LinqTreeExtension
-    {
-        public static IEnumerable<T> SelectNestedChildren<T>
-            (this IEnumerable<T> source, Func<T, IEnumerable<T>> selector)
-        {
-            foreach (T item in source)
-            {
-                yield return item;
-                foreach (T subItem in SelectNestedChildren(selector(item), selector))
-                {
-                    yield return subItem;
-                }
-            }
-        }
-
-        public static IEnumerable<T> SelectNestedParents<T>
-            (this T source, Func<T, T> selector) 
-            where T : class
-        {
-            yield return source;
-            var parent = selector(source);
-            if (parent == null)
-                yield break;
-            yield return SelectNestedParents(parent, selector).FirstOrDefault();
-        }
-
-        
     }
 }
