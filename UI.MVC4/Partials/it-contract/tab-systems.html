@@ -31,19 +31,19 @@
                     </td>
 
                     <td>
-                        <div class="pull-right">
-                        <a class="btn btn-danger btn-xs"
-                           data-confirmed-click="associatedSystemUsage.delete()"
-                           data-confirm-click="Er du sikker på at du vil slette rækken?">
-                            <i class="glyphicon glyphicon-trash"></i>
-                        </a>
-                            </div>
+                        <div class="pull-right" data-ng-if="hasWriteAccess">
+                            <a class="btn btn-danger btn-xs"
+                                data-confirmed-click="associatedSystemUsage.delete()"
+                                data-confirm-click="Er du sikker på at du vil slette rækken?">
+                                <i class="glyphicon glyphicon-trash"></i>
+                            </a>
+                        </div>
                     </td>
                 </tr>
 
 
             </tbody>
-            <tfoot>
+            <tfoot data-ng-if="hasWriteAccess">
                 <!-- new row -->
                 <tr>
                     <td colspan="3">
@@ -103,7 +103,7 @@
 
                     <td>
 
-                        <div class="pull-right">
+                        <div class="pull-right" data-ng-if="hasWriteAccess">
                             <a class="btn btn-danger btn-xs"
                                 data-confirmed-click="associatedInterface.delete()"
                                 data-confirm-click="Er du sikker på at du vil slette rækken?">
@@ -113,7 +113,7 @@
                     </td>
                 </tr>
             </tbody>
-            <tfoot>
+            <tfoot data-ng-if="hasWriteAccess">
                 <!-- new row -->
                 <tr>
                     <td>
