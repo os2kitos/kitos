@@ -4,13 +4,10 @@ using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ActivityMap : EntityTypeConfiguration<Activity>
+    public class ActivityMap : EntityMap<Activity>
     {
         public ActivityMap()
         {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
             // Table & Column Mappings
             this.ToTable("Activity");
 

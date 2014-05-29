@@ -95,7 +95,6 @@ namespace UI.MVC4.Controllers.API
 
                 PostQuery(item);
 
-                //var msg = new HttpResponseMessage(HttpStatusCode.Created);
                 return Created(Map<TModel, TDto>(item), new Uri(Request.RequestUri + "/" + item.Id));
             }
             catch (ConflictException e)
@@ -119,14 +118,15 @@ namespace UI.MVC4.Controllers.API
         // PUT api/T
         public virtual HttpResponseMessage Put(int id, TDto dto)
         {
-            var oldItem = Repository.GetByKey(id);
-            if (!HasWriteAccess(oldItem, KitosUser)) return Unauthorized();
-
-            var item = Map<TDto, TModel>(dto);
-            item.Id = id;
             try
             {
-                PutQuery(item);
+                var oldItem = Repository.GetByKey(id);
+                if (!HasWriteAccess(oldItem, KitosUser)) return Unauthorized();
+
+                var newItem = Map<TDto, TModel>(dto);
+                newItem.Id = id;
+
+                PutQuery(newItem);
 
                 return Ok();
             }
@@ -147,6 +147,9 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
+                var item = Repository.GetByKey(id);
+                if (!HasWriteAccess(item, KitosUser)) return Unauthorized();
+
                 DeleteQuery(id);
 
                 return Ok();
@@ -168,57 +171,56 @@ namespace UI.MVC4.Controllers.API
         // PATCH api/T
         public virtual HttpResponseMessage Patch(int id, JObject obj)
         {
-            var item = Repository.GetByKey(id);
-            if (!HasWriteAccess(item, KitosUser)) return Unauthorized();
-
-            var itemType = item.GetType();
-
-            foreach (var valuePair in obj)
-            {
-                // get name of mapped property
-                var map =
-                    AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>()
-                              .GetPropertyMaps();
-                var nonNullMaps = map.Where(x => x.SourceMember != null);
-                var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name.Equals(valuePair.Key, StringComparison.InvariantCultureIgnoreCase));
-                if (mapMember == null) 
-                    continue; // abort if no map found
-
-                var destName = mapMember.DestinationProperty.Name;
-                var jToken = valuePair.Value;
-
-                var propRef = itemType.GetProperty(destName);
-                var t = propRef.PropertyType;
-
-                // we have to handle enums separately
-                if (t.IsEnum)
-                {
-                    var value = valuePair.Value.Value<int>();
-                    propRef.SetValue(item, value);
-                }
-                else
-                {
-                    try
-                    {
-                        // get reference to the generic method obj.Value<t>(parameter);
-                        var genericMethod = jToken.GetType().GetMethod("Value").MakeGenericMethod(new Type[] { t });
-                        // use reflection to call obj.Value<t>("keyName");
-                        var value = genericMethod.Invoke(obj, new object[] { valuePair.Key });
-                        // update the entity
-                        propRef.SetValue(item, value);
-                    }
-                    catch (Exception)
-                    {
-                        // if obj.Value<t>("keyName") cast fails set to fallback value
-                        propRef.SetValue(item, null); // TODO this is could be dangerous, should probably also be default(t)
-                    }
-                }
-            }
-
             try
             {
-                PatchQuery(item);
+                var item = Repository.GetByKey(id);
+                if (!HasWriteAccess(item, KitosUser)) return Unauthorized();
 
+                var itemType = item.GetType();
+
+                foreach (var valuePair in obj)
+                {
+                    // get name of mapped property
+                    var map =
+                        AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>()
+                                  .GetPropertyMaps();
+                    var nonNullMaps = map.Where(x => x.SourceMember != null);
+                    var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name.Equals(valuePair.Key, StringComparison.InvariantCultureIgnoreCase));
+                    if (mapMember == null)
+                        continue; // abort if no map found
+
+                    var destName = mapMember.DestinationProperty.Name;
+                    var jToken = valuePair.Value;
+
+                    var propRef = itemType.GetProperty(destName);
+                    var t = propRef.PropertyType;
+
+                    // we have to handle enums separately
+                    if (t.IsEnum)
+                    {
+                        var value = valuePair.Value.Value<int>();
+                        propRef.SetValue(item, value);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            // get reference to the generic method obj.Value<t>(parameter);
+                            var genericMethod = jToken.GetType().GetMethod("Value").MakeGenericMethod(new Type[] { t });
+                            // use reflection to call obj.Value<t>("keyName");
+                            var value = genericMethod.Invoke(obj, new object[] { valuePair.Key });
+                            // update the entity
+                            propRef.SetValue(item, value);
+                        }
+                        catch (Exception)
+                        {
+                            // if obj.Value<t>("keyName") cast fails set to fallback value
+                            propRef.SetValue(item, null); // TODO this is could be dangerous, should probably also be default(t)
+                        }
+                    }
+                }
+                
+                PatchQuery(item);
                 return Ok(Map(item));
             }
             catch (Exception e)

@@ -3,12 +3,10 @@ using Core.DomainModel;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class AdminRightMap : EntityTypeConfiguration<AdminRight>
+    public class AdminRightMap : EntityMap<AdminRight>
     {
         public AdminRightMap()
         {
-            this.HasKey(right => new { right.ObjectId, right.RoleId, right.UserId });
-
             this.ToTable("AdminRight");
 
             this.HasRequired(right => right.Object)
