@@ -120,6 +120,101 @@ namespace Infrastructure.DataAccess.Migrations
 
             #endregion
             
+            #region ADMIN ROLES
+
+            var localAdmin = new AdminRole { Name = "LocalAdmin", IsActive = true };
+            context.AdminRoles.AddOrUpdate(x => x.Name, localAdmin);
+
+            #endregion
+            
+            #region ORG ROLES
+
+            var boss = new OrganizationRole()
+            {
+                IsActive = true,
+                Name = "Chef",
+                Note = "Lederen af en organisationsenhed",
+                HasWriteAccess = true, 
+                ObjectOwner = globalUser
+            };
+
+            var resourcePerson = new OrganizationRole()
+            {
+                IsActive = true,
+                Name = "Ressourceperson",
+                Note = "...",
+                HasWriteAccess = true,
+                ObjectOwner = globalUser
+            };
+
+            var employee = new OrganizationRole()
+            {
+                IsActive = true,
+                Name = "Medarbejder",
+                Note = "...",
+                HasWriteAccess = false,
+                ObjectOwner = globalUser
+            };
+
+            context.OrganizationRoles.AddOrUpdate(role => role.Id, boss, resourcePerson, employee);
+
+
+            #endregion
+
+            #region PROJECT ROLES
+
+            context.ItProjectRoles.AddOrUpdate(r => r.Id, new ItProjectRole() { IsActive = true, Name = "Projektejer" },
+                                               new ItProjectRole() { IsActive = true, Name = "Projektleder" },
+                                               new ItProjectRole() { IsActive = true, Name = "Delprojektleder" },
+                                               new ItProjectRole() { IsActive = true, Name = "Projektdeltager" });
+
+            #endregion
+            
+            #region SYSTEM ROLES
+
+            var systemRole1 = new ItSystemRole()
+            {
+                HasReadAccess = true,
+                HasWriteAccess = true,
+                IsActive = true,
+                Name = "Systemrolle 1"
+            };
+
+            var systemRole2 = new ItSystemRole()
+            {
+                HasReadAccess = true,
+                HasWriteAccess = false,
+                IsActive = true,
+                Name = "Systemrolle 2"
+            };
+
+            context.ItSystemRoles.AddOrUpdate(x => x.Name, systemRole1, systemRole2);
+            context.SaveChanges();
+
+            #endregion
+
+            #region CONTRACT ROLES
+
+            context.ItContractRoles.AddOrUpdate(x => x.Name, new ItContractRole()
+            {
+                HasWriteAccess = true,
+                Name = "Kontraktrolle A",
+                IsActive = true
+            }, new ItContractRole()
+            {
+                HasWriteAccess = true,
+                Name = "Kontraktrolle B",
+                IsActive = true
+            }, new ItContractRole()
+            {
+                HasWriteAccess = false,
+                Name = "Kontraktrolle C",
+                IsActive = true
+            });
+            context.SaveChanges();
+
+            #endregion
+
             #region ORGANIZATIONS
 
             var organizationService = new OrganizationService(null, null, null); // TODO needs a refactor as this is a bit hacky!
@@ -132,6 +227,298 @@ namespace Infrastructure.DataAccess.Migrations
 
             context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø, kl, companyA, companyB, companyC);
             context.SaveChanges();
+
+            #endregion
+
+            #region ADMIN RIGHTS
+
+            context.AdminRights.AddOrUpdate(right => new { right.ObjectId, right.RoleId, right.UserId },
+                                            new AdminRight()
+                                            {
+                                                Object = roskilde,
+                                                Role = localAdmin,
+                                                User = user1
+                                            },
+                                            new AdminRight()
+                                            {
+                                                Object = kl,
+                                                Role = localAdmin,
+                                                User = erik
+                                            },
+                                            new AdminRight()
+                                            {
+                                                Object = roskilde,
+                                                Role = localAdmin,
+                                                User = localUser
+                                            });
+
+            context.SaveChanges();
+
+            #endregion
+
+            #region ROSKILDE ORG UNITS
+
+            //LEVEL 0
+            var roskildeRoot = roskilde.OrgUnits.First();
+
+            //LEVEL 1
+            var munChief = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = roskildeRoot,
+                Name = "Kommunaldirektøren"
+            };
+            var wellfare = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = roskildeRoot,
+                Name = "Velfærd"
+            };
+
+            //LEVEL 2
+            var digi = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = munChief,
+                Name = "Digitalisering og Borgerservice"
+            };
+
+            var hrcouncil = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = munChief,
+                Name = "HR og Byråd"
+            };
+
+            var elderArea = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = wellfare,
+                Name = "Ældreområdet"
+            };
+
+            //LEVEL 3
+            var itservice = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = digi,
+                Name = "IT Service"
+            };
+            var projectunit = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = digi,
+                Name = "Projektenheden"
+            };
+            var citizenservice = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = digi,
+                Name = "Borgerservice"
+            };
+            var hr = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = hrcouncil,
+                Name = "HR"
+            };
+            var nursinghome = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = elderArea,
+                Name = "Plejehjem"
+            };
+
+            //LEVEL 4
+            var infra = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = itservice,
+                Name = "Infrastruktur"
+            };
+            var teamcontact = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = citizenservice,
+                Name = "Team Kontaktcenter"
+            };
+
+            context.OrganizationUnits.AddOrUpdate(o => o.Name, munChief, wellfare, digi, hrcouncil, elderArea, itservice, projectunit, citizenservice, hr, nursinghome, infra, teamcontact);
+            context.SaveChanges();
+
+            #endregion
+
+            #region SORØ ORG UNITS
+
+            //LEVEL 0
+            var sorøRoot = sorø.OrgUnits.First();
+
+            //LEVEL 1
+            var level1a = new OrganizationUnit()
+            {
+                Organization = sorø, ObjectOwner = globalUser,
+                Parent = sorøRoot,
+                Name = "Direktørområde"
+            };
+
+            //LEVEL 2
+            var level2a = new OrganizationUnit()
+            {
+                Organization = sorø, ObjectOwner = globalUser,
+                Parent = level1a,
+                Name = "Afdeling 1"
+            };
+
+            var level2b = new OrganizationUnit()
+            {
+                Organization = sorø, ObjectOwner = globalUser,
+                Parent = level1a,
+                Name = "Afdeling 2"
+            };
+
+            var level2c = new OrganizationUnit()
+            {
+                Organization = sorø, ObjectOwner = globalUser,
+                Parent = level1a,
+                Name = "Afdeling 3"
+            };
+
+            //LEVEL 2
+            var level3a = new OrganizationUnit()
+            {
+                Organization = sorø, ObjectOwner = globalUser,
+                Parent = level2a,
+                Name = "Afdeling 1a"
+            };
+
+            var level3b = new OrganizationUnit()
+            {
+                Organization = sorø, ObjectOwner = globalUser,
+                Parent = level2b,
+                Name = "Afdeling 2a"
+            };
+
+            var level3c = new OrganizationUnit()
+            {
+                Organization = sorø, ObjectOwner = globalUser,
+                Parent = level2b,
+                Name = "Afdeling 2b"
+            };
+
+            context.OrganizationUnits.AddOrUpdate(o => o.Name, level1a, level2a, level2b, level2c, level3a, level3b, level3c);
+            context.SaveChanges();
+
+            #endregion
+
+            #region KL ORG UNITS
+
+            var klRootUnit = kl.OrgUnits.First();
+
+            #endregion
+
+            #region TEXTS
+
+            context.Texts.AddOrUpdate(x => x.Id,
+                                      new Text() { Value = "Head" },
+                                      new Text() { Value = "Body" });
+
+            #endregion
+
+            #region KLE
+
+            var task00 = new TaskRef()
+            {
+                TaskKey = "00",
+                Description = "Kommunens styrelse",
+                Type = "KLE-Hovedgruppe",
+                IsPublic = true,
+                OwnedByOrganizationUnit = klRootUnit
+            };
+            var task0001 = new TaskRef()
+            {
+                TaskKey = "00.01",
+                Description = "Kommunens styrelse",
+                Type = "KLE-Gruppe",
+                Parent = task00,
+                IsPublic = true,
+                OwnedByOrganizationUnit = klRootUnit
+            };
+            var task0003 = new TaskRef()
+            {
+                TaskKey = "00.03",
+                Description = "International virksomhed og EU",
+                Type = "KLE-Gruppe",
+                Parent = task00,
+                IsPublic = true,
+                OwnedByOrganizationUnit = klRootUnit
+            };
+            context.TaskRefs.AddOrUpdate(x => x.TaskKey,
+                                         task00,
+                                         task0001,
+                                         new TaskRef()
+                                         {
+                                             TaskKey = "00.01.00",
+                                             Description = "Kommunens styrelse i almindelighed",
+                                             Type = "KLE-Emne",
+                                             Parent = task0001,
+                                             IsPublic = true,
+                                             OwnedByOrganizationUnit = klRootUnit
+                                         },
+                                         new TaskRef()
+                                         {
+                                             TaskKey = "00.01.10",
+                                             Description = "Opgaver der dækker flere hovedgrupper",
+                                             Type = "KLE-Emne",
+                                             Parent = task0001,
+                                             IsPublic = true,
+                                             OwnedByOrganizationUnit = klRootUnit
+                                         },
+                                         task0003,
+                                         new TaskRef()
+                                         {
+                                             TaskKey = "00.03.00",
+                                             Description = "International virksomhed og EU i almindelighed",
+                                             Type = "KLE-Emne",
+                                             Parent = task0003,
+                                             IsPublic = true,
+                                             OwnedByOrganizationUnit = klRootUnit
+                                         },
+                                         new TaskRef()
+                                         {
+                                             TaskKey = "00.03.02",
+                                             Description = "Internationale organisationers virksomhed",
+                                             Type = "KLE-Emne",
+                                             Parent = task0003,
+                                             IsPublic = true,
+                                             OwnedByOrganizationUnit = klRootUnit
+                                         },
+                                         new TaskRef()
+                                         {
+                                             TaskKey = "00.03.04",
+                                             Description = "Regionaludvikling EU",
+                                             Type = "KLE-Emne",
+                                             Parent = task0003,
+                                             IsPublic = true,
+                                             OwnedByOrganizationUnit = klRootUnit
+                                         },
+                                         new TaskRef()
+                                         {
+                                             TaskKey = "00.03.08",
+                                             Description = "EU-interessevaretagelse",
+                                             Type = "KLE-Emne",
+                                             Parent = task0003,
+                                             IsPublic = true,
+                                             OwnedByOrganizationUnit = klRootUnit
+                                         },
+                                         new TaskRef()
+                                         {
+                                             TaskKey = "00.03.10",
+                                             Description = "Internationalt samarbejde",
+                                             Type = "KLE-Emne",
+                                             Parent = task0003,
+                                             IsPublic = true,
+                                             OwnedByOrganizationUnit = klRootUnit
+                                         });
 
             #endregion
         }
