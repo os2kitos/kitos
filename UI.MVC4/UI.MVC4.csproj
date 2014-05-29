@@ -219,6 +219,7 @@
     <Compile Include="Controllers\API\TerminationDeadlineController.cs" />
     <Compile Include="Controllers\API\PaymentMilestoneController.cs" />
     <Compile Include="Models\ItContractOverviewDTO.cs" />
+    <Compile Include="Models\ItContractPlanDTO.cs" />
     <Compile Include="Models\PaymentMilestoneDTO.cs" />
     <Compile Include="Controllers\API\AdviceController.cs" />
     <Compile Include="Controllers\API\CustomAgreementElementController.cs" />

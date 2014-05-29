@@ -332,7 +332,10 @@ namespace UI.MVC4.App_Start
                   .ForMember(contract => contract.ExternEconomyStreams, opt => opt.Ignore());
 
             //Output only - this mapping should not be reversed
-            Mapper.CreateMap<ItContract, ItContractOverviewDTO>(); 
+            Mapper.CreateMap<ItContract, ItContractOverviewDTO>();
+
+            //Output only - this mapping should not be reversed
+            Mapper.CreateMap<ItContract, ItContractPlanDTO>(); 
 
             Mapper.CreateMap<CustomAgreementElement, CustomAgreementElementDTO>()
                   .ReverseMap()
