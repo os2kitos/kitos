@@ -12,9 +12,9 @@ using UI.MVC4.Models;
 namespace UI.MVC4.Controllers.API
 {
     public abstract class GenericRightController<TRight, TObject, TRole> : BaseApiController
-        where TObject : class, IEntity<int>
-        where TRole : IRoleEntity, IEntity<int>
-        where TRight : class, IRight<TObject, TRole>
+        where TObject : Entity
+        where TRole : Entity, IRoleEntity
+        where TRight : Entity, IRight<TObject, TRole>
     {
         protected readonly IGenericRepository<TRight> RightRepository;
         private readonly IGenericRepository<TObject> _objectRepository;
@@ -32,7 +32,7 @@ namespace UI.MVC4.Controllers.API
 
         protected virtual bool HasWriteAccess(TObject theObject, User user)
         {
-            if (theObject is IHasOwner && ((IHasOwner) theObject).ObjectOwnerId == user.Id) return true; 
+            if (theObject.ObjectOwnerId == user.Id) return true; 
 
             var rights = RightRepository.Get(right => right.ObjectId == theObject.Id && right.UserId == user.Id).ToList();
             return rights.Any(right => right.Role.HasWriteAccess);

@@ -9,7 +9,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class ItSystemController : GenericApiController<ItSystem, int, ItSystemDTO>
+    public class ItSystemController : GenericApiController<ItSystem, ItSystemDTO>
     {
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemService _systemService;

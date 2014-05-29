@@ -12,7 +12,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class ItProjectController : GenericApiController<ItProject, int, ItProjectDTO>
+    public class ItProjectController : GenericApiController<ItProject, ItProjectDTO>
     {
         private readonly IItProjectService _itProjectService;
         private readonly IGenericRepository<TaskRef> _taskRepository;

@@ -8,7 +8,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class TaskUsageController : GenericApiController<TaskUsage, int, TaskUsageDTO>
+    public class TaskUsageController : GenericApiController<TaskUsage, TaskUsageDTO>
     {
         private readonly IOrgUnitService _orgUnitService;
 

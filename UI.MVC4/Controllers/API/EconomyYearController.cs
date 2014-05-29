@@ -10,7 +10,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class EconomyYearController : GenericApiController<EconomyYear, int, EconomyYearDTO>
+    public class EconomyYearController : GenericApiController<EconomyYear, EconomyYearDTO>
     {
         private readonly IItProjectService _itProjectService;
 

@@ -84,8 +84,11 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<Interface>>().To<GenericRepository<Interface>>().InRequestScope();
             kernel.Bind<IGenericRepository<DataType>>().To<GenericRepository<DataType>>().InRequestScope();
             kernel.Bind<IGenericRepository<DataRowUsage>>().To<GenericRepository<DataRowUsage>>().InRequestScope();
-            kernel.Bind<IGenericRepository<ProjectPhase>>().To<GenericRepository<ProjectPhase>>().InRequestScope();
-            kernel.Bind<IGenericRepository<ProjPhaseLocale>>().To<GenericRepository<ProjPhaseLocale>>().InRequestScope();
+
+            //TODO
+            //kernel.Bind<IGenericRepository<ProjectPhase>>().To<GenericRepository<ProjectPhase>>().InRequestScope();
+           // kernel.Bind<IGenericRepository<ProjPhaseLocale>>().To<GenericRepository<ProjPhaseLocale>>().InRequestScope();
+
             kernel.Bind<IGenericRepository<ItProjectCategory>>().To<GenericRepository<ItProjectCategory>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItProjectType>>().To<GenericRepository<ItProjectType>>().InRequestScope();
             kernel.Bind<IGenericRepository<PurchaseForm>>().To<GenericRepository<PurchaseForm>>().InRequestScope();

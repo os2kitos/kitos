@@ -75,9 +75,10 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<ProjectPhase, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
+            //TODO
+            //Mapper.CreateMap<ProjectPhase, OptionDTO>()
+            //      .ReverseMap()
+            //      .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<ItProjectType, OptionDTO>()
                   .ReverseMap()
@@ -175,10 +176,14 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<ProjPhaseLocale, LocaleDTO>().ReverseMap();
+            //TODO
+            //Mapper.CreateMap<ProjPhaseLocale, LocaleDTO>().ReverseMap();
+
             Mapper.CreateMap<ExtRefTypeLocale, LocaleDTO>().ReverseMap();
 
-            Mapper.CreateMap<ProjPhaseLocale, LocaleInputDTO>().ReverseMap();
+            //TODO
+            //Mapper.CreateMap<ProjPhaseLocale, LocaleInputDTO>().ReverseMap();
+
             Mapper.CreateMap<ExtRefTypeLocale, LocaleInputDTO>().ReverseMap();
 
             Mapper.CreateMap<Config, ConfigDTO>().ReverseMap();

@@ -9,8 +9,8 @@ using UI.MVC4.Models.Exceptions;
 
 namespace UI.MVC4.Controllers.API
 {
-    public abstract class GenericApiController<TModel, TKeyType, TDto> : BaseApiController // TODO perhaps it's possible to infer the TKeyType from TModel somehow
-        where TModel : class, IEntity<TKeyType>
+    public abstract class GenericApiController<TModel, TDto> : BaseApiController // TODO perhaps it's possible to infer the TKeyType from TModel somehow
+        where TModel : Entity
     {
         protected readonly IGenericRepository<TModel> Repository;
 
@@ -66,7 +66,7 @@ namespace UI.MVC4.Controllers.API
         }
 
         // GET api/T
-        public HttpResponseMessage GetSingle(TKeyType id)
+        public HttpResponseMessage GetSingle(int id)
         {
             var item = Repository.GetByKey(id);
 
@@ -85,15 +85,13 @@ namespace UI.MVC4.Controllers.API
         }
 
         // POST api/T
-        //[Authorize(Roles = "GlobalAdmin")] TODO: FIX!
         public virtual HttpResponseMessage Post(TDto dto)
         {
             try
             {
                 var item = Map<TDto, TModel>(dto);
 
-                if (item is IHasOwner)
-                    (item as IHasOwner).ObjectOwner = KitosUser;
+                item.ObjectOwner = KitosUser;
 
                 PostQuery(item);
 
@@ -119,32 +117,33 @@ namespace UI.MVC4.Controllers.API
         }
 
         // PUT api/T
-        //[Authorize(Roles = "GlobalAdmin")] TODO: FIX!
-        public virtual HttpResponseMessage Put(TKeyType id, TDto dto)
+        public virtual HttpResponseMessage Put(int id, TDto dto)
         {
+            var oldItem = Repository.GetByKey(id);
+            if (!HasWriteAccess(oldItem, KitosUser)) return Unauthorized();
+
             var item = Map<TDto, TModel>(dto);
             item.Id = id;
             try
             {
                 PutQuery(item);
 
-                return Ok(); //TODO correct?
+                return Ok();
             }
             catch (Exception)
             {
-                return NoContent(); // TODO catch correct expection
+                return NoContent();
             }
         }
 
-        protected virtual void DeleteQuery(TKeyType id)
+        protected virtual void DeleteQuery(int id)
         {
             Repository.DeleteByKey(id);
             Repository.Save();
         }
 
         // DELETE api/T
-        //[Authorize(Roles = "GlobalAdmin")] TODO: FIX!
-        public virtual HttpResponseMessage Delete(TKeyType id)
+        public virtual HttpResponseMessage Delete(int id)
         {
             try
             {
@@ -154,7 +153,7 @@ namespace UI.MVC4.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e); // TODO catch correct expection
+                return Error(e);
             }
         }
 
@@ -167,10 +166,11 @@ namespace UI.MVC4.Controllers.API
         }
 
         // PATCH api/T
-        //[Authorize(Roles = "GlobalAdmin")] TODO: FIX!
-        public virtual HttpResponseMessage Patch(TKeyType id, JObject obj)
+        public virtual HttpResponseMessage Patch(int id, JObject obj)
         {
             var item = Repository.GetByKey(id);
+            if (!HasWriteAccess(item, KitosUser)) return Unauthorized();
+
             var itemType = item.GetType();
 
             foreach (var valuePair in obj)
@@ -219,12 +219,11 @@ namespace UI.MVC4.Controllers.API
             {
                 PatchQuery(item);
 
-                // pretty sure we'll get a merge conflict here???
-                return Ok(Map(item)); // TODO correct?
+                return Ok(Map(item));
             }
             catch (Exception e)
             {
-                return Error(e); // TODO catch correct expection
+                return Error(e);
             }
         }
 
@@ -232,6 +231,13 @@ namespace UI.MVC4.Controllers.API
         {
             Repository.Dispose();
             base.Dispose(disposing);
+        }
+
+        protected virtual bool HasWriteAccess(TModel obj, User user)
+        {
+            if (obj.ObjectOwnerId == user.Id) return true;
+
+            return false;
         }
     }
 }
