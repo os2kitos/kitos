@@ -6,16 +6,13 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel
 {
-    public class Activity : IEntity<int>, IHasOwner
+    public class Activity : Entity
     {
         public Activity()
         {
             this.AssociatedActivities = new List<Activity>();
             this.AssociatedStates = new List<State>();
         }
-
-
-        public int Id { get; set; }
 
         /// <summary>
         /// Human readable ID ("brugervendt noegle" in OIO)
@@ -51,9 +48,6 @@ namespace Core.DomainModel
 
         public int? AssociatedUserId { get; set; }
         public virtual User AssociatedUser { get; set; }
-
-        public int ObjectOwnerId { get; set; }
-        public virtual User ObjectOwner { get; set; }
         
         public virtual ItProject.ItProject Phase1ForProject { get; set; }
         public virtual ItProject.ItProject Phase2ForProject { get; set; }

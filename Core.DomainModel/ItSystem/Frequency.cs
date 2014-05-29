@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class Frequency : IOptionEntity<DataRowUsage>
+    public class Frequency : Entity, IOptionEntity<DataRowUsage>
     {
         public Frequency()
         {
             this.References = new List<DataRowUsage>();
         }
 
-        public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }

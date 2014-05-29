@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Core.DomainModel.ItProject;
 
 namespace Core.DomainModel
 {
@@ -10,7 +9,7 @@ namespace Core.DomainModel
         CommunityOfInterests
     }
 
-    public class Organization : IEntity<int>
+    public class Organization : Entity
     {
         public Organization()
         {
@@ -19,11 +18,12 @@ namespace Core.DomainModel
             this.Supplier = new List<ItContract.ItContract>();
             this.ItSystemUsages = new List<ItSystem.ItSystemUsage>();
             this.Contracts = new List<ItContract.ItContract>();
-            this.ProjectPhaseLocales = new List<ProjPhaseLocale>();
+
+            //this.ProjectPhaseLocales = new List<ProjPhaseLocale>();
+
             this.OrgUnits = new List<OrganizationUnit>();
         }
 
-        public int Id { get; set; }
         public string Name { get; set; }
         public OrganizationType? Type { get; set; }
         public int? Cvr { get; set; }
@@ -49,7 +49,10 @@ namespace Core.DomainModel
 
         /* Config and localization */
         public virtual Config Config { get; set; }
-        public virtual ICollection<ProjPhaseLocale> ProjectPhaseLocales { get; set; }
+
+        //TODO
+        //public virtual ICollection<ProjPhaseLocale> ProjectPhaseLocales { get; set; }
+
         public virtual ICollection<ExtRefTypeLocale> ExtRefTypeLocales { get; set; }
 
         #endregion

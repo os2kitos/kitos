@@ -209,39 +209,40 @@ namespace Infrastructure.DataAccess.Migrations
                 };
             context.ExtReferenceTypes.AddOrUpdate(x => x.Name, extRef1, extRef2, extRef3);
 
-            var projPhase1 = new ProjectPhase()
-                {
-                    IsActive = true,
-                    Name = "Afventer",
-                    Note = "..."
-                };
+            //TODO?
+            //var projPhase1 = new ProjectPhase()
+            //    {
+            //        IsActive = true,
+            //        Name = "Afventer",
+            //        Note = "..."
+            //    };
 
-            context.ProjectPhases.AddOrUpdate(x => x.Name, projPhase1,
-                new ProjectPhase()
-                    {
-                        IsActive = true,
-                        Name = "Foranalyse",
-                        Note = "..."
-                    },
-                new ProjectPhase()
-                    {
-                        IsActive = true,
-                        Name = "Gennemførsel",
-                        Note = "..."
-                    },
-                new ProjectPhase()
-                    {
-                        IsActive = true,
-                        Name = "Overlevering",
-                        Note = "..."
-                    },
-                new ProjectPhase()
-                    {
-                        IsActive = true,
-                        Name = "Drift",
-                        Note = "..."
-                    }
-                );
+            //context.ProjectPhases.AddOrUpdate(x => x.Name, projPhase1,
+            //    new ProjectPhase()
+            //        {
+            //            IsActive = true,
+            //            Name = "Foranalyse",
+            //            Note = "..."
+            //        },
+            //    new ProjectPhase()
+            //        {
+            //            IsActive = true,
+            //            Name = "Gennemførsel",
+            //            Note = "..."
+            //        },
+            //    new ProjectPhase()
+            //        {
+            //            IsActive = true,
+            //            Name = "Overlevering",
+            //            Note = "..."
+            //        },
+            //    new ProjectPhase()
+            //        {
+            //            IsActive = true,
+            //            Name = "Drift",
+            //            Note = "..."
+            //        }
+            //    );
 
             var archiveTypeYes = new ArchiveType()
                 {
@@ -645,8 +646,8 @@ namespace Infrastructure.DataAccess.Migrations
             #region Texts
 
             context.Texts.AddOrUpdate(x => x.Id,
-                                      new Text() { Id = "intro-head", Value = "Head" },
-                                      new Text() { Id = "intro-body", Value = "Body" });
+                                      new Text() { Value = "Head" },
+                                      new Text() { Value = "Body" });
 
             #endregion
 
@@ -1056,14 +1057,16 @@ namespace Infrastructure.DataAccess.Migrations
 
             #endregion
 
-            context.ProjectPhaseLocales.AddOrUpdate(x => new { x.MunicipalityId, x.OriginalId },
-                                                    new ProjPhaseLocale()
-                                                        {
-                                                            Organization = roskilde,
-                                                            Original = projPhase1,
-                                                            Name = "Pending"
-                                                        }
-                );
+            //TODO?
+            //context.ProjectPhaseLocales.AddOrUpdate(x => new { x.MunicipalityId, x.OriginalId },
+            //                                        new ProjPhaseLocale()
+            //                                            {
+            //                                                Organization = roskilde,
+            //                                                Original = projPhase1,
+            //                                                Name = "Pending"
+            //                                            }
+            //    );
+             
 
             base.Seed(context);
         }

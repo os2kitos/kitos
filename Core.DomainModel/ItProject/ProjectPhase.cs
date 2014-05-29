@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace Core.DomainModel.ItProject
 {
+    /* TODO?
     public class ProjectPhase : IOptionEntity<ProjectStatus>, IHasLocales<ProjPhaseLocale>
     {
         public ProjectPhase()
@@ -20,4 +21,5 @@ namespace Core.DomainModel.ItProject
         public virtual ICollection<ProjectStatus> References { get; set; }
         public virtual ICollection<ProjPhaseLocale> Locales { get; set; } 
     }
+     * */
 }

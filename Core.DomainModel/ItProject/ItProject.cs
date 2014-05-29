@@ -4,7 +4,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProject : IEntity<int>, IHasRights<ItProjectRight>, IHasAccessModifier, IHasOwner
+    public class ItProject : Entity, IHasRights<ItProjectRight>, IHasAccessModifier
     {
         public ItProject()
         {
@@ -28,8 +28,7 @@ namespace Core.DomainModel.ItProject
             this.PriorityPf = ItProjectPriority.None; // default value if not set
             this.AccessModifier = AccessModifier.Normal;
         }
-
-        public int Id { get; set; }
+        
         public string ItProjectId { get; set; }
         public string Background { get; set; }
         public bool IsTransversal { get; set; }
@@ -53,10 +52,7 @@ namespace Core.DomainModel.ItProject
         //public int? ItProjectLeaderId { get; set; }
         //public int? PartItProjectLeaderId { get; set; }
         //public int? ConsultantId { get; set; }
-
-        public int ObjectOwnerId { get; set; }
-        public virtual User ObjectOwner { get; set; }
-
+        
         public int? AssociatedProgramId { get; set; }
         public virtual ItProject AssociatedProgram { get; set; }
         public virtual ICollection<ItProject> AssociatedProjects { get; set; }

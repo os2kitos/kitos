@@ -1,6 +1,6 @@
 ﻿namespace Core.DomainModel.ItProject
 {
-    public class ItProjectRight : IRight<ItProject, ItProjectRole>
+    public class ItProjectRight : Entity, IRight<ItProject, ItProjectRole>
     {
         public int UserId { get; set; }
         public int RoleId { get; set; }

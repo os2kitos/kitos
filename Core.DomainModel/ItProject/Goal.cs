@@ -2,10 +2,8 @@ using System;
 
 namespace Core.DomainModel.ItProject
 {
-    public class Goal : IEntity<int>
+    public class Goal : Entity
     {
-        public int Id { get; set; }
-
         public int GoalStatusId { get; set; }
         public virtual GoalStatus GoalStatus { get; set; }
 

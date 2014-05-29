@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ItSystem : IEntity<int>, IHasRights<ItSystemRight>, IHasAccessModifier, IHasOwner
+    public class ItSystem : Entity, IHasRights<ItSystemRight>, IHasAccessModifier
     {
         public ItSystem()
         {
@@ -21,8 +21,7 @@ namespace Core.DomainModel.ItSystem
             this.InterfaceLocalExposure = new List<InterfaceExposure>();
             this.InfrastructureUsage = new List<InterfaceUsage>();
         }
-
-        public int Id { get; set; }
+        
         public string Version { get; set; }
         public string Name { get; set; }
         public string SystemId { get; set; }
@@ -36,8 +35,6 @@ namespace Core.DomainModel.ItSystem
 
         public int OrganizationId { get; set; }
 
-        public int ObjectOwnerId { get; set; }
-        public virtual User ObjectOwner { get; set; }
 
         public AccessModifier AccessModifier { get; set; }
 

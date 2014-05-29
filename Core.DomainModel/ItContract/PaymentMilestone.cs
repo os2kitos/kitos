@@ -2,9 +2,8 @@ using System;
 
 namespace Core.DomainModel.ItContract
 {
-    public class PaymentMilestone : IEntity<int>
+    public class PaymentMilestone : Entity
     {
-        public int Id { get; set; }
         public string Title { get; set; }
         public DateTime? Expected { get; set; }
         public DateTime? Approved { get; set; }

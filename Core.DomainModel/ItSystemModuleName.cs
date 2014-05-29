@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel
 {
-    public class ItSystemModuleName : IOptionEntity<Config>
+    public class ItSystemModuleName : Entity, IOptionEntity<Config>
     {
         public ItSystemModuleName()
         {
@@ -10,7 +10,6 @@ namespace Core.DomainModel
             this.References = new List<Config>();
         }
 
-        public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }

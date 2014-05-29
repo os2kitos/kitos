@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Core.DomainModel
 {
-    public class OrganizationRole : IRoleEntity, IOptionEntity<OrganizationRight>
+    public class OrganizationRole : Entity, IRoleEntity, IOptionEntity<OrganizationRight>
     {
         public OrganizationRole()
         {
@@ -14,7 +10,6 @@ namespace Core.DomainModel
             References = new List<OrganizationRight>();
         }
 
-        public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }

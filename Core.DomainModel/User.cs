@@ -6,7 +6,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
 {
-    public class User : IEntity<int>
+    public class User : Entity
     {
         public User()
         {
@@ -31,7 +31,6 @@ namespace Core.DomainModel
             this.SignerForContracts = new Collection<ItContract.ItContract>();
         }
 
-        public int Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }

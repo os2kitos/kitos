@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class DataRow : IEntity<int>
+    public class DataRow : Entity
     {
         public DataRow()
         {
             this.Usages = new List<DataRowUsage>();
         }
 
-        public int Id { get; set; }
         public int ItSystemId { get; set; }
         public int DataTypeId { get; set; }
 

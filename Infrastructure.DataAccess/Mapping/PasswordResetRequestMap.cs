@@ -9,7 +9,7 @@ namespace Infrastructure.DataAccess.Mapping
         {
             // Primary Key
             this.HasKey(t => t.Id);
-
+            
             // Properties
             // Table & Column Mappings
             this.ToTable("PasswordResetRequest");

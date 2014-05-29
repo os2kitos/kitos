@@ -3,15 +3,13 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItProject
 {
-    public class GoalStatus : IEntity<int>
+    public class GoalStatus : Entity
     {
         public GoalStatus()
         {
             this.Goals = new List<Goal>();
         }
-
-        public int Id { get; set; }
-
+        
         public virtual ItProject ItProject { get; set; }
 
         /// <summary>

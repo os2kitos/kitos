@@ -3,6 +3,7 @@ using Core.DomainModel.ItProject;
 
 namespace Infrastructure.DataAccess.Mapping
 {
+    /* TODO?
     public class ProjectPhaseLocaleMap : EntityTypeConfiguration<ProjPhaseLocale>
     {
         public ProjectPhaseLocaleMap()
@@ -24,4 +25,5 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(t => t.OriginalId);
         }
     }
+     * */
 }

@@ -1,8 +1,7 @@
 namespace Core.DomainModel.ItProject
 {
-    public class Stakeholder : IEntity<int>
+    public class Stakeholder : Entity
     {
-        public int Id { get; set; }
         public int ItProjectId { get; set; }
 
         public virtual ItProject ItProject { get; set; }

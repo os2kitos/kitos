@@ -2,9 +2,10 @@
 
 namespace Core.DomainModel
 {
-    public class PasswordResetRequest : IEntity<string>
+    public class PasswordResetRequest : Entity
     {
-        public string Id { get; set; }
+        public string Hash { get; set; }
+
         public DateTime Time { get; set; }
         public int UserId { get; set; }
 

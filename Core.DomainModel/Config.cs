@@ -1,8 +1,7 @@
 namespace Core.DomainModel
 {
-    public class Config : IEntity<int>
+    public class Config : Entity
     {
-        public int Id { get; set; }
         public bool ShowItProjectModule { get; set; }
         public bool ShowItSystemModule { get; set; }
         public bool ShowItContractModule { get; set; }

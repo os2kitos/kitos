@@ -1,8 +1,7 @@
 namespace Core.DomainModel.ItSystem
 {
-    public class Wish : IEntity<int>
+    public class Wish : Entity
     {
-        public int Id { get; set; }
         public bool IsPublic { get; set; }
         public string Text { get; set; }
 

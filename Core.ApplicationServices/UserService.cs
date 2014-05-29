@@ -77,7 +77,7 @@ namespace Core.ApplicationServices
             _mailClient.Send(message);
 
 
-            var request = new PasswordResetRequest {Id = hash, Time = now, UserId = user.Id};
+            var request = new PasswordResetRequest {Hash = hash, Time = now, UserId = user.Id};
 
             _passwordResetRequestRepository.Insert(request);
             _passwordResetRequestRepository.Save();
@@ -85,9 +85,9 @@ namespace Core.ApplicationServices
             return request;
         }
 
-        public PasswordResetRequest GetPasswordReset(string requestId)
+        public PasswordResetRequest GetPasswordReset(string hash)
         {
-            var passwordReset = _passwordResetRequestRepository.GetByKey(requestId);
+            var passwordReset = _passwordResetRequestRepository.Get(req => req.Hash == hash).FirstOrDefault();
 
             if (passwordReset == null) return null;
 

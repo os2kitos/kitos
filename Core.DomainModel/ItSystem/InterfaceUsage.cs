@@ -6,15 +6,13 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class InterfaceUsage : IEntity<int>
+    public class InterfaceUsage : Entity
     {
         public InterfaceUsage()
         {
             this.DataRowUsages = new List<DataRowUsage>();
         }
-
-        public int Id { get; set; }
-
+        
         public int ItSystemUsageId { get; set; }
         /// <summary>
         /// The system that is using the interface.

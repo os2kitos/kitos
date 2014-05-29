@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class InterfaceCategory : IOptionEntity<InterfaceUsage>
+    public class InterfaceCategory : Entity, IOptionEntity<InterfaceUsage>
     {
         public InterfaceCategory()
         {
             this.References = new List<InterfaceUsage>();
         }
 
-        public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }

@@ -5,9 +5,8 @@ using System.Text;
 
 namespace Core.DomainModel
 {
-    public class TaskUsage : IEntity<int>
+    public class TaskUsage : Entity
     {
-        public int Id { get; set; }
         public int TaskRefId { get; set; }
         public int OrgUnitId { get; set; }
 

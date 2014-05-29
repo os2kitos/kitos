@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProjectRole : IRoleEntity, IOptionEntity<ItProjectRight>
+    public class ItProjectRole : Entity, IRoleEntity, IOptionEntity<ItProjectRight>
     {
         public ItProjectRole()
         {
@@ -14,7 +14,6 @@ namespace Core.DomainModel.ItProject
             References = new List<ItProjectRight>();
         }
 
-        public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }

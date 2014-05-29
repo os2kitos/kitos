@@ -4,7 +4,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
 {
-    public class TaskRef : IEntity<int>
+    public class TaskRef : Entity
     {
         public TaskRef()
         {
@@ -13,8 +13,7 @@ namespace Core.DomainModel
             this.ItSystemUsages = new List<ItSystemUsage>();
             this.ItProjects = new List<ItProject.ItProject>();
         }
-
-        public int Id { get; set; }
+        
         public bool IsPublic { get; set; }
         public Guid Uuid { get; set; }
         public string Type { get; set; }

@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel
 {
-    public class AdminRole : IRoleEntity, IOptionEntity<AdminRight>
+    public class AdminRole : Entity, IRoleEntity, IOptionEntity<AdminRight>
     {
         public AdminRole()
         {
@@ -11,7 +11,6 @@ namespace Core.DomainModel
             HasWriteAccess = true;
         }
 
-        public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }

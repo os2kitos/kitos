@@ -2,14 +2,13 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProjectType : IOptionEntity<ItProject>
+    public class ItProjectType : Entity, IOptionEntity<ItProject>
     {
         public ItProjectType()
         {
             this.References = new List<ItProject>();
         }
 
-        public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }

@@ -2,10 +2,8 @@ using System;
 
 namespace Core.DomainModel.ItContract
 {
-    public class Advice : IEntity<int>
+    public class Advice : Entity
     {
-        public int Id { get; set; }
-
         public bool IsActive { get; set; }
 
         public string Name { get; set; }

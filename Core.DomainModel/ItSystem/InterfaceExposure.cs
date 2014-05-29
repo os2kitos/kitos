@@ -1,10 +1,7 @@
 namespace Core.DomainModel.ItSystem
 {
-    public class InterfaceExposure : IEntity<int>
+    public class InterfaceExposure : Entity
     {
-
-        public int Id { get; set; }
-
         public int ItSystemUsageId { get; set; }
         /// <summary>
         /// The system that is exposing the interface.

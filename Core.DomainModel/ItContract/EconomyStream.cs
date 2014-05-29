@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel.ItContract
 {
-    public class EconomyStream : IEntity<int>
+    public class EconomyStream : Entity
     {
-        public int Id { get; set; }
-
         /// <summary>
         /// The EconomyStream might be an extern payment for a contract
         /// </summary>

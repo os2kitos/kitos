@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel
 {
-    public class State : IEntity<int>, IHasOwner
+    public class State : Entity
     {
-        public int Id { get; set; }
 
         /// <summary>
         /// Human readable ID ("brugervendt noegle" in OIO)
@@ -36,9 +35,6 @@ namespace Core.DomainModel
 
         public int? AssociatedActivityId { get; set; }
         public virtual Activity AssociatedActivity { get; set; }
-
-        public int ObjectOwnerId { get; set; }
-        public virtual User ObjectOwner { get; set; }
 
         /// <summary>
         /// The state might be a milestone for an IT project

@@ -1,9 +1,7 @@
 namespace Core.DomainModel.ItProject
 {
-    public class EconomyYear : IEntity<int>
+    public class EconomyYear : Entity
     {
-        public int Id { get; set; }
-
         public int YearNumber { get; set; }
 
         public int ItProjectId { get; set; }

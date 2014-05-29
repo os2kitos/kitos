@@ -2,14 +2,13 @@
 
 namespace Core.DomainModel.ItSystem
 {
-    public class AppType : IOptionEntity<ItSystem>
+    public class AppType : Entity, IOptionEntity<ItSystem>
     {
         public AppType()
         {
             References = new List<ItSystem>();
         }
 
-        public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }

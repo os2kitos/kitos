@@ -2,6 +2,7 @@
 
 namespace Core.DomainModel.ItProject
 {
+    /* TODO?
     public class ProjPhaseLocale : ILocaleEntity<ProjectPhase>
     {
         public int MunicipalityId { get; set; }
@@ -11,4 +12,5 @@ namespace Core.DomainModel.ItProject
         public virtual Organization Organization { get; set; }
         public virtual ProjectPhase Original { get; set; }
     }
+     * */
 }

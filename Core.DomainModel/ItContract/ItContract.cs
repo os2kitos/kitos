@@ -4,7 +4,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel.ItContract
 {
-    public class ItContract : IEntity<int>, IHasRights<ItContractRight>, IHasOwner
+    public class ItContract : Entity, IHasRights<ItContractRight>
     {
         public ItContract()
         {
@@ -22,10 +22,6 @@ namespace Core.DomainModel.ItContract
             this.Advices = new List<Advice>();
         }
 
-        public int ObjectOwnerId { get; set; }
-        public virtual User ObjectOwner { get; set; }
-
-        public int Id { get; set; }
         public string Name { get; set; }
         public string Note { get; set; }
         public string ItContractId { get; set; }

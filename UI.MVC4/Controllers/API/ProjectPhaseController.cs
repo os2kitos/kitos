@@ -10,11 +10,12 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class ProjectPhaseController : GenericOptionApiController<ProjectPhase, ProjectStatus, OptionDTO>
-    {
-        public ProjectPhaseController(IGenericRepository<ProjectPhase> repository) 
-            : base(repository)
-        {
-        }
-    }
+    //TODO?
+    //public class ProjectPhaseController : GenericOptionApiController<ProjectPhase, ProjectStatus, OptionDTO>
+    //{
+    //    public ProjectPhaseController(IGenericRepository<ProjectPhase> repository) 
+    //        : base(repository)
+    //    {
+    //    }
+    //}
 }

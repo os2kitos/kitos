@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ItSystemUsage : IEntity<int>, IHasRights<ItSystemRight>, IHasOwner
+    public class ItSystemUsage : Entity, IHasRights<ItSystemRight>
     {
         public ItSystemUsage()
         {
@@ -16,8 +16,7 @@ namespace Core.DomainModel.ItSystem
             this.UsedBy = new List<OrganizationUnit>();
             this.ItProjects = new List<ItProject.ItProject>();
         }
-
-        public int Id { get; set; }
+        
         public bool IsStatusActive { get; set; }
         public string Note { get; set; }
         public string LocalSystemId { get; set; }
@@ -70,9 +69,6 @@ namespace Core.DomainModel.ItSystem
         /// The local exposures of interfaces.
         /// </summary>
         public virtual ICollection<InterfaceExposure> InterfaceExposures { get; set; }
-
-        public int ObjectOwnerId { get; set; }
-        public virtual User ObjectOwner { get; set; }
 
         public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
     }

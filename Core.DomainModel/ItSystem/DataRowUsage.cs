@@ -1,9 +1,7 @@
 ﻿namespace Core.DomainModel.ItSystem
 {
-    public class DataRowUsage : IEntity<int>
+    public class DataRowUsage : Entity
     {
-        public int Id { get; set; }
-
         public int InterfaceUsageId { get; set; }
         public virtual InterfaceUsage InterfaceUsage { get; set; }
 

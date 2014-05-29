@@ -4,7 +4,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
 {
-    public class OrganizationUnit : IEntity<int>, IHasRights<OrganizationRight>
+    public class OrganizationUnit : Entity, IHasRights<OrganizationRight>
     {
         public OrganizationUnit()
         {
@@ -17,7 +17,6 @@ namespace Core.DomainModel
             this.UsingItProjects = new List<ItProject.ItProject>();
         }
 
-        public int Id { get; set; }
         public string Name { get; set; }
         public int? Ean { get; set; }
 

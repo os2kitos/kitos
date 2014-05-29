@@ -2,9 +2,8 @@ using System;
 
 namespace Core.DomainModel.ItProject
 {
-    public class Communication : IEntity<int>
+    public class Communication : Entity
     {
-        public int Id { get; set; }
         public string TargetAudiance { get; set; }
         public string Purpose { get; set; }
         public string Message { get; set; }

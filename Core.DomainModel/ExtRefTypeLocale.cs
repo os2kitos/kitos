@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel
 {
-    public class ExtRefTypeLocale : ILocaleEntity<ExtReferenceType>
+    public class ExtRefTypeLocale : Entity, ILocaleEntity<ExtReferenceType>
     {
         public int MunicipalityId { get; set; }
         public int OriginalId { get; set; }

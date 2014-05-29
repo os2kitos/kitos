@@ -1,8 +1,8 @@
 namespace Core.DomainModel
 {
-    public class ExtReference
+    // TODO DELETE THIS?
+    public class ExtReference : Entity
     {
-        public int Id { get; set; }
         public string Value { get; set; }
         public int ItProjectId { get; set; }
         public int ExtReferenceTypeId { get; set; }

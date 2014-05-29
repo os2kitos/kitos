@@ -91,14 +91,12 @@
     <Compile Include="Mapping\OrganizationUnitMap.cs" />
     <Compile Include="Mapping\OrganizationRightMap.cs" />
     <Compile Include="Mapping\OrganizationRoleMap.cs" />
-    <Compile Include="Mapping\EconomyMap.cs" />
     <Compile Include="Mapping\ExtReferenceMap.cs" />
     <Compile Include="Mapping\ExtReferenceTypeMap.cs" />
     <Compile Include="Mapping\ExtRefTypeLocaleMap.cs" />
     <Compile Include="Mapping\GoalMap.cs" />
     <Compile Include="Mapping\GoalStatusMap.cs" />
     <Compile Include="Mapping\HandoverMap.cs" />
-    <Compile Include="Mapping\HierarchyMap.cs" />
     <Compile Include="Mapping\InterfaceMap.cs" />
     <Compile Include="Mapping\InterfaceTypeMap.cs" />
     <Compile Include="Mapping\ItContractMap.cs" />
@@ -115,11 +113,8 @@
     <Compile Include="Mapping\ItSystemRoleMap.cs" />
     <Compile Include="Mapping\ItSystemModuleNameMap.cs" />
     <Compile Include="Mapping\TaskRefMap.cs" />
-    <Compile Include="Mapping\LocalizationMap.cs" />
     <Compile Include="Mapping\MethodMap.cs" />
-    <Compile Include="Mapping\MilestoneMap.cs" />
     <Compile Include="Mapping\OrganizationMap.cs" />
-    <Compile Include="Mapping\OrgTabMap.cs" />
     <Compile Include="Mapping\PasswordResetRequestMap.cs" />
     <Compile Include="Mapping\ItProjectCategoryMap.cs" />
     <Compile Include="Mapping\ProjectPhaseLocaleMap.cs" />
@@ -127,7 +122,6 @@
     <Compile Include="Mapping\ProjectStatusMap.cs" />
     <Compile Include="Mapping\ItProjectTypeMap.cs" />
     <Compile Include="Mapping\PurchaseFormMap.cs" />
-    <Compile Include="Mapping\ResourcesMap.cs" />
     <Compile Include="Mapping\RiskMap.cs" />
     <Compile Include="Mapping\AdviceMap.cs" />
     <Compile Include="Mapping\StakeholderMap.cs" />
