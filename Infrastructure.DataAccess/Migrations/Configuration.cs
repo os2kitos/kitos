@@ -33,19 +33,19 @@ namespace Infrastructure.DataAccess.Migrations
             var globalUser = CreateUser("Global", "g@test", "test", cryptoService);
             globalUser.IsGlobalAdmin = true;
 
-            var localUser = CreateUser("Local Test Bruger", "l@test", "test", cryptoService);
+            var localUser = CreateUser("Local Test Bruger", "l@test", "test", cryptoService, globalUser);
 
             var simon = CreateUser("Simon Lynn-Pedersen", "slp@it-minds.dk", "slp123", cryptoService, globalUser);
             simon.IsGlobalAdmin = true;
 
-            var brian = CreateUser("Brian", "briana@roskilde.dk", "123", cryptoService);
+            var brian = CreateUser("Brian", "briana@roskilde.dk", "123", cryptoService, globalUser);
             brian.IsGlobalAdmin = true;
 
-            var user1 = CreateUser("Pia", "pia@it-minds.dk", "arne123", cryptoService);
-            var user2 = CreateUser("Morten", "morten@it-minds.dk", "arne123", cryptoService);
-            var user3 = CreateUser("Anders", "anders@it-minds.dk", "arne123", cryptoService);
-            var user4 = CreateUser("Peter", "peter@it-minds.dk", "arne123", cryptoService);
-            var user5 = CreateUser("Jesper", "jesper@it-minds.dk", "arne123", cryptoService);
+            var user1 = CreateUser("Pia", "pia@it-minds.dk", "arne123", cryptoService, globalUser);
+            var user2 = CreateUser("Morten", "morten@it-minds.dk", "arne123", cryptoService, globalUser);
+            var user3 = CreateUser("Anders", "anders@it-minds.dk", "arne123", cryptoService, globalUser);
+            var user4 = CreateUser("Peter", "peter@it-minds.dk", "arne123", cryptoService, globalUser);
+            var user5 = CreateUser("Jesper", "jesper@it-minds.dk", "arne123", cryptoService, globalUser);
 
             var erik = CreateUser("Erik", "ehl@kl.dk", "123", cryptoService);
 
@@ -96,11 +96,30 @@ namespace Infrastructure.DataAccess.Migrations
 
             AddOptions<ItContractModuleName, Config>(context.ItContractModuleNames, globalUser, "IT Kontrakter", "Kontrakter");
 
-            AddOptions<Frequency, DataRowUsage>(context.Frequencies, globalUser, "Dagligt", "Ugentligt", "Månedligt", "Årligt");
+            AddOptions<Frequency, DataRowUsage>(context.Frequencies, globalUser, "Dagligt", "Ugentligt", "Månedligt", "Årligt"); 
+            
+            AddOptions<ExtReferenceType, ExtReference>(context.ExtReferenceTypes, globalUser, "ESDH ref", "CMDB ref", "Mappe ref"); 
+
+            AddOptions<ArchiveType, ItSystemUsage>(context.ArchiveTypes, globalUser, "Arkiveret", "Ikke arkiveret");
+
+            AddOptions<SensitiveDataType, ItSystemUsage>(context.SensitiveDataTypes, globalUser, "Ja", "Nej");
+
+            AddOptions<GoalType, Goal>(context.GoalTypes, globalUser, "Måltype 1", "Måltype 2");
+
+            AddOptions<OptionExtend, ItContract>(context.OptionExtention, globalUser, "2 x 1 år");
+
+            AddOptions<TerminationDeadline, ItContract>(context.TerminationDeadlines, globalUser, "Frist 1", "Frist 2");
+
+            AddOptions<PaymentFreqency, ItContract>(context.PaymentFreqencies, globalUser, "Frekvens A", "Frekvens B");
+
+            AddOptions<PaymentModel, ItContract>(context.PaymentModels, globalUser, "Model A", "Model B");
+
+            AddOptions<PriceRegulation, ItContract>(context.PriceRegulations, globalUser, "Pris regulering A", "Pris regulering B"); 
+
+            context.SaveChanges();
 
             #endregion
-
-
+            
             #region ORGANIZATIONS
 
             var organizationService = new OrganizationService(null, null, null); // TODO needs a refactor as this is a bit hacky!
@@ -111,7 +130,7 @@ namespace Infrastructure.DataAccess.Migrations
             var companyB = organizationService.CreateOrganization("Firma B", OrganizationType.Company, globalUser);
             var companyC = organizationService.CreateOrganization("Firma C", OrganizationType.Company, globalUser);
 
-            //context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø, kl, companyA, companyB, companyC);
+            context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø, kl, companyA, companyB, companyC);
             context.SaveChanges();
 
             #endregion
