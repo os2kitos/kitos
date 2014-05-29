@@ -70,6 +70,8 @@
             function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, suppliers, orgUnits, contracts, agreementElements, customAgreementElements, hasWriteAccess) {
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.contract = contract;
+                $scope.hasWriteAccess = hasWriteAccess;
+                
                 $scope.contractTypes = contractTypes;
                 $scope.contractTemplates = contractTemplates;
                 $scope.purchaseForms = purchaseForms;
@@ -187,10 +189,6 @@
                             msg.toErrorMessage("Fejl! Feltet kunne ikke slettes!");
                         });
                 };
-            
-                $scope.hasWriteAccess = hasWriteAccess;
-                
-
 
                 function formatContractSigner(signer) {
 
