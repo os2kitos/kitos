@@ -104,7 +104,8 @@
                     userModel: '=',
                     addUser: '@?',
                     allowClear: '@?',
-                    onSelect: '&?'
+                    onSelect: '&?',
+                    ngDisabled: '=?'
                 },
                 replace: true,
                 templateUrl: 'partials/directives/select-user.html',
