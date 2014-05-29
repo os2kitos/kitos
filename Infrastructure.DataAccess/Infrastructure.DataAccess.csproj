@@ -77,7 +77,6 @@
     <Compile Include="Mapping\GoalTypeMap.cs" />
     <Compile Include="Mapping\StateMap.cs" />
     <Compile Include="Mapping\EconomyYearMap.cs" />
-    <Compile Include="Mapping\InterfaceCategoryMap.cs" />
     <Compile Include="Mapping\DataTypeMap.cs" />
     <Compile Include="Mapping\DataRowUsageMap.cs" />
     <Compile Include="Mapping\DataRowMap.cs" />

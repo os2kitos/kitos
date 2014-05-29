@@ -35,10 +35,7 @@ namespace Core.DomainModel.ItSystem
 
         public int? InfrastructureId { get; set; }
         public virtual ItSystem Infrastructure { get; set; }
-
-        public int? InterfaceCategoryId { get; set; }
-        public InterfaceCategory InterfaceCategory { get; set; }
-
+        
         /// <summary>
         /// Whether local usage of the interface is wanted or not.
         /// </summary>

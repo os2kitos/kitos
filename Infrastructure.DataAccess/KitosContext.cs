@@ -50,7 +50,6 @@ namespace Infrastructure.DataAccess
         public DbSet<InterfaceUsage> InterfaceUsages { get; set; }
         public DbSet<InterfaceExposure> InterfaceExposure { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
-        public DbSet<InterfaceCategory> InterfaceCategories { get; set; }
         public DbSet<ItContractModuleName> ItContractModuleNames { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
         public DbSet<ItContractRight> ItContractRights { get; set; }
@@ -127,7 +126,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new InterfaceUsageMap());
             modelBuilder.Configurations.Add(new InterfaceExposureMap());
             modelBuilder.Configurations.Add(new InterfaceTypeMap());
-            modelBuilder.Configurations.Add(new InterfaceCategoryMap());
             modelBuilder.Configurations.Add(new ItContractMap());
             modelBuilder.Configurations.Add(new ItContractRightMap());
             modelBuilder.Configurations.Add(new ItContractRoleMap());

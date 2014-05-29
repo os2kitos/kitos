@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
@@ -29,32 +30,79 @@ namespace Infrastructure.DataAccess.Migrations
 
             var cryptoService = new CryptoService();
 
-            var globalUser = SimpleUser("Global", "g@test", "test", cryptoService);
+            var globalUser = CreateUser("Global", "g@test", "test", cryptoService);
             globalUser.IsGlobalAdmin = true;
 
-            var localUser = SimpleUser("Local Test Bruger", "l@test", "test", cryptoService);
+            var localUser = CreateUser("Local Test Bruger", "l@test", "test", cryptoService);
 
-            var simon = SimpleUser("Simon Lynn-Pedersen", "slp@it-minds.dk", "slp123", cryptoService, globalUser);
+            var simon = CreateUser("Simon Lynn-Pedersen", "slp@it-minds.dk", "slp123", cryptoService, globalUser);
             simon.IsGlobalAdmin = true;
 
-            var brian = SimpleUser("Brian", "briana@roskilde.dk", "123", cryptoService);
+            var brian = CreateUser("Brian", "briana@roskilde.dk", "123", cryptoService);
             brian.IsGlobalAdmin = true;
 
-            var user1 = SimpleUser("Pia", "pia@it-minds.dk", "arne123", cryptoService);
-            var user2 = SimpleUser("Morten", "morten@it-minds.dk", "arne123", cryptoService);
-            var user3 = SimpleUser("Anders", "anders@it-minds.dk", "arne123", cryptoService);
-            var user4 = SimpleUser("Peter", "peter@it-minds.dk", "arne123", cryptoService);
-            var user5 = SimpleUser("Jesper", "jesper@it-minds.dk", "arne123", cryptoService);
+            var user1 = CreateUser("Pia", "pia@it-minds.dk", "arne123", cryptoService);
+            var user2 = CreateUser("Morten", "morten@it-minds.dk", "arne123", cryptoService);
+            var user3 = CreateUser("Anders", "anders@it-minds.dk", "arne123", cryptoService);
+            var user4 = CreateUser("Peter", "peter@it-minds.dk", "arne123", cryptoService);
+            var user5 = CreateUser("Jesper", "jesper@it-minds.dk", "arne123", cryptoService);
 
-            var erik = SimpleUser("Erik", "ehl@kl.dk", "123", cryptoService);
+            var erik = CreateUser("Erik", "ehl@kl.dk", "123", cryptoService);
 
             context.Users.AddOrUpdate(x => x.Email, simon, globalUser, localUser, user1, user2, user3, user4, user5, brian, erik);
             context.SaveChanges();
 
             #endregion
 
-            #region ORGANIZATIONS
+            #region OPTIONS
             
+            AddOptions<ItProjectCategory, ItProject>(context.ProjectCategories, globalUser, "Fællesoffentlig", "Fælleskommunal");
+
+            AddOptions<ItProjectType, ItProject>(context.ProjectTypes, globalUser, "IT Projekt", "IT Program", "Indsatsområde");
+            
+            AddOptions<AppType, ItSystem>(context.AppTypes, globalUser, "Snitflade", "Fagsystem", "Selvbetjening");
+
+            AddOptions<BusinessType, ItSystem>(context.BusinessTypes, globalUser, "Forretningstype 1", "Forretningstype 2", "Forretningstype 3");
+
+            AddOptions<Interface, ItSystem>(context.Interfaces, globalUser, "Grænseflade 1", "Grænseflade 2", "Grænseflade 3");
+
+            AddOptions<Interface, ItSystem>(context.Interfaces, globalUser, "Grænseflade 1", "Grænseflade 2", "Grænseflade 3");
+            
+            AddOptions<Tsa, ItSystem>(context.Tsas, globalUser, "Ja", "Nej");
+            
+            AddOptions<InterfaceType, ItSystem>(context.InterfaceTypes, globalUser, "WS");
+
+            AddOptions<DataType, DataRow>(context.DataTypes, globalUser, "Datatype 1", "Datatype 2", "Datatype 3");
+
+            AddOptions<Method, ItSystem>(context.Methods, globalUser, "Batch", "Request-Response");
+
+            AddOptions<ContractType, ItContract>(context.ContractTypes, globalUser, "Hovedkontrakt", "Tillægskontrakt", "Snitflade");
+
+            AddOptions<ContractTemplate, ItContract>(context.ContractTemplates, globalUser, "K01", "K02", "K03");
+
+            AddOptions<PurchaseForm, ItContract>(context.PurchaseForms, globalUser, "SKI", "SKI 02.19", "Udbud");
+
+            AddOptions<ProcurementStrategy, ItContract>(context.ProcurementStrategies, globalUser, "Strategi 1", "Strategi 2", "Strategi 3");
+
+            AddOptions<AgreementElement, ItContract>(context.AgreementElements, globalUser, 
+                "Licens", "Udvikling", "Drift", "Vedligehold", "Support", 
+                "Serverlicenser", "Serverdrift", "Databaselicenser", "Backup", "Overvågning");
+
+            AddOptions<ItSupportModuleName, Config>(context.ItSupportModuleNames, globalUser, "IT Understøttelse", "Organisation");
+
+            AddOptions<ItProjectModuleName, Config>(context.ItProjectModuleNames, globalUser, "IT Projekter", "Projekter");
+
+            AddOptions<ItSystemModuleName, Config>(context.ItSystemModuleNames, globalUser, "IT Systemer", "Systemer");
+
+            AddOptions<ItContractModuleName, Config>(context.ItContractModuleNames, globalUser, "IT Kontrakter", "Kontrakter");
+
+            AddOptions<Frequency, DataRowUsage>(context.Frequencies, globalUser, "Dagligt", "Ugentligt", "Månedligt", "Årligt");
+
+            #endregion
+
+
+            #region ORGANIZATIONS
+
             var organizationService = new OrganizationService(null, null, null); // TODO needs a refactor as this is a bit hacky!
             var roskilde = organizationService.CreateOrganization("Roskilde", OrganizationType.Municipality, globalUser);
             var sorø = organizationService.CreateOrganization("Sorø", OrganizationType.Municipality, globalUser);
@@ -63,10 +111,43 @@ namespace Infrastructure.DataAccess.Migrations
             var companyB = organizationService.CreateOrganization("Firma B", OrganizationType.Company, globalUser);
             var companyC = organizationService.CreateOrganization("Firma C", OrganizationType.Company, globalUser);
 
-            context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø, kl, companyA, companyB, companyC);
+            //context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø, kl, companyA, companyB, companyC);
             context.SaveChanges();
 
             #endregion
+        }
+
+        private T CreateOption<T, TReference>(string name, User objectOwner, string note = "...", bool isActive = true, bool isSuggestion = false)
+            where T : Entity, IOptionEntity<TReference>, new()
+        {
+            return new T()
+                {
+                    IsActive = isActive,
+                    IsSuggestion = isSuggestion,
+                    Name = name,
+                    Note = note,
+                    ObjectOwner = objectOwner
+                };
+        }
+
+        private void AddOptions<T, TReference>(DbSet<T> dbSet, User objectOwner, params string[] names)
+            where T : Entity, IOptionEntity<TReference>, new()
+        {
+            var options = names.Select(name => CreateOption<T, TReference>(name, objectOwner)).ToArray();
+            dbSet.AddOrUpdate(x => x.Name, options);
+        } 
+
+        private User CreateUser(string name, string email, string password, CryptoService cryptoService, User objectOwner = null)
+        {
+            var salt = cryptoService.Encrypt(name + "salt");
+            return new User()
+                {
+                    Name = name,
+                    Email = email,
+                    Salt = salt,
+                    Password = cryptoService.Encrypt(password + salt),
+                    ObjectOwner = objectOwner
+                };
         }
         
         private void OldSeed(Infrastructure.DataAccess.KitosContext context)
@@ -96,19 +177,19 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Drop Down Data
 
-            var itProjectCategoryPublic = new ItProjectCategory() {IsActive = true, Note = "...", Name = "Fællesoffentlig"};
+            var itProjectCategoryPublic = new ItProjectCategory() { IsActive = true, Note = "...", Name = "Fællesoffentlig" };
             var itProjectCategoryMunipalicity = new ItProjectCategory() { IsActive = true, Note = "...", Name = "Fælleskommunal" };
             context.ProjectCategories.AddOrUpdate(x => x.Name, itProjectCategoryPublic, itProjectCategoryMunipalicity);
 
-            var itProjectTypeProject = new ItProjectType() {IsActive = true, Note = "...", Name = "IT Projekt"};
-            var itProjectTypeProgram = new ItProjectType() {IsActive = true, Note = "...", Name = "IT Program"};
+            var itProjectTypeProject = new ItProjectType() { IsActive = true, Note = "...", Name = "IT Projekt" };
+            var itProjectTypeProgram = new ItProjectType() { IsActive = true, Note = "...", Name = "IT Program" };
             context.ProjectTypes.AddOrUpdate(x => x.Name,
                                              itProjectTypeProject,
                                              itProjectTypeProgram,
                                              new ItProjectType() { IsActive = true, Note = "En samlebetegnelse for projekter, som ikke er et IT Program", Name = "Indsatsområde" });
 
-            var appType1 = new AppType() {IsActive = true, Note = "...", Name = "Snitflade"};
-            var appType2 = new AppType() {IsActive = true, Note = "...", Name = "Fagsystem"};
+            var appType1 = new AppType() { IsActive = true, Note = "...", Name = "Snitflade" };
+            var appType2 = new AppType() { IsActive = true, Note = "...", Name = "Fagsystem" };
             context.AppTypes.AddOrUpdate(x => x.Name,
                                             appType1, appType2,
                                             new AppType() { IsActive = true, Note = "...", Name = "Selvbetjening" }
@@ -120,8 +201,8 @@ namespace Infrastructure.DataAccess.Migrations
                                               businessType1, businessType2);
 
             context.Interfaces.AddOrUpdate(x => x.Name,
-                                           new Interface() {IsActive = true, Note = "...", Name = "Grænseflade 1"},
-                                           new Interface() {IsActive = true, Note = "...", Name = "Grænseflade 2"},
+                                           new Interface() { IsActive = true, Note = "...", Name = "Grænseflade 1" },
+                                           new Interface() { IsActive = true, Note = "...", Name = "Grænseflade 2" },
                                            new Interface() { IsActive = true, Note = "...", Name = "Grænseflade 3" });
 
             context.Tsas.AddOrUpdate(x => x.Name,
@@ -228,11 +309,7 @@ namespace Infrastructure.DataAccess.Migrations
             var frequency4 = new Frequency() { IsActive = true, Note = "...", Name = "Årligt" };
 
             context.Frequencies.AddOrUpdate(x => x.Name, frequency1, frequency2, frequency3, frequency4);
-
-            context.InterfaceCategories.AddOrUpdate(x => x.Name, 
-                new InterfaceCategory(){ IsActive = true, Note = "...", Name = "Kategori 1" },
-                new InterfaceCategory(){ IsActive = true, Note = "...", Name = "Kategori 2" });
-
+            
             context.SaveChanges();
 
 
@@ -590,22 +667,22 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Users
 
-            var simon = SimpleUser("Simon Lynn-Pedersen", "slp@it-minds.dk", "slp123", cryptoService);
+            var simon = CreateUser("Simon Lynn-Pedersen", "slp@it-minds.dk", "slp123", cryptoService);
             simon.IsGlobalAdmin = true;
 
-            var globalUser = SimpleUser("Global Test Bruger", "g@test", "test", cryptoService);
+            var globalUser = CreateUser("Global Test Bruger", "g@test", "test", cryptoService);
             globalUser.IsGlobalAdmin = true;
 
-            var localUser = SimpleUser("Local Test Bruger", "l@test", "test", cryptoService);
+            var localUser = CreateUser("Local Test Bruger", "l@test", "test", cryptoService);
 
-            var roskildeUser1 = SimpleUser("Pia", "pia@it-minds.dk", "arne123", cryptoService);
-            var roskildeUser2 = SimpleUser("Morten", "morten@it-minds.dk", "arne123", cryptoService);
-            var roskildeUser3 = SimpleUser("Anders", "anders@it-minds.dk", "arne123", cryptoService);
-            var roskildeUser4 = SimpleUser("Peter", "peter@it-minds.dk", "arne123", cryptoService);
-            var roskildeUser5 = SimpleUser("Jesper", "jesper@it-minds.dk", "arne123", cryptoService);
-            var roskildeUser6 = SimpleUser("Brian", "briana@roskilde.dk", "123", cryptoService);
+            var roskildeUser1 = CreateUser("Pia", "pia@it-minds.dk", "arne123", cryptoService);
+            var roskildeUser2 = CreateUser("Morten", "morten@it-minds.dk", "arne123", cryptoService);
+            var roskildeUser3 = CreateUser("Anders", "anders@it-minds.dk", "arne123", cryptoService);
+            var roskildeUser4 = CreateUser("Peter", "peter@it-minds.dk", "arne123", cryptoService);
+            var roskildeUser5 = CreateUser("Jesper", "jesper@it-minds.dk", "arne123", cryptoService);
+            var roskildeUser6 = CreateUser("Brian", "briana@roskilde.dk", "123", cryptoService);
             roskildeUser6.IsGlobalAdmin = true;
-            var roskildeUser7 = SimpleUser("Erik", "ehl@kl.dk", "123", cryptoService);
+            var roskildeUser7 = CreateUser("Erik", "ehl@kl.dk", "123", cryptoService);
 
             context.Users.AddOrUpdate(x => x.Email, simon, globalUser, localUser, roskildeUser1, roskildeUser2, roskildeUser3, roskildeUser4, roskildeUser5, roskildeUser6, roskildeUser7);
 
@@ -1118,18 +1195,6 @@ namespace Infrastructure.DataAccess.Migrations
             base.Seed(context);
         }
 
-        private User SimpleUser(string name, string email, string password, CryptoService cryptoService, User objectOwner = null)
-        {
-            var salt = cryptoService.Encrypt(name + "salt");
-            return new User()
-                {
-                    Name = name,
-                    Email = email,
-                    Salt = salt,
-                    Password = cryptoService.Encrypt(password + salt),
-                    ObjectOwner = objectOwner
-                };
-        }
 
         private ItProject SimpleProject(string name, User owner, Organization organization, ItProjectCategory projectCategory, ItProjectType type, Activity phase1)
         {
