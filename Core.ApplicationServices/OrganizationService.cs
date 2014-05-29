@@ -47,6 +47,7 @@ namespace Core.ApplicationServices
             org.OrgUnits.Add(new OrganizationUnit()
             {
                 Name = org.Name,
+                ObjectOwner = objectOwner
             });
 
             return org;
