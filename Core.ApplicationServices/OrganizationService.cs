@@ -34,13 +34,14 @@ namespace Core.ApplicationServices
             return orgs;
         }
 
-        public Organization CreateOrganization(string name, OrganizationType organizationType)
+        public Organization CreateOrganization(string name, OrganizationType organizationType, User objectOwner = null)
         {
             var org = new Organization
             {
                 Name = name,
                 Config = Config.Default,
-                Type = organizationType
+                Type = organizationType,
+                ObjectOwner = objectOwner
             };
 
             org.OrgUnits.Add(new OrganizationUnit()

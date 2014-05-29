@@ -22,7 +22,54 @@ namespace Infrastructure.DataAccess.Migrations
             SetHistoryContextFactory("MySql.Data.MySqlClient", (conn, schema) => new MySqlHistoryContext(conn, schema));
         }
 
+        
         protected override void Seed(Infrastructure.DataAccess.KitosContext context)
+        {
+            #region USERS
+
+            var cryptoService = new CryptoService();
+
+            var globalUser = SimpleUser("Global", "g@test", "test", cryptoService);
+            globalUser.IsGlobalAdmin = true;
+
+            var localUser = SimpleUser("Local Test Bruger", "l@test", "test", cryptoService);
+
+            var simon = SimpleUser("Simon Lynn-Pedersen", "slp@it-minds.dk", "slp123", cryptoService, globalUser);
+            simon.IsGlobalAdmin = true;
+
+            var brian = SimpleUser("Brian", "briana@roskilde.dk", "123", cryptoService);
+            brian.IsGlobalAdmin = true;
+
+            var user1 = SimpleUser("Pia", "pia@it-minds.dk", "arne123", cryptoService);
+            var user2 = SimpleUser("Morten", "morten@it-minds.dk", "arne123", cryptoService);
+            var user3 = SimpleUser("Anders", "anders@it-minds.dk", "arne123", cryptoService);
+            var user4 = SimpleUser("Peter", "peter@it-minds.dk", "arne123", cryptoService);
+            var user5 = SimpleUser("Jesper", "jesper@it-minds.dk", "arne123", cryptoService);
+
+            var erik = SimpleUser("Erik", "ehl@kl.dk", "123", cryptoService);
+
+            context.Users.AddOrUpdate(x => x.Email, simon, globalUser, localUser, user1, user2, user3, user4, user5, brian, erik);
+            context.SaveChanges();
+
+            #endregion
+
+            #region ORGANIZATIONS
+            
+            var organizationService = new OrganizationService(null, null, null); // TODO needs a refactor as this is a bit hacky!
+            var roskilde = organizationService.CreateOrganization("Roskilde", OrganizationType.Municipality, globalUser);
+            var sorø = organizationService.CreateOrganization("Sorø", OrganizationType.Municipality, globalUser);
+            var kl = organizationService.CreateOrganization("KL", OrganizationType.Municipality, globalUser);
+            var companyA = organizationService.CreateOrganization("Firma A", OrganizationType.Company, globalUser);
+            var companyB = organizationService.CreateOrganization("Firma B", OrganizationType.Company, globalUser);
+            var companyC = organizationService.CreateOrganization("Firma C", OrganizationType.Company, globalUser);
+
+            context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø, kl, companyA, companyB, companyC);
+            context.SaveChanges();
+
+            #endregion
+        }
+        
+        private void OldSeed(Infrastructure.DataAccess.KitosContext context)
         {
             //  This method will be called after migrating to the latest version.
 
@@ -310,12 +357,12 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Organizations
 
-            var roskilde = organizationService.CreateOrganization("Roskilde", OrganizationType.Municipality);
-            var sorø = organizationService.CreateOrganization("Sorø", OrganizationType.Municipality);
-            var kl = organizationService.CreateOrganization("KL", OrganizationType.Municipality);
-            var companyA = organizationService.CreateOrganization("Firma A", OrganizationType.Company);
-            var companyB = organizationService.CreateOrganization("Firma B", OrganizationType.Company);
-            var companyC = organizationService.CreateOrganization("Firma C", OrganizationType.Company);
+            var roskilde = organizationService.CreateOrganization("Roskilde", OrganizationType.Municipality, null);
+            var sorø = organizationService.CreateOrganization("Sorø", OrganizationType.Municipality, null);
+            var kl = organizationService.CreateOrganization("KL", OrganizationType.Municipality, null);
+            var companyA = organizationService.CreateOrganization("Firma A", OrganizationType.Company, null);
+            var companyB = organizationService.CreateOrganization("Firma B", OrganizationType.Company, null);
+            var companyC = organizationService.CreateOrganization("Firma C", OrganizationType.Company, null);
 
             context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø, kl, companyA, companyB, companyC);
 
@@ -1071,7 +1118,7 @@ namespace Infrastructure.DataAccess.Migrations
             base.Seed(context);
         }
 
-        private User SimpleUser(string name, string email, string password, CryptoService cryptoService)
+        private User SimpleUser(string name, string email, string password, CryptoService cryptoService, User objectOwner = null)
         {
             var salt = cryptoService.Encrypt(name + "salt");
             return new User()
@@ -1079,7 +1126,8 @@ namespace Infrastructure.DataAccess.Migrations
                     Name = name,
                     Email = email,
                     Salt = salt,
-                    Password = cryptoService.Encrypt(password + salt)
+                    Password = cryptoService.Encrypt(password + salt),
+                    ObjectOwner = objectOwner
                 };
         }
 
