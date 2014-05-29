@@ -1,1 +1,77 @@
-﻿
+﻿<table class="table table-condensed table-striped">
+    <thead>
+        <tr>
+            <th>IT Kontrakt</th>
+
+            <th>Ansv. organisationsenhed</th>
+
+            <th>
+                <select class="form-control input-sm" data-ng-init="chosenRoleId = 2" 
+                        data-ng-model="chosenRoleId" data-ng-options="role.id as role.name for role in itContractRoles">
+                </select>
+            </th>
+            
+            <th>
+                Leverandør
+            </th>
+            
+            <th>
+                Anskaffelse
+            </th>
+            
+            <th>
+                Drift/år
+            </th>
+            
+            <th>
+                Betalings model
+            </th>
+            
+            <th>
+                Frekvens
+            </th>
+            
+            <th colspan="2">
+                Audit
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        
+        <!-- for each active contract -->
+        <tr data-ng-repeat="contract in activeContracts | filter:{'show': true}" 
+            data-ng-include="'partials/it-contract/overview-row.html'">
+        </tr>
+        
+        <!-- when there are no active contracts to show -->
+        <tr data-ng-if="activeContracts.length == 0">
+            <td colspan="10" class="text-center">
+                <i>Ingen aktive kontrakter</i>
+            </td>
+        </tr>
+        
+        <!-- "click to show inactive contracts"-row -->
+        <tr>
+            <td colspan="10">
+                <a class="full-width btn btn-link text-left" data-ng-click="showInactive = !showInactive">
+                    <i class="glyphicon" data-ng-class="{'glyphicon-chevron-right': !showInactive, 'glyphicon-chevron-down': showInactive}"></i>
+                    Klik for at {{ showInactive && 'skjule' || 'vise' }} inaktive IT kontrakter
+                </a>
+            </td>
+        </tr>
+        
+        <!-- for each inactive contract -->
+        <tr data-ng-if="showInactive" data-ng-repeat="contract in inactiveContracts | filter:{'show': true}" 
+            data-ng-include="'partials/it-contract/overview-row.html'">
+        </tr>
+
+        
+        <!-- when there are no active contracts to show -->
+        <tr data-ng-if="showInactive && inactiveContracts.length == 0">
+            <td colspan="10" class="text-center">
+                <i>Ingen inaktive kontrakter</i>
+            </td>
+        </tr>
+    </tbody>
+</table>

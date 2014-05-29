@@ -148,5 +148,22 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
         }
+
+        public HttpResponseMessage GetOverview(bool? overview, int organizationId)
+        {
+            try
+            {
+                //Get contracts without parents (roots)
+                var contracts = Repository.Get(contract => contract.OrganizationId == organizationId && contract.ParentId == null);
+
+                var overviewDtos = AutoMapper.Mapper.Map<IEnumerable<ItContractOverviewDTO>>(contracts);
+
+                return Ok(overviewDtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
     }
 }
