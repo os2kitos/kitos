@@ -95,6 +95,28 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        public HttpResponseMessage Delete(int id, [FromUri] int rId, [FromUri] int uId)
+        {
+            try
+            {
+                if (!HasWriteAccess(id, KitosUser))
+                    return Unauthorized();
+
+                var right = _rightRepository.Get(r => r.ObjectId == id && r.RoleId == rId && r.UserId == uId).FirstOrDefault();
+
+                if (right == null) return NotFound();
+
+                _rightRepository.DeleteByKey(right.Id);
+                _rightRepository.Save();
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
     }
 
 
