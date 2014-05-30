@@ -112,12 +112,12 @@
 
         function loadUnits() {
 
-            return $http.get('api/organizationunit?userId=' + userId).success(function (result) {
-                $scope.nodes = result.response;
+            return $http.get('api/organizationunit?organization=' + user.currentOrganizationId).success(function (result) {
+                var rootNode = result.response;
 
-                _.each(result.response, function (u) {
-                    flattenAndSave(u, false, null);
-                });
+                $scope.nodes = [rootNode];
+
+                flattenAndSave(rootNode, false, null);
 
                 if ($scope.chosenOrgUnit) {
 
@@ -155,7 +155,7 @@
             }
 
             //get org rights on the org unit and subtree
-            $http.get('api/organizationRight?organizationUnitId=' + node.id).success(function (data) {
+            $http.get('api/organizationUnit/' + node.id + '?rights').success(function (data) {
                 node.orgRights = data.response;
 
                 _.each(node.orgRights, function (right) {
@@ -191,12 +191,11 @@
             if (!oId || !rId || !uId) return;
 
             var data = {
-                "objectId": oId,
                 "roleId": rId,
                 "userId": uId
             };
 
-            $http.post("api/organizationright", data).success(function (result) {
+            $http.post("api/organizationunit/" + oId, data).success(function (result) {
                 notify.addSuccessMessage(result.response.user.name + " er knyttet i rollen");
 
                 $scope.chosenOrgUnit.orgRights.push({
@@ -224,7 +223,7 @@
             var rId = right.roleId;
             var uId = right.userId;
 
-            $http.delete("api/organizationright?oId=" + oId + "&rId=" + rId + "&uId=" + uId).success(function (deleteResult) {
+            $http.delete("api/organizationunit/" + oId + "?rId=" + rId + "&uId=" + uId).success(function (deleteResult) {
                 right.show = false;
                 notify.addSuccessMessage('Rollen er slettet!');
             }).error(function (deleteResult) {
@@ -255,15 +254,14 @@
 
             //otherwise, we should delete the old entry, then add a new one
 
-            $http.delete("api/organizationright?oId=" + oIdOld + "&rId=" + rIdOld + "&uId=" + uIdOld).success(function (deleteResult) {
+            $http.delete("api/organizationunit/" + oIdOld + "?rId=" + rIdOld + "&uId=" + uIdOld).success(function (deleteResult) {
 
                 var data = {
-                    "objectId": oIdNew,
                     "roleId": rIdNew,
                     "userId": uIdNew
                 };
 
-                $http.post("api/organizationright", data).success(function (result) {
+                $http.post("api/organizationunit/" + oIdNew, data).success(function (result) {
 
                     right.roleId = result.response.roleId;
                     right.user = result.response.user;
@@ -885,7 +883,7 @@
                     hasWriteAccess(child, true);
                 });
             } else {
-                $http.get('api/organizationRight?hasWriteAccess&oId=' + orgUnit.id + '&uId=' + userId).success(function(result) {
+                $http.get('api/organizationUnit/' + orgUnit.id + '?hasWriteAccess').success(function(result) {
                     orgUnit.hasWriteAccess = result.response;
 
                     _.each(orgUnit.children, function(child) {
@@ -906,13 +904,13 @@
         
         function loadUnits() {
 
-            return $http.get('api/organizationunit?userId=' + userId).success(function (result) {
-                $scope.nodes = result.response;
+            return $http.get('api/organizationunit?organization=' + user.currentOrganizationId).success(function (result) {
+                var rootNode = result.response;
 
-                _.each(result.response, function (unit) {
-                    visitOrgUnit(unit);
-                    hasWriteAccess(unit, false);
-                });
+                $scope.nodes = [rootNode];
+
+                visitOrgUnit(rootNode);
+                hasWriteAccess(rootNode, false);
             });
         }
 
