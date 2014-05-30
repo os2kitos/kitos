@@ -10,14 +10,15 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class ItSystemUsageController : GenericApiController<ItSystemUsage, ItSystemUsageDTO, ItSystemUsageDTO> 
+    public class ItSystemUsageController : GenericHasRightsController<ItSystemUsage, ItSystemRight, ItSystemRole, ItSystemUsageDTO> 
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemUsageService _itSystemUsageService;
 
-        public ItSystemUsageController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository, IItSystemUsageService itSystemUsageService) 
-            : base(repository)
+        public ItSystemUsageController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<ItSystemRight> rightRepository,
+            IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository, IItSystemUsageService itSystemUsageService) 
+            : base(repository, rightRepository)
         {
             _orgUnitRepository = orgUnitRepository;
             _taskRepository = taskRepository;
@@ -91,13 +92,10 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 var usage = Repository.Get(u => u.ItSystemId == itSystemId && u.OrganizationId == organizationId).FirstOrDefault();
-
                 if (usage == null) return NotFound();
 
-                Repository.DeleteByKey(usage.Id);
-                Repository.Save();
-
-                return Ok();
+                //This will make sure we check for permissions and such...
+                return Delete(usage.Id);
 
             }
             catch (Exception e)
@@ -127,9 +125,12 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 var usage = Repository.GetByKey(id);
-                var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
+                if (usage == null) return NotFound();
+                if (!HasWriteAccess(usage)) return Unauthorized();
 
-                if (usage == null || orgUnit == null) return NotFound();
+                var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
+                if(orgUnit == null) return NotFound();
+
 
                 usage.UsedBy.Add(orgUnit);
                 Repository.Save();

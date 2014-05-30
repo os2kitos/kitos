@@ -10,7 +10,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class GoalStatusController : GenericApiController<GoalStatus, GoalStatusDTO, GoalStatusDTO>
+    public class GoalStatusController : GenericApiController<GoalStatus, GoalStatusDTO>
     {
         public GoalStatusController(IGenericRepository<GoalStatus> repository) : base(repository)
         {

@@ -7,7 +7,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class OrganizationController : GenericHasRightsController<Organization, AdminRight, AdminRole, OrganizationDTO, OrganizationDTO>
+    public class OrganizationController : GenericHasRightsController<Organization, AdminRight, AdminRole, OrganizationDTO>
     {
         private readonly IOrganizationService _organizationService;
 

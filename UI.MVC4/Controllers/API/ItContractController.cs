@@ -11,7 +11,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class ItContractController : GenericHasRightsController<ItContract, ItContractRight, ItContractRole, ItContractDTO, ItContractDTO>
+    public class ItContractController : GenericHasRightsController<ItContract, ItContractRight, ItContractRole, ItContractDTO>
     {
         private readonly IGenericRepository<AgreementElement> _agreementElementRepository;
 

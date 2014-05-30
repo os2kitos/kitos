@@ -10,7 +10,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class StateController : GenericApiController<State, StateDTO, StateDTO>
+    public class StateController : GenericApiController<State, StateDTO>
     {
         public StateController(IGenericRepository<State> repository) : base(repository)
         {

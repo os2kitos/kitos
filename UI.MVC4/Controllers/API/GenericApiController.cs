@@ -10,7 +10,7 @@ using UI.MVC4.Models.Exceptions;
 
 namespace UI.MVC4.Controllers.API
 {
-    public abstract class GenericApiController<TModel, TInputDTO, TOutputDTO> : BaseApiController // TODO perhaps it's possible to infer the TKeyType from TModel somehow
+    public abstract class GenericApiController<TModel, TDto> : BaseApiController
         where TModel : Entity
     {
         protected readonly IGenericRepository<TModel> Repository;
@@ -86,11 +86,11 @@ namespace UI.MVC4.Controllers.API
         }
 
         // POST api/T
-        public virtual HttpResponseMessage Post(TInputDTO dto)
+        public virtual HttpResponseMessage Post(TDto dto)
         {
             try
             {
-                var item = Map<TInputDTO, TModel>(dto);
+                var item = Map<TDto, TModel>(dto);
 
                 item.ObjectOwner = KitosUser;
 
@@ -117,7 +117,7 @@ namespace UI.MVC4.Controllers.API
         }
 
         // PUT api/T
-        public virtual HttpResponseMessage Put(int id, TInputDTO dto)
+        public virtual HttpResponseMessage Put(int id, TDto dto)
         {
             try
             {
@@ -183,7 +183,7 @@ namespace UI.MVC4.Controllers.API
                 {
                     // get name of mapped property
                     var map =
-                        AutoMapper.Mapper.FindTypeMapFor<TInputDTO, TModel>()
+                        AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>()
                                   .GetPropertyMaps();
                     var nonNullMaps = map.Where(x => x.SourceMember != null);
                     var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name.Equals(valuePair.Key, StringComparison.InvariantCultureIgnoreCase));
@@ -289,27 +289,27 @@ namespace UI.MVC4.Controllers.API
         #region Mapping functions
 
         //for easy access
-        protected virtual TOutputDTO Map(TModel model)
+        protected virtual TDto Map(TModel model)
         {
-            return Map<TModel, TOutputDTO>(model);
+            return Map<TModel, TDto>(model);
         }
 
         //for easy access
-        protected virtual TModel Map(TInputDTO inputDto)
+        protected virtual TModel Map(TDto inputDto)
         {
-            return Map<TInputDTO, TModel>(inputDto);
+            return Map<TDto, TModel>(inputDto);
         }
 
         //for easy access (list)
-        protected virtual IEnumerable<TOutputDTO> Map(IEnumerable<TModel> models)
+        protected virtual IEnumerable<TDto> Map(IEnumerable<TModel> models)
         {
-            return Map<IEnumerable<TModel>, IEnumerable<TOutputDTO>>(models);
+            return Map<IEnumerable<TModel>, IEnumerable<TDto>>(models);
         }
 
         //for easy access (list)
-        protected virtual IEnumerable<TModel> Map(IEnumerable<TInputDTO> inputDtos)
+        protected virtual IEnumerable<TModel> Map(IEnumerable<TDto> inputDtos)
         {
-            return Map<IEnumerable<TInputDTO>, IEnumerable<TModel>>(inputDtos);
+            return Map<IEnumerable<TDto>, IEnumerable<TModel>>(inputDtos);
         }
 
         protected virtual TDest Map<TSource, TDest>(TSource item)

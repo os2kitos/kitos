@@ -6,7 +6,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class RiskController : GenericApiController<Risk, RiskDTO, RiskDTO>
+    public class RiskController : GenericApiController<Risk, RiskDTO>
     {
         public RiskController(IGenericRepository<Risk> repository) : base(repository)
         {

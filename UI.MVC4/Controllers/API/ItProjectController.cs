@@ -12,14 +12,14 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class ItProjectController : GenericHasRightsController<ItProject, ItProjectRight, ItProjectRole, ItProjectDTO, ItProjectDTO>
+    public class ItProjectController : GenericHasRightsController<ItProject, ItProjectRight, ItProjectRole, ItProjectDTO>
     {
         private readonly IItProjectService _itProjectService;
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
 
-        //TODO: Man, this constructor smells bad...
+        //TODO: Man, this constructor smells ...
         public ItProjectController(IGenericRepository<ItProject> repository, IGenericRepository<ItProjectRight> rightRepository,
             IItProjectService itProjectService, IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository, 
             IGenericRepository<ItSystemUsage> itSystemUsageRepository) 

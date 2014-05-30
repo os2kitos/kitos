@@ -20,14 +20,14 @@ namespace Core.ApplicationServices
             _systemRepository = systemRepository;
         }
 
-        public ItSystemUsage Add(int systemId, int orgId, User owner)
+        public ItSystemUsage Add(int systemId, int orgId, User objectOwner)
         {
             //Adding the usage
             var usage = new ItSystemUsage()
                 {
                     ItSystemId = systemId,
                     OrganizationId = orgId,
-                    ObjectOwner = owner
+                    ObjectOwner = objectOwner
                 };
 
             var system = _systemRepository.GetByKey(systemId);

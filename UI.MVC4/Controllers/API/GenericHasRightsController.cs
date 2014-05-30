@@ -11,7 +11,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public abstract class GenericHasRightsController<TObject, TRight, TRole, TInputDTO, TOutputDTO> : GenericApiController<TObject, TInputDTO, TOutputDTO>
+    public abstract class GenericHasRightsController<TObject, TRight, TRole, TDto> : GenericApiController<TObject, TDto>
         where TObject : Entity, IHasRights<TRight>
         where TRight : Entity, IRight<TObject, TRight, TRole>
         where TRole : IRoleEntity<TRight>
@@ -53,7 +53,7 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 var theRights = GetAllRightsQuery(id);
-                var dtos = Map<IEnumerable<TRight>, IEnumerable<TOutputDTO>>(theRights);
+                var dtos = Map<IEnumerable<TRight>, IEnumerable<RightOutputDTO>>(theRights);
 
                 return Ok(dtos);
             }
