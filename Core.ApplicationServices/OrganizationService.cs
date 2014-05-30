@@ -39,7 +39,7 @@ namespace Core.ApplicationServices
             var org = new Organization
             {
                 Name = name,
-                Config = Config.Default,
+                Config = Config.Default(objectOwner),
                 Type = organizationType,
                 ObjectOwner = objectOwner
             };

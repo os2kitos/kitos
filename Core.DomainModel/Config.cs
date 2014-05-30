@@ -34,31 +34,30 @@ namespace Core.DomainModel
         public virtual ItContractModuleName ItContractModuleName { get; set; }
         public virtual Organization Organization { get; set; }
 
-        public static Config Default
+        public static Config Default(User objectOwner)
         {
-            get
-            {
-                return new Config()
-                    {
-                        ShowItContractModule = true,
-                        ShowItProjectModule = true,
-                        ShowItSystemModule = true,
-                        ItSupportModuleNameId = 1,
-                        ItContractModuleNameId = 1,
-                        ItProjectModuleNameId = 1,
-                        ItSystemModuleNameId = 1,
-                        ItSupportGuide = ".../itunderstøttelsesvejledning",
-                        ItProjectGuide = ".../itprojektvejledning",
-                        ItSystemGuide = ".../itsystemvejledning",
-                        ItContractGuide = ".../itkontraktvejledning",
-                        ShowBC = true,
-                        ShowPortfolio = true,
-                        ShowColumnMandatory = true,
-                        ShowColumnTechnology = true,
-                        ShowColumnUsage = true,
-                        ShowTabOverview = true
-                    };
-            }
+            return new Config()
+                {
+                    ShowItContractModule = true,
+                    ShowItProjectModule = true,
+                    ShowItSystemModule = true,
+                    ItSupportModuleNameId = 1,
+                    ItContractModuleNameId = 1,
+                    ItProjectModuleNameId = 1,
+                    ItSystemModuleNameId = 1,
+                    ItSupportGuide = ".../itunderstøttelsesvejledning",
+                    ItProjectGuide = ".../itprojektvejledning",
+                    ItSystemGuide = ".../itsystemvejledning",
+                    ItContractGuide = ".../itkontraktvejledning",
+                    ShowBC = true,
+                    ShowPortfolio = true,
+                    ShowColumnMandatory = true,
+                    ShowColumnTechnology = true,
+                    ShowColumnUsage = true,
+                    ShowTabOverview = true,
+                    ObjectOwner = objectOwner
+                };
+
         }
     }
 }
