@@ -10,19 +10,21 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class OrganizationUnitController : GenericApiController<OrganizationUnit, OrgUnitDTO>
+    public class OrganizationUnitController : GenericHasRightsController<OrganizationUnit, OrganizationRight, OrganizationRole, OrgUnitDTO>
     {
         private readonly IOrgUnitService _orgUnitService;
         private readonly IAdminService _adminService;
 
-        public OrganizationUnitController(IGenericRepository<OrganizationUnit> repository, IOrgUnitService orgUnitService, IAdminService adminService) 
-            : base(repository)
+        public OrganizationUnitController(IGenericRepository<OrganizationUnit> repository, IGenericRepository<OrganizationRight> rightRepository, 
+            IOrgUnitService orgUnitService, IAdminService adminService) 
+            : base(repository, rightRepository)
         {
             _orgUnitService = orgUnitService;
             _adminService = adminService;
         }
 
-        public HttpResponseMessage GetByUser(int userId)
+        //TODO probably obsolete
+        /*public HttpResponseMessage GetByUser(int userId)
         {
             try
             {
@@ -39,8 +41,14 @@ namespace UI.MVC4.Controllers.API
             {
                 return Error(e);
             }
-        }
+        }*/
 
+        //TODO rename this into something more saying
+        /// <summary>
+        /// Returns every OrganizationUnit that the user has a role for
+        /// </summary>
+        /// <param name="userId2"></param>
+        /// <returns></returns>
         public HttpResponseMessage GetByUser2(int userId2)
         {
             try
@@ -97,7 +105,7 @@ namespace UI.MVC4.Controllers.API
                 if (obj.TryGetValue("parentId", out jtoken))
                 {
                     //You have to be local or global admin to change parent
-                    if (!_adminService.IsGlobalAdmin(KitosUser) && !_orgUnitService.IsLocalAdminFor(KitosUser, id))
+                    if (!(IsGlobalAdmin() || _orgUnitService.IsLocalAdminFor(KitosUser, id)))
                         return Unauthorized();
 
                     var parentId = jtoken.Value<int>();
@@ -122,12 +130,9 @@ namespace UI.MVC4.Controllers.API
             return NotAllowed();
         }
 
-        protected override void DeleteQuery(int id)
+        protected override bool HasWriteAccess(OrganizationUnit obj, User user)
         {
-            if(!_orgUnitService.HasWriteAccess(KitosUser, id))
-                throw new SecurityException();
-
-            base.DeleteQuery(id);
+            return _orgUnitService.HasWriteAccess(user, obj);
         }
     }
 }
