@@ -544,6 +544,9 @@ namespace Infrastructure.DataAccess.Migrations
 
             var simon = SimpleUser("Simon Lynn-Pedersen", "slp@it-minds.dk", "slp123", cryptoService);
             simon.IsGlobalAdmin = true;
+            
+            var eskild = SimpleUser("Eskild", "esd@it-minds.dk", "123", cryptoService);
+            eskild.IsGlobalAdmin = true;
 
             var globalUser = SimpleUser("Global Test Bruger", "g@test", "test", cryptoService);
             globalUser.IsGlobalAdmin = true;
@@ -559,7 +562,7 @@ namespace Infrastructure.DataAccess.Migrations
             roskildeUser6.IsGlobalAdmin = true;
             var roskildeUser7 = SimpleUser("Erik", "ehl@kl.dk", "123", cryptoService);
 
-            context.Users.AddOrUpdate(x => x.Email, simon, globalUser, localUser, roskildeUser1, roskildeUser2, roskildeUser3, roskildeUser4, roskildeUser5, roskildeUser6, roskildeUser7);
+            context.Users.AddOrUpdate(x => x.Email, simon, eskild, globalUser, localUser, roskildeUser1, roskildeUser2, roskildeUser3, roskildeUser4, roskildeUser5, roskildeUser6, roskildeUser7);
 
             context.SaveChanges();
 
