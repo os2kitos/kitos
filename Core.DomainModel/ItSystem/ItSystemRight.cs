@@ -1,6 +1,6 @@
 ﻿namespace Core.DomainModel.ItSystem
 {
-    public class ItSystemRight : Entity, IRight<ItSystemUsage, ItSystemRole>
+    public class ItSystemRight : Entity, IRight<ItSystemUsage, ItSystemRight, ItSystemRole>
     {
         public int UserId { get; set; }
         public int RoleId { get; set; }

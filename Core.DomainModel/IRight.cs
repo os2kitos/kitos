@@ -1,8 +1,8 @@
 ﻿namespace Core.DomainModel
 {
-    public interface IRight<TObject, TRole>
-        where TRole : Entity, IRoleEntity
-        where TObject : Entity
+    public interface IRight<TObject, TRight, TRole>
+        where TObject : Entity, IHasRights<TRight>
+        where TRole : IRoleEntity<TRight>
     {
         int UserId { get; set; }
         int RoleId { get; set; }

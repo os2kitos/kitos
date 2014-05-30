@@ -9,7 +9,7 @@ namespace Core.DomainModel
         CommunityOfInterests
     }
 
-    public class Organization : Entity
+    public class Organization : Entity, IHasRights<AdminRight>
     {
         public Organization()
         {
@@ -42,7 +42,7 @@ namespace Core.DomainModel
         /// </summary>
         public virtual ICollection<ItContract.ItContract> Supplier { get; set; }
         public virtual ICollection<ItContract.ItContract> Contracts { get; set; }
-        public virtual ICollection<AdminRight> AdminRights { get; set; }
+        public virtual ICollection<AdminRight> Rights { get; set; }
         public virtual ICollection<ItSystem.ItSystemUsage> ItSystemUsages { get; set; }
 
         #region Config and localization

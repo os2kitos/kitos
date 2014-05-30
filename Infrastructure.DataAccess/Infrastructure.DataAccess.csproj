@@ -77,6 +77,7 @@
     <Compile Include="Mapping\ProcurementStrategyMap.cs" />
     <Compile Include="Mapping\InterfaceExposureMap.cs" />
     <Compile Include="Mapping\GoalTypeMap.cs" />
+    <Compile Include="Mapping\RightMap.cs" />
     <Compile Include="Mapping\StateMap.cs" />
     <Compile Include="Mapping\EconomyYearMap.cs" />
     <Compile Include="Mapping\DataTypeMap.cs" />

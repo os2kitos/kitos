@@ -1,6 +1,6 @@
 ﻿namespace Core.DomainModel
 {
-    public class OrganizationRight : Entity, IRight<OrganizationUnit, OrganizationRole>
+    public class OrganizationRight : Entity, IRight<OrganizationUnit, OrganizationRight, OrganizationRole>
     {
         public int UserId { get; set; }
         public int RoleId { get; set; }

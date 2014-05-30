@@ -1,6 +1,6 @@
 ﻿namespace Core.DomainModel.ItContract
 {
-    public class ItContractRight : Entity, IRight<ItContract, ItContractRole>
+    public class ItContractRight : Entity, IRight<ItContract, ItContractRight, ItContractRole>
     {
         public int UserId { get; set; }
         public int RoleId { get; set; }
