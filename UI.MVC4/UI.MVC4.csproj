@@ -259,7 +259,7 @@
     <Compile Include="Controllers\API\DataRowUsageController.cs" />
     <Compile Include="Controllers\API\DataTypeController.cs" />
     <Compile Include="Controllers\API\FrequencyController.cs" />
-    <Compile Include="Controllers\API\GenericRightController.cs" />
+    <Compile Include="Controllers\API\GenericHasRightsController.cs" />
     <Compile Include="Controllers\API\InterfaceController.cs" />
     <Compile Include="Controllers\API\InterfaceUsageController.cs" />
     <Compile Include="Controllers\API\ItProjectController.cs" />

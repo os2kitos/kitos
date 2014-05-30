@@ -12,10 +12,10 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class ItSystemRightController : GenericRightController<ItSystemRight, ItSystemUsage, ItSystemRole>
-    {
-        public ItSystemRightController(IGenericRepository<ItSystemRight> repository, IGenericRepository<ItSystemUsage> usageRepository) : base(repository, usageRepository)
-        {
-        }
-    }
+    //public class ItSystemRightController : GenericRightController<ItSystemRight, ItSystemUsage, ItSystemRole>
+    //{
+    //    public ItSystemRightController(IGenericRepository<ItSystemRight> repository, IGenericRepository<ItSystemUsage> usageRepository) : base(repository, usageRepository)
+    //    {
+    //    }
+    //}
 }

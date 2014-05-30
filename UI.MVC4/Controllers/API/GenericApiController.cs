@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Security;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
@@ -76,6 +77,26 @@ namespace UI.MVC4.Controllers.API
             return Ok(Map(item));
         }
 
+        /// <summary>
+        /// GET api/T/5?hasWriteAccess
+        /// Returns whether the current authenticated user has write access 
+        /// to the object with the given id
+        /// </summary>
+        /// <param name="id">The id of the object</param>
+        /// <param name="hasWriteAccess">Route qualifier</param>
+        /// <returns>True or false</returns>
+        public HttpResponseMessage GetHasWriteAccess(int id, bool? hasWriteAccess)
+        {
+            try
+            {
+                return Ok(HasWriteAccess(id));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         protected virtual TModel PostQuery(TModel item)
         {
             Repository.Insert(item);
@@ -121,7 +142,7 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 var oldItem = Repository.GetByKey(id);
-                if (!HasWriteAccess(oldItem, KitosUser)) return Unauthorized();
+                if (!HasWriteAccess(oldItem)) return Unauthorized();
 
                 var newItem = Map(dto);
                 newItem.Id = id;
@@ -148,7 +169,7 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 var item = Repository.GetByKey(id);
-                if (!HasWriteAccess(item, KitosUser)) return Unauthorized();
+                if (!HasWriteAccess(item)) return Unauthorized();
 
                 DeleteQuery(id);
 
@@ -174,7 +195,7 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 var item = Repository.GetByKey(id);
-                if (!HasWriteAccess(item, KitosUser)) return Unauthorized();
+                if (!HasWriteAccess(item)) return Unauthorized();
 
                 var itemType = item.GetType();
 
@@ -235,11 +256,51 @@ namespace UI.MVC4.Controllers.API
             base.Dispose(disposing);
         }
 
+        /// <summary>
+        /// Checks if the current authenticated user has write access to a given object. 
+        /// Override this method as needed.
+        /// </summary>
+        /// <param name="obj">The object</param>
+        /// <returns>True iff user has write access to obj</returns>
+        protected virtual bool HasWriteAccess(TModel obj)
+        {
+            return HasWriteAccess(obj, KitosUser);
+        }
+
+        /// <summary>
+        /// Checks if a given user has write access to a given object. 
+        /// Override this method as needed.
+        /// </summary>
+        /// <param name="obj">The object</param>
+        /// <param name="user">The user</param>
+        /// <returns>True iff user has write access to obj</returns>
         protected virtual bool HasWriteAccess(TModel obj, User user)
         {
             if (obj.ObjectOwnerId.HasValue && obj.ObjectOwnerId == user.Id) return true;
 
             return false;
+        }
+
+        /// <summary>
+        /// Checks if the current authenticated user has write access to a given object. 
+        /// </summary>
+        /// <param name="objId">The id of object</param>
+        /// <returns>True iff user has write access to the object with objId</returns>
+        protected bool HasWriteAccess(int objId)
+        {
+            return HasWriteAccess(objId, KitosUser);
+        }
+
+        /// <summary>
+        /// Checks if a given user has write access to a given object. 
+        /// </summary>
+        /// <param name="objId">The id of object</param>
+        /// <param name="user">The user</param>
+        /// <returns>True iff user has write access to the object with objId</returns>
+        protected bool HasWriteAccess(int objId, User user)
+        {
+            var obj = Repository.GetByKey(objId);
+            return HasWriteAccess(obj, user);
         }
     }
 }
