@@ -9,7 +9,7 @@ using UI.MVC4.Models.Exceptions;
 
 namespace UI.MVC4.Controllers.API
 {
-    public abstract class GenericApiController<TModel, TDto> : BaseApiController // TODO perhaps it's possible to infer the TKeyType from TModel somehow
+    public abstract class GenericApiController<TModel, TInputDTO, TOutputDTO> : BaseApiController // TODO perhaps it's possible to infer the TKeyType from TModel somehow
         where TModel : Entity
     {
         protected readonly IGenericRepository<TModel> Repository;
@@ -22,27 +22,27 @@ namespace UI.MVC4.Controllers.API
         #region mapping functions
 
         //for easy access
-        protected virtual TDto Map(TModel model)
+        protected virtual TOutputDTO Map(TModel model)
         {
-            return Map<TModel, TDto>(model);
+            return Map<TModel, TOutputDTO>(model);
         }
 
         //for easy access
-        protected virtual TModel Map(TDto dto)
+        protected virtual TModel Map(TInputDTO inputDto)
         {
-            return Map<TDto, TModel>(dto);
+            return Map<TInputDTO, TModel>(inputDto);
         }
 
         //for easy access (list)
-        protected virtual IEnumerable<TDto> Map(IEnumerable<TModel> models)
+        protected virtual IEnumerable<TOutputDTO> Map(IEnumerable<TModel> models)
         {
-            return Map<IEnumerable<TModel>, IEnumerable<TDto>>(models);
+            return Map<IEnumerable<TModel>, IEnumerable<TOutputDTO>>(models);
         }
 
         //for easy access (list)
-        protected virtual IEnumerable<TModel> Map(IEnumerable<TDto> dtos)
+        protected virtual IEnumerable<TModel> Map(IEnumerable<TInputDTO> inputDtos)
         {
-            return Map<IEnumerable<TDto>, IEnumerable<TModel>>(dtos);
+            return Map<IEnumerable<TInputDTO>, IEnumerable<TModel>>(inputDtos);
         }
 
         protected virtual TDest Map<TSource, TDest>(TSource item)
@@ -62,7 +62,7 @@ namespace UI.MVC4.Controllers.API
         {
             var items = GetAllQuery();
 
-            return Ok(Map<IEnumerable<TModel>, IEnumerable<TDto>>(items));
+            return Ok(Map<IEnumerable<TModel>, IEnumerable<TOutputDTO>>(items));
         }
 
         // GET api/T
@@ -73,7 +73,7 @@ namespace UI.MVC4.Controllers.API
             if (item == null)
                 return NotFound();
 
-            return Ok(Map<TModel, TDto>(item));
+            return Ok(Map(item));
         }
 
         protected virtual TModel PostQuery(TModel item)
@@ -85,17 +85,17 @@ namespace UI.MVC4.Controllers.API
         }
 
         // POST api/T
-        public virtual HttpResponseMessage Post(TDto dto)
+        public virtual HttpResponseMessage Post(TInputDTO dto)
         {
             try
             {
-                var item = Map<TDto, TModel>(dto);
+                var item = Map<TInputDTO, TModel>(dto);
 
                 item.ObjectOwner = KitosUser;
 
                 PostQuery(item);
 
-                return Created(Map<TModel, TDto>(item), new Uri(Request.RequestUri + "/" + item.Id));
+                return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
             }
             catch (ConflictException e)
             {
@@ -116,14 +116,14 @@ namespace UI.MVC4.Controllers.API
         }
 
         // PUT api/T
-        public virtual HttpResponseMessage Put(int id, TDto dto)
+        public virtual HttpResponseMessage Put(int id, TInputDTO dto)
         {
             try
             {
                 var oldItem = Repository.GetByKey(id);
                 if (!HasWriteAccess(oldItem, KitosUser)) return Unauthorized();
 
-                var newItem = Map<TDto, TModel>(dto);
+                var newItem = Map(dto);
                 newItem.Id = id;
 
                 PutQuery(newItem);
@@ -182,7 +182,7 @@ namespace UI.MVC4.Controllers.API
                 {
                     // get name of mapped property
                     var map =
-                        AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>()
+                        AutoMapper.Mapper.FindTypeMapFor<TInputDTO, TModel>()
                                   .GetPropertyMaps();
                     var nonNullMaps = map.Where(x => x.SourceMember != null);
                     var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name.Equals(valuePair.Key, StringComparison.InvariantCultureIgnoreCase));
@@ -237,7 +237,7 @@ namespace UI.MVC4.Controllers.API
 
         protected virtual bool HasWriteAccess(TModel obj, User user)
         {
-            if (obj.ObjectOwnerId == user.Id) return true;
+            if (obj.ObjectOwnerId.HasValue && obj.ObjectOwnerId == user.Id) return true;
 
             return false;
         }
