@@ -5,12 +5,10 @@ using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItSystemRightMap : EntityTypeConfiguration<ItSystemRight>
+    public class ItSystemRightMap : EntityMap<ItSystemRight>
     {
         public ItSystemRightMap()
         {
-            this.HasKey(right => new { right.ObjectId, right.RoleId, right.UserId });
-
             this.ToTable("ItSystemRight");
 
             this.HasRequired(right => right.Object)

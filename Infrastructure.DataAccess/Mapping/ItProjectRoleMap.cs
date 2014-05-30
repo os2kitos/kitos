@@ -3,15 +3,7 @@ using Core.DomainModel.ItProject;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItProjectRoleMap : EntityTypeConfiguration<ItProjectRole>
+    public class ItProjectRoleMap : OptionEntityMap<ItProjectRole, ItProjectRight>
     {
-        public ItProjectRoleMap()
-        {
-            this.HasKey(t => t.Id);
-
-            this.ToTable("ItProjectRole");
-
-            this.Property(t => t.Name).IsRequired();
-        }
     }
 }

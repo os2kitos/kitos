@@ -4,17 +4,13 @@ using Core.DomainModel.ItProject;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class EconomyStreamMap : EntityTypeConfiguration<EconomyStream>
+    public class EconomyStreamMap : EntityMap<EconomyStream>
     {
         public EconomyStreamMap()
         {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
             // Properties
             // Table & Column Mappings
             this.ToTable("EconomyStream");
-            this.Property(t => t.Id).HasColumnName("Id");
 
             // Relationships
             this.HasOptional(t => t.ExternPaymentFor)

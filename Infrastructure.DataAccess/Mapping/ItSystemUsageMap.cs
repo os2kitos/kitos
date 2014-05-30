@@ -3,26 +3,17 @@ using System.Data.Entity.ModelConfiguration;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    class ItSystemUsageMap : EntityTypeConfiguration<ItSystemUsage>
+    class ItSystemUsageMap : EntityMap<ItSystemUsage>
     {
         public ItSystemUsageMap()
         {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
             // Properties
             // Table & Column Mappings
             this.ToTable("ItSystemUsage");
-            this.Property(t => t.Id)
-                .HasColumnName("Id");
 
             // Relationships
             this.HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystemUsages);
-
-            this.HasRequired(t => t.ObjectOwner)
-                .WithMany(user => user.CreatedSystemUsages)
-                .HasForeignKey(t => t.ObjectOwnerId);
 
             this.HasMany(t => t.OrgUnits)
                  .WithMany(t => t.ItSystemUsages)

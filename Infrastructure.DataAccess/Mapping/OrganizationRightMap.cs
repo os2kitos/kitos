@@ -6,12 +6,10 @@ using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class OrganizationRightMap : EntityTypeConfiguration<OrganizationRight>
+    public class OrganizationRightMap : EntityMap<OrganizationRight>
     {
         public OrganizationRightMap()
         {
-            this.HasKey(right => new { right.ObjectId, right.RoleId, right.UserId });
-
             this.ToTable("OrganizationRight");
 
             this.HasRequired(right => right.Object)

@@ -8,21 +8,7 @@ using Core.DomainModel.ItContract;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class HandoverTrialMap : EntityTypeConfiguration<HandoverTrial>
+    public class HandoverTrialMap : OptionEntityMap<HandoverTrial, ItContract>
     {
-        public HandoverTrialMap()
-        {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
-            // Properties
-            this.Property(t => t.Name)
-                .IsRequired();
-
-            // Table & Column Mappings
-            this.ToTable("HandoverTrial");
-            this.Property(t => t.Id).HasColumnName("Id");
-            this.Property(t => t.Name).HasColumnName("Name");
-        }
     }
 }

@@ -3,13 +3,10 @@ using Core.DomainModel.ItContract;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class AdviceMap : EntityTypeConfiguration<Advice>
+    public class AdviceMap : EntityMap<Advice>
     {
         public AdviceMap()
         {
-            // Primary Key
-            this.HasKey(t => t.Id);
-            
             // Table & Column Mappings
             this.ToTable("Advice");
 

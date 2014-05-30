@@ -6,15 +6,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class AdminRoleMap : EntityTypeConfiguration<AdminRole>
+    public class AdminRoleMap : OptionEntityMap<AdminRole, AdminRight>
     {
-        public AdminRoleMap()
-        {
-            this.HasKey(t => t.Id);
-
-            this.ToTable("AdminRole");
-
-            this.Property(t => t.Name).IsRequired();
-        }
     }
 }

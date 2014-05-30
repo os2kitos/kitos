@@ -12,7 +12,8 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasKey(t => t.Id);
 
             this.HasRequired(t => t.ObjectOwner)
-                .WithOptional();
+                .WithMany()
+                .HasForeignKey(t => t.ObjectOwnerId);
         }
     }
 }

@@ -8,16 +8,7 @@ using Core.DomainModel.ItProject;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class EconomyYearMap : EntityTypeConfiguration<EconomyYear>
+    public class EconomyYearMap : EntityMap<EconomyYear>
     {
-        public EconomyYearMap()
-        {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
-            // Table & Column Mappings
-            this.ToTable("EconomyYear");
-            this.Property(t => t.Id).HasColumnName("Id");
-        }
     }
 }

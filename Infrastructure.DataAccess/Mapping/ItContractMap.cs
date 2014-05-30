@@ -7,20 +7,9 @@ namespace Infrastructure.DataAccess.Mapping
     {
         public ItContractMap()
         {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
             // Properties
             // Table & Column Mappings
             this.ToTable("ItContract");
-            this.Property(t => t.Id).HasColumnName("Id");
-            
-
-            // Relationships
-            this.HasRequired(t => t.ObjectOwner)
-                .WithMany(t => t.CreatedItContracts)
-                .HasForeignKey(d => d.ObjectOwnerId)
-                .WillCascadeOnDelete(false);
 
             this.HasOptional(t => t.ContractTemplate)
                 .WithMany(t => t.References)

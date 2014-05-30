@@ -73,6 +73,7 @@
     <Compile Include="Mapping\EntityMap.cs" />
     <Compile Include="Mapping\EconomyStreamMap.cs" />
     <Compile Include="Mapping\CustomAgreementElementMap.cs" />
+    <Compile Include="Mapping\OptionEntityMap.cs" />
     <Compile Include="Mapping\ProcurementStrategyMap.cs" />
     <Compile Include="Mapping\InterfaceExposureMap.cs" />
     <Compile Include="Mapping\GoalTypeMap.cs" />

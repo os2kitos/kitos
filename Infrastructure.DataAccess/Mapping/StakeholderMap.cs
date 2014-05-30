@@ -3,23 +3,14 @@ using Core.DomainModel.ItProject;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class StakeholderMap : EntityTypeConfiguration<Stakeholder>
+    public class StakeholderMap : EntityMap<Stakeholder>
     {
         public StakeholderMap()
         {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
             // Properties
             // Table & Column Mappings
             this.ToTable("Stakeholder");
-            this.Property(t => t.Id).HasColumnName("Id");
             this.Property(t => t.ItProjectId).HasColumnName("ItProjectId");
-
-            // Relationships
-            //this.HasRequired(t => t.ItProject)
-            //    .WithMany(t => t.Stakeholders)
-            //    .HasForeignKey(d => d.ItProjectId);
 
         }
     }

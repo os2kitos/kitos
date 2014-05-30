@@ -122,8 +122,14 @@ namespace Infrastructure.DataAccess.Migrations
             
             #region ADMIN ROLES
 
-            var localAdmin = new AdminRole { Name = "LocalAdmin", IsActive = true };
+            var localAdmin = new AdminRole
+            {
+                Name = "LocalAdmin",
+                IsActive = true,
+                ObjectOwner = globalUser
+            };
             context.AdminRoles.AddOrUpdate(x => x.Name, localAdmin);
+            context.SaveChanges();
 
             #endregion
             
@@ -157,16 +163,38 @@ namespace Infrastructure.DataAccess.Migrations
             };
 
             context.OrganizationRoles.AddOrUpdate(role => role.Id, boss, resourcePerson, employee);
-
+            context.SaveChanges();
 
             #endregion
 
             #region PROJECT ROLES
 
-            context.ItProjectRoles.AddOrUpdate(r => r.Id, new ItProjectRole() { IsActive = true, Name = "Projektejer" },
-                                               new ItProjectRole() { IsActive = true, Name = "Projektleder" },
-                                               new ItProjectRole() { IsActive = true, Name = "Delprojektleder" },
-                                               new ItProjectRole() { IsActive = true, Name = "Projektdeltager" });
+            context.ItProjectRoles.AddOrUpdate(r => r.Id,
+                new ItProjectRole()
+                {
+                    IsActive = true,
+                    Name = "Projektejer",
+                    ObjectOwner = globalUser
+                },
+                new ItProjectRole()
+                {
+                    IsActive = true,
+                    Name = "Projektleder",
+                    ObjectOwner = globalUser
+                },
+                new ItProjectRole()
+                {
+                    IsActive = true,
+                    Name = "Delprojektleder",
+                    ObjectOwner = globalUser
+                },
+                new ItProjectRole()
+                {
+                    IsActive = true,
+                    Name = "Projektdeltager",
+                    ObjectOwner = globalUser
+                });
+            context.SaveChanges();
 
             #endregion
             
@@ -177,7 +205,8 @@ namespace Infrastructure.DataAccess.Migrations
                 HasReadAccess = true,
                 HasWriteAccess = true,
                 IsActive = true,
-                Name = "Systemrolle 1"
+                Name = "Systemrolle 1",
+                ObjectOwner = globalUser
             };
 
             var systemRole2 = new ItSystemRole()
@@ -185,7 +214,8 @@ namespace Infrastructure.DataAccess.Migrations
                 HasReadAccess = true,
                 HasWriteAccess = false,
                 IsActive = true,
-                Name = "Systemrolle 2"
+                Name = "Systemrolle 2",
+                ObjectOwner = globalUser
             };
 
             context.ItSystemRoles.AddOrUpdate(x => x.Name, systemRole1, systemRole2);
@@ -199,17 +229,20 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 HasWriteAccess = true,
                 Name = "Kontraktrolle A",
-                IsActive = true
+                IsActive = true,
+                ObjectOwner = globalUser
             }, new ItContractRole()
             {
                 HasWriteAccess = true,
                 Name = "Kontraktrolle B",
-                IsActive = true
+                IsActive = true,
+                ObjectOwner = globalUser
             }, new ItContractRole()
             {
                 HasWriteAccess = false,
                 Name = "Kontraktrolle C",
-                IsActive = true
+                IsActive = true,
+                ObjectOwner = globalUser
             });
             context.SaveChanges();
 
@@ -237,19 +270,22 @@ namespace Infrastructure.DataAccess.Migrations
                                             {
                                                 Object = roskilde,
                                                 Role = localAdmin,
-                                                User = user1
+                                                User = user1, 
+                                                ObjectOwner = globalUser
                                             },
                                             new AdminRight()
                                             {
                                                 Object = kl,
                                                 Role = localAdmin,
-                                                User = erik
+                                                User = erik,
+                                                ObjectOwner = globalUser
                                             },
                                             new AdminRight()
                                             {
                                                 Object = roskilde,
                                                 Role = localAdmin,
-                                                User = localUser
+                                                User = localUser,
+                                                ObjectOwner = globalUser
                                             });
 
             context.SaveChanges();
@@ -419,8 +455,8 @@ namespace Infrastructure.DataAccess.Migrations
             #region TEXTS
 
             context.Texts.AddOrUpdate(x => x.Id,
-                                      new Text() { Value = "Head" },
-                                      new Text() { Value = "Body" });
+                                      new Text() { Value = "Head", ObjectOwner = globalUser },
+                                      new Text() { Value = "Body", ObjectOwner = globalUser });
 
             #endregion
 
@@ -432,7 +468,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Description = "Kommunens styrelse",
                 Type = "KLE-Hovedgruppe",
                 IsPublic = true,
-                OwnedByOrganizationUnit = klRootUnit
+                OwnedByOrganizationUnit = klRootUnit,
+                ObjectOwner = globalUser
             };
             var task0001 = new TaskRef()
             {
@@ -441,7 +478,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Type = "KLE-Gruppe",
                 Parent = task00,
                 IsPublic = true,
-                OwnedByOrganizationUnit = klRootUnit
+                OwnedByOrganizationUnit = klRootUnit,
+                ObjectOwner = globalUser
             };
             var task0003 = new TaskRef()
             {
@@ -450,7 +488,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Type = "KLE-Gruppe",
                 Parent = task00,
                 IsPublic = true,
-                OwnedByOrganizationUnit = klRootUnit
+                OwnedByOrganizationUnit = klRootUnit,
+                ObjectOwner = globalUser
             };
             context.TaskRefs.AddOrUpdate(x => x.TaskKey,
                                          task00,
@@ -462,7 +501,8 @@ namespace Infrastructure.DataAccess.Migrations
                                              Type = "KLE-Emne",
                                              Parent = task0001,
                                              IsPublic = true,
-                                             OwnedByOrganizationUnit = klRootUnit
+                                             OwnedByOrganizationUnit = klRootUnit,
+                                             ObjectOwner = globalUser
                                          },
                                          new TaskRef()
                                          {
@@ -471,7 +511,8 @@ namespace Infrastructure.DataAccess.Migrations
                                              Type = "KLE-Emne",
                                              Parent = task0001,
                                              IsPublic = true,
-                                             OwnedByOrganizationUnit = klRootUnit
+                                             OwnedByOrganizationUnit = klRootUnit,
+                                             ObjectOwner = globalUser
                                          },
                                          task0003,
                                          new TaskRef()
@@ -481,7 +522,8 @@ namespace Infrastructure.DataAccess.Migrations
                                              Type = "KLE-Emne",
                                              Parent = task0003,
                                              IsPublic = true,
-                                             OwnedByOrganizationUnit = klRootUnit
+                                             OwnedByOrganizationUnit = klRootUnit,
+                                             ObjectOwner = globalUser
                                          },
                                          new TaskRef()
                                          {
@@ -490,7 +532,8 @@ namespace Infrastructure.DataAccess.Migrations
                                              Type = "KLE-Emne",
                                              Parent = task0003,
                                              IsPublic = true,
-                                             OwnedByOrganizationUnit = klRootUnit
+                                             OwnedByOrganizationUnit = klRootUnit,
+                                             ObjectOwner = globalUser
                                          },
                                          new TaskRef()
                                          {
@@ -499,7 +542,8 @@ namespace Infrastructure.DataAccess.Migrations
                                              Type = "KLE-Emne",
                                              Parent = task0003,
                                              IsPublic = true,
-                                             OwnedByOrganizationUnit = klRootUnit
+                                             OwnedByOrganizationUnit = klRootUnit,
+                                             ObjectOwner = globalUser
                                          },
                                          new TaskRef()
                                          {
@@ -508,7 +552,8 @@ namespace Infrastructure.DataAccess.Migrations
                                              Type = "KLE-Emne",
                                              Parent = task0003,
                                              IsPublic = true,
-                                             OwnedByOrganizationUnit = klRootUnit
+                                             OwnedByOrganizationUnit = klRootUnit,
+                                             ObjectOwner = globalUser
                                          },
                                          new TaskRef()
                                          {
@@ -517,12 +562,24 @@ namespace Infrastructure.DataAccess.Migrations
                                              Type = "KLE-Emne",
                                              Parent = task0003,
                                              IsPublic = true,
-                                             OwnedByOrganizationUnit = klRootUnit
+                                             OwnedByOrganizationUnit = klRootUnit,
+                                             ObjectOwner = globalUser
                                          });
 
             #endregion
         }
 
+        /// <summary>
+        /// Creates and returns an Option entity.
+        /// </summary>
+        /// <typeparam name="T">Type of option to be added.</typeparam>
+        /// <typeparam name="TReference">Reference type for the option</typeparam>
+        /// <param name="name">The name of the new option entity</param>
+        /// <param name="objectOwner">Object owner of the new entity</param>
+        /// <param name="note">Note for the entity</param>
+        /// <param name="isActive">Is the option active</param>
+        /// <param name="isSuggestion">Is the option an suggestion</param>
+        /// <returns></returns>
         private T CreateOption<T, TReference>(string name, User objectOwner, string note = "...", bool isActive = true, bool isSuggestion = false)
             where T : Entity, IOptionEntity<TReference>, new()
         {
@@ -536,6 +593,14 @@ namespace Infrastructure.DataAccess.Migrations
                 };
         }
 
+        /// <summary>
+        /// Helper method for quickly adding a lot of Option entities
+        /// </summary>
+        /// <typeparam name="T">Type of option to be added.</typeparam>
+        /// <typeparam name="TReference">Reference type for the option</typeparam>
+        /// <param name="dbSet">The db set to add too</param>
+        /// <param name="objectOwner">Object owner of the new entities</param>
+        /// <param name="names">The names of the new options</param>
         private void AddOptions<T, TReference>(DbSet<T> dbSet, User objectOwner, params string[] names)
             where T : Entity, IOptionEntity<TReference>, new()
         {
@@ -543,6 +608,15 @@ namespace Infrastructure.DataAccess.Migrations
             dbSet.AddOrUpdate(x => x.Name, options);
         } 
 
+        /// <summary>
+        /// Creates and returns a User
+        /// </summary>
+        /// <param name="name">User name</param>
+        /// <param name="email">User email</param>
+        /// <param name="password">User password</param>
+        /// <param name="cryptoService">The cryptoservice used to encrypt the password of the user</param>
+        /// <param name="objectOwner"></param>
+        /// <returns></returns>
         private User CreateUser(string name, string email, string password, CryptoService cryptoService, User objectOwner = null)
         {
             var salt = cryptoService.Encrypt(name + "salt");

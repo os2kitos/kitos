@@ -3,13 +3,10 @@ using Core.DomainModel;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class StateMap : EntityTypeConfiguration<State>
+    public class StateMap : EntityMap<State>
     {
         public StateMap()
         {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
             // Table & Column Mappings
             this.ToTable("State");
 
@@ -21,10 +18,6 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.AssociatedActivity)
                 .WithMany(d => d.AssociatedStates)
                 .HasForeignKey(t => t.AssociatedActivityId);
-
-            this.HasRequired(t => t.ObjectOwner)
-                .WithMany(d => d.CreatedStates)
-                .HasForeignKey(t => t.ObjectOwnerId);
         }
     }
 }

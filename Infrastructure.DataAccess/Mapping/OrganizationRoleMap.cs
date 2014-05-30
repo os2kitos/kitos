@@ -6,15 +6,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class OrganizationRoleMap : EntityTypeConfiguration<OrganizationRole>
+    public class OrganizationRoleMap : OptionEntityMap<OrganizationRole, OrganizationRight>
     {
-        public OrganizationRoleMap()
-        {
-            this.HasKey(t => t.Id);
-
-            this.ToTable("OrganizationRole");
-
-            this.Property(t => t.Name).IsRequired();
-        }
     }
 }
