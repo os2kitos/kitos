@@ -7,12 +7,12 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class OrganizationController : GenericApiController<Organization, OrganizationDTO, OrganizationDTO>
+    public class OrganizationController : GenericHasRightsController<Organization, AdminRight, AdminRole, OrganizationDTO, OrganizationDTO>
     {
         private readonly IOrganizationService _organizationService;
 
-        public OrganizationController(IGenericRepository<Organization> repository, IOrganizationService organizationService) 
-            : base(repository)
+        public OrganizationController(IGenericRepository<Organization> repository, IGenericRepository<AdminRight> rightRepository, IOrganizationService organizationService) 
+            : base(repository, rightRepository)
         {
             _organizationService = organizationService;
         }
