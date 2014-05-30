@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ItSystem : Entity, IHasRights<ItSystemRight>, IHasAccessModifier
+    public class ItSystem : Entity, IHasAccessModifier
     {
         public ItSystem()
         {
@@ -11,7 +11,6 @@ namespace Core.DomainModel.ItSystem
             this.CanBeUsedBy = new List<ItSystem>();
             this.Children = new List<ItSystem>();
             this.TaskRefs = new List<TaskRef>();
-            this.Rights = new List<ItSystemRight>();
             this.Usages = new List<ItSystemUsage>();
             this.Wishes = new List<Wish>();
             this.TaskRefs = new List<TaskRef>();
@@ -77,9 +76,6 @@ namespace Core.DomainModel.ItSystem
         /// which organization the it system was created under
         /// </summary>
         public virtual Organization Organization { get; set; }
-        
-
-        public virtual ICollection<ItSystemRight> Rights { get; set; }
 
         /// <summary>
         /// Usages (binding between system and org)
