@@ -28,6 +28,7 @@ namespace UI.MVC4.Controllers.API
             return AutoMapper.Mapper.Map<TDest>(item);
         }
 
+        //TODO: what goes on here?
         protected virtual IEnumerable<TModel> GetAllQuery()
         {
             return Repository.Get(l => l.MunicipalityId == 1);

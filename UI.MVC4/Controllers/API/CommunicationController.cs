@@ -6,7 +6,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class CommunicationController : GenericApiController<Communication, CommunicationDTO>
+    public class CommunicationController : GenericApiController<Communication, CommunicationDTO, CommunicationDTO>
     {
         public CommunicationController(IGenericRepository<Communication> repository) 
             : base(repository)

@@ -5,7 +5,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class ConfigController : GenericApiController<Config, ConfigDTO>
+    public class ConfigController : GenericApiController<Config, ConfigDTO, ConfigDTO>
     {
         public ConfigController(IGenericRepository<Config> repository) 
             : base(repository)

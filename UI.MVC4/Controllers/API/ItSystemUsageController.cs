@@ -10,7 +10,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class ItSystemUsageController : GenericApiController<ItSystemUsage, ItSystemUsageDTO> 
+    public class ItSystemUsageController : GenericApiController<ItSystemUsage, ItSystemUsageDTO, ItSystemUsageDTO> 
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<TaskRef> _taskRepository;

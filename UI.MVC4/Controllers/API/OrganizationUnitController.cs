@@ -10,7 +10,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class OrganizationUnitController : GenericApiController<OrganizationUnit, OrgUnitDTO>
+    public class OrganizationUnitController : GenericApiController<OrganizationUnit, OrgUnitDTO, OrgUnitDTO>
     {
         private readonly IOrgUnitService _orgUnitService;
         private readonly IAdminService _adminService;

@@ -10,7 +10,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class DataRowUsageController : GenericApiController<DataRowUsage, DataRowUsageDTO>
+    public class DataRowUsageController : GenericApiController<DataRowUsage, DataRowUsageDTO, DataRowUsageDTO>
     {
         public DataRowUsageController(IGenericRepository<DataRowUsage> repository) : base(repository)
         {

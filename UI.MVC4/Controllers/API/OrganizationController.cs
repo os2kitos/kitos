@@ -7,7 +7,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class OrganizationController : GenericApiController<Organization, OrganizationDTO>
+    public class OrganizationController : GenericApiController<Organization, OrganizationDTO, OrganizationDTO>
     {
         private readonly IOrganizationService _organizationService;
 

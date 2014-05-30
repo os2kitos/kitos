@@ -10,7 +10,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class AdviceController : GenericApiController<Advice, AdviceDTO>
+    public class AdviceController : GenericApiController<Advice, AdviceDTO, AdviceDTO>
     {
         public AdviceController(IGenericRepository<Advice> repository) : base(repository)
         {
