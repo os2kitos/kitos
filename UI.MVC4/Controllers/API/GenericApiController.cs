@@ -19,66 +19,46 @@ namespace UI.MVC4.Controllers.API
         {
             Repository = repository;
         }
-
-        #region mapping functions
-
-        //for easy access
-        protected virtual TOutputDTO Map(TModel model)
-        {
-            return Map<TModel, TOutputDTO>(model);
-        }
-
-        //for easy access
-        protected virtual TModel Map(TInputDTO inputDto)
-        {
-            return Map<TInputDTO, TModel>(inputDto);
-        }
-
-        //for easy access (list)
-        protected virtual IEnumerable<TOutputDTO> Map(IEnumerable<TModel> models)
-        {
-            return Map<IEnumerable<TModel>, IEnumerable<TOutputDTO>>(models);
-        }
-
-        //for easy access (list)
-        protected virtual IEnumerable<TModel> Map(IEnumerable<TInputDTO> inputDtos)
-        {
-            return Map<IEnumerable<TInputDTO>, IEnumerable<TModel>>(inputDtos);
-        }
-
-        protected virtual TDest Map<TSource, TDest>(TSource item)
-        {
-            return AutoMapper.Mapper.Map<TDest>(item);
-        }
-
-        #endregion
-
+        
         protected virtual IEnumerable<TModel> GetAllQuery()
         {
             //TODO: remove this hardcode and do some proper paging
             return Repository.Get().Take(100);
         }
 
-        public HttpResponseMessage GetAll()
+        public virtual HttpResponseMessage GetAll()
         {
-            var items = GetAllQuery();
+            try
+            {
+                var items = GetAllQuery();
 
-            return Ok(Map<IEnumerable<TModel>, IEnumerable<TOutputDTO>>(items));
+                return Ok(Map(items));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
         }
 
         // GET api/T
-        public HttpResponseMessage GetSingle(int id)
+        public virtual HttpResponseMessage GetSingle(int id)
         {
-            var item = Repository.GetByKey(id);
+            try
+            {
+                var item = Repository.GetByKey(id);
 
-            if (item == null)
-                return NotFound();
+                if (item == null) return NotFound();
 
-            return Ok(Map(item));
+                return Ok(Map(item));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
         }
 
         /// <summary>
-        /// GET api/T/5?hasWriteAccess
+        /// GET api/T/id?hasWriteAccess
         /// Returns whether the current authenticated user has write access 
         /// to the object with the given id
         /// </summary>
@@ -256,16 +236,7 @@ namespace UI.MVC4.Controllers.API
             base.Dispose(disposing);
         }
 
-        /// <summary>
-        /// Checks if the current authenticated user has write access to a given object. 
-        /// Override this method as needed.
-        /// </summary>
-        /// <param name="obj">The object</param>
-        /// <returns>True iff user has write access to obj</returns>
-        protected virtual bool HasWriteAccess(TModel obj)
-        {
-            return HasWriteAccess(obj, KitosUser);
-        }
+        #region Write Access Checks functions
 
         /// <summary>
         /// Checks if a given user has write access to a given object. 
@@ -302,5 +273,51 @@ namespace UI.MVC4.Controllers.API
             var obj = Repository.GetByKey(objId);
             return HasWriteAccess(obj, user);
         }
+
+        /// <summary>
+        /// Checks if the current authenticated user has write access to a given object. 
+        /// </summary>
+        /// <param name="obj">The object</param>
+        /// <returns>True iff user has write access to obj</returns>
+        protected bool HasWriteAccess(TModel obj)
+        {
+            return HasWriteAccess(obj, KitosUser);
+        }
+
+        #endregion
+
+        #region Mapping functions
+
+        //for easy access
+        protected virtual TOutputDTO Map(TModel model)
+        {
+            return Map<TModel, TOutputDTO>(model);
+        }
+
+        //for easy access
+        protected virtual TModel Map(TInputDTO inputDto)
+        {
+            return Map<TInputDTO, TModel>(inputDto);
+        }
+
+        //for easy access (list)
+        protected virtual IEnumerable<TOutputDTO> Map(IEnumerable<TModel> models)
+        {
+            return Map<IEnumerable<TModel>, IEnumerable<TOutputDTO>>(models);
+        }
+
+        //for easy access (list)
+        protected virtual IEnumerable<TModel> Map(IEnumerable<TInputDTO> inputDtos)
+        {
+            return Map<IEnumerable<TInputDTO>, IEnumerable<TModel>>(inputDtos);
+        }
+
+        protected virtual TDest Map<TSource, TDest>(TSource item)
+        {
+            return AutoMapper.Mapper.Map<TDest>(item);
+        }
+
+        #endregion
+
     }
 }
