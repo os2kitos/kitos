@@ -23,8 +23,36 @@ namespace UI.MVC4.Controllers.API
             _adminService = adminService;
         }
 
-        //TODO probably obsolete
-        /*public HttpResponseMessage GetByUser(int userId)
+        /// <summary>
+        /// Returns all colllecteds rights for an organization unit and all sub units
+        /// </summary>
+        /// <param name="id">Id of the unit</param>
+        /// <param name="rights">Routing qualifier</param>
+        /// <returns>List of rights</returns>
+        public override HttpResponseMessage GetRights(int id, bool? rights)
+        {
+            try
+            {
+                var orgUnits = _orgUnitService.GetSubTree(id);
+
+                var theRights = new List<OrganizationRight>();
+                foreach (var orgUnit in orgUnits)
+                {
+                    theRights.AddRange(GetAllRightsQuery(orgUnit.Id));
+                }
+
+                var dtos = AutoMapper.Mapper.Map<ICollection<OrganizationRight>, ICollection<RightOutputDTO>>(theRights);
+
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        //TODO probably don't use this, use get by organization instead
+        public HttpResponseMessage GetByUser(int userId)
         {
             try
             {
@@ -41,7 +69,7 @@ namespace UI.MVC4.Controllers.API
             {
                 return Error(e);
             }
-        }*/
+        }
 
         //TODO rename this into something more saying
         /// <summary>

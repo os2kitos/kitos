@@ -28,7 +28,7 @@ namespace UI.MVC4.Controllers.API
         /// </summary>
         /// <param name="id">The id of the object</param>
         /// <returns>List of all rights</returns>
-        protected virtual IEnumerable<TRight> GetAllRightsQuery(int id)
+        protected IEnumerable<TRight> GetAllRightsQuery(int id)
         {
             return _rightRepository.Get(right => right.ObjectId == id);
         }
@@ -48,7 +48,7 @@ namespace UI.MVC4.Controllers.API
         /// <param name="id">The id of the object</param>
         /// <param name="rights">Routing qualifier</param>
         /// <returns>List of rights</returns>
-        public HttpResponseMessage GetRights(int id, bool? rights)
+        public virtual HttpResponseMessage GetRights(int id, bool? rights)
         {
             try
             {
@@ -78,6 +78,7 @@ namespace UI.MVC4.Controllers.API
 
                 var right = AutoMapper.Mapper.Map<RightInputDTO, TRight>(dto);
                 right.ObjectId = id;
+                right.ObjectOwner = KitosUser;
 
                 right = _rightRepository.Insert(right);
                 _rightRepository.Save();
