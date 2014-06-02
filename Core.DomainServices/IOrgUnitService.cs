@@ -6,7 +6,7 @@ namespace Core.DomainServices
 {
     public interface IOrgUnitService
     {
-        ICollection<OrganizationUnit> GetByUser(User user);
+        //ICollection<OrganizationUnit> GetByUser(User user);
         OrganizationUnit GetRoot(OrganizationUnit unit);
 
         ICollection<OrganizationUnit> GetSubTree(int orgUnitId);

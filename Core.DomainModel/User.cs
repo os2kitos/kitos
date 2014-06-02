@@ -11,15 +11,12 @@ namespace Core.DomainModel
         public User()
         {
             this.PasswordResetRequests = new List<PasswordResetRequest>();
-            this.OrganizationRights = new List<OrganizationRight>();
-            this.ProjectRights = new List<ItProjectRight>();
-            this.SystemRights = new List<ItSystemRight>();
-            this.ContractRights = new List<ItContractRight>();
+            //this.OrganizationRights = new List<OrganizationRight>();
+            //this.ProjectRights = new List<ItProjectRight>();
+            //this.SystemRights = new List<ItSystemRight>();
+            //this.ContractRights = new List<ItContractRight>();
             this.AdminRights = new List<AdminRight>();
-            this.CreatedSystems = new List<ItSystem.ItSystem>();
-            this.CreatedSystemUsages = new List<ItSystemUsage>();
-            this.CreatedActivities = new List<Activity>();
-            this.CreatedStates = new List<State>();
+
             this.Wishes = new List<Wish>();
             this.Activities = new List<Activity>();
             this.States = new List<State>();
@@ -27,7 +24,6 @@ namespace Core.DomainModel
             this.ResponsibleForCommunications = new List<Communication>();
             this.HandoverParticipants = new List<Handover>();
 
-            this.CreatedItContracts = new Collection<ItContract.ItContract>();
             this.SignerForContracts = new Collection<ItContract.ItContract>();
         }
 
@@ -37,25 +33,22 @@ namespace Core.DomainModel
         public string Salt { get; set; }
         public bool IsGlobalAdmin { get; set; }
         public int? DefaultOrganizationUnitId { get; set; }
-
         public virtual OrganizationUnit DefaultOrganizationUnit { get; set; }
-        public virtual ICollection<PasswordResetRequest> PasswordResetRequests { get; set; }
-        public virtual ICollection<OrganizationRight> OrganizationRights { get; set; }
-        public virtual ICollection<ItProjectRight> ProjectRights { get; set; }
-        public virtual ICollection<ItSystemRight> SystemRights { get; set; }
-        public virtual ICollection<ItContractRight> ContractRights { get; set; }
+
         public virtual ICollection<AdminRight> AdminRights { get; set; }
-        public virtual ICollection<ItSystem.ItSystem> CreatedSystems { get; set; }
-        public virtual ICollection<ItSystem.ItSystemUsage> CreatedSystemUsages { get; set; }
-        public virtual ICollection<Activity> CreatedActivities { get; set; }
-        public virtual ICollection<State> CreatedStates { get; set; }
+        //public virtual ICollection<OrganizationRight> OrganizationRights { get; set; }
+        //public virtual ICollection<ItProjectRight> ProjectRights { get; set; }
+        //public virtual ICollection<ItSystemRight> SystemRights { get; set; }
+        //public virtual ICollection<ItContractRight> ContractRights { get; set; }
+
+
+        public virtual ICollection<PasswordResetRequest> PasswordResetRequests { get; set; }
         public virtual ICollection<Wish> Wishes { get; set; }
         public virtual ICollection<Activity> Activities { get; set; }
         public virtual ICollection<State> States { get; set; }  
         public virtual ICollection<Risk> ResponsibleForRisks { get; set; }
         public virtual ICollection<Communication> ResponsibleForCommunications { get; set; } 
         public virtual ICollection<Handover> HandoverParticipants { get; set; }
-        public virtual ICollection<ItContract.ItContract> CreatedItContracts { get; set; }
         public virtual ICollection<ItContract.ItContract> SignerForContracts { get; set; }
     }
 }

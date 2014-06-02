@@ -19,6 +19,7 @@ namespace Core.ApplicationServices
             _adminService = adminService;
         }
 
+        /*
         public ICollection<OrganizationUnit> GetByUser(User user)
         {
             List<OrganizationUnit> units;
@@ -42,7 +43,7 @@ namespace Core.ApplicationServices
 
             var roots = units.Select(GetRoot);
             return roots.Distinct().ToList();
-        }
+        }*/
 
         public OrganizationUnit GetRoot(OrganizationUnit unit)
         {

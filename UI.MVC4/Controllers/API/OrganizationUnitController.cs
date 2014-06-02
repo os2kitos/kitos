@@ -52,7 +52,7 @@ namespace UI.MVC4.Controllers.API
         }
 
         //TODO probably don't use this, use get by organization instead
-        public HttpResponseMessage GetByUser(int userId)
+        /*public HttpResponseMessage GetByUser(int userId)
         {
             try
             {
@@ -69,7 +69,7 @@ namespace UI.MVC4.Controllers.API
             {
                 return Error(e);
             }
-        }
+        }*/
 
         //TODO rename this into something more saying
         /// <summary>
