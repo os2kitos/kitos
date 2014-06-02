@@ -81,7 +81,7 @@ namespace UI.MVC4.Controllers.API
             Repository.Insert(item);
             Repository.Save();
 
-            return item;
+            return item; // TODO this doesn't need to return
         }
 
         // POST api/T
@@ -95,7 +95,7 @@ namespace UI.MVC4.Controllers.API
                 if (item is IHasOwner)
                     (item as IHasOwner).ObjectOwner = KitosUser;
 
-                item = PostQuery(item);
+                PostQuery(item);
 
                 //var msg = new HttpResponseMessage(HttpStatusCode.Created);
                 return Created(Map<TModel, TDto>(item), new Uri(Request.RequestUri + "/" + item.Id));
@@ -217,7 +217,7 @@ namespace UI.MVC4.Controllers.API
 
             try
             {
-                item = PatchQuery(item);
+                PatchQuery(item);
 
                 // pretty sure we'll get a merge conflict here???
                 return Ok(Map(item)); // TODO correct?

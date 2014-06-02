@@ -45,7 +45,7 @@ namespace UI.MVC4.Controllers.API
 
         protected override Organization PostQuery(Organization item)
         {
-            item = _organizationService.CreateOrganization(item.Name, item.Type);
+            _organizationService.AddDefaultOrgUnit(item);
             return base.PostQuery(item);
         }
     }

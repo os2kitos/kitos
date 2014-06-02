@@ -34,6 +34,14 @@ namespace Core.ApplicationServices
             return orgs;
         }
 
+        public void AddDefaultOrgUnit(Organization org)
+        {
+            org.OrgUnits.Add(new OrganizationUnit()
+                {
+                    Name = org.Name,
+                });
+        }
+
         public Organization CreateOrganization(string name, OrganizationType organizationType)
         {
             var org = new Organization

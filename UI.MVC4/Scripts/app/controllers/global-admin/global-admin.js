@@ -34,6 +34,13 @@
         $rootScope.page.title = 'Ny organisation';
         $rootScope.page.subnav = subnav;
 
+        function init() {
+            $scope.org = {};
+            $scope.org.accessModifier = 0;
+            $scope.org.type = 1; // set type to municipality by default
+        };
+        init();
+
         $scope.submit = function() {
             if ($scope.addForm.$invalid) return;
 
@@ -42,6 +49,7 @@
                 .success(function(result) {
                     notify.addSuccessMessage("Organisationen " + result.response.name + " er blevet oprettet!");
                     delete $scope.org;
+                    init();
                 })
                 .error(function(result) {
                     notify.addErrorMessage("Organisationen " + $scope.org.name + " kunne ikke oprettes!");
