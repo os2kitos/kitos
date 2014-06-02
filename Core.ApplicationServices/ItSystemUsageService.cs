@@ -33,13 +33,13 @@ namespace Core.ApplicationServices
             var system = _systemRepository.GetByKey(systemId);
 
             //Adding the interfaceUsages
-            usage.InterfaceUsages =
-                system.CanUseInterfaces.Select(CreateInterfaceUsage).ToList();
+            usage.InterfaceUsages = system.CanUseInterfaces.Select(itSys => CreateInterfaceUsage(itSys, objectOwner)).ToList();
 
             //Adding the interfaceExposures
             usage.InterfaceExposures = system.ExposedInterfaces.Select(theInterface => new InterfaceExposure()
             {
-                Interface = theInterface
+                Interface = theInterface,
+                ObjectOwner = objectOwner
             }).ToList();
 
             _usageRepository.Insert(usage);
@@ -48,12 +48,20 @@ namespace Core.ApplicationServices
             return usage;
         }
 
-        private InterfaceUsage CreateInterfaceUsage(ItSystem theInterface)
+        private InterfaceUsage CreateInterfaceUsage(ItSystem theInterface, User objectOwner)
         {
+            var dataRowUsages = theInterface.DataRows.Select(dataRow =>
+                                                             new DataRowUsage()
+                                                                 {
+                                                                     DataRowId = dataRow.Id,
+                                                                     ObjectOwner = objectOwner
+                                                                 }).ToList();
+
             var usage = new InterfaceUsage()
                 {
                     Interface = theInterface,
-                    DataRowUsages = theInterface.DataRows.Select(dataRow => new DataRowUsage(){ DataRowId = dataRow.Id}).ToList()
+                    DataRowUsages = dataRowUsages,
+                    ObjectOwner = objectOwner
                 };
             
             return usage;
