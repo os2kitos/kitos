@@ -185,14 +185,6 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        protected override bool HasWriteAccess(ItContract obj, Core.DomainModel.User user)
-        {
-            //contract signer also has write access
-            if (obj.ContractSignerId.HasValue && obj.ContractSignerId == user.Id) return true;
-
-            return base.HasWriteAccess(obj, user);
-        }
-
         private IEnumerable<ItSystemUsageSimpleDTO> MapSystemUsages(ItContract contract)
         {
             return Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageSimpleDTO>>(contract.AssociatedSystemUsages);

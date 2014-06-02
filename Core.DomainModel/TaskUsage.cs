@@ -17,5 +17,10 @@ namespace Core.DomainModel
         public int TechnologyStatus { get; set; }
         public int UsageStatus { get; set; }
         public string Comment { get; set; }
+
+        public override bool HasUserWriteAccess(User user)
+        {
+            return OrgUnit != null && OrgUnit.HasUserWriteAccess(user);
+        }
     }
 }

@@ -245,11 +245,9 @@ namespace UI.MVC4.Controllers.API
         /// <param name="obj">The object</param>
         /// <param name="user">The user</param>
         /// <returns>True iff user has write access to obj</returns>
-        protected virtual bool HasWriteAccess(TModel obj, User user)
+        protected bool HasWriteAccess(TModel obj, User user)
         {
-            if (obj.ObjectOwnerId.HasValue && obj.ObjectOwnerId == user.Id) return true;
-
-            return IsGlobalAdmin();
+            return obj.HasUserWriteAccess(user);
         }
 
         /// <summary>

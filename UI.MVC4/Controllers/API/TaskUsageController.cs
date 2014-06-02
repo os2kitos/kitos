@@ -114,12 +114,5 @@ namespace UI.MVC4.Controllers.API
         {
             return NotAllowed();
         }
-
-        protected override bool HasWriteAccess(TaskUsage obj, User user)
-        {
-            if (_orgUnitService.HasWriteAccess(KitosUser, obj.OrgUnit)) return true;
-
-            return base.HasWriteAccess(obj, user);
-        }
     }
 }

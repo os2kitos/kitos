@@ -72,7 +72,7 @@
     <Compile Include="ExtReferenceType.cs" />
     <Compile Include="ExtRefTypeLocale.cs" />
     <Compile Include="IHasLocales.cs" />
-    <Compile Include="IHasRights.cs" />
+    <Compile Include="HasRightsEntity.cs" />
     <Compile Include="IOptionEntity.cs" />
     <Compile Include="IRight.cs" />
     <Compile Include="IRoleEntity.cs" />

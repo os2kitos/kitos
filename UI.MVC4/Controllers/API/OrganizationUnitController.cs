@@ -132,9 +132,7 @@ namespace UI.MVC4.Controllers.API
                 JToken jtoken;
                 if (obj.TryGetValue("parentId", out jtoken))
                 {
-                    //You have to be local or global admin to change parent
-                    if (!(IsGlobalAdmin() || _orgUnitService.IsLocalAdminFor(KitosUser, id)))
-                        return Unauthorized();
+                    //TODO: You have to be local or global admin to change parent
 
                     var parentId = jtoken.Value<int>();
                     
@@ -156,11 +154,6 @@ namespace UI.MVC4.Controllers.API
         public override HttpResponseMessage Put(int id, OrgUnitDTO dto)
         {
             return NotAllowed();
-        }
-
-        protected override bool HasWriteAccess(OrganizationUnit obj, User user)
-        {
-            return _orgUnitService.HasWriteAccess(user, obj);
         }
     }
 }

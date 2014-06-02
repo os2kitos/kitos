@@ -12,7 +12,7 @@ using UI.MVC4.Models;
 namespace UI.MVC4.Controllers.API
 {
     public abstract class GenericHasRightsController<TObject, TRight, TRole, TDto> : GenericApiController<TObject, TDto>
-        where TObject : Entity, IHasRights<TRight>
+        where TObject : HasRightsEntity<TObject, TRight, TRole>
         where TRight : Entity, IRight<TObject, TRight, TRole>
         where TRole : IRoleEntity<TRight>
     {
@@ -31,15 +31,6 @@ namespace UI.MVC4.Controllers.API
         protected IEnumerable<TRight> GetRightsQuery(int id)
         {
             return RightRepository.Get(right => right.ObjectId == id);
-        }
-
-        protected override bool HasWriteAccess(TObject obj, User user)
-        {
-            //Check for rights on the object
-            var rights = GetRightsQuery(obj.Id).Where(right => right.UserId == user.Id);
-            if(rights.Any(right => right.Role.HasWriteAccess)) return true;
-
-            return base.HasWriteAccess(obj, user);
         }
 
         /// <summary>
@@ -67,7 +58,7 @@ namespace UI.MVC4.Controllers.API
         /// Post a new right to the object
         /// </summary>
         /// <param name="id">The id of the object</param>
-        /// <param name="dto"></param>
+        /// <param name="dto">DTO of right</param>
         /// <returns></returns>
         public HttpResponseMessage PostRight(int id, RightInputDTO dto)
         {
@@ -96,6 +87,13 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        /// <summary>
+        /// Delete a right from the object
+        /// </summary>
+        /// <param name="id">ID of object</param>
+        /// <param name="rId">ID of role</param>
+        /// <param name="uId">ID of user in role</param>
+        /// <returns></returns>
         public HttpResponseMessage Delete(int id, [FromUri] int rId, [FromUri] int uId)
         {
             try

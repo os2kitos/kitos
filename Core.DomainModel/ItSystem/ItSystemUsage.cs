@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ItSystemUsage : Entity, IHasRights<ItSystemRight>
+    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>
     {
         public ItSystemUsage()
         {
@@ -10,7 +10,6 @@ namespace Core.DomainModel.ItSystem
             this.Wishes = new List<Wish>();
             this.OrgUnits = new List<OrganizationUnit>();
             this.TaskRefs = new List<TaskRef>();
-            this.Rights = new List<ItSystemRight>();
             this.InterfaceUsages = new List<InterfaceUsage>();
             this.InterfaceExposures = new List<InterfaceExposure>();
             this.UsedBy = new List<OrganizationUnit>();
@@ -57,8 +56,6 @@ namespace Core.DomainModel.ItSystem
         /// IT System support these tasks
         /// </summary>
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
-
-        public virtual ICollection<ItSystemRight> Rights { get; set; }
 
         /// <summary>
         /// The local usages of interfaces. 

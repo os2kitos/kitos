@@ -4,7 +4,7 @@ namespace Infrastructure.DataAccess.Mapping
 {
     public abstract class RightMap<TObject, TRight, TRole> : EntityMap<TRight>
         where TRight : Entity, IRight<TObject, TRight, TRole>
-        where TObject : Entity, IHasRights<TRight>
+        where TObject : HasRightsEntity<TObject, TRight, TRole>
         where TRole : Entity, IRoleEntity<TRight>
     {
         protected RightMap()

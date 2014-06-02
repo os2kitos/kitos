@@ -110,51 +110,5 @@ namespace Core.ApplicationServices
 
             return IsAncestorOf(unit, ancestor);
         }
-
-        public bool HasWriteAccess(User user, int orgUnitId)
-        {
-            var orgUnit = _orgUnitRepository.GetByKey(orgUnitId);
-
-            return HasWriteAccess(user, orgUnit);
-        }
-
-        public bool HasWriteAccess(User user, OrganizationUnit unit)
-        {
-            //if user is global admin or local admin, user has write access
-            if (_adminService.IsGlobalAdmin(user)) return true;
-
-            if (IsLocalAdminFor(user, unit)) return true;
-
-            // check all rights for the user on this org unit,
-            // as well as every ancestor org unit
-            // if we find a unit with write access, we return it
-            do
-            {
-                //this is to avoid the 'access to modified closure' warning
-                var currUnit = unit;
-
-                var writeRights =
-                    _orgRightRepository.Get(
-                        right => right.UserId == user.Id && right.ObjectId == currUnit.Id && right.Role.HasWriteAccess).ToList();
-
-                if (writeRights.Any()) return true;
-
-                unit = currUnit.Parent;
-
-            } while (unit != null);
-
-            return false;
-        }
-
-        public bool IsLocalAdminFor(User user, int orgUnitId)
-        {
-            var orgUnit = _orgUnitRepository.GetByKey(orgUnitId);
-            return IsLocalAdminFor(user, orgUnit);
-        }
-
-        public bool IsLocalAdminFor(User user, OrganizationUnit unit)
-        {
-            return _adminService.IsLocalAdmin(user, unit.Organization);
-        }
     }
 }
