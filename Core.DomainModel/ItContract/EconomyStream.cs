@@ -34,7 +34,7 @@ namespace Core.DomainModel.ItContract
         public int Operation { get; set; }
 
         public int Other { get; set; }
-        
+
         /// <summary>
         /// The field "kontering"
         /// </summary>
@@ -51,5 +51,14 @@ namespace Core.DomainModel.ItContract
         public DateTime? AuditDate { get; set; }
 
         public string Note { get; set; }
+
+        public override bool HasUserWriteAccess(User user)
+        {
+            if (ExternPaymentFor != null && ExternPaymentFor.HasUserWriteAccess(user)) return true;
+            if (InternPaymentFor != null && InternPaymentFor.HasUserWriteAccess(user)) return true;
+
+            return base.HasUserWriteAccess(user);
         }
+
+    }
 }
