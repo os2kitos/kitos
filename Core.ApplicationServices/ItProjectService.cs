@@ -100,12 +100,20 @@ namespace Core.ApplicationServices
                 Note = original.Note,
                 Description = original.Description,
                 IsStrategy = original.IsStrategy,
-                Handover = new Handover(), // TODO clone actual data
+
+                // TODO clone actual data
+                Handover = new Handover()
+                    {
+                        ObjectOwner = newOwner
+                    }, 
+
                 // TODO AssociatedProgramId = project.AssociatedProgramId,
                 // TODO AssociatedProjects = project.AssociatedProjects,
+
                 ItProjectTypeId = original.ItProjectTypeId,
                 ItProjectCategoryId = original.ItProjectCategoryId,
                 TaskRefs = original.TaskRefs,
+
                 // TODO Risk
                 // TODO Rights
                 // TODO JointMunicipalProjectId = project.JointMunicipalProjectId,
@@ -119,6 +127,9 @@ namespace Core.ApplicationServices
 
                 //TODO: clone this instead of creating new
                 GoalStatus = new GoalStatus()
+                    {
+                        ObjectOwner = newOwner
+                    }
             };
 
             ClonePhases(original, clone);

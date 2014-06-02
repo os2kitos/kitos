@@ -13,7 +13,8 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Relationships
             this.HasRequired(t => t.ItProject)
-                .WithOptional(t => t.Handover);
+                .WithOptional(t => t.Handover)
+                .WillCascadeOnDelete(true);
 
             this.HasMany(t => t.Participants)
                 .WithMany(t => t.HandoverParticipants);

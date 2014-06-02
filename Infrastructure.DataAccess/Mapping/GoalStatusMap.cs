@@ -13,7 +13,8 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Relationships
             this.HasRequired(t => t.ItProject)
-                .WithOptional(t => t.GoalStatus);
+                .WithOptional(t => t.GoalStatus)
+                .WillCascadeOnDelete(true);
 
         }
     }
