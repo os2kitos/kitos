@@ -35,11 +35,11 @@
                         return result.data.response;
                     });
                 }],
-                interfaceCategories: ['$http', function ($http) {
-                    return $http.get("api/interfaceCategory").then(function (result) {
-                        return result.data.response;
-                    });
-                }],
+                //interfaceCategories: ['$http', function ($http) {
+                //    return $http.get("api/interfaceCategory").then(function (result) {
+                //        return result.data.response;
+                //    });
+                //}],
                 interfaceSystems: ['$http', function ($http) {
                     return $http.get("api/itsystem?interfaces").then(function (result) {
                         return result.data.response;
@@ -53,12 +53,11 @@
     app.controller('system.EditInterfaces',
         ['$rootScope', '$scope', '$http', 'notify',
             'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'frequencies',
-            'interfaceCategories', 'interfaceSystems', 'itSystemUsage',
+            'interfaceSystems', 'itSystemUsage',
             function ($rootScope, $scope, $http, notify,                 
                 tsas, interfaces, interfaceTypes, methods, dataTypes, frequencies,
-                interfaceCategories, interfaceSystems, itSystemUsage) {
+                interfaceSystems, itSystemUsage) {
 
-                $scope.interfaceCategories = interfaceCategories;
                 $scope.frequencies = frequencies;
                 
                 $scope.filterInterfaces = function(interfaceSystem) {
