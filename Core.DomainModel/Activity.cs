@@ -62,5 +62,17 @@ namespace Core.DomainModel
         public int? TaskForProjectId { get; set; }
 
 
+        public override bool HasUserWriteAccess(User user)
+        {
+            if (Phase1ForProject != null && Phase1ForProject.HasUserWriteAccess(user)) return true;
+            if (Phase2ForProject != null && Phase2ForProject.HasUserWriteAccess(user)) return true;
+            if (Phase3ForProject != null && Phase3ForProject.HasUserWriteAccess(user)) return true;
+            if (Phase4ForProject != null && Phase4ForProject.HasUserWriteAccess(user)) return true;
+            if (Phase5ForProject != null && Phase5ForProject.HasUserWriteAccess(user)) return true;
+
+            if (TaskForProject != null && TaskForProject.HasUserWriteAccess(user)) return true;
+
+            return base.HasUserWriteAccess(user);
+        }
     }
 }

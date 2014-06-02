@@ -12,5 +12,12 @@ namespace Core.DomainModel.ItProject
         public string Benefits { get; set; }
         public int Significance { get; set; }
         public string HowToHandle { get; set; }
+
+        public override bool HasUserWriteAccess(User user)
+        {
+            if (ItProject != null && ItProject.HasUserWriteAccess(user)) return true;
+
+            return base.HasUserWriteAccess(user);
+        }
     }
 }

@@ -34,5 +34,12 @@ namespace Core.DomainModel.ItProject
         public string SubGoalRea3 { get; set; }
 
         public int Status { get; set; }
+
+        public override bool HasUserWriteAccess(User user)
+        {
+            if (GoalStatus != null && GoalStatus.HasUserWriteAccess(user)) return true;
+
+            return base.HasUserWriteAccess(user);
+        }
     }
 }

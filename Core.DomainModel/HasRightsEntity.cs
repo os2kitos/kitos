@@ -17,7 +17,7 @@ namespace Core.DomainModel
 
         public override bool HasUserWriteAccess(User user)
         {
-            if (Rights.Any(right => right.Role.HasWriteAccess)) return true;
+            if (Rights.Any(right => right.UserId == user.Id && right.Role.HasWriteAccess)) return true;
 
             return base.HasUserWriteAccess(user);
         }

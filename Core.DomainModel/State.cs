@@ -41,5 +41,12 @@ namespace Core.DomainModel
         /// </summary>
         public virtual ItProject.ItProject MilestoneForProject { get; set; }
         public int? MilestoneForProjectId { get; set; }
+
+        public override bool HasUserWriteAccess(User user)
+        {
+            if (MilestoneForProject != null && MilestoneForProject.HasUserWriteAccess(user)) return true;
+
+            return base.HasUserWriteAccess(user);
+        }
     }
 }

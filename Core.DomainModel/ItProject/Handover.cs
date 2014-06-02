@@ -16,5 +16,12 @@ namespace Core.DomainModel.ItProject
 
         public virtual ItProject ItProject { get; set; }
         public virtual ICollection<User> Participants { get; set; }
+
+        public override bool HasUserWriteAccess(User user)
+        {
+            if (ItProject != null && ItProject.HasUserWriteAccess(user)) return true;
+
+            return base.HasUserWriteAccess(user);
+        }
     }
 }

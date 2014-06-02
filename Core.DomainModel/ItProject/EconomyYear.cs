@@ -50,5 +50,12 @@ namespace Core.DomainModel.ItProject
 
         public int OtherItSavingsBudget { get; set; }
         public int OtherItSavingsRea { get; set; }
+
+        public override bool HasUserWriteAccess(User user)
+        {
+            if (ItProject != null && ItProject.HasUserWriteAccess(user)) return true;
+
+            return base.HasUserWriteAccess(user);
+        }
     }
 }
