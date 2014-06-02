@@ -10,7 +10,30 @@
                 Organisationens navn
             </label>
             <div class="col-md-8">
-                <input type="text" data-ng-model="name" name="name" class="form-control" data-ng-required="true"/>
+                <input type="text" data-ng-model="name" id="name" class="form-control" data-ng-required="true">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="cvr" class="col-md-3 control-label">
+                CVR nummer
+            </label>
+            <div class="col-md-8">
+                <input type="number" data-ng-model="cvr" id="cvr" class="form-control" data-ng-required="true">
+            </div>
+        </div>
+        <div class="form-group radio-inline">
+            <div class="col-md-8">
+                <input type="radio" data-ng-model="type" value="0" class="form-control"> Virksomhed
+                <input type="radio" data-ng-model="type" value="1" class="form-control" checked> Kommune
+                <input type="radio" data-ng-model="type" value="2" class="form-control"> Interessefælleskab
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="access" class="col-md-3 control-label">
+                Public
+            </label>
+            <div class="col-md-8">
+                <select id="access" data-ng-model="system.accessModifier" class="form-control input-sm" data-select-access-modifier data-ng-required></select>
             </div>
         </div>
         <div class="form-group">
