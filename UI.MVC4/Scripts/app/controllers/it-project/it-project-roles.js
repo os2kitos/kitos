@@ -8,7 +8,7 @@
             controller: 'project.EditRolesCtrl',
             resolve: {
                 itProjectRights: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itprojectright/" + $stateParams.id)
+                    return $http.get("api/itproject/" + $stateParams.id + "?rights")
                         .then(function (result) {
                             return result.data.response;
                         });
@@ -57,12 +57,11 @@
                 if (!oId || !rId || !uId) return;
 
                 var data = {
-                    "objectId": oId,
                     "roleId": rId,
                     "userId": uId
                 };
 
-                $http.post("api/itprojectright", data).success(function (result) {
+                $http.post("api/itproject/" + oId, data).success(function (result) {
                     notify.addSuccessMessage(result.response.user.name + " er knyttet i rollen");
 
                     $scope.rights.push({
@@ -90,7 +89,7 @@
                 var rId = right.roleId;
                 var uId = right.userId;
 
-                $http.delete("api/itprojectright?oId=" + projectId + "&rId=" + rId + "&uId=" + uId).success(function (deleteResult) {
+                $http.delete("api/itproject/" + projectId + "?rId=" + rId + "&uId=" + uId).success(function (deleteResult) {
                     right.show = false;
                     notify.addSuccessMessage('Rollen er slettet!');
                 }).error(function (deleteResult) {
@@ -119,15 +118,14 @@
 
                 //otherwise, we should delete the old entry, then add a new one
 
-                $http.delete("api/itprojectright?oId=" + projectId + "&rId=" + rIdOld + "&uId=" + uIdOld).success(function (deleteResult) {
+                $http.delete("api/itproject/" + projectId + "?rId=" + rIdOld + "&uId=" + uIdOld).success(function (deleteResult) {
 
                     var data = {
-                        "objectId": projectId,
                         "roleId": rIdNew,
                         "userId": uIdNew
                     };
 
-                    $http.post("api/itprojectright", data).success(function (result) {
+                    $http.post("api/itprojectright/" + projectId, data).success(function (result) {
 
                         right.roleId = result.response.roleId;
                         right.user = result.response.user;

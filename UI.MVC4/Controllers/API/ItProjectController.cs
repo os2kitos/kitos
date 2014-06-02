@@ -79,7 +79,7 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage PostCloneProject(int id, [FromBody] ItProjectDTO dto)
+        public HttpResponseMessage PostCloneProject(int id, bool? clone, [FromBody] ItProjectDTO dto)
         {
             try
             {
