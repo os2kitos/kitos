@@ -24,5 +24,12 @@ namespace Core.DomainModel.ItSystem
         /// Whether local exposure of the interface is wanted or not.
         /// </summary>
         public bool IsWishedFor { get; set; }
+
+        public override bool HasUserWriteAccess(User user)
+        {
+            if (ItSystemUsage != null && ItSystemUsage.HasUserWriteAccess(user)) return true;
+
+            return base.HasUserWriteAccess(user);
+        }
     }
 }
