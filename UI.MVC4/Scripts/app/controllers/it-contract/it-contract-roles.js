@@ -6,7 +6,7 @@
             controller: 'contract.EditRolesCtrl',
             resolve: {
                 itContractRights: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itcontractright/" + $stateParams.id)
+                    return $http.get("api/itcontract/" + $stateParams.id + "?rights")
                         .then(function (result) {
                             return result.data.response;
                         });
@@ -48,19 +48,17 @@
             $scope.submitRight = function () {
                 if (!$scope.selectedUser || !$scope.newRole) return;
 
-                var oId = contractId;
                 var rId = parseInt($scope.newRole);
                 var uId = $scope.selectedUser.id;
 
-                if (!oId || !rId || !uId) return;
+                if (!rId || !uId) return;
 
                 var data = {
-                    "objectId": oId,
                     "roleId": rId,
                     "userId": uId
                 };
 
-                $http.post("api/itcontractright", data).success(function (result) {
+                $http.post("api/itcontract/" + contractId, data).success(function (result) {
                     notify.addSuccessMessage(result.response.user.name + " er knyttet i rollen");
 
                     $scope.rights.push({
@@ -88,7 +86,7 @@
                 var rId = right.roleId;
                 var uId = right.userId;
 
-                $http.delete("api/itcontractright?oId=" + contractId + "&rId=" + rId + "&uId=" + uId).success(function (deleteResult) {
+                $http.delete("api/itcontract/" + contractId + "?rId=" + rId + "&uId=" + uId).success(function (deleteResult) {
                     right.show = false;
                     notify.addSuccessMessage('Rollen er slettet!');
                 }).error(function (deleteResult) {
@@ -117,15 +115,14 @@
 
                 //otherwise, we should delete the old entry, then add a new one
 
-                $http.delete("api/itcontractright?oId=" + contractId + "&rId=" + rIdOld + "&uId=" + uIdOld).success(function (deleteResult) {
+                $http.delete("api/itcontract/" + contractId + "?rId=" + rIdOld + "&uId=" + uIdOld).success(function (deleteResult) {
 
                     var data = {
-                        "objectId": contractId,
                         "roleId": rIdNew,
                         "userId": uIdNew
                     };
 
-                    $http.post("api/itcontractright", data).success(function (result) {
+                    $http.post("api/itcontract/" + contractId, data).success(function (result) {
 
                         right.roleId = result.response.roleId;
                         right.user = result.response.user;
