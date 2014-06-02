@@ -38,6 +38,9 @@ namespace Infrastructure.DataAccess.Migrations
             var simon = CreateUser("Simon Lynn-Pedersen", "slp@it-minds.dk", "slp123", cryptoService, globalUser);
             simon.IsGlobalAdmin = true;
 
+            var eskild = CreateUser("Eskild", "esd@it-minds.dk", "123", cryptoService, globalUser);
+            eskild.IsGlobalAdmin = true;
+
             var brian = CreateUser("Brian", "briana@roskilde.dk", "123", cryptoService, globalUser);
             brian.IsGlobalAdmin = true;
 
@@ -248,13 +251,12 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region ORGANIZATIONS
 
-            var organizationService = new OrganizationService(null, null, null); // TODO needs a refactor as this is a bit hacky!
-            var roskilde = organizationService.CreateOrganization("Roskilde", OrganizationType.Municipality, globalUser);
-            var sorø = organizationService.CreateOrganization("Sorø", OrganizationType.Municipality, globalUser);
-            var kl = organizationService.CreateOrganization("KL", OrganizationType.Municipality, globalUser);
-            var companyA = organizationService.CreateOrganization("Firma A", OrganizationType.Company, globalUser);
-            var companyB = organizationService.CreateOrganization("Firma B", OrganizationType.Company, globalUser);
-            var companyC = organizationService.CreateOrganization("Firma C", OrganizationType.Company, globalUser);
+            var roskilde = CreateOrganization("Roskilde", OrganizationType.Municipality, globalUser);
+            var sorø = CreateOrganization("Sorø", OrganizationType.Municipality, globalUser);
+            var kl = CreateOrganization("KL", OrganizationType.Municipality, globalUser);
+            var companyA = CreateOrganization("Firma A", OrganizationType.Company, globalUser);
+            var companyB = CreateOrganization("Firma B", OrganizationType.Company, globalUser);
+            var companyC = CreateOrganization("Firma C", OrganizationType.Company, globalUser);
 
             context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø, kl, companyA, companyB, companyC);
             context.SaveChanges();
@@ -627,7 +629,27 @@ namespace Infrastructure.DataAccess.Migrations
                     ObjectOwner = objectOwner
                 };
         }
+
+        private Organization CreateOrganization(string name, OrganizationType organizationType, User objectOwner = null)
+        {
+            var org = new Organization
+            {
+                Name = name,
+                Config = Config.Default(objectOwner),
+                Type = organizationType,
+                ObjectOwner = objectOwner
+            };
+
+            org.OrgUnits.Add(new OrganizationUnit()
+            {
+                Name = org.Name,
+                ObjectOwner = objectOwner
+            });
+
+            return org;
+        }
         
+        //TODO REMOVE THIS
         private void OldSeed(Infrastructure.DataAccess.KitosContext context)
         {
             //  This method will be called after migrating to the latest version.
@@ -912,12 +934,12 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Organizations
 
-            var roskilde = organizationService.CreateOrganization("Roskilde", OrganizationType.Municipality, null);
-            var sorø = organizationService.CreateOrganization("Sorø", OrganizationType.Municipality, null);
-            var kl = organizationService.CreateOrganization("KL", OrganizationType.Municipality, null);
-            var companyA = organizationService.CreateOrganization("Firma A", OrganizationType.Company, null);
-            var companyB = organizationService.CreateOrganization("Firma B", OrganizationType.Company, null);
-            var companyC = organizationService.CreateOrganization("Firma C", OrganizationType.Company, null);
+            var roskilde = CreateOrganization("Roskilde", OrganizationType.Municipality, null);
+            var sorø = CreateOrganization("Sorø", OrganizationType.Municipality, null);
+            var kl = CreateOrganization("KL", OrganizationType.Municipality, null);
+            var companyA = CreateOrganization("Firma A", OrganizationType.Company, null);
+            var companyB = CreateOrganization("Firma B", OrganizationType.Company, null);
+            var companyC = CreateOrganization("Firma C", OrganizationType.Company, null);
 
             context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø, kl, companyA, companyB, companyC);
 
@@ -1148,6 +1170,9 @@ namespace Infrastructure.DataAccess.Migrations
             var simon = CreateUser("Simon Lynn-Pedersen", "slp@it-minds.dk", "slp123", cryptoService);
             simon.IsGlobalAdmin = true;
 
+            var eskild = CreateUser("Eskild", "esd@it-minds.dk", "123", cryptoService);
+            eskild.IsGlobalAdmin = true;
+
             var globalUser = CreateUser("Global Test Bruger", "g@test", "test", cryptoService);
             globalUser.IsGlobalAdmin = true;
 
@@ -1162,7 +1187,7 @@ namespace Infrastructure.DataAccess.Migrations
             roskildeUser6.IsGlobalAdmin = true;
             var roskildeUser7 = CreateUser("Erik", "ehl@kl.dk", "123", cryptoService);
 
-            context.Users.AddOrUpdate(x => x.Email, simon, globalUser, localUser, roskildeUser1, roskildeUser2, roskildeUser3, roskildeUser4, roskildeUser5, roskildeUser6, roskildeUser7);
+            context.Users.AddOrUpdate(x => x.Email, simon, eskild, globalUser, localUser, roskildeUser1, roskildeUser2, roskildeUser3, roskildeUser4, roskildeUser5, roskildeUser6, roskildeUser7);
 
             context.SaveChanges();
 
@@ -1672,7 +1697,6 @@ namespace Infrastructure.DataAccess.Migrations
 
             base.Seed(context);
         }
-
 
         private ItProject SimpleProject(string name, User owner, Organization organization, ItProjectCategory projectCategory, ItProjectType type, Activity phase1)
         {

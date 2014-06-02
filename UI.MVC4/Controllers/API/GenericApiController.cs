@@ -82,7 +82,7 @@ namespace UI.MVC4.Controllers.API
             Repository.Insert(item);
             Repository.Save();
 
-            return item;
+            return item; // TODO this doesn't need to return
         }
 
         // POST api/T
