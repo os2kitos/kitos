@@ -65,8 +65,6 @@ namespace Infrastructure.DataAccess.Migrations
             AddOptions<BusinessType, ItSystem>(context.BusinessTypes, globalUser, "Forretningstype 1", "Forretningstype 2", "Forretningstype 3");
 
             AddOptions<Interface, ItSystem>(context.Interfaces, globalUser, "Grænseflade 1", "Grænseflade 2", "Grænseflade 3");
-
-            AddOptions<Interface, ItSystem>(context.Interfaces, globalUser, "Grænseflade 1", "Grænseflade 2", "Grænseflade 3");
             
             AddOptions<Tsa, ItSystem>(context.Tsas, globalUser, "Ja", "Nej");
             
