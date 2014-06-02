@@ -249,7 +249,7 @@ namespace UI.MVC4.Controllers.API
         {
             if (obj.ObjectOwnerId.HasValue && obj.ObjectOwnerId == user.Id) return true;
 
-            return false;
+            return IsGlobalAdmin();
         }
 
         /// <summary>

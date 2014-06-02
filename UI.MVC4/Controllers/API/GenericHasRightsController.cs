@@ -16,11 +16,11 @@ namespace UI.MVC4.Controllers.API
         where TRight : Entity, IRight<TObject, TRight, TRole>
         where TRole : IRoleEntity<TRight>
     {
-        private readonly IGenericRepository<TRight> _rightRepository;
+        protected readonly IGenericRepository<TRight> RightRepository;
 
         protected GenericHasRightsController(IGenericRepository<TObject> repository, IGenericRepository<TRight> rightRepository ) : base(repository)
         {
-            _rightRepository = rightRepository;
+            RightRepository = rightRepository;
         }
 
         /// <summary>
@@ -28,15 +28,15 @@ namespace UI.MVC4.Controllers.API
         /// </summary>
         /// <param name="id">The id of the object</param>
         /// <returns>List of all rights</returns>
-        protected IEnumerable<TRight> GetAllRightsQuery(int id)
+        protected IEnumerable<TRight> GetRightsQuery(int id)
         {
-            return _rightRepository.Get(right => right.ObjectId == id);
+            return RightRepository.Get(right => right.ObjectId == id);
         }
 
         protected override bool HasWriteAccess(TObject obj, User user)
         {
             //Check for rights on the object
-            var rights = GetAllRightsQuery(obj.Id).Where(right => right.UserId == user.Id);
+            var rights = GetRightsQuery(obj.Id).Where(right => right.UserId == user.Id);
             if(rights.Any(right => right.Role.HasWriteAccess)) return true;
 
             return base.HasWriteAccess(obj, user);
@@ -52,7 +52,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var theRights = GetAllRightsQuery(id);
+                var theRights = GetRightsQuery(id);
                 var dtos = Map<IEnumerable<TRight>, IEnumerable<RightOutputDTO>>(theRights);
 
                 return Ok(dtos);
@@ -80,8 +80,8 @@ namespace UI.MVC4.Controllers.API
                 right.ObjectId = id;
                 right.ObjectOwner = KitosUser;
 
-                right = _rightRepository.Insert(right);
-                _rightRepository.Save();
+                right = RightRepository.Insert(right);
+                RightRepository.Save();
 
                 //TODO: FIX navigation properties not loading properly!!!
                 right.User = UserRepository.GetByKey(right.UserId);
@@ -103,12 +103,12 @@ namespace UI.MVC4.Controllers.API
                 if (!HasWriteAccess(id, KitosUser))
                     return Unauthorized();
 
-                var right = _rightRepository.Get(r => r.ObjectId == id && r.RoleId == rId && r.UserId == uId).FirstOrDefault();
+                var right = RightRepository.Get(r => r.ObjectId == id && r.RoleId == rId && r.UserId == uId).FirstOrDefault();
 
                 if (right == null) return NotFound();
 
-                _rightRepository.DeleteByKey(right.Id);
-                _rightRepository.Save();
+                RightRepository.DeleteByKey(right.Id);
+                RightRepository.Save();
 
                 return Ok();
             }
@@ -117,125 +117,8 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
         }
-
     }
 
 
-
-    //public abstract class GenericRightController<TRight, TObject, TRole> : GenericApiController<TRight, RightInputDTO, RightOutputDTO> 
-    //    where TRight : Entity, IRight
-    //    where TObject : Entity
-    //    where TRole : Entity, IRoleEntity
-    //{
-    //    protected readonly IGenericRepository<TRight> RightRepository;
-    //    private readonly IGenericRepository<TObject> _objectRepository;
-
-    //    protected GenericRightController(IGenericRepository<TRight> rightRepository, IGenericRepository<TObject> objectRepository)
-    //        : base(rightRepository)
-    //    {
-    //        RightRepository = rightRepository;
-    //        _objectRepository = objectRepository;
-    //    }
-
-    //    protected virtual IEnumerable<TRight> GetAll(int oId)
-    //    {
-    //        return RightRepository.Get(right => right.ObjectId == oId);
-    //    } 
-
-    //    protected virtual bool HasWriteAccess(TObject theObject, User user)
-    //    {
-    //        if (theObject.ObjectOwnerId == user.Id) return true; 
-
-    //        var rights = RightRepository.Get(right => right.ObjectId == theObject.Id && right.UserId == user.Id).ToList();
-    //        return rights.Any(right => right.Role.HasWriteAccess);
-    //    }
-
-    //    private bool HasWriteAccess(int objId, int userId)
-    //    {
-    //        var user = UserRepository.GetByKey(userId);
-    //        var theObject = _objectRepository.GetByKey(objId);
-    //        return HasWriteAccess(theObject, user);
-    //    }
-
-    //    public HttpResponseMessage Get(int id)
-    //    {
-    //        try
-    //        {
-    //            var rights = GetAll(id);
-    //            var dtos = AutoMapper.Mapper.Map<IEnumerable<TRight>, IEnumerable<RightOutputDTO>>(rights);
-
-    //            return Ok(dtos);
-    //        }
-    //        catch (Exception e)
-    //        {
-    //            return Error(e);
-    //        }
-    //    }
-
-    //    public HttpResponseMessage GetHasWriteAccess(int id, bool? hasWriteAccess)
-    //    {
-    //        try
-    //        {
-    //            return Ok(HasWriteAccess(id, KitosUser.Id));
-    //        }
-    //        catch (Exception e)
-    //        {
-    //            return Error(e);
-    //        }
-    //    }
-
-    //    public HttpResponseMessage GetHasWriteAccess(bool? hasWriteAccess, int oId, int uId)
-    //    {
-    //        try
-    //        {
-    //            return Ok(HasWriteAccess(oId, uId));
-    //        }
-    //        catch (Exception e)
-    //        {
-    //            return Error(e);
-    //        }
-    //    }
-
-    //    public HttpResponseMessage Post(RightInputDTO inputDTO)
-    //    {
-    //        try
-    //        {
-    //            if (!HasWriteAccess(inputDTO.ObjectId, KitosUser.Id))
-    //                return Unauthorized();
-
-    //            var right = AutoMapper.Mapper.Map<RightInputDTO, TRight>(inputDTO);
-
-    //            right = RightRepository.Insert(right);
-    //            RightRepository.Save();
-
-    //            //TODO: FIX navigation properties not loading properly!!!
-    //            right.User = UserRepository.GetByKey(right.UserId);
-
-    //            var outputDTO = AutoMapper.Mapper.Map<TRight, RightOutputDTO>(right);
-
-    //            return Created(outputDTO);
-    //        }
-    //        catch (Exception e)
-    //        {
-    //            return Error(e);
-    //        }
-    //    }
-
-    //    public HttpResponseMessage Delete([FromUri] int oId, [FromUri] int rId, [FromUri] int uId)
-    //    {
-    //        try
-    //        {
-    //            RightRepository.DeleteByKey(oId, rId, uId);
-    //            RightRepository.Save();
-
-    //            return Ok();
-    //        }
-    //        catch (Exception e)
-    //        {
-    //            return Error(e);
-    //        }
-    //    }
-
-    //}
-
+    
 }

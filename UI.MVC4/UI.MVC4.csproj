@@ -239,7 +239,6 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\API\ActivityController.cs" />
-    <Compile Include="Controllers\API\AdminRightController.cs" />
     <Compile Include="Controllers\API\AdminRoleController.cs" />
     <Compile Include="Controllers\API\AgreementElementController.cs" />
     <Compile Include="Controllers\API\ArchiveTypeController.cs" />

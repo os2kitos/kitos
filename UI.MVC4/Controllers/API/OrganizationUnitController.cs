@@ -38,7 +38,7 @@ namespace UI.MVC4.Controllers.API
                 var theRights = new List<OrganizationRight>();
                 foreach (var orgUnit in orgUnits)
                 {
-                    theRights.AddRange(GetAllRightsQuery(orgUnit.Id));
+                    theRights.AddRange(GetRightsQuery(orgUnit.Id));
                 }
 
                 var dtos = AutoMapper.Mapper.Map<ICollection<OrganizationRight>, ICollection<RightOutputDTO>>(theRights);

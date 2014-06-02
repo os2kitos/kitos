@@ -79,7 +79,7 @@
             $scope.adminRights.push(right);
         }
 
-        $http.get("api/adminright").success(function(result) {
+        $http.get("api/organization?rights").success(function(result) {
             _.each(result.response, pushRight);
         });
         
@@ -96,7 +96,6 @@
             if (!(uId && oId && rId)) return;
 
             var data = {
-                objectId: oId,
                 userId: uId,
                 roleId: rId,
             };
@@ -104,7 +103,7 @@
             console.log(data);
             var msg = notify.addInfoMessage("Arbejder ...", false);
             
-            $http.post("api/adminright", data, { handleBusy: true }).success(function(result) {
+            $http.post("api/organization/" + oId, data, { handleBusy: true }).success(function(result) {
                 msg.toSuccessMessage(user.text + " er blevet lokal administrator for " + orgName);
                 $scope.newUser = null;
                 $scope.newOrg = null;
@@ -135,7 +134,7 @@
             var uId = right.userId;
 
             var msg = notify.addInfoMessage("Arbejder ...", false);
-            $http.delete("api/adminRight?oId=" + oId + "&rId=" + rId + "&uId=" + uId).success(function (deleteResult) {
+            $http.delete("api/organization/" + oId + "?rId=" + rId + "&uId=" + uId).success(function (deleteResult) {
                 right.show = false;
                 msg.toSuccessMessage(right.user.name + " er ikke længere lokal administrator");
             }).error(function (deleteResult) {
@@ -168,17 +167,16 @@
 
             var msg = notify.addInfoMessage("Arbejder ...", false);
             
-            $http.delete("api/adminRight?oId=" + oIdOld + "&rId=" + rId + "&uId=" + uIdOld, {handleBusy: true}).success(function (deleteResult) {
+            $http.delete("api/organization/" + oIdOld + "?rId=" + rId + "&uId=" + uIdOld, { handleBusy: true }).success(function (deleteResult) {
 
                 var newData = {
-                    objectId: oIdNew,
                     userId: uIdNew,
                     roleId: rId,
                 };
                 
                 var orgName = $scope.organizations[oIdNew].name;
 
-                $http.post("api/adminRight", newData).success(function (result) {
+                $http.post("api/organization/" + oIdNew, newData).success(function (result) {
 
                     right.roleId = result.response.roleId;
                     right.user = result.response.user;

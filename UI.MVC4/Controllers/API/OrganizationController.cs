@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
@@ -47,6 +48,22 @@ namespace UI.MVC4.Controllers.API
         {
             item = _organizationService.CreateOrganization(item.Name, OrganizationType.Municipality, KitosUser);
             return base.PostQuery(item);
+        }
+        
+        public virtual HttpResponseMessage GetAllRights(bool? rights)
+        {
+            try
+            {
+                if (!IsGlobalAdmin()) return Unauthorized();
+                var theRights = RightRepository.Get();
+                var dtos = Map<IEnumerable<AdminRight>, IEnumerable<RightOutputDTO>>(theRights);
+
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
         }
     }
 }
