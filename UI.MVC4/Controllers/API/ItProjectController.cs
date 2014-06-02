@@ -338,10 +338,7 @@ namespace UI.MVC4.Controllers.API
             {
                 var projects = _itProjectService.GetAll(orgId, includePublic: false)
                     .Where(project => project.ItSystemUsages.Any(usage => usage.Id == usageId)).ToList();
-
-                //TODO: if list is empty, return empty list, not NotFound()
-                if (!projects.Any()) return NotFound();
-
+                
                 return Ok(Map(projects));
             }
             catch (Exception e)
