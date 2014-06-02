@@ -67,8 +67,16 @@ namespace Core.ApplicationServices
         {
             CreateDefaultPhases(project);
             AddEconomyYears(project);
-            project.Handover = new Handover();
-            project.GoalStatus = new GoalStatus();
+
+            project.Handover = new Handover()
+                {
+                    ObjectOwner = project.ObjectOwner
+                };
+
+            project.GoalStatus = new GoalStatus()
+                {
+                    ObjectOwner = project.ObjectOwner
+                };
 
             _projectRepository.Insert(project);
             _projectRepository.Save();
@@ -223,27 +231,27 @@ namespace Core.ApplicationServices
                 {
                     new EconomyYear()
                         {
-                            YearNumber = 0
+                            YearNumber = 0, ObjectOwner = project.ObjectOwner
                         },
                     new EconomyYear()
                         {
-                            YearNumber = 1
+                            YearNumber = 1, ObjectOwner = project.ObjectOwner
                         },
                     new EconomyYear()
                         {
-                            YearNumber = 2
+                            YearNumber = 2, ObjectOwner = project.ObjectOwner
                         },
                     new EconomyYear()
                         {
-                            YearNumber = 3
+                            YearNumber = 3, ObjectOwner = project.ObjectOwner
                         },
                     new EconomyYear()
                         {
-                            YearNumber = 4
+                            YearNumber = 4, ObjectOwner = project.ObjectOwner
                         },
                     new EconomyYear()
                         {
-                            YearNumber = 5
+                            YearNumber = 5, ObjectOwner = project.ObjectOwner
                         }
                 };
         }
