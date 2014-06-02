@@ -22,6 +22,7 @@
                 <!-- wished to be used -->
                 <td>
                     <input type="checkbox" data-ng-model="exposure.isWishedFor"
+                                data-ng-disabled="!hasWriteAccess"
                         data-field="isWishedFor"
                         data-autosave="{{exposure.updateUrl}}"/>
                 </td>
@@ -122,6 +123,7 @@
                  <!-- wished to be used -->
                 <td>
                     <input type="checkbox" data-ng-model="usage.isWishedFor" 
+                                data-ng-disabled="!hasWriteAccess"
                         data-field="isWishedFor"
                         data-autosave="{{usage.updateUrl}}">
                 </td>
@@ -152,7 +154,7 @@
                 <!-- infrastructure -->
                 <td>
                     <input type="hidden" data-ui-select2="itSystemsSelectOptions" data-ng-model="usage.infrastructure" 
-                           class="form-control input-sm" data-ng-disabled="!usage.itContractId" data-ng-change="updateInfrastructure(usage)">
+                           class="form-control input-sm" data-ng-disabled="!usage.itContractId || !hasWriteAccess" data-ng-change="updateInfrastructure(usage)">
                 </td>
                 
                 <!-- interface method -->
@@ -201,7 +203,7 @@
                                 <td>
                                     <select data-ng-model="dataRowUsage.frequencyId"
                                         class="form-control input-sm"
-                                        data-ng-disabled="!usage.itContractId"
+                                        data-ng-disabled="!usage.itContractId || !hasWriteAccess"
                                         data-ng-options="freq.id as freq.name for freq in frequencies"
                                         data-field="frequencyId"
                                         data-autosave="{{dataRowUsage.updateUrl}}">
@@ -211,7 +213,7 @@
                                 <!-- price -->
                                 <td>
                                     <input type="text" data-ng-model="dataRowUsage.price" class="form-control input-sm" 
-                                           data-ng-disabled="!usage.itContractId" 
+                                           data-ng-disabled="!usage.itContractId || !hasWriteAccess" 
                                         data-field="price"
                                         data-autosave="{{dataRowUsage.updateUrl}}" />
                                 </td>
@@ -219,7 +221,7 @@
                                 <!-- amount -->
                                 <td>
                                     <input type="text" data-ng-model="dataRowUsage.amount" class="form-control input-sm" 
-                                           data-ng-disabled="!usage.itContractId"
+                                           data-ng-disabled="!usage.itContractId || !hasWriteAccess"
                                         data-field="amount"
                                         data-autosave="{{dataRowUsage.updateUrl}}" />
                                 </td>
@@ -227,7 +229,7 @@
                                 <!-- economy -->
                                 <td>
                                     <input type="text" data-ng-model="dataRowUsage.economy" class="form-control input-sm" 
-                                           data-ng-disabled="!usage.itContractId" 
+                                           data-ng-disabled="!usage.itContractId || !hasWriteAccess" 
                                         data-field="economy"
                                         data-autosave="{{dataRowUsage.updateUrl}}"/>
                                 </td>
