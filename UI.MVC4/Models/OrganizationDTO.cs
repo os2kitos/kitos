@@ -8,6 +8,7 @@ namespace UI.MVC4.Models
         public string Name { get; set; }
         public int Cvr { get; set; }
 
-        public OrganizationType? Type { get; set; }
+        public OrganizationType Type { get; set; }
+        public AccessModifier AccessModifier { get; set; }
     }
 }

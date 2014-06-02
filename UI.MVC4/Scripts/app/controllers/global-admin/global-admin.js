@@ -37,15 +37,15 @@
         $scope.submit = function() {
             if ($scope.addForm.$invalid) return;
 
-            var data = { "name": $scope.name };
-            
-            $http.post('api/organization', data).success(function (result) {
-                notify.addSuccessMessage("Organisationen " + $scope.name + " er blevet oprettet!");
-
-                $scope.name = "";
-            }).error(function (result) {
-                notify.addErrorMessage("Organisationen " + $scope.name + " kunne ikke oprettes!");
-            });
+            var payload = $scope.org;
+            $http.post('api/organization', payload)
+                .success(function(result) {
+                    notify.addSuccessMessage("Organisationen " + result.response.name + " er blevet oprettet!");
+                    delete $scope.org;
+                })
+                .error(function(result) {
+                    notify.addErrorMessage("Organisationen " + $scope.org.name + " kunne ikke oprettes!");
+                });
         };
     }]);
     

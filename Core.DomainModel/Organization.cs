@@ -10,7 +10,7 @@ namespace Core.DomainModel
         CommunityOfInterests
     }
 
-    public class Organization : IEntity<int>
+    public class Organization : IEntity<int>, IHasAccessModifier
     {
         public Organization()
         {
@@ -25,8 +25,9 @@ namespace Core.DomainModel
 
         public int Id { get; set; }
         public string Name { get; set; }
-        public OrganizationType? Type { get; set; }
+        public OrganizationType Type { get; set; }
         public int? Cvr { get; set; }
+        public AccessModifier AccessModifier { get; set; }
         
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
 
@@ -53,8 +54,5 @@ namespace Core.DomainModel
         public virtual ICollection<ExtRefTypeLocale> ExtRefTypeLocales { get; set; }
 
         #endregion
-
-
-
     }
 }
