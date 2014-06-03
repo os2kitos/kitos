@@ -11,10 +11,6 @@ namespace Core.DomainModel
         public User()
         {
             this.PasswordResetRequests = new List<PasswordResetRequest>();
-            //this.OrganizationRights = new List<OrganizationRight>();
-            //this.ProjectRights = new List<ItProjectRight>();
-            //this.SystemRights = new List<ItSystemRight>();
-            //this.ContractRights = new List<ItContractRight>();
             this.AdminRights = new List<AdminRight>();
 
             this.Wishes = new List<Wish>();
@@ -36,10 +32,6 @@ namespace Core.DomainModel
         public virtual OrganizationUnit DefaultOrganizationUnit { get; set; }
 
         public virtual ICollection<AdminRight> AdminRights { get; set; }
-        //public virtual ICollection<OrganizationRight> OrganizationRights { get; set; }
-        //public virtual ICollection<ItProjectRight> ProjectRights { get; set; }
-        //public virtual ICollection<ItSystemRight> SystemRights { get; set; }
-        //public virtual ICollection<ItContractRight> ContractRights { get; set; }
 
 
         public virtual ICollection<PasswordResetRequest> PasswordResetRequests { get; set; }
@@ -50,5 +42,12 @@ namespace Core.DomainModel
         public virtual ICollection<Communication> ResponsibleForCommunications { get; set; } 
         public virtual ICollection<Handover> HandoverParticipants { get; set; }
         public virtual ICollection<ItContract.ItContract> SignerForContracts { get; set; }
+
+        public override bool HasUserWriteAccess(User user)
+        {
+            if (user.Id == this.Id) return true;
+
+            return base.HasUserWriteAccess(user);
+        }
     }
 }

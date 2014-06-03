@@ -18,33 +18,7 @@ namespace Core.ApplicationServices
             _orgRightRepository = orgRightRepository;
             _adminService = adminService;
         }
-
-        /*
-        public ICollection<OrganizationUnit> GetByUser(User user)
-        {
-            List<OrganizationUnit> units;
-
-            if (user.IsGlobalAdmin)
-            {
-                units = _orgUnitRepository.Get().ToList();
-            }
-            else
-            {
-                //add the OrgUnits that the user is directly connected to, through OrgRights
-                units = user.OrganizationRights.Select(orgRight => orgRight.Object).ToList();
-
-                //add the OrgUnits that the user is indirectly connected to, through an Admin role on an organization
-                foreach (var adminRights in user.AdminRights)
-                {
-                    units.Add(adminRights.Object.OrgUnits.First());
-                }
-
-            }
-
-            var roots = units.Select(GetRoot);
-            return roots.Distinct().ToList();
-        }*/
-
+        
         public OrganizationUnit GetRoot(OrganizationUnit unit)
         {
             var whereWeStarted = unit;

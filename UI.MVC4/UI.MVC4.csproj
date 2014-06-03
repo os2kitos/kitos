@@ -308,8 +308,6 @@
     <Compile Include="Controllers\API\MethodController.cs" />
     <Compile Include="Controllers\API\OrganizationUnitController.cs" />
     <Compile Include="Controllers\API\ItProjectCategoryController.cs" />
-    <Compile Include="Controllers\API\ProjectPhaseController.cs" />
-    <Compile Include="Controllers\API\ProjectPhaseLocaleController.cs" />
     <Compile Include="Controllers\API\ItProjectTypeController.cs" />
     <Compile Include="Controllers\API\PurchaseFormController.cs" />
     <Compile Include="Controllers\API\AppTypeController.cs" />
@@ -360,6 +358,7 @@
     <Compile Include="Models\TaskDelegationDTO.cs" />
     <Compile Include="Models\TaskUsageDTO.cs" />
     <Compile Include="Models\TaskRefDTO.cs" />
+    <Compile Include="Models\TextDTO.cs" />
     <Compile Include="Models\UserDTO.cs" />
     <Compile Include="Models\UserOrganizationsDTO.cs" />
     <Compile Include="Models\UserProfileDTO.cs" />

@@ -121,12 +121,13 @@ namespace UI.MVC4.Controllers.API
             {
                 try
                 {
-                    var user = UserRepository.Get(u => u.Email == User.Identity.Name).FirstOrDefault();
+                    var id = Convert.ToUInt32(User.Identity.Name);
+                    var user = UserRepository.Get(u => u.Id == id).FirstOrDefault();
                     if(user == null) throw new SecurityException();
 
                     return user;
                 }
-                catch
+                catch (Exception e)
                 {
                     throw new SecurityException();
                 }

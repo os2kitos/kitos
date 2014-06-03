@@ -18,9 +18,6 @@ namespace Core.DomainModel
             this.Supplier = new List<ItContract.ItContract>();
             this.ItSystemUsages = new List<ItSystem.ItSystemUsage>();
             this.Contracts = new List<ItContract.ItContract>();
-
-            //this.ProjectPhaseLocales = new List<ProjPhaseLocale>();
-
             this.OrgUnits = new List<OrganizationUnit>();
         }
 
@@ -49,10 +46,7 @@ namespace Core.DomainModel
 
         /* Config and localization */
         public virtual Config Config { get; set; }
-
-        //TODO
-        //public virtual ICollection<ProjPhaseLocale> ProjectPhaseLocales { get; set; }
-
+        
         public virtual ICollection<ExtRefTypeLocale> ExtRefTypeLocales { get; set; }
 
         #endregion

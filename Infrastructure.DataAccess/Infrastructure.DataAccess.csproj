@@ -119,9 +119,6 @@
     <Compile Include="Mapping\OrganizationMap.cs" />
     <Compile Include="Mapping\PasswordResetRequestMap.cs" />
     <Compile Include="Mapping\ItProjectCategoryMap.cs" />
-    <Compile Include="Mapping\ProjectPhaseLocaleMap.cs" />
-    <Compile Include="Mapping\ProjectPhaseMap.cs" />
-    <Compile Include="Mapping\ProjectStatusMap.cs" />
     <Compile Include="Mapping\ItProjectTypeMap.cs" />
     <Compile Include="Mapping\PurchaseFormMap.cs" />
     <Compile Include="Mapping\RiskMap.cs" />

@@ -9,63 +9,23 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class UserController : BaseApiController
+    public class UserController : GenericApiController<User, UserDTO>
     {
-        private readonly IGenericRepository<User> _repository;
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
 
-        public UserController(IGenericRepository<User> repository, IUserService userService, IOrganizationService organizationService)
+        public UserController(IGenericRepository<User> repository, IUserService userService, IOrganizationService organizationService) : base(repository)
         {
-            _repository = repository;
             _userService = userService;
             _organizationService = organizationService;
         }
 
-        public HttpResponseMessage Post(UserDTO item)
+        protected override User PostQuery(User item)
         {
-            try
-            {
-                if (!IsAuthenticated) return Unauthorized();
-
-                var user = AutoMapper.Mapper.Map<UserDTO, User>(item);
-
-                user = _userService.AddUser(user);
-
-                return Created(AutoMapper.Mapper.Map<User, UserDTO>(user), new Uri(Request.RequestUri + "/" + user.Id));
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
+            return _userService.AddUser(item);
         }
 
-        public HttpResponseMessage Get()
-        {
-            try
-            {
-                var users = _repository.Get();
-                return Ok(AutoMapper.Mapper.Map<IEnumerable<User>, List<UserDTO>>(users));
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
-
-        public HttpResponseMessage Get(int id)
-        {
-            try
-            {
-                var user = _repository.GetByKey(id);
-                return Ok(AutoMapper.Mapper.Map<User, UserDTO>(user));
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
-
+        //TODO REWRITE THIS, perhaps so it's passes along at login?
         public HttpResponseMessage Get(bool? organizations)
         {
             try
@@ -94,61 +54,16 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage Get(string q)
+        public HttpResponseMessage GetBySearch(string q)
         {
-            if (string.IsNullOrEmpty(q)) return Get();
-
             try
             {
-                var users = _repository.Get(u => u.Name.StartsWith(q) || u.Email.StartsWith(q));
+                var users = Repository.Get(u => u.Name.StartsWith(q) || u.Email.StartsWith(q));
                 return Ok(AutoMapper.Mapper.Map<IEnumerable<User>, IEnumerable<UserDTO>>(users));
             }
             catch (Exception e)
             {
                 return Error(e);
-            }
-            
-        }
-
-        public virtual HttpResponseMessage Patch(int id, JObject obj)
-        {
-            var item = _repository.GetByKey(id);
-            var itemType = item.GetType();
-
-            foreach (var valuePair in obj)
-            {
-                // get name of mapped property
-                var map =
-                    AutoMapper.Mapper.FindTypeMapFor<UserProfileDTO, User>()
-                              .GetPropertyMaps();
-                var nonNullMaps = map.Where(x => x.SourceMember != null);
-                var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name.Equals(valuePair.Key, StringComparison.InvariantCultureIgnoreCase));
-                if (mapMember == null)
-                    continue; // abort if no map found
-
-                var destName = mapMember.DestinationProperty.Name;
-                var jToken = valuePair.Value;
-
-                var propRef = itemType.GetProperty(destName);
-                var t = propRef.PropertyType;
-                // use reflection to call obj.Value<t>("keyName");
-                var genericMethod = jToken.GetType().GetMethod("Value").MakeGenericMethod(new Type[] { t });
-                var value = genericMethod.Invoke(obj, new object[] { valuePair.Key });
-                // update the entity
-                propRef.SetValue(item, value);
-            }
-
-            try
-            {
-                _repository.Update(item);
-                _repository.Save();
-
-                //pretty sure we'll get a merge conflict here???
-                return Ok(AutoMapper.Mapper.Map<User, UserProfileDTO>(item)); // TODO correct?
-            }
-            catch (Exception)
-            {
-                return NoContent(); // TODO catch correct expection
             }
         }
     }

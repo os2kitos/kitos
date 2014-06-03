@@ -26,7 +26,7 @@
         $rootScope.page.title = 'Index';
         $rootScope.page.subnav = [];
         
-        Restangular.one('text', 'intro-head').get().then(function (data) {
+        Restangular.one('text', 1).get().then(function (data) {
             $scope.introhead = data.value;
 
             $scope.submitIntroHead = function(newValue) {
@@ -35,7 +35,7 @@
             };
         });
         
-        Restangular.one('text', 'intro-body').get().then(function (data) {
+        Restangular.one('text', 2).get().then(function (data) {
             $scope.introbody = data.value;
             
             $scope.submitIntroBody = function (newValue) {

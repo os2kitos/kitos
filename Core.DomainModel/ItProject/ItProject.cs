@@ -46,12 +46,6 @@ namespace Core.DomainModel.ItProject
         public bool IsCommunicationVisible { get; set; }
         public bool IsHandoverVisible { get; set; }
         
-        //public bool IsTermsOfReferenceApproved { get; set; }
-        //public int? ItProjectOwnerId { get; set; }
-        //public int? ItProjectLeaderId { get; set; }
-        //public int? PartItProjectLeaderId { get; set; }
-        //public int? ConsultantId { get; set; }
-        
         public int? AssociatedProgramId { get; set; }
         public virtual ItProject AssociatedProgram { get; set; }
         public virtual ICollection<ItProject> AssociatedProjects { get; set; }
@@ -65,16 +59,10 @@ namespace Core.DomainModel.ItProject
         public int OrganizationId { get; set; }
         public virtual Organization Organization { get; set; }
 
-        //public virtual ProjectStatus ProjectStatus { get; set; }
-        //public virtual GoalStatus GoalStatus { get; set; }
         public virtual Handover Handover { get; set; }
-        //public virtual OrgTab OrgTab { get; set; }
-        //public virtual Hierarchy Hierarchy { get; set; }
         public virtual ICollection<Communication> Communications { get; set; }
-        //public virtual ICollection<Economy> Economies { get; set; }
         //public virtual ICollection<ExtReference> ExtReferences { get; set; } // TODO
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
-        //public virtual ICollection<Resource> Resources { get; set; }
         public virtual ICollection<Risk> Risks { get; set; }
         public virtual ICollection<Stakeholder> Stakeholders { get; set; }
 
