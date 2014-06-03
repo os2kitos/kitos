@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using Newtonsoft.Json.Linq;
 using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
@@ -22,7 +23,7 @@ namespace UI.MVC4.Controllers.API
             return NotAllowed();
         }
 
-        public override HttpResponseMessage Put(int id, InterfaceExposureDTO dto)
+        public override HttpResponseMessage Put(int id, JObject jObject)
         {
             return NotAllowed();
         }
