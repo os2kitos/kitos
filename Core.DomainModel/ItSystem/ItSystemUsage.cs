@@ -43,7 +43,11 @@ namespace Core.DomainModel.ItSystem
         public int? OverviewItSystemId { get; set; }
         public virtual ItSystem OverviewItSystem { get; set; }
 
+        public virtual int? MainContractId { get; set; }
+        public virtual ItContract.ItContract MainContract { get; set; }
+
         public virtual ICollection<ItContract.ItContract> Contracts { get; set; }
+
         public virtual ICollection<Wish> Wishes { get; set; }
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
 
