@@ -127,6 +127,12 @@
                     return $http.get("api/apptype?interfaceAppType").then(function(result) {
                         return result.data.response;
                     });
+                }],
+                hasWriteAccess: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get('api/itsystemusage/' + $stateParams.id + "?hasWriteAccess")
+                        .then(function (result) {
+                            return result.data.response;
+                        });
                 }]
             }
         });
@@ -402,11 +408,13 @@
             }]);
 
     app.controller('system.EditUsage', ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'itSystemUsage', 'appTypes',
-        'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'itSystems', 'interfaceAppType',
-        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, appTypes, businessTypes, archiveTypes, sensitiveDataTypes, itSystems, interfaceAppType) {
+        'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'itSystems', 'interfaceAppType', 'hasWriteAccess',
+        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, appTypes, businessTypes, archiveTypes, sensitiveDataTypes, itSystems, interfaceAppType, hasWriteAccess) {
             $rootScope.page.title = 'IT system';
             $rootScope.page.subnav = subnav.slice();
             $rootScope.page.subnav.push({ state: 'it-system-usage', text: 'IT System' });
+
+            $scope.hasWriteAccess = hasWriteAccess;
 
             $scope.interfaceAppType = interfaceAppType;
 

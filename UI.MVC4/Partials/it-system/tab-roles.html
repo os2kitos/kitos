@@ -4,7 +4,7 @@
         <i class="glyphicon glyphicon-user"></i>
         Systemroller
 
-                        <a class="pull-right"
+                        <a class="pull-right" data-ng-if="hasWriteAccess"
                             data-ng-click="editRights = !editRights">Rediger
                         </a>
     </div>
@@ -27,7 +27,7 @@
                 <td>{{ right.role.name }}</td>
                 <td>{{ right.user.name }}</td>
                 <td>{{ right.user.email }}
-                    <div data-ng-show="editRights" class="pull-right">
+                    <div data-ng-show="editRights" class="pull-right" data-ng-if="hasWriteAccess">
                         <a data-ng-click="right.edit = true" class="btn btn-info btn-xs">
                             <i class="glyphicon glyphicon-pencil"></i>
                         </a>
@@ -58,7 +58,7 @@
         </tbody>
 
         <!-- add-new-right row -->
-        <tbody data-ng-show="true">
+        <tbody data-ng-show="true" data-ng-if="hasWriteAccess">
             <tr>
                 <td>
                     <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en systemrolle" class="form-control input-sm" data-ng-change="submitRight()">

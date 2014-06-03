@@ -4,7 +4,7 @@
 
 <div data-ng-repeat="task in kle | filter:kleFilter">
     <label>
-        <input type="checkbox" data-ng-model="task.selected" data-ng-change="save(task)" data-ng-disabled="task.disabled" />
+        <input type="checkbox" data-ng-model="task.selected" data-ng-change="save(task)" data-ng-disabled="task.disabled || !hasWriteAccess" />
         {{ task.taskKey }} {{ task.description }}
     </label>
 </div>

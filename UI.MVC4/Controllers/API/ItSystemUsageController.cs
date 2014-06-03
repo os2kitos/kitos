@@ -148,9 +148,12 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 var usage = Repository.GetByKey(id);
-                var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
+                if (usage == null) return NotFound();
 
-                if (usage == null || orgUnit == null) return NotFound();
+                if (!HasWriteAccess(usage)) return Unauthorized();
+
+                var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
+                if (orgUnit == null) return NotFound();
 
                 usage.UsedBy.Remove(orgUnit);
                 Repository.Save();
@@ -184,9 +187,11 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 var usage = Repository.GetByKey(id);
-                var task = _taskRepository.GetByKey(taskId);
+                if (usage == null) return NotFound();
+                if (!HasWriteAccess(usage)) return Unauthorized();
 
-                if (usage == null || task == null) return NotFound();
+                var task = _taskRepository.GetByKey(taskId);
+                if (task == null) return NotFound();
 
                 usage.TaskRefs.Add(task);
                 Repository.Save();
@@ -204,9 +209,11 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 var usage = Repository.GetByKey(id);
-                var task = _taskRepository.GetByKey(taskId);
+                if (usage == null) return NotFound();
+                if (!HasWriteAccess(usage)) return Unauthorized();
 
-                if (usage == null || task == null) return NotFound();
+                var task = _taskRepository.GetByKey(taskId);
+                if (task == null) return NotFound();
 
                 usage.TaskRefs.Remove(task);
                 Repository.Save();
