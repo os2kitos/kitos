@@ -521,4 +521,154 @@
 
     ]);
 
+    app.directive('suggestNew', ['$http', 'notify', function ($http, notify) {
+        return {
+            scope: {
+                url: '@'
+            },
+            templateUrl: 'partials/local-config/suggest-new.html',
+            link: function (scope, element, attrs) {
+                scope.suggest = function () {
+                    if (scope.suggestForm.$invalid) return;
+
+                    var data = {
+                        "isSuggestion": true,
+                        "name": scope.suggestion
+                    };
+
+                    $http.post(scope.url, data).success(function (result) {
+                        notify.addSuccessMessage('Foreslag sendt!');
+                        scope.suggestion = "";
+                    }).error(function (result) {
+                        notify.addErrorMessage('Kunne ikke sende foreslag!');
+                    });
+                };
+            }
+        };
+    }]);
+
+    app.directive('suggestNewRole', ['$http', 'notify', function ($http, notify) {
+        return {
+            scope: {
+                url: '@'
+            },
+            templateUrl: 'partials/local-config/suggest-new-role.html',
+            link: function (scope, element, attrs) {
+                scope.suggest = function () {
+                    if (scope.suggestForm.$invalid) return;
+
+                    var data = {
+                        "isSuggestion": true,
+                        "name": scope.suggestion,
+                        "hasReadAccess": true,
+                        "hasWriteAccess": scope.writeAccess
+                    };
+
+                    $http.post(scope.url, data).success(function (result) {
+                        notify.addSuccessMessage('Foreslag sendt!');
+                        scope.suggestion = "";
+                    }).error(function (result) {
+                        notify.addErrorMessage('Kunne ikke sende foreslag!');
+                    });
+                };
+            }
+        };
+    }]);
+
+    app.directive('optionList', ['$http', function ($http) {
+        return {
+            scope: {
+                optionsUrl: '@',
+                title: '@',
+            },
+            templateUrl: 'partials/local-config/optionlist.html',
+            link: function (scope, element, attrs) {
+
+                scope.list = [];
+
+                var optionsData = $http.get(scope.optionsUrl).success(function (result) {
+                    _.each(result.response, function (v) {
+                        scope.list.push({
+                            id: v.id,
+                            name: v.name,
+                            note: v.note
+                        });
+                    });
+                });
+            }
+        };
+    }]);
+
+    app.directive('optionLocaleList', ['$rootScope', '$q', '$http', 'notify', function ($rootScope, $q, $http, notify) {
+        return {
+            scope: {
+                optionsUrl: '@',
+                localesUrl: '@',
+                title: '@',
+                orgId: '='
+            },
+            templateUrl: 'partials/local-config/optionlocalelist.html',
+            link: function (scope, element, attrs) {
+
+                var orgId = parseInt(scope.orgId);
+
+                scope.list = [];
+
+                $q.all([
+                    $http.get(scope.optionsUrl),
+                    $http.get(scope.localesUrl + '/' + orgId)
+                ]).then(function (result) {
+
+                    var options = result[0].data.response;
+                    var locales = result[1].data.response;
+
+                    _.each(options, function (v) {
+
+                        var locale = _.find(locales, function (loc) {
+                            return loc.originalId == v.id;
+                        });
+
+                        var isNew = _.isUndefined(locale);
+                        var localeName = isNew ? '' : locale.name;
+
+                        scope.list.push({
+                            id: v.id,
+                            name: v.name,
+                            note: v.note,
+                            localeName: localeName,
+                            isNew: isNew
+                        });
+                    });
+                });
+
+
+                scope.updateLocale = function (value, option) {
+
+                    var oId = option.id;
+
+                    if (_.isEmpty(value)) {
+
+                        return $http({ method: 'DELETE', url: scope.url + '?mId=' + orgId + '&oId=' + oId });
+
+                    } else {
+
+                        var method = option.isNew ? 'POST' : 'PUT';
+
+                        var data = {
+                            "name": value,
+                            "originalId": oId,
+                            "municipalityId": orgId
+                        };
+
+                        return $http({ method: method, url: scope.localesUrl, data: data })
+                            .success(function (result) {
+                                notify.addSuccessMessage('Felt opdateret');
+                            }).error(function (result) {
+                                notify.addErrorMessage('Kunne ikke opdatere feltet med værdien: ' + value + '!');
+                            });
+                    }
+                };
+            }
+        };
+    }]);
 })(angular, app);

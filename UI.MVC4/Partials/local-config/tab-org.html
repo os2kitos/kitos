@@ -1,0 +1,34 @@
+﻿<div class="form-group row">
+    <label class="col-md-2 control-label">
+        Overblik
+    </label>
+    <div class="col-md-10">
+        <div>
+            <label>
+                <input type="checkbox" data-ng-model="support.showTabOverview" data-ng-change="updateConfig(support.showTabOverview, 'showTabOverview')" tabindex="1"/>
+                Medtag fanen 'Overblik'
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" data-ng-model="support.showTechnology" data-ng-change="updateConfig(support.showTechnology, 'showColumnTechnology')" tabindex="2"/>
+                Medtag kolonnen 'Teknologi'
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" data-ng-model="support.showUsage" data-ng-change="updateConfig(support.showUsage, 'showColumnUsage')" tabindex="3"/>
+                Medtag kolonnen 'Anvendelse'
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" data-ng-model="support.showMandatory" data-ng-change="updateConfig(support.showMandatory, 'showColumnMandatory')" tabindex="4"/>
+                Medtag kolonnen 'SKAL'
+            </label>
+        </div>
+    </div>
+</div>
+
+<div data-option-list="" title="Roller" data-options-url="api/organizationRole"></div>
+<div data-suggest-new-role="" data-url="api/organizationRole"></div>
