@@ -42,5 +42,12 @@ namespace Core.DomainModel
         public virtual ICollection<Communication> ResponsibleForCommunications { get; set; } 
         public virtual ICollection<Handover> HandoverParticipants { get; set; }
         public virtual ICollection<ItContract.ItContract> SignerForContracts { get; set; }
+
+        public override bool HasUserWriteAccess(User user)
+        {
+            if (user.Id == this.Id) return true;
+
+            return base.HasUserWriteAccess(user);
+        }
     }
 }

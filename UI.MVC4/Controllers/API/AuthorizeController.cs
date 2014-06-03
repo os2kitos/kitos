@@ -11,6 +11,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
+    //TODO refactor this mess
     public class AuthorizeController : BaseApiController
     {
         private readonly IUserRepository _userRepository;
@@ -22,13 +23,18 @@ namespace UI.MVC4.Controllers.API
             _userService = userService;
         }
 
-        [Authorize]
         public HttpResponseMessage GetLogin()
-        {
-            var user = _userRepository.GetByEmail(User.Identity.Name);
-            var userApiModel = AutoMapper.Mapper.Map<User, UserDTO>(user);
+        { 
+            try
+            {
+                var userApiModel = AutoMapper.Mapper.Map<User, UserDTO>(KitosUser);
 
-            return Ok(userApiModel);
+                return Ok(userApiModel);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
         }
 
         // POST api/Authorize
@@ -39,9 +45,10 @@ namespace UI.MVC4.Controllers.API
                 if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
                     throw new ArgumentException();
 
-                FormsAuthentication.SetAuthCookie(loginDto.Email, loginDto.RememberMe);
-
                 var user = _userRepository.GetByEmail(loginDto.Email);
+
+                FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
+
                 var userApiModel = AutoMapper.Mapper.Map<User, UserDTO>(user);
 
                 return Created(userApiModel);
@@ -58,8 +65,15 @@ namespace UI.MVC4.Controllers.API
 
         public HttpResponseMessage PostLogout(bool? logout)
         {
-            FormsAuthentication.SignOut();
-            return Ok();
+            try
+            {
+                FormsAuthentication.SignOut();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
         }
 
 
