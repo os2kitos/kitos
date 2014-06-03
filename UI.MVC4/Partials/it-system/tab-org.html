@@ -12,7 +12,7 @@
     <li data-ng-repeat="orgUnit in orgUnitsTree" data-ng-include="'tree_item_renderer.html'"></li>
 </ul>
 
-<div class="col-md-8">
+<div class="col-md-5">
     <div class="form-group">
         <label for="responsible" class="control-label">Vælg ansvarlig organisationsenhed i blandt ovenstående:</label>
         <select id="responsible" data-ng-options="o.id as o.name for o in orgUnits"
