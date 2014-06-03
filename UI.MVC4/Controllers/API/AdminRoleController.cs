@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
+using Newtonsoft.Json.Linq;
 using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
@@ -41,7 +42,7 @@ namespace UI.MVC4.Controllers.API
             return NotAllowed();
         }
 
-        public override HttpResponseMessage Put(int id, RoleDTO dto)
+        public override HttpResponseMessage Put(int id, JObject jObject)
         {
             return NotAllowed();
         }

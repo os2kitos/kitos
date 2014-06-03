@@ -181,6 +181,9 @@ namespace UI.MVC4.App_Start
         {
             base.Configure();
 
+            Mapper.CreateMap<Text, TextDTO>()
+                  .ReverseMap();
+
             Mapper.CreateMap<User, UserDTO>()
                   .ReverseMap();
             Mapper.CreateMap<User, UserProfileDTO>()

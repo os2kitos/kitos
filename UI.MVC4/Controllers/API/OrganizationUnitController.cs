@@ -151,7 +151,7 @@ namespace UI.MVC4.Controllers.API
             return base.Patch(id, obj);
         }
 
-        public override HttpResponseMessage Put(int id, OrgUnitDTO dto)
+        public override HttpResponseMessage Put(int id, JObject jObject)
         {
             return NotAllowed();
         }

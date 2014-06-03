@@ -117,24 +117,9 @@ namespace UI.MVC4.Controllers.API
         }
 
         // PUT api/T
-        public virtual HttpResponseMessage Put(int id, TDto dto)
+        public virtual HttpResponseMessage Put(int id, JObject obj)
         {
-            try
-            {
-                var oldItem = Repository.GetByKey(id);
-                if (!HasWriteAccess(oldItem)) return Unauthorized();
-
-                var newItem = Map(dto);
-                newItem.Id = id;
-
-                PutQuery(newItem);
-
-                return Ok();
-            }
-            catch (Exception)
-            {
-                return NoContent();
-            }
+            return Patch(id, obj);
         }
 
         protected virtual void DeleteQuery(int id)
