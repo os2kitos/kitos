@@ -1,0 +1,58 @@
+﻿<div class="panel panel-default">
+    <div class="panel-heading">IT Systemet har følgende IT kontrakter tilknyttet:</div>
+    
+    <table class="table table-condensed table-striped">
+        <thead>
+            <tr>
+                <th>
+                    IT Kontrakt
+                </th>
+                <th>
+                    Kontrakttype
+                </th>
+                <th>
+                    Leverandør
+                </th>
+                <th>
+                    Drift
+                </th>
+                <th>
+                    Indgået
+                </th>
+                <th>
+                    Udløber
+                </th>
+                <th>
+                    Opsagt
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="contract in contracts">
+                
+                <!-- name -->
+                <td>
+                    <a data-ui-sref="it-contract.edit({id: contract.id})">
+                        {{ contract.name ? contract.name : 'Unavngiven' }}
+                    </a>
+                </td>
+                
+                <!-- type -->
+                <td>
+                    {{ contract.contractTypeName }}
+                </td>
+                
+                <!-- supplier -->
+                <td>
+                    {{ contract.supplierName }}
+                </td>
+                
+                <!-- has operation -->
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>

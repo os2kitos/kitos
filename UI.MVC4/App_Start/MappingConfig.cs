@@ -336,7 +336,10 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<ItContract, ItContractOverviewDTO>();
 
             //Output only - this mapping should not be reversed
-            Mapper.CreateMap<ItContract, ItContractPlanDTO>(); 
+            Mapper.CreateMap<ItContract, ItContractPlanDTO>();
+
+            //Output only - this mapping should not be reversed
+            Mapper.CreateMap<ItContract, ItContractSystemDTO>(); 
 
             Mapper.CreateMap<CustomAgreementElement, CustomAgreementElementDTO>()
                   .ReverseMap()
