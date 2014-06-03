@@ -254,7 +254,8 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.OrgUnits, opt => opt.Ignore())
                   .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
-                  .ForMember(dest => dest.ItProjects, opt => opt.Ignore());
+                  .ForMember(dest => dest.ItProjects, opt => opt.Ignore())
+                  .ForMember(dest => dest.Contracts, opt => opt.Ignore());
 
             //Simplere mapping than the one above, only one way
             Mapper.CreateMap<ItSystemUsage, ItSystemUsageSimpleDTO>();
