@@ -35,7 +35,6 @@ namespace Infrastructure.DataAccess
         public DbSet<DataType> DataTypes { get; set; }
         public DbSet<DataRow> DataRows { get; set; }
         public DbSet<DataRowUsage> DataRowUsages { get; set; }
-        public DbSet<Economy> Economies { get; set; }
         public DbSet<EconomyYear> EconomyYears { get; set; }
         public DbSet<EconomyStream> EconomyStrams { get; set; }
         public DbSet<ExtReference> ExtReferences { get; set; }
@@ -47,12 +46,10 @@ namespace Infrastructure.DataAccess
         public DbSet<GoalType> GoalTypes { get; set; }
         public DbSet<Handover> Handovers { get; set; }
         public DbSet<HandoverTrial> HandoverTrials { get; set; }
-        public DbSet<Hierarchy> Hierarchies { get; set; }
         public DbSet<Interface> Interfaces { get; set; }
         public DbSet<InterfaceUsage> InterfaceUsages { get; set; }
         public DbSet<InterfaceExposure> InterfaceExposure { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
-        public DbSet<InterfaceCategory> InterfaceCategories { get; set; }
         public DbSet<ItContractModuleName> ItContractModuleNames { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
         public DbSet<ItContractRight> ItContractRights { get; set; }
@@ -67,12 +64,9 @@ namespace Infrastructure.DataAccess
         public DbSet<ItSystemUsage> ItSystemUsages { get; set; }
         public DbSet<ItSystemRight> ItSystemRights { get; set; }
         public DbSet<ItSystemRole> ItSystemRoles { get; set; }
-        public DbSet<Localization> Localizations { get; set; }
         public DbSet<Method> Methods { get; set; }
-        public DbSet<Milestone> Milestones { get; set; }
         public DbSet<OptionExtend> OptionExtention { get; set; }
         public DbSet<Organization> Organizations { get; set; }
-        public DbSet<OrgTab> OrgTabs { get; set; }
         public DbSet<OrganizationUnit> OrganizationUnits { get; set; }
         public DbSet<OrganizationRight> OrganizationRights { get; set; }
         public DbSet<OrganizationRole> OrganizationRoles { get; set; }
@@ -83,12 +77,8 @@ namespace Infrastructure.DataAccess
         public DbSet<PriceRegulation> PriceRegulations { get; set; }
         public DbSet<ProcurementStrategy> ProcurementStrategies { get; set; }
         public DbSet<ItProjectCategory> ProjectCategories { get; set; }
-        public DbSet<ProjectPhase> ProjectPhases { get; set; }
-        public DbSet<ProjPhaseLocale> ProjectPhaseLocales { get; set; }
-        public DbSet<ProjectStatus> ProjectStatus { get; set; }
         public DbSet<ItProjectType> ProjectTypes { get; set; }
         public DbSet<PurchaseForm> PurchaseForms { get; set; }
-        public DbSet<Resource> Resources { get; set; }
         public DbSet<Risk> Risks { get; set; }
         public DbSet<SensitiveDataType> SensitiveDataTypes { get; set; }
         public DbSet<Stakeholder> Stakeholders { get; set; }
@@ -118,7 +108,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new DataTypeMap());
             modelBuilder.Configurations.Add(new DataRowMap());
             modelBuilder.Configurations.Add(new DataRowUsageMap());
-            modelBuilder.Configurations.Add(new EconomyMap());
             modelBuilder.Configurations.Add(new EconomyStreamMap());
             modelBuilder.Configurations.Add(new EconomyYearMap());
             modelBuilder.Configurations.Add(new ExtReferenceMap());
@@ -130,12 +119,10 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new GoalTypeMap());
             modelBuilder.Configurations.Add(new HandoverMap());
             modelBuilder.Configurations.Add(new HandoverTrialMap());
-            modelBuilder.Configurations.Add(new HierarchyMap());
             modelBuilder.Configurations.Add(new InterfaceMap());
             modelBuilder.Configurations.Add(new InterfaceUsageMap());
             modelBuilder.Configurations.Add(new InterfaceExposureMap());
             modelBuilder.Configurations.Add(new InterfaceTypeMap());
-            modelBuilder.Configurations.Add(new InterfaceCategoryMap());
             modelBuilder.Configurations.Add(new ItContractMap());
             modelBuilder.Configurations.Add(new ItContractRightMap());
             modelBuilder.Configurations.Add(new ItContractRoleMap());
@@ -150,23 +137,16 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemRightMap());
             modelBuilder.Configurations.Add(new ItSystemRoleMap());
             modelBuilder.Configurations.Add(new ItSystemModuleNameMap());
-            modelBuilder.Configurations.Add(new LocalizationMap());
             modelBuilder.Configurations.Add(new MethodMap());
-            modelBuilder.Configurations.Add(new MilestoneMap());
             modelBuilder.Configurations.Add(new OrganizationMap());
-            modelBuilder.Configurations.Add(new OrgTabMap());
             modelBuilder.Configurations.Add(new OrganizationUnitMap());
             modelBuilder.Configurations.Add(new OrganizationRightMap());
             modelBuilder.Configurations.Add(new OrganizationRoleMap());
             modelBuilder.Configurations.Add(new PasswordResetRequestMap());
             modelBuilder.Configurations.Add(new ItProjectCategoryMap());
             modelBuilder.Configurations.Add(new ProcurementStrategyMap());
-            modelBuilder.Configurations.Add(new ProjectPhaseMap());
-            modelBuilder.Configurations.Add(new ProjectPhaseLocaleMap());
-            modelBuilder.Configurations.Add(new ProjectStatusMap());
             modelBuilder.Configurations.Add(new ItProjectTypeMap());
             modelBuilder.Configurations.Add(new PurchaseFormMap());
-            modelBuilder.Configurations.Add(new ResourcesMap());
             modelBuilder.Configurations.Add(new RiskMap());
             modelBuilder.Configurations.Add(new SensitiveDataTypeMap());
             modelBuilder.Configurations.Add(new StakeholderMap());

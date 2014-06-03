@@ -77,15 +77,12 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<InterfaceType>>().To<GenericRepository<InterfaceType>>().InRequestScope();
             kernel.Bind<IGenericRepository<InterfaceUsage>>().To<GenericRepository<InterfaceUsage>>().InRequestScope();
             kernel.Bind<IGenericRepository<InterfaceExposure>>().To<GenericRepository<InterfaceExposure>>().InRequestScope();
-            kernel.Bind<IGenericRepository<InterfaceCategory>>().To<GenericRepository<InterfaceCategory>>().InRequestScope();
             kernel.Bind<IGenericRepository<Method>>().To<GenericRepository<Method>>().InRequestScope();
             kernel.Bind<IGenericRepository<Tsa>>().To<GenericRepository<Tsa>>().InRequestScope();
             kernel.Bind<IGenericRepository<Frequency>>().To<GenericRepository<Frequency>>().InRequestScope();
             kernel.Bind<IGenericRepository<Interface>>().To<GenericRepository<Interface>>().InRequestScope();
             kernel.Bind<IGenericRepository<DataType>>().To<GenericRepository<DataType>>().InRequestScope();
             kernel.Bind<IGenericRepository<DataRowUsage>>().To<GenericRepository<DataRowUsage>>().InRequestScope();
-            kernel.Bind<IGenericRepository<ProjectPhase>>().To<GenericRepository<ProjectPhase>>().InRequestScope();
-            kernel.Bind<IGenericRepository<ProjPhaseLocale>>().To<GenericRepository<ProjPhaseLocale>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItProjectCategory>>().To<GenericRepository<ItProjectCategory>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItProjectType>>().To<GenericRepository<ItProjectType>>().InRequestScope();
             kernel.Bind<IGenericRepository<PurchaseForm>>().To<GenericRepository<PurchaseForm>>().InRequestScope();
@@ -139,6 +136,7 @@ namespace UI.MVC4.App_Start
 
             kernel.Bind<IGenericRepository<Config>>().To<GenericRepository<Config>>();
 
+            //TODO shouldn't this be in request scope?
             kernel.Bind<IGenericRepository<ItContractModuleName>>().To<GenericRepository<ItContractModuleName>>();
             kernel.Bind<IGenericRepository<ItProjectModuleName>>().To<GenericRepository<ItProjectModuleName>>();
             kernel.Bind<IGenericRepository<ItSupportModuleName>>().To<GenericRepository<ItSupportModuleName>>();

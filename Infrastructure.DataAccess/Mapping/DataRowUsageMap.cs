@@ -3,17 +3,13 @@ using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class DataRowUsageMap : EntityTypeConfiguration<DataRowUsage>
+    public class DataRowUsageMap : EntityMap<DataRowUsage>
     {
         public DataRowUsageMap()
         {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
             // Properties
             // Table & Column Mappings
             this.ToTable("DataRowUsage");
-            this.Property(t => t.Id).HasColumnName("Id");
 
             this.HasRequired(t => t.InterfaceUsage)
                 .WithMany(d => d.DataRowUsages)

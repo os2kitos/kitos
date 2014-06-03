@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
@@ -22,7 +23,634 @@ namespace Infrastructure.DataAccess.Migrations
             SetHistoryContextFactory("MySql.Data.MySqlClient", (conn, schema) => new MySqlHistoryContext(conn, schema));
         }
 
+        
         protected override void Seed(Infrastructure.DataAccess.KitosContext context)
+        {
+            #region USERS
+
+            var cryptoService = new CryptoService();
+
+            var globalUser = CreateUser("Global", "g@test", "test", cryptoService);
+            globalUser.IsGlobalAdmin = true;
+
+            var localUser = CreateUser("Local Test Bruger", "l@test", "test", cryptoService, globalUser);
+
+            var simon = CreateUser("Simon Lynn-Pedersen", "slp@it-minds.dk", "slp123", cryptoService, globalUser);
+            simon.IsGlobalAdmin = true;
+
+            var eskild = CreateUser("Eskild", "esd@it-minds.dk", "123", cryptoService, globalUser);
+            eskild.IsGlobalAdmin = true;
+
+            var brian = CreateUser("Brian", "briana@roskilde.dk", "123", cryptoService, globalUser);
+            brian.IsGlobalAdmin = true;
+
+            var user1 = CreateUser("Pia", "pia@it-minds.dk", "arne123", cryptoService, globalUser);
+            var user2 = CreateUser("Morten", "morten@it-minds.dk", "arne123", cryptoService, globalUser);
+            var user3 = CreateUser("Anders", "anders@it-minds.dk", "arne123", cryptoService, globalUser);
+            var user4 = CreateUser("Peter", "peter@it-minds.dk", "arne123", cryptoService, globalUser);
+            var user5 = CreateUser("Jesper", "jesper@it-minds.dk", "arne123", cryptoService, globalUser);
+
+            var erik = CreateUser("Erik", "ehl@kl.dk", "123", cryptoService);
+
+            context.Users.AddOrUpdate(x => x.Email, simon, globalUser, localUser, user1, user2, user3, user4, user5, brian, erik);
+            context.SaveChanges();
+
+            #endregion
+
+            #region OPTIONS
+            
+            AddOptions<ItProjectCategory, ItProject>(context.ProjectCategories, globalUser, "Fællesoffentlig", "Fælleskommunal");
+
+            AddOptions<ItProjectType, ItProject>(context.ProjectTypes, globalUser, "IT Projekt", "IT Program", "Indsatsområde");
+            
+            AddOptions<AppType, ItSystem>(context.AppTypes, globalUser, "Snitflade", "Fagsystem", "Selvbetjening");
+
+            AddOptions<BusinessType, ItSystem>(context.BusinessTypes, globalUser, "Forretningstype 1", "Forretningstype 2", "Forretningstype 3");
+
+            AddOptions<Interface, ItSystem>(context.Interfaces, globalUser, "Grænseflade 1", "Grænseflade 2", "Grænseflade 3");
+            
+            AddOptions<Tsa, ItSystem>(context.Tsas, globalUser, "Ja", "Nej");
+            
+            AddOptions<InterfaceType, ItSystem>(context.InterfaceTypes, globalUser, "WS");
+
+            AddOptions<DataType, DataRow>(context.DataTypes, globalUser, "Datatype 1", "Datatype 2", "Datatype 3");
+
+            AddOptions<Method, ItSystem>(context.Methods, globalUser, "Batch", "Request-Response");
+
+            AddOptions<ContractType, ItContract>(context.ContractTypes, globalUser, "Hovedkontrakt", "Tillægskontrakt", "Snitflade");
+
+            AddOptions<ContractTemplate, ItContract>(context.ContractTemplates, globalUser, "K01", "K02", "K03");
+
+            AddOptions<PurchaseForm, ItContract>(context.PurchaseForms, globalUser, "SKI", "SKI 02.19", "Udbud");
+
+            AddOptions<ProcurementStrategy, ItContract>(context.ProcurementStrategies, globalUser, "Strategi 1", "Strategi 2", "Strategi 3");
+
+            AddOptions<AgreementElement, ItContract>(context.AgreementElements, globalUser, 
+                "Licens", "Udvikling", "Drift", "Vedligehold", "Support", 
+                "Serverlicenser", "Serverdrift", "Databaselicenser", "Backup", "Overvågning");
+
+            AddOptions<ItSupportModuleName, Config>(context.ItSupportModuleNames, globalUser, "IT Understøttelse", "Organisation");
+
+            AddOptions<ItProjectModuleName, Config>(context.ItProjectModuleNames, globalUser, "IT Projekter", "Projekter");
+
+            AddOptions<ItSystemModuleName, Config>(context.ItSystemModuleNames, globalUser, "IT Systemer", "Systemer");
+
+            AddOptions<ItContractModuleName, Config>(context.ItContractModuleNames, globalUser, "IT Kontrakter", "Kontrakter");
+
+            AddOptions<Frequency, DataRowUsage>(context.Frequencies, globalUser, "Dagligt", "Ugentligt", "Månedligt", "Årligt"); 
+            
+            AddOptions<ExtReferenceType, ExtReference>(context.ExtReferenceTypes, globalUser, "ESDH ref", "CMDB ref", "Mappe ref"); 
+
+            AddOptions<ArchiveType, ItSystemUsage>(context.ArchiveTypes, globalUser, "Arkiveret", "Ikke arkiveret");
+
+            AddOptions<SensitiveDataType, ItSystemUsage>(context.SensitiveDataTypes, globalUser, "Ja", "Nej");
+
+            AddOptions<GoalType, Goal>(context.GoalTypes, globalUser, "Måltype 1", "Måltype 2");
+
+            AddOptions<OptionExtend, ItContract>(context.OptionExtention, globalUser, "2 x 1 år");
+
+            AddOptions<TerminationDeadline, ItContract>(context.TerminationDeadlines, globalUser, "Frist 1", "Frist 2");
+
+            AddOptions<PaymentFreqency, ItContract>(context.PaymentFreqencies, globalUser, "Frekvens A", "Frekvens B");
+
+            AddOptions<PaymentModel, ItContract>(context.PaymentModels, globalUser, "Model A", "Model B");
+
+            AddOptions<PriceRegulation, ItContract>(context.PriceRegulations, globalUser, "Pris regulering A", "Pris regulering B"); 
+
+            context.SaveChanges();
+
+            #endregion
+            
+            #region ADMIN ROLES
+
+            var localAdmin = new AdminRole
+            {
+                Name = "LocalAdmin",
+                IsActive = true,
+                ObjectOwner = globalUser
+            };
+            context.AdminRoles.AddOrUpdate(x => x.Name, localAdmin);
+            context.SaveChanges();
+
+            #endregion
+            
+            #region ORG ROLES
+
+            var boss = new OrganizationRole()
+            {
+                IsActive = true,
+                Name = "Chef",
+                Note = "Lederen af en organisationsenhed",
+                HasWriteAccess = true, 
+                ObjectOwner = globalUser
+            };
+
+            var resourcePerson = new OrganizationRole()
+            {
+                IsActive = true,
+                Name = "Ressourceperson",
+                Note = "...",
+                HasWriteAccess = true,
+                ObjectOwner = globalUser
+            };
+
+            var employee = new OrganizationRole()
+            {
+                IsActive = true,
+                Name = "Medarbejder",
+                Note = "...",
+                HasWriteAccess = false,
+                ObjectOwner = globalUser
+            };
+
+            context.OrganizationRoles.AddOrUpdate(role => role.Id, boss, resourcePerson, employee);
+            context.SaveChanges();
+
+            #endregion
+
+            #region PROJECT ROLES
+
+            context.ItProjectRoles.AddOrUpdate(r => r.Id,
+                new ItProjectRole()
+                {
+                    IsActive = true,
+                    Name = "Projektejer",
+                    ObjectOwner = globalUser
+                },
+                new ItProjectRole()
+                {
+                    IsActive = true,
+                    Name = "Projektleder",
+                    ObjectOwner = globalUser
+                },
+                new ItProjectRole()
+                {
+                    IsActive = true,
+                    Name = "Delprojektleder",
+                    ObjectOwner = globalUser
+                },
+                new ItProjectRole()
+                {
+                    IsActive = true,
+                    Name = "Projektdeltager",
+                    ObjectOwner = globalUser
+                });
+            context.SaveChanges();
+
+            #endregion
+            
+            #region SYSTEM ROLES
+
+            var systemRole1 = new ItSystemRole()
+            {
+                HasReadAccess = true,
+                HasWriteAccess = true,
+                IsActive = true,
+                Name = "Systemrolle 1",
+                ObjectOwner = globalUser
+            };
+
+            var systemRole2 = new ItSystemRole()
+            {
+                HasReadAccess = true,
+                HasWriteAccess = false,
+                IsActive = true,
+                Name = "Systemrolle 2",
+                ObjectOwner = globalUser
+            };
+
+            context.ItSystemRoles.AddOrUpdate(x => x.Name, systemRole1, systemRole2);
+            context.SaveChanges();
+
+            #endregion
+
+            #region CONTRACT ROLES
+
+            context.ItContractRoles.AddOrUpdate(x => x.Name, new ItContractRole()
+            {
+                HasWriteAccess = true,
+                Name = "Kontraktrolle A",
+                IsActive = true,
+                ObjectOwner = globalUser
+            }, new ItContractRole()
+            {
+                HasWriteAccess = true,
+                Name = "Kontraktrolle B",
+                IsActive = true,
+                ObjectOwner = globalUser
+            }, new ItContractRole()
+            {
+                HasWriteAccess = false,
+                Name = "Kontraktrolle C",
+                IsActive = true,
+                ObjectOwner = globalUser
+            });
+            context.SaveChanges();
+
+            #endregion
+
+            #region ORGANIZATIONS
+
+            var roskilde = CreateOrganization("Roskilde", OrganizationType.Municipality, globalUser);
+            var sorø = CreateOrganization("Sorø", OrganizationType.Municipality, globalUser);
+            var kl = CreateOrganization("KL", OrganizationType.Municipality, globalUser);
+            var companyA = CreateOrganization("Firma A", OrganizationType.Company, globalUser);
+            var companyB = CreateOrganization("Firma B", OrganizationType.Company, globalUser);
+            var companyC = CreateOrganization("Firma C", OrganizationType.Company, globalUser);
+
+            context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø, kl, companyA, companyB, companyC);
+            context.SaveChanges();
+
+            #endregion
+
+            #region ADMIN RIGHTS
+
+            context.AdminRights.AddOrUpdate(right => new { right.ObjectId, right.RoleId, right.UserId },
+                                            new AdminRight()
+                                            {
+                                                Object = roskilde,
+                                                Role = localAdmin,
+                                                User = user1, 
+                                                ObjectOwner = globalUser
+                                            },
+                                            new AdminRight()
+                                            {
+                                                Object = kl,
+                                                Role = localAdmin,
+                                                User = erik,
+                                                ObjectOwner = globalUser
+                                            },
+                                            new AdminRight()
+                                            {
+                                                Object = roskilde,
+                                                Role = localAdmin,
+                                                User = localUser,
+                                                ObjectOwner = globalUser
+                                            });
+
+            context.SaveChanges();
+
+            #endregion
+
+            #region ROSKILDE ORG UNITS
+
+            //LEVEL 0
+            var roskildeRoot = roskilde.OrgUnits.First();
+
+            //LEVEL 1
+            var munChief = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = roskildeRoot,
+                Name = "Kommunaldirektøren"
+            };
+            var wellfare = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = roskildeRoot,
+                Name = "Velfærd"
+            };
+
+            //LEVEL 2
+            var digi = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = munChief,
+                Name = "Digitalisering og Borgerservice"
+            };
+
+            var hrcouncil = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = munChief,
+                Name = "HR og Byråd"
+            };
+
+            var elderArea = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = wellfare,
+                Name = "Ældreområdet"
+            };
+
+            //LEVEL 3
+            var itservice = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = digi,
+                Name = "IT Service"
+            };
+            var projectunit = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = digi,
+                Name = "Projektenheden"
+            };
+            var citizenservice = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = digi,
+                Name = "Borgerservice"
+            };
+            var hr = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = hrcouncil,
+                Name = "HR"
+            };
+            var nursinghome = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = elderArea,
+                Name = "Plejehjem"
+            };
+
+            //LEVEL 4
+            var infra = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = itservice,
+                Name = "Infrastruktur"
+            };
+            var teamcontact = new OrganizationUnit()
+            {
+                Organization = roskilde, ObjectOwner = globalUser,
+                Parent = citizenservice,
+                Name = "Team Kontaktcenter"
+            };
+
+            context.OrganizationUnits.AddOrUpdate(o => o.Name, munChief, wellfare, digi, hrcouncil, elderArea, itservice, projectunit, citizenservice, hr, nursinghome, infra, teamcontact);
+            context.SaveChanges();
+
+            #endregion
+
+            #region SORØ ORG UNITS
+
+            //LEVEL 0
+            var sorøRoot = sorø.OrgUnits.First();
+
+            //LEVEL 1
+            var level1a = new OrganizationUnit()
+            {
+                Organization = sorø, ObjectOwner = globalUser,
+                Parent = sorøRoot,
+                Name = "Direktørområde"
+            };
+
+            //LEVEL 2
+            var level2a = new OrganizationUnit()
+            {
+                Organization = sorø, ObjectOwner = globalUser,
+                Parent = level1a,
+                Name = "Afdeling 1"
+            };
+
+            var level2b = new OrganizationUnit()
+            {
+                Organization = sorø, ObjectOwner = globalUser,
+                Parent = level1a,
+                Name = "Afdeling 2"
+            };
+
+            var level2c = new OrganizationUnit()
+            {
+                Organization = sorø, ObjectOwner = globalUser,
+                Parent = level1a,
+                Name = "Afdeling 3"
+            };
+
+            //LEVEL 2
+            var level3a = new OrganizationUnit()
+            {
+                Organization = sorø, ObjectOwner = globalUser,
+                Parent = level2a,
+                Name = "Afdeling 1a"
+            };
+
+            var level3b = new OrganizationUnit()
+            {
+                Organization = sorø, ObjectOwner = globalUser,
+                Parent = level2b,
+                Name = "Afdeling 2a"
+            };
+
+            var level3c = new OrganizationUnit()
+            {
+                Organization = sorø, ObjectOwner = globalUser,
+                Parent = level2b,
+                Name = "Afdeling 2b"
+            };
+
+            context.OrganizationUnits.AddOrUpdate(o => o.Name, level1a, level2a, level2b, level2c, level3a, level3b, level3c);
+            context.SaveChanges();
+
+            #endregion
+
+            #region KL ORG UNITS
+
+            var klRootUnit = kl.OrgUnits.First();
+
+            #endregion
+
+            #region TEXTS
+
+            context.Texts.AddOrUpdate(x => x.Id,
+                                      new Text() { Value = "Head", ObjectOwner = globalUser },
+                                      new Text() { Value = "Body", ObjectOwner = globalUser });
+
+            #endregion
+
+            #region KLE
+
+            var task00 = new TaskRef()
+            {
+                TaskKey = "00",
+                Description = "Kommunens styrelse",
+                Type = "KLE-Hovedgruppe",
+                IsPublic = true,
+                OwnedByOrganizationUnit = klRootUnit,
+                ObjectOwner = globalUser
+            };
+            var task0001 = new TaskRef()
+            {
+                TaskKey = "00.01",
+                Description = "Kommunens styrelse",
+                Type = "KLE-Gruppe",
+                Parent = task00,
+                IsPublic = true,
+                OwnedByOrganizationUnit = klRootUnit,
+                ObjectOwner = globalUser
+            };
+            var task0003 = new TaskRef()
+            {
+                TaskKey = "00.03",
+                Description = "International virksomhed og EU",
+                Type = "KLE-Gruppe",
+                Parent = task00,
+                IsPublic = true,
+                OwnedByOrganizationUnit = klRootUnit,
+                ObjectOwner = globalUser
+            };
+            context.TaskRefs.AddOrUpdate(x => x.TaskKey,
+                                         task00,
+                                         task0001,
+                                         new TaskRef()
+                                         {
+                                             TaskKey = "00.01.00",
+                                             Description = "Kommunens styrelse i almindelighed",
+                                             Type = "KLE-Emne",
+                                             Parent = task0001,
+                                             IsPublic = true,
+                                             OwnedByOrganizationUnit = klRootUnit,
+                                             ObjectOwner = globalUser
+                                         },
+                                         new TaskRef()
+                                         {
+                                             TaskKey = "00.01.10",
+                                             Description = "Opgaver der dækker flere hovedgrupper",
+                                             Type = "KLE-Emne",
+                                             Parent = task0001,
+                                             IsPublic = true,
+                                             OwnedByOrganizationUnit = klRootUnit,
+                                             ObjectOwner = globalUser
+                                         },
+                                         task0003,
+                                         new TaskRef()
+                                         {
+                                             TaskKey = "00.03.00",
+                                             Description = "International virksomhed og EU i almindelighed",
+                                             Type = "KLE-Emne",
+                                             Parent = task0003,
+                                             IsPublic = true,
+                                             OwnedByOrganizationUnit = klRootUnit,
+                                             ObjectOwner = globalUser
+                                         },
+                                         new TaskRef()
+                                         {
+                                             TaskKey = "00.03.02",
+                                             Description = "Internationale organisationers virksomhed",
+                                             Type = "KLE-Emne",
+                                             Parent = task0003,
+                                             IsPublic = true,
+                                             OwnedByOrganizationUnit = klRootUnit,
+                                             ObjectOwner = globalUser
+                                         },
+                                         new TaskRef()
+                                         {
+                                             TaskKey = "00.03.04",
+                                             Description = "Regionaludvikling EU",
+                                             Type = "KLE-Emne",
+                                             Parent = task0003,
+                                             IsPublic = true,
+                                             OwnedByOrganizationUnit = klRootUnit,
+                                             ObjectOwner = globalUser
+                                         },
+                                         new TaskRef()
+                                         {
+                                             TaskKey = "00.03.08",
+                                             Description = "EU-interessevaretagelse",
+                                             Type = "KLE-Emne",
+                                             Parent = task0003,
+                                             IsPublic = true,
+                                             OwnedByOrganizationUnit = klRootUnit,
+                                             ObjectOwner = globalUser
+                                         },
+                                         new TaskRef()
+                                         {
+                                             TaskKey = "00.03.10",
+                                             Description = "Internationalt samarbejde",
+                                             Type = "KLE-Emne",
+                                             Parent = task0003,
+                                             IsPublic = true,
+                                             OwnedByOrganizationUnit = klRootUnit,
+                                             ObjectOwner = globalUser
+                                         });
+
+            #endregion
+        }
+
+        /// <summary>
+        /// Creates and returns an Option entity.
+        /// </summary>
+        /// <typeparam name="T">Type of option to be added.</typeparam>
+        /// <typeparam name="TReference">Reference type for the option</typeparam>
+        /// <param name="name">The name of the new option entity</param>
+        /// <param name="objectOwner">Object owner of the new entity</param>
+        /// <param name="note">Note for the entity</param>
+        /// <param name="isActive">Is the option active</param>
+        /// <param name="isSuggestion">Is the option an suggestion</param>
+        /// <returns></returns>
+        private T CreateOption<T, TReference>(string name, User objectOwner, string note = "...", bool isActive = true, bool isSuggestion = false)
+            where T : Entity, IOptionEntity<TReference>, new()
+        {
+            return new T()
+                {
+                    IsActive = isActive,
+                    IsSuggestion = isSuggestion,
+                    Name = name,
+                    Note = note,
+                    ObjectOwner = objectOwner
+                };
+        }
+
+        /// <summary>
+        /// Helper method for quickly adding a lot of Option entities
+        /// </summary>
+        /// <typeparam name="T">Type of option to be added.</typeparam>
+        /// <typeparam name="TReference">Reference type for the option</typeparam>
+        /// <param name="dbSet">The db set to add too</param>
+        /// <param name="objectOwner">Object owner of the new entities</param>
+        /// <param name="names">The names of the new options</param>
+        private void AddOptions<T, TReference>(DbSet<T> dbSet, User objectOwner, params string[] names)
+            where T : Entity, IOptionEntity<TReference>, new()
+        {
+            var options = names.Select(name => CreateOption<T, TReference>(name, objectOwner)).ToArray();
+            dbSet.AddOrUpdate(x => x.Name, options);
+        } 
+
+        /// <summary>
+        /// Creates and returns a User
+        /// </summary>
+        /// <param name="name">User name</param>
+        /// <param name="email">User email</param>
+        /// <param name="password">User password</param>
+        /// <param name="cryptoService">The cryptoservice used to encrypt the password of the user</param>
+        /// <param name="objectOwner"></param>
+        /// <returns></returns>
+        private User CreateUser(string name, string email, string password, CryptoService cryptoService, User objectOwner = null)
+        {
+            var salt = cryptoService.Encrypt(name + "salt");
+            return new User()
+                {
+                    Name = name,
+                    Email = email,
+                    Salt = salt,
+                    Password = cryptoService.Encrypt(password + salt),
+                    ObjectOwner = objectOwner
+                };
+        }
+
+        private Organization CreateOrganization(string name, OrganizationType organizationType, User objectOwner = null)
+        {
+            var org = new Organization
+            {
+                Name = name,
+                Config = Config.Default(objectOwner),
+                Type = organizationType,
+                ObjectOwner = objectOwner
+            };
+
+            org.OrgUnits.Add(new OrganizationUnit()
+            {
+                Name = org.Name,
+                ObjectOwner = objectOwner
+            });
+
+            return org;
+        }
+        
+        //TODO REMOVE THIS
+        private void OldSeed(Infrastructure.DataAccess.KitosContext context)
         {
             //  This method will be called after migrating to the latest version.
 
@@ -49,19 +677,19 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Drop Down Data
 
-            var itProjectCategoryPublic = new ItProjectCategory() {IsActive = true, Note = "...", Name = "Fællesoffentlig"};
+            var itProjectCategoryPublic = new ItProjectCategory() { IsActive = true, Note = "...", Name = "Fællesoffentlig" };
             var itProjectCategoryMunipalicity = new ItProjectCategory() { IsActive = true, Note = "...", Name = "Fælleskommunal" };
             context.ProjectCategories.AddOrUpdate(x => x.Name, itProjectCategoryPublic, itProjectCategoryMunipalicity);
 
-            var itProjectTypeProject = new ItProjectType() {IsActive = true, Note = "...", Name = "IT Projekt"};
-            var itProjectTypeProgram = new ItProjectType() {IsActive = true, Note = "...", Name = "IT Program"};
+            var itProjectTypeProject = new ItProjectType() { IsActive = true, Note = "...", Name = "IT Projekt" };
+            var itProjectTypeProgram = new ItProjectType() { IsActive = true, Note = "...", Name = "IT Program" };
             context.ProjectTypes.AddOrUpdate(x => x.Name,
                                              itProjectTypeProject,
                                              itProjectTypeProgram,
                                              new ItProjectType() { IsActive = true, Note = "En samlebetegnelse for projekter, som ikke er et IT Program", Name = "Indsatsområde" });
 
-            var appType1 = new AppType() {IsActive = true, Note = "...", Name = "Snitflade"};
-            var appType2 = new AppType() {IsActive = true, Note = "...", Name = "Fagsystem"};
+            var appType1 = new AppType() { IsActive = true, Note = "...", Name = "Snitflade" };
+            var appType2 = new AppType() { IsActive = true, Note = "...", Name = "Fagsystem" };
             context.AppTypes.AddOrUpdate(x => x.Name,
                                             appType1, appType2,
                                             new AppType() { IsActive = true, Note = "...", Name = "Selvbetjening" }
@@ -73,8 +701,8 @@ namespace Infrastructure.DataAccess.Migrations
                                               businessType1, businessType2);
 
             context.Interfaces.AddOrUpdate(x => x.Name,
-                                           new Interface() {IsActive = true, Note = "...", Name = "Grænseflade 1"},
-                                           new Interface() {IsActive = true, Note = "...", Name = "Grænseflade 2"},
+                                           new Interface() { IsActive = true, Note = "...", Name = "Grænseflade 1" },
+                                           new Interface() { IsActive = true, Note = "...", Name = "Grænseflade 2" },
                                            new Interface() { IsActive = true, Note = "...", Name = "Grænseflade 3" });
 
             context.Tsas.AddOrUpdate(x => x.Name,
@@ -181,11 +809,7 @@ namespace Infrastructure.DataAccess.Migrations
             var frequency4 = new Frequency() { IsActive = true, Note = "...", Name = "Årligt" };
 
             context.Frequencies.AddOrUpdate(x => x.Name, frequency1, frequency2, frequency3, frequency4);
-
-            context.InterfaceCategories.AddOrUpdate(x => x.Name, 
-                new InterfaceCategory(){ IsActive = true, Note = "...", Name = "Kategori 1" },
-                new InterfaceCategory(){ IsActive = true, Note = "...", Name = "Kategori 2" });
-
+            
             context.SaveChanges();
 
 
@@ -208,40 +832,6 @@ namespace Infrastructure.DataAccess.Migrations
                     Note = "Ref. til andre steder, hvor der er projektdokumenter"
                 };
             context.ExtReferenceTypes.AddOrUpdate(x => x.Name, extRef1, extRef2, extRef3);
-
-            var projPhase1 = new ProjectPhase()
-                {
-                    IsActive = true,
-                    Name = "Afventer",
-                    Note = "..."
-                };
-
-            context.ProjectPhases.AddOrUpdate(x => x.Name, projPhase1,
-                new ProjectPhase()
-                    {
-                        IsActive = true,
-                        Name = "Foranalyse",
-                        Note = "..."
-                    },
-                new ProjectPhase()
-                    {
-                        IsActive = true,
-                        Name = "Gennemførsel",
-                        Note = "..."
-                    },
-                new ProjectPhase()
-                    {
-                        IsActive = true,
-                        Name = "Overlevering",
-                        Note = "..."
-                    },
-                new ProjectPhase()
-                    {
-                        IsActive = true,
-                        Name = "Drift",
-                        Note = "..."
-                    }
-                );
 
             var archiveTypeYes = new ArchiveType()
                 {
@@ -309,12 +899,12 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Organizations
 
-            var roskilde = organizationService.CreateOrganization("Roskilde", OrganizationType.Municipality);
-            var sorø = organizationService.CreateOrganization("Sorø", OrganizationType.Municipality);
-            var kl = organizationService.CreateOrganization("KL", OrganizationType.Municipality);
-            var companyA = organizationService.CreateOrganization("Firma A", OrganizationType.Company);
-            var companyB = organizationService.CreateOrganization("Firma B", OrganizationType.Company);
-            var companyC = organizationService.CreateOrganization("Firma C", OrganizationType.Company);
+            var roskilde = CreateOrganization("Roskilde", OrganizationType.Municipality, null);
+            var sorø = CreateOrganization("Sorø", OrganizationType.Municipality, null);
+            var kl = CreateOrganization("KL", OrganizationType.Municipality, null);
+            var companyA = CreateOrganization("Firma A", OrganizationType.Company, null);
+            var companyB = CreateOrganization("Firma B", OrganizationType.Company, null);
+            var companyC = CreateOrganization("Firma C", OrganizationType.Company, null);
 
             context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø, kl, companyA, companyB, companyC);
 
@@ -542,25 +1132,25 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Users
 
-            var simon = SimpleUser("Simon Lynn-Pedersen", "slp@it-minds.dk", "slp123", cryptoService);
+            var simon = CreateUser("Simon Lynn-Pedersen", "slp@it-minds.dk", "slp123", cryptoService);
             simon.IsGlobalAdmin = true;
-            
-            var eskild = SimpleUser("Eskild", "esd@it-minds.dk", "123", cryptoService);
+
+            var eskild = CreateUser("Eskild", "esd@it-minds.dk", "123", cryptoService);
             eskild.IsGlobalAdmin = true;
 
-            var globalUser = SimpleUser("Global Test Bruger", "g@test", "test", cryptoService);
+            var globalUser = CreateUser("Global Test Bruger", "g@test", "test", cryptoService);
             globalUser.IsGlobalAdmin = true;
 
-            var localUser = SimpleUser("Local Test Bruger", "l@test", "test", cryptoService);
+            var localUser = CreateUser("Local Test Bruger", "l@test", "test", cryptoService);
 
-            var roskildeUser1 = SimpleUser("Pia", "pia@it-minds.dk", "arne123", cryptoService);
-            var roskildeUser2 = SimpleUser("Morten", "morten@it-minds.dk", "arne123", cryptoService);
-            var roskildeUser3 = SimpleUser("Anders", "anders@it-minds.dk", "arne123", cryptoService);
-            var roskildeUser4 = SimpleUser("Peter", "peter@it-minds.dk", "arne123", cryptoService);
-            var roskildeUser5 = SimpleUser("Jesper", "jesper@it-minds.dk", "arne123", cryptoService);
-            var roskildeUser6 = SimpleUser("Brian", "briana@roskilde.dk", "123", cryptoService);
+            var roskildeUser1 = CreateUser("Pia", "pia@it-minds.dk", "arne123", cryptoService);
+            var roskildeUser2 = CreateUser("Morten", "morten@it-minds.dk", "arne123", cryptoService);
+            var roskildeUser3 = CreateUser("Anders", "anders@it-minds.dk", "arne123", cryptoService);
+            var roskildeUser4 = CreateUser("Peter", "peter@it-minds.dk", "arne123", cryptoService);
+            var roskildeUser5 = CreateUser("Jesper", "jesper@it-minds.dk", "arne123", cryptoService);
+            var roskildeUser6 = CreateUser("Brian", "briana@roskilde.dk", "123", cryptoService);
             roskildeUser6.IsGlobalAdmin = true;
-            var roskildeUser7 = SimpleUser("Erik", "ehl@kl.dk", "123", cryptoService);
+            var roskildeUser7 = CreateUser("Erik", "ehl@kl.dk", "123", cryptoService);
 
             context.Users.AddOrUpdate(x => x.Email, simon, eskild, globalUser, localUser, roskildeUser1, roskildeUser2, roskildeUser3, roskildeUser4, roskildeUser5, roskildeUser6, roskildeUser7);
 
@@ -648,8 +1238,8 @@ namespace Infrastructure.DataAccess.Migrations
             #region Texts
 
             context.Texts.AddOrUpdate(x => x.Id,
-                                      new Text() { Id = "intro-head", Value = "Head" },
-                                      new Text() { Id = "intro-body", Value = "Body" });
+                                      new Text() { Value = "Head" },
+                                      new Text() { Value = "Body" });
 
             #endregion
 
@@ -1058,29 +1648,8 @@ namespace Infrastructure.DataAccess.Migrations
             context.ItContracts.AddOrUpdate(x => x.Name, itContractA, itContractNode1, itContractNode11, itContractNode111, itContractNode12, itContractNode121, itContractNode2);
 
             #endregion
-
-            context.ProjectPhaseLocales.AddOrUpdate(x => new { x.MunicipalityId, x.OriginalId },
-                                                    new ProjPhaseLocale()
-                                                        {
-                                                            Organization = roskilde,
-                                                            Original = projPhase1,
-                                                            Name = "Pending"
-                                                        }
-                );
-
+            
             base.Seed(context);
-        }
-
-        private User SimpleUser(string name, string email, string password, CryptoService cryptoService)
-        {
-            var salt = cryptoService.Encrypt(name + "salt");
-            return new User()
-                {
-                    Name = name,
-                    Email = email,
-                    Salt = salt,
-                    Password = cryptoService.Encrypt(password + salt)
-                };
         }
 
         private ItProject SimpleProject(string name, User owner, Organization organization, ItProjectCategory projectCategory, ItProjectType type, Activity phase1)

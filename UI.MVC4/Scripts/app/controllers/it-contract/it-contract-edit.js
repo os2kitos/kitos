@@ -56,7 +56,7 @@
                     });
                 }],
                 hasWriteAccess: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itcontractright/" + $stateParams.id + "?hasWriteAccess")
+                    return $http.get("api/itcontract/" + $stateParams.id + "?hasWriteAccess")
                         .then(function (result) {
                             return result.data.response;
                         });
@@ -155,9 +155,15 @@
                     }
                 };
 
+                function clearNewAgreementItem() {
+                    $scope.newItem = {};
+                }
+
+                clearNewAgreementItem();
+
                 $scope.saveCustomElem = function() {
                     var payload = {
-                        name: $scope.newElement,
+                        name: $scope.newItem.name,
                         itContractId: $stateParams.id
                     };
                     var msg = notify.addInfoMessage("Gemmer...", false);
@@ -165,7 +171,7 @@
                         .success(function(result) {
                             msg.toSuccessMessage("Feltet er oprettet.");
                             $scope.customAgreementElements.push(result.response);
-                            delete $scope.newElement;
+                            clearNewAgreementItem();
                         })
                         .error(function() {
                             msg.toErrorMessage("Fejl! Feltet kunne ikke oprettes!");
@@ -210,8 +216,6 @@
                             var selectedUser = $scope.contractSigner.userForSelect;
                             var signerId = selectedUser ? selectedUser.id : null;
                             var signerUser = selectedUser ? selectedUser.user : null;
-                            
-                            console.log($scope.contractSigner);
 
                             $http({
                                 method: 'PATCH',

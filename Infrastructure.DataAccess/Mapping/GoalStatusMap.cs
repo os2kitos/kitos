@@ -3,21 +3,18 @@ using Core.DomainModel.ItProject;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class GoalStatusMap : EntityTypeConfiguration<GoalStatus>
+    public class GoalStatusMap : EntityMap<GoalStatus>
     {
         public GoalStatusMap()
         {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
             // Properties
             // Table & Column Mappings
             this.ToTable("GoalStatus");
-            this.Property(t => t.Id).HasColumnName("Id");
 
             // Relationships
             this.HasRequired(t => t.ItProject)
-                .WithOptional(t => t.GoalStatus);
+                .WithOptional(t => t.GoalStatus)
+                .WillCascadeOnDelete(true);
 
         }
     }

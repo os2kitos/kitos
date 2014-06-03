@@ -2,14 +2,13 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItContract
 {
-    public class PaymentFreqency : IOptionEntity<ItContract>
+    public class PaymentFreqency : Entity, IOptionEntity<ItContract>
     {
         public PaymentFreqency()
         {
             References = new List<ItContract>();
         }
 
-        public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }

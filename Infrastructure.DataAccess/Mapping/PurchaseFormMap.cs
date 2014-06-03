@@ -3,17 +3,7 @@ using Core.DomainModel.ItContract;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class PurchaseFormMap : EntityTypeConfiguration<PurchaseForm>
+    public class PurchaseFormMap : OptionEntityMap<PurchaseForm, ItContract>
     {
-        public PurchaseFormMap()
-        {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
-            // Properties
-            // Table & Column Mappings
-            this.ToTable("PurchaseForm");
-            this.Property(t => t.Id).HasColumnName("Id");
-        }
     }
 }

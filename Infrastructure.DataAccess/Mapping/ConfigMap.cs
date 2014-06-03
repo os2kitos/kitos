@@ -3,7 +3,7 @@ using Core.DomainModel;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ConfigMap : EntityTypeConfiguration<Config>
+    public class ConfigMap : EntityMap<Config>
     {
         public ConfigMap()
         {

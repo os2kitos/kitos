@@ -3,25 +3,16 @@ using Core.DomainModel;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class AdminRightMap : EntityTypeConfiguration<AdminRight>
+    public class AdminRightMap : RightMap<Organization, AdminRight, AdminRole>
     {
         public AdminRightMap()
         {
-            this.HasKey(right => new { right.ObjectId, right.RoleId, right.UserId });
-
-            this.ToTable("AdminRight");
-
-            this.HasRequired(right => right.Object)
-                .WithMany(org => org.AdminRights)
-                .HasForeignKey(right => right.ObjectId);
-
-            this.HasRequired(right => right.Role)
-                .WithMany(role => role.References)
-                .HasForeignKey(right => right.RoleId);
-
-            this.HasRequired(right => right.User)
-                .WithMany(user => user.AdminRights)
-                .HasForeignKey(right => right.UserId);
+            //This is already mapped in ctor of RightMap, but
+            //because we need to specify the nav property on user,
+            //we need to remap
+            this.HasRequired(t => t.User)
+                .WithMany(d => d.AdminRights)
+                .HasForeignKey(t => t.UserId);
         }
     }
 }

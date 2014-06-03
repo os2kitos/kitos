@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Core.DomainModel
+﻿namespace Core.DomainModel
 {
-    public class AdminRight : IRight<Organization, AdminRole>
+    public class AdminRight : Entity, IRight<Organization, AdminRight, AdminRole>
     {
         public int UserId { get; set; }
         public int RoleId { get; set; }

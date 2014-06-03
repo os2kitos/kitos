@@ -38,7 +38,7 @@
             
             _.each(projects, function(project) {
                 // fetch assigned roles for each project
-                $http.get('api/itprojectright/' + project.id).success(function (result) {
+                $http.get('api/itproject/' + project.id + '?rights').success(function (result) {
                     project.roles = result.response;
                 });
                 
@@ -54,7 +54,6 @@
 
             _.each(orgUnits, function(orgUnit) {
                 visitOrgUnit(orgUnit);
-                hasWriteAccess(orgUnit, false);
             });
 
             checkForDefaultUnit();
@@ -89,25 +88,6 @@
 
                 $scope.chosenOrgUnitId = user.defaultOrganizationUnitId;
                 filterProjects();
-            }
-            
-            
-            function hasWriteAccess(orgUnit, inherit) {
-                if (inherit) {
-                    orgUnit.hasWriteAccess = true;
-
-                    _.each(orgUnit.children, function (child) {
-                        hasWriteAccess(child, true);
-                    });
-                } else {
-                    $http.get('api/organizationRight?hasWriteAccess&oId=' + orgUnit.id + '&uId=' + user.id).success(function (result) {
-                        orgUnit.hasWriteAccess = result.response;
-
-                        _.each(orgUnit.children, function (child) {
-                            hasWriteAccess(child, result.response);
-                        });
-                    });
-                }
             }
             
             $scope.selectOrgUnitOptions = {

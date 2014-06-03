@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class Tsa : IOptionEntity<ItSystem>
+    public class Tsa : Entity, IOptionEntity<ItSystem>
     {
         public Tsa()
         {
             References = new List<ItSystem>();
         }
 
-        public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }

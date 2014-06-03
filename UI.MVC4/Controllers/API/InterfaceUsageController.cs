@@ -9,7 +9,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class InterfaceUsageController : GenericApiController<InterfaceUsage, int, InterfaceUsageDTO>
+    public class InterfaceUsageController : GenericApiController<InterfaceUsage, InterfaceUsageDTO>
     {
         private readonly IGenericRepository<ItSystem> _systemRepository;
         private readonly IItSystemUsageService _itSystemUsageService;
@@ -28,6 +28,7 @@ namespace UI.MVC4.Controllers.API
         public override System.Net.Http.HttpResponseMessage Post(InterfaceUsageDTO dto)
         {
             return NotAllowed();
-        }
+        }
+
     }
 }

@@ -3,17 +3,13 @@ using Core.DomainModel;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class PasswordResetRequestMap : EntityTypeConfiguration<PasswordResetRequest>
+    public class PasswordResetRequestMap : EntityMap<PasswordResetRequest>
     {
         public PasswordResetRequestMap()
         {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
             // Properties
             // Table & Column Mappings
             this.ToTable("PasswordResetRequest");
-            this.Property(t => t.Id).HasColumnName("Id");
             this.Property(t => t.Time).HasColumnName("Time");
             this.Property(t => t.UserId).HasColumnName("UserId");
 

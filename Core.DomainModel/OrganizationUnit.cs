@@ -4,11 +4,10 @@ using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
 {
-    public class OrganizationUnit : IEntity<int>, IHasRights<OrganizationRight>
+    public class OrganizationUnit : HasRightsEntity<OrganizationUnit, OrganizationRight, OrganizationRole>
     {
         public OrganizationUnit()
         {
-            this.Rights = new List<OrganizationRight>();
             this.TaskUsages = new List<TaskUsage>();
             this.TaskRefs = new List<TaskRef>();
             this.OwnedTasks = new List<TaskRef>();
@@ -17,7 +16,6 @@ namespace Core.DomainModel
             this.UsingItProjects = new List<ItProject.ItProject>();
         }
 
-        public int Id { get; set; }
         public string Name { get; set; }
         public int? Ean { get; set; }
 
@@ -28,7 +26,6 @@ namespace Core.DomainModel
         public int OrganizationId { get; set; }
         public virtual Organization Organization { get; set; }
 
-        public virtual ICollection<OrganizationRight> Rights { get; set; }
         public virtual ICollection<TaskUsage> TaskUsages { get; set; }
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
         public virtual ICollection<TaskRef> OwnedTasks { get; set; }
@@ -64,5 +61,20 @@ namespace Core.DomainModel
         /// The Organization Unit is listed in these economy streams
         /// </summary>
         public virtual ICollection<EconomyStream> EconomyStreams { get; set; }
+
+        public override bool HasUserWriteAccess(User user)
+        {
+            //if user has write access to the organisation, 
+            //user has write access to the org unit
+            if (Organization.HasUserWriteAccess(user)) return true;
+
+            //Check rights on this org unit
+            if (base.HasUserWriteAccess(user)) return true;
+
+            //Check rights on parent org unit
+            if (Parent != null && Parent.HasUserWriteAccess(user)) return true;
+
+            return false;
+        }
     }
 }

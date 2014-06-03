@@ -3,12 +3,15 @@ using Core.DomainModel;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class UserMap : EntityTypeConfiguration<User>
+    public class UserMap : EntityMap<User>
     {
         public UserMap()
         {
-            // Primary Key
-            this.HasKey(t => t.Id);
+            //User does NOT require an ObjectOwner!
+            //Otherwise, we cannot add the first user to the system
+            this.HasOptional(t => t.ObjectOwner)
+                .WithMany()
+                .HasForeignKey(t => t.ObjectOwnerId);
 
             // Properties
             this.Property(t => t.Name)

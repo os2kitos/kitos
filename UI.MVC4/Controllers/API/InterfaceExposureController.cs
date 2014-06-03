@@ -5,11 +5,8 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class InterfaceExposureController : GenericApiController<InterfaceExposure, int, InterfaceExposureDTO>
+    public class InterfaceExposureController : GenericApiController<InterfaceExposure, InterfaceExposureDTO>
     {
-        private readonly IGenericRepository<ItSystem> _systemRepository;
-        private readonly IItSystemUsageService _itSystemUsageService;
-
         public InterfaceExposureController(IGenericRepository<InterfaceExposure> repository)
             : base(repository)
         {

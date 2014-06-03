@@ -3,13 +3,10 @@ using Core.DomainModel.ItProject;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class CommunicationMap : EntityTypeConfiguration<Communication>
+    public class CommunicationMap : EntityMap<Communication>
     {
         public CommunicationMap()
         {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
             // Properties
             // Table & Column Mappings
             this.ToTable("Communication");

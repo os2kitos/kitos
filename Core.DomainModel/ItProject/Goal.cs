@@ -2,10 +2,8 @@ using System;
 
 namespace Core.DomainModel.ItProject
 {
-    public class Goal : IEntity<int>
+    public class Goal : Entity
     {
-        public int Id { get; set; }
-
         public int GoalStatusId { get; set; }
         public virtual GoalStatus GoalStatus { get; set; }
 
@@ -36,5 +34,12 @@ namespace Core.DomainModel.ItProject
         public string SubGoalRea3 { get; set; }
 
         public int Status { get; set; }
+
+        public override bool HasUserWriteAccess(User user)
+        {
+            if (GoalStatus != null && GoalStatus.HasUserWriteAccess(user)) return true;
+
+            return base.HasUserWriteAccess(user);
+        }
     }
 }

@@ -3,15 +3,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class SensitiveDataTypeMap : EntityTypeConfiguration<SensitiveDataType>
+    public class SensitiveDataTypeMap : OptionEntityMap<SensitiveDataType, ItSystemUsage>
     {
-        public SensitiveDataTypeMap()
-        {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
-            // Table & Column Mappings
-            this.ToTable("SensitiveDataType");
-        }
     }
 }

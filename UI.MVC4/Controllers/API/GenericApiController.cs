@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Security;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
@@ -9,8 +10,8 @@ using UI.MVC4.Models.Exceptions;
 
 namespace UI.MVC4.Controllers.API
 {
-    public abstract class GenericApiController<TModel, TKeyType, TDto> : BaseApiController // TODO perhaps it's possible to infer the TKeyType from TModel somehow
-        where TModel : class, IEntity<TKeyType>
+    public abstract class GenericApiController<TModel, TDto> : BaseApiController
+        where TModel : Entity
     {
         protected readonly IGenericRepository<TModel> Repository;
 
@@ -18,62 +19,62 @@ namespace UI.MVC4.Controllers.API
         {
             Repository = repository;
         }
-
-        #region mapping functions
-
-        //for easy access
-        protected virtual TDto Map(TModel model)
-        {
-            return Map<TModel, TDto>(model);
-        }
-
-        //for easy access
-        protected virtual TModel Map(TDto dto)
-        {
-            return Map<TDto, TModel>(dto);
-        }
-
-        //for easy access (list)
-        protected virtual IEnumerable<TDto> Map(IEnumerable<TModel> models)
-        {
-            return Map<IEnumerable<TModel>, IEnumerable<TDto>>(models);
-        }
-
-        //for easy access (list)
-        protected virtual IEnumerable<TModel> Map(IEnumerable<TDto> dtos)
-        {
-            return Map<IEnumerable<TDto>, IEnumerable<TModel>>(dtos);
-        }
-
-        protected virtual TDest Map<TSource, TDest>(TSource item)
-        {
-            return AutoMapper.Mapper.Map<TDest>(item);
-        }
-
-        #endregion
-
+        
         protected virtual IEnumerable<TModel> GetAllQuery()
         {
             //TODO: remove this hardcode and do some proper paging
             return Repository.Get().Take(100);
         }
 
-        public HttpResponseMessage GetAll()
+        public virtual HttpResponseMessage GetAll()
         {
-            var items = GetAllQuery();
+            try
+            {
+                var items = GetAllQuery();
 
-            return Ok(Map<IEnumerable<TModel>, IEnumerable<TDto>>(items));
+                return Ok(Map(items));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
         }
 
         // GET api/T
-        public HttpResponseMessage GetSingle(TKeyType id)
+        public virtual HttpResponseMessage GetSingle(int id)
         {
-            var item = Repository.GetByKey(id);
+            try
+            {
+                var item = Repository.GetByKey(id);
 
-            if (item == null)
-                return NotFound();
+                if (item == null) return NotFound();
 
-            return Ok(Map<TModel, TDto>(item));
+                return Ok(Map(item));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        /// <summary>
+        /// GET api/T/id?hasWriteAccess
+        /// Returns whether the current authenticated user has write access 
+        /// to the object with the given id
+        /// </summary>
+        /// <param name="id">The id of the object</param>
+        /// <param name="hasWriteAccess">Route qualifier</param>
+        /// <returns>True or false</returns>
+        public HttpResponseMessage GetHasWriteAccess(int id, bool? hasWriteAccess)
+        {
+            try
+            {
+                return Ok(HasWriteAccess(id));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
         }
 
         protected virtual TModel PostQuery(TModel item)
@@ -85,20 +86,17 @@ namespace UI.MVC4.Controllers.API
         }
 
         // POST api/T
-        //[Authorize(Roles = "GlobalAdmin")] TODO: FIX!
         public virtual HttpResponseMessage Post(TDto dto)
         {
             try
             {
                 var item = Map<TDto, TModel>(dto);
 
-                if (item is IHasOwner)
-                    (item as IHasOwner).ObjectOwner = KitosUser;
+                item.ObjectOwner = KitosUser;
 
                 PostQuery(item);
 
-                //var msg = new HttpResponseMessage(HttpStatusCode.Created);
-                return Created(Map<TModel, TDto>(item), new Uri(Request.RequestUri + "/" + item.Id));
+                return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
             }
             catch (ConflictException e)
             {
@@ -119,42 +117,47 @@ namespace UI.MVC4.Controllers.API
         }
 
         // PUT api/T
-        //[Authorize(Roles = "GlobalAdmin")] TODO: FIX!
-        public virtual HttpResponseMessage Put(TKeyType id, TDto dto)
+        public virtual HttpResponseMessage Put(int id, TDto dto)
         {
-            var item = Map<TDto, TModel>(dto);
-            item.Id = id;
             try
             {
-                PutQuery(item);
+                var oldItem = Repository.GetByKey(id);
+                if (!HasWriteAccess(oldItem)) return Unauthorized();
 
-                return Ok(); //TODO correct?
+                var newItem = Map(dto);
+                newItem.Id = id;
+
+                PutQuery(newItem);
+
+                return Ok();
             }
             catch (Exception)
             {
-                return NoContent(); // TODO catch correct expection
+                return NoContent();
             }
         }
 
-        protected virtual void DeleteQuery(TKeyType id)
+        protected virtual void DeleteQuery(int id)
         {
             Repository.DeleteByKey(id);
             Repository.Save();
         }
 
         // DELETE api/T
-        //[Authorize(Roles = "GlobalAdmin")] TODO: FIX!
-        public virtual HttpResponseMessage Delete(TKeyType id)
+        public virtual HttpResponseMessage Delete(int id)
         {
             try
             {
+                var item = Repository.GetByKey(id);
+                if (!HasWriteAccess(item)) return Unauthorized();
+
                 DeleteQuery(id);
 
                 return Ok();
             }
             catch (Exception e)
             {
-                return Error(e); // TODO catch correct expection
+                return Error(e);
             }
         }
 
@@ -167,64 +170,63 @@ namespace UI.MVC4.Controllers.API
         }
 
         // PATCH api/T
-        //[Authorize(Roles = "GlobalAdmin")] TODO: FIX!
-        public virtual HttpResponseMessage Patch(TKeyType id, JObject obj)
+        public virtual HttpResponseMessage Patch(int id, JObject obj)
         {
-            var item = Repository.GetByKey(id);
-            var itemType = item.GetType();
-
-            foreach (var valuePair in obj)
-            {
-                // get name of mapped property
-                var map =
-                    AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>()
-                              .GetPropertyMaps();
-                var nonNullMaps = map.Where(x => x.SourceMember != null);
-                var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name.Equals(valuePair.Key, StringComparison.InvariantCultureIgnoreCase));
-                if (mapMember == null) 
-                    continue; // abort if no map found
-
-                var destName = mapMember.DestinationProperty.Name;
-                var jToken = valuePair.Value;
-
-                var propRef = itemType.GetProperty(destName);
-                var t = propRef.PropertyType;
-
-                // we have to handle enums separately
-                if (t.IsEnum)
-                {
-                    var value = valuePair.Value.Value<int>();
-                    propRef.SetValue(item, value);
-                }
-                else
-                {
-                    try
-                    {
-                        // get reference to the generic method obj.Value<t>(parameter);
-                        var genericMethod = jToken.GetType().GetMethod("Value").MakeGenericMethod(new Type[] { t });
-                        // use reflection to call obj.Value<t>("keyName");
-                        var value = genericMethod.Invoke(obj, new object[] { valuePair.Key });
-                        // update the entity
-                        propRef.SetValue(item, value);
-                    }
-                    catch (Exception)
-                    {
-                        // if obj.Value<t>("keyName") cast fails set to fallback value
-                        propRef.SetValue(item, null); // TODO this is could be dangerous, should probably also be default(t)
-                    }
-                }
-            }
-
             try
             {
-                PatchQuery(item);
+                var item = Repository.GetByKey(id);
+                if (!HasWriteAccess(item)) return Unauthorized();
 
-                // pretty sure we'll get a merge conflict here???
-                return Ok(Map(item)); // TODO correct?
+                var itemType = item.GetType();
+
+                foreach (var valuePair in obj)
+                {
+                    // get name of mapped property
+                    var map =
+                        AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>()
+                                  .GetPropertyMaps();
+                    var nonNullMaps = map.Where(x => x.SourceMember != null);
+                    var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name.Equals(valuePair.Key, StringComparison.InvariantCultureIgnoreCase));
+                    if (mapMember == null)
+                        continue; // abort if no map found
+
+                    var destName = mapMember.DestinationProperty.Name;
+                    var jToken = valuePair.Value;
+
+                    var propRef = itemType.GetProperty(destName);
+                    var t = propRef.PropertyType;
+
+                    // we have to handle enums separately
+                    if (t.IsEnum)
+                    {
+                        var value = valuePair.Value.Value<int>();
+                        propRef.SetValue(item, value);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            // get reference to the generic method obj.Value<t>(parameter);
+                            var genericMethod = jToken.GetType().GetMethod("Value").MakeGenericMethod(new Type[] { t });
+                            // use reflection to call obj.Value<t>("keyName");
+                            var value = genericMethod.Invoke(obj, new object[] { valuePair.Key });
+                            // update the entity
+                            propRef.SetValue(item, value);
+                        }
+                        catch (Exception)
+                        {
+                            // if obj.Value<t>("keyName") cast fails set to fallback value
+                            propRef.SetValue(item, null); // TODO this is could be dangerous, should probably also be default(t)
+                        }
+                    }
+                }
+                
+                PatchQuery(item);
+                return Ok(Map(item));
             }
             catch (Exception e)
             {
-                return Error(e); // TODO catch correct expection
+                return Error(e);
             }
         }
 
@@ -233,5 +235,87 @@ namespace UI.MVC4.Controllers.API
             Repository.Dispose();
             base.Dispose(disposing);
         }
+
+        #region Write Access Checks functions
+
+        /// <summary>
+        /// Checks if a given user has write access to a given object. 
+        /// Override this method as needed.
+        /// </summary>
+        /// <param name="obj">The object</param>
+        /// <param name="user">The user</param>
+        /// <returns>True iff user has write access to obj</returns>
+        protected bool HasWriteAccess(TModel obj, User user)
+        {
+            return obj.HasUserWriteAccess(user);
+        }
+
+        /// <summary>
+        /// Checks if the current authenticated user has write access to a given object. 
+        /// </summary>
+        /// <param name="objId">The id of object</param>
+        /// <returns>True iff user has write access to the object with objId</returns>
+        protected bool HasWriteAccess(int objId)
+        {
+            return HasWriteAccess(objId, KitosUser);
+        }
+
+        /// <summary>
+        /// Checks if a given user has write access to a given object. 
+        /// </summary>
+        /// <param name="objId">The id of object</param>
+        /// <param name="user">The user</param>
+        /// <returns>True iff user has write access to the object with objId</returns>
+        protected bool HasWriteAccess(int objId, User user)
+        {
+            var obj = Repository.GetByKey(objId);
+            return HasWriteAccess(obj, user);
+        }
+
+        /// <summary>
+        /// Checks if the current authenticated user has write access to a given object. 
+        /// </summary>
+        /// <param name="obj">The object</param>
+        /// <returns>True iff user has write access to obj</returns>
+        protected bool HasWriteAccess(TModel obj)
+        {
+            return HasWriteAccess(obj, KitosUser);
+        }
+
+        #endregion
+
+        #region Mapping functions
+
+        //for easy access
+        protected virtual TDto Map(TModel model)
+        {
+            return Map<TModel, TDto>(model);
+        }
+
+        //for easy access
+        protected virtual TModel Map(TDto inputDto)
+        {
+            return Map<TDto, TModel>(inputDto);
+        }
+
+        //for easy access (list)
+        protected virtual IEnumerable<TDto> Map(IEnumerable<TModel> models)
+        {
+            return Map<IEnumerable<TModel>, IEnumerable<TDto>>(models);
+        }
+
+        //for easy access (list)
+        protected virtual IEnumerable<TModel> Map(IEnumerable<TDto> inputDtos)
+        {
+            return Map<IEnumerable<TDto>, IEnumerable<TModel>>(inputDtos);
+        }
+
+        protected virtual TDest Map<TSource, TDest>(TSource item)
+        {
+            return AutoMapper.Mapper.Map<TDest>(item);
+        }
+
+        #endregion
+
     }
 }

@@ -3,15 +3,13 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItProject
 {
-    public class GoalStatus : IEntity<int>
+    public class GoalStatus : Entity
     {
         public GoalStatus()
         {
             this.Goals = new List<Goal>();
         }
-
-        public int Id { get; set; }
-
+        
         public virtual ItProject ItProject { get; set; }
 
         /// <summary>
@@ -30,5 +28,11 @@ namespace Core.DomainModel.ItProject
 
         public virtual ICollection<Goal> Goals { get; set; }
 
+        public override bool HasUserWriteAccess(User user)
+        {
+            if (ItProject != null && ItProject.HasUserWriteAccess(user)) return true;
+
+            return base.HasUserWriteAccess(user);
+        }
     }
 }

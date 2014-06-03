@@ -8,16 +8,12 @@ using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    class InterfaceUsageMap : EntityTypeConfiguration<InterfaceUsage>
+    class InterfaceUsageMap : EntityMap<InterfaceUsage>
     {
         public InterfaceUsageMap()
         {
-            // Primary Key
-            this.HasKey(t => t.Id);
-            
             // Table & Column Mappings
             this.ToTable("InterfaceUsage");
-            this.Property(t => t.Id).HasColumnName("Id");
 
             this.HasRequired(t => t.ItSystemUsage)
                 .WithMany(d => d.InterfaceUsages)
@@ -37,10 +33,6 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.Infrastructure)
                 .WithMany(d => d.InfrastructureUsage)
                 .HasForeignKey(t => t.InfrastructureId);
-
-            this.HasOptional(t => t.InterfaceCategory)
-                .WithMany(d => d.References)
-                .HasForeignKey(t => t.InterfaceCategoryId);
 
         }
     }

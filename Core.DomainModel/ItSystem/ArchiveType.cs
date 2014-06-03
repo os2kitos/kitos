@@ -2,14 +2,13 @@
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ArchiveType : IOptionEntity<ItSystemUsage>
+    public class ArchiveType : Entity, IOptionEntity<ItSystemUsage>
     {
         public ArchiveType()
         {
             this.References = new List<ItSystemUsage>();
         }
 
-        public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }

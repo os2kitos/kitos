@@ -5,9 +5,8 @@ using System.Text;
 
 namespace Core.DomainModel
 {
-    public class TaskUsage : IEntity<int>
+    public class TaskUsage : Entity
     {
-        public int Id { get; set; }
         public int TaskRefId { get; set; }
         public int OrgUnitId { get; set; }
 
@@ -18,5 +17,12 @@ namespace Core.DomainModel
         public int TechnologyStatus { get; set; }
         public int UsageStatus { get; set; }
         public string Comment { get; set; }
+
+        public override bool HasUserWriteAccess(User user)
+        {
+            if (OrgUnit != null && OrgUnit.HasUserWriteAccess(user)) return true;
+
+            return base.HasUserWriteAccess(user);
+        }
     }
 }

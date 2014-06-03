@@ -5,15 +5,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItSystemRoleMap : EntityTypeConfiguration<ItSystemRole>
+    public class ItSystemRoleMap : OptionEntityMap<ItSystemRole, ItSystemRight>
     {
-        public ItSystemRoleMap()
-        {
-            this.HasKey(t => t.Id);
-
-            this.ToTable("ItSystemRole");
-
-            this.Property(t => t.Name).IsRequired();
-        }
     }
 }

@@ -4,14 +4,13 @@ using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel.ItContract
 {
-    public class ItContract : IEntity<int>, IHasRights<ItContractRight>, IHasOwner
+    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>
     {
         public ItContract()
         {
             this.AgreementElements = new List<AgreementElement>();
             this.CustomAgreementElements = new List<CustomAgreementElement>();
             this.Children = new List<ItContract>();
-            this.Rights = new List<ItContractRight>();
             this.AssociatedSystemUsages = new List<ItSystemUsage>();
             this.AssociatedInterfaceUsages = new List<InterfaceUsage>();
             this.AssociatedInterfaceExposures = new List<InterfaceExposure>();
@@ -22,10 +21,6 @@ namespace Core.DomainModel.ItContract
             this.Advices = new List<Advice>();
         }
 
-        public int ObjectOwnerId { get; set; }
-        public virtual User ObjectOwner { get; set; }
-
-        public int Id { get; set; }
         public string Name { get; set; }
         public string Note { get; set; }
         public string ItContractId { get; set; }
@@ -123,9 +118,7 @@ namespace Core.DomainModel.ItContract
         /// </summary>
         public virtual ItContract Parent { get; set; }
         public virtual ICollection<ItContract> Children { get; set; }
-
-        public virtual ICollection<ItContractRight> Rights { get; set; }
-
+        
         /// <summary>
         /// The (local usages of) it systems, that this contract is associated to. 
         /// </summary>
@@ -146,5 +139,12 @@ namespace Core.DomainModel.ItContract
 
 
         public virtual ICollection<Advice> Advices { get; set; }
+
+        public override bool HasUserWriteAccess(User user)
+        {
+            if (ContractSignerId == user.Id) return true;
+
+            return base.HasUserWriteAccess(user);
+        }
     }
 }

@@ -4,13 +4,10 @@ using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ActivityMap : EntityTypeConfiguration<Activity>
+    public class ActivityMap : EntityMap<Activity>
     {
         public ActivityMap()
         {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
             // Table & Column Mappings
             this.ToTable("Activity");
 
@@ -22,10 +19,6 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.AssociatedActivity)
                 .WithMany(d => d.AssociatedActivities)
                 .HasForeignKey(t => t.AssociatedActivityId);
-
-            this.HasRequired(t => t.ObjectOwner)
-                .WithMany(d => d.CreatedActivities)
-                .HasForeignKey(t => t.ObjectOwnerId);
         }
     }
 }

@@ -1,8 +1,7 @@
 namespace Core.DomainModel.ItProject
 {
-    public class Stakeholder : IEntity<int>
+    public class Stakeholder : Entity
     {
-        public int Id { get; set; }
         public int ItProjectId { get; set; }
 
         public virtual ItProject ItProject { get; set; }
@@ -13,5 +12,12 @@ namespace Core.DomainModel.ItProject
         public string Benefits { get; set; }
         public int Significance { get; set; }
         public string HowToHandle { get; set; }
+
+        public override bool HasUserWriteAccess(User user)
+        {
+            if (ItProject != null && ItProject.HasUserWriteAccess(user)) return true;
+
+            return base.HasUserWriteAccess(user);
+        }
     }
 }

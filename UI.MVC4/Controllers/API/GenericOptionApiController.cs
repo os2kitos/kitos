@@ -6,8 +6,8 @@ using Core.DomainServices;
 
 namespace UI.MVC4.Controllers.API
 {
-    public abstract class GenericOptionApiController<TModel, TReference, TDto> : GenericApiController<TModel, int, TDto>
-        where TModel : class, IOptionEntity<TReference>
+    public abstract class GenericOptionApiController<TModel, TReference, TDto> : GenericApiController<TModel, TDto>
+        where TModel : Entity, IOptionEntity<TReference>
     {
         protected GenericOptionApiController(IGenericRepository<TModel> repository) 
             : base(repository)

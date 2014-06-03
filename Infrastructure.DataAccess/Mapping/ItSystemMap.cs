@@ -3,17 +3,13 @@ using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItSystemMap : EntityTypeConfiguration<ItSystem>
+    public class ItSystemMap : EntityMap<ItSystem>
     {
         public ItSystemMap()
         {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
             // Properties
             // Table & Column Mappings
             this.ToTable("ItSystem");
-            this.Property(t => t.Id).HasColumnName("Id");
 
             // Relationships
             this.HasOptional(t => t.Parent)
@@ -28,10 +24,6 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.BelongsTo)
                 .WithMany(d => d.BelongingSystems)
                 .HasForeignKey(t => t.BelongsToId);
-
-            this.HasRequired(t => t.ObjectOwner)
-                .WithMany(user => user.CreatedSystems)
-                .HasForeignKey(t => t.ObjectOwnerId);
 
             this.HasRequired(t => t.AppType)
                 .WithMany(t => t.References)

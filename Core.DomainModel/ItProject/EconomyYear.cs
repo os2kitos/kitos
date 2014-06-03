@@ -1,9 +1,7 @@
 namespace Core.DomainModel.ItProject
 {
-    public class EconomyYear : IEntity<int>
+    public class EconomyYear : Entity
     {
-        public int Id { get; set; }
-
         public int YearNumber { get; set; }
 
         public int ItProjectId { get; set; }
@@ -52,5 +50,12 @@ namespace Core.DomainModel.ItProject
 
         public int OtherItSavingsBudget { get; set; }
         public int OtherItSavingsRea { get; set; }
+
+        public override bool HasUserWriteAccess(User user)
+        {
+            if (ItProject != null && ItProject.HasUserWriteAccess(user)) return true;
+
+            return base.HasUserWriteAccess(user);
+        }
     }
 }

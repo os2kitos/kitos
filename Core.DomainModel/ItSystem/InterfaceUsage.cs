@@ -6,15 +6,13 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class InterfaceUsage : IEntity<int>
+    public class InterfaceUsage : Entity
     {
         public InterfaceUsage()
         {
             this.DataRowUsages = new List<DataRowUsage>();
         }
-
-        public int Id { get; set; }
-
+        
         public int ItSystemUsageId { get; set; }
         /// <summary>
         /// The system that is using the interface.
@@ -37,13 +35,17 @@ namespace Core.DomainModel.ItSystem
 
         public int? InfrastructureId { get; set; }
         public virtual ItSystem Infrastructure { get; set; }
-
-        public int? InterfaceCategoryId { get; set; }
-        public InterfaceCategory InterfaceCategory { get; set; }
-
+        
         /// <summary>
         /// Whether local usage of the interface is wanted or not.
         /// </summary>
         public bool IsWishedFor { get; set; }
+
+        public override bool HasUserWriteAccess(User user)
+        {
+            if (ItSystemUsage != null && ItSystemUsage.HasUserWriteAccess(user)) return true;
+
+            return base.HasUserWriteAccess(user);
+        }
     }
 }

@@ -8,7 +8,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class TaskUsageController : GenericApiController<TaskUsage, int, TaskUsageDTO>
+    public class TaskUsageController : GenericApiController<TaskUsage, TaskUsageDTO>
     {
         private readonly IOrgUnitService _orgUnitService;
 
@@ -25,13 +25,20 @@ namespace UI.MVC4.Controllers.API
 
         public HttpResponseMessage Get(int orgUnitId, bool onlyStarred)
         {
-            var usages = Repository.Get(u => u.OrgUnitId == orgUnitId);
+            try
+            {
+                var usages = Repository.Get(u => u.OrgUnitId == orgUnitId);
 
-            if (onlyStarred) usages = usages.Where(u => u.Starred);
+                if (onlyStarred) usages = usages.Where(u => u.Starred);
 
-            var result = usages.Select(CompileDelegation);
+                var delegationDtos = usages.Select(CompileDelegation);
 
-            return Ok(result);
+                return Ok(delegationDtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
         }
 
         //Given a task usage, compile the task delegation down the org unit tree
@@ -55,7 +62,10 @@ namespace UI.MVC4.Controllers.API
         //Given a unit and a task, compile the task delegation down the org unit tree
         private TaskDelegationDTO CompileDelegation(OrganizationUnit unit, TaskRef task)
         {
-            var usage = Repository.Get(u => u.OrgUnitId == unit.Id && u.TaskRefId == task.Id).FirstOrDefault();
+            var unitId = unit.Id;
+            var taskId = task.Id;
+
+            var usage = Repository.Get(u => u.OrgUnitId == unitId && u.TaskRefId == taskId).FirstOrDefault();
             if (usage == null) return null;
 
             var delegations = unit.Children.Select(child => CompileDelegation(child, task))
@@ -94,36 +104,15 @@ namespace UI.MVC4.Controllers.API
             var taskRefId = entity.TaskRefId;
             var unit = entity.OrgUnit;
 
-            if (!_orgUnitService.HasWriteAccess(KitosUser, unit)) throw new SecurityException();
-
             Repository.DeleteByKey(entity.Id);
             DeleteTaskOnChildren(unit, taskRefId);
 
             Repository.Save();
         }
-
-        protected override TaskUsage PostQuery(TaskUsage item)
-        {
-
-            var unit = item.OrgUnit;
-
-            if (!_orgUnitService.HasWriteAccess(KitosUser, unit)) throw new SecurityException();
-
-            return base.PostQuery(item);
-        }
-
+        
         public override HttpResponseMessage Put(int id, TaskUsageDTO dto)
         {
             return NotAllowed();
-        }
-
-        public override HttpResponseMessage Patch(int id, Newtonsoft.Json.Linq.JObject obj)
-        {
-
-            var entity = Repository.GetByKey(id);
-            if (!_orgUnitService.HasWriteAccess(KitosUser, entity.OrgUnit)) return Unauthorized();
-
-            return base.Patch(id, obj);
         }
     }
 }

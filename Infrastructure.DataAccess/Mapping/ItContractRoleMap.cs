@@ -3,15 +3,7 @@ using Core.DomainModel.ItContract;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItContractRoleMap : EntityTypeConfiguration<ItContractRole>
+    public class ItContractRoleMap : OptionEntityMap<ItContractRole, ItContractRight>
     {
-        public ItContractRoleMap()
-        {
-            this.HasKey(t => t.Id);
-
-            this.ToTable("ItContractRole");
-
-            this.Property(t => t.Name).IsRequired();
-        }
     }
 }

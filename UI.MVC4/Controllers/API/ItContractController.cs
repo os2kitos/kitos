@@ -11,13 +11,14 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class ItContractController : GenericApiController<ItContract, int, ItContractDTO>
+    public class ItContractController : GenericHasRightsController<ItContract, ItContractRight, ItContractRole, ItContractDTO>
     {
         private readonly IGenericRepository<AgreementElement> _agreementElementRepository;
 
         private readonly IGenericRepository<ItSystemUsage> _usageRepository;
-        public ItContractController(IGenericRepository<ItContract> repository, IGenericRepository<ItSystemUsage> usageRepository, IGenericRepository<AgreementElement> agreementElementRepository) 
-            : base(repository)
+        public ItContractController(IGenericRepository<ItContract> repository, IGenericRepository<ItContractRight> rightRepository, 
+            IGenericRepository<ItSystemUsage> usageRepository, IGenericRepository<AgreementElement> agreementElementRepository) 
+            : base(repository, rightRepository)
         {
             _usageRepository = usageRepository;
             _agreementElementRepository = agreementElementRepository;
@@ -27,10 +28,12 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var itContract = Repository.GetByKey(id);
+                var contract = Repository.GetByKey(id);
+                if (!HasWriteAccess(contract)) return Unauthorized();
+
                 var elem = _agreementElementRepository.GetByKey(elemId);
 
-                itContract.AgreementElements.Add(elem);
+                contract.AgreementElements.Add(elem);
 
                 Repository.Save();
 
@@ -46,10 +49,12 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var itContract = Repository.GetByKey(id);
+                var contract = Repository.GetByKey(id);
+                if (!HasWriteAccess(contract)) return Unauthorized();
+
                 var elem = _agreementElementRepository.GetByKey(elemId);
 
-                itContract.AgreementElements.Remove(elem);
+                contract.AgreementElements.Remove(elem);
 
                 Repository.Save();
 
@@ -72,6 +77,7 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 var contract = Repository.GetByKey(id);
+                if (!HasWriteAccess(contract)) return Unauthorized();
 
                 if (contract.AssociatedSystemUsages.Any(usage => usage.Id == systemUsageId))
                     return Conflict("The IT system is already associated with the contract");
@@ -102,6 +108,7 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 var contract = Repository.GetByKey(id);
+                if (!HasWriteAccess(contract)) return Unauthorized();
 
                 if (contract.AssociatedSystemUsages.All(usage => usage.Id != systemUsageId))
                     return Conflict("The IT system is not associated with the contract");
@@ -120,12 +127,7 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
         }
-
-        private IEnumerable<ItSystemUsageSimpleDTO> MapSystemUsages(ItContract contract)
-        {
-            return Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageSimpleDTO>>(contract.AssociatedSystemUsages);
-        }
-
+        
         public HttpResponseMessage GetHierarchy(int id, [FromUri] bool? hierarchy)
         {
             try
@@ -181,6 +183,11 @@ namespace UI.MVC4.Controllers.API
             {
                 return Error(e);
             }
+        }
+
+        private IEnumerable<ItSystemUsageSimpleDTO> MapSystemUsages(ItContract contract)
+        {
+            return Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageSimpleDTO>>(contract.AssociatedSystemUsages);
         }
     }
 }

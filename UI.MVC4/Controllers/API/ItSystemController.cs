@@ -9,7 +9,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class ItSystemController : GenericApiController<ItSystem, int, ItSystemDTO>
+    public class ItSystemController : GenericApiController<ItSystem, ItSystemDTO>
     {
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemService _systemService;
@@ -141,6 +141,11 @@ namespace UI.MVC4.Controllers.API
 
                 item.ObjectOwner = KitosUser;
 
+                foreach (var dataRow in item.DataRows)
+                {
+                    dataRow.ObjectOwner = KitosUser;
+                }
+
                 foreach (var id in dto.TaskRefIds)
                 {
                     var task = _taskRepository.GetByKey(id);
@@ -152,6 +157,7 @@ namespace UI.MVC4.Controllers.API
                     var intrface = Repository.GetByKey(id);
                     item.CanUseInterfaces.Add(intrface);
                 }
+
 
                 PostQuery(item);
 

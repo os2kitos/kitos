@@ -1,8 +1,7 @@
 namespace Core.DomainModel.ItSystem
 {
-    public class Wish : IEntity<int>
+    public class Wish : Entity
     {
-        public int Id { get; set; }
         public bool IsPublic { get; set; }
         public string Text { get; set; }
 
@@ -11,5 +10,12 @@ namespace Core.DomainModel.ItSystem
 
         public int ItSystemUsageId { get; set; }
         public virtual ItSystemUsage ItSystemUsage { get; set; }
+
+        public override bool HasUserWriteAccess(User user)
+        {
+            if (ItSystemUsage != null && ItSystemUsage.HasUserWriteAccess(user)) return true;
+
+            return base.HasUserWriteAccess(user);
+        }
     }
 }

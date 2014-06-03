@@ -39,24 +39,8 @@ namespace Core.ApplicationServices
             org.OrgUnits.Add(new OrganizationUnit()
                 {
                     Name = org.Name,
+                    ObjectOwner = org.ObjectOwner
                 });
-        }
-
-        public Organization CreateOrganization(string name, OrganizationType organizationType)
-        {
-            var org = new Organization
-            {
-                Name = name,
-                Config = Config.Default,
-                Type = organizationType
-            };
-
-            org.OrgUnits.Add(new OrganizationUnit()
-            {
-                Name = org.Name,
-            });
-
-            return org;
         }
 
         public bool IsUserMember(User user, Organization organization)

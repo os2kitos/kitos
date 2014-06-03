@@ -6,7 +6,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class PaymentMilestoneController : GenericApiController<PaymentMilestone, int, PaymentMilestoneDTO>
+    public class PaymentMilestoneController : GenericApiController<PaymentMilestone, PaymentMilestoneDTO>
     {
         public PaymentMilestoneController(IGenericRepository<PaymentMilestone> repository) 
             : base(repository)

@@ -60,13 +60,7 @@ namespace UI.MVC4.Controllers.API
         {
             return CreateResponse(HttpStatusCode.OK, response);
         }
-
-        // TODO: This doesn't seem to work
-        protected virtual HttpResponseMessage Error(SecurityException e)
-        {
-            return Unauthorized(e.Message);
-        }
-
+        
         protected virtual HttpResponseMessage Error<T>(T response)
         {
             if (response is SecurityException) return Unauthorized();

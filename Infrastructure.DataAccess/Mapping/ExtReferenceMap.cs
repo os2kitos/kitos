@@ -3,20 +3,16 @@ using Core.DomainModel;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ExtReferenceMap : EntityTypeConfiguration<ExtReference>
+    public class ExtReferenceMap : EntityMap<ExtReference>
     {
         public ExtReferenceMap()
         {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
             // Properties
             this.Property(t => t.Value)
                 .IsRequired();
 
             // Table & Column Mappings
             this.ToTable("ExtReference");
-            this.Property(t => t.Id).HasColumnName("Id");
             this.Property(t => t.Value).HasColumnName("Value");
             this.Property(t => t.ItProjectId).HasColumnName("ItProjectId");
             this.Property(t => t.ExtReferenceTypeId).HasColumnName("ExtReferenceTypeId");

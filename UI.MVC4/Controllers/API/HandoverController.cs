@@ -8,7 +8,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class HandoverController : GenericApiController<Handover, int, HandoverDTO>
+    public class HandoverController : GenericApiController<Handover, HandoverDTO>
     {
         private readonly IGenericRepository<User> _userRepository;
 

@@ -12,42 +12,42 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class OrganizationRightController : GenericRightController<OrganizationRight, OrganizationUnit, OrganizationRole>
-    {
-        private readonly IOrgUnitService _orgUnitService;
+    //public class OrganizationRightController : GenericRightController<OrganizationRight, OrganizationUnit, OrganizationRole>
+    //{
+    //    private readonly IOrgUnitService _orgUnitService;
 
-        public OrganizationRightController(IGenericRepository<OrganizationRight> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IOrgUnitService orgUnitService) 
-            : base(repository, orgUnitRepository)
-        {
-            _orgUnitService = orgUnitService;
-        }
+    //    public OrganizationRightController(IGenericRepository<OrganizationRight> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IOrgUnitService orgUnitService) 
+    //        : base(repository, orgUnitRepository)
+    //    {
+    //        _orgUnitService = orgUnitService;
+    //    }
 
-        protected override bool HasWriteAccess(OrganizationUnit orgUnit, User user)
-        {
-            return _orgUnitService.HasWriteAccess(user, orgUnit);
-        }
+    //    protected override bool HasWriteAccess(OrganizationUnit orgUnit, User user)
+    //    {
+    //        return _orgUnitService.HasWriteAccess(user, orgUnit);
+    //    }
 
-        /* returns the organisations-rights for an organization unit and all units in the subtree */
-        public HttpResponseMessage GetSubTreeRights(int organizationUnitId)
-        {
-            try
-            {
-                var orgUnits = _orgUnitService.GetSubTree(organizationUnitId);
+    //    /* returns the organisations-rights for an organization unit and all units in the subtree */
+    //    public HttpResponseMessage GetSubTreeRights(int organizationUnitId)
+    //    {
+    //        try
+    //        {
+    //            var orgUnits = _orgUnitService.GetSubTree(organizationUnitId);
 
-                var rights = new List<OrganizationRight>();
-                foreach (var orgUnit in orgUnits)
-                {
-                    rights.AddRange(GetAll(orgUnit.Id));
-                }
+    //            var rights = new List<OrganizationRight>();
+    //            foreach (var orgUnit in orgUnits)
+    //            {
+    //                rights.AddRange(GetAll(orgUnit.Id));
+    //            }
 
-                var dtos = AutoMapper.Mapper.Map<ICollection<OrganizationRight>, ICollection<RightOutputDTO>>(rights);
+    //            var dtos = AutoMapper.Mapper.Map<ICollection<OrganizationRight>, ICollection<RightOutputDTO>>(rights);
 
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
-    }
+    //            return Ok(dtos);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            return Error(e);
+    //        }
+    //    }
+    //}
 }

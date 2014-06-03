@@ -6,25 +6,10 @@ using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class OrganizationRightMap : EntityTypeConfiguration<OrganizationRight>
+    public class OrganizationRightMap : RightMap<OrganizationUnit, OrganizationRight, OrganizationRole>
     {
         public OrganizationRightMap()
         {
-            this.HasKey(right => new { right.ObjectId, right.RoleId, right.UserId });
-
-            this.ToTable("OrganizationRight");
-
-            this.HasRequired(right => right.Object)
-                .WithMany(proj => proj.Rights)
-                .HasForeignKey(right => right.ObjectId);
-
-            this.HasRequired(right => right.Role)
-                .WithMany(role => role.References)
-                .HasForeignKey(right => right.RoleId);
-
-            this.HasRequired(right => right.User)
-                .WithMany(user => user.OrganizationRights)
-                .HasForeignKey(right => right.UserId);
         }
     }
 }

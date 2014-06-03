@@ -10,19 +10,49 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class OrganizationUnitController : GenericApiController<OrganizationUnit, int, OrgUnitDTO>
+    public class OrganizationUnitController : GenericHasRightsController<OrganizationUnit, OrganizationRight, OrganizationRole, OrgUnitDTO>
     {
         private readonly IOrgUnitService _orgUnitService;
         private readonly IAdminService _adminService;
 
-        public OrganizationUnitController(IGenericRepository<OrganizationUnit> repository, IOrgUnitService orgUnitService, IAdminService adminService) 
-            : base(repository)
+        public OrganizationUnitController(IGenericRepository<OrganizationUnit> repository, IGenericRepository<OrganizationRight> rightRepository, 
+            IOrgUnitService orgUnitService, IAdminService adminService) 
+            : base(repository, rightRepository)
         {
             _orgUnitService = orgUnitService;
             _adminService = adminService;
         }
 
-        public HttpResponseMessage GetByUser(int userId)
+        /// <summary>
+        /// Returns all colllecteds rights for an organization unit and all sub units
+        /// </summary>
+        /// <param name="id">Id of the unit</param>
+        /// <param name="rights">Routing qualifier</param>
+        /// <returns>List of rights</returns>
+        public override HttpResponseMessage GetRights(int id, bool? rights)
+        {
+            try
+            {
+                var orgUnits = _orgUnitService.GetSubTree(id);
+
+                var theRights = new List<OrganizationRight>();
+                foreach (var orgUnit in orgUnits)
+                {
+                    theRights.AddRange(GetRightsQuery(orgUnit.Id));
+                }
+
+                var dtos = AutoMapper.Mapper.Map<ICollection<OrganizationRight>, ICollection<RightOutputDTO>>(theRights);
+
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        //TODO probably don't use this, use get by organization instead
+        /*public HttpResponseMessage GetByUser(int userId)
         {
             try
             {
@@ -39,8 +69,14 @@ namespace UI.MVC4.Controllers.API
             {
                 return Error(e);
             }
-        }
+        }*/
 
+        //TODO rename this into something more saying
+        /// <summary>
+        /// Returns every OrganizationUnit that the user has a role for
+        /// </summary>
+        /// <param name="userId2"></param>
+        /// <returns></returns>
         public HttpResponseMessage GetByUser2(int userId2)
         {
             try
@@ -96,9 +132,7 @@ namespace UI.MVC4.Controllers.API
                 JToken jtoken;
                 if (obj.TryGetValue("parentId", out jtoken))
                 {
-                    //You have to be local or global admin to change parent
-                    if (!_adminService.IsGlobalAdmin(KitosUser) && !_orgUnitService.IsLocalAdminFor(KitosUser, id))
-                        return Unauthorized();
+                    //TODO: You have to be local or global admin to change parent
 
                     var parentId = jtoken.Value<int>();
                     
@@ -120,14 +154,6 @@ namespace UI.MVC4.Controllers.API
         public override HttpResponseMessage Put(int id, OrgUnitDTO dto)
         {
             return NotAllowed();
-        }
-
-        protected override void DeleteQuery(int id)
-        {
-            if(!_orgUnitService.HasWriteAccess(KitosUser, id))
-                throw new SecurityException();
-
-            base.DeleteQuery(id);
         }
     }
 }

@@ -2,14 +2,13 @@
 
 namespace Core.DomainModel.ItContract
 {
-    public class AgreementElement : IOptionEntity<ItContract>
+    public class AgreementElement : Entity, IOptionEntity<ItContract>
     {
         public AgreementElement()
         {
             References = new List<ItContract>();
         }
 
-        public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }

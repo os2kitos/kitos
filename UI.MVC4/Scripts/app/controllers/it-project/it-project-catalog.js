@@ -34,7 +34,7 @@
             
             $scope.toggle = function (project) {
                 if (!isSelected(project)) {
-                    $http.post('api/itproject/' + project.id, { organizationId: user.currentOrganizationId }).finally(reload);
+                    $http.post('api/itproject/' + project.id + '?clone', { organizationId: user.currentOrganizationId }).finally(reload);
                 } else {
                     $http.delete('api/itproject/' + project.id).finally(reload);
                 }

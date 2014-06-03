@@ -8,7 +8,7 @@ using UI.MVC4.Models.Exceptions;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class CustomAgreementElementController : GenericApiController<CustomAgreementElement, int, CustomAgreementElementDTO>
+    public class CustomAgreementElementController : GenericApiController<CustomAgreementElement, CustomAgreementElementDTO>
     {
         public CustomAgreementElementController(IGenericRepository<CustomAgreementElement> repository) 
             : base(repository)

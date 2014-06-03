@@ -4,13 +4,10 @@ using Core.DomainModel.ItProject;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ExtRefTypeLocaleMap : EntityTypeConfiguration<ExtRefTypeLocale>
+    public class ExtRefTypeLocaleMap : EntityMap<ExtRefTypeLocale>
     {
         public ExtRefTypeLocaleMap()
         {
-            // Primary Key
-            this.HasKey(t => new { t.MunicipalityId, t.OriginalId });
-
             // Properties
             // Table & Column Mappings
             this.ToTable("ExtRefTypeLocale");

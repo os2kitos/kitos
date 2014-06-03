@@ -3,17 +3,13 @@ using Core.DomainModel;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class OrganizationUnitMap : EntityTypeConfiguration<OrganizationUnit>
+    public class OrganizationUnitMap : EntityMap<OrganizationUnit>
     {
         public OrganizationUnitMap()
         {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
             // Properties
             // Table & Column Mappings
             this.ToTable("OrganizationUnit");
-            this.Property(t => t.Id).HasColumnName("Id");
 
             // Relationships
             this.HasOptional(o => o.Parent)

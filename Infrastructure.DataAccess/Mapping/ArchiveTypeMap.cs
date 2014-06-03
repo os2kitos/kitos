@@ -3,15 +3,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ArchiveTypeMap : EntityTypeConfiguration<ArchiveType>
+    public class ArchiveTypeMap : OptionEntityMap<ArchiveType, ItSystemUsage>
     {
-        public ArchiveTypeMap()
-        {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
-            // Table & Column Mappings
-            this.ToTable("ArchiveType");
-        }
     }
 }

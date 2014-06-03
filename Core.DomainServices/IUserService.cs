@@ -7,7 +7,7 @@ namespace Core.DomainServices
         /* TODO: This doesn't really conform to single responsibility principle */
         User AddUser(User user);
         PasswordResetRequest IssuePasswordReset(User user);
-        PasswordResetRequest GetPasswordReset(string requestId);
+        PasswordResetRequest GetPasswordReset(string hash);
         void ResetPassword(PasswordResetRequest passwordResetRequest, string newPassword);
     }
 }

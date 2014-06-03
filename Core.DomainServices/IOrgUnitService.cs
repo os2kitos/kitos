@@ -6,7 +6,6 @@ namespace Core.DomainServices
 {
     public interface IOrgUnitService
     {
-        ICollection<OrganizationUnit> GetByUser(User user);
         OrganizationUnit GetRoot(OrganizationUnit unit);
 
         ICollection<OrganizationUnit> GetSubTree(int orgUnitId);
@@ -14,11 +13,5 @@ namespace Core.DomainServices
 
         bool IsAncestorOf(OrganizationUnit unitA, OrganizationUnit unitB);
         bool IsAncestorOf(int unitIdA, int unitIdB);
-
-        bool HasWriteAccess(User user, int orgUnitId);
-        bool HasWriteAccess(User user, OrganizationUnit unit);
-
-        bool IsLocalAdminFor(User user, int orgUnitId);
-        bool IsLocalAdminFor(User user, OrganizationUnit unit);
     }
 }

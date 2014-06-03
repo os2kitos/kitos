@@ -3,18 +3,7 @@ using Core.DomainModel;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItContractModuleNameMap : EntityTypeConfiguration<ItContractModuleName>
+    public class ItContractModuleNameMap : OptionEntityMap<ItContractModuleName, Config>
     {
-        public ItContractModuleNameMap()
-        {
-            // Primary Key
-            this.HasKey(t => t.Id);
-
-            // Properties
-            // Table & Column Mappings
-            this.ToTable("ItContractName");
-            this.Property(t => t.Id).HasColumnName("Id");
-            this.Property(t => t.Name).HasColumnName("Name");
-        }
     }
 }

@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel.ItContract
 {
-    public class HandoverTrial : IOptionEntity<ItContract>
+    public class HandoverTrial : Entity, IOptionEntity<ItContract>
     {
         public HandoverTrial()
         {
             References = new List<ItContract>();
         }
 
-        public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }
