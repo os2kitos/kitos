@@ -20,7 +20,9 @@ namespace Core.DomainModel
 
         public override bool HasUserWriteAccess(User user)
         {
-            return OrgUnit != null && OrgUnit.HasUserWriteAccess(user);
+            if (OrgUnit != null && OrgUnit.HasUserWriteAccess(user)) return true;
+
+            return base.HasUserWriteAccess(user);
         }
     }
 }
