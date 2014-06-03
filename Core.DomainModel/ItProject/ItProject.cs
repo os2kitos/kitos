@@ -65,8 +65,6 @@ namespace Core.DomainModel.ItProject
         public int OrganizationId { get; set; }
         public virtual Organization Organization { get; set; }
 
-        //public virtual ProjectStatus ProjectStatus { get; set; }
-        //public virtual GoalStatus GoalStatus { get; set; }
         public virtual Handover Handover { get; set; }
         //public virtual OrgTab OrgTab { get; set; }
         //public virtual Hierarchy Hierarchy { get; set; }
