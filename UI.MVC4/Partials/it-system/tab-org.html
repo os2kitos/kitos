@@ -12,18 +12,14 @@
     <li data-ng-repeat="orgUnit in orgUnitsTree" data-ng-include="'tree_item_renderer.html'"></li>
 </ul>
 
-<form class="form-horizontal">
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="responsible" class="col-md-4 control-label small">Ansvarlig OrgEnhed</label>
-            <div class="col-md-8">
-                <select id="responsible" data-ng-options="o.id as o.name for o in orgUnits"
-                        data-ng-disabled="!hasWriteAccess"
-                        data-ng-model="usage.responsibleUnitId" data-field="responsibleUnitId"
-                        data-autosave="api/itsystemusage/{{usageId}}" class="form-control input-sm">
-                    <option value="">Vælg blandt ovenstående</option>
-                </select>
-            </div>
-        </div>
+<div class="col-md-8">
+    <div class="form-group">
+        <label for="responsible" class="control-label">Vælg ansvarlig organisationsenhed i blandt ovenstående:</label>
+        <select id="responsible" data-ng-options="o.id as o.name for o in orgUnits"
+                data-ng-disabled="!hasWriteAccess"
+                data-ng-model="usage.responsibleUnitId" data-field="responsibleUnitId"
+                data-autosave="api/itsystemusage/{{usageId}}" class="form-control input-sm">
+            <option value="">Ingen</option>
+        </select>
     </div>
-</form>
+</div>
