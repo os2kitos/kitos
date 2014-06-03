@@ -125,7 +125,7 @@
                         "userId": uIdNew
                     };
 
-                    $http.post("api/itprojectright/" + projectId, data).success(function (result) {
+                    $http.post("api/itproject/" + projectId, data).success(function (result) {
 
                         right.roleId = result.response.roleId;
                         right.user = result.response.user;
