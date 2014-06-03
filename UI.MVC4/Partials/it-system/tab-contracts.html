@@ -28,8 +28,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr data-ng-repeat="contract in contracts">
-                
+            <tr data-ng-repeat="contract in usage.contracts">
                 <!-- name -->
                 <td>
                     <a data-ui-sref="it-contract.edit({id: contract.id})">
@@ -48,11 +47,54 @@
                 </td>
                 
                 <!-- has operation -->
+                <td>
+                    <span data-ng-if="contract.hasOperationElement" class="text-success">
+                        <i class="glyphicon glyphicon-ok"></i>
+                    </span>
+                </td>
+                
+                <!-- concluded ("indgået") -->
+                <td>
+                    <span data-ng-model="contract.concluded" data-datereader=""></span>
+                </td>
 
+                <!-- expiration -->
+                <td>
+                    <span data-ng-model="contract.expirationDate" data-datereader=""></span>
+                </td>
+
+                <!-- expiration -->
+                <td>
+                    <span data-ng-model="contract.expirationDate" data-datereader=""></span>
+                </td>
+
+                <!-- terminated -->
+                <td>
+                    <span data-ng-model="contract.terminated" data-datereader=""></span>
+                </td>
             </tr>
-
         </tbody>
-
     </table>
+</div>
 
+<div class="col-md-12">
+    <form class="form-horizontal">
+        <div class="form-group">
+            <label class="col-md-4 control-label">
+                Hvilken kontrakt skal afgøre om IT systemet er aktivt:
+            </label>
+            <div class="col-md-3">
+                <select class="form-control input-sm" data-ng-model="usage.mainContractId" data-ng-change="updateActiveStatus()"
+                    data-autosave="api/itsystemusage/{{usageId}}" data-field="mainContractId" data-ng-options="c.id as c.name for c in usage.contracts">
+                    <option value="">Ingen kontrakt</option>
+                </select>
+
+            </div>
+            <div class="col-md-4">
+                IT systemet har nu status som: 
+                    <strong class="text-success" data-ng-if="systemActive">Aktivt</strong>
+                <strong class="text-danger" data-ng-if="!systemActive">Inaktivt</strong>
+            </div>
+        </div>
+    </form>
 </div>
