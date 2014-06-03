@@ -9,10 +9,7 @@
                     return $http.get('api/config/' + $stateParams.id).then(function(result) {
                         return result.data.response;
                     });
-                }],
-                organization: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get('api/organization/' + $stateParams.id);
-                }],
+                }]
             },
             controller: ['$rootScope', function ($rootScope) {
                 $rootScope.page.title = 'Konfiguration';

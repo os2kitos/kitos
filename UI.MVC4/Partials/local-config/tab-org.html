@@ -1,4 +1,28 @@
-﻿<div class="form-group row">
+﻿<div class="form-group">
+    <label>Navn</label>
+    <input type="text" class="form-control" data-ng-model="orgName" data-autosave="{{ orgAutosaveUrl }}" data-field="name" />
+</div>
+
+<div class="form-group">
+    <label>CVR</label>
+    <input type="text" class="form-control" data-ng-model="orgCvr" data-autosave="{{ orgAutosaveUrl }}" data-field="cvr" />
+</div>
+
+<div class="form-group">
+    <div>
+        <label class="radio-inline">
+            <input type="radio" data-ng-model="orgType" value="0" data-autosave="{{ orgAutosaveUrl }}" data-field="type"> Virksomhed
+        </label>
+        <label class="radio-inline">
+            <input type="radio" data-ng-model="orgType" value="1" data-autosave="{{ orgAutosaveUrl }}" data-field="type"> Kommune
+        </label>
+        <label class="radio-inline">
+            <input type="radio" data-ng-model="orgType" value="2" data-autosave="{{ orgAutosaveUrl }}" data-field="type"> Interessefælleskab
+        </label>
+    </div>
+</div>
+
+<div class="form-group row">
     <label class="col-md-2 control-label">
         Overblik
     </label>
