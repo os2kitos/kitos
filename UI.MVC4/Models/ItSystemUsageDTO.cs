@@ -40,5 +40,8 @@ namespace UI.MVC4.Models
         public IEnumerable<InterfaceExposureDTO> InterfaceExposures { get; set; }
 
         public IEnumerable<ItProjectDTO> ItProjects { get; set; }
+
+        public int? MainContractId { get; set; }
+        public IEnumerable<ItContractSystemDTO> Contracts { get; set; } 
     }
 }
