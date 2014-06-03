@@ -245,10 +245,12 @@ namespace UI.MVC4.App_Start
                   .ReverseMap();
 
             Mapper.CreateMap<InterfaceUsage, InterfaceUsageDTO>()
-                  .ReverseMap();
+                  .ReverseMap()
+                  .ForMember(dest => dest.ItContract, opt => opt.Ignore());
 
             Mapper.CreateMap<InterfaceExposure, InterfaceExposureDTO>()
-                  .ReverseMap();
+                  .ReverseMap()
+                  .ForMember(dest => dest.ItContract, opt => opt.Ignore());
 
             Mapper.CreateMap<ItSystemUsage, ItSystemUsageDTO>()
                   .ReverseMap()
