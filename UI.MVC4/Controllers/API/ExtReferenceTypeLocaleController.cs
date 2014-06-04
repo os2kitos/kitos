@@ -11,7 +11,7 @@ namespace UI.MVC4.Controllers.API
 {
     public class ExtReferenceTypeLocaleController : GenericLocaleApiController<ExtRefTypeLocale, ExtReferenceType>
     {
-        public ExtReferenceTypeLocaleController(IGenericRepository<ExtRefTypeLocale> repository, IUserRepository userRepository) : base(repository, userRepository)
+        public ExtReferenceTypeLocaleController(IGenericRepository<ExtRefTypeLocale> repository) : base(repository)
         {
         }
     }

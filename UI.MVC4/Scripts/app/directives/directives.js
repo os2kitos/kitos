@@ -203,7 +203,7 @@
             };
         }
     ]);
-    
+
     app.directive('selectStatus2', ['$timeout',
         function ($timeout) {
             return {
@@ -217,19 +217,19 @@
                     scope.setModel = function (n) {
                         //only update on change
                         if (scope.model == n) return;
-                        
+
                         //save new value
                         scope.model = n;
-                        
+
                         $timeout(function () {
                             //then trigger event
                             ngModel.$setViewValue(scope.model);
-                            
+
                             //this triggers the autosave directive
                             element.triggerHandler("blur");
                         });
                     };
-                    
+
                     //read value from ngModel
                     ngModel.$render = function () {
                         scope.model = ngModel.$viewValue;
@@ -427,7 +427,7 @@
                 link: function (scope, element, attrs, ctrl) {
                     //this is called when the user selects something from select2
                     element.bind('change', function () {
-                        $timeout(function() {
+                        $timeout(function () {
                             //update the view value
                             ctrl.$setViewValue(scope.select.selected);
 
@@ -437,7 +437,7 @@
                     });
 
                     //when the outer ngModel is changed, update the inner model
-                    ctrl.$render = function() {
+                    ctrl.$render = function () {
                         scope.select.selected = ctrl.$viewValue;
                     };
 
@@ -446,7 +446,7 @@
 
                     //settings for select2
                     var settings = {
-                        
+
                         allowClear: !!scope.allowClear,
 
                         //don't format markup in result
@@ -454,7 +454,7 @@
 
                         //when an option has been selected, print the no-html version
                         formatSelection: function (item) {
-                            
+
                             var option;
                             if (item.id) {
                                 option = _.findWhere(options, { id: parseInt(item.id) });
@@ -529,8 +529,6 @@
             templateUrl: 'partials/local-config/suggest-new.html',
             link: function (scope, element, attrs) {
                 scope.suggest = function () {
-                    if (scope.suggestForm.$invalid) return;
-
                     var data = {
                         "isSuggestion": true,
                         "name": scope.suggestion
@@ -555,7 +553,6 @@
             templateUrl: 'partials/local-config/suggest-new-role.html',
             link: function (scope, element, attrs) {
                 scope.suggest = function () {
-                    if (scope.suggestForm.$invalid) return;
 
                     var data = {
                         "isSuggestion": true,
@@ -586,7 +583,7 @@
 
                 scope.list = [];
 
-                var optionsData = $http.get(scope.optionsUrl).success(function (result) {
+                $http.get(scope.optionsUrl).success(function (result) {
                     _.each(result.response, function (v) {
                         scope.list.push({
                             id: v.id,
@@ -616,14 +613,16 @@
 
                 $q.all([
                     $http.get(scope.optionsUrl),
-                    $http.get(scope.localesUrl + '/' + orgId)
+                    $http.get(scope.localesUrl + '?organization=' + orgId)
                 ]).then(function (result) {
 
                     var options = result[0].data.response;
                     var locales = result[1].data.response;
 
+                    //for each of the original options
                     _.each(options, function (v) {
 
+                        //look for a locale translation
                         var locale = _.find(locales, function (loc) {
                             return loc.originalId == v.id;
                         });
@@ -631,43 +630,59 @@
                         var isNew = _.isUndefined(locale);
                         var localeName = isNew ? '' : locale.name;
 
-                        scope.list.push({
+                        var option = {
                             id: v.id,
                             name: v.name,
                             note: v.note,
                             localeName: localeName,
+                            locale: locale,
                             isNew: isNew
-                        });
+                        };
+
+                        option.update = function () {
+                            if (_.isEmpty(option.localeName)) {
+
+                                if (!isNew) {
+                                    $http({ method: 'DELETE', url: scope.localesUrl + "/" + locale.id }).success(function() {
+                                        option.local = null;
+                                        option.isNew = isNew;
+                                    
+                                        notify.addSuccessMessage('Felt opdateret');
+                                    });
+                                }
+
+                                return;
+
+                            } else {
+
+                                var method = isNew ? 'POST' : 'PUT';
+
+                                var url = isNew ? scope.localesUrl : (scope.localesUrl + "/" + locale.id);
+
+                                var data = {
+                                    "name": option.localeName,
+                                    "originalId": option.id,
+                                    "municipalityId": orgId
+                                };
+
+                                $http({ method: method, url: url, data: data })
+                                    .success(function (localeResult) {
+                                        option.locale = localeResult.response;
+                                        option.isNew = false;
+                                            
+                                        notify.addSuccessMessage('Felt opdateret');
+                                    }).error(function () {
+                                        notify.addErrorMessage('Kunne ikke opdatere feltet!');
+                                    });
+
+                                return;
+                            }
+                        };
+
+                        scope.list.push(option);
                     });
                 });
 
-
-                scope.updateLocale = function (value, option) {
-
-                    var oId = option.id;
-
-                    if (_.isEmpty(value)) {
-
-                        return $http({ method: 'DELETE', url: scope.url + '?mId=' + orgId + '&oId=' + oId });
-
-                    } else {
-
-                        var method = option.isNew ? 'POST' : 'PUT';
-
-                        var data = {
-                            "name": value,
-                            "originalId": oId,
-                            "municipalityId": orgId
-                        };
-
-                        return $http({ method: method, url: scope.localesUrl, data: data })
-                            .success(function (result) {
-                                notify.addSuccessMessage('Felt opdateret');
-                            }).error(function (result) {
-                                notify.addErrorMessage('Kunne ikke opdatere feltet med værdien: ' + value + '!');
-                            });
-                    }
-                };
             }
         };
     }]);

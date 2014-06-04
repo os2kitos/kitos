@@ -32,37 +32,40 @@
     </div>
 </div>
 
-<div class="form-group">
-    <label class="col-md-2 control-label">
-        Overblik
-    </label>
-    <div class="col-md-10">
-        <div>
-            <label>
-                <input type="checkbox" data-ng-model="config.showTabOverview" data-autosave="{{config.autosaveUrl}}" data-field="showTabOverview" tabindex="1"/>
-                Medtag fanen 'Overblik'
-            </label>
-        </div>
-        <div>
-            <label>
-                <input type="checkbox" data-ng-model="config.showTechnology" data-autosave="{{config.autosaveUrl}}" data-field="showTechnology" tabindex="2"/>
-                Medtag kolonnen 'Teknologi'
-            </label>
-        </div>
-        <div>
-            <label>
-                <input type="checkbox" data-ng-model="config.showUsage" data-autosave="{{config.autosaveUrl}}" data-field="showUsage" tabindex="3"/>
-                Medtag kolonnen 'Anvendelse'
-            </label>
-        </div>
-        <div>
-            <label>
-                <input type="checkbox" data-ng-model="config.showMandatory" data-autosave="{{config.autosaveUrl}}" data-field="showMandatory" tabindex="4"/>
-                Medtag kolonnen 'SKAL'
-            </label>
+<form class="form-horizontal">
+    <div class="form-group">
+        <label class="col-md-2 control-label">
+            Overblik
+        </label>
+        <div class="col-md-10">
+            <div>
+                <label>
+                    <input type="checkbox" data-ng-model="config.showTabOverview" data-autosave="{{config.autosaveUrl}}" data-field="showTabOverview" tabindex="1" />
+                    Medtag fanen 'Overblik'
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="checkbox" data-ng-model="config.showColumnTechnology" data-autosave="{{config.autosaveUrl}}" data-field="showColumnTechnology" tabindex="2" />
+                    Medtag kolonnen 'Teknologi'
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="checkbox" data-ng-model="config.showColumnUsage" data-autosave="{{config.autosaveUrl}}" data-field="showColumnUsage" tabindex="3" />
+                    Medtag kolonnen 'Anvendelse'
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="checkbox" data-ng-model="config.showColumnMandatory" data-autosave="{{config.autosaveUrl}}" data-field="showColumnMandatory" tabindex="4" />
+                    Medtag kolonnen 'SKAL'
+                </label>
+            </div>
         </div>
     </div>
-</div>
 
-<div data-option-list="" title="Roller" data-options-url="api/organizationRole"></div>
-<div data-suggest-new-role="" data-url="api/organizationRole"></div>
+    <div data-option-list="" title="Roller" data-options-url="api/organizationRole"></div>
+    <div data-suggest-new-role="" data-url="api/organizationRole"></div>
+
+</form>

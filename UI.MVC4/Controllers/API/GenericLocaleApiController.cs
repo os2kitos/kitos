@@ -11,135 +11,46 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public abstract class GenericLocaleApiController<TModel, TOriginal> : BaseApiController
-        where TModel : class, ILocaleEntity<TOriginal>
+    public abstract class GenericLocaleApiController<TModel, TOriginal> : GenericApiController<TModel, LocaleDTO>
+        where TModel : Entity, ILocaleEntity<TOriginal>
     {
-        protected readonly IGenericRepository<TModel> Repository;
-        private readonly IUserRepository _userRepository;
-
-        protected GenericLocaleApiController(IGenericRepository<TModel> repository, IUserRepository userRepository)
+        protected GenericLocaleApiController(IGenericRepository<TModel> repository)
+            : base(repository)
         {
-            Repository = repository;
-            _userRepository = userRepository;
-        }
-
-        protected virtual TDest Map<TSource, TDest>(TSource item)
-        {
-            return AutoMapper.Mapper.Map<TDest>(item);
-        }
-
-        //TODO: what goes on here?
-        protected virtual IEnumerable<TModel> GetAllQuery()
-        {
-            return Repository.Get(l => l.MunicipalityId == 1);
-        }
-
-        protected virtual TModel PostQuery(TModel item)
-        {
-            Repository.Insert(item);
-            Repository.Save();
-
-            return item;
-        }
-
-        protected virtual TModel PutQuery(TModel item)
-        {
-            Repository.Update(item);
-            Repository.Save();
-
-            return item;
-        }
-
-        public HttpResponseMessage GetAll()
-        {
-            var items = GetAllQuery().ToList();
-
-            if (!items.Any())
-                return NoContent();
-
-            return Ok(Map<IEnumerable<TModel>, IEnumerable<LocaleDTO>>(items));
         }
         
-        public HttpResponseMessage Get(int id)
+        public HttpResponseMessage Get(int organization)
         {
-            var items = Repository.Get(l => l.MunicipalityId == id).ToList();
+            try
+            {
+                var items = Repository.Get(locale => locale.MunicipalityId == organization).ToList();
 
-            if (!items.Any())
-                return NoContent();
+                if (!items.Any()) return NoContent();
 
-            return Ok(Map<IEnumerable<TModel>, IEnumerable<LocaleDTO>>(items));
+                return Ok(Map(items));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
         }
 
         // GET api/T
-        public HttpResponseMessage GetSingle([FromUri] int orgId, [FromUri] int oId)
+        public HttpResponseMessage GetSingle([FromUri] int organization, [FromUri] int original)
         {
-            var item = Repository.GetByKey(orgId, oId);
-
-            if (item == null)
-                return NoContent();
-
-            return Ok(Map<TModel, LocaleDTO>(item));
-        }
-
-        // POST api/T
-        public HttpResponseMessage Post(LocaleInputDTO dto)
-        {
-            var item = Map<LocaleInputDTO, TModel>(dto);
             try
             {
-                TestMunicipalityMembership(dto.MunicipalityId);
+                var item = Repository.Get(locale => locale.MunicipalityId == organization && locale.OriginalId == original)
+                              .FirstOrDefault();
 
-                PostQuery(item);
+                if (item == null) return NoContent();
 
-                //var msg = new HttpResponseMessage(HttpStatusCode.Created);
-                return Created(item,
-                               new Uri(Request.RequestUri + "?orgId=" + item.MunicipalityId + "&oId=" + item.OriginalId));
-            }
-            catch (Exception e)
-            {
-                return Error(e); // TODO catch correct expection
-            }
-        }
-
-        // PUT api/T
-        public HttpResponseMessage Put(LocaleInputDTO dto)
-        {
-            var item = Map<LocaleInputDTO, TModel>(dto);
-            try
-            {
-                TestMunicipalityMembership(dto.MunicipalityId);
-
-                PutQuery(item);
-
-                return Ok(); // TODO correct?
+                return Ok((item));
             }
             catch (Exception e)
             {
                 return Error(e);
             }
-        }
-
-        // PUT api/T
-        public HttpResponseMessage Delete([FromUri] int orgId, [FromUri] int oId)
-        {
-            try
-            {
-                TestMunicipalityMembership(orgId);
-
-                Repository.DeleteByKey(orgId, oId);
-                Repository.Save();
-
-                return Ok(); // TODO correct?
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
-
-        private void TestMunicipalityMembership(int mId)
-        {
-            //throw new NotImplementedException();
         }
     }
 }

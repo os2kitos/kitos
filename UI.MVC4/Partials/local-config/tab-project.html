@@ -1,49 +1,53 @@
-﻿<div class="col-md-12">
-    <div class="form-group row">
+﻿<form class="form-horizontal">
+    <!-- module name -->
+    <div class="form-group">
         <label class="col-md-2 control-label">
             Modulnavn
         </label>
-        <div class="col-md-10">
-            <a href="#" data-editable-select="project.chosenNameId" data-buttons="no" data-e-ng-options="name.id as name.name for name in project.moduleNames" data-onbeforesave="updateConfig($data, 'itProjectModuleNameId')">
-                {{ project.moduleNames[project.chosenNameId - 1].name; }}
-            </a>
+        <!-- todo -->
+        <div class="col-md-6">
+            <input type="text" class="input-sm form-control" disabled="disabled" />
         </div>
     </div>
-    <div class="form-group row">
+
+    <div class="form-group">
         <label class="col-md-2 control-label">
             Vejledning
         </label>
-        <div class="col-md-10">
-            <a href="#" data-editable-text="project.guideUrl" data-buttons="no" data-onbeforesave="updateConfig($data, 'itProjectGuide')">
-                {{ project.guideUrl || 'Ingen guide' }}
-            </a>
+        <div class="col-md-6">
+            <input type="text" class="input-sm form-control" data-ng-model="config.itProjectGuide" data-autosave="{{config.autosaveUrl}}" data-field="itProjectGuide" />
         </div>
     </div>
 
-    <div data-option-locale-list="" title="Referencer" data-locales-url="api/extReferenceTypeLocale" data-options-url="api/extReferenceType" data-org-id="orgId"></div>
+    <div data-option-locale-list="" title="Referencer"
+        data-locales-url="api/extReferenceTypeLocale"
+        data-options-url="api/extReferenceType"
+        data-org-id="user.currentOrganizationId">
+    </div>
 
-    <div data-option-locale-list="" title="Projektfaser" data-locales-url="api/projectPhaseLocale" data-options-url="api/projectPhase" data-org-id="orgId"></div>
-
-    <div data-option-list="" title="Projektkategorier" data-options-url="api/projectCategory"></div>
-    <div data-suggest-new="" data-url="api/projectCategory"></div>
+    <div data-option-list="" title="Projektkategorier" data-options-url="api/itProjectCategory"></div>
+    <div data-suggest-new="" data-url="api/itProjectCategory"></div>
 
     <div data-option-list="" title="Roller" data-options-url="api/itProjectRole"></div>
     <div data-suggest-new-role="" data-url="api/itProjectRole"></div>
 
-    <div class="form-group row">
+    <div class="form-group">
         <label class="col-md-2 control-label">
             Portefølje
         </label>
         <div class="col-md-10">
             <div>
-                <a href="#" data-editable-checkbox="project.showPortfolio" data-e-title="Medtag fanen 'Portefølje'?" data-onbeforesave="updateConfig($data, 'showPortfolio')" data-buttons="no">{{project.showPortfolio && "Medtager fanen 'Portefølje'" || "Medtager IKKE fanen 'Porteføjle'" }}
-                </a>
+                <label>
+                    <input type="checkbox" data-ng-model="config.showPortfolio" data-autosave="{{config.autosaveUrl}}" data-field="showPortfolio" tabindex="3" />
+                    Medtag fanen 'Portefølje'
+                </label>
             </div>
-
             <div>
-                <a href="#" data-editable-checkbox="project.showBC" data-e-title="Medtag kolonnen 'BC'?" data-onbeforesave="updateConfig($data, 'showBC')" data-buttons="no">{{project.showBC && "Medtager kolonnen 'BC'" || "Medtager IKKE kolonnen 'BC'" }}
-                </a>
+                <label>
+                    <input type="checkbox" data-ng-model="config.showBC" data-autosave="{{config.autosaveUrl}}" data-field="showBC" tabindex="3" />
+                    Medtag kolonnen 'BC'
+                </label>
             </div>
         </div>
     </div>
-</div>
+</form>
