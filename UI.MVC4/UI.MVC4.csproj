@@ -296,7 +296,6 @@
     <Compile Include="Controllers\API\ExtReferenceTypeController.cs" />
     <Compile Include="Controllers\API\GenericLocaleApiController.cs" />
     <Compile Include="Controllers\API\GenericOptionApiController.cs" />
-    <Compile Include="Controllers\API\HandoverTrialController.cs" />
     <Compile Include="Controllers\API\InterfaceTypeController.cs" />
     <Compile Include="Controllers\API\ItContractNamesController.cs" />
     <Compile Include="Controllers\API\ItContractRoleController.cs" />

@@ -81,7 +81,6 @@
     <Compile Include="ItContract\AgreementElement.cs" />
     <Compile Include="ItContract\ContractTemplate.cs" />
     <Compile Include="ItContract\ContractType.cs" />
-    <Compile Include="ItContract\HandoverTrial.cs" />
     <Compile Include="ItContract\ItContract.cs" />
     <Compile Include="ItContract\ItContractRight.cs" />
     <Compile Include="ItContract\ItContractRole.cs" />

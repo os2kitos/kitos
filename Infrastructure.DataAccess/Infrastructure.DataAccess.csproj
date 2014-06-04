@@ -89,7 +89,6 @@
     <Compile Include="Mapping\SensitiveDataTypeMap.cs" />
     <Compile Include="Mapping\TsaMap.cs" />
     <Compile Include="Mapping\TaskUsageMap.cs" />
-    <Compile Include="Mapping\HandoverTrialMap.cs" />
     <Compile Include="Mapping\OrganizationUnitMap.cs" />
     <Compile Include="Mapping\OrganizationRightMap.cs" />
     <Compile Include="Mapping\OrganizationRoleMap.cs" />

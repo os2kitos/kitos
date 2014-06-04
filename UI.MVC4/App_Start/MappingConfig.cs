@@ -39,10 +39,6 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<HandoverTrial, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
-
             Mapper.CreateMap<ContractTemplate, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
