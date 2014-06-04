@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Core.DomainModel
 {
     public class Config : Entity
@@ -58,6 +60,13 @@ namespace Core.DomainModel
                     ObjectOwner = objectOwner
                 };
 
+        }
+
+        public override bool HasUserWriteAccess(User user)
+        {
+            if (Organization != null && user.AdminRights.Any(right => right.ObjectId == Organization.Id)) return true;
+
+            return base.HasUserWriteAccess(user);
         }
     }
 }
