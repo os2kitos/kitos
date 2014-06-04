@@ -29,7 +29,9 @@
 
                 <!-- active (depends on contract) -->
                 <td>
-                    <!-- TODO: --> <i class="glyphicon glyphicon-ok text-muted"></i>
+                    <span data-ng-if="exposure.itContract.isActive" class="text-success">
+                        <i class="glyphicon glyphicon-ok"></i>
+                    </span>
                 </td>
                 
                 <!-- name of the system -->
@@ -42,8 +44,8 @@
 
                 <!-- contract id -->
                 <td>
-                    <a data-ng-if="exposure.itContractId != null" data-ui-sref="it-contract.edit({id: exposure.itContractId})">
-                        {{exposure.itContractItContractId}}
+                    <a data-ng-if="exposure.itContractId != null" data-ui-sref="it-contract.edit({id: exposure.itContract.id})">
+                        {{exposure.itContract.itContractId}}
                     </a>
                 </td>
                 
@@ -130,7 +132,9 @@
 
                 <!-- active (depends on contract) -->
                 <td>
-                    <!-- TODO: --> <i class="glyphicon glyphicon-ok text-muted"></i>
+                    <span data-ng-if="usage.itContract.isActive" class="text-success">
+                        <i class="glyphicon glyphicon-ok"></i>
+                    </span>
                 </td>
                 
                 <!-- name of the system -->
@@ -143,8 +147,8 @@
 
                 <!-- contract id -->
                 <td>
-                    <a data-ng-if="usage.itContractId != null" data-ui-sref="it-contract.edit({id: usage.itContractId})">
-                        {{usage.itContractItContractId}}
+                    <a data-ng-if="usage.itContractId != null" data-ui-sref="it-contract.edit({id: usage.itContract.id})">
+                        {{usage.itContract.itContractId}}
                     </a>
                 </td>
                 

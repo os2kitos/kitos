@@ -245,16 +245,19 @@ namespace UI.MVC4.App_Start
                   .ReverseMap();
 
             Mapper.CreateMap<InterfaceUsage, InterfaceUsageDTO>()
-                  .ReverseMap();
+                  .ReverseMap()
+                  .ForMember(dest => dest.ItContract, opt => opt.Ignore());
 
             Mapper.CreateMap<InterfaceExposure, InterfaceExposureDTO>()
-                  .ReverseMap();
+                  .ReverseMap()
+                  .ForMember(dest => dest.ItContract, opt => opt.Ignore());
 
             Mapper.CreateMap<ItSystemUsage, ItSystemUsageDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.OrgUnits, opt => opt.Ignore())
                   .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
-                  .ForMember(dest => dest.ItProjects, opt => opt.Ignore());
+                  .ForMember(dest => dest.ItProjects, opt => opt.Ignore())
+                  .ForMember(dest => dest.Contracts, opt => opt.Ignore());
 
             //Simplere mapping than the one above, only one way
             Mapper.CreateMap<ItSystemUsage, ItSystemUsageSimpleDTO>();
@@ -328,7 +331,10 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<ItContract, ItContractOverviewDTO>();
 
             //Output only - this mapping should not be reversed
-            Mapper.CreateMap<ItContract, ItContractPlanDTO>(); 
+            Mapper.CreateMap<ItContract, ItContractPlanDTO>();
+
+            //Output only - this mapping should not be reversed
+            Mapper.CreateMap<ItContract, ItContractSystemDTO>(); 
 
             Mapper.CreateMap<CustomAgreementElement, CustomAgreementElementDTO>()
                   .ReverseMap()

@@ -13,7 +13,7 @@ namespace UI.MVC4.Models
         public IEnumerable<DataRowUsageDTO> DataRowUsages { get; set; }
 
         public int? ItContractId { get; set; }
-        public string ItContractItContractId { get; set; }
+        public ItContractSystemDTO ItContract { get; set; }
 
         public int? InfrastructureId { get; set; }
         public string InfrastructureName { get; set; }

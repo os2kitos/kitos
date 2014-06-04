@@ -9,7 +9,7 @@
         public ItSystemDTO Interface { get; set; }
 
         public int? ItContractId { get; set; }
-        public string ItContractItContractId { get; set; }
+        public ItContractSystemDTO ItContract { get; set; }
 
         public bool IsWishedFor { get; set; }
     }

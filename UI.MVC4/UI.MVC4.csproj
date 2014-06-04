@@ -218,6 +218,7 @@
     <Compile Include="Controllers\API\PaymentFrequencyController.cs" />
     <Compile Include="Controllers\API\TerminationDeadlineController.cs" />
     <Compile Include="Controllers\API\PaymentMilestoneController.cs" />
+    <Compile Include="Models\ItContractSystemDTO.cs" />
     <Compile Include="Models\ItContractOverviewDTO.cs" />
     <Compile Include="Models\ItContractPlanDTO.cs" />
     <Compile Include="Models\PaymentMilestoneDTO.cs" />
@@ -486,6 +487,7 @@
     <Content Include="Partials\it-project\tab-strategy.html" />
     <Content Include="Partials\it-project\tab-status-project.html" />
     <Content Include="Partials\it-system\assign-it-system.html" />
+    <Content Include="Partials\it-system\tab-contracts.html" />
     <Content Include="Partials\it-system\tab-proj.html" />
     <Content Include="Partials\it-system\tab-kle.html" />
     <Content Include="Partials\it-system\edit-it-system.html" />
@@ -576,6 +578,7 @@
     <Content Include="Scripts\app\controllers\it-project\it-project-strategy.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project.js" />
     <Content Include="Scripts\app\controllers\it-project\subnav.js" />
+    <Content Include="Scripts\app\controllers\it-system\it-system-contracts.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-proj.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-kle.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-org.js" />
