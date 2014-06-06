@@ -17,7 +17,7 @@ namespace Core.DomainModel
         }
 
         public string Name { get; set; }
-        public int? Ean { get; set; }
+        public long? Ean { get; set; }
 
         public int? ParentId { get; set; }
         public virtual OrganizationUnit Parent { get; set; }
