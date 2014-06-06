@@ -25,7 +25,7 @@ namespace UI.MVC4.Controllers.API
             return _userService.AddUser(item);
         }
 
-        //TODO REWRITE THIS, perhaps so it's passes along at login?
+        //TODO REWRITE THIS, perhaps so it's passed along at login?
         public HttpResponseMessage Get(bool? organizations)
         {
             try
