@@ -500,7 +500,6 @@
     <Content Include="Partials\local-config\tab-org.html" />
     <Content Include="Partials\local-config\suggest-new-role.html" />
     <Content Include="Partials\local-config\optionlist.html" />
-    <Content Include="Partials\local-config\optionlocalelist.html" />
     <Content Include="Partials\local-config\suggest-new.html" />
     <Content Include="Partials\org\add-task-modal.html" />
     <Content Include="Partials\org\edit-org-unit-modal.html" />
