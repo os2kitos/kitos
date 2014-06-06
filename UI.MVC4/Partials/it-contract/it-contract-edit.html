@@ -31,7 +31,7 @@
                         <div class="form-group">
                             <label for="contract-type" class="control-label small">Kontrakttype</label>
                             <select id="contract-type" class="form-control input-sm" data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="contract.contractTypeId" data-ng-options="o.id as o.name for o in contractTypes">
+                                    data-ng-model="contract.contractTypeId" data-ng-options="o.id as o.name for o in contractTypes" data-autosave="{{ autoSaveUrl }}" data-field="contractTypeId">
                                 <option value=""></option>
                             </select>
                         </div>
