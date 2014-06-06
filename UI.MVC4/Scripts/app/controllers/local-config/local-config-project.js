@@ -12,12 +12,6 @@
 
     app.controller('local-config.EditProjectCtrl', ['$scope', '$http', 'notify', 'config',
             function ($scope, $http, notify, config) {
-                $scope.project = {
-                    chosenNameId: config.itProjectModuleNameId,
-                    guideUrl: config.itProjectGuide,
-                    showPortfolio: config.showPortfolio,
-                    showBC: config.showBC
-                };
             }
         ]
     );

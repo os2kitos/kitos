@@ -12,10 +12,7 @@
 
     app.controller('local-config.EditContractCtrl', ['$scope', '$http', 'notify', 'config',
             function ($scope, $http, notify, config) {
-                $scope.contract = {
-                    chosenNameId: config.itContractModuleNameId,
-                    guideUrl: config.itContractGuide
-                };
+
             }
         ]
     );

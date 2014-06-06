@@ -292,11 +292,7 @@
     <Compile Include="Models\CreateLocalAdminDTO.cs" />
     <Compile Include="Controllers\API\ConfigController.cs" />
     <Compile Include="Controllers\API\OrganizationRoleController.cs" />
-    <Compile Include="Controllers\API\ExtReferenceTypeLocaleController.cs" />
-    <Compile Include="Controllers\API\ExtReferenceTypeController.cs" />
-    <Compile Include="Controllers\API\GenericLocaleApiController.cs" />
     <Compile Include="Controllers\API\GenericOptionApiController.cs" />
-    <Compile Include="Controllers\API\HandoverTrialController.cs" />
     <Compile Include="Controllers\API\InterfaceTypeController.cs" />
     <Compile Include="Controllers\API\ItContractNamesController.cs" />
     <Compile Include="Controllers\API\ItContractRoleController.cs" />
@@ -342,7 +338,6 @@
     <Compile Include="Models\AuthorizeViewModels.cs" />
     <Compile Include="Models\ConfigDTO.cs" />
     <Compile Include="Models\ItSystemUsageDTO.cs" />
-    <Compile Include="Models\LocaleDTO.cs" />
     <Compile Include="Models\LoginDTO.cs" />
     <Compile Include="Models\OptionDTO.cs" />
     <Compile Include="Models\OrganizationDTO.cs" />
@@ -504,7 +499,6 @@
     <Content Include="Partials\local-config\tab-org.html" />
     <Content Include="Partials\local-config\suggest-new-role.html" />
     <Content Include="Partials\local-config\optionlist.html" />
-    <Content Include="Partials\local-config\optionlocalelist.html" />
     <Content Include="Partials\local-config\suggest-new.html" />
     <Content Include="Partials\org\add-task-modal.html" />
     <Content Include="Partials\org\edit-org-unit-modal.html" />

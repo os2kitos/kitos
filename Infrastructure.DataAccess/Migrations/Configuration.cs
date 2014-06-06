@@ -99,8 +99,6 @@ namespace Infrastructure.DataAccess.Migrations
 
             AddOptions<Frequency, DataRowUsage>(context.Frequencies, globalUser, "Dagligt", "Ugentligt", "Månedligt", "Årligt"); 
             
-            AddOptions<ExtReferenceType, ExtReference>(context.ExtReferenceTypes, globalUser, "ESDH ref", "CMDB ref", "Mappe ref"); 
-
             AddOptions<ArchiveType, ItSystemUsage>(context.ArchiveTypes, globalUser, "Arkiveret", "Ikke arkiveret");
 
             AddOptions<SensitiveDataType, ItSystemUsage>(context.SensitiveDataTypes, globalUser, "Ja", "Nej");
@@ -812,26 +810,6 @@ namespace Infrastructure.DataAccess.Migrations
             
             context.SaveChanges();
 
-
-            var extRef1 = new ExtReferenceType()
-                            {
-                                IsActive = true,
-                                Name = "ESDH Ref",
-                                Note = "Ref. til ESDH system, hvor der er projektdokumenter"
-                            };
-            var extRef2 = new ExtReferenceType()
-                {
-                    IsActive = true,
-                    Name = "CMDB Ref",
-                    Note = "Ref. til CMDB o.l system, hvor der er projektdokumenter"
-                };
-            var extRef3 = new ExtReferenceType()
-                {
-                    IsActive = true,
-                    Name = "Mappe Ref",
-                    Note = "Ref. til andre steder, hvor der er projektdokumenter"
-                };
-            context.ExtReferenceTypes.AddOrUpdate(x => x.Name, extRef1, extRef2, extRef3);
 
             var archiveTypeYes = new ArchiveType()
                 {

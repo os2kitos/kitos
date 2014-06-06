@@ -47,8 +47,6 @@ namespace Core.DomainModel
         /* Config and localization */
         public virtual Config Config { get; set; }
         
-        public virtual ICollection<ExtRefTypeLocale> ExtRefTypeLocales { get; set; }
-
         #endregion
     }
 }
