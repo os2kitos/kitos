@@ -7,9 +7,7 @@
             resolve: {
                 config: ['$http', 'userService', function ($http, userService) {
                     return userService.getUser().then(function(user) {
-                        return $http.get('api/config/' + user.currentOrganizationId).then(function(result) {
-                            return result.data.response;
-                        });
+                        return user.currentConfig;
                     });
 
                 }]

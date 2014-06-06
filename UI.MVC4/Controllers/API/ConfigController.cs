@@ -11,28 +11,6 @@ namespace UI.MVC4.Controllers.API
             : base(repository)
         {
         }
-
-        // GET api/T/default
-        public HttpResponseMessage GetDefault(bool? @default)
-        {
-            var item = Repository.GetByKey(1); // global Organization has id 1
-
-            if (item == null)
-                return NoContent();
-
-            return Ok(Map<Config, ConfigDTO>(item));
-        }
-
-        //[Authorize(Roles = "LocalAdmin")]
-        public override HttpResponseMessage Patch(int id, Newtonsoft.Json.Linq.JObject obj)
-        {
-            return base.Patch(id, obj);
-        }
-
-        //[Authorize(Roles = "LocalAdmin")]
-        protected override Config PatchQuery(Config item)
-        {
-            return base.PatchQuery(item);
-        }
+        
     }
 }

@@ -2,13 +2,13 @@
     <li>
         <a data-ui-sref="org-view" data-ui-sref-active="active">Organisation</a>
     </li>
-    <li>
+    <li data-ng-if="user.currentConfig.showItProjectModule">
         <a data-ui-sref="it-project.overview" data-ui-sref-active="active">IT Projekter</a>
     </li>
-    <li>
+    <li data-ng-if="user.currentConfig.showItSystemModule">
         <a data-ui-sref="overview-it-system" data-ui-sref-active="active">IT Systemer</a>
     </li>
-    <li>
+    <li data-ng-if="user.currentConfig.showItContractModule">
         <a data-ui-sref="it-contract.overview" data-ui-sref-active="active">IT Kontrakter</a>
     </li>
 </ul>

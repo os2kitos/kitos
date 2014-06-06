@@ -6,16 +6,17 @@
         <div class="col-md-1">KLE ID</div>
         <div class="col-md-3">KLE Navn</div>
         <div class="col-md-2">
-            <div class="supertext">Digitaliseringsgrad</div>
+            <div data-ng-class="{'supertext': user.currentConfig.showColumnTechnology || user.currentConfig.showColumnUsage}">
+                Digitaliseringsgrad
+            </div>
             <div class="subtext">
-                <span class="small">Teknologi</span>
-                <span class="small">Anvendelse</span>
+                <span class="small" data-ng-if="user.currentConfig.showColumnTechnology">Teknologi</span>
+                <span class="small" data-ng-if="user.currentConfig.showColumnUsage">Anvendelse</span>
             </div>
 
         </div>
         <div class="col-md-1 text-center">IT Projekt</div>
         <div class="col-md-1 text-center">IT System</div>
-        <div class="col-md-1 text-center">OBS</div>
     </div>
 
     <div data-ng-repeat="usage in taskUsages" class="task-usage-container">

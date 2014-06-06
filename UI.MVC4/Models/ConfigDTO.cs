@@ -10,6 +10,7 @@ namespace UI.MVC4.Models
 
         /* IT SUPPORT */
         public int ItSupportModuleNameId { get; set; }
+        public string ItSupportModuleNameName { get; set; }
         public string ItSupportGuide { get; set; }
         public bool ShowTabOverview { get; set; }
         public bool ShowColumnTechnology { get; set; }
@@ -18,16 +19,19 @@ namespace UI.MVC4.Models
 
         /* IT PROJECT */
         public int ItProjectModuleNameId { get; set; }
+        public string ItProjectModuleNameName { get; set; }
         public string ItProjectGuide { get; set; }
         public bool ShowPortfolio { get; set; }
         public bool ShowBC { get; set; }
 
         /* IT SYSTEM */
         public int ItSystemModuleNameId { get; set; }
+        public string ItSystemModuleNameName { get; set; }
         public string ItSystemGuide { get; set; }
 
         /* IT CONTRACT */
         public int ItContractModuleNameId { get; set; }
+        public string ItContractModuleNameName { get; set; }
         public string ItContractGuide { get; set; }
     }
 }
