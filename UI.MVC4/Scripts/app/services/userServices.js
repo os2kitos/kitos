@@ -20,9 +20,10 @@
                 isLocalAdminFor: _.pluck(response.adminRights, 'organizationId'),
                 defaultOrganizationUnitId: response.defaultOrganizationUnitId,
                 currentOrganizationId: currOrg.id,
-                currentOrganizationName: currOrg.name
+                currentOrganizationName: currOrg.name,
+                currentConfig: currOrg.config
             };
-
+            
             $rootScope.user = _user;
 
             return _user;
@@ -61,7 +62,7 @@
                 }).error(function(result) {
                     loadUserDeferred.reject("Not authorized");
                     loadUserDeferred = null;
-                    clearSavedOrg();
+                    clearSavedOrgId();
                 });
             }
 
@@ -102,7 +103,7 @@
 
                 deferred.resolve();
 
-                clearSavedOrg();
+                clearSavedOrgId();
 
             }).error(function(result) {
                 deferred.reject("Could not log out");
@@ -132,83 +133,107 @@
 
         }
         
-        function getSavedOrg() {
-            var org = localStorage.getItem("currentOrg");
-            return org != "undefined" && JSON.parse(org);
+        function getSavedOrgId() {
+            var orgId = localStorage.getItem("currentOrgId");
+            return orgId != null && JSON.parse(orgId);
         }
             
-        function setSavedOrg(org) {
-            localStorage.setItem("currentOrg", JSON.stringify(org));
+        function setSavedOrgId(orgId) {
+            localStorage.setItem("currentOrgId", JSON.stringify(orgId));
         }
         
-        function clearSavedOrg() {
-            localStorage.setItem("currentOrg", "undefined");
+        function clearSavedOrgId() {
+            localStorage.setItem("currentOrgId", null);
         }
 
+        //resolve which organization context, the user will be working in.
+        //when a user logs in, the user is prompted with a select-organization modal.
+        //the organization that is selected here, will be saved in local storage, for the next
+        //time the user is visiting.
         function resolveOrganization() {
 
             var deferred = $q.defer();
+            
+            //first try to get previous selected organization id from the local storage
+            var storedOrgId = getSavedOrgId();
 
-            var storedOrganization = getSavedOrg();
+            if (storedOrgId) {
+                
+                //given the saved org id, fetch the org details and config from the server 
+                $http.get("api/organization/" + storedOrgId).success(function(result) {
+                    deferred.resolve(result.response);
+                    
+                }).error(function(result) {
 
-            if (storedOrganization) {
-                deferred.resolve(storedOrganization);
+                    //the saved org was probably bad
+                    clearSavedOrgId();
+                    
+                    //prompt the user to select an org via modal
+                    openModal();
+                });
 
             } else {
 
+                //no previous selected org in local storage. 
+                
+                //prompt the user to select an org via modal
+                openModal();
+            }
+            
+            function openModal() {
                 //fetch the relevant organizations
                 $http.get("api/user?organizations").success(function (result) {
 
                     var organizations = result.response.organizations;
-                    
+
                     //if there's only one, just select that
                     if (organizations.length == 1) {
-                        
-                        var org = organizations[0];
-                        setSavedOrg(org);
-                        
-                        deferred.resolve(org);
-                        
+
+                        var firstOrg = organizations[0];
+                        setSavedOrgId(firstOrg.id);
+
+                        deferred.resolve(firstOrg);
+
                     } else {
-                        
+
                         //otherwise, open a modal 
                         var modal = $modal.open({
                             backdrop: 'static',
                             templateUrl: 'partials/home/choose-organization.html',
-                            controller: ['$scope', '$modalInstance', function($modalScope, $modalInstance) {
+                            controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
 
                                 $modalScope.orgChooser = {
                                     selectedId: result.response.defaultOrganizationId
                                 };
+                                
                                 $modalScope.organizations = organizations;
 
-                                $modalScope.ok = function() {
+                                $modalScope.ok = function () {
 
-                                    var org = _.findWhere(organizations, { id: $modalScope.orgChooser.selectedId });
+                                    var selectedOrg = _.findWhere(organizations, { id: $modalScope.orgChooser.selectedId });
 
-                                    $modalInstance.close(org);
+                                    $modalInstance.close(selectedOrg);
 
                                 };
 
                             }]
                         });
 
-                        modal.result.then(function(org) {
+                        modal.result.then(function (selectedOrg) {
 
-                            setSavedOrg(org);
-                            deferred.resolve(org);
+                            setSavedOrgId(selectedOrg.id);
+                            deferred.resolve(selectedOrg);
 
                         }, function () {
-                            
+
                             deferred.reject("Modal dismissed");
                         });
-                        
+
                     }
 
-                }).error(function() {
+                }).error(function () {
                     deferred.reject("Request for the users organizations failed!");
                 });
-
             }
 
             return deferred.promise;
@@ -223,23 +248,6 @@
         };
 
     }]);
-    
-    //which orgs do the user belong to - for the select box
-    //$http.get("api/user?organizations").success(function (result) {
-    //    var orgs = result.response.organizations;
-    //    $rootScope.user.organizations = orgs;
-
-    //    var defaultOrgId = result.response.defaultOrganizationId;
-
-    //    $rootScope.user.defaultOrganizationId = defaultOrgId;
-
-    //    if (defaultOrgId != 0) {
-    //        $rootScope.user.currentOrganizationId = defaultOrgId;
-    //    } else if (orgs.length > 0) {
-    //        $rootScope.user.currentOrganizationId = orgs[0].id;
-    //    }
-
-    //});
 
 
 })(angular, app);
