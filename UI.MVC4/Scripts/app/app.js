@@ -33,8 +33,8 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
         //x-editable config
         editableOptions.theme = 'bs3'; // bootstrap3 theme.
 
-        userService.getUser().then(function (user) {
-            $rootScope.openProfileModal = function () {
+        $rootScope.openProfileModal = function () {
+            userService.getUser().then(function (user) {
                 $modal.open({
                     templateUrl: 'partials/topnav/profileModal.html',
                     resolve: {
@@ -74,9 +74,9 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
                         };
                     }]
                 });
-            };
 
-        });
+            });
+        };
 
 
 
