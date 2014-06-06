@@ -1,6 +1,21 @@
 ﻿<form class="form-horizontal">
     
-    <!-- module name -->
+    <!-- show/hide-module -->
+    <div class="form-group">
+        <label class="col-md-2 control-label">
+            Generelt
+        </label>
+        <div class="col-md-10">
+            <div>
+                <label class="control-label">
+                    <input type="checkbox" data-ng-model="config.showItContractModule" data-autosave="{{config.autosaveUrl}}" data-field="showItContractModule" tabindex="1" />
+                    Medtag dette modul
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- module-name -->
     <div class="form-group">
         <label class="col-md-2 control-label">
             Modulnavn
@@ -10,7 +25,8 @@
             <input type="text" class="input-sm form-control" disabled="disabled" />
         </div>
     </div>
-
+    
+    <!-- guide -->
     <div class="form-group">
         <label class="col-md-2 control-label">
             Vejledning
@@ -19,6 +35,8 @@
             <input type="text" class="input-sm form-control" data-ng-model="config.itContractGuide" data-autosave="{{config.autosaveUrl}}" data-field="itContractGuide" />
         </div>
     </div>
+    
+    
     
     <div data-option-list="" title="Roller" data-options-url="api/itContractRole"></div>
     <div data-suggest-new-role="" data-url="api/itContractRole"></div>
