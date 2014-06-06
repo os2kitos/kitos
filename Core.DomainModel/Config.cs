@@ -4,6 +4,7 @@ namespace Core.DomainModel
 {
     public class Config : Entity
     {
+        /* SHOW/HIDE MODULES */
         public bool ShowItProjectModule { get; set; }
         public bool ShowItSystemModule { get; set; }
         public bool ShowItContractModule { get; set; }

@@ -37,9 +37,6 @@ namespace Infrastructure.DataAccess
         public DbSet<DataRowUsage> DataRowUsages { get; set; }
         public DbSet<EconomyYear> EconomyYears { get; set; }
         public DbSet<EconomyStream> EconomyStrams { get; set; }
-        public DbSet<ExtReference> ExtReferences { get; set; }
-        public DbSet<ExtReferenceType> ExtReferenceTypes { get; set; }
-        public DbSet<ExtRefTypeLocale> ExtRefTypeLocales { get; set; }
         public DbSet<Frequency> Frequencies { get; set; }
         public DbSet<Goal> Goals { get; set; }
         public DbSet<GoalStatus> GoalStatus { get; set; }
@@ -109,9 +106,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new DataRowUsageMap());
             modelBuilder.Configurations.Add(new EconomyStreamMap());
             modelBuilder.Configurations.Add(new EconomyYearMap());
-            modelBuilder.Configurations.Add(new ExtReferenceMap());
-            modelBuilder.Configurations.Add(new ExtReferenceTypeMap());
-            modelBuilder.Configurations.Add(new ExtRefTypeLocaleMap());
             modelBuilder.Configurations.Add(new FrequencyMap());
             modelBuilder.Configurations.Add(new GoalMap());
             modelBuilder.Configurations.Add(new GoalStatusMap());

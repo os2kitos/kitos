@@ -292,9 +292,6 @@
     <Compile Include="Models\CreateLocalAdminDTO.cs" />
     <Compile Include="Controllers\API\ConfigController.cs" />
     <Compile Include="Controllers\API\OrganizationRoleController.cs" />
-    <Compile Include="Controllers\API\ExtReferenceTypeLocaleController.cs" />
-    <Compile Include="Controllers\API\ExtReferenceTypeController.cs" />
-    <Compile Include="Controllers\API\GenericLocaleApiController.cs" />
     <Compile Include="Controllers\API\GenericOptionApiController.cs" />
     <Compile Include="Controllers\API\InterfaceTypeController.cs" />
     <Compile Include="Controllers\API\ItContractNamesController.cs" />

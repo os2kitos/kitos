@@ -92,9 +92,6 @@
     <Compile Include="Mapping\OrganizationUnitMap.cs" />
     <Compile Include="Mapping\OrganizationRightMap.cs" />
     <Compile Include="Mapping\OrganizationRoleMap.cs" />
-    <Compile Include="Mapping\ExtReferenceMap.cs" />
-    <Compile Include="Mapping\ExtReferenceTypeMap.cs" />
-    <Compile Include="Mapping\ExtRefTypeLocaleMap.cs" />
     <Compile Include="Mapping\GoalMap.cs" />
     <Compile Include="Mapping\GoalStatusMap.cs" />
     <Compile Include="Mapping\HandoverMap.cs" />
