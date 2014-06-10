@@ -1,0 +1,75 @@
+﻿<form class="form-horizontal">
+    
+    <!-- show/hide-module -->
+    <div class="form-group">
+        <label class="col-md-2 control-label">
+            Generelt
+        </label>
+        <div class="col-md-10">
+            <div>
+                <label class="control-label">
+                    <input type="checkbox" data-ng-model="config.showItContractModule" data-autosave="{{config.autosaveUrl}}" data-field="showItContractModule" tabindex="1" />
+                    Medtag dette modul
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- module-name -->
+    <div class="form-group">
+        <label class="col-md-2 control-label">
+            Modulnavn
+        </label>
+        <!-- todo -->
+        <div class="col-md-6">
+            <input type="text" class="input-sm form-control" disabled="disabled" />
+        </div>
+    </div>
+    
+    <!-- guide -->
+    <div class="form-group">
+        <label class="col-md-2 control-label">
+            Vejledning
+        </label>
+        <div class="col-md-6">
+            <input type="text" class="input-sm form-control" data-ng-model="config.itContractGuide" data-autosave="{{config.autosaveUrl}}" data-field="itContractGuide" />
+        </div>
+    </div>
+    
+    
+    
+    <div data-option-list="" title="Roller" data-options-url="api/itContractRole"></div>
+    <div data-suggest-new-role="" data-url="api/itContractRole"></div>
+
+    <div data-option-list="" title="Kontrakttyper" data-options-url="api/contractType"></div>
+    <div data-suggest-new="" data-url="api/contractType"></div>
+
+    <div data-option-list="" title="Kontraktskabeloner" data-options-url="api/contractTemplate"></div>
+    <div data-suggest-new="" data-url="api/contractTemplate"></div>
+
+    <div data-option-list="" title="Indkøbsformer" data-options-url="api/purchaseForm"></div>
+    <div data-suggest-new="" data-url="api/purchaseForm"></div>
+
+    <div data-option-list="" title="Betalingsmodeller" data-options-url="api/paymentModel"></div>
+    <div data-suggest-new="" data-url="api/paymentModel"></div>
+
+    <div data-option-list="" title="Aftaleelementer" data-options-url="api/agreementElement"></div>
+    <div data-suggest-new="" data-url="api/agreementElement"></div>
+
+    <div data-option-list="" title="Option forlæng" data-options-url="api/optionExtend"></div>
+    <div data-suggest-new="" data-url="api/optionExtend"></div>
+
+    <div data-option-list="" title="Betalingsfrekvenser" data-options-url="api/paymentFrequency"></div>
+    <div data-suggest-new="" data-url="api/paymentFrequency"></div>
+    
+    <div data-option-list="" title="Pris reguleringer" data-options-url="api/priceRegulation"></div>
+    <div data-suggest-new="" data-url="api/priceRegulation"></div>
+    
+    <div data-option-list="" title="Indkøbsstrategier" data-options-url="api/procurementStrategy"></div>
+    <div data-suggest-new="" data-url="api/procurementStrategy"></div>
+
+    <div data-option-list="" title="Opsigelsesfrister" data-options-url="api/terminationDeadline"></div>
+    <div data-suggest-new="" data-url="api/terminationDeadline"></div>
+
+    
+</form>

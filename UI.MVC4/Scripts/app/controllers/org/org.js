@@ -1,11 +1,18 @@
 ﻿(function (ng, app) {
 
-    var subnav = [
-            { state: 'org-overview', text: 'Overblik' },
-            { state: 'org-view', text: 'Organisation' },
-            { state: 'index', text: 'Rapport' }
-    ];
+    function getSubnav(config) {
+        var subnav = [];
 
+        if (config.showTabOverview) {
+            subnav.push({ state: 'org-overview', text: 'Overblik' });
+        }
+
+        subnav.push({ state: 'org-view', text: 'Organisation' });
+
+        return subnav;
+    }
+    
+    
     function indent(level) {
         var result = "";
         for (var i = 0; i < level; i++) result += ".....";
@@ -43,7 +50,7 @@
     app.controller('org.OrgViewCtrl', ['$rootScope', '$scope', '$http', '$q', '$filter', '$modal', 'notify', 'orgRolesHttp', 'user',
         function ($rootScope, $scope, $http, $q, $filter, $modal, notify, orgRolesHttp, user) {
         $rootScope.page.title = 'Organisation';
-        $rootScope.page.subnav = subnav;
+        $rootScope.page.subnav = getSubnav(user.currentConfig);
             
             var userId = user.id;
 
@@ -852,7 +859,7 @@
 
     app.controller('org.OverviewCtrl', ['$rootScope', '$scope', '$http', 'notify', '$modal', '$timeout', '$sce', 'user', function ($rootScope, $scope, $http, notify, $modal, $timeout, $sce, user) {
         $rootScope.page.title = 'Organisation';
-        $rootScope.page.subnav = subnav;
+        $rootScope.page.subnav = getSubnav(user.currentConfig);
 
         var userId = user.id;
 

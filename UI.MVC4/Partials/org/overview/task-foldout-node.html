@@ -10,8 +10,8 @@
         </div>
 
         <div class="col-md-2">
-            <div class="status-column" data-show-status="usage.calculatedTechStatus"></div>
-            <div class="status-column" data-show-status="usage.calculatedUsageStatus"></div>
+            <div class="status-column" data-show-status="usage.calculatedTechStatus" data-ng-if="user.currentConfig.showColumnTechnology"></div>
+            <div class="status-column" data-show-status="usage.calculatedUsageStatus" data-ng-if="user.currentConfig.showColumnUsage"></div>
             <div class="status-column">
                 <button class="btn btn-link btn-xs"
                     data-tooltip-html-unsafe="<small>{{ usage.usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"

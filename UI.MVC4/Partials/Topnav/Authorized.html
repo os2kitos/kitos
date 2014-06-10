@@ -2,25 +2,25 @@
     <li>
         <a data-ui-sref="org-view" data-ui-sref-active="active">Organisation</a>
     </li>
-    <li>
+    <li data-ng-if="user.currentConfig.showItProjectModule">
         <a data-ui-sref="it-project.overview" data-ui-sref-active="active">IT Projekter</a>
     </li>
-    <li>
+    <li data-ng-if="user.currentConfig.showItSystemModule">
         <a data-ui-sref="overview-it-system" data-ui-sref-active="active">IT Systemer</a>
     </li>
-    <li>
+    <li data-ng-if="user.currentConfig.showItContractModule">
         <a data-ui-sref="it-contract.overview" data-ui-sref-active="active">IT Kontrakter</a>
     </li>
 </ul>
 
 <div class="navbar-text navbar-text-small navbar-right navbar-complex">
     <div>
-        <a data-ng-click="openProfileModal()">{{ user.name }}</a> {{ user.currentOrganizationName}}
+        <a data-ng-click="openProfileModal()">{{ user.name }}</a> {{ user.currentOrganizationName }}
         <a data-ng-click="logout()">Log ud</a>
     </div>
     
     <div>
-        <a data-ng-if="user.isLocalAdmin" data-ui-sref="local-config" data-ui-sref-active="active">Lokal admin</a>
+        <a data-ng-if="user.isLocalAdmin" data-ui-sref="local-config.org" data-ui-sref-active="active">Lokal admin</a>
         <a data-ng-if="user.isGlobalAdmin" data-ui-sref="global-admin" data-ui-sref-active="active">Global admin</a>
         <a data-ng-if="user.isGlobalAdmin" data-ui-sref="config-org" data-ui-sref-active="active">Global konfig</a>
     </div>

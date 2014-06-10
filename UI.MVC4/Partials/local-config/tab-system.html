@@ -1,0 +1,70 @@
+﻿<form class="form-horizontal">
+       
+    <!-- show/hide-module -->
+    <div class="form-group">
+        <label class="col-md-2 control-label">
+            Generelt
+        </label>
+        <div class="col-md-10">
+            <div>
+                <label class="control-label">
+                    <input type="checkbox" data-ng-model="config.showItSystemModule" data-autosave="{{config.autosaveUrl}}" data-field="showItSystemModule" tabindex="1" />
+                    Medtag dette modul
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- module name -->
+    <div class="form-group">
+        <label class="col-md-2 control-label">
+            Modulnavn
+        </label>
+        <!-- todo -->
+        <div class="col-md-6">
+            <input type="text" class="input-sm form-control" disabled="disabled" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-2 control-label">
+            Vejledning
+        </label>
+        <div class="col-md-6">
+            <input type="text" class="input-sm form-control" data-ng-model="config.itSystemGuide" data-autosave="{{config.autosaveUrl}}" data-field="itSystemGuide" />
+        </div>
+    </div>
+    
+    <div data-option-list="" title="Roller" data-options-url="api/itSystemRole"></div>
+    <div data-suggest-new-role="" data-url="api/itSystemRole"></div>
+
+    <div data-option-list="" title="Applikationstyper" data-options-url="api/appType"></div>
+    <div data-suggest-new="" data-url="api/appType"></div>
+
+    <div data-option-list="" title="Forretningstyper" data-options-url="api/businessType"></div>
+    <div data-suggest-new="" data-url="api/businessType"></div>
+
+    <div data-option-list="" title="Arkiveringstyper" data-options-url="api/archiveType"></div>
+    <div data-suggest-new="" data-url="api/archiveType"></div>
+    
+    <div data-option-list="" title="Datatyper" data-options-url="api/dataType"></div>
+    <div data-suggest-new="" data-url="api/dataType"></div>
+
+    <div data-option-list="" title="Frekvenser" data-options-url="api/frequency"></div>
+    <div data-suggest-new="" data-url="api/frequency"></div>
+
+    <div data-option-list="" title="Snitfladetyper" data-options-url="api/interfaceType"></div>
+    <div data-suggest-new="" data-url="api/interfaceType"></div>
+
+    <div data-option-list="" title="Grænseflader" data-options-url="api/interface"></div>
+    <div data-suggest-new="" data-url="api/interface"></div>
+
+    <div data-option-list="" title="Metoder" data-options-url="api/method"></div>
+    <div data-suggest-new="" data-url="api/method"></div>
+
+    <div data-option-list="" title="Personfølsomme data" data-options-url="api/sensitiveDataType"></div>
+    <div data-suggest-new="" data-url="api/sensitiveDataType"></div>
+
+    <div data-option-list="" title="TSA" data-options-url="api/tsa"></div>
+    <div data-suggest-new="" data-url="api/tsa"></div>
+</form>

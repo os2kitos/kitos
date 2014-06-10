@@ -24,14 +24,16 @@
                         <div class="form-group">
                             <label for="contract-parent" class="control-label small">Overordent kontrakt</label>
                             <select id="contract-parent" class="form-control input-sm" data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="contract.parentId" data-ng-options="o.id as o.name for o in contracts" data-autosave="{{ autoSaveUrl }}" data-field="parentId"></select>
+                                    data-ng-model="contract.parentId" data-ng-options="o.id as (o.name ? o.name : 'Unavngiven') for o in contracts" data-autosave="{{ autoSaveUrl }}" data-field="parentId">
+                                <option value=""></option>
+                            </select>
                         </div>
 
                         <!-- Type -->
                         <div class="form-group">
                             <label for="contract-type" class="control-label small">Kontrakttype</label>
                             <select id="contract-type" class="form-control input-sm" data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="contract.contractTypeId" data-ng-options="o.id as o.name for o in contractTypes">
+                                    data-ng-model="contract.contractTypeId" data-ng-options="o.id as o.name for o in contractTypes" data-autosave="{{ autoSaveUrl }}" data-field="contractTypeId">
                                 <option value=""></option>
                             </select>
                         </div>

@@ -10,6 +10,6 @@ namespace UI.MVC4.Models
         public int ParentId { get; set; }
         public List<OrgUnitDTO> Children { get; set; }
 
-        public int? Ean { get; set; }
+        public long? Ean { get; set; }
     }
 }

@@ -203,7 +203,7 @@
             };
         }
     ]);
-    
+
     app.directive('selectStatus2', ['$timeout',
         function ($timeout) {
             return {
@@ -217,19 +217,19 @@
                     scope.setModel = function (n) {
                         //only update on change
                         if (scope.model == n) return;
-                        
+
                         //save new value
                         scope.model = n;
-                        
+
                         $timeout(function () {
                             //then trigger event
                             ngModel.$setViewValue(scope.model);
-                            
+
                             //this triggers the autosave directive
                             element.triggerHandler("blur");
                         });
                     };
-                    
+
                     //read value from ngModel
                     ngModel.$render = function () {
                         scope.model = ngModel.$viewValue;
@@ -427,7 +427,7 @@
                 link: function (scope, element, attrs, ctrl) {
                     //this is called when the user selects something from select2
                     element.bind('change', function () {
-                        $timeout(function() {
+                        $timeout(function () {
                             //update the view value
                             ctrl.$setViewValue(scope.select.selected);
 
@@ -437,7 +437,7 @@
                     });
 
                     //when the outer ngModel is changed, update the inner model
-                    ctrl.$render = function() {
+                    ctrl.$render = function () {
                         scope.select.selected = ctrl.$viewValue;
                     };
 
@@ -446,7 +446,7 @@
 
                     //settings for select2
                     var settings = {
-                        
+
                         allowClear: !!scope.allowClear,
 
                         //don't format markup in result
@@ -454,7 +454,7 @@
 
                         //when an option has been selected, print the no-html version
                         formatSelection: function (item) {
-                            
+
                             var option;
                             if (item.id) {
                                 option = _.findWhere(options, { id: parseInt(item.id) });
@@ -521,4 +521,79 @@
 
     ]);
 
+    app.directive('suggestNew', ['$http', 'notify', function ($http, notify) {
+        return {
+            scope: {
+                url: '@'
+            },
+            templateUrl: 'partials/local-config/suggest-new.html',
+            link: function (scope, element, attrs) {
+                scope.suggest = function () {
+                    var data = {
+                        "isSuggestion": true,
+                        "name": scope.suggestion
+                    };
+
+                    $http.post(scope.url, data).success(function (result) {
+                        notify.addSuccessMessage('Foreslag sendt!');
+                        scope.suggestion = "";
+                    }).error(function (result) {
+                        notify.addErrorMessage('Kunne ikke sende foreslag!');
+                    });
+                };
+            }
+        };
+    }]);
+
+    app.directive('suggestNewRole', ['$http', 'notify', function ($http, notify) {
+        return {
+            scope: {
+                url: '@'
+            },
+            templateUrl: 'partials/local-config/suggest-new-role.html',
+            link: function (scope, element, attrs) {
+                scope.suggest = function () {
+
+                    var data = {
+                        "isSuggestion": true,
+                        "name": scope.suggestion,
+                        "hasReadAccess": true,
+                        "hasWriteAccess": scope.writeAccess
+                    };
+
+                    $http.post(scope.url, data).success(function (result) {
+                        notify.addSuccessMessage('Foreslag sendt!');
+                        scope.suggestion = "";
+                    }).error(function (result) {
+                        notify.addErrorMessage('Kunne ikke sende foreslag!');
+                    });
+                };
+            }
+        };
+    }]);
+
+    app.directive('optionList', ['$http', function ($http) {
+        return {
+            scope: {
+                optionsUrl: '@',
+                title: '@',
+            },
+            templateUrl: 'partials/local-config/optionlist.html',
+            link: function (scope, element, attrs) {
+
+                scope.list = [];
+
+                $http.get(scope.optionsUrl).success(function (result) {
+                    _.each(result.response, function (v) {
+                        scope.list.push({
+                            id: v.id,
+                            name: v.name,
+                            note: v.note
+                        });
+                    });
+                });
+            }
+        };
+    }]);
+    
 })(angular, app);

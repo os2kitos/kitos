@@ -45,6 +45,10 @@ namespace Infrastructure.DataAccess.Mapping
                         mc.MapLeftKey("UsageId");
                         mc.MapRightKey("OrgUnitId");
                     });
+
+            this.HasOptional(t => t.MainContract)
+                .WithMany()
+                .HasForeignKey(t => t.MainContractId);
         }
     }
 }

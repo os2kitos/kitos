@@ -1,0 +1,70 @@
+﻿<form class="form-horizontal">
+    
+    <!-- show/hide-module -->
+    <div class="form-group">
+        <label class="col-md-2 control-label">
+            Generelt
+        </label>
+        <div class="col-md-10">
+            <div>
+                <label class="control-label">
+                    <input type="checkbox" data-ng-model="config.showItProjectModule" data-autosave="{{config.autosaveUrl}}" data-field="showItProjectModule" tabindex="1" />
+                    Medtag dette modul
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- module name -->
+    <div class="form-group">
+        <label class="col-md-2 control-label">
+            Modulnavn
+        </label>
+        <!-- todo -->
+        <div class="col-md-6">
+            <input type="text" class="input-sm form-control" disabled="disabled" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-2 control-label">
+            Vejledning
+        </label>
+        <div class="col-md-6">
+            <input type="text" class="input-sm form-control" data-ng-model="config.itProjectGuide" data-autosave="{{config.autosaveUrl}}" data-field="itProjectGuide" />
+        </div>
+    </div>
+    
+    <div data-option-list="" title="Projektkategorier" data-options-url="api/itProjectCategory"></div>
+    <div data-suggest-new="" data-url="api/itProjectCategory"></div>
+
+    <div data-option-list="" title="Projekttype" data-options-url="api/itProjectType"></div>
+    <div data-suggest-new="" data-url="api/itProjectType"></div>
+    
+    <div data-option-list="" title="Måltyper" data-options-url="api/goalType"></div>
+    <div data-suggest-new="" data-url="api/goalType"></div>
+
+    <div data-option-list="" title="Roller" data-options-url="api/itProjectRole"></div>
+    <div data-suggest-new-role="" data-url="api/itProjectRole"></div>
+    
+    <!-- TODO this is outdated! -->
+    <div class="form-group text-muted">
+        <label class="col-md-2 control-label">
+            Portefølje
+        </label>
+        <div class="col-md-10">
+            <div>
+                <label>
+                    <input type="checkbox" data-ng-model="config.showPortfolio" data-autosave="{{config.autosaveUrl}}" data-field="showPortfolio" tabindex="3" disabled="disabled"/>
+                    Medtag fanen 'Portefølje'
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="checkbox" data-ng-model="config.showBC" data-autosave="{{config.autosaveUrl}}" data-field="showBC" tabindex="3" disabled="disabled"/>
+                    Medtag kolonnen 'BC'
+                </label>
+            </div>
+        </div>
+    </div>
+</form>

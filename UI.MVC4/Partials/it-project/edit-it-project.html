@@ -55,41 +55,37 @@
                 </div>
             </div>
             
-            <!-- TODO: ARE THESE OBSOLETE??
             <div class="form-group">
-                <!-- esdh ref 
+                <!-- esdh ref -->
                 <label for="project-esdh" class="col-md-2 control-label small">ESDH ref.</label>
                 <div class="col-md-4">
-                    <input id="project-esdh" class="form-control input-sm" type="text" data-ng-model="project.esdhRef" />
-                    <!-- TODO
-                        data-field="esdhRef" 
+                    <input id="project-esdh" class="form-control input-sm" type="text" data-ng-model="project.esdh"
+                        data-field="esdh" 
                         data-autosave="api/itproject/{{project.id}}" /> 
                        
 
                 </div>
 
-                <!-- cmdb ref 
+                <!-- cmdb ref -->
                 <label for="project-cmdb" class="col-md-2 control-label small">CMDB ref.</label>
                 <div class="col-md-4">
-                    <input id="project-cmdb" class="form-control input-sm" type="text" data-ng-model="project.cmdbRef" />
-                    <!-- TODO
-                        data-field="cmdbRef" 
+                    <input id="project-cmdb" class="form-control input-sm" type="text" data-ng-model="project.cmdb"
+                        data-field="cmdb" 
                         data-autosave="api/itproject/{{project.id}}" /> 
                         
                 </div>
             </div>
 
-            <!-- link ref 
+            <!-- link ref -->
             <div class="form-group">
-                <label for="project-url" class="col-md-2 control-label small">Mappe/URL ref.</label>
+                <label for="project-url" class="col-md-2 control-label small">Mappe link</label>
                 <div class="col-md-10">
-                    <input id="project-url" class="form-control input-sm" type="text" data-ng-model="project.directoryOrUrlRef" />
-                    <!-- TODO
-                        data-field="directoryOrUrlRef" 
+                    <input id="project-url" class="form-control input-sm" type="text" data-ng-model="project.folder" 
+                        data-field="folder" 
                         data-autosave="api/itproject/{{project.id}}" />
                         
                 </div>
-            </div>-->
+            </div>
             
             <!-- associated program -->
             <div class="form-group" data-ng-if="project.itProjectTypeId != itProgramType.id">
