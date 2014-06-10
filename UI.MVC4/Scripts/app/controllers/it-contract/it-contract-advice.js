@@ -10,42 +10,40 @@
                         .then(function (result) {
                             return result.data.response;
                         });
+                }],
+                advices: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get('api/itcontract/' + $stateParams.id).then(function (result) {
+                        return result.data.response.advices;
+                    });
                 }]
             }
         });
     }]);
 
-    app.controller('contract.EditAdviceCtrl', ['$scope', '$http', 'notify', 'contract', 'itContractRoles',
-        function ($scope, $http, notify, contract, itContractRoles) {
+    app.controller('contract.EditAdviceCtrl', ['$scope', '$http', '$state', '$stateParams', '$timeout', 'notify', 'contract', 'advices', 'itContractRoles',
+        function ($scope, $http, $state, $stateParams, $timeout, notify, contract, advices, itContractRoles) {
             $scope.itContractRoles = itContractRoles;
-
+            $scope.advices = advices;
             var baseUrl = "api/advice";
             
-            var advices = [];
-            $scope.advices = advices;
-            
+            _.each(advices, pushAdvice);
+
             function pushAdvice(advice) {
-                advice.show = true;
                 advice.updateUrl = baseUrl + "/" + advice.id;
 
                 advice.delete = function () {
                     var msg = notify.addInfoMessage("Sletter rækken...", false);
                     
                     $http.delete(advice.updateUrl).success(function(result) {
-                        advice.show = false;
                         msg.toSuccessMessage("Rækken er slettet!");
+                        reload();
                     }).error(function () {
                         msg.toErrorMessage("Fejl! Rækken kunne ikke slettes!");
                     });
                 };
-
-                advices.push(advice);
             }
 
-            _.each(contract.advices, pushAdvice);
-
-            function newAdvice() {
-
+            $scope.newAdvice = function() {
                 var data = {
                     itContractId: contract.id,
                     isActive: true
@@ -56,13 +54,23 @@
                 $http.post(baseUrl, data).success(function(result) {
                     pushAdvice(result.response);
                     msg.toSuccessMessage("Rækken er tilføjet!");
+                    reload();
                 }).error(function() {
                     msg.toErrorMessage("Fejl! Kunne ikke tilføje række!");
                 });
-            }
+            };
 
-            $scope.newAdvice = newAdvice;
-
+            // work around for $state.reload() not updating scope
+            // https://github.com/angular-ui/ui-router/issues/582
+            function reload() {
+                return $state.transitionTo($state.current, $stateParams, {
+                    reload: true
+                }).then(function () {
+                    $scope.hideContent = true;
+                    return $timeout(function () {
+                        return $scope.hideContent = false;
+                    }, 1);
+                });
+            };
         }]);
-
 })(angular, app);
