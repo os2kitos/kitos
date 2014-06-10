@@ -13,15 +13,15 @@ namespace UI.MVC4.Controllers.API
         {
         }
 
-        public HttpResponseMessage GetByOrgUnit(int orgUnitId)
+        public HttpResponseMessage GetByOrgUnit(int orgUnitId, int skip = 0, int take = 100)
         {
-            var items =  GetAllQuery().Where(x => x.OwnedByOrganizationUnitId == orgUnitId || x.IsPublic);
+            var items = Repository.AsQueryable().Where(x => x.OwnedByOrganizationUnitId == orgUnitId || x.IsPublic).OrderBy(x => x.Id).Skip(skip).Take(take);
             return Ok(Map(items));
         }
 
-        public HttpResponseMessage GetByOrg(int orgId)
+        public HttpResponseMessage GetByOrg(int orgId, int skip = 0, int take = 100)
         {
-            var items = GetAllQuery().Where(x => x.OwnedByOrganizationUnit.OrganizationId == orgId || x.IsPublic);
+            var items = Repository.AsQueryable().Where(x => x.OwnedByOrganizationUnit.OrganizationId == orgId || x.IsPublic).OrderBy(x => x.Id).Skip(skip).Take(take);
             return Ok(Map(items));
         }
     }

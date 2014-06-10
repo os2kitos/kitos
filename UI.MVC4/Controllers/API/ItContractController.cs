@@ -132,7 +132,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var itContract = Repository.GetQueryable().Single(x => x.Id == id);
+                var itContract = Repository.AsQueryable().Single(x => x.Id == id);
 
                 if (itContract == null)
                     return NotFound();

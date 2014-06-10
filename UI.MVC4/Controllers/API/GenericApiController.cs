@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Security;
+using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
@@ -20,17 +20,26 @@ namespace UI.MVC4.Controllers.API
             Repository = repository;
         }
         
-        protected virtual IEnumerable<TModel> GetAllQuery()
+        protected virtual IEnumerable<TModel> GetAllQuery(int skip, int take, bool descending, string orderBy = null)
         {
-            //TODO: remove this hardcode and do some proper paging
-            return Repository.Get().Take(100);
+            var field = orderBy ?? "Id";
+            return Repository.AsQueryable().OrderByField(field, descending).Skip(skip).Take(take);
         }
 
-        public virtual HttpResponseMessage GetAll()
+        public virtual HttpResponseMessage GetAll(int skip = 0, int take = 100, string orderBy = null, bool descending = false)
         {
             try
             {
-                var items = GetAllQuery();
+                var items = GetAllQuery(skip, take, descending, orderBy);
+
+                var totalCount = Repository.AsQueryable().Count(); // TODO this isn't accurate if a where is used in GetAllQuery
+                var paginationHeader = new
+                    {
+                        TotalCount = totalCount
+                    };
+                System.Web.HttpContext.Current.Response.Headers.Add("X-Pagination",
+                                                                    Newtonsoft.Json.JsonConvert.SerializeObject(
+                                                                        paginationHeader));
 
                 return Ok(Map(items));
             }

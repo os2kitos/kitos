@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Security;
+using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainServices;
 
@@ -14,23 +16,24 @@ namespace UI.MVC4.Controllers.API
         {
         }
 
-        protected override IEnumerable<TModel> GetAllQuery()
+        protected override IEnumerable<TModel> GetAllQuery(int skip, int take, bool descending, string orderBy = null)
         {
-            return this.Repository.Get(t => t.IsActive && !t.IsSuggestion);
+            var field = orderBy ?? "Id";
+            return Repository.AsQueryable().Where(t => t.IsActive && !t.IsSuggestion).OrderByField(field, descending).Skip(skip).Take(take);
         }
 
-        public HttpResponseMessage GetAllSuggestions(bool? suggestions)
+        public HttpResponseMessage GetAllSuggestions(bool? suggestions, int skip = 0, int take = 100)
         {
-            var items = this.Repository.Get(t => t.IsSuggestion);
+            var items = Repository.AsQueryable().Where(t => t.IsSuggestion).OrderBy(x => x.Id).Skip(skip).Take(take);
             
-            return Ok(Map<IEnumerable<TModel>, IEnumerable<TDto>>(items));
+            return Ok(Map(items));
         }
 
-        public HttpResponseMessage GetAllNonSuggestions(bool? nonsuggestions)
+        public HttpResponseMessage GetAllNonSuggestions(bool? nonsuggestions, int skip = 0, int take = 100)
         {
-            var items = this.Repository.Get(t => !t.IsSuggestion);
+            var items = Repository.AsQueryable().Where(t => !t.IsSuggestion).OrderBy(x => x.Id).Skip(skip).Take(take);
 
-            return Ok(Map<IEnumerable<TModel>, IEnumerable<TDto>>(items));
+            return Ok(Map(items));
         }
         
         protected override TModel PutQuery(TModel item)

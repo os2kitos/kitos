@@ -43,7 +43,7 @@ namespace Infrastructure.DataAccess
             return orderBy != null ? orderBy(query).ToList() : query.ToList();
         }
 
-        public IQueryable<T> GetQueryable()
+        public IQueryable<T> AsQueryable()
         {
             return _dbSet.AsQueryable();
         }

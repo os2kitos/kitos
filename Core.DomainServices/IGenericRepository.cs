@@ -18,6 +18,6 @@ namespace Core.DomainServices
         void Update(TModel entity);
         void Save();
         void Patch(TModel item);
-        IQueryable<TModel> GetQueryable();
+        IQueryable<TModel> AsQueryable();
     }
 }
