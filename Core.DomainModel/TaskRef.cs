@@ -4,7 +4,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
 {
-    public class TaskRef : Entity
+    public class TaskRef : Entity, IHierarchy<TaskRef>
     {
         public TaskRef()
         {

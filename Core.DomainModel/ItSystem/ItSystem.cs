@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ItSystem : Entity, IHasAccessModifier
+    public class ItSystem : Entity, IHasAccessModifier, IHierarchy<ItSystem>
     {
         public ItSystem()
         {

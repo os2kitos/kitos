@@ -212,6 +212,7 @@
   <ItemGroup>
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Controllers\API\GenericHierarchyApiController.cs" />
     <Compile Include="Controllers\API\OptionExtendController.cs" />
     <Compile Include="Controllers\API\PriceRegulationController.cs" />
     <Compile Include="Controllers\API\PaymentModelController.cs" />
