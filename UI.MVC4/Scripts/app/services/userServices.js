@@ -15,10 +15,14 @@
                 id: response.id,
                 name: response.name,
                 email: response.email,
+                
                 isGlobalAdmin: response.isGlobalAdmin,
                 isLocalAdmin: isLocalAdmin,
                 isLocalAdminFor: _.pluck(response.adminRights, 'organizationId'),
+                
                 defaultOrganizationUnitId: response.defaultOrganizationUnitId,
+                
+                currentOrganization: currOrg,
                 currentOrganizationId: currOrg.id,
                 currentOrganizationName: currOrg.name,
                 currentConfig: currOrg.config
@@ -27,6 +31,30 @@
             $rootScope.user = _user;
 
             return _user;
+        }
+        
+        function patchUser(payload) {
+            var deferred = $q.defer();
+
+            if (_user == null) {
+                deferred.reject("Not authenticated.");
+            } else {
+                $http({
+                    method: 'PATCH',
+                    url: 'api/user/' + _user.id,
+                    data: payload
+                }).success(function (result) {
+                    var newUser = result.response;
+                    
+                    saveUser(newUser, _user.currentOrganization);
+                    deferred.resolve(_user);
+
+                }).error(function () {
+                    deferred.reject("Couldn't patch the user!");
+                });
+
+            }
+            return deferred.promise;
         }
 
         function getUser() {
@@ -180,6 +208,7 @@
                 openModal();
             }
             
+            //helper function for displaying the choose-organization modal
             function openModal() {
                 //fetch the relevant organizations
                 $http.get("api/user?organizations").success(function (result) {
@@ -244,7 +273,8 @@
             getUser: getUser,
             login: login,
             logout: logout,
-            auth: auth
+            auth: auth,
+            patchUser: patchUser
         };
 
     }]);

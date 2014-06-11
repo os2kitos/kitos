@@ -449,6 +449,7 @@
     <Content Include="Partials\global-config\project.html" />
     <Content Include="Partials\global-admin\new-organization.html" />
     <Content Include="Partials\home\choose-organization.html" />
+    <Content Include="Partials\home\edit-user.html" />
     <Content Include="Partials\home\reset-password.html" />
     <Content Include="Partials\home\forgot-password.html" />
     <Content Include="Partials\home\index.html" />
@@ -512,7 +513,6 @@
     <Content Include="Partials\org\overview\task-usage.html" />
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />
-    <Content Include="Partials\topnav\profileModal.html" />
     <Content Include="Partials\topnav\topnav.html" />
     <Content Include="Scripts\angular-animate.js" />
     <Content Include="Scripts\angular-animate.min.js" />
@@ -539,6 +539,7 @@
     <Content Include="Scripts\AngularUI\ui-router.min.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-admin.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-config.js" />
+    <Content Include="Scripts\app\controllers\home\edit-user.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-hierarchy.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-deadlines.js" />
