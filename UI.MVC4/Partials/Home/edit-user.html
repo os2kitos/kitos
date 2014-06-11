@@ -1,0 +1,36 @@
+﻿<div class="col-md-7">
+    <h2>Rediger profil</h2>
+
+    <form name="profileForm" class="form-horizontal">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="default-unit" class="col-md-3 control-label">
+                    Standard valgt enhed
+                </label>
+                <div class="col-md-8">
+                    <select id="default-unit" data-ng-model="user.defaultOrganizationUnitId"  data-ng-blur="patch('defaultOrganizationUnitId', user.defaultOrganizationUnitId)"
+                        class="form-control" data-ng-options="orgUnit.id as orgUnit.name for orgUnit in orgUnits">
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="username" class="col-md-3 control-label">
+                    Navn
+                </label>
+                <div class="col-md-8">
+                    <input type="text" id="username" data-ng-model="user.name" class="form-control" data-ng-blur="patch('name', user.name)"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="usermail" class="col-md-3 control-label">
+                    Email
+                </label>
+                <div class="col-md-8">
+                    <input type="text" id="usermail" data-ng-model="user.email" class="form-control" data-ng-blur="patch('email', user.email)" />
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+</div>

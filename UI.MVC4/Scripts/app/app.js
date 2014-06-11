@@ -33,59 +33,6 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
         //x-editable config
         editableOptions.theme = 'bs3'; // bootstrap3 theme.
 
-        //modal for editing the user name, email and default org unit
-        $rootScope.openProfileModal = function () {
-            userService.getUser().then(function (user) {
-                $modal.open({
-                    templateUrl: 'partials/topnav/profileModal.html',
-                    resolve: {
-                        orgUnits: [function () {
-                            return $http.get('api/organizationunit/?userid2=' + user.id).then(function (result) {
-                                return result.data.response;
-                            });
-                        }]
-                    },
-                    controller: ['$scope', '$modalInstance', 'orgUnits', function ($modalScope, $modalInstance, orgUnits) {
-                        $modalScope.user = {
-                            name: user.name,
-                            email: user.email,
-                            defaultOrganizationUnitId: user.defaultOrganizationUnitId
-                        };
-                        
-                        $modalScope.orgUnits = orgUnits;
-
-                        $modalScope.ok = function () {
-                            var userData = {};
-                            if ($modalScope.user.name)
-                                userData.name = $modalScope.user.name;
-                            if ($modalScope.user.defaultOrganizationUnitId)
-                                userData.defaultOrganizationUnitId = $modalScope.user.defaultOrganizationUnitId;
-                            if ($modalScope.user.email)
-                                userData.email = $modalScope.user.email;
-
-                            $http({
-                                method: 'PATCH',
-                                url: 'api/user/' + user.id,
-                                data: userData
-                            }).success(function () {
-                                notify.addSuccessMessage('OK');
-                                $modalInstance.close();
-                            }).error(function () {
-                                notify.addErrorMessage('Fejl');
-                            });
-                        };
-
-                        $modalScope.cancel = function () {
-                            $modalInstance.dismiss('cancel');
-                        };
-                    }]
-                });
-
-            });
-        };
-
-
-
         //logout function for top navigation bar
         $rootScope.logout = function () {
             userService.logout().then(function () {
@@ -110,6 +57,7 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
             });
         });
 
+        //when something goes wrong during state change (e.g a rejected resolve)
         $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
             console.log(error);
             $state.go('index');
