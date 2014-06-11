@@ -24,7 +24,7 @@
 
     app.controller('home.EditUserCtrl', ['$rootScope', '$scope', 'notify', 'userService', 'user', 'orgUnits',
         function ($rootScope, $scope, notify, userService, user, orgUnits) {
-            $rootScope.page.title = 'Rediger profil';
+            $rootScope.page.title = 'Profil indstillinger';
             $rootScope.page.subnav = [];
             
             $scope.user = {
