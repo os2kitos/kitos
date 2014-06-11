@@ -1,6 +1,5 @@
 ﻿body
 {
-    font-size: 15px;
     background-color: #d9d9d9;
 }
 
@@ -574,4 +573,8 @@ tr.super-sum {
 .form-inline .form-group{
     margin-left: 0;
     margin-right: 0;
+}
+
+body, .btn {
+    font-size: 13px !important;
 }
