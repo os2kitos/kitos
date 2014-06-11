@@ -12,7 +12,7 @@
                 }],
                 orgUnits: ['userService', '$http', function (userService, $http) {
                     return userService.getUser().then(function (user) {
-                        return $http.get('api/organizationunit/?userid2=' + user.id).then(function (result) {
+                        return $http.get('api/organizationunit/?byUser').then(function (result) {
                             return result.data.response;
                         });
                     });
