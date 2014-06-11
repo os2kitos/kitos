@@ -316,16 +316,14 @@
                             try {
                                 newValue = ctrl.$viewValue.id;
                             } catch (e) {
-                                // $viewValue is null thus the value has cleared
+                                // $viewValue is null thus the value has been cleared
                                 newValue = null;
                             }
                            
                             var payload = {};
                             payload[attrs.field] = newValue;
 
-                            if (newValue !== oldValue) {
-                                save(payload);
-                            }
+                            save(payload);
                         });
                     }
 
