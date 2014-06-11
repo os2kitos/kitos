@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Core.DomainModel
 {
@@ -48,5 +49,11 @@ namespace Core.DomainModel
         public virtual Config Config { get; set; }
         
         #endregion
+
+
+        public OrganizationUnit GetRoot()
+        {
+            return OrgUnits.FirstOrDefault(u => u.Parent == null);
+        }
     }
 }

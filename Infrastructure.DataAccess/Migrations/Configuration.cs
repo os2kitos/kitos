@@ -54,7 +54,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             context.Users.AddOrUpdate(x => x.Email, simon, globalUser, localUser, user1, user2, user3, user4, user5, brian, erik);
             context.SaveChanges();
-
+            
             #endregion
 
             #region OPTIONS
@@ -258,6 +258,13 @@ namespace Infrastructure.DataAccess.Migrations
 
             context.Organizations.AddOrUpdate(x => x.Name, roskilde, sorø, kl, companyA, companyB, companyC);
             context.SaveChanges();
+
+            foreach (var user in context.Users)
+            {
+                SetUserCreatedOrganization(user, roskilde);
+            }
+
+            SetUserCreatedOrganization(erik, kl);
 
             #endregion
 
@@ -647,6 +654,17 @@ namespace Infrastructure.DataAccess.Migrations
             return org;
         }
         
+        /// <summary>
+        /// Helper function for setting the CreatedIn and DefaultOrganizationUnit properties.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="organization"></param>
+        private void SetUserCreatedOrganization(User user, Organization organization)
+        {
+            user.CreatedIn = organization;
+            user.DefaultOrganizationUnit = organization.GetRoot();
+        }
+
         //TODO REMOVE THIS
         private void OldSeed(Infrastructure.DataAccess.KitosContext context)
         {

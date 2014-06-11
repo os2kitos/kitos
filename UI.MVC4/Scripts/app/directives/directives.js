@@ -16,8 +16,13 @@
                         var modal = $modal.open({
                             backdrop: "static", //modal can't be closed by clicking outside modal
                             templateUrl: 'partials/directives/add-user-modal.html',
+                            resolve: {
+                                user: ['userService', function (userService) {
+                                    return userService.getUser();
+                                }]
+                            },
                             controller: [
-                                '$scope', 'notify', '$modalInstance', function ($scope, notify, $modalInstance) {
+                                '$scope', 'notify', '$modalInstance', 'user', function ($scope, notify, $modalInstance, user) {
 
                                     $scope.newUser = {};
 
@@ -34,7 +39,8 @@
 
                                         var data = {
                                             "name": name,
-                                            "email": email
+                                            "email": email,
+                                            "createdInId": user.currentOrganizationId
                                         };
 
                                         var msg = notify.addInfoMessage("Arbejder ...", false);

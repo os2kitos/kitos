@@ -42,6 +42,9 @@ namespace Core.ApplicationServices
 #else
             user.Password = _cryptoService.Encrypt(DateTime.Now + user.Salt);
 #endif
+            
+            if(user.CreatedIn != null) user.DefaultOrganizationUnit = user.CreatedIn.GetRoot();
+
             user = _userRepository.Insert(user);
 
             IssuePasswordReset(user);
