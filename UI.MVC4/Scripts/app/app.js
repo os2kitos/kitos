@@ -28,6 +28,9 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
             subnav: []
         };
 
+        //this will try to authenticate - to see if the user's already logged in
+        userService.getUser();
+
         uiSelect2Config.dropdownAutoWidth = true;
 
         //x-editable config
