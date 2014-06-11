@@ -77,7 +77,7 @@ namespace Core.ApplicationServices
             _mailClient.Send(message);
 
 
-            var request = new PasswordResetRequest {Hash = hash, Time = now, UserId = user.Id};
+            var request = new PasswordResetRequest {Hash = hash, Time = now, UserId = user.Id, ObjectOwner = user};
 
             _passwordResetRequestRepository.Insert(request);
             _passwordResetRequestRepository.Save();
