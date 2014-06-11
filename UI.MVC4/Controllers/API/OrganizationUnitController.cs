@@ -72,7 +72,7 @@ namespace UI.MVC4.Controllers.API
         }*/
 
         /// <summary>
-        /// Returns every OrganizationUnit that the user has a role for
+        /// Returns every OrganizationUnit that the user can select as the default unit
         /// </summary>
         /// <param name="byUser">Routing qualifier</param>
         /// <returns></returns>
@@ -80,7 +80,16 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var orgUnits = Repository.Get(x => x.Rights.Any(y => y.UserId == KitosUser.Id));
+                var orgUnits = Repository.Get(x => x.Rights.Any(y => y.UserId == KitosUser.Id)).ToList();
+
+                if (KitosUser.CreatedIn != null)
+                {
+                    var rootOrgUnit = KitosUser.CreatedIn.GetRoot();
+
+                    orgUnits.Add(rootOrgUnit);
+                    orgUnits = orgUnits.Distinct().ToList();
+                }
+
                 return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(orgUnits));
             }
             catch (Exception e)
