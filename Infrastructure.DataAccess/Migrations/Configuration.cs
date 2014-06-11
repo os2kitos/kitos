@@ -655,7 +655,7 @@ namespace Infrastructure.DataAccess.Migrations
         }
         
         /// <summary>
-        /// Helper function for sets the CreatedIn and DefaultOrganizationUnit properties.
+        /// Helper function for setting the CreatedIn and DefaultOrganizationUnit properties.
         /// </summary>
         /// <param name="user"></param>
         /// <param name="organization"></param>
