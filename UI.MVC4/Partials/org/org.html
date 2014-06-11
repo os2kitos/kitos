@@ -10,15 +10,12 @@
         </h2>
         
         <div data-ng-if="nodes.length != 0">
-            
-            <p>Du er tilknyttet disse organisationsenheder:</p>
-
             <div data-ng-repeat="node in nodes" class="org-node-top">
                 <div data-ng-include="'partials/org/org-unit.html'"></div>
             </div>
         </div>
         <div data-ng-if="nodes.length == 0">
-            <strong>Du er ikke tilknyttet nogen enheder.</strong>
+            <strong>Orgnaisationer</strong>
         </div>
 
     </div>
