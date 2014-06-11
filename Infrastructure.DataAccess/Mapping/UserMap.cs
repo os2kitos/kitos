@@ -32,6 +32,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.DefaultOrganizationUnit)
                 .WithMany(t => t.DefaultUsers)
                 .HasForeignKey(d => d.DefaultOrganizationUnitId);
+
+            this.HasOptional(t => t.CreatedIn)
+                .WithMany()
+                .HasForeignKey(t => t.CreatedInId);
         }
     }
 }
