@@ -31,11 +31,7 @@ namespace UI.MVC4.Controllers.API
                 var user = _userRepository.GetByEmail(input.Email);
                 var request = _userService.IssuePasswordReset(user);
 
-                var dto = AutoMapper.Mapper.Map<PasswordResetRequest, PasswordResetRequestDTO>(request);
-
-                var msg = CreateResponse(HttpStatusCode.OK);
-                msg.Headers.Location = new Uri(Request.RequestUri.ToString());
-                return msg;
+                return Ok();
             }
             catch (Exception e)
             {
@@ -49,7 +45,7 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 var request = _userService.GetPasswordReset(requestId);
-                if(request == null) throw new Exception("Request not found");
+                if (request == null) return NotFound();
                 var dto = AutoMapper.Mapper.Map<PasswordResetRequest, PasswordResetRequestDTO>(request);
 
                 var msg = CreateResponse(HttpStatusCode.OK, dto);
