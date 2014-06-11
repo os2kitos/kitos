@@ -60,16 +60,29 @@
                         .then(function (result) {
                             return result.data.response;
                         });
+                }],
+                user: ['userService', function (userService) {
+                    return userService.getUser().then(function (user) {
+                            return user;
+                        });
                 }]
             }
         });
     }]);
 
     app.controller('contract.EditCtrl',
-        ['$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'suppliers', 'orgUnits', 'contracts', 'agreementElements', 'customAgreementElements', 'hasWriteAccess',
-            function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, suppliers, orgUnits, contracts, agreementElements, customAgreementElements, hasWriteAccess) {
+        ['$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'suppliers', 'orgUnits', 'contracts', 'agreementElements', 'customAgreementElements', 'hasWriteAccess', 'user',
+            function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, suppliers, orgUnits, contracts, agreementElements, customAgreementElements, hasWriteAccess, user) {
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.contract = contract;
+
+                if (contract.parentId) {
+                    $scope.contract.parent = {
+                        id: contract.parentId,
+                        text: contract.parentName
+                    };
+                }
+                
                 $scope.hasWriteAccess = hasWriteAccess;
                 
                 $scope.contractTypes = contractTypes;
@@ -195,6 +208,48 @@
                             msg.toErrorMessage("Fejl! Feltet kunne ikke slettes!");
                         });
                 };
+
+                $scope.itContractsSelectOptions = selectLazyLoading('api/itcontract');
+
+                function selectLazyLoading(url) {
+                    return {
+                        minimumInputLength: 1,
+                        allowClear: true,
+                        placeholder: ' ',
+                        initSelection: function(elem, callback) {
+                        },
+                        ajax: {
+                            data: function(term, page) {
+                                return { query: term };
+                            },
+                            quietMillis: 500,
+                            transport: function(queryParams) {
+                                var res = $http.get(url + '?q=' + queryParams.data.query + '&orgId=' + user.currentOrganizationId).then(queryParams.success);
+                                res.abort = function() {
+                                    return null;
+                                };
+
+                                return res;
+                            },
+
+                            results: function(data, page) {
+                                var results = [];
+
+                                _.each(data.data.response, function(obj) {
+                                    if (obj.id == contract.id) 
+                                        return; // don't add self to result
+                                    
+                                    results.push({
+                                        id: obj.id,
+                                        text: obj.name ? obj.name : 'Unavngiven'
+                                    });
+                                });
+
+                                return { results: results };
+                            }
+                        }
+                    };
+                }
 
                 function formatContractSigner(signer) {
 

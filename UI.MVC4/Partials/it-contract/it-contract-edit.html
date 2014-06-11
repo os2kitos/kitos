@@ -23,10 +23,7 @@
                         <!-- Parent -->
                         <div class="form-group">
                             <label for="contract-parent" class="control-label small">Overordent kontrakt</label>
-                            <select id="contract-parent" class="form-control input-sm" data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="contract.parentId" data-ng-options="o.id as (o.name ? o.name : 'Unavngiven') for o in contracts" data-autosave="{{ autoSaveUrl }}" data-field="parentId">
-                                <option value=""></option>
-                            </select>
+                            <input type="hidden" data-ui-select2="itContractsSelectOptions" id="contract-parent" data-ng-model="contract.parent" class="form-control input-sm" data-autosave="{{ autoSaveUrl }}" data-field="parentId" data-ng-disabled="!hasWriteAccess">
                         </div>
 
                         <!-- Type -->

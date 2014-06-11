@@ -272,7 +272,7 @@
     ]);
 
     app.directive('autosave', [
-        '$http', 'notify', function ($http, notify) {
+        '$http', '$timeout', 'notify', function ($http, $timeout, notify) {
             return {
                 restrict: 'A',
                 require: 'ngModel',
@@ -298,11 +298,35 @@
                     }
 
                     function saveCheckbox() {
-                        // ctrl.$viewValue reflects the old state, so having to invert
-                        var newValue = !ctrl.$viewValue;
-                        var payload = {};
-                        payload[attrs.field] = newValue;
-                        save(payload);
+                        // ctrl.$viewValue reflects the old state.
+                        // using timeout to wait for the value to update
+                        $timeout(function() {
+                            var newValue = ctrl.$viewValue;
+                            var payload = {};
+                            payload[attrs.field] = newValue;
+                            save(payload);
+                        });
+                    }
+
+                    function saveSelect2() {
+                        // ctrl.$viewValue reflects the old state.
+                        // using timeout to wait for the value to update
+                        $timeout(function () {
+                            var newValue;
+                            try {
+                                newValue = ctrl.$viewValue.id;
+                            } catch (e) {
+                                // $viewValue is null thus the value has cleared
+                                newValue = null;
+                            }
+                           
+                            var payload = {};
+                            payload[attrs.field] = newValue;
+
+                            if (newValue !== oldValue) {
+                                save(payload);
+                            }
+                        });
                     }
 
                     function save(payload) {
@@ -316,7 +340,10 @@
                             });
                     }
 
-                    if (attrs.type === "checkbox") {
+                    // type=hidden is cause select2 fields are usually hidden and trigger the change event
+                    if (attrs.type === "hidden") { 
+                        element.bind('change', saveSelect2);
+                    } else if (attrs.type === "checkbox") {
                         element.bind('change', saveCheckbox);
                     } else {
                         element.bind('blur', saveIfNew);

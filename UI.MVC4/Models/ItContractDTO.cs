@@ -59,6 +59,7 @@ namespace UI.MVC4.Models
         public int? ContractTypeId { get; set; }
         public int? PurchaseFormId { get; set; }
         public int? ParentId { get; set; }
+        public string ParentName { get; set; }
         public IEnumerable<OptionDTO> AgreementElements { get; set; }
         public IEnumerable<CustomAgreementElementDTO> CustomAgreementElements { get; set; }
 
