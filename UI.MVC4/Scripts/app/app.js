@@ -33,8 +33,9 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
         //x-editable config
         editableOptions.theme = 'bs3'; // bootstrap3 theme.
 
-        userService.getUser().then(function (user) {
-            $rootScope.openProfileModal = function () {
+        //modal for editing the user name, email and default org unit
+        $rootScope.openProfileModal = function () {
+            userService.getUser().then(function (user) {
                 $modal.open({
                     templateUrl: 'partials/topnav/profileModal.html',
                     resolve: {
@@ -45,7 +46,12 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
                         }]
                     },
                     controller: ['$scope', '$modalInstance', 'orgUnits', function ($modalScope, $modalInstance, orgUnits) {
-                        $modalScope.user = user;
+                        $modalScope.user = {
+                            name: user.name,
+                            email: user.email,
+                            defaultOrganizationUnitId: user.defaultOrganizationUnitId
+                        };
+                        
                         $modalScope.orgUnits = orgUnits;
 
                         $modalScope.ok = function () {
@@ -74,9 +80,9 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
                         };
                     }]
                 });
-            };
 
-        });
+            });
+        };
 
 
 
