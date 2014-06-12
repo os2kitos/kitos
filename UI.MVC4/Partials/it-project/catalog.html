@@ -50,7 +50,7 @@
             
             <!-- archived -->
             <td>
-                <span class="text-muted">A</span>
+                {{ p.isArchived == 1 ? 'A' : '' }}
             </td>
             
             <!-- responsible org unit -->
