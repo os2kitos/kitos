@@ -86,51 +86,49 @@ namespace Core.ApplicationServices
         
         public ItProject CloneProject(ItProject original, User newOwner, int newOrgId)
         {
-            // TODO find a better approach, this is silly
-            var clone = new ItProject()
-            {
-                OrganizationId = newOrgId,
-                ObjectOwner = newOwner,
-                ParentItProjectId = original.Id,
+            var clone = _projectRepository.Create();
+            
+            clone.OrganizationId = newOrgId;
+            clone.ObjectOwner = newOwner;
+            clone.ParentItProjectId = original.Id;
 
-                ItProjectId = original.ItProjectId,
-                Background = original.Background,
-                IsTransversal = original.IsTransversal,
-                Name = original.Name,
-                Note = original.Note,
-                Description = original.Description,
-                IsStrategy = original.IsStrategy,
+            clone.ItProjectId = original.ItProjectId;
+            clone.Background = original.Background;
+            clone.IsTransversal = original.IsTransversal;
+            clone.Name = original.Name;
+            clone.Note = original.Note;
+            clone.Description = original.Description;
+            clone.IsStrategy = original.IsStrategy;
 
-                // TODO clone actual data
-                Handover = new Handover()
-                    {
-                        ObjectOwner = newOwner
-                    }, 
+           // TODO clone actual data
+            clone.Handover = new Handover()
+                {
+                    ObjectOwner = newOwner
+                };
 
-                // TODO AssociatedProgramId = project.AssociatedProgramId,
-                // TODO AssociatedProjects = project.AssociatedProjects,
+            // TODO AssociatedProgramId = project.AssociatedProgramId,
+            // TODO AssociatedProjects = project.AssociatedProjects,
 
-                ItProjectTypeId = original.ItProjectTypeId,
-                ItProjectCategoryId = original.ItProjectCategoryId,
-                TaskRefs = original.TaskRefs,
+            clone.ItProjectTypeId = original.ItProjectTypeId;
+            clone.ItProjectCategoryId = original.ItProjectCategoryId;
+            clone.TaskRefs = original.TaskRefs;
 
-                // TODO Risk
-                // TODO Rights
-                // TODO JointMunicipalProjectId = project.JointMunicipalProjectId,
-                // TODO JointMunicipalProjects = project.JointMunicipalProjects,
-                // TODO CommonPublicProjectId = project.CommonPublicProjectId,
-                // TODO CommonPublicProjects = project.CommonPublicProjects,
-                // TODO EconomyYears = project.EconomyYears
-                // TODO MilestoneStates = project.MilestoneStates,
-                // TODO TaskActivities = project.TaskActivities,
-                // TODO Communcations = project.Communcations
+            // TODO Risk
+            // TODO Rights
+            // TODO JointMunicipalProjectId = project.JointMunicipalProjectId,
+            // TODO JointMunicipalProjects = project.JointMunicipalProjects,
+            // TODO CommonPublicProjectId = project.CommonPublicProjectId,
+            // TODO CommonPublicProjects = project.CommonPublicProjects,
+            // TODO EconomyYears = project.EconomyYears
+            // TODO MilestoneStates = project.MilestoneStates,
+            // TODO TaskActivities = project.TaskActivities,
+            // TODO Communcations = project.Communcations
 
                 //TODO: clone this instead of creating new
-                GoalStatus = new GoalStatus()
-                    {
-                        ObjectOwner = newOwner
-                    }
-            };
+            clone.GoalStatus = new GoalStatus()
+                {
+                    ObjectOwner = newOwner
+                };
 
             ClonePhases(original, clone);
             AddEconomyYears(clone);
@@ -143,51 +141,26 @@ namespace Core.ApplicationServices
 
         public void DeleteProject(ItProject project)
         {
+            //Remove reference to this project in cloned projects
+            project.ChildItProjects.Select(clone => clone.ParentItProject = null);
+            _projectRepository.Save();
+            
             var phase1Id = project.Phase1.Id;
-            var phase2Id = project.Phase1.Id;
-            var phase3Id = project.Phase1.Id;
-            var phase4Id = project.Phase1.Id;
-            var phase5Id = project.Phase1.Id;
-
+            var phase2Id = project.Phase2.Id;
+            var phase3Id = project.Phase3.Id;
+            var phase4Id = project.Phase4.Id;
+            var phase5Id = project.Phase5.Id;
+            
             _projectRepository.DeleteByKey(project.Id);
             _projectRepository.Save();
 
+            //deleting phases - must be done afterwards, since they're required on project
             _activityRepository.DeleteByKey(phase1Id);
             _activityRepository.DeleteByKey(phase2Id);
             _activityRepository.DeleteByKey(phase3Id);
             _activityRepository.DeleteByKey(phase4Id);
             _activityRepository.DeleteByKey(phase5Id);
             _activityRepository.Save();
-
-        }
-
-        public bool HasReadAccess(User user, ItProject project)
-        {
-            //if the project is public, the user has read access
-            if (project.AccessModifier == AccessModifier.Public) return true;
-
-            //if the user is object owner, the user has read access
-            if (project.ObjectOwnerId == user.Id) return true;
-
-            //if the user has read role, the user has read access
-            if (_rightRepository.Get(right => 
-                right.User.Id == user.Id &&
-                right.Object.Id == project.Id && 
-                right.Role.HasReadAccess).Any()) 
-                return true;
-
-            //if the user is part of an organization, which owns the project, the user has read access
-            var userOrganizations = _organizationService.GetByUser(user);
-            return userOrganizations.Any(org => org.Id == project.OrganizationId);
-        }
-
-        public bool HasWriteAccess(User user, ItProject project)
-        {
-            if (project.ObjectOwnerId == user.Id) return true;
-
-            return
-                _rightRepository.Get(right => right.User.Id == user.Id && right.Object.Id == project.Id && right.Role.HasWriteAccess)
-                                .Any();
         }
 
         /// <summary>
@@ -197,8 +170,6 @@ namespace Core.ApplicationServices
         /// <returns></returns>
         private void CreateDefaultPhases(ItProject project)
         {
-
-            //TODO: use global config names of default phases
             var phase1 = CreatePhase("Afventer", project.ObjectOwner);
             _activityRepository.Insert(phase1);
             _activityRepository.Save();
@@ -208,7 +179,7 @@ namespace Core.ApplicationServices
             project.Phase2 = CreatePhase("Foranalyse", project.ObjectOwner);
             project.Phase3 = CreatePhase("Gennemførsel", project.ObjectOwner);
             project.Phase4 = CreatePhase("Overlevering", project.ObjectOwner);
-            project.Phase5 = CreatePhase("Drif", project.ObjectOwner);
+            project.Phase5 = CreatePhase("Drift", project.ObjectOwner);
         }
 
         /// <summary>
