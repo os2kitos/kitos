@@ -298,6 +298,9 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
                   .ForMember(dest => dest.ResponsibleOrgUnit, opt => opt.Ignore())
                   .ForMember(dest => dest.Stakeholders, opt => opt.Ignore());
+            
+            //Output only - this mapping should not be reversed
+            Mapper.CreateMap<ItProject, ItProjectCatalogDTO>();
 
             Mapper.CreateMap<Handover, HandoverDTO>()
                   .ReverseMap()

@@ -11,7 +11,7 @@
                 projects: ['$http', 'userService', function ($http, userService) {
                     return userService.getUser().then(function(user) {
                         var orgId = user.currentOrganizationId;
-                        return $http.get('api/itproject?orgId=' + orgId).then(function (result) {
+                        return $http.get('api/itproject?catalog&orgId=' + orgId).then(function (result) {
                             return result.data.response;
                         });
                     });

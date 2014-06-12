@@ -46,6 +46,23 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        public HttpResponseMessage GetCatalog(bool? catalog, [FromUri] int orgId)
+        {
+            try
+            {
+                //Get all projects inside the organizaton OR public
+                var projects = _itProjectService.GetAll(orgId, includePublic: true);
+
+                var dto = Map<IEnumerable<ItProject>, IEnumerable<ItProjectCatalogDTO>>(projects);
+
+                return Ok(dto);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetPrograms(string q, int orgId, bool? programs)
         {
             try
