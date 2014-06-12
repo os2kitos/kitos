@@ -35,8 +35,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                //Get all projects inside the organizaton OR public
-                var projects = _itProjectService.GetAll(orgId, includePublic: true).ToList();
+                var projects = _itProjectService.GetAll(orgId, includePublic: false).ToList();
                 
                 return Ok(Map(projects));
             }
