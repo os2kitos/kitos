@@ -967,6 +967,11 @@
                     $http.get('api/taskusage/' + usage.usage.id + '?projects').success(function(result) {
                         usage.usage.projects = result.response;
                     });
+                    
+                    $http.get('api/taskusage/' + usage.usage.id + '?systems').success(function (result) {
+                        usage.usage.systems = result.response;
+                    });
+
 
                     $http.get('api/taskref/' + usage.usage.taskRefId).success(function (result) {
                         visit(usage, null, 0, false, result.response);

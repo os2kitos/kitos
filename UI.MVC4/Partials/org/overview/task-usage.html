@@ -44,7 +44,11 @@
             <i class="glyphicon glyphicon-ok" data-tooltip="{{usage.usage.projects | joinBy:', ':'name'}}"></i>
         </span>
     </div>
-    <div class="col-md-1 text-center"></div>
+    <div class="col-md-1 text-center">
+        <span data-ng-if="usage.usage.systems.length > 0" class="text-success">
+            <i class="glyphicon glyphicon-ok" data-tooltip="{{usage.usage.systems | joinBy:', ':'itSystemName'}}"></i>
+        </span>
+    </div>
 </div>
 
 <div data-ng-if="usage.hasDelegations">
@@ -95,7 +99,11 @@
                 <i class="glyphicon glyphicon-ok" data-tooltip="{{usage.usage.projects | joinBy:', ':'name'}}"></i>
             </span>
         </div>
-        <div class="col-md-1 text-center"></div>
+        <div class="col-md-1 text-center">
+            <span data-ng-if="usage.usage.systems.length > 0" class="text-success">
+                <i class="glyphicon glyphicon-ok" data-tooltip="{{usage.usage.systems | joinBy:', ':'itSystemName'}}"></i>
+            </span>
+        </div>
     </div>
 
     <!-- delegations -->
