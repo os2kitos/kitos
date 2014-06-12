@@ -44,13 +44,13 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetProjects(int id, int orgId, bool? projects)
+        public HttpResponseMessage GetProjects(int id, bool? projects)
         {
             try
             {
                 var usage = Repository.GetByKey(id);
 
-                var theProjects = usage.TaskRef.ItProjects.Where(p => p.OrganizationId == orgId);
+                var theProjects = usage.TaskRef.ItProjects.Where(p => p.OrganizationId == usage.OrgUnit.OrganizationId);
                 var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectSimpleDTO>>(theProjects);
 
                 return Ok(dtos);

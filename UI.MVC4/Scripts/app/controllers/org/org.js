@@ -964,7 +964,7 @@
                 _.each($scope.taskUsages, function (usage) {
                     usage.isRoot = true;
 
-                    $http.get('api/taskusage/' + usage.usage.id + '?orgId=' + user.currentOrganizationId + "&projects").success(function(result) {
+                    $http.get('api/taskusage/' + usage.usage.id + '?projects').success(function(result) {
                         usage.usage.projects = result.response;
                     });
 
