@@ -48,6 +48,11 @@ namespace Infrastructure.DataAccess
             return _dbSet.AsQueryable();
         }
 
+        public T Create()
+        {
+            return _dbSet.Create<T>();
+        }
+
         public T GetByKey(params object[] key)
         {
             return _dbSet.Find(key);

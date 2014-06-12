@@ -29,8 +29,5 @@ namespace Core.DomainServices
         ItProject CloneProject(ItProject original, User newOwner, int newOrgId);
 
         void DeleteProject(ItProject project);
-
-        bool HasReadAccess(User user, ItProject project);
-        bool HasWriteAccess(User user, ItProject project);
     }
 }
