@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Security;
 using Core.DomainModel;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
 using UI.MVC4.Models;
@@ -11,12 +14,10 @@ namespace UI.MVC4.Controllers.API
 {
     public class TaskUsageController : GenericApiController<TaskUsage, TaskUsageDTO>
     {
-        private readonly IOrgUnitService _orgUnitService;
 
-        public TaskUsageController(IGenericRepository<TaskUsage> repository,IOrgUnitService orgUnitService) 
+        public TaskUsageController(IGenericRepository<TaskUsage> repository) 
             : base(repository)
         {
-            _orgUnitService = orgUnitService;
         }
 
         public HttpResponseMessage Get(int orgUnitId)
@@ -35,6 +36,50 @@ namespace UI.MVC4.Controllers.API
                 var delegationDtos = usages.Select(CompileDelegation);
 
                 return Ok(delegationDtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetProjects(int id, bool? projects)
+        {
+            try
+            {
+                var usage = Repository.GetByKey(id);
+
+                var theProjects = usage.TaskRef.ItProjects.Where(p => p.OrganizationId == usage.OrgUnit.OrganizationId);
+                var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectSimpleDTO>>(theProjects);
+
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetSystems(int id, bool? systems)
+        {
+            try
+            {
+                var taskUsage = Repository.GetByKey(id);
+
+
+                var indirectUsages =
+                    taskUsage.TaskRef.ItSystems.SelectMany(system => system.Usages)
+                             .Where(usage => usage.OrganizationId == taskUsage.OrgUnit.OrganizationId);
+
+                var directUsages =
+                    taskUsage.TaskRef.ItSystemUsages.Where(
+                        usage => usage.OrganizationId == taskUsage.OrgUnit.OrganizationId);
+
+                var allUsages = indirectUsages.Union(directUsages);
+
+                var dtos = Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageSimpleDTO>>(allUsages);
+
+                return Ok(dtos);
             }
             catch (Exception e)
             {
