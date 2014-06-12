@@ -74,15 +74,7 @@
         ['$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'suppliers', 'orgUnits', 'contracts', 'agreementElements', 'customAgreementElements', 'hasWriteAccess', 'user',
             function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, suppliers, orgUnits, contracts, agreementElements, customAgreementElements, hasWriteAccess, user) {
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
-                $scope.contract = contract;
-
-                if (contract.parentId) {
-                    $scope.contract.parent = {
-                        id: contract.parentId,
-                        text: contract.parentName
-                    };
-                }
-                
+                $scope.contract = contract;              
                 $scope.hasWriteAccess = hasWriteAccess;
                 
                 $scope.contractTypes = contractTypes;
@@ -209,13 +201,42 @@
                         });
                 };
 
-                $scope.itContractsSelectOptions = selectLazyLoading('api/itcontract');
+                if (contract.parentId) {
+                    $scope.contract.parent = {
+                        id: contract.parentId,
+                        text: contract.parentName
+                    };
+                }
+                
+                $scope.itContractsSelectOptions = selectLazyLoading('api/itcontract', true, formatContract, ['orgId=' + user.currentOrganizationId]);
 
-                function selectLazyLoading(url) {
+                function formatContract(supplier) {
+                    return '<div>' + supplier.text + '</div>';
+                }
+
+                if (contract.supplierId) {
+                    $scope.contract.supplier = {
+                        id: contract.supplierId,
+                        text: contract.supplierName
+                    };
+                }
+                
+                $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, formatSupplier, ['public']);
+
+                function formatSupplier(supplier) {
+                    var result = '<div>' + supplier.text + '</div>';
+                    if (supplier.cvr) {
+                        result += '<div class="small">' + supplier.cvr + '</div>';
+                    }
+                    return result;
+                }
+
+                function selectLazyLoading(url, excludeSelf, format, paramAry) {
                     return {
                         minimumInputLength: 1,
                         allowClear: true,
                         placeholder: ' ',
+                        formatResult: format,
                         initSelection: function(elem, callback) {
                         },
                         ajax: {
@@ -224,7 +245,8 @@
                             },
                             quietMillis: 500,
                             transport: function(queryParams) {
-                                var res = $http.get(url + '?q=' + queryParams.data.query + '&orgId=' + user.currentOrganizationId).then(queryParams.success);
+                                var extraParams = paramAry ? '&' + paramAry.join('&') : '';
+                                var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
                                 res.abort = function() {
                                     return null;
                                 };
@@ -236,12 +258,13 @@
                                 var results = [];
 
                                 _.each(data.data.response, function(obj) {
-                                    if (obj.id == contract.id) 
+                                    if (excludeSelf && obj.id == contract.id)
                                         return; // don't add self to result
                                     
                                     results.push({
                                         id: obj.id,
-                                        text: obj.name ? obj.name : 'Unavngiven'
+                                        text: obj.name ? obj.name : 'Unavngiven',
+                                        cvr: obj.cvr
                                     });
                                 });
 
