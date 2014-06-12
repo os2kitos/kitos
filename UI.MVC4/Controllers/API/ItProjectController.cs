@@ -37,11 +37,6 @@ namespace UI.MVC4.Controllers.API
             {
                 //Get all projects inside the organizaton OR public
                 var projects = _itProjectService.GetAll(orgId, includePublic: true).ToList();
-
-                var clonedParentIds = projects.Where(x => x.ParentItProjectId.HasValue).Select(x => x.ParentItProjectId);
-
-                // remove cloned parents
-                projects.RemoveAll(x => clonedParentIds.Contains(x.Id));
                 
                 return Ok(Map(projects));
             }
@@ -351,6 +346,13 @@ namespace UI.MVC4.Controllers.API
         {
             //Makes sure to create the necessary properties, like phases
             return _itProjectService.AddProject(item);
+        }
+
+        protected override void DeleteQuery(int id)
+        {
+            var project = Repository.GetByKey(id);
+
+            _itProjectService.DeleteProject(project);
         }
     }
 }

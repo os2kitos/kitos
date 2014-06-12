@@ -8,7 +8,7 @@
                 user: ['userService', function(userService) {
                     return userService.getUser();
                 }],
-                programs: ['$http', 'userService', function ($http, userService) {
+                projects: ['$http', 'userService', function ($http, userService) {
                     return userService.getUser().then(function(user) {
                         var orgId = user.currentOrganizationId;
                         return $http.get('api/itproject?orgId=' + orgId).then(function (result) {
@@ -21,60 +21,84 @@
     }]);
 
     app.controller('project.CatalogCtrl',
-        ['$scope', '$http', '$state', '$stateParams', '$timeout', 'user', 'programs', function ($scope, $http, $state, $stateParams, $timeout, user, programs) {
-            $scope.programs = programs;
+        ['$scope', '$http', '$state', '$stateParams', '$timeout', 'notify', 'user', 'projects',
+            function ($scope, $http, $state, $stateParams, $timeout, notify, user, projects) {
 
-            function isSelected(project) {
-                //a project is selected if created inside the current organisation
-                return project.organizationId == user.currentOrganizationId;
-            };
+                $scope.projects = [];
 
-            $scope.isSelected = isSelected;
-                
-            
-            $scope.toggle = function (project) {
-                if (!isSelected(project)) {
-                    $http.post('api/itproject/' + project.id + '?clone', { organizationId: user.currentOrganizationId }).finally(reload);
-                } else {
-                    $http.delete('api/itproject/' + project.id).finally(reload);
+                _.each(projects, pushProject);
+
+                //adds a project to the list of projects
+                function pushProject(project) {
+
+                    $scope.projects.push(project);
+
+                    project.baseUrl = 'api/itproject/' + project.id;
+                    project.show = true;
+                    
+                    $http.get(project.baseUrl + "?hasWriteAccess").success(function (result) {
+                        project.hasWriteAccess = result.response;
+                    });
+                    
+                    //clone the project
+                    project.clone = function () {
+                        var url = project.baseUrl + '?clone';
+                        var payload = { organizationId: user.currentOrganizationId };
+                        
+                        var msg = notify.addInfoMessage("Kloner projekt...", false);
+                        $http.post(url, payload).success(function (result) {
+                            msg.toSuccessMessage("Projektet er klonet!");
+
+                            //push the new project
+                            pushProject(result.response);
+                        }).error(function () {
+                            msg.toErrorMessage("Fejl! Kunne ikke klone projektet!");
+                        });
+                    };
+
+                    //delete the project
+                    project.delete = function() {
+                        var msg = notify.addInfoMessage("Sletter projekt...", false);
+                        $http.delete(project.baseUrl).success(function(result) {
+                            project.show = false;
+
+                            msg.toSuccessMessage("Projektet er slettet!");
+                        }).error(function() {
+                            msg.toErrorMessage("Fejl! Kunne ikke slette projektet!");
+                        });
+                    };
                 }
-                
-            };
 
-            // work around for $state.reload() not updating scope
-            // https://github.com/angular-ui/ui-router/issues/582
-            function reload() {
-                return $state.transitionTo($state.current, $stateParams, {
-                    reload: true
-                }).then(function () {
-                    $scope.hideContent = true;
-                    return $timeout(function () {
-                        return $scope.hideContent = false;
-                    }, 1);
-                });
-            };
+                $scope.create = function () {
+                    var orgUnitId = user.defaultOrganizationUnitId;
+                    var payload = {
+                        itProjectTypeId: 1,
+                        ItProjectCategoryId: 1,
+                        responsibleOrgUnitId: orgUnitId,
+                        organizationId: user.currentOrganizationId,
+                    };
+                    
+                    $scope.creatingProject = true;
+                    var msg = notify.addInfoMessage("Opretter projekt...", false);
 
-            $scope.create = function () {
-                var orgUnitId = user.defaultOrganizationUnitId;
-                var payload = {
-                    itProjectTypeId: 1,
-                    ItProjectCategoryId: 1,
-                    responsibleOrgUnitId: orgUnitId,
-                    organizationId: user.currentOrganizationId,
-                };
-                $http.post('api/itproject', payload)
-                    .success(function (result) {
+                    $http.post('api/itproject', payload).success(function (result) {
+                        
+                        msg.toSuccessMessage("Et nyt projekt er oprettet!");
+                        
                         var projectId = result.response.id;
+
                         if (orgUnitId) {
                             // add users default org unit to the new project
                             $http.post('api/itproject/' + projectId + '?organizationunit=' + orgUnitId);
                         }
-                        $state.go('it-project.edit', { id: projectId });
-                    })
-                    .error(function() {
+
+                        $state.go('it-project.edit.status-project', { id: projectId });
                         
+                    }).error(function () {
+                        msg.toErrorMessage("Fejl! Kunne ikke oprette nyt projekt!");
+                        $scope.creatingProject = false;
                     });
-            };
+                };
         }]
     );
 })(angular, app);
