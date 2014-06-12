@@ -462,6 +462,7 @@
     <Content Include="Partials\it-contract\tab-economy.html" />
     <Content Include="Partials\it-contract\tab-advice.html" />
     <Content Include="Partials\it-contract\tab-hierarchy.html" />
+    <Content Include="Partials\it-contract\tab-paymentmodel.html" />
     <Content Include="Partials\it-contract\tab-systems.html" />
     <Content Include="Partials\it-contract\tab-roles.html" />
     <Content Include="Partials\it-project\catalog.html" />
@@ -548,6 +549,7 @@
     <Content Include="Scripts\app\controllers\it-contract\it-contract-create.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-edit.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-overview.js" />
+    <Content Include="Scripts\app\controllers\it-contract\it-contract-paymentmodel.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-plan.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-roles.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-subnav.js" />

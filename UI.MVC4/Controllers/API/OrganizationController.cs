@@ -22,7 +22,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var orgs = Repository.Get(org => org.Name.StartsWith(q));
+                var orgs = Repository.Get(org => org.Name.Contains(q));
                 return Ok(Map(orgs));
             }
             catch (Exception e)
@@ -31,11 +31,11 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetCompanies([FromUri] bool? company)
+        public HttpResponseMessage GetPublic(string q, [FromUri] bool? @public)
         {
             try
             {
-                var orgs = Repository.Get(org => org.Type == OrganizationType.Company);
+                var orgs = Repository.Get(org => org.AccessModifier == AccessModifier.Public && (org.Name.Contains(q) || org.Cvr.Contains(q)));
                 return Ok(Map(orgs));
             }
             catch (Exception e)

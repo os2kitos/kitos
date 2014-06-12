@@ -477,7 +477,6 @@
 
                     //settings for select2
                     var settings = {
-
                         allowClear: !!scope.allowClear,
 
                         //don't format markup in result

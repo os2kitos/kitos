@@ -1100,49 +1100,9 @@
             $modal.open({
                 templateUrl: 'partials/org/overview/comment-modal.html',
                 controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
-                    $modalScope.comment = {
-                        text: usage.usage.comment
-                    };
-                    $modalScope.taskKey = usage.usage.task.taskKey;
-                    $modalScope.taskDescription = usage.usage.task.description;
-                    $modalScope.orgUnitName = usage.usage.orgUnit.name;
+                    $modalScope.usage = usage;
+                    
                     $modalScope.hasWriteAccess = usage.usage.orgUnit.hasWriteAccess;
-
-                    $modalScope.saveComment = function () {
-                        $modalScope.submitting = true;
-
-                        patchUsageComplex(usage,
-                            {
-                                'comment': $modalScope.comment.text
-                            }, function (result) {
-                                notify.addSuccessMessage("Kommentaren er gemt");
-                                usage.usage.comment = $modalScope.comment.text;
-                                $modalInstance.close();
-                            }, function (error) {
-                                $modalScope.submitting = false;
-                                notify.addSuccessMessage("Fejl!");
-                            });
-                    };
-
-                    $modalScope.deleteComment = function () {
-                        $modalScope.submitting = true;
-
-                        patchUsageComplex(usage,
-                            {
-                                'comment': ""
-                            }, function (result) {
-                                notify.addSuccessMessage("Kommentaren er slettet");
-                                usage.usage.comment = $modalScope.comment.text;
-                                $modalInstance.close();
-                            }, function (error) {
-                                $modalScope.submitting = false;
-                                notify.addSuccessMessage("Fejl!");
-                            });
-                    };
-
-                    $modalScope.cancel = function () {
-                        $modalInstance.dismiss('cancel');
-                    };
                 }]
             });
         };

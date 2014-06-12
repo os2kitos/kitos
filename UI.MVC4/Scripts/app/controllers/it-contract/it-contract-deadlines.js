@@ -15,21 +15,6 @@
                         return result.data.response;
                     });
                 }],
-                paymentFrequencies: ['$http', function ($http) {
-                    return $http.get('api/paymentFrequency').then(function (result) {
-                        return result.data.response;
-                    });
-                }],
-                paymentModels: ['$http', function ($http) {
-                    return $http.get('api/paymentModel').then(function (result) {
-                        return result.data.response;
-                    });
-                }],
-                priceRegulations: ['$http', function ($http) {
-                    return $http.get('api/priceRegulation').then(function (result) {
-                        return result.data.response;
-                    });
-                }],
                 paymentMilestones: ['$http', function ($http) {
                     return $http.get('api/paymentMilestone').then(function (result) {
                         return result.data.response;
@@ -39,15 +24,12 @@
         });
     }]);
 
-    app.controller('contract.DeadlinesCtrl', ['$scope', '$http', 'notify', 'contract', 'optionExtensions', 'terminationDeadlines', 'paymentFrequencies', 'paymentModels', 'priceRegulations', 'paymentMilestones',
-            function ($scope, $http, notify, contract, optionExtensions, terminationDeadlines, paymentFrequencies, paymentModels, priceRegulations, paymentMilestones) {
+    app.controller('contract.DeadlinesCtrl', ['$scope', '$http', 'notify', 'contract', 'optionExtensions', 'terminationDeadlines', 'paymentMilestones',
+            function ($scope, $http, notify, contract, optionExtensions, terminationDeadlines, paymentMilestones) {
                 $scope.contract = contract;
                 $scope.autosaveUrl = 'api/itcontract/' + contract.id;
                 $scope.optionExtensions = optionExtensions;
                 $scope.terminationDeadlines = terminationDeadlines;
-                $scope.paymentFrequencies = paymentFrequencies;
-                $scope.paymentModels = paymentModels;
-                $scope.priceRegulations = priceRegulations;
                 $scope.paymentMilestones = paymentMilestones;
 
                 $scope.save = function (paymentMilestone) {

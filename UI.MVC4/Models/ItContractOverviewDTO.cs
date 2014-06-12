@@ -18,7 +18,6 @@ namespace UI.MVC4.Models
         public IEnumerable<RightOutputDTO> Rights { get; set; }
 
         public string PaymentModelName { get; set; }
-        public string PaymentFreqencyName { get; set; }
 
         /// <summary>
         /// When the contract began (indgået)
