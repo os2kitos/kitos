@@ -13,10 +13,10 @@
     <!-- statuses -->
     <div class="col-md-2">
         <div class="status-column" data-ng-if="user.currentConfig.showColumnTechnology">
-            <input data-select-status="usage.usage.technologyStatus" data-can-write="usage.usage.orgUnit.hasWriteAccess"/>
+            <input data-select-status="usage.usage.technologyStatus" data-can-write="usage.usage.orgUnit.hasWriteAccess" />
         </div>
         <div class="status-column" data-ng-if="user.currentConfig.showColumnUsage">
-            <input data-select-status="usage.usage.usageStatus" data-can-write="usage.usage.orgUnit.hasWriteAccess"/>
+            <input data-select-status="usage.usage.usageStatus" data-can-write="usage.usage.orgUnit.hasWriteAccess" />
         </div>
         <div class="status-column">
             <button class="btn btn-link btn-xs"
@@ -39,7 +39,11 @@
     </div>
 
     <!-- extra info -->
-    <div class="col-md-1 text-center"></div>
+    <div class="col-md-1 text-center">
+        <span data-ng-if="usage.usage.projects.length > 0" class="text-success">
+            <i class="glyphicon glyphicon-ok" data-tooltip="{{usage.usage.projects | joinBy:', ':'name'}}"></i>
+        </span>
+    </div>
     <div class="col-md-1 text-center"></div>
 </div>
 
@@ -86,7 +90,11 @@
 
 
         <!-- extra info -->
-        <div class="col-md-1 text-center"></div>
+        <div class="col-md-1 text-center">
+            <span data-ng-if="usage.usage.projects.length > 0" class="text-success">
+                <i class="glyphicon glyphicon-ok" data-tooltip="{{usage.usage.projects | joinBy:', ':'name'}}"></i>
+            </span>
+        </div>
         <div class="col-md-1 text-center"></div>
     </div>
 

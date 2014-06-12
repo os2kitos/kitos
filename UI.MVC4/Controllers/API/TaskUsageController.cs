@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Security;
 using Core.DomainModel;
+using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
 using UI.MVC4.Models;
@@ -35,6 +37,23 @@ namespace UI.MVC4.Controllers.API
                 var delegationDtos = usages.Select(CompileDelegation);
 
                 return Ok(delegationDtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetProjects(int id, int orgId, bool? projects)
+        {
+            try
+            {
+                var usage = Repository.GetByKey(id);
+
+                var theProjects = usage.TaskRef.ItProjects.Where(p => p.OrganizationId == orgId);
+                var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectSimpleDTO>>(theProjects);
+
+                return Ok(dtos);
             }
             catch (Exception e)
             {
