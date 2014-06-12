@@ -221,6 +221,7 @@
     <Compile Include="Models\ItContractSystemDTO.cs" />
     <Compile Include="Models\ItContractOverviewDTO.cs" />
     <Compile Include="Models\ItContractPlanDTO.cs" />
+    <Compile Include="Models\ItProjectSimpleDTO.cs" />
     <Compile Include="Models\ItProjectCatalogDTO.cs" />
     <Compile Include="Models\PaymentMilestoneDTO.cs" />
     <Compile Include="Controllers\API\AdviceController.cs" />

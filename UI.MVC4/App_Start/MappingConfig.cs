@@ -302,6 +302,9 @@ namespace UI.MVC4.App_Start
             //Output only - this mapping should not be reversed
             Mapper.CreateMap<ItProject, ItProjectCatalogDTO>();
 
+            //Output only - this mapping should not be reversed
+            Mapper.CreateMap<ItProject, ItProjectSimpleDTO>();
+
             Mapper.CreateMap<Handover, HandoverDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.ItProject, opt => opt.Ignore());
