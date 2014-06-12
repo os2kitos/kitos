@@ -14,14 +14,10 @@ namespace UI.MVC4.Controllers.API
 {
     public class TaskUsageController : GenericApiController<TaskUsage, TaskUsageDTO>
     {
-        private readonly IOrgUnitService _orgUnitService;
-        private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
 
-        public TaskUsageController(IGenericRepository<TaskUsage> repository, IOrgUnitService orgUnitService, IGenericRepository<ItSystemUsage> systemUsageRepository) 
+        public TaskUsageController(IGenericRepository<TaskUsage> repository) 
             : base(repository)
         {
-            _orgUnitService = orgUnitService;
-            _systemUsageRepository = systemUsageRepository;
         }
 
         public HttpResponseMessage Get(int orgUnitId)
