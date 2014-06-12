@@ -4,7 +4,6 @@
             { state: 'overview-it-system', text: 'Overblik' },
             { state: 'assign-it-system', text: 'Tilknyt IT system' },
             { state: 'add-it-system', text: 'Opret IT system' },
-            { state: 'index', text: 'Rapport' }
     ];
 
     app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
