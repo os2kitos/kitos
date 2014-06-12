@@ -277,6 +277,26 @@
         }
     ]);
 
+    app.directive('dateToString', ['$timeout', 'dateFilter', function($timeout, dateFilter) {
+        return {
+            restrict: 'A',
+            require: 'ngModel',
+            link: function (scope, element, attr, ctrl) {
+                ctrl.$parsers.push(function (value) {
+                    // ugly hack to not send a patch request on each change
+                    _.debounce(function () {
+                        element.triggerHandler('dateChange');
+                        scope.$apply();
+                    }, 500);
+                       
+                    if (value instanceof Date)
+                        return dateFilter(value, 'yyyy-MM-dd');
+                    return value;
+                });
+            }
+        };
+    }]);
+
     app.directive('autosave', [
         '$http', '$timeout', 'notify', function ($http, $timeout, notify) {
             return {
@@ -284,14 +304,13 @@
                 require: 'ngModel',
                 priority: 0,
                 link: function (scope, element, attrs, ctrl) {
-
                     var oldValue;
-                    element.bind('focus', function () {
-                        oldValue = ctrl.$viewValue;
+                    $timeout(function () {
+                        oldValue = ctrl.$modelValue; // get initial value
                     });
 
                     function saveIfNew() {
-                        var newValue = ctrl.$viewValue;
+                        var newValue = ctrl.$modelValue;
                         if (attrs.pluck)
                             newValue = _.pluck(newValue, attrs.pluck);
 
@@ -307,7 +326,7 @@
                         // ctrl.$viewValue reflects the old state.
                         // using timeout to wait for the value to update
                         $timeout(function() {
-                            var newValue = ctrl.$viewValue;
+                            var newValue = ctrl.$modelValue;
                             var payload = {};
                             payload[attrs.field] = newValue;
                             save(payload);
@@ -320,9 +339,9 @@
                         $timeout(function () {
                             var newValue;
                             try {
-                                newValue = ctrl.$viewValue.id;
+                                newValue = ctrl.$modelValue.id;
                             } catch (e) {
-                                // $viewValue is null thus the value has been cleared
+                                // $viewValue is null/undefined thus the value has been cleared
                                 newValue = null;
                             }
                            
@@ -338,14 +357,17 @@
                         $http({ method: 'PATCH', url: attrs.autosave, data: payload })
                             .success(function () {
                                 msg.toSuccessMessage("Feltet er opdateret.");
+                                oldValue = ctrl.$modelValue;
                             })
                             .error(function () {
                                 msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                             });
                     }
 
-                    // type=hidden is cause select2 fields are usually hidden and trigger the change event
-                    if (attrs.type === "hidden") { 
+                    // workaround to detect chagnes for ui-datepicker
+                    if (attrs.hasOwnProperty('dateToString')) {
+                        element.bind('dateChange', saveIfNew);
+                    } else if (attrs.type === "hidden") { // type=hidden is cause select2 fields are usually hidden and trigger the change event
                         element.bind('change', saveSelect2);
                     } else if (attrs.type === "checkbox") {
                         element.bind('change', saveCheckbox);
