@@ -117,10 +117,6 @@
                 milestone.isMilestone = true;
                 milestone.updateUrl = "api/state/" + milestone.id;
 
-                autoSaveTrafficLight(milestone.updateUrl, "status", function() {
-                    return milestone.status;
-                });
-
                 return addMilestoneActivity(milestone);
             }
 
