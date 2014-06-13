@@ -1,6 +1,6 @@
 ﻿(function (ng, app) {
     app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-system-usage.hierarchy', {
+        $stateProvider.state('it-system.usage.hierarchy', {
             url: '/hierarchy',
             templateUrl: 'partials/it-system/tab-hierarchy.html',
             controller: 'system.EditHierarchy',

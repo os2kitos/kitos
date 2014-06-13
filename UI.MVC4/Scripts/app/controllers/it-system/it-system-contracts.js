@@ -1,6 +1,6 @@
 ﻿(function (ng, app) {
     app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-system-usage.contracts', {
+        $stateProvider.state('it-system.usage.contracts', {
             url: '/contracts',
             templateUrl: 'partials/it-system/tab-contracts.html',
             controller: 'system.EditContracts',
