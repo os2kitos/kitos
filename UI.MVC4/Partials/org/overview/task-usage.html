@@ -13,10 +13,12 @@
     <!-- statuses -->
     <div class="col-md-2">
         <div class="status-column" data-ng-if="user.currentConfig.showColumnTechnology">
-            <input data-select-status="usage.usage.technologyStatus" data-can-write="usage.usage.orgUnit.hasWriteAccess" />
+            <span data-select-status2="" data-ng-model="usage.usage.technologyStatus" data-can-write="usage.usage.orgUnit.hasWriteAccess"
+                   data-autosave="{{usage.updateUrl}}" data-field="technologyStatus"></span>
         </div>
         <div class="status-column" data-ng-if="user.currentConfig.showColumnUsage">
-            <input data-select-status="usage.usage.usageStatus" data-can-write="usage.usage.orgUnit.hasWriteAccess" />
+            <span data-select-status2="" data-ng-model="usage.usage.usageStatus" data-can-write="usage.usage.orgUnit.hasWriteAccess"
+                   data-autosave="{{usage.updateUrl}}" data-field="usageStatus"></span>
         </div>
         <div class="status-column">
             <button class="btn btn-link btn-xs"
