@@ -91,7 +91,7 @@
 
                 /* visit every task usage and delegation */
                 function visit(usage, parent, level, altStyle, task) {
-
+                    usage.usage.updateUrl = 'api/taskUsage/' + usage.usage.id;
                     usage.usage.task = task;
                     usage.usage.orgUnit = $scope.orgUnits[usage.usage.orgUnitId];
 
@@ -104,13 +104,9 @@
                     if (!usage.hasDelegations) {
                         $scope.$watch(function () { return usage.usage.technologyStatus; }, function (newVal, oldVal) {
                             updateTechStatus(usage);
-
-                            if (newVal !== oldVal) patchTechStatus(usage);
                         });
                         $scope.$watch(function () { return usage.usage.usageStatus; }, function (newVal, oldVal) {
                             updateUsageStatus(usage);
-
-                            if (newVal !== oldVal) patchUsageStatus(usage);
                         });
                     }
 
@@ -234,36 +230,6 @@
         };
 
         $scope.indent = indent;
-
-        function patchUsageComplex(usage, data, onSuccess, onError) {
-            $http({
-                method: 'PATCH',
-                url: 'api/taskusage/' + usage.usage.id,
-                data: data
-            }).success(onSuccess).error(onError);
-        };
-
-        function patchUsage(usage, data) {
-            return patchUsageComplex(usage, data, function (result) {
-                notify.addSuccessMessage("Feltet er opdateret!");
-            }, function (result) {
-                notify.addErrorMessage("Fejl!");
-                console.log(result);
-
-            });
-        };
-
-        function patchTechStatus(usage) {
-            patchUsage(usage, {
-                "technologyStatus": usage.usage.technologyStatus
-            });
-        };
-
-        function patchUsageStatus(usage) {
-            patchUsage(usage, {
-                "usageStatus": usage.usage.usageStatus
-            });
-        };
 
         $scope.openComment = function (usage) {
             $modal.open({
