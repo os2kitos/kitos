@@ -588,7 +588,9 @@
     <Content Include="Scripts\app\controllers\local-config\local-config-project.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-org.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-subnav.js" />
-    <Content Include="Scripts\app\controllers\org\org.js" />
+    <Content Include="Scripts\app\controllers\org\org-structure.js" />
+    <Content Include="Scripts\app\controllers\org\org-subnav.js" />
+    <Content Include="Scripts\app\controllers\org\org-overview.js" />
     <Content Include="Scripts\app\directives\angularjs-dropdown-multiselect.js" />
     <Content Include="Scripts\app\directives\directives.js" />
     <Content Include="Scripts\app\directives\filters.js" />
