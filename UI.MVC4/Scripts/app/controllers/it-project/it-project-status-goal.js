@@ -87,27 +87,6 @@
                     });
             };
 
-            function autoSaveTrafficLight(url, field, watchExp, scope) {
-                var theScope = scope || $scope;
-
-                theScope.$watch(watchExp, function (newVal, oldVal) {
-
-                    if (angular.isUndefined(newVal) || newVal == null || newVal == oldVal) return;
-
-                    var msg = notify.addInfoMessage("Gemmer...", false);
-                    patch(url, field, newVal).success(function (result) {
-                        msg.toSuccessMessage("Feltet er opdateret");
-                    }).error(function () {
-                        msg.toErrorMessage("Fejl!");
-                    });
-
-                });
-            }
-
-            autoSaveTrafficLight($scope.goalStatus.updateUrl, "status", function () {
-                return $scope.goalStatus.status;
-            });
-
             $scope.addGoal = function() {
                 $http.post("api/goal", {
                     goalStatusId: itProject.goalStatus.id,

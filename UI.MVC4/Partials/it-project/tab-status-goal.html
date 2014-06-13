@@ -7,7 +7,11 @@
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusGoal">Status mål (samlet):</label>
                     <div class="col-md-7">
-                        <input id="statusGoal" data-select-status="goalStatus.status" data-can-write="hasWriteAccess" />
+                        <span id="statusGoal" data-select-status2="" data-ng-model="goalStatus.status"  
+                            data-field="status"
+                              data-autosave="{{goalStatus.updateUrl}}" 
+                            data-can-write="hasWriteAccess">
+                            </span>
                     </div>
                 </div>
 
@@ -142,7 +146,7 @@
                         
                         <!-- Status -->
                         <td>
-                            <input data-select-status="goal.status" />
+                            <span data-select-status2="" data-ng-model="goal.status"></span>
                         </td>
                         <td>
                             <div class="pull-right" data-ng-hide="!hasWriteAccess">
