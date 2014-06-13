@@ -130,10 +130,6 @@
 
                         $modalScope.goal = goal;
                         $modalScope.goalTypes = goalTypes;
-
-                        autoSaveTrafficLight(goal.updateUrl, "status", function() {
-                            return goal.status;
-                        }, $modalScope);
                         
                         //update the i'th date of a subgoal
                         $modalScope.updateSubGoalDate = function (i) {
