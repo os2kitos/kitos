@@ -186,30 +186,7 @@
             };
         }
     ]);
-
-    app.directive('selectStatus', ['$timeout',
-        function ($timeout) {
-            return {
-                scope: {
-                    model: '=selectStatus',
-                    canWrite: '=',
-                    onStatusChange: '&?'
-                },
-                replace: true,
-                templateUrl: 'partials/directives/select-status.html',
-
-                link: function (scope, element, attr) {
-                    scope.setModel = function (n) {
-                        if (scope.model == n) return;
-
-                        scope.model = n;
-                        $timeout(scope.onStatusChange);
-                    };
-                }
-            };
-        }
-    ]);
-
+    
     app.directive('selectStatus2', ['$timeout',
         function ($timeout) {
             return {
@@ -230,7 +207,7 @@
                         $timeout(function () {
                             //then trigger event
                             ngModel.$setViewValue(scope.model);
-
+                            
                             //this triggers the autosave directive
                             element.triggerHandler("blur");
                         });

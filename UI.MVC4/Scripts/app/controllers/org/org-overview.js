@@ -159,9 +159,10 @@
 
         /* helper function to aggregate status-trafficlight */
         function addToStatusResult(status, result) {
-            if (status == 2) result.green++;
-            else if (status == 1) result.yellow++;
-            else result.red++;
+            if (status == 3) result.green++;
+            else if (status == 2) result.yellow++;
+            else if (status == 1) result.red++;
+            else result.white++;
 
             result.max++;
 
@@ -172,6 +173,7 @@
         function sumStatusResult(result1, result2) {
             return {
                 max: result1.max + result2.max,
+                white: result1.white + result2.white,
                 red: result1.red + result2.red,
                 yellow: result1.yellow + result2.yellow,
                 green: result1.green + result2.green
@@ -183,9 +185,10 @@
             /* this will hold the aggregated tech status of this node */
             var result = {
                 max: 0,
+                white: 0,
                 red: 0,
                 yellow: 0,
-                green: 0
+                green: 0,
             };
 
             /* if the usage isn't delegated, the agg result is just this tech status */
@@ -208,6 +211,7 @@
 
             var result = {
                 max: 0,
+                white: 0,
                 red: 0,
                 yellow: 0,
                 green: 0
