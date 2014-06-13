@@ -25,7 +25,7 @@
                 ],
                 systems: [
                     '$http', function($http) {
-                        return $http.get("api/itsystem");
+                        return $http.get("api/itsystem?nonInterfaces");
                     }
                 ],
                 user: [
