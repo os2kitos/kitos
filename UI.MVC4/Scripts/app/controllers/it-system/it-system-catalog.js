@@ -3,10 +3,10 @@
 
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
 
-        $stateProvider.state('it-system.assign', {
-            url: '/assign',
-            templateUrl: 'partials/it-system/assign-it-system.html',
-            controller: 'system.AssignCtrl',
+        $stateProvider.state('it-system.catalog', {
+            url: '/catalog',
+            templateUrl: 'partials/it-system/it-system-catalog.html',
+            controller: 'system.CatalogCtrl',
             resolve: {
                 appTypes: [
                     '$http', function($http) {
@@ -38,12 +38,12 @@
     }]);
 
 
-    app.controller('system.AssignCtrl',
-        ['$rootScope', '$scope', '$http', 'notify',
+    app.controller('system.CatalogCtrl',
+        ['$rootScope', '$scope', '$http', 'notify', '$state',
             'appTypes', 'businessTypes', 'systems', 'organizations', 'user',
-            function ($rootScope, $scope, $http, notify,
+            function ($rootScope, $scope, $http, notify, $state,
              appTypesHttp, businessTypesHttp, systems, organizationsHttp, user) {
-                $rootScope.page.title = 'IT System - Tilknyt system';
+                $rootScope.page.title = 'IT System - Katalog';
 
                 $scope.showType = 'appType';
 
@@ -129,6 +129,34 @@
 
                     $scope.systems.push(system);
                 });
+
+                $scope.create = function () {
+                    var payload = {
+                        name: 'Unavngivent IT system',
+                        belongsToId: user.currentOrganizationId,
+                        organizationId: user.currentOrganizationId,
+                        userId: user.id,
+                        dataRows: [],
+                        taskRefIds: [],
+                        canUseInterfaceIds: []
+                    };
+
+                    $scope.creatingSystem = true;
+                    var msg = notify.addInfoMessage("Opretter system...", false);
+
+                    $http.post('api/itsystem', payload).success(function (result) {
+
+                        msg.toSuccessMessage("Et nyt system er oprettet!");
+
+                        var systemId = result.response.id;
+
+                        //$state.go('it-project.edit.status-project', { id: systemId });
+
+                    }).error(function () {
+                        msg.toErrorMessage("Fejl! Kunne ikke oprette nyt system!");
+                        $scope.creatingSystem = false;
+                    });
+                };
 
 
             }]);
