@@ -6,7 +6,9 @@ namespace UI.MVC4.Models
     public class ItSystemDTO
     {
         public int Id { get; set; }
+
         public int? ParentId { get; set; }
+        public string ParentName { get; set; }
 
         public int? ExposedById { get; set; }
         public ItSystemDTO ExposedBy { get; set; }
@@ -17,6 +19,7 @@ namespace UI.MVC4.Models
         public int? BelongsToId { get; set; }
         public string BelongsToName { get; set; }
         public int OrganizationId { get; set; }
+        public string OrganizationName { get; set; }
         public string Version { get; set; }
         public string Name { get; set; }
         public string SystemId { get; set; }

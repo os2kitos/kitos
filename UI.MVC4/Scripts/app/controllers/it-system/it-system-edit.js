@@ -3,11 +3,17 @@
 
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
 
-        $stateProvider.state('it-system.add', {
-            url: '/add',
+        $stateProvider.state('it-system.edit', {
+            url: '/edit/{id:[0-9]+}',
             templateUrl: 'partials/it-system/edit-it-system.html',
-            controller: 'system.AddCtrl',
+            controller: 'system.EditCtrl',
             resolve: {
+                itSystem: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itsystem/" + $stateParams.id)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }],
                 appTypes: [
                     '$http', function($http) {
                         return $http.get("api/apptype");
@@ -57,12 +63,18 @@
         });
     }]);
 
-    app.controller('system.AddCtrl',
-        ['$rootScope', '$scope', '$http', 'notify',
+    app.controller('system.EditCtrl',
+        ['$rootScope', '$scope', '$http', 'notify', 'itSystem',
             'appTypes', 'interfaceAppType', 'businessTypes', 'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'user',
-            function ($rootScope, $scope, $http, notify,
+            function ($rootScope, $scope, $http, notify, itSystem,
             appTypes, interfaceAppType, businessTypes, tsas, interfaces, interfaceTypes, methods, dataTypes, user) {
-                $rootScope.page.title = 'IT System - Opret nyt system';
+                $rootScope.page.title = 'IT System - Rediger system';
+
+                itSystem.updateUrl = 'api/itSystem/' + itSystem.id;
+                itSystem.belongsTo = !itSystem.belongsToId ? {} : { id: itSystem.belongsToId, text: itSystem.belongsToName};
+                itSystem.parent = !itSystem.parentId ? {} : { id: itSystem.parentId, text: itSystem.parentName };
+
+                $scope.system = itSystem;
 
                 $scope.appTypes = appTypes.data.response;
                 $scope.interfaceAppType = interfaceAppType.data.response;
@@ -79,58 +91,10 @@
                 $scope.interfacesSelectOptions = selectLazyLoading('api/itsystem?interfaces');
                 $scope.organizationSelectOptions = selectLazyLoading('api/organization?');
 
-                //default values of a system
-                $scope.system =
-                {
-                    accessModifier: 0,
-                    dataRows: []
-                };
 
                 $scope.newDataRow = {};
 
                 // submit system
-                $scope.saveSystem = function () {
-
-                    var system = $scope.system;
-
-                    var checkedTasks = _.filter($scope.allTasksFlat, function (task) {
-                        return task.isChecked;
-                    });
-
-                    var data = {
-                        parentId: system.parent ? system.parent.id : null,
-                        exposedById: system.exposedBy ? system.exposedBy.id : null,
-                        canUseInterfaceIds: _.pluck(system.canUseInterfaces, 'id'),
-                        belongsToId: system.belongsTo ? system.belongsTo.id : null,
-                        organizationId: user.currentOrganizationId,
-
-                        version: system.version,
-                        name: system.name,
-                        systemId: system.systemId,
-                        userId: user.id,
-                        accessModifier: system.accessModifier,
-                        description: system.description,
-                        url: system.url,
-                        taskRefIds: _.pluck(checkedTasks, 'id'),
-
-                        appTypeId: system.appTypeId,
-                        businessTypeId: system.businessTypeId,
-
-                        interfaceId: system.interfaceId,
-                        interfaceTypeId: system.interfaceTypeId,
-                        tsaId: system.tsaId,
-                        methodId: system.methodId,
-                        dataRows: system.dataRows,
-                    };
-
-                    var msg = notify.addInfoMessage("Gemmer... ");
-                    $http.post('api/itsystem', data, { handleBusy: true }).success(function () {
-                        msg.toSuccessMessage("Systemet er gemt!");
-                    }).error(function () {
-                        msg.toErrorMessage("Fejl! Systemet kunne ikke gemmes!");
-                    });
-                };
-
                 $scope.addDataRow = function (newDataRow) {
                     if (!newDataRow.data || !newDataRow.dataTypeId) return;
 

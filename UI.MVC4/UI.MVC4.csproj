@@ -574,7 +574,7 @@
     <Content Include="Scripts\app\controllers\it-project\it-project-strategy.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-edit.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-subnav.js" />
-    <Content Include="Scripts\app\controllers\it-system\it-system-add.js" />
+    <Content Include="Scripts\app\controllers\it-system\it-system-edit.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-catalog.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-contracts.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-overview.js" />

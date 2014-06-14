@@ -150,7 +150,7 @@
 
                         var systemId = result.response.id;
 
-                        //$state.go('it-project.edit.status-project', { id: systemId });
+                        $state.go('it-system.edit', { id: systemId });
 
                     }).error(function () {
                         msg.toErrorMessage("Fejl! Kunne ikke oprette nyt system!");

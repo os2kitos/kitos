@@ -1,4 +1,4 @@
-﻿<form class="form-horizontal fix-label-padding" data-ng-submit="saveSystem()">
+﻿<form class="form-horizontal fix-label-padding">
     <div class="row">
         <div class="col-md-7">
             <div class="col-md-6">
@@ -7,7 +7,9 @@
                 <div class="form-group">
                     <label for="system-name" class="control-label col-md-5 small">IT System</label>
                     <div class="col-md-7">
-                        <input type="text" id="system-name" data-ng-model="system.name" class="form-control input-sm" required="required"/>
+                        <input type="text" id="system-name" 
+                               data-autosave="{{system.updateUrl}}" data-field="name" 
+                            data-ng-model="system.name" class="form-control input-sm"/>
                     </div>
                 </div>
 
@@ -15,7 +17,9 @@
                 <div class="form-group">
                     <label for="system-id" class="control-label col-md-5 small">System ID</label>
                     <div class="col-md-7">
-                        <input type="text" id="system-id" data-ng-model="system.systemId" class="form-control input-sm" required="required"/>
+                        <input type="text" id="system-id" 
+                               data-autosave="{{system.updateUrl}}" data-field="systemId" 
+                             data-ng-model="system.systemId" class="form-control input-sm"/>
                     </div>
                 </div>
 
@@ -23,7 +27,9 @@
                 <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
                     <label for="system-parent" class="control-label col-md-5 small">Overordnet system</label>
                     <div class="col-md-7">
-                        <input type="hidden" data-ui-select2="itSystemsSelectOptions" id="system-parent" data-ng-model="system.parent" class="form-control input-sm">
+                        <input type="hidden" data-ui-select2="itSystemsSelectOptions" 
+                               data-autosave="{{system.updateUrl}}" data-field="parentId" 
+                            id="system-parent" data-ng-model="system.parent" class="form-control input-sm">
                     </div>
                 </div>
                 <!--Interfaces can-use-->
@@ -36,7 +42,9 @@
                 <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
                     <label for="system-belongs-to" class="control-label col-md-5 small">Tilhører</label>
                     <div class="col-md-7">
-                         <input type="hidden" data-ui-select2="organizationSelectOptions" id="system-belongs-to" data-ng-model="system.belongsTo" class="form-control input-sm" required="required">
+                         <input type="hidden" data-ui-select2="organizationSelectOptions" 
+                               data-autosave="{{system.updateUrl}}" data-field="belongsToId" 
+                             id="system-belongs-to" data-ng-model="system.belongsTo" class="form-control input-sm">
                     </div>
                 </div>
             </div>
@@ -46,7 +54,9 @@
                 <div class="form-group">
                     <label for="system-version" class="control-label col-md-5 small">Version</label>
                     <div class="col-md-7">
-                        <input type="text" id="system-version" data-ng-model="system.version" class="form-control input-sm" required="required"/>
+                        <input type="text" id="system-version"
+                               data-autosave="{{system.updateUrl}}" data-field="version" 
+                              data-ng-model="system.version" class="form-control input-sm"/>
                     </div>
                 </div>
 
@@ -54,7 +64,9 @@
                 <div class="form-group">
                     <label for="system-access" class="control-label col-md-5 small">Public</label>
                     <div class="col-md-7">
-                        <input id="system-access" data-ng-model="system.accessModifier" class="form-control input-sm" data-select-access-modifier="" />
+                        <input id="system-access" 
+                               data-autosave="{{system.updateUrl}}" data-field="accessModifier" 
+                             data-ng-model="system.accessModifier" class="form-control input-sm" data-select-access-modifier="" />
                     </div>
                 </div>
 
@@ -62,7 +74,9 @@
                 <div class="form-group">
                     <label for="system-app-type" class="control-label col-md-5 small">Applikationstype</label>
                     <div class="col-md-7">
-                        <select data-ui-select2="" id="system-app-type" data-ng-model="system.appTypeId" class="form-control input-sm" required="required">
+                        <select data-ui-select2="" id="system-app-type" 
+                                data-autosave="{{system.updateUrl}}" data-field="appTypeId" 
+                             data-ng-model="system.appTypeId" class="form-control input-sm">
                             <option data-ng-repeat="appType in appTypes" value="{{appType.id}}">{{appType.name}}</option>
                         </select>
                     </div>
@@ -72,7 +86,9 @@
                 <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
                     <label for="system-business-type" class="control-label col-md-5 small">Forretningstype</label>
                     <div class="col-md-7">
-                        <select data-ui-select2="" id="system-business-type" data-ng-model="system.businessTypeId" class="form-control input-sm" required="required">
+                        <select data-ui-select2="" id="system-business-type"
+                                data-autosave="{{system.updateUrl}}" data-field="businessTypeId" 
+                              data-ng-model="system.businessTypeId" class="form-control input-sm">
                             <option data-ng-repeat="businessType in businessTypes" value="{{businessType.id}}">{{businessType.name}}</option>
                         </select>
                     </div>
@@ -86,7 +102,9 @@
             <div class="form-group">
                 <label for="system-description" class="control-label col-md-4 small">Beskrivelse</label>
                 <div class="col-md-8">
-                    <textarea id="system-description" data-ng-model="system.description" class="form-control input-sm" rows="7"></textarea>
+                    <textarea id="system-description"
+                                data-autosave="{{system.updateUrl}}" data-field="description" 
+                               data-ng-model="system.description" class="form-control input-sm" rows="7"></textarea>
                 </div>
             </div>
 
@@ -94,7 +112,9 @@
             <div class="form-group">
                 <label for="system-url" class="control-label col-md-4 small">Link til yderligere beskrivelse</label>
                 <div class="col-md-8">
-                    <input type="text" id="system-url" data-ng-model="system.url" class="form-control input-sm" placeholder="URL" />
+                    <input type="text" id="system-url" 
+                                data-autosave="{{system.updateUrl}}" data-field="url" 
+                               data-ng-model="system.url" class="form-control input-sm" placeholder="URL" />
                 </div>
             </div>
         </div>
@@ -190,7 +210,7 @@
     <div class="row">&nbsp;</div>
     
     <!-- KLE -->
-    <div class="row panel panel-default" data-ng-if="system.appTypeId != interfaceAppType.id">
+    <div class="panel panel-default" data-ng-if="system.appTypeId != interfaceAppType.id">
         <div class="panel-heading small">Tilknyt KLE</div>
         <div>
             <select data-ng-model="kleFilter.parentId" data-ng-options="t.id as (t.taskKey + ' ' + t.description) for t in allTasksFlat | filter:{ type:'KLE-Gruppe' }" data-ng-change="cleanKleFilter()">
@@ -205,9 +225,5 @@
                 </label>
             </div>
         </div>
-    </div>
-    
-    <div class="row">
-        <input type="submit" value="Gem IT system" class="btn btn-success full-width" data-disable-on-busy=""/>
     </div>
 </form>
