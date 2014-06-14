@@ -34,7 +34,6 @@ namespace Core.DomainModel
         public virtual User AssociatedUser { get; set; }
 
         public int? AssociatedActivityId { get; set; }
-        public virtual Activity AssociatedActivity { get; set; }
 
         /// <summary>
         /// The state might be a milestone for an IT project
