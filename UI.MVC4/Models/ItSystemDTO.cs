@@ -28,7 +28,7 @@ namespace UI.MVC4.Models
         public string Url { get; set; }
         public IEnumerable<int> TaskRefIds { get; set; }
 
-        public int AppTypeId { get; set; }
+        public int? AppTypeId { get; set; }
         public int? BusinessTypeId { get; set; }
 
         public int? InterfaceId { get; set; }
