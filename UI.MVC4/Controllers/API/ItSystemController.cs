@@ -182,5 +182,49 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
         }
+
+        public HttpResponseMessage PostTasksUsedByThisSystem(int id, [FromUri] int taskId)
+        {
+            try
+            {
+                var system = Repository.GetByKey(id);
+                if (system == null) return NotFound();
+                if (!HasWriteAccess(system)) return Unauthorized();
+
+                var task = _taskRepository.GetByKey(taskId);
+                if (task == null) return NotFound();
+
+                system.TaskRefs.Add(task);
+                Repository.Save();
+
+                return Created(Map<TaskRef, TaskRefDTO>(task));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage DeleteTasksUsedByThisSystem(int id, [FromUri] int taskId)
+        {
+            try
+            {
+                var system = Repository.GetByKey(id);
+                if (system == null) return NotFound();
+                if (!HasWriteAccess(system)) return Unauthorized();
+
+                var task = _taskRepository.GetByKey(taskId);
+                if (task == null) return NotFound();
+
+                system.TaskRefs.Remove(task);
+                Repository.Save();
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
     }
 }
