@@ -71,8 +71,8 @@
                 $rootScope.page.title = 'IT System - Rediger system';
 
                 itSystem.updateUrl = 'api/itSystem/' + itSystem.id;
-                itSystem.belongsTo = !itSystem.belongsToId ? {} : { id: itSystem.belongsToId, text: itSystem.belongsToName};
-                itSystem.parent = !itSystem.parentId ? {} : { id: itSystem.parentId, text: itSystem.parentName };
+                itSystem.belongsTo = !itSystem.belongsToId ? null : { id: itSystem.belongsToId, text: itSystem.belongsToName};
+                itSystem.parent = !itSystem.parentId ? null : { id: itSystem.parentId, text: itSystem.parentName };
 
                 $scope.system = itSystem;
 
@@ -87,7 +87,7 @@
 
                 $scope.dataTypes = dataTypes.data.response;
 
-                $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem?nonInterfaces');
+                $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem?nonInterfaces', true);
                 $scope.interfacesSelectOptions = selectLazyLoading('api/itsystem?interfaces');
                 $scope.organizationSelectOptions = selectLazyLoading('api/organization?');
 
@@ -104,11 +104,12 @@
                     $scope.newDataRow.dataTypeId = "";
                 };
 
-                function selectLazyLoading(url) {
+                function selectLazyLoading(url, allowClear) {
                     return {
                         minimumInputLength: 1,
                         initSelection: function (elem, callback) {
                         },
+                        allowClear: allowClear,
                         ajax: {
                             data: function (term, page) {
                                 return { query: term };

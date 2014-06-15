@@ -485,6 +485,7 @@
     <Content Include="Partials\it-project\tab-status-goal.html" />
     <Content Include="Partials\it-project\tab-strategy.html" />
     <Content Include="Partials\it-project\tab-status-project.html" />
+    <Content Include="Partials\it-system\tab-edit-kle.html" />
     <Content Include="Partials\it-system\it-system-catalog.html" />
     <Content Include="Partials\it-system\tab-contracts.html" />
     <Content Include="Partials\it-system\tab-proj.html" />
@@ -574,6 +575,7 @@
     <Content Include="Scripts\app\controllers\it-project\it-project-strategy.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-edit.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-subnav.js" />
+    <Content Include="Scripts\app\controllers\it-system\it-system-edit-kle.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-edit.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-catalog.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-contracts.js" />

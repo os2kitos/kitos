@@ -318,10 +318,13 @@
                         // ctrl.$viewValue reflects the old state.
                         // using timeout to wait for the value to update
                         $timeout(function () {
+                            //debugger;
                             var newValue;
 
                             var viewValue = ctrl.$viewValue;
-                            if (angular.isObject(viewValue)) {
+                            if (angular.isArray(viewValue)) {
+                                newValue = _.pluck(viewValue, 'id');
+                            } else if (angular.isObject(viewValue)) {
                                 newValue = viewValue.id;
                             } else {
                                 newValue = viewValue;
