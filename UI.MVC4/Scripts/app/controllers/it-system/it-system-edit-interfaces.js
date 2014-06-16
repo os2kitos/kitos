@@ -14,9 +14,8 @@
 
     app.controller('system.SystemInterfacesCtrl', ['$scope', '$http', 'notify', 'itSystem',
         function ($scope, $http, notify, itSystem) {
-
-            $scope.canUseInterfaces = itSystem.canUseInterfaces;
-
+            $scope.new = {};
+            
             _.each(itSystem.canUseInterfaces, pushInterface);
             
             function pushInterface(theInterface) {
@@ -37,15 +36,15 @@
             }
 
             $scope.addNewInterface = function() {
-                if (!$scope.newInterface) return;
+                if (!$scope.new.interface) return;
 
                 var msg = notify.addInfoMessage("Gemmer opmærkning...", false);
-                $http.post(itSystem.updateUrl + '?interfaceId=' + $scope.newInterface.id).success(function (result) {
+                $http.post(itSystem.updateUrl + '?interfaceId=' + $scope.new.interface.id).success(function (result) {
                     itSystem.canUseInterfaces.push(result.response);
                     pushInterface(result.response);
                     
                     msg.toSuccessMessage("IT systemet er opmærket med kan-anvende snitfladen");
-                    $scope.newInterface = null;
+                    $scope.new.interface = null;
                     
                 }).error(function() {
                     msg.toErrorMessage("Fejl! Kunne ikke gemme opmærkning!");
@@ -54,7 +53,7 @@
             
             $scope.interfacesSelectOptions = selectLazyLoading('api/itsystem?interfaces', false, function (obj) {
                 //filter interfaces that's already assigned to the system
-                if (_.findWhere($scope.canUseInterfaces, { id: obj.id, show: true })) return false;
+                if (_.findWhere(itSystem.canUseInterfaces, { id: obj.id, show: true })) return false;
 
                 return obj;
             });

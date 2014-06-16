@@ -25,7 +25,12 @@
                 ],
                 systems: [
                     '$http', function($http) {
-                        return $http.get("api/itsystem?nonInterfaces");
+                        return $http.get("api/itsystem");
+                    }
+                ],
+                interfaceAppType: [
+                    '$http', function ($http) {
+                        return $http.get("api/apptype?interfaceAppType");
                     }
                 ],
                 user: [
@@ -40,14 +45,15 @@
 
     app.controller('system.CatalogCtrl',
         ['$rootScope', '$scope', '$http', 'notify', '$state',
-            'appTypes', 'businessTypes', 'systems', 'organizations', 'user',
+            'appTypes', 'businessTypes', 'systems', 'organizations', 'interfaceAppType', 'user',
             function ($rootScope, $scope, $http, notify, $state,
-             appTypesHttp, businessTypesHttp, systems, organizationsHttp, user) {
+             appTypesHttp, businessTypesHttp, systems, organizationsHttp, interfaceAppTypeHttp, user) {
                 $rootScope.page.title = 'IT System - Katalog';
 
                 $scope.showType = 'appType';
 
                 var appTypes = appTypesHttp.data.response;
+                var interfaceAppType = interfaceAppTypeHttp.data.response;
                 var businessTypes = businessTypesHttp.data.response;
                 var organizations = organizationsHttp.data.response;
 
@@ -78,7 +84,7 @@
                 function loadUsage(system) {
                     return $http.get(system.usageUrl)
                         .success(function (result) {
-                            system.selected = true;
+                            system.hasUsage = true;
                         });
                 }
 
@@ -87,20 +93,20 @@
                         itSystemId: system.id,
                         organizationId: user.currentOrganizationId
                     }).success(function (result) {
-                        notify.addSuccessMessage("Systemet er tilknyttet");
-                        system.selected = true;
+                        notify.addSuccessMessage("Systemet er taget i anvendelse");
+                        system.hasUsage = true;
                     }).error(function (result) {
-                        notify.addErrorMessage("Systemet kunne ikke tilknyttes!");
+                        notify.addErrorMessage("Systemet kunne ikke tages i anvendelse!");
                     });
                 }
 
                 function deleteUsage(system) {
 
                     return $http.delete(system.usageUrl).success(function (result) {
-                        notify.addSuccessMessage("Systemet er fjernet");
-                        system.selected = false;
+                        notify.addSuccessMessage("Anvendelse af systemet er fjernet");
+                        system.hasUsage = false;
                     }).error(function (result) {
-                        notify.addErrorMessage("Systemet kunne ikke fjernes!");
+                        notify.addErrorMessage("Anvendelse af systemet kunne ikke fjernes!");
                     });
                 }
 
@@ -108,6 +114,7 @@
                 _.each(systems.data.response, function (system) {
 
                     system.appType = _.findWhere(appTypes, { id: system.appTypeId });
+                    system.isInterface = (system.appTypeId == interfaceAppType.id);
                     system.businessType = _.findWhere(businessTypes, { id: system.businessTypeId });
 
                     system.belongsTo = _.findWhere(organizations, { id: system.belongsToId });
@@ -119,12 +126,12 @@
                     loadTaskRef(system);
                     loadUsage(system);
 
-                    system.toggle = function () {
-                        if (system.selected) {
-                            return deleteUsage(system);
-                        } else {
-                            return addUsage(system);
-                        }
+                    system.addUsage = function() {
+                        addUsage(system);
+                    };
+
+                    system.deleteUsage = function() {
+                        deleteUsage(system);
                     };
 
                     $scope.systems.push(system);

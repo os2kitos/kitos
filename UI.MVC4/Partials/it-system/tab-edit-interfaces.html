@@ -8,7 +8,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr data-ng-repeat="interface in canUseInterfaces | filter: {show:true}">
+            <tr data-ng-repeat="interface in system.canUseInterfaces | filter: {show:true}">
                 <td>{{ interface.name }}</td>
                 <td>
                     <button class="btn btn-danger btn-xs" data-tooltip="Fjern kan-anvende" data-confirmed-click="interface.delete()"
@@ -22,7 +22,7 @@
             <tr>
                 <td colspan="2">
                     <input type="hidden" data-ui-select2="interfacesSelectOptions"
-                           data-placeholder="Vælg snitflade" data-ng-model="newInterface" 
+                           data-placeholder="Vælg snitflade" data-ng-model="new.interface" 
                            class="form-control input-sm" data-ng-change="addNewInterface()">
                 </td>
             </tr>

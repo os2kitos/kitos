@@ -2,9 +2,6 @@
     <thead>
         <tr>
             <td>
-                <!-- empty - for checkboxes -->
-            </td>
-            <td>
                 IT System
             </td>
             <td>
@@ -39,15 +36,16 @@
             <td>
                 Oprettet af
             </td>
+            <td>
+                Anvendelse
+            </td>
         </tr>
     </thead>
     <tbody>
         <tr data-ng-repeat="system in systems" >
-            <td data-ng-click="system.toggle()">
-                <input type="checkbox" data-ng-checked="system.selected"/>
-            </td>
             <td>
-                <label data-ng-click="system.toggle()">{{system.name}}</label>
+                <a data-ng-if="system.isInterface" ui-sref="it-system.edit.interface-details({id: system.id})">{{system.name}}</a>
+                <a data-ng-if="!system.isInterface" ui-sref="it-system.edit.interfaces({id: system.id})">{{system.name}}</a>
             </td>
             <td>
                 {{system.systemId}}
@@ -70,6 +68,18 @@
                 <span data-popover-placement="right" data-popover="Oprettet i {{system.organization.name}}" data-popover-trigger="mouseenter">
                     {{system.user.name}}
                 </span>
+            </td>
+            <td>
+                <div data-ng-if="!system.isInterface">
+                    <button class="btn btn-xs btn-success" data-ng-click="system.addUsage()" data-tooltip="Tag systemet i lokal anvendelse" data-ng-show="!system.hasUsage">
+                        Anvend
+                    </button>
+                    <button class="btn btn-xs btn-danger" data-confirmed-click="system.deleteUsage()"
+                        data-confirm-click="Er du sikker på at du vil fjerne den lokale anvendelse af systemet? Dette sletter ikke systemet, men vil slette alle lokale detaljer vedrørende anvendelsen."
+                        data-tooltip="Slet lokal anvendelse af systemet" data-ng-show="system.hasUsage">
+                        Fjern anv.
+                    </button>
+                </div>
             </td>
         </tr>
 
