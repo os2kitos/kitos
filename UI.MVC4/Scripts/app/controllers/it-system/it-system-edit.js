@@ -14,6 +14,12 @@
                             return result.data.response;
                         });
                 }],
+                hasWriteAccess: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itsystem/" + $stateParams.id + "?hasWriteAccess")
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }],
                 appTypes: [
                     '$http', function($http) {
                         return $http.get("api/apptype");
@@ -39,9 +45,9 @@
     }]);
 
     app.controller('system.EditCtrl',
-        ['$rootScope', '$scope', '$http', '$state', 'notify', 'itSystem',
+        ['$rootScope', '$scope', '$http', '$state', 'notify', 'itSystem', 'hasWriteAccess',
             'appTypes', 'interfaceAppType', 'businessTypes', 'user',
-            function ($rootScope, $scope, $http, $state, notify, itSystem,
+            function ($rootScope, $scope, $http, $state, notify, itSystem, hasWriteAccess,
             appTypes, interfaceAppType, businessTypes, user) {
                 $rootScope.page.title = 'IT System - Rediger system';
 
@@ -50,6 +56,7 @@
                 itSystem.parent = (!itSystem.parentId) ? null : { id: itSystem.parentId, text: itSystem.parentName };
 
                 $scope.system = itSystem;
+                $scope.hasWriteAccess = hasWriteAccess;
 
                 $scope.appTypes = appTypes.data.response;
                 $scope.interfaceAppType = interfaceAppType.data.response;

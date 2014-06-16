@@ -11,14 +11,14 @@
             <tr data-ng-repeat="interface in system.canUseInterfaces | filter: {show:true}">
                 <td>{{ interface.name }}</td>
                 <td>
-                    <button class="btn btn-danger btn-xs" data-tooltip="Fjern kan-anvende" data-confirmed-click="interface.delete()"
+                    <button data-ng-if="hasWriteAccess" class="btn btn-danger btn-xs" data-tooltip="Fjern kan-anvende" data-confirmed-click="interface.delete()"
                             data-confirm-click="Er du sikker på at du vil fjerne opmærkingen? Dette sletter ikke snitfladen.">
                         <i class="glyphicon glyphicon-trash"></i>
                     </button>
                 </td>
             </tr>
         </tbody>
-        <tfoot>
+        <tfoot data-ng-if="hasWriteAccess">
             <tr>
                 <td colspan="2">
                     <input type="hidden" data-ui-select2="interfacesSelectOptions"
