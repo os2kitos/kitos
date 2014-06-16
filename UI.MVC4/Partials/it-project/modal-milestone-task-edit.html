@@ -108,7 +108,11 @@
                 </select>
             </div>
             <div class="col-md-4" data-ng-if="activity.isMilestone">
-                <input id="status" data-select-status="activity.status" data-can-write="true" />
+                <span id="status" data-select-status2="" data-ng-model="activity.status" 
+                      data-field="status"
+                      data-autosave="{{activity.updateUrl}}"   
+                      data-can-write="true">
+                </span>
             </div>
         </div>
 

@@ -29,7 +29,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var usages = Repository.Get(u => u.OrganizationId == organizationId && u.ItSystem.Name.StartsWith(q));
+                var usages = Repository.Get(u => u.OrganizationId == organizationId && u.ItSystem.Name.Contains(q));
 
                 return Ok(Map(usages));
             }

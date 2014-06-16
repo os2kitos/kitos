@@ -42,7 +42,8 @@
                     contract.unfolded = false;
 
                     contract.status = {
-                        max: contract.totalRedStatuses + contract.totalYellowStatuses + contract.totalGreenStatuses,
+                        max: contract.totalWhiteStatuses + contract.totalRedStatuses + contract.totalYellowStatuses + contract.totalGreenStatuses,
+                        white: contract.totalWhiteStatuses,
                         red: contract.totalRedStatuses,
                         yellow: contract.totalYellowStatuses,
                         green: contract.totalGreenStatuses

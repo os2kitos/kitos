@@ -25,7 +25,7 @@ namespace Core.ApplicationServices
 
             if (nameSearch == null) return _repository.Get();
 
-            return _repository.Get(system => system.Name.StartsWith(nameSearch));
+            return _repository.Get(system => system.Name.Contains(nameSearch));
         }
 
         public IEnumerable<ItSystem> GetNonInterfaces(Organization organization, string nameSearch)
