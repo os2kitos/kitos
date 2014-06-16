@@ -29,31 +29,6 @@
                         return $http.get("api/businesstype");
                     }
                 ],
-                tsas: [
-                    '$http', function($http) {
-                        return $http.get("api/tsa");
-                    }
-                ],
-                interfaces: [
-                    '$http', function($http) {
-                        return $http.get("api/interface");
-                    }
-                ],
-                interfaceTypes: [
-                    '$http', function($http) {
-                        return $http.get("api/interfacetype");
-                    }
-                ],
-                methods: [
-                    '$http', function($http) {
-                        return $http.get("api/method");
-                    }
-                ],
-                dataTypes: [
-                    '$http', function($http) {
-                        return $http.get("api/datatype");
-                    }
-                ],
                 user: [
                     'userService', function(userService) {
                         return userService.getUser();
@@ -64,15 +39,15 @@
     }]);
 
     app.controller('system.EditCtrl',
-        ['$rootScope', '$scope', '$http', 'notify', 'itSystem',
-            'appTypes', 'interfaceAppType', 'businessTypes', 'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'user',
-            function ($rootScope, $scope, $http, notify, itSystem,
-            appTypes, interfaceAppType, businessTypes, tsas, interfaces, interfaceTypes, methods, dataTypes, user) {
+        ['$rootScope', '$scope', '$http', '$state', 'notify', 'itSystem',
+            'appTypes', 'interfaceAppType', 'businessTypes', 'user',
+            function ($rootScope, $scope, $http, $state, notify, itSystem,
+            appTypes, interfaceAppType, businessTypes, user) {
                 $rootScope.page.title = 'IT System - Rediger system';
 
                 itSystem.updateUrl = 'api/itSystem/' + itSystem.id;
-                itSystem.belongsTo = !itSystem.belongsToId ? null : { id: itSystem.belongsToId, text: itSystem.belongsToName};
-                itSystem.parent = !itSystem.parentId ? null : { id: itSystem.parentId, text: itSystem.parentName };
+                itSystem.belongsTo = (!itSystem.belongsToId) ? null : { id: itSystem.belongsToId, text: itSystem.belongsToName};
+                itSystem.parent = (!itSystem.parentId) ? null : { id: itSystem.parentId, text: itSystem.parentName };
 
                 $scope.system = itSystem;
 
@@ -80,28 +55,9 @@
                 $scope.interfaceAppType = interfaceAppType.data.response;
                 $scope.businessTypes = businessTypes.data.response;
 
-                $scope.tsas = tsas.data.response;
-                $scope.interfaces = interfaces.data.response;
-                $scope.interfaceTypes = interfaceTypes.data.response;
-                $scope.methods = methods.data.response;
-
-                $scope.dataTypes = dataTypes.data.response;
-
                 $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem?nonInterfaces', true);
                 $scope.organizationSelectOptions = selectLazyLoading('api/organization?');
-
-                $scope.newDataRow = {};
-
-                // submit system
-                $scope.addDataRow = function (newDataRow) {
-                    if (!newDataRow.data || !newDataRow.dataTypeId) return;
-
-                    $scope.system.dataRows.push({ data: newDataRow.data, dataTypeId: newDataRow.dataTypeId });
-
-                    $scope.newDataRow.data = "";
-                    $scope.newDataRow.dataTypeId = "";
-                };
-
+                
                 function selectLazyLoading(url, allowClear) {
                     return {
                         minimumInputLength: 1,
@@ -139,16 +95,17 @@
                     };
                 }
 
-                $http.get('api/taskref').success(function (result) {
-                    $scope.kleFilter = { type: 'KLE-Emne' };
-                    $scope.allTasksFlat = result.response;
+                //when appType == interface, we only want to show the interface specific tab
+                $scope.$watch('system.appTypeId', function(newVal, oldVal) {
+                    if (newVal == oldVal || !newVal) return;
+                    
+                    if (newVal == $scope.interfaceAppType.id) {
+                        $state.go('it-system.edit.interface-details');
+                    } else {
+                        $state.go('it-system.edit.interfaces');
+                    }
                 });
 
-                $scope.cleanKleFilter = function () {
-                    if ($scope.kleFilter.parentId === null) {
-                        delete $scope.kleFilter.parentId;
-                    }
-                };
             }]);
 
 })(angular, app);

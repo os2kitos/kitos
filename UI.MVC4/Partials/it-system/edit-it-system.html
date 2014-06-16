@@ -119,11 +119,14 @@
 
 <!-- sub tab buttons -->
 <ul class="nav nav-tabs">
-    <li data-ui-sref-active="active">
+    <li data-ui-sref-active="active" data-ng-if="system.appTypeId != interfaceAppType.id">
         <a data-ui-sref="it-system.edit.interfaces">Snitflader</a>
     </li>
-    <li data-ui-sref-active="active">
+    <li data-ui-sref-active="active" data-ng-if="system.appTypeId != interfaceAppType.id">
         <a data-ui-sref="it-system.edit.kle">KLE</a>
+    </li>
+    <li data-ui-sref-active="active" data-ng-if="system.appTypeId == interfaceAppType.id">
+        <a data-ui-sref="it-system.edit.interface-details">Snitflade detaljer</a>
     </li>
 </ul>
 
