@@ -186,7 +186,7 @@
             };
         }
     ]);
-    
+
     app.directive('selectStatus2', ['$timeout',
         function ($timeout) {
             return {
@@ -207,7 +207,7 @@
                         $timeout(function () {
                             //then trigger event
                             ngModel.$setViewValue(scope.model);
-                            
+
                             //this triggers the autosave directive
                             element.triggerHandler("blur");
                         });
