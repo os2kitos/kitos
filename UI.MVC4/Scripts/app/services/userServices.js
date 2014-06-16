@@ -10,6 +10,8 @@
                 return userRight.roleName == "LocalAdmin";
             });
 
+            var defOrgUnitId = response.defaultOrganizationUnitOrganizationId == currOrg.id ? response.defaultOrganizationUnitId : currOrg.root.id;
+
             _user = {
                 isAuth: true,
                 id: response.id,
@@ -20,7 +22,7 @@
                 isLocalAdmin: isLocalAdmin,
                 isLocalAdminFor: _.pluck(response.adminRights, 'organizationId'),
                 
-                defaultOrganizationUnitId: response.defaultOrganizationUnitId,
+                defaultOrganizationUnitId: defOrgUnitId,
                 
                 currentOrganization: currOrg,
                 currentOrganizationId: currOrg.id,

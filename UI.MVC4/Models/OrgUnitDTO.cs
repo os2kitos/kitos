@@ -12,4 +12,11 @@ namespace UI.MVC4.Models
 
         public long? Ean { get; set; }
     }
+
+    public class OrgUnitSimpleDTO
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int OrganizationId { get; set; }
+    }
 }
