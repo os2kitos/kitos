@@ -283,12 +283,6 @@
             require: 'ngModel',
             link: function (scope, element, attr, ctrl) {
                 ctrl.$parsers.push(function (value) {
-                    // ugly hack to not send a patch request on each change
-                    _.debounce(function () {
-                        element.triggerHandler('dateChange');
-                        scope.$apply();
-                    }, 500);
-                       
                     if (value instanceof Date)
                         return dateFilter(value, 'yyyy-MM-dd');
                     return value;
@@ -364,10 +358,7 @@
                             });
                     }
 
-                    // workaround to detect chagnes for ui-datepicker
-                    if (attrs.hasOwnProperty('dateToString')) {
-                        element.bind('dateChange', saveIfNew);
-                    } else if (attrs.type === "hidden") { // type=hidden is cause select2 fields are usually hidden and trigger the change event
+                    if (attrs.type === "hidden") { // type=hidden is cause select2 fields are usually hidden and trigger the change event
                         element.bind('change', saveSelect2);
                     } else if (attrs.type === "checkbox") {
                         element.bind('change', saveCheckbox);

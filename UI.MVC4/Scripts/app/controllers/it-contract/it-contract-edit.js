@@ -318,11 +318,12 @@
 
                 formatContractSigner(contract.contractSigner);
 
-                $scope.open = function ($event) {
+                $scope.opened = {};
+                $scope.open = function ($event, datepicker) {
                     $event.preventDefault();
                     $event.stopPropagation();
 
-                    $scope.opened = true;
+                    $scope.opened[datepicker] = true;
                 };
             }]);
 })(angular, app);
