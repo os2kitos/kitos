@@ -295,7 +295,6 @@
                         // ctrl.$viewValue reflects the old state.
                         // using timeout to wait for the value to update
                         $timeout(function () {
-                            //debugger;
                             var newValue;
 
                             var viewValue = ctrl.$viewValue;
