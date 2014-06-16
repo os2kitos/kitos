@@ -8,8 +8,9 @@
                 $rootScope.page.title = 'IT System';
                 $rootScope.page.subnav = [
                     { state: 'it-system.overview', text: 'Overblik' },
-                    { state: 'it-system.catalog', text: 'IT system katalog' },
-                    { state: 'it-system.edit', text: 'IT system', showWhen: 'it-system.edit' }
+                    { state: 'it-system.catalog', text: 'IT System katalog' },
+                    { state: 'it-system.edit', text: 'IT System', showWhen: 'it-system.edit' },
+                    { state: 'it-system.usage', text: 'IT System anvendelse', showWhen: 'it-system.usage' }
                 ];
             }]
         });
