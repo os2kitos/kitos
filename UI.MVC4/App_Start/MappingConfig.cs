@@ -263,16 +263,14 @@ namespace UI.MVC4.App_Start
                 .ForMember(dest => dest.ItProject, opt => opt.Ignore());
 
             Mapper.CreateMap<Activity, ActivityDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.AssociatedUser, opt => opt.Ignore())
-                  .ForMember(dest => dest.ObjectOwner, opt => opt.Ignore())
-                  .ForMember(dest => dest.AssociatedActivity, opt => opt.Ignore());
+                .ReverseMap()
+                .ForMember(dest => dest.AssociatedUser, opt => opt.Ignore())
+                .ForMember(dest => dest.ObjectOwner, opt => opt.Ignore());
 
             Mapper.CreateMap<State, StateDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.AssociatedUser, opt => opt.Ignore())
-                  .ForMember(dest => dest.ObjectOwner, opt => opt.Ignore())
-                  .ForMember(dest => dest.AssociatedActivity, opt => opt.Ignore());
+                .ReverseMap()
+                .ForMember(dest => dest.AssociatedUser, opt => opt.Ignore())
+                .ForMember(dest => dest.ObjectOwner, opt => opt.Ignore());
 
             Mapper.CreateMap<GoalStatus, GoalStatusDTO>()
                   .ReverseMap()
