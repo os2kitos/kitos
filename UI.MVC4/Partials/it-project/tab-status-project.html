@@ -7,7 +7,10 @@
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusProject">Status projekt (økonomi, tid og kvalitet):</label>
                     <div class="col-md-7">
-                        <input id="statusProject" data-select-status="project.statusProject" data-can-write="hasWriteAccess" />
+                        <span id="statusProject" data-select-status2="" data-ng-model="project.statusProject" data-can-write="hasWriteAccess"
+                            data-field="statusProject"
+                            data-autosave="{{project.updateUrl}}">
+                        </span>
                     </div>
                 </div>
 
@@ -121,7 +124,7 @@
                                 {{activity.statusProcentage}}%
                             </span>
                             <span data-ng-show="activity.isMilestone">
-                                <input data-select-status="activity.status"/>
+                                <span data-select-status2="" data-ng-model="activity.status"></span>
                             </span>
                         </td>
                         <td>{{activity.associatedUser.name}}</td>

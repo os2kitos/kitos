@@ -82,6 +82,14 @@ namespace UI.MVC4.Models
         }
 
         /// <summary>
+        /// The number of extern economy streams, that have white status
+        /// </summary>
+        public int TotalWhiteStatuses
+        {
+            get { return ExternEconomyStreams.Count(stream => stream.AuditStatus == TrafficLight.White); }
+        }
+
+        /// <summary>
         /// The number of extern economy streams, that have red status
         /// </summary>
         public int TotalRedStatuses 

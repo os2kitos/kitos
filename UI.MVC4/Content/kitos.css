@@ -428,6 +428,9 @@ a.select-status:hover .status-circle {
 .status-circle.green, .progress-bar-success {
     background: rgb(54, 164, 54);
 }
+.status-circle.white, .progress-bar-white {
+    background: rgb(255, 255, 255);
+}
 .status-bar {
     display: inline-block;
     width: 36px;
