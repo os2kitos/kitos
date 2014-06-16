@@ -33,15 +33,8 @@
                                    id="system-parent" data-ng-model="system.parent" class="form-control input-sm">
                         </div>
                     </div>
-                    <!--Interfaces can-use-->
-                    <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
-                        <label for="system-interfaces-can-use" class="control-label col-md-5 small">Snitflader (kan anvende)</label>
-                        <div class="col-md-7">
-                            <input type="hidden" data-ui-select2="interfacesSelectOptions"
-                                   data-autosave="{{system.updateUrl}}" data-field="canUseInterfaceIds" data-placeholder="Vælg snitflader"
-                                   id="system-interfaces-can-use" data-ng-model="system.canUseInterfaces" class="form-control input-sm" multiple="multiple">
-                        </div>
-                    </div>
+
+                    <!-- belongs to -->
                     <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
                         <label for="system-belongs-to" class="control-label col-md-5 small">Tilhører</label>
                         <div class="col-md-7">

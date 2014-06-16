@@ -226,5 +226,49 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
         }
+
+        public HttpResponseMessage PostInterfaceCanBeUsedBySystem(int id, [FromUri] int interfaceId)
+        {
+            try
+            {
+                var system = Repository.GetByKey(id);
+                if (system == null) return NotFound();
+                if (!HasWriteAccess(system)) return Unauthorized();
+
+                var theInterface = Repository.GetByKey(interfaceId);
+                if (theInterface == null) return NotFound();
+
+                system.CanUseInterfaces.Add(theInterface);
+                Repository.Save();
+
+                return Created(Map<ItSystem, ItSystemSimpleDTO>(theInterface));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage DeleteInterfaceCanBeUsedBySystem(int id, [FromUri] int interfaceId)
+        {
+            try
+            {
+                var system = Repository.GetByKey(id);
+                if (system == null) return NotFound();
+                if (!HasWriteAccess(system)) return Unauthorized();
+
+                var theInterface = Repository.GetByKey(interfaceId);
+                if (theInterface == null) return NotFound();
+
+                system.CanUseInterfaces.Remove(theInterface);
+                Repository.Save();
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
     }
 }

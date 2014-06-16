@@ -1,0 +1,31 @@
+﻿<div class="panel panel-default">
+    <div class="panel-heading">IT systemet kan anvende disse snitflader:</div>
+    <table class="table table-condensed">
+        <thead>
+            <tr>
+                <th class="col-md-12">Snitflade</th>
+                <th>Fjern</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="interface in canUseInterfaces | filter: {show:true}">
+                <td>{{ interface.name }}</td>
+                <td>
+                    <button class="btn btn-danger btn-xs" data-tooltip="Fjern kan-anvende" data-confirmed-click="interface.delete()"
+                            data-confirm-click="Er du sikker på at du vil fjerne opmærkingen? Dette sletter ikke snitfladen.">
+                        <i class="glyphicon glyphicon-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="2">
+                    <input type="hidden" data-ui-select2="interfacesSelectOptions"
+                           data-placeholder="Vælg snitflade" data-ng-model="newInterface" 
+                           class="form-control input-sm" data-ng-change="addNewInterface()">
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

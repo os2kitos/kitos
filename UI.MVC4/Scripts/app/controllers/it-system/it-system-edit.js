@@ -88,9 +88,7 @@
                 $scope.dataTypes = dataTypes.data.response;
 
                 $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem?nonInterfaces', true);
-                $scope.interfacesSelectOptions = selectLazyLoading('api/itsystem?interfaces');
                 $scope.organizationSelectOptions = selectLazyLoading('api/organization?');
-
 
                 $scope.newDataRow = {};
 

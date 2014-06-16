@@ -15,6 +15,7 @@ namespace UI.MVC4.Models
 
         public IEnumerable<int> CanBeUsedByIds { get; set; }
         public IEnumerable<int> CanUseInterfaceIds { get; set; }
+        public IEnumerable<ItSystemSimpleDTO> CanUseInterfaces { get; set; }
         public IEnumerable<int> ExposedInterfaceIds { get; set; }
         public int? BelongsToId { get; set; }
         public string BelongsToName { get; set; }
