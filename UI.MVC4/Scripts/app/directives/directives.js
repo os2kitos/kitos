@@ -186,7 +186,7 @@
             };
         }
     ]);
-    
+
     app.directive('selectStatus2', ['$timeout',
         function ($timeout) {
             return {
@@ -207,7 +207,7 @@
                         $timeout(function () {
                             //then trigger event
                             ngModel.$setViewValue(scope.model);
-                            
+
                             //this triggers the autosave directive
                             element.triggerHandler("blur");
                         });
@@ -295,7 +295,6 @@
                         // ctrl.$viewValue reflects the old state.
                         // using timeout to wait for the value to update
                         $timeout(function () {
-                            //debugger;
                             var newValue;
 
                             var viewValue = ctrl.$viewValue;

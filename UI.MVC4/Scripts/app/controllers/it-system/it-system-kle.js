@@ -26,7 +26,6 @@
         $scope.selectedKle = selectedKle;
         $scope.kle = kle;
         $scope.kleFilter = { type: 'KLE-Emne' };
-        debugger;
 
         $scope.cleanKleFilter = function () {
             if ($scope.kleFilter.parentId === null) {
