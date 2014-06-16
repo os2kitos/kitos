@@ -82,6 +82,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<Frequency>>().To<GenericRepository<Frequency>>().InRequestScope();
             kernel.Bind<IGenericRepository<Interface>>().To<GenericRepository<Interface>>().InRequestScope();
             kernel.Bind<IGenericRepository<DataType>>().To<GenericRepository<DataType>>().InRequestScope();
+            kernel.Bind<IGenericRepository<DataRow>>().To<GenericRepository<DataRow>>().InRequestScope();
             kernel.Bind<IGenericRepository<DataRowUsage>>().To<GenericRepository<DataRowUsage>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItProjectCategory>>().To<GenericRepository<ItProjectCategory>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItProjectType>>().To<GenericRepository<ItProjectType>>().InRequestScope();

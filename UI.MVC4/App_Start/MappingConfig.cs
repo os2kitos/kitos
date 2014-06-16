@@ -229,6 +229,9 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.ExposedInterfaces, opt => opt.Ignore())
                   .ForMember(dest => dest.CanBeUsedBy, opt => opt.Ignore());
 
+            //Simplere mapping than the one above, only one way
+            Mapper.CreateMap<ItSystem, ItSystemSimpleDTO>();
+
             Mapper.CreateMap<DataRowUsage, DataRowUsageDTO>()
                   .ReverseMap();
 

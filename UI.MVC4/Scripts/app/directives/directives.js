@@ -296,11 +296,14 @@
                         // using timeout to wait for the value to update
                         $timeout(function () {
                             var newValue;
-                            try {
-                                newValue = ctrl.$viewValue.id;
-                            } catch (e) {
-                                // $viewValue is null thus the value has been cleared
-                                newValue = null;
+
+                            var viewValue = ctrl.$viewValue;
+                            if (angular.isArray(viewValue)) {
+                                newValue = _.pluck(viewValue, 'id');
+                            } else if (angular.isObject(viewValue)) {
+                                newValue = viewValue.id;
+                            } else {
+                                newValue = viewValue;
                             }
                            
                             var payload = {};
@@ -322,7 +325,7 @@
                     }
 
                     // type=hidden is cause select2 fields are usually hidden and trigger the change event
-                    if (attrs.type === "hidden") { 
+                    if (attrs.type === "hidden" || !angular.isUndefined(attrs.uiSelect2)) {
                         element.bind('change', saveSelect2);
                     } else if (attrs.type === "checkbox") {
                         element.bind('change', saveCheckbox);
