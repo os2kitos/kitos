@@ -11,7 +11,7 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("DataRow");
 
-            this.HasRequired(t => t.DataType)
+            this.HasOptional(t => t.DataType)
                 .WithMany(d => d.References)
                 .HasForeignKey(t => t.DataTypeId);
 

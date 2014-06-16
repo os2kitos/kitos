@@ -54,38 +54,41 @@
         </div>
 
         <div class="col-md-6">
-            <table class="table table-condensed table-bordered">
+            <table class="table table-condensed">
                 <thead>
                     <tr>
-                        <th>Data</th>
-                        <th>Datatype</th>
+                        <th class="col-md-6">Data</th>
+                        <th class="col-md-6">Datatype</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-ng-repeat="dataRow in system.dataRows">
+                    <tr data-ng-repeat="dataRow in dataRows">
                         <td>
-                            <input type="text" class="form-control input-sm" data-ng-model="dataRow.data" />
+                            <input type="text" class="form-control input-sm" data-ng-model="dataRow.data"
+                                    data-autosave="{{dataRow.updateUrl}}" data-field="data" />
                         </td>
                         <td>
-                            <select data-ui-select2="" data-ng-model="dataRow.dataTypeId" class="form-control input-sm">
+                            <select data-ui-select2="" data-ng-model="dataRow.dataTypeId" class="form-control input-sm"
+                                    data-autosave="{{dataRow.updateUrl}}" data-field="dataTypeId">
                                 <option data-ng-repeat="dataType in dataTypes" value="{{dataType.id}}">{{dataType.name}}</option>
                             </select>
+                        </td>
+                        <td class="text-right">
+                            <button class="btn btn-danger btn-xs" data-tooltip="Slet rækken" data-ng-click="dataRow.delete()">
+                                <i class="glyphicon glyphicon-trash"></i>
+                            </button>
                         </td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td>
-                            <input type="text" class="form-control input-sm" id="newData" data-ng-model="newDataRow.data" data-ng-change="addDataRow(newDataRow)" placeholder="Ny række" />
-                        </td>
-                        <td>
-                            <select data-ui-select2="" data-ng-model="newDataRow.dataTypeId" class="form-control input-sm" data-ng-change="addDataRow(newDataRow)" data-placeholder="Vælg datatype">
-                                <option></option>
-                                <option data-ng-repeat="dataType in dataTypes" value="{{dataType.id}}">{{dataType.name}}</option>
-                            </select>
+                        <td colspan="3" class="text-right">
+                            <button class="btn btn-success btn-xs" data-tooltip="Ny række" data-ng-click="newDataRow()">
+                                <i class="glyphicon glyphicon-plus"></i> Ny række
+                            </button>
                         </td>
                     </tr>
-
                 </tfoot>
             </table>
         </div>

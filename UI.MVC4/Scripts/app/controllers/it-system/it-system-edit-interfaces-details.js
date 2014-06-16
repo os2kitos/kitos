@@ -48,6 +48,38 @@
             $scope.dataTypes = dataTypes.data.response;
 
             itSystem.exposedByObj = !itSystem.exposedById ? null : { id: itSystem.exposedById, text: itSystem.exposedBy.name };
+
+            $scope.dataRows = [];
+            _.each(itSystem.dataRows, pushDataRow);
+
+            function pushDataRow(dataRow) {
+                dataRow.show = true;
+                $scope.dataRows.push(dataRow);
+
+                dataRow.updateUrl = "api/dataRow/" + dataRow.id;
+                dataRow.delete = function () {
+                    var msg = notify.addInfoMessage("Fjerne rækken...", false);
+                    $http.delete(dataRow.updateUrl).success(function(result) {
+                        dataRow.show = false;
+                        msg.toSuccessMessage("Rækken er fjernet!");
+                    }).error(function() {
+                        msg.toErrorMessage("Fejl! Kunne ikke fjerne rækken!");
+                    });
+                };
+            }
+
+            $scope.newDataRow = function() {
+
+                var payload = { itSystemId: itSystem.id };
+
+                var msg = notify.addInfoMessage("Tilføjer række...", false);
+                $http.post("api/dataRow", payload).success(function(result) {
+                    pushDataRow(result.response);
+                    msg.toSuccessMessage("Rækken er tilføjet!");
+                }).error(function() {
+                    msg.toErrorMessage("Fejl! Kunne ikke tilføje rækken!");
+                });
+            };
             
             //TODO wuff
             function selectLazyLoading(url, allowClear, filterObj) {
