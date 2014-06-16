@@ -5,9 +5,11 @@
             templateUrl: 'partials/it-project/overview.html',
             controller: 'project.EditOverviewCtrl',
             resolve: {
-                projects: ['$http', function($http) {
-                    return $http.get('api/itproject').then(function(result) {
-                        return result.data.response;
+                projects: ['$http', 'userService', function ($http, userService) {
+                    return userService.getUser().then(function (user) {
+                        return $http.get('api/itproject?orgId=' + user.currentOrganizationId).then(function (result) {
+                            return result.data.response;
+                        });
                     });
                 }],
                 projectRoles: ['$http', function ($http) {

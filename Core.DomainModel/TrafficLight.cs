@@ -8,6 +8,6 @@ namespace Core.DomainModel
 {
     public enum TrafficLight
     {
-        Red = 0, Yellow, Green
+        White = 0, Red = 1, Yellow, Green
     }
 }

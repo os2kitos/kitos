@@ -1,31 +1,90 @@
-﻿<table class="table">
+﻿<table class="table table-condensed table-striped">
     <thead>
         <tr>
-            <th></th>
             <th>Type</th>
             <th>ProjektId</th>
             <th>GlobaltId</th>
             <th>Projektnavn</th>
             <th>Kategori</th>
             <th>P</th>
+            <th>A</th>
             <th>Ansvarlig</th>
             <th>Oprettet af</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
-        <tr data-ng-repeat="p in programs">
-            <td><input type="checkbox" data-ng-click="toggle(p)" data-ng-checked="isSelected(p)" /></td>
-            <td>{{ p.itProjectTypeName }}</td>
-            <td>{{ p.itProjectId }}</td>
-            <td>{{ p.parentItProject ? p.parentItProject.itProjectId : '' }}</td>
-            <td><a data-ui-sref="it-project.edit.status-project({id: p.id})">{{ p.name ? p.name : 'intet navn' }}</a></td>
-            <td>{{ p.itProjectCategoryName }}</td>
-            <td>{{ p.accessModifier == 1 ? 'P' : '' }}</td>
-            <td>{{ p.responsibleOrgUnit.name }}</td>
-            <td>{{ p.objectOwnerName }}</td>
+        <tr data-ng-repeat="p in projects | filter : { show: true }">
+            
+            <!-- type -->
+            <td>
+                {{ p.itProjectTypeName }}
+            </td>
+            
+            <!-- human readable id -->
+            <td>
+                {{ p.itProjectId }}
+            </td>
+            
+            <!-- parent id -->
+            <td>
+                {{ p.parentItProjectItProjectId }}
+            </td>
+            
+            <!-- name + link -->
+            <td>
+                <a data-ui-sref="it-project.edit.status-project({id: p.id})">
+                    {{ p.name ? p.name : 'intet navn' }}
+                </a>
+            </td>
+            
+            <!-- category name -->
+            <td>
+                {{ p.itProjectCategoryName }}
+            </td>
+            
+            <!-- access modifier -->
+            <td>
+                {{ p.accessModifier == 1 ? 'P' : '' }}
+            </td>
+            
+            <!-- archived -->
+            <td>
+                {{ p.isArchived == 1 ? 'A' : '' }}
+            </td>
+            
+            <!-- responsible org unit -->
+            <td>
+                {{ p.responsibleOrgUnitName }}
+            </td>
+            
+            <!-- object owner -->
+            <td>
+                {{ p.objectOwnerName }}
+            </td>
+            
+            <!-- buttons -->
+            <td class="text-right">
+                <button class="btn btn-danger btn-xs" data-tooltip="Slet projektet" data-ng-if="p.hasWriteAccess" data-confirmed-click="p.delete()"
+                              data-confirm-click="Er du sikker på at du vil slette projektet? Dette kan ikke fortrydes!">
+                          <i class="glyphicon glyphicon-trash"></i>
+                      </button>
+                <button class="btn btn-info btn-xs" data-ng-click="p.clone()" data-tooltip="Klon projektet">
+                    Klon
+                </button>
+            </td>
         </tr>
     </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="10">
+                <div class="pull-right">
+                    <!-- Create New IT Project-->
+                    <button class="btn btn-success btn-sm" data-ng-click="create()" data-ng-disabled="creatingProject">
+                        <i class="glyphicon glyphicon-plus"></i> Opret IT Projekt
+                    </button>
+                </div>
+            </td>
+        </tr>
+    </tfoot>
 </table>
-
-<!--Create New IT Project-->
-<button class="btn btn-default" data-ng-click="create()">Opret IT Projekt</button>

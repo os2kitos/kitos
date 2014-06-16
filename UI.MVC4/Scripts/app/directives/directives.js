@@ -187,29 +187,6 @@
         }
     ]);
 
-    app.directive('selectStatus', ['$timeout',
-        function ($timeout) {
-            return {
-                scope: {
-                    model: '=selectStatus',
-                    canWrite: '=',
-                    onStatusChange: '&?'
-                },
-                replace: true,
-                templateUrl: 'partials/directives/select-status.html',
-
-                link: function (scope, element, attr) {
-                    scope.setModel = function (n) {
-                        if (scope.model == n) return;
-
-                        scope.model = n;
-                        $timeout(scope.onStatusChange);
-                    };
-                }
-            };
-        }
-    ]);
-
     app.directive('selectStatus2', ['$timeout',
         function ($timeout) {
             return {
@@ -332,11 +309,14 @@
                         // using timeout to wait for the value to update
                         $timeout(function () {
                             var newValue;
-                            try {
-                                newValue = ctrl.$modelValue.id;
-                            } catch (e) {
-                                // $viewValue is null/undefined thus the value has been cleared
-                                newValue = null;
+
+                            var viewValue = ctrl.$viewValue;
+                            if (angular.isArray(viewValue)) {
+                                newValue = _.pluck(viewValue, 'id');
+                            } else if (angular.isObject(viewValue)) {
+                                newValue = viewValue.id;
+                            } else {
+                                newValue = viewValue;
                             }
                            
                             var payload = {};
@@ -358,7 +338,8 @@
                             });
                     }
 
-                    if (attrs.type === "hidden") { // type=hidden is cause select2 fields are usually hidden and trigger the change event
+                    // type=hidden is cause select2 fields are usually hidden and trigger the change event
+                    if (attrs.type === "hidden" || !angular.isUndefined(attrs.uiSelect2)) {
                         element.bind('change', saveSelect2);
                     } else if (attrs.type === "checkbox") {
                         element.bind('change', saveCheckbox);

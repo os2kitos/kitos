@@ -85,7 +85,7 @@ namespace Core.DomainModel.ItSystem
         /// </value>
         public virtual ICollection<ItSystemUsage> Usages { get; set; }
 
-        public int AppTypeId { get; set; }
+        public int? AppTypeId { get; set; }
         public virtual AppType AppType { get; set; }
 
         public int? BusinessTypeId { get; set; }

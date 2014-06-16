@@ -54,7 +54,11 @@
                 Status:
             </label>
             <div class="col-md-3">
-                    <input id="statusGoal" data-select-status="goal.status" data-can-write="true" />
+                <span id="statusGoal" data-select-status2="" data-ng-model="goal.status"
+                      data-field="status"
+                      data-autosave="{{goal.updateUrl}}"
+                      data-can-write="true">
+                </span>
             </div>
         </div>
         

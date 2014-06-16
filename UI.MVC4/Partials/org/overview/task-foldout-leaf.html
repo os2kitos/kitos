@@ -1,7 +1,7 @@
 ﻿<div class="row task-usage-row task-foldout-leaf">
     
     <!-- org unit name -->
-    <div class="col-md-7">
+    <div class="col-md-8">
         <span class="indent">{{ indent(usage.level) }}</span>
         <i class="glyphicon glyphicon-asterisk invisible"></i>
         {{ usage.usage.orgUnit.name }}
@@ -10,10 +10,12 @@
     <!-- status -->
     <div class="col-md-2">
         <div class="status-column" data-ng-if="user.currentConfig.showColumnTechnology">
-            <input data-select-status="usage.usage.technologyStatus" data-can-write="usage.usage.orgUnit.hasWriteAccess"/>
+            <span data-select-status2="" data-ng-model="usage.usage.technologyStatus" data-can-write="usage.usage.orgUnit.hasWriteAccess"
+                   data-autosave="{{usage.usage.updateUrl}}" data-field="technologyStatus"></span>
         </div>
         <div class="status-column" data-ng-if="user.currentConfig.showColumnUsage">
-            <input data-select-status="usage.usage.usageStatus" data-can-write="usage.usage.orgUnit.hasWriteAccess"/>
+            <span data-select-status2="" data-ng-model="usage.usage.usageStatus" data-can-write="usage.usage.orgUnit.hasWriteAccess"
+                   data-autosave="{{usage.usage.updateUrl}}" data-field="usageStatus"></span>
         </div>
         <div class="status-column">
             <button class="btn btn-link btn-xs"
@@ -38,7 +40,4 @@
     <!-- it project / it system -->
     <div class="col-md-1 text-center"></div>
     <div class="col-md-1 text-center"></div>
-    
-    <!-- not used (OBS) -->
-    <!--<div class="col-md-1 text-center"></div>-->
 </div>

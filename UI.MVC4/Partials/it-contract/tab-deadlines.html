@@ -1,8 +1,5 @@
 ﻿<form role="form">
-    <div class="container-fluid">
-        <div class="row">
             <div class="col-md-6">
-                <div class="row">
                     <div class="panel panel-default">
                         <div class="panel-heading">Anskaffelse</div>
                         <table class="table table-condensed small">
@@ -18,7 +15,14 @@
                                     <td>Funktionsprøve</td>
                                     <td>
                                         <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control" data-datepicker-popup="dd-MM-yyyy" data-is-open="opened.ote" data-date-to-string data-ng-disabled="!hasWriteAccess" data-ng-model="contract.operationTestExpected" data-autosave="{{ autosaveUrl }}" data-field="operationTestExpected">
+                                            <input type="text" class="form-control" 
+                                                data-datepicker-popup="dd-MM-yyyy" 
+                                                data-is-open="opened.ote" 
+                                                data-date-to-string 
+                                                data-ng-disabled="!hasWriteAccess" 
+                                                data-ng-model="contract.operationTestExpected" 
+                                                data-autosave="{{ autosaveUrl }}" 
+                                                data-field="operationTestExpected">
                                             <span class="input-group-btn">
                                                 <button type="button" class="btn btn-default" data-ng-click="open($event, 'ote')"><i class="glyphicon glyphicon-calendar"></i></button>
                                             </span>
@@ -26,7 +30,14 @@
                                     </td>
                                     <td>
                                         <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control" data-datepicker-popup="dd-MM-yyyy" data-is-open="opened.ota" data-date-to-string data-ng-disabled="!hasWriteAccess" data-ng-model="contract.operationTestApproved" data-autosave="{{ autosaveUrl }}" data-field="operationTestApproved">
+                                            <input type="text" class="form-control" 
+                                                data-datepicker-popup="dd-MM-yyyy" 
+                                                data-is-open="opened.ota" 
+                                                data-date-to-string 
+                                                data-ng-disabled="!hasWriteAccess" 
+                                                data-ng-model="contract.operationTestApproved" 
+                                                data-autosave="{{ autosaveUrl }}" 
+                                                data-field="operationTestApproved">
                                             <span class="input-group-btn">
                                                 <button type="button" class="btn btn-default" data-ng-click="open($event, 'ota')"><i class="glyphicon glyphicon-calendar"></i></button>
                                             </span>
@@ -37,7 +48,14 @@
                                     <td>Driftovertagelsesprøve</td>
                                     <td>
                                         <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control" data-datepicker-popup="dd-MM-yyyy" data-is-open="opened.oate" data-date-to-string data-ng-disabled="!hasWriteAccess" data-ng-model="contract.operationalAcceptanceTestExpected" data-autosave="{{ autosaveUrl }}" data-field="operationalAcceptanceTestExpected">
+                                            <input type="text" class="form-control" 
+                                                data-datepicker-popup="dd-MM-yyyy" 
+                                                data-is-open="opened.oate" 
+                                                data-date-to-string 
+                                                data-ng-disabled="!hasWriteAccess" 
+                                                data-ng-model="contract.operationalAcceptanceTestExpected" 
+                                                data-autosave="{{ autosaveUrl }}" 
+                                                data-field="operationalAcceptanceTestExpected">
                                             <span class="input-group-btn">
                                                 <button type="button" class="btn btn-default" data-ng-click="open($event, 'oate')"><i class="glyphicon glyphicon-calendar"></i></button>
                                             </span>
@@ -45,7 +63,14 @@
                                     </td>
                                     <td>
                                         <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control" data-datepicker-popup="dd-MM-yyyy" data-is-open="opened.oata" data-date-to-string data-ng-disabled="!hasWriteAccess" data-ng-model="contract.operationalAcceptanceTestApproved" data-autosave="{{ autosaveUrl }}" data-field="operationalAcceptanceTestApproved">
+                                            <input type="text" class="form-control" 
+                                                data-datepicker-popup="dd-MM-yyyy" 
+                                                data-is-open="opened.oata" 
+                                                data-date-to-string 
+                                                data-ng-disabled="!hasWriteAccess" 
+                                                data-ng-model="contract.operationalAcceptanceTestApproved" 
+                                                data-autosave="{{ autosaveUrl }}" 
+                                                data-field="operationalAcceptanceTestApproved">
                                             <span class="input-group-btn">
                                                 <button type="button" class="btn btn-default" data-ng-click="open($event, 'oata')"><i class="glyphicon glyphicon-calendar"></i></button>
                                             </span>
@@ -104,11 +129,10 @@
                         </table>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <div class="row">
+    <div class="col-md-3">
                     <div class="panel panel-default">
                         <div class="panel-heading">Aftalefrister</div>
+            <div class="panel-body">
                         <div class="form-group">
                             <label for="agreement-concluded" class="control-label small">
                                 Indgået
@@ -118,16 +142,16 @@
                         <div class="form-group">
                             <label for="agreement-duration" class="control-label small">Varighed</label>
                             <select id="agreement-duration" class="form-control input-sm" data-ng-disabled="!hasWriteAccess" data-ng-model="contract.duration" data-autosave="{{autosaveUrl}}" data-field="duration">
-                                <option value="3">3</option>
-                                <option value="6">6</option>
-                                <option value="9">9</option>
-                                <option value="12">12</option>
-                                <option value="18">18</option>
-                                <option value="24">24</option>
-                                <option value="36">36</option>
-                                <option value="48">48</option>
-                                <option value="60">60</option>
-                                <option value="72">72</option>
+                        <option value="3">3 md</option>
+                        <option value="6">6 md</option>
+                        <option value="9">9 md</option>
+                        <option value="12">12 md</option>
+                        <option value="18">18 md</option>
+                        <option value="24">24 md</option>
+                        <option value="36">36 md</option>
+                        <option value="48">48 md</option>
+                        <option value="60">60 md</option>
+                        <option value="72">72 md</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -155,10 +179,10 @@
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <div class="row">
+    <div class="col-md-3">
                     <div class="panel panel-default">
                         <div class="panel-heading">Opsigelse</div>
+            <div class="panel-body">
                         <div class="form-group">
                             <label for="agreement-terminated" class="control-label small">Kontrakten opsagt</label>
                             <input type="date" id="agreement-terminated" class="form-control input-sm" data-ng-disabled="!hasWriteAccess" data-ng-model="contract.terminated" data-autosave="{{autosaveUrl}}" data-field="terminated">

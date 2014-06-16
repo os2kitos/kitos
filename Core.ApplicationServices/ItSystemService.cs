@@ -25,17 +25,17 @@ namespace Core.ApplicationServices
 
             if (nameSearch == null) return _repository.Get();
 
-            return _repository.Get(system => system.Name.StartsWith(nameSearch));
+            return _repository.Get(system => system.Name.Contains(nameSearch));
         }
 
         public IEnumerable<ItSystem> GetNonInterfaces(Organization organization, string nameSearch)
         {
-            return GetSystems(organization, nameSearch).Where(system => system.AppType.Id != InterfaceAppType.Id);
+            return GetSystems(organization, nameSearch).Where(system => system.AppType == null || system.AppType.Id != InterfaceAppType.Id);
         }
 
         public IEnumerable<ItSystem> GetInterfaces(Organization organization, string nameSearch)
         {
-            return GetSystems(organization, nameSearch).Where(system => system.AppType.Id == InterfaceAppType.Id);
+            return GetSystems(organization, nameSearch).Where(system => system.AppType != null && system.AppType.Id == InterfaceAppType.Id);
         }
 
         public IEnumerable<ItSystem> GetHierarchy(int systemId)
