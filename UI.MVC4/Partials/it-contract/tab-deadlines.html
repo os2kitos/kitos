@@ -95,17 +95,31 @@
                                     </td>
                                     <td>
                                         <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control" data-datepicker-popup="dd-MM-yyyy" data-is-open="opened.nexp" data-date-to-string data-ng-disabled="!hasWriteAccess" data-ng-model="item.expected" data-autosave="api/paymentmilestone/{{item.id}}" data-field="expected">
+                                            <input type="text" class="form-control" 
+                                                   data-datepicker-popup="dd-MM-yyyy" 
+                                                   data-is-open="$parent.opened['exp' + $index]" 
+                                                   data-date-to-string 
+                                                   data-ng-disabled="!hasWriteAccess" 
+                                                   data-ng-model="item.expected"
+                                                   data-autosave="api/paymentmilestone/{{item.id}}" 
+                                                   data-field="expected">
                                             <span class="input-group-btn">
-                                                <button type="button" class="btn btn-default" data-ng-click="open($event, 'nexp')"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                <button type="button" class="btn btn-default" data-ng-click="open($event, 'exp' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
                                             </span>
                                         </div>
                                     </td>
                                     <td colspan="2">
                                         <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control" data-datepicker-popup="dd-MM-yyyy" data-is-open="opened.nappr" data-date-to-string data-ng-disabled="!hasWriteAccess" data-ng-model="item.expected" data-autosave="api/paymentmilestone/{{item.id}}" data-field="approved">
+                                            <input type="text" class="form-control" 
+                                                   data-datepicker-popup="dd-MM-yyyy" 
+                                                   data-is-open="$parent.opened['appr' + $index]"
+                                                   data-date-to-string 
+                                                   data-ng-disabled="!hasWriteAccess"
+                                                   data-ng-model="item.approved"
+                                                   data-autosave="api/paymentmilestone/{{item.id}}" 
+                                                   data-field="approved">
                                             <span class="input-group-btn">
-                                                <button type="button" class="btn btn-default" data-ng-click="open($event, 'nappr')"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                <button type="button" class="btn btn-default" data-ng-click="open($event, 'appr' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
                                             </span>
                                         </div>
                                     </td>
@@ -116,14 +130,31 @@
                                     <td><input type="text" class="form-control input-sm" data-ng-model="paymentMilestone.title"></td>
                                     <td>
                                         <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control" data-datepicker-popup="dd-MM-yyyy" data-is-open="opened.oata" data-date-to-string data-ng-disabled="!hasWriteAccess" data-ng-model="paymentMilestone.expected" data-autosave="{{ autosaveUrl }}" data-field="expected">
+                                            <input type="text" class="form-control" 
+                                                   data-datepicker-popup="dd-MM-yyyy" 
+                                                   data-is-open="opened.nexp" 
+                                                   data-date-to-string 
+                                                   data-ng-disabled="!hasWriteAccess" 
+                                                   data-ng-model="paymentMilestone.expected">
                                             <span class="input-group-btn">
-                                                <button type="button" class="btn btn-default" data-ng-click="open($event, 'oata')"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                <button type="button" class="btn btn-default" data-ng-click="open($event, 'nexp')"><i class="glyphicon glyphicon-calendar"></i></button>
                                             </span>
                                         </div>
                                     </td>
-                                    <td><input type="date" class="form-control input-sm" data-ng-model="paymentMilestone.approved"></td>
-                                    <td><button class="btn btn-success btn-sm" data-ng-click="save(paymentMilestone)">Gem</button></td>
+                                    <td>
+                                        <div class="input-group input-group-sm">
+                                        <input type="text" class="form-control" 
+                                               data-datepicker-popup="dd-MM-yyyy" 
+                                               data-is-open="opened.nappr" 
+                                               data-date-to-string 
+                                               data-ng-disabled="!hasWriteAccess" 
+                                               data-ng-model="paymentMilestone.approved">
+                                            <span class="input-group-btn">
+                                                <button type="button" class="btn btn-default" data-ng-click="open($event, 'nappr')"><i class="glyphicon glyphicon-calendar"></i></button>
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td><button class="btn btn-success btn-sm" data-ng-click="save(paymentMilestone)"><i class="glyphicon glyphicon-plus"></i></button></td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -137,21 +168,33 @@
                             <label for="agreement-concluded" class="control-label small">
                                 Indgået
                             </label>
-                            <input type="date" id="agreement-concluded" class="form-control input-sm" data-ng-disabled="!hasWriteAccess" data-ng-model="contract.concluded" data-autosave="{{autosaveUrl}}" data-field="concluded">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" id="agreement-concluded"
+                                       data-datepicker-popup="dd-MM-yyyy" 
+                                       data-is-open="opened.conc" 
+                                       data-date-to-string 
+                                       data-ng-disabled="!hasWriteAccess" 
+                                       data-ng-model="contract.concluded"
+                                       data-autosave="{{autosaveUrl}}" 
+                                       data-field="concluded">
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" data-ng-click="open($event, 'conc')"><i class="glyphicon glyphicon-calendar"></i></button>
+                                </span>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="agreement-duration" class="control-label small">Varighed</label>
                             <select id="agreement-duration" class="form-control input-sm" data-ng-disabled="!hasWriteAccess" data-ng-model="contract.duration" data-autosave="{{autosaveUrl}}" data-field="duration">
-                        <option value="3">3 md</option>
-                        <option value="6">6 md</option>
-                        <option value="9">9 md</option>
-                        <option value="12">12 md</option>
-                        <option value="18">18 md</option>
-                        <option value="24">24 md</option>
-                        <option value="36">36 md</option>
-                        <option value="48">48 md</option>
-                        <option value="60">60 md</option>
-                        <option value="72">72 md</option>
+                                <option value="3">3 md</option>
+                                <option value="6">6 md</option>
+                                <option value="9">9 md</option>
+                                <option value="12">12 md</option>
+                                <option value="18">18 md</option>
+                                <option value="24">24 md</option>
+                                <option value="36">36 md</option>
+                                <option value="48">48 md</option>
+                                <option value="60">60 md</option>
+                                <option value="72">72 md</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -169,11 +212,35 @@
                         </div>
                         <div class="form-group">
                             <label for="agreement-irrevocable" class="control-label small">Uopsigelig til</label>
-                            <input type="date" id="agreement-irrevocable" class="form-control input-sm" data-ng-disabled="!hasWriteAccess" data-ng-model="contract.irrevocableTo" data-autosave="{{autosaveUrl}}" data-field="irrevocableTo">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" id="agreement-irrevocable"
+                                       data-datepicker-popup="dd-MM-yyyy" 
+                                       data-is-open="opened.irre" 
+                                       data-date-to-string 
+                                       data-ng-disabled="!hasWriteAccess" 
+                                       data-ng-model="contract.irrevocableTo"
+                                       data-autosave="{{autosaveUrl}}" 
+                                       data-field="irrevocableTo">
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" data-ng-click="open($event, 'irre')"><i class="glyphicon glyphicon-calendar"></i></button>
+                                </span>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="agreement-expiration" class="control-label small">Udløbsdato</label>
-                            <input type="date" id="agreement-expiration" class="form-control input-sm" data-ng-disabled="!hasWriteAccess" data-ng-model="contract.expirationDate" data-autosave="{{autosaveUrl}}" data-field="expirationDate">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" id="agreement-expiration"
+                                       data-datepicker-popup="dd-MM-yyyy" 
+                                       data-is-open="opened.expi" 
+                                       data-date-to-string 
+                                       data-ng-disabled="!hasWriteAccess" 
+                                       data-ng-model="contract.expirationDate"
+                                       data-autosave="{{autosaveUrl}}" 
+                                       data-field="expirationDate">
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" data-ng-click="open($event, 'expi')"><i class="glyphicon glyphicon-calendar"></i></button>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -185,7 +252,19 @@
             <div class="panel-body">
                         <div class="form-group">
                             <label for="agreement-terminated" class="control-label small">Kontrakten opsagt</label>
-                            <input type="date" id="agreement-terminated" class="form-control input-sm" data-ng-disabled="!hasWriteAccess" data-ng-model="contract.terminated" data-autosave="{{autosaveUrl}}" data-field="terminated">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" id="agreement-terminated"
+                                       data-datepicker-popup="dd-MM-yyyy" 
+                                       data-is-open="opened.term" 
+                                       data-date-to-string 
+                                       data-ng-disabled="!hasWriteAccess" 
+                                       data-ng-model="contract.terminated"
+                                       data-autosave="{{autosaveUrl}}" 
+                                       data-field="terminated">
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" data-ng-click="open($event, 'term')"><i class="glyphicon glyphicon-calendar"></i></button>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
