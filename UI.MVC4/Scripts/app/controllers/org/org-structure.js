@@ -132,7 +132,7 @@
                 }
 
                 //get org rights on the org unit and subtree
-                $http.get('api/organizationUnit/' + node.id + '?rights').success(function (data) {
+                $http.get('api/organizationUnitRights/' + node.id).success(function (data) {
                     node.orgRights = data.response;
 
                     _.each(node.orgRights, function (right) {
@@ -172,7 +172,7 @@
                     "userId": uId
                 };
 
-                $http.post("api/organizationunit/" + oId, data).success(function (result) {
+                $http.post("api/organizationUnitRights/" + oId, data).success(function (result) {
                     notify.addSuccessMessage(result.response.user.name + " er knyttet i rollen");
 
                     $scope.chosenOrgUnit.orgRights.push({
@@ -200,7 +200,7 @@
                 var rId = right.roleId;
                 var uId = right.userId;
 
-                $http.delete("api/organizationunit/" + oId + "?rId=" + rId + "&uId=" + uId).success(function (deleteResult) {
+                $http.delete("api/organizationUnitRights/" + oId + "?rId=" + rId + "&uId=" + uId).success(function (deleteResult) {
                     right.show = false;
                     notify.addSuccessMessage('Rollen er slettet!');
                 }).error(function (deleteResult) {
@@ -231,14 +231,14 @@
 
                 //otherwise, we should delete the old entry, then add a new one
 
-                $http.delete("api/organizationunit/" + oIdOld + "?rId=" + rIdOld + "&uId=" + uIdOld).success(function (deleteResult) {
+                $http.delete("api/organizationUnitRights/" + oIdOld + "?rId=" + rIdOld + "&uId=" + uIdOld).success(function (deleteResult) {
 
                     var data = {
                         "roleId": rIdNew,
                         "userId": uIdNew
                     };
 
-                    $http.post("api/organizationunit/" + oIdNew, data).success(function (result) {
+                    $http.post("api/organizationUnitRights/" + oIdNew, data).success(function (result) {
 
                         right.roleId = result.response.roleId;
                         right.user = result.response.user;
