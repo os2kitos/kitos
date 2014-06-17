@@ -202,24 +202,12 @@
             function editActivity(activity) {
                 var modal = $modal.open({
                     templateUrl: 'partials/it-project/modal-milestone-task-edit.html',
-                    controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
+                    controller: ['$scope', function ($modalScope) {
 
                         $modalScope.activity = activity;
-
-                        $modalScope.updateDate = function(field) {
-                            patch(activity.updateUrl, field, activity[field]).success(function() {
-                                notify.addSuccessMessage("Feltet er opdateret");
-                            }).error(function() {
-                                notify.addErrorMessage("Fejl!");
-                            });
-                        };
-
                         $modalScope.phases = $scope.project.phases;
-
                         $modalScope.usersWithRoles = _.values(usersWithRoles);
-
                         $modalScope.updateUserName = $modalScope.activity.updateUser;
-
                         $modalScope.updatePhase = $modalScope.activity.updatePhase;
                         
                         $modalScope.opened = {};

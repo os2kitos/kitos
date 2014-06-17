@@ -106,23 +106,10 @@
                 var modal = $modal.open({
                     size: 'lg',
                     templateUrl: 'partials/it-project/modal-goal-edit.html',
-                    controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
-
+                    controller: ['$scope', function ($modalScope) {
                         $modalScope.goal = goal;
                         $modalScope.goalTypes = goalTypes;
-                        
-                        //update the i'th date of a subgoal
-                        $modalScope.updateSubGoalDate = function (i) {
-                            var fieldStr = "subGoalDate" + i;
-                            
-                            patch(goal.updateUrl, fieldStr, goal[fieldStr])
-                                .success(function() {
-                                    notify.addSuccessMessage("Feltet er opdateret");
-                                }).error(function() {
-                                    notify.addErrorMessage("Fejl!");
-                                });
-                        };
-                        
+                                                
                         $modalScope.opened = {};
                         $modalScope.open = function ($event, datepicker) {
                             $event.preventDefault();
