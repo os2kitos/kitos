@@ -221,6 +221,14 @@
                         $modalScope.updateUserName = $modalScope.activity.updateUser;
 
                         $modalScope.updatePhase = $modalScope.activity.updatePhase;
+                        
+                        $modalScope.opened = {};
+                        $modalScope.open = function ($event, datepicker) {
+                            $event.preventDefault();
+                            $event.stopPropagation();
+
+                            $modalScope.opened[datepicker] = true;
+                        };
                     }]
                 });
             }
