@@ -137,5 +137,10 @@ namespace UI.MVC4.Controllers.API
         {
             get { return User.Identity.IsAuthenticated; }
         }
+
+        protected virtual TDest Map<TSource, TDest>(TSource item)
+        {
+            return AutoMapper.Mapper.Map<TDest>(item);
+        }
     }
 }
