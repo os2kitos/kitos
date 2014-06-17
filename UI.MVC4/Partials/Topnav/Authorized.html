@@ -1,6 +1,7 @@
 ﻿<ul class="nav navbar-nav">
     <li>
-        <a data-ui-sref="organization.overview" data-ui-sref-active="active">Organisation</a>
+        <a data-ui-sref="organization.overview" data-ui-sref-active="active" data-ng-if="user.currentConfig.showTabOverview">Organisation</a>
+        <a data-ui-sref="organization.structure" data-ui-sref-active="active" data-ng-if="!user.currentConfig.showTabOverview">Organisation</a>
     </li>
     <li data-ng-if="user.currentConfig.showItProjectModule">
         <a data-ui-sref="it-project.overview" data-ui-sref-active="active">IT Projekter</a>
