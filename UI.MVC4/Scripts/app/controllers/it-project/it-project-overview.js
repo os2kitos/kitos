@@ -40,7 +40,7 @@
             
             _.each(projects, function(project) {
                 // fetch assigned roles for each project
-                $http.get('api/itproject/' + project.id + '?rights').success(function (result) {
+                $http.get('api/itprojectrights/' + project.id).success(function (result) {
                     project.roles = result.response;
                 });
                 
