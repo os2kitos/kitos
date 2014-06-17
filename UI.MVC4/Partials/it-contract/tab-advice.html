@@ -17,7 +17,7 @@
                 <input type="checkbox" data-ng-model="advice.isActive"
                     data-ng-disabled="!hasWriteAccess"
                     data-autosave="{{advice.updateUrl}}"
-                    data-field="isActive" />
+                    data-field="isActive">
             </td>
 
             <!-- name -->
@@ -25,15 +25,24 @@
                 <input type="text" data-ng-model="advice.name" class="form-control input-sm"
                     data-ng-disabled="!hasWriteAccess"
                     data-autosave="{{advice.updateUrl}}"
-                    data-field="name" />
+                    data-field="name">
             </td>
 
             <!-- date -->
             <td>
-                <span data-ng-model="advice.alarmDate" data-datewriter=""
-                    data-is-disabled="!hasWriteAccess"
-                    data-field="alarmDate"
-                    data-autosave="{{advice.updateUrl}}"></span>
+                <div class="input-group input-group-sm">
+                    <input type="text" class="form-control"
+                           data-datepicker-popup="dd-MM-yyyy" 
+                           data-is-open="$parent.opened['alarm' + $index]" 
+                           data-date-to-string 
+                           data-ng-disabled="!hasWriteAccess" 
+                           data-ng-model="advice.alarmDate"
+                           data-autosave="{{advice.updateUrl}}" 
+                           data-field="alarmDate">
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'alarm' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </div>
             </td>
 
             <!-- receiver -->
@@ -63,7 +72,7 @@
                 <input type="text" data-ng-model="advice.subject" class="form-control input-sm"
                     data-ng-disabled="!hasWriteAccess"
                     data-autosave="{{advice.updateUrl}}"
-                    data-field="subject" />
+                    data-field="subject">
             </td>
 
             <!-- delete button -->
