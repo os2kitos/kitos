@@ -18,5 +18,11 @@ namespace UI.MVC4.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public int OrganizationId { get; set; }
+        public string OrganizationName { get; set; }
+
+        public string QualifiedName
+        {
+            get { return Name + ", " + OrganizationName; }
+        }
     }
 }

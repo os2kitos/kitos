@@ -26,20 +26,29 @@
         function ($rootScope, $scope, notify, userService, user, orgUnits) {
             $rootScope.page.title = 'Profil indstillinger';
             $rootScope.page.subnav = [];
-            
-            $scope.user = {
-                name: user.name,
-                email: user.email,
-                defaultOrganizationUnitId: user.defaultOrganizationUnitId
-            };
+
+            function init(user) {
+                $scope.user = {
+                    name: user.name,
+                    email: user.email,
+                    defaultOrganizationUnitId: user.defaultOrganizationUnitId,
+                    isUsingDefaultOrgUnit: user.isUsingDefaultOrgUnit,
+                    currentOrganizationName: user.currentOrganizationName,
+                    currentOrganizationUnitName: user.currentOrganizationUnitName
+                };
+            }
+
+            init(user);
 
             $scope.orgUnits = orgUnits;
 
+            //can't use autosave - need to patch through userService!
             $scope.patch = function (field, value) {
                 var payload = {};
                 payload[field] = value;
 
-                userService.patchUser(payload).then(function() {
+                userService.patchUser(payload).then(function (newUser) {
+                    init(newUser);
                     notify.addSuccessMessage("Feltet er opdateret!");
                 }, function() {
                     notify.addErrorMessage("Fejl! Kunne ikke opdatere feltet!");

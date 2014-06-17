@@ -8,9 +8,18 @@
                     Standard valgt enhed
                 </label>
                 <div class="col-md-8">
-                    <select id="default-unit" data-ng-model="user.defaultOrganizationUnitId"  data-ng-blur="patch('defaultOrganizationUnitId', user.defaultOrganizationUnitId)"
-                        class="form-control" data-ng-options="orgUnit.id as orgUnit.name for orgUnit in orgUnits">
+                    <select id="default-unit" data-ng-model="user.defaultOrganizationUnitId" data-ng-blur="patch('defaultOrganizationUnitId', user.defaultOrganizationUnitId)"
+                            class="form-control" data-ng-options="orgUnit.id as orgUnit.qualifiedName for orgUnit in orgUnits">
                     </select>
+
+                    <div data-ng-if="!user.isUsingDefaultOrgUnit" class="help-block">
+                        <i class="glyphicon glyphicon-exclamation-sign"></i>
+                        Bemærk: Du har valgt en standard enhed, som hører under en anden kommune end {{user.currentOrganizationName}}.
+                        Så længe du er logget ind i {{user.currentOrganizationName}} anvendes enheden {{user.currentOrganizationUnitName}} som standard enhed.
+                        
+                    </div>
+                    
+
                 </div>
             </div>
             <div class="form-group">

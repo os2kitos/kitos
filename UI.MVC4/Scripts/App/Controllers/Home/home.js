@@ -53,10 +53,6 @@
                 .then(function() {
                     notify.addSuccessMessage("Du er nu logget ind!");
                     
-                    var to = $stateParams.to ? $stateParams.to : 'org-view';
-
-                    $state.go(to);
-                    
                 }, function () {
                     notify.addErrorMessage("Forkert brugernavn eller password!");
                     

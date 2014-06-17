@@ -74,9 +74,9 @@
             }
 
             function checkForDefaultUnit(unit) {
-                if (!user.defaultOrganizationUnitId) return;
+                if (!user.currentOrganizationUnitId) return;
 
-                if (!unit || unit.id !== user.defaultOrganizationUnitId) return;
+                if (!unit || unit.id !== user.currentOrganizationUnitId) return;
 
                 open(unit);
                 $scope.chooseOrgUnit(unit);
