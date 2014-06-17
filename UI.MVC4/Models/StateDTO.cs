@@ -1,5 +1,6 @@
 ﻿using System;
-using Core.DomainModel;
+using Newtonsoft.Json;
+using UI.MVC4.Filters;
 
 namespace UI.MVC4.Models
 {
@@ -21,7 +22,8 @@ namespace UI.MVC4.Models
         /// <summary>
         /// Which date, the state should be reached
         /// </summary>
-        public DateTime Date { get; set; }
+        [JsonConverter(typeof(CustomDateTimeConverter))]
+        public DateTime? Date { get; set; }
 
         /// <summary>
         /// Trafic light status for the state

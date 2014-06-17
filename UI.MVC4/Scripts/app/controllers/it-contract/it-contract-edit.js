@@ -317,5 +317,13 @@
                 }
 
                 formatContractSigner(contract.contractSigner);
+
+                $scope.opened = {};
+                $scope.open = function ($event, datepicker) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    
+                    $scope.opened[datepicker] = true;
+                };
             }]);
 })(angular, app);

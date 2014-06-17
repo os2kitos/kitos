@@ -1,8 +1,7 @@
 ﻿<div>
     <form class="form-horizontal fix-label-padding">
         <div class="row">
-            <div class="col-md-5">
-
+            <div class="col-md-3">
                 <!-- Status traffic light -->
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusProject">Status projekt (økonomi, tid og kvalitet):</label>
@@ -17,11 +16,20 @@
                 <!-- Date for status update -->
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
-                    <div class="col-md-3">
-                        <span id="statusDate" data-ng-model="project.statusDate" data-datewriter=""
-                            data-is-disabled="!hasWriteAccess"
-                            data-ng-change="updateStatusDate()"
-                            data-ng-disabled="!hasWriteAccess"></span>
+                    <div class="col-md-7">
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control" id="statusDate"
+                                   data-datepicker-popup="dd-MM-yyyy" 
+                                   data-is-open="opened.psd" 
+                                   data-date-to-string 
+                                   data-is-disabled="!hasWriteAccess"
+                                   data-ng-model="project.statusDate"
+                                   data-autosave="{{project.updateUrl}}"
+                                   data-field="statusDate">
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" data-ng-click="open($event, 'psd')"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </div>
                     </div>
                 </div>
 
@@ -35,7 +43,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-7">
+            <div class="col-md-9">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <span class="small">
@@ -72,7 +80,18 @@
                             <!-- Phases buttons -->
                             <div class="col-md-3 small">Forventet slut/start:</div>
                             <span data-ng-repeat="phase in project.phases" class="col-md-2" data-ng-hide="$first">
-                                <span data-ng-model="phase.startDate" data-datewriter="" data-is-disabled="!hasWriteAccess" data-ng-change="updatePhaseDate(phase)"></span>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control"
+                                           data-datepicker-popup="dd-MM-yyyy" 
+                                           data-is-open="opened['pd' + $index]" 
+                                           data-date-to-string 
+                                           data-is-disabled="!hasWriteAccess"
+                                           data-ng-model="phase.startDate"
+                                           data-ng-change="updatePhaseDate(phase)">
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'pd' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                    </span>
+                                </div>
                             </span>
                         </div>
                     </div>

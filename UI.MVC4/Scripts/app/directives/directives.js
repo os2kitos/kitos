@@ -254,6 +254,20 @@
         }
     ]);
 
+    app.directive('dateToString', ['$timeout', 'dateFilter', function($timeout, dateFilter) {
+        return {
+            restrict: 'A',
+            require: 'ngModel',
+            link: function (scope, element, attr, ctrl) {
+                ctrl.$parsers.push(function (value) {
+                    if (value instanceof Date)
+                        return dateFilter(value, 'yyyy-MM-dd');
+                    return value;
+                });
+            }
+        };
+    }]);
+
     app.directive('autosave', [
         '$http', '$timeout', 'notify', function ($http, $timeout, notify) {
             return {
@@ -261,14 +275,13 @@
                 require: 'ngModel',
                 priority: 0,
                 link: function (scope, element, attrs, ctrl) {
-
                     var oldValue;
-                    element.bind('focus', function () {
-                        oldValue = ctrl.$viewValue;
+                    $timeout(function () {
+                        oldValue = ctrl.$modelValue; // get initial value
                     });
 
                     function saveIfNew() {
-                        var newValue = ctrl.$viewValue;
+                        var newValue = ctrl.$modelValue;
                         if (attrs.pluck)
                             newValue = _.pluck(newValue, attrs.pluck);
 
@@ -284,7 +297,7 @@
                         // ctrl.$viewValue reflects the old state.
                         // using timeout to wait for the value to update
                         $timeout(function() {
-                            var newValue = ctrl.$viewValue;
+                            var newValue = ctrl.$modelValue;
                             var payload = {};
                             payload[attrs.field] = newValue;
                             save(payload);
@@ -318,6 +331,7 @@
                         $http({ method: 'PATCH', url: attrs.autosave, data: payload })
                             .success(function () {
                                 msg.toSuccessMessage("Feltet er opdateret.");
+                                oldValue = ctrl.$modelValue;
                             })
                             .error(function () {
                                 msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
@@ -336,49 +350,6 @@
             };
         }
     ]);
-
-    app.directive('datewriter', ['$timeout', function ($timeout) {
-        return {
-            scope: {
-                'isDisabled': '=?isDisabled'
-            },
-            templateUrl: 'partials/directives/datewriter.html',
-            require: 'ngModel',
-            link: function (scope, element, attr, ctrl) {
-
-                scope.date = {};
-
-                function read() {
-                    var parsedDate = moment(ctrl.$modelValue);
-
-
-                    scope.date.dateStr = parsedDate.isValid() ? moment(ctrl.$modelValue).format("DD-MM-YY", "da", true) : "dd-mm-åå";
-                }
-
-                read();
-                ctrl.$render = read;
-
-                function write() {
-                    scope.dateInvalid = false;
-
-                    var newDate = moment(scope.date.dateStr, "DD-MM-YY", "da", true);
-                    if (!newDate.isValid()) {
-                        scope.dateInvalid = true;
-                        return;
-                    }
-
-                    ctrl.$setViewValue(newDate.format("YYYY-MM-DD HH:mm:ss"));
-
-                    $timeout(function () {
-                        //this triggers the autosave directive
-                        element.triggerHandler("blur");
-                    });
-                }
-
-                scope.write = write;
-            }
-        };
-    }]);
 
     app.directive('datereader', [function () {
         return {
