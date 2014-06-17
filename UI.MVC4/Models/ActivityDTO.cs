@@ -22,8 +22,8 @@ namespace UI.MVC4.Models
         /// </summary>
         public int StatusProcentage { get; set; }
 
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         public int? AssociatedUserId { get; set; }
         public UserDTO AssociatedUser { get; set; }
