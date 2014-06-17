@@ -26,7 +26,7 @@ namespace UI.MVC4.Controllers.API
         /// <param name="id">Id of the unit</param>
         /// <param name="rights">Routing qualifier</param>
         /// <returns>List of rights</returns>
-        public override HttpResponseMessage GetRights(int id, bool? rights)
+        public override HttpResponseMessage GetRights(int id)
         {
             try
             {
