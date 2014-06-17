@@ -11,16 +11,18 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public abstract class GenericHasRightsController<TObject, TRight, TRole, TDto> : GenericApiController<TObject, TDto>
+    public abstract class GenericRightsController<TObject, TRight, TRole> : BaseApiController
         where TObject : HasRightsEntity<TObject, TRight, TRole>
         where TRight : Entity, IRight<TObject, TRight, TRole>
         where TRole : IRoleEntity<TRight>
     {
         protected readonly IGenericRepository<TRight> RightRepository;
+        private readonly IGenericRepository<TObject> _objectRepository;
 
-        protected GenericHasRightsController(IGenericRepository<TObject> repository, IGenericRepository<TRight> rightRepository ) : base(repository)
+        protected GenericRightsController(IGenericRepository<TRight> rightRepository, IGenericRepository<TObject> objectRepository )
         {
             RightRepository = rightRepository;
+            _objectRepository = objectRepository;
         }
 
         /// <summary>
@@ -115,8 +117,12 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
         }
+
+        private bool HasWriteAccess(int objectId, User user)
+        {
+            var obj = _objectRepository.GetByKey(objectId);
+
+            return obj.HasUserWriteAccess(user);
+        }
     }
-
-
-    
 }

@@ -11,14 +11,14 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class ItContractController : GenericHasRightsController<ItContract, ItContractRight, ItContractRole, ItContractDTO>
+    public class ItContractController : GenericApiController<ItContract, ItContractDTO>
     {
         private readonly IGenericRepository<AgreementElement> _agreementElementRepository;
 
         private readonly IGenericRepository<ItSystemUsage> _usageRepository;
-        public ItContractController(IGenericRepository<ItContract> repository, IGenericRepository<ItContractRight> rightRepository, 
+        public ItContractController(IGenericRepository<ItContract> repository,
             IGenericRepository<ItSystemUsage> usageRepository, IGenericRepository<AgreementElement> agreementElementRepository) 
-            : base(repository, rightRepository)
+            : base(repository)
         {
             _usageRepository = usageRepository;
             _agreementElementRepository = agreementElementRepository;

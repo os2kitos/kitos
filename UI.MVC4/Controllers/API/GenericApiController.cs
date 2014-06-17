@@ -295,11 +295,6 @@ namespace UI.MVC4.Controllers.API
             return Map<IEnumerable<TDto>, IEnumerable<TModel>>(inputDtos);
         }
 
-        protected virtual TDest Map<TSource, TDest>(TSource item)
-        {
-            return AutoMapper.Mapper.Map<TDest>(item);
-        }
-
         #endregion
 
     }
