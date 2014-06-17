@@ -10,6 +10,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
+    //TODO refactor this into AdminRightsController
     public class GlobalAdminController : BaseApiController
     {
         private readonly IAdminService _adminService;

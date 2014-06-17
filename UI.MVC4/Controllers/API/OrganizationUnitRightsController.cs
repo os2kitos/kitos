@@ -24,7 +24,6 @@ namespace UI.MVC4.Controllers.API
         /// Returns all colllecteds rights for an organization unit and all sub units
         /// </summary>
         /// <param name="id">Id of the unit</param>
-        /// <param name="rights">Routing qualifier</param>
         /// <returns>List of rights</returns>
         public override HttpResponseMessage GetRights(int id)
         {
