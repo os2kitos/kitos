@@ -39,9 +39,8 @@ namespace UI.MVC4.Controllers.API
         /// Get all rights for a given object
         /// </summary>
         /// <param name="id">The id of the object</param>
-        /// <param name="rights">Routing qualifier</param>
         /// <returns>List of rights</returns>
-        public virtual HttpResponseMessage GetRights(int id, bool? rights)
+        public virtual HttpResponseMessage GetRights(int id)
         {
             try
             {

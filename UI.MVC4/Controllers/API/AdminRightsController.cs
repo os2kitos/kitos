@@ -16,7 +16,7 @@ namespace UI.MVC4.Controllers.API
         {
         }
 
-        public virtual HttpResponseMessage GetAllRights(bool? rights)
+        public virtual HttpResponseMessage GetAllRights()
         {
             try
             {
