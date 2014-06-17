@@ -87,10 +87,11 @@ namespace UI.MVC4.Controllers.API
                     var rootOrgUnit = KitosUser.CreatedIn.GetRoot();
 
                     orgUnits.Add(rootOrgUnit);
-                    orgUnits = orgUnits.Distinct().ToList();
                 }
 
-                return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(orgUnits));
+                orgUnits = orgUnits.Distinct().ToList();
+
+                return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitSimpleDTO>>(orgUnits));
             }
             catch (Exception e)
             {

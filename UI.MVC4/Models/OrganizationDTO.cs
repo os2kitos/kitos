@@ -11,5 +11,7 @@ namespace UI.MVC4.Models
         public OrganizationType Type { get; set; }
         public AccessModifier AccessModifier { get; set; }
         public ConfigDTO Config { get; set; }
+
+        public OrgUnitSimpleDTO Root { get; set; }
     }
 }

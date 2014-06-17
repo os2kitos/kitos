@@ -85,9 +85,9 @@
             }
 
             function checkForDefaultUnit() {
-                if (!user.defaultOrganizationUnitId) return;
+                if (!user.currentOrganizationUnitId) return;
 
-                $scope.chosenOrgUnitId = user.defaultOrganizationUnitId;
+                $scope.chosenOrgUnitId = user.currentOrganizationUnitId;
                 filterProjects();
             }
 

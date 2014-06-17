@@ -10,6 +10,20 @@
                 return userRight.roleName == "LocalAdmin";
             });
 
+            //the current org unit is either:
+            //a) the user selected default org unit (persisted in db) iff it belongs to the currently selected organization context 
+            //b) the root of the currently selected organization context otherwise
+            var currentOrgUnitId = response.defaultOrganizationUnitId;
+            var currentOrgUnitName = response.defaultOrganizationUnitName;
+            var isUsingDefaultOrgUnit = true;
+            
+            if (response.defaultOrganizationUnitOrganizationId != currOrg.id) {
+                currentOrgUnitId = currOrg.root.id;
+                currentOrgUnitName = currOrg.root.name;
+
+                isUsingDefaultOrgUnit = false;
+            }
+
             _user = {
                 isAuth: true,
                 id: response.id,
@@ -20,7 +34,10 @@
                 isLocalAdmin: isLocalAdmin,
                 isLocalAdminFor: _.pluck(response.adminRights, 'organizationId'),
                 
+                currentOrganizationUnitId: currentOrgUnitId,
+                currentOrganizationUnitName: currentOrgUnitName,
                 defaultOrganizationUnitId: response.defaultOrganizationUnitId,
+                isUsingDefaultOrgUnit: isUsingDefaultOrgUnit,
                 
                 currentOrganization: currOrg,
                 currentOrganizationId: currOrg.id,

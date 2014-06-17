@@ -9,6 +9,7 @@ namespace UI.MVC4.Models
         public string Email { get; set; }
         public int? DefaultOrganizationUnitId { get; set; }
         public string DefaultOrganizationUnitName { get; set; }
+        public int? DefaultOrganizationUnitOrganizationId { get; set; }
         public bool IsGlobalAdmin { get; set; }
         public List<AdminRightDTO> AdminRights { get; set; }
 
