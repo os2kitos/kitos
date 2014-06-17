@@ -19,7 +19,7 @@ namespace Core.DomainModel.ItProject
         /// <summary>
         /// Date-for-status-update field
         /// </summary>
-        public DateTime StatusDate { get; set; }
+        public DateTime? StatusDate { get; set; }
 
         /// <summary>
         /// Notes on collected status on project    

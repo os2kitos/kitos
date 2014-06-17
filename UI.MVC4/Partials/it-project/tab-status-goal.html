@@ -18,8 +18,20 @@
                 <!-- Date for status update -->
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
-                    <div class="col-md-3">
-                        <span id="statusDate" data-ng-model="goalStatus.statusDate" data-datewriter="" data-is-disabled="!hasWriteAccess" data-ng-change="updateStatusDate()"></span>
+                    <div class="col-md-4">
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control" id="statusDate"
+                                   data-datepicker-popup="dd-MM-yyyy" 
+                                   data-is-open="opened.gsd" 
+                                   data-date-to-string 
+                                   data-is-disabled="!hasWriteAccess"
+                                   data-ng-model="goalStatus.statusDate"
+                                   data-autosave="{{goalStatus.updateUrl}}"
+                                   data-field="statusDate">
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" data-ng-click="open($event, 'gsd')"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </div>
                     </div>
                 </div>
 

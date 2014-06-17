@@ -169,15 +169,6 @@
                         notify.addErrorMessage("Fejl!");
                     });
             };
-
-            $scope.updateStatusDate = function() {
-                patch($scope.project.updateUrl, "statusDate", $scope.project.statusDate)
-                    .success(function () {
-                        notify.addSuccessMessage("Feltet er opdateret");
-                    }).error(function () {
-                        notify.addErrorMessage("Fejl!");
-                    });
-            };
             
             $scope.addMilestone = function() {
                 $http.post("api/state", { milestoneForProjectId: itProject.id }).success(function(result) {
@@ -202,25 +193,21 @@
             function editActivity(activity) {
                 var modal = $modal.open({
                     templateUrl: 'partials/it-project/modal-milestone-task-edit.html',
-                    controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
+                    controller: ['$scope', function ($modalScope) {
 
                         $modalScope.activity = activity;
-
-                        $modalScope.updateDate = function(field) {
-                            patch(activity.updateUrl, field, activity[field]).success(function() {
-                                notify.addSuccessMessage("Feltet er opdateret");
-                            }).error(function() {
-                                notify.addErrorMessage("Fejl!");
-                            });
-                        };
-
                         $modalScope.phases = $scope.project.phases;
-
                         $modalScope.usersWithRoles = _.values(usersWithRoles);
-
                         $modalScope.updateUserName = $modalScope.activity.updateUser;
-
                         $modalScope.updatePhase = $modalScope.activity.updatePhase;
+                        
+                        $modalScope.opened = {};
+                        $modalScope.open = function ($event, datepicker) {
+                            $event.preventDefault();
+                            $event.stopPropagation();
+
+                            $modalScope.opened[datepicker] = true;
+                        };
                     }]
                 });
             }

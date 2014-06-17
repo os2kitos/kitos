@@ -63,9 +63,9 @@
         }
         
         function checkForDefaultUnit() {
-            if (!user.defaultOrganizationUnitId) return;
+            if (!user.currentOrganizationUnitId) return;
 
-            $scope.orgUnitId = user.defaultOrganizationUnitId;
+            $scope.orgUnitId = user.currentOrganizationUnitId;
             loadUsages();
         }
         

@@ -1,16 +1,16 @@
 ﻿<ul class="nav navbar-nav">
     <li>
-        <a data-ui-sref="organization.overview" data-ui-sref-active="active" data-ng-if="user.currentConfig.showTabOverview">Organisation</a>
-        <a data-ui-sref="organization.structure" data-ui-sref-active="active" data-ng-if="!user.currentConfig.showTabOverview">Organisation</a>
+        <a data-ui-sref="organization.overview" data-ng-class="{'active': $state.includes('organization')}" data-ng-if="user.currentConfig.showTabOverview">Organisation</a>
+        <a data-ui-sref="organization.structure" data-ng-class="{'active': $state.includes('organization')}" data-ng-if="!user.currentConfig.showTabOverview">Organisation</a>
     </li>
     <li data-ng-if="user.currentConfig.showItProjectModule">
-        <a data-ui-sref="it-project.overview" data-ui-sref-active="active">IT Projekter</a>
+        <a data-ui-sref="it-project.overview" data-ng-class="{'active': $state.includes('it-project')}">IT Projekter</a>
     </li>
     <li data-ng-if="user.currentConfig.showItSystemModule">
-        <a data-ui-sref="it-system.overview" data-ui-sref-active="active">IT Systemer</a>
+        <a data-ui-sref="it-system.overview"  data-ng-class="{'active': $state.includes('it-system')}">IT Systemer</a>
     </li>
     <li data-ng-if="user.currentConfig.showItContractModule">
-        <a data-ui-sref="it-contract.overview" data-ui-sref-active="active">IT Kontrakter</a>
+        <a data-ui-sref="it-contract.overview" data-ng-class="{'active': $state.includes('it-contract')}">IT Kontrakter</a>
     </li>
 </ul>
 

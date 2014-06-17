@@ -150,8 +150,12 @@
                         <!-- Extern contract signed date -->
                         <div class="form-group">
                             <label for="contract-ext-date" class="control-label small">Dato</label>
-                            <input type="date" id="contract-ext-date" class="form-control input-sm" data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="contract.supplierSignedDate" data-autosave="{{ autoSaveUrl }}" data-field="supplierSignedDate">
+                            <div class="input-group input-group-sm">
+                                <input type="text" id="contract-ext-date" class="form-control" data-datepicker-popup="dd-MM-yyyy" data-is-open="opened.ext" data-date-to-string data-ng-disabled="!hasWriteAccess" data-ng-model="contract.supplierSignedDate" data-autosave="{{ autoSaveUrl }}" data-field="supplierSignedDate" />
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" data-ng-click="open($event, 'ext')"><i class="glyphicon glyphicon-calendar"></i></button>
+                                </span>
+                            </div>
                         </div>
 
                         <!-- Intern contract is signed -->
@@ -166,8 +170,12 @@
                         <!-- Intern contract signed date -->
                         <div class="form-group">
                             <label for="contract-int-date" class="control-label small">Dato</label>
-                            <input type="date" id="contract-int-date" class="form-control input-sm" data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="contract.signedDate" data-autosave="{{ autoSaveUrl }}" data-field="signedDate">
+                            <div class="input-group input-group-sm">
+                                <input type="text" id="contract-int-date" class="form-control" data-datepicker-popup="dd-MM-yyyy" data-is-open="opened.int" data-ng-disabled="!hasWriteAccess" data-date-to-string data-ng-model="contract.signedDate" data-autosave="{{ autoSaveUrl }}" data-field="signedDate" />
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" data-ng-click="open($event, 'int')"><i class="glyphicon glyphicon-calendar"></i></button>
+                                </span>
+                            </div>
                         </div>
                     </div>
 
