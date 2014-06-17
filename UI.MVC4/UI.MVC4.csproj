@@ -237,7 +237,6 @@
     <Compile Include="Controllers\API\EconomyStreamController.cs" />
     <Compile Include="Models\EconomyStreamDTO.cs" />
     <Compile Include="Controllers\API\ItContractController.cs" />
-    <Compile Include="Controllers\API\ItContractRightController.cs" />
     <Compile Include="Controllers\API\ProcurementStrategyController.cs" />
     <Compile Include="Models\AdviceDTO.cs" />
     <Compile Include="Models\CustomAgreementElementDTO.cs" />
@@ -265,7 +264,6 @@
     <Compile Include="Controllers\API\GoalStatusController.cs" />
     <Compile Include="Controllers\API\GoalTypeController.cs" />
     <Compile Include="Controllers\API\InterfaceExposureController.cs" />
-    <Compile Include="Controllers\API\ItProjectRightController.cs" />
     <Compile Include="Controllers\API\DataRowUsageController.cs" />
     <Compile Include="Controllers\API\DataTypeController.cs" />
     <Compile Include="Controllers\API\FrequencyController.cs" />
@@ -274,7 +272,6 @@
     <Compile Include="Controllers\API\InterfaceUsageController.cs" />
     <Compile Include="Controllers\API\ItProjectController.cs" />
     <Compile Include="Controllers\API\ItSystemController.cs" />
-    <Compile Include="Controllers\API\ItSystemRightController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageController.cs" />
     <Compile Include="Controllers\API\RiskController.cs" />
     <Compile Include="Controllers\API\StakeholderController.cs" />
@@ -296,7 +293,6 @@
     <Compile Include="Models\InterfaceUsageDTO.cs" />
     <Compile Include="Models\ItProjectDTO.cs" />
     <Compile Include="Models\ItSystemDTO.cs" />
-    <Compile Include="Controllers\API\OrganizationRightController.cs" />
     <Compile Include="Controllers\API\TaskUsageController.cs" />
     <Compile Include="Models\CreateGlobalAdminDTO.cs" />
     <Compile Include="Models\CreateLocalAdminDTO.cs" />
