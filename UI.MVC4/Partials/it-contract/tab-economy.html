@@ -10,7 +10,7 @@
                 <th>Andet</th>
                 <th>Kontering</th>
                 <th>Audit</th>
-                <th>Dato</th>
+                <th class="col-md-2">Dato</th>
                 <th>Note</th>
                 <th></th>
             </tr>
@@ -72,10 +72,19 @@
                 
                 <!-- Audit date -->
                 <td>
-                    <span data-ng-model="stream.auditDate" data-datewriter="" 
-                          data-is-disabled="!hasWriteAccess" 
-                          data-field="auditDate"
-                          data-autosave="{{stream.updateUrl}}"></span>
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control"
+                               data-datepicker-popup="dd-MM-yyyy" 
+                               data-is-open="opened['eaud' + $index]" 
+                               data-date-to-string 
+                               data-ng-disabled="!hasWriteAccess" 
+                               data-ng-model="stream.auditDate"
+                               data-autosave="{{stream.updateUrl}}"
+                               data-field="auditDate">
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" data-ng-click="open($event, 'eaud' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
+                        </span>
+                    </div>
                 </td>
 
                 <!-- Note -->
@@ -124,7 +133,7 @@
                 <th>Andet</th>
                 <th>Kontering</th>
                 <th>Audit</th>
-                <th>Dato</th>
+                <th class="col-md-2">Dato</th>
                 <th>Note</th>
                 <th></th>
             </tr>
@@ -186,10 +195,19 @@
                 
                 <!-- Audit date -->
                 <td>
-                    <span data-ng-model="stream.auditDate" data-datewriter="" 
-                          data-is-disabled="!hasWriteAccess" 
-                          data-field="auditDate"
-                          data-autosave="{{stream.updateUrl}}"></span>
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control"
+                               data-datepicker-popup="dd-MM-yyyy" 
+                               data-is-open="opened['iaud' + $index]" 
+                               data-date-to-string 
+                               data-ng-disabled="!hasWriteAccess" 
+                               data-ng-model="stream.auditDate"
+                               data-autosave="{{stream.updateUrl}}"
+                               data-field="auditDate">
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" data-ng-click="open($event, 'iaud' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
+                        </span>
+                    </div>
                 </td>
 
                 <!-- Note -->
