@@ -10,15 +10,36 @@
                 return userRight.roleName == "LocalAdmin";
             });
 
+            //the current org unit is either:
+            //a) the user selected default org unit (persisted in db) iff it belongs to the currently selected organization context 
+            //b) the root of the currently selected organization context otherwise
+            var currentOrgUnitId = response.defaultOrganizationUnitId;
+            var currentOrgUnitName = response.defaultOrganizationUnitName;
+            var isUsingDefaultOrgUnit = true;
+            
+            if (response.defaultOrganizationUnitOrganizationId != currOrg.id) {
+                currentOrgUnitId = currOrg.root.id;
+                currentOrgUnitName = currOrg.root.name;
+
+                isUsingDefaultOrgUnit = false;
+            }
+
             _user = {
                 isAuth: true,
                 id: response.id,
                 name: response.name,
                 email: response.email,
+                
                 isGlobalAdmin: response.isGlobalAdmin,
                 isLocalAdmin: isLocalAdmin,
                 isLocalAdminFor: _.pluck(response.adminRights, 'organizationId'),
+                
+                currentOrganizationUnitId: currentOrgUnitId,
+                currentOrganizationUnitName: currentOrgUnitName,
                 defaultOrganizationUnitId: response.defaultOrganizationUnitId,
+                isUsingDefaultOrgUnit: isUsingDefaultOrgUnit,
+                
+                currentOrganization: currOrg,
                 currentOrganizationId: currOrg.id,
                 currentOrganizationName: currOrg.name,
                 currentConfig: currOrg.config
@@ -27,6 +48,31 @@
             $rootScope.user = _user;
 
             return _user;
+        }
+        
+        function patchUser(payload) {
+            var deferred = $q.defer();
+
+            if (_user == null) {
+                deferred.reject("Not authenticated.");
+            } else {
+                $http({
+                    method: 'PATCH',
+                    url: 'api/user/' + _user.id,
+                    data: payload
+                }).success(function (result) {
+                    var newUser = result.response;
+                    
+                    saveUser(newUser, _user.currentOrganization);
+                    loadUserDeferred = null;
+                    deferred.resolve(_user);
+
+                }).error(function () {
+                    deferred.reject("Couldn't patch the user!");
+                });
+
+            }
+            return deferred.promise;
         }
 
         function getUser() {
@@ -180,6 +226,7 @@
                 openModal();
             }
             
+            //helper function for displaying the choose-organization modal
             function openModal() {
                 //fetch the relevant organizations
                 $http.get("api/user?organizations").success(function (result) {
@@ -244,7 +291,8 @@
             getUser: getUser,
             login: login,
             logout: logout,
-            auth: auth
+            auth: auth,
+            patchUser: patchUser
         };
 
     }]);

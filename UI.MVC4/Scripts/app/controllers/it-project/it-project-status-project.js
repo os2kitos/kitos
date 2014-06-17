@@ -117,10 +117,6 @@
                 milestone.isMilestone = true;
                 milestone.updateUrl = "api/state/" + milestone.id;
 
-                autoSaveTrafficLight(milestone.updateUrl, "status", function() {
-                    return milestone.status;
-                });
-
                 return addMilestoneActivity(milestone);
             }
 
@@ -173,34 +169,6 @@
                         notify.addErrorMessage("Fejl!");
                     });
             };
-
-            $scope.updateStatusDate = function() {
-                patch($scope.project.updateUrl, "statusDate", $scope.project.statusDate)
-                    .success(function () {
-                        notify.addSuccessMessage("Feltet er opdateret");
-                    }).error(function () {
-                        notify.addErrorMessage("Fejl!");
-                    });
-            };
-            
-            function autoSaveTrafficLight(url, field, watchExp) {
-                $scope.$watch(watchExp, function(newVal, oldVal) {
-
-                    if (angular.isUndefined(newVal) || newVal == null || newVal == oldVal) return;
-
-                    var msg = notify.addInfoMessage("Gemmer...", false);
-                    patch(url, field, newVal).success(function(result) {
-                        msg.toSuccessMessage("Feltet er opdateret");
-                    }).error(function() {
-                        msg.toErrorMessage("Fejl!");
-                    });
-
-                });
-            }
-
-            autoSaveTrafficLight($scope.project.updateUrl, "statusProject", function() {
-                return $scope.project.statusProject;
-            });
             
             $scope.addMilestone = function() {
                 $http.post("api/state", { milestoneForProjectId: itProject.id }).success(function(result) {
@@ -225,25 +193,21 @@
             function editActivity(activity) {
                 var modal = $modal.open({
                     templateUrl: 'partials/it-project/modal-milestone-task-edit.html',
-                    controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
+                    controller: ['$scope', function ($modalScope) {
 
                         $modalScope.activity = activity;
-
-                        $modalScope.updateDate = function(field) {
-                            patch(activity.updateUrl, field, activity[field]).success(function() {
-                                notify.addSuccessMessage("Feltet er opdateret");
-                            }).error(function() {
-                                notify.addErrorMessage("Fejl!");
-                            });
-                        };
-
                         $modalScope.phases = $scope.project.phases;
-
                         $modalScope.usersWithRoles = _.values(usersWithRoles);
-
                         $modalScope.updateUserName = $modalScope.activity.updateUser;
-
                         $modalScope.updatePhase = $modalScope.activity.updatePhase;
+                        
+                        $modalScope.opened = {};
+                        $modalScope.open = function ($event, datepicker) {
+                            $event.preventDefault();
+                            $event.stopPropagation();
+
+                            $modalScope.opened[datepicker] = true;
+                        };
                     }]
                 });
             }

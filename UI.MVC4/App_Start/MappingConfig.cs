@@ -182,10 +182,15 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.User, opt => opt.Ignore())
                   .ForMember(dest => dest.ItSystemUsage, opt => opt.Ignore());
 
-            Mapper.CreateMap<Organization, OrganizationDTO>().ReverseMap();
+            Mapper.CreateMap<Organization, OrganizationDTO>()
+                .ForMember(dest => dest.Root, opt => opt.MapFrom(src => src.GetRoot()))
+                .ReverseMap();
+
             Mapper.CreateMap<OrganizationUnit, OrgUnitDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.Children, opt => opt.Ignore());
+
+            Mapper.CreateMap<OrganizationUnit, OrgUnitSimpleDTO>();
 
             Mapper.CreateMap<PasswordResetRequest, PasswordResetRequestDTO>()
                   .ForMember(dest => dest.UserEmail, opt => opt.MapFrom(src => src.User.Email));
@@ -229,6 +234,9 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.ExposedInterfaces, opt => opt.Ignore())
                   .ForMember(dest => dest.CanBeUsedBy, opt => opt.Ignore());
 
+            //Simplere mapping than the one above, only one way
+            Mapper.CreateMap<ItSystem, ItSystemSimpleDTO>();
+
             Mapper.CreateMap<DataRowUsage, DataRowUsageDTO>()
                   .ReverseMap();
 
@@ -263,16 +271,14 @@ namespace UI.MVC4.App_Start
                 .ForMember(dest => dest.ItProject, opt => opt.Ignore());
 
             Mapper.CreateMap<Activity, ActivityDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.AssociatedUser, opt => opt.Ignore())
-                  .ForMember(dest => dest.ObjectOwner, opt => opt.Ignore())
-                  .ForMember(dest => dest.AssociatedActivity, opt => opt.Ignore());
+                .ReverseMap()
+                .ForMember(dest => dest.AssociatedUser, opt => opt.Ignore())
+                .ForMember(dest => dest.ObjectOwner, opt => opt.Ignore());
 
             Mapper.CreateMap<State, StateDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.AssociatedUser, opt => opt.Ignore())
-                  .ForMember(dest => dest.ObjectOwner, opt => opt.Ignore())
-                  .ForMember(dest => dest.AssociatedActivity, opt => opt.Ignore());
+                .ReverseMap()
+                .ForMember(dest => dest.AssociatedUser, opt => opt.Ignore())
+                .ForMember(dest => dest.ObjectOwner, opt => opt.Ignore());
 
             Mapper.CreateMap<GoalStatus, GoalStatusDTO>()
                   .ReverseMap()
@@ -298,6 +304,12 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
                   .ForMember(dest => dest.ResponsibleOrgUnit, opt => opt.Ignore())
                   .ForMember(dest => dest.Stakeholders, opt => opt.Ignore());
+            
+            //Output only - this mapping should not be reversed
+            Mapper.CreateMap<ItProject, ItProjectCatalogDTO>();
+
+            //Output only - this mapping should not be reversed
+            Mapper.CreateMap<ItProject, ItProjectSimpleDTO>();
 
             Mapper.CreateMap<Handover, HandoverDTO>()
                   .ReverseMap()

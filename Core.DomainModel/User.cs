@@ -27,6 +27,10 @@ namespace Core.DomainModel
         public string Email { get; set; }
         public string Password { get; set; }
         public string Salt { get; set; }
+
+        public int? CreatedInId { get; set; }
+        public virtual Organization CreatedIn { get; set; }
+
         public bool IsGlobalAdmin { get; set; }
         public int? DefaultOrganizationUnitId { get; set; }
         public virtual OrganizationUnit DefaultOrganizationUnit { get; set; }

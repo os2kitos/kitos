@@ -71,21 +71,27 @@ namespace UI.MVC4.Controllers.API
             }
         }*/
 
-        //TODO rename this into something more saying
         /// <summary>
-        /// Returns every OrganizationUnit that the user has a role for
+        /// Returns every OrganizationUnit that the user can select as the default unit
         /// </summary>
-        /// <param name="userId2"></param>
+        /// <param name="byUser">Routing qualifier</param>
         /// <returns></returns>
-        public HttpResponseMessage GetByUser2(int userId2)
+        public HttpResponseMessage GetByUser(bool? byUser)
         {
             try
             {
-                var user = KitosUser;
-                if(user.Id != userId2) throw new SecurityException();
+                var orgUnits = Repository.Get(x => x.Rights.Any(y => y.UserId == KitosUser.Id)).ToList();
 
-                var orgUnits = Repository.Get(x => x.Rights.Any(y => y.UserId == userId2));
-                return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(orgUnits));
+                if (KitosUser.CreatedIn != null)
+                {
+                    var rootOrgUnit = KitosUser.CreatedIn.GetRoot();
+
+                    orgUnits.Add(rootOrgUnit);
+                }
+
+                orgUnits = orgUnits.Distinct().ToList();
+
+                return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitSimpleDTO>>(orgUnits));
             }
             catch (Exception e)
             {

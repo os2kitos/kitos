@@ -1,0 +1,39 @@
+﻿<form role="form">
+    <div class="panel panel-default">
+        <div class="panel-heading">Betalingsmodel</div>
+        <div class="form-group">
+            <label for="agreement-operation" class="control-label small">Driftsvederlag påbegyndt</label>
+            <div class="input-group input-group-sm">
+                <input type="text" class="form-control" id="agreement-operation"
+                       data-datepicker-popup="dd-MM-yyyy" 
+                       data-is-open="opened.orb" 
+                       data-date-to-string 
+                       data-ng-disabled="!hasWriteAccess" 
+                       data-ng-model="contract.operationRemunerationBegun"
+                       data-autosave="{{autosaveUrl}}" 
+                       data-field="operationRemunerationBegun">
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-default" data-ng-click="open($event, 'orb')"><i class="glyphicon glyphicon-calendar"></i></button>
+                </span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="agreement-freq" class="control-label small">Betalingsfrekvens</label>
+            <select id="agreement-freq" class="form-control input-sm" data-ng-disabled="!hasWriteAccess" data-ng-model="contract.paymentFreqencyId" data-ng-options="o.id as o.name for o in paymentFrequencies" data-autosave="{{autosaveUrl}}" data-field="paymentFreqencyId">
+                <option value=""></option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="agreement-payment" class="control-label small">Betalingsmodel</label>
+            <select id="agreement-payment" class="form-control input-sm" data-ng-disabled="!hasWriteAccess" data-ng-model="contract.paymentModelId" data-ng-options="o.id as o.name for o in paymentModels" data-autosave="{{autosaveUrl}}" data-field="paymentModelId">
+                <option value=""></option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="agreement-price" class="control-label small">Prisregulering</label>
+            <select id="agreement-price" class="form-control input-sm" data-ng-disabled="!hasWriteAccess" data-ng-model="contract.priceRegulationId" data-ng-options="o.id as o.name for o in priceRegulations" data-autosave="{{autosaveUrl}}" data-field="priceRegulationId">
+                <option value=""></option>
+            </select>
+        </div>
+    </div>
+</form>

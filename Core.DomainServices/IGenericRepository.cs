@@ -19,5 +19,7 @@ namespace Core.DomainServices
         void Save();
         void Patch(TModel item);
         IQueryable<TModel> AsQueryable();
+
+        TModel Create();
     }
 }

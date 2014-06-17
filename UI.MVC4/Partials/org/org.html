@@ -1,52 +1,20 @@
 ﻿<div class="col-md-12">
 
     <div class="col-md-4 container-fluid">
-        <h2>Enheder
-            <span class="pull-right small" data-ng-hide="true || chosenOrgUnit.hasWriteAccess">Låst
-                <!--<i class="glyphicon glyphicon-lock" title="Du har ikke skriveadgang til denne organisationsenhed"></i>-->
-            </span>
+        <h2>
+            Organisation
+            <span class="pull-right small" data-ng-hide="true || chosenOrgUnit.hasWriteAccess">Låst</span>
             <span class="pull-right small" data-ng-show="chosenOrgUnit.hasWriteAccess">
                 <a data-ng-click="editUnit(chosenOrgUnit)">Rediger 
-                  <!--          <i class="glyphicon glyphicon-cog" title="Rediger {{chosenOrgUnit.name}}"></i> -->
                 </a>
             </span>
         </h2>
         
-        <div data-ng-if="nodes.length != 0">
-            
-            <p>Du er tilknyttet disse organisationsenheder:</p>
-
+        <div>
             <div data-ng-repeat="node in nodes" class="org-node-top">
                 <div data-ng-include="'partials/org/org-unit.html'"></div>
             </div>
         </div>
-        <div data-ng-if="nodes.length == 0">
-            <strong>Du er ikke tilknyttet nogen enheder.</strong>
-        </div>
-
-        <!--
-        <div class="well well-sm margin-top">
-            Forklaring:
-
-            <div class="org-node" style="display: inline;">
-                <span class="org-node-info small">
-                    <a>Læserettighed</a>
-                </span>
-            </div>
-
-            <div class="org-node hasWriteAccess" style="display: inline;">
-                <span class="org-node-info small">
-                    <a>Skriverettighed</a>
-                </span>
-            </div>
-
-            <div class="org-node hasWriteAccess selected" style="display: inline;">
-                <span class="org-node-info small">
-                    <a>Valgt</a>
-                </span>
-            </div>
-        </div>
-            -->
     </div>
 
     <div class="col-md-8 container-fluid">
@@ -108,7 +76,7 @@
                                         </a>
                                         <a class="btn btn-danger btn-xs" 
                                            data-confirmed-click="deleteRight(right)" 
-                                           data-confirm-click="Er du sikker på at du vil slette?">
+                                           data-confirm-click="Er du sikker på at du vil fjerne denne rolle fra denne person? Du sletter ikke personen.">
                                             <i class="glyphicon glyphicon-trash"></i>
                                         </a>
                                     </div>

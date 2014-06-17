@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+using UI.MVC4.Filters;
 
 namespace UI.MVC4.Models
 {
@@ -21,10 +23,13 @@ namespace UI.MVC4.Models
         public string GoalTypeName { get; set; }
 
         public bool Measurable { get; set; }
-
-        public DateTime SubGoalDate1 { get; set; }
-        public DateTime SubGoalDate2 { get; set; }
-        public DateTime SubGoalDate3 { get; set; }
+        
+        [JsonConverter(typeof(CustomDateTimeConverter))]
+        public DateTime? SubGoalDate1 { get; set; }
+        [JsonConverter(typeof(CustomDateTimeConverter))]
+        public DateTime? SubGoalDate2 { get; set; }
+        [JsonConverter(typeof(CustomDateTimeConverter))]
+        public DateTime? SubGoalDate3 { get; set; }
 
         public string SubGoal1 { get; set; }
         public string SubGoal2 { get; set; }

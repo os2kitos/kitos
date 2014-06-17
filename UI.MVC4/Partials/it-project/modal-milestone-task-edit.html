@@ -52,7 +52,18 @@
                 Start
             </label>
             <div class="col-md-4">
-                <span id="startDate" data-ng-model="activity.startDate" data-datewriter="" data-ng-change="updateDate('startDate')" />
+                <div class="input-group input-group-sm">
+                    <input type="text" class="form-control" id="startDate"
+                           data-datepicker-popup="dd-MM-yyyy" 
+                           data-is-open="opened.sd" 
+                           data-date-to-string 
+                           data-ng-model="activity.startDate"
+                           data-autosave="{{activity.updateUrl}}"
+                           data-field="startDate">
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'sd')"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </div>
             </div>
 
             <!-- End date -->
@@ -60,7 +71,18 @@
                 Slut
             </label>
             <div class="col-md-4">
-                <span id="endDate" data-ng-model="activity.endDate" data-datewriter="" data-ng-change="updateDate('endDate')" />
+                <div class="input-group input-group-sm">
+                    <input type="text" class="form-control" id="endDate"
+                           data-datepicker-popup="dd-MM-yyyy" 
+                           data-is-open="opened.ed" 
+                           data-date-to-string 
+                           data-ng-model="activity.endDate"
+                           data-autosave="{{activity.updateUrl}}"
+                           data-field="endDate">
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'ed')"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </div>
             </div>
         </div>
 
@@ -71,7 +93,18 @@
                 Dato
             </label>
             <div class="col-md-4">
-                <span id="date" data-ng-model="activity.date" data-datewriter="" data-ng-change="updateDate('date')" />
+                <div class="input-group input-group-sm">
+                    <input type="text" class="form-control" id="date"
+                           data-datepicker-popup="dd-MM-yyyy" 
+                           data-is-open="opened.d" 
+                           data-date-to-string 
+                           data-ng-model="activity.date"
+                           data-autosave="{{activity.updateUrl}}"
+                           data-field="date">
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'd')"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </div>
             </div>
         </div>
 
@@ -108,7 +141,11 @@
                 </select>
             </div>
             <div class="col-md-4" data-ng-if="activity.isMilestone">
-                <input id="status" data-select-status="activity.status" data-can-write="true" />
+                <span id="status" data-select-status2="" data-ng-model="activity.status" 
+                      data-field="status"
+                      data-autosave="{{activity.updateUrl}}"   
+                      data-can-write="true">
+                </span>
             </div>
         </div>
 

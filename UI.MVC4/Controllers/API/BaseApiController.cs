@@ -126,7 +126,7 @@ namespace UI.MVC4.Controllers.API
 
                     return user;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     throw new SecurityException();
                 }

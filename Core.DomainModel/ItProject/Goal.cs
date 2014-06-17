@@ -21,9 +21,9 @@ namespace Core.DomainModel.ItProject
 
         public bool Measurable { get; set; }
 
-        public DateTime SubGoalDate1 { get; set; }
-        public DateTime SubGoalDate2 { get; set; }
-        public DateTime SubGoalDate3 { get; set; }
+        public DateTime? SubGoalDate1 { get; set; }
+        public DateTime? SubGoalDate2 { get; set; }
+        public DateTime? SubGoalDate3 { get; set; }
 
         public string SubGoal1 { get; set; }
         public string SubGoal2 { get; set; }

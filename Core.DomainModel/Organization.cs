@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Core.DomainModel
 {
@@ -23,7 +24,13 @@ namespace Core.DomainModel
 
         public string Name { get; set; }
         public OrganizationType Type { get; set; }
-        public int? Cvr { get; set; }
+        /// <summary>
+        /// Cvr number
+        /// </summary>
+        /// <remarks>
+        /// This is a string instead of int because it's much easier to do a partial search on strings
+        /// </remarks>
+        public string Cvr { get; set; }
         public AccessModifier AccessModifier { get; set; }
         
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
@@ -48,5 +55,11 @@ namespace Core.DomainModel
         public virtual Config Config { get; set; }
         
         #endregion
+
+
+        public OrganizationUnit GetRoot()
+        {
+            return OrgUnits.FirstOrDefault(u => u.Parent == null);
+        }
     }
 }

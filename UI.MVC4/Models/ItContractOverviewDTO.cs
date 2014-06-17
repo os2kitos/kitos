@@ -18,7 +18,6 @@ namespace UI.MVC4.Models
         public IEnumerable<RightOutputDTO> Rights { get; set; }
 
         public string PaymentModelName { get; set; }
-        public string PaymentFreqencyName { get; set; }
 
         /// <summary>
         /// When the contract began (indgået)
@@ -80,6 +79,14 @@ namespace UI.MVC4.Models
         public DateTime? FirstAuditDate
         {
             get { return ExternEconomyStreams.Min(stream => stream.AuditDate); }
+        }
+
+        /// <summary>
+        /// The number of extern economy streams, that have white status
+        /// </summary>
+        public int TotalWhiteStatuses
+        {
+            get { return ExternEconomyStreams.Count(stream => stream.AuditStatus == TrafficLight.White); }
         }
 
         /// <summary>

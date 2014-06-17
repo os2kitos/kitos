@@ -54,7 +54,11 @@
                 Status:
             </label>
             <div class="col-md-3">
-                    <input id="statusGoal" data-select-status="goal.status" data-can-write="true" />
+                <span id="statusGoal" data-select-status2="" data-ng-model="goal.status"
+                      data-field="status"
+                      data-autosave="{{goal.updateUrl}}"
+                      data-can-write="true">
+                </span>
             </div>
         </div>
         
@@ -79,7 +83,18 @@
             <div class="form-group">
                 <label for="subGoalDate1" class="col-md-1 control-label small">Dato</label>
                 <div class="col-md-3">
-                    <span id="subGoalDate1" data-ng-model="goal.subGoalDate1" data-datewriter="" data-ng-change="updateSubGoalDate(1)"></span>
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" id="subGoalDate1"
+                               data-datepicker-popup="dd-MM-yyyy" 
+                               data-is-open="opened.sgd1" 
+                               data-date-to-string 
+                               data-ng-model="goal.subGoalDate1"
+                               data-autosave="{{goal.updateUrl}}"
+                               data-field="subGoalDate1">
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" data-ng-click="open($event, 'sgd1')"><i class="glyphicon glyphicon-calendar"></i></button>
+                        </span>
+                    </div>
                 </div>
                 <label for="subGoal1" class="col-md-1 control-label small">Mål</label>
                 <div class="col-md-3">
@@ -107,7 +122,18 @@
             <div class="form-group">
                 <label for="subGoalDate2" class="col-md-1 control-label small">Dato</label>
                 <div class="col-md-3">
-                    <span id="subGoalDate2" data-ng-model="goal.subGoalDate2" data-datewriter="" data-ng-change="updateSubGoalDate(2)"></span>
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" id="subGoalDate2"
+                               data-datepicker-popup="dd-MM-yyyy" 
+                               data-is-open="opened.sgd2" 
+                               data-date-to-string 
+                               data-ng-model="goal.subGoalDate2"
+                               data-autosave="{{goal.updateUrl}}"
+                               data-field="subGoalDate2">
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" data-ng-click="open($event, 'sgd2')"><i class="glyphicon glyphicon-calendar"></i></button>
+                        </span>
+                    </div>
                 </div>
                 <label for="subGoal2" class="col-md-1 control-label small">Mål</label>
                 <div class="col-md-3">
@@ -137,7 +163,18 @@
             <div class="form-group">
                 <label for="subGoalDate3" class="col-md-1 control-label small">Dato</label>
                 <div class="col-md-3">
-                    <span id="subGoalDate3" data-ng-model="goal.subGoalDate3" data-datewriter="" data-ng-change="updateSubGoalDate(3)"></span>
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" id="subGoalDate3"
+                               data-datepicker-popup="dd-MM-yyyy" 
+                               data-is-open="opened.sgd3" 
+                               data-date-to-string 
+                               data-ng-model="goal.subGoalDate3"
+                               data-autosave="{{goal.updateUrl}}"
+                               data-field="subGoalDate3">
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" data-ng-click="open($event, 'sgd3')"><i class="glyphicon glyphicon-calendar"></i></button>
+                        </span>
+                    </div>
                 </div>
                 <label for="subGoal3" class="col-md-1 control-label small">Mål</label>
                 <div class="col-md-3">

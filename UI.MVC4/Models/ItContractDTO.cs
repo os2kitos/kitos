@@ -52,6 +52,7 @@ namespace UI.MVC4.Models
         public DateTime? SignedDate { get; set; }
         public int? ResponsibleOrganizationUnitId { get; set; }
         public int? SupplierId { get; set; }
+        public string SupplierName { get; set; }
         public int? ProcurementStrategyId { get; set; }
         public int? ProcurementPlanHalf { get; set; }
         public int? ProcurementPlanYear { get; set; }
@@ -59,6 +60,7 @@ namespace UI.MVC4.Models
         public int? ContractTypeId { get; set; }
         public int? PurchaseFormId { get; set; }
         public int? ParentId { get; set; }
+        public string ParentName { get; set; }
         public IEnumerable<OptionDTO> AgreementElements { get; set; }
         public IEnumerable<CustomAgreementElementDTO> CustomAgreementElements { get; set; }
 

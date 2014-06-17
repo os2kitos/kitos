@@ -86,7 +86,7 @@ namespace Core.DomainModel.ItProject
         /// <summary>
         /// Organization Unit responsible for this project
         /// </summary>
-        public OrganizationUnit ResponsibleOrgUnit { get; set; }
+        public virtual OrganizationUnit ResponsibleOrgUnit { get; set; }
 
         /// <summary>
         /// These Organization Units are using this project
@@ -104,7 +104,7 @@ namespace Core.DomainModel.ItProject
         /// <summary>
         /// Date-for-status-update field
         /// </summary>
-        public DateTime StatusDate { get; set; }
+        public DateTime? StatusDate { get; set; }
 
         /// <summary>
         /// Notes on collected status on project    

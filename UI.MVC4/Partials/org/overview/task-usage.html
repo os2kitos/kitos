@@ -8,15 +8,17 @@
 
     <!-- task description -->
     <div class="col-md-1">{{ usage.usage.task.taskKey }}</div>
-    <div class="col-md-3">{{ usage.usage.task.description }}</div>
+    <div class="col-md-4">{{ usage.usage.task.description }}</div>
 
     <!-- statuses -->
     <div class="col-md-2">
         <div class="status-column" data-ng-if="user.currentConfig.showColumnTechnology">
-            <input data-select-status="usage.usage.technologyStatus" data-can-write="usage.usage.orgUnit.hasWriteAccess"/>
+            <span data-select-status2="" data-ng-model="usage.usage.technologyStatus" data-can-write="usage.usage.orgUnit.hasWriteAccess"
+                   data-autosave="{{usage.usage.updateUrl}}" data-field="technologyStatus"></span>
         </div>
         <div class="status-column" data-ng-if="user.currentConfig.showColumnUsage">
-            <input data-select-status="usage.usage.usageStatus" data-can-write="usage.usage.orgUnit.hasWriteAccess"/>
+            <span data-select-status2="" data-ng-model="usage.usage.usageStatus" data-can-write="usage.usage.orgUnit.hasWriteAccess"
+                   data-autosave="{{usage.usage.updateUrl}}" data-field="usageStatus"></span>
         </div>
         <div class="status-column">
             <button class="btn btn-link btn-xs"
@@ -39,9 +41,16 @@
     </div>
 
     <!-- extra info -->
-    <div class="col-md-1 text-center"></div>
-    <div class="col-md-1 text-center"></div>
-    <div class="col-md-1 text-center"></div>
+    <div class="col-md-1 text-center">
+        <span data-ng-if="usage.usage.projects.length > 0" class="text-success">
+            <i class="glyphicon glyphicon-ok" data-tooltip="{{usage.usage.projects | joinBy:', ':'name'}}"></i>
+        </span>
+    </div>
+    <div class="col-md-1 text-center">
+        <span data-ng-if="usage.usage.systems.length > 0" class="text-success">
+            <i class="glyphicon glyphicon-ok" data-tooltip="{{usage.usage.systems | joinBy:', ':'itSystemName'}}"></i>
+        </span>
+    </div>
 </div>
 
 <div data-ng-if="usage.hasDelegations">
@@ -58,7 +67,7 @@
 
         <!-- task description -->
         <div class="col-md-1">{{ usage.usage.task.taskKey }}</div>
-        <div class="col-md-3">{{ usage.usage.task.description }}</div>
+        <div class="col-md-4">{{ usage.usage.task.description }}</div>
 
         <!-- statuses -->
         <div class="col-md-2">
@@ -87,9 +96,16 @@
 
 
         <!-- extra info -->
-        <div class="col-md-1 text-center"></div>
-        <div class="col-md-1 text-center"></div>
-        <div class="col-md-1 text-center"></div>
+        <div class="col-md-1 text-center">
+            <span data-ng-if="usage.usage.projects.length > 0" class="text-success">
+                <i class="glyphicon glyphicon-ok" data-tooltip="{{usage.usage.projects | joinBy:', ':'name'}}"></i>
+            </span>
+        </div>
+        <div class="col-md-1 text-center">
+            <span data-ng-if="usage.usage.systems.length > 0" class="text-success">
+                <i class="glyphicon glyphicon-ok" data-tooltip="{{usage.usage.systems | joinBy:', ':'itSystemName'}}"></i>
+            </span>
+        </div>
     </div>
 
     <!-- delegations -->

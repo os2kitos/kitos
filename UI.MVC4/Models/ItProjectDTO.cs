@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
+using Newtonsoft.Json;
+using UI.MVC4.Filters;
 
 namespace UI.MVC4.Models
 {
@@ -59,7 +61,8 @@ namespace UI.MVC4.Models
         /// <summary>
         /// Date-for-status-update field
         /// </summary>
-        public DateTime StatusDate { get; set; }
+        [JsonConverter(typeof(CustomDateTimeConverter))]
+        public DateTime? StatusDate { get; set; }
 
         /// <summary>
         /// Notes on collected status on project    

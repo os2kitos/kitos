@@ -34,15 +34,26 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                //Get all projects inside the organizaton OR public
-                var projects = _itProjectService.GetAll(orgId, includePublic: true).ToList();
-
-                var clonedParentIds = projects.Where(x => x.ParentItProjectId.HasValue).Select(x => x.ParentItProjectId);
-
-                // remove cloned parents
-                projects.RemoveAll(x => clonedParentIds.Contains(x.Id));
+                var projects = _itProjectService.GetAll(orgId, includePublic: false).ToList();
                 
                 return Ok(Map(projects));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetCatalog(bool? catalog, [FromUri] int orgId)
+        {
+            try
+            {
+                //Get all projects inside the organizaton OR public
+                var projects = _itProjectService.GetAll(orgId, includePublic: true);
+
+                var dto = Map<IEnumerable<ItProject>, IEnumerable<ItProjectCatalogDTO>>(projects);
+
+                return Ok(dto);
             }
             catch (Exception e)
             {
@@ -350,6 +361,13 @@ namespace UI.MVC4.Controllers.API
         {
             //Makes sure to create the necessary properties, like phases
             return _itProjectService.AddProject(item);
+        }
+
+        protected override void DeleteQuery(int id)
+        {
+            var project = Repository.GetByKey(id);
+
+            _itProjectService.DeleteProject(project);
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
 using Core.DomainModel;
+using Newtonsoft.Json;
+using UI.MVC4.Filters;
 
 namespace UI.MVC4.Models
 {
@@ -38,6 +40,7 @@ namespace UI.MVC4.Models
         /// <summary>
         /// DateTime for audit
         /// </summary>
+        [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime? AuditDate { get; set; }
 
         public string Note { get; set; }

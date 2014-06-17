@@ -1,6 +1,6 @@
 ﻿(function (ng, app) {
     app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-system-usage.roles', {
+        $stateProvider.state('it-system.usage.roles', {
             url: '/roles',
             templateUrl: 'partials/it-system/tab-roles.html',
             controller: 'system.EditRoles',

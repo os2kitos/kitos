@@ -28,57 +28,15 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
             subnav: []
         };
 
+        $rootScope.$state = $state;
+
+        //this will try to authenticate - to see if the user's already logged in
+        userService.getUser();
+
         uiSelect2Config.dropdownAutoWidth = true;
 
         //x-editable config
         editableOptions.theme = 'bs3'; // bootstrap3 theme.
-
-        userService.getUser().then(function (user) {
-            $rootScope.openProfileModal = function () {
-                $modal.open({
-                    templateUrl: 'partials/topnav/profileModal.html',
-                    resolve: {
-                        orgUnits: [function () {
-                            return $http.get('api/organizationunit/?userid2=' + user.id).then(function (result) {
-                                return result.data.response;
-                            });
-                        }]
-                    },
-                    controller: ['$scope', '$modalInstance', 'orgUnits', function ($modalScope, $modalInstance, orgUnits) {
-                        $modalScope.user = user;
-                        $modalScope.orgUnits = orgUnits;
-
-                        $modalScope.ok = function () {
-                            var userData = {};
-                            if ($modalScope.user.name)
-                                userData.name = $modalScope.user.name;
-                            if ($modalScope.user.defaultOrganizationUnitId)
-                                userData.defaultOrganizationUnitId = $modalScope.user.defaultOrganizationUnitId;
-                            if ($modalScope.user.email)
-                                userData.email = $modalScope.user.email;
-
-                            $http({
-                                method: 'PATCH',
-                                url: 'api/user/' + user.id,
-                                data: userData
-                            }).success(function () {
-                                notify.addSuccessMessage('OK');
-                                $modalInstance.close();
-                            }).error(function () {
-                                notify.addErrorMessage('Fejl');
-                            });
-                        };
-
-                        $modalScope.cancel = function () {
-                            $modalInstance.dismiss('cancel');
-                        };
-                    }]
-                });
-            };
-
-        });
-
-
 
         //logout function for top navigation bar
         $rootScope.logout = function () {
@@ -104,6 +62,7 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
             });
         });
 
+        //when something goes wrong during state change (e.g a rejected resolve)
         $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
             console.log(error);
             $state.go('index');

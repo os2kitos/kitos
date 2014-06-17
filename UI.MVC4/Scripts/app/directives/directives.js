@@ -16,8 +16,13 @@
                         var modal = $modal.open({
                             backdrop: "static", //modal can't be closed by clicking outside modal
                             templateUrl: 'partials/directives/add-user-modal.html',
+                            resolve: {
+                                user: ['userService', function (userService) {
+                                    return userService.getUser();
+                                }]
+                            },
                             controller: [
-                                '$scope', 'notify', '$modalInstance', function ($scope, notify, $modalInstance) {
+                                '$scope', 'notify', '$modalInstance', 'user', function ($scope, notify, $modalInstance, user) {
 
                                     $scope.newUser = {};
 
@@ -34,7 +39,8 @@
 
                                         var data = {
                                             "name": name,
-                                            "email": email
+                                            "email": email,
+                                            "createdInId": user.currentOrganizationId
                                         };
 
                                         var msg = notify.addInfoMessage("Arbejder ...", false);
@@ -181,29 +187,6 @@
         }
     ]);
 
-    app.directive('selectStatus', ['$timeout',
-        function ($timeout) {
-            return {
-                scope: {
-                    model: '=selectStatus',
-                    canWrite: '=',
-                    onStatusChange: '&?'
-                },
-                replace: true,
-                templateUrl: 'partials/directives/select-status.html',
-
-                link: function (scope, element, attr) {
-                    scope.setModel = function (n) {
-                        if (scope.model == n) return;
-
-                        scope.model = n;
-                        $timeout(scope.onStatusChange);
-                    };
-                }
-            };
-        }
-    ]);
-
     app.directive('selectStatus2', ['$timeout',
         function ($timeout) {
             return {
@@ -271,21 +254,34 @@
         }
     ]);
 
+    app.directive('dateToString', ['$timeout', 'dateFilter', function($timeout, dateFilter) {
+        return {
+            restrict: 'A',
+            require: 'ngModel',
+            link: function (scope, element, attr, ctrl) {
+                ctrl.$parsers.push(function (value) {
+                    if (value instanceof Date)
+                        return dateFilter(value, 'yyyy-MM-dd');
+                    return value;
+                });
+            }
+        };
+    }]);
+
     app.directive('autosave', [
-        '$http', 'notify', function ($http, notify) {
+        '$http', '$timeout', 'notify', function ($http, $timeout, notify) {
             return {
                 restrict: 'A',
                 require: 'ngModel',
                 priority: 0,
                 link: function (scope, element, attrs, ctrl) {
-
                     var oldValue;
-                    element.bind('focus', function () {
-                        oldValue = ctrl.$viewValue;
+                    $timeout(function () {
+                        oldValue = ctrl.$modelValue; // get initial value
                     });
 
                     function saveIfNew() {
-                        var newValue = ctrl.$viewValue;
+                        var newValue = ctrl.$modelValue;
                         if (attrs.pluck)
                             newValue = _.pluck(newValue, attrs.pluck);
 
@@ -298,11 +294,36 @@
                     }
 
                     function saveCheckbox() {
-                        // ctrl.$viewValue reflects the old state, so having to invert
-                        var newValue = !ctrl.$viewValue;
-                        var payload = {};
-                        payload[attrs.field] = newValue;
-                        save(payload);
+                        // ctrl.$viewValue reflects the old state.
+                        // using timeout to wait for the value to update
+                        $timeout(function() {
+                            var newValue = ctrl.$modelValue;
+                            var payload = {};
+                            payload[attrs.field] = newValue;
+                            save(payload);
+                        });
+                    }
+
+                    function saveSelect2() {
+                        // ctrl.$viewValue reflects the old state.
+                        // using timeout to wait for the value to update
+                        $timeout(function () {
+                            var newValue;
+
+                            var viewValue = ctrl.$viewValue;
+                            if (angular.isArray(viewValue)) {
+                                newValue = _.pluck(viewValue, 'id');
+                            } else if (angular.isObject(viewValue)) {
+                                newValue = viewValue.id;
+                            } else {
+                                newValue = viewValue;
+                            }
+                           
+                            var payload = {};
+                            payload[attrs.field] = newValue;
+
+                            save(payload);
+                        });
                     }
 
                     function save(payload) {
@@ -310,13 +331,17 @@
                         $http({ method: 'PATCH', url: attrs.autosave, data: payload })
                             .success(function () {
                                 msg.toSuccessMessage("Feltet er opdateret.");
+                                oldValue = ctrl.$modelValue;
                             })
                             .error(function () {
                                 msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                             });
                     }
 
-                    if (attrs.type === "checkbox") {
+                    // type=hidden is cause select2 fields are usually hidden and trigger the change event
+                    if (attrs.type === "hidden" || !angular.isUndefined(attrs.uiSelect2)) {
+                        element.bind('change', saveSelect2);
+                    } else if (attrs.type === "checkbox") {
                         element.bind('change', saveCheckbox);
                     } else {
                         element.bind('blur', saveIfNew);
@@ -325,49 +350,6 @@
             };
         }
     ]);
-
-    app.directive('datewriter', ['$timeout', function ($timeout) {
-        return {
-            scope: {
-                'isDisabled': '=?isDisabled'
-            },
-            templateUrl: 'partials/directives/datewriter.html',
-            require: 'ngModel',
-            link: function (scope, element, attr, ctrl) {
-
-                scope.date = {};
-
-                function read() {
-                    var parsedDate = moment(ctrl.$modelValue);
-
-
-                    scope.date.dateStr = parsedDate.isValid() ? moment(ctrl.$modelValue).format("DD-MM-YY", "da", true) : "dd-mm-åå";
-                }
-
-                read();
-                ctrl.$render = read;
-
-                function write() {
-                    scope.dateInvalid = false;
-
-                    var newDate = moment(scope.date.dateStr, "DD-MM-YY", "da", true);
-                    if (!newDate.isValid()) {
-                        scope.dateInvalid = true;
-                        return;
-                    }
-
-                    ctrl.$setViewValue(newDate.format("YYYY-MM-DD HH:mm:ss"));
-
-                    $timeout(function () {
-                        //this triggers the autosave directive
-                        element.triggerHandler("blur");
-                    });
-                }
-
-                scope.write = write;
-            }
-        };
-    }]);
 
     app.directive('datereader', [function () {
         return {
@@ -446,7 +428,6 @@
 
                     //settings for select2
                     var settings = {
-
                         allowClear: !!scope.allowClear,
 
                         //don't format markup in result
