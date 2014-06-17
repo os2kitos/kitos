@@ -64,6 +64,7 @@
                     var newUser = result.response;
                     
                     saveUser(newUser, _user.currentOrganization);
+                    loadUserDeferred = null;
                     deferred.resolve(_user);
 
                 }).error(function () {
