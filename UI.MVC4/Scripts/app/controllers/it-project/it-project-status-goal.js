@@ -104,6 +104,7 @@
 
             function editGoal(goal) {
                 var modal = $modal.open({
+                    size: 'lg',
                     templateUrl: 'partials/it-project/modal-goal-edit.html',
                     controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
 
@@ -120,6 +121,14 @@
                                 }).error(function() {
                                     notify.addErrorMessage("Fejl!");
                                 });
+                        };
+                        
+                        $modalScope.opened = {};
+                        $modalScope.open = function ($event, datepicker) {
+                            $event.preventDefault();
+                            $event.stopPropagation();
+
+                            $modalScope.opened[datepicker] = true;
                         };
                     }]
                 });
