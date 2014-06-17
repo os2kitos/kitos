@@ -18,10 +18,19 @@
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
                     <div class="col-md-3">
-                        <span id="statusDate" data-ng-model="project.statusDate" data-datewriter=""
-                            data-is-disabled="!hasWriteAccess"
-                            data-ng-change="updateStatusDate()"
-                            data-ng-disabled="!hasWriteAccess"></span>
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control" id="statusDate"
+                                   data-datepicker-popup="dd-MM-yyyy" 
+                                   data-is-open="opened.psd" 
+                                   data-date-to-string 
+                                   data-is-disabled="!hasWriteAccess"
+                                   data-ng-model="project.statusDate"
+                                   data-autosave="{{project.updateUrl}}"
+                                   data-field="statusDate">
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" data-ng-click="open($event, 'psd')"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </div>
                     </div>
                 </div>
 

@@ -169,15 +169,6 @@
                         notify.addErrorMessage("Fejl!");
                     });
             };
-
-            $scope.updateStatusDate = function() {
-                patch($scope.project.updateUrl, "statusDate", $scope.project.statusDate)
-                    .success(function () {
-                        notify.addSuccessMessage("Feltet er opdateret");
-                    }).error(function () {
-                        notify.addErrorMessage("Fejl!");
-                    });
-            };
             
             $scope.addMilestone = function() {
                 $http.post("api/state", { milestoneForProjectId: itProject.id }).success(function(result) {
