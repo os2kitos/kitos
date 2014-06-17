@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+using UI.MVC4.Filters;
 
 namespace UI.MVC4.Models
 {
@@ -20,6 +22,7 @@ namespace UI.MVC4.Models
         /// <summary>
         /// Which date, the state should be reached
         /// </summary>
+        [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime? Date { get; set; }
 
         /// <summary>

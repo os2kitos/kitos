@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+using UI.MVC4.Filters;
 
 namespace UI.MVC4.Models
 {
@@ -22,7 +24,9 @@ namespace UI.MVC4.Models
         /// </summary>
         public int StatusProcentage { get; set; }
 
+        [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime? StartDate { get; set; }
+        [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime? EndDate { get; set; }
 
         public int? AssociatedUserId { get; set; }
