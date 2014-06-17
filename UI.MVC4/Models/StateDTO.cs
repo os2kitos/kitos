@@ -1,5 +1,4 @@
 ﻿using System;
-using Core.DomainModel;
 
 namespace UI.MVC4.Models
 {
@@ -21,7 +20,7 @@ namespace UI.MVC4.Models
         /// <summary>
         /// Which date, the state should be reached
         /// </summary>
-        public DateTime Date { get; set; }
+        public DateTime? Date { get; set; }
 
         /// <summary>
         /// Trafic light status for the state
