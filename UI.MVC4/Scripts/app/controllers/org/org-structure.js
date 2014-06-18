@@ -110,6 +110,7 @@
             $scope.chosenOrgUnit = null;
 
             $scope.chooseOrgUnit = function (node) {
+                if ($scope.chosenOrgUnit == node) return;
 
                 //get organization related to the org unit
                 if (!node.organization) {
@@ -144,13 +145,29 @@
                 });
 
                 $scope.chosenOrgUnit = node;
-            };
 
+                //makes a list of the assigned tasks to the parent of the chosen unit
+                //this is used to filter the selectable tasks
+                node.parentTasks = null;
+                if (node.parentId != null) {
+                    $http.get('api/taskusage/?orgUnitId=' + node.parentId).success(function (result) {
+                        
+                        node.parentTasks = _.map(result.response, function(taskDelegation) {
+                            return taskDelegation.usage.taskRefId;
+                        });
+                        
+                        reloadTaskList();
+                    });
+                } else {
+                    reloadTaskList();
+                }
+            };
+            
             $scope.$watch("selectedUser", function () {
                 $scope.submitRight();
             });
 
-            /* the role of "medarbejder", mmm, the taste of hardcode */
+            /* the role of "medarbejder" */
             function getDefaultNewRole() {
                 return 3;
             }
@@ -444,6 +461,91 @@
                 });
             };
 
+            $scope.$watch("taskList", function(newVal, oldVal) {
+                if (!newVal) return;
+
+                reloadTaskList();
+            });
+            
+            function reloadTaskList() {
+                $http.get('api/taskUsage/?orgUnitId=' + $scope.chosenOrgUnit.id).success(function (result) {
+                    var taskDelegations = result.response;
+
+                    var parentTasks = $scope.chosenOrgUnit.parentTasks;
+                    
+                    _.each($scope.taskList, function (task) {
+                        
+                        //hide or show this task depending on the parent org unit
+                        task.show = parentTasks == null || _.contains(parentTasks, task.id);
+
+                        //get delegations for this task
+                        var delegation = _.find(taskDelegations, function (del) {
+                            return del.usage.taskRefId === task.id;
+                        });
+
+                        task.usage = null;
+                        task.hasDelegations = false;
+                        
+                        if (delegation) {
+                            task.usage = delegation.usage;
+                            task.hasDelegations = delegation.hasDelegations;
+                        }
+                        
+
+                        task.toggleSelected = function () {
+                            
+                            //if no current usage, post a new usage
+                            if (!task.usage) {
+                                var data = {
+                                    taskRefId: task.id,
+                                    orgUnitId: $scope.chosenOrgUnit.id
+                                };
+                                $http.post('api/taskusage/', data).success(function(result) {
+                                    task.usage = result.response;
+                                    
+                                     //the usage was just added, cant already be delegated
+                                    task.hasDelegations = false;
+                                    
+                                    notifySuccess();
+                                }).error(notifyError);
+                                
+                            } else {
+                                //else, remove the current usage
+                                $http.delete('api/taskusage/' + task.usage.id).success(function () {
+                                    task.usage = null;
+                                    task.hasDelegations = false;
+                                    
+                                    notifySuccess();
+                                    
+                                }).error(notifyError);
+                            }
+                        };
+
+                        task.toggleStar = function() {
+                            if (!task.usage) return;
+
+                            var payload = {
+                                starred: !task.usage.starred
+                            };
+
+                            var url = 'api/taskusage/' + task.usage.id;
+                            $http({
+                                method: 'PATCH',
+                                url: url,
+                                data: payload
+                            }).success(function(result) {
+                                task.usage = result.response;
+                                notifySuccess();
+
+                            }).error(notifyError);
+
+                        };
+
+                    });
+                });
+            }
+            
+
             function notifySuccess() {
                 notify.addSuccessMessage("Feltet er opdateret");
             }
@@ -451,7 +553,7 @@
             function notifyError() {
                 notify.addErrorMessage("Fejl!");
             }
-
+/*
             $scope.updateTask = function (task) {
                 task.selected = !task.selected;
                 var orgUnitId = $scope.chosenOrgUnit.id;
@@ -824,5 +926,7 @@
                     }
                 });
             };
+
+            */
         }]);
 })(angular, app);
