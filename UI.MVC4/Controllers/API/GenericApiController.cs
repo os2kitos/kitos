@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using UI.MVC4.Models;
 using UI.MVC4.Models.Exceptions;
 
 namespace UI.MVC4.Controllers.API
@@ -19,27 +21,35 @@ namespace UI.MVC4.Controllers.API
         {
             Repository = repository;
         }
-        
-        protected virtual IEnumerable<TModel> GetAllQuery(int skip, int take, bool descending, string orderBy = null)
+
+        protected virtual IQueryable<TModel> GetAllQuery()
         {
-            var field = orderBy ?? "Id";
-            return Repository.AsQueryable().OrderByField(field, descending).Skip(skip).Take(take);
+            return Repository.AsQueryable();
+        } 
+        
+        protected virtual IQueryable<TModel> Page(IQueryable<TModel> query, PagingModel<TModel> paging)
+        {
+            query = paging.Filter(query);
+
+            var totalCount = query.Count();
+            var paginationHeader = new
+            {
+                TotalCount = totalCount
+            };
+            System.Web.HttpContext.Current.Response.Headers.Add("X-Pagination",
+                                                                Newtonsoft.Json.JsonConvert.SerializeObject(
+                                                                    paginationHeader));
+
+            return query.OrderByField(paging.OrderBy, paging.Descending).Skip(paging.Skip).Take(paging.Take);
         }
 
-        public virtual HttpResponseMessage GetAll(int skip = 0, int take = 100, string orderBy = null, bool descending = false)
+        public virtual HttpResponseMessage GetAll([FromUri] PagingModel<TModel> paging)
         {
             try
             {
-                var items = GetAllQuery(skip, take, descending, orderBy);
+                var items = GetAllQuery();
 
-                var totalCount = Repository.AsQueryable().Count(); // TODO this isn't accurate if a where is used in GetAllQuery
-                var paginationHeader = new
-                    {
-                        TotalCount = totalCount
-                    };
-                System.Web.HttpContext.Current.Response.Headers.Add("X-Pagination",
-                                                                    Newtonsoft.Json.JsonConvert.SerializeObject(
-                                                                        paginationHeader));
+                items = Page(items, paging);
 
                 return Ok(Map(items));
             }

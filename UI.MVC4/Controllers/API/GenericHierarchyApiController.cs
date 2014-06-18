@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Net.Http;
+﻿using System.Net.Http;
+using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainServices;
+using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
@@ -15,54 +15,18 @@ namespace UI.MVC4.Controllers.API
         {
         }
 
-        public virtual HttpResponseMessage GetRoots(bool? roots, int skip = 0, int take = 100, string orderBy = null, bool descending = false)
+        public virtual HttpResponseMessage GetRoots(bool? roots, [FromUri] PagingModel<TModel> paging)
         {
-            try
-            {
-                var query = Repository.AsQueryable().Where(x => x.ParentId == null);
-                var totalCount = query.Count();
-                // TODO there needs to be a more generic way to make these queries as this is c/p from GetAllQuery()
-                var field = orderBy ?? "Id";
-                var page = query.OrderByField(field, descending).Skip(skip).Take(take);
+            paging.Where(x => x.ParentId == null);
 
-                var paginationHeader = new { TotalCount = totalCount };
-                System.Web.HttpContext.Current.Response.Headers.Add("X-Pagination",
-                                                                    Newtonsoft.Json.JsonConvert.SerializeObject(
-                                                                        paginationHeader));
-
-                return Ok(Map(page.Cast<TModel>()));
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
+            return base.GetAll(paging);
         }
 
-        public virtual HttpResponseMessage GetChildren(int id, bool? children, int skip = 0, int take = 100, string orderBy = null, bool descending = false)
+        public virtual HttpResponseMessage GetChildren(int id, bool? children, [FromUri] PagingModel<TModel> paging)
         {
-            try
-            {
-                var item = Repository.GetByKey(id);
+            paging.Where(x => x.ParentId == id);
 
-                if (item == null) return NotFound();
-
-                // TODO there needs to be a more generic way to make these queries as this is c/p from GetAllQuery()
-                var query = item.Children.AsQueryable();
-                var totalCount = query.Count();
-                var field = orderBy ?? "Id";
-                var page = query.OrderByField(field, descending).Skip(skip).Take(take);
-
-                var paginationHeader = new { TotalCount = totalCount };
-                System.Web.HttpContext.Current.Response.Headers.Add("X-Pagination",
-                                                                    Newtonsoft.Json.JsonConvert.SerializeObject(
-                                                                        paginationHeader));
-
-                return Ok(Map(page));
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
+            return base.GetAll(paging);
         }
     }
 }

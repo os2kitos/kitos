@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using System.Net.Http;
+﻿using System.Net.Http;
+using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 using UI.MVC4.Models;
@@ -13,18 +13,32 @@ namespace UI.MVC4.Controllers.API
         {
         }
 
-        //TODO should return hierarchy
-        public HttpResponseMessage GetByOrgUnit(int orgUnitId, int skip = 0, int take = 100)
+        public HttpResponseMessage GetRootsByOrgUnit(int orgUnitId, bool? roots, [FromUri] PagingModel<TaskRef> paging)
         {
-            var items = Repository.AsQueryable().Where(x => x.OwnedByOrganizationUnitId == orgUnitId || x.IsPublic).OrderBy(x => x.Id).Skip(skip).Take(take);
-            return Ok(Map(items));
+            paging.Where(taskRef => taskRef.OwnedByOrganizationUnitId == orgUnitId || taskRef.IsPublic);
+
+            return base.GetRoots(true, paging);
         }
 
-        //TODO should return hierarchy
-        public HttpResponseMessage GetByOrg(int orgId, int skip = 0, int take = 100)
+        public HttpResponseMessage GetChildrenByOrgUnit(int id, int orgUnitId, bool? children, [FromUri] PagingModel<TaskRef> paging)
         {
-            var items = Repository.AsQueryable().Where(x => x.OwnedByOrganizationUnit.OrganizationId == orgId || x.IsPublic).OrderBy(x => x.Id).Skip(skip).Take(take);
-            return Ok(Map(items));
+            paging.Where(taskRef => taskRef.OwnedByOrganizationUnitId == orgUnitId || taskRef.IsPublic);
+
+            return base.GetChildren(id, true, paging);
+        }
+
+        public HttpResponseMessage GetRootsByOrg(int orgId, bool? roots, [FromUri] PagingModel<TaskRef> paging)
+        {
+            paging.Where(taskRef => taskRef.OwnedByOrganizationUnit.OrganizationId == orgId || taskRef.IsPublic);
+
+            return base.GetRoots(true, paging);
+        }
+
+        public HttpResponseMessage GetChildrenByOrg(int id, int orgId, bool? children, [FromUri] PagingModel<TaskRef> paging)
+        {
+            paging.Where(taskRef => taskRef.OwnedByOrganizationUnit.OrganizationId == orgId || taskRef.IsPublic);
+
+            return base.GetChildren(id, true, paging);
         }
     }
 }
