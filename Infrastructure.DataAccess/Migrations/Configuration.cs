@@ -53,12 +53,12 @@ namespace Infrastructure.DataAccess.Migrations
 
         private List<TaskRef> GenerateAllTasks(User objectOwner, OrganizationUnit orgUnitOwner)
         {
-            var maingroups = GenerateTasks(objectOwner, orgUnitOwner, "KLE-Hovedgruppe");
+            var maingroups = GenerateTasks(objectOwner, orgUnitOwner, "KLE-Hovedgruppe", 5);
             var subgroups =
                 maingroups.SelectMany(
-                    parent => GenerateTasks(objectOwner, orgUnitOwner, "KLE-Gruppe", 20, parent, parent.TaskKey)).ToList();
+                    parent => GenerateTasks(objectOwner, orgUnitOwner, "KLE-Gruppe", 10, parent, parent.TaskKey)).ToList();
 
-            var leafs = maingroups.SelectMany(parent => GenerateTasks(objectOwner, orgUnitOwner, "KLE-Emne", 20, parent, parent.TaskKey)).ToList();
+            var leafs = subgroups.SelectMany(parent => GenerateTasks(objectOwner, orgUnitOwner, "KLE-Emne", 20, parent, parent.TaskKey)).ToList();
 
             var result = new List<TaskRef>();
             result.AddRange(maingroups);
