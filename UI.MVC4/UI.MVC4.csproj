@@ -220,6 +220,7 @@
     <Compile Include="Controllers\API\ItSystemUsageRightsController.cs" />
     <Compile Include="Controllers\API\OptionExtendController.cs" />
     <Compile Include="Controllers\API\OrganizationUnitRightsController.cs" />
+    <Compile Include="Models\PagingModel.cs" />
     <Compile Include="Controllers\API\PriceRegulationController.cs" />
     <Compile Include="Controllers\API\PaymentModelController.cs" />
     <Compile Include="Controllers\API\PaymentFrequencyController.cs" />

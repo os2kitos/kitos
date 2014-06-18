@@ -7,6 +7,7 @@ using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using UI.MVC4.Models;
 using UI.MVC4.Models.Exceptions;
 
 namespace UI.MVC4.Controllers.API
