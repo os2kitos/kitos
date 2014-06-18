@@ -577,4 +577,44 @@
         };
     }]);
     
+    app.directive('kleFilter', ['taskService', function (taskService) {
+        return {
+            scope: {
+                //the output of filtering tasks
+                taskList: "=kleFilter"
+            },
+            templateUrl: 'partials/directives/kle-filter.html',
+            link: function (scope, element, attrs) {
+
+                //loading main groups
+                taskService.getRoots().then(function (roots) {
+                    scope.maingroups = roots;
+                });
+
+                //called when selected a main group
+                scope.loadGroups = function () {
+                    scope.taskList = [];
+                    
+                    if (!scope.selectedMaingroup) return;
+
+                    //load groups
+                    taskService.getChildren(scope.selectedMaingroup).then(function (groups) {
+                        scope.selectedGroup = null;
+                        scope.groups = groups;
+                    });
+                };
+
+                //called when selected a group
+                scope.loadTasks = function() {
+                    if (!scope.selectedGroup) return;
+
+                    //load tasks
+                    taskService.getChildren(scope.selectedGroup).then(function(tasks) {
+                        scope.taskList = tasks;
+                    });
+                };
+            }
+        };
+    }]);
+    
 })(angular, app);
