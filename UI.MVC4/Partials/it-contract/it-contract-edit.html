@@ -183,7 +183,10 @@
                         <!-- Agreement elements -->
                         <div class="form-group">
                             <label class="control-label small">IT Kontrakten omfatter flg. aftaleelementer</label>
-                            <div class="form-inline">
+                            <select class="form-control" multiple data-ui-select2="" data-ng-model="test" data-ng-disabled="!hasWriteAccess" data-autosave="asdf">
+                                <option value="{{ item.id }}" data-ng-repeat="item in agreementElements">{{ item.name }}</option>
+                            </select>
+                            <!--<div class="form-inline">
                                 <div class="checkbox input-sm col-md-4" data-ng-repeat="item in agreementElements">
                                     <label>
                                         <input type="checkbox" data-ng-model="item.isChecked" data-ng-disabled="!hasWriteAccess"
@@ -208,7 +211,7 @@
                                         </button>
                                     </span>
                                 </div>
-                            </div>
+                            </div>-->
                         </div>
                     </div>
                 </div>

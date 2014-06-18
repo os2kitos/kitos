@@ -254,7 +254,7 @@
         }
     ]);
 
-    app.directive('dateToString', ['$timeout', 'dateFilter', function($timeout, dateFilter) {
+    app.directive('dateToString', ['dateFilter', function(dateFilter) {
         return {
             restrict: 'A',
             require: 'ngModel',
@@ -326,6 +326,10 @@
                         });
                     }
 
+                    function saveMultipleSelect2(e) {
+                        console.log(e);
+                    }
+
                     function save(payload) {
                         var msg = notify.addInfoMessage("Gemmer...", false);
                         $http({ method: 'PATCH', url: attrs.autosave, data: payload })
@@ -338,9 +342,13 @@
                             });
                     }
 
-                    // type=hidden is cause select2 fields are usually hidden and trigger the change event
-                    if (attrs.type === "hidden" || !angular.isUndefined(attrs.uiSelect2)) {
-                        element.bind('change', saveSelect2);
+                    // select2 fields trigger the change event
+                    if (!angular.isUndefined(attrs.uiSelect2)) {
+                        if (attrs.multiple) {
+                            element.bind('change', saveMultipleSelect2);
+                        } else {
+                            element.bind('change', saveSelect2);
+                        }
                     } else if (attrs.type === "checkbox") {
                         element.bind('change', saveCheckbox);
                     } else {
