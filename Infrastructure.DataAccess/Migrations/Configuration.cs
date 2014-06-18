@@ -14,6 +14,7 @@ namespace Infrastructure.DataAccess.Migrations
 
     internal sealed class Configuration : DbMigrationsConfiguration<Infrastructure.DataAccess.KitosContext>
     {
+
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
@@ -22,6 +23,50 @@ namespace Infrastructure.DataAccess.Migrations
             //Use a smaller key size for our migration history table. See MySqlHistoryContext.cs
             SetHistoryContextFactory("MySql.Data.MySqlClient", (conn, schema) => new MySqlHistoryContext(conn, schema));
         }
+
+
+        private List<TaskRef> GenerateTasks(User objectOwner, OrganizationUnit orgUnitOwner, string type, int n = 20,
+                                                     TaskRef parent = null, string parentTaskKey = null)
+        {
+            var result = new List<TaskRef>();
+
+            if (parentTaskKey != null) parentTaskKey = parentTaskKey + ".";
+
+            for (var i = 0; i < n; i++)
+            {
+                var taskKey = parentTaskKey + i.ToString().PadLeft(2, '0');
+
+                result.Add(new TaskRef()
+                    {
+                        Type = type,
+                        Description = "...",
+                        TaskKey = taskKey,
+                        OwnedByOrganizationUnit = orgUnitOwner,
+                        ObjectOwner = objectOwner,
+                        IsPublic = true,
+                        Parent = parent
+                    });
+            }
+
+            return result;
+        }
+
+        private List<TaskRef> GenerateAllTasks(User objectOwner, OrganizationUnit orgUnitOwner)
+        {
+            var maingroups = GenerateTasks(objectOwner, orgUnitOwner, "KLE-Hovedgruppe");
+            var subgroups =
+                maingroups.SelectMany(
+                    parent => GenerateTasks(objectOwner, orgUnitOwner, "KLE-Gruppe", 20, parent, parent.TaskKey)).ToList();
+
+            var leafs = maingroups.SelectMany(parent => GenerateTasks(objectOwner, orgUnitOwner, "KLE-Emne", 20, parent, parent.TaskKey)).ToList();
+
+            var result = new List<TaskRef>();
+            result.AddRange(maingroups);
+            result.AddRange(subgroups);
+            result.AddRange(leafs);
+
+            return result;
+        } 
 
         
         protected override void Seed(Infrastructure.DataAccess.KitosContext context)
@@ -467,7 +512,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region KLE
 
-            var task00 = new TaskRef()
+            /*var task00 = new TaskRef()
             {
                 TaskKey = "00",
                 Description = "Kommunens styrelse",
@@ -569,7 +614,9 @@ namespace Infrastructure.DataAccess.Migrations
                                              IsPublic = true,
                                              OwnedByOrganizationUnit = klRootUnit,
                                              ObjectOwner = globalUser
-                                         });
+                                         });*/
+
+            context.TaskRefs.AddOrUpdate(x => x.TaskKey, GenerateAllTasks(globalUser, klRootUnit).ToArray());
 
             #endregion
         }
