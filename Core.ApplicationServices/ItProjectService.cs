@@ -90,7 +90,7 @@ namespace Core.ApplicationServices
             
             clone.OrganizationId = newOrgId;
             clone.ObjectOwner = newOwner;
-            clone.ParentItProjectId = original.Id;
+            clone.ParentId = original.Id;
 
             clone.ItProjectId = original.ItProjectId;
             clone.Background = original.Background;
@@ -142,7 +142,7 @@ namespace Core.ApplicationServices
         public void DeleteProject(ItProject project)
         {
             //Remove reference to this project in cloned projects
-            project.ChildItProjects.Select(clone => clone.ParentItProject = null);
+            project.Children.Select(clone => clone.Parent = null);
             _projectRepository.Save();
             
             var phase1Id = project.Phase1.Id;

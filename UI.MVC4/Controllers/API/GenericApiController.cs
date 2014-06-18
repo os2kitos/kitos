@@ -47,11 +47,9 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var items = GetAllQuery();
+                var query = Page(GetAllQuery(), paging);
 
-                items = Page(items, paging);
-
-                return Ok(Map(items));
+                return Ok(Map(query));
             }
             catch (Exception e)
             {

@@ -4,7 +4,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>, IHasAccessModifier
+    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>, IHasAccessModifier, IHierarchy<ItProject>
     {
         public ItProject()
         {
@@ -22,7 +22,7 @@ namespace Core.DomainModel.ItProject
             this.JointMunicipalProjects = new List<ItProject>();
             this.CommonPublicProjects = new List<ItProject>();
             this.AssociatedProjects = new List<ItProject>();
-            this.ChildItProjects = new List<ItProject>();
+            this.Children = new List<ItProject>();
             this.Priority = ItProjectPriority.None; // default value if not set
             this.PriorityPf = ItProjectPriority.None; // default value if not set
             this.AccessModifier = AccessModifier.Normal;
@@ -131,9 +131,9 @@ namespace Core.DomainModel.ItProject
 
         #endregion
 
-        public virtual int? ParentItProjectId { get; set; }
-        public virtual ItProject ParentItProject { get; set; }
-        public virtual ICollection<ItProject> ChildItProjects { get; set; }
+        public virtual int? ParentId { get; set; }
+        public virtual ItProject Parent { get; set; }
+        public virtual ICollection<ItProject> Children { get; set; }
 
         public virtual GoalStatus GoalStatus { get; set; }
     }

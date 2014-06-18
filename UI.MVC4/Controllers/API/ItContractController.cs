@@ -24,18 +24,10 @@ namespace UI.MVC4.Controllers.API
             _agreementElementRepository = agreementElementRepository;
         }
 
-        public virtual HttpResponseMessage Get(string q, int orgId)
+        public virtual HttpResponseMessage Get(string q, int orgId, [FromUri] PagingModel<ItContract> paging)
         {
-            try
-            {
-                var items = Repository.Get(x => x.Name.Contains(q) && x.OrganizationId == orgId);
-
-                return Ok(Map(items));
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
+            paging.Where(x => x.Name.Contains(q) && x.OrganizationId == orgId);
+            return base.GetAll(paging);
         }
 
         public virtual HttpResponseMessage PostAgreementElement(int id, [FromUri] int elemId)

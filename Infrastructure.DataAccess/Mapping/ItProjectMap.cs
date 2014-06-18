@@ -97,9 +97,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(d => d.ResponsibleOrgUnitId)
                 .WillCascadeOnDelete(false);
 
-            this.HasOptional(t => t.ParentItProject)
-                .WithMany(t => t.ChildItProjects)
-                .HasForeignKey(d => d.ParentItProjectId)
+            this.HasOptional(t => t.Parent)
+                .WithMany(t => t.Children)
+                .HasForeignKey(d => d.ParentId)
                 .WillCascadeOnDelete(false);
 
             this.HasMany(t => t.Stakeholders)
