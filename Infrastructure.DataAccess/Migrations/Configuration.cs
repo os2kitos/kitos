@@ -1465,7 +1465,7 @@ namespace Infrastructure.DataAccess.Migrations
                 {
                     ArchiveType = archiveTypeNo,
                     SensitiveDataType = sensitiveDataNo,
-                    AdOrIdmRef = "ad",
+                    LocalCallSystem = "ad",
                     CmdbRef = "cmdb",
                     EsdhRef = "esdh",
                     DirectoryOrUrlRef = "x:/foo/bar",

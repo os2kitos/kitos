@@ -23,7 +23,7 @@ namespace Core.DomainModel.ItSystem
         public string EsdhRef { get; set; }
         public string CmdbRef { get; set; }
         public string DirectoryOrUrlRef { get; set; }
-        public string AdOrIdmRef { get; set; }
+        public string LocalCallSystem { get; set; }
 
         public int? ResponsibleUnitId { get; set; }
         public virtual OrganizationUnit ResponsibleUnit { get; set; }
