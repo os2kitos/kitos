@@ -10,19 +10,13 @@ namespace Core.ApplicationServices
     {
         private readonly IGenericRepository<ItProject> _projectRepository;
         private readonly IGenericRepository<Activity> _activityRepository;
-        private readonly IGenericRepository<ItProjectRight> _rightRepository;
-        private readonly IOrganizationService _organizationService;
 
         public ItProjectService(IGenericRepository<ItProject> projectRepository, 
             IGenericRepository<ItProjectType> projectTypeRepository, 
-            IGenericRepository<Activity> activityRepository, 
-            IGenericRepository<ItProjectRight> rightRepository,
-            IOrganizationService organizationService)
+            IGenericRepository<Activity> activityRepository)
         {
             _projectRepository = projectRepository;
             _activityRepository = activityRepository;
-            _rightRepository = rightRepository;
-            _organizationService = organizationService;
 
             //TODO: dont hardcode this
             ProgramType = projectTypeRepository.Get(type => type.Name == "IT Program").Single();
