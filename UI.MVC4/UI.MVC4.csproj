@@ -555,7 +555,6 @@
     <Content Include="Scripts\app\controllers\it-contract\it-contract-hierarchy.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-deadlines.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-advice.js" />
-    <Content Include="Scripts\app\controllers\it-contract\it-contract-create.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-edit.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-overview.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-paymentmodel.js" />
