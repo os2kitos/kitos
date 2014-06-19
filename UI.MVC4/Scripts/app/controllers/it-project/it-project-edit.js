@@ -35,10 +35,10 @@
             'project', 'itProjectCategories', 'user', 'hasWriteAccess',
             function ($scope, $http, notify, project, itProjectCategories, user, hasWriteAccess) {
                 $scope.project = project;
-                if ($scope.project.associatedProgramId) {
-                    $scope.project.associatedProgram = {
-                        id: $scope.project.associatedProgramId,
-                        text: $scope.project.associatedProgramName
+                if ($scope.project.parentId) {
+                    $scope.project.parent = {
+                        id: $scope.project.parentId,
+                        text: $scope.project.parentName
                     };
                 }
 
@@ -124,13 +124,6 @@
                 $scope.autosaveUrl = "api/itproject/" + project.id;
                 $scope.itProjectCategories = itProjectCategories;
                 
-                if (project.parentId) {
-                    $scope.project.parent = {
-                        id: project.parentId,
-                        text: project.parent.name
-                    };
-                }
-
                 $scope.parentSelectOptions = selectLazyLoading('api/itproject', true, ['orgId=' + user.currentOrganizationId]);
 
                 function selectLazyLoading(url, excludeSelf, format, paramAry) {

@@ -21,8 +21,8 @@ namespace Core.DomainModel.ItProject
             this.EconomyYears = new List<EconomyYear>();
             this.JointMunicipalProjects = new List<ItProject>();
             this.CommonPublicProjects = new List<ItProject>();
-            this.AssociatedProjects = new List<ItProject>();
             this.Children = new List<ItProject>();
+            this.Clones = new List<ItProject>();
             this.Priority = ItProjectPriority.None; // default value if not set
             this.PriorityPf = ItProjectPriority.None; // default value if not set
             this.AccessModifier = AccessModifier.Normal;
@@ -49,9 +49,9 @@ namespace Core.DomainModel.ItProject
         public bool IsCommunicationVisible { get; set; }
         public bool IsHandoverVisible { get; set; }
         
-        public int? AssociatedProgramId { get; set; }
-        public virtual ItProject AssociatedProgram { get; set; }
-        public virtual ICollection<ItProject> AssociatedProjects { get; set; }
+        public int? ParentId { get; set; }
+        public virtual ItProject Parent { get; set; }
+        public virtual ICollection<ItProject> Children { get; set; }
 
         public int ItProjectCategoryId { get; set; }
         public virtual ItProjectCategory ItProjectCategory { get; set; }
@@ -128,9 +128,9 @@ namespace Core.DomainModel.ItProject
 
         #endregion
 
-        public int? ParentId { get; set; }
-        public virtual ItProject Parent { get; set; }
-        public virtual ICollection<ItProject> Children { get; set; }
+        public int? OriginalId { get; set; }
+        public virtual ItProject Original { get; set; }
+        public virtual ICollection<ItProject> Clones { get; set; }
 
         public virtual GoalStatus GoalStatus { get; set; }
     }
