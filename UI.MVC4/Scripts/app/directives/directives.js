@@ -581,7 +581,7 @@
         return {
             scope: {
                 //the output of filtering tasks
-                taskList: "=kleFilter"
+                selectedGroup: "=kleFilter"
             },
             templateUrl: 'partials/directives/kle-filter.html',
             link: function (scope, element, attrs) {
@@ -592,7 +592,7 @@
                 });
 
                 //called when selected a main group
-                scope.loadGroups = function () {
+                scope.maingroupChanged = function () {
                     scope.taskList = [];
                     
                     if (!scope.selectedMaingroup) return;
@@ -601,16 +601,6 @@
                     taskService.getChildren(scope.selectedMaingroup).then(function (groups) {
                         scope.selectedGroup = null;
                         scope.groups = groups;
-                    });
-                };
-
-                //called when selected a group
-                scope.loadTasks = function() {
-                    if (!scope.selectedGroup) return;
-
-                    //load tasks
-                    taskService.getChildren(scope.selectedGroup).then(function(tasks) {
-                        scope.taskList = tasks;
                     });
                 };
             }
