@@ -71,7 +71,7 @@ namespace Infrastructure.DataAccess
         public DbSet<PaymentModel> PaymentModels { get; set; }
         public DbSet<PriceRegulation> PriceRegulations { get; set; }
         public DbSet<ProcurementStrategy> ProcurementStrategies { get; set; }
-        public DbSet<ItProjectType> ProjectCategories { get; set; }
+        public DbSet<ItProjectType> ProjectTypes { get; set; }
         public DbSet<PurchaseForm> PurchaseForms { get; set; }
         public DbSet<Risk> Risks { get; set; }
         public DbSet<SensitiveDataType> SensitiveDataTypes { get; set; }

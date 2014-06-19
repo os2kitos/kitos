@@ -92,7 +92,7 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetProjectsByCategory([FromUri] int orgId, [FromUri] int typeId)
+        public HttpResponseMessage GetProjectsByType([FromUri] int orgId, [FromUri] int typeId)
         {
             try
             {

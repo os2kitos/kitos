@@ -59,7 +59,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region OPTIONS
             
-            AddOptions<ItProjectType, ItProject>(context.ProjectCategories, globalUser, "Fællesoffentlig", "Fælleskommunal");
+            AddOptions<ItProjectType, ItProject>(context.ProjectTypes, globalUser, "Fællesoffentlig", "Fælleskommunal");
             
             AddOptions<AppType, ItSystem>(context.AppTypes, globalUser, "Snitflade", "Fagsystem", "Selvbetjening");
 
@@ -692,7 +692,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             var itProjectCategoryPublic = new ItProjectType() { IsActive = true, Note = "...", Name = "Fællesoffentlig" };
             var itProjectCategoryMunipalicity = new ItProjectType() { IsActive = true, Note = "...", Name = "Fælleskommunal" };
-            context.ProjectCategories.AddOrUpdate(x => x.Name, itProjectCategoryPublic, itProjectCategoryMunipalicity);
+            context.ProjectTypes.AddOrUpdate(x => x.Name, itProjectCategoryPublic, itProjectCategoryMunipalicity);
 
             var appType1 = new AppType() { IsActive = true, Note = "...", Name = "Snitflade" };
             var appType2 = new AppType() { IsActive = true, Note = "...", Name = "Fagsystem" };
