@@ -92,11 +92,11 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetProjectsByCategory([FromUri] int orgId, [FromUri] int catId)
+        public HttpResponseMessage GetProjectsByCategory([FromUri] int orgId, [FromUri] int typeId)
         {
             try
             {
-                var projects = _itProjectService.GetAll(orgId, includePublic:false).Where(p => p.ItProjectTypeId == catId);
+                var projects = _itProjectService.GetAll(orgId, includePublic:false).Where(p => p.ItProjectTypeId == typeId);
 
                 return Ok(Map(projects));
             }

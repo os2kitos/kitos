@@ -31,10 +31,10 @@
         <div class="well">
             <h4>Projektkategorier</h4>
        
-            <div class="form-group" data-ng-repeat="item in categories">
+            <div class="form-group" data-ng-repeat="item in projectTypes">
                 <div class="col-sm-offset-2 col-sm-5">
                     <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.isActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchCategory($data, $index)">
+                        <a href="#" data-editable-checkbox="item.isActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchProjectType($data, $index)">
                             {{ item.isActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
                         </a>
                     </div>

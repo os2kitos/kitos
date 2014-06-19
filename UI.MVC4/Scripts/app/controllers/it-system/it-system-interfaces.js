@@ -35,11 +35,6 @@
                         return result.data.response;
                     });
                 }],
-                //interfaceCategories: ['$http', function ($http) {
-                //    return $http.get("api/interfaceCategory").then(function (result) {
-                //        return result.data.response;
-                //    });
-                //}],
                 interfaceSystems: ['$http', function ($http) {
                     return $http.get("api/itsystem?interfaces").then(function (result) {
                         return result.data.response;
