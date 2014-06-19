@@ -5,8 +5,8 @@
             templateUrl: 'partials/it-project/tab-strategy.html',
             controller: 'project.EditStrategyCtrl',
             resolve: {
-                jointMunicipalProjects: ['$http', 'project', 'itProjectCategories', function ($http, project, itProjectCategories) {
-                    var category = _.find(itProjectCategories, function(cat) {
+                jointMunicipalProjects: ['$http', 'project', 'projectTypes', function ($http, project, projectTypes) {
+                    var category = _.find(projectTypes, function(cat) {
                         return cat.name == 'Fælleskommunal'; // TODO hardcoded literal... find better solution!
                     });
                     var catId = category.id;
@@ -15,8 +15,8 @@
                         return result.data.response;
                     });
                 }],
-                commonPublicProjects: ['$http', 'project', 'itProjectCategories', function ($http, project, itProjectCategories) {
-                    var category = _.find(itProjectCategories, function (cat) {
+                commonPublicProjects: ['$http', 'project', 'projectTypes', function ($http, project, projectTypes) {
+                    var category = _.find(projectTypes, function (cat) {
                         return cat.name == 'Fællesoffentlig'; // TODO hardcoded literal... find better solution!
                     });
                     var catId = category.id;

@@ -25,7 +25,6 @@
                     var orgUnitId = user.currentOrganizationUnitId;
                     var payload = {
                         itProjectTypeId: 1,
-                        ItProjectCategoryId: 1,
                         responsibleOrgUnitId: orgUnitId,
                         organizationId: user.currentOrganizationId,
                     };

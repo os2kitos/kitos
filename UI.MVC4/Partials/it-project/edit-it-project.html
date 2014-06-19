@@ -32,16 +32,13 @@
             </div>
             
             <div class="form-group">
-                <!-- TODO type -->
-                
-
-                <!-- category -->
-                <label for="project-category" class="control-label col-md-2 small">Kategori</label>
+                <!-- type -->
+                <label for="project-type" class="control-label col-md-2 small">Type</label>
                 <div class="col-md-4">
-                    <select id="project-category" class="form-control input-sm"
-                            data-ng-options="o.id as o.name for o in itProjectCategories"
-                            data-ng-model="project.itProjectCategoryId"
-                            data-field="itProjectCategoryId"
+                    <select id="project-type" class="form-control input-sm"
+                            data-ng-options="o.id as o.name for o in projectTypes"
+                            data-ng-model="project.itProjectTypeId"
+                            data-field="itProjectTypeId"
                             data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess">
                     </select>
                 </div>

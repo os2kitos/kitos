@@ -23,7 +23,6 @@
                 </select>
             </th>
             <th>Projektnavn</th>
-            <th>Kategori</th>
             <th>Fase</th>
             <th>Risiko</th>
             <th>ROI</th>
@@ -43,7 +42,6 @@
             <td>{{ p.isStrategy ? '(S)' : '' }}</td>
             <td>{{ chosenId == 0 ? p.itProjectId : p.parent.itProjectId }}</td>
             <td><a data-ui-sref="it-project.edit.status-project({id: p.id})">{{ p.name ? p.name : 'intet navn' }}</a></td>
-            <td>{{ p.itProjectCategoryName }}</td>
             <td>{{ p.currentPhase.name }}</td>
             <td>{{ p.averageRisk }}</td>
             <td>{{ p.roi }}</td>
@@ -99,7 +97,6 @@
                         </select>
                     </th>
                     <th>Projektnavn</th>
-                    <th>Kategori</th>
                     <th>Fase</th>
                     <th>Risiko</th>
                     <th>ROI</th>
@@ -119,7 +116,6 @@
                     <td>{{ p.isStrategy ? '(S)' : '' }}</td>
                     <td>{{ chosenId == 0 ? p.itProjectId : p.parent.itProjectId }}</td>
                     <td><a data-ui-sref="it-project.edit.status-project({id: p.id})">{{ p.name ? p.name : 'intet navn' }}</a></td>
-                    <td>{{ p.itProjectCategoryName }}</td>
                     <td>{{ p.currentPhase.name }}</td>
                     <td>{{ p.averageRisk }}</td>
                     <td>{{ p.roi }}</td>
