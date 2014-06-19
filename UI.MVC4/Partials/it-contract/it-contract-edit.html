@@ -182,8 +182,8 @@
                     <div class="col-md-12">
                         <!-- Agreement elements -->
                         <div class="form-group">
-                            <label class="control-label small">IT Kontrakten omfatter flg. aftaleelementer</label>
-                            <select class="form-control" multiple data-ui-select2="" data-ng-model="selectedAgreementElements" data-ng-disabled="!hasWriteAccess" data-autosave="{{ autoSaveUrl }}" data-field="elemId">
+                            <label for="agreement-elements" class="control-label small">IT Kontrakten omfatter flg. aftaleelementer</label>
+                            <select id="agreement-elements" class="form-control" multiple data-ui-select2="" data-ng-model="selectedAgreementElements" data-ng-disabled="!hasWriteAccess" data-autosave="{{ autoSaveUrl }}" data-field="elemId">
                                 <option value="{{ item.id }}" data-ng-repeat="item in agreementElements">{{ item.name }}</option>
                             </select>
                         </div>
