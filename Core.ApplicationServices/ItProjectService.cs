@@ -93,7 +93,7 @@ namespace Core.ApplicationServices
             // TODO ParentId = project.ParentId,
             // TODO Children = project.Children,
 
-            clone.ItProjectCategoryId = original.ItProjectCategoryId;
+            clone.ItProjectTypeId = original.ItProjectTypeId;
             clone.TaskRefs = original.TaskRefs;
 
             // TODO Risk

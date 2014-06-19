@@ -5,23 +5,23 @@
             templateUrl: 'partials/it-project/tab-strategy.html',
             controller: 'project.EditStrategyCtrl',
             resolve: {
-                jointMunicipalProjects: ['$http', 'project', 'itProjectCategories', function ($http, project, itProjectCategories) {
-                    var category = _.find(itProjectCategories, function(cat) {
-                        return cat.name == 'Fælleskommunal'; // TODO hardcoded literal... find better solution!
+                jointMunicipalProjects: ['$http', 'project', 'projectTypes', function ($http, project, projectTypes) {
+                    var type = _.find(projectTypes, function(t) {
+                        return t.name == 'Fælleskommunal'; // TODO hardcoded literal... find better solution!
                     });
-                    var catId = category.id;
+                    var typeId = type.id;
                     var orgId = project.organizationId;
-                    return $http.get('api/itproject/?orgId=' + orgId + '&catId=' + catId).then(function(result) {
+                    return $http.get('api/itproject/?orgId=' + orgId + '&typeId=' + typeId).then(function(result) {
                         return result.data.response;
                     });
                 }],
-                commonPublicProjects: ['$http', 'project', 'itProjectCategories', function ($http, project, itProjectCategories) {
-                    var category = _.find(itProjectCategories, function (cat) {
-                        return cat.name == 'Fællesoffentlig'; // TODO hardcoded literal... find better solution!
+                commonPublicProjects: ['$http', 'project', 'projectTypes', function ($http, project, projectTypes) {
+                    var type = _.find(projectTypes, function (t) {
+                        return t.name == 'Fællesoffentlig'; // TODO hardcoded literal... find better solution!
                     });
-                    var catId = category.id;
+                    var typeId = type.id;
                     var orgId = project.organizationId;
-                    return $http.get('api/itproject/?orgId=' + orgId + '&catId=' + catId).then(function (result) {
+                    return $http.get('api/itproject/?orgId=' + orgId + '&typeId=' + typeId).then(function (result) {
                         return result.data.response;
                     });
                 }]

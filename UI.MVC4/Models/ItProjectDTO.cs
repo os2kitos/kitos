@@ -38,8 +38,8 @@ namespace UI.MVC4.Models
         public string ParentName { get; set; }
         public IEnumerable<int> ChildrenIds { get; set; }
 
-        public int ItProjectCategoryId { get; set; }
-        public string ItProjectCategoryName { get; set; }
+        public int ItProjectTypeId { get; set; }
+        public string ItProjectTypeName { get; set; }
         public int OrganizationId { get; set; }
         public IEnumerable<OrgUnitDTO> UsedByOrgUnits { get; set; }
         public IEnumerable<EconomyYearDTO> EconomyYears { get; set; } 

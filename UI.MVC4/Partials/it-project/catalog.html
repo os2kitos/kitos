@@ -5,7 +5,6 @@
             <th>ProjektId</th>
             <th>GlobaltId</th>
             <th>Projektnavn</th>
-            <th>Kategori</th>
             <th>P</th>
             <th>A</th>
             <th>Ansvarlig</th>
@@ -36,11 +35,6 @@
                 <a data-ui-sref="it-project.edit.status-project({id: p.id})">
                     {{ p.name ? p.name : 'intet navn' }}
                 </a>
-            </td>
-            
-            <!-- category name -->
-            <td>
-                {{ p.itProjectCategoryName }}
             </td>
             
             <!-- access modifier -->

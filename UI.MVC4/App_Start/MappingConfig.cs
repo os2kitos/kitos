@@ -63,7 +63,7 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<ItProjectCategory, OptionDTO>()
+            Mapper.CreateMap<ItProjectType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore()); 
 

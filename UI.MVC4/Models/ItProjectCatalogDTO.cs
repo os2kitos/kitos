@@ -16,10 +16,7 @@ namespace UI.MVC4.Models
         //4th column: name + link
         public int Id { get; set; }
         public string Name { get; set; }
-
-        //5th column: category
-        public string ItProjectCategoryName { get; set; }
-        
+       
         //6th and 7th column: public, archived
         public AccessModifier AccessModifier { get; set; }
         public bool IsArchived { get; set; }

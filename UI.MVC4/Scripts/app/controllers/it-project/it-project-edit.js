@@ -12,8 +12,8 @@
                             return result.data.response;
                         });
                 }],
-                itProjectCategories: ['$http', function ($http) {
-                    return $http.get("api/itprojectcategory/")
+                projectTypes: ['$http', function ($http) {
+                    return $http.get("api/itprojecttype/")
                         .then(function (result) {
                             return result.data.response;
                         });
@@ -32,9 +32,10 @@
     }]);
 
     app.controller('project.EditCtrl', ['$scope', '$http', 'notify',
-            'project', 'itProjectCategories', 'user', 'hasWriteAccess',
-            function ($scope, $http, notify, project, itProjectCategories, user, hasWriteAccess) {
+            'project', 'projectTypes', 'user', 'hasWriteAccess',
+            function ($scope, $http, notify, project, projectTypes, user, hasWriteAccess) {
                 $scope.project = project;
+                $scope.projectTypes = projectTypes;
                 if ($scope.project.parentId) {
                     $scope.project.parent = {
                         id: $scope.project.parentId,
@@ -122,7 +123,6 @@
 
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.autosaveUrl = "api/itproject/" + project.id;
-                $scope.itProjectCategories = itProjectCategories;
                 
                 $scope.parentSelectOptions = selectLazyLoading('api/itproject', true, ['orgId=' + user.currentOrganizationId]);
 
