@@ -59,7 +59,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region OPTIONS
             
-            AddOptions<ItProjectCategory, ItProject>(context.ProjectCategories, globalUser, "Fællesoffentlig", "Fælleskommunal");
+            AddOptions<ItProjectType, ItProject>(context.ProjectCategories, globalUser, "Fællesoffentlig", "Fælleskommunal");
             
             AddOptions<AppType, ItSystem>(context.AppTypes, globalUser, "Snitflade", "Fagsystem", "Selvbetjening");
 
@@ -690,8 +690,8 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region Drop Down Data
 
-            var itProjectCategoryPublic = new ItProjectCategory() { IsActive = true, Note = "...", Name = "Fællesoffentlig" };
-            var itProjectCategoryMunipalicity = new ItProjectCategory() { IsActive = true, Note = "...", Name = "Fælleskommunal" };
+            var itProjectCategoryPublic = new ItProjectType() { IsActive = true, Note = "...", Name = "Fællesoffentlig" };
+            var itProjectCategoryMunipalicity = new ItProjectType() { IsActive = true, Note = "...", Name = "Fælleskommunal" };
             context.ProjectCategories.AddOrUpdate(x => x.Name, itProjectCategoryPublic, itProjectCategoryMunipalicity);
 
             var appType1 = new AppType() { IsActive = true, Note = "...", Name = "Snitflade" };

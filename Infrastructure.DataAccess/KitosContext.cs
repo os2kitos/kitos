@@ -72,7 +72,7 @@ namespace Infrastructure.DataAccess
         public DbSet<PaymentModel> PaymentModels { get; set; }
         public DbSet<PriceRegulation> PriceRegulations { get; set; }
         public DbSet<ProcurementStrategy> ProcurementStrategies { get; set; }
-        public DbSet<ItProjectCategory> ProjectCategories { get; set; }
+        public DbSet<ItProjectType> ProjectCategories { get; set; }
         public DbSet<PurchaseForm> PurchaseForms { get; set; }
         public DbSet<Risk> Risks { get; set; }
         public DbSet<SensitiveDataType> SensitiveDataTypes { get; set; }
@@ -134,7 +134,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new OrganizationRightMap());
             modelBuilder.Configurations.Add(new OrganizationRoleMap());
             modelBuilder.Configurations.Add(new PasswordResetRequestMap());
-            modelBuilder.Configurations.Add(new ItProjectCategoryMap());
+            modelBuilder.Configurations.Add(new ItProjectTypeMap());
             modelBuilder.Configurations.Add(new ProcurementStrategyMap());
             modelBuilder.Configurations.Add(new PurchaseFormMap());
             modelBuilder.Configurations.Add(new RiskMap());

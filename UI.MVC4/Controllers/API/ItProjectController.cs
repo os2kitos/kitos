@@ -65,7 +65,7 @@ namespace UI.MVC4.Controllers.API
                 //Get all projects inside the organizaton OR public
                 var projects = _itProjectService.GetAll(orgId, includePublic: true);
 
-                var dto = Map<IEnumerable<ItProject>, IEnumerable<ItProjectCatalogDTO>>(projects);
+                var dto = Map<IEnumerable<ItProject>, IEnumerable<ItProjectTypeDTO>>(projects);
 
                 return Ok(dto);
             }
@@ -124,7 +124,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var projects = _itProjectService.GetAll(orgId, includePublic:false).Where(p => p.ItProjectCategoryId == catId);
+                var projects = _itProjectService.GetAll(orgId, includePublic:false).Where(p => p.ItProjectTypeId == catId);
 
                 return Ok(Map(projects));
             }

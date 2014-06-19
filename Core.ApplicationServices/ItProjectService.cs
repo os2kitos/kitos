@@ -93,7 +93,7 @@ namespace Core.ApplicationServices
             // TODO AssociatedProgramId = project.AssociatedProgramId,
             // TODO AssociatedProjects = project.AssociatedProjects,
 
-            clone.ItProjectCategoryId = original.ItProjectCategoryId;
+            clone.ItProjectTypeId = original.ItProjectTypeId;
             clone.TaskRefs = original.TaskRefs;
 
             // TODO Risk

@@ -89,7 +89,7 @@
     <Compile Include="ItProject\ItProject.cs" />
     <Compile Include="ItProject\ItProjectRight.cs" />
     <Compile Include="ItProject\ItProjectRole.cs" />
-    <Compile Include="ItProject\ItProjectCategory.cs" />
+    <Compile Include="ItProject\ItProjectType.cs" />
     <Compile Include="ItProject\Risk.cs" />
     <Compile Include="ItProject\Stakeholder.cs" />
     <Compile Include="ItSupportModuleName.cs" />

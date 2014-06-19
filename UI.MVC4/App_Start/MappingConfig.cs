@@ -63,7 +63,7 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<ItProjectCategory, OptionDTO>()
+            Mapper.CreateMap<ItProjectType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore()); 
 
@@ -302,7 +302,7 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.Stakeholders, opt => opt.Ignore());
             
             //Output only - this mapping should not be reversed
-            Mapper.CreateMap<ItProject, ItProjectCatalogDTO>();
+            Mapper.CreateMap<ItProject, ItProjectTypeDTO>();
 
             //Output only - this mapping should not be reversed
             Mapper.CreateMap<ItProject, ItProjectSimpleDTO>();

@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProjectCategory : Entity, IOptionEntity<ItProject>
+    public class ItProjectType : Entity, IOptionEntity<ItProject>
     {
-        public ItProjectCategory()
+        public ItProjectType()
         {
             References = new List<ItProject>();
         }

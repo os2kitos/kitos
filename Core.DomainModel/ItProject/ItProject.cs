@@ -53,8 +53,8 @@ namespace Core.DomainModel.ItProject
         public virtual ItProject AssociatedProgram { get; set; }
         public virtual ICollection<ItProject> AssociatedProjects { get; set; }
 
-        public int ItProjectCategoryId { get; set; }
-        public virtual ItProjectCategory ItProjectCategory { get; set; }
+        public int ItProjectTypeId { get; set; }
+        public virtual ItProjectType ItProjectType { get; set; }
 
         public int OrganizationId { get; set; }
         public virtual Organization Organization { get; set; }
