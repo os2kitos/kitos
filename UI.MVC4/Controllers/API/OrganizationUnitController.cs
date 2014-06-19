@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Security;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
@@ -13,14 +12,12 @@ namespace UI.MVC4.Controllers.API
     public class OrganizationUnitController : GenericHasRightsController<OrganizationUnit, OrganizationRight, OrganizationRole, OrgUnitDTO>
     {
         private readonly IOrgUnitService _orgUnitService;
-        private readonly IAdminService _adminService;
 
         public OrganizationUnitController(IGenericRepository<OrganizationUnit> repository, IGenericRepository<OrganizationRight> rightRepository, 
-            IOrgUnitService orgUnitService, IAdminService adminService) 
+            IOrgUnitService orgUnitService) 
             : base(repository, rightRepository)
         {
             _orgUnitService = orgUnitService;
-            _adminService = adminService;
         }
 
         /// <summary>
@@ -50,26 +47,6 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
         }
-
-        //TODO probably don't use this, use get by organization instead
-        /*public HttpResponseMessage GetByUser(int userId)
-        {
-            try
-            {
-                var user = KitosUser;
-
-                if(user.Id != userId) throw new SecurityException();
-
-                var orgUnits = _orgUnitService.GetByUser(user);
-
-                return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(orgUnits));
-
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }*/
 
         /// <summary>
         /// Returns every OrganizationUnit that the user can select as the default unit
