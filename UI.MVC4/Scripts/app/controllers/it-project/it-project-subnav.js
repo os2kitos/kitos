@@ -17,7 +17,7 @@
                     { state: 'it-project.catalog', text: 'IT Projekt katalog' },
                     { state: 'it-project.edit', text: 'IT Projekt', showWhen: 'it-project.edit' },
                 ];
-                $rootScope.page.buttons = [
+                $rootScope.page.subnav.buttons = [
                     { func: create, text: 'Opret IT Projekt'}
                 ];
                 
