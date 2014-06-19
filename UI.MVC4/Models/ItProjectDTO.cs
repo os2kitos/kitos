@@ -39,8 +39,6 @@ namespace UI.MVC4.Models
 
         public IEnumerable<int> AssociatedProjectIds { get; set; }
 
-        public int ItProjectTypeId { get; set; }
-        public string ItProjectTypeName { get; set; }
         public int ItProjectCategoryId { get; set; }
         public string ItProjectCategoryName { get; set; }
         public int OrganizationId { get; set; }

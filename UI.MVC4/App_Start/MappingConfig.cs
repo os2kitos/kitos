@@ -65,11 +65,7 @@ namespace UI.MVC4.App_Start
 
             Mapper.CreateMap<ItProjectCategory, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
-            
-            Mapper.CreateMap<ItProjectType, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
+                  .ForMember(dest => dest.References, opt => opt.Ignore()); 
 
             Mapper.CreateMap<PurchaseForm, OptionDTO>()
                   .ReverseMap()

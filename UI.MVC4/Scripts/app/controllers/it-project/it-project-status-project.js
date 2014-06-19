@@ -48,13 +48,13 @@
     }]);
 
     app.controller('project.EditStatusProjectCtrl',
-    ['$scope', '$http', 'notify', '$modal', 'itProject', 'usersWithRoles',
-        function ($scope, $http, notify, $modal, itProject, usersWithRoles) {
-            $scope.project = itProject;
-            $scope.project.updateUrl = "api/itproject/" + itProject.id;
+    ['$scope', '$http', 'notify', '$modal', 'project', 'usersWithRoles',
+        function ($scope, $http, notify, $modal, project, usersWithRoles) {
+            $scope.project = project;
+            $scope.project.updateUrl = "api/itproject/" + project.id;
 
             //Setup phases
-            $scope.project.phases = [itProject.phase1, itProject.phase2, itProject.phase3, itProject.phase4, itProject.phase5];
+            $scope.project.phases = [project.phase1, project.phase2, project.phase3, project.phase4, project.phase5];
             var prevPhase = null;
             _.each($scope.project.phases, function (phase) {
                 phase.updateUrl = "api/activity/" + phase.id;
@@ -128,8 +128,8 @@
                 return addMilestoneActivity(task);
             }
 
-            _.each(itProject.taskActivities, addTask);
-            _.each(itProject.milestoneStates, addMilestone);
+            _.each(project.taskActivities, addTask);
+            _.each(project.milestoneStates, addMilestone);
 
             function patch(url, field, value) {
                 var payload = {};
@@ -171,7 +171,7 @@
             };
             
             $scope.addMilestone = function() {
-                $http.post("api/state", { milestoneForProjectId: itProject.id }).success(function(result) {
+                $http.post("api/state", { milestoneForProjectId: project.id }).success(function(result) {
                     var activity = result.response;
 
                     addMilestone(activity);
@@ -181,7 +181,7 @@
             };
             
             $scope.addTask = function () {
-                $http.post("api/activity", { taskForProjectId: itProject.id }).success(function (result) {
+                $http.post("api/activity", { taskForProjectId: project.id }).success(function (result) {
                     var activity = result.response;
 
                     addTask(activity);

@@ -5,17 +5,17 @@
             templateUrl: 'partials/it-project/tab-org.html',
             controller: 'project.EditOrgCtrl',
             resolve: {
-                isTransversal: ['itProject', function (itProject) {
-                    return itProject.isTransversal;
+                isTransversal: ['project', function (project) {
+                    return project.isTransversal;
                 }],
-                selectedOrgUnits: ['itProject', function (itProject) {
-                    return itProject.usedByOrgUnits;
+                selectedOrgUnits: ['project', function (project) {
+                    return project.usedByOrgUnits;
                 }],
-                responsibleOrgUnitId: ['itProject', function (itProject) {
-                    return itProject.responsibleOrgUnitId;
+                responsibleOrgUnitId: ['project', function (project) {
+                    return project.responsibleOrgUnitId;
                 }],
-                orgUnitsTree: ['$http', 'itProject', function ($http, itProject) {
-                    return $http.get('api/organizationunit/?organization=' + itProject.organizationId)
+                orgUnitsTree: ['$http', 'project', function ($http, project) {
+                    return $http.get('api/organizationunit/?organization=' + project.organizationId)
                         .then(function (result) {
                             return [result.data.response]; // to array for ngRepeat to work
                         });

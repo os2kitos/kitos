@@ -6,7 +6,7 @@
             templateUrl: 'partials/it-project/edit-it-project.html',
             controller: 'project.EditCtrl',
             resolve: {
-                itProject: ['$http', '$stateParams', function($http, $stateParams) {
+                project: ['$http', '$stateParams', function($http, $stateParams) {
                     return $http.get("api/itproject/" + $stateParams.id)
                         .then(function(result) {
                             return result.data.response;
@@ -39,9 +39,9 @@
 
 
     app.controller('project.EditCtrl', ['$scope', '$http', 'notify',
-            'itProject', 'itProjectTypes', 'itProjectCategories', 'user', 'hasWriteAccess',
-            function ($scope, $http, notify, itProject, itProjectTypes, itProjectCategories, user, hasWriteAccess) {
-                $scope.project = itProject;
+            'project', 'itProjectTypes', 'itProjectCategories', 'user', 'hasWriteAccess',
+            function ($scope, $http, notify, project, itProjectTypes, itProjectCategories, user, hasWriteAccess) {
+                $scope.project = project;
                 if ($scope.project.associatedProgramId) {
                     $scope.project.associatedProgram = {
                         id: $scope.project.associatedProgramId,
@@ -51,15 +51,15 @@
 
                 $scope.selectSettings = { dynamicTitle: false, defaultText: 'Tabs' };
                 $scope.selectedData = [];
-                if (itProject.isStatusGoalVisible) 
+                if (project.isStatusGoalVisible) 
                     $scope.selectedData.push({ id: 1 });
-                if (itProject.isEconomyVisible)
+                if (project.isEconomyVisible)
                     $scope.selectedData.push({ id: 2 });
-                if (itProject.isStakeholderVisible)
+                if (project.isStakeholderVisible)
                     $scope.selectedData.push({ id: 3 });
-                if (itProject.isCommunicationVisible)
+                if (project.isCommunicationVisible)
                     $scope.selectedData.push({ id: 4 });
-                if (itProject.isHandoverVisible)
+                if (project.isHandoverVisible)
                     $scope.selectedData.push({ id: 5 });
                 $scope.dropdownData = [
                     {id: 1, label: 'Vis Status: Mål'},
@@ -128,73 +128,16 @@
                 }, true);
 
                 $scope.hasWriteAccess = hasWriteAccess;
-
-                $scope.autosaveUrl = "api/itproject/" + itProject.id;
-
-                $scope.itProjectTypes = itProjectTypes;
+                $scope.autosaveUrl = "api/itproject/" + project.id;
                 $scope.itProjectCategories = itProjectCategories;
                 
-                //ItProgram type TODO: don't hardcode this?
-                $scope.itProgramType = _.findWhere(itProjectTypes, { name: "IT Program" });
-
-                $scope.programSelectOptions = selectLazyLoading('api/itproject?programs&orgId=' + user.currentOrganizationId);
-                $scope.programSelectOptions.allowClear = true;
-                $scope.programSelectOptions.placeholder = "Vælg program";
-
-                function selectLazyLoading(url) {
-                    return {
-                        minimumInputLength: 1,
-                        initSelection: function (elem, callback) {
-                        },
-                        ajax: {
-                            data: function (term, page) {
-                                return { query: term };
-                            },
-                            quietMillis: 500,
-                            transport: function (queryParams) {
-                                var res = $http.get(url + '&q=' + queryParams.data.query).then(queryParams.success);
-                                res.abort = function () {
-                                    return null;
-                                };
-
-                                return res;
-                            },
-
-                            results: function (data, page) {
-                                var results = [];
-
-                                _.each(data.data.response, function (obj) {
-
-                                    results.push({
-                                        id: obj.id,
-                                        text: obj.name
-                                    });
-                                });
-
-                                return { results: results };
-                            }
-                        }
+                if (project.parentId) {
+                    $scope.contract.parent = {
+                        id: contract.parentId,
+                        text: contract.parentName
                     };
                 }
 
-                $scope.updateAssociatedProgram = function() {
-
-                    var val = null;
-                    if ($scope.project.associatedProgram != null) val = $scope.project.associatedProgram.id;
-
-                    var payload = { associatedProgramId: val };
-
-                    $http({
-                        method: 'PATCH',
-                        url: $scope.autosaveUrl,
-                        data: payload
-                    }).success(function(result) {
-                        notify.addSuccessMessage("Feltet er opdateret");
-                    }).error(function(result) {
-                        notify.addErrorMessage("Feltet kunne ikke opdateres!");
-                    });
-                };
-                
                 $scope.opened = {};
                 $scope.open = function ($event, datepicker) {
                     $event.preventDefault();

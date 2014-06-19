@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Security;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
@@ -62,33 +61,33 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetPrograms(string q, int orgId, bool? programs)
-        {
-            try
-            {
-                var thePrograms = _itProjectService.GetPrograms(orgId, nameSearch: q);
+        //public HttpResponseMessage GetPrograms(string q, int orgId, bool? programs)
+        //{
+        //    try
+        //    {
+        //        var thePrograms = _itProjectService.GetPrograms(orgId, nameSearch: q);
 
-                return Ok(Map(thePrograms));
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
+        //        return Ok(Map(thePrograms));
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return Error(e);
+        //    }
+        //}
 
-        public HttpResponseMessage GetNonPrograms(string q, int orgId, bool? nonPrograms)
-        {
-            try
-            {
-                var projects = _itProjectService.GetProjects(orgId, nameSearch: q);
+        //public HttpResponseMessage GetNonPrograms(string q, int orgId, bool? nonPrograms)
+        //{
+        //    try
+        //    {
+        //        var projects = _itProjectService.GetProjects(orgId, nameSearch: q);
 
-                return Ok(Map(projects));
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
+        //        return Ok(Map(projects));
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return Error(e);
+        //    }
+        //}
 
         public HttpResponseMessage PostCloneProject(int id, bool? clone, [FromBody] ItProjectDTO dto)
         {

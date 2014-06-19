@@ -60,8 +60,6 @@ namespace Infrastructure.DataAccess.Migrations
             #region OPTIONS
             
             AddOptions<ItProjectCategory, ItProject>(context.ProjectCategories, globalUser, "Fællesoffentlig", "Fælleskommunal");
-
-            AddOptions<ItProjectType, ItProject>(context.ProjectTypes, globalUser, "IT Projekt", "IT Program", "Indsatsområde");
             
             AddOptions<AppType, ItSystem>(context.AppTypes, globalUser, "Snitflade", "Fagsystem", "Selvbetjening");
 
@@ -682,7 +680,6 @@ namespace Infrastructure.DataAccess.Migrations
             //
 
             var cryptoService = new CryptoService();
-            var organizationService = new OrganizationService(null, null, null); // TODO needs a refactor as this is a bit hacky!
 
             #region AdminRoles
 
@@ -696,13 +693,6 @@ namespace Infrastructure.DataAccess.Migrations
             var itProjectCategoryPublic = new ItProjectCategory() { IsActive = true, Note = "...", Name = "Fællesoffentlig" };
             var itProjectCategoryMunipalicity = new ItProjectCategory() { IsActive = true, Note = "...", Name = "Fælleskommunal" };
             context.ProjectCategories.AddOrUpdate(x => x.Name, itProjectCategoryPublic, itProjectCategoryMunipalicity);
-
-            var itProjectTypeProject = new ItProjectType() { IsActive = true, Note = "...", Name = "IT Projekt" };
-            var itProjectTypeProgram = new ItProjectType() { IsActive = true, Note = "...", Name = "IT Program" };
-            context.ProjectTypes.AddOrUpdate(x => x.Name,
-                                             itProjectTypeProject,
-                                             itProjectTypeProgram,
-                                             new ItProjectType() { IsActive = true, Note = "En samlebetegnelse for projekter, som ikke er et IT Program", Name = "Indsatsområde" });
 
             var appType1 = new AppType() { IsActive = true, Note = "...", Name = "Snitflade" };
             var appType2 = new AppType() { IsActive = true, Note = "...", Name = "Fagsystem" };

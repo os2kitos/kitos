@@ -15,10 +15,10 @@
     }]);
 
     app.controller('project.EditStatusGoalCtrl',
-    ['$scope', '$http', 'notify', '$modal', 'itProject', 'goalTypes',
-        function ($scope, $http, notify, $modal, itProject, goalTypes) {
-            $scope.goalStatus = itProject.goalStatus;
-            $scope.goalStatus.updateUrl = "api/goalStatus/" + itProject.goalStatus.id;
+    ['$scope', '$http', 'notify', '$modal', 'project', 'goalTypes',
+        function ($scope, $http, notify, $modal, project, goalTypes) {
+            $scope.goalStatus = project.goalStatus;
+            $scope.goalStatus.updateUrl = "api/goalStatus/" + project.goalStatus.id;
 
             $scope.getGoalTypeName = function(goalTypeId) {
                 var type = _.findWhere(goalTypes, { id: goalTypeId });
@@ -89,7 +89,7 @@
 
             $scope.addGoal = function() {
                 $http.post("api/goal", {
-                    goalStatusId: itProject.goalStatus.id,
+                    goalStatusId: project.goalStatus.id,
                     goalTypeId: 1
                 }).success(function(result) {
                     notify.addSuccessMessage("Nyt mål tilføjet!");

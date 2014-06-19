@@ -24,10 +24,10 @@
     }]);
 
     app.controller('project.EditRolesCtrl',
-    ['$rootScope', '$scope', '$http', 'notify', 'itProject', 'itProjectRights', 'itProjectRoles',
-        function($rootScope, $scope, $http, notify, itProject, itProjectRights, itProjectRoles) {
+    ['$rootScope', '$scope', '$http', 'notify', 'project', 'itProjectRights', 'itProjectRoles',
+        function($rootScope, $scope, $http, notify, project, itProjectRights, itProjectRoles) {
 
-            var projectId = itProject.id;
+            var projectId = project.id;
 
             $scope.itProjectRoles = itProjectRoles;
             $scope.newRole = 1;
