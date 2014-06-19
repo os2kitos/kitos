@@ -12,12 +12,6 @@
                             return result.data.response;
                         });
                 }],
-                itProjectTypes: ['$http', function ($http) {
-                    return $http.get("api/itprojecttype/")
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }],
                 itProjectCategories: ['$http', function ($http) {
                     return $http.get("api/itprojectcategory/")
                         .then(function (result) {
@@ -37,10 +31,9 @@
         });
     }]);
 
-
     app.controller('project.EditCtrl', ['$scope', '$http', 'notify',
-            'project', 'itProjectTypes', 'itProjectCategories', 'user', 'hasWriteAccess',
-            function ($scope, $http, notify, project, itProjectTypes, itProjectCategories, user, hasWriteAccess) {
+            'project', 'itProjectCategories', 'user', 'hasWriteAccess',
+            function ($scope, $http, notify, project, itProjectCategories, user, hasWriteAccess) {
                 $scope.project = project;
                 if ($scope.project.associatedProgramId) {
                     $scope.project.associatedProgram = {
@@ -132,9 +125,53 @@
                 $scope.itProjectCategories = itProjectCategories;
                 
                 if (project.parentId) {
-                    $scope.contract.parent = {
-                        id: contract.parentId,
-                        text: contract.parentName
+                    $scope.project.parent = {
+                        id: project.parentId,
+                        text: project.parent.name
+                    };
+                }
+
+                $scope.parentSelectOptions = selectLazyLoading('api/itproject', true, ['orgId=' + user.currentOrganizationId]);
+
+                function selectLazyLoading(url, excludeSelf, format, paramAry) {
+                    return {
+                        minimumInputLength: 1,
+                        allowClear: true,
+                        placeholder: ' ',
+                        initSelection: function (elem, callback) {
+                        },
+                        ajax: {
+                            data: function (term, page) {
+                                return { query: term };
+                            },
+                            quietMillis: 500,
+                            transport: function (queryParams) {
+                                var extraParams = paramAry ? '&' + paramAry.join('&') : '';
+                                var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
+                                res.abort = function () {
+                                    return null;
+                                };
+
+                                return res;
+                            },
+
+                            results: function (data, page) {
+                                var results = [];
+
+                                _.each(data.data.response, function (obj) {
+                                    if (excludeSelf && obj.id == project.id)
+                                        return; // don't add self to result
+
+                                    results.push({
+                                        id: obj.id,
+                                        text: obj.name ? obj.name : 'Unavngiven',
+                                        cvr: obj.cvr
+                                    });
+                                });
+
+                                return { results: results };
+                            }
+                        }
                     };
                 }
 

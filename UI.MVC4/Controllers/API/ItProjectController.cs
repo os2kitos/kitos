@@ -44,6 +44,20 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        public virtual HttpResponseMessage Get(string q, int orgId)
+        {
+            try
+            {
+                var items = Repository.Get(x => x.Name.Contains(q) && x.OrganizationId == orgId);
+
+                return Ok(Map(items));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetCatalog(bool? catalog, [FromUri] int orgId)
         {
             try
