@@ -29,9 +29,7 @@
             
             //cache
             var orgs = [];
-
-            var rootNode = null;
-
+            
             //flatten map of all loaded orgUnits
             $scope.orgUnits = {};
 
@@ -92,7 +90,7 @@
             function loadUnits() {
 
                 return $http.get('api/organizationunit?organization=' + user.currentOrganizationId).success(function (result) {
-                    rootNode = result.response;
+                    var rootNode = result.response;
 
                     $scope.nodes = [rootNode];
 
