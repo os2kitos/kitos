@@ -17,7 +17,7 @@
                     { state: 'it-system.edit', text: 'IT System', showWhen: 'it-system.edit' },
                     { state: 'it-system.usage', text: 'IT System anvendelse', showWhen: 'it-system.usage' }
                 ];
-                $rootScope.page.buttons = [
+                $rootScope.page.subnav.buttons = [
                     { func: create, text: 'Opret IT System' }
                 ];
 

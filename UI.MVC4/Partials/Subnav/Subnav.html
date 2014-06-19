@@ -3,7 +3,7 @@
         <li data-ng-repeat="link in page.subnav" data-ng-if="!link.showWhen || $state.includes(link.showWhen)">
             <a data-ui-sref="{{link.state}}" data-ng-class="{'btn-tab-active': $state.includes(link.state)}" class="btn btn-tab">{{link.text}}</a>
         </li>
-        <li data-ng-repeat="btn in page.buttons">
+        <li data-ng-repeat="btn in page.subnav.buttons">
             <a class="btn btn-success btn-sm" data-ng-click="btn.func()"><i class="glyphicon glyphicon-plus"></i> {{ btn.text }}</a>
         </li>
     </ul>
