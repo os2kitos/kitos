@@ -46,7 +46,7 @@ namespace UI.MVC4.Controllers.API
 
         protected override Organization PostQuery(Organization item)
         {
-            _organizationService.AddDefaultOrgUnit(item);
+            _organizationService.SetupDefaultOrganization(item, KitosUser);
             return base.PostQuery(item);
         }
         
