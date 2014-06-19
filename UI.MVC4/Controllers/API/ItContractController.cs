@@ -30,7 +30,7 @@ namespace UI.MVC4.Controllers.API
             return base.GetAll(paging);
         }
 
-        public virtual HttpResponseMessage PostAgreementElement(int id, [FromUri] int elemId)
+        public virtual HttpResponseMessage PostAgreementElement(int id, int elemId)
         {
             try
             {
@@ -51,7 +51,7 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public virtual HttpResponseMessage DeleteAgreementElement(int id, [FromUri] int elemId)
+        public virtual HttpResponseMessage DeleteAgreementElement(int id, int elemId)
         {
             try
             {

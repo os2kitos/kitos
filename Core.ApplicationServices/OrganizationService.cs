@@ -36,8 +36,9 @@ namespace Core.ApplicationServices
             return orgs;
         }
 
-        public void AddDefaultOrgUnit(Organization org)
+        public void SetupDefaultOrganization(Organization org, User objectOwner)
         {
+            org.Config = Config.Default(objectOwner);
             org.OrgUnits.Add(new OrganizationUnit()
                 {
                     Name = org.Name,

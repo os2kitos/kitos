@@ -13,8 +13,8 @@
     }]);
 
     app.controller('project.EditEconomyCtrl',
-    ['$rootScope', '$scope', 'itProject',
-        function ($rootScope, $scope, itProject) {
+    ['$rootScope', '$scope', 'project',
+        function ($rootScope, $scope, project) {
             $scope.columns = _.range(6);
 
             var expensesTitleRow = createTitleRow("OMKOSTNINGER");
@@ -47,7 +47,7 @@
             }
 
             function createReadonlyRow(label, classes) {
-                var columns = _.map(itProject.economyYears, function() {
+                var columns = _.map(project.economyYears, function() {
                     return {
                         budget: 0,
                         rea: 0
@@ -70,7 +70,7 @@
                 var budgetName = field + "Budget",
                     reaName = field + "Rea";
 
-                var columns = _.map(itProject.economyYears, function(year) {
+                var columns = _.map(project.economyYears, function(year) {
                     return {
                         updateUrl: "api/economyYear/" + year.id,
                         budget: year[budgetName],

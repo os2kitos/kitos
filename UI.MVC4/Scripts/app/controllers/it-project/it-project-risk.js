@@ -5,8 +5,8 @@
             templateUrl: 'partials/it-project/tab-risk.html',
             controller: 'project.EditRiskCtrl',
             resolve: {
-                risks: ['$http', 'itProject', function ($http, itProject) {
-                        return $http.get('api/risk/?getByProject&projectId=' + itProject.id)
+                risks: ['$http', 'project', function ($http, project) {
+                        return $http.get('api/risk/?getByProject&projectId=' + project.id)
                             .then(function (result) {
                                 return result.data.response;
                             });

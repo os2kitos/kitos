@@ -9,7 +9,6 @@ namespace Core.DomainModel.ItContract
         public ItContract()
         {
             this.AgreementElements = new List<AgreementElement>();
-            this.CustomAgreementElements = new List<CustomAgreementElement>();
             this.Children = new List<ItContract>();
             this.AssociatedSystemUsages = new List<ItSystemUsage>();
             this.AssociatedInterfaceUsages = new List<InterfaceUsage>();
@@ -131,7 +130,6 @@ namespace Core.DomainModel.ItContract
         public virtual ICollection<InterfaceExposure> AssociatedInterfaceExposures { get; set; } 
 
         public virtual ICollection<AgreementElement> AgreementElements { get; set; }
-        public virtual ICollection<CustomAgreementElement> CustomAgreementElements { get; set; }
 
 
         public virtual ICollection<EconomyStream> InternEconomyStreams { get; set; }

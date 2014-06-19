@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Core.DomainModel.ItProject;
+﻿using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using UI.MVC4.Models;
 

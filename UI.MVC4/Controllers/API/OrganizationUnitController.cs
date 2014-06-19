@@ -18,7 +18,7 @@ namespace UI.MVC4.Controllers.API
             : base(repository)
         {
             _orgUnitService = orgUnitService;
-        }
+                }
 
         /// <summary>
         /// Returns every OrganizationUnit that the user can select as the default unit

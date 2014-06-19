@@ -8,9 +8,9 @@
     }]);
 
     app.controller('project.EditDescriptionCtrl',
-    ['$scope', 'itProject',
-        function ($scope, itProject) {
-            $scope.itProjectId = itProject.id;
-            $scope.description = itProject.description;
+    ['$scope', 'project',
+        function ($scope, project) {
+            $scope.itProjectId = project.id;
+            $scope.description = project.description;
         }]);
 })(angular, app);

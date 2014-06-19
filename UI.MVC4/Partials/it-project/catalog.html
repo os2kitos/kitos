@@ -5,7 +5,6 @@
             <th>ProjektId</th>
             <th>GlobaltId</th>
             <th>Projektnavn</th>
-            <th>Kategori</th>
             <th>P</th>
             <th>A</th>
             <th>Ansvarlig</th>
@@ -28,7 +27,7 @@
             
             <!-- parent id -->
             <td>
-                {{ p.parentItProjectId }}
+                {{ p.parentId }}
             </td>
             
             <!-- name + link -->
@@ -36,11 +35,6 @@
                 <a data-ui-sref="it-project.edit.status-project({id: p.id})">
                     {{ p.name ? p.name : 'intet navn' }}
                 </a>
-            </td>
-            
-            <!-- category name -->
-            <td>
-                {{ p.itProjectCategoryName }}
             </td>
             
             <!-- access modifier -->
@@ -75,16 +69,4 @@
             </td>
         </tr>
     </tbody>
-    <tfoot>
-        <tr>
-            <td colspan="10">
-                <div class="pull-right">
-                    <!-- Create New IT Project-->
-                    <button class="btn btn-success btn-sm" data-ng-click="create()" data-ng-disabled="creatingProject">
-                        <i class="glyphicon glyphicon-plus"></i> Opret IT Projekt
-                    </button>
-                </div>
-            </td>
-        </tr>
-    </tfoot>
 </table>

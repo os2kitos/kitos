@@ -5,11 +5,11 @@
             templateUrl: 'partials/it-project/tab-kle.html',
             controller: 'project.EditKleCtrl',
             resolve: {
-                selectedKle: ['itProject', function (itProject) {
+                selectedKle: ['project', function (itProject) {
                     return itProject.taskRefs;
                 }],
-                kle: ['$http', 'itProject', function ($http, itProject) {
-                    return $http.get('api/taskref/?orgId=' + itProject.organizationId)
+                kle: ['$http', 'project', function ($http, project) {
+                    return $http.get('api/taskref/?orgId=' + project.organizationId)
                         .then(function (result) {
                             return result.data.response;
                         });

@@ -5,11 +5,11 @@
             templateUrl: 'partials/it-project/tab-itsys.html',
             controller: 'project.EditItsysCtrl',
             resolve: {
-                selectedItSystemIds: ['itProject', function (itProject) {
+                selectedItSystemIds: ['project', function (itProject) {
                     return _.pluck(itProject.itSystems, 'id');
                 }],
-                itSystemUsages: ['$http', 'itProject', function ($http, itProject) {
-                    return $http.get('api/itsystemusage/?organizationId=' + itProject.organizationId)
+                itSystemUsages: ['$http', 'project', function ($http, project) {
+                    return $http.get('api/itsystemusage/?organizationId=' + project.organizationId)
                         .then(function (result) {
                             return result.data.response;
                         });

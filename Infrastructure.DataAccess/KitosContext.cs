@@ -31,7 +31,6 @@ namespace Infrastructure.DataAccess
         public DbSet<Config> Configs { get; set; }
         public DbSet<ContractTemplate> ContractTemplates { get; set; }
         public DbSet<ContractType> ContractTypes { get; set; }
-        public DbSet<CustomAgreementElement> CustomAgreementElements { get; set; }
         public DbSet<DataType> DataTypes { get; set; }
         public DbSet<DataRow> DataRows { get; set; }
         public DbSet<DataRowUsage> DataRowUsages { get; set; }
@@ -72,7 +71,6 @@ namespace Infrastructure.DataAccess
         public DbSet<PaymentModel> PaymentModels { get; set; }
         public DbSet<PriceRegulation> PriceRegulations { get; set; }
         public DbSet<ProcurementStrategy> ProcurementStrategies { get; set; }
-        public DbSet<ItProjectCategory> ProjectCategories { get; set; }
         public DbSet<ItProjectType> ProjectTypes { get; set; }
         public DbSet<PurchaseForm> PurchaseForms { get; set; }
         public DbSet<Risk> Risks { get; set; }
@@ -135,9 +133,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new OrganizationRightMap());
             modelBuilder.Configurations.Add(new OrganizationRoleMap());
             modelBuilder.Configurations.Add(new PasswordResetRequestMap());
-            modelBuilder.Configurations.Add(new ItProjectCategoryMap());
-            modelBuilder.Configurations.Add(new ProcurementStrategyMap());
             modelBuilder.Configurations.Add(new ItProjectTypeMap());
+            modelBuilder.Configurations.Add(new ProcurementStrategyMap());
             modelBuilder.Configurations.Add(new PurchaseFormMap());
             modelBuilder.Configurations.Add(new RiskMap());
             modelBuilder.Configurations.Add(new SensitiveDataTypeMap());

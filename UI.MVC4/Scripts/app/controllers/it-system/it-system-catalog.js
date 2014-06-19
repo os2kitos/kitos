@@ -1,8 +1,5 @@
 ﻿(function (ng, app) {
-
-
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
-
         $stateProvider.state('it-system.catalog', {
             url: '/catalog',
             templateUrl: 'partials/it-system/it-system-catalog.html',
@@ -41,7 +38,6 @@
             }
         });
     }]);
-
 
     app.controller('system.CatalogCtrl',
         ['$rootScope', '$scope', '$http', 'notify', '$state',
@@ -136,35 +132,5 @@
 
                     $scope.systems.push(system);
                 });
-
-                $scope.create = function () {
-                    var payload = {
-                        name: 'Unavngivent IT system',
-                        belongsToId: user.currentOrganizationId,
-                        organizationId: user.currentOrganizationId,
-                        userId: user.id,
-                        dataRows: [],
-                        taskRefIds: [],
-                        canUseInterfaceIds: []
-                    };
-
-                    $scope.creatingSystem = true;
-                    var msg = notify.addInfoMessage("Opretter system...", false);
-
-                    $http.post('api/itsystem', payload).success(function (result) {
-
-                        msg.toSuccessMessage("Et nyt system er oprettet!");
-
-                        var systemId = result.response.id;
-
-                        $state.go('it-system.edit', { id: systemId });
-
-                    }).error(function () {
-                        msg.toErrorMessage("Fejl! Kunne ikke oprette nyt system!");
-                        $scope.creatingSystem = false;
-                    });
-                };
-
-
             }]);
 })(angular, app);

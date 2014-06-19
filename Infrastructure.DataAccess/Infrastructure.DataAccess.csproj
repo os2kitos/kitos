@@ -72,7 +72,6 @@
     <Compile Include="Mapping\ActivityMap.cs" />
     <Compile Include="Mapping\EntityMap.cs" />
     <Compile Include="Mapping\EconomyStreamMap.cs" />
-    <Compile Include="Mapping\CustomAgreementElementMap.cs" />
     <Compile Include="Mapping\OptionEntityMap.cs" />
     <Compile Include="Mapping\ProcurementStrategyMap.cs" />
     <Compile Include="Mapping\InterfaceExposureMap.cs" />
@@ -114,7 +113,6 @@
     <Compile Include="Mapping\MethodMap.cs" />
     <Compile Include="Mapping\OrganizationMap.cs" />
     <Compile Include="Mapping\PasswordResetRequestMap.cs" />
-    <Compile Include="Mapping\ItProjectCategoryMap.cs" />
     <Compile Include="Mapping\ItProjectTypeMap.cs" />
     <Compile Include="Mapping\PurchaseFormMap.cs" />
     <Compile Include="Mapping\RiskMap.cs" />
