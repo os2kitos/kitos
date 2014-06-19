@@ -327,7 +327,26 @@
                     }
 
                     function saveMultipleSelect2(e) {
-                        console.log(e);
+                        var id, msg = notify.addInfoMessage("Gemmer...", false);
+                        if (e.added) {
+                            id = e.added.id;
+                            $http.post(attrs.autosave + '?' + attrs.field + '=' + id)
+                            .success(function () {
+                                msg.toSuccessMessage("Feltet er opdateret.");
+                            })
+                            .error(function () {
+                                msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                            });
+                        } else if (e.removed) {
+                            id = e.removed.id;
+                            $http.delete(attrs.autosave + '?' + attrs.field + '=' + id)
+                            .success(function () {
+                                msg.toSuccessMessage("Feltet er opdateret.");
+                            })
+                            .error(function () {
+                                msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                            });
+                        }
                     }
 
                     function save(payload) {
