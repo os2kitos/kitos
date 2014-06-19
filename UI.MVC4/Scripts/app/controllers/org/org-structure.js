@@ -24,11 +24,13 @@
 
     }]);
 
-    app.controller('org.StructureCtrl', ['$scope', '$http', '$q', '$filter', '$modal', 'notify', 'orgRolesHttp', 'user',
-        function ($scope, $http, $q, $filter, $modal, notify, orgRolesHttp, user) {
+    app.controller('org.StructureCtrl', ['$scope', '$http', '$q', '$filter', '$modal', 'notify', 'orgRolesHttp', 'user', 'taskService',
+        function ($scope, $http, $q, $filter, $modal, notify, orgRolesHttp, user, taskService) {
             
             //cache
             var orgs = [];
+
+            var rootNode = null;
 
             //flatten map of all loaded orgUnits
             $scope.orgUnits = {};
@@ -90,7 +92,7 @@
             function loadUnits() {
 
                 return $http.get('api/organizationunit?organization=' + user.currentOrganizationId).success(function (result) {
-                    var rootNode = result.response;
+                    rootNode = result.response;
 
                     $scope.nodes = [rootNode];
 
@@ -146,21 +148,7 @@
 
                 $scope.chosenOrgUnit = node;
 
-                //makes a list of the assigned tasks to the parent of the chosen unit
-                //this is used to filter the selectable tasks
-                node.parentTasks = null;
-                if (node.parentId != null) {
-                    $http.get('api/taskusage/?orgUnitId=' + node.parentId).success(function (result) {
-                        
-                        node.parentTasks = _.map(result.response, function(taskDelegation) {
-                            return taskDelegation.usage.taskRefId;
-                        });
-                        
-                        reloadTaskList();
-                    });
-                } else {
-                    reloadTaskList();
-                }
+                loadTasks();
             };
             
             $scope.$watch("selectedUser", function () {
@@ -461,472 +449,155 @@
                 });
             };
 
-            $scope.$watch("taskList", function(newVal, oldVal) {
-                if (!newVal) return;
-
-                reloadTaskList();
+            $scope.$watch("selectedTaskGroup", function (newVal, oldVal) {
+                clearTasksPagination();
+                loadTasks();
             });
-            
-            function reloadTaskList() {
-                $http.get('api/taskUsage/?orgUnitId=' + $scope.chosenOrgUnit.id).success(function (result) {
-                    var taskDelegations = result.response;
 
-                    var parentTasks = $scope.chosenOrgUnit.parentTasks;
+            //change between show all tasks and only show active tasks
+            $scope.changeTaskView = function() {
+                $scope.showAllTasks = !$scope.showAllTasks;
+
+                clearTasksPagination();
+                loadTasks();
+            };
+
+            var skipTasks = 0;
+            var takeTasks = 20;
+            function clearTasksPagination() {
+                skipTasks = 0;
+            }
+            
+            $scope.loadLessTasks = function() {
+                skipTasks -= takeTasks;
+                if (skipTasks < 0) skipTasks = 0;
+
+                loadTasks();
+            };
+            
+            $scope.loadMoreTasks = function () {
+                skipTasks += takeTasks;
+                
+                loadTasks();
+            };
+            
+            function loadTasks() {
+                if (!$scope.chosenOrgUnit) return;
+
+                var url = 'api/organizationUnit/' + $scope.chosenOrgUnit.id;
+
+                if ($scope.showAllTasks) url += "?tasks";
+                else url += '?usages';
+
+                url += '&taskGroup=' + $scope.selectedTaskGroup;
+
+                url += '&skip=' + skipTasks + '&take=' + takeTasks;
+
+                $scope.taskRefUsageList = [];
+                $http.get(url).success(function(result, status, headers) {
+                    $scope.taskRefUsageList = result.response;
+
+                    calculatePaginationButtons(headers);
+                    decorateTasks();
+                }).error(function() {
+                    notify.addErrorMessage("Kunne ikke hente opgaver!");
+                });
+            }
+            
+            function calculatePaginationButtons(headers) {
+                $scope.lessTasks = (skipTasks != 0);
+
+                var paginationHeader = JSON.parse(headers('X-Pagination'));
+                var count = paginationHeader.TotalCount;
+                $scope.moreTasks = (skipTasks + takeTasks) < count;
+            }
+            
+            function addUsage(refUsage, showMessage) {
+                
+                if (showMessage) var msg = notify.addInfoMessage("Opretter tilknytning...", false);
+                
+                url = 'api/taskUsage/';
+
+                var payload = {
+                    taskRefId: refUsage.taskRef.id,
+                    orgUnitId: $scope.chosenOrgUnit.id
+                };
+
+                $http.post(url, payload).success(function (result) {
+                    refUsage.usage = result.response;
+                    if (showMessage) msg.toSuccessMessage("Tilknyningen er oprettet");
+                }).error(function () {
+                    if (showMessage) msg.toErrorMessage("Fejl! Kunne ikke oprette tilknytningen!");
+                });
+            }
+            
+            function removeUsage(refUsage, showMessage) {
+                if (showMessage) var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
+                
+                url = 'api/taskUsage/' + refUsage.usage.id;
+                
+                $http.delete(url).success(function (result) {
+                    refUsage.usage = null;
+                    if (showMessage) msg.toSuccessMessage("Tilknyningen er fjernet");
+                }).error(function () {
+                    if (showMessage) msg.toErrorMessage("Fejl! Kunne ikke fjerne tilknytningen!");
+                });
+            }
+            
+            function decorateTasks() {
+
+                _.each($scope.taskRefUsageList, function(refUsage) {
                     
-                    _.each($scope.taskList, function (task) {
-                        
-                        //hide or show this task depending on the parent org unit
-                        task.show = parentTasks == null || _.contains(parentTasks, task.id);
+                    refUsage.toggleUsage = function() {
 
-                        //get delegations for this task
-                        var delegation = _.find(taskDelegations, function (del) {
-                            return del.usage.taskRefId === task.id;
-                        });
+                        if (refUsage.usage) {
 
-                        task.usage = null;
-                        task.hasDelegations = false;
-                        
-                        if (delegation) {
-                            task.usage = delegation.usage;
-                            task.hasDelegations = delegation.hasDelegations;
+                            removeUsage(refUsage, true);
+
+                        } else {
+
+                            addUsage(refUsage, true);
                         }
-                        
 
-                        task.toggleSelected = function () {
-                            
-                            //if no current usage, post a new usage
-                            if (!task.usage) {
-                                var data = {
-                                    taskRefId: task.id,
-                                    orgUnitId: $scope.chosenOrgUnit.id
-                                };
-                                $http.post('api/taskusage/', data).success(function(result) {
-                                    task.usage = result.response;
-                                    
-                                     //the usage was just added, cant already be delegated
-                                    task.hasDelegations = false;
-                                    
-                                    notifySuccess();
-                                }).error(notifyError);
-                                
-                            } else {
-                                //else, remove the current usage
-                                $http.delete('api/taskusage/' + task.usage.id).success(function () {
-                                    task.usage = null;
-                                    task.hasDelegations = false;
-                                    
-                                    notifySuccess();
-                                    
-                                }).error(notifyError);
-                            }
+                    };
+
+                    refUsage.toggleStar = function() {
+                        if (!refUsage.usage) return;
+
+                        var payload = {
+                            starred: !refUsage.usage.starred
                         };
 
-                        task.toggleStar = function() {
-                            if (!task.usage) return;
-
-                            var payload = {
-                                starred: !task.usage.starred
-                            };
-
-                            var url = 'api/taskusage/' + task.usage.id;
-                            $http({
-                                method: 'PATCH',
-                                url: url,
-                                data: payload
-                            }).success(function(result) {
-                                task.usage = result.response;
-                                notifySuccess();
-
-                            }).error(notifyError);
-
-                        };
-
-                    });
-                });
-            }
-            
-
-            function notifySuccess() {
-                notify.addSuccessMessage("Feltet er opdateret");
-            }
-
-            function notifyError() {
-                notify.addErrorMessage("Fejl!");
-            }
-/*
-            $scope.updateTask = function (task) {
-                task.selected = !task.selected;
-                var orgUnitId = $scope.chosenOrgUnit.id;
-
-                //task.setChildrenState(task.selected);
-                //task.setParentState();
-
-                if (task.selected === true) {
-                    var data = {
-                        taskRefId: task.id,
-                        OrgUnitId: orgUnitId
-                    };
-                    $http.post('api/taskusage/', data).success(function (result) {
-                        task.usageId = result.response.id;
-                        notifySuccess();
-                    }).error(notifyError);
-                } else {
-                    $http.delete('api/taskusage/' + task.usageId).success(function () {
-                        task.starred = false;
-                        delete task.delegatedTo;
-                        notifySuccess();
-                    }).error(notifyError);
-                }
-            };
-
-            $scope.updateStar = function (task) {
-                task.starred = !task.starred;
-                $http({
-                    method: 'PATCH',
-                    url: 'api/taskusage/' + task.usageId,
-                    data: { starred: task.starred }
-                }).success(notifySuccess).error(notifyError);
-            };
-
-            function filterTasks() {
-                var orgUnitParentId = $scope.chosenOrgUnit.parentId;
-
-                if (orgUnitParentId === 0) {
-                    // root tree, show all
-                    _.each($scope.allTasksFlat, function (task) {
-                        task.show = true;
-                        task.canWrite = true;
-                    });
-                } else {
-                    // node tree, show selected from parent
-                    $http.get('api/taskusage/?orgUnitId=' + orgUnitParentId).success(function (result) {
-                        var selectedTasksOnParent = result.response;
-                        _.each(selectedTasksOnParent, function (selectedTask) {
-                            var foundTask = _.find($scope.allTasksFlat, function (task) {
-                                return task.id === selectedTask.usage.taskRefId;
-                            });
-                            if (foundTask) {
-                                foundTask.show = true;
-                                foundTask.canWrite = true;
-                                foundTask.setChildrenShown(true);
-                                foundTask.setParentShown(true);
-                            }
-                        });
-                    });
-                }
-            }
-
-            function selectTasks() {
-                var orgUnitId = $scope.chosenOrgUnit.id;
-
-                $http.get('api/taskusage/?orgUnitId=' + orgUnitId).success(function (result) {
-                    var selectedTasks = result.response;
-                    _.each(selectedTasks, function (selectTask) {
-                        var foundTask = _.find($scope.allTasksFlat, function (task) {
-                            return task.id === selectTask.usage.taskRefId;
-                        });
-                        if (foundTask) {
-                            foundTask.usageId = selectTask.usage.id;
-                            foundTask.selected = true;
-                            foundTask.starred = selectTask.usage.starred;
-                            //foundTask.setChildrenState(true);
-                            //foundTask.setParentState();
-
-                            foundTask.delegatedTo = mapIdToOrgUnit(_.map(selectTask.delegations, function (delegation) {
-                                return delegation.usage.orgUnitId;
-                            }));
-                        }
-                    });
-                });
-            }
-
-            $scope.cleanKleFilter = function () {
-                if ($scope.chosenOrgUnit.kleFilter.parent && $scope.chosenOrgUnit.kleFilter.parent.parentId === null) {
-                    delete $scope.chosenOrgUnit.kleFilter.parent;
-                }
-                if ($scope.chosenOrgUnit.kleFilter.parentId === null) {
-                    delete $scope.chosenOrgUnit.kleFilter.parentId;
-                }
-            };
-
-            function mapIdToOrgUnit(idList) {
-                if (idList.length === 0) {
-                    return [];
-                }
-
-                return _.map(idList, function (id) {
-                    var foundOrgUnit = _.find($scope.orgUnits, function (orgUnit) {
-                        if (angular.isUndefined(orgUnit))
-                            return false;
-                        return orgUnit.id === id;
-                    });
-                    if (foundOrgUnit) {
-                        return foundOrgUnit.name;
-                    }
-                    return 'Ukendt';
-                });
-            };
-
-            function toHierarchy(flatAry, idPropertyName, parentIdPropetyName, parentPropetyName, childPropertyName) {
-                // default values
-                parentPropetyName = typeof parentPropetyName !== 'undefined' ? parentPropetyName : 'parent';
-                childPropertyName = typeof childPropertyName !== 'undefined' ? childPropertyName : 'children';
-
-                // sort by parent to get roots (roots are null) first, then we only need to iterrate once
-                // example [1, 1, null, 2] -> [null, 1, 1, 2] (number is parent id)
-                var sorted = _.sortBy(flatAry, function (obj) {
-                    return obj[parentIdPropetyName];
-                });
-
-                function search(nestedAry, id) {
-                    if (!nestedAry || !id)
-                        throw new Error("Invalid argument(s)"); // abort if not valid input
-
-                    for (var i = 0; i < nestedAry.length; i++) {
-                        var obj = nestedAry[i];
-                        if (obj[idPropertyName] === id) {
-                            return obj;
-                        } else if (obj.hasOwnProperty(childPropertyName)) { // has children, search them too
-                            var found = search(obj[childPropertyName], id);
-                            if (found) return found;
-                        }
-                    }
-                }
-
-                var hierarchy = [];
-                _.each(sorted, function (obj) {
-                    // define functions
-                    obj.isAllChildren = function (isChecked) {
-                        if (typeof isChecked !== 'boolean')
-                            throw new Error('Argument must be a boolean');
-
-                        return _.every(this.children, function (child) {
-                            if (isChecked === true) {
-                                return child.selected === true;
-                            } else {
-                                return child.selected === false && child.indeterminate === false;
-                            }
+                        var url = 'api/taskUsage/' + refUsage.usage.id;
+                        var msg = notify.addInfoMessage("Opdaterer...", false);
+                        $http({ method: 'PATCH', url: url, data: payload }).success(function() {
+                            refUsage.usage.starred = !refUsage.usage.starred;
+                            msg.toSuccessMessage("Feltet er opdateret");
+                        }).error(function() {
+                            msg.toErrorMessage("Fejl!");
                         });
                     };
-                    obj.setChildrenShown = function (isShown) {
-                        if (typeof isShown !== 'boolean')
-                            throw new Error('Argument must be a boolean');
 
-                        var children = this.children;
-                        if (!children) return;
-
-                        _.each(children, function (child) {
-                            child.show = isShown;
-                            child.canWrite = isShown;
-                            child.setChildrenShown(isShown);
-                        });
-                    };
-                    obj.setParentShown = function (isShown) {
-                        var parent = this.parent;
-                        if (!parent) return;
-                        parent.show = isShown;
-                        parent.setParentShown(isShown);
-                    };
-                    obj.setState = function (isChecked) {
-                        if (isChecked === true) {
-                            this.indeterminate = false;
-                            this.selected = true;
-                        } else if (isChecked === false) {
-                            this.indeterminate = false;
-                            this.selected = false;
-                        } else {
-                            this.indeterminate = true;
-                            this.selected = false;
-                        }
-                    };
-                    obj.setChildrenState = function (isChecked) {
-                        if (typeof isChecked !== 'boolean')
-                            throw new Error('Argument must be a boolean');
-
-                        var children = this.children;
-                        if (!children) return;
-
-                        _.each(children, function (child) {
-                            child.setState(isChecked);
-                            child.setChildrenState(isChecked);
-                        });
-                    };
-                    obj.setParentState = function () {
-                        var parent = this.parent;
-                        if (!parent)
-                            return;
-                        if (parent.isAllChildren(true)) {
-                            parent.setState(true);
-                        } else if (parent.isAllChildren(false)) {
-                            parent.setState(false);
-                        } else {
-                            // if all children is neither true or false 
-                            // then it must be a mix
-                            // so we need to set the parent as not selected 
-                            // and show the indeterminate state
-                            parent.setState(null);
-                        }
-                        // cascade up the tree
-                        parent.setParentState();
-                    };
-
-                    if (obj[parentIdPropetyName] === null) { // is root
-                        obj.level = 0;
-                        hierarchy.push(obj);
-                    } else {
-                        var parentObj = search(hierarchy, obj[parentIdPropetyName]);
-                        if (!parentObj.hasOwnProperty(childPropertyName))
-                            parentObj[childPropertyName] = [];
-
-                        obj.level = parentObj.level + 1;
-                        obj[parentPropetyName] = parentObj;
-                        parentObj[childPropertyName].push(obj);
-                    }
                 });
 
-                return hierarchy;
             }
 
-            $scope.editTasks = function () {
-                $scope.chosenOrgUnit.editTasks = !$scope.chosenOrgUnit.editTasks;
-
-                if ($scope.chosenOrgUnit.editTasks) {
-                    delete $scope.chosenOrgUnit.kleFilter.selected;
-                } else {
-                    $scope.chosenOrgUnit.kleFilter.selected = true;
-                }
-            };
-
-            $scope.$watch('chosenOrgUnit', function (newOrgUnit, oldOrgUnit) {
-                if (newOrgUnit) {
-                    newOrgUnit.kleFilter = { type: 'KLE-Emne', selected: true };
-                    var newRootOrgUnitId = getRootOrg(newOrgUnit).id;
-                    var oldRootOrgUnitId;
-                    if (oldOrgUnit === null) {
-                        oldRootOrgUnitId = null;
-                    } else {
-                        oldRootOrgUnitId = getRootOrg(oldOrgUnit).id;
-                    }
-
-                    if (newRootOrgUnitId !== oldRootOrgUnitId) {
-                        getAllTasks(newRootOrgUnitId).then(function () {
-                            cleanup();
-                        });
-                    } else {
-                        cleanup();
-                    }
-                }
-            });
-
-            function cleanup() {
-                resetTasks();
-                filterTasks();
-                selectTasks();
-            }
-
-            function getRootOrg(orgUnit) {
-                if (orgUnit.parent === null) {
-                    return orgUnit;
-                } else {
-                    return getRootOrg(orgUnit.parent);
-                }
-            }
-
-            function getAllTasks(rootOrgUnitId) {
-                var deferred = $q.defer();
-                $http.get('api/taskref?orgUnitId=' + rootOrgUnitId).success(function (result) {
-                    var tasks = result.response;
-                    // flat array for easy searching
-                    $scope.allTasksFlat = tasks;
-                    // nested array for angular to generate tree in a repeat
-                    $scope.allTasksTree = toHierarchy(tasks, 'id', 'parentId');
-                    deferred.resolve();
-                });
-                return deferred.promise;
-            }
-
-            function resetTasks() {
-                _.each($scope.allTasksFlat, function (task) {
-                    task.show = false;
-                    task.selected = false;
-                    task.indeterminate = false;
-                    task.canWrite = false;
-                    task.starred = false;
-                    delete task.delegatedTo;
-                    delete task.usageId;
-                });
-            }
-
-            //function updateTree(rootOrgUnitId) {
-            //    rootOrgUnitId = typeof rootOrgUnitId !== 'undefined' ? rootOrgUnitId : getRootOrg($scope.chosenOrgUnit).id;
-            //    getAllTasks(rootOrgUnitId).then(function () {
-            //        cleanup();
-            //    });
-            //}
-
-            //$scope.modalAddTaskClick = function () {
-            //    var modal = $modal.open({
-            //        templateUrl: 'partials/org/add-task-modal.html',
-            //        controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
-            //            $modalScope.orgName = $scope.chosenOrgUnit.organization.name;
-            //            $modalScope.allTasks = $scope.allTasksFlat;
-            //            $modalScope.task = {
-            //                ownedByOrganizationUnitId: $scope.chosenOrgUnit.organization.id,
-            //                uuid: '00000000-0000-0000-0000-000000000000',
-            //                type: 'KLE',
-            //                activeFrom: null,
-            //                activeTo: null
-            //            };
-
-            //            $modalScope.ok = function () {
-            //                var task = $modalScope.task;
-            //                $http.post('api/taskref', task)
-            //                    .success(function () {
-            //                        notify.addSuccessMessage(task.taskKey + ' er oprettet');
-            //                        updateTree();
-            //                        $modalInstance.close();
-            //                    })
-            //                    .error(function () {
-            //                        notify.addErrorMessage('Fejl');
-            //                    });
-            //            };
-
-            //            $modalScope.cancel = function () {
-            //                $modalInstance.dismiss('cancel');
-            //            };
-            //        }]
-            //    });
-
-            //    modal.result.then(
-            //        //close
-            //        function (result) {
-            //            console.log(result);
-            //        },
-            //        //dismiss
-            //        function (result) {
-            //            var a = result;
-            //        });
-            //};
-
-            $scope.indent = indent;
-
-            var altRow = false;
-            $scope.getAltRow = function () {
-                altRow = !altRow;
-                return altRow;
-            };
-
-            $scope.selectAll = function (toState) {
-                var filter = $filter('filter');
-                var filteredTasks = filter($scope.allTasksFlat, $scope.chosenOrgUnit.kleFilter);
-
-                angular.forEach(filteredTasks, function (task) {
-                    if (task.selected !== toState) {
-                        $scope.updateTask(task);
+            $scope.selectAllTasks = function() {
+                _.each($scope.taskRefUsageList, function(refUsage) {
+                    if (!refUsage.usage) {
+                        addUsage(refUsage, false);
                     }
                 });
             };
 
-            */
+            $scope.removeAllTasks = function() {
+                _.each($scope.taskRefUsageList, function(refUsage) {
+                    if (refUsage.usage) {
+                        removeUsage(refUsage, false);
+                    }
+                });
+            };
+
+
         }]);
 })(angular, app);

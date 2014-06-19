@@ -138,7 +138,7 @@ namespace UI.MVC4.Controllers.API
         {
             return NotAllowed();
         }
-
+        
         /// <summary>
         /// Returns every task that a given OrgUnit can use. This depends on the task usages of the parent OrgUnit.
         /// For every task returned, possibly a taskUsage is returned too, if the OrgUnit is currently using that task.
@@ -154,15 +154,28 @@ namespace UI.MVC4.Controllers.API
             {
                 var orgUnit = Repository.GetByKey(id);
 
+                IQueryable<TaskRef> taskQuery;
                 //if the org unit has a parent, only select those tasks that is in use by the parent org unit
                 if (orgUnit.ParentId.HasValue)
-                    pagingModel.Where(taskRef => taskRef.Usages.Any(usage => usage.OrgUnitId == orgUnit.ParentId));
+                {
+                    //this is not so good performance wise
+                    var orgUnitQueryable = Repository.AsQueryable().Where(unit => unit.Id == id);
+                    taskQuery = orgUnitQueryable.SelectMany(u => u.Parent.TaskUsages.Select(usage => usage.TaskRef));
+
+                    //it would have been better with:
+                    //pagingModel.Where(taskRef => taskRef.Usages.Any(usage => usage.OrgUnitId == orgUnit.ParentId));
+                    //but we cant because of a bug in the mysql connector: http://bugs.mysql.com/bug.php?id=70722
+                }
+                else
+                {
+                    taskQuery = _taskRepository.AsQueryable();
+                }
 
                 //if a task group is given, only find the tasks in that group
-                if (taskGroup.HasValue) pagingModel.Where(taskRef => taskRef.ParentId == taskGroup);
+                if (taskGroup.HasValue) pagingModel.Where(taskRef => taskRef.ParentId.Value == taskGroup.Value);
+                else pagingModel.Where(taskRef => taskRef.Children.Any() == false);
 
-                var taskQuery = _taskRepository.AsQueryable();
-                var theTasks = Page(taskQuery, pagingModel);
+                var theTasks = Page(taskQuery, pagingModel).ToList();
 
                 //convert tasks to DTO containing both the task and possibly also a taskUsage, if that exists
                 var dtos = (from taskRef in theTasks
@@ -170,7 +183,7 @@ namespace UI.MVC4.Controllers.API
                            select new TaskRefUsageDTO()
                                {
                                    TaskRef = Map<TaskRef, TaskRefDTO>(taskRef),
-                                   TaskUsage = Map<TaskUsage, TaskUsageDTO>(taskUsage)
+                                   Usage = Map<TaskUsage, TaskUsageDTO>(taskUsage)
                                });
 
                 return Ok(dtos);
@@ -188,7 +201,7 @@ namespace UI.MVC4.Controllers.API
         /// <param name="taskGroup">Optional id of a taskgroup</param>
         /// <param name="usages">Routing qualifier</param>
         /// <param name="pagingModel">Paging options</param>
-        /// <returns></returns>
+        /// <returns>List of (task, taskUsage)</returns>
         public HttpResponseMessage GetTaskUsages(int id, int? taskGroup, bool? usages,
                                                  [FromUri] PagingModel<TaskUsage> pagingModel)
         {
@@ -196,11 +209,17 @@ namespace UI.MVC4.Controllers.API
             {
                 var usageQuery = _taskUsageRepository.AsQueryable();
 
+                pagingModel.OrderBy = "TaskRefId";
                 pagingModel.Where(usage => usage.OrgUnitId == id);
 
-                var theUsages = Page(usageQuery, pagingModel);
+                var theUsages = Page(usageQuery, pagingModel).ToList();
 
-                var dtos = Map<IEnumerable<TaskUsage>, IEnumerable<TaskUsageDTO>>(theUsages);
+                var dtos = (from usage in theUsages
+                            select new TaskRefUsageDTO()
+                            {
+                                TaskRef = Map<TaskRef, TaskRefDTO>(usage.TaskRef),
+                                Usage = Map<TaskUsage, TaskUsageDTO>(usage)
+                            });
 
                 return Ok(dtos);
             }

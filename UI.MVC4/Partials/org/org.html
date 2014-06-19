@@ -126,13 +126,13 @@
                     <div class="panel-heading">
                         <i class="glyphicon glyphicon-tasks"></i> 
                         Tilknyttede opgaver
-                        <a class="pull-right" data-ng-show="chosenOrgUnit.hasWriteAccess" data-ng-click="editTasks()">
-                            <span data-ng-if="!chosenOrgUnit.editTasks">Rediger</span>
-                            <span data-ng-if="chosenOrgUnit.editTasks">Afslut rediger</span>
+                        <a class="pull-right" data-ng-show="chosenOrgUnit.hasWriteAccess" data-ng-click="changeTaskView()">
+                            <span data-ng-if="!showAllTasks">Vis alle</span>
+                            <span data-ng-if="showAllTasks">Vis valgte</span>
                         </a>
                     </div>
                     <div class="panel-body">
-                        <div data-kle-filter="taskList"></div>
+                        <div data-kle-filter="selectedTaskGroup"></div>
                     </div>
                     <table class="table table-condensed">
                         <thead>
@@ -144,13 +144,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr data-ng-repeat="task in taskList | filter:{show: true}">
+                            <tr data-ng-repeat="task in taskRefUsageList">
                                 <!-- selected -->
                                 <td>
-                                    <input type="checkbox" id="task{{task.id}}" data-ng-checked="task.usage" data-ng-click="task.toggleSelected()" data-ng-disabled="!chosenOrgUnit.hasWriteAccess"/>
+                                    <input type="checkbox" id="{{task.taskRef.id}}" data-ng-checked="task.usage" data-ng-click="task.toggleUsage()" data-ng-disabled="!chosenOrgUnit.hasWriteAccess"/>
                                 </td>
                                 <td>
-                                    <label for="task{{task.id}}">{{task.taskKey}} {{task.description}}</label>
+                                    <label for="{{task.taskRef.id}}">{{task.taskRef.taskKey}} {{task.taskRef.description}}</label>
                                 </td>
                                 <td>
                                     <button class="btn btn-link btn-star" data-ng-if="task.usage"
@@ -162,37 +162,40 @@
                                     </button>
                                 </td>
                                 <td>
-                                    <span class="text-success" data-ng-show="task.hasDelegations">
-                                        <i class="glyphicon glyphicon-ok" data-tooltip="{{ task.delegatedTo | joinBy:', ' }}" data-tooltip-placement="right"></i>
+                                    <span class="text-success" data-ng-show="task.usage.hasDelegations">
+                                        <i class="glyphicon glyphicon-ok" data-tooltip="{{ task.usage.delegatedTo | joinBy:', ' }}" data-tooltip-placement="right"></i>
                                     </span>
                                 </td>
                             </tr>
                         </tbody>
-                        
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" class="text-center">
+                                    <div class="pull-left">
+                                        <button class="btn btn-primary btn-sm" data-ng-if="lessTasks" data-ng-click="loadLessTasks()">
+                                            <i class="glyphicon glyphicon-chevron-left small"></i> Forrige
+                                        </button>
+                                    </div>
+                                    <span>
+                                        <button class="btn btn-success btn-sm" data-ng-click="selectAllTasks()">
+                                            Vælg alle
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" data-confirmed-click="removeAllTasks()" data-confirm-click="Er du sikker?">
+                                            Fjern alle
+                                        </button>
+                                    </span>
+                                    <div class="pull-right">
+                                        <button class="btn btn-primary btn-sm" data-ng-if="moreTasks" data-ng-click="loadMoreTasks()">
+                                            Næste <i class="glyphicon glyphicon-chevron-right small"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+
+                        </tfoot>
 
                     </table>
-                        <div class="col-md-12" >
-                            
-                            
-                            
-
-                        </div>
-                        <!--
-                            <div class="row">
-                                <span class="col-md-1 text-center"><strong>Valgt</strong></span>
-                                <span class="col-md-9"><strong>Opgave</strong></span>
-                                <span class="col-md-2 text-center"><strong>Delegeret</strong></span>
-                            </div>
-                            <div data-ng-repeat="task in allTasksFlat | filter:chosenOrgUnit.kleFilter" data-ng-show="task.show" data-ng-include="'partials/org/task.html'">
-                            
-                            </div>
-                            -->
-
-                    </div>
-                    <div class="panel-footer" data-ng-if="chosenOrgUnit.editTasks">
-                        <button data-ng-click="selectAll(true)">Vælg alle</button>
-                        <button data-ng-click="selectAll(false)">Ryd alle</button>
-                    </div>
                 </div>
             </div>              
         </div>

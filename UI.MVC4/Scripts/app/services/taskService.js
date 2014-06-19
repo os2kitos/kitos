@@ -54,7 +54,6 @@
 
             return deferred.promise;
         }
-
         return {
             getRoots: getRoots,
             getChildren: getChildren

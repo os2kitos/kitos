@@ -3,6 +3,6 @@
     public class TaskRefUsageDTO
     {
         public TaskRefDTO TaskRef { get; set; }
-        public TaskUsageDTO TaskUsage { get; set; }
+        public TaskUsageDTO Usage { get; set; }
     }
 }
