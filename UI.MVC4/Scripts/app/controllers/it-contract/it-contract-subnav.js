@@ -16,7 +16,7 @@
                     { state: 'it-contract.plan', text: 'Overblik: tid' },
                     { state: 'it-contract.edit', text: 'IT Kontrakt', showWhen: 'it-contract.edit' },
                 ];
-                $rootScope.page.buttons = [
+                $rootScope.page.subnav.buttons = [
                     { func: create, text: 'Opret IT Kontrakt' }
                 ];
 

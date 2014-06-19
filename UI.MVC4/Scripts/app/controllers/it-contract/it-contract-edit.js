@@ -84,8 +84,8 @@
                 $scope.suppliers = suppliers;
                 $scope.orgUnits = orgUnits;
                 $scope.contracts = contracts;
-                $scope.agreementElements = agreementElements; // all available elements
-                $scope.customAgreementElements = customAgreementElements;
+                $scope.agreementElements = agreementElements
+                $scope.selectedAgreementElements = _.pluck(contract.agreementElements, 'id');
 
                 $scope.procurementPlans = [];
                 var currentDate = moment();
@@ -125,81 +125,6 @@
                             msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                         });
                 }
-
-                // check selected agreementElements
-                (function () {
-                    var selectedIds = _.pluck(contract.agreementElements, 'id'); // selected agreementElements
-                    _.each(selectedIds, function(id) {
-                        var foundElem = _.find($scope.agreementElements, function(elem) {
-                            return elem.id == id;
-                        });
-                        if (foundElem) {
-                            foundElem.isChecked = true;
-                        }
-                    });
-                })();
-                
-                $scope.updateElem = function(item) {
-                    var msg = notify.addInfoMessage("Gemmer...", false);
-                    if (item.isChecked) {
-                        $http.post('api/itcontract/' + $stateParams.id + '?elemId=' + item.id)
-                            .success(function() {
-                                msg.toSuccessMessage("Feltet er oprettet.");
-                            })
-                            .error(function() {
-                                msg.toErrorMessage("Fejl! Feltet kunne ikke oprettes!");
-                            });
-                    } else {
-                        $http.delete('api/itcontract/' + $stateParams.id + '?elemId=' + item.id)
-                            .success(function () {
-                                msg.toSuccessMessage("Feltet er oprettet.");
-                            })
-                            .error(function () {
-                                msg.toErrorMessage("Fejl! Feltet kunne ikke oprettes!");
-                            });
-                    }
-                };
-
-                function clearNewAgreementItem() {
-                    $scope.newItem = {};
-                }
-
-                clearNewAgreementItem();
-
-                $scope.saveCustomElem = function() {
-                    var payload = {
-                        name: $scope.newItem.name,
-                        itContractId: $stateParams.id
-                    };
-                    var msg = notify.addInfoMessage("Gemmer...", false);
-                    $http.post('api/customagreementelement', payload)
-                        .success(function(result) {
-                            msg.toSuccessMessage("Feltet er oprettet.");
-                            $scope.customAgreementElements.push(result.response);
-                            clearNewAgreementItem();
-                        })
-                        .error(function() {
-                            msg.toErrorMessage("Fejl! Feltet kunne ikke oprettes!");
-                        });
-                };
-
-                $scope.deleteCustomElem = function(id) {
-                    var msg = notify.addInfoMessage("Sletter...", false);
-                    $http.delete('api/customagreementelement/' + id)
-                        .success(function() {
-                            msg.toSuccessMessage("Feltet er slettet.");
-                            var foundElem = _.find($scope.customAgreementElements, function (elem) {
-                                return elem.id == id;
-                            });
-                            if (foundElem) {
-                                var index = _.indexOf($scope.customAgreementElements, foundElem);
-                                $scope.customAgreementElements.splice(index, 1);
-                            }
-                        })
-                        .error(function() {
-                            msg.toErrorMessage("Fejl! Feltet kunne ikke slettes!");
-                        });
-                };
 
                 if (contract.parentId) {
                     $scope.contract.parent = {

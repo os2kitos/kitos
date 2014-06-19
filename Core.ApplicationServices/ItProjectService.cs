@@ -74,7 +74,7 @@ namespace Core.ApplicationServices
             
             clone.OrganizationId = newOrgId;
             clone.ObjectOwner = newOwner;
-            clone.ParentId = original.Id;
+            clone.OriginalId = original.Id;
 
             clone.ItProjectId = original.ItProjectId;
             clone.Background = original.Background;
@@ -90,8 +90,8 @@ namespace Core.ApplicationServices
                     ObjectOwner = newOwner
                 };
 
-            // TODO AssociatedProgramId = project.AssociatedProgramId,
-            // TODO AssociatedProjects = project.AssociatedProjects,
+            // TODO ParentId = project.ParentId,
+            // TODO Children = project.Children,
 
             clone.ItProjectTypeId = original.ItProjectTypeId;
             clone.TaskRefs = original.TaskRefs;
@@ -125,7 +125,7 @@ namespace Core.ApplicationServices
         public void DeleteProject(ItProject project)
         {
             //Remove reference to this project in cloned projects
-            project.Children.Select(clone => clone.Parent = null);
+            project.Clones.Select(clone => clone.Original = null);
             _projectRepository.Save();
             
             var phase1Id = project.Phase1.Id;

@@ -18,9 +18,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(d => d.References)
                 .HasForeignKey(t => t.ItProjectTypeId);
 
-           this.HasOptional(t => t.AssociatedProgram)
-                .WithMany(d => d.AssociatedProjects)
-                .HasForeignKey(t => t.AssociatedProgramId)
+           this.HasOptional(t => t.Parent)
+                .WithMany(d => d.Children)
+                .HasForeignKey(t => t.ParentId)
                 .WillCascadeOnDelete(false);
 
             this.HasMany(t => t.UsedByOrgUnits)
@@ -92,9 +92,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(d => d.ResponsibleOrgUnitId)
                 .WillCascadeOnDelete(false);
 
-            this.HasOptional(t => t.Parent)
-                .WithMany(t => t.Children)
-                .HasForeignKey(d => d.ParentId)
+            this.HasOptional(t => t.Original)
+                .WithMany(t => t.Clones)
+                .HasForeignKey(d => d.OriginalId)
                 .WillCascadeOnDelete(false);
 
             this.HasMany(t => t.Stakeholders)
