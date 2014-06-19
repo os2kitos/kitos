@@ -2,7 +2,7 @@
 
 namespace UI.MVC4.Models
 {
-    public class ItProjectTypeDTO
+    public class ItProjectCatalogDTO
     {
         //1st column: type
         public string ItProjectTypeName { get; set; }
