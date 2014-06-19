@@ -5,22 +5,22 @@
             templateUrl: 'partials/it-project/tab-strategy.html',
             controller: 'project.EditStrategyCtrl',
             resolve: {
-                jointMunicipalProjects: ['$http', 'itProject', 'itProjectCategories', function ($http, itProject, itProjectCategories) {
+                jointMunicipalProjects: ['$http', 'project', 'itProjectCategories', function ($http, project, itProjectCategories) {
                     var category = _.find(itProjectCategories, function(cat) {
                         return cat.name == 'Fælleskommunal'; // TODO hardcoded literal... find better solution!
                     });
                     var catId = category.id;
-                    var orgId = itProject.organizationId;
+                    var orgId = project.organizationId;
                     return $http.get('api/itproject/?orgId=' + orgId + '&catId=' + catId).then(function(result) {
                         return result.data.response;
                     });
                 }],
-                commonPublicProjects: ['$http', 'itProject', 'itProjectCategories', function ($http, itProject, itProjectCategories) {
+                commonPublicProjects: ['$http', 'project', 'itProjectCategories', function ($http, project, itProjectCategories) {
                     var category = _.find(itProjectCategories, function (cat) {
                         return cat.name == 'Fællesoffentlig'; // TODO hardcoded literal... find better solution!
                     });
                     var catId = category.id;
-                    var orgId = itProject.organizationId;
+                    var orgId = project.organizationId;
                     return $http.get('api/itproject/?orgId=' + orgId + '&catId=' + catId).then(function (result) {
                         return result.data.response;
                     });
@@ -30,14 +30,14 @@
     }]);
 
     app.controller('project.EditStrategyCtrl',
-    ['$scope', 'itProject', 'jointMunicipalProjects', 'commonPublicProjects',
-        function ($scope, itProject, jointMunicipalProjects, commonPublicProjects) {
-            $scope.isStrategy = itProject.isStrategy;
-            $scope.jointMunicipalProjectId = itProject.jointMunicipalProjectId;
+    ['$scope', 'project', 'jointMunicipalProjects', 'commonPublicProjects',
+        function ($scope, project, jointMunicipalProjects, commonPublicProjects) {
+            $scope.isStrategy = project.isStrategy;
+            $scope.jointMunicipalProjectId = project.jointMunicipalProjectId;
             $scope.jointMunicipalProjects = jointMunicipalProjects;
-            $scope.commonPublicProjectId = itProject.commonPublicProjectId;
+            $scope.commonPublicProjectId = project.commonPublicProjectId;
             $scope.commonPublicProjects = commonPublicProjects;
 
-            $scope.autosaveUrl = 'api/itproject/' + itProject.id;
+            $scope.autosaveUrl = 'api/itproject/' + project.id;
         }]);
 })(angular, app);

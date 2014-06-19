@@ -65,11 +65,7 @@ namespace UI.MVC4.App_Start
 
             Mapper.CreateMap<ItProjectCategory, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
-            
-            Mapper.CreateMap<ItProjectType, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
+                  .ForMember(dest => dest.References, opt => opt.Ignore()); 
 
             Mapper.CreateMap<PurchaseForm, OptionDTO>()
                   .ReverseMap()
@@ -294,12 +290,12 @@ namespace UI.MVC4.App_Start
                   .ReverseMap();
 
             Mapper.CreateMap<ItProject, ItProjectDTO>()
-                  .ForMember(dest => dest.AssociatedProjectIds,
-                             opt => opt.MapFrom(x => x.AssociatedProjects.Select(y => y.Id)))
+                  .ForMember(dest => dest.ChildrenIds,
+                             opt => opt.MapFrom(x => x.Children.Select(y => y.Id)))
                   .ForMember(dest => dest.ItSystems,
                              opt => opt.MapFrom(src => src.ItSystemUsages.Select(x => x.ItSystem)))
                   .ReverseMap()
-                  .ForMember(dest => dest.AssociatedProjects, opt => opt.Ignore())
+                  .ForMember(dest => dest.Children, opt => opt.Ignore())
                   .ForMember(dest => dest.ItSystemUsages, opt => opt.Ignore())
                   .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
                   .ForMember(dest => dest.ResponsibleOrgUnit, opt => opt.Ignore())

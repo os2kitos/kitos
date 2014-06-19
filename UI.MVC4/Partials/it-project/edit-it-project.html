@@ -9,7 +9,7 @@
                 <div class="col-md-10">
                     <input type="text" id="project-name" data-ng-model="project.name" class="form-control input-sm" 
                            data-field="name"
-                           data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess"/>
+                           data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess">
                 </div>
             </div>
 
@@ -19,7 +19,7 @@
                 <div class="col-md-4">
                     <input type="text" id="project-projectId" data-ng-model="project.itProjectId" class="form-control input-sm" 
                         data-field="itProjectId"
-                        data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess"/>
+                        data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess">
                 </div>
                 
                 <!-- access modifier -->
@@ -27,21 +27,13 @@
                 <div class="col-md-4">
                     <input id="project-access" data-ng-model="project.accessModifier" class="form-control input-sm" data-select-access-modifier=""
                         data-field="accessModifier"
-                        data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess"/>
+                        data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess">
                 </div>
             </div>
             
             <div class="form-group">
-                <!-- type -->
-                <label for="project-type" class="control-label col-md-2 small">Type</label>
-                <div class="col-md-4">
-                    <select id="project-type" class="form-control input-sm"
-                            data-ng-options="o.id as o.name for o in itProjectTypes"
-                            data-ng-model="project.itProjectTypeId"
-                            data-field="itProjectTypeId"
-                            data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess">
-                    </select>
-                </div>
+                <!-- TODO type -->
+                
 
                 <!-- category -->
                 <label for="project-category" class="control-label col-md-2 small">Kategori</label>
@@ -62,7 +54,7 @@
                     <input id="project-esdh" class="form-control input-sm" type="text" data-ng-model="project.esdh"
                         data-ng-disabled="!hasWriteAccess"   
                         data-field="esdh" 
-                        data-autosave="api/itproject/{{project.id}}" /> 
+                        data-autosave="api/itproject/{{project.id}}"> 
                        
 
                 </div>
@@ -73,7 +65,7 @@
                     <input id="project-cmdb" class="form-control input-sm" type="text" data-ng-model="project.cmdb"
                         data-ng-disabled="!hasWriteAccess"   
                         data-field="cmdb" 
-                        data-autosave="api/itproject/{{project.id}}" /> 
+                        data-autosave="api/itproject/{{project.id}}"> 
                         
                 </div>
             </div>
@@ -85,33 +77,16 @@
                     <input id="project-url" class="form-control input-sm" type="text" data-ng-model="project.folder" 
                         data-ng-disabled="!hasWriteAccess"   
                         data-field="folder" 
-                        data-autosave="api/itproject/{{project.id}}" />
+                        data-autosave="api/itproject/{{project.id}}">
                         
                 </div>
             </div>
             
-            <!-- associated program -->
-            <div class="form-group" data-ng-if="project.itProjectTypeId != itProgramType.id">
-                <label class="col-md-2 control-label small" for="associated-program">
-                    Tilknyttet program
-                </label>
+            <!-- Parent -->
+            <div class="form-group">
+                <label for="project-parent" class="col-md-2 control-label small">Overordnet projekt</label>
                 <div class="col-md-10">
-                    <!-- TODO -->
-                    <input type="hidden"  id="associated-program" class="form-control input-sm"
-                           data-ng-model="project.associatedProgram" data-ui-select2="programSelectOptions"
-                           data-ng-change="updateAssociatedProgram()" data-ng-disabled="!hasWriteAccess"/>
-                           
-                </div>
-            </div>
-            
-            <!-- associated projects -->
-            <!--TODO: only show this if project _is_ of type 'program' -->
-            <div class="form-group"  data-ng-if="project.itProjectTypeId == itProgramType.id">
-                <label class="col-md-2 control-label small" for="associated-projects">
-                    Tilknyttede projekter
-                </label>
-                <div id="associated-projects" class="col-md-10">
-                    <!-- TODO: list projects as links -->
+                    <input type="hidden" data-ui-select2="parentSelectOptions" id="project-parent" data-ng-model="project.parent" class="form-control input-sm" data-autosave="{{ autosaveUrl }}" data-field="parentId" data-ng-disabled="!hasWriteAccess">
                 </div>
             </div>
 
@@ -120,7 +95,7 @@
                 <div class="col-md-offset-2">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" data-ng-model="project.isArchived" data-autosave="{{autosaveUrl}}" data-field="isArchived" /> Arkiveret
+                            <input type="checkbox" data-ng-model="project.isArchived" data-autosave="{{autosaveUrl}}" data-field="isArchived"> Arkiveret
                         </label>
                     </div>
                 </div>

@@ -14,7 +14,6 @@ namespace Core.ApplicationServices
         private readonly IOrganizationService _organizationService;
 
         public ItProjectService(IGenericRepository<ItProject> projectRepository, 
-            IGenericRepository<ItProjectType> projectTypeRepository, 
             IGenericRepository<Activity> activityRepository, 
             IGenericRepository<ItProjectRight> rightRepository,
             IOrganizationService organizationService)
@@ -23,12 +22,7 @@ namespace Core.ApplicationServices
             _activityRepository = activityRepository;
             _rightRepository = rightRepository;
             _organizationService = organizationService;
-
-            //TODO: dont hardcode this
-            ProgramType = projectTypeRepository.Get(type => type.Name == "IT Program").Single();
         }
-
-        public ItProjectType ProgramType { get; private set; }
 
         public IEnumerable<ItProject> GetAll(int? orgId = null, string nameSearch = null, bool includePublic = true)
         {
@@ -51,16 +45,6 @@ namespace Core.ApplicationServices
             if (nameSearch != null) result = result.Where(p => p.Name.Contains(nameSearch));
 
             return result;
-        }
-
-        public IEnumerable<ItProject> GetProjects(int? orgId = null, string nameSearch = null, bool includePublic = true)
-        {
-            return GetAll(orgId, nameSearch: nameSearch, includePublic: includePublic).Where(project => project.ItProjectType.Id != ProgramType.Id);
-        }
-
-        public IEnumerable<ItProject> GetPrograms(int? orgId = null, string nameSearch = null, bool includePublic = true)
-        {
-            return GetAll(orgId, nameSearch: nameSearch, includePublic: includePublic).Where(project => project.ItProjectType.Id == ProgramType.Id);
         }
 
         public ItProject AddProject(ItProject project)
@@ -90,7 +74,7 @@ namespace Core.ApplicationServices
             
             clone.OrganizationId = newOrgId;
             clone.ObjectOwner = newOwner;
-            clone.ParentItProjectId = original.Id;
+            clone.OriginalId = original.Id;
 
             clone.ItProjectId = original.ItProjectId;
             clone.Background = original.Background;
@@ -106,10 +90,9 @@ namespace Core.ApplicationServices
                     ObjectOwner = newOwner
                 };
 
-            // TODO AssociatedProgramId = project.AssociatedProgramId,
-            // TODO AssociatedProjects = project.AssociatedProjects,
+            // TODO ParentId = project.ParentId,
+            // TODO Children = project.Children,
 
-            clone.ItProjectTypeId = original.ItProjectTypeId;
             clone.ItProjectCategoryId = original.ItProjectCategoryId;
             clone.TaskRefs = original.TaskRefs;
 
@@ -142,7 +125,7 @@ namespace Core.ApplicationServices
         public void DeleteProject(ItProject project)
         {
             //Remove reference to this project in cloned projects
-            project.ChildItProjects.Select(clone => clone.ParentItProject = null);
+            project.Clones.Select(clone => clone.Original = null);
             _projectRepository.Save();
             
             var phase1Id = project.Phase1.Id;

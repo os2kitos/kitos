@@ -6,15 +6,9 @@
             templateUrl: 'partials/it-project/edit-it-project.html',
             controller: 'project.EditCtrl',
             resolve: {
-                itProject: ['$http', '$stateParams', function($http, $stateParams) {
+                project: ['$http', '$stateParams', function($http, $stateParams) {
                     return $http.get("api/itproject/" + $stateParams.id)
                         .then(function(result) {
-                            return result.data.response;
-                        });
-                }],
-                itProjectTypes: ['$http', function ($http) {
-                    return $http.get("api/itprojecttype/")
-                        .then(function (result) {
                             return result.data.response;
                         });
                 }],
@@ -37,29 +31,28 @@
         });
     }]);
 
-
     app.controller('project.EditCtrl', ['$scope', '$http', 'notify',
-            'itProject', 'itProjectTypes', 'itProjectCategories', 'user', 'hasWriteAccess',
-            function ($scope, $http, notify, itProject, itProjectTypes, itProjectCategories, user, hasWriteAccess) {
-                $scope.project = itProject;
-                if ($scope.project.associatedProgramId) {
-                    $scope.project.associatedProgram = {
-                        id: $scope.project.associatedProgramId,
-                        text: $scope.project.associatedProgramName
+            'project', 'itProjectCategories', 'user', 'hasWriteAccess',
+            function ($scope, $http, notify, project, itProjectCategories, user, hasWriteAccess) {
+                $scope.project = project;
+                if ($scope.project.parentId) {
+                    $scope.project.parent = {
+                        id: $scope.project.parentId,
+                        text: $scope.project.parentName
                     };
                 }
 
                 $scope.selectSettings = { dynamicTitle: false, defaultText: 'Tabs' };
                 $scope.selectedData = [];
-                if (itProject.isStatusGoalVisible) 
+                if (project.isStatusGoalVisible) 
                     $scope.selectedData.push({ id: 1 });
-                if (itProject.isEconomyVisible)
+                if (project.isEconomyVisible)
                     $scope.selectedData.push({ id: 2 });
-                if (itProject.isStakeholderVisible)
+                if (project.isStakeholderVisible)
                     $scope.selectedData.push({ id: 3 });
-                if (itProject.isCommunicationVisible)
+                if (project.isCommunicationVisible)
                     $scope.selectedData.push({ id: 4 });
-                if (itProject.isHandoverVisible)
+                if (project.isHandoverVisible)
                     $scope.selectedData.push({ id: 5 });
                 $scope.dropdownData = [
                     {id: 1, label: 'Vis Status: Mål'},
@@ -128,22 +121,16 @@
                 }, true);
 
                 $scope.hasWriteAccess = hasWriteAccess;
-
-                $scope.autosaveUrl = "api/itproject/" + itProject.id;
-
-                $scope.itProjectTypes = itProjectTypes;
+                $scope.autosaveUrl = "api/itproject/" + project.id;
                 $scope.itProjectCategories = itProjectCategories;
                 
-                //ItProgram type TODO: don't hardcode this?
-                $scope.itProgramType = _.findWhere(itProjectTypes, { name: "IT Program" });
+                $scope.parentSelectOptions = selectLazyLoading('api/itproject', true, ['orgId=' + user.currentOrganizationId]);
 
-                $scope.programSelectOptions = selectLazyLoading('api/itproject?programs&orgId=' + user.currentOrganizationId);
-                $scope.programSelectOptions.allowClear = true;
-                $scope.programSelectOptions.placeholder = "Vælg program";
-
-                function selectLazyLoading(url) {
+                function selectLazyLoading(url, excludeSelf, format, paramAry) {
                     return {
                         minimumInputLength: 1,
+                        allowClear: true,
+                        placeholder: ' ',
                         initSelection: function (elem, callback) {
                         },
                         ajax: {
@@ -152,7 +139,8 @@
                             },
                             quietMillis: 500,
                             transport: function (queryParams) {
-                                var res = $http.get(url + '&q=' + queryParams.data.query).then(queryParams.success);
+                                var extraParams = paramAry ? '&' + paramAry.join('&') : '';
+                                var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
                                 res.abort = function () {
                                     return null;
                                 };
@@ -164,10 +152,13 @@
                                 var results = [];
 
                                 _.each(data.data.response, function (obj) {
+                                    if (excludeSelf && obj.id == project.id)
+                                        return; // don't add self to result
 
                                     results.push({
                                         id: obj.id,
-                                        text: obj.name
+                                        text: obj.name ? obj.name : 'Unavngiven',
+                                        cvr: obj.cvr
                                     });
                                 });
 
@@ -177,24 +168,6 @@
                     };
                 }
 
-                $scope.updateAssociatedProgram = function() {
-
-                    var val = null;
-                    if ($scope.project.associatedProgram != null) val = $scope.project.associatedProgram.id;
-
-                    var payload = { associatedProgramId: val };
-
-                    $http({
-                        method: 'PATCH',
-                        url: $scope.autosaveUrl,
-                        data: payload
-                    }).success(function(result) {
-                        notify.addSuccessMessage("Feltet er opdateret");
-                    }).error(function(result) {
-                        notify.addErrorMessage("Feltet kunne ikke opdateres!");
-                    });
-                };
-                
                 $scope.opened = {};
                 $scope.open = function ($event, datepicker) {
                     $event.preventDefault();
