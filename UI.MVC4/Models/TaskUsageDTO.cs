@@ -1,9 +1,13 @@
-﻿namespace UI.MVC4.Models
+﻿using System.Collections.Generic;
+
+namespace UI.MVC4.Models
 {
     public class TaskUsageDTO
     {
         public int Id { get; set; }
         public int TaskRefId { get; set; }
+        public string TaskRefDescription { get; set; }
+        public string TaskRefTaskKey { get; set; }
         public int OrgUnitId { get; set; }
 
         public bool Starred { get; set; }
