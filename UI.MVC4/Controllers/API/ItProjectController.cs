@@ -58,12 +58,14 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetCatalog(bool? catalog, [FromUri] int orgId)
+        public HttpResponseMessage GetCatalog(bool? catalog, [FromUri] int orgId, [FromUri] PagingModel<ItProject> pagingModel)
         {
             try
             {
+                pagingModel.Where(p => p.OrganizationId == orgId || p.AccessModifier == AccessModifier.Public);
+
                 //Get all projects inside the organizaton OR public
-                var projects = _itProjectService.GetAll(orgId, includePublic: true);
+                var projects = Page(Repository.AsQueryable(), pagingModel);
 
                 var dto = Map<IEnumerable<ItProject>, IEnumerable<ItProjectCatalogDTO>>(projects);
 
@@ -110,8 +112,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var project = _itProjectService.GetAll().FirstOrDefault(p => p.Id == id);
-
+                var project = Repository.GetByKey(id);
                 if (project == null) return NotFound();
 
                 return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(project.UsedByOrgUnits));

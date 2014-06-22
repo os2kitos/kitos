@@ -23,10 +23,34 @@
     app.controller('project.CatalogCtrl',
         ['$scope', '$http', '$state', '$stateParams', '$timeout', 'notify', 'user', 'projects',
             function ($scope, $http, $state, $stateParams, $timeout, notify, user, projects) {
+                
+                $scope.pagination = {
+                    skip: 0,
+                    take: 20
+                };
 
-                $scope.projects = [];
+                $scope.$watchCollection('pagination', loadProjects);
+                
+                function loadProjects() {
+                    var url = 'api/itProject?catalog&orgId=' + user.currentOrganizationId;
 
-                _.each(projects, pushProject);
+                    url += '&skip=' + $scope.pagination.skip;
+                    url += '&take=' + $scope.pagination.take;
+
+                    $scope.projects = [];
+                    
+                    $http.get(url).success(function(result, status, headers) {
+
+                        var paginationHeader = JSON.parse(headers('X-Pagination'));
+                        $scope.pagination.count = paginationHeader.TotalCount;
+                        
+                        _.each(result.response, pushProject);
+                        
+                    }).error(function() {
+                        notify.addErrorMessage("Kunne ikke hente projekter!");
+                    });
+
+                }
 
                 //adds a project to the list of projects
                 function pushProject(project) {
