@@ -14,13 +14,15 @@ namespace Core.ApplicationServices
         private const int ResetRequestTTL = 12;
 
         private readonly IGenericRepository<User> _userRepository;
+        private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IGenericRepository<PasswordResetRequest> _passwordResetRequestRepository;
         private readonly IMailClient _mailClient;
         private readonly ICryptoService _cryptoService;
 
-        public UserService(IGenericRepository<User> userRepository, IGenericRepository<PasswordResetRequest> passwordResetRequestRepository, IMailClient mailClient, ICryptoService cryptoService)
+        public UserService(IGenericRepository<User> userRepository, IGenericRepository<Organization> orgRepository, IGenericRepository<PasswordResetRequest> passwordResetRequestRepository, IMailClient mailClient, ICryptoService cryptoService)
         {
             _userRepository = userRepository;
+            _orgRepository = orgRepository;
             _passwordResetRequestRepository = passwordResetRequestRepository;
             _mailClient = mailClient;
             _cryptoService = cryptoService;
@@ -45,20 +47,23 @@ namespace Core.ApplicationServices
             
             if(user.CreatedIn != null) user.DefaultOrganizationUnit = user.CreatedIn.GetRoot();
 
-            user = _userRepository.Insert(user);
+            _userRepository.Insert(user);
+            _userRepository.Save();
+
+            // user isn't an EF proxy class so navigation properites aren't set,
+            // so we need to fetch org name ourself
+            var org = _orgRepository.GetByKey(user.CreatedInId);
 
             var reset = GenerateResetRequest(user);
             var resetLink = "http://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
             const string subject = "Oprettelse af KITOS profil";
             var content = "<h2>Kære " + user.Name + "</h2>" +
-                          "<p>Du er blevet oprettet, som bruger i KITOS (Kommunernes IT Overblikssystem) under organisationen " + user.CreatedIn.Name + ".</p>" +
+                          "<p>Du er blevet oprettet, som bruger i KITOS (Kommunernes IT Overblikssystem) under organisationen " + org.Name + ".</p>" +
                           "Du bedes klikke <a href='" + resetLink + "'>her</a>, hvor du første gang bliver bedt om at indtaste et nyt password for din KITOS profil" +
-                          "<p>Linket udløber om " + ResetRequestTTL + "timer.</p>";
+                          "<p>Linket udløber om " + ResetRequestTTL + " timer.</p>";
 
             IssuePasswordReset(user, subject, content);
-            
-            _userRepository.Save();
-            
+
             return user;
         }
 
@@ -67,13 +72,17 @@ namespace Core.ApplicationServices
             if (user == null)
                 throw new ArgumentNullException("user");
 
-            var reset = GenerateResetRequest(user);
-            var resetLink = "http://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
-
+            string mailContent = "";
+            var reset = new PasswordResetRequest();
+            if (content == null)
+            {
+                reset = GenerateResetRequest(user);
+                var resetLink = "http://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
+                mailContent = "<p>Du har bedt om at få nulstillet dit password.</p>" +
+                                  "<p><a href='" + resetLink + "'>Klik her for at nulstille passwordet for din KITOS profil</a>.</p>" +
+                                  "<p>Linket udløber om " + ResetRequestTTL + " timer.</p>";
+            }
             const string mailSubject = "Nulstilning af dit KITOS password";
-            var mailContent = "<p>Du har bedt om at få nulstillet dit password.</p>" +
-                              "<p><a href='" + resetLink + "'>Klik her for at nulstille passwordet for din KITOS profil</a>.</p>" +
-                              "<p>Linket udløber om " + ResetRequestTTL + "timer.</p>";
 
             var message = new MailMessage()
                 {
