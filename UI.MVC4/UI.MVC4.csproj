@@ -234,13 +234,11 @@
     <Compile Include="Models\ItSystemSimpleDTO.cs" />
     <Compile Include="Models\PaymentMilestoneDTO.cs" />
     <Compile Include="Controllers\API\AdviceController.cs" />
-    <Compile Include="Controllers\API\CustomAgreementElementController.cs" />
     <Compile Include="Controllers\API\EconomyStreamController.cs" />
     <Compile Include="Models\EconomyStreamDTO.cs" />
     <Compile Include="Controllers\API\ItContractController.cs" />
     <Compile Include="Controllers\API\ProcurementStrategyController.cs" />
     <Compile Include="Models\AdviceDTO.cs" />
-    <Compile Include="Models\CustomAgreementElementDTO.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\MappingConfig.cs" />
     <Compile Include="App_Start\NinjectWebCommon.cs" />
@@ -310,7 +308,6 @@
     <Compile Include="Controllers\API\ItSystemRoleController.cs" />
     <Compile Include="Controllers\API\MethodController.cs" />
     <Compile Include="Controllers\API\OrganizationUnitController.cs" />
-    <Compile Include="Controllers\API\ItProjectCategoryController.cs" />
     <Compile Include="Controllers\API\ItProjectTypeController.cs" />
     <Compile Include="Controllers\API\PurchaseFormController.cs" />
     <Compile Include="Controllers\API\AppTypeController.cs" />
@@ -475,7 +472,6 @@
     <Content Include="Partials\it-contract\tab-roles.html" />
     <Content Include="Partials\it-project\catalog.html" />
     <Content Include="Partials\it-project\overview.html" />
-    <Content Include="Partials\it-project\portfolio.html" />
     <Content Include="Partials\it-project\modal-goal-edit.html" />
     <Content Include="Partials\it-project\modal-milestone-task-edit.html" />
     <Content Include="Partials\it-project\tab-communication.html" />
@@ -561,7 +557,6 @@
     <Content Include="Scripts\app\controllers\it-contract\it-contract-hierarchy.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-deadlines.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-advice.js" />
-    <Content Include="Scripts\app\controllers\it-contract\it-contract-create.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-edit.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-overview.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-paymentmodel.js" />
@@ -578,7 +573,6 @@
     <Content Include="Scripts\app\controllers\it-project\it-project-status-project.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-catalog.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-description.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-portfolio.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-risk.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-roles.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-org.js" />

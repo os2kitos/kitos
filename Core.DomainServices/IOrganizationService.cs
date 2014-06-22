@@ -6,7 +6,7 @@ namespace Core.DomainServices
     public interface IOrganizationService
     {
         ICollection<Organization> GetByUser(User user);
-        void AddDefaultOrgUnit(Organization org);
+        void SetupDefaultOrganization(Organization org, User objectOwner);
         bool IsUserMember(User user, Organization organization);
     }
 }

@@ -5,6 +5,14 @@
             templateUrl: 'partials/it-project/tab-kle.html',
             controller: 'project.EditKleCtrl',
             resolve: {
+                // re-resolve data from parent cause changes here wont cascade to it
+                project: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itproject/" + $stateParams.id)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }]
+
             }
         });
     }]);
@@ -32,7 +40,7 @@
             var takeTasks = 20;
             function clearTasksPagination() {
                 skipTasks = 0;
-            }
+                }
 
             $scope.loadLessTasks = function () {
                 skipTasks -= takeTasks;
@@ -46,7 +54,7 @@
 
                 loadTasks();
             };
-            
+
             function calculatePaginationButtons(headers) {
                 $scope.lessTasks = (skipTasks != 0);
 
@@ -72,12 +80,12 @@
                     notify.addErrorMessage("Kunne ikke hente opgaver!");
                 });
 
-            }
+                }
             
             function add(task) {
                 return $http.post(baseUrl + '?taskId=' + task.taskRef.id).success(function(result) {
                     task.isSelected = true;
-                });
+            });
             }
             
             function remove(task) {
@@ -116,7 +124,7 @@
                 _.each($scope.tasklist, function (task) {
                     if (task.isSelected) {
                         remove(task);
-                    }
+                }
                 });
             };
         }]);

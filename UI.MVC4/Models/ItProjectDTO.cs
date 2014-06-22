@@ -27,6 +27,8 @@ namespace UI.MVC4.Models
         public string Esdh { get; set; }
         public string Cmdb { get; set; }
         public string Folder { get; set; }
+        public int? CommonPublicProjectId { get; set; }
+        public int? JointMunicipalProjectId { get; set; }
 
         public bool IsStatusGoalVisible { get; set; }
         public bool IsEconomyVisible { get; set; }
@@ -34,15 +36,12 @@ namespace UI.MVC4.Models
         public bool IsCommunicationVisible { get; set; }
         public bool IsHandoverVisible { get; set; }
 
-        public int? AssociatedProgramId { get; set; }
-        public string AssociatedProgramName { get; set; }
-
-        public IEnumerable<int> AssociatedProjectIds { get; set; }
+        public int? ParentId { get; set; }
+        public string ParentName { get; set; }
+        public IEnumerable<int> ChildrenIds { get; set; }
 
         public int ItProjectTypeId { get; set; }
         public string ItProjectTypeName { get; set; }
-        public int ItProjectCategoryId { get; set; }
-        public string ItProjectCategoryName { get; set; }
         public int OrganizationId { get; set; }
         public IEnumerable<OrgUnitDTO> UsedByOrgUnits { get; set; }
         public IEnumerable<EconomyYearDTO> EconomyYears { get; set; } 
@@ -92,8 +91,9 @@ namespace UI.MVC4.Models
         public int? ResponsibleOrgUnitId { get; set; }
         public OrgUnitDTO ResponsibleOrgUnit { get; set; }
 
-        public int? ParentItProjectId { get; set; }
-        public ItProjectDTO ParentItProject { get; set; }
+        public int? OrignialId { get; set; }
+        public ItProjectDTO Original { get; set; }
+        
 
 
 

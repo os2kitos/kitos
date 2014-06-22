@@ -86,7 +86,6 @@
         </div>
         <div class="col-md-6">
             <div class="col-md-6">
-
                 <!-- local sys id -->
                 <div class="form-group">
                     <label for="sysId" class="col-md-4 control-label small">Lokal SystemID</label>
@@ -137,14 +136,25 @@
 
             </div>
             <div class="col-md-6">
+                <!-- local call system -->
+                <div class="form-group">
+                    <label for="localcallsystem" class="col-md-4 control-label small">Lokalt kaldesystem</label>
+                    <div class="col-md-8">
+                        <input id="localcallsystem" type="text" data-ng-model="usage.localCallSystem"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-field="localCallSystem" data-autosave="api/itsystemusage/{{usageId}}"
+                               class="form-control input-sm" />
+                    </div>
+                </div>
+
                 <!-- overview system -->
                 <div class="form-group">
                     <label for="overview" class="col-md-4 control-label small">Overblik</label>
                     <div class="col-md-8">
                         <select id="overview" data-ng-options="a.id as a.name for a in itSystems"
-                            data-ng-disabled="!hasWriteAccess"
-                            data-ng-model="usage.overviewItSystemId" data-field="overviewItSystemId"
-                            data-autosave="api/itsystemusage/{{usageId}}" class="form-control input-sm">
+                                data-ng-disabled="!hasWriteAccess"
+                                data-ng-model="usage.overviewItSystemId" data-field="overviewItSystemId"
+                                data-autosave="api/itsystemusage/{{usageId}}" class="form-control input-sm">
                         </select>
                     </div>
                 </div>
@@ -154,9 +164,9 @@
                     <label for="archive" class="col-md-4 control-label small">Arkivering</label>
                     <div class="col-md-8">
                         <select id="archive" data-ng-options="a.id as a.name for a in archiveTypes" data-ng-model="usage.archiveTypeId"
-                            data-ng-disabled="!hasWriteAccess"
-                            data-field="archiveTypeId" data-autosave="api/itsystemusage/{{usageId}}"
-                            class="form-control input-sm">
+                                data-ng-disabled="!hasWriteAccess"
+                                data-field="archiveTypeId" data-autosave="api/itsystemusage/{{usageId}}"
+                                class="form-control input-sm">
                         </select>
                     </div>
                 </div>
@@ -166,20 +176,9 @@
                     <label for="cmdb" class="col-md-4 control-label small">CMDB ref.</label>
                     <div class="col-md-8">
                         <input id="cmdb" type="text" data-ng-model="usage.cmdbRef"
-                            data-ng-disabled="!hasWriteAccess"
-                            data-field="cmdbRef" data-autosave="api/itsystemusage/{{usageId}}"
-                            class="form-control input-sm" />
-                    </div>
-                </div>
-
-                <!-- ad/idm ref -->
-                <div class="form-group">
-                    <label for="adidm" class="col-md-4 control-label small">AD/IDM ref</label>
-                    <div class="col-md-8">
-                        <input id="adidm" type="text" data-ng-model="usage.adOrIdmRef"
-                            data-ng-disabled="!hasWriteAccess"
-                            data-field="adOrIdmRef" data-autosave="api/itsystemusage/{{usageId}}"
-                            class="form-control input-sm" />
+                               data-ng-disabled="!hasWriteAccess"
+                               data-field="cmdbRef" data-autosave="api/itsystemusage/{{usageId}}"
+                               class="form-control input-sm" />
                     </div>
                 </div>
             </div>

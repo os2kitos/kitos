@@ -5,23 +5,30 @@
             templateUrl: 'partials/it-project/tab-strategy.html',
             controller: 'project.EditStrategyCtrl',
             resolve: {
-                jointMunicipalProjects: ['$http', 'itProject', 'itProjectCategories', function ($http, itProject, itProjectCategories) {
-                    var category = _.find(itProjectCategories, function(cat) {
-                        return cat.name == 'Fælleskommunal'; // TODO hardcoded literal... find better solution!
+                // re-resolve data from parent cause changes here wont cascade to it
+                project: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itproject/" + $stateParams.id)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }],
+                jointMunicipalProjects: ['$http', 'project', 'projectTypes', function ($http, project, projectTypes) {
+                    var type = _.find(projectTypes, function(t) {
+                        return t.name == 'Fælleskommunal'; // TODO hardcoded literal... find better solution!
                     });
-                    var catId = category.id;
-                    var orgId = itProject.organizationId;
-                    return $http.get('api/itproject/?orgId=' + orgId + '&catId=' + catId).then(function(result) {
+                    var typeId = type.id;
+                    var orgId = project.organizationId;
+                    return $http.get('api/itproject/?orgId=' + orgId + '&typeId=' + typeId).then(function(result) {
                         return result.data.response;
                     });
                 }],
-                commonPublicProjects: ['$http', 'itProject', 'itProjectCategories', function ($http, itProject, itProjectCategories) {
-                    var category = _.find(itProjectCategories, function (cat) {
-                        return cat.name == 'Fællesoffentlig'; // TODO hardcoded literal... find better solution!
+                commonPublicProjects: ['$http', 'project', 'projectTypes', function ($http, project, projectTypes) {
+                    var type = _.find(projectTypes, function (t) {
+                        return t.name == 'Fællesoffentlig'; // TODO hardcoded literal... find better solution!
                     });
-                    var catId = category.id;
-                    var orgId = itProject.organizationId;
-                    return $http.get('api/itproject/?orgId=' + orgId + '&catId=' + catId).then(function (result) {
+                    var typeId = type.id;
+                    var orgId = project.organizationId;
+                    return $http.get('api/itproject/?orgId=' + orgId + '&typeId=' + typeId).then(function (result) {
                         return result.data.response;
                     });
                 }]
@@ -30,14 +37,14 @@
     }]);
 
     app.controller('project.EditStrategyCtrl',
-    ['$scope', 'itProject', 'jointMunicipalProjects', 'commonPublicProjects',
-        function ($scope, itProject, jointMunicipalProjects, commonPublicProjects) {
-            $scope.isStrategy = itProject.isStrategy;
-            $scope.jointMunicipalProjectId = itProject.jointMunicipalProjectId;
+    ['$scope', 'project', 'jointMunicipalProjects', 'commonPublicProjects',
+        function ($scope, project, jointMunicipalProjects, commonPublicProjects) {
+            $scope.isStrategy = project.isStrategy;
+            $scope.jointMunicipalProjectId = project.jointMunicipalProjectId;
             $scope.jointMunicipalProjects = jointMunicipalProjects;
-            $scope.commonPublicProjectId = itProject.commonPublicProjectId;
+            $scope.commonPublicProjectId = project.commonPublicProjectId;
             $scope.commonPublicProjects = commonPublicProjects;
 
-            $scope.autosaveUrl = 'api/itproject/' + itProject.id;
+            $scope.autosaveUrl = 'api/itproject/' + project.id;
         }]);
 })(angular, app);

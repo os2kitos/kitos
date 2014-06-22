@@ -22,7 +22,7 @@
 
                         <!-- Parent -->
                         <div class="form-group">
-                            <label for="contract-parent" class="control-label small">Overordent kontrakt</label>
+                            <label for="contract-parent" class="control-label small">Overordnet kontrakt</label>
                             <input type="hidden" data-ui-select2="itContractsSelectOptions" id="contract-parent" data-ng-model="contract.parent" class="form-control input-sm" data-autosave="{{ autoSaveUrl }}" data-field="parentId" data-ng-disabled="!hasWriteAccess">
                         </div>
 
@@ -182,33 +182,10 @@
                     <div class="col-md-12">
                         <!-- Agreement elements -->
                         <div class="form-group">
-                            <label class="control-label small">IT Kontrakten omfatter flg. aftaleelementer</label>
-                            <div class="form-inline">
-                                <div class="checkbox input-sm col-md-4" data-ng-repeat="item in agreementElements">
-                                    <label>
-                                        <input type="checkbox" data-ng-model="item.isChecked" data-ng-disabled="!hasWriteAccess"
-                                    data-ng-change="updateElem(item)">
-                                        {{ item.name }}
-                                    </label>
-                                </div>
-                                <div class="col-md-4" data-ng-repeat="item in customAgreementElements">
-                                    <div class="input-group input-group-sm">
-                                        <input type="text" class="form-control" data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="item.name">
-                                        <span class="input-group-addon">
-                                            <input type="checkbox" checked data-ng-click="deleteCustomElem(item.id)">
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="input-group input-group-sm col-md-4" data-ng-if="hasWriteAccess">
-                                    <input type="text" class="form-control" data-ng-model="newItem.name">
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-success" type="button" data-ng-click="saveCustomElem()">
-                                            Gem
-                                        </button>
-                                    </span>
-                                </div>
-                            </div>
+                            <label for="agreement-elements" class="control-label small">IT Kontrakten omfatter flg. aftaleelementer</label>
+                            <select id="agreement-elements" class="form-control" multiple data-ui-select2="" data-ng-model="selectedAgreementElements" data-ng-disabled="!hasWriteAccess" data-autosave="{{ autoSaveUrl }}" data-field="elemId">
+                                <option value="{{ item.id }}" data-ng-repeat="item in agreementElements">{{ item.name }}</option>
+                            </select>
                         </div>
                     </div>
                 </div>

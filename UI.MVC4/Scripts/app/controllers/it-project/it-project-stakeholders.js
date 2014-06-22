@@ -7,14 +7,20 @@
             templateUrl: 'partials/it-project/tab-stakeholders.html',
             controller: 'project.EditStakeholdersCtrl',
             resolve: {
-                                
+                // re-resolve data from parent cause changes here wont cascade to it
+                project: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itproject/" + $stateParams.id)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }]             
             }
         });
     }]);
 
     app.controller('project.EditStakeholdersCtrl',
-    ['$rootScope', '$scope', '$http', 'notify', 'itProject',
-        function($rootScope, $scope, $http, notify, itProject) {
+    ['$rootScope', '$scope', '$http', 'notify', 'project',
+        function($rootScope, $scope, $http, notify, project) {
 
             $scope.stakeholders = [];
 
@@ -36,7 +42,7 @@
                 $scope.stakeholders.push(stakeholder);
             }
 
-            _.each(itProject.stakeholders, addStakeholder);
+            _.each(project.stakeholders, addStakeholder);
 
             function resetNew() {
                 $scope.new = {};
@@ -53,7 +59,7 @@
                 if (row.significance < 1 || row.significance > 5) return;
 
                 var data = {
-                    itProjectId: itProject.id,
+                    itProjectId: project.id,
                     name: row.name,
                     role: row.role,
                     downsides: row.downsides,

@@ -6,11 +6,7 @@ namespace Core.DomainServices
 {
     public interface IItProjectService
     {
-        ItProjectType ProgramType { get; }
-
         IEnumerable<ItProject> GetAll(int? orgId = null, string nameSearch = null, bool includePublic = true);
-        IEnumerable<ItProject> GetProjects(int? orgId = null, string nameSearch = null, bool includePublic = true);
-        IEnumerable<ItProject> GetPrograms(int? orgId = null, string nameSearch = null, bool includePublic = true);
 
         /// <summary>
         /// Adds an IT project. It creates default phases and saves the project.

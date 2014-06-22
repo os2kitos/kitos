@@ -7,6 +7,13 @@
             templateUrl: 'partials/it-project/tab-roles.html',
             controller: 'project.EditRolesCtrl',
             resolve: {
+                // re-resolve data from parent cause changes here wont cascade to it
+                project: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itproject/" + $stateParams.id)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }],
                 itProjectRights: ['$http', '$stateParams', function ($http, $stateParams) {
                     return $http.get("api/itprojectrights/" + $stateParams.id)
                         .then(function (result) {
@@ -24,10 +31,10 @@
     }]);
 
     app.controller('project.EditRolesCtrl',
-    ['$rootScope', '$scope', '$http', 'notify', 'itProject', 'itProjectRights', 'itProjectRoles',
-        function($rootScope, $scope, $http, notify, itProject, itProjectRights, itProjectRoles) {
+    ['$rootScope', '$scope', '$http', 'notify', 'project', 'itProjectRights', 'itProjectRoles',
+        function($rootScope, $scope, $http, notify, project, itProjectRights, itProjectRoles) {
 
-            var projectId = itProject.id;
+            var projectId = project.id;
 
             $scope.itProjectRoles = itProjectRoles;
             $scope.newRole = 1;

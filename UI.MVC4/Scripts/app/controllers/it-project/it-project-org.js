@@ -5,17 +5,24 @@
             templateUrl: 'partials/it-project/tab-org.html',
             controller: 'project.EditOrgCtrl',
             resolve: {
-                isTransversal: ['itProject', function (itProject) {
-                    return itProject.isTransversal;
+                // re-resolve data from parent cause changes here wont cascade to it
+                project: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itproject/" + $stateParams.id)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
                 }],
-                selectedOrgUnits: ['itProject', function (itProject) {
-                    return itProject.usedByOrgUnits;
+                isTransversal: ['project', function (project) {
+                    return project.isTransversal;
                 }],
-                responsibleOrgUnitId: ['itProject', function (itProject) {
-                    return itProject.responsibleOrgUnitId;
+                selectedOrgUnits: ['project', function (project) {
+                    return project.usedByOrgUnits;
                 }],
-                orgUnitsTree: ['$http', 'itProject', function ($http, itProject) {
-                    return $http.get('api/organizationunit/?organization=' + itProject.organizationId)
+                responsibleOrgUnitId: ['project', function (project) {
+                    return project.responsibleOrgUnitId;
+                }],
+                orgUnitsTree: ['$http', 'project', function ($http, project) {
+                    return $http.get('api/organizationunit/?organization=' + project.organizationId)
                         .then(function (result) {
                             return [result.data.response]; // to array for ngRepeat to work
                         });
