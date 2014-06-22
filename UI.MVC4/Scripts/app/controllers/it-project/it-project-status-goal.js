@@ -5,6 +5,13 @@
             templateUrl: 'partials/it-project/tab-status-goal.html',
             controller: 'project.EditStatusGoalCtrl',
             resolve: {
+                // re-resolve data from parent cause changes here wont cascade to it
+                project: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itproject/" + $stateParams.id)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }],
                 goalTypes: ['$http', function($http) {
                     return $http.get("api/goalType").then(function(result) {
                         return result.data.response;

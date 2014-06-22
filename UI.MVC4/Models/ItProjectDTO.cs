@@ -27,6 +27,8 @@ namespace UI.MVC4.Models
         public string Esdh { get; set; }
         public string Cmdb { get; set; }
         public string Folder { get; set; }
+        public int? CommonPublicProjectId { get; set; }
+        public int? JointMunicipalProjectId { get; set; }
 
         public bool IsStatusGoalVisible { get; set; }
         public bool IsEconomyVisible { get; set; }

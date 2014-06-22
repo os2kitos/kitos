@@ -5,6 +5,13 @@
             templateUrl: 'partials/it-project/tab-org.html',
             controller: 'project.EditOrgCtrl',
             resolve: {
+                // re-resolve data from parent cause changes here wont cascade to it
+                project: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itproject/" + $stateParams.id)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }],
                 isTransversal: ['project', function (project) {
                     return project.isTransversal;
                 }],

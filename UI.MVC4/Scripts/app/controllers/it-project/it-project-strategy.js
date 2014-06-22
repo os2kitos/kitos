@@ -5,6 +5,13 @@
             templateUrl: 'partials/it-project/tab-strategy.html',
             controller: 'project.EditStrategyCtrl',
             resolve: {
+                // re-resolve data from parent cause changes here wont cascade to it
+                project: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itproject/" + $stateParams.id)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }],
                 jointMunicipalProjects: ['$http', 'project', 'projectTypes', function ($http, project, projectTypes) {
                     var type = _.find(projectTypes, function(t) {
                         return t.name == 'Fælleskommunal'; // TODO hardcoded literal... find better solution!

@@ -5,6 +5,13 @@
             templateUrl: 'partials/it-project/tab-itsys.html',
             controller: 'project.EditItsysCtrl',
             resolve: {
+                // re-resolve data from parent cause changes here wont cascade to it
+                project: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itproject/" + $stateParams.id)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }],
                 selectedItSystemIds: ['project', function (itProject) {
                     return _.pluck(itProject.itSystems, 'id');
                 }],

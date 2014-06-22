@@ -3,7 +3,16 @@
         $stateProvider.state('it-project.edit.description', {
             url: '/description',
             templateUrl: 'partials/it-project/tab-description.html',
-            controller: 'project.EditDescriptionCtrl'
+            controller: 'project.EditDescriptionCtrl',
+            resolve: {
+                // re-resolve data from parent cause changes here wont cascade to it
+                project: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itproject/" + $stateParams.id)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }]
+            }
         });
     }]);
 
