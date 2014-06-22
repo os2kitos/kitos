@@ -150,7 +150,7 @@ namespace UI.MVC4.Controllers.API
 
                 //if a task group is given, only find the tasks in that group
                 if (taskGroup.HasValue) pagingModel.Where(taskRef => taskRef.ParentId.Value == taskGroup.Value);
-                else pagingModel.Where(taskRef => taskRef.Children.Any() == false);
+                else pagingModel.Where(taskRef => taskRef.Children.Count == 0);
 
                 var theTasks = Page(taskQuery, pagingModel).ToList();
 

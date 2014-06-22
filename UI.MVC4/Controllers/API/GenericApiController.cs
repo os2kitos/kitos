@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
@@ -27,22 +26,6 @@ namespace UI.MVC4.Controllers.API
             return Repository.AsQueryable();
         } 
         
-        protected virtual IQueryable<T> Page<T>(IQueryable<T> query, PagingModel<T> paging)
-        {
-            query = paging.Filter(query);
-
-            var totalCount = query.Count();
-            var paginationHeader = new
-            {
-                TotalCount = totalCount
-            };
-            System.Web.HttpContext.Current.Response.Headers.Add("X-Pagination",
-                                                                Newtonsoft.Json.JsonConvert.SerializeObject(
-                                                                    paginationHeader));
-
-            return query.OrderByField(paging.OrderBy, paging.Descending).Skip(paging.Skip).Take(paging.Take);
-        }
-
         public virtual HttpResponseMessage GetAll([FromUri] PagingModel<TModel> paging)
         {
             try
