@@ -39,7 +39,7 @@
                 <select data-ng-model="chosenEco" data-ng-init="chosenEco = 0">
                     <option value="0">Risiko</option>
                     <option value="1">RO</option>
-                    <option value="1">BC</option>
+                    <option value="2">BC</option>
                 </select>
             </th>
             <!-- Priority -->
@@ -99,118 +99,63 @@
                 </select>
             </td>
         </tr>
+        
+        <!-- "click to show inactive contracts"-row -->
+        <tr>
+            <td colspan="9">
+                <a class="full-width btn btn-link text-left" data-ng-click="showInactive = !showInactive">
+                    <i class="glyphicon" data-ng-class="{'glyphicon-chevron-right': !showInactive, 'glyphicon-chevron-down': showInactive}"></i>
+                    Klik for at {{ showInactive && 'skjule' || 'vise' }} arkiverede IT projekter
+                </a>
+            </td>
+        </tr>
+
+        <tr data-ng-repeat="p in projects | filter:{isArchived: true}" data-ng-if="showInactive">
+            <!-- Name -->
+            <td><a data-ui-sref="it-project.edit.status-project({id: p.id})">{{ p.name ? p.name : 'Unavngiven' }}</a></td>
+            <!-- Responsible -->
+            <td>{{ p.responsibleOrgUnit.name }}</td>
+            <!-- Role -->
+            <td>{{ p.roles | filter:{roleId:chosenRoleId} | joinBy:', ':'user.name' }}</td>
+            <!-- ID -->
+            <td>{{ chosenId == 0 ? p.itProjectId : p.parent.itProjectId }}</td>
+            <!-- Type -->
+            <td>{{ p.itProjectTypeName }}</td>
+            <!-- Phase -->
+            <td>{{ p.currentPhase.name }}</td>
+            <!-- Status -->
+            <td>
+                <span data-select-status2="" data-ng-model="p.statusProject" data-can-write="false" data-ng-if="chosenStatus == 0"></span>
+                <span data-select-status2="" data-ng-model="p.goalStatus.status" data-can-write="false" data-ng-if="chosenStatus == 1"></span>
+            </td>
+            <!-- Risk/RO/BC -->
+            <td>
+                <span data-ng-if="chosenEco == 0">{{ p.averageRisk }}</span>
+                <span data-ng-if="chosenEco == 1">{{ p.roi }}</span>
+                <span data-ng-if="chosenEco == 2">{{ p.bc }}</span>
+            </td>
+            <td>
+                <select data-ng-model="p.priority" data-autosave="api/itproject/{{p.id}}" data-field="priority" data-ng-disabled="p.isPriorityLocked" data-ng-if="chosenPriority == 0">
+                    <option value="0">-- Vælg prioritet --</option>
+                    <option value="3">Høj</option>
+                    <option value="2">Mellem</option>
+                    <option value="1">Lav</option>
+                </select>
+
+                <div class="btn-group btn-group-sm" data-toggle="buttons" data-ng-if="chosenPriority == 1">
+                    <label class="btn btn-star" data-ng-class="{ 'unstarred': p.isPriorityLocked }">
+                        <input type="checkbox" data-ng-model="p.isPriorityLocked" data-autosave="api/itproject/{{p.id}}" data-field="isPriorityLocked">
+                        <i class="glyphicon glyphicon-lock"></i>
+                    </label>
+                </div>
+
+                <select data-ng-model="p.priorityPf" data-autosave="api/itproject/{{p.id}}" data-field="priorityPf" data-ng-if="chosenPriority == 1">
+                    <option value="0">-- Vælg prioritet --</option>
+                    <option value="3">Høj</option>
+                    <option value="2">Mellem</option>
+                    <option value="1">Lav</option>
+                </select>
+            </td>
+        </tr>
     </tbody>
 </table>
-
-
-<!-- archived -->
-<accordion>
-    <accordion-group is-open="status.open">
-        <accordion-heading>
-            Vis arkiverede IT Projekter <i class="pull-right glyphicon" data-ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-        </accordion-heading>
-        
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <!-- Name -->
-                    <th>Navn</th>
-                    <!-- Responsible -->
-                    <th>
-                        <span data-ng-model="chosenOrgUnitId" data-select-org-unit="" data-ng-change="filterProjects()" 
-                              data-extra-options="[{id: 0, text: 'Alle projekter'}, {id: -1, text: 'Tværgående projekter'}]">
-                        </span>
-                    </th>
-                    <!-- Role -->
-                    <th>
-                        <select data-ng-model="chosenRoleId" data-ng-init="chosenRoleId = 2" data-ng-options="r.id as r.name for r in projectRoles">
-                            <option value="">-- Vælg projektrolle --</option>
-                        </select>
-                    </th>
-                    <!-- ID -->
-                    <th>
-                        <select data-ng-model="chosenId" data-ng-init="chosenId = 0">
-                            <option value="0">Projekt id</option>
-                            <option value="1">Globalt id</option>
-                        </select>
-                    </th>
-                    <!-- Type -->
-                    <th>Type</th>
-                    <!-- Phase -->
-                    <th>Fase</th>
-                    <!-- Status -->
-                    <th>
-                        <select data-ng-model="chosenStatus" data-ng-init="chosenStatus = 0">
-                            <option value="0">Status projekt</option>
-                            <option value="1">Status mål</option>
-                        </select>
-                    </th>
-                    <!-- Risk/RO/BC -->
-                    <th>
-                        <select data-ng-model="chosenEco" data-ng-init="chosenEco = 0">
-                            <option value="0">Risiko</option>
-                            <option value="1">RO</option>
-                            <option value="1">BC</option>
-                        </select>
-                    </th>
-                    <!-- Priority -->
-                    <th>
-                        <select data-ng-model="chosenPriority" data-ng-init="chosenPriority = 0">
-                            <option value="0">Prioritet</option>
-                            <option value="1">Prioritet PF</option>
-                        </select>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr data-ng-repeat="p in allProjects | filter:{isArchived: true}">
-                    <!-- Name -->
-                    <td><a data-ui-sref="it-project.edit.status-project({id: p.id})">{{ p.name ? p.name : 'Unavngiven' }}</a></td>
-                    <!-- Responsible -->
-                    <td>{{ p.responsibleOrgUnit.name }}</td>
-                    <!-- Role -->
-                    <td>{{ p.roles | filter:{roleId:chosenRoleId} | joinBy:', ':'user.name' }}</td>
-                    <!-- ID -->
-                    <td>{{ chosenId == 0 ? p.itProjectId : p.parent.itProjectId }}</td>
-                    <!-- Type -->
-                    <td>{{ p.itProjectTypeName }}</td>
-                    <!-- Phase -->
-                    <td>{{ p.currentPhase.name }}</td>
-                    <!-- Status -->
-                    <td>
-                        <span data-select-status2="" data-ng-model="p.statusProject" data-can-write="false" data-ng-if="chosenStatus == 0"></span>
-                        <span data-select-status2="" data-ng-model="p.goalStatus.status" data-can-write="false" data-ng-if="chosenStatus == 1"></span>
-                    </td>
-                    <!-- Risk/RO/BC -->
-                    <td>
-                        <span data-ng-if="chosenEco == 0">{{ p.averageRisk }}</span>
-                        <span data-ng-if="chosenEco == 1">{{ p.roi }}</span>
-                        <span data-ng-if="chosenEco == 2">{{ p.bc }}</span>
-                    </td>
-                    <td>
-                        <select data-ng-model="p.priority" data-autosave="api/itproject/{{p.id}}" data-field="priority" data-ng-disabled="p.isPriorityLocked" data-ng-if="chosenPriority == 0">
-                            <option value="0">-- Vælg prioritet --</option>
-                            <option value="3">Høj</option>
-                            <option value="2">Mellem</option>
-                            <option value="1">Lav</option>
-                        </select>
-                        
-                        <div class="btn-group btn-group-sm" data-toggle="buttons" data-ng-if="chosenPriority == 1">
-                            <label class="btn btn-star" data-ng-class="{ 'unstarred': p.isPriorityLocked }">
-                                <input type="checkbox" data-ng-model="p.isPriorityLocked" data-autosave="api/itproject/{{p.id}}" data-field="isPriorityLocked">
-                                <i class="glyphicon glyphicon-lock"></i>
-                            </label>
-                        </div>
-                        
-                        <select data-ng-model="p.priorityPf" data-autosave="api/itproject/{{p.id}}" data-field="priorityPf" data-ng-if="chosenPriority == 1">
-                            <option value="0">-- Vælg prioritet --</option>
-                            <option value="3">Høj</option>
-                            <option value="2">Mellem</option>
-                            <option value="1">Lav</option>
-                        </select>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </accordion-group>
-</accordion>
