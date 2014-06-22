@@ -145,7 +145,5 @@
                         });
                     });
                 }
-
-                loadSystems();
             }]);
 })(angular, app);
