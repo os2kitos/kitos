@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Mail;
 using System.Web.Http;
-using System.Web.Security;
 using Core.DomainModel;
 using Core.DomainServices;
 using UI.MVC4.Models;
@@ -29,7 +25,7 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 var user = _userRepository.GetByEmail(input.Email);
-                var request = _userService.IssuePasswordReset(user);
+                var request = _userService.IssuePasswordReset(user, null, null);
 
                 return Ok();
             }
