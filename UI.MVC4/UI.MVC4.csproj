@@ -440,6 +440,7 @@
     <Content Include="Partials\directives\add-user-button.html" />
     <Content Include="Partials\directives\add-user-modal.html" />
     <Content Include="Partials\directives\kle-filter.html" />
+    <Content Include="Partials\directives\pagination.html" />
     <Content Include="Partials\directives\select-status2.html" />
     <Content Include="Partials\directives\datewriter.html" />
     <Content Include="Partials\directives\select-access-modifier.html" />
