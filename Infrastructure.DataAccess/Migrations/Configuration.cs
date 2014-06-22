@@ -53,12 +53,12 @@ namespace Infrastructure.DataAccess.Migrations
 
         private List<TaskRef> GenerateAllTasks(User objectOwner, OrganizationUnit orgUnitOwner)
         {
-            var maingroups = GenerateTasks(objectOwner, orgUnitOwner, "KLE-Hovedgruppe", 5);
+            var maingroups = GenerateTasks(objectOwner, orgUnitOwner, "KLE-Hovedgruppe", 3);
             var subgroups =
                 maingroups.SelectMany(
-                    parent => GenerateTasks(objectOwner, orgUnitOwner, "KLE-Gruppe", 10, parent, parent.TaskKey)).ToList();
+                    parent => GenerateTasks(objectOwner, orgUnitOwner, "KLE-Gruppe", 5, parent, parent.TaskKey)).ToList();
 
-            var leafs = subgroups.SelectMany(parent => GenerateTasks(objectOwner, orgUnitOwner, "KLE-Emne", 20, parent, parent.TaskKey)).ToList();
+            var leafs = subgroups.SelectMany(parent => GenerateTasks(objectOwner, orgUnitOwner, "KLE-Emne", 10, parent, parent.TaskKey)).ToList();
 
             var result = new List<TaskRef>();
             result.AddRange(maingroups);
@@ -510,111 +510,9 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region KLE
 
-            /*var task00 = new TaskRef()
-            {
-                TaskKey = "00",
-                Description = "Kommunens styrelse",
-                Type = "KLE-Hovedgruppe",
-                IsPublic = true,
-                OwnedByOrganizationUnit = klRootUnit,
-                ObjectOwner = globalUser
-            };
-            var task0001 = new TaskRef()
-            {
-                TaskKey = "00.01",
-                Description = "Kommunens styrelse",
-                Type = "KLE-Gruppe",
-                Parent = task00,
-                IsPublic = true,
-                OwnedByOrganizationUnit = klRootUnit,
-                ObjectOwner = globalUser
-            };
-            var task0003 = new TaskRef()
-            {
-                TaskKey = "00.03",
-                Description = "International virksomhed og EU",
-                Type = "KLE-Gruppe",
-                Parent = task00,
-                IsPublic = true,
-                OwnedByOrganizationUnit = klRootUnit,
-                ObjectOwner = globalUser
-            };
-            context.TaskRefs.AddOrUpdate(x => x.TaskKey,
-                                         task00,
-                                         task0001,
-                                         new TaskRef()
-                                         {
-                                             TaskKey = "00.01.00",
-                                             Description = "Kommunens styrelse i almindelighed",
-                                             Type = "KLE-Emne",
-                                             Parent = task0001,
-                                             IsPublic = true,
-                                             OwnedByOrganizationUnit = klRootUnit,
-                                             ObjectOwner = globalUser
-                                         },
-                                         new TaskRef()
-                                         {
-                                             TaskKey = "00.01.10",
-                                             Description = "Opgaver der dækker flere hovedgrupper",
-                                             Type = "KLE-Emne",
-                                             Parent = task0001,
-                                             IsPublic = true,
-                                             OwnedByOrganizationUnit = klRootUnit,
-                                             ObjectOwner = globalUser
-                                         },
-                                         task0003,
-                                         new TaskRef()
-                                         {
-                                             TaskKey = "00.03.00",
-                                             Description = "International virksomhed og EU i almindelighed",
-                                             Type = "KLE-Emne",
-                                             Parent = task0003,
-                                             IsPublic = true,
-                                             OwnedByOrganizationUnit = klRootUnit,
-                                             ObjectOwner = globalUser
-                                         },
-                                         new TaskRef()
-                                         {
-                                             TaskKey = "00.03.02",
-                                             Description = "Internationale organisationers virksomhed",
-                                             Type = "KLE-Emne",
-                                             Parent = task0003,
-                                             IsPublic = true,
-                                             OwnedByOrganizationUnit = klRootUnit,
-                                             ObjectOwner = globalUser
-                                         },
-                                         new TaskRef()
-                                         {
-                                             TaskKey = "00.03.04",
-                                             Description = "Regionaludvikling EU",
-                                             Type = "KLE-Emne",
-                                             Parent = task0003,
-                                             IsPublic = true,
-                                             OwnedByOrganizationUnit = klRootUnit,
-                                             ObjectOwner = globalUser
-                                         },
-                                         new TaskRef()
-                                         {
-                                             TaskKey = "00.03.08",
-                                             Description = "EU-interessevaretagelse",
-                                             Type = "KLE-Emne",
-                                             Parent = task0003,
-                                             IsPublic = true,
-                                             OwnedByOrganizationUnit = klRootUnit,
-                                             ObjectOwner = globalUser
-                                         },
-                                         new TaskRef()
-                                         {
-                                             TaskKey = "00.03.10",
-                                             Description = "Internationalt samarbejde",
-                                             Type = "KLE-Emne",
-                                             Parent = task0003,
-                                             IsPublic = true,
-                                             OwnedByOrganizationUnit = klRootUnit,
-                                             ObjectOwner = globalUser
-                                         });*/
 
-            context.TaskRefs.AddOrUpdate(x => x.TaskKey, GenerateAllTasks(globalUser, klRootUnit).ToArray());
+            var kle = GenerateAllTasks(globalUser, klRootUnit);
+            context.TaskRefs.AddRange(kle);
 
             #endregion
         }

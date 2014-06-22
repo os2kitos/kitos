@@ -227,6 +227,15 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        /// <summary>
+        /// Returns a list of task ref and whether or not they are currently associated with a given system
+        /// </summary>
+        /// <param name="id">ID of the system</param>
+        /// <param name="tasks">Routing qualifer</param>
+        /// <param name="onlySelected">If true, only return those task ref that are associated with the system. If false, return all task ref.</param>
+        /// <param name="taskGroup">Optional filtering on task group</param>
+        /// <param name="pagingModel">Paging model</param>
+        /// <returns>List of TaskRefSelectedDTO</returns>
         public HttpResponseMessage GetTasks(int id, bool? tasks, bool onlySelected, int? taskGroup, [FromUri] PagingModel<TaskRef> pagingModel)
         {
             try

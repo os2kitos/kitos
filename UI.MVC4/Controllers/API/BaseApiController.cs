@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Security;
 using System.Web.Http;
+using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainServices;
 using Ninject;
@@ -141,6 +142,22 @@ namespace UI.MVC4.Controllers.API
         protected virtual TDest Map<TSource, TDest>(TSource item)
         {
             return AutoMapper.Mapper.Map<TDest>(item);
+        }
+
+        protected virtual IQueryable<T> Page<T>(IQueryable<T> query, PagingModel<T> paging)
+        {
+            query = paging.Filter(query);
+
+            var totalCount = query.Count();
+            var paginationHeader = new
+            {
+                TotalCount = totalCount
+            };
+            System.Web.HttpContext.Current.Response.Headers.Add("X-Pagination",
+                                                                Newtonsoft.Json.JsonConvert.SerializeObject(
+                                                                    paginationHeader));
+
+            return query.OrderByField(paging.OrderBy, paging.Descending).Skip(paging.Skip).Take(paging.Take);
         }
     }
 }

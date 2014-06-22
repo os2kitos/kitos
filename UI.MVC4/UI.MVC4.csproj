@@ -359,6 +359,7 @@
     <Compile Include="Models\TaskRefUsageDTO.cs" />
     <Compile Include="Models\TaskUsageDTO.cs" />
     <Compile Include="Models\TaskRefDTO.cs" />
+    <Compile Include="Models\TaskUsageNestedDTO.cs" />
     <Compile Include="Models\TextDTO.cs" />
     <Compile Include="Models\UserDTO.cs" />
     <Compile Include="Models\UserOrganizationsDTO.cs" />
