@@ -1,13 +1,13 @@
-﻿<div class="dropdown">
+﻿<div class="dropdown" data-is-open="opt.isOpen">
     <a class="dropdown-toggle select-status" data-ng-if="canWrite">
         <span class="status-circle" data-ng-class="{'white': model == 0, 'red': model == 1, 'yellow': model == 2, 'green': model == 3}"></span>
         <span class="status-arrow-down"></span>
     </a>
     <span class="status-circle" data-ng-class="{'white': model == 0, 'red': model == 1, 'yellow': model == 2, 'green': model == 3}" data-ng-if="!canWrite"></span>
     <ul class="dropdown-menu stop-light">
-        <li><a data-ng-click="setModel(0)" class="status-circle white"></a></li>
-        <li><a data-ng-click="setModel(1)" class="status-circle red"></a></li>
-        <li><a data-ng-click="setModel(2)" class="status-circle yellow"></a></li>
-        <li><a data-ng-click="setModel(3)" class="status-circle green"></a></li>
+        <li><a data-ng-click="setModel(0); opt.isOpen=false" class="status-circle white"></a></li>
+        <li><a data-ng-click="setModel(1); opt.isOpen=false" class="status-circle red"></a></li>
+        <li><a data-ng-click="setModel(2); opt.isOpen=false" class="status-circle yellow"></a></li>
+        <li><a data-ng-click="setModel(3); opt.isOpen=false" class="status-circle green"></a></li>
     </ul>
 </div>
