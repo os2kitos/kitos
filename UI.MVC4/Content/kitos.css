@@ -436,7 +436,7 @@ a.select-status:hover .status-circle {
     width: 36px;
     height: 18px;
     border: 2px solid rgb(52, 52, 52);
-    border-radius: 9px;
+    border-radius: 0px;
 
     margin-bottom: 0;
 }
