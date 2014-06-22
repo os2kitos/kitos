@@ -24,7 +24,7 @@ namespace UI.MVC4.Models
         public string Version { get; set; }
         public string Name { get; set; }
         public string SystemId { get; set; }
-        public int UserId { get; set; }
+        public int ObjectOwnerId { get; set; }
 
         public AccessModifier AccessModifier { get; set; }
 
