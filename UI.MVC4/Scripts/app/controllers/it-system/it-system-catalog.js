@@ -54,7 +54,7 @@
                 var organizations = organizationsHttp.data.response;
 
                 function loadUser(system) {
-                    return $http.get("api/user/" + system.userId, { cache: true })
+                    return $http.get("api/user/" + system.objectOwnerId, { cache: true })
                         .success(function (result) {
                             system.user = result.response;
                         });
