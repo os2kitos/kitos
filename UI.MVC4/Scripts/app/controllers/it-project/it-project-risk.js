@@ -5,6 +5,13 @@
             templateUrl: 'partials/it-project/tab-risk.html',
             controller: 'project.EditRiskCtrl',
             resolve: {
+                // re-resolve data from parent cause changes here wont cascade to it
+                project: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itproject/" + $stateParams.id)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }],
                 risks: ['$http', 'project', function ($http, project) {
                         return $http.get('api/risk/?getByProject&projectId=' + project.id)
                             .then(function (result) {
@@ -14,7 +21,6 @@
                 //returns a map with those users who have a role in this project.
                 //the names of the roles is saved in user.roleNames
                 usersWithRoles: ['$http', '$stateParams', function ($http, $stateParams) {
-
                     //get the rights of the projects
                     return $http.get("api/itproject/" + $stateParams.id + "?rights")
                         .then(function (rightResult) {
@@ -42,9 +48,7 @@
                                     });
 
                                     return users;
-
                                 });
-
                         });
                 }]
             }
