@@ -5,60 +5,117 @@
             templateUrl: 'partials/it-system/tab-kle.html',
             controller: 'system.EditKle',
             resolve: {
-                forcedKle: ['itSystemUsage', function(itSystemUsage) {
-                    return itSystemUsage.itSystem.taskRefIds;
-                }],
-                selectedKle: ['itSystemUsage', function (itSystemUsage) {
-                    return itSystemUsage.taskRefs;
-                }],
-                kle: ['$http', 'itSystemUsage', function ($http, itSystemUsage) {
-                    return $http.get('api/taskref/?orgId=' + itSystemUsage.organizationId)
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }]
             }
         });
     }]);
 
-    app.controller('system.EditKle', ['$scope', '$http', '$stateParams', 'forcedKle', 'selectedKle', 'kle', function ($scope, $http, $stateParams, forcedKle, selectedKle, kle) {
-        $scope.forcedKle = forcedKle;
-        $scope.selectedKle = selectedKle;
-        $scope.kle = kle;
-        $scope.kleFilter = { type: 'KLE-Emne' };
+    app.controller('system.EditKle', ['$scope', '$http', '$stateParams', 'notify', function ($scope, $http, $stateParams, notify) {
+        var usageId = $stateParams.id;
+        var baseUrl = 'api/itSystemUsage/' + usageId;
 
-        $scope.cleanKleFilter = function () {
-            if ($scope.kleFilter.parentId === null) {
-                delete $scope.kleFilter.parentId;
+        $scope.$watch("selectedTaskGroup", function (newVal, oldVal) {
+            clearTasksPagination();
+            loadTasks();
+        });
+
+        //change between show all tasks and only show active tasks
+        $scope.changeTaskView = function () {
+            $scope.showAllTasks = !$scope.showAllTasks;
+
+            clearTasksPagination();
+            loadTasks();
+        };
+
+        var skipTasks = 0;
+        var takeTasks = 20;
+        function clearTasksPagination() {
+            skipTasks = 0;
+        }
+
+        $scope.loadLessTasks = function () {
+            skipTasks -= takeTasks;
+            if (skipTasks < 0) skipTasks = 0;
+
+            loadTasks();
+        };
+
+        $scope.loadMoreTasks = function () {
+            skipTasks += takeTasks;
+
+            loadTasks();
+        };
+
+        function calculatePaginationButtons(headers) {
+            $scope.lessTasks = (skipTasks != 0);
+
+            var paginationHeader = JSON.parse(headers('X-Pagination'));
+            var count = paginationHeader.TotalCount;
+            $scope.moreTasks = (skipTasks + takeTasks) < count;
+        }
+
+        function loadTasks() {
+
+            var url = baseUrl + "?tasks";
+
+            url += '&onlySelected=' + !$scope.showAllTasks;
+
+            url += '&taskGroup=' + $scope.selectedTaskGroup;
+
+            url += '&skip=' + skipTasks + '&take=' + takeTasks;
+
+            $http.get(url).success(function (result, status, headers) {
+                $scope.tasklist = result.response;
+                calculatePaginationButtons(headers);
+            }).error(function () {
+                notify.addErrorMessage("Kunne ikke hente opgaver!");
+            });
+
+        }
+
+        function add(task) {
+            return $http.post(baseUrl + '?taskId=' + task.taskRef.id).success(function (result) {
+                task.isSelected = true;
+            });
+        }
+
+        function remove(task) {
+            return $http.delete(baseUrl + '?taskId=' + task.taskRef.id).success(function (result) {
+                task.isSelected = false;
+            });
+        }
+
+        $scope.save = function (task) {
+            var msg = notify.addInfoMessage("Opdaterer ...", false);
+
+            if (!task.isSelected) {
+                add(task).success(function () {
+                    msg.toSuccessMessage("Feltet er opdateret!");
+                }).error(function () {
+                    msg.toErrorMessage("Fejl!");
+                });
+            } else {
+                remove(task).success(function () {
+                    msg.toSuccessMessage("Feltet er opdateret!");
+                }).error(function () {
+                    msg.toErrorMessage("Fejl!");
+                });
             }
         };
 
-        _.each($scope.selectedKle, function (obj) {
-            var found = _.find($scope.kle, function(task) {
-                return task.id == obj.id;
+        $scope.selectAllTasks = function () {
+            _.each($scope.tasklist, function (task) {
+                if (!task.isSelected && !task.isLocked) {
+                    add(task);
+                }
             });
-            if (found) {
-                found.selected = true;
-            }
-        });
-        
-        _.each($scope.forcedKle, function (id) {
-            var found = _.find($scope.kle, function (task) {
-                return task.id == id;
-            });
-            if (found) {
-                found.selected = true;
-                found.disabled = true;
-            }
-        });
+        };
 
-        var usageId = $stateParams.id;
-        $scope.save = function(task) {
-            if (task.selected) {
-                $http.post('api/itsystemusage/' + usageId + '?taskId=' + task.id);
-            } else {
-                $http.delete('api/itsystemusage/' + usageId + '?taskId=' + task.id);
-            }
+        $scope.removeAllTasks = function () {
+            _.each($scope.tasklist, function (task) {
+                if (task.isSelected && !task.isLocked) {
+                    remove(task);
+                }
+            });
         };
     }]);
 })(angular, app);
