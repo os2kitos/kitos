@@ -13,7 +13,6 @@
                 $rootScope.page.title = 'IT Projekt';
                 $rootScope.page.subnav = [
                     { state: 'it-project.overview', text: 'Overblik' },
-                    { state: 'it-project.portfolio', text: 'Portefølje' },
                     { state: 'it-project.catalog', text: 'IT Projekt katalog' },
                     { state: 'it-project.edit', text: 'IT Projekt', showWhen: 'it-project.edit' },
                 ];
