@@ -227,6 +227,42 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        public HttpResponseMessage GetTasks(int id, bool? tasks, bool onlySelected, int? taskGroup, [FromUri] PagingModel<TaskRef> pagingModel)
+        {
+            try
+            {
+                var system = Repository.GetByKey(id);
+
+                IQueryable<TaskRef> taskQuery;
+                if (onlySelected)
+                {
+                    taskQuery = Repository.AsQueryable().Where(p => p.Id == id).SelectMany(p => p.TaskRefs);
+                }
+                else
+                {
+                    taskQuery = _taskRepository.AsQueryable();
+                }
+
+                //if a task group is given, only find the tasks in that group
+                if (taskGroup.HasValue) pagingModel.Where(taskRef => taskRef.ParentId.Value == taskGroup.Value);
+                else pagingModel.Where(taskRef => taskRef.Children.Count == 0);
+
+                var theTasks = Page(taskQuery, pagingModel).ToList();
+
+                var dtos = theTasks.Select(task => new TaskRefSelectedDTO()
+                {
+                    TaskRef = Map<TaskRef, TaskRefDTO>(task),
+                    IsSelected = onlySelected || system.TaskRefs.Any(t => t.Id == task.Id)
+                });
+
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage PostInterfaceCanBeUsedBySystem(int id, [FromUri] int interfaceId)
         {
             try
