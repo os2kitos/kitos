@@ -39,14 +39,15 @@ namespace UI.MVC4.Controllers.API
             } 
         }
 
-        public HttpResponseMessage GetByOrganization(int organizationId)
+        public HttpResponseMessage GetByOrganization(int organizationId, [FromUri] PagingModel<ItSystemUsage> pagingModel )
         {
             try
             {
-                var usages = Repository.Get(u => u.OrganizationId == organizationId);
+                pagingModel.Where(u => u.OrganizationId == organizationId);
+
+                var usages = Page(Repository.AsQueryable(), pagingModel);
                 
                 return Ok(Map(usages));
-
             }
             catch (Exception e)
             {
