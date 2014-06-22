@@ -187,24 +187,8 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
         }
-
-        public HttpResponseMessage GetTasksUsedByThisProject(int id, [FromUri] int taskId)
-        {
-            try
-            {
-                var project = Repository.GetByKey(id);
-
-                if (project == null) return NotFound();
-
-                return Ok(Map<IEnumerable<TaskRef>, IEnumerable<TaskRefDTO>>(project.TaskRefs));
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
-
-        public HttpResponseMessage PostTasksUsedByThisProject(int id, [FromUri] int taskId)
+        
+        public HttpResponseMessage PostTaskToProject(int id, [FromUri] int taskId)
         {
             try
             {
@@ -227,7 +211,7 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage DeleteTasksUsedByThisProject(int id, [FromUri] int taskId)
+        public HttpResponseMessage DeleteTasksToProject(int id, [FromUri] int taskId)
         {
             try
             {
@@ -243,6 +227,42 @@ namespace UI.MVC4.Controllers.API
                 Repository.Save();
 
                 return Ok();
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetTasks(int id, bool? tasks, bool onlySelected, int? taskGroup, [FromUri] PagingModel<TaskRef> pagingModel)
+        {
+            try
+            {
+                var project = Repository.GetByKey(id);
+
+                IQueryable<TaskRef> taskQuery;
+                if (onlySelected)
+                {
+                    taskQuery = Repository.AsQueryable().Where(p => p.Id == id).SelectMany(p => p.TaskRefs);
+                }
+                else
+                {
+                    taskQuery = _taskRepository.AsQueryable();
+                }
+
+                //if a task group is given, only find the tasks in that group
+                if (taskGroup.HasValue) pagingModel.Where(taskRef => taskRef.ParentId.Value == taskGroup.Value);
+                else pagingModel.Where(taskRef => taskRef.Children.Count == 0);
+
+                var theTasks = Page(taskQuery, pagingModel).ToList();
+
+                var dtos = theTasks.Select(task => new TaskRefSelectedDTO()
+                    {
+                        TaskRef = Map<TaskRef, TaskRefDTO>(task),
+                        IsSelected = onlySelected || project.TaskRefs.Any(t => t.Id == task.Id)
+                    });
+
+                return Ok(dtos);
             }
             catch (Exception e)
             {

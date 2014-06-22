@@ -358,6 +358,7 @@
     <Compile Include="Models\StakeholderDTO.cs" />
     <Compile Include="Models\StateDTO.cs" />
     <Compile Include="Models\TaskDelegationDTO.cs" />
+    <Compile Include="Models\TaskRefSelectedDTO.cs" />
     <Compile Include="Models\TaskRefUsageDTO.cs" />
     <Compile Include="Models\TaskUsageDTO.cs" />
     <Compile Include="Models\TaskRefDTO.cs" />
