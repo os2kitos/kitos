@@ -47,10 +47,8 @@ namespace Core.ApplicationServices
 
             user = _userRepository.Insert(user);
 
-            // TODO this repeats in IssuePasswordReset(), so refactor...
-            var now = DateTime.Now;
-            var hash = _cryptoService.Encrypt(now + user.Email);
-            var resetLink = "http://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(hash);
+            var reset = GenerateResetRequest(user);
+            var resetLink = "http://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
             const string subject = "Oprettelse af KITOS profil";
             var content = "<h2>Kære " + user.Name + "</h2>" +
                           "<p>Du er blevet oprettet, som bruger i KITOS (Kommunernes IT Overblikssystem) under organisationen " + user.CreatedIn.Name + ".</p>" +
@@ -69,9 +67,8 @@ namespace Core.ApplicationServices
             if (user == null)
                 throw new ArgumentNullException("user");
 
-            var now = DateTime.Now;
-            var hash = _cryptoService.Encrypt(now + user.Email);
-            var resetLink = "http://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(hash);
+            var reset = GenerateResetRequest(user);
+            var resetLink = "http://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
 
             const string mailSubject = "Nulstilning af dit KITOS password";
             var mailContent = "<p>Du har bedt om at få nulstillet dit password.</p>" +
@@ -89,8 +86,15 @@ namespace Core.ApplicationServices
 
             _mailClient.Send(message);
 
+            return reset;
+        }
 
-            var request = new PasswordResetRequest {Hash = hash, Time = now, UserId = user.Id, ObjectOwner = user};
+        private PasswordResetRequest GenerateResetRequest(User user)
+        {
+            var now = DateTime.Now;
+            var hash = _cryptoService.Encrypt(now + user.Email);
+
+            var request = new PasswordResetRequest { Hash = hash, Time = now, UserId = user.Id, ObjectOwner = user };
 
             _passwordResetRequestRepository.Insert(request);
             _passwordResetRequestRepository.Save();
