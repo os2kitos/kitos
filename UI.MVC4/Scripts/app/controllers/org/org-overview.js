@@ -22,44 +22,8 @@
     app.controller('org.OverviewCtrl', ['$rootScope', '$scope', '$http', 'notify', '$modal', 'user',
         function ($rootScope, $scope, $http, notify, $modal, user) {
         $rootScope.page.title = 'Organisation - Overblik';
-            
-        //$scope.orgUnits = {};
-
-        //loadUnits();
+        
         checkForDefaultUnit();
-
-        //$scope.selectOrgUnitOptions = {
-        //    escapeMarkup: function(m) { return m; }
-        //};
-
-        //function visitOrgUnit(orgUnit) {
-            
-        //    $scope.orgUnits[orgUnit.id] = orgUnit;
-
-        //    _.each(orgUnit.children, function(child) {
-        //        return visitOrgUnit(child);
-        //    });
-        //}
-
-        //function hasWriteAccess(orgUnit, inherit) {
-        //    if (inherit) {
-        //        orgUnit.hasWriteAccess = true;
-
-        //        _.each(orgUnit.children, function(child) {
-        //            hasWriteAccess(child, true);
-        //        });
-        //    } else {
-        //        $http.get('api/organizationUnit/' + orgUnit.id + '?hasWriteAccess').success(function(result) {
-        //            orgUnit.hasWriteAccess = result.response;
-
-        //            _.each(orgUnit.children, function(child) {
-        //                hasWriteAccess(child, result.response);
-        //            });
-
-        //        });
-
-        //    }
-        //}
         
         function checkForDefaultUnit() {
             if (!user.currentOrganizationUnitId) return;
@@ -67,18 +31,6 @@
             $scope.orgUnitId = user.currentOrganizationUnitId;
             loadUsages();
         }
-        
-        //function loadUnits() {
-
-        //    return $http.get('api/organizationunit?organization=' + user.currentOrganizationId).success(function (result) {
-        //        var rootNode = result.response;
-
-        //        $scope.nodes = [rootNode];
-
-        //        visitOrgUnit(rootNode);
-        //        hasWriteAccess(rootNode, false);
-        //    });
-        //}
 
         /* load task usages */
         function loadUsages() {
