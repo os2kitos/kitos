@@ -50,11 +50,6 @@
                         return result.data.response;
                     });
                 }],
-                customAgreementElements: ['$http', function ($http) {
-                    return $http.get('api/customagreementelement/').then(function (result) {
-                        return result.data.response;
-                    });
-                }],
                 hasWriteAccess: ['$http', '$stateParams', function ($http, $stateParams) {
                     return $http.get("api/itcontract/" + $stateParams.id + "?hasWriteAccess")
                         .then(function (result) {
@@ -71,8 +66,8 @@
     }]);
 
     app.controller('contract.EditCtrl',
-        ['$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'suppliers', 'orgUnits', 'contracts', 'agreementElements', 'customAgreementElements', 'hasWriteAccess', 'user',
-            function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, suppliers, orgUnits, contracts, agreementElements, customAgreementElements, hasWriteAccess, user) {
+        ['$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'suppliers', 'orgUnits', 'contracts', 'agreementElements', 'hasWriteAccess', 'user',
+            function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, suppliers, orgUnits, contracts, agreementElements, hasWriteAccess, user) {
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.contract = contract;              
                 $scope.hasWriteAccess = hasWriteAccess;
