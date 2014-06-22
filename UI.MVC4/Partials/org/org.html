@@ -177,10 +177,10 @@
                                         </button>
                                     </div>
                                     <span>
-                                        <button class="btn btn-success btn-sm" data-ng-click="selectAllTasks()">
+                                        <button class="btn btn-success btn-sm" data-ng-click="selectAllTasks()" data-ng-if="hasWriteAccess">
                                             Vælg alle
                                         </button>
-                                        <button class="btn btn-danger btn-sm" data-confirmed-click="removeAllTasks()" data-confirm-click="Er du sikker?">
+                                        <button class="btn btn-danger btn-sm" data-confirmed-click="removeAllTasks()" data-confirm-click="Er du sikker?" data-ng-if="hasWriteAccess">
                                             Fjern alle
                                         </button>
                                     </span>
