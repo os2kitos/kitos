@@ -163,14 +163,12 @@ namespace UI.MVC4.Controllers.API
                 if (!HasWriteAccess(item)) return Unauthorized();
 
                 var itemType = item.GetType();
+                // get name of mapped property
+                var map = AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>().GetPropertyMaps();
+                var nonNullMaps = map.Where(x => x.SourceMember != null).ToList();
 
                 foreach (var valuePair in obj)
                 {
-                    // get name of mapped property
-                    var map =
-                        AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>()
-                                  .GetPropertyMaps();
-                    var nonNullMaps = map.Where(x => x.SourceMember != null);
                     var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name.Equals(valuePair.Key, StringComparison.InvariantCultureIgnoreCase));
                     if (mapMember == null)
                         continue; // abort if no map found
