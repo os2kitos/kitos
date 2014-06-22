@@ -5,11 +5,16 @@
             templateUrl: 'partials/it-project/tab-status-project.html',
             controller: 'project.EditStatusProjectCtrl',
             resolve: {
-               
+                // re-resolve data from parent cause changes here wont cascade to it
+                project: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itproject/" + $stateParams.id)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }],
                 //returns a map with those users who have a role in this project.
                 //the names of the roles is saved in user.roleNames
                 usersWithRoles: ['$http', '$stateParams', function ($http, $stateParams) {
-
                     //get the rights of the projects
                     return $http.get("api/itprojectrights/" + $stateParams.id)
                         .then(function (rightResult) {
@@ -37,12 +42,9 @@
                                     });
                                     
                                     return users;
-
                                 });
-
                         });
                 }]
-                
             }
         });
     }]);

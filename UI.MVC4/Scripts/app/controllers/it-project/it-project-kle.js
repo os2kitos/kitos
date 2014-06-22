@@ -5,6 +5,13 @@
             templateUrl: 'partials/it-project/tab-kle.html',
             controller: 'project.EditKleCtrl',
             resolve: {
+                // re-resolve data from parent cause changes here wont cascade to it
+                project: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itproject/" + $stateParams.id)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }],
                 selectedKle: ['project', function (itProject) {
                     return itProject.taskRefs;
                 }],
