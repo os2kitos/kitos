@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel
 {
-    public class TaskUsage : Entity
+    public class TaskUsage : Entity, IHierarchy<TaskUsage>
     {
         public TaskUsage()
         {
