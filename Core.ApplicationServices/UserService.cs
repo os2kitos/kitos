@@ -44,15 +44,16 @@ namespace Core.ApplicationServices
 #else
             user.Password = _cryptoService.Encrypt(DateTime.Now + user.Salt);
 #endif
-            
-            if(user.CreatedIn != null) user.DefaultOrganizationUnit = user.CreatedIn.GetRoot();
+            // user isn't an EF proxy class so navigation properites aren't set,
+            // so we need to fetch org name ourself
+            var org = _orgRepository.GetByKey(user.CreatedInId);
+
+            user.DefaultOrganizationUnitId = org.GetRoot().Id;
 
             _userRepository.Insert(user);
             _userRepository.Save();
 
-            // user isn't an EF proxy class so navigation properites aren't set,
-            // so we need to fetch org name ourself
-            var org = _orgRepository.GetByKey(user.CreatedInId);
+            
 
             var reset = GenerateResetRequest(user);
             var resetLink = "http://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
