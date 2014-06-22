@@ -11,31 +11,23 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class ItContractController : GenericHasRightsController<ItContract, ItContractRight, ItContractRole, ItContractDTO>
+    public class ItContractController : GenericHierarchyApiController<ItContract, ItContractDTO>
     {
         private readonly IGenericRepository<AgreementElement> _agreementElementRepository;
 
         private readonly IGenericRepository<ItSystemUsage> _usageRepository;
-        public ItContractController(IGenericRepository<ItContract> repository, IGenericRepository<ItContractRight> rightRepository, 
+        public ItContractController(IGenericRepository<ItContract> repository,
             IGenericRepository<ItSystemUsage> usageRepository, IGenericRepository<AgreementElement> agreementElementRepository) 
-            : base(repository, rightRepository)
+            : base(repository)
         {
             _usageRepository = usageRepository;
             _agreementElementRepository = agreementElementRepository;
         }
 
-        public virtual HttpResponseMessage Get(string q, int orgId)
+        public virtual HttpResponseMessage Get(string q, int orgId, [FromUri] PagingModel<ItContract> paging)
         {
-            try
-            {
-                var items = Repository.Get(x => x.Name.Contains(q) && x.OrganizationId == orgId);
-
-                return Ok(Map(items));
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
+            paging.Where(x => x.Name.Contains(q) && x.OrganizationId == orgId);
+            return base.GetAll(paging);
         }
 
         public virtual HttpResponseMessage PostAgreementElement(int id, int elemId)
@@ -146,7 +138,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var itContract = Repository.GetQueryable().Single(x => x.Id == id);
+                var itContract = Repository.AsQueryable().Single(x => x.Id == id);
 
                 if (itContract == null)
                     return NotFound();

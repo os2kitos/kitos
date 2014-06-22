@@ -9,44 +9,16 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class OrganizationUnitController : GenericHasRightsController<OrganizationUnit, OrganizationRight, OrganizationRole, OrgUnitDTO>
+    public class OrganizationUnitController : GenericHierarchyApiController<OrganizationUnit, OrgUnitDTO>
     {
         private readonly IOrgUnitService _orgUnitService;
 
-        public OrganizationUnitController(IGenericRepository<OrganizationUnit> repository, IGenericRepository<OrganizationRight> rightRepository, 
+        public OrganizationUnitController(IGenericRepository<OrganizationUnit> repository,
             IOrgUnitService orgUnitService) 
-            : base(repository, rightRepository)
+            : base(repository)
         {
             _orgUnitService = orgUnitService;
-        }
-
-        /// <summary>
-        /// Returns all colllecteds rights for an organization unit and all sub units
-        /// </summary>
-        /// <param name="id">Id of the unit</param>
-        /// <param name="rights">Routing qualifier</param>
-        /// <returns>List of rights</returns>
-        public override HttpResponseMessage GetRights(int id, bool? rights)
-        {
-            try
-            {
-                var orgUnits = _orgUnitService.GetSubTree(id);
-
-                var theRights = new List<OrganizationRight>();
-                foreach (var orgUnit in orgUnits)
-                {
-                    theRights.AddRange(GetRightsQuery(orgUnit.Id));
                 }
-
-                var dtos = AutoMapper.Mapper.Map<ICollection<OrganizationRight>, ICollection<RightOutputDTO>>(theRights);
-
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
 
         /// <summary>
         /// Returns every OrganizationUnit that the user can select as the default unit

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Security;
 using Core.DomainModel;
@@ -14,23 +15,37 @@ namespace UI.MVC4.Controllers.API
         {
         }
 
-        protected override IEnumerable<TModel> GetAllQuery()
+        protected override IQueryable<TModel> GetAllQuery()
         {
-            return this.Repository.Get(t => t.IsActive && !t.IsSuggestion);
+            return Repository.AsQueryable().Where(t => t.IsActive && !t.IsSuggestion);
         }
 
         public HttpResponseMessage GetAllSuggestions(bool? suggestions)
         {
-            var items = this.Repository.Get(t => t.IsSuggestion);
-            
-            return Ok(Map<IEnumerable<TModel>, IEnumerable<TDto>>(items));
+            try
+            {
+                var items = Repository.AsQueryable().Where(t => t.IsSuggestion);
+
+                return Ok(Map(items));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
         }
 
         public HttpResponseMessage GetAllNonSuggestions(bool? nonsuggestions)
         {
-            var items = this.Repository.Get(t => !t.IsSuggestion);
+            try
+            {
+                var items = Repository.AsQueryable().Where(t => !t.IsSuggestion);
 
-            return Ok(Map<IEnumerable<TModel>, IEnumerable<TDto>>(items));
+                return Ok(Map(items));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
         }
         
         protected override TModel PutQuery(TModel item)

@@ -4,7 +4,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>, IHasAccessModifier
+    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>, IHasAccessModifier, IHierarchy<ItProject>
     {
         public ItProject()
         {

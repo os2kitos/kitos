@@ -4,7 +4,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel.ItContract
 {
-    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>
+    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHierarchy<ItContract>
     {
         public ItContract()
         {

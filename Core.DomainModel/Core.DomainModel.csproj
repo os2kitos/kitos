@@ -43,6 +43,7 @@
     <Compile Include="AdminRight.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="IHasAccessModifier.cs" />
+	<Compile Include="IHierarchy.cs" />
     <Compile Include="ItContract\OptionExtend.cs" />
     <Compile Include="ItContract\PaymentFreqency.cs" />
     <Compile Include="ItContract\PaymentMilestone.cs" />

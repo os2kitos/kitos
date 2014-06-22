@@ -4,7 +4,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
 {
-    public class OrganizationUnit : HasRightsEntity<OrganizationUnit, OrganizationRight, OrganizationRole>
+    public class OrganizationUnit : HasRightsEntity<OrganizationUnit, OrganizationRight, OrganizationRole>, IHierarchy<OrganizationUnit>
     {
         public OrganizationUnit()
         {

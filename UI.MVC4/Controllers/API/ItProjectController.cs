@@ -11,7 +11,7 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class ItProjectController : GenericHasRightsController<ItProject, ItProjectRight, ItProjectRole, ItProjectDTO>
+    public class ItProjectController : GenericHierarchyApiController<ItProject, ItProjectDTO>
     {
         private readonly IItProjectService _itProjectService;
         private readonly IGenericRepository<TaskRef> _taskRepository;
@@ -19,10 +19,10 @@ namespace UI.MVC4.Controllers.API
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
 
         //TODO: Man, this constructor smells ...
-        public ItProjectController(IGenericRepository<ItProject> repository, IGenericRepository<ItProjectRight> rightRepository,
+        public ItProjectController(IGenericRepository<ItProject> repository,
             IItProjectService itProjectService, IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository, 
             IGenericRepository<ItSystemUsage> itSystemUsageRepository) 
-            : base(repository, rightRepository)
+            : base(repository)
         {
             _itProjectService = itProjectService;
             _taskRepository = taskRepository;

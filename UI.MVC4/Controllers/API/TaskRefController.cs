@@ -1,28 +1,44 @@
-﻿using System.Linq;
-using System.Net.Http;
+﻿using System.Net.Http;
+using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
-    public class TaskRefController : GenericApiController<TaskRef, TaskRefDTO>
+    public class TaskRefController : GenericHierarchyApiController<TaskRef, TaskRefDTO>
     {
         public TaskRefController(IGenericRepository<TaskRef> repository) 
             : base(repository)
         {
         }
 
-        public HttpResponseMessage GetByOrgUnit(int orgUnitId)
+        public HttpResponseMessage GetRootsByOrgUnit(int orgUnitId, bool? roots, [FromUri] PagingModel<TaskRef> paging)
         {
-            var items =  GetAllQuery().Where(x => x.OwnedByOrganizationUnitId == orgUnitId || x.IsPublic);
-            return Ok(Map(items));
+            paging.Where(taskRef => taskRef.OwnedByOrganizationUnitId == orgUnitId || taskRef.IsPublic);
+
+            return base.GetRoots(true, paging);
         }
 
-        public HttpResponseMessage GetByOrg(int orgId)
+        public HttpResponseMessage GetChildrenByOrgUnit(int id, int orgUnitId, bool? children, [FromUri] PagingModel<TaskRef> paging)
         {
-            var items = GetAllQuery().Where(x => x.OwnedByOrganizationUnit.OrganizationId == orgId || x.IsPublic);
-            return Ok(Map(items));
+            paging.Where(taskRef => taskRef.OwnedByOrganizationUnitId == orgUnitId || taskRef.IsPublic);
+
+            return base.GetChildren(id, true, paging);
+        }
+
+        public HttpResponseMessage GetRootsByOrg(int orgId, bool? roots, [FromUri] PagingModel<TaskRef> paging)
+        {
+            paging.Where(taskRef => taskRef.OwnedByOrganizationUnit.OrganizationId == orgId || taskRef.IsPublic);
+
+            return base.GetRoots(true, paging);
+        }
+
+        public HttpResponseMessage GetChildrenByOrg(int id, int orgId, bool? children, [FromUri] PagingModel<TaskRef> paging)
+        {
+            paging.Where(taskRef => taskRef.OwnedByOrganizationUnit.OrganizationId == orgId || taskRef.IsPublic);
+
+            return base.GetChildren(id, true, paging);
         }
     }
 }

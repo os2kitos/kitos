@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -137,6 +136,11 @@ namespace UI.MVC4.Controllers.API
         protected bool IsAuthenticated
         {
             get { return User.Identity.IsAuthenticated; }
+        }
+
+        protected virtual TDest Map<TSource, TDest>(TSource item)
+        {
+            return AutoMapper.Mapper.Map<TDest>(item);
         }
     }
 }

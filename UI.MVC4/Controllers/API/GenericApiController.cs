@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Security;
+using System.Web.Http;
+using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using UI.MVC4.Models;
 using UI.MVC4.Models.Exceptions;
 
 namespace UI.MVC4.Controllers.API
@@ -19,20 +21,35 @@ namespace UI.MVC4.Controllers.API
         {
             Repository = repository;
         }
-        
-        protected virtual IEnumerable<TModel> GetAllQuery()
+
+        protected virtual IQueryable<TModel> GetAllQuery()
         {
-            //TODO: remove this hardcode and do some proper paging
-            return Repository.Get().Take(100);
+            return Repository.AsQueryable();
+        } 
+        
+        protected virtual IQueryable<TModel> Page(IQueryable<TModel> query, PagingModel<TModel> paging)
+        {
+            query = paging.Filter(query);
+
+            var totalCount = query.Count();
+            var paginationHeader = new
+            {
+                TotalCount = totalCount
+            };
+            System.Web.HttpContext.Current.Response.Headers.Add("X-Pagination",
+                                                                Newtonsoft.Json.JsonConvert.SerializeObject(
+                                                                    paginationHeader));
+
+            return query.OrderByField(paging.OrderBy, paging.Descending).Skip(paging.Skip).Take(paging.Take);
         }
 
-        public virtual HttpResponseMessage GetAll()
+        public virtual HttpResponseMessage GetAll([FromUri] PagingModel<TModel> paging)
         {
             try
             {
-                var items = GetAllQuery();
+                var query = Page(GetAllQuery(), paging);
 
-                return Ok(Map(items));
+                return Ok(Map(query));
             }
             catch (Exception e)
             {
@@ -293,11 +310,6 @@ namespace UI.MVC4.Controllers.API
         protected virtual IEnumerable<TModel> Map(IEnumerable<TDto> inputDtos)
         {
             return Map<IEnumerable<TDto>, IEnumerable<TModel>>(inputDtos);
-        }
-
-        protected virtual TDest Map<TSource, TDest>(TSource item)
-        {
-            return AutoMapper.Mapper.Map<TDest>(item);
         }
 
         #endregion
