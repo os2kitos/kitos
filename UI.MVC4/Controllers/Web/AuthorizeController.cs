@@ -68,7 +68,7 @@ namespace UI.MVC4.Controllers.Web
             try
             {
                 var user = _userRepository.GetByEmail(model.Email);
-                _userService.IssuePasswordReset(user);
+                _userService.IssuePasswordReset(user, null, null);
             }
             catch (ArgumentNullException)
             {

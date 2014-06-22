@@ -47,14 +47,24 @@ namespace Core.ApplicationServices
 
             user = _userRepository.Insert(user);
 
-            IssuePasswordReset(user);
+            // TODO this repeats in IssuePasswordReset(), so refactor...
+            var now = DateTime.Now;
+            var hash = _cryptoService.Encrypt(now + user.Email);
+            var resetLink = "http://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(hash);
+            const string subject = "Oprettelse af KITOS profil";
+            var content = "<h2>Kære " + user.Name + "</h2>" +
+                          "<p>Du er blevet oprettet, som bruger i KITOS (Kommunernes IT Overblikssystem) under organisationen " + user.CreatedIn.Name + ".</p>" +
+                          "Du bedes klikke <a href='" + resetLink + "'>her</a>, hvor du første gang bliver bedt om at indtaste et nyt password for din KITOS profil" +
+                          "<p>Linket udløber om " + ResetRequestTTL + "timer.</p>";
+
+            IssuePasswordReset(user, subject, content);
             
             _userRepository.Save();
             
             return user;
         }
 
-        public PasswordResetRequest IssuePasswordReset(User user)
+        public PasswordResetRequest IssuePasswordReset(User user, string subject, string content)
         {
             if (user == null)
                 throw new ArgumentNullException("user");
@@ -64,16 +74,16 @@ namespace Core.ApplicationServices
             var resetLink = "http://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(hash);
 
             const string mailSubject = "Nulstilning af dit KITOS password";
-            var mailContent = "<a href='" + resetLink + "'>" +
-                              "Klik her for at nulstille passwordet for din KITOS bruger</a>. Linket udløber om " +
-                              ResetRequestTTL + " timer.";
+            var mailContent = "<p>Du har bedt om at få nulstillet dit password.</p>" +
+                              "<p><a href='" + resetLink + "'>Klik her for at nulstille passwordet for din KITOS profil</a>.</p>" +
+                              "<p>Linket udløber om " + ResetRequestTTL + "timer.</p>";
 
             var message = new MailMessage()
                 {
-                    Body = mailContent,
+                    Subject = subject ?? mailSubject,
+                    Body = content ?? mailContent,
                     IsBodyHtml = true,
                     BodyEncoding = Encoding.UTF8,
-                    Subject = mailSubject,
                 };
             message.To.Add(user.Email);
 
