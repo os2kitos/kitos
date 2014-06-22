@@ -194,7 +194,13 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<TaskRef, TaskRefDTO>()
                   .ReverseMap();
 
-            Mapper.CreateMap<TaskUsage, TaskUsageDTO>().ReverseMap();
+            Mapper.CreateMap<TaskUsage, TaskUsageDTO>()
+                .ForMember(dto => dto.HasDelegations, opt => opt.MapFrom(src => src.Children.Any()))
+                .ReverseMap();
+
+            Mapper.CreateMap<TaskUsage, TaskUsageNestedDTO>()
+                .ForMember(dto => dto.HasDelegations, opt => opt.MapFrom(src => src.Children.Any()))
+                .ReverseMap();
 
             Mapper.CreateMap<AdminRight, AdminRightDTO>()
                   .ForMember(dto => dto.OrganizationId, opt => opt.MapFrom(src => src.ObjectId))

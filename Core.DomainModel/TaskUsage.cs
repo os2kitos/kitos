@@ -1,12 +1,23 @@
-﻿namespace Core.DomainModel
+﻿using System.Collections.Generic;
+
+namespace Core.DomainModel
 {
     public class TaskUsage : Entity
     {
+        public TaskUsage()
+        {
+            Children = new List<TaskUsage>();
+        }
+
         public int TaskRefId { get; set; }
         public int OrgUnitId { get; set; }
 
         public virtual TaskRef TaskRef { get; set; }
         public virtual OrganizationUnit OrgUnit { get; set; }
+
+        public int? ParentId { get; set; }
+        public virtual TaskUsage Parent { get; set; }
+        public virtual ICollection<TaskUsage> Children { get; set; } 
 
         public bool Starred { get; set; }
         public int TechnologyStatus { get; set; }

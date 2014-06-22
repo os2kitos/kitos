@@ -27,7 +27,7 @@ namespace UI.MVC4.Controllers.API
             return Repository.AsQueryable();
         } 
         
-        protected virtual IQueryable<TModel> Page(IQueryable<TModel> query, PagingModel<TModel> paging)
+        protected virtual IQueryable<T> Page<T>(IQueryable<T> query, PagingModel<T> paging)
         {
             query = paging.Filter(query);
 

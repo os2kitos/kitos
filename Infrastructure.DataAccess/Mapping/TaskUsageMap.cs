@@ -19,6 +19,11 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasRequired(t => t.TaskRef)
                 .WithMany(r => r.Usages)
                 .HasForeignKey(t => t.TaskRefId);
+
+            this.HasOptional(t => t.Parent)
+                .WithMany(d => d.Children)
+                .HasForeignKey(t => t.ParentId)
+                .WillCascadeOnDelete(true);
         }
     }
 }

@@ -1,0 +1,19 @@
+﻿<form class="form-horizontal fix-label-padding">
+    <div class="row">
+        <label class="col-md-2 control-label" for="maingroup">Hovedgruppe:</label>
+        <div class="col-md-4">
+            <select id="maingroup" class="form-control input-sm" data-ui-select2="" data-placeholder="Vælg hovedgruppe" data-ng-model="selectedMaingroup" data-ng-change="maingroupChanged()">
+                <option value=""></option>
+                <option data-ng-repeat="task in maingroups" value="{{task.id}}">{{task.taskKey}} {{task.description}}</option>
+            </select>
+        </div>
+
+        <label class="col-md-1 control-label" for="group">Gruppe:</label>
+        <div class="col-md-4">
+            <select id="group" class="form-control input-sm" data-ui-select2="" data-placeholder="Vælg gruppe" data-ng-model="selectedGroup">
+                <option value=""></option>
+                <option data-ng-repeat="task in groups" value="{{task.id}}">{{task.taskKey}} {{task.description}}</option>
+            </select>
+        </div>
+    </div>
+</form>

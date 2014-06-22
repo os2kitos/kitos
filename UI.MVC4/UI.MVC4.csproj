@@ -355,6 +355,8 @@
     <Compile Include="Models\StakeholderDTO.cs" />
     <Compile Include="Models\StateDTO.cs" />
     <Compile Include="Models\TaskDelegationDTO.cs" />
+    <Compile Include="Models\TaskRefSelectedDTO.cs" />
+    <Compile Include="Models\TaskRefUsageDTO.cs" />
     <Compile Include="Models\TaskUsageDTO.cs" />
     <Compile Include="Models\TaskRefDTO.cs" />
     <Compile Include="Models\TextDTO.cs" />
@@ -436,6 +438,7 @@
     <Content Include="Images\logo.png" />
     <Content Include="Partials\directives\add-user-button.html" />
     <Content Include="Partials\directives\add-user-modal.html" />
+    <Content Include="Partials\directives\kle-filter.html" />
     <Content Include="Partials\directives\select-status2.html" />
     <Content Include="Partials\directives\datewriter.html" />
     <Content Include="Partials\directives\select-access-modifier.html" />
@@ -609,6 +612,7 @@
     <Content Include="Scripts\app\directives\form-directives.js" />
     <Content Include="Scripts\app\app.js" />
     <Content Include="Scripts\app\directives\utils-directives.js" />
+    <Content Include="Scripts\app\services\taskService.js" />
     <Content Include="Scripts\app\services\userServices.js" />
     <Content Include="Scripts\app\utility\underscore.mixin.js" />
     <Content Include="Scripts\app\utility\utility.js" />

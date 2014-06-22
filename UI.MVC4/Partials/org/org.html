@@ -126,34 +126,73 @@
                     <div class="panel-heading">
                         <i class="glyphicon glyphicon-tasks"></i> 
                         Tilknyttede opgaver
-                        <a class="pull-right" data-ng-show="chosenOrgUnit.hasWriteAccess" data-ng-click="editTasks()">
-                            <span data-ng-if="!chosenOrgUnit.editTasks">Rediger</span>
-                            <span data-ng-if="chosenOrgUnit.editTasks">Afslut rediger</span>
+                        <a class="pull-right" data-ng-show="chosenOrgUnit.hasWriteAccess" data-ng-click="changeTaskView()">
+                            <span data-ng-if="!showAllTasks">Vis alle</span>
+                            <span data-ng-if="showAllTasks">Vis valgte</span>
                         </a>
                     </div>
-                    <div class="container-fluid task-table">
-                        <div class="row">
-                            <select data-ng-model="chosenOrgUnit.kleFilter.parent.parentId" data-ng-options="t.id as (t.taskKey + ' ' + t.description) for t in allTasksFlat | filter:{ type:'KLE-Hovedgruppe', show: true }" data-ng-change="cleanKleFilter()">
-                                <option value="">-- Hoved Gruppe --</option>
-                            </select>
-                            
-                            <select data-ng-model="chosenOrgUnit.kleFilter.parentId" data-ng-options="t.id as (t.taskKey + ' ' + t.description) for t in allTasksFlat | filter:{ type:'KLE-Gruppe', show: true }" data-ng-change="cleanKleFilter()">
-                                <option value="">-- Gruppe --</option>
-                            </select>
-                        </div>
-                        <div class="row">
-                            <span class="col-md-1 text-center"><strong>Valgt</strong></span>
-                            <span class="col-md-9"><strong>Opgave</strong></span>
-                            <span class="col-md-2 text-center"><strong>Delegeret</strong></span>
-                        </div>
-                        <div data-ng-repeat="task in allTasksFlat | filter:chosenOrgUnit.kleFilter" data-ng-show="task.show" data-ng-include="'partials/org/task.html'">
-                            
-                        </div>
+                    <div class="panel-body">
+                        <div data-kle-filter="selectedTaskGroup"></div>
                     </div>
-                    <div class="panel-footer" data-ng-if="chosenOrgUnit.editTasks">
-                        <button data-ng-click="selectAll(true)">Vælg alle</button>
-                        <button data-ng-click="selectAll(false)">Ryd alle</button>
-                    </div>
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Valgt</th>
+                                <th class="col-md-10">Emne</th>
+                                <th>Overblik</th>
+                                <th>Delegeret</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="task in taskRefUsageList">
+                                <!-- selected -->
+                                <td>
+                                    <input type="checkbox" id="{{task.taskRef.id}}" data-ng-checked="task.usage" data-ng-click="task.toggleUsage()" data-ng-disabled="!chosenOrgUnit.hasWriteAccess"/>
+                                </td>
+                                <td>
+                                    <label for="{{task.taskRef.id}}">{{task.taskRef.taskKey}} {{task.taskRef.description}}</label>
+                                </td>
+                                <td>
+                                    <button class="btn btn-link btn-star" data-ng-if="task.usage"
+                                            data-ng-class="{'unstarred': !task.usage.starred}"
+                                            data-ng-click="task.toggleStar()"
+                                            data-ng-disabled="!chosenOrgUnit.hasWriteAccess"
+                                            data-tooltip="Vis under overblik?">
+                                        <i class="glyphicon glyphicon-star"></i>
+                                    </button>
+                                </td>
+                                <td>
+                                    <span class="text-success" data-ng-show="task.usage.hasDelegations">
+                                        <i class="glyphicon glyphicon-ok" data-tooltip="{{ task.usage.delegatedTo | joinBy:', ' }}" data-tooltip-placement="right"></i>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" class="text-center">
+                                    <div class="pull-left">
+                                        <button class="btn btn-primary btn-sm" data-ng-if="lessTasks" data-ng-click="loadLessTasks()">
+                                            <i class="glyphicon glyphicon-chevron-left small"></i> Forrige
+                                        </button>
+                                    </div>
+                                    <span>
+                                        <button class="btn btn-success btn-sm" data-ng-click="selectAllTasks()" data-ng-if="hasWriteAccess">
+                                            Vælg alle
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" data-confirmed-click="removeAllTasks()" data-confirm-click="Er du sikker?" data-ng-if="hasWriteAccess">
+                                            Fjern alle
+                                        </button>
+                                    </span>
+                                    <div class="pull-right">
+                                        <button class="btn btn-primary btn-sm" data-ng-if="moreTasks" data-ng-click="loadMoreTasks()">
+                                            Næste <i class="glyphicon glyphicon-chevron-right small"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
             </div>              
         </div>

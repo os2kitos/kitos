@@ -604,4 +604,34 @@
         };
     }]);
     
+    app.directive('kleFilter', ['taskService', function (taskService) {
+        return {
+            scope: {
+                //the output of filtering tasks
+                selectedGroup: "=kleFilter"
+            },
+            templateUrl: 'partials/directives/kle-filter.html',
+            link: function (scope, element, attrs) {
+
+                //loading main groups
+                taskService.getRoots().then(function (roots) {
+                    scope.maingroups = roots;
+                });
+
+                //called when selected a main group
+                scope.maingroupChanged = function () {
+                    scope.taskList = [];
+                    
+                    if (!scope.selectedMaingroup) return;
+
+                    //load groups
+                    taskService.getChildren(scope.selectedMaingroup).then(function (groups) {
+                        scope.selectedGroup = null;
+                        scope.groups = groups;
+                    });
+                };
+            }
+        };
+    }]);
+    
 })(angular, app);
