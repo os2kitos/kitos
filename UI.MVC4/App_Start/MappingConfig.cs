@@ -202,6 +202,10 @@ namespace UI.MVC4.App_Start
                 .ForMember(dto => dto.HasDelegations, opt => opt.MapFrom(src => src.Children.Any()))
                 .ReverseMap();
 
+            Mapper.CreateMap<TaskUsage, TaskUsageNestedDTO>()
+                .ForMember(dto => dto.HasDelegations, opt => opt.MapFrom(src => src.Children.Any()))
+                .ReverseMap();
+
             Mapper.CreateMap<AdminRight, AdminRightDTO>()
                   .ForMember(dto => dto.OrganizationId, opt => opt.MapFrom(src => src.ObjectId))
                   .ForMember(dto => dto.RoleName, opt => opt.MapFrom(src => src.Role.Name));

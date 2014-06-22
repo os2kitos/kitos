@@ -22,28 +22,28 @@ namespace UI.MVC4.Controllers.API
             _orgUnitRepository = orgUnitRepository;
         }
 
-        //public HttpResponseMessage Get(int orgUnitId)
-        //{
-        //    return Get(orgUnitId, false);
-        //}
+        public HttpResponseMessage Get(int orgUnitId)
+        {
+            return Get(orgUnitId, false);
+        }
 
-        //public HttpResponseMessage Get(int orgUnitId, bool onlyStarred)
-        //{
-        //    try
-        //    {
-        //        var usages = Repository.Get(u => u.OrgUnitId == orgUnitId);
+        public HttpResponseMessage Get(int orgUnitId, bool onlyStarred)
+        {
+            try
+            {
+                var usages = Repository.Get(u => u.OrgUnitId == orgUnitId);
 
-        //        if (onlyStarred) usages = usages.Where(u => u.Starred);
+                if (onlyStarred) usages = usages.Where(u => u.Starred);
 
-        //        var delegationDtos = usages.Select(CompileDelegation);
+                var dtos = Map<IEnumerable<TaskUsage>, IEnumerable<TaskUsageNestedDTO>>(usages);
 
-        //        return Ok(delegationDtos);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return Error(e);
-        //    }
-        //}
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
 
         public HttpResponseMessage GetProjects(int id, bool? projects)
         {
