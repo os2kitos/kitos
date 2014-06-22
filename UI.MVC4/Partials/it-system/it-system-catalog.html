@@ -1,72 +1,58 @@
 ﻿<table class="table full-width table-striped">
     <thead>
         <tr>
-            <td>
-                IT System
+            <td>IT System
             </td>
             <td>
                 <select>
-                    <option value="global">
-                        Globalt SystemID
+                    <option value="global">Globalt SystemID
                     </option>
-                    <option value="local">
-                        Lokalt SystemID
+                    <option value="local">Lokalt SystemID
                     </option>
                 </select>
             </td>
             <td>
                 <select data-ng-model="showType">
-                    <option value="appType">
-                        Applikationstype
+                    <option value="appType">Applikationstype
                     </option>
-                    <option value="businessType">
-                        Forretningstype
+                    <option value="businessType">Forretningstype
                     </option>
                 </select>
             </td>
-            <td>
-                KLE ID
+            <td>KLE ID
             </td>
-            <td>
-                KLE Navn
+            <td>KLE Navn
             </td>
-            <td>
-                Tilhører
+            <td>Tilhører
             </td>
-            <td>
-                Oprettet af
+            <td>Oprettet af
             </td>
-            <td>
-                Anvendelse
+            <td>Anvendelse
             </td>
         </tr>
     </thead>
     <tbody>
-        <tr data-ng-repeat="system in systems" >
+        <tr data-ng-repeat="system in systems">
             <td>
                 <a data-ng-if="system.isInterface" ui-sref="it-system.edit.interface-details({id: system.id})">{{system.name}}</a>
                 <a data-ng-if="!system.isInterface" ui-sref="it-system.edit.interfaces({id: system.id})">{{system.name}}</a>
             </td>
-            <td>
-                {{system.systemId}}
+            <td>{{system.systemId}}
             </td>
             <td data-ng-switch="showType">
                 <span data-ng-switch-when="appType">{{system.appType.name}}</span>
                 <span data-ng-switch-when="businessType">{{system.businessType.name}}</span>
             </td>
-            <td>
-                {{system.taskId}}
+            <td>{{system.taskId}}
             </td>
-            <td>
-                {{system.taskName}}
+            <td>{{system.taskName}}
             </td>
             <td>
                 <!-- name of organization -->
                 {{system.belongsTo.name}}
             </td>
             <td>
-                <span data-popover-placement="right" data-popover="Oprettet i {{system.organization.name}}" data-popover-trigger="mouseenter">
-                    {{system.user.name}}
+                <span data-popover-placement="right" data-popover="Oprettet i {{system.organization.name}}" data-popover-trigger="mouseenter">{{system.user.name}}
                 </span>
             </td>
             <td>
@@ -82,6 +68,12 @@
                 </div>
             </td>
         </tr>
-
     </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="8" class="text-center">
+                <span data-pagination-buttons="pagination"></span>
+            </td>
+        </tr>
+    </tfoot>
 </table>

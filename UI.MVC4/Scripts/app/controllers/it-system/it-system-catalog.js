@@ -6,23 +6,18 @@
             controller: 'system.CatalogCtrl',
             resolve: {
                 appTypes: [
-                    '$http', function($http) {
+                    '$http', function ($http) {
                         return $http.get("api/apptype");
                     }
                 ],
                 businessTypes: [
-                    '$http', function($http) {
+                    '$http', function ($http) {
                         return $http.get("api/businesstype");
                     }
                 ],
                 organizations: [
-                    '$http', function($http) {
+                    '$http', function ($http) {
                         return $http.get("api/organization");
-                    }
-                ],
-                systems: [
-                    '$http', function($http) {
-                        return $http.get("api/itsystem");
                     }
                 ],
                 interfaceAppType: [
@@ -31,7 +26,7 @@
                     }
                 ],
                 user: [
-                    'userService', function(userService) {
+                    'userService', function (userService) {
                         return userService.getUser();
                     }
                 ]
@@ -41,10 +36,15 @@
 
     app.controller('system.CatalogCtrl',
         ['$rootScope', '$scope', '$http', 'notify', '$state',
-            'appTypes', 'businessTypes', 'systems', 'organizations', 'interfaceAppType', 'user',
+            'appTypes', 'businessTypes', 'organizations', 'interfaceAppType', 'user',
             function ($rootScope, $scope, $http, notify, $state,
-             appTypesHttp, businessTypesHttp, systems, organizationsHttp, interfaceAppTypeHttp, user) {
+             appTypesHttp, businessTypesHttp, organizationsHttp, interfaceAppTypeHttp, user) {
                 $rootScope.page.title = 'IT System - Katalog';
+
+                $scope.pagination = {
+                    skip: 0,
+                    take: 20
+                };
 
                 $scope.showType = 'appType';
 
@@ -106,31 +106,46 @@
                     });
                 }
 
-                $scope.systems = [];
-                _.each(systems.data.response, function (system) {
+                $scope.$watchCollection('pagination', loadSystems);
 
-                    system.appType = _.findWhere(appTypes, { id: system.appTypeId });
-                    system.isInterface = (system.appTypeId == interfaceAppType.id);
-                    system.businessType = _.findWhere(businessTypes, { id: system.businessTypeId });
+                function loadSystems() {
 
-                    system.belongsTo = _.findWhere(organizations, { id: system.belongsToId });
+                    var url = 'api/itSystem/?skip=' + $scope.pagination.skip + "&take=" + $scope.pagination.take;
 
-                    system.usageUrl = "api/itsystemusage?itSystemId=" + system.id + "&organizationId=" + user.currentOrganizationId;
+                    $scope.systems = [];
+                    $http.get(url).success(function (result, status, headers) {
 
-                    loadUser(system);
-                    loadOrganization(system);
-                    loadTaskRef(system);
-                    loadUsage(system);
+                        var paginationHeader = JSON.parse(headers('X-Pagination'));
+                        $scope.pagination.count = paginationHeader.TotalCount;
 
-                    system.addUsage = function() {
-                        addUsage(system);
-                    };
+                        _.each(result.response, function (system) {
 
-                    system.deleteUsage = function() {
-                        deleteUsage(system);
-                    };
+                            system.appType = _.findWhere(appTypes, { id: system.appTypeId });
+                            system.isInterface = (system.appTypeId == interfaceAppType.id);
+                            system.businessType = _.findWhere(businessTypes, { id: system.businessTypeId });
 
-                    $scope.systems.push(system);
-                });
+                            system.belongsTo = _.findWhere(organizations, { id: system.belongsToId });
+
+                            system.usageUrl = "api/itsystemusage?itSystemId=" + system.id + "&organizationId=" + user.currentOrganizationId;
+
+                            loadUser(system);
+                            loadOrganization(system);
+                            loadTaskRef(system);
+                            loadUsage(system);
+
+                            system.addUsage = function () {
+                                addUsage(system);
+                            };
+
+                            system.deleteUsage = function () {
+                                deleteUsage(system);
+                            };
+
+                            $scope.systems.push(system);
+                        });
+                    });
+                }
+
+                loadSystems();
             }]);
 })(angular, app);
