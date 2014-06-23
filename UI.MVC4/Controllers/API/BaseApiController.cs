@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -121,6 +122,16 @@ namespace UI.MVC4.Controllers.API
             {
                 try
                 {
+#if DEBUG
+                    // backdoor for Erik to publish his data
+                    // TODO remove when the REST api no longer uses cookies for login
+                    IEnumerable<string> header;
+                    Request.Headers.TryGetValues("X-Auth", out header);
+                    if (header.FirstOrDefault() == "afc79f24-1a3e-40eb-8f7e-9167dce342b3")
+                    {
+                        return UserRepository.Get(u => u.Email == "ehl@kl.dk").First();
+                    }
+#endif
                     var id = Convert.ToUInt32(User.Identity.Name);
                     var user = UserRepository.Get(u => u.Id == id).FirstOrDefault();
                     if(user == null) throw new SecurityException();
