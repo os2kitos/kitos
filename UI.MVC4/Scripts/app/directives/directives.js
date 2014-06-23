@@ -654,5 +654,30 @@
             }
         };
     }]);
-    
+
+    app.directive('orderBy', [function() {
+        return {
+            scope: {
+                orderBy: '=orderBy',
+                pagination: '=paging',
+            },
+            replace: true,
+            templateUrl: 'partials/directives/order-by.html',
+            link: function (scope, element, attrs) {
+                scope.order = function () {
+                    scope.pagination.skip = 0;
+
+                    if (scope.pagination.orderBy == scope.orderBy) {
+                        scope.pagination.descending = !scope.pagination.descending;
+                    } else {
+                        scope.pagination.orderBy = scope.orderBy;
+                        scope.pagination.descending = false;
+                    }
+                };
+            }
+
+        };
+
+    }]);
+
 })(angular, app);
