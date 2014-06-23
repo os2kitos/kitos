@@ -1,15 +1,18 @@
 ﻿<table class="table full-width table-striped">
     <thead>
         <tr>
-            <td>IT System
+            <td>
+                IT System
+                <button data-order-by="'name'" data-paging="pagination"></button>
             </td>
             <td>
-                <select>
-                    <option value="global">Globalt SystemID
+                <select data-ng-model="showId">
+                    <option value="systemId">Globalt SystemID
                     </option>
-                    <option value="local">Lokalt SystemID
+                    <option value="localSystemId">Lokalt SystemID
                     </option>
                 </select>
+                <button data-order-by="'systemId'" data-paging="pagination" data-ng-show="showId == 'systemId'"></button>
             </td>
             <td>
                 <select data-ng-model="showType">
@@ -37,7 +40,9 @@
                 <a data-ng-if="system.isInterface" ui-sref="it-system.edit.interface-details({id: system.id})">{{system.name}}</a>
                 <a data-ng-if="!system.isInterface" ui-sref="it-system.edit.interfaces({id: system.id})">{{system.name}}</a>
             </td>
-            <td>{{system.systemId}}
+            <td data-ng-switch="showId">
+                <span data-ng-switch-when="systemId">{{system.systemId}}</span>
+                <span data-ng-switch-when="localSystemId">{{system.usage.localSystemId}}</span>
             </td>
             <td data-ng-switch="showType">
                 <span data-ng-switch-when="appType">{{system.appType.name}}</span>

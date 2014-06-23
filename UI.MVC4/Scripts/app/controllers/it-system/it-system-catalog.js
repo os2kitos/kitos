@@ -48,6 +48,8 @@
 
                 $scope.showType = 'appType';
 
+                $scope.showId = 'systemId';
+
                 var appTypes = appTypesHttp.data.response;
                 var interfaceAppType = interfaceAppTypeHttp.data.response;
                 var businessTypes = businessTypesHttp.data.response;
@@ -81,6 +83,7 @@
                     return $http.get(system.usageUrl)
                         .success(function (result) {
                             system.hasUsage = true;
+                            system.usage = result.response;
                         });
                 }
 
@@ -91,6 +94,7 @@
                     }).success(function (result) {
                         notify.addSuccessMessage("Systemet er taget i anvendelse");
                         system.hasUsage = true;
+                        system.usage = result.response;
                     }).error(function (result) {
                         notify.addErrorMessage("Systemet kunne ikke tages i anvendelse!");
                     });
@@ -111,6 +115,11 @@
                 function loadSystems() {
 
                     var url = 'api/itSystem/?skip=' + $scope.pagination.skip + "&take=" + $scope.pagination.take;
+
+                    if ($scope.pagination.orderBy) {
+                        url += '&orderBy=' + $scope.pagination.orderBy;
+                        if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+                    }
 
                     $scope.systems = [];
                     $http.get(url).success(function (result, status, headers) {
