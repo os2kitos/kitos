@@ -127,7 +127,7 @@ namespace UI.MVC4.Controllers.API
                     // TODO remove when the REST api no longer uses cookies for login
                     IEnumerable<string> header;
                     Request.Headers.TryGetValues("X-Auth", out header);
-                    if (header.FirstOrDefault() == "afc79f24-1a3e-40eb-8f7e-9167dce342b3")
+                    if (header != null && header.FirstOrDefault() == "afc79f24-1a3e-40eb-8f7e-9167dce342b3")
                     {
                         return UserRepository.Get(u => u.Email == "ehl@kl.dk").First();
                     }
