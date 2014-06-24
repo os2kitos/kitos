@@ -1,12 +1,19 @@
 ﻿(function(ng, app) {
-
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
         
         $stateProvider.state('index', {
             url: '/?to',
             templateUrl: 'partials/home/index.html',
             controller: 'home.IndexCtrl',
-            noAuth: true
+            noAuth: true,
+            resolve: {
+                texts: ['$http', function ($http) {
+                    return $http.get("api/text/")
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }]
+            }
         }).state('forgot-password', {
             url: '/forgot-password',
             templateUrl: 'partials/home/forgot-password.html',
@@ -18,48 +25,39 @@
             controller: 'home.ResetPasswordCtrl',
             noAuth: true
         });
-
     }]);
 
-    app.controller('home.IndexCtrl', ['$rootScope', '$scope', '$http', '$state', '$stateParams', 'notify', 'Restangular', 'userService',
-        function ($rootScope, $scope, $http, $state, $stateParams, notify, Restangular, userService) {
-        $rootScope.page.title = 'Index';
-        $rootScope.page.subnav = [];
-        
-        Restangular.one('text', 1).get().then(function (data) {
-            $scope.introhead = data.value;
+    app.controller('home.IndexCtrl', ['$rootScope', '$scope', '$http', '$state', '$stateParams', 'notify', 'userService', 'texts',
+        function($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts) {
+            $rootScope.page.title = 'Index';
+            $rootScope.page.subnav = [];
 
-            $scope.submitIntroHead = function(newValue) {
-                data.value = newValue;
-                data.put();
+            userService.getUser().then(function(user) {
+                $scope.user = user;
+            });
+
+            $scope.about = _.find(texts, function(textObj) {
+                return textObj.id == 1;
+            }).value;
+
+            $scope.status = _.find(texts, function (textObj) {
+                return textObj.id == 2;
+            }).value;
+
+            //login
+            $scope.submitLogin = function() {
+                if ($scope.loginForm.$invalid) return;
+
+                userService.login($scope.email, $scope.password, $scope.remember)
+                    .then(function() {
+                        notify.addSuccessMessage("Du er nu logget ind!");
+
+                    }, function() {
+                        notify.addErrorMessage("Forkert brugernavn eller password!");
+
+                    });
             };
-        });
-        
-        Restangular.one('text', 2).get().then(function (data) {
-            $scope.introbody = data.value;
-            
-            $scope.submitIntroBody = function (newValue) {
-                data.value = newValue;
-                data.put();
-            };
-        });
-
-        //login
-        $scope.submitLogin = function () {
-            
-            if ($scope.loginForm.$invalid) return;
-
-            userService.login($scope.email, $scope.password, $scope.remember)
-                .then(function() {
-                    notify.addSuccessMessage("Du er nu logget ind!");
-                    
-                }, function () {
-                    notify.addErrorMessage("Forkert brugernavn eller password!");
-                    
-                });
-
-        };
-    }]);
+        }]);
     
     app.controller('home.ForgotPasswordCtrl', ['$rootScope', '$scope', '$http', 'notify', function ($rootScope, $scope, $http, notify) {
         $rootScope.page.title = 'Glemt password';

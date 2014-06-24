@@ -1,4 +1,4 @@
-﻿var app = angular.module('app', ['ui.router', 'ui.bootstrap', 'ui.select2', 'ngAnimate', 'notify', 'xeditable', 'restangular', 'ui.utils', 'angularjs-dropdown-multiselect']);
+﻿var app = angular.module('app', ['ui.router', 'ui.bootstrap', 'ui.select2', 'ngAnimate', 'notify', 'xeditable', 'restangular', 'ui.utils', 'angularjs-dropdown-multiselect', 'ngSanitize']);
 
 app.config(['$urlRouterProvider', function ($urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
