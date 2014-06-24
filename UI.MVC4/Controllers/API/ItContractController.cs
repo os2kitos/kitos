@@ -179,12 +179,17 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetPlan(bool? plan, int organizationId)
+        public HttpResponseMessage GetPlan(bool? plan, int organizationId, [FromUri] PagingModel<ItContract> pagingModel )
         {
             try
             {
+                //Get contracts within organization
+                pagingModel.Where(contract => contract.OrganizationId == organizationId);
+
                 //Get contracts without parents (roots)
-                var contracts = Repository.Get(contract => contract.OrganizationId == organizationId && contract.ParentId == null);
+                pagingModel.Where(contract => contract.ParentId == null);
+
+                var contracts = Page(Repository.AsQueryable(), pagingModel);
 
                 var overviewDtos = AutoMapper.Mapper.Map<IEnumerable<ItContractPlanDTO>>(contracts);
 

@@ -1,45 +1,56 @@
 ﻿<table class="table table-condensed table-striped">
     <thead>
         <tr>
-            <th>IT Kontrakt</th>
+            <th>IT Kontrakt
+                <button data-order-by="'name'" data-paging="pagination"></button>
+            </th>
 
             <th>
-                <select class="form-control input-sm" data-ng-model="chosenFilter" data-ng-init="chosenFilter = 'type'">
-                    <option value="type">Kontrakttype</option>
-                    <option value="template">Kontraktskabelon</option>
+                <select data-ng-model="chosenFilter" data-ng-init="chosenFilter = 'contractType.name'">
+                    <option value="contractType.name">Kontrakttype</option>
+                    <option value="contractTemplate.name">Kontraktskabelon</option>
                 </select>
+                <button data-order-by="chosenFilter" data-paging="pagination"></button>
             </th>
 
             <th>
                 Indkøbsform
+                <button data-order-by="'purchaseForm.name'" data-paging="pagination"></button>
             </th>
 
             <th>
                 Indgået
+                <button data-order-by="'concluded'" data-paging="pagination"></button>
             </th>
 
             <th>
                 Varighed
+                <button data-order-by="'duration'" data-paging="pagination"></button>
             </th>
 
             <th>
                 Udløbsdato
+                <button data-order-by="'expirationDate'" data-paging="pagination"></button>
             </th>
 
             <th>
                 Option
+                <button data-order-by="'optionExtend.name'" data-paging="pagination"></button>
             </th>
 
             <th>
                 Opsigelse
+                <button data-order-by="'terminationDeadline.name'" data-paging="pagination"></button>
             </th>
             
             <th>
                 Uopsigelig til
+                <button data-order-by="'irrevocableTo'" data-paging="pagination"></button>
             </th>
             
             <th>
                 Udbudsstrategi
+                <button data-order-by="'procurementStrategy.name'" data-paging="pagination"></button>
             </th>
             
             <th>
@@ -67,8 +78,8 @@
             
             <!-- type or template -->
             <td data-ng-switch="chosenFilter">
-                <span data-ng-switch-when="type">{{contract.contractTypeName}}</span>
-                <span data-ng-switch-when="template">{{contract.contractTemplateName}}</span>
+                <span data-ng-switch-when="contractType.name">{{contract.contractTypeName}}</span>
+                <span data-ng-switch-when="contractTemplate.name">{{contract.contractTemplateName}}</span>
             </td>
             
             <!-- purchase form -->
@@ -116,5 +127,12 @@
                 </span>
             </td>
         </tr>
-    </tbody>
+    </tbody>    
+    <tfoot>
+        <tr>
+            <td colspan="11">
+                <span data-pagination-buttons="pagination"></span>
+            </td>
+        </tr>
+    </tfoot>
 </table>
