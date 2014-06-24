@@ -36,20 +36,16 @@ namespace Core.ApplicationServices
     {
         public static IQueryable<T> OrderByField<T>(this IQueryable<T> q, string sortField, bool descending = false)
         {
-            var param = (Expression) Expression.Parameter(typeof(T), "p");
+            var memberTokens = sortField.Split('.');
 
-            var tokens = sortField.Split('.');
-
-            var prop = Expression.Property()
-            foreach (var token in tokens)
+            var param = Expression.Parameter(typeof(T), "p");
+            var property = (Expression) param;
+            foreach (var token in memberTokens)
             {
-                prop = Expression.Property(param, sortField);
+                property = Expression.Property(property, token);
             }
 
-
-            var exp = Expression.Lambda(prop, param);
-
-
+            var exp = Expression.Lambda(property, param);
             var method = descending ? "OrderByDescending" : "OrderBy";
             var types = new Type[] { q.ElementType, exp.Body.Type };
             var mce = Expression.Call(typeof(Queryable), method, types, q.Expression, exp);
