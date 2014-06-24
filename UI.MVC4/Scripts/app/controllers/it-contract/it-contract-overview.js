@@ -68,11 +68,7 @@
                 $scope.$watchCollection('pagination', loadContracts);
 
                 function loadContracts() {
-
-                    // clear lists 
-                    $scope.activeContracts = [];
-                    $scope.inactiveContracts = [];
-
+                    
                     var url = 'api/itcontract?overview&organizationId=' + user.currentOrganizationId;
 
                     url += '&skip=' + $scope.pagination.skip + "&take=" + $scope.pagination.take;
@@ -82,7 +78,11 @@
                         if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
                     }
 
-                    $http.get(url).success(function(result) {
+                    $http.get(url).success(function (result) {
+                        // clear lists 
+                        $scope.activeContracts = [];
+                        $scope.inactiveContracts = [];
+
                         _.each(result.response, function (contract) {
                             contract.show = true;
 

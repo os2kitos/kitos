@@ -37,13 +37,18 @@
                     url += '&skip=' + $scope.pagination.skip;
                     url += '&take=' + $scope.pagination.take;
 
-                    $scope.projects = [];
+                    if ($scope.pagination.orderBy) {
+                        url += '&orderBy=' + $scope.pagination.orderBy;
+                        if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+                    }
+
                     
                     $http.get(url).success(function(result, status, headers) {
 
                         var paginationHeader = JSON.parse(headers('X-Pagination'));
                         $scope.pagination.count = paginationHeader.TotalCount;
                         
+                        $scope.projects = [];
                         _.each(result.response, pushProject);
                         
                     }).error(function() {
