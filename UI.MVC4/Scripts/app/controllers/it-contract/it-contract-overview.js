@@ -22,7 +22,7 @@
             function ($scope, $http, notify, user, itContractRoles) {
                 $scope.pagination = {
                     skip: 0,
-                    take: 200
+                    take: 1000
                 };
 
                 $scope.itContractRoles = itContractRoles;
