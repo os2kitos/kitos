@@ -46,9 +46,7 @@
                     take: 20
                 };
 
-                $scope.showType = 'appType';
-
-                $scope.showId = 'systemId';
+                $scope.showType = 'appType.name';
 
                 var appTypes = appTypesHttp.data.response;
                 var interfaceAppType = interfaceAppTypeHttp.data.response;

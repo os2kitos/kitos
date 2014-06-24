@@ -6,29 +6,34 @@
             </td>
             <td>
                 <select data-ng-model="showSystemId">
-                    <option value="global">Globalt SystemID
+                    <option value="itSystem.systemId">Globalt SystemID
                     </option>
-                    <option value="local">Lokalt SystemID
+                    <option value="localSystemId">Lokalt SystemID
                     </option>
                 </select>
+                <button data-order-by="showSystemId" data-paging="pagination"></button>
             </td>
             <td>
                 <select data-ng-model="showType">
-                    <option value="appType">Applikationstype
+                    <option value="itSystem.appType.name">Applikationstype
                     </option>
-                    <option value="businessType">Forretningstype
+                    <option value="itSystem.businessType.name">Forretningstype
                     </option>
                 </select>
+                <button data-order-by="showType" data-paging="pagination"></button>
             </td>
             <td>Anvender
             </td>
             <td>Udstiller
             </td>
             <td>Overblik
+                <button data-order-by="'overviewItSystem.name'" data-paging="pagination"></button>
             </td>
             <td>Ansv. organisationsenhed
+                <button data-order-by="'responsibleUnit.name'" data-paging="pagination"></button>
             </td>
             <td>Leverandør
+                <button data-order-by="showType" data-paging="pagination"></button>
             </td>
         </tr>
     </thead>
@@ -41,12 +46,12 @@
                 </span>
             </td>
             <td data-ng-switch="showSystemId">
-                <span data-ng-switch-when="global">{{usage.itSystem.systemId}}</span>
-                <span data-ng-switch-when="local">{{usage.localSystemId}}</span>
+                <span data-ng-switch-when="itSystem.systemId">{{usage.itSystem.systemId}}</span>
+                <span data-ng-switch-when="localSystemId">{{usage.localSystemId}}</span>
             </td>
             <td data-ng-switch="showType">
-                <span data-ng-switch-when="appType">{{usage.itSystem.appType.name}}</span>
-                <span data-ng-switch-when="businessType">{{usage.itSystem.businessType.name}}</span>
+                <span data-ng-switch-when="itSystem.appType.name">{{usage.itSystem.appType.name}}</span>
+                <span data-ng-switch-when="itSystem.businessType.name">{{usage.itSystem.businessType.name}}</span>
             </td>
             <td>{{ usage.interfaceUsages.length }}
                 ({{ usage.itSystem.canUseInterfaceIds.length }})

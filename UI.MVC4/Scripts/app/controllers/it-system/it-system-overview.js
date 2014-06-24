@@ -48,8 +48,8 @@
                 var appTypes = appTypesHttp.data.response;
                 var businessTypes = businessTypesHttp.data.response;
 
-                $scope.showSystemId = 'global';
-                $scope.showType = 'appType';
+                $scope.showSystemId = 'localSystemId';
+                $scope.showType = 'itSystem.appType.name';
 
                 $scope.$watchCollection('pagination', loadUsages);
 
