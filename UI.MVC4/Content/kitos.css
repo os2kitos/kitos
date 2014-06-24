@@ -591,14 +591,15 @@ body, .btn {
     color: black !important;
 }
 .btn-order-by::after {
+    font-size: 0.7em;
     content: '▼▲';
     opacity: 0.5;
     min-width: 20px;
 }
 .btn-order-by.ordering::after {
-    content: '▼';
+    content: '▲';
     opacity: 1;
 }
 .btn-order-by.ordering.descending::after {
-    content: '▲'
+    content: '▼';
 }
