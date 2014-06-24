@@ -1,9 +1,13 @@
 ﻿<table class="table table-condensed table-striped">
     <thead>
         <tr>
-            <th>IT Kontrakt</th>
+            <th>IT Kontrakt
+                <button data-order-by="'name'" data-paging="pagination"></button>
+            </th>
 
-            <th>Ansv. organisationsenhed</th>
+            <th>Ansv. organisationsenhed
+                <button data-order-by="'responsibleOrganizationUnit.name'" data-paging="pagination"></button>
+            </th>
 
             <th>
                 <select class="form-control input-sm" data-ng-init="chosenRoleId = 2" 
@@ -70,4 +74,11 @@
             </td>
         </tr>
     </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="9">
+                <span data-pagination-buttons="pagination"></span>
+            </td>
+        </tr>
+    </tfoot>
 </table>
