@@ -15,8 +15,6 @@ div#page-content
 {
     min-width: 1024px;
     max-width: 1280px;
-    margin: 120px auto;
-    padding: 0px 5px 0px 10px;
 }
 
 div#page-body
@@ -95,11 +93,6 @@ div#page-body
         text-decoration: none;
     }
 /*********************************************/
-
-#subnav
-{
-    margin-top: 20px;
-}
 
     #subnav ul
     {

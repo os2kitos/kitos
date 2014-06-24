@@ -54,8 +54,7 @@ namespace UI.MVC4
 
             // css
             bundles.Add(new StyleBundle("~/Content/css").Include(
-                "~/Content/bootstrap-cosmo.*",
-                "~/Content/carousel.css",
+                "~/Content/bootstrap/bootstrap.css",
                 "~/Content/notify/notify.css",
                 "~/Content/css/select2.css",
                 "~/Content/css/bootstrap-wysihtml5.css",

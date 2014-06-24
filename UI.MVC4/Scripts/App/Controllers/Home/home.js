@@ -32,10 +32,6 @@
             $rootScope.page.title = 'Index';
             $rootScope.page.subnav = [];
 
-            userService.getUser().then(function(user) {
-                $scope.user = user;
-            });
-
             $scope.about = _.find(texts, function(textObj) {
                 return textObj.id == 1;
             }).value;
