@@ -25,7 +25,7 @@
             
             $scope.pagination = {
                 skip: 0,
-                take: 10
+                take: 15
             };
             
             $scope.$watch("selectedTaskGroup", function (newVal, oldVal) {
