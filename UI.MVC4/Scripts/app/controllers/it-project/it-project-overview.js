@@ -18,11 +18,11 @@
     }]);
 
     app.controller('project.EditOverviewCtrl',
-    ['$scope', '$http', 'projectRoles', 'user',
-        function ($scope, $http, projectRoles, user) {
+    ['$scope', '$http', 'notify', 'projectRoles', 'user',
+        function ($scope, $http, notify, projectRoles, user) {
             $scope.pagination = {
                 skip: 0,
-                take: 20
+                take: 10
             };
 
             $scope.projects = [];
@@ -32,7 +32,7 @@
             $scope.$watchCollection('pagination', loadProjects);
 
             function loadProjects() {
-                var url = 'api/itProject?orgId=' + user.currentOrganizationId;
+                var url = 'api/itProject?overview&orgId=' + user.currentOrganizationId;
 
                 url += '&skip=' + $scope.pagination.skip;
                 url += '&take=' + $scope.pagination.take;
@@ -57,11 +57,6 @@
             }
             
             function pushProject(project) {
-                // fetch assigned roles for each project
-                $http.get('api/itprojectrights/' + project.id).success(function (result) {
-                    project.roles = result.response;
-                });
-                
                 // set current phase
                 var phases = [project.phase1, project.phase2, project.phase3, project.phase4, project.phase5];
                 project.currentPhase = _.find(phases, function (phase) {

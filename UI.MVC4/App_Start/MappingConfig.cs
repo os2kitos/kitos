@@ -277,6 +277,9 @@ namespace UI.MVC4.App_Start
                 .ForMember(dest => dest.AssociatedUser, opt => opt.Ignore())
                 .ForMember(dest => dest.ObjectOwner, opt => opt.Ignore());
 
+            //Output only - this mapping should not be reversed
+            Mapper.CreateMap<Activity, ActivitySimpleDTO>();
+
             Mapper.CreateMap<State, StateDTO>()
                 .ReverseMap()
                 .ForMember(dest => dest.AssociatedUser, opt => opt.Ignore())
@@ -312,6 +315,9 @@ namespace UI.MVC4.App_Start
 
             //Output only - this mapping should not be reversed
             Mapper.CreateMap<ItProject, ItProjectSimpleDTO>();
+
+            //Output only - this mapping should not be reversed
+            Mapper.CreateMap<ItProject, ItProjectOverviewDTO>();
 
             Mapper.CreateMap<Handover, HandoverDTO>()
                   .ReverseMap()

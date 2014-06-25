@@ -61,6 +61,25 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        public HttpResponseMessage GetOverview(bool? overview, [FromUri] int orgId, [FromUri] PagingModel<ItProject> pagingModel)
+        {
+            try
+            {
+                //Get all projects inside the organizaton
+                pagingModel.Where(p => p.OrganizationId == orgId);
+
+                var projects = Page(Repository.AsQueryable(), pagingModel);
+
+                var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectOverviewDTO>>(projects);
+
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetCatalog(bool? catalog, [FromUri] int orgId, [FromUri] PagingModel<ItProject> pagingModel)
         {
             try
