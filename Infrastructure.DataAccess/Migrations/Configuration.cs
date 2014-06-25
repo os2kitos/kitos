@@ -503,8 +503,8 @@ namespace Infrastructure.DataAccess.Migrations
             #region TEXTS
 
             context.Texts.AddOrUpdate(x => x.Id,
-                                      new Text() { Value = "Head", ObjectOwner = globalUser },
-                                      new Text() { Value = "Body", ObjectOwner = globalUser });
+                                      new Text() { Value = "Om kitos blablabla", ObjectOwner = globalUser },
+                                      new Text() { Value = "Status blablabla", ObjectOwner = globalUser });
 
             #endregion
 

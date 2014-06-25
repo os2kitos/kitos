@@ -37,6 +37,7 @@ namespace UI.MVC4
             bundles.Add(new ScriptBundle("~/Scripts/angular").Include(
                 "~/Scripts/angular.js",
                 "~/Scripts/angular-animate.js",
+                "~/Scripts/angular-sanitize.js",
                 "~/Scripts/angular-route.js",
                 "~/Scripts/AngularUI/ui-router.js",
                 "~/Scripts/angular-ui/ui-bootstrap.js",
@@ -53,11 +54,9 @@ namespace UI.MVC4
 
             // css
             bundles.Add(new StyleBundle("~/Content/css").Include(
-                "~/Content/bootstrap-cosmo.*",
-                "~/Content/carousel.css",
+                "~/Content/bootstrap/bootstrap.css",
                 "~/Content/notify/notify.css",
                 "~/Content/css/select2.css",
-                "~/Content/css/bootstrap-wysihtml5.css",
                 "~/Content/select2-bootstrap.css",
                 "~/Content/xeditable.css",
                 "~/Content/kitos.css"));

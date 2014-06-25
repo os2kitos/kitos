@@ -1,87 +1,108 @@
-﻿<div class="container-fluid marketing" data-ng-controller="home.IndexCtrl">
-
+﻿<div class="container-fluid">
     <div class="row">
         <div class="col-lg-4">
-            <img class="img-circle" data-src="holder.js/140x140" alt="Generic placeholder image" holder-fix>
-            <h2>Produktoversigt</h2>
-            <p>Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo cursus magna.</p>
-            <p><a class="btn btn-default" href="#" role="button">Vis Produktoversigt &raquo;</a></p>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Om KITOS?</h3>
+                </div>
+                <div class="panel-body">
+                    <textarea data-ng-model="about" data-autosave="api/text/1" data-field="value" data-ng-if="user.isGlobalAdmin"></textarea>
+                    <div data-ng-bind-html="about" data-ng-if="!user.isGlobalAdmin"></div>
+                </div>
+                <div class="panel-footer">
+                    <a href="/docs/om.pdf">Klik her for at læse mere</a>
+                </div>
+            </div>
         </div>
         <div class="col-lg-4">
-            <img class="img-circle" data-src="holder.js/140x140" alt="Generic placeholder image" holder-fix>
-            <h2>Installationsguide</h2>
-            <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.</p>
-            <p><a class="btn btn-default" href="#" role="button">Vis Installationsguide &raquo;</a></p>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Hjælp og vejledning til KITOS</h3>
+                </div>
+                <div class="panel-body">
+                    <ul class="list-unstyled">
+                        <li><a href="/docs/introduktion.pdf">Introduktion</a></li>
+                        <li><a href="/docs/hvordan-kitos.pdf">Hvordan kan vi tage KITOS i brug?</a></li>
+                        <li><a href="/docs/hvordan-lokaladm.pdf">Hjælp til lokal adm</a></li>
+                        <li><a href="/docs/modul-org.pdf">Hjælp til modulet Organisation</a></li>
+                        <li><a href="/docs/modul-projekt.pdf">Hjælp til modulet IT Projekter</a></li>
+                        <li><a href="/docs/modul-system.pdf">Hjælp til modulet IT Systemer</a></li>
+                        <li><a href="/docs/modul-kontrakt.pdf">Hjælp til modulet IT Kontrakter</a></li>
+                        <li><a href="/docs/undervisning.pdf">Undervisning - hvad og hvornår?</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
         
-        <!-- login formular -->
-        <div class="col-lg-4" data-highlight="" data-on="highlightLogin" data-ng-show="!user">
-            <img class="img-circle" data-src="holder.js/140x140" alt="Generic placeholder image" holder-fix>
-            <h2>Log ind</h2>
-            <div class="text-left col-md-10">
-                <form name="loginForm" class="form-horizontal" autocomplete="off" novalidate="novalidate">
-                    <div class="form-group">
-                        <div class="col-md-3">
-                            <label for="email" class="control-label">Email</label></div>
-                        <div class="col-md-9">
-                            <input name="email" data-ng-model="email" type="email" class="form-control input-sm" required />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-md-3">
-                            <label for="password" class="control-label">Password</label></div>
-                        <div class="col-md-9">
-                            <input name="password" data-ng-model="password" type="password" class="form-control input-sm" required />
-                        </div>
+        <div class="col-lg-4">
+            <!-- login -->
+            <div class="panel panel-default" data-highlight="" data-on="highlightLogin" data-ng-show="!user">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Log ind</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="text-left col-md-10">
+                        <form name="loginForm" class="form-horizontal" autocomplete="off" novalidate="novalidate">
+                            <div class="form-group">
+                                <div class="col-md-3">
+                                    <label for="email" class="control-label">Email</label></div>
+                                <div class="col-md-9">
+                                    <input name="email" data-ng-model="email" type="email" class="form-control input-sm" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-3">
+                                    <label for="password" class="control-label">Password</label></div>
+                                <div class="col-md-9">
+                                    <input name="password" data-ng-model="password" type="password" class="form-control input-sm" required>
+                                </div>
 
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-6 col-md-offset-3">
+                                    <label class="checkbox">
+                                        <input name="remember" data-ng-model="remember" type="checkbox">
+                                        Log mig ikke ud
+                                    </label>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="submit" class="btn btn-default btn-sm pull-right" data-ng-click="submitLogin()" value="Log ind">
+                                </div>
+                            </div>
+                        </form>
                     </div>
-                    <div class="form-group">
-                        <div class="col-md-6 col-md-offset-3">
-                            <label class="checkbox">
-                                Lad være med at logge mig ud
-                                <input name="remember" data-ng-model="remember" type="checkbox" />
-                            </label>
-                        </div>
-                        <div class="col-md-3">
-                            <input type="submit" class="btn btn-default btn-sm pull-right" data-ng-click="submitLogin()" value="Log ind" />
-                        </div>
-                    </div>
-                </form>
-                
-                <p>Hvis du har glemt dit password, <a data-ui-sref="forgot-password">kan du anmode om at nulstille det.</a></p>
-
+                </div>
+                <div class="panel-footer">
+                    Hvis du har glemt dit password, <a data-ui-sref="forgot-password">kan du anmode om at nulstille det.</a>
+                </div>
+            </div>
+            
+            <!-- Support -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Support</h3>
+                </div>
+                <div class="panel-body">
+                    Hvis du oplever problemer med KITOS skal du kontakte din lokale adm.
+                </div>
+                <div class="panel-footer">
+                    <a href="/docs/kontaktinfo.pdf">Klik her for kontaktinfo på din lokale adm.</a>
+                </div>
+            </div>
+            
+            <!-- Status -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Driftstatus</h3>
+                </div>
+                <div class="panel-body">
+                    <textarea data-ng-model="status" data-autosave="api/text/2" data-field="value" data-ng-if="user.isGlobalAdmin"></textarea>
+                    <div data-ng-bind-html="status" data-ng-if="!user.isGlobalAdmin"></div>
+                </div>
+                <div class="panel-footer">
+                    <a href="/docs/drift-mere-info.pdf">Klik her for at læse mere</a>
+                </div>
             </div>
         </div>
     </div>
-
-    <hr class="featurette-divider">
-
-    <div class="row featurette">
-        <div class="col-md-5">
-            <img class="featurette-image img-responsive" data-src="holder.js/500x500/auto" alt="Generic placeholder image" holder-fix>
-        </div>
-        <div class="col-md-7">
-            <h2 class="featurette-heading" data-editable-textarea="introhead" data-onbeforesave="submitIntroHead($data)">{{ introhead || 'tom' }}
-            </h2>
-            <p class="lead" data-editable-textarea="introbody" data-onbeforesave="submitIntroBody($data)">
-                {{ introbody || 'tom' }}
-            </p>
-        </div>
-    </div>
-
-    <hr class="featurette-divider">
-
-    <div class="row featurette">
-        <div class="col-md-7">
-            <h2 class="featurette-heading">Guide/brugervejledninger. <span class="text-muted">Nulla non metus auctor fringilla.</span></h2>
-            <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
-        </div>
-        <div class="col-md-5">
-            <img class="featurette-image img-responsive" data-src="holder.js/500x500/auto" alt="Generic placeholder image" holder-fix>
-        </div>
-    </div>
-
-    <hr class="featurette-divider">
-
-    <!-- /END THE FEATURETTES -->
 </div>

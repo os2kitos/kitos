@@ -1,6 +1,7 @@
 ﻿body
 {
     background-color: #d9d9d9;
+    font-family: Calibri, Candara, Arial, sans-serif !important;
 }
 
 div#page-wrapper
@@ -15,8 +16,6 @@ div#page-content
 {
     min-width: 1024px;
     max-width: 1280px;
-    margin: 120px auto;
-    padding: 0px 5px 0px 10px;
 }
 
 div#page-body
@@ -95,11 +94,6 @@ div#page-body
         text-decoration: none;
     }
 /*********************************************/
-
-#subnav
-{
-    margin-top: 20px;
-}
 
     #subnav ul
     {
@@ -318,7 +312,7 @@ td.border-left {
 
 .light-blue
 {
-    color: rgb(208, 217, 229) !important;
+    color: rgb(184, 202, 226) !important;
 }
 
 .broken-white
@@ -603,4 +597,22 @@ body, .btn {
 }
 .btn-order-by.ordering.descending::after {
     content: '▼';
+}
+
+.btn-default {
+    color: black;
+    background-color: white;
+    border-color: #cccccc;
+}
+
+.btn-default:hover, .btn-default:focus {
+    color: black;
+    background-color: #e0e0e0;
+    border-color: #cccccc;
+}
+
+.btn-default:active,  .btn-default.active, .open .dropdown-toggle.btn-default {
+    color: black;
+    background-color: #cccccc;
+    border-color: #cccccc;
 }
