@@ -22,8 +22,8 @@
                                 }]
                             },
                             controller: [
-                                '$scope', 'notify', '$modalInstance', 'user', function ($scope, notify, $modalInstance, user) {
-
+                                '$scope', 'notify', '$modalInstance', 'user', 'autofocus', function ($scope, notify, $modalInstance, user, autofocus) {
+                                    autofocus();
                                     $scope.newUser = {};
 
                                     $scope.addUser = function () {

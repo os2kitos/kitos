@@ -195,8 +195,8 @@
             function editActivity(activity) {
                 var modal = $modal.open({
                     templateUrl: 'partials/it-project/modal-milestone-task-edit.html',
-                    controller: ['$scope', function ($modalScope) {
-
+                    controller: ['$scope', 'autofocus', function ($modalScope, autofocus) {
+                        autofocus();
                         $modalScope.activity = activity;
                         $modalScope.phases = $scope.project.phases;
                         $modalScope.usersWithRoles = _.values(usersWithRoles);

@@ -247,8 +247,8 @@
                         var modal = $modal.open({
                             backdrop: 'static',
                             templateUrl: 'partials/home/choose-organization.html',
-                            controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
-
+                            controller: ['$scope', '$modalInstance', 'autofocus', function ($modalScope, $modalInstance, autofocus) {
+                                autofocus();
                                 $modalScope.orgChooser = {
                                     selectedId: result.response.defaultOrganizationId
                                 };

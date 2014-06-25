@@ -3,8 +3,6 @@
 </div>
 <div class="modal-body">
     <form name="modal.form" novalidate="novalidate" class="form-horizontal">
-
-
         <div class="form-group">
             <!-- Name -->
             <label for="name" class="col-md-2 control-label small">
@@ -13,7 +11,7 @@
             <div class="col-md-6">
                 <input type="text" id="name" data-ng-model="goal.name" class="form-control input-sm"
                        data-field="name"
-                       data-autosave="{{goal.updateUrl}}" />
+                       data-autosave="{{goal.updateUrl}}" autofocus />
             </div>
             
             <!-- Human readable ID -->

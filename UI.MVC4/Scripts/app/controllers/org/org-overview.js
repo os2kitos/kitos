@@ -185,13 +185,12 @@
         $scope.openComment = function (usage) {
             $modal.open({
                 templateUrl: 'partials/org/overview/comment-modal.html',
-                controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
+                controller: ['$scope', '$modalInstance', 'autofocus', function ($modalScope, $modalInstance, autofocus) {
+                    autofocus();
                     $modalScope.usage = usage;
-                    
                     $modalScope.hasWriteAccess = usage.hasWriteAccess;
                 }]
             });
         };
-        
     }]);
 })(angular, app);
