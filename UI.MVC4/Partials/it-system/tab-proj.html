@@ -1,6 +1,6 @@
-﻿<div data-ng-repeat="itProject in itProjects">
+﻿<div class="checkbox" data-ng-repeat="itProject in itProjects">
     <label>
         <input type="checkbox" data-ng-model="itProject.selected" data-ng-change="save(itProject)" />
-        {{ itProject.name }}
+        <a data-ui-sref="it-project.edit.status-project({ id: itProject.id })">{{ itProject.name }}</a>
     </label>
 </div>
