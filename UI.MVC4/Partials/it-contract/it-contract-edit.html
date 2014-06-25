@@ -74,7 +74,7 @@
 
                         <!-- Contract template -->
                         <div class="form-group">
-                            <label for="contract-template" class="control-label small">Kontratskabalon</label>
+                            <label for="contract-template" class="control-label small">Kontratskabelon</label>
                             <select id="contract-template" class="form-control input-sm" data-ng-disabled="!hasWriteAccess"
                                     data-ng-model="contract.contractTemplateId" data-ng-options="o.id as o.name for o in contractTemplates" data-autosave="{{ autoSaveUrl }}" data-field="contractTemplateId">
                                 <option value=""></option>
@@ -118,14 +118,16 @@
                         <div class="form-group">
                             <label for="contract-ext-signer" class="control-label small">Leverandørs kontraktunderskriver</label>
                             <input type="text" id="contract-ext-signer" class="form-control input-sm" data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="contract.supplierContractSigner" data-autosave="{{ autoSaveUrl }}" data-field="supplierContractSigner">
+                                   data-ng-model="contract.supplierContractSigner" data-autosave="{{ autoSaveUrl }}" data-field="supplierContractSigner">
+                            
                         </div>
 
                         <!-- Responsible org unit -->
                         <div class="form-group">
                             <label for="contract-orgunit" class="control-label small">Ansvarlig enhed</label>
-                            <select id="contract-orgunit" class="form-control input-sm" data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="contract.responsibleOrganizationUnitId" data-ng-options="o.id as o.name for o in orgUnits" data-autosave="{{ autoSaveUrl }}" data-field="responsibleOrganizationUnitId"></select>
+                            <div id="contract-orgunit" data-ng-model="contract.responsibleOrganizationUnitId" data-ng-disabled="!hasWriteAccess" 
+                                data-select-org-unit="" data-autosave="{{ autoSaveUrl }}" data-field="responsibleOrganizationUnitId"></div>
+                        
                         </div>
 
                         <!-- Intern contract signer -->
