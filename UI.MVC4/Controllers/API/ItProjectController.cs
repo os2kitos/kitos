@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
+using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -51,6 +52,29 @@ namespace UI.MVC4.Controllers.API
                 var items = Repository.Get(x => x.Name.Contains(q) && x.OrganizationId == orgId);
 
                 return Ok(Map(items));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetHierarchy(int id, [FromUri] bool? hierarchy)
+        {
+            try
+            {
+                var itProject = Repository.AsQueryable().Single(x => x.Id == id);
+
+                if (itProject == null)
+                    return NotFound();
+
+                // this trick will put the first object in the result as well as the children
+                var children = new[] { itProject }.SelectNestedChildren(x => x.Children);
+                // gets parents only
+                var parents = itProject.SelectNestedParents(x => x.Parent);
+                // put it all in one result
+                var contracts = children.Union(parents);
+                return Ok(Map(contracts));
             }
             catch (Exception e)
             {
