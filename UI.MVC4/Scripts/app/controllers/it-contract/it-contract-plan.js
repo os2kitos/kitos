@@ -63,7 +63,10 @@
                         if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
                     }
 
-                    $http.get(url).success(function (result) {
+                    $http.get(url).success(function (result, status, headers) {
+                        var paginationHeader = JSON.parse(headers('X-Pagination'));
+                        $scope.pagination.count = paginationHeader.TotalCount;
+
                         // clear list
                         $scope.contracts = [];
 

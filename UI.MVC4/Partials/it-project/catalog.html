@@ -7,8 +7,8 @@
             <th>Projekt ID
                 <button data-order-by="'itProjectId'" data-paging="pagination"></button>
             </th>
-            <th>Overordnet ID
-                <button data-order-by="'parent.itProjectId'" data-paging="pagination"></button>
+            <th>Original ID
+                <button data-order-by="'original.itProjectId'" data-paging="pagination"></button>
             </th>
             <th>Projektnavn
                 <button data-order-by="'name'" data-paging="pagination"></button></th>
@@ -38,7 +38,7 @@
             
             <!-- parent id -->
             <td>
-                {{ p.parentItProjectId }}
+                {{ p.originalItProjectId }}
             </td>
             
             <!-- name + link -->

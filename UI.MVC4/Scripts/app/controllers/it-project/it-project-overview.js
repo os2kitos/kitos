@@ -5,23 +5,9 @@
             templateUrl: 'partials/it-project/overview.html',
             controller: 'project.EditOverviewCtrl',
             resolve: {
-                projects: ['$http', 'userService', function ($http, userService) {
-                    return userService.getUser().then(function (user) {
-                        return $http.get('api/itproject?orgId=' + user.currentOrganizationId).then(function (result) {
-                            return result.data.response;
-                        });
-                    });
-                }],
                 projectRoles: ['$http', function ($http) {
                     return $http.get('api/itprojectrole').then(function (result) {
                         return result.data.response;
-                    });
-                }],
-                orgUnits: ['$http', 'userService', function ($http, userService) {
-                    return userService.getUser().then(function(user) {
-                        return $http.get('api/organizationunit?userId=' + user.id).then(function(result) {
-                            return result.data.response;
-                        });
                     });
                 }],
                 user: ['userService', function (userService) {
@@ -32,13 +18,45 @@
     }]);
 
     app.controller('project.EditOverviewCtrl',
-    ['$scope', '$http', '$sce', '$timeout', '$filter', 'projects', 'projectRoles', 'orgUnits', 'user',
-        function ($scope, $http, $sce, $timeout, $filter, projects, projectRoles, orgUnits, user) {
-            $scope.projects = projects;
-            $scope.allProjects = projects;
+    ['$scope', '$http', 'projectRoles', 'user',
+        function ($scope, $http, projectRoles, user) {
+            $scope.pagination = {
+                skip: 0,
+                take: 20
+            };
+
+            $scope.projects = [];
+
             $scope.projectRoles = projectRoles;
             
-            _.each(projects, function(project) {
+            $scope.$watchCollection('pagination', loadProjects);
+
+            function loadProjects() {
+                var url = 'api/itProject?orgId=' + user.currentOrganizationId;
+
+                url += '&skip=' + $scope.pagination.skip;
+                url += '&take=' + $scope.pagination.take;
+
+                if ($scope.pagination.orderBy) {
+                    url += '&orderBy=' + $scope.pagination.orderBy;
+                    if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+                }
+
+                $scope.projects = [];
+                $http.get(url).success(function (result, status, headers) {
+
+                    var paginationHeader = JSON.parse(headers('X-Pagination'));
+                    $scope.pagination.count = paginationHeader.TotalCount;
+
+                    _.each(result.response, pushProject);
+
+                }).error(function () {
+                    notify.addErrorMessage("Kunne ikke hente projekter!");
+                });
+
+            }
+            
+            function pushProject(project) {
                 // fetch assigned roles for each project
                 $http.get('api/itprojectrights/' + project.id).success(function (result) {
                     project.roles = result.response;
@@ -49,52 +67,7 @@
                 project.currentPhase = _.find(phases, function (phase) {
                     return phase.id == project.currentPhaseId;
                 });
-            });
-
-            $scope.orgUnits = {};
-            $scope.orgUnitTree = [];
-
-            _.each(orgUnits, function(orgUnit) {
-                visitOrgUnit(orgUnit);
-            });
-
-            checkForDefaultUnit();
-
-            function filterProjects() {
-                if ($scope.chosenOrgUnitId == 0) {
-                    // 'alle' has been selected
-                    $scope.projects = projects;
-                } else if ($scope.chosenOrgUnitId == -1) {
-                    // 'tværgående' has been selected
-                    $scope.projects = $filter('filter')(projects, { isTransversal: true });
-                } else {
-                    $scope.projects = $filter('andChildren')(projects, 'responsibleOrgUnitId', $scope.orgUnitTree, $scope.chosenOrgUnitId);
-                }
-
+                $scope.projects.push(project);
             }
-
-            $scope.filterProjects = filterProjects;
-
-            function visitOrgUnit(orgUnit) {
-
-                $scope.orgUnits[orgUnit.id] = orgUnit;
-                $scope.orgUnitTree.push(orgUnit);
-
-                _.each(orgUnit.children, function (child) {
-                    return visitOrgUnit(child);
-                });
-            }
-
-            function checkForDefaultUnit() {
-                if (!user.currentOrganizationUnitId) return;
-
-                $scope.chosenOrgUnitId = user.currentOrganizationUnitId;
-                filterProjects();
-            }
-            
-            $scope.selectOrgUnitOptions = {
-                dropdownAutoWidth : true,
-                escapeMarkup: function (m) { return m; }
-            };
         }]);
 })(angular, app);

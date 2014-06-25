@@ -78,8 +78,7 @@
                         $http.post(url, payload).success(function (result) {
                             msg.toSuccessMessage("Projektet er klonet!");
 
-                            //push the new project
-                            pushProject(result.response);
+                            loadProjects();
                         }).error(function () {
                             msg.toErrorMessage("Fejl! Kunne ikke klone projektet!");
                         });

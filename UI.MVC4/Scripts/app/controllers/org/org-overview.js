@@ -37,6 +37,8 @@
             if (!$scope.orgUnitId) return;
 
             $scope.taskUsages = {};
+            var url = 'api/taskusage?orgUnitId=' + $scope.orgUnitId + '&onlyStarred=true';
+
             $http.get('api/taskusage?orgUnitId=' + $scope.orgUnitId + "&onlyStarred=true").success(function (result) {
                 $scope.taskUsages = result.response;
 
