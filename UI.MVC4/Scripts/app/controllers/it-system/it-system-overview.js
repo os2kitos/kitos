@@ -1,8 +1,6 @@
 ﻿(function (ng, app) {
-
     app.config([
         '$stateProvider', '$urlRouterProvider', function($stateProvider) {
-
             $stateProvider.state('it-system.overview', {
                 url: '/overview',
                 templateUrl: 'partials/it-system/overview-it-system.html',
@@ -27,19 +25,23 @@
                         'userService', function(userService) {
                             return userService.getUser();
                         }
-                    ]
+                    ],
+                    itSystemRoles: ['$http', function ($http) {
+                        return $http.get("api/itsystemrole/")
+                            .then(function (result) {
+                                return result.data.response;
+                            });
+                    }]
                 }
             });
         }
     ]);
 
     app.controller('system.OverviewCtrl',
-        ['$rootScope', '$scope', '$http', 'notify',
-            'appTypes', 'businessTypes', 'organizations', 'user',
-            function ($rootScope, $scope, $http, notify,
-             appTypesHttp, businessTypesHttp, organizationsHttp, user) {
+        ['$rootScope', '$scope', '$http', 'notify', 'appTypes', 'businessTypes', 'organizations', 'user', 'itSystemRoles',
+            function ($rootScope, $scope, $http, notify, appTypesHttp, businessTypesHttp, organizationsHttp, user, itSystemRoles) {
                 $rootScope.page.title = 'IT System - Overblik';
-                
+                $scope.itSystemRoles = itSystemRoles;
                 $scope.pagination = {
                     skip: 0,
                     take: 20

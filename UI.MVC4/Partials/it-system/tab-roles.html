@@ -58,7 +58,7 @@
         </tbody>
 
         <!-- add-new-right row -->
-        <tbody data-ng-show="true" data-ng-if="hasWriteAccess">
+        <tbody data-ng-hide="!hasWriteAccess">
             <tr>
                 <td>
                     <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en systemrolle" class="form-control input-sm" data-ng-change="submitRight()">

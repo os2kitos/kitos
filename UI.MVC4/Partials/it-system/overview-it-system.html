@@ -32,8 +32,10 @@
             <th>Ansv. organisationsenhed
                 <button data-order-by="'responsibleUnit.name'" data-paging="pagination"></button>
             </th>
-            <th>Leverandør
-                <button data-order-by="showType" data-paging="pagination"></button>
+            <th>
+                <select data-ng-model="chosenRoleId" data-ng-init="chosenRoleId = 1" data-ng-options="r.id as r.name for r in itSystemRoles">
+                    <option value="">-- Vælg rolle --</option>
+                </select>
             </th>
         </tr>
     </thead>
@@ -68,7 +70,8 @@
             </td>
             <td>{{ usage.responsibleUnit.name }}
             </td>
-            <td>{{ usage.provider.name }}
+            <td>
+                {{ usage.rights | filter:{roleId: chosenRoleId} | joinBy:', ':'user.name' }}
             </td>
         </tr>
     </tbody>
