@@ -3,8 +3,14 @@
         <div class="col-md-3">
             <div data-ng-model="orgUnitId" data-ng-change="loadUsages()" data-select-org-unit=""></div>
         </div>
-        <div class="col-md-1">KLE ID</div>
-        <div class="col-md-4">KLE Navn</div>
+        <div class="col-md-1">
+            KLE ID
+                <button data-order-by="'taskRef.taskKey'" data-paging="pagination"></button>
+        </div>
+        <div class="col-md-4">KLE Navn
+            
+                <button data-order-by="'taskRef.description'" data-paging="pagination"></button>
+        </div>
         <div class="col-md-2">
             <div data-ng-class="{'supertext': user.currentConfig.showColumnTechnology || user.currentConfig.showColumnUsage}">
                 Digitaliseringsgrad
@@ -21,6 +27,9 @@
 
     <div data-ng-repeat="usage in taskUsages" class="task-usage-container">
         <div data-ng-include="'partials/org/overview/task-usage.html'"></div>
+    </div>
+    <div class="col-md-12">
+        <span data-pagination-buttons="pagination"></span>
     </div>
 
 </div>

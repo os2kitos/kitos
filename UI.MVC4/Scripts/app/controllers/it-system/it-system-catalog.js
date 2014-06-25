@@ -119,12 +119,12 @@
                         if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
                     }
 
-                    $scope.systems = [];
                     $http.get(url).success(function (result, status, headers) {
 
                         var paginationHeader = JSON.parse(headers('X-Pagination'));
                         $scope.pagination.count = paginationHeader.TotalCount;
 
+                        $scope.systems = [];
                         _.each(result.response, function (system) {
 
                             system.appType = _.findWhere(appTypes, { id: system.appTypeId });
