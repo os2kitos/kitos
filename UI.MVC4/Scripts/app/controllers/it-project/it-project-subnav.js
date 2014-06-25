@@ -17,11 +17,13 @@
                     { state: 'it-project.edit', text: 'IT Projekt', showWhen: 'it-project.edit' },
                 ];
                 $rootScope.page.subnav.buttons = [
-                    { func: create, text: 'Opret IT Projekt'}
+                    { func: create, text: 'Opret IT Projekt', style: 'btn-success', icon: 'glyphicon-plus' },
+                    { func: remove, text: 'Slet IT Projekt', style: 'btn-danger', icon: 'glyphicon-minus', showWhen: 'it-project.edit' }
                 ];
                 
+                var orgUnitId = user.currentOrganizationUnitId;
+
                 function create() {
-                    var orgUnitId = user.currentOrganizationUnitId;
                     var payload = {
                         itProjectTypeId: 1,
                         responsibleOrgUnitId: orgUnitId,
@@ -46,6 +48,19 @@
                             msg.toErrorMessage("Fejl! Kunne ikke oprette nyt projekt!");
                         });
                 };
+
+                function remove() {
+                    var projectId = $state.params.id;
+                    var msg = notify.addInfoMessage("Sletter IT Projektet...", false);
+                    $http.delete('api/itproject/' + projectId)
+                        .success(function(result) {
+                            msg.toSuccessMessage("IT Projektet er slettet!");
+                            $state.go('it-project.overview');
+                        })
+                        .error(function() {
+                            msg.toErrorMessage("Fejl! Kunne ikke slette IT Projektet!");
+                        });
+                }
             }]
         });
     }]);

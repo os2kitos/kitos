@@ -17,7 +17,8 @@
                     { state: 'it-contract.edit', text: 'IT Kontrakt', showWhen: 'it-contract.edit' },
                 ];
                 $rootScope.page.subnav.buttons = [
-                    { func: create, text: 'Opret IT Kontrakt' }
+                    { func: create, text: 'Opret IT Kontrakt', style: 'btn-success', icon: 'glyphicon-plus' },
+                    { func: remove, text: 'Slet IT Kontrakt', style: 'btn-danger', icon: 'glyphicon-minus', showWhen: 'it-contract.edit' }
                 ];
 
                 function create() {
@@ -31,6 +32,19 @@
                         })
                         .error(function() {
                             msg.toErrorMessage("Fejl! Kunne ikke oprette en ny kontrakt!");
+                        });
+                }
+
+                function remove() {
+                    var contractId = $state.params.id;
+                    var msg = notify.addInfoMessage("Sletter IT Kontrakten...", false);
+                    $http.delete('api/itcontract/' + contractId)
+                        .success(function (result) {
+                            msg.toSuccessMessage("IT Kontrakten er slettet!");
+                            $state.go('it-contract.overview');
+                        })
+                        .error(function () {
+                            msg.toErrorMessage("Fejl! Kunne ikke slette IT Kontrakten!");
                         });
                 }
             }]
