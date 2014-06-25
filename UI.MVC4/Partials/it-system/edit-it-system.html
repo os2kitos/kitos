@@ -104,11 +104,11 @@
 
                 <!--Further description-->
                 <div class="form-group">
-                    <label for="system-url" class="control-label col-md-4 small">Link til yderligere beskrivelse</label>
+                    <label for="system-url" class="control-label col-md-4 small">Link til yderligere beskrivelse <span class="text-muted">(Skal starte med http://)</span></label>
                     <div class="col-md-8">
                         <input type="text" id="system-url" 
                                data-autosave="{{system.updateUrl}}" data-field="url" data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="system.url" class="form-control input-sm" placeholder="URL" />
+                               data-ng-model="system.url" class="form-control input-sm" placeholder="http://" />
                     </div>
                 </div>
             </div>
