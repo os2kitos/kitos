@@ -8,7 +8,7 @@
                         <div class="col-md-7">
                             <select data-ui-select2="" id="system-app-type" 
                                     data-autosave="{{system.updateUrl}}" data-field="appTypeId" data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="system.appTypeId" class="form-control input-sm">
+                                    data-ng-model="system.appTypeId" class="form-control input-sm" data-autofocus>
                                 <option data-ng-repeat="appType in appTypes" value="{{appType.id}}">{{appType.name}}</option>
                             </select>
                         </div>

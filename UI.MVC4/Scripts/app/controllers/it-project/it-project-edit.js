@@ -32,8 +32,10 @@
     }]);
 
     app.controller('project.EditCtrl', ['$scope', '$http', 'notify',
-            'project', 'projectTypes', 'user', 'hasWriteAccess',
-            function ($scope, $http, notify, project, projectTypes, user, hasWriteAccess) {
+            'project', 'projectTypes', 'user', 'hasWriteAccess', 'autofocus',
+            function ($scope, $http, notify, project, projectTypes, user, hasWriteAccess, autofocus) {
+                autofocus();
+
                 $scope.project = project;
                 $scope.projectTypes = projectTypes;
                 if ($scope.project.parentId) {

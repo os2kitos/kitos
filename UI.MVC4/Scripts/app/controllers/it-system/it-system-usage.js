@@ -76,9 +76,11 @@
     }]);
 
     app.controller('system.UsageCtrl', ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'itSystemUsage', 'appTypes',
-        'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'itSystems', 'interfaceAppType', 'hasWriteAccess',
-        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, appTypes, businessTypes, archiveTypes, sensitiveDataTypes, itSystems, interfaceAppType, hasWriteAccess) {
+        'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'itSystems', 'interfaceAppType', 'hasWriteAccess', 'autofocus',
+        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, appTypes, businessTypes, archiveTypes, sensitiveDataTypes, itSystems, interfaceAppType, hasWriteAccess, autofocus) {
             $rootScope.page.title = 'IT System - Anvendelse';
+
+            autofocus();
 
             //TODO create tab for this page
             //$rootScope.page.subnav = subnav.slice();
