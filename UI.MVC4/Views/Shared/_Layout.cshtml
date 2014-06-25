@@ -3,13 +3,13 @@
     <head>
         <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
         <meta charset="utf-8" />
-        <title>{{page.title}} - KITOS</title>
+        <title data-ng-bind="page.title + ' - KITOS'">KITOS</title>
         <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
         <meta name="viewport" content="width=device-width" />
         @Styles.Render("~/Content/css")
         
     </head>
-    <body>
+    <body data-ng-cloak>
         <div data-notify></div>
         <div id="page-wrapper" class="container-fluid">
             <!-- NAVBAR
@@ -20,7 +20,7 @@
                 
                 <div id="subnav" data-ng-include="'partials/subnav/subnav.html'"></div>
 
-                <div id="page-body" class="row container-fluid" data-ui-view="" data-autoscroll="false">
+                <div id="page-body" class="row container-fluid" data-ui-view="" data-autoscroll="false" data-ng-cloak>
                 </div>
                 
                 @{/* this doesn't really do anything, but it's necessary to shut up the interpreter */}
