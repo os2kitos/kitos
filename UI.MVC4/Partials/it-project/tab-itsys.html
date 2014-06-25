@@ -1,8 +1,6 @@
-﻿<h1>IT System</h1>
-
-<div data-ng-repeat="usage in itSystemUsages">
+﻿<div class="checkbox" data-ng-repeat="usage in itSystemUsages">
     <label>
-        <input type="checkbox" data-ng-model="usage.selected" data-ng-change="save(usage)"  data-ng-disabled="!hasWriteAccess"/>
-        {{ usage.itSystem.name }}
+        <input type="checkbox" data-ng-model="usage.selected" data-ng-change="save(usage)"  data-ng-disabled="!hasWriteAccess">
+        <a data-ui-sref="it-system.usage.interfaces({ id: usage.itSystem.id })">{{ usage.itSystem.name }}</a>
     </label>
 </div>

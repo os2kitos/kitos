@@ -18,16 +18,13 @@
 
                 <tr data-ng-repeat="associatedSystemUsage in associatedSystemUsages | filter:{'show':true}">
                     <!-- the system -->
-                    <td>{{ associatedSystemUsage.itSystemName }}
-                        
-
-                        <!--                        <input type="hidden" data-ui-select2="itSystemUsagesSelectOptions" 
-                                                           data-ng-model="associatedSystemUsage.selectedSystem" 
-                                                           class="form-control input-sm" data-ng-change="associatedSystemUsage.update()">-->
+                    <td>
+                        <a data-ui-sref="it-system.usage.interfaces({ id: associatedSystemUsage.id })">{{ associatedSystemUsage.itSystemName }}</a>
                     </td>
 
                     <!-- app type (read only) -->
-                    <td>{{ associatedSystemUsage.itSystemAppTypeName }}
+                    <td>
+                        {{ associatedSystemUsage.itSystemAppTypeName }}
                     </td>
 
                     <td>
@@ -68,9 +65,6 @@
                     <th class="col-md-4">IT System
                     </th>
 
-                    <!--<th>Applikationstype
-                        </th>-->
-
                     <th class="col-md-4">Relation
                     </th>
 
@@ -84,11 +78,8 @@
                 <tr data-ng-repeat="associatedInterface in associatedInterfaces | filter:{'show': true}">
                     <!-- the system -->
                     <td>
-                        {{ associatedInterface.itSystemUsage.itSystemName }}
+                        <a data-ui-sref="it-system.usage.interfaces({ id: associatedInterface.itSystemUsage.id })">{{ associatedInterface.itSystemUsage.itSystemName }}</a>
                     </td>
-
-                    <!-- app type (read only) -->
-                    <!--<td></td>-->
 
                     <!-- relation -->
                     <td data-ng-switch="associatedInterface.relation">
@@ -98,7 +89,7 @@
 
                     <!-- interface -->
                     <td>
-                        {{associatedInterface.interface.name }}
+                        <a data-ui-sref="it-system.edit.interfaces({ id: associatedInterface.interface.id })">{{ associatedInterface.interface.name }}</a>
                     </td>
 
                     <td>
