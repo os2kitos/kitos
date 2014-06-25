@@ -46,7 +46,7 @@
                     take: 20
                 };
 
-                $scope.showType = 'appType';
+                $scope.showType = 'appType.name';
 
                 var appTypes = appTypesHttp.data.response;
                 var interfaceAppType = interfaceAppTypeHttp.data.response;
@@ -81,6 +81,7 @@
                     return $http.get(system.usageUrl)
                         .success(function (result) {
                             system.hasUsage = true;
+                            system.usage = result.response;
                         });
                 }
 
@@ -91,6 +92,7 @@
                     }).success(function (result) {
                         notify.addSuccessMessage("Systemet er taget i anvendelse");
                         system.hasUsage = true;
+                        system.usage = result.response;
                     }).error(function (result) {
                         notify.addErrorMessage("Systemet kunne ikke tages i anvendelse!");
                     });
@@ -112,12 +114,17 @@
 
                     var url = 'api/itSystem/?skip=' + $scope.pagination.skip + "&take=" + $scope.pagination.take;
 
-                    $scope.systems = [];
+                    if ($scope.pagination.orderBy) {
+                        url += '&orderBy=' + $scope.pagination.orderBy;
+                        if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+                    }
+
                     $http.get(url).success(function (result, status, headers) {
 
                         var paginationHeader = JSON.parse(headers('X-Pagination'));
                         $scope.pagination.count = paginationHeader.TotalCount;
 
+                        $scope.systems = [];
                         _.each(result.response, function (system) {
 
                             system.appType = _.findWhere(appTypes, { id: system.appTypeId });

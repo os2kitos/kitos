@@ -9,7 +9,7 @@
                 <div class="col-md-10">
                     <input type="text" id="project-name" data-ng-model="project.name" class="form-control input-sm" 
                            data-field="name"
-                           data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess">
+                           data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess" autofocus>
                 </div>
             </div>
 
@@ -149,6 +149,9 @@
     </li>
     <li data-ui-sref-active="active">
         <a data-ui-sref="it-project.edit.roles">Projektroller</a>
+    </li>
+    <li data-ui-sref-active="active">
+        <a data-ui-sref="it-project.edit.hierarchy">Hierarki</a>
     </li>
     <li data-ui-sref-active="active" data-ng-show="project.isEconomyVisible">
         <a data-ui-sref="it-project.edit.economy">Økonomi</a>

@@ -106,14 +106,14 @@
                 }).error(function() {
                     notify.addErrorMessage("Kunne ikke oprette nyt mål!");
                 });
-
             };
 
             function editGoal(goal) {
                 var modal = $modal.open({
                     size: 'lg',
                     templateUrl: 'partials/it-project/modal-goal-edit.html',
-                    controller: ['$scope', function ($modalScope) {
+                    controller: ['$scope', 'autofocus', function ($modalScope, autofocus) {
+                        autofocus();
                         $modalScope.goal = goal;
                         $modalScope.goalTypes = goalTypes;
                                                 
@@ -127,7 +127,5 @@
                     }]
                 });
             }
-
-
         }]);
 })(angular, app);

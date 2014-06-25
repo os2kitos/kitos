@@ -9,7 +9,7 @@
             </label>
             <div class="col-md-8" data-ng-if="hasWriteAccess">
                 <textarea class="form-control" name="comment" id="comment" data-ng-model="usage.comment" rows="10"
-                    data-autosave="{{usage.updateUrl}}" data-field="comment">
+                    data-autosave="{{usage.updateUrl}}" data-field="comment" autofocus>
                 </textarea>
             </div>
             <div class="col-md-8" data-ng-if="!hasWriteAccess">

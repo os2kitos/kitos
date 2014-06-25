@@ -1,8 +1,18 @@
-﻿
-    <div class="row">
+﻿    <div class="row">
         <form class="form-horizontal fix-label-padding">
             <div class="col-md-7">
                 <div class="col-md-6">
+                    <!--Application type -->
+                    <div class="form-group">
+                        <label for="system-app-type" class="control-label col-md-5 small">Applikationstype</label>
+                        <div class="col-md-7">
+                            <select data-ui-select2="" id="system-app-type" 
+                                    data-autosave="{{system.updateUrl}}" data-field="appTypeId" data-ng-disabled="!hasWriteAccess"
+                                    data-ng-model="system.appTypeId" class="form-control input-sm" data-autofocus>
+                                <option data-ng-repeat="appType in appTypes" value="{{appType.id}}">{{appType.name}}</option>
+                            </select>
+                        </div>
+                    </div>
 
                     <!--Name-->
                     <div class="form-group">
@@ -33,7 +43,9 @@
                                    id="system-parent" data-ng-model="system.parent" class="form-control input-sm">
                         </div>
                     </div>
+                </div>
 
+                <div class="col-md-6">
                     <!-- belongs to -->
                     <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
                         <label for="system-belongs-to" class="control-label col-md-5 small">Tilhører</label>
@@ -43,9 +55,7 @@
                                    id="system-belongs-to" data-ng-model="system.belongsTo" class="form-control input-sm">
                         </div>
                     </div>
-                </div>
 
-                <div class="col-md-6">
                     <!--Version-->
                     <div class="form-group">
                         <label for="system-version" class="control-label col-md-5 small">Version</label>
@@ -63,18 +73,6 @@
                             <input id="system-access" 
                                    data-autosave="{{system.updateUrl}}" data-field="accessModifier"  data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="system.accessModifier" class="form-control input-sm" data-select-access-modifier="" />
-                        </div>
-                    </div>
-
-                    <!--Application type -->
-                    <div class="form-group">
-                        <label for="system-app-type" class="control-label col-md-5 small">Applikationstype</label>
-                        <div class="col-md-7">
-                            <select data-ui-select2="" id="system-app-type" 
-                                    data-autosave="{{system.updateUrl}}" data-field="appTypeId" data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="system.appTypeId" class="form-control input-sm">
-                                <option data-ng-repeat="appType in appTypes" value="{{appType.id}}">{{appType.name}}</option>
-                            </select>
                         </div>
                     </div>
 
@@ -106,11 +104,11 @@
 
                 <!--Further description-->
                 <div class="form-group">
-                    <label for="system-url" class="control-label col-md-4 small">Link til yderligere beskrivelse</label>
+                    <label for="system-url" class="control-label col-md-4 small">Link til yderligere beskrivelse <span class="text-muted">(Skal starte med http://)</span></label>
                     <div class="col-md-8">
                         <input type="text" id="system-url" 
                                data-autosave="{{system.updateUrl}}" data-field="url" data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="system.url" class="form-control input-sm" placeholder="URL" />
+                               data-ng-model="system.url" class="form-control input-sm" placeholder="http://" />
                     </div>
                 </div>
             </div>

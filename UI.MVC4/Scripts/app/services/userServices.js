@@ -7,7 +7,7 @@
         //formats and saves the user
         function saveUser(response, currOrg) {
             var isLocalAdmin = _.some(response.adminRights, function(userRight) {
-                return userRight.roleName == "LocalAdmin";
+                return userRight.roleName == "LocalAdmin" && userRight.organizationId == currOrg.id;
             });
 
             //the current org unit is either:
@@ -32,7 +32,6 @@
                 
                 isGlobalAdmin: response.isGlobalAdmin,
                 isLocalAdmin: isLocalAdmin,
-                isLocalAdminFor: _.pluck(response.adminRights, 'organizationId'),
                 
                 currentOrganizationUnitId: currentOrgUnitId,
                 currentOrganizationUnitName: currentOrgUnitName,
@@ -247,8 +246,8 @@
                         var modal = $modal.open({
                             backdrop: 'static',
                             templateUrl: 'partials/home/choose-organization.html',
-                            controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
-
+                            controller: ['$scope', '$modalInstance', 'autofocus', function ($modalScope, $modalInstance, autofocus) {
+                                autofocus();
                                 $modalScope.orgChooser = {
                                     selectedId: result.response.defaultOrganizationId
                                 };

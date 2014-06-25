@@ -14,7 +14,12 @@
         <thead>
             <tr>
                 <th>Valgt</th>
-                <th class="col-md-10">Emne</th>
+                <th class="col-md-2">KLE ID
+                                    <button data-order-by="'taskKey'" data-paging="pagination"></button>
+                </th>
+                <th class="col-md-9">KLE Navn
+                                    <button data-order-by="'description'" data-paging="pagination"></button>
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -24,18 +29,17 @@
                     <input type="checkbox" id="{{task.taskRef.id}}" data-ng-checked="task.isSelected" data-ng-click="save(task)" data-ng-disabled="!hasWriteAccess" />
                 </td>
                 <td>
-                    <label for="{{task.taskRef.id}}">{{task.taskRef.taskKey}} {{task.taskRef.description}}</label>
+                    <label for="{{task.taskRef.id}}">{{task.taskRef.taskKey}}</label>
+                </td>
+                <td>
+                    <label for="{{task.taskRef.id}}">{{task.taskRef.description}}</label>
                 </td>
             </tr>
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="2" class="text-center">
-                    <div class="pull-left">
-                        <button class="btn btn-primary btn-sm" data-ng-if="lessTasks" data-ng-click="loadLessTasks()">
-                            <i class="glyphicon glyphicon-chevron-left small"></i>Forrige
-                        </button>
-                    </div>
+                <td colspan="3" class="text-center">
+                    <span data-pagination-buttons="pagination"></span>
                     <span>
                         <button class="btn btn-success btn-sm" data-ng-click="selectAllTasks()" data-ng-if="hasWriteAccess">
                             Vælg alle
@@ -44,11 +48,6 @@
                             Fjern alle
                         </button>
                     </span>
-                    <div class="pull-right">
-                        <button class="btn btn-primary btn-sm" data-ng-if="moreTasks" data-ng-click="loadMoreTasks()">
-                            Næste <i class="glyphicon glyphicon-chevron-right small"></i>
-                        </button>
-                    </div>
                 </td>
             </tr>
         </tfoot>

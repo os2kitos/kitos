@@ -10,7 +10,7 @@
 
         <label class="col-md-1 control-label" for="group">Gruppe:</label>
         <div class="col-md-4">
-            <select id="group" class="form-control input-sm" data-ui-select2="" data-placeholder="Vælg gruppe" data-ng-model="selectedGroup">
+            <select id="group" class="form-control input-sm" data-ui-select2="{allowClear:true}" data-placeholder="Vælg gruppe" data-ng-model="selectedGroup">
                 <option value=""></option>
                 <option data-ng-repeat="task in groups" value="{{task.id}}">{{task.taskKey}} {{task.description}}</option>
             </select>

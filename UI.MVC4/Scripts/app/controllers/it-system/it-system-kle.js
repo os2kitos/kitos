@@ -12,46 +12,25 @@
     app.controller('system.EditKle', ['$scope', '$http', '$stateParams', 'notify', function ($scope, $http, $stateParams, notify) {
         var usageId = $stateParams.id;
         var baseUrl = 'api/itSystemUsage/' + usageId;
+        
+        $scope.pagination = {
+            skip: 0,
+            take: 15
+        };
 
         $scope.$watch("selectedTaskGroup", function (newVal, oldVal) {
-            clearTasksPagination();
+            $scope.pagination.skip = 0;
             loadTasks();
         });
+        $scope.$watchCollection('pagination', loadTasks);
 
         //change between show all tasks and only show active tasks
         $scope.changeTaskView = function () {
             $scope.showAllTasks = !$scope.showAllTasks;
-
-            clearTasksPagination();
+            $scope.pagination.skip = 0;
             loadTasks();
         };
 
-        var skipTasks = 0;
-        var takeTasks = 20;
-        function clearTasksPagination() {
-            skipTasks = 0;
-        }
-
-        $scope.loadLessTasks = function () {
-            skipTasks -= takeTasks;
-            if (skipTasks < 0) skipTasks = 0;
-
-            loadTasks();
-        };
-
-        $scope.loadMoreTasks = function () {
-            skipTasks += takeTasks;
-
-            loadTasks();
-        };
-
-        function calculatePaginationButtons(headers) {
-            $scope.lessTasks = (skipTasks != 0);
-
-            var paginationHeader = JSON.parse(headers('X-Pagination'));
-            var count = paginationHeader.TotalCount;
-            $scope.moreTasks = (skipTasks + takeTasks) < count;
-        }
 
         function loadTasks() {
 
@@ -60,12 +39,20 @@
             url += '&onlySelected=' + !$scope.showAllTasks;
 
             url += '&taskGroup=' + $scope.selectedTaskGroup;
+            
+            url += '&skip=' + $scope.pagination.skip + '&take=' + $scope.pagination.take;
 
-            url += '&skip=' + skipTasks + '&take=' + takeTasks;
+            if ($scope.pagination.orderBy) {
+                url += '&orderBy=' + $scope.pagination.orderBy;
+                if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+            }
 
             $http.get(url).success(function (result, status, headers) {
                 $scope.tasklist = result.response;
-                calculatePaginationButtons(headers);
+                
+                var paginationHeader = JSON.parse(headers('X-Pagination'));
+                $scope.pagination.count = paginationHeader.TotalCount;
+
             }).error(function () {
                 notify.addErrorMessage("Kunne ikke hente opgaver!");
             });

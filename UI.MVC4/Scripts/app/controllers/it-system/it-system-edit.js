@@ -46,10 +46,11 @@
 
     app.controller('system.EditCtrl',
         ['$rootScope', '$scope', '$http', '$state', 'notify', 'itSystem', 'hasWriteAccess',
-            'appTypes', 'interfaceAppType', 'businessTypes', 'user',
+            'appTypes', 'interfaceAppType', 'businessTypes', 'user', 'autofocus',
             function ($rootScope, $scope, $http, $state, notify, itSystem, hasWriteAccess,
-            appTypes, interfaceAppType, businessTypes, user) {
+            appTypes, interfaceAppType, businessTypes, user, autofocus) {
                 $rootScope.page.title = 'IT System - Rediger system';
+                autofocus();
 
                 itSystem.updateUrl = 'api/itSystem/' + itSystem.id;
                 itSystem.belongsTo = (!itSystem.belongsToId) ? null : { id: itSystem.belongsToId, text: itSystem.belongsToName};

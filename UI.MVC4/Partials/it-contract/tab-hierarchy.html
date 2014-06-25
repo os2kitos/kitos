@@ -1,5 +1,5 @@
 ﻿<script type="text/ng-template"  id="tree_item_renderer.html">
-    {{ contract.name }}
+    <a data-ui-sref="it-contract.edit.systems({ id: contract.id })">{{ contract.name }}</a>
     <ul>
         <li ng-repeat="contract in contract.children" ng-include="'tree_item_renderer.html'"></li>
     </ul>

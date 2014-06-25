@@ -22,7 +22,13 @@
     app.controller('org.OverviewCtrl', ['$rootScope', '$scope', '$http', 'notify', '$modal', 'user',
         function ($rootScope, $scope, $http, notify, $modal, user) {
         $rootScope.page.title = 'Organisation - Overblik';
-        
+
+        $scope.pagination = {
+            skip: 0,
+            take: 10,
+            orderBy: 'taskRef.taskKey'
+        };
+            
         checkForDefaultUnit();
         
         function checkForDefaultUnit() {
@@ -32,12 +38,27 @@
             loadUsages();
         }
 
+        $scope.$watchCollection('pagination', loadUsages);
+            
         /* load task usages */
         function loadUsages() {
             if (!$scope.orgUnitId) return;
 
-            $scope.taskUsages = {};
-            $http.get('api/taskusage?orgUnitId=' + $scope.orgUnitId + "&onlyStarred=true").success(function (result) {
+            var url = 'api/taskusage?orgUnitId=' + $scope.orgUnitId + '&onlyStarred=true';
+            
+            url += '&skip=' + $scope.pagination.skip;
+            url += '&take=' + $scope.pagination.take;
+
+            if ($scope.pagination.orderBy) {
+                url += '&orderBy=' + $scope.pagination.orderBy;
+                if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+            }
+
+            $http.get(url).success(function (result, status, headers) {
+
+                var paginationHeader = JSON.parse(headers('X-Pagination'));
+                $scope.pagination.count = paginationHeader.TotalCount;
+                
                 $scope.taskUsages = result.response;
 
                 /* visit every task usage and delegation */
@@ -45,12 +66,14 @@
                     usage.updateUrl = 'api/taskUsage/' + usage.id;
 
                     //check for write access
-                    $http.get(usage.updateUrl + "?hasWriteAccess").success(function(result) {
-                        usage.hasWriteAccess = result.response;
-                    });
+                    //$http.get(usage.updateUrl + "?hasWriteAccess").success(function(result) {
+                    //    usage.hasWriteAccess = result.response;
+                    //});
 
                     usage.parent = parent;
                     usage.level = level;
+
+                    if (parent) usage.hasWriteAccess = parent.hasWriteAccess;
 
                     /* if this task hasn't been delegated, it's a leaf. A leaf can select and update the statuses
                      * at which point we need to update the parents statuses as well */
@@ -72,14 +95,6 @@
                 /* each of these are root usages */
                 _.each($scope.taskUsages, function (usage) {
                     usage.isRoot = true;
-
-                    $http.get('api/taskusage/' + usage.id + '?projects').success(function(result) {
-                        usage.projects = result.response;
-                    });
-                    
-                    $http.get('api/taskusage/' + usage.id + '?systems').success(function (result) {
-                        usage.systems = result.response;
-                    });
 
                     visit(usage, null, 0);
                     
@@ -185,13 +200,12 @@
         $scope.openComment = function (usage) {
             $modal.open({
                 templateUrl: 'partials/org/overview/comment-modal.html',
-                controller: ['$scope', '$modalInstance', function ($modalScope, $modalInstance) {
+                controller: ['$scope', '$modalInstance', 'autofocus', function ($modalScope, $modalInstance, autofocus) {
+                    autofocus();
                     $modalScope.usage = usage;
-                    
                     $modalScope.hasWriteAccess = usage.hasWriteAccess;
                 }]
             });
         };
-        
     }]);
 })(angular, app);

@@ -1,5 +1,5 @@
 ﻿<script type="text/ng-template"  id="tree_item_renderer.html">
-    {{ system.name }}
+    <a data-ui-sref="it-system.edit.interfaces({ id: system.id })">{{ system.name }}</a>
     <ul>
         <li ng-repeat="system in system.children" ng-include="'tree_item_renderer.html'"></li>
     </ul>

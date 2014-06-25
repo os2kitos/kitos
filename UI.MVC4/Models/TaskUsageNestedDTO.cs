@@ -20,5 +20,9 @@ namespace UI.MVC4.Models
 
         public IEnumerable<TaskUsageNestedDTO> Children { get; set; } 
         public bool HasDelegations { get; set; }
+
+        public IEnumerable<ItSystemUsageSimpleDTO> SystemUsages { get; set; }
+        public IEnumerable<ItProjectSimpleDTO> Projects { get; set; }
+        public bool HasWriteAccess { get; set; }
     }
 }
