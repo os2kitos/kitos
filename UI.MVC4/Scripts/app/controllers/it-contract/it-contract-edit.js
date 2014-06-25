@@ -66,11 +66,13 @@
     }]);
 
     app.controller('contract.EditCtrl',
-        ['$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'suppliers', 'orgUnits', 'contracts', 'agreementElements', 'hasWriteAccess', 'user',
-            function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, suppliers, orgUnits, contracts, agreementElements, hasWriteAccess, user) {
+        ['$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'suppliers', 'orgUnits', 'contracts', 'agreementElements', 'hasWriteAccess', 'user', 'autofocus',
+            function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, suppliers, orgUnits, contracts, agreementElements, hasWriteAccess, user, autofocus) {
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.contract = contract;              
                 $scope.hasWriteAccess = hasWriteAccess;
+
+                autofocus();
                 
                 $scope.contractTypes = contractTypes;
                 $scope.contractTemplates = contractTemplates;
