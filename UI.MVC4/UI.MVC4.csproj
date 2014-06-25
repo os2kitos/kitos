@@ -368,13 +368,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\bootstrap-cosmo.css" />
     <Content Include="Content\bootstrap3-wysihtml5\bootstrap3-wysihtml5.css" />
-    <Content Include="Content\bootstrap\bootstrap-theme.css" />
-    <Content Include="Content\bootstrap\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap\bootstrap.css" />
     <Content Include="Content\bootstrap\bootstrap.min.css" />
-    <Content Include="Content\carousel.css" />
     <Content Include="Content\notify\notify.css" />
     <Content Include="Content\css\select2-spinner.gif" />
     <Content Include="Content\css\select2.css" />
@@ -883,8 +879,6 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="Content\bootstrap\bootstrap-theme.css.map" />
-    <Content Include="Content\bootstrap\bootstrap.css.map" />
     <None Include="Properties\PublishProfiles\Kitos - Debug.pubxml" />
     <None Include="Scripts\jquery-2.1.0.intellisense.js" />
     <Content Include="Scripts\jquery-2.1.0.js" />

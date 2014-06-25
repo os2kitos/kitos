@@ -1,6 +1,7 @@
 ﻿body
 {
     background-color: #d9d9d9;
+    font-family: Calibri, Candara, Arial, sans-serif !important;
 }
 
 div#page-wrapper
@@ -34,7 +35,7 @@ div#page-body
 #navbar-top
 {
     height: 100px;
-    font-size: 13px;
+    font-size: 15px;
     background-color: rgb(55, 96, 146);
     border: 0px;
 }
@@ -311,7 +312,7 @@ td.border-left {
 
 .light-blue
 {
-    color: rgb(208, 217, 229) !important;
+    color: rgb(184, 202, 226) !important;
 }
 
 .broken-white
@@ -572,5 +573,23 @@ tr.super-sum {
 }
 
 body, .btn {
-    font-size: 12px !important;
+    font-size: 13px !important;
+}
+
+.btn-default {
+    color: black;
+    background-color: white;
+    border-color: #cccccc;
+}
+
+.btn-default:hover, .btn-default:focus {
+    color: black;
+    background-color: #e0e0e0;
+    border-color: #cccccc;
+}
+
+.btn-default:active,  .btn-default.active {
+    color: black;
+    background-color: #cccccc;
+    border-color: #cccccc;
 }

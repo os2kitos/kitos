@@ -57,7 +57,6 @@ namespace UI.MVC4
                 "~/Content/bootstrap/bootstrap.css",
                 "~/Content/notify/notify.css",
                 "~/Content/css/select2.css",
-                "~/Content/css/bootstrap-wysihtml5.css",
                 "~/Content/select2-bootstrap.css",
                 "~/Content/xeditable.css",
                 "~/Content/kitos.css"));
