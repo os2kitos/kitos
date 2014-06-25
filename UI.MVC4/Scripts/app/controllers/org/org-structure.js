@@ -26,7 +26,12 @@
 
     app.controller('org.StructureCtrl', ['$scope', '$http', '$q', '$filter', '$modal', 'notify', 'orgRolesHttp', 'user', 'taskService',
         function ($scope, $http, $q, $filter, $modal, notify, orgRolesHttp, user, taskService) {
-            
+
+            $scope.pagination = {
+                skip: 0,
+                take: 10
+            };
+
             //cache
             var orgs = [];
             
@@ -448,34 +453,17 @@
             };
 
             $scope.$watch("selectedTaskGroup", function (newVal, oldVal) {
-                clearTasksPagination();
+                $scope.pagination.skip = 0;
                 loadTasks();
             });
+
+            $scope.$watchCollection('pagination', loadTasks);
 
             //change between show all tasks and only show active tasks
             $scope.changeTaskView = function() {
                 $scope.showAllTasks = !$scope.showAllTasks;
-
-                clearTasksPagination();
-                loadTasks();
-            };
-
-            var skipTasks = 0;
-            var takeTasks = 20;
-            function clearTasksPagination() {
-                skipTasks = 0;
-            }
-            
-            $scope.loadLessTasks = function() {
-                skipTasks -= takeTasks;
-                if (skipTasks < 0) skipTasks = 0;
-
-                loadTasks();
-            };
-            
-            $scope.loadMoreTasks = function () {
-                skipTasks += takeTasks;
-                
+                $scope.pagination.orderBy = null;
+                $scope.pagination.skip = 0;
                 loadTasks();
             };
             
@@ -489,26 +477,25 @@
 
                 url += '&taskGroup=' + $scope.selectedTaskGroup;
 
-                url += '&skip=' + skipTasks + '&take=' + takeTasks;
+                url += '&skip=' + $scope.pagination.skip + '&take=' + $scope.pagination.take;
+                
+                if ($scope.pagination.orderBy) {
+                    url += '&orderBy=' + $scope.pagination.orderBy;
+                    if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+                }
 
-                $scope.taskRefUsageList = [];
-                $http.get(url).success(function(result, status, headers) {
+                $http.get(url).success(function (result, status, headers) {
                     $scope.taskRefUsageList = result.response;
 
-                    calculatePaginationButtons(headers);
+                    var paginationHeader = JSON.parse(headers('X-Pagination'));
+                    $scope.pagination.count = paginationHeader.TotalCount;
                     decorateTasks();
+                    
                 }).error(function() {
                     notify.addErrorMessage("Kunne ikke hente opgaver!");
                 });
             }
-            
-            function calculatePaginationButtons(headers) {
-                $scope.lessTasks = (skipTasks != 0);
 
-                var paginationHeader = JSON.parse(headers('X-Pagination'));
-                var count = paginationHeader.TotalCount;
-                $scope.moreTasks = (skipTasks + takeTasks) < count;
-            }
             
             function addUsage(refUsage, showMessage) {
                 
