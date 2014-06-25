@@ -7,7 +7,7 @@
         //formats and saves the user
         function saveUser(response, currOrg) {
             var isLocalAdmin = _.some(response.adminRights, function(userRight) {
-                return userRight.roleName == "LocalAdmin";
+                return userRight.roleName == "LocalAdmin" && userRight.organizationId == currOrg.id;
             });
 
             //the current org unit is either:
@@ -32,7 +32,6 @@
                 
                 isGlobalAdmin: response.isGlobalAdmin,
                 isLocalAdmin: isLocalAdmin,
-                isLocalAdminFor: _.pluck(response.adminRights, 'organizationId'),
                 
                 currentOrganizationUnitId: currentOrgUnitId,
                 currentOrganizationUnitName: currentOrgUnitName,

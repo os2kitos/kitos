@@ -339,7 +339,7 @@
                         };
 
                         //only allow changing the parent if user is admin, and the unit isn't at the root
-                        $modalScope.isAdmin = user.isGlobalAdmin || _.contains(user.isLocalAdminFor, unit.organizationId);
+                        $modalScope.isAdmin = user.isGlobalAdmin || user.isLocalAdmin;
                         $modalScope.canChangeParent = $modalScope.isAdmin && !$modalScope.orgUnit.isRoot;
 
                         $modalScope.patch = function () {
