@@ -1,34 +1,32 @@
 ﻿<table class="table full-width table-striped">
     <thead>
         <tr>
-            <td>IT System
-            </td>
-            <td>
+            <th>IT System</th>
+            <th>
                 <select data-ng-model="showSystemId">
                     <option value="global">Globalt SystemID
                     </option>
                     <option value="local">Lokalt SystemID
                     </option>
                 </select>
-            </td>
-            <td>
+            </th>
+            <th>
                 <select data-ng-model="showType">
                     <option value="appType">Applikationstype
                     </option>
                     <option value="businessType">Forretningstype
                     </option>
                 </select>
-            </td>
-            <td>Anvender
-            </td>
-            <td>Udstiller
-            </td>
-            <td>Overblik
-            </td>
-            <td>Ansv. organisationsenhed
-            </td>
-            <td>Leverandør
-            </td>
+            </th>
+            <th>Anvender</th>
+            <th>Udstiller</th>
+            <th>Overblik</th>
+            <th>Ansv. organisationsenhed</th>
+            <th>
+                <select data-ng-model="chosenRoleId" data-ng-init="chosenRoleId = 1" data-ng-options="r.id as r.name for r in itSystemRoles">
+                    <option value="">-- Vælg rolle --</option>
+                </select>
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -62,7 +60,8 @@
             </td>
             <td>{{ usage.responsibleUnit.name }}
             </td>
-            <td>{{ usage.provider.name }}
+            <td>
+                {{ usage.rights | filter:{roleId: chosenRoleId} | joinBy:', ':'user.name' }}
             </td>
         </tr>
     </tbody>
