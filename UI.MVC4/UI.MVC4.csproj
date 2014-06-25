@@ -220,6 +220,8 @@
     <Compile Include="Controllers\API\ItSystemUsageRightsController.cs" />
     <Compile Include="Controllers\API\OptionExtendController.cs" />
     <Compile Include="Controllers\API\OrganizationUnitRightsController.cs" />
+    <Compile Include="Models\ActivitySimpleDTO.cs" />
+    <Compile Include="Models\ItProjectOverviewDTO.cs" />
     <Compile Include="Models\PagingModel.cs" />
     <Compile Include="Controllers\API\PriceRegulationController.cs" />
     <Compile Include="Controllers\API\PaymentModelController.cs" />
@@ -440,6 +442,7 @@
     <Content Include="Partials\directives\add-user-button.html" />
     <Content Include="Partials\directives\add-user-modal.html" />
     <Content Include="Partials\directives\kle-filter.html" />
+    <Content Include="Partials\directives\order-by.html" />
     <Content Include="Partials\directives\pagination.html" />
     <Content Include="Partials\directives\select-status2.html" />
     <Content Include="Partials\directives\datewriter.html" />

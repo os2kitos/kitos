@@ -5,12 +5,8 @@
             templateUrl: 'partials/it-contract/it-contract-overview.html',
             controller: 'contract.OverviewCtrl',
             resolve: {
-                itContracts: ['$http', 'userService', function ($http, userService) {
-                    return userService.getUser().then(function (user) {
-                        return $http.get('api/itcontract?overview&organizationId=' + user.currentOrganizationId).then(function (result) {
-                            return result.data.response;
-                        });
-                    });
+                user: ['userService', function (userService) {
+                    return userService.getUser();
                 }],
                 itContractRoles: ['$http', function ($http) {
                     return $http.get("api/itcontractrole/")
@@ -22,16 +18,14 @@
         });
     }]);
 
-    app.controller('contract.OverviewCtrl', ['$scope', '$http', 'notify', 'itContracts', 'itContractRoles',
-            function ($scope, $http, notify, itContracts, itContractRoles) {
+    app.controller('contract.OverviewCtrl', ['$scope', '$http', 'notify', 'user', 'itContractRoles',
+            function ($scope, $http, notify, user, itContractRoles) {
+                $scope.pagination = {
+                    skip: 0,
+                    take: 1000
+                };
+
                 $scope.itContractRoles = itContractRoles;
-
-                var activeContracts = [];
-                $scope.activeContracts = activeContracts;
-                
-                var inactiveContracts = [];
-                $scope.inactiveContracts = inactiveContracts;
-
                 
                 //decorates the contracts and adds it to a collection.
                 //then repeats recursively for all children
@@ -70,13 +64,40 @@
                     });
                 }
 
-                _.each(itContracts, function(contract) {
-                   contract.show = true;
 
-                    var collection = contract.isActive ? activeContracts : inactiveContracts;
+                $scope.$watchCollection('pagination', loadContracts);
 
-                    visit(contract, collection, "");
-                });
+                function loadContracts() {
+                    
+                    var url = 'api/itcontract?overview&organizationId=' + user.currentOrganizationId;
+
+                    url += '&skip=' + $scope.pagination.skip + "&take=" + $scope.pagination.take;
+
+                    if ($scope.pagination.orderBy) {
+                        url += '&orderBy=' + $scope.pagination.orderBy;
+                        if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+                    }
+
+                    $http.get(url).success(function (result, status, headers) {
+                        var paginationHeader = JSON.parse(headers('X-Pagination'));
+                        $scope.pagination.count = paginationHeader.TotalCount;
+
+                        // clear lists 
+                        $scope.activeContracts = [];
+                        $scope.inactiveContracts = [];
+
+                        _.each(result.response, function (contract) {
+                            contract.show = true;
+
+                            //TODO isActive filtering should be handle by backend and not by frontend as here
+                            var collection = contract.isActive ? $scope.activeContracts : $scope.inactiveContracts;
+
+                            visit(contract, collection, "");
+                        });
+                    }).error(function() {
+                        notify.addErrorMessage("Kunne ikke hente kontrakter!");
+                    });
+                }
 
             }]);
 })(angular, app);

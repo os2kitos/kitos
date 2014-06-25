@@ -1,27 +1,37 @@
 ﻿<table class="table full-width table-striped">
     <thead>
         <tr>
-            <th>IT System</th>
+            <th>IT System 
+                <button data-order-by="'itSystem.name'" data-paging="pagination"></button>
+            </th>
             <th>
                 <select data-ng-model="showSystemId">
-                    <option value="global">Globalt SystemID
+                    <option value="itSystem.systemId">Globalt SystemID
                     </option>
-                    <option value="local">Lokalt SystemID
+                    <option value="localSystemId">Lokalt SystemID
                     </option>
                 </select>
+                <button data-order-by="showSystemId" data-paging="pagination"></button>
             </th>
             <th>
                 <select data-ng-model="showType">
-                    <option value="appType">Applikationstype
+                    <option value="itSystem.appType.name">Applikationstype
                     </option>
-                    <option value="businessType">Forretningstype
+                    <option value="itSystem.businessType.name">Forretningstype
                     </option>
                 </select>
+                <button data-order-by="showType" data-paging="pagination"></button>
             </th>
-            <th>Anvender</th>
-            <th>Udstiller</th>
-            <th>Overblik</th>
-            <th>Ansv. organisationsenhed</th>
+            <th>Anvender
+            </th>
+            <th>Udstiller
+            </th>
+            <th>Overblik
+                <button data-order-by="'overviewItSystem.name'" data-paging="pagination"></button>
+            </th>
+            <th>Ansv. organisationsenhed
+                <button data-order-by="'responsibleUnit.name'" data-paging="pagination"></button>
+            </th>
             <th>
                 <select data-ng-model="chosenRoleId" data-ng-init="chosenRoleId = 1" data-ng-options="r.id as r.name for r in itSystemRoles">
                     <option value="">-- Vælg rolle --</option>
@@ -38,12 +48,12 @@
                 </span>
             </td>
             <td data-ng-switch="showSystemId">
-                <span data-ng-switch-when="global">{{usage.itSystem.systemId}}</span>
-                <span data-ng-switch-when="local">{{usage.localSystemId}}</span>
+                <span data-ng-switch-when="itSystem.systemId">{{usage.itSystem.systemId}}</span>
+                <span data-ng-switch-when="localSystemId">{{usage.localSystemId}}</span>
             </td>
             <td data-ng-switch="showType">
-                <span data-ng-switch-when="appType">{{usage.itSystem.appType.name}}</span>
-                <span data-ng-switch-when="businessType">{{usage.itSystem.businessType.name}}</span>
+                <span data-ng-switch-when="itSystem.appType.name">{{usage.itSystem.appType.name}}</span>
+                <span data-ng-switch-when="itSystem.businessType.name">{{usage.itSystem.businessType.name}}</span>
             </td>
             <td>{{ usage.interfaceUsages.length }}
                 ({{ usage.itSystem.canUseInterfaceIds.length }})

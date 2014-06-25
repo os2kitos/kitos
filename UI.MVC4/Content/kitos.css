@@ -376,6 +376,7 @@ div.task-usage-root {
     background-color: rgb(242, 242, 242);
 
     margin-top: 5px;
+    margin-bottom: 5px;
 
     padding-top: 5px;
     padding-bottom: 5px;
@@ -580,4 +581,26 @@ tr.super-sum {
 
 body, .btn {
     font-size: 13px !important;
+}
+
+.btn-order-by {
+    text-align: left;
+    color: inherit;
+    background: none;
+}
+.btn-order-by:hover, .btn-order-by:active, .btn-order-by:focus {
+    color: black !important;
+}
+.btn-order-by::after {
+    font-size: 0.7em;
+    content: '▼▲';
+    opacity: 0.5;
+    min-width: 20px;
+}
+.btn-order-by.ordering::after {
+    content: '▲';
+    opacity: 1;
+}
+.btn-order-by.ordering.descending::after {
+    content: '▼';
 }

@@ -31,12 +31,15 @@ namespace UI.MVC4.Controllers.API
             _orgUnitRepository = orgUnitRepository;
         }
 
-        public HttpResponseMessage GetByOrg([FromUri] int orgId)
+        public HttpResponseMessage GetByOrg([FromUri] int orgId, [FromUri] PagingModel<ItProject> pagingModel)
         {
             try
             {
-                var projects = _itProjectService.GetAll(orgId, includePublic: false).ToList();
+                //Get all projects inside the organizaton
+                pagingModel.Where(p => p.OrganizationId == orgId);
                 
+                var projects = Page(Repository.AsQueryable(), pagingModel);
+
                 return Ok(Map(projects));
             }
             catch (Exception e)
@@ -82,13 +85,32 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        public HttpResponseMessage GetOverview(bool? overview, [FromUri] int orgId, [FromUri] PagingModel<ItProject> pagingModel)
+        {
+            try
+            {
+                //Get all projects inside the organizaton
+                pagingModel.Where(p => p.OrganizationId == orgId);
+
+                var projects = Page(Repository.AsQueryable(), pagingModel);
+
+                var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectOverviewDTO>>(projects);
+
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetCatalog(bool? catalog, [FromUri] int orgId, [FromUri] PagingModel<ItProject> pagingModel)
         {
             try
             {
+                //Get all projects inside the organizaton OR public
                 pagingModel.Where(p => p.OrganizationId == orgId || p.AccessModifier == AccessModifier.Public);
 
-                //Get all projects inside the organizaton OR public
                 var projects = Page(Repository.AsQueryable(), pagingModel);
 
                 var dto = Map<IEnumerable<ItProject>, IEnumerable<ItProjectCatalogDTO>>(projects);

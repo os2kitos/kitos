@@ -10,8 +10,8 @@ namespace UI.MVC4.Models
         //2nd column: project ID
         public string ItProjectId { get; set; }
 
-        //3rd column: parent ID
-        public string ParentItProjectId { get; set; }
+        //3rd column: original ID
+        public string OriginalItProjectId { get; set; }
 
         //4th column: name + link
         public int Id { get; set; }

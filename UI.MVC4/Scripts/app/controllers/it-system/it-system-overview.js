@@ -50,8 +50,8 @@
                 var appTypes = appTypesHttp.data.response;
                 var businessTypes = businessTypesHttp.data.response;
 
-                $scope.showSystemId = 'global';
-                $scope.showType = 'appType';
+                $scope.showSystemId = 'localSystemId';
+                $scope.showType = 'itSystem.appType.name';
 
                 $scope.$watchCollection('pagination', loadUsages);
 
@@ -59,7 +59,12 @@
                     $scope.systemUsages = [];
 
                     var url = 'api/itSystemUsage?organizationId=' + user.currentOrganizationId + '&skip=' + $scope.pagination.skip + '&take=' + $scope.pagination.take;
-
+                    
+                    if ($scope.pagination.orderBy) {
+                        url += '&orderBy=' + $scope.pagination.orderBy;
+                        if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+                    }
+                    
                     $http.get(url).success(function(result, status, headers) {
                         $scope.systemUsages = result.response;
                         

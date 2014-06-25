@@ -5,22 +5,21 @@
             templateUrl: 'partials/it-contract/it-contract-plan.html',
             controller: 'contract.PlanCtrl',
             resolve: {
-                itContracts: ['$http', 'userService', function ($http, userService) {
-                    return userService.getUser().then(function (user) {
-                        return $http.get('api/itcontract?plan&organizationId=' + user.currentOrganizationId).then(function (result) {
-                            return result.data.response;
-                        });
-                    });
+                user: ['userService', function (userService) {
+                    return userService.getUser();
                 }]
             }
         });
     }]);
 
-    app.controller('contract.PlanCtrl', ['$scope', '$http', 'notify','itContracts',
-            function ($scope, $http, notify, itContracts) {
+    app.controller('contract.PlanCtrl', ['$scope', '$http', 'notify','user',
+            function ($scope, $http, notify, user) {
+                $scope.pagination = {
+                    skip: 0,
+                    take: 20
+                };
 
-                var contracts = [];
-                $scope.contracts = contracts;
+                $scope.contracts = [];
 
                 //decorates the contracts and adds it to a collection.
                 //then repeats recursively for all children
@@ -44,17 +43,41 @@
                         });
                     };
 
-                    contracts.push(contract);
+                    $scope.contracts.push(contract);
 
                     _.each(contract.children, function (child) {
                         visit(child, indentation + "     ");
                     });
                 }
 
-                _.each(itContracts, function (contract) {
-                    contract.show = true;
+                $scope.$watchCollection('pagination', loadContracts);
 
-                    visit(contract, "");
-                });
+                function loadContracts() {
+                    
+                    var url = 'api/itcontract?plan&organizationId=' + user.currentOrganizationId;
+
+                    url += '&skip=' + $scope.pagination.skip + "&take=" + $scope.pagination.take;
+
+                    if ($scope.pagination.orderBy) {
+                        url += '&orderBy=' + $scope.pagination.orderBy;
+                        if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+                    }
+
+                    $http.get(url).success(function (result, status, headers) {
+                        var paginationHeader = JSON.parse(headers('X-Pagination'));
+                        $scope.pagination.count = paginationHeader.TotalCount;
+
+                        // clear list
+                        $scope.contracts = [];
+
+                        _.each(result.response, function (contract) {
+                            contract.show = true;
+
+                            visit(contract, "");
+                        });
+                    }).error(function () {
+                        notify.addErrorMessage("Kunne ikke hente kontrakter!");
+                    });
+                }
             }]);
 })(angular, app);
