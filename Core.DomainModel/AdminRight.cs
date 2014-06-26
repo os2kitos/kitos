@@ -1,5 +1,8 @@
 ﻿namespace Core.DomainModel
 {
+    /// <summary>
+    /// Represents that a user has a administrator role on an organization.
+    /// </summary>
     public class AdminRight : Entity, IRight<Organization, AdminRight, AdminRole>
     {
         public int UserId { get; set; }

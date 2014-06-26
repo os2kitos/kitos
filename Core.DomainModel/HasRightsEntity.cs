@@ -3,6 +3,12 @@ using System.Linq;
 
 namespace Core.DomainModel
 {
+    /// <summary>
+    /// Entity which holds a list of rights
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model.</typeparam>
+    /// <typeparam name="TRight">The type of the right.</typeparam>
+    /// <typeparam name="TRole">The type of the role.</typeparam>
     public abstract class HasRightsEntity<TModel, TRight, TRole> : Entity
         where TModel : HasRightsEntity<TModel, TRight, TRole>
         where TRight : IRight<TModel, TRight, TRole>

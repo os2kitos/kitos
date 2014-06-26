@@ -7,6 +7,5 @@ namespace Core.DomainServices
     {
         ICollection<Organization> GetByUser(User user);
         void SetupDefaultOrganization(Organization org, User objectOwner);
-        bool IsUserMember(User user, Organization organization);
     }
 }

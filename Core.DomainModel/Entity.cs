@@ -1,5 +1,9 @@
 ﻿namespace Core.DomainModel
 {
+    /// <summary>
+    /// Base entity class.
+    /// Every domain model should extend this
+    /// </summary>
     public abstract class Entity
     {
         public int Id { get; set; }

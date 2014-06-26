@@ -9,7 +9,12 @@ namespace Core.DomainModel
         Municipality,
         CommunityOfInterests
     }
-
+    
+    /// <summary>
+    /// Represents an Organization (such as a municipality, or a company).
+    /// Holds local configuration and admin roles, as well as collections of
+    /// ItSystems, ItProjects, etc that was created in this organization.
+    /// </summary>
     public class Organization : HasRightsEntity<Organization, AdminRight, AdminRole>, IHasAccessModifier
     {
         public Organization()
@@ -35,6 +40,9 @@ namespace Core.DomainModel
         
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
 
+        /// <summary>
+        /// ItProjects created inside this organization
+        /// </summary>
         public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
 
         //Systems that belongs to this organization (OIO term - think "produced by IRL")
@@ -46,17 +54,26 @@ namespace Core.DomainModel
         /// Organization is marked as supplier in these contracts
         /// </summary>
         public virtual ICollection<ItContract.ItContract> Supplier { get; set; }
+
+        /// <summary>
+        /// Contracts created inside the organization
+        /// </summary>
         public virtual ICollection<ItContract.ItContract> Contracts { get; set; }
+
+        /// <summary>
+        /// Local usages of IT systems within this organization
+        /// </summary>
         public virtual ICollection<ItSystem.ItSystemUsage> ItSystemUsages { get; set; }
-
-        #region Config and localization
-
-        /* Config and localization */
-        public virtual Config Config { get; set; }
         
-        #endregion
+        /// <summary>
+        /// Local configuration of KITOS
+        /// </summary>
+        public virtual Config Config { get; set; }
 
-
+        /// <summary>
+        /// Get the level-0 organization unit, which by convention is named represently
+        /// </summary>
+        /// <returns></returns>
         public OrganizationUnit GetRoot()
         {
             return OrgUnits.FirstOrDefault(u => u.Parent == null);

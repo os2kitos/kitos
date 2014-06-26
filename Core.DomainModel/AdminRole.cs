@@ -2,6 +2,13 @@
 
 namespace Core.DomainModel
 {
+    /// <summary>
+    /// Administrator roles, suchs a Local administrator.
+    /// </summary>
+    /// <remarks>
+    /// Notice that global administrator is not an AdminRight
+    /// because it's not connected to any organization
+    /// </remarks>
     public class AdminRole : Entity, IRoleEntity<AdminRight>
     {
         public AdminRole()

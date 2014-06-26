@@ -1,10 +1,17 @@
 namespace Core.DomainModel.ItSystem
 {
+    /// <summary>
+    /// Represent the local exposure of a interface.
+    /// When an <see cref="ItSystem"/>, which exposes an interface, is taken into local usage,
+    /// a InterfaceExposure is created, to allow for adding local details regarding the exposure 
+    /// of the interface. 
+    /// It is also used for binding an <see cref="ItContract"/> with the usage.
+    /// </summary>
     public class InterfaceExposure : Entity
     {
         public int ItSystemUsageId { get; set; }
         /// <summary>
-        /// The system that is exposing the interface.
+        /// The local usage of the system that is exposing the interface.
         /// </summary>
         public virtual ItSystemUsage ItSystemUsage { get; set; }
 
