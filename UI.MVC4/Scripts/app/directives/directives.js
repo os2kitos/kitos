@@ -45,10 +45,15 @@
 
                                         var msg = notify.addInfoMessage("Arbejder ...", false);
 
-                                        $http.post("api/user", data, { handleBusy: true }).success(function (result) {
-                                            msg.toSuccessMessage(name + " er oprettet i KITOS");
+                                        $http.post("api/user", data, { handleBusy: true }).success(function (result, status) {
+                                            var userResult = result.response;
+                                            if (status == 201) {
+                                                msg.toSuccessMessage(userResult.name + " er oprettet i KITOS");
+                                            } else {
+                                                msg.toInfoMessage("En bruger med den email-adresse fandtes allerede i systemet.");
+                                            }
 
-                                            $modalInstance.close(result.response);
+                                            $modalInstance.close(userResult);
                                         }).error(function (result) {
                                             msg.toErrorMessage("Fejl! " + name + " blev ikke oprettet i KITOS!");
                                         });

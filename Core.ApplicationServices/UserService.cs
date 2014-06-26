@@ -30,14 +30,7 @@ namespace Core.ApplicationServices
 
         public User AddUser(User user)
         {
-            //to avoid access to modified closure-warning
-            var tmp = user;
-
-            //check if user already exists. If so, just return him
-            var existingUser = _userRepository.Get(u => u.Email == tmp.Email).FirstOrDefault();
-            if (existingUser != null) return existingUser;
-
-            //otherwise, hash his salt and default password
+            //hash his salt and default password
             user.Salt = _cryptoService.Encrypt(DateTime.Now + " spices");
 #if DEBUG
             user.Password = _cryptoService.Encrypt("arne123" + user.Salt); //TODO: Don't use default password
@@ -52,8 +45,6 @@ namespace Core.ApplicationServices
 
             _userRepository.Insert(user);
             _userRepository.Save();
-
-            
 
             var reset = GenerateResetRequest(user);
             var resetLink = "http://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 using UI.MVC4.Models;
+using UI.MVC4.Models.Exceptions;
 
 namespace UI.MVC4.Controllers.API
 {
@@ -17,10 +19,27 @@ namespace UI.MVC4.Controllers.API
             _userService = userService;
             _organizationService = organizationService;
         }
-
-        protected override User PostQuery(User item)
+        
+        public override HttpResponseMessage Post(UserDTO dto)
         {
-            return _userService.AddUser(item);
+            try
+            {
+                //check if user already exists. If so, just return him
+                var existingUser = Repository.Get(u => u.Email == dto.Email).FirstOrDefault();
+                if (existingUser != null) return Ok(Map(existingUser));
+
+                var item = Map(dto);
+
+                item.ObjectOwner = KitosUser;
+
+                _userService.AddUser(item);
+
+                return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
         }
 
         //TODO REWRITE THIS, perhaps so it's passed along at login?
