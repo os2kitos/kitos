@@ -32,7 +32,6 @@ namespace Core.DomainModel.ItSystem
         /// </summary>
         public virtual Organization BelongsTo { get; set; }
 
-        public int OrganizationId { get; set; }
 
 
         public AccessModifier AccessModifier { get; set; }
@@ -72,6 +71,7 @@ namespace Core.DomainModel.ItSystem
         /// </summary>
         public virtual ItSystem Parent { get; set; }
 
+        public int OrganizationId { get; set; }
         /// <summary>
         /// which organization the it system was created under
         /// </summary>
