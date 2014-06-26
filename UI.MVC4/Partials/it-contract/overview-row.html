@@ -17,7 +17,13 @@
 </td>
 
 <!-- name of users with the selected role -->
-<td>{{ contract.rights | filter:{roleId:chosenRoleId} | joinBy:', ':'user.name'}}
+<td>
+    <span data-ng-if="chosenRoleId">
+        {{ contract.rights | filter:{roleId:chosenRoleId} | joinBy:', ':'user.name'}}
+    </span>
+    <span data-ng-if="!chosenRoleId">
+        {{ contract.contractSignerName }}
+    </span>
 </td>
 
 <!-- supplier name -->
