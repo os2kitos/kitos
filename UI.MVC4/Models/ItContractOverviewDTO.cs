@@ -14,6 +14,7 @@ namespace UI.MVC4.Models
 
         public string ResponsibleOrganizationUnitName { get; set; }
         public string SupplierName { get; set; }
+        public string ContractSignerName { get; set; }
 
         public IEnumerable<RightOutputDTO> Rights { get; set; }
 
