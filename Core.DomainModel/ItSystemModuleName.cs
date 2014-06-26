@@ -2,6 +2,10 @@
 
 namespace Core.DomainModel
 {
+    // TODO DELETE THIS? Currently local admin cannot change names of modules
+    /// <summary>
+    /// Local configuration of the name of the ItSystem module.
+    /// </summary>
     public class ItSystemModuleName : Entity, IOptionEntity<Config>
     {
         public ItSystemModuleName()

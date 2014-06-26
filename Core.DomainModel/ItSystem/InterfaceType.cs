@@ -3,6 +3,10 @@ using System.Collections.ObjectModel;
 
 namespace Core.DomainModel.ItSystem
 {
+    /// <summary>
+    /// Dropdown type for the <see cref="ItSystem"/>.  
+    /// Provides details about an ItSystem of type interface.
+    /// </summary>
     public class InterfaceType : Entity, IOptionEntity<ItSystem>
     {
         public InterfaceType()

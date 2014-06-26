@@ -6,11 +6,11 @@ namespace Core.DomainModel
     /// Defines interface for objects that have a 1:M option choice in another object.
     /// In practice this will be dropdown menus.
     /// </summary>
-    /// <typeparam name="T">Type of the object that this option relates to.</typeparam>
+    /// <typeparam name="TReference">Type of the object that this option relates to.</typeparam>
     /// <remarks>
     /// These types of OptionEntities can only be used by one <see cref="References"/>.
     /// </remarks>
-    public interface IOptionEntity<T>
+    public interface IOptionEntity<TReference>
     {
         /// <summary>
         /// Gets or sets the name.
@@ -50,6 +50,6 @@ namespace Core.DomainModel
         /// <value>
         /// The references.
         /// </value>
-        ICollection<T> References { get; set; }
+        ICollection<TReference> References { get; set; }
     }
 }

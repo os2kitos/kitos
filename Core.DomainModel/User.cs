@@ -4,7 +4,10 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
-{
+{    
+    /// <summary>
+    /// Represents a user with credentials and user roles
+    /// </summary>
     public class User : Entity
     {
         public User()
@@ -26,24 +29,60 @@ namespace Core.DomainModel
         public string Email { get; set; }
         public string Password { get; set; }
         public string Salt { get; set; }
+        public bool IsGlobalAdmin { get; set; }
 
         public int? CreatedInId { get; set; }
         public virtual Organization CreatedIn { get; set; }
 
-        public bool IsGlobalAdmin { get; set; }
         public int? DefaultOrganizationUnitId { get; set; }
+        /// <summary>
+        /// The organization unit that the user has selected as his default.
+        /// </summary>
         public virtual OrganizationUnit DefaultOrganizationUnit { get; set; }
 
+        /// <summary>
+        /// The admin rights of the user
+        /// </summary>
         public virtual ICollection<AdminRight> AdminRights { get; set; }
-
-
+        
+        /// <summary>
+        /// Passwords reset request issued for the user
+        /// </summary>
         public virtual ICollection<PasswordResetRequest> PasswordResetRequests { get; set; }
+
+        /// <summary>
+        /// Wishes created by this user
+        /// </summary>
         public virtual ICollection<Wish> Wishes { get; set; }
+
+        /// <summary>
+        /// Activity associated with this user
+        /// </summary>
         public virtual ICollection<Activity> Activities { get; set; }
-        public virtual ICollection<State> States { get; set; }  
+
+        /// <summary>
+        /// States associated with this user
+        /// </summary>
+        public virtual ICollection<State> States { get; set; }
+
+        /// <summary>
+        /// Risks associated with this user
+        /// </summary>
         public virtual ICollection<Risk> ResponsibleForRisks { get; set; }
-        public virtual ICollection<Communication> ResponsibleForCommunications { get; set; } 
+
+        /// <summary>
+        /// Communications associated with this user
+        /// </summary>
+        public virtual ICollection<Communication> ResponsibleForCommunications { get; set; }
+
+        /// <summary>
+        /// Handovers associated with this user
+        /// </summary>
         public virtual ICollection<Handover> HandoverParticipants { get; set; }
+
+        /// <summary>
+        /// The contracts that the user has been marked as contract signer for
+        /// </summary>
         public virtual ICollection<ItContract.ItContract> SignerForContracts { get; set; }
 
         public override bool HasUserWriteAccess(User user)

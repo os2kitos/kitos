@@ -1,5 +1,8 @@
 ﻿namespace Core.DomainModel
 {
+    /// <summary>
+    /// Represents organization rights on an Organization Unit
+    /// </summary>
     public class OrganizationRight : Entity, IRight<OrganizationUnit, OrganizationRight, OrganizationRole>
     {
         public int UserId { get; set; }

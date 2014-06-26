@@ -2,18 +2,27 @@
 
 namespace Core.DomainModel
 {
+    /// <summary>
+    /// Represents a state or milestone. (OIO entity: "Tilstand")
+    /// </summary>
     public class State : Entity
     {
-
         /// <summary>
         /// Human readable ID ("brugervendt noegle" in OIO)
         /// </summary>
         public string HumanReadableId { get; set; }
+
         public string Name { get; set; }
 
+        /// <summary>
+        /// Description of the state
+        /// </summary>
         public string Description { get; set; }
         public string Note { get; set; }
 
+        /// <summary>
+        /// Estimate for the time needed to reach this state
+        /// </summary>
         public int TimeEstimate { get; set; }
 
         /// <summary>
@@ -27,6 +36,9 @@ namespace Core.DomainModel
         public int Status { get; set; }
 
         public int? AssociatedUserId { get; set; }
+        /// <summary>
+        /// User which is somehow associated with this state
+        /// </summary>
         public virtual User AssociatedUser { get; set; }
 
         public int? AssociatedActivityId { get; set; }

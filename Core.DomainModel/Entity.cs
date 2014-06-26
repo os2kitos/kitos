@@ -2,7 +2,7 @@
 {
     /// <summary>
     /// Base entity class.
-    /// Defines properties every object must have.
+    /// Every domain model should extend this.
     /// </summary>
     public abstract class Entity
     {

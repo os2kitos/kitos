@@ -6,6 +6,13 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel.ItSystem
 {
+    /// <summary>
+    /// Represent the local usage of a interface.
+    /// When an <see cref="ItSystem"/>, which can use an interface, is taken into local usage,
+    /// a InterfaceUsage is created, to allow for adding local details regarding the usage 
+    /// of the interface.
+    /// It is also used for binding an <see cref="ItContract"/> with the usage.
+    /// </summary>
     public class InterfaceUsage : Entity
     {
         public InterfaceUsage()
@@ -19,10 +26,10 @@ namespace Core.DomainModel.ItSystem
         /// </summary>
         public virtual ItSystemUsage ItSystemUsage { get; set; }
 
+        public int? ItContractId { get; set; }
         /// <summary>
         /// The contract for this interface usage.
         /// </summary>
-        public int? ItContractId { get; set; }
         public virtual ItContract.ItContract ItContract { get; set; }
 
         public int InterfaceId { get; set; }
@@ -31,9 +38,15 @@ namespace Core.DomainModel.ItSystem
         /// </summary>
         public virtual ItSystem Interface { get; set; }
 
+        /// <summary>
+        /// Local details regarding the usage of the exposed data of the interface
+        /// </summary>
         public virtual ICollection<DataRowUsage> DataRowUsages { get; set; }
 
         public int? InfrastructureId { get; set; }
+        /// <summary>
+        /// An ItSystem marked as infrastructure for the local usage of the interface.
+        /// </summary>
         public virtual ItSystem Infrastructure { get; set; }
         
         /// <summary>
