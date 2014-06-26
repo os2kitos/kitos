@@ -5,7 +5,7 @@
         Normal, Public, Private
     }
 
-    public interface IHasAccessModifier //LOL
+    public interface IHasAccessModifier
     {
         AccessModifier AccessModifier { get; set; }
     }

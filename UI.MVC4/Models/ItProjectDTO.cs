@@ -56,7 +56,7 @@ namespace UI.MVC4.Models
         /// <summary>
         /// Traffic-light dropdown for overall status
         /// </summary>
-        public int StatusProject { get; set; }
+        public TrafficLight StatusProject { get; set; }
         /// <summary>
         /// Date-for-status-update field
         /// </summary>

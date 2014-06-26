@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.DomainModel;
 using Newtonsoft.Json;
 using UI.MVC4.Filters;
 
@@ -39,6 +40,6 @@ namespace UI.MVC4.Models
         public string SubGoalRea2 { get; set; }
         public string SubGoalRea3 { get; set; }
 
-        public int Status { get; set; }
+        public TrafficLight Status { get; set; }
     }
 }

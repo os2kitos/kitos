@@ -2,6 +2,9 @@
 
 namespace Core.DomainModel.ItContract
 {
+    /// <summary>
+    /// It contract agreement elements options.
+    /// </summary>
     public class AgreementElement : Entity, IOptionEntity<ItContract>
     {
         public AgreementElement()
