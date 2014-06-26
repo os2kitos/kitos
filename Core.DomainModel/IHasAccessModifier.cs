@@ -5,7 +5,10 @@
         Normal, Public, Private
     }
 
-    public interface IHasAccessModifier //LOL
+    /// <summary>
+    /// Implemented by types whose read access can be modified
+    /// </summary>
+    public interface IHasAccessModifier
     {
         AccessModifier AccessModifier { get; set; }
     }

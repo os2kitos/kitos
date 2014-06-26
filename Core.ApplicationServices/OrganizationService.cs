@@ -45,10 +45,5 @@ namespace Core.ApplicationServices
                     ObjectOwner = org.ObjectOwner
                 });
         }
-
-        public bool IsUserMember(User user, Organization organization)
-        {
-            throw new System.NotImplementedException(); //TODO
-        }
     }
 }

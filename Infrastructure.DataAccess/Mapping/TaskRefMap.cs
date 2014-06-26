@@ -10,7 +10,6 @@ namespace Infrastructure.DataAccess.Mapping
             // Properties
             // Table & Column Mappings
             this.ToTable("TaskRef");
-            this.Property(t => t.ItProjectId).HasColumnName("ItProjectId");
 
             // Relationships
             this.HasOptional(t => t.Parent)

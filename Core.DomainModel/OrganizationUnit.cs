@@ -4,6 +4,9 @@ using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
 {
+    /// <summary>
+    /// Represents a unit or department within an organization (OIO term: "OrgEnhed").
+    /// </summary>
     public class OrganizationUnit : HasRightsEntity<OrganizationUnit, OrganizationRight, OrganizationRole>, IHierarchy<OrganizationUnit>
     {
         public OrganizationUnit()
@@ -17,17 +20,36 @@ namespace Core.DomainModel
         }
 
         public string Name { get; set; }
+        
+        /// <summary>
+        /// EAN number of the department
+        /// </summary>
         public long? Ean { get; set; }
 
         public int? ParentId { get; set; }
+        /// <summary>
+        /// Parent department
+        /// </summary>
         public virtual OrganizationUnit Parent { get; set; }
         public virtual ICollection<OrganizationUnit> Children { get; set; }
 
         public int OrganizationId { get; set; }
+        /// <summary>
+        /// The organization which the unit belongs to
+        /// </summary>
         public virtual Organization Organization { get; set; }
 
+        /// <summary>
+        /// The usage of task on this Organization Unit. 
+        /// Should be a subset of the TaskUsages of the parent department.
+        /// </summary>
         public virtual ICollection<TaskUsage> TaskUsages { get; set; }
+
+        /// <summary>
+        /// Local tasks that was created in this unit
+        /// </summary>
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
+
         public virtual ICollection<TaskRef> OwnedTasks { get; set; }
         public virtual ICollection<ItSystemUsage> DelegatedSystemUsages { get; set; }
         public virtual ICollection<ItSystemUsage> ItSystemUsages { get; set; }

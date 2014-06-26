@@ -2,6 +2,9 @@ using System.Linq;
 
 namespace Core.DomainModel
 {
+    /// <summary>
+    /// Configuration of KITOS for an organization
+    /// </summary>
     public class Config : Entity
     {
         /* SHOW/HIDE MODULES */
@@ -63,6 +66,11 @@ namespace Core.DomainModel
 
         }
 
+        /// <summary>
+        /// Should only be editable by local admin
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public override bool HasUserWriteAccess(User user)
         {
             if (Organization != null && user.AdminRights.Any(right => right.ObjectId == Organization.Id)) return true;
