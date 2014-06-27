@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\docs\Core.DomainModel.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -43,7 +44,7 @@
     <Compile Include="AdminRight.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="IHasAccessModifier.cs" />
-	<Compile Include="IHierarchy.cs" />
+    <Compile Include="IHierarchy.cs" />
     <Compile Include="ItContract\OptionExtend.cs" />
     <Compile Include="ItContract\PaymentFreqency.cs" />
     <Compile Include="ItContract\PaymentMilestone.cs" />
