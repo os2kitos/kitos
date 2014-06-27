@@ -121,6 +121,15 @@ namespace Core.DomainModel.ItProject
         /// Organization units using this project.
         /// </value>
         public virtual ICollection<OrganizationUnit> UsedByOrgUnits { get; set; }
+        /// <summary>
+        /// Gets or sets the associated it system usages.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="ItSystemUsage"/> have a corresponding property linking back.
+        /// </remarks>
+        /// <value>
+        /// Associated it system usages.
+        /// </value>
         public virtual ICollection<ItSystemUsage> ItSystemUsages { get; set; }
         public virtual ICollection<EconomyYear> EconomyYears { get; set; }
 

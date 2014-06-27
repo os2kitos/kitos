@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace Core.DomainModel.ItSystem
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class Method : Entity, IOptionEntity<ItSystem>
     {
         public Method()

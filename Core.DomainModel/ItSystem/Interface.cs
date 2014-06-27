@@ -8,7 +8,8 @@ namespace Core.DomainModel.ItSystem
     /// </summary>
     /// <remarks>
     /// Notice that this is NOT an interface, nor does it 
-    /// distinguish systems from interfaces.</remarks>
+    /// distinguish systems from interfaces.
+    /// </remarks>
     public class Interface : Entity, IOptionEntity<ItSystem>
     {
         public Interface()
