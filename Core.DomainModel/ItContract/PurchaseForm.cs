@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItContract
 {
+    /// <summary>
+    /// It contract purchase form option.
+    /// </summary>
     public class PurchaseForm : Entity, IOptionEntity<ItContract>
     {
         public PurchaseForm()

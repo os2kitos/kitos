@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItContract
 {
+    /// <summary>
+    /// It contract price regulation option.
+    /// </summary>
     public class PriceRegulation : Entity, IOptionEntity<ItContract>
     {
         public PriceRegulation()

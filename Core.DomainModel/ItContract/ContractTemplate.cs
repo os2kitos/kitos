@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItContract
 {
+    /// <summary>
+    /// It contract contract template options.
+    /// </summary>
     public class ContractTemplate : Entity, IOptionEntity<ItContract>
     {
         public ContractTemplate()

@@ -22,20 +22,20 @@ namespace Core.DomainModel
         public string Name { get; set; }
         
         /// <summary>
-        /// EAN number of the department
+        /// EAN number of the department.
         /// </summary>
         public long? Ean { get; set; }
 
         public int? ParentId { get; set; }
         /// <summary>
-        /// Parent department
+        /// Parent department.
         /// </summary>
         public virtual OrganizationUnit Parent { get; set; }
         public virtual ICollection<OrganizationUnit> Children { get; set; }
 
         public int OrganizationId { get; set; }
         /// <summary>
-        /// The organization which the unit belongs to
+        /// The organization which the unit belongs to.
         /// </summary>
         public virtual Organization Organization { get; set; }
 

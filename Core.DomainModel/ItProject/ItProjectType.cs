@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItProject
 {
+    /// <summary>
+    /// It project type option.
+    /// </summary>
     public class ItProjectType : Entity, IOptionEntity<ItProject>
     {
         public ItProjectType()

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.DomainModel;
 using Newtonsoft.Json;
 using UI.MVC4.Filters;
 
@@ -14,7 +15,7 @@ namespace UI.MVC4.Models
         /// <summary>
         /// Traffic-light dropdown for overall status
         /// </summary>
-        public int Status { get; set; }
+        public TrafficLight Status { get; set; }
         /// <summary>
         /// Date-for-status-update field
         /// </summary>

@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Core.DomainModel.ItProject
 {
+    /// <summary>
+    /// It project role.
+    /// </summary>
     public class ItProjectRole : Entity, IRoleEntity<ItProjectRight>
     {
         public ItProjectRole()

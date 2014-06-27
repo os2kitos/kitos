@@ -2,6 +2,9 @@
 
 namespace Core.DomainModel.ItSystem
 {
+    /// <summary>
+    /// Represents an organisation's usage of an it system.
+    /// </summary>
     public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>
     {
         public ItSystemUsage()
@@ -15,23 +18,86 @@ namespace Core.DomainModel.ItSystem
             this.UsedBy = new List<OrganizationUnit>();
             this.ItProjects = new List<ItProject.ItProject>();
         }
-        
-        public bool IsStatusActive { get; set; }
-        public string Note { get; set; }
-        public string LocalSystemId { get; set; }
-        
-        public string EsdhRef { get; set; }
-        public string CmdbRef { get; set; }
-        public string DirectoryOrUrlRef { get; set; }
-        public string LocalCallSystem { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance's status is active.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if this instance's status is active; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsStatusActive { get; set; }
+        /// <summary>
+        /// Gets or sets the note.
+        /// </summary>
+        /// <value>
+        /// The note.
+        /// </value>
+        public string Note { get; set; }
+        /// <summary>
+        /// Gets or sets the user defined local system identifier.
+        /// </summary>
+        /// <remarks>
+        /// This identifier is not the primary key.
+        /// </remarks>
+        /// <value>
+        /// The local system identifier.
+        /// </value>
+        public string LocalSystemId { get; set; }
+        /// <summary>
+        /// Gets or sets a reference to relevant documents in an extern ESDH system.
+        /// </summary>
+        /// <value>
+        /// Extern reference  to ESDH system.
+        /// </value>
+        public string EsdhRef { get; set; }
+        /// <summary>
+        /// Gets or sets a reference to relevant documents in an extern CMDB system.
+        /// </summary>
+        /// <value>
+        /// Extern reference  to CMDB system.
+        /// </value>
+        public string CmdbRef { get; set; }
+        /// <summary>
+        /// Gets or sets a path or url to relevant documents.
+        /// </summary>
+        /// <value>
+        /// Path or url relevant documents.
+        /// </value>
+        public string DirectoryOrUrlRef { get; set; }
+        /// <summary>
+        /// Gets or sets the local call system.
+        /// </summary>
+        /// <value>
+        /// The local call system.
+        /// </value>
+        public string LocalCallSystem { get; set; }
         public int? ResponsibleUnitId { get; set; }
+        /// <summary>
+        /// Gets or sets the organization unit marked as responsible for this it system usage.
+        /// </summary>
+        /// <remarks>
+        /// Must be an organization unit contained in <see cref="OrgUnits"/>.
+        /// </remarks>
+        /// <value>
+        /// The responsible organization unit.
+        /// </value>
         public virtual OrganizationUnit ResponsibleUnit { get; set; }
-        
         public int OrganizationId { get; set; }
+        /// <summary>
+        /// Gets or sets the organization marked as responsible for this it system usage.
+        /// </summary>
+        /// <value>
+        /// The responsible organization.
+        /// </value>
         public virtual Organization Organization { get; set; }
         
         public int ItSystemId { get; set; }
+        /// <summary>
+        /// Gets or sets the it system this instance is using.
+        /// </summary>
+        /// <value>
+        /// It system.
+        /// </value>
         public virtual ItSystem ItSystem { get; set; }
 
         public int? ArchiveTypeId { get; set; }
@@ -44,33 +110,70 @@ namespace Core.DomainModel.ItSystem
         public virtual ItSystem OverviewItSystem { get; set; }
 
         public virtual int? MainContractId { get; set; }
+        /// <summary>
+        /// Gets or sets the main it contract for this instance.
+        /// The it contract is used to determine whether this instance
+        /// is marked as active/inactive.
+        /// </summary>
+        /// <value>
+        /// The main contract.
+        /// </value>
         public virtual ItContract.ItContract MainContract { get; set; }
-
+        /// <summary>
+        /// Gets or sets it contracts associated with this instance.
+        /// </summary>
+        /// <value>
+        /// The contracts.
+        /// </value>
         public virtual ICollection<ItContract.ItContract> Contracts { get; set; }
-
+        /// <summary>
+        /// Gets or sets the wishes associated with this instance.
+        /// </summary>
+        /// <value>
+        /// Wishes.
+        /// </value>
         public virtual ICollection<Wish> Wishes { get; set; }
+        /// <summary>
+        /// Gets or sets the organization units associated with this instance.
+        /// </summary>
+        /// <value>
+        /// The organization units.
+        /// </value>
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
-
         /// <summary>
-        /// These Organization Units are using this system
+        /// Gets or sets the organization units that are using this instance.
         /// </summary>
+        /// <remarks>
+        /// Must be organization units that belongs to <see cref="Organization"/>.
+        /// </remarks>
+        /// <value>
+        /// The organization units used by this instance.
+        /// </value>
         public virtual ICollection<OrganizationUnit> UsedBy { get; set; }
-        
         /// <summary>
-        /// IT System support these tasks
+        /// Gets or sets the tasks this instance supports.
         /// </summary>
+        /// <value>
+        /// The supported tasks.
+        /// </value>
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
-
         /// <summary>
         /// The local usages of interfaces. 
         /// </summary>
         public virtual ICollection<InterfaceUsage> InterfaceUsages { get; set; }
-
         /// <summary>
         /// The local exposures of interfaces.
         /// </summary>
         public virtual ICollection<InterfaceExposure> InterfaceExposures { get; set; }
-
+        /// <summary>
+        /// Gets or sets the associated it projects.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="ItProject.ItProject"/> have a corresponding property linking back.
+        /// </remarks>
+        /// <value>
+        /// Associated it projects.
+        /// </value>
         public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
     }
 }

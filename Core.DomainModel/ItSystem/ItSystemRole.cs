@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Core.DomainModel.ItSystem
 {
+    /// <summary>
+    /// It system role option.
+    /// </summary>
     public class ItSystemRole : Entity, IRoleEntity<ItSystemRight>
     {
         public ItSystemRole()

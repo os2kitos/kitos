@@ -16,8 +16,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.ItSystemUsages);
 
             this.HasMany(t => t.OrgUnits)
-                 .WithMany(t => t.ItSystemUsages)
-                 .Map(t => t.ToTable("OrgUnitSystemUsage"));
+                .WithMany(t => t.ItSystemUsages)
+                .Map(t => t.ToTable("OrgUnitSystemUsage"));
 
             this.HasOptional(t => t.ResponsibleUnit)
                  .WithMany(t => t.DelegatedSystemUsages);

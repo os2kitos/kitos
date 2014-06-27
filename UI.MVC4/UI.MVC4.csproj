@@ -31,6 +31,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -220,6 +222,7 @@
     <Compile Include="Controllers\API\ItSystemUsageRightsController.cs" />
     <Compile Include="Controllers\API\OptionExtendController.cs" />
     <Compile Include="Controllers\API\OrganizationUnitRightsController.cs" />
+    <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Models\ActivitySimpleDTO.cs" />
     <Compile Include="Models\ItProjectOverviewDTO.cs" />
     <Compile Include="Models\PagingModel.cs" />
@@ -319,16 +322,8 @@
     <Compile Include="Controllers\API\PasswordResetRequestController.cs" />
     <Compile Include="Controllers\API\TaskRefController.cs" />
     <Compile Include="Controllers\API\UserController.cs" />
-    <Compile Include="Controllers\Web\HomeController.cs" />
-    <Compile Include="Controllers\Web\GlobalConfigController.cs" />
-    <Compile Include="Controllers\Web\LocalConfigController.cs" />
-    <Compile Include="Controllers\Web\GlobalAdminController.cs" />
-    <Compile Include="Controllers\Web\AuthorizeController.cs" />
     <Compile Include="Controllers\API\GenericApiController.cs" />
-    <Compile Include="Controllers\Web\WIPGlobalConfController.cs" />
-    <Compile Include="Controllers\Web\OldHomeController.cs" />
     <Compile Include="Controllers\API\TextController.cs" />
-    <Compile Include="Controllers\Web\TestController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

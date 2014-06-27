@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItContract
 {
+    /// <summary>
+    /// It contract termination deadline option.
+    /// </summary>
     public class TerminationDeadline : Entity, IOptionEntity<ItContract>
     {
         public TerminationDeadline()

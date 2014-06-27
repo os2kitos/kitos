@@ -1,5 +1,8 @@
 ﻿namespace Core.DomainModel.ItSystem
 {
+    /// <summary>
+    /// Associates a <see cref="User"/> with an it system (<see cref="Object"/>) in a specific <see cref="Role"/>.
+    /// </summary>
     public class ItSystemRight : Entity, IRight<ItSystemUsage, ItSystemRight, ItSystemRole>
     {
         public int UserId { get; set; }

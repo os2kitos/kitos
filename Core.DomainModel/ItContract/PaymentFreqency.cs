@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItContract
 {
+    /// <summary>
+    /// It contract payment freqency option.
+    /// </summary>
     public class PaymentFreqency : Entity, IOptionEntity<ItContract>
     {
         public PaymentFreqency()

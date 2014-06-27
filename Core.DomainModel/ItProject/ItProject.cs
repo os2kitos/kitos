@@ -9,10 +9,7 @@ namespace Core.DomainModel.ItProject
         public ItProject()
         {
             this.Communications = new List<Communication>();
-            //this.Economies = new List<Economy>();
-            //this.ExtReferences = new List<ExtReference>();
             this.TaskRefs = new List<TaskRef>();
-            //this.Resources = new List<Resource>();
             this.Risks = new List<Risk>();
             this.Stakeholders = new List<Stakeholder>();
             this.ItSystemUsages = new List<ItSystemUsage>();
@@ -23,32 +20,34 @@ namespace Core.DomainModel.ItProject
             this.CommonPublicProjects = new List<ItProject>();
             this.Children = new List<ItProject>();
             this.Clones = new List<ItProject>();
-            this.Priority = ItProjectPriority.None; // default value if not set
-            this.PriorityPf = ItProjectPriority.None; // default value if not set
+
+            // default values
+            this.Priority = ItProjectPriority.None; 
+            this.PriorityPf = ItProjectPriority.None;
             this.AccessModifier = AccessModifier.Normal;
         }
-        
+
+        #region Master
+
+        /// <summary>
+        /// Gets or sets the user defined it project identifier.
+        /// </summary>
+        /// <remarks>
+        /// This is NOT the primary key.
+        /// </remarks>
+        /// <value>
+        /// It project identifier.
+        /// </value>
         public string ItProjectId { get; set; }
         public string Background { get; set; }
-        public bool IsTransversal { get; set; }
         public string Note { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public AccessModifier AccessModifier { get; set; }
-        public ItProjectPriority Priority { get; set; }
-        public bool IsPriorityLocked { get; set; }
-        public ItProjectPriority PriorityPf { get; set; }
         public bool IsArchived { get; set; }
         public string Esdh { get; set; }
         public string Cmdb { get; set; }
         public string Folder { get; set; }
-
-        public bool IsStatusGoalVisible { get; set; }
-        public bool IsEconomyVisible { get; set; }
-        public bool IsStakeholderVisible { get; set; }
-        public bool IsCommunicationVisible { get; set; }
-        public bool IsHandoverVisible { get; set; }
-        
         public int? ParentId { get; set; }
         public virtual ItProject Parent { get; set; }
         public virtual ICollection<ItProject> Children { get; set; }
@@ -59,16 +58,43 @@ namespace Core.DomainModel.ItProject
         public int OrganizationId { get; set; }
         public virtual Organization Organization { get; set; }
 
+        #endregion
+
+        #region Overview
+
+        public ItProjectPriority Priority { get; set; }
+        public bool IsPriorityLocked { get; set; }
+        public ItProjectPriority PriorityPf { get; set; }
+
+        #endregion
+
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is transversal. (tværgående)
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if this instance is transversal; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsTransversal { get; set; }
+
+        public bool IsStatusGoalVisible { get; set; }
+        public bool IsEconomyVisible { get; set; }
+        public bool IsStakeholderVisible { get; set; }
+        public bool IsCommunicationVisible { get; set; }
+        public bool IsHandoverVisible { get; set; }
+
         public virtual Handover Handover { get; set; }
         public virtual ICollection<Communication> Communications { get; set; }
-        //public virtual ICollection<ExtReference> ExtReferences { get; set; } // TODO
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
         public virtual ICollection<Risk> Risks { get; set; }
         public virtual ICollection<Stakeholder> Stakeholders { get; set; }
 
         /// <summary>
-        /// Determines if this project is an IT digitization strategy
+        /// Determines if this project is an IT digitalization strategy
         /// </summary>
+        /// <value>
+        /// <c>true</c> if this instance is an strategy; otherwise, <c>false</c>.
+        /// </value>
         public bool IsStrategy { get; set; }
 
         public int? JointMunicipalProjectId { get; set; }
@@ -81,14 +107,29 @@ namespace Core.DomainModel.ItProject
 
         public int? ResponsibleOrgUnitId { get; set; }
         /// <summary>
-        /// Organization Unit responsible for this project
+        /// Organization Unit responsible for this project.
         /// </summary>
+        /// <value>
+        /// The responsible org unit.
+        /// </value>
         public virtual OrganizationUnit ResponsibleOrgUnit { get; set; }
 
         /// <summary>
-        /// These Organization Units are using this project
+        /// Organization units that are using this project.
         /// </summary>
+        /// <value>
+        /// Organization units using this project.
+        /// </value>
         public virtual ICollection<OrganizationUnit> UsedByOrgUnits { get; set; }
+        /// <summary>
+        /// Gets or sets the associated it system usages.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="ItSystemUsage"/> have a corresponding property linking back.
+        /// </remarks>
+        /// <value>
+        /// Associated it system usages.
+        /// </value>
         public virtual ICollection<ItSystemUsage> ItSystemUsages { get; set; }
         public virtual ICollection<EconomyYear> EconomyYears { get; set; }
 
@@ -97,7 +138,7 @@ namespace Core.DomainModel.ItProject
         /// <summary>
         /// Traffic-light dropdown for overall status
         /// </summary>
-        public int StatusProject { get; set; }
+        public TrafficLight StatusProject { get; set; }
         /// <summary>
         /// Date-for-status-update field
         /// </summary>
@@ -128,8 +169,26 @@ namespace Core.DomainModel.ItProject
 
         #endregion
 
+        /// <summary>
+        /// Gets or sets the original it project identifier this it project was "cloned" from.
+        /// </summary>
+        /// <value>
+        /// The original it project identifier.
+        /// </value>
         public int? OriginalId { get; set; }
+        /// <summary>
+        /// Gets or sets the original it project this it project was "cloned" from.
+        /// </summary>
+        /// <value>
+        /// The original it project.
+        /// </value>
         public virtual ItProject Original { get; set; }
+        /// <summary>
+        /// Gets or sets the it projects that were cloned from this it project.
+        /// </summary>
+        /// <value>
+        /// The clones.
+        /// </value>
         public virtual ICollection<ItProject> Clones { get; set; }
 
         public virtual GoalStatus GoalStatus { get; set; }

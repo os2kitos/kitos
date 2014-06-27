@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItContract
 {
+    /// <summary>
+    /// It contract procurment strategy option. (udbudsstrategi)
+    /// </summary>
     public class ProcurementStrategy : Entity, IOptionEntity<ItContract>
     {
         public ProcurementStrategy()

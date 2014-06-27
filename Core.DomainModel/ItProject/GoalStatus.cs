@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItProject
 {
+    /// <summary>
+    /// It project goal status.
+    /// </summary>
     public class GoalStatus : Entity
     {
         public GoalStatus()
@@ -13,9 +16,12 @@ namespace Core.DomainModel.ItProject
         public virtual ItProject ItProject { get; set; }
 
         /// <summary>
-        /// Traffic-light dropdown for overall status
+        /// Traffic-light dropdown for overall status.
         /// </summary>
-        public int Status { get; set; }
+        /// <value>
+        /// The status.
+        /// </value>
+        public TrafficLight Status { get; set; }
         /// <summary>
         /// Date-for-status-update field
         /// </summary>
@@ -28,6 +34,13 @@ namespace Core.DomainModel.ItProject
 
         public virtual ICollection<Goal> Goals { get; set; }
 
+        /// <summary>
+        /// Determines whether a user has write access to this instance.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        /// <returns>
+        ///   <c>true</c> if user has write access; otherwise, <c>false</c>.
+        /// </returns>
         public override bool HasUserWriteAccess(User user)
         {
             if (ItProject != null && ItProject.HasUserWriteAccess(user)) return true;
