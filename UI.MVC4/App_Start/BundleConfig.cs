@@ -30,8 +30,7 @@ namespace UI.MVC4
             // standalone libraries
             bundles.Add(new ScriptBundle("~/Scripts/libraries").Include(
                 "~/Scripts/underscore.js",
-                "~/Scripts/lodash.js",
-                "~/Scripts/wysihtml5/wysihtml5-{version}.js"));
+                "~/Scripts/lodash.js"));
 
             // angularjs and plugins
             bundles.Add(new ScriptBundle("~/Scripts/angular").Include(
