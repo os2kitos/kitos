@@ -365,7 +365,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\bootstrap3-wysihtml5\bootstrap3-wysihtml5.css" />
     <Content Include="Content\bootstrap\bootstrap.css" />
     <Content Include="Content\bootstrap\bootstrap.min.css" />
     <Content Include="Content\notify\notify.css" />
@@ -943,10 +942,6 @@
     <Content Include="Scripts\restangular.min.js" />
     <Content Include="Scripts\underscore.js" />
     <Content Include="Scripts\underscore.min.js" />
-    <Content Include="Scripts\wysihtml5\parser_rules\advanced.js" />
-    <Content Include="Scripts\wysihtml5\parser_rules\simple.js" />
-    <Content Include="Scripts\wysihtml5\wysihtml5-0.3.0.js" />
-    <Content Include="Scripts\wysihtml5\wysihtml5-0.3.0.min.js" />
     <Content Include="Scripts\xeditable.js" />
     <Content Include="Scripts\xeditable.min.js" />
     <Content Include="Web.config">
