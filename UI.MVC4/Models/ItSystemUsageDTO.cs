@@ -12,7 +12,7 @@ namespace UI.MVC4.Models
         public string EsdhRef { get; set; }
         public string CmdbRef { get; set; }
         public string DirectoryOrUrlRef { get; set; }
-        public string LocalCallSystem { get; set; }
+        public string LocalCallName { get; set; }
 
         public int? SensitiveDataTypeId { get; set; }
         public int? ArchiveTypeId { get; set; }
