@@ -3,7 +3,7 @@
         $stateProvider.state('it-project', {
             url: '/project',
             abstract: true,
-            template: '<ui-view/>',
+            template: '<ui-view autoscroll="false" />',
             resolve: {
                 user: ['userService', function (userService) {
                     return userService.getUser();

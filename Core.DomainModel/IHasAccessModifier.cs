@@ -2,7 +2,18 @@
 {
     public enum AccessModifier
     {
-        Normal, Public, Private
+        /// <summary>
+        /// Only users within the organization this instance was created in have read access.
+        /// </summary>
+        Normal, 
+        /// <summary>
+        /// Everyone have read access.
+        /// </summary>
+        Public, 
+        /// <summary>
+        /// Only users with a role on the instance have read access.
+        /// </summary>
+        Private
     }
 
     /// <summary>

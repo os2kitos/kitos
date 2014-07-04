@@ -3,7 +3,7 @@
         $stateProvider.state('local-config', {
             url: '/local-config',
             abstract: true,
-            template: '<ui-view/>',
+            template: '<ui-view autoscroll="false" />',
             resolve: {
                 config: ['$http', 'userService', function ($http, userService) {
                     return userService.getUser().then(function(user) {
