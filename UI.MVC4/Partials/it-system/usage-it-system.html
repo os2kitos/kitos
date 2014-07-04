@@ -5,32 +5,32 @@
                 <div class="col-md-6">
                     <!--Name-->
                     <div class="form-group">
-                        <label for="system-name" class="control-label col-md-5 small">IT System</label>
-                        <div class="col-md-7">
+                        <label for="system-name" class="control-label col-md-4 small">IT System</label>
+                        <div class="col-md-8">
                             <input type="text" id="system-name" data-ng-model="usage.itSystem.name" class="form-control input-sm" disabled="disabled" />
                         </div>
                     </div>
 
                     <!--ID-->
                     <div class="form-group">
-                        <label for="system-id" class="control-label col-md-5 small">System ID</label>
-                        <div class="col-md-7">
+                        <label for="system-id" class="control-label col-md-4 small">System ID</label>
+                        <div class="col-md-8">
                             <input type="text" id="system-id" data-ng-model="usage.itSystem.systemId" class="form-control input-sm" disabled="disabled" />
                         </div>
                     </div>
 
                     <!--Parent system-->
                     <div class="form-group" data-ng-if="usage.itSystem.appTypeId != interfaceAppType.id">
-                        <label for="system-parent" class="control-label col-md-5 small">Overordnet system</label>
-                        <div class="col-md-7">
+                        <label for="system-parent" class="control-label col-md-4 small">Overordnet system</label>
+                        <div class="col-md-8">
                             <input type="text" id="system-parent" data-ng-model="parentSystem.name" class="form-control input-sm" disabled="disabled">
                         </div>
                     </div>
 
                     <!--Belongs to-->
                     <div class="form-group" data-ng-if="usage.itSystem.appTypeId != interfaceAppType.id">
-                        <label for="system-belongs-to" class="control-label col-md-5 small">Tilhører</label>
-                        <div class="col-md-7">
+                        <label for="system-belongs-to" class="control-label col-md-4 small">Tilhører</label>
+                        <div class="col-md-8">
                             <input type="text" id="system-belongs-to" data-ng-model="usage.itSystem.belongsToName" class="form-control input-sm" disabled="disabled">
                         </div>
                     </div>
@@ -38,24 +38,24 @@
                 <div class="col-md-6">
                     <!--Version-->
                     <div class="form-group">
-                        <label for="system-version" class="control-label col-md-5 small">Version</label>
-                        <div class="col-md-7">
+                        <label for="system-version" class="control-label col-md-4 small">Version</label>
+                        <div class="col-md-8">
                             <input type="text" id="system-version" data-ng-model="usage.itSystem.version" class="form-control input-sm" disabled="disabled" />
                         </div>
                     </div>
 
                     <!--Access modifier -->
                     <div class="form-group">
-                        <label for="system-access" class="control-label col-md-5 small">Public</label>
-                        <div class="col-md-7">
+                        <label for="system-access" class="control-label col-md-4 small">Public</label>
+                        <div class="col-md-8">
                             <span id="system-access" data-ng-model="usage.itSystem.accessModifier" class="form-control input-sm" data-select-access-modifier="" disabled="disabled" />
                         </div>
                     </div>
 
                     <!--Application type -->
                     <div class="form-group">
-                        <label for="system-app-type" class="control-label col-md-5 small">Applikationstype</label>
-                        <div class="col-md-7">
+                        <label for="system-app-type" class="control-label col-md-4 small">Applikationstype</label>
+                        <div class="col-md-8">
                             <select data-ui-select2="" id="system-app-type" data-ng-model="usage.itSystem.appTypeId" class="form-control input-sm" disabled="disabled">
                                 <option data-ng-repeat="appType in appTypes" value="{{appType.id}}">{{appType.name}}</option>
                             </select>
@@ -64,23 +64,25 @@
 
                     <!--Usage type-->
                     <div class="form-group" data-ng-if="usage.itSystem.appTypeId != interfaceAppType.id">
-                        <label for="system-business-type" class="control-label col-md-5 small">Forretningstype</label>
-                        <div class="col-md-7">
+                        <label for="system-business-type" class="control-label col-md-4 small">Forretningstype</label>
+                        <div class="col-md-8">
                             <select data-ui-select2="" id="system-business-type" data-ng-model="usage.itSystem.businessTypeId" class="form-control input-sm" disabled="disabled">
                                 <option data-ng-repeat="businessType in businessTypes" value="{{businessType.id}}">{{businessType.name}}</option>
                             </select>
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- Description and URL -->
-            <div class="form-group">
-                <label for="system-description" class="control-label col-md-2 small">Beskrivelse</label>
-                <div class="col-md-10">
-                    <textarea id="system-description" data-ng-model="usage.itSystem.description" class="form-control input-sm" rows="7" disabled="disabled"></textarea>
-                    <p class="help-block">
-                        Yderligere beskrivelse: <a data-ng-href="{{usage.itSystem.url}}">{{usage.itSystem.url}}</a>
-                    </p>
+                <div class="col-md-12">
+                <!-- Description and URL -->
+                    <div class="form-group">
+                        <label for="system-description" class="control-label col-md-2 small">Beskrivelse</label>
+                        <div class="col-md-10">
+                            <textarea id="system-description" data-ng-model="usage.itSystem.description" class="form-control input-sm" rows="7" disabled="disabled"></textarea>
+                            <p class="help-block">
+                                Yderligere beskrivelse: <a data-ng-href="{{usage.itSystem.url}}">{{usage.itSystem.url}}</a>
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
