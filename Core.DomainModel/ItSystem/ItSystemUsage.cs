@@ -70,7 +70,7 @@ namespace Core.DomainModel.ItSystem
         /// <value>
         /// The local call system.
         /// </value>
-        public string LocalCallSystem { get; set; }
+        public string LocalCallName { get; set; }
         public int? ResponsibleUnitId { get; set; }
         /// <summary>
         /// Gets or sets the organization unit marked as responsible for this it system usage.
