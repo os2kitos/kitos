@@ -1,12 +1,12 @@
-﻿<table class="table table-striped">
+﻿<table class="table table-striped ">
     <thead>
         <tr>
             <th>Navn</th>
             <th>Email</th>
-            <th>OrgEnhed</th>
-            <th>Ændringsønske</th>
-            <th>Public</th>
-            <th></th>
+            <th>Organisation</th>
+            <th style="width: 60%">Ændringsønske</th>
+            <th style="width: 20px">Public</th>
+            <th style="width: 30px"></th>
         </tr>
     </thead>
     <tbody>
@@ -23,10 +23,10 @@
         <tr>
             <td data-ng-bind="user.name"></td>
             <td data-ng-bind="user.email"></td>
-            <td data-ng-bind="user.defaultOrganizationUnit"></td>
-            <td><textarea data-ng-model="text"></textarea></td>
-            <td><input type="checkbox" data-ng-model="isPublic"/></td>
-            <td><button data-ng-click="save()">Gem</button></td>
+            <td data-ng-bind="user.currentOrganizationName"></td>
+            <td><textarea class="form-control" data-ng-model="text"></textarea></td>
+            <td style="text-align: center"><input type="checkbox" data-ng-model="isPublic"></td>
+            <td><button class="btn btn-sm btn-success pull-right" data-ng-click="save()">Gem</button></td>
         </tr>
     </tfoot>
 </table>
