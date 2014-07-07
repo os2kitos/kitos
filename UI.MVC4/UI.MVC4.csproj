@@ -306,7 +306,6 @@
     <Compile Include="Controllers\API\InterfaceTypeController.cs" />
     <Compile Include="Controllers\API\ItContractNamesController.cs" />
     <Compile Include="Controllers\API\ItContractRoleController.cs" />
-    <Compile Include="Controllers\API\ItProjectNamesController.cs" />
     <Compile Include="Controllers\API\ItProjectRoleController.cs" />
     <Compile Include="Controllers\API\ItSupportNamesController.cs" />
     <Compile Include="Controllers\API\ItSystemNamesController.cs" />

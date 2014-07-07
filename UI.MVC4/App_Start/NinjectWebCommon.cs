@@ -134,7 +134,6 @@ namespace UI.MVC4.App_Start
 
             //TODO shouldn't this be in request scope?
             kernel.Bind<IGenericRepository<ItContractModuleName>>().To<GenericRepository<ItContractModuleName>>();
-            kernel.Bind<IGenericRepository<ItProjectModuleName>>().To<GenericRepository<ItProjectModuleName>>();
             kernel.Bind<IGenericRepository<ItSupportModuleName>>().To<GenericRepository<ItSupportModuleName>>();
             kernel.Bind<IGenericRepository<ItSystemModuleName>>().To<GenericRepository<ItSystemModuleName>>();
 

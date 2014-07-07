@@ -10,8 +10,8 @@
         });
     }]);
 
-    app.controller('local-config.EditProjectCtrl', ['$scope', '$http', 'notify', 'config',
-            function ($scope, $http, notify, config) {
+    app.controller('local-config.EditProjectCtrl', ['$scope',
+            function ($scope) {
             }
         ]
     );

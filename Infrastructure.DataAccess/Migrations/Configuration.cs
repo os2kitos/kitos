@@ -134,8 +134,6 @@ namespace Infrastructure.DataAccess.Migrations
 
             AddOptions<ItSupportModuleName, Config>(context.ItSupportModuleNames, globalUser, "IT Understøttelse", "Organisation");
 
-            AddOptions<ItProjectModuleName, Config>(context.ItProjectModuleNames, globalUser, "IT Projekter", "Projekter");
-
             AddOptions<ItSystemModuleName, Config>(context.ItSystemModuleNames, globalUser, "IT Systemer", "Systemer");
 
             AddOptions<ItContractModuleName, Config>(context.ItContractModuleNames, globalUser, "IT Kontrakter", "Kontrakter");

@@ -17,13 +17,6 @@ namespace UI.MVC4.Models
         public bool ShowColumnUsage { get; set; }
         public bool ShowColumnMandatory { get; set; }
 
-        /* IT PROJECT */
-        public int ItProjectModuleNameId { get; set; }
-        public string ItProjectModuleNameName { get; set; }
-        public string ItProjectGuide { get; set; }
-        public bool ShowPortfolio { get; set; }
-        public bool ShowBC { get; set; }
-
         /* IT SYSTEM */
         public int ItSystemModuleNameId { get; set; }
         public string ItSystemModuleNameName { get; set; }
