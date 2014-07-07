@@ -59,72 +59,38 @@
         </tr>
     </thead>
     <tbody>
-        <tr data-ng-repeat="contract in contracts | filter:{'show': true}">
-            <!-- name -->
-            <td>
-                {{ contract.indentation }}
-
-                <button class="btn btn-xs btn-link" data-ng-class="{'invisible': !contract.hasChildren}" data-ng-click="contract.toggleFold()">
-                    <i class="glyphicon" 
-                       data-ng-class="{'glyphicon-chevron-right': !contract.unfolded, 'glyphicon-chevron-down': contract.unfolded}">
-                    </i>
-                </button>
-
-                <a data-ui-sref="it-contract.edit.systems({id: contract.id})">
-                    {{contract.name ? contract.name : 'Unavngiven'}}
+        <!-- for each active contract -->
+        <tr data-ng-repeat="contract in activeContracts | filter:{'show': true}"
+            data-ng-include="'partials/it-contract/overview-plan-row.html'">
+        </tr>
+        
+        <!-- when there are no active contracts to show -->
+        <tr data-ng-if="activeContracts.length == 0">
+            <td colspan="11" class="text-center">
+                <i>Ingen aktive kontrakter</i>
+            </td>
+        </tr>
+        
+        <!-- "click to show inactive contracts"-row -->
+        <tr>
+            <td colspan="11">
+                <a data-ng-click="showInactive = !showInactive">
+                    <i class="glyphicon" data-ng-class="{'glyphicon-chevron-right': !showInactive, 'glyphicon-chevron-down': showInactive}"></i>
+                    Klik for at {{ showInactive && 'skjule' || 'vise' }} inaktive IT kontrakter
                 </a>
+            </td>
+        </tr>
+        
+        <!-- for each inactive contract -->
+        <tr data-ng-if="showInactive" data-ng-repeat="contract in inactiveContracts | filter:{'show': true}" 
+            data-ng-include="'partials/it-contract/overview-plan-row.html'">
+        </tr>
 
-            </td>
-            
-            <!-- type or template -->
-            <td data-ng-switch="chosenFilter">
-                <span data-ng-switch-when="contractType.name">{{contract.contractTypeName}}</span>
-                <span data-ng-switch-when="contractTemplate.name">{{contract.contractTemplateName}}</span>
-            </td>
-            
-            <!-- purchase form -->
-            <td>
-                {{ contract.purchaseFormName }}
-            </td>
-            
-            <!-- concluded -->
-            <td>
-                <span data-ng-model="contract.concluded" data-datereader=""></span>
-            </td>
-            
-            <!-- duration -->
-            <td>
-                {{contract.duration}} md.
-            </td>
-            
-            <!-- expiration -->
-            <td>
-                <span data-ng-model="contract.expirationDate" data-datereader=""></span>
-            </td>
-            
-            <!-- option -->
-            <td>
-                <span data-ng-if="contract.optionExtendName">
-                    {{ contract.optionExtendName }} ({{contract.extendMultiplier}})
-                </span>
-            </td>
-
-            <td>
-                {{ contract.terminationDeadlineName }}
-            </td>
-            
-            <td>
-                <span data-ng-model="contract.irrevocableTo" data-datereader=""></span>
-            </td>
-            
-            <td>
-                {{ contract.procurementStrategyName }}
-            </td>
-            
-            <td>
-                <span data-ng-if="contract.procurementPlanHalf && contract.procurementPlanYear">
-                    {{contract.procurementPlanHalf}} | {{contract.procurementPlanYear}}
-                </span>
+        
+        <!-- when there are no active contracts to show -->
+        <tr data-ng-if="showInactive && inactiveContracts.length == 0">
+            <td colspan="11" class="text-center">
+                <i>Ingen inaktive kontrakter</i>
             </td>
         </tr>
     </tbody>    

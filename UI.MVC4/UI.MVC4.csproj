@@ -457,6 +457,7 @@
     <Content Include="Partials\it-contract\it-contract-edit.html" />
     <Content Include="Partials\it-contract\it-contract-overview.html" />
     <Content Include="Partials\it-contract\it-contract-plan.html" />
+    <Content Include="Partials\it-contract\overview-plan-row.html" />
     <Content Include="Partials\it-contract\overview-row.html" />
     <Content Include="Partials\it-contract\tab-deadlines.html" />
     <Content Include="Partials\it-contract\tab-economy.html" />

@@ -19,11 +19,12 @@
                     take: 20
                 };
 
-                $scope.contracts = [];
+                $scope.activeContracts = [];
+                $scope.inactiveContracts = [];
 
                 //decorates the contracts and adds it to a collection.
                 //then repeats recursively for all children
-                function visit(contract, indentation) {
+                function visit(contract, collection, indentation) {
                     contract.hasChildren = contract.children && contract.children.length > 0;
                     contract.indentation = indentation;
 
@@ -43,10 +44,11 @@
                         });
                     };
 
-                    $scope.contracts.push(contract);
+
+                    collection.push(contract);
 
                     _.each(contract.children, function (child) {
-                        visit(child, indentation + "     ");
+                        visit(child, collection, indentation + "     ");
                     });
                 }
 
@@ -68,12 +70,16 @@
                         $scope.pagination.count = paginationHeader.TotalCount;
 
                         // clear list
-                        $scope.contracts = [];
+                        $scope.activeContracts = [];
+                        $scope.inactiveContracts = [];
 
                         _.each(result.response, function (contract) {
                             contract.show = true;
 
-                            visit(contract, "");
+                            //TODO isActive filtering should be handle by backend and not by frontend as here
+                            var collection = contract.isActive ? $scope.activeContracts : $scope.inactiveContracts;
+
+                            visit(contract, collection, "");
                         });
                     }).error(function () {
                         notify.addErrorMessage("Kunne ikke hente kontrakter!");
