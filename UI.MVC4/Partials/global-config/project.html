@@ -1,34 +1,6 @@
 ﻿<div data-ng-controller="globalConfig.ProjectCtrl">
     <div class="form-horizontal">
         <div class="well">
-            <h4>Reference</h4>
-
-            <div class="form-group" data-ng-repeat="item in refs">
-                <label class="col-sm-2 control-label">{{ item.name }}</label>
-                <div class="col-sm-5">
-                    <a href="#" data-editable-text="item.name" data-onbeforesave="patchRef($data, $index)">
-                        {{ item.name || "Ikke sat" }}
-                    </a>
-                    <p class="help-block">{{ item.note }}</p>
-                </div>
-            </div>
-        </div>
-            
-        <div class="well">
-            <h4>Projektfase</h4>
-        
-            <div class="form-group" data-ng-repeat="item in phases">
-                <label class="col-sm-2 control-label">{{ item.name }}</label>
-                <div class="col-sm-5">
-                    <a href="#" data-editable-text="item.name" data-onbeforesave="patchPhase($data, $index)">
-                        {{ item.name || "Ikke sat" }}
-                    </a>
-                    <p class="help-block">{{ item.note }}</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="well">
             <h4>Projekttyper</h4>
        
             <div class="form-group" data-ng-repeat="item in projectTypes">
