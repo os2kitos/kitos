@@ -34,7 +34,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var orgs = Repository.Get(org => (org.AccessModifier == AccessModifier.Public || (org.AccessModifier == AccessModifier.Normal && org.Id == orgId)) && (org.Name.Contains(q) || org.Cvr.Contains(q)));
+                var orgs = Repository.Get(org => (org.AccessModifier == AccessModifier.Public || org.Id == orgId) && (org.Name.Contains(q) || org.Cvr.Contains(q)));
                 return Ok(Map(orgs));
             }
             catch (Exception e)
