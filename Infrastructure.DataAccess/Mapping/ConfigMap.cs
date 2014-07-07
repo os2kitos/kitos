@@ -1,4 +1,3 @@
-using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel;
 
 namespace Infrastructure.DataAccess.Mapping
@@ -17,22 +16,6 @@ namespace Infrastructure.DataAccess.Mapping
             // Relationships
             this.HasRequired(t => t.Organization)
                 .WithOptional(t => t.Config);
-
-            this.HasRequired(t => t.ItSupportModuleName)
-                .WithMany(t => t.References)
-                .HasForeignKey(d => d.ItSupportModuleNameId);
-
-            this.HasRequired(t => t.ItContractModuleName)
-                .WithMany(t => t.References)
-                .HasForeignKey(d => d.ItContractModuleNameId);
-
-            this.HasRequired(t => t.ItProjectModuleName)
-                .WithMany(t => t.References)
-                .HasForeignKey(d => d.ItProjectModuleNameId);
-
-            this.HasRequired(t => t.ItSystemModuleName)
-                .WithMany(t => t.References)
-                .HasForeignKey(d => d.ItSystemModuleNameId);
         }
     }
 }

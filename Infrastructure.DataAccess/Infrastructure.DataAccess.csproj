@@ -101,9 +101,7 @@
     <Compile Include="Mapping\ItContractMap.cs" />
     <Compile Include="Mapping\ItContractRightMap.cs" />
     <Compile Include="Mapping\ItContractRoleMap.cs" />
-    <Compile Include="Mapping\ItContractModuleNameMap.cs" />
     <Compile Include="Mapping\ItProjectMap.cs" />
-    <Compile Include="Mapping\ItSupportModuleNameMap.cs" />
     <Compile Include="Mapping\ItProjectRightMap.cs" />
     <Compile Include="Mapping\ItProjectRoleMap.cs" />
     <Compile Include="Mapping\ItSystemMap.cs" />
