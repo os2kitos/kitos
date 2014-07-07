@@ -112,7 +112,7 @@
 
                 function loadSystems() {
 
-                    var url = 'api/itSystem/?skip=' + $scope.pagination.skip + "&take=" + $scope.pagination.take;
+                    var url = 'api/itSystem/?skip=' + $scope.pagination.skip + "&take=" + $scope.pagination.take + '&organizationId=' + user.currentOrganizationId;
 
                     if ($scope.pagination.orderBy) {
                         url += '&orderBy=' + $scope.pagination.orderBy;
