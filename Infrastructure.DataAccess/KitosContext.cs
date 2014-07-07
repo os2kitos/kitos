@@ -53,7 +53,6 @@ namespace Infrastructure.DataAccess
         public DbSet<ItProjectRight> ItProjectRights { get; set; }
         public DbSet<ItProjectRole> ItProjectRoles { get; set; }
         public DbSet<ItSupportModuleName> ItSupportModuleNames { get; set; }
-        public DbSet<ItSystemModuleName> ItSystemModuleNames { get; set; }
         public DbSet<ItSystem> ItSystems { get; set; }
         public DbSet<ItSystemUsage> ItSystemUsages { get; set; }
         public DbSet<ItSystemRight> ItSystemRights { get; set; }
@@ -124,7 +123,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemUsageMap());
             modelBuilder.Configurations.Add(new ItSystemRightMap());
             modelBuilder.Configurations.Add(new ItSystemRoleMap());
-            modelBuilder.Configurations.Add(new ItSystemModuleNameMap());
             modelBuilder.Configurations.Add(new MethodMap());
             modelBuilder.Configurations.Add(new OrganizationMap());
             modelBuilder.Configurations.Add(new OrganizationUnitMap());

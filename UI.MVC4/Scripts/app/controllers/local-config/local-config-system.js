@@ -10,8 +10,8 @@
         });
     }]);
 
-    app.controller('local-config.EditSystemCtrl', ['$scope', '$http', 'notify', 'config',
-            function ($scope, $http, notify, config) {
+    app.controller('local-config.EditSystemCtrl', ['$scope',
+            function ($scope) {
             }
         ]
     );

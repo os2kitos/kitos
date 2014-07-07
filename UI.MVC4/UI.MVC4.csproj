@@ -308,7 +308,6 @@
     <Compile Include="Controllers\API\ItContractRoleController.cs" />
     <Compile Include="Controllers\API\ItProjectRoleController.cs" />
     <Compile Include="Controllers\API\ItSupportNamesController.cs" />
-    <Compile Include="Controllers\API\ItSystemNamesController.cs" />
     <Compile Include="Controllers\API\ItSystemRoleController.cs" />
     <Compile Include="Controllers\API\MethodController.cs" />
     <Compile Include="Controllers\API\OrganizationUnitController.cs" />
