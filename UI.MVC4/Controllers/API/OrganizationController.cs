@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
@@ -31,11 +30,11 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetPublic(string q, [FromUri] bool? @public)
+        public HttpResponseMessage GetPublic(string q, [FromUri] bool? @public, int orgId)
         {
             try
             {
-                var orgs = Repository.Get(org => org.AccessModifier == AccessModifier.Public && (org.Name.Contains(q) || org.Cvr.Contains(q)));
+                var orgs = Repository.Get(org => (org.AccessModifier == AccessModifier.Public || org.Id == orgId) && (org.Name.Contains(q) || org.Cvr.Contains(q)));
                 return Ok(Map(orgs));
             }
             catch (Exception e)

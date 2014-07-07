@@ -30,11 +30,6 @@
                         return result.data.response;
                     });
                 }],
-                suppliers: ['$http', function ($http) {
-                    return $http.get('api/organization/?company').then(function (result) {
-                        return result.data.response;
-                    });
-                }],
                 orgUnits: ['$http', 'contract', function ($http, contract) {
                     return $http.get('api/organizationunit/?organizationid=' + contract.organizationId).then(function (result) {
                         return result.data.response;
@@ -66,8 +61,8 @@
     }]);
 
     app.controller('contract.EditCtrl',
-        ['$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'suppliers', 'orgUnits', 'contracts', 'agreementElements', 'hasWriteAccess', 'user', 'autofocus',
-            function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, suppliers, orgUnits, contracts, agreementElements, hasWriteAccess, user, autofocus) {
+        ['$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'contracts', 'agreementElements', 'hasWriteAccess', 'user', 'autofocus',
+            function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, contracts, agreementElements, hasWriteAccess, user, autofocus) {
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.contract = contract;              
                 $scope.hasWriteAccess = hasWriteAccess;
@@ -78,7 +73,6 @@
                 $scope.contractTemplates = contractTemplates;
                 $scope.purchaseForms = purchaseForms;
                 $scope.procurementStrategies = procurementStrategies;
-                $scope.suppliers = suppliers;
                 $scope.orgUnits = orgUnits;
                 $scope.contracts = contracts;
                 $scope.agreementElements = agreementElements
@@ -143,7 +137,7 @@
                     };
                 }
                 
-                $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, formatSupplier, ['public']);
+                $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, formatSupplier, ['public', 'orgId=' + user.currentOrganizationId]);
 
                 function formatSupplier(supplier) {
                     var result = '<div>' + supplier.text + '</div>';
