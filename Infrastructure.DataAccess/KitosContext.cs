@@ -45,14 +45,12 @@ namespace Infrastructure.DataAccess
         public DbSet<InterfaceUsage> InterfaceUsages { get; set; }
         public DbSet<InterfaceExposure> InterfaceExposure { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
-        public DbSet<ItContractModuleName> ItContractModuleNames { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
         public DbSet<ItContractRight> ItContractRights { get; set; }
         public DbSet<ItContractRole> ItContractRoles { get; set; }
         public DbSet<ItProject> ItProjects { get; set; }
         public DbSet<ItProjectRight> ItProjectRights { get; set; }
         public DbSet<ItProjectRole> ItProjectRoles { get; set; }
-        public DbSet<ItSupportModuleName> ItSupportModuleNames { get; set; }
         public DbSet<ItSystem> ItSystems { get; set; }
         public DbSet<ItSystemUsage> ItSystemUsages { get; set; }
         public DbSet<ItSystemRight> ItSystemRights { get; set; }
@@ -114,11 +112,9 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItContractMap());
             modelBuilder.Configurations.Add(new ItContractRightMap());
             modelBuilder.Configurations.Add(new ItContractRoleMap());
-            modelBuilder.Configurations.Add(new ItContractModuleNameMap());
             modelBuilder.Configurations.Add(new ItProjectMap());
             modelBuilder.Configurations.Add(new ItProjectRightMap());
             modelBuilder.Configurations.Add(new ItProjectRoleMap());
-            modelBuilder.Configurations.Add(new ItSupportModuleNameMap());
             modelBuilder.Configurations.Add(new ItSystemMap());
             modelBuilder.Configurations.Add(new ItSystemUsageMap());
             modelBuilder.Configurations.Add(new ItSystemRightMap());

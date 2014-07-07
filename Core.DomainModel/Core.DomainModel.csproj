@@ -74,7 +74,6 @@
     <Compile Include="IOptionEntity.cs" />
     <Compile Include="IRight.cs" />
     <Compile Include="IRoleEntity.cs" />
-    <Compile Include="ItContractModuleName.cs" />
     <Compile Include="ItContract\AgreementElement.cs" />
     <Compile Include="ItContract\ContractTemplate.cs" />
     <Compile Include="ItContract\ContractType.cs" />
@@ -93,7 +92,6 @@
     <Compile Include="ItProject\ItProjectType.cs" />
     <Compile Include="ItProject\Risk.cs" />
     <Compile Include="ItProject\Stakeholder.cs" />
-    <Compile Include="ItSupportModuleName.cs" />
     <Compile Include="ItSystem\Interface.cs" />
     <Compile Include="ItSystem\InterfaceType.cs" />
     <Compile Include="ItSystem\ItSystem.cs" />

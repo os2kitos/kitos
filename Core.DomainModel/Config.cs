@@ -18,14 +18,7 @@ namespace Core.DomainModel
         public bool ShowTabOverview { get; set; }
         public bool ShowColumnTechnology { get; set; }
         public bool ShowColumnUsage { get; set; }
-        public bool ShowColumnMandatory { get; set; }
 
-        /* IT CONTRACT */
-        public int ItContractModuleNameId { get; set; }
-        public string ItContractGuide { get; set; }
-
-        public virtual ItSupportModuleName ItSupportModuleName { get; set; }
-        public virtual ItContractModuleName ItContractModuleName { get; set; }
         public virtual Organization Organization { get; set; }
 
         public static Config Default(User objectOwner)
@@ -35,11 +28,6 @@ namespace Core.DomainModel
                     ShowItContractModule = true,
                     ShowItProjectModule = true,
                     ShowItSystemModule = true,
-                    ItSupportModuleNameId = 1,
-                    ItContractModuleNameId = 1,
-                    ItSupportGuide = ".../itunderstøttelsesvejledning",
-                    ItContractGuide = ".../itkontraktvejledning",
-                    ShowColumnMandatory = true,
                     ShowColumnTechnology = true,
                     ShowColumnUsage = true,
                     ShowTabOverview = true,

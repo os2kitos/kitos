@@ -121,21 +121,13 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<PaymentMilestone>>().To<GenericRepository<PaymentMilestone>>().InRequestScope();
             kernel.Bind<IGenericRepository<EconomyStream>>().To<GenericRepository<EconomyStream>>().InRequestScope();
             kernel.Bind<IGenericRepository<Advice>>().To<GenericRepository<Advice>>().InRequestScope();
-
             kernel.Bind<IGenericRepository<OrganizationRight>>().To<GenericRepository<OrganizationRight>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItSystemRight>>().To<GenericRepository<ItSystemRight>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItProjectRight>>().To<GenericRepository<ItProjectRight>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItContractRight>>().To<GenericRepository<ItContractRight>>().InRequestScope();
-
             kernel.Bind<IGenericRepository<AdminRight>>().To<GenericRepository<AdminRight>>().InRequestScope();
             kernel.Bind<IGenericRepository<AdminRole>>().To<GenericRepository<AdminRole>>().InRequestScope();
-
             kernel.Bind<IGenericRepository<Config>>().To<GenericRepository<Config>>();
-
-            //TODO shouldn't this be in request scope?
-            kernel.Bind<IGenericRepository<ItContractModuleName>>().To<GenericRepository<ItContractModuleName>>();
-            kernel.Bind<IGenericRepository<ItSupportModuleName>>().To<GenericRepository<ItSupportModuleName>>();
-
             kernel.Bind<IUserRepository>().To<UserRepository>().InRequestScope();
             kernel.Bind<IMailClient>().To<MailClient>().InRequestScope();
             kernel.Bind<ICryptoService>().To<CryptoService>();
@@ -146,7 +138,6 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IItSystemService>().To<ItSystemService>().InRequestScope();
             kernel.Bind<IItProjectService>().To<ItProjectService>().InRequestScope();
             kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InRequestScope();
-
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs

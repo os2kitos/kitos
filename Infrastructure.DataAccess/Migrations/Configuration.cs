@@ -132,10 +132,6 @@ namespace Infrastructure.DataAccess.Migrations
                 "Licens", "Udvikling", "Drift", "Vedligehold", "Support", 
                 "Serverlicenser", "Serverdrift", "Databaselicenser", "Backup", "Overvågning");
 
-            AddOptions<ItSupportModuleName, Config>(context.ItSupportModuleNames, globalUser, "IT Understøttelse", "Organisation");
-
-            AddOptions<ItContractModuleName, Config>(context.ItContractModuleNames, globalUser, "IT Kontrakter", "Kontrakter");
-
             AddOptions<Frequency, DataRowUsage>(context.Frequencies, globalUser, "Dagligt", "Ugentligt", "Månedligt", "Årligt"); 
             
             AddOptions<ArchiveType, ItSystemUsage>(context.ArchiveTypes, globalUser, "Arkiveret", "Ikke arkiveret");
