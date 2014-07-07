@@ -137,7 +137,7 @@
                     };
                 }
                 
-                $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, formatSupplier, ['public']);
+                $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, formatSupplier, ['public', 'orgId=' + user.currentOrganizationId]);
 
                 function formatSupplier(supplier) {
                     var result = '<div>' + supplier.text + '</div>';
