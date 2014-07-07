@@ -21,6 +21,23 @@ namespace UI.MVC4.Controllers.API
             _systemService = systemService;
         }
 
+        public HttpResponseMessage GetPublic([FromUri] int organizationId, [FromUri] PagingModel<ItSystem> paging)
+        {
+            try
+            {
+                var systems =
+                    Repository.AsQueryable()
+                              .Where(sys => sys.AccessModifier == AccessModifier.Public || sys.BelongsToId == organizationId);
+                var query = Page(systems, paging);
+
+                return Ok(Map(query));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         /// <summary>
         /// Returns the interfaces that a given system exposes
         /// </summary>
