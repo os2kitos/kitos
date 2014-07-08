@@ -1,27 +1,18 @@
-﻿var app = angular.module('app', ['ui.router', 'ui.bootstrap', 'ui.select2', 'ngAnimate', 'notify', 'xeditable', 'restangular', 'ui.utils', 'angularjs-dropdown-multiselect', 'ngSanitize']);
+﻿var app = angular.module('app', ['ui.router', 'ui.bootstrap', 'ui.select2', 'ngAnimate', 'notify', 'ui.utils', 'angularjs-dropdown-multiselect', 'ngSanitize']);
 
 app.config(['$urlRouterProvider', function ($urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
 }]);
 
-app.config(['$httpProvider', 'notifyProvider', 'RestangularProvider', function ($httpProvider, notifyProvider, restangularProvider) {
+app.config(['$httpProvider', 'notifyProvider', function ($httpProvider, notifyProvider) {
     $httpProvider.interceptors.push("httpBusyInterceptor");
 
     notifyProvider.globalTimeToLive(5000);
     notifyProvider.onlyUniqueMessages(false);
-
-    //Restangular config
-    restangularProvider.setBaseUrl('/api');
-    restangularProvider.setRestangularFields({
-        id: 'id'
-    });
-    restangularProvider.setResponseExtractor(function (response, operation) {
-        return response.response;
-    });
 }]);
 
-app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify', 'userService', 'uiSelect2Config',
-    function ($rootScope, $http, $state, editableOptions, $modal, notify, userService, uiSelect2Config) {
+app.run(['$rootScope', '$http', '$state', '$modal', 'notify', 'userService', 'uiSelect2Config',
+    function ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config) {
         //init info
         $rootScope.page = {
             title: 'Index',
@@ -34,9 +25,6 @@ app.run(['$rootScope', '$http', '$state', 'editableOptions', '$modal', 'notify',
         userService.getUser();
 
         uiSelect2Config.dropdownAutoWidth = true;
-
-        //x-editable config
-        editableOptions.theme = 'bs3'; // bootstrap3 theme.
 
         //logout function for top navigation bar
         $rootScope.logout = function () {
