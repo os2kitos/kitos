@@ -1,8 +1,5 @@
 ﻿(function (ng, app) {
-
-
-    app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
-
+    app.config(['$stateProvider', function($stateProvider) {
         $stateProvider.state('it-system.usage', {
             url: '/usage/{id:[0-9]+}',
             templateUrl: 'partials/it-system/usage-it-system.html',
@@ -10,7 +7,7 @@
             resolve: {
                 appTypes: [
                     '$http', function($http) {
-                        return $http.get("api/apptype")
+                        return $http.get('api/apptype')
                             .then(function(result) {
                                 return result.data.response;
                             });
@@ -18,7 +15,7 @@
                 ],
                 businessTypes: [
                     '$http', function($http) {
-                        return $http.get("api/businesstype")
+                        return $http.get('api/businesstype')
                             .then(function(result) {
                                 return result.data.response;
                             });
@@ -26,7 +23,7 @@
                 ],
                 archiveTypes: [
                     '$http', function($http) {
-                        return $http.get("api/archivetype")
+                        return $http.get('api/archivetype')
                             .then(function(result) {
                                 return result.data.response;
                             });
@@ -34,15 +31,7 @@
                 ],
                 sensitiveDataTypes: [
                     '$http', function($http) {
-                        return $http.get("api/sensitivedatatype")
-                            .then(function(result) {
-                                return result.data.response;
-                            });
-                    }
-                ],
-                itSystems: [
-                    '$http', function($http) {
-                        return $http.get("api/itsystem/")
+                        return $http.get('api/sensitivedatatype')
                             .then(function(result) {
                                 return result.data.response;
                             });
@@ -58,7 +47,7 @@
                 ],
                 interfaceAppType: [
                     '$http', function($http) {
-                        return $http.get("api/apptype?interfaceAppType").then(function(result) {
+                        return $http.get('api/apptype?interfaceAppType').then(function(result) {
                             return result.data.response;
                         });
                     }
@@ -76,27 +65,20 @@
     }]);
 
     app.controller('system.UsageCtrl', ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'itSystemUsage', 'appTypes',
-        'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'itSystems', 'interfaceAppType', 'hasWriteAccess', 'autofocus',
-        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, appTypes, businessTypes, archiveTypes, sensitiveDataTypes, itSystems, interfaceAppType, hasWriteAccess, autofocus) {
+        'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'interfaceAppType', 'hasWriteAccess', 'autofocus',
+        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, appTypes, businessTypes, archiveTypes, sensitiveDataTypes, interfaceAppType, hasWriteAccess, autofocus) {
             $rootScope.page.title = 'IT System - Anvendelse';
 
             autofocus();
 
-            //TODO create tab for this page
-            //$rootScope.page.subnav = subnav.slice();
-            //$rootScope.page.subnav.push({ state: 'it-system.usage', text: 'IT System' });
-
             $scope.hasWriteAccess = hasWriteAccess;
-
             $scope.interfaceAppType = interfaceAppType;
-
             $scope.usageId = $stateParams.id;
             $scope.status = [{ id: true, name: 'Aktiv' }, { id: false, name: 'Inaktiv' }];
             $scope.appTypes = appTypes;
             $scope.businessTypes = businessTypes;
             $scope.archiveTypes = archiveTypes;
             $scope.sensitiveDataTypes = sensitiveDataTypes;
-            $scope.itSystems = itSystems;
             $scope.usage = itSystemUsage;
 
             if (itSystemUsage.itSystem.parentId) {
@@ -106,6 +88,49 @@
             }
 
             $scope.orgUnits = itSystemUsage.usedBy;
+            
+            $scope.itSytemUsagesSelectOptions = selectLazyLoading('api/itsystemusage', false, ['organizationId=' + itSystemUsage.organizationId]);
+            function selectLazyLoading(url, excludeSelf, paramAry) {
+                return {
+                    minimumInputLength: 1,
+                    allowClear: true,
+                    placeholder: ' ',
+                    initSelection: function (elem, callback) {
+                    },
+                    ajax: {
+                        data: function (term, page) {
+                            return { query: term };
+                        },
+                        quietMillis: 500,
+                        transport: function (queryParams) {
+                            var extraParams = paramAry ? '&' + paramAry.join('&') : '';
+                            var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
+                            res.abort = function () {
+                                return null;
+                            };
+
+                            return res;
+                        },
+
+                        results: function (data, page) {
+                            var results = [];
+
+                            _.each(data.data.response, function (obj) {
+                                if (excludeSelf && obj.id == contract.id)
+                                    return; // don't add self to result
+
+                                results.push({
+                                    id: obj.id,
+                                    text: obj.itSystem.name ? obj.itSystem.name : 'Unavngiven',
+                                    cvr: obj.cvr
+                                });
+                            });
+
+                            return { results: results };
+                        }
+                    }
+                };
+            }
         }
     ]);
 })(angular, app);
