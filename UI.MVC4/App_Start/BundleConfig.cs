@@ -1,5 +1,4 @@
-﻿using System.Web;
-using System.Web.Optimization;
+﻿using System.Web.Optimization;
 
 namespace UI.MVC4
 {
@@ -42,9 +41,7 @@ namespace UI.MVC4
                 "~/Scripts/angular-ui/ui-bootstrap.js",
                 "~/Scripts/angular-ui/ui-bootstrap-tpls.js",
                 "~/Scripts/ui-select2.js",
-                "~/Scripts/restangular.js",
                 "~/Scripts/notify/*.js",
-                "~/Scripts/xeditable.js",
                 "~/Scripts/angular-ui-util/ui-utils.js"));
 
             // angular app files
@@ -57,7 +54,6 @@ namespace UI.MVC4
                 "~/Content/notify/notify.css",
                 "~/Content/css/select2.css",
                 "~/Content/select2-bootstrap.css",
-                "~/Content/xeditable.css",
                 "~/Content/kitos.css"));
         }
     }

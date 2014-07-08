@@ -442,6 +442,8 @@
     <Content Include="Partials\directives\show-status.html" />
     <Content Include="Partials\global-admin\global-admins.html" />
     <Content Include="Partials\global-admin\local-admins.html" />
+    <Content Include="Partials\global-config\optionrolelist.html" />
+    <Content Include="Partials\global-config\optionlist.html" />
     <Content Include="Partials\global-config\system.html" />
     <Content Include="Partials\global-admin\new-global-admin.html" />
     <Content Include="Partials\global-admin\new-local-admin.html" />
@@ -935,12 +937,8 @@
     <Content Include="Scripts\select2.js" />
     <Content Include="Scripts\select2.min.js" />
     <Content Include="Scripts\ui-select2.js" />
-    <Content Include="Scripts\restangular.js" />
-    <Content Include="Scripts\restangular.min.js" />
     <Content Include="Scripts\underscore.js" />
     <Content Include="Scripts\underscore.min.js" />
-    <Content Include="Scripts\xeditable.js" />
-    <Content Include="Scripts\xeditable.min.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
