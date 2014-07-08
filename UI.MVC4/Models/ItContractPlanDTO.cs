@@ -42,5 +42,25 @@ namespace UI.MVC4.Models
         //Eleventh
         public int? ProcurementPlanHalf { get; set; }
         public int? ProcurementPlanYear { get; set; }
+
+        /// <summary>
+        /// When the contract ends (opsagt)
+        /// </summary>
+        public DateTime? Terminated { get; set; }
+
+        /// <summary>
+        /// Whether the contract is active or not
+        /// </summary>
+        public bool IsActive
+        {
+            get
+            {
+                var today = DateTime.Now;
+                var startDate = Concluded ?? today;
+                var endDate = Terminated ?? ExpirationDate ?? DateTime.MaxValue;
+
+                return today >= startDate && today <= endDate;
+            }
+        }
     }
 }
