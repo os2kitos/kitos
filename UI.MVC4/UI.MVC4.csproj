@@ -936,12 +936,8 @@
     <Content Include="Scripts\select2.js" />
     <Content Include="Scripts\select2.min.js" />
     <Content Include="Scripts\ui-select2.js" />
-    <Content Include="Scripts\restangular.js" />
-    <Content Include="Scripts\restangular.min.js" />
     <Content Include="Scripts\underscore.js" />
     <Content Include="Scripts\underscore.min.js" />
-    <Content Include="Scripts\xeditable.js" />
-    <Content Include="Scripts\xeditable.min.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
