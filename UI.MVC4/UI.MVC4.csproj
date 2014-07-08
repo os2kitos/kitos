@@ -442,6 +442,8 @@
     <Content Include="Partials\directives\show-status.html" />
     <Content Include="Partials\global-admin\global-admins.html" />
     <Content Include="Partials\global-admin\local-admins.html" />
+    <Content Include="Partials\global-config\optionrolelist.html" />
+    <Content Include="Partials\global-config\optionlist.html" />
     <Content Include="Partials\global-config\system.html" />
     <Content Include="Partials\global-admin\new-global-admin.html" />
     <Content Include="Partials\global-admin\new-local-admin.html" />

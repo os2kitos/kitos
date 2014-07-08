@@ -1,48 +1,36 @@
 ﻿<div data-ng-controller="globalConfig.ProjectCtrl">
-    <div class="form-horizontal">
-        <div class="well">
-            <h4>Projekttyper</h4>
+    <div data-global-option-list="" title="Projekttyper" data-options-url="api/itProjectType"></div>
+    
+    <div data-global-option-role-list="" title="Roller" data-options-url="api/itProjectRole"></div>
+        
+    <div class="well">
+        <h4>Roller</h4>
        
-            <div class="form-group" data-ng-repeat="item in projectTypes">
-                <div class="col-sm-offset-2 col-sm-5">
-                    <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.isActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchProjectType($data, $index)">
-                            {{ item.isActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
-                        </a>
-                    </div>
+        <div class="form-group" data-ng-repeat="item in ItProjectRoles">
+            <div class="col-sm-offset-2 col-sm-5">
+                <div class="checkbox">
+                    <a href="#" data-editable-checkbox="item.isActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchItProjectRole($data, $index)">
+                        {{ item.isActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
+                    </a>
+                </div>
+                <div class="checkbox">
+                    <a href="#" data-editable-checkbox="item.hasWriteAccess" data-e-title="Skriverettighed?" data-onbeforesave="patchItProjectRoleAccess($data, $index)">
+                        {{ item.hasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
+                    </a>
                 </div>
             </div>
         </div>
-        
-        <div class="well">
-            <h4>Roller</h4>
-       
-            <div class="form-group" data-ng-repeat="item in ItProjectRoles">
-                <div class="col-sm-offset-2 col-sm-5">
-                    <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.isActive" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchItProjectRole($data, $index)">
-                            {{ item.isActive && "Medtager " + item.name || "Medtager ikke " + item.name }}
-                        </a>
-                    </div>
-                    <div class="checkbox">
-                        <a href="#" data-editable-checkbox="item.hasWriteAccess" data-e-title="Skriverettighed?" data-onbeforesave="patchItProjectRoleAccess($data, $index)">
-                            {{ item.hasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
-                        </a>
-                    </div>
-                </div>
-            </div>
             
-            <hr>
+        <hr>
             
-            <h5>Rolle forslag</h5>
+        <h5>Rolle forslag</h5>
             
-            <div class="form-group" data-ng-repeat="item in ItProjectRoleSuggestions">
-                <div class="col-sm-offset-2 col-sm-5">
-                    <div class="checkbox">
-                        <a href="#" data-editable-checkbox="!item.isSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchItProjectRoleSuggestion(!$data, $index)">
-                            {{ item.isSuggestion && "Medtage " + item.name || "Medtager ikke " + item.name }} med {{ item.hasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
-                        </a>
-                    </div>
+        <div class="form-group" data-ng-repeat="item in ItProjectRoleSuggestions">
+            <div class="col-sm-offset-2 col-sm-5">
+                <div class="checkbox">
+                    <a href="#" data-editable-checkbox="!item.isSuggestion" data-e-title="Medtag {{item.name}}?" data-onbeforesave="patchItProjectRoleSuggestion(!$data, $index)">
+                        {{ item.isSuggestion && "Medtage " + item.name || "Medtager ikke " + item.name }} med {{ item.hasWriteAccess && "Læse/Skrive adgang" || "Læse adgang" }}
+                    </a>
                 </div>
             </div>
         </div>

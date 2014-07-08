@@ -1,0 +1,16 @@
+﻿<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ title }}</h3>
+    </div>
+    <div class="panel-body">
+        <div data-ng-repeat="option in list">
+            <form class="form-inline" role="form">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" data-ng-model="option.isActive" data-autosave="{{ optionsUrl }}/{{ option.id }}" data-field="isActive"> {{ option.name }}
+                    </label>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

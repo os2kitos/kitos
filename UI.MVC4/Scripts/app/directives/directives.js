@@ -596,9 +596,72 @@
 
                 scope.list = [];
 
-                $http.get(scope.optionsUrl).success(function (result) {
+                $http.get(scope.optionsUrl + '?nonsuggestions').success(function (result) {
                     _.each(result.response, function (v) {
                         scope.list.push({
+                            id: v.id,
+                            name: v.name,
+                            note: v.note
+                        });
+                    });
+                });
+            }
+        };
+    }]);
+    
+    app.directive('globalOptionList', ['$http', function ($http) {
+        return {
+            scope: {
+                optionsUrl: '@',
+                title: '@',
+            },
+            templateUrl: 'partials/global-config/optionlist.html',
+            link: function (scope, element, attrs) {
+
+                scope.list = [];
+
+                $http.get(scope.optionsUrl + '?nonsuggestions').success(function (result) {
+                    _.each(result.response, function (v) {
+                        scope.list.push({
+                            id: v.id,
+                            name: v.name,
+                            note: v.note,
+                            isActive: v.isActive
+                        });
+                    });
+                });
+            }
+        };
+    }]);
+
+    app.directive('globalOptionRoleList', ['$http', function ($http) {
+        return {
+            scope: {
+                optionsUrl: '@',
+                title: '@',
+            },
+            templateUrl: 'partials/global-config/optionrolelist.html',
+            link: function (scope, element, attrs) {
+
+                scope.list = [];
+
+                $http.get(scope.optionsUrl + '?nonsuggestions').success(function (result) {
+                    _.each(result.response, function (v) {
+                        scope.list.push({
+                            id: v.id,
+                            name: v.name,
+                            note: v.note,
+                            isActive: v.isActive,
+                            hasWriteAccess: v.hasWriteAccess
+                        });
+                    });
+                });
+
+                scope.suggestions = [];
+                
+                $http.get(scope.optionsUrl + '?suggestions').success(function (result) {
+                    _.each(result.response, function (v) {
+                        scope.suggestions.push({
                             id: v.id,
                             name: v.name,
                             note: v.note
