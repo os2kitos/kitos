@@ -18,10 +18,10 @@
             </form>
         </div>
     </div>
-    <div class="panel-footer">
+    <div class="panel-footer" data-ng-if="suggestions.length > 0">
         <h3 class="panel-title">Forslag</h3>
         <div data-ng-repeat="option in suggestions">
-            {{ option.name }} <button type="button" class="btn btn-sm btn-success" value="0" data-ng-model="option.zero" data-autosave="{{ optionsUrl }}/{{ option.id }}" data-field="isSuggestion">Medtag</button>
+            {{ option.name }} <button type="button" class="btn btn-xs btn-success" data-ng-click="approve(option.id)">Medtag</button>
         </div>
     </div>
 </div>

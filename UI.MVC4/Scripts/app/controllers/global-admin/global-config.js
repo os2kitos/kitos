@@ -75,10 +75,10 @@
         handler($scope, Restangular, 'OrganizationRole', 'OrganizationRoles');
     }]);
 
-    app.controller('globalConfig.ProjectCtrl', ['$rootScope', '$scope', 'Restangular', 'notify', function ($rootScope, $scope, Restangular, notify) {
+    app.controller('globalConfig.ProjectCtrl', ['$rootScope', '$scope', '$timeout', '$state', '$stateParams', 'Restangular', 'notify', function ($rootScope, $scope, $timeout, $state, $stateParams, Restangular, notify) {
         $rootScope.page.title = 'Global konfiguration';
         $rootScope.page.subnav = subnav;
-               
+
         var projectTypes = Restangular.all('ItProjectType');
         projectTypes.getList({nonsuggestions: true}).then(function (types) {
             $scope.projectTypes = types;

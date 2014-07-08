@@ -13,4 +13,10 @@
             </form>
         </div>
     </div>
+     <div class="panel-footer" data-ng-if="suggestions.length > 0">
+        <h3 class="panel-title">Forslag</h3>
+        <div data-ng-repeat="option in suggestions">
+            {{ option.name }} <button type="button" class="btn btn-xs btn-success" data-ng-click="approve(option.id)">Medtag</button>
+        </div>
+    </div>
 </div>
