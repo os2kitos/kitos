@@ -39,7 +39,7 @@ namespace UI.MVC4.Controllers.API
             } 
         }
 
-        public HttpResponseMessage GetByOrganization(int organizationId, [FromUri] PagingModel<ItSystemUsage> pagingModel )
+        public HttpResponseMessage GetByOrganization(int organizationId, [FromUri] PagingModel<ItSystemUsage> pagingModel)
         {
             try
             {

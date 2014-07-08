@@ -153,11 +153,12 @@
                 <div class="form-group">
                     <label for="overview" class="col-md-4 control-label small">Overblik</label>
                     <div class="col-md-8">
-                        <select id="overview" data-ng-options="a.id as a.name for a in itSystems"
-                                data-ng-disabled="!hasWriteAccess"
-                                data-ng-model="usage.overviewItSystemId" data-field="overviewItSystemId"
-                                data-autosave="api/itsystemusage/{{usageId}}" class="form-control input-sm">
-                        </select>
+                        <input type="hidden" id="overview" class="form-control input-sm" 
+                               data-ui-select2="itSytemUsagesSelectOptions" 
+                               data-ng-disabled="!hasWriteAccess" 
+                               data-ng-model="usage.overviewItSystemId" 
+                               data-autosave="api/itsystemusage/{{usageId}}"
+                               data-field="overviewItSystemId">
                     </div>
                 </div>
                 
