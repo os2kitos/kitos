@@ -444,8 +444,6 @@
     <Content Include="Partials\global-config\optionrolelist.html" />
     <Content Include="Partials\global-config\optionlist.html" />
     <Content Include="Partials\global-config\system.html" />
-    <Content Include="Partials\global-admin\new-global-admin.html" />
-    <Content Include="Partials\global-admin\new-local-admin.html" />
     <Content Include="Partials\global-config\contract.html" />
     <Content Include="Partials\global-config\org.html" />
     <Content Include="Partials\global-config\project.html" />
