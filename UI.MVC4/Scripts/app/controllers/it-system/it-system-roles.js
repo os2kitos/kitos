@@ -16,11 +16,11 @@
     }]);
 
     app.controller('system.EditRoles', ['$scope', '$http', 'notify', 'itSystemUsage', 'itSystemRoles', function ($scope, $http, notify, itSystemUsage, itSystemRoles) {
-
         var usageId = itSystemUsage.id;
 
         $scope.itSystemRoles = itSystemRoles;
         $scope.newRole = 1;
+        $scope.orgId = itSystemUsage.organizationId;
         
         $scope.rights = [];
         _.each(itSystemUsage.rights, function (right) {
