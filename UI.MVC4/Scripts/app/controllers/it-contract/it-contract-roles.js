@@ -23,9 +23,9 @@
 
     app.controller('contract.EditRolesCtrl', ['$scope', '$http', 'notify', 'contract', 'itContractRights', 'itContractRoles',
         function ($scope, $http, notify, contract, itContractRights, itContractRoles) {
-
             var contractId = contract.id;
-            
+            $scope.orgId = contract.organizationId;
+
             //normal user roles
             $scope.itContractRoles = itContractRoles;
             $scope.newRole = itContractRoles.length > 0 ? 1 : 0;
