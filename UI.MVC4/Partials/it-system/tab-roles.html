@@ -4,9 +4,7 @@
         <i class="glyphicon glyphicon-user"></i>
         Systemroller
 
-                        <a class="pull-right" data-ng-if="hasWriteAccess"
-                            data-ng-click="editRights = !editRights">Rediger
-                        </a>
+        <a class="pull-right" data-ng-click="editRights = !editRights" data-ng-show="hasWriteAccess">Rediger</a>
     </div>
     <table class="full-width table org-role-table">
         <thead>
@@ -27,7 +25,7 @@
                 <td>{{ right.role.name }}</td>
                 <td>{{ right.user.name }}</td>
                 <td>{{ right.user.email }}
-                    <div data-ng-show="editRights" class="pull-right" data-ng-if="hasWriteAccess">
+                    <div data-ng-show="editRights" class="pull-right">
                         <a data-ng-click="right.edit = true" class="btn btn-info btn-xs">
                             <i class="glyphicon glyphicon-pencil"></i>
                         </a>
