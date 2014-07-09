@@ -1,15 +1,13 @@
-﻿<div class="col-md-12">
-
-    <div class="col-md-4 container-fluid">
-        <h2>
-            Organisation
+﻿<div class="row">
+    <div class="col-md-4">
+        <h2>Organisation
             <span class="pull-right small" data-ng-hide="true || chosenOrgUnit.hasWriteAccess">Låst</span>
             <span class="pull-right small" data-ng-show="chosenOrgUnit.hasWriteAccess">
                 <a data-ng-click="editUnit(chosenOrgUnit)">Rediger 
                 </a>
             </span>
         </h2>
-        
+
         <div>
             <div data-ng-repeat="node in nodes" class="org-node-top">
                 <div data-ng-include="'partials/org/org-unit.html'"></div>
@@ -17,7 +15,7 @@
         </div>
     </div>
 
-    <div class="col-md-8 container-fluid">
+    <div class="col-md-8">
         <div class="row">
 
             <!-- if no org unit is selected, this is shown -->
@@ -41,11 +39,11 @@
                         <i class="glyphicon glyphicon-user"></i>
                         Organisationsroller
 
-                        <a class="pull-right" 
-                           data-ng-show="chosenOrgUnit.hasWriteAccess" 
+                        <a class="pull-right"
+                            data-ng-show="chosenOrgUnit.hasWriteAccess"
                             data-ng-click="chosenOrgUnit.editRights = !chosenOrgUnit.editRights">
                             <span data-ng-if="!chosenOrgUnit.editRights">Rediger</span>
-                            <span data-ng-if="chosenOrgUnit.editRights">Afslut rediger</span>                           
+                            <span data-ng-if="chosenOrgUnit.editRights">Afslut rediger</span>
                         </a>
                     </div>
                     <table class="full-width table org-role-table">
@@ -63,7 +61,7 @@
                         </thead>
                         <!-- for each right -->
                         <tbody data-ng-repeat="right in chosenOrgUnit.orgRights | filter : { show: true } | orderBy : rightSort : rightSortReverse">
-                            
+
                             <!-- show -->
                             <tr data-ng-hide="right.edit">
                                 <td>{{ orgUnits[right.objectId].name }}</td>
@@ -74,9 +72,9 @@
                                         <a data-ng-click="right.edit = true" class="btn btn-info btn-xs">
                                             <i class="glyphicon glyphicon-pencil"></i>
                                         </a>
-                                        <a class="btn btn-danger btn-xs" 
-                                           data-confirmed-click="deleteRight(right)" 
-                                           data-confirm-click="Er du sikker på at du vil fjerne denne rolle fra denne person? Du sletter ikke personen.">
+                                        <a class="btn btn-danger btn-xs"
+                                            data-confirmed-click="deleteRight(right)"
+                                            data-confirm-click="Er du sikker på at du vil fjerne denne rolle fra denne person? Du sletter ikke personen.">
                                             <i class="glyphicon glyphicon-trash"></i>
                                         </a>
                                     </div>
@@ -112,7 +110,7 @@
                                     <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en organisationsrolle" class="form-control input-sm" data-ng-change="submitRight()">
                                         <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.id}}">{{orgRole.name}} ({{orgRole.hasWriteAccess && "skriv" || "læs" }})
                                         </option>
-                                    </select>   
+                                    </select>
                                 </td>
                                 <td colspan="2" class="form-group">
                                     <input data-select-user="foo" data-user-model="selectedUser" data-add-user="true" />
@@ -121,10 +119,10 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <i class="glyphicon glyphicon-tasks"></i> 
+                        <i class="glyphicon glyphicon-tasks"></i>
                         Tilknyttede opgaver
                         <a class="pull-right" data-ng-show="chosenOrgUnit.hasWriteAccess" data-ng-click="changeTaskView()">
                             <span data-ng-if="!showAllTasks">Vis alle</span>
@@ -138,12 +136,12 @@
                         <thead>
                             <tr>
                                 <th>Valgt</th>
-                                <th class="col-md-2">
-                                    KLE ID
+                                <th class="col-md-2">KLE ID
                                     <button data-order-by="showAllTasks && 'taskKey' || 'taskRef.taskKey'" data-paging="pagination"></button>
                                 </th>
                                 <th class="col-md-9">KLE Navn
-                                    <button data-order-by="showAllTasks && 'description' || 'taskRef.description'" data-paging="pagination"></button></th>
+                                    <button data-order-by="showAllTasks && 'description' || 'taskRef.description'" data-paging="pagination"></button>
+                                </th>
                                 <th>Overblik</th>
                                 <th>Delegeret</th>
                             </tr>
@@ -152,7 +150,7 @@
                             <tr data-ng-repeat="task in taskRefUsageList">
                                 <!-- selected -->
                                 <td>
-                                    <input type="checkbox" id="{{task.taskRef.id}}" data-ng-checked="task.usage" data-ng-click="task.toggleUsage()" data-ng-disabled="!chosenOrgUnit.hasWriteAccess"/>
+                                    <input type="checkbox" id="{{task.taskRef.id}}" data-ng-checked="task.usage" data-ng-click="task.toggleUsage()" data-ng-disabled="!chosenOrgUnit.hasWriteAccess" />
                                 </td>
                                 <td>
                                     <label for="{{task.taskRef.id}}">{{task.taskRef.taskKey}}</label>
@@ -162,10 +160,10 @@
                                 </td>
                                 <td>
                                     <button class="btn btn-link btn-star" data-ng-if="task.usage"
-                                            data-ng-class="{'unstarred': !task.usage.starred}"
-                                            data-ng-click="task.toggleStar()"
-                                            data-ng-disabled="!chosenOrgUnit.hasWriteAccess"
-                                            data-tooltip="Vis under overblik?">
+                                        data-ng-class="{'unstarred': !task.usage.starred}"
+                                        data-ng-click="task.toggleStar()"
+                                        data-ng-disabled="!chosenOrgUnit.hasWriteAccess"
+                                        data-tooltip="Vis under overblik?">
                                         <i class="glyphicon glyphicon-star"></i>
                                     </button>
                                 </td>
@@ -193,9 +191,7 @@
                         </tfoot>
                     </table>
                 </div>
-            </div>              
+            </div>
         </div>
     </div>
 </div>
-
-
