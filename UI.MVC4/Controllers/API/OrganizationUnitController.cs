@@ -185,8 +185,6 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 var usageQuery = _taskUsageRepository.AsQueryable();
-
-                //pagingModel.OrderBy = "TaskRef.TaskKey";
                 pagingModel.Where(usage => usage.OrgUnitId == id);
 
                 var theUsages = Page(usageQuery, pagingModel).ToList();
