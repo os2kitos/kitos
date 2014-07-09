@@ -133,7 +133,7 @@
                         <!-- Intern contract signer -->
                         <div class="form-group">
                             <label for="contract-int-signer" class="control-label small">Kontraktunderskriver</label>
-                            <input id="contract-int-signer" data-select-user="foo" data-ng-disabled="!hasWriteAccess"
+                            <input id="contract-int-signer" data-select-user="bar" data-ng-disabled="!hasWriteAccess" data-org-id="{{ contract.organizationId }}"
                                     data-user-model="contractSigner.userForSelect" data-allow-clear="true" data-on-select="contractSigner.update()" />
                         </div>
                     </div>

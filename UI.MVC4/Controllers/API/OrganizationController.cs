@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
@@ -41,6 +43,29 @@ namespace UI.MVC4.Controllers.API
             {
                 return Error(e);
             }
+        }
+
+        /// <summary>
+        /// Gets all users from an organization matching the search criteria.
+        /// </summary>
+        /// <param name="q">Text search string</param>
+        /// <param name="orgId">Organization id</param>
+        /// <returns>All users from organization <see cref="orgId"/> which matched the search criteria <see cref="q"/></returns>
+        public HttpResponseMessage GetUsers(string q, int orgId)
+        {
+            try
+            {
+                var users =
+                    Repository.AsQueryable().Single(x => x.Id == orgId).OrgUnits.SelectMany(y => y.Rights)
+                              .Select(z => z.User)
+                              .Where(u => u.Name.Contains(q) || u.Email.Contains(q));
+
+                return Ok(Map<IEnumerable<User>, IEnumerable<UserDTO>>(users));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }            
         }
 
         protected override Organization PostQuery(Organization item)

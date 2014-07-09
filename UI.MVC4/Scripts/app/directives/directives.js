@@ -116,7 +116,8 @@
                     addUser: '@?',
                     allowClear: '@?',
                     onSelect: '&?',
-                    ngDisabled: '=?'
+                    ngDisabled: '=?',
+                    orgId: '@?'
                 },
                 replace: true,
                 templateUrl: 'partials/directives/select-user.html',
@@ -133,6 +134,8 @@
                             //timeout, otherwise we get the bad version of the model.
                             $timeout($scope.onSelect);
                         };
+
+                        var userSrc = typeof $scope.orgId !== 'undefined' ? 'api/organization?orgId=' + $scope.orgId + '&q=' : 'api/user?q=';
 
                         $scope.selectUserOptions = {
 
@@ -152,7 +155,7 @@
                                 },
                                 quietMillis: 500,
                                 transport: function (queryParams) {
-                                    var res = $http.get('api/user?q=' + queryParams.data.query).then(queryParams.success);
+                                    var res = $http.get(userSrc + queryParams.data.query).then(queryParams.success);
                                     res.abort = function () {
                                         return null;
                                     };
