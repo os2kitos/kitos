@@ -459,10 +459,13 @@
 
             $scope.$watchCollection('pagination', loadTasks);
 
+            // default kle sort order
+            $scope.pagination.orderBy = 'taskRef.taskKey';
+
             //change between show all tasks and only show active tasks
             $scope.changeTaskView = function() {
                 $scope.showAllTasks = !$scope.showAllTasks;
-                $scope.pagination.orderBy = null;
+                $scope.pagination.orderBy = $scope.showAllTasks ? 'taskKey' : 'taskRef.taskKey';
                 $scope.pagination.skip = 0;
                 loadTasks();
             };
