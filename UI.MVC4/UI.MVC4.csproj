@@ -424,7 +424,6 @@
     <Content Include="Content\themes\base\minified\jquery.ui.slider.min.css" />
     <Content Include="Content\themes\base\minified\jquery.ui.tabs.min.css" />
     <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
-    <Content Include="Content\xeditable.css" />
     <Content Include="favicon.ico" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -445,8 +444,6 @@
     <Content Include="Partials\global-config\optionrolelist.html" />
     <Content Include="Partials\global-config\optionlist.html" />
     <Content Include="Partials\global-config\system.html" />
-    <Content Include="Partials\global-admin\new-global-admin.html" />
-    <Content Include="Partials\global-admin\new-local-admin.html" />
     <Content Include="Partials\global-config\contract.html" />
     <Content Include="Partials\global-config\org.html" />
     <Content Include="Partials\global-config\project.html" />
@@ -948,7 +945,6 @@
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
-    <None Include="Content\Site.oldcss" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Images\accent.png" />
     <Content Include="Images\bullet.png" />

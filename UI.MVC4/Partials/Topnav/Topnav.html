@@ -1,16 +1,14 @@
-﻿<div class="navbar-wrapper">
-    <div class="container-fluid">
-        <nav id="navbar-top" class="navbar navbar-inverse navbar-static-top" role="navigation">
-            <div class="container-fluid">
+﻿<div>
+    <nav id="navbar-top" class="navbar navbar-inverse navbar-static-top" role="navigation">
+        <div class="container-fluid">
                 
-                <div class="navbar-header">
-                    <a class="navbar-brand" data-ui-sref="index">KIT<span class="light-blue">OS</span></a>
-                </div>
-                
-                <div data-ng-if="user.isAuth">
-                    <div data-ng-include="'partials/topnav/authorized.html'"></div>
-                </div>
+            <div class="navbar-header">
+                <a class="navbar-brand" data-ui-sref="index"><b>KIT<span class="light-blue">OS</span></b></a>
             </div>
-        </nav>
-    </div>
+                
+            <div data-ng-if="user.isAuth">
+                <div data-ng-include="'partials/topnav/authorized.html'"></div>
+            </div>
+        </div>
+    </nav>
 </div>
