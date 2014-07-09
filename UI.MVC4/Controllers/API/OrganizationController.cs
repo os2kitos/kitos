@@ -56,12 +56,9 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 var users =
-                Repository.AsQueryable()
-                          .SelectMany(
-                              x =>
-                              x.OrgUnits.SelectMany(y => y.Rights)
-                               .Select(z => z.User)
-                               .Where(u => u.Name.Contains(q) || u.Email.Contains(q)));
+                    Repository.AsQueryable().Single(x => x.Id == orgId).OrgUnits.SelectMany(y => y.Rights)
+                              .Select(z => z.User)
+                              .Where(u => u.Name.Contains(q) || u.Email.Contains(q));
 
                 return Ok(Map<IEnumerable<User>, IEnumerable<UserDTO>>(users));
             }
