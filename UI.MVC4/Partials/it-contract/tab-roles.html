@@ -80,7 +80,7 @@
             <!-- edit -->
             <tr data-ng-show="right.edit">
                 <td>
-                    <select data-ui-select2="" name="selectRole" data-ng-model="right.roleForSelect" class="form-control input-sm" >
+                    <select data-ui-select2="" name="selectRole" data-ng-model="right.roleForSelect" class="form-control input-sm">
                         <option data-ng-repeat="contractRole in itContractRoles" value="{{contractRole.id}}">{{contractRole.name}} ({{contractRole.hasWriteAccess && "skriv" || "læs" }})
                         </option>
                     </select>

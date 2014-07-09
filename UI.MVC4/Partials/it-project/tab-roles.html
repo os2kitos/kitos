@@ -47,7 +47,7 @@
                     </select>
                 </td>
                 <td colspan="2" class="relative-position">
-                    <input data-select-user="foo" data-user-model="right.userForSelect" />
+                    <input data-select-user="foo" data-org-id="{{ orgId }}" data-user-model="right.userForSelect" />
                     <div class="pull-outside-table">
                         <input type="submit" class="btn btn-success btn-sm" data-ng-click="updateRight(right)" value="Gem" />
                     </div>
@@ -66,7 +66,7 @@
                     </select>
                 </td>
                 <td colspan="2" class="form-group">
-                    <input data-select-user="foo" data-user-model="selectedUser" />
+                    <input data-select-user="foo" data-org-id="{{ orgId }}" data-user-model="selectedUser" />
                 </td>
             </tr>
         </tbody>
