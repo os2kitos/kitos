@@ -106,8 +106,14 @@
                     }
                 }
 
-                $scope.saveProcurement = function() {
-                    var payload = { procurementPlanHalf: $scope.contract.procurementPlan.half, procurementPlanYear: $scope.contract.procurementPlan.year };
+                $scope.saveProcurement = function () {
+                    var payload;
+                    // if null the value has been unset
+                    if ($scope.contract.procurementPlan === null) {
+                        payload = { procurementPlanHalf: null, procurementPlanYear: null };
+                    } else {
+                        payload = { procurementPlanHalf: $scope.contract.procurementPlan.half, procurementPlanYear: $scope.contract.procurementPlan.year };
+                    }
                     patch(payload, $scope.autoSaveUrl);
                 };
 
