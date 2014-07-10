@@ -137,7 +137,7 @@ namespace UI.MVC4.Controllers.API
                 {
                     //this is not so good performance wise
                     var orgUnitQueryable = Repository.AsQueryable().Where(unit => unit.Id == id);
-                    taskQuery = orgUnitQueryable.SelectMany(u => u.Parent.TaskUsages.Select(usage => usage.TaskRef));
+                    taskQuery = orgUnitQueryable.SelectMany(u => u.Parent.TaskUsages.Select(usage => usage.TaskRef).Where(x => x.AccessModifier == AccessModifier.Public)); // TODO add support for normal
 
                     //it would have been better with:
                     //pagingModel.Where(taskRef => taskRef.Usages.Any(usage => usage.OrgUnitId == orgUnit.ParentId));
@@ -145,11 +145,11 @@ namespace UI.MVC4.Controllers.API
                 }
                 else
                 {
-                    taskQuery = _taskRepository.AsQueryable();
+                    taskQuery = _taskRepository.AsQueryable().Where(x => x.AccessModifier == AccessModifier.Public); // TODO add support for normal
                 }
 
                 //if a task group is given, only find the tasks in that group
-                if (taskGroup.HasValue) pagingModel.Where(taskRef => taskRef.ParentId.Value == taskGroup.Value);
+                if (taskGroup.HasValue) pagingModel.Where(taskRef => taskRef.ParentId.Value == taskGroup.Value && taskRef.AccessModifier == AccessModifier.Public); // TODO add support for normal
                 else pagingModel.Where(taskRef => taskRef.Children.Count == 0);
 
                 var theTasks = Page(taskQuery, pagingModel).ToList();
