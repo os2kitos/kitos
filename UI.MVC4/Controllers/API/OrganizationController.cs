@@ -49,18 +49,19 @@ namespace UI.MVC4.Controllers.API
         /// Gets all users from an organization matching the search criteria.
         /// </summary>
         /// <param name="q">Text search string</param>
-        /// <param name="orgId">Organization id</param>
-        /// <returns>All users from organization <see cref="orgId"/> which matched the search criteria <see cref="q"/></returns>
-        public HttpResponseMessage GetUsers(string q, int orgId)
+        /// <param name="id">Organization id</param>
+        /// <param name="users">Route identifier</param>
+        /// <returns>All users from organization <see cref="id"/> which matched the search criteria <see cref="q"/></returns>
+        public HttpResponseMessage GetUsers(int id, string q, bool? users)
         {
             try
             {
-                var users =
-                    Repository.AsQueryable().Single(x => x.Id == orgId).OrgUnits.SelectMany(y => y.Rights)
+                var qry =
+                    Repository.AsQueryable().Single(x => x.Id == id).OrgUnits.SelectMany(y => y.Rights)
                               .Select(z => z.User)
                               .Where(u => u.Name.Contains(q) || u.Email.Contains(q));
 
-                return Ok(Map<IEnumerable<User>, IEnumerable<UserDTO>>(users));
+                return Ok(Map<IEnumerable<User>, IEnumerable<UserDTO>>(qry));
             }
             catch (Exception e)
             {
