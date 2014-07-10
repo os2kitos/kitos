@@ -5,13 +5,6 @@
             templateUrl: 'partials/it-project/tab-itsys.html',
             controller: 'project.EditItsysCtrl',
             resolve: {
-                // re-resolve data from parent cause changes here wont cascade to it
-                project: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itproject/" + $stateParams.id)
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }],
                 user: ['userService', function (userService) {
                     return userService.getUser();
                 }]
@@ -20,14 +13,15 @@
     }]);
 
     app.controller('project.EditItsysCtrl',
-    ['$scope', '$http', '$stateParams', 'user', 'notify', 'project',
-        function ($scope, $http, $stateParams, user, notify, project) {
+    ['$scope', '$http', '$timeout', '$state', '$stateParams', 'user', 'notify', 'project',
+        function ($scope, $http, $timeout, $state, $stateParams, user, notify, project) {
             $scope.systemUsages = project.itSystems;
 
             $scope.save = function () {
                 $http.post('api/itproject/' + project.id + '?usageId=' + $scope.selectedSystemUsage.id)
                     .success(function () {
                         notify.addSuccessMessage("Systemet er tilknyttet.");
+                        reload();
                     })
                     .error(function () {
                         notify.addErrorMessage("Fejl! Kunne ikke tilknytte systemet!");
@@ -38,10 +32,24 @@
                 $http.delete('api/itproject/' + project.id + '?usageId=' + usageId)
                     .success(function() {
                         notify.addSuccessMessage("Systemets tilknyttning er fjernet.");
+                        reload();
                     })
                     .error(function() {
                         notify.addErrorMessage("Fejl! Kunne ikke fjerne systemets tilknyttning!");
                     });
+            };
+
+            // work around for $state.reload() not updating scope
+            // https://github.com/angular-ui/ui-router/issues/582
+            function reload() {
+                return $state.transitionTo($state.current, $stateParams, {
+                    reload: true
+                }).then(function () {
+                    $scope.hideContent = true;
+                    return $timeout(function () {
+                        return $scope.hideContent = false;
+                    }, 1);
+                });
             };
 
             //select2 options for looking up it system usages
