@@ -43,7 +43,7 @@ namespace Infrastructure.DataAccess.Migrations
                         TaskKey = taskKey,
                         OwnedByOrganizationUnit = orgUnitOwner,
                         ObjectOwner = objectOwner,
-                        IsPublic = true,
+                        AccessModifier = AccessModifier.Public,
                         Parent = parent
                     });
             }

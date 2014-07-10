@@ -8,7 +8,7 @@ namespace Core.DomainModel
     /// Represents a task (such as KLE), which can be associated
     /// with Systems, Projects or Organization Units.
     /// </summary>
-    public class TaskRef : Entity, IHierarchy<TaskRef>
+    public class TaskRef : Entity, IHierarchy<TaskRef>, IHasAccessModifier
     {
         public TaskRef()
         {
@@ -18,7 +18,13 @@ namespace Core.DomainModel
             this.ItProjects = new List<ItProject.ItProject>();
         }
         
-        public bool IsPublic { get; set; }
+        /// <summary>
+        /// Gets or sets the access modifier.
+        /// </summary>
+        /// <value>
+        /// The access modifier.
+        /// </value>
+        public AccessModifier AccessModifier { get; set; }
 
         /// <summary>
         /// Global ID

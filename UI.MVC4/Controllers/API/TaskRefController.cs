@@ -15,28 +15,28 @@ namespace UI.MVC4.Controllers.API
 
         public HttpResponseMessage GetRootsByOrgUnit(int orgUnitId, bool? roots, [FromUri] PagingModel<TaskRef> paging)
         {
-            paging.Where(taskRef => taskRef.OwnedByOrganizationUnitId == orgUnitId || taskRef.IsPublic);
+            paging.Where(taskRef => taskRef.OwnedByOrganizationUnitId == orgUnitId || taskRef.AccessModifier == AccessModifier.Public);
 
             return base.GetRoots(true, paging);
         }
 
         public HttpResponseMessage GetChildrenByOrgUnit(int id, int orgUnitId, bool? children, [FromUri] PagingModel<TaskRef> paging)
         {
-            paging.Where(taskRef => taskRef.OwnedByOrganizationUnitId == orgUnitId || taskRef.IsPublic);
+            paging.Where(taskRef => taskRef.OwnedByOrganizationUnitId == orgUnitId || taskRef.AccessModifier == AccessModifier.Public);
 
             return base.GetChildren(id, true, paging);
         }
 
         public HttpResponseMessage GetRootsByOrg(int orgId, bool? roots, [FromUri] PagingModel<TaskRef> paging)
         {
-            paging.Where(taskRef => taskRef.OwnedByOrganizationUnit.OrganizationId == orgId || taskRef.IsPublic);
+            paging.Where(taskRef => taskRef.OwnedByOrganizationUnit.OrganizationId == orgId || taskRef.AccessModifier == AccessModifier.Public);
 
             return base.GetRoots(true, paging);
         }
 
         public HttpResponseMessage GetChildrenByOrg(int id, int orgId, bool? children, [FromUri] PagingModel<TaskRef> paging)
         {
-            paging.Where(taskRef => taskRef.OwnedByOrganizationUnit.OrganizationId == orgId || taskRef.IsPublic);
+            paging.Where(taskRef => taskRef.OwnedByOrganizationUnit.OrganizationId == orgId || taskRef.AccessModifier == AccessModifier.Public);
 
             return base.GetChildren(id, true, paging);
         }
