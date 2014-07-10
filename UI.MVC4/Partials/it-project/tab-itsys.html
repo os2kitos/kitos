@@ -1,6 +1,32 @@
-﻿<div class="checkbox" data-ng-repeat="usage in itSystemUsages">
-    <label>
-        <input type="checkbox" data-ng-model="usage.selected" data-ng-change="save(usage)"  data-ng-disabled="!hasWriteAccess">
-        <a data-ui-sref="it-system.usage.interfaces({ id: usage.itSystem.id })">{{ usage.itSystem.name }}</a>
-    </label>
+﻿<div class="panel panel-default">
+    <div class="panel-heading">Projektet vedrører følgende IT systemer</div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>IT System</th>
+                <th>Applikationstype</th>
+                <th><!-- edit ctrl --></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="usage in systemUsages">
+                <td><a data-ui-sref="it-system.usage.interfaces({ id: usage.id })">{{ usage.name }}</a></td>
+                <td>{{ usage.appTypeName }}</td>
+                <td class="text-right">
+                    <button type="button" class="btn btn-danger btn-xs" data-confirmed-click="delete({{ usage.id }})" data-confirm-click="Er du sikker på at du vil slette tilknytningen?" data-ng-show="hasWriteAccess">
+                        <i class="glyphicon glyphicon-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot data-ng-show="hasWriteAccess">
+            <tr>
+                <td colspan="3">
+                    <input type="hidden" data-ui-select2="itSystemUsagesSelectOptions"
+                           data-ng-model="selectedSystemUsage" class="form-control input-sm" data-ng-change="save()"
+                           data-placeholder="Vælg IT system" />
+                </td>
+            </tr>
+        </tfoot>
+    </table>
 </div>

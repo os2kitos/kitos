@@ -71,7 +71,6 @@
             function formatAssociatedInterfaces(associatedInterfaceUsages, associatedInterfaceExposures) {
                 
                 function patchContractId(associatedInterface, contractId) {
-                    console.log(associatedInterface);
                     return $http({
                         method: 'PATCH',
                         url: associatedInterface.baseUrl + associatedInterface.id,

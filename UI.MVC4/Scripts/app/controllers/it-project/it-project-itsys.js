@@ -12,39 +12,75 @@
                             return result.data.response;
                         });
                 }],
-                selectedItSystemIds: ['project', function (itProject) {
-                    return _.pluck(itProject.itSystems, 'id');
-                }],
-                itSystemUsages: ['$http', 'project', function ($http, project) {
-                    return $http.get('api/itsystemusage/?organizationId=' + project.organizationId)
-                        .then(function (result) {
-                            return result.data.response;
-                        });
+                user: ['userService', function (userService) {
+                    return userService.getUser();
                 }]
             }
         });
     }]);
 
     app.controller('project.EditItsysCtrl',
-    ['$scope', '$http', '$stateParams', 'selectedItSystemIds', 'itSystemUsages',
-        function ($scope, $http, $stateParams, selectedItSystemIds, itSystemUsages) {
-            $scope.itSystemUsages = itSystemUsages;
+    ['$scope', '$http', '$stateParams', 'user', 'notify', 'project',
+        function ($scope, $http, $stateParams, user, notify, project) {
+            $scope.systemUsages = project.itSystems;
 
-            _.each(selectedItSystemIds, function (id) {
-                var found = _.find($scope.itSystemUsages, function (usage) {
-                    return usage.itSystemId == id;
-                });
-                if (found) {
-                    found.selected = true;
-                }
-            });
+            $scope.save = function () {
+                $http.post('api/itproject/' + project.id + '?usageId=' + $scope.selectedSystemUsage.id)
+                    .success(function () {
+                        notify.addSuccessMessage("Systemet er tilknyttet.");
+                    })
+                    .error(function () {
+                        notify.addErrorMessage("Fejl! Kunne ikke tilknytte systemet!");
+                    });
+            };
 
-            var projectId = $stateParams.id;
-            $scope.save = function(usage) {
-                if (usage.selected) {
-                    $http.post('api/itproject/' + projectId + '?usageId=' + usage.id);
-                } else {
-                    $http.delete('api/itproject/' + projectId + '?usageId=' + usage.id);
+            $scope.delete = function(usageId) {
+                $http.delete('api/itproject/' + project.id + '?usageId=' + usageId)
+                    .success(function() {
+                        notify.addSuccessMessage("Systemets tilknyttning er fjernet.");
+                    })
+                    .error(function() {
+                        notify.addErrorMessage("Fejl! Kunne ikke fjerne systemets tilknyttning!");
+                    });
+            };
+
+            //select2 options for looking up it system usages
+            $scope.itSystemUsagesSelectOptions = {
+                minimumInputLength: 1,
+                initSelection: function (elem, callback) {
+                },
+                ajax: {
+                    data: function (term, page) {
+                        return { query: term };
+                    },
+                    quietMillis: 500,
+                    transport: function (queryParams) {
+                        var res = $http.get('api/itSystemUsage?organizationId=' + user.currentOrganizationId + '&q=' + queryParams.data.query).then(queryParams.success);
+                        res.abort = function () {
+                            return null;
+                        };
+
+                        return res;
+                    },
+
+                    results: function (data, page) {
+                        var results = [];
+
+                        //for each system usages
+                        _.each(data.data.response, function (usage) {
+
+                            results.push({
+                                //the id of the system usage is the id, that is selected
+                                id: usage.id,
+                                //but the name of the system is the label for the select2
+                                text: usage.itSystem.name,
+                                //saving the usage for later use
+                                usage: usage
+                            });
+                        });
+
+                        return { results: results };
+                    }
                 }
             };
         }]);
