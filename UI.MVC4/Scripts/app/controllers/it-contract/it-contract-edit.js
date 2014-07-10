@@ -75,13 +75,13 @@
                 $scope.procurementStrategies = procurementStrategies;
                 $scope.orgUnits = orgUnits;
                 $scope.contracts = contracts;
-                $scope.agreementElements = agreementElements
+                $scope.agreementElements = agreementElements;
                 $scope.selectedAgreementElements = _.pluck(contract.agreementElements, 'id');
 
                 $scope.procurementPlans = [];
                 var currentDate = moment();
                 for (var i = 0; i < 20; i++) {
-                    var half = Math.ceil(currentDate.month() / 6); // calcs 1 for the first 6 months, 2 for the rest
+                    var half = Math.ceil(currentDate.month() / 6) + 1; // calcs 1 for the first 6 months, 2 for the rest
                     var year = currentDate.year();
                     var obj = { half: half, year: year };
                     $scope.procurementPlans.push(obj);
@@ -98,11 +98,22 @@
                     $scope.contract.procurementPlan = foundPlan;
                 } else {
                     // plan is not found, add missing plan to begining of list
-                    $scope.procurementPlans.unshift({ half: contract.procurementPlanHalf, year: contract.procurementPlanYear });
+                    // if not null
+                    if (contract.procurementPlanHalf != null) {
+                        var plan = { half: contract.procurementPlanHalf, year: contract.procurementPlanYear };
+                        $scope.procurementPlans.unshift(plan); // add to list
+                        $scope.contract.procurementPlan = plan; // select it
+                    }
                 }
 
-                $scope.saveProcurement = function() {
-                    var payload = { procurementPlanHalf: $scope.contract.procurementPlan.half, procurementPlanYear: $scope.contract.procurementPlan.year };
+                $scope.saveProcurement = function () {
+                    var payload;
+                    // if null the value has been unset
+                    if ($scope.contract.procurementPlan === null) {
+                        payload = { procurementPlanHalf: null, procurementPlanYear: null };
+                    } else {
+                        payload = { procurementPlanHalf: $scope.contract.procurementPlan.half, procurementPlanYear: $scope.contract.procurementPlan.year };
+                    }
                     patch(payload, $scope.autoSaveUrl);
                 };
 
