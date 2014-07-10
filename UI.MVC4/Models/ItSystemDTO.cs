@@ -34,6 +34,7 @@ namespace UI.MVC4.Models
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
 
         public int? AppTypeId { get; set; }
+        public string AppTypeName { get; set; }
         public int? BusinessTypeId { get; set; }
 
         public int? InterfaceId { get; set; }
