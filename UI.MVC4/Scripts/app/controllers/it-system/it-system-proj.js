@@ -5,40 +5,84 @@
             templateUrl: 'partials/it-system/tab-proj.html',
             controller: 'system.EditProjCtrl',
             resolve: {
-                selectedItProjects: ['$http', '$stateParams', 'itSystemUsage', function ($http, $stateParams, itSystemUsage) {
-                    return $http.get('api/itproject/?orgId=' + itSystemUsage.organizationId + '&usageId=' + $stateParams.id)
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }],
-                itProjects: ['$http', 'itSystemUsage', function ($http, itSystemUsage) {
-                    return $http.get('api/itproject/?orgId=' + itSystemUsage.organizationId + '&itProjects=true')
-                        .then(function (result) {
-                            return result.data.response;
-                        });
+                user: ['userService', function (userService) {
+                    return userService.getUser();
                 }]
             }
         });
     }]);
 
-    app.controller('system.EditProjCtrl', ['$scope', '$http', '$stateParams', 'selectedItProjects', 'itProjects', function ($scope, $http, $stateParams, selectedItProjects, itProjects) {
-        $scope.itProjects = itProjects;
-
-        _.each(selectedItProjects, function (obj) {
-            var found = _.find($scope.itProjects, function (project) {
-                return project.id == obj.id;
-            });
-            if (found) {
-                found.selected = true;
-            }
-        });
+    app.controller('system.EditProjCtrl', ['$scope', '$http', '$timeout', '$state', '$stateParams', 'notify', 'itSystemUsage', 'user', function ($scope, $http, $timeout, $state, $stateParams, notify, itSystemUsage, user) {
+        $scope.itProjects = itSystemUsage.itProjects;
 
         var usageId = $stateParams.id;
-        $scope.save = function (itProject) {
-            if (itProject.selected) {
-                $http.post('api/itproject/' + itProject.id + '?usageId=' + usageId);
-            } else {
-                $http.delete('api/itproject/' + itProject.id + '?usageId=' + usageId);
+        $scope.save = function () {
+            $http.post('api/itproject/' + $scope.selectedProject.id + '?usageId=' + usageId)
+                .success(function () {
+                    notify.addSuccessMessage("Projektet er tilknyttet.");
+                    reload();
+                })
+                .error(function () {
+                    notify.addErrorMessage("Fejl! Kunne ikke tilknytte projektet!");
+                });
+        };
+
+        $scope.delete = function(projectId) {
+            $http.delete('api/itproject/' + projectId + '?usageId=' + usageId)
+                .success(function() {
+                    notify.addSuccessMessage("Projektets tilknyttning er fjernet.");
+                    reload();
+                })
+                .error(function() {
+                    notify.addErrorMessage("Fejl! Kunne ikke fjerne projektets tilknyttning!");
+                });
+        };
+
+        // work around for $state.reload() not updating scope
+        // https://github.com/angular-ui/ui-router/issues/582
+        function reload() {
+            return $state.transitionTo($state.current, $stateParams, {
+                reload: true
+            }).then(function () {
+                $scope.hideContent = true;
+                return $timeout(function () {
+                    return $scope.hideContent = false;
+                }, 1);
+            });
+        };
+
+        //select2 options for looking up it system usages
+        $scope.itProjectsSelectOptions = {
+            minimumInputLength: 1,
+            initSelection: function (elem, callback) {
+            },
+            ajax: {
+                data: function (term, page) {
+                    return { query: term };
+                },
+                quietMillis: 500,
+                transport: function (queryParams) {
+                    var res = $http.get('api/itProject?orgId=' + user.currentOrganizationId + '&q=' + queryParams.data.query).then(queryParams.success);
+                    res.abort = function () {
+                        return null;
+                    };
+
+                    return res;
+                },
+
+                results: function (data, page) {
+                    var results = [];
+                    //for each system usages
+                    _.each(data.data.response, function (project) {
+                        results.push({
+                            //the id of the system usage is the id, that is selected
+                            id: project.id,
+                            //but the name of the system is the label for the select2
+                            text: project.name
+                        });
+                    });
+                    return { results: results };
+                }
             }
         };
     }]);
