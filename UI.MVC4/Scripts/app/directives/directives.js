@@ -135,7 +135,7 @@
                             $timeout($scope.onSelect);
                         };
 
-                        var userSrc = typeof $scope.orgId !== 'undefined' ? 'api/organization?orgId=' + $scope.orgId + '&q=' : 'api/user?q=';
+                        var userSrc = typeof $scope.orgId !== 'undefined' ? 'api/organization/' + $scope.orgId + '?users&q=' : 'api/user?q=';
 
                         $scope.selectUserOptions = {
 
