@@ -160,8 +160,9 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 var item = Repository.GetByKey(id);
+                if (item == null) return NotFound();
                 if (!HasWriteAccess(item)) return Unauthorized();
-
+                
                 var itemType = item.GetType();
                 // get name of mapped property
                 var map = AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>().GetPropertyMaps();
