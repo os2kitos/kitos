@@ -11,7 +11,7 @@ namespace Core.DomainModel.ItSystem
         /// <value>
         ///   <c>true</c> if this instance is public; otherwise, <c>false</c>.
         /// </value>
-        public bool IsPublic { get; set; }
+        public bool IsPublic { get; set; } // TODO shouldn't this be IHasAccessModifier
         /// <summary>
         /// Gets or sets the wish text.
         /// </summary>
