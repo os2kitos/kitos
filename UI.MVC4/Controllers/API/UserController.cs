@@ -5,7 +5,6 @@ using System.Net.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 using UI.MVC4.Models;
-using UI.MVC4.Models.Exceptions;
 
 namespace UI.MVC4.Controllers.API
 {
@@ -31,6 +30,7 @@ namespace UI.MVC4.Controllers.API
                 var item = Map(dto);
 
                 item.ObjectOwner = KitosUser;
+                item.LastChangedByUser = KitosUser;
 
                 _userService.AddUser(item);
 

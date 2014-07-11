@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainServices;
@@ -17,14 +16,16 @@ namespace Core.ApplicationServices
             _adminRoles = adminRoles;
         }
 
-        public AdminRight MakeLocalAdmin(User user, Organization organization)
+        public AdminRight MakeLocalAdmin(User user, Organization organization, User kitosUser)
         {
             var result = _adminRights.Insert(new AdminRight
                 {
                     Object = organization,
                     User = user,
-                    Role = GetLocalAdminRole()
+                    Role = GetLocalAdminRole(),
+                    LastChangedByUser = kitosUser
                 });
+            // TODO update related objects, like the user and organization. Missing support for it right now.
             _adminRights.Save();
 
             return result;

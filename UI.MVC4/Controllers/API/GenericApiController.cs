@@ -93,6 +93,7 @@ namespace UI.MVC4.Controllers.API
                 var item = Map<TDto, TModel>(dto);
 
                 item.ObjectOwner = KitosUser;
+                item.LastChangedByUser = KitosUser;
 
                 PostQuery(item);
 
@@ -213,6 +214,9 @@ namespace UI.MVC4.Controllers.API
                     }
                 }
                 
+                item.LastChanged = new DateTime();
+                item.LastChangedByUser = KitosUser;
+
                 PatchQuery(item);
                 return Ok(Map(item));
             }

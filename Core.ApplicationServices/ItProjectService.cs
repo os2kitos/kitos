@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
@@ -66,7 +67,8 @@ namespace Core.ApplicationServices
         public ItProject CloneProject(ItProject original, User newOwner, int newOrgId)
         {
             var clone = _projectRepository.Create();
-            
+            clone.LastChangedByUser = newOwner;
+
             clone.OrganizationId = newOrgId;
             clone.ObjectOwner = newOwner;
             clone.OriginalId = original.Id;
@@ -82,7 +84,8 @@ namespace Core.ApplicationServices
            // TODO clone actual data
             clone.Handover = new Handover()
                 {
-                    ObjectOwner = newOwner
+                    ObjectOwner = newOwner,
+                    LastChangedByUser = newOwner
                 };
 
             // TODO ParentId = project.ParentId,
@@ -105,7 +108,8 @@ namespace Core.ApplicationServices
                 //TODO: clone this instead of creating new
             clone.GoalStatus = new GoalStatus()
                 {
-                    ObjectOwner = newOwner
+                    ObjectOwner = newOwner,
+                    LastChangedByUser = newOwner
                 };
 
             ClonePhases(original, clone);
@@ -120,7 +124,7 @@ namespace Core.ApplicationServices
         public void DeleteProject(ItProject project)
         {
             //Remove reference to this project in cloned projects
-            project.Clones.Select(clone => clone.Original = null);
+            project.Clones.Select(clone => clone.Original = null); // TODO what's going on here?
             _projectRepository.Save();
             
             var phase1Id = project.Phase1.Id;

@@ -1,4 +1,6 @@
-﻿namespace Core.DomainModel
+﻿using System;
+
+namespace Core.DomainModel
 {
     /// <summary>
     /// Base entity class.
@@ -6,6 +8,12 @@
     /// </summary>
     public abstract class Entity
     {
+        protected Entity()
+        {
+            // instance creation time
+            LastChanged = new DateTime();
+        }
+
         /// <summary>
         /// Gets or sets the primary identifier.
         /// </summary>
@@ -40,5 +48,22 @@
         {
             return ObjectOwnerId == user.Id || user.IsGlobalAdmin;
         }
+
+        /// <summary>
+        /// Gets or sets the DateTime of when the last change occurred to this instance.
+        /// </summary>
+        /// <value>
+        /// Datetime of when thethe last change occurred.
+        /// </value>
+        public DateTime LastChanged { get; set; }
+
+        public int LastChangedByUserId { get; set; }
+        /// <summary>
+        /// Gets or sets the User which made the most recent change to this instance.
+        /// </summary>
+        /// <value>
+        /// The last User which made changes to this instance.
+        /// </value>
+        public virtual User LastChangedByUser { get; set; }
     }
 }

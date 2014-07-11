@@ -69,6 +69,8 @@ namespace UI.MVC4.Controllers.API
                 var right = AutoMapper.Mapper.Map<RightInputDTO, TRight>(dto);
                 right.ObjectId = id;
                 right.ObjectOwner = KitosUser;
+                right.LastChangedByUser = KitosUser;
+                right.LastChanged = new DateTime();
 
                 right = RightRepository.Insert(right);
                 RightRepository.Save();

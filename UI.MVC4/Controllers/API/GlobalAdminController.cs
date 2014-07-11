@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
-using System.Net.Mail;
 using System.Web.Http;
-using Core.DomainModel;
-using Core.DomainServices;
 using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
@@ -13,13 +9,6 @@ namespace UI.MVC4.Controllers.API
     //TODO refactor this into AdminRightsController
     public class GlobalAdminController : BaseApiController
     {
-        private readonly IAdminService _adminService;
-
-        public GlobalAdminController(IAdminService adminService)
-        {
-            _adminService = adminService;
-        }
-
         public HttpResponseMessage Get()
         {
             try
@@ -51,6 +40,8 @@ namespace UI.MVC4.Controllers.API
                 if (user.IsGlobalAdmin) return Conflict(user.Name + " is already global admin");
 
                 user.IsGlobalAdmin = true;
+                user.LastChanged = new DateTime();
+                user.LastChangedByUser = KitosUser;
                 UserRepository.Save();
 
                 var outDto = AutoMapper.Mapper.Map<UserDTO>(user);
@@ -85,30 +76,5 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
         }
-
-        //private readonly IUserService _userService;
-
-        //public GlobalAdminController(IUserService userService)
-        //{
-        //    _userService = userService;
-        //}
-
-        //public HttpResponseMessage Post(CreateGlobalAdminDTO item)
-        //{
-        //    try
-        //    {
-        //        var user = UserRepository.GetByKey(item.UserId);
-
-        //        user.IsGlobalAdmin = true;
-
-        //        UserRepository.Save();
-
-        //        return Created(AutoMapper.Mapper.Map<User, UserDTO>(user), new Uri(Request.RequestUri + "/" + user.Id));
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return Error(e);
-        //    }
-        //}
     }
 }

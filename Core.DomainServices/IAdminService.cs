@@ -5,7 +5,7 @@ namespace Core.DomainServices
 {
     public interface IAdminService
     {
-        AdminRight MakeLocalAdmin(User user, Organization organization);
+        AdminRight MakeLocalAdmin(User user, Organization organization, User kitosUser);
         void RemoveLocalAdmin(User user, Organization organization);
 
         bool IsGlobalAdmin(User user);

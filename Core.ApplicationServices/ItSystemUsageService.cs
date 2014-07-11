@@ -27,7 +27,8 @@ namespace Core.ApplicationServices
                 {
                     ItSystemId = systemId,
                     OrganizationId = orgId,
-                    ObjectOwner = objectOwner
+                    ObjectOwner = objectOwner,
+                    LastChangedByUser = objectOwner
                 };
 
             var system = _systemRepository.GetByKey(systemId);
@@ -39,7 +40,8 @@ namespace Core.ApplicationServices
             usage.InterfaceExposures = system.ExposedInterfaces.Select(theInterface => new InterfaceExposure()
             {
                 Interface = theInterface,
-                ObjectOwner = objectOwner
+                ObjectOwner = objectOwner,
+                LastChangedByUser = objectOwner
             }).ToList();
 
             _usageRepository.Insert(usage);
@@ -61,7 +63,8 @@ namespace Core.ApplicationServices
                 {
                     Interface = theInterface,
                     DataRowUsages = dataRowUsages,
-                    ObjectOwner = objectOwner
+                    ObjectOwner = objectOwner,
+                    LastChangedByUser = objectOwner
                 };
             
             return usage;
