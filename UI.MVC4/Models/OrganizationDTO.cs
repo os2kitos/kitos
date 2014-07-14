@@ -1,4 +1,7 @@
-﻿using Core.DomainModel;
+﻿using System;
+using Core.DomainModel;
+using Newtonsoft.Json;
+using UI.MVC4.Filters;
 
 namespace UI.MVC4.Models
 {
@@ -13,5 +16,8 @@ namespace UI.MVC4.Models
         public ConfigDTO Config { get; set; }
 
         public OrgUnitSimpleDTO Root { get; set; }
+        [JsonConverter(typeof(CustomDateTimeConverter))]
+        public DateTime LastChanged { get; set; }
+        public int LastChangedByUserId { get; set; }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
 using Core.DomainModel;
+using Newtonsoft.Json;
+using UI.MVC4.Filters;
 
 namespace UI.MVC4.Models
 {
@@ -15,5 +17,8 @@ namespace UI.MVC4.Models
         public DateTime? ActiveFrom { get; set; }
         public DateTime? ActiveTo { get; set; }
         public int OwnedByOrganizationUnitId { get; set; }
+        [JsonConverter(typeof(CustomDateTimeConverter))]
+        public DateTime LastChanged { get; set; }
+        public int LastChangedByUserId { get; set; }
     }
 }
