@@ -43,6 +43,7 @@ namespace Infrastructure.DataAccess.Migrations
                         TaskKey = taskKey,
                         OwnedByOrganizationUnit = orgUnitOwner,
                         ObjectOwner = objectOwner,
+                        LastChangedByUser = objectOwner,
                         AccessModifier = AccessModifier.Public,
                         Parent = parent
                     });
@@ -160,7 +161,8 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 Name = "LocalAdmin",
                 IsActive = true,
-                ObjectOwner = globalUser
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser
             };
             context.AdminRoles.AddOrUpdate(x => x.Name, localAdmin);
             context.SaveChanges();
@@ -174,8 +176,9 @@ namespace Infrastructure.DataAccess.Migrations
                 IsActive = true,
                 Name = "Chef",
                 Note = "Lederen af en organisationsenhed",
-                HasWriteAccess = true, 
-                ObjectOwner = globalUser
+                HasWriteAccess = true,
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser
             };
 
             var resourcePerson = new OrganizationRole()
@@ -184,7 +187,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Name = "Ressourceperson",
                 Note = "...",
                 HasWriteAccess = true,
-                ObjectOwner = globalUser
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser
             };
 
             var employee = new OrganizationRole()
@@ -193,7 +197,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Name = "Medarbejder",
                 Note = "...",
                 HasWriteAccess = false,
-                ObjectOwner = globalUser
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser
             };
 
             context.OrganizationRoles.AddOrUpdate(role => role.Id, boss, resourcePerson, employee);
@@ -208,25 +213,29 @@ namespace Infrastructure.DataAccess.Migrations
                 {
                     IsActive = true,
                     Name = "Projektejer",
-                    ObjectOwner = globalUser
+                    ObjectOwner = globalUser,
+                    LastChangedByUser = globalUser
                 },
                 new ItProjectRole()
                 {
                     IsActive = true,
                     Name = "Projektleder",
-                    ObjectOwner = globalUser
+                    ObjectOwner = globalUser,
+                    LastChangedByUser = globalUser
                 },
                 new ItProjectRole()
                 {
                     IsActive = true,
                     Name = "Delprojektleder",
-                    ObjectOwner = globalUser
+                    ObjectOwner = globalUser,
+                    LastChangedByUser = globalUser
                 },
                 new ItProjectRole()
                 {
                     IsActive = true,
                     Name = "Projektdeltager",
-                    ObjectOwner = globalUser
+                    ObjectOwner = globalUser,
+                    LastChangedByUser = globalUser
                 });
             context.SaveChanges();
 
@@ -240,7 +249,8 @@ namespace Infrastructure.DataAccess.Migrations
                 HasWriteAccess = true,
                 IsActive = true,
                 Name = "Systemrolle 1",
-                ObjectOwner = globalUser
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser
             };
 
             var systemRole2 = new ItSystemRole()
@@ -249,7 +259,8 @@ namespace Infrastructure.DataAccess.Migrations
                 HasWriteAccess = false,
                 IsActive = true,
                 Name = "Systemrolle 2",
-                ObjectOwner = globalUser
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser
             };
 
             context.ItSystemRoles.AddOrUpdate(x => x.Name, systemRole1, systemRole2);
@@ -264,19 +275,22 @@ namespace Infrastructure.DataAccess.Migrations
                 HasWriteAccess = true,
                 Name = "Kontraktrolle A",
                 IsActive = true,
-                ObjectOwner = globalUser
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser
             }, new ItContractRole()
             {
                 HasWriteAccess = true,
                 Name = "Kontraktrolle B",
                 IsActive = true,
-                ObjectOwner = globalUser
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser
             }, new ItContractRole()
             {
                 HasWriteAccess = false,
                 Name = "Kontraktrolle C",
                 IsActive = true,
-                ObjectOwner = globalUser
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser
             });
             context.SaveChanges();
 
@@ -310,22 +324,25 @@ namespace Infrastructure.DataAccess.Migrations
                                             {
                                                 Object = roskilde,
                                                 Role = localAdmin,
-                                                User = user1, 
-                                                ObjectOwner = globalUser
+                                                User = user1,
+                                                ObjectOwner = globalUser,
+                                                LastChangedByUser = globalUser
                                             },
                                             new AdminRight()
                                             {
                                                 Object = kl,
                                                 Role = localAdmin,
                                                 User = erik,
-                                                ObjectOwner = globalUser
+                                                ObjectOwner = globalUser,
+                                                LastChangedByUser = globalUser
                                             },
                                             new AdminRight()
                                             {
                                                 Object = roskilde,
                                                 Role = localAdmin,
                                                 User = localUser,
-                                                ObjectOwner = globalUser
+                                                ObjectOwner = globalUser,
+                                                LastChangedByUser = globalUser
                                             });
 
             context.SaveChanges();
@@ -340,13 +357,17 @@ namespace Infrastructure.DataAccess.Migrations
             //LEVEL 1
             var munChief = new OrganizationUnit()
             {
-                Organization = roskilde, ObjectOwner = globalUser,
+                Organization = roskilde, 
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser,
                 Parent = roskildeRoot,
                 Name = "Kommunaldirektøren"
             };
             var wellfare = new OrganizationUnit()
             {
-                Organization = roskilde, ObjectOwner = globalUser,
+                Organization = roskilde, 
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser,
                 Parent = roskildeRoot,
                 Name = "Velfærd"
             };
@@ -354,21 +375,27 @@ namespace Infrastructure.DataAccess.Migrations
             //LEVEL 2
             var digi = new OrganizationUnit()
             {
-                Organization = roskilde, ObjectOwner = globalUser,
+                Organization = roskilde, 
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser,
                 Parent = munChief,
                 Name = "Digitalisering og Borgerservice"
             };
 
             var hrcouncil = new OrganizationUnit()
             {
-                Organization = roskilde, ObjectOwner = globalUser,
+                Organization = roskilde, 
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser,
                 Parent = munChief,
                 Name = "HR og Byråd"
             };
 
             var elderArea = new OrganizationUnit()
             {
-                Organization = roskilde, ObjectOwner = globalUser,
+                Organization = roskilde, 
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser,
                 Parent = wellfare,
                 Name = "Ældreområdet"
             };
@@ -376,31 +403,41 @@ namespace Infrastructure.DataAccess.Migrations
             //LEVEL 3
             var itservice = new OrganizationUnit()
             {
-                Organization = roskilde, ObjectOwner = globalUser,
+                Organization = roskilde, 
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser,
                 Parent = digi,
                 Name = "IT Service"
             };
             var projectunit = new OrganizationUnit()
             {
-                Organization = roskilde, ObjectOwner = globalUser,
+                Organization = roskilde, 
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser,
                 Parent = digi,
                 Name = "Projektenheden"
             };
             var citizenservice = new OrganizationUnit()
             {
-                Organization = roskilde, ObjectOwner = globalUser,
+                Organization = roskilde, 
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser,
                 Parent = digi,
                 Name = "Borgerservice"
             };
             var hr = new OrganizationUnit()
             {
-                Organization = roskilde, ObjectOwner = globalUser,
+                Organization = roskilde, 
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser,
                 Parent = hrcouncil,
                 Name = "HR"
             };
             var nursinghome = new OrganizationUnit()
             {
-                Organization = roskilde, ObjectOwner = globalUser,
+                Organization = roskilde, 
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser,
                 Parent = elderArea,
                 Name = "Plejehjem"
             };
@@ -408,13 +445,17 @@ namespace Infrastructure.DataAccess.Migrations
             //LEVEL 4
             var infra = new OrganizationUnit()
             {
-                Organization = roskilde, ObjectOwner = globalUser,
+                Organization = roskilde, 
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser,
                 Parent = itservice,
                 Name = "Infrastruktur"
             };
             var teamcontact = new OrganizationUnit()
             {
-                Organization = roskilde, ObjectOwner = globalUser,
+                Organization = roskilde, 
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser,
                 Parent = citizenservice,
                 Name = "Team Kontaktcenter"
             };
@@ -432,7 +473,9 @@ namespace Infrastructure.DataAccess.Migrations
             //LEVEL 1
             var level1a = new OrganizationUnit()
             {
-                Organization = sorø, ObjectOwner = globalUser,
+                Organization = sorø, 
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser,
                 Parent = sorøRoot,
                 Name = "Direktørområde"
             };
@@ -440,21 +483,27 @@ namespace Infrastructure.DataAccess.Migrations
             //LEVEL 2
             var level2a = new OrganizationUnit()
             {
-                Organization = sorø, ObjectOwner = globalUser,
+                Organization = sorø, 
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser,
                 Parent = level1a,
                 Name = "Afdeling 1"
             };
 
             var level2b = new OrganizationUnit()
             {
-                Organization = sorø, ObjectOwner = globalUser,
+                Organization = sorø, 
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser,
                 Parent = level1a,
                 Name = "Afdeling 2"
             };
 
             var level2c = new OrganizationUnit()
             {
-                Organization = sorø, ObjectOwner = globalUser,
+                Organization = sorø, 
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser,
                 Parent = level1a,
                 Name = "Afdeling 3"
             };
@@ -462,21 +511,27 @@ namespace Infrastructure.DataAccess.Migrations
             //LEVEL 2
             var level3a = new OrganizationUnit()
             {
-                Organization = sorø, ObjectOwner = globalUser,
+                Organization = sorø, 
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser,
                 Parent = level2a,
                 Name = "Afdeling 1a"
             };
 
             var level3b = new OrganizationUnit()
             {
-                Organization = sorø, ObjectOwner = globalUser,
+                Organization = sorø, 
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser,
                 Parent = level2b,
                 Name = "Afdeling 2a"
             };
 
             var level3c = new OrganizationUnit()
             {
-                Organization = sorø, ObjectOwner = globalUser,
+                Organization = sorø, 
+                ObjectOwner = globalUser,
+                LastChangedByUser = globalUser,
                 Parent = level2b,
                 Name = "Afdeling 2b"
             };
@@ -495,8 +550,8 @@ namespace Infrastructure.DataAccess.Migrations
             #region TEXTS
 
             context.Texts.AddOrUpdate(x => x.Id,
-                                      new Text() { Value = "Om kitos blablabla", ObjectOwner = globalUser },
-                                      new Text() { Value = "Status blablabla", ObjectOwner = globalUser });
+                                      new Text() { Value = "Om kitos blablabla", ObjectOwner = globalUser, LastChangedByUser = globalUser },
+                                      new Text() { Value = "Status blablabla", ObjectOwner = globalUser, LastChangedByUser = globalUser });
 
             #endregion
 
@@ -528,7 +583,8 @@ namespace Infrastructure.DataAccess.Migrations
                     IsSuggestion = isSuggestion,
                     Name = name,
                     Note = note,
-                    ObjectOwner = objectOwner
+                    ObjectOwner = objectOwner,
+                    LastChangedByUser = objectOwner
                 };
         }
 
@@ -565,7 +621,8 @@ namespace Infrastructure.DataAccess.Migrations
                     Email = email,
                     Salt = salt,
                     Password = cryptoService.Encrypt(password + salt),
-                    ObjectOwner = objectOwner
+                    ObjectOwner = objectOwner,
+                    LastChangedByUser = objectOwner
                 };
         }
 
@@ -576,13 +633,15 @@ namespace Infrastructure.DataAccess.Migrations
                 Name = name,
                 Config = Config.Default(objectOwner),
                 Type = organizationType,
-                ObjectOwner = objectOwner
+                ObjectOwner = objectOwner,
+                LastChangedByUser = objectOwner
             };
 
             org.OrgUnits.Add(new OrganizationUnit()
             {
                 Name = org.Name,
-                ObjectOwner = objectOwner
+                ObjectOwner = objectOwner,
+                LastChangedByUser = objectOwner
             });
 
             return org;

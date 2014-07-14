@@ -214,7 +214,7 @@ namespace UI.MVC4.Controllers.API
                     }
                 }
                 
-                item.LastChanged = new DateTime();
+                item.LastChanged = DateTime.Now;
                 item.LastChangedByUser = KitosUser;
 
                 PatchQuery(item);

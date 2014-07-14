@@ -11,7 +11,7 @@ namespace Core.DomainModel
         protected Entity()
         {
             // instance creation time
-            LastChanged = new DateTime();
+            LastChanged = DateTime.Now;
         }
 
         /// <summary>
@@ -28,6 +28,10 @@ namespace Core.DomainModel
         /// <value>
         /// The object owner <see cref="User"/> identifier.
         /// </value>
+        /// <remarks>
+        /// Note that type must be nullable as <see cref="User"/>
+        /// needs it to be optional.
+        /// </remarks>
         public int? ObjectOwnerId { get; set; }
         /// <summary>
         /// Gets or sets the <see cref="User"/> that owns this instance.
@@ -53,11 +57,18 @@ namespace Core.DomainModel
         /// Gets or sets the DateTime of when the last change occurred to this instance.
         /// </summary>
         /// <value>
-        /// Datetime of when thethe last change occurred.
+        /// Datetime of when the last change occurred.
         /// </value>
         public DateTime LastChanged { get; set; }
 
-        public int LastChangedByUserId { get; set; }
+        /// <summary>
+        /// Gets or sets the User identifier for <see cref="LastChangedByUser"/>
+        /// </summary>
+        /// <remarks>
+        /// Note that type must be nullable as <see cref="User"/>
+        /// needs it to be optional
+        /// </remarks>
+        public int? LastChangedByUserId { get; set; }
         /// <summary>
         /// Gets or sets the User which made the most recent change to this instance.
         /// </summary>

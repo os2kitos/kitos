@@ -40,7 +40,7 @@ namespace UI.MVC4.Controllers.API
                 if (user.IsGlobalAdmin) return Conflict(user.Name + " is already global admin");
 
                 user.IsGlobalAdmin = true;
-                user.LastChanged = new DateTime();
+                user.LastChanged = DateTime.Now;
                 user.LastChangedByUser = KitosUser;
                 UserRepository.Save();
 

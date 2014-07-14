@@ -70,7 +70,7 @@ namespace UI.MVC4.Controllers.API
                 right.ObjectId = id;
                 right.ObjectOwner = KitosUser;
                 right.LastChangedByUser = KitosUser;
-                right.LastChanged = new DateTime();
+                right.LastChanged = DateTime.Now;
 
                 right = RightRepository.Insert(right);
                 RightRepository.Save();

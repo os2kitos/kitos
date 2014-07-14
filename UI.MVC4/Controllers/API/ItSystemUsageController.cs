@@ -135,7 +135,7 @@ namespace UI.MVC4.Controllers.API
 
                 usage.UsedBy.Add(orgUnit);
 
-                usage.LastChanged = new DateTime();
+                usage.LastChanged = DateTime.Now;
                 usage.LastChangedByUser = KitosUser;
 
                 Repository.Save();
@@ -162,7 +162,7 @@ namespace UI.MVC4.Controllers.API
 
                 usage.UsedBy.Remove(orgUnit);
 
-                usage.LastChanged = new DateTime();
+                usage.LastChanged = DateTime.Now;
                 usage.LastChangedByUser = KitosUser;
 
                 Repository.Save();
@@ -188,7 +188,7 @@ namespace UI.MVC4.Controllers.API
 
                 usage.TaskRefs.Add(task);
 
-                usage.LastChanged = new DateTime();
+                usage.LastChanged = DateTime.Now;
                 usage.LastChangedByUser = KitosUser;
 
                 Repository.Save();
@@ -214,7 +214,7 @@ namespace UI.MVC4.Controllers.API
 
                 usage.TaskRefs.Remove(task);
 
-                usage.LastChanged = new DateTime();
+                usage.LastChanged = DateTime.Now;
                 usage.LastChangedByUser = KitosUser;
 
                 Repository.Save();

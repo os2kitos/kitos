@@ -183,7 +183,7 @@ namespace UI.MVC4.Controllers.API
                 
                 project.UsedByOrgUnits.Add(orgUnit);
                 
-                project.LastChanged = new DateTime();
+                project.LastChanged = DateTime.Now;
                 project.LastChangedByUser = KitosUser;
 
                 Repository.Save();
@@ -216,7 +216,7 @@ namespace UI.MVC4.Controllers.API
                 
                 project.UsedByOrgUnits.Remove(orgUnit);
 
-                project.LastChanged = new DateTime();
+                project.LastChanged = DateTime.Now;
                 project.LastChangedByUser = KitosUser;
 
                 Repository.Save();
@@ -243,7 +243,7 @@ namespace UI.MVC4.Controllers.API
                 
                 project.TaskRefs.Add(task);
 
-                project.LastChanged = new DateTime();
+                project.LastChanged = DateTime.Now;
                 project.LastChangedByUser = KitosUser;
 
                 Repository.Save();
@@ -270,7 +270,7 @@ namespace UI.MVC4.Controllers.API
 
                 project.TaskRefs.Remove(task);
 
-                project.LastChanged = new DateTime();
+                project.LastChanged = DateTime.Now;
                 project.LastChangedByUser = KitosUser;
 
                 Repository.Save();
@@ -358,7 +358,7 @@ namespace UI.MVC4.Controllers.API
                 
                 project.ItSystemUsages.Add(systemUsage);
 
-                project.LastChanged = new DateTime();
+                project.LastChanged = DateTime.Now;
                 project.LastChangedByUser = KitosUser;
 
                 Repository.Save();
@@ -386,7 +386,7 @@ namespace UI.MVC4.Controllers.API
                 
                 project.ItSystemUsages.Remove(systemUsage);
 
-                project.LastChanged = new DateTime();
+                project.LastChanged = DateTime.Now;
                 project.LastChangedByUser = KitosUser;
 
                 Repository.Save();

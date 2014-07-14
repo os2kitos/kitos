@@ -215,7 +215,7 @@ namespace UI.MVC4.Controllers.API
 
                 system.TaskRefs.Add(task);
 
-                system.LastChanged = new DateTime();
+                system.LastChanged = DateTime.Now;
                 system.LastChangedByUser = KitosUser;
 
                 Repository.Save();
@@ -241,7 +241,7 @@ namespace UI.MVC4.Controllers.API
 
                 system.TaskRefs.Remove(task);
 
-                system.LastChanged = new DateTime();
+                system.LastChanged = DateTime.Now;
                 system.LastChangedByUser = KitosUser;
 
                 Repository.Save();
@@ -312,7 +312,7 @@ namespace UI.MVC4.Controllers.API
 
                 system.CanUseInterfaces.Add(theInterface);
 
-                system.LastChanged = new DateTime();
+                system.LastChanged = DateTime.Now;
                 system.LastChangedByUser = KitosUser;
 
                 Repository.Save();
@@ -338,7 +338,7 @@ namespace UI.MVC4.Controllers.API
 
                 system.CanUseInterfaces.Remove(theInterface);
 
-                system.LastChanged = new DateTime();
+                system.LastChanged = DateTime.Now;
                 system.LastChangedByUser = KitosUser;
 
                 Repository.Save();

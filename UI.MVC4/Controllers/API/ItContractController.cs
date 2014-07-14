@@ -40,7 +40,7 @@ namespace UI.MVC4.Controllers.API
                 var elem = _agreementElementRepository.GetByKey(elemId);
 
                 contract.AgreementElements.Add(elem);
-                contract.LastChanged = new DateTime();
+                contract.LastChanged = DateTime.Now;
                 contract.LastChangedByUser = KitosUser;
 
                 Repository.Save();
@@ -63,7 +63,7 @@ namespace UI.MVC4.Controllers.API
                 var elem = _agreementElementRepository.GetByKey(elemId);
 
                 contract.AgreementElements.Remove(elem);
-                contract.LastChanged = new DateTime();
+                contract.LastChanged = DateTime.Now;
                 contract.LastChangedByUser = KitosUser;
 
                 Repository.Save();
@@ -96,7 +96,7 @@ namespace UI.MVC4.Controllers.API
 
                 contract.AssociatedSystemUsages.Add(systemUsage);
                 
-                contract.LastChanged = new DateTime();
+                contract.LastChanged = DateTime.Now;
                 contract.LastChangedByUser = KitosUser;
 
                 Repository.Update(contract);
@@ -130,7 +130,7 @@ namespace UI.MVC4.Controllers.API
 
                 contract.AssociatedSystemUsages.Remove(systemUsage);
 
-                contract.LastChanged = new DateTime();
+                contract.LastChanged = DateTime.Now;
                 contract.LastChangedByUser = KitosUser;
 
                 Repository.Update(contract);

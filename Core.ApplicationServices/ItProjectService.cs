@@ -50,12 +50,14 @@ namespace Core.ApplicationServices
 
             project.Handover = new Handover()
                 {
-                    ObjectOwner = project.ObjectOwner
+                    ObjectOwner = project.ObjectOwner,
+                    LastChangedByUser = project.ObjectOwner
                 };
 
             project.GoalStatus = new GoalStatus()
                 {
-                    ObjectOwner = project.ObjectOwner
+                    ObjectOwner = project.ObjectOwner,
+                    LastChangedByUser = project.ObjectOwner
                 };
 
             _projectRepository.Insert(project);
@@ -186,7 +188,7 @@ namespace Core.ApplicationServices
 
         private Activity CreatePhase(string name, User owner)
         {
-            return new Activity() {Name = name, ObjectOwner = owner};
+            return new Activity() {Name = name, ObjectOwner = owner, LastChangedByUser = owner};
         }
 
         private void AddEconomyYears(ItProject project)
@@ -195,27 +197,27 @@ namespace Core.ApplicationServices
                 {
                     new EconomyYear()
                         {
-                            YearNumber = 0, ObjectOwner = project.ObjectOwner
+                            YearNumber = 0, ObjectOwner = project.ObjectOwner, LastChangedByUser = project.ObjectOwner
                         },
                     new EconomyYear()
                         {
-                            YearNumber = 1, ObjectOwner = project.ObjectOwner
+                            YearNumber = 1, ObjectOwner = project.ObjectOwner, LastChangedByUser = project.ObjectOwner
                         },
                     new EconomyYear()
                         {
-                            YearNumber = 2, ObjectOwner = project.ObjectOwner
+                            YearNumber = 2, ObjectOwner = project.ObjectOwner, LastChangedByUser = project.ObjectOwner
                         },
                     new EconomyYear()
                         {
-                            YearNumber = 3, ObjectOwner = project.ObjectOwner
+                            YearNumber = 3, ObjectOwner = project.ObjectOwner, LastChangedByUser = project.ObjectOwner
                         },
                     new EconomyYear()
                         {
-                            YearNumber = 4, ObjectOwner = project.ObjectOwner
+                            YearNumber = 4, ObjectOwner = project.ObjectOwner, LastChangedByUser = project.ObjectOwner
                         },
                     new EconomyYear()
                         {
-                            YearNumber = 5, ObjectOwner = project.ObjectOwner
+                            YearNumber = 5, ObjectOwner = project.ObjectOwner, LastChangedByUser = project.ObjectOwner
                         }
                 };
         }
