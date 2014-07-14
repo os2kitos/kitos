@@ -30,7 +30,7 @@ namespace UI.MVC4.Controllers.API
 
                 var organization = _organizationRepository.GetByKey(item.OrganizationId);
 
-                _adminService.MakeLocalAdmin(user, organization);
+                _adminService.MakeLocalAdmin(user, organization, KitosUser);
 
                 return Created(AutoMapper.Mapper.Map<User, UserDTO>(user), new Uri(Request.RequestUri + "/" + user.Id));
 

@@ -1,4 +1,6 @@
-﻿namespace UI.MVC4.Models
+﻿using System;
+
+namespace UI.MVC4.Models
 {
     public class RightOutputDTO
     {
@@ -8,5 +10,8 @@
 
         public int UserId { get; set; }
         public UserDTO User { get; set; }
+
+        public DateTime LastChanged { get; set; }
+        public int LastChangedByUserId { get; set; }
     }
 }

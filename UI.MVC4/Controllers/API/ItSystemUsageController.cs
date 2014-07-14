@@ -134,6 +134,10 @@ namespace UI.MVC4.Controllers.API
 
 
                 usage.UsedBy.Add(orgUnit);
+
+                usage.LastChanged = DateTime.Now;
+                usage.LastChangedByUser = KitosUser;
+
                 Repository.Save();
 
                 return Created(Map<OrganizationUnit, OrgUnitDTO>(orgUnit));
@@ -157,6 +161,10 @@ namespace UI.MVC4.Controllers.API
                 if (orgUnit == null) return NotFound();
 
                 usage.UsedBy.Remove(orgUnit);
+
+                usage.LastChanged = DateTime.Now;
+                usage.LastChangedByUser = KitosUser;
+
                 Repository.Save();
                 
                 return Ok();
@@ -179,6 +187,10 @@ namespace UI.MVC4.Controllers.API
                 if (task == null) return NotFound();
 
                 usage.TaskRefs.Add(task);
+
+                usage.LastChanged = DateTime.Now;
+                usage.LastChangedByUser = KitosUser;
+
                 Repository.Save();
 
                 return Created(Map<TaskRef, TaskRefDTO>(task));
@@ -201,6 +213,10 @@ namespace UI.MVC4.Controllers.API
                 if (task == null) return NotFound();
 
                 usage.TaskRefs.Remove(task);
+
+                usage.LastChanged = DateTime.Now;
+                usage.LastChangedByUser = KitosUser;
+
                 Repository.Save();
 
                 return Ok();
@@ -263,7 +279,5 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
         }
-
-        
     }
 }

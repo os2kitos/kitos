@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.DomainModel;
 
 namespace UI.MVC4.Models
@@ -42,6 +43,9 @@ namespace UI.MVC4.Models
         public int? TsaId { get; set; }
         public int? MethodId { get; set; }
 
-        public IEnumerable<DataRowDTO> DataRows { get; set; } 
+        public IEnumerable<DataRowDTO> DataRows { get; set; }
+
+        public DateTime LastChanged { get; set; }
+        public int LastChangedByUserId { get; set; }
     }
 }

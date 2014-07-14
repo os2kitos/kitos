@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace UI.MVC4.Models
 {
@@ -11,6 +12,9 @@ namespace UI.MVC4.Models
         public List<OrgUnitDTO> Children { get; set; }
 
         public long? Ean { get; set; }
+
+        public DateTime LastChanged { get; set; }
+        public int LastChangedByUserId { get; set; }
     }
 
     public class OrgUnitSimpleDTO

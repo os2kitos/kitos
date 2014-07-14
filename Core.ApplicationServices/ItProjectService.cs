@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
@@ -49,12 +50,14 @@ namespace Core.ApplicationServices
 
             project.Handover = new Handover()
                 {
-                    ObjectOwner = project.ObjectOwner
+                    ObjectOwner = project.ObjectOwner,
+                    LastChangedByUser = project.ObjectOwner
                 };
 
             project.GoalStatus = new GoalStatus()
                 {
-                    ObjectOwner = project.ObjectOwner
+                    ObjectOwner = project.ObjectOwner,
+                    LastChangedByUser = project.ObjectOwner
                 };
 
             _projectRepository.Insert(project);
@@ -66,7 +69,8 @@ namespace Core.ApplicationServices
         public ItProject CloneProject(ItProject original, User newOwner, int newOrgId)
         {
             var clone = _projectRepository.Create();
-            
+            clone.LastChangedByUser = newOwner;
+
             clone.OrganizationId = newOrgId;
             clone.ObjectOwner = newOwner;
             clone.OriginalId = original.Id;
@@ -82,7 +86,8 @@ namespace Core.ApplicationServices
            // TODO clone actual data
             clone.Handover = new Handover()
                 {
-                    ObjectOwner = newOwner
+                    ObjectOwner = newOwner,
+                    LastChangedByUser = newOwner
                 };
 
             // TODO ParentId = project.ParentId,
@@ -105,7 +110,8 @@ namespace Core.ApplicationServices
                 //TODO: clone this instead of creating new
             clone.GoalStatus = new GoalStatus()
                 {
-                    ObjectOwner = newOwner
+                    ObjectOwner = newOwner,
+                    LastChangedByUser = newOwner
                 };
 
             ClonePhases(original, clone);
@@ -120,7 +126,7 @@ namespace Core.ApplicationServices
         public void DeleteProject(ItProject project)
         {
             //Remove reference to this project in cloned projects
-            project.Clones.Select(clone => clone.Original = null);
+            project.Clones.Select(clone => clone.Original = null); // TODO what's going on here?
             _projectRepository.Save();
             
             var phase1Id = project.Phase1.Id;
@@ -182,7 +188,7 @@ namespace Core.ApplicationServices
 
         private Activity CreatePhase(string name, User owner)
         {
-            return new Activity() {Name = name, ObjectOwner = owner};
+            return new Activity() {Name = name, ObjectOwner = owner, LastChangedByUser = owner};
         }
 
         private void AddEconomyYears(ItProject project)
@@ -191,27 +197,27 @@ namespace Core.ApplicationServices
                 {
                     new EconomyYear()
                         {
-                            YearNumber = 0, ObjectOwner = project.ObjectOwner
+                            YearNumber = 0, ObjectOwner = project.ObjectOwner, LastChangedByUser = project.ObjectOwner
                         },
                     new EconomyYear()
                         {
-                            YearNumber = 1, ObjectOwner = project.ObjectOwner
+                            YearNumber = 1, ObjectOwner = project.ObjectOwner, LastChangedByUser = project.ObjectOwner
                         },
                     new EconomyYear()
                         {
-                            YearNumber = 2, ObjectOwner = project.ObjectOwner
+                            YearNumber = 2, ObjectOwner = project.ObjectOwner, LastChangedByUser = project.ObjectOwner
                         },
                     new EconomyYear()
                         {
-                            YearNumber = 3, ObjectOwner = project.ObjectOwner
+                            YearNumber = 3, ObjectOwner = project.ObjectOwner, LastChangedByUser = project.ObjectOwner
                         },
                     new EconomyYear()
                         {
-                            YearNumber = 4, ObjectOwner = project.ObjectOwner
+                            YearNumber = 4, ObjectOwner = project.ObjectOwner, LastChangedByUser = project.ObjectOwner
                         },
                     new EconomyYear()
                         {
-                            YearNumber = 5, ObjectOwner = project.ObjectOwner
+                            YearNumber = 5, ObjectOwner = project.ObjectOwner, LastChangedByUser = project.ObjectOwner
                         }
                 };
         }

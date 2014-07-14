@@ -1,4 +1,5 @@
-﻿using Core.DomainModel;
+﻿using System;
+using Core.DomainModel;
 
 namespace UI.MVC4.Models
 {
@@ -13,5 +14,7 @@ namespace UI.MVC4.Models
         public ConfigDTO Config { get; set; }
 
         public OrgUnitSimpleDTO Root { get; set; }
+        public DateTime LastChanged { get; set; }
+        public int LastChangedByUserId { get; set; }
     }
 }

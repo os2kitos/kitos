@@ -25,6 +25,8 @@ namespace UI.MVC4.Controllers.API
                 var handover = Repository.GetByKey(id);
                 var user = _userRepository.GetByKey(participantId);
                 handover.Participants.Add(user);
+                handover.LastChanged = DateTime.Now;
+                handover.LastChangedByUser = KitosUser;
                 Repository.Save();
 
                 return Ok();

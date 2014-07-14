@@ -157,10 +157,12 @@ namespace UI.MVC4.Controllers.API
                 var item = Map(dto);
 
                 item.ObjectOwner = KitosUser;
+                item.LastChangedByUser = KitosUser;
 
                 foreach (var dataRow in item.DataRows)
                 {
                     dataRow.ObjectOwner = KitosUser;
+                    dataRow.LastChangedByUser = KitosUser;
                 }
 
                 foreach (var id in dto.TaskRefIds)
@@ -212,6 +214,10 @@ namespace UI.MVC4.Controllers.API
                 if (task == null) return NotFound();
 
                 system.TaskRefs.Add(task);
+
+                system.LastChanged = DateTime.Now;
+                system.LastChangedByUser = KitosUser;
+
                 Repository.Save();
 
                 return Created(Map<TaskRef, TaskRefDTO>(task));
@@ -234,6 +240,10 @@ namespace UI.MVC4.Controllers.API
                 if (task == null) return NotFound();
 
                 system.TaskRefs.Remove(task);
+
+                system.LastChanged = DateTime.Now;
+                system.LastChangedByUser = KitosUser;
+
                 Repository.Save();
 
                 return Ok();
@@ -301,6 +311,10 @@ namespace UI.MVC4.Controllers.API
                 if (theInterface == null) return NotFound();
 
                 system.CanUseInterfaces.Add(theInterface);
+
+                system.LastChanged = DateTime.Now;
+                system.LastChangedByUser = KitosUser;
+
                 Repository.Save();
 
                 return Created(Map<ItSystem, ItSystemSimpleDTO>(theInterface));
@@ -323,6 +337,10 @@ namespace UI.MVC4.Controllers.API
                 if (theInterface == null) return NotFound();
 
                 system.CanUseInterfaces.Remove(theInterface);
+
+                system.LastChanged = DateTime.Now;
+                system.LastChangedByUser = KitosUser;
+
                 Repository.Save();
 
                 return Ok();

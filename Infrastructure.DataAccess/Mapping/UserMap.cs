@@ -1,5 +1,4 @@
-﻿using System.Data.Entity.ModelConfiguration;
-using Core.DomainModel;
+﻿using Core.DomainModel;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -7,11 +6,16 @@ namespace Infrastructure.DataAccess.Mapping
     {
         public UserMap()
         {
-            //User does NOT require an ObjectOwner!
-            //Otherwise, we cannot add the first user to the system
+            // User does NOT require an ObjectOwner!
+            // Otherwise, we cannot add the first user to the system
+            // this is a limitation of EF
             this.HasOptional(t => t.ObjectOwner)
                 .WithMany()
-                .HasForeignKey(t => t.ObjectOwnerId);
+                .HasForeignKey(d => d.ObjectOwnerId);
+            // same as above
+            this.HasOptional(t => t.LastChangedByUser)
+                .WithMany()
+                .HasForeignKey(d => d.LastChangedByUserId);
 
             // Properties
             this.Property(t => t.Name)
@@ -35,7 +39,7 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasOptional(t => t.CreatedIn)
                 .WithMany()
-                .HasForeignKey(t => t.CreatedInId);
+                .HasForeignKey(d => d.CreatedInId);
         }
     }
 }

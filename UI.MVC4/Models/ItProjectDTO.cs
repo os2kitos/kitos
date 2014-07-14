@@ -94,9 +94,9 @@ namespace UI.MVC4.Models
         public int? OriginalId { get; set; }
         public ItProjectDTO Original { get; set; }
         public string OriginalItProjectId { get; set; }
-        
 
-
+        public DateTime LastChanged { get; set; }
+        public int LastChangedByUserId { get; set; }
 
         public virtual GoalStatusDTO GoalStatus { get; set; }
 

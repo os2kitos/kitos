@@ -182,6 +182,10 @@ namespace UI.MVC4.Controllers.API
                 if (orgUnit == null) return NotFound();
                 
                 project.UsedByOrgUnits.Add(orgUnit);
+                
+                project.LastChanged = DateTime.Now;
+                project.LastChangedByUser = KitosUser;
+
                 Repository.Save();
 
                 return Created(Map<OrganizationUnit, OrgUnitDTO>(orgUnit));
@@ -211,6 +215,10 @@ namespace UI.MVC4.Controllers.API
                 if (orgUnit == null) return NotFound();
                 
                 project.UsedByOrgUnits.Remove(orgUnit);
+
+                project.LastChanged = DateTime.Now;
+                project.LastChangedByUser = KitosUser;
+
                 Repository.Save();
 
                 return Ok();
@@ -234,6 +242,10 @@ namespace UI.MVC4.Controllers.API
                 if (task == null) return NotFound();
                 
                 project.TaskRefs.Add(task);
+
+                project.LastChanged = DateTime.Now;
+                project.LastChangedByUser = KitosUser;
+
                 Repository.Save();
 
                 return Created(Map<TaskRef, TaskRefDTO>(task));
@@ -257,6 +269,10 @@ namespace UI.MVC4.Controllers.API
                 if (task == null) return NotFound();
 
                 project.TaskRefs.Remove(task);
+
+                project.LastChanged = DateTime.Now;
+                project.LastChangedByUser = KitosUser;
+
                 Repository.Save();
 
                 return Ok();
@@ -341,6 +357,10 @@ namespace UI.MVC4.Controllers.API
                 if (systemUsage == null) return NotFound();
                 
                 project.ItSystemUsages.Add(systemUsage);
+
+                project.LastChanged = DateTime.Now;
+                project.LastChangedByUser = KitosUser;
+
                 Repository.Save();
 
                 return Created(Map<ItSystemUsage, ItSystemUsageDTO>(systemUsage));
@@ -365,6 +385,10 @@ namespace UI.MVC4.Controllers.API
                 if (systemUsage == null) return NotFound();
                 
                 project.ItSystemUsages.Remove(systemUsage);
+
+                project.LastChanged = DateTime.Now;
+                project.LastChangedByUser = KitosUser;
+
                 Repository.Save();
 
                 return Ok();

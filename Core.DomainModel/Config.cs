@@ -31,7 +31,8 @@ namespace Core.DomainModel
                     ShowColumnTechnology = true,
                     ShowColumnUsage = true,
                     ShowTabOverview = true,
-                    ObjectOwner = objectOwner
+                    ObjectOwner = objectOwner,
+                    LastChangedByUser = objectOwner
                 };
         }
 
