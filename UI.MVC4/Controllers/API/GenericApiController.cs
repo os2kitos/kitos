@@ -178,6 +178,9 @@ namespace UI.MVC4.Controllers.API
                     var destName = mapMember.DestinationProperty.Name;
                     var jToken = valuePair.Value;
 
+                    if (destName == "LastChangedByUserId" && destName == "LastChanged")
+                        continue; // don't allow writing to these. TODO This should really be done using in/out DTOs
+
                     var propRef = itemType.GetProperty(destName);
                     var t = propRef.PropertyType;
 
