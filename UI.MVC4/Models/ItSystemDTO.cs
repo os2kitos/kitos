@@ -47,7 +47,6 @@ namespace UI.MVC4.Models
 
         public IEnumerable<DataRowDTO> DataRows { get; set; }
 
-        [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }
     }

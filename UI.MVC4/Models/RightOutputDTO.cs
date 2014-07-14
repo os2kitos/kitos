@@ -13,7 +13,6 @@ namespace UI.MVC4.Models
         public int UserId { get; set; }
         public UserDTO User { get; set; }
 
-        [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }
     }

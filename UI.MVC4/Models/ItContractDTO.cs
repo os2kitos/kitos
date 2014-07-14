@@ -71,7 +71,6 @@ namespace UI.MVC4.Models
         public IEnumerable<EconomyStreamDTO> ExternEconomyStreams { get; set; }
 
         public IEnumerable<AdviceDTO> Advices { get; set; }
-        [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }
     }

@@ -17,7 +17,6 @@ namespace UI.MVC4.Models
         public List<AdminRightDTO> AdminRights { get; set; }
 
         public int? CreatedInId { get; set; }
-        [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime LastChanged { get; set; }
         public int? LastChangedByUserId { get; set; }
     }

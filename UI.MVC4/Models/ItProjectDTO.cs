@@ -95,7 +95,6 @@ namespace UI.MVC4.Models
         public ItProjectDTO Original { get; set; }
         public string OriginalItProjectId { get; set; }
 
-        [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }
 
