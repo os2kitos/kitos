@@ -1,6 +1,4 @@
 ﻿using System;
-using Newtonsoft.Json;
-using UI.MVC4.Filters;
 
 namespace UI.MVC4.Models
 {
