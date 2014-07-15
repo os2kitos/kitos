@@ -90,9 +90,15 @@
             <!-- archived -->
             <div class="form-group">
                 <div class="col-md-offset-2">
-                    <div class="checkbox">
+                    <div class="checkbox col-md-2">
                         <label>
-                            <input type="checkbox" data-ng-model="project.isArchived" data-autosave="{{autosaveUrl}}" data-field="isArchived"> Arkiveret
+                            <input type="checkbox" data-ng-model="project.isArchived" data-autosave="{{autosaveUrl}}" data-field="isArchived" data-ng-disabled="!hasWriteAccess"> Arkiveret
+                        </label>
+                    </div>
+                    <div class="checkbox col-md-2">
+                        <label>
+                            <input type="checkbox" data-ng-model="isTransversal" data-autosave="{{patchUrl}}" data-field="isTransversal" data-ng-disabled="!hasWriteAccess" />
+                            Tværgående
                         </label>
                     </div>
                 </div>
