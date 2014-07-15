@@ -34,6 +34,7 @@ namespace UI.MVC4
             // angularjs and plugins
             bundles.Add(new ScriptBundle("~/Scripts/angular").Include(
                 "~/Scripts/angular.js",
+                "~/Scripts/i18n/angular-locale_da-dk.js",
                 "~/Scripts/angular-animate.js",
                 "~/Scripts/angular-sanitize.js",
                 "~/Scripts/angular-route.js",
