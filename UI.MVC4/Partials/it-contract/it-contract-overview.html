@@ -1,16 +1,17 @@
 ﻿<table class="table table-condensed table-striped">
     <thead>
         <tr>
-            <th>IT Kontrakt
-                <button data-order-by="'name'" data-paging="pagination"></button>
+            <th>
+                IT Kontrakt
+                <order-by data-order-by="'name'" data-paging="pagination"></order-by>
             </th>
 
             <th>Ansv. organisationsenhed
-                <button data-order-by="'responsibleOrganizationUnit.name'" data-paging="pagination"></button>
+                <order-by data-order-by="'responsibleOrganizationUnit.name'" data-paging="pagination"></order-by>
             </th>
 
             <th>
-                <select data-ng-init="chosenRoleId = 2" 
+                <select data-ng-init="chosenRoleId = ''" 
                         data-ng-model="chosenRoleId" data-ng-options="role.id as role.name for role in itContractRoles">
                     <option value="">Kontraktunderskriver</option>
                 </select>
@@ -18,7 +19,7 @@
             
             <th>
                 Leverandør
-                <button data-order-by="'supplier.name'" data-paging="pagination"></button>
+                <order-by data-order-by="'supplier.name'" data-paging="pagination"></order-by>
             </th>
             
             <th>
@@ -30,8 +31,8 @@
             </th>
             
             <th>
-                Betalings model
-                <button data-order-by="'paymentModel.name'" data-paging="pagination"></button>
+                Betalingsmodel
+                <order-by data-order-by="'paymentModel.name'" data-paging="pagination"></order-by>
             </th>
                        
             <th colspan="2">
@@ -49,14 +50,14 @@
         
         <!-- when there are no active contracts to show -->
         <tr data-ng-if="activeContracts.length == 0">
-            <td colspan="10" class="text-center">
+            <td colspan="9" class="text-center">
                 <i>Ingen aktive kontrakter</i>
             </td>
         </tr>
         
         <!-- "click to show inactive contracts"-row -->
         <tr>
-            <td colspan="10">
+            <td colspan="9">
                 <a data-ng-click="showInactive = !showInactive">
                     <i class="glyphicon" data-ng-class="{'glyphicon-chevron-right': !showInactive, 'glyphicon-chevron-down': showInactive}"></i>
                     Klik for at {{ showInactive && 'skjule' || 'vise' }} inaktive IT kontrakter
@@ -72,7 +73,7 @@
         
         <!-- when there are no active contracts to show -->
         <tr data-ng-if="showInactive && inactiveContracts.length == 0">
-            <td colspan="10" class="text-center">
+            <td colspan="9" class="text-center">
                 <i>Ingen inaktive kontrakter</i>
             </td>
         </tr>
