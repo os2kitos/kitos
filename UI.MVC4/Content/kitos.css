@@ -594,3 +594,12 @@ body, .btn {
 
     width: 100%;
 }
+
+.dropdown-menu {
+    font-size: inherit !important;
+}
+
+.nav.nav-tabs > li > a {
+    padding: 8px 9px !important;
+    text-align: center;
+}
