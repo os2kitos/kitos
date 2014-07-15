@@ -1,46 +1,39 @@
 ﻿<table class="table table-condensed table-striped">
     <thead>
         <tr>
-            <th>Type
-                <button data-order-by="'itProjectType.name'" data-paging="pagination"></button>
+            <th>
+                IT Projekt
+                <order-by data-order-by="'name'" data-paging="pagination"></order-by>
             </th>
-            <th>Projekt ID
-                <button data-order-by="'itProjectId'" data-paging="pagination"></button>
+            <th>
+                Oprettet af: Organisation
+                <order-by data-order-by="'organizationName'" data-paging="pagination"></order-by>
             </th>
-            <th>Original ID
-                <button data-order-by="'original.itProjectId'" data-paging="pagination"></button>
+            <th>
+                Oprettet af: Navn
+                <order-by data-order-by="'objectOwner.name'" data-paging="pagination"></order-by>
             </th>
-            <th>Projektnavn
-                <button data-order-by="'name'" data-paging="pagination"></button></th>
-            <th>P
-                <button data-order-by="'accessModifier'" data-paging="pagination"></button></th>
-            <th>A
-                <button data-order-by="'isArchived'" data-paging="pagination"></button></th>
-            <th>Ansvarlig
-                <button data-order-by="'responsibleOrgUnit.name'" data-paging="pagination"></button></th>
-            <th>Oprettet af
-                <button data-order-by="'objectOwner.name'" data-paging="pagination"></button></th>
-            <th></th>
+            <th>
+                Projekt ID
+                <order-by data-order-by="'itProjectId'" data-paging="pagination"></order-by>
+            </th>
+            <th>
+                Type
+                <order-by data-order-by="'itProjectType.name'" data-paging="pagination"></order-by>
+            </th>
+            <th>
+                Public
+                <order-by data-order-by="'accessModifier'" data-paging="pagination"></order-by>
+            </th>
+            <th>
+                Arkiv
+                <order-by data-order-by="'isArchived'" data-paging="pagination"></order-by>
+            </th>
+            <th><!-- control --></th>
         </tr>
     </thead>
     <tbody>
         <tr data-ng-repeat="p in projects | filter : { show: true }">
-            
-            <!-- type -->
-            <td>
-                {{ p.itProjectTypeName }}
-            </td>
-            
-            <!-- human readable id -->
-            <td>
-                {{ p.itProjectId }}
-            </td>
-            
-            <!-- parent id -->
-            <td>
-                {{ p.originalItProjectId }}
-            </td>
-            
             <!-- name + link -->
             <td>
                 <a data-ui-sref="it-project.edit.status-project({id: p.id})">
@@ -48,6 +41,26 @@
                 </a>
             </td>
             
+            <!-- created by org -->
+            <td>
+                {{ p.organizationName }}
+            </td>
+
+            <!-- object owner -->
+            <td>
+                {{ p.objectOwnerName }}
+            </td>
+
+            <!-- human readable id -->
+            <td>
+                {{ p.itProjectId }}
+            </td>
+            
+            <!-- type -->
+            <td>
+                {{ p.itProjectTypeName }}
+            </td>
+
             <!-- access modifier -->
             <td>
                 {{ p.accessModifier == 1 ? 'P' : '' }}
@@ -56,16 +69,6 @@
             <!-- archived -->
             <td>
                 {{ p.isArchived == 1 ? 'A' : '' }}
-            </td>
-            
-            <!-- responsible org unit -->
-            <td>
-                {{ p.responsibleOrgUnitName }}
-            </td>
-            
-            <!-- object owner -->
-            <td>
-                {{ p.objectOwnerName }}
             </td>
             
             <!-- buttons -->
