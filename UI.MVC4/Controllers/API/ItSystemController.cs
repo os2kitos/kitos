@@ -13,12 +13,14 @@ namespace UI.MVC4.Controllers.API
     {
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemService _systemService;
+        private readonly IItSystemUsageService _systemUsageService;
 
-        public ItSystemController(IGenericRepository<ItSystem> repository, IGenericRepository<TaskRef> taskRepository, IItSystemService systemService) 
+        public ItSystemController(IGenericRepository<ItSystem> repository, IGenericRepository<TaskRef> taskRepository, IItSystemService systemService, IItSystemUsageService systemUsageService) 
             : base(repository)
         {
             _taskRepository = taskRepository;
             _systemService = systemService;
+            _systemUsageService = systemUsageService;
         }
 
         public HttpResponseMessage GetPublic([FromUri] int organizationId, [FromUri] PagingModel<ItSystem> paging)
@@ -298,7 +300,13 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
         }
-
+        
+        /// <summary>
+        /// Adds a new can-use-interface to the system
+        /// </summary>
+        /// <param name="id">Id of the system</param>
+        /// <param name="interfaceId">Id of the interface, that can-be-used by the system</param>
+        /// <returns></returns>
         public HttpResponseMessage PostInterfaceCanBeUsedBySystem(int id, [FromUri] int interfaceId)
         {
             try
@@ -311,6 +319,12 @@ namespace UI.MVC4.Controllers.API
                 if (theInterface == null) return NotFound();
 
                 system.CanUseInterfaces.Add(theInterface);
+                
+                //also update each of the existing SystemUsages to allow them to use the new interface
+                foreach (var systemUsage in system.Usages)
+                {
+                    _systemUsageService.AddInterfaceUsage(systemUsage, theInterface);
+                }
 
                 system.LastChanged = DateTime.Now;
                 system.LastChangedByUser = KitosUser;
