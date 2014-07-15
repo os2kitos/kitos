@@ -45,7 +45,12 @@
                     };
                 }
 
-                $scope.selectSettings = { dynamicTitle: false, defaultText: 'Tabs' };
+                $scope.selectSettings = { dynamicTitle: false, buttonClasses: 'btn btn-default btn-sm' };
+                $scope.selectTranslation = {
+                    checkAll: 'Vis alle',
+                    uncheckAll: 'Skjul alle',
+                    buttonDefaultText: 'Faner '
+                };
                 $scope.selectedData = [];
                 if (project.isStatusGoalVisible) 
                     $scope.selectedData.push({ id: 1 });
