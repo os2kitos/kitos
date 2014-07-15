@@ -46,6 +46,16 @@ namespace Core.ApplicationServices
             return usage;
         }
 
+        /// <summary>
+        /// Adds a new InterfaceUsage to an existing ItSystemUsage.
+        /// </summary>
+        /// <param name="usage">The ItSystemUsage</param>
+        /// <param name="theInterface">The new interface, which the InterfaceUsage should be generated from</param>
+        public void AddInterfaceUsage(ItSystemUsage usage, ItSystem theInterface)
+        {
+            usage.InterfaceUsages.Add(CreateInterfaceUsage(theInterface, usage.ObjectOwner));
+        }
+
         private InterfaceUsage CreateInterfaceUsage(ItSystem theInterface, User objectOwner)
         {
             var dataRowUsages = theInterface.DataRows.Select(dataRow =>
