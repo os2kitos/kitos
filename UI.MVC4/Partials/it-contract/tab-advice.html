@@ -1,8 +1,9 @@
 ﻿<form role="form">
-    <table class="table table-condensed">
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Aktiv</th>
+                <th>Sendt</th>
                 <th>Advis navn</th>
                 <th class="col-md-2">Dato</th>
                 <th>Modtager</th>
@@ -20,6 +21,11 @@
                            data-ng-disabled="!hasWriteAccess"
                            data-autosave="{{advice.updateUrl}}"
                            data-field="isActive">
+                </td>
+                
+                <!-- mail sent indicator -->
+                <td class="vert-align">
+                    {{ advice.sentDate }}
                 </td>
 
                 <!-- name -->
@@ -94,7 +100,7 @@
                 <td colspan="7">
                     <div class="pull-right">
                         <button class="btn btn-success btn-sm" data-ng-click="newAdvice()">
-                            <i class="glyphicon glyphicon-plus small"></i>Ny
+                            <i class="glyphicon glyphicon-plus small"></i> Ny
                         </button>
                     </div>
                 </td>
