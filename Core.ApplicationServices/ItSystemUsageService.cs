@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
@@ -56,7 +52,8 @@ namespace Core.ApplicationServices
                                                              new DataRowUsage()
                                                                  {
                                                                      DataRowId = dataRow.Id,
-                                                                     ObjectOwner = objectOwner
+                                                                     ObjectOwner = objectOwner,
+                                                                     LastChangedByUser = objectOwner
                                                                  }).ToList();
 
             var usage = new InterfaceUsage()
