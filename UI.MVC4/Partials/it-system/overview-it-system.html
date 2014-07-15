@@ -1,11 +1,13 @@
-﻿<table class="table full-width table-striped">
+﻿<table class="table table-striped">
     <thead>
         <tr>
-            <th>IT System 
-                <button data-order-by="'itSystem.name'" data-paging="pagination"></button>
+            <th>
+                IT System 
+                <order-by data-order-by="'itSystem.name'" data-paging="pagination"></order-by>
             </th>
-            <th>Ansv. organisationsenhed
-                <button data-order-by="'responsibleUnit.name'" data-paging="pagination"></button>
+            <th>
+                Ansv. organisationsenhed
+                <order-by data-order-by="'responsibleUnit.name'" data-paging="pagination"></order-by>
             </th>
             <th>
                 <select data-ng-model="chosenRoleId" data-ng-init="chosenRoleId = 1" data-ng-options="r.id as r.name for r in itSystemRoles">
@@ -19,7 +21,7 @@
                     <option value="localSystemId">Lokalt SystemID
                     </option>
                 </select>
-                <button data-order-by="showSystemId" data-paging="pagination"></button>
+                <order-by data-order-by="showSystemId" data-paging="pagination"></order-by>
             </th>
             <th>
                 <select data-ng-model="showType">
@@ -28,14 +30,13 @@
                     <option value="itSystem.businessType.name">Forretningstype
                     </option>
                 </select>
-                <button data-order-by="showType" data-paging="pagination"></button>
+                <order-by data-order-by="showType" data-paging="pagination"></order-by>
             </th>
-            <th>Anvender
-            </th>
-            <th>Udstiller
-            </th>
-            <th>Overblik
-                <button data-order-by="'overviewItSystem.name'" data-paging="pagination"></button>
+            <th>Anvender</th>
+            <th>Udstiller</th>
+            <th>
+                Overblik
+                <order-by data-order-by="'overviewItSystem.name'" data-paging="pagination"></order-by>
             </th>
         </tr>
     </thead>
