@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace UI.MVC4.Models
 {
@@ -42,6 +43,15 @@ namespace UI.MVC4.Models
         public IEnumerable<ItProjectDTO> ItProjects { get; set; }
 
         public int? MainContractId { get; set; }
-        public IEnumerable<ItContractSystemDTO> Contracts { get; set; } 
+        public IEnumerable<ItContractSystemDTO> Contracts { get; set; }
+
+        public int ActiveInterfaceUsages {
+            get
+            {
+                if (InterfaceUsages == null) return 0;
+
+                return InterfaceUsages.Count(usage => usage.ItContract != null && usage.ItContract.IsActive);
+            } 
+        }
     }
 }
