@@ -75,7 +75,7 @@
 
                             usage.itSystem.appType = _.findWhere(appTypes, { id: usage.itSystem.appTypeId });
                             usage.itSystem.businessType = _.findWhere(businessTypes, { id: usage.itSystem.businessTypeId });
-
+                            
                             loadOverviewSystem(usage);
 
                         });
