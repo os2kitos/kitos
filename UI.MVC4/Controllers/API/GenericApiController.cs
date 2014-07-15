@@ -192,7 +192,7 @@ namespace UI.MVC4.Controllers.API
                     }
                     // BUG JSON.NET throws on Guid
                     // Bugreport https://json.codeplex.com/workitem/25599
-                    if (t.IsEquivalentTo(typeof(Guid)))
+                    else if (t.IsEquivalentTo(typeof(Guid)))
                     {
                         Guid guid;
                         Guid.TryParse(valuePair.Value.Value<String>(), out guid);

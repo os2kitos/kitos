@@ -4,27 +4,13 @@ namespace UI.MVC4.Models
 {
     public class ItProjectCatalogDTO
     {
-        //1st column: type
-        public string ItProjectTypeName { get; set; }
-
-        //2nd column: project ID
-        public string ItProjectId { get; set; }
-
-        //3rd column: original ID
-        public string OriginalItProjectId { get; set; }
-
-        //4th column: name + link
         public int Id { get; set; }
         public string Name { get; set; }
-
-        //6th and 7th column: public, archived
+        public string ItProjectTypeName { get; set; }
+        public string ItProjectId { get; set; }
         public AccessModifier AccessModifier { get; set; }
         public bool IsArchived { get; set; }
-
-        //8th column: responsible org unit
-        public string ResponsibleOrgUnitName { get; set; }
-
-        //9th column object owner
         public string ObjectOwnerName { get; set; }
+        public string OrganizationName { get; set; }
     }
 }

@@ -13,8 +13,7 @@
 </td>
 
 <!-- responsible org unit name -->
-<td>{{ contract.responsibleOrganizationUnitName }}
-</td>
+<td>{{ contract.responsibleOrganizationUnitName }}</td>
 
 <!-- name of users with the selected role -->
 <td>
@@ -27,17 +26,16 @@
 </td>
 
 <!-- supplier name -->
-<td>{{ contract.supplierName }}
-</td>
+<td>{{ contract.supplierName }}</td>
 
 <!-- sum of acquisition column -->
 <td class="text-right">
-    <span data-ng-if="contract.acquisitionSum != null">{{ contract.acquisitionSum }}</span>
+    <span data-ng-if="contract.acquisitionSum != null">{{ contract.acquisitionSum | currency:'kr' }}</span>
 </td>
 
 <!-- sum of operation column -->
 <td class="text-right">
-    <span data-ng-if="contract.operationSum != null">{{ contract.operationSum }}</span>
+    <span data-ng-if="contract.operationSum != null">{{ contract.operationSum | currency:'kr' }}</span>
 </td>
 
 <!-- payment model -->

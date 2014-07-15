@@ -3,15 +3,11 @@
         <tr>
             <th>
                 IT System
-                <button data-order-by="'name'" data-paging="pagination"></button>
+                <order-by data-order-by="'name'" data-paging="pagination"></order-by>
             </th>
-            <th>Globalt SystemID
-                <!--<select data-ng-model="showId">
-                    <option value="systemId"></option>
-                    <option value="localSystemId">Lokalt SystemID
-                    </option>
-                </select>-->
-                <button data-order-by="'systemId'" data-paging="pagination"></button>
+            <th>
+                Globalt SystemID
+                <order-by data-order-by="'systemId'" data-paging="pagination"></order-by>
             </th>
             <th>
                 <select data-ng-model="showType">
@@ -20,20 +16,19 @@
                     <option value="businessType.name">Forretningstype
                     </option>
                 </select>
-                <button data-order-by="showType" data-paging="pagination"></button>
+                <order-by data-order-by="showType" data-paging="pagination"></order-by>
             </th>
-            <th>KLE ID
+            <th>KLE ID</th>
+            <th>KLE Navn</th>
+            <th>
+                Tilhører
+                <order-by data-order-by="'belongsTo.name'" data-paging="pagination"></order-by>
             </th>
-            <th>KLE Navn
+            <th>
+                Oprettet af
+                <order-by data-order-by="'objectOwner.name'" data-paging="pagination"></order-by>
             </th>
-            <th>Tilhører
-                <button data-order-by="'belongsTo.name'" data-paging="pagination"></button>
-            </th>
-            <th>Oprettet af
-                <button data-order-by="'objectOwner.name'" data-paging="pagination"></button>
-            </th>
-            <th>Anvendelse
-            </th>
+            <th>Anvendelse</th>
         </tr>
     </thead>
     <tbody>
@@ -42,18 +37,13 @@
                 <a data-ng-if="system.isInterface" ui-sref="it-system.edit.interface-details({id: system.id})">{{system.name}}</a>
                 <a data-ng-if="!system.isInterface" ui-sref="it-system.edit.interfaces({id: system.id})">{{system.name}}</a>
             </td>
-            <td>{{system.systemId}}
-<!--                <span data-ng-switch-when="systemId">{{system.systemId}}</span>
-                <span data-ng-switch-when="localSystemId">{{system.usage.localSystemId}}</span>-->
-            </td>
+            <td>{{system.systemId}}</td>
             <td data-ng-switch="showType">
                 <span data-ng-switch-when="appType.name">{{system.appType.name}}</span>
                 <span data-ng-switch-when="businessType.name">{{system.businessType.name}}</span>
             </td>
-            <td>{{system.taskId}}
-            </td>
-            <td>{{system.taskName}}
-            </td>
+            <td>{{system.taskId}}</td>
+            <td>{{system.taskName}}</td>
             <td>
                 <!-- name of organization -->
                 {{system.belongsTo.name}}

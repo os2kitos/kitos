@@ -3,12 +3,12 @@
     <thead>
         <tr>
             <!-- Name -->
-            <th>Navn
+            <th>IT Projekt
                 <button data-order-by="'name'" data-paging="pagination"></button>
             </th>
             <!-- Responsible -->
             <th>
-                Ansvarlig
+                Ansv. organisationsenhed
                 <button data-order-by="'responsibleOrgUnit.name'" data-paging="pagination"></button>
             </th>
             <!-- Role -->
@@ -18,42 +18,39 @@
             </th>
             <!-- ID -->
             <th>
-                <select data-ng-model="chosenId" data-ng-init="chosenId = 'itProjectId'">
-                    <option value="itProjectId">Projekt ID</option>
-                    <option value="original.itProjectId">Orginal ID</option>
-                </select>
-                <button data-order-by="chosenId" data-paging="pagination"></button>
+                Projekt ID
+                <order-by data-order-by="chosenId" data-paging="pagination"></order-by>
             </th>
             <!-- Type -->
             <th>Type
-                <button data-order-by="'itProjectType.name'" data-paging="pagination"></button>
+                <order-by data-order-by="'itProjectType.name'" data-paging="pagination"></order-by>
             </th>
             <!-- Phase -->
             <th>Fase
             </th>
             <!-- Status -->
-            <th>
+            <th class="text-center">
                 <select data-ng-model="chosenStatus" data-ng-init="chosenStatus = 'statusProject'">
                     <option value="statusProject">Status projekt</option>
                     <option value="goalStatus.status">Status mål</option>
                 </select>
-                <button data-order-by="chosenStatus" data-paging="pagination"></button>
+                <order-by data-order-by="chosenStatus" data-paging="pagination"></order-by>
             </th>
             <!-- Risk/RO/BC -->
-            <th>
-                <select data-ng-model="chosenEco" data-ng-init="chosenEco = 0">
+            <th class="text-right">
+                <select data-ng-model="chosenEco" data-ng-init="chosenEco = 2">
                     <option value="0">Risiko</option>
                     <option value="1">RO</option>
-                    <option value="2">BC</option>
+                    <option value="2">Økonomi</option>
                 </select>
             </th>
             <!-- Priority -->
-            <th>
+            <th class="text-right">
                 <select data-ng-model="chosenPriority" data-ng-init="chosenPriority = 'priority'">
-                    <option value="priority">Prioritet</option>
-                    <option value="priorityPf">Prioritet PF</option>
+                    <option value="priority">Prioritet 1</option>
+                    <option value="priorityPf">Prioritet 2</option>
                 </select>
-                <button data-order-by="chosenPriority" data-paging="pagination"></button>
+                <order-by data-order-by="chosenPriority" data-paging="pagination"></order-by>
             </th>
         </tr>
     </thead>
@@ -66,26 +63,23 @@
             <!-- Role -->
             <td>{{ p.rights | filter:{roleId:chosenRoleId} | joinBy:', ':'user.name' }}</td>
             <!-- ID -->
-            <td data-ng-switch="chosenId">
-                <span data-ng-switch-when="itProjectId">{{p.itProjectId}}</span>
-                <span data-ng-switch-when="original.itProjectId">{{p.originalItProjectId}}</span>
-            </td>
+            <td>{{ p.itProjectId }}</td>
             <!-- Type -->
             <td>{{ p.itProjectTypeName }}</td>
             <!-- Phase -->
             <td>{{ p.currentPhase.name }}</td>
             <!-- Status -->
-            <td data-ng-switch="chosenStatus">
+            <td class="text-center" data-ng-switch="chosenStatus">
                 <span data-select-status2="" data-ng-model="p.statusProject" data-can-write="false" data-ng-switch-when="statusProject"></span>
                 <span data-select-status2="" data-ng-model="p.goalStatusStatus" data-can-write="false" data-ng-switch-when="goalStatus.status"></span>
             </td>
             <!-- Risk/RO/BC -->
-            <td>
+            <td class="text-right">
                 <span data-ng-if="chosenEco == 0">{{ p.averageRisk }}</span>
                 <span data-ng-if="chosenEco == 1">{{ p.roi }}</span>
                 <span data-ng-if="chosenEco == 2">{{ p.bc }}</span>
             </td>
-            <td data-ng-switch="chosenPriority">
+            <td class="text-right" data-ng-switch="chosenPriority">
                 <select data-ng-model="p.priority" data-autosave="api/itproject/{{p.id}}" data-field="priority" data-ng-disabled="p.isPriorityLocked" data-ng-switch-when="priority">
                     <option value="0">-- Vælg --</option>
                     <option value="3">Høj</option>

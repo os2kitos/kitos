@@ -55,7 +55,20 @@ namespace Core.DomainModel.ItProject
         public int ItProjectTypeId { get; set; }
         public virtual ItProjectType ItProjectType { get; set; }
 
+
+        /// <summary>
+        /// Gets or sets the organization identifier in which this project was created.
+        /// </summary>
+        /// <value>
+        /// The organization identifier.
+        /// </value>
         public int OrganizationId { get; set; }
+        /// <summary>
+        /// Gets or sets the organization in which this project was created.
+        /// </summary>
+        /// <value>
+        /// The organization.
+        /// </value>
         public virtual Organization Organization { get; set; }
 
         #endregion
