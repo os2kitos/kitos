@@ -31,6 +31,9 @@ namespace UI.MVC4.Models
         public int? JointMunicipalProjectId { get; set; }
 
         public bool IsStatusGoalVisible { get; set; }
+        public bool IsStrategyVisible { get; set; }
+        public bool IsRiskVisible { get; set; }
+        public bool IsHierarchyVisible { get; set; }
         public bool IsEconomyVisible { get; set; }
         public bool IsStakeholderVisible { get; set; }
         public bool IsCommunicationVisible { get; set; }
