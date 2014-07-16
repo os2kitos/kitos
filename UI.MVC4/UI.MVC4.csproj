@@ -473,6 +473,7 @@
     <Content Include="Partials\it-project\tab-description.html" />
     <Content Include="Partials\it-project\tab-handover.html" />
     <Content Include="Partials\it-project\tab-hierarchy.html" />
+    <Content Include="Partials\it-project\tab-phases.html" />
     <Content Include="Partials\it-project\tab-risk.html" />
     <Content Include="Partials\it-project\tab-roles.html" />
     <Content Include="Partials\it-project\edit-it-project.html" />
@@ -565,6 +566,7 @@
     <Content Include="Scripts\app\controllers\it-project\it-project-communication.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-handover.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-hierarchy.js" />
+    <Content Include="Scripts\app\controllers\it-project\it-project-phases.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-stakeholders.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-overview.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-status-goal.js" />
