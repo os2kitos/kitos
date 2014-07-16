@@ -1,158 +1,144 @@
-﻿<form class="form-horizontal fix-label-padding">
+﻿<!-- it system usage master sheet -->
+<form role="form" class="container-fluid">
     <div class="row">
+        <!-- Left side -->
         <div class="col-md-6">
             <div class="row">
+                <!-- 1st column -->
                 <div class="col-md-6">
                     <!--Name-->
                     <div class="form-group">
-                        <label for="system-name" class="control-label col-md-4 small">IT System</label>
-                        <div class="col-md-8">
-                            <input type="text" id="system-name" data-ng-model="usage.itSystem.name" class="form-control input-sm" disabled="disabled" />
-                        </div>
+                        <label for="system-name" class="control-label small">IT System</label>
+                        <input type="text" id="system-name" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystem.name">
                     </div>
 
                     <!--ID-->
                     <div class="form-group">
-                        <label for="system-id" class="control-label col-md-4 small">System ID</label>
-                        <div class="col-md-8">
-                            <input type="text" id="system-id" data-ng-model="usage.itSystem.systemId" class="form-control input-sm" disabled="disabled" />
-                        </div>
+                        <label for="system-id" class="control-label small">System ID</label>
+                        <input type="text" id="system-id" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystem.systemId">
                     </div>
 
                     <!--Parent system-->
                     <div class="form-group" data-ng-if="usage.itSystem.appTypeId != interfaceAppType.id">
-                        <label for="system-parent" class="control-label col-md-4 small">Overordnet system</label>
-                        <div class="col-md-8">
-                            <input type="text" id="system-parent" data-ng-model="parentSystem.name" class="form-control input-sm" disabled="disabled">
-                        </div>
+                        <label for="system-parent" class="control-label small">Overordnet system</label>
+                        <input type="text" id="system-parent" class="form-control input-sm" disabled="disabled" data-ng-model="parentSystem.name">
                     </div>
 
                     <!--Belongs to-->
                     <div class="form-group" data-ng-if="usage.itSystem.appTypeId != interfaceAppType.id">
-                        <label for="system-belongs-to" class="control-label col-md-4 small">Tilhører</label>
-                        <div class="col-md-8">
-                            <input type="text" id="system-belongs-to" data-ng-model="usage.itSystem.belongsToName" class="form-control input-sm" disabled="disabled">
-                        </div>
+                        <label for="system-belongs-to" class="control-label small">Tilhører</label>
+                        <input type="text" id="system-belongs-to" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystem.belongsToName">
                     </div>
                 </div>
+            
+                <!-- 2st column -->
                 <div class="col-md-6">
                     <!--Version-->
                     <div class="form-group">
-                        <label for="system-version" class="control-label col-md-4 small">Version</label>
-                        <div class="col-md-8">
-                            <input type="text" id="system-version" data-ng-model="usage.itSystem.version" class="form-control input-sm" disabled="disabled" />
-                        </div>
+                        <label for="system-version" class="control-label small">Version</label>
+                        <input type="text" id="system-version" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystem.version">
                     </div>
 
                     <!--Access modifier -->
                     <div class="form-group">
-                        <label for="system-access" class="control-label col-md-4 small">Public</label>
-                        <div class="col-md-8">
-                            <span id="system-access" data-ng-model="usage.itSystem.accessModifier" class="form-control input-sm" data-select-access-modifier="" disabled="disabled" />
-                        </div>
+                        <label for="system-access" class="control-label small">Public</label>
+                        <input id="system-access" class="form-control input-sm" disabled data-select-access-modifier="" data-ng-model="usage.itSystem.accessModifier">
                     </div>
 
                     <!--Application type -->
                     <div class="form-group">
-                        <label for="system-app-type" class="control-label col-md-4 small">Applikationstype</label>
-                        <div class="col-md-8">
-                            <select data-ui-select2="" id="system-app-type" data-ng-model="usage.itSystem.appTypeId" class="form-control input-sm" disabled="disabled">
-                                <option data-ng-repeat="appType in appTypes" value="{{appType.id}}">{{appType.name}}</option>
-                            </select>
-                        </div>
+                        <label for="system-app-type" class="control-label small">Applikationstype</label>
+                        <select id="system-app-type" class="form-control input-sm" disabled data-ui-select2="" data-ng-model="usage.itSystem.appTypeId">
+                            <option data-ng-repeat="appType in appTypes" value="{{appType.id}}">{{appType.name}}</option>
+                        </select>
                     </div>
 
                     <!--Usage type-->
                     <div class="form-group" data-ng-if="usage.itSystem.appTypeId != interfaceAppType.id">
-                        <label for="system-business-type" class="control-label col-md-4 small">Forretningstype</label>
-                        <div class="col-md-8">
-                            <select data-ui-select2="" id="system-business-type" data-ng-model="usage.itSystem.businessTypeId" class="form-control input-sm" disabled="disabled">
-                                <option data-ng-repeat="businessType in businessTypes" value="{{businessType.id}}">{{businessType.name}}</option>
-                            </select>
-                        </div>
+                        <label for="system-business-type" class="control-label small">Forretningstype</label>
+                        <select id="system-business-type" class="form-control input-sm" disabled data-ui-select2="" data-ng-model="usage.itSystem.businessTypeId">
+                            <option data-ng-repeat="businessType in businessTypes" value="{{businessType.id}}">{{businessType.name}}</option>
+                        </select>
                     </div>
                 </div>
+            
+                <!-- full width -->
                 <div class="col-md-12">
-                <!-- Description and URL -->
+                    <!-- Description and URL -->
                     <div class="form-group">
-                        <label for="system-description" class="control-label col-md-2 small">Beskrivelse</label>
-                        <div class="col-md-10">
-                            <textarea id="system-description" data-ng-model="usage.itSystem.description" class="form-control input-sm" rows="7" disabled="disabled"></textarea>
-                            <p class="help-block">
-                                Yderligere beskrivelse: <a data-ng-href="{{usage.itSystem.url}}">{{usage.itSystem.url}}</a>
-                            </p>
-                        </div>
+                        <label for="system-description" class="control-label small">Beskrivelse</label>
+                        <textarea id="system-description" class="form-control input-sm" rows="7" disabled data-ng-model="usage.itSystem.description"></textarea>
+                        <span class="help-block">
+                            Yderligere beskrivelse: <a data-ng-href="{{usage.itSystem.url}}">{{usage.itSystem.url}}</a>
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
+    
+        <!-- Right side -->
         <div class="col-md-6">
-            <div class="col-md-6">
-                <!-- local sys id -->
-                <div class="form-group">
-                    <label for="sysId" class="col-md-4 control-label small">Lokal SystemID</label>
-                    <div class="col-md-8">
-                        <input id="sysId" type="text" class="form-control input-sm"
-                            data-ng-disabled="!hasWriteAccess"
-                            data-ng-model="usage.localSystemId"
-                            data-field="localSystemId"
-                               data-autosave="api/itsystemusage/{{usageId}}" autofocus/>
+            <div class="row">
+                <!-- 3rd column -->
+                <div class="col-md-6">
+                    <!-- local sys id -->
+                    <div class="form-group">
+                        <label for="sysId" class="control-label small">Lokal SystemID</label>
+                        <input id="sysId" type="text" class="form-control input-sm" autofocus
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-model="usage.localSystemId"
+                               data-field="localSystemId"
+                               data-autosave="api/itsystemusage/{{usageId}}">
                     </div>
-                </div>
 
-                <!-- sensitive data -->
-                <div class="form-group">
-                    <label for="sensitive" class="col-md-4 control-label small">Personfølsom data</label>
-                    <div class="col-md-8">
-                        <select id="sensitive"
-                            data-ng-disabled="!hasWriteAccess"
-                            data-ng-options="a.id as a.name for a in sensitiveDataTypes"
-                            data-ng-model="usage.sensitiveDataTypeId" data-field="sensitiveDataTypeId"
-                            data-autosave="api/itsystemusage/{{usageId}}" class="form-control input-sm">
+                    <!-- sensitive data -->
+                    <div class="form-group">
+                        <label for="sensitive" class="control-label small">Personfølsom data</label>
+                        <select id="sensitive" class="form-control input-sm"
+                                data-ng-disabled="!hasWriteAccess"
+                                data-ng-options="a.id as a.name for a in sensitiveDataTypes"
+                                data-ng-model="usage.sensitiveDataTypeId" 
+                                data-field="sensitiveDataTypeId"
+                                data-autosave="api/itsystemusage/{{usageId}}">
                         </select>
                     </div>
-                </div>
 
-                <!-- esdh ref -->
-                <div class="form-group">
-                    <label for="esdh" class="col-md-4 control-label small">ESDH ref.</label>
-                    <div class="col-md-8">
-                        <input id="esdh" type="text" data-ng-model="usage.esdhRef"
-                            data-ng-disabled="!hasWriteAccess"
-                            data-field="esdhRef" data-autosave="api/itsystemusage/{{usageId}}"
-                            class="form-control input-sm" />
-                    </div>
-                </div>
-
-                <!-- link ref -->
-                <div class="form-group">
-                    <label for="url" class="col-md-4 control-label small">Mappe/URL ref.</label>
-                    <div class="col-md-8">
-                        <input id="url" type="text" data-ng-model="usage.directoryOrUrlRef"
-                            data-ng-disabled="!hasWriteAccess"
-                            data-field="directoryOrUrlRef" data-autosave="api/itsystemusage/{{usageId}}"
-                            class="form-control input-sm" />
-                    </div>
-                </div>
-
-
-            </div>
-            <div class="col-md-6">
-                <!-- local call name -->
-                <div class="form-group">
-                    <label for="localcallname" class="col-md-4 control-label small">Lokal kaldenavn</label>
-                    <div class="col-md-8">
-                        <input id="localcallname" type="text" data-ng-model="usage.localCallName"
+                    <!-- esdh ref -->
+                    <div class="form-group">
+                        <label for="esdh" class="control-label small">ESDH ref.</label>
+                        <input id="esdh" type="text" class="form-control input-sm"
+                               data-ng-model="usage.esdhRef"
                                data-ng-disabled="!hasWriteAccess"
-                               data-field="localCallName" data-autosave="api/itsystemusage/{{usageId}}"
-                               class="form-control input-sm" />
+                               data-field="esdhRef" 
+                               data-autosave="api/itsystemusage/{{usageId}}">
+                    </div>
+
+                    <!-- link ref -->
+                    <div class="form-group">
+                        <label for="url" class="control-label small">Mappe/URL ref.</label>
+                        <input id="url" type="text" class="form-control input-sm"
+                               data-ng-model="usage.directoryOrUrlRef"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-field="directoryOrUrlRef" 
+                               data-autosave="api/itsystemusage/{{usageId}}">
                     </div>
                 </div>
+            
+                <!-- 4th column -->
+                <div class="col-md-6">
+                    <!-- local call name -->
+                    <div class="form-group">
+                        <label for="localcallname" class="control-label small">Lokal kaldenavn</label>
+                        <input id="localcallname" type="text" class="form-control input-sm"
+                               data-ng-model="usage.localCallName"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-field="localCallName" 
+                               data-autosave="api/itsystemusage/{{usageId}}">
+                    </div>
 
-                <!-- overview system -->
-                <div class="form-group">
-                    <label for="overview" class="col-md-4 control-label small">Overblik</label>
-                    <div class="col-md-8">
+                    <!-- overview system -->
+                    <div class="form-group">
+                        <label for="overview" class="control-label small">Overblik</label>
                         <input type="hidden" id="overview" class="form-control input-sm" 
                                data-ui-select2="itSytemUsagesSelectOptions" 
                                data-ng-disabled="!hasWriteAccess" 
@@ -160,46 +146,43 @@
                                data-autosave="api/itsystemusage/{{usageId}}"
                                data-field="overviewItSystemId">
                     </div>
-                </div>
                 
-                <!-- archiving -->
-                <div class="form-group">
-                    <label for="archive" class="col-md-4 control-label small">Arkivering</label>
-                    <div class="col-md-8">
-                        <select id="archive" data-ng-options="a.id as a.name for a in archiveTypes" data-ng-model="usage.archiveTypeId"
+                    <!-- archiving -->
+                    <div class="form-group">
+                        <label for="archive" class="control-label small">Arkivering</label>
+                        <select id="archive" class="form-control input-sm"
+                                data-ng-options="a.id as a.name for a in archiveTypes" 
+                                data-ng-model="usage.archiveTypeId"
                                 data-ng-disabled="!hasWriteAccess"
-                                data-field="archiveTypeId" data-autosave="api/itsystemusage/{{usageId}}"
-                                class="form-control input-sm">
+                                data-field="archiveTypeId" 
+                                data-autosave="api/itsystemusage/{{usageId}}">
                         </select>
                     </div>
-                </div>
 
-                <!-- CMDB ref -->
-                <div class="form-group">
-                    <label for="cmdb" class="col-md-4 control-label small">CMDB ref.</label>
-                    <div class="col-md-8">
-                        <input id="cmdb" type="text" data-ng-model="usage.cmdbRef"
+                    <!-- CMDB ref -->
+                    <div class="form-group">
+                        <label for="cmdb" class="control-label small">CMDB ref.</label>
+                        <input id="cmdb" type="text" class="form-control input-sm"
+                               data-ng-model="usage.cmdbRef"
                                data-ng-disabled="!hasWriteAccess"
-                               data-field="cmdbRef" data-autosave="api/itsystemusage/{{usageId}}"
-                               class="form-control input-sm" />
+                               data-field="cmdbRef" 
+                               data-autosave="api/itsystemusage/{{usageId}}">
                     </div>
                 </div>
-            </div>
-            <div class="col-md-12">
-                <!-- note -->
-                <div class="form-group">
-                    <label for="note" class="col-md-2 control-label small">Note</label>
-                    <div class="col-md-10">
-                        <textarea id="note" data-ng-model="usage.note"
+            
+                <!-- full width -->
+                <div class="col-md-12">
+                    <!-- note -->
+                    <div class="form-group">
+                        <label for="note" class="control-label small">Note</label>
+                        <textarea id="note" class="form-control input-sm" rows="5"
+                                  data-ng-model="usage.note"
                                   data-ng-disabled="!hasWriteAccess"
-                                  data-field="note" data-autosave="api/itsystemusage/{{usageId}}" 
-                            rows="5"
-                                  class="form-control input-sm">
+                                  data-field="note" data-autosave="api/itsystemusage/{{usageId}}">
                         </textarea>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </form>

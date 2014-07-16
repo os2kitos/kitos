@@ -1,135 +1,139 @@
-﻿<!-- it project master data -->
-<form role="form">
+﻿<!-- it project master sheet -->
+<form role="form" class="container-fluid">
     <div class="row">
         <!-- Left side -->
         <div class="col-md-6">
-            <!-- top full width (left side) column -->
-            <div class="col-md-12">
-                <!-- Name -->
-                <div class="form-group">
-                    <label for="project-name" class="control-label small">Projekt</label>
-                    <input type="text" id="project-name" data-ng-model="project.name" class="form-control input-sm" 
-                           data-field="name"
-                           data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess" autofocus>
+            <div class="row">
+                <!-- top full width (left side) column -->
+                <div class="col-md-12">
+                    <!-- Name -->
+                    <div class="form-group">
+                        <label for="project-name" class="control-label small">Projekt</label>
+                        <input type="text" id="project-name" data-ng-model="project.name" class="form-control input-sm" 
+                               data-field="name"
+                               data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess" autofocus>
+                    </div>
                 </div>
-            </div>
 
-            <!-- 1st column -->
-            <div class="col-md-6">
-                <!-- ID -->
-                <div class="form-group">
-                    <label for="project-projectId" class="control-label small">Projekt ID</label>
-                    <input type="text" id="project-projectId" data-ng-model="project.itProjectId" class="form-control input-sm" 
-                           data-field="itProjectId"
-                           data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess">
-                </div>
+                <!-- 1st column -->
+                <div class="col-md-6">
+                    <!-- ID -->
+                    <div class="form-group">
+                        <label for="project-projectId" class="control-label small">Projekt ID</label>
+                        <input type="text" id="project-projectId" data-ng-model="project.itProjectId" class="form-control input-sm" 
+                               data-field="itProjectId"
+                               data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess">
+                    </div>
                 
-                <!-- type -->
-                <div class="form-group">
-                    <label for="project-type" class="control-label small">Type</label>
-                    <select id="project-type" class="form-control input-sm"
-                            data-ng-options="o.id as o.name for o in projectTypes"
-                            data-ng-model="project.itProjectTypeId"
-                            data-field="itProjectTypeId"
-                            data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess">
-                    </select>
-                </div>
+                    <!-- type -->
+                    <div class="form-group">
+                        <label for="project-type" class="control-label small">Type</label>
+                        <select id="project-type" class="form-control input-sm"
+                                data-ng-options="o.id as o.name for o in projectTypes"
+                                data-ng-model="project.itProjectTypeId"
+                                data-field="itProjectTypeId"
+                                data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess">
+                        </select>
+                    </div>
                 
-                <!-- cmdb ref -->
-                <div class="form-group">
-                    <label for="project-cmdb" class="control-label small">CMDB ref.</label>
-                    <input id="project-cmdb" class="form-control input-sm" type="text" data-ng-model="project.cmdb"
-                           data-ng-disabled="!hasWriteAccess"   
-                           data-field="cmdb" 
-                           data-autosave="api/itproject/{{project.id}}">
-                </div>
+                    <!-- cmdb ref -->
+                    <div class="form-group">
+                        <label for="project-cmdb" class="control-label small">CMDB ref.</label>
+                        <input id="project-cmdb" class="form-control input-sm" type="text" data-ng-model="project.cmdb"
+                               data-ng-disabled="!hasWriteAccess"   
+                               data-field="cmdb" 
+                               data-autosave="api/itproject/{{project.id}}">
+                    </div>
                 
-                <!-- archived -->
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" data-ng-model="project.isArchived" data-autosave="{{autosaveUrl}}" data-field="isArchived" data-ng-disabled="!hasWriteAccess">
-                        Arkiveret
-                    </label>
+                    <!-- archived -->
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" data-ng-model="project.isArchived" data-autosave="{{autosaveUrl}}" data-field="isArchived" data-ng-disabled="!hasWriteAccess">
+                            Arkiveret
+                        </label>
+                    </div>
                 </div>
-            </div>
             
-            <!-- 2nd column -->
-            <div class="col-md-6">
-                <!-- access modifier -->
-                <div class="form-group">
-                    <label for="project-access" class="control-label small">Public</label>
-                    <input id="project-access" data-ng-model="project.accessModifier" class="form-control input-sm" data-select-access-modifier=""
-                           data-field="accessModifier"
-                           data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess">
-                </div>
+                <!-- 2nd column -->
+                <div class="col-md-6">
+                    <!-- access modifier -->
+                    <div class="form-group">
+                        <label for="project-access" class="control-label small">Public</label>
+                        <input id="project-access" data-ng-model="project.accessModifier" class="form-control input-sm" data-select-access-modifier=""
+                               data-field="accessModifier"
+                               data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess">
+                    </div>
                 
-                <!-- esdh ref -->
-                <div class="form-group">
-                    <label for="project-esdh" class="control-label small">ESDH ref.</label>
-                    <input id="project-esdh" class="form-control input-sm" type="text" data-ng-model="project.esdh"
-                           data-ng-disabled="!hasWriteAccess"   
-                           data-field="esdh" 
-                           data-autosave="api/itproject/{{project.id}}">
-                </div>
+                    <!-- esdh ref -->
+                    <div class="form-group">
+                        <label for="project-esdh" class="control-label small">ESDH ref.</label>
+                        <input id="project-esdh" class="form-control input-sm" type="text" data-ng-model="project.esdh"
+                               data-ng-disabled="!hasWriteAccess"   
+                               data-field="esdh" 
+                               data-autosave="api/itproject/{{project.id}}">
+                    </div>
                 
-                <!-- link ref -->
-                <div class="form-group">
-                    <label for="project-url" class="control-label small">Mappe link</label>
-                    <input id="project-url" class="form-control input-sm" type="text" data-ng-model="project.folder" 
-                           data-ng-disabled="!hasWriteAccess"   
-                           data-field="folder" 
-                           data-autosave="api/itproject/{{project.id}}">
-                </div>
+                    <!-- link ref -->
+                    <div class="form-group">
+                        <label for="project-url" class="control-label small">Mappe link</label>
+                        <input id="project-url" class="form-control input-sm" type="text" data-ng-model="project.folder" 
+                               data-ng-disabled="!hasWriteAccess"   
+                               data-field="folder" 
+                               data-autosave="api/itproject/{{project.id}}">
+                    </div>
                 
-                <!-- transversal -->
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" data-ng-model="isTransversal" data-autosave="{{patchUrl}}" data-field="isTransversal" data-ng-disabled="!hasWriteAccess" />
-                        Tværgående
-                    </label>
+                    <!-- transversal -->
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" data-ng-model="isTransversal" data-autosave="{{patchUrl}}" data-field="isTransversal" data-ng-disabled="!hasWriteAccess" />
+                            Tværgående
+                        </label>
+                    </div>
                 </div>
-            </div>
             
-            <div class="col-md-12">
-                <!-- Parent -->
-                <div class="form-group">
-                    <label for="project-parent" class="control-label small">Overordnet projekt</label>
-                    <input type="hidden" id="project-parent" class="form-control input-sm" 
-                           data-ui-select2="parentSelectOptions" 
-                           data-ng-model="project.parent" 
-                           data-autosave="{{ autosaveUrl }}" 
-                           data-field="parentId" 
-                           data-ng-disabled="!hasWriteAccess">
+                <div class="col-md-12">
+                    <!-- Parent -->
+                    <div class="form-group">
+                        <label for="project-parent" class="control-label small">Overordnet projekt</label>
+                        <input type="hidden" id="project-parent" class="form-control input-sm" 
+                               data-ui-select2="parentSelectOptions" 
+                               data-ng-model="project.parent" 
+                               data-autosave="{{ autosaveUrl }}" 
+                               data-field="parentId" 
+                               data-ng-disabled="!hasWriteAccess">
+                    </div>
                 </div>
             </div>
         </div>
         
         <!-- Right side -->
         <div class="col-md-6">
-            <!-- full width -->
-            <div class="col-md-12">
-                <!-- background -->
-                <div class="form-group">
-                    <label for="project-background" class="control-label small">Formål/baggrund</label>
-                    <textarea id="project-background" class="form-control input-sm" rows="7"
-                              data-ng-model="project.background"
-                              data-field="background" 
-                              data-autosave="{{autosaveUrl}}"
-                              data-ng-disabled="!hasWriteAccess">
+            <div class="row">
+                <!-- full width -->
+                <div class="col-md-12">
+                    <!-- background -->
+                    <div class="form-group">
+                        <label for="project-background" class="control-label small">Formål/baggrund</label>
+                        <textarea id="project-background" class="form-control input-sm" rows="7"
+                                  data-ng-model="project.background"
+                                  data-field="background" 
+                                  data-autosave="{{autosaveUrl}}"
+                                  data-ng-disabled="!hasWriteAccess">
                     </textarea>
+                    </div>
                 </div>
-            </div>
             
-            <div class="col-md-12">
-                <!-- notes -->
-                <div class="form-group">
-                    <label for="project-note" class="control-label small">Noter</label>
-                    <textarea id="project-note" class="form-control input-sm" rows="7" 
-                              data-ng-model="project.note"
-                              data-field="note" 
-                              data-autosave="{{autosaveUrl}}"
-                              data-ng-disabled="!hasWriteAccess">
+                <div class="col-md-12">
+                    <!-- notes -->
+                    <div class="form-group">
+                        <label for="project-note" class="control-label small">Noter</label>
+                        <textarea id="project-note" class="form-control input-sm" rows="7" 
+                                  data-ng-model="project.note"
+                                  data-field="note" 
+                                  data-autosave="{{autosaveUrl}}"
+                                  data-ng-disabled="!hasWriteAccess">
                     </textarea>
+                    </div>
                 </div>
             </div>
         </div>
