@@ -9,7 +9,7 @@
         <div class="form-group">
             <!-- Name -->
             <label for="name" class="col-md-2 control-label small">
-                Aktivitetsnavn:
+                {{ activity.isTask && "Opgave" || "Milepæl" }}
             </label>
             <div class="col-md-10">
                 <input type="text" id="name" data-ng-model="activity.name" class="form-control input-sm"
@@ -21,7 +21,7 @@
         <div class="form-group">
             <!-- Human readable ID -->
             <label for="humanReadableId" class="col-md-2 control-label small">
-                ID
+                {{ activity.isTask && "Opgave ID" || "Milepæl ID" }}
             </label>
             <div class="col-md-4">
                 <input type="text" id="humanReadableId" data-ng-model="activity.humanReadableId" class="form-control input-sm"
@@ -178,7 +178,7 @@
         <div class="form-group">
             <!-- Associated User -->
             <label for="associatedUserId" class="col-md-2 control-label small">
-                Navn
+                Ansvarlig
             </label>
             <div class="col-md-10">
                 <select id="associatedUserId" class="form-control input-sm" 
@@ -200,5 +200,5 @@
     </form>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-primary" data-ng-click="$close()" data-disabled-on-busy="">Færdig</button>
+    <button class="btn btn-primary" data-ng-click="$close()" data-disabled-on-busy="">Gem</button>
 </div>
