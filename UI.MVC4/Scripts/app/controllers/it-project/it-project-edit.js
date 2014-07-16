@@ -54,20 +54,29 @@
                 $scope.selectedData = [];
                 if (project.isStatusGoalVisible) 
                     $scope.selectedData.push({ id: 1 });
-                if (project.isEconomyVisible)
+                if (project.isStrategyVisible)
                     $scope.selectedData.push({ id: 2 });
-                if (project.isStakeholderVisible)
+                if (project.isHierarchyVisible)
                     $scope.selectedData.push({ id: 3 });
-                if (project.isCommunicationVisible)
+                if (project.isEconomyVisible)
                     $scope.selectedData.push({ id: 4 });
-                if (project.isHandoverVisible)
+                if (project.isStakeholderVisible)
                     $scope.selectedData.push({ id: 5 });
+                if (project.isRiskVisible)
+                    $scope.selectedData.push({ id: 6 });
+                if (project.isCommunicationVisible)
+                    $scope.selectedData.push({ id: 7 });
+                if (project.isHandoverVisible)
+                    $scope.selectedData.push({ id: 8 });
                 $scope.dropdownData = [
                     {id: 1, label: 'Vis Status: Mål'},
-                    {id: 2, label: 'Vis Økonomi'},
-                    {id: 3, label: 'Vis Interessanter'},
-                    {id: 4, label: 'Vis Kommunikation'},
-                    {id: 5, label: 'Vis Overlevering'}
+                    { id: 2, label: 'Vis Strategi' },
+                    { id: 3, label: 'Vis Hierarki' },
+                    { id: 4, label: 'Vis Økonomi'},
+                    { id: 5, label: 'Vis Interessenter' },
+                    { id: 6, label: 'Vis Risiko' },
+                    { id: 7, label: 'Vis Kommunikation'},
+                    { id: 8, label: 'Vis Overlevering'}
                 ];
                 // TODO refactor this garbage!
                 $scope.$watch('selectedData', function (newValue, oldValue) {
@@ -81,15 +90,24 @@
                                 payload.isStatusGoalVisible = true;
                                 break;
                             case 2:
-                                payload.isEconomyVisible = true;
+                                payload.isStrategyVisible = true;
                                 break;
                             case 3:
-                                payload.isStakeholderVisible = true;
+                                payload.isHierarchyVisible = true;
                                 break;
                             case 4:
-                                payload.isCommunicationVisible = true;
+                                payload.isEconomyVisible = true;
                                 break;
                             case 5:
+                                payload.isStakeholderVisible = true;
+                                break;
+                            case 6:
+                                payload.isRiskVisible = true;
+                                break;
+                            case 7:
+                                payload.isCommunicationVisible = true;
+                                break;
+                            case 8:
                                 payload.isHandoverVisible = true;
                                 break;
                             }
@@ -103,15 +121,24 @@
                                     payload.isStatusGoalVisible = false;
                                     break;
                                 case 2:
-                                    payload.isEconomyVisible = false;
+                                    payload.isStrategyVisible = false;
                                     break;
                                 case 3:
-                                    payload.isStakeholderVisible = false;
+                                    payload.isHierarchyVisible = false;
                                     break;
                                 case 4:
-                                    payload.isCommunicationVisible = false;
+                                    payload.isEconomyVisible = false;
                                     break;
                                 case 5:
+                                    payload.isStakeholderVisible = false;
+                                    break;
+                                case 6:
+                                    payload.isRiskVisible = false;
+                                    break;
+                                case 7:
+                                    payload.isCommunicationVisible = false;
+                                    break;
+                                case 8:
                                     payload.isHandoverVisible = false;
                                     break;
                             }
@@ -120,8 +147,11 @@
                     if (_.size(payload) > 0) {
                         $http({ method: 'PATCH', url: $scope.autosaveUrl, data: payload }).success(function (result) {
                             $scope.project.isStatusGoalVisible = result.response.isStatusGoalVisible;
+                            $scope.project.isStrategyVisible = result.response.isStrategyVisible;
+                            $scope.project.isHierarchyVisible = result.response.isHierarchyVisible;
                             $scope.project.isEconomyVisible = result.response.isEconomyVisible;
                             $scope.project.isStakeholderVisible = result.response.isStakeholderVisible;
+                            $scope.project.isRiskVisible = result.response.isRiskVisible;
                             $scope.project.isCommunicationVisible = result.response.isCommunicationVisible;
                             $scope.project.isHandoverVisible = result.response.isHandoverVisible;
                         });
