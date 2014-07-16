@@ -47,7 +47,7 @@ namespace Core.ApplicationServices
             _userRepository.Save();
 
             var reset = GenerateResetRequest(user);
-            var resetLink = "http://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
+            var resetLink = "https://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
             const string subject = "Oprettelse af KITOS profil";
             var content = "<h2>Kære " + user.Name + "</h2>" +
                           "<p>Du er blevet oprettet, som bruger i KITOS (Kommunernes IT Overblikssystem) under organisationen " + org.Name + ".</p>" +
@@ -69,7 +69,7 @@ namespace Core.ApplicationServices
             if (content == null)
             {
                 reset = GenerateResetRequest(user);
-                var resetLink = "http://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
+                var resetLink = "https://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
                 mailContent = "<p>Du har bedt om at få nulstillet dit password.</p>" +
                                   "<p><a href='" + resetLink + "'>Klik her for at nulstille passwordet for din KITOS profil</a>.</p>" +
                                   "<p>Linket udløber om " + ResetRequestTTL + " timer.</p>";
@@ -95,7 +95,7 @@ namespace Core.ApplicationServices
             var now = DateTime.Now;
             var hash = _cryptoService.Encrypt(now + user.Email);
 
-            var request = new PasswordResetRequest { Hash = hash, Time = now, UserId = user.Id, ObjectOwner = user };
+            var request = new PasswordResetRequest { Hash = hash, Time = now, UserId = user.Id, ObjectOwner = user, LastChangedByUser = user};
 
             _passwordResetRequestRepository.Insert(request);
             _passwordResetRequestRepository.Save();
