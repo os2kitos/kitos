@@ -1,5 +1,10 @@
 ﻿<form role="form">
-    <table class="table table-striped">
+    
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Advis
+        </div>
+        <table class="table table-condensed small">
         <thead>
             <tr>
                 <th>Aktiv</th>
@@ -22,7 +27,7 @@
                            data-autosave="{{advice.updateUrl}}"
                            data-field="isActive">
                 </td>
-                
+
                 <!-- mail sent indicator -->
                 <td class="vert-align">
                     {{ advice.sentDate | date }}
@@ -107,4 +112,5 @@
             </tr>
         </tfoot>
     </table>
+    </div>
 </form>

@@ -339,15 +339,22 @@ div.task-usage-row {
     padding: 2px 0;
 }
 
-.dropdown-menu.stop-light {
+.dropdown-menu.traffic-light {
     min-width: initial;
     padding: 0;
+
+    left: 7px;
 }
 
-    .dropdown-menu.stop-light a {
+    .dropdown-menu.traffic-light a {
         padding: 5px;
         margin: 5px;
     }
+    
+    .dropdown-menu.traffic-light a:hover {
+        border-color: black;
+    }
+
 
 a.task-fold {
     color: inherit;
@@ -358,11 +365,14 @@ a.task-fold {
         color: black;
     }
 
-a.select-status {
+.select-status {
+    color: transparent !important;
     display: inline-block;
+    padding: 4px 6px 0px 6px;
 }
 
 .status-circle {
+    position: relative;
     width: 18px;
     height: 18px;
     border-radius: 12px;
@@ -371,34 +381,69 @@ a.select-status {
     background: gray;
 }
 
-a.select-status:hover .status-circle {
+.select-status:hover .status-circle {
     border: 2px solid rgb(108, 108, 108);
+}
+
+.status-arrow-down {
+    display: inline-block;
+    margin-bottom: 5px;
+    margin-left: 2px;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid rgb(52, 52, 52);
+}
+
+.select-status:hover .status-arrow-down {
+    border-top: 5px solid rgb(108, 108, 108);
 }
 
 .status-circle.red, .progress-bar-danger {
     background: rgb(208, 67, 67);
 }
+.traffic-light .status-circle.red:hover {
+    background: rgb(157, 45, 45);
+}
 
 .status-circle.yellow, .progress-bar-warning {
     background: rgb(254, 232, 34);
+}
+.traffic-light a.status-circle.yellow:hover {
+    background: rgb(204, 183, 0);
 }
 
 .status-circle.green, .progress-bar-success {
     background: rgb(54, 164, 54);
 }
+.traffic-light  a.status-circle.green:hover {
+    background: rgb(33, 118, 33);
+}
 
 .status-circle.white, .progress-bar-white {
     background: rgb(255, 255, 255);
 }
+.traffic-light a.status-circle.white:hover {
+    background: rgb(213, 213, 213);
+}
 
 .status-bar {
     display: inline-block;
-    width: 36px;
-    height: 18px;
-    border: 2px solid rgb(52, 52, 52);
+    width: 45px;
+    height: 23px;
+    border: 1px solid #cccccc;
     border-radius: 0px;
     margin-bottom: 0;
 }
+
+
+.status-column {
+    display: inline-block;
+    text-align: center;
+    width: 32%;
+}
+
 
 .supertext {
     position: absolute;
@@ -410,28 +455,6 @@ a.select-status:hover .status-circle {
     top: 8px;
     width: 100%;
 }
-
-.status-column {
-    display: inline-block;
-    text-align: center;
-    width: 32%;
-}
-
-.status-arrow-down {
-    display: inline-block;
-    margin-bottom: 5px;
-    margin-left: 5px;
-    width: 0;
-    height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 5px solid rgb(52, 52, 52);
-}
-
-a.select-status:hover .status-arrow-down {
-    border-top: 5px solid rgb(108, 108, 108);
-}
-
 .btn-star {
     color: rgb(255, 141, 0);
     display: inline-block;
@@ -591,3 +614,20 @@ body, .btn {
         background-color: #cccccc;
         border-color: #cccccc;
     }
+
+
+.subtabs {
+    display: inline-block;
+    padding: 20px 5px 2px 5px !important;
+
+    width: 100%;
+}
+
+.dropdown-menu {
+    font-size: inherit !important;
+}
+
+.nav.nav-tabs > li > a {
+    padding: 8px 9px !important;
+    text-align: center;
+}

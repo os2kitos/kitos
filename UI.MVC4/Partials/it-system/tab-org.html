@@ -1,25 +1,17 @@
-﻿<script type="text/ng-template"  id="tree_item_renderer.html">
-    <label>
-        <input type="checkbox" value="{{ orgUnit.id }}" data-ng-model="orgUnit.selected" data-ng-change="save(orgUnit)" data-ng-disabled="!hasWriteAccess" />
-        {{ orgUnit.name }}
-    </label>
-    <ul>
-        <li data-ng-repeat="orgUnit in orgUnit.children" data-ng-include="'tree_item_renderer.html'"></li>
-    </ul>
-</script>
-
-<ul>
-    <li data-ng-repeat="orgUnit in orgUnitsTree" data-ng-include="'tree_item_renderer.html'"></li>
-</ul>
-
-<div>
-    <div class="form-group">
-        <label for="responsible" class="control-label">Vælg ansvarlig organisationsenhed i blandt ovenstående:</label>
-        <select id="responsible" data-ng-options="o.id as o.name for o in orgUnits"
-                data-ng-disabled="!hasWriteAccess"
-                data-ng-model="usage.responsibleUnitId" data-field="responsibleUnitId"
-                data-autosave="api/itsystemusage/{{usageId}}" class="form-control input-sm">
-            <option value="">Ingen</option>
-        </select>
+﻿<div class="panel panel-default">
+    <div class="panel-heading">Organisation</div>
+    <div class="panel-body">
+        <div>
+            <div class="form-group">
+                <label for="responsible" class="control-label">Vælg ansvarlig organisationsenhed i blandt nedenstående:</label>
+                <select id="responsible" data-ng-options="o.id as o.name for o in orgUnits"
+                    data-ng-disabled="!hasWriteAccess"
+                    data-ng-model="usage.responsibleUnitId" data-field="responsibleUnitId"
+                    data-autosave="api/itsystemusage/{{usageId}}" class="form-control input-sm">
+                    <option value="">Ingen</option>
+                </select>
+            </div>
+        </div>
+        <div data-ng-repeat="orgUnit in orgUnitsTree" data-ng-include="'/partials/shared/org-tree-item.html'"></div>
     </div>
 </div>
