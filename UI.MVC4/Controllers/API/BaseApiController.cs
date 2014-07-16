@@ -131,6 +131,10 @@ namespace UI.MVC4.Controllers.API
                     {
                         return UserRepository.Get(u => u.Email == "ehl@kl.dk").First();
                     }
+                    if (header != null && header.FirstOrDefault() == "b0aee3d2-3d8f-49b5-8edc-9c0cc5143034")
+                    {
+                        return UserRepository.Get(u => u.Email == "g@test").First();
+                    }
 #endif
                     var id = Convert.ToUInt32(User.Identity.Name);
                     var user = UserRepository.Get(u => u.Id == id).FirstOrDefault();
