@@ -43,7 +43,7 @@
                                             "createdInId": user.currentOrganizationId
                                         };
 
-                                        var msg = notify.addInfoMessage("Arbejder ...", false);
+                                        var msg = notify.addInfoMessage("Opretter bruger, sender email...", false);
 
                                         $http.post("api/user", data, { handleBusy: true }).success(function (result, status) {
                                             var userResult = result.response;
@@ -55,7 +55,7 @@
 
                                             $modalInstance.close(userResult);
                                         }).error(function (result) {
-                                            msg.toErrorMessage("Fejl! " + name + " blev ikke oprettet i KITOS!");
+                                            msg.toErrorMessage("Fejl! Noget gik galt ved oprettelsen af " + name + "!");
                                         });
                                     };
 
