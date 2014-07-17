@@ -635,3 +635,22 @@ body, .btn {
     padding: 8px 9px !important;
     text-align: center;
 }
+
+div.searchbox {
+    position: absolute;
+    right: 0;
+    top: -45px;
+
+    display: inline-block;
+    width: 200px;
+}
+div.searchbox-wrapper {
+    position: relative;
+    width: 100%;
+}
+.input-xs {
+    height: 26px;
+    padding: 5px 10px;
+    font-size: 12px;
+    line-height: 1.5;
+}

@@ -809,6 +809,18 @@
 
     }]);
 
+    app.directive('searchBox', [function () {
+        return {
+            scope: {
+                pagination: '=paging'
+            },
+            replace: true,
+            templateUrl: 'partials/directives/search-box.html',
+            link: function (scope, element, attrs) {
+            }
+        };
+    }]);
+
     app.directive('showErrors', [function() {
         return {
             restrict: 'A',
