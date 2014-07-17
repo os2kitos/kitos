@@ -1,91 +1,116 @@
-﻿<table class="table">
-    <thead>
-        <tr>
-            <th>Målgruppe</th>
-            <th>Formål</th>
-            <th>Budskab</th>
-            <th>Medie</th>
-            <th class="col-md-2">Hvornår</th>
-            <th colspan="2">Ansvarlig</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr data-ng-repeat="c in comms">
-            <td>
-                <div class="form-group">
-                    <input type="text" class="form-control input-sm" data-ng-model="c.targetAudiance" data-autosave="api/communication/{{c.id}}" data-field="targetAudiance">
-                </div>
-            </td>
-            <td>
-                <div class="form-group">
-                    <input type="text" class="form-control input-sm" data-ng-model="c.purpose" data-autosave="api/communication/{{c.id}}" data-field="purpose">
-                </div>
-            </td>
-            <td>
-                <div class="form-group">
-                    <input type="text" class="form-control input-sm" data-ng-model="c.message" data-autosave="api/communication/{{c.id}}" data-field="message">
-                </div>
-            </td>
-            <td>
-                <div class="form-group">
-                    <input type="text" class="form-control input-sm" data-ng-model="c.media" data-autosave="api/communication/{{c.id}}" data-field="media">
-                </div>
-            </td>
-            <td>
-                <div class="input-group input-group-sm">
-                    <input type="text" class="form-control"
-                           data-datepicker-popup="dd-MM-yyyy" 
-                           data-is-open="$parent.opened['dd' + $index]" 
-                           data-date-to-string 
-                           data-ng-disabled="!hasWriteAccess" 
-                           data-ng-model="c.dueDate"
-                           data-autosave="api/communication/{{c.id}}"
-                           data-field="dueDate">
-                    <span class="input-group-btn">
-                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'dd' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
-                    </span>
-                </div>
-            </td>
-            <td colspan="2">
-                <div class="form-group">
-                    <select class="form-control input-sm" 
-                            data-field="responsibleUserId"
-                            data-autosave="api/communication/{{c.id}}"
-                            data-ng-model="c.responsibleUserId" 
-                            data-ng-options="user.id as user.name for user in usersWithRoles">
-                        <option value=""></option>
-                    </select>
-                </div>
-            </td>
-        </tr>
-    </tbody>
-    <tfoot>
-        <tr>
-            <td><input type="text" class="form-control input-sm" data-ng-model="comm.targetAudiance" /></td>
-            <td><input type="text" class="form-control input-sm" data-ng-model="comm.purpose" /></td>
-            <td><input type="text" class="form-control input-sm" data-ng-model="comm.message" /></td>
-            <td><input type="text" class="form-control input-sm" data-ng-model="comm.media"/></td>
-            <td>
-                <div class="input-group input-group-sm">
-                    <input type="text" class="form-control"
-                           data-datepicker-popup="dd-MM-yyyy" 
-                           data-is-open="opened['ndd' + $index]" 
-                           data-date-to-string 
-                           data-ng-disabled="!hasWriteAccess" 
-                           data-ng-model="comm.dueDate">
-                    <span class="input-group-btn">
-                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'ndd' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
-                    </span>
-                </div>
-            </td>
-            <td>
-                <select class="form-control input-sm" 
-                        data-ng-model="comm.responsibleUserId" 
-                        data-ng-options="user.id as user.name for user in usersWithRoles">
-                    <option value=""></option>
-                </select>
-            </td>
-            <td><button class="btn btn-success" data-ng-click="save()">GEM</button></td>
-        </tr>
-    </tfoot>
-</table>
+﻿<form role="form" name="commForm">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Målgruppe</th>
+                <th>Formål</th>
+                <th>Budskab</th>
+                <th>Medie</th>
+                <th class="col-md-2">Hvornår</th>
+                <th>Ansvarlig</th>
+                <th><!-- control --></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="c in comms">
+                <td>
+                    <div class="form-group">
+                        <textarea class="form-control input-sm" data-ng-model="c.targetAudiance" data-autosave="api/communication/{{c.id}}" data-field="targetAudiance"></textarea>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <textarea class="form-control input-sm" data-ng-model="c.purpose" data-autosave="api/communication/{{c.id}}" data-field="purpose"></textarea>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <textarea class="form-control input-sm" data-ng-model="c.message" data-autosave="api/communication/{{c.id}}" data-field="message"></textarea>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <textarea class="form-control input-sm" data-ng-model="c.media" data-autosave="api/communication/{{c.id}}" data-field="media"></textarea>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control"
+                               data-datepicker-popup="dd-MM-yyyy" 
+                               data-is-open="$parent.opened['dd' + $index]" 
+                               data-date-to-string 
+                               data-ng-disabled="!hasWriteAccess" 
+                               data-ng-model="c.dueDate"
+                               data-autosave="api/communication/{{c.id}}"
+                               data-field="dueDate">
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" data-ng-click="open($event, 'dd' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
+                        </span>
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div class="form-group">
+                        <select class="form-control input-sm" 
+                                data-field="responsibleUserId"
+                                data-autosave="api/communication/{{c.id}}"
+                                data-ng-model="c.responsibleUserId" 
+                                data-ng-options="user.id as user.name for user in usersWithRoles">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>
+                    <div class="form-group" data-show-errors>
+                        <textarea name="target" class="form-control input-sm" data-ng-model="comm.targetAudiance"></textarea>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group" data-show-errors>
+                        <textarea name="purpose" class="form-control input-sm" data-ng-model="comm.purpose"></textarea>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group" data-show-errors>
+                        <textarea name="mesasge" class="form-control input-sm" data-ng-model="comm.message"></textarea>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group" data-show-errors>
+                        <textarea name="media" class="form-control input-sm" data-ng-model="comm.media"></textarea>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group" data-show-errors>
+                        <div class="input-group input-group-sm">
+                            <input type="text" name="due" class="form-control" required
+                                   data-datepicker-popup="dd-MM-yyyy" 
+                                   data-is-open="opened['ndd' + $index]" 
+                                   data-date-to-string 
+                                   data-ng-disabled="!hasWriteAccess" 
+                                   data-ng-model="comm.dueDate">
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" data-ng-click="open($event, 'ndd' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group" data-show-errors>
+                        <select name="responsible" class="form-control input-sm" required
+                                data-ng-model="comm.responsibleUserId" 
+                                data-ng-options="user.id as user.name for user in usersWithRoles">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </td>
+                <td>
+                    <button class="btn btn-success btn-sm" data-ng-click="save()">Gem</button>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</form>

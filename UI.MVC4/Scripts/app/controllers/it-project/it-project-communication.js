@@ -59,7 +59,11 @@
             $scope.comm = {
                 itProjectId: $stateParams.id
             };
-            $scope.save = function() {
+            $scope.save = function () {
+                $scope.$broadcast('show-errors-check-validity');
+
+                if ($scope.commForm.$invalid) { return; }
+
                 $http.post('api/communication', $scope.comm).finally(reload);
             };
             
