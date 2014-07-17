@@ -1,119 +1,140 @@
-﻿    <div class="row">
-        <form class="form-horizontal fix-label-padding">
-            <div class="col-md-7">
-                <div class="col-md-6">
+﻿<!-- it system master sheet -->
+<form role="form" class="container-fluid">
+    <div class="row">
+        <!-- Left side -->
+        <div class="col-md-4">
+            <div class="row">
+                <div class="col-md-12">
                     <!--Application type -->
                     <div class="form-group">
-                        <label for="system-app-type" class="control-label col-md-5 small">Applikationstype</label>
-                        <div class="col-md-7">
-                            <select data-ui-select2="" id="system-app-type" 
-                                    data-autosave="{{system.updateUrl}}" data-field="appTypeId" data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="system.appTypeId" class="form-control input-sm" data-autofocus>
-                                <option data-ng-repeat="appType in appTypes" value="{{appType.id}}">{{appType.name}}</option>
-                            </select>
-                        </div>
+                        <label for="system-app-type" class="control-label small">Applikationstype</label>
+                        <select id="system-app-type" class="form-control input-sm" autofocus
+                                data-ui-select2=""
+                                data-autosave="{{system.updateUrl}}" 
+                                data-field="appTypeId" 
+                                data-ng-disabled="!hasWriteAccess"
+                                data-ng-model="system.appTypeId">
+                            <option data-ng-repeat="appType in appTypes" value="{{appType.id}}">{{appType.name}}</option>
+                        </select>
                     </div>
 
                     <!--Name-->
                     <div class="form-group">
-                        <label for="system-name" class="control-label col-md-5 small">IT System</label>
-                        <div class="col-md-7">
-                            <input type="text" id="system-name" data-ng-disabled="!hasWriteAccess"
-                                   data-autosave="{{system.updateUrl}}" data-field="name" 
-                                   data-ng-model="system.name" class="form-control input-sm"/>
-                        </div>
+                        <label for="system-name" class="control-label small">IT System</label>
+                        <input type="text" id="system-name" class="form-control input-sm" 
+                               data-ng-disabled="!hasWriteAccess"
+                               data-autosave="{{system.updateUrl}}" 
+                               data-field="name" 
+                               data-ng-model="system.name" />
                     </div>
 
                     <!--ID-->
                     <div class="form-group">
-                        <label for="system-id" class="control-label col-md-5 small">System ID</label>
-                        <div class="col-md-7">
-                            <input type="text" id="system-id" data-ng-disabled="!hasWriteAccess"
-                                   data-autosave="{{system.updateUrl}}" data-field="systemId" 
-                                   data-ng-model="system.systemId" class="form-control input-sm"/>
-                        </div>
+                        <label for="system-id" class="control-label small">System ID</label>
+                        <input type="text" id="system-id" class="form-control input-sm"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-autosave="{{system.updateUrl}}" 
+                               data-field="systemId" 
+                               data-ng-model="system.systemId">
                     </div>
 
                     <!--Parent system-->
                     <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
-                        <label for="system-parent" class="control-label col-md-5 small">Overordnet system</label>
-                        <div class="col-md-7">
-                            <input type="hidden" data-ui-select2="itSystemsSelectOptions" data-ng-disabled="!hasWriteAccess"
-                                   data-autosave="{{system.updateUrl}}" data-field="parentId" data-placeholder="Vælg system"
-                                   id="system-parent" data-ng-model="system.parent" class="form-control input-sm">
-                        </div>
+                        <label for="system-parent" class="control-label small">Overordnet system</label>
+                        <input type="hidden" id="system-parent" class="form-control input-sm" 
+                               data-ui-select2="itSystemsSelectOptions" 
+                               data-ng-disabled="!hasWriteAccess"
+                               data-autosave="{{system.updateUrl}}" 
+                               data-field="parentId" 
+                               data-placeholder="Vælg system"
+                               data-ng-model="system.parent">
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <div class="col-md-6">
+        <!-- Middle -->
+        <div class="col-md-4">
+            <div class="row">
+                <div class="col-md-12">
                     <!-- belongs to -->
                     <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
-                        <label for="system-belongs-to" class="control-label col-md-5 small">Tilhører</label>
-                        <div class="col-md-7">
-                            <input type="hidden" data-ui-select2="organizationSelectOptions"  data-ng-disabled="!hasWriteAccess"
-                                   data-autosave="{{system.updateUrl}}" data-field="belongsToId" 
-                                   id="system-belongs-to" data-ng-model="system.belongsTo" class="form-control input-sm">
-                        </div>
+                        <label for="system-belongs-to" class="control-label small">Tilhører</label>
+                        <input type="hidden" id="system-belongs-to" class="form-control input-sm" 
+                               data-ui-select2="organizationSelectOptions"  
+                               data-ng-disabled="!hasWriteAccess"
+                               data-autosave="{{system.updateUrl}}" 
+                               data-field="belongsToId" 
+                               data-ng-model="system.belongsTo">
                     </div>
 
                     <!--Version-->
                     <div class="form-group">
-                        <label for="system-version" class="control-label col-md-5 small">Version</label>
-                        <div class="col-md-7">
-                            <input type="text" id="system-version" data-ng-disabled="!hasWriteAccess"
-                                   data-autosave="{{system.updateUrl}}" data-field="version" 
-                                   data-ng-model="system.version" class="form-control input-sm"/>
-                        </div>
+                        <label for="system-version" class="control-label small">Version</label>
+                        <input type="text" id="system-version" class="form-control input-sm" 
+                               data-ng-disabled="!hasWriteAccess"
+                               data-autosave="{{system.updateUrl}}" 
+                               data-field="version" 
+                               data-ng-model="system.version">
                     </div>
 
                     <!--Access modifier -->
                     <div class="form-group">
-                        <label for="system-access" class="control-label col-md-5 small">Public</label>
-                        <div class="col-md-7">
-                            <input id="system-access" 
-                                   data-autosave="{{system.updateUrl}}" data-field="accessModifier"  data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="system.accessModifier" class="form-control input-sm" data-select-access-modifier="" />
-                        </div>
+                        <label for="system-access" class="control-label small">Public</label>
+                        <input id="system-access" class="form-control input-sm"
+                               data-autosave="{{system.updateUrl}}" 
+                               data-field="accessModifier"  
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-model="system.accessModifier"
+                               data-select-access-modifier="">
                     </div>
 
                     <!--Usage type-->
                     <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
-                        <label for="system-business-type" class="control-label col-md-5 small">Forretningstype</label>
-                        <div class="col-md-7">
-                            <select data-ui-select2="" id="system-business-type"
-                                    data-autosave="{{system.updateUrl}}" data-field="businessTypeId" data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="system.businessTypeId" class="form-control input-sm">
-                                <option data-ng-repeat="businessType in businessTypes" value="{{businessType.id}}">{{businessType.name}}</option>
-                            </select>
-                        </div>
+                        <label for="system-business-type" class="control-label small">Forretningstype</label>
+                        <select id="system-business-type" class="form-control input-sm"
+                                data-ui-select2=""
+                                data-autosave="{{system.updateUrl}}" 
+                                data-field="businessTypeId" 
+                                data-ng-disabled="!hasWriteAccess"
+                                data-ng-model="system.businessTypeId">
+                            <option data-ng-repeat="businessType in businessTypes" value="{{businessType.id}}">{{businessType.name}}</option>
+                        </select>
                     </div>
                 </div>
             </div>
-
-            <div class="col-md-5">
-
-                <!--Description-->
-                <div class="form-group">
-                    <label for="system-description" class="control-label col-md-4 small">Beskrivelse</label>
-                    <div class="col-md-8">
-                        <textarea id="system-description"
-                                  data-autosave="{{system.updateUrl}}" data-field="description" data-ng-disabled="!hasWriteAccess"
-                                  data-ng-model="system.description" class="form-control input-sm" rows="7"></textarea>
+        </div>
+            
+        <!-- Right side -->
+        <div class="col-md-4">
+            <div class="row">
+                <div class="col-md-12">
+                    <!--Description-->
+                    <div class="form-group">
+                        <label for="system-description" class="control-label small">Beskrivelse</label>
+                        <textarea id="system-description" class="form-control input-sm" rows="7"
+                                  data-autosave="{{system.updateUrl}}" 
+                                  data-field="description" 
+                                  data-ng-disabled="!hasWriteAccess"
+                                  data-ng-model="system.description">
+                        </textarea>
                     </div>
-                </div>
 
-                <!--Further description-->
-                <div class="form-group">
-                    <label for="system-url" class="control-label col-md-4 small">Link til yderligere beskrivelse <span class="text-muted">(Skal starte med http://)</span></label>
-                    <div class="col-md-8">
-                        <input type="text" id="system-url" 
-                               data-autosave="{{system.updateUrl}}" data-field="url" data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="system.url" class="form-control input-sm" placeholder="http://" />
+                    <!--Further description-->
+                    <div class="form-group">
+                        <label for="system-url" class="control-label small">Link til yderligere beskrivelse</label>
+                        <input type="text" id="system-url" class="form-control input-sm" placeholder="http://"
+                               data-autosave="{{system.updateUrl}}" 
+                               data-field="url" 
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-model="system.url">
+                        <span class="help-block">Skal starte med http://</span>
                     </div>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
+</form>
 
 <!-- sub tab buttons -->
 <ul class="nav nav-tabs">
