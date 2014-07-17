@@ -1,11 +1,9 @@
 ﻿<div class="searchbox-wrapper">
-    <form class="form-horizontal fi"></form>
-    <div class="searchbox form-group">
-        <label class="col-md-2 vert-align">
-            Søg: 
-        </label>
-        <div class="col-md-10">
-            <input type="text" class="input-xs form-control" data-ng-model="pagination.search" placeholder="Søg" />
+    <form class="form-inline fix-label-padding">
+        <div class="searchbox form-group text-right">
+            <label class="control-label">
+                Søg: <input type="text" class="input-xs form-control" data-ng-model="search" placeholder="Søg" data-ng-change="update()"/>
+            </label>
         </div>
-    </div>
+    </form>
 </div>

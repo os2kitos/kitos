@@ -642,7 +642,7 @@ div.searchbox {
     top: -45px;
 
     display: inline-block;
-    width: 200px;
+    width: 300px;
 }
 div.searchbox-wrapper {
     position: relative;
@@ -652,5 +652,5 @@ div.searchbox-wrapper {
     height: 26px;
     padding: 5px 10px;
     font-size: 12px;
-    line-height: 1.5;
+    line-height: 1.3;
 }

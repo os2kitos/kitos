@@ -809,7 +809,7 @@
 
     }]);
 
-    app.directive('searchBox', [function () {
+    app.directive('searchBox', ['$timeout', function ($timeout) {
         return {
             scope: {
                 pagination: '=paging'
@@ -817,6 +817,21 @@
             replace: true,
             templateUrl: 'partials/directives/search-box.html',
             link: function (scope, element, attrs) {
+               var updatePromise = null;
+
+                function doUpdate() {
+                    scope.pagination.skip = 0;
+                    scope.pagination.search = scope.search;
+
+                    updatePromise = null;
+                }
+
+
+                scope.update = function () {
+                    if (updatePromise) $timeout.cancel(updatePromise);
+
+                    updatePromise = $timeout(doUpdate, 200);
+                };
             }
         };
     }]);
