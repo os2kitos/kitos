@@ -1,16 +1,19 @@
 ﻿<div class="row">
     <div class="col-md-4">
-        <h2>Organisation
-            <span class="pull-right small" data-ng-hide="true || chosenOrgUnit.hasWriteAccess">Låst</span>
-            <span class="pull-right small" data-ng-show="chosenOrgUnit.hasWriteAccess">
-                <a data-ng-click="editUnit(chosenOrgUnit)">Rediger 
-                </a>
-            </span>
-        </h2>
-
-        <div>
-            <div data-ng-repeat="node in nodes" class="org-node-top">
-                <div data-ng-include="'partials/org/org-unit.html'"></div>
+        <!-- Organization tree -->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-list"></span>
+                <h7 class="panel-title">Organisation</h7>
+                <span class="pull-right" data-ng-hide="true || chosenOrgUnit.hasWriteAccess">Låst</span>
+                <span class="pull-right" data-ng-show="chosenOrgUnit.hasWriteAccess">
+                    <a data-ng-click="editUnit(chosenOrgUnit)">Rediger</a>
+                </span>
+            </div>
+            <div class="panel-body">
+                <div data-ng-repeat="node in nodes">
+                    <div data-ng-include="'partials/org/org-unit.html'"></div>
+                </div>
             </div>
         </div>
     </div>
