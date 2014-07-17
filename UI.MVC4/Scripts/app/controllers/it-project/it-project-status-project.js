@@ -72,7 +72,7 @@
             //All activities - both activities ("opgaver") and milestones
             $scope.milestonesActivities = [];
             
-            function addMilestoneActivity(activity) {
+            function addMilestoneActivity(activity, skipAdding) {
                 activity.show = true;
 
                 activity.updatePhase = function(id) {
@@ -109,7 +109,7 @@
 
                 };
 
-                $scope.milestonesActivities.push(activity);
+                if(!skipAdding) $scope.milestonesActivities.push(activity);
 
                 return activity;
             }
@@ -195,13 +195,13 @@
             function editActivity(activity) {
                 var modal = $modal.open({
                     templateUrl: 'partials/it-project/modal-milestone-task-edit.html',
-                    controller: ['$scope', 'autofocus', function ($modalScope, autofocus) {
+                    controller: ['$scope', 'autofocus', '$modalInstance', function ($modalScope, autofocus, $modalInstance) {
                         autofocus();
-                        $modalScope.activity = activity;
+                        
+                        $modalScope.activity = angular.copy(activity);
+
                         $modalScope.phases = $scope.project.phases;
                         $modalScope.usersWithRoles = _.values(usersWithRoles);
-                        $modalScope.updateUserName = $modalScope.activity.updateUser;
-                        $modalScope.updatePhase = $modalScope.activity.updatePhase;
                         
                         $modalScope.opened = {};
                         $modalScope.open = function ($event, datepicker) {
@@ -210,11 +210,32 @@
 
                             $modalScope.opened[datepicker] = true;
                         };
+
+                        $modalScope.save = function () {
+                            var msg = notify.addInfoMessage("Gemmer ændringer...", false);
+
+                            var payload = angular.copy($modalScope.activity);
+                            delete payload.id;
+                            delete payload.objectOwnerId;
+                            delete payload.objectOwner;
+
+                            $http({
+                                method: 'PATCH',
+                                url: $modalScope.activity.updateUrl,
+                                data: payload
+                            }).success(function (result) {
+                                msg.toSuccessMessage("Ændringerne er gemt!");
+                                angular.extend(activity, result.response);
+
+                                addMilestoneActivity(activity, true);
+                                $modalInstance.close();
+
+                            }).error(function() {
+                                msg.toErrorMessage("Ændringerne kunne ikke gemmes!");
+                            });
+                        };
                     }]
                 });
             }
-            
-
-
         }]);
 })(angular, app);

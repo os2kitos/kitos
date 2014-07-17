@@ -9,24 +9,20 @@
         <div class="form-group">
             <!-- Name -->
             <label for="name" class="col-md-2 control-label small">
-                Aktivitetsnavn:
+                {{ activity.isTask && "Opgave" || "Milepæl" }}
             </label>
             <div class="col-md-10">
-                <input type="text" id="name" data-ng-model="activity.name" class="form-control input-sm"
-                       data-field="name"
-                       data-autosave="{{activity.updateUrl}}" autofocus />
+                <input type="text" id="name" data-ng-model="activity.name" class="form-control input-sm" autofocus />
             </div>
         </div>
         
         <div class="form-group">
             <!-- Human readable ID -->
             <label for="humanReadableId" class="col-md-2 control-label small">
-                ID
+                {{ activity.isTask && "Opgave ID" || "Milepæl ID" }}
             </label>
             <div class="col-md-4">
-                <input type="text" id="humanReadableId" data-ng-model="activity.humanReadableId" class="form-control input-sm"
-                       data-field="humanReadableId"
-                       data-autosave="{{activity.updateUrl}}" />
+                <input type="text" id="humanReadableId" data-ng-model="activity.humanReadableId" class="form-control input-sm"/>
             </div>
 
             <!-- Phase -->
@@ -35,9 +31,6 @@
             </label>
             <div class="col-md-4">
                 <select id="phase" class="form-control input-sm" 
-                        data-field="associatedActivityId"
-                        data-autosave="{{activity.updateUrl}}"
-                        data-ng-change="updatePhase()"
                         data-ng-model="activity.associatedActivityId" 
                         data-ng-options="phase.id as phase.name for phase in phases">
                     <option value=""></option>
@@ -57,9 +50,7 @@
                            data-datepicker-popup="dd-MM-yyyy" 
                            data-is-open="opened.sd" 
                            data-date-to-string 
-                           data-ng-model="activity.startDate"
-                           data-autosave="{{activity.updateUrl}}"
-                           data-field="startDate">
+                           data-ng-model="activity.startDate" />
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-default" data-ng-click="open($event, 'sd')"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>
@@ -76,9 +67,7 @@
                            data-datepicker-popup="dd-MM-yyyy" 
                            data-is-open="opened.ed" 
                            data-date-to-string 
-                           data-ng-model="activity.endDate"
-                           data-autosave="{{activity.updateUrl}}"
-                           data-field="endDate">
+                           data-ng-model="activity.endDate">
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-default" data-ng-click="open($event, 'ed')"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>
@@ -98,9 +87,7 @@
                            data-datepicker-popup="dd-MM-yyyy" 
                            data-is-open="opened.d" 
                            data-date-to-string 
-                           data-ng-model="activity.date"
-                           data-autosave="{{activity.updateUrl}}"
-                           data-field="date">
+                           data-ng-model="activity.date"">
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-default" data-ng-click="open($event, 'd')"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>
@@ -114,9 +101,7 @@
                 Tidsestimat <small>(timer)</small>
             </label>
             <div class="col-md-4">
-                <input id="timeEstimate" type="number" data-ng-model="activity.timeEstimate" class="form-control input-sm"
-                       data-field="timeEstimate"
-                       data-autosave="{{activity.updateUrl}}" />
+                <input id="timeEstimate" type="number" data-ng-model="activity.timeEstimate" class="form-control input-sm"/>
             </div>
 
             <!-- Status estimate -->
@@ -124,9 +109,7 @@
                 Status
             </label>
             <div class="col-md-4" data-ng-if="activity.isTask">
-                <select id="status" class="form-control input-sm" data-ng-model="activity.statusProcentage"
-                    data-field="statusProcentage"
-                    data-autosave="{{activity.updateUrl}}">
+                <select id="status" class="form-control input-sm" data-ng-model="activity.statusProcentage">
                     <option value="0">0%</option>
                     <option value="10">10%</option>
                     <option value="20">20%</option>
@@ -141,9 +124,7 @@
                 </select>
             </div>
             <div class="col-md-4" data-ng-if="activity.isMilestone">
-                <span id="status" data-select-status2="" data-ng-model="activity.status" 
-                      data-field="status"
-                      data-autosave="{{activity.updateUrl}}"   
+                <span id="status" data-select-status2="" data-ng-model="activity.status"
                       data-can-write="true">
                 </span>
             </div>
@@ -156,9 +137,7 @@
                 Beskrivelse
             </label>
             <div class="col-md-10">
-                <textarea id="description" class="form-control input-sm" data-ng-model="activity.description" rows="4"
-                    data-field="description"
-                    data-autosave="{{activity.updateUrl}}"></textarea>
+                <textarea id="description" class="form-control input-sm" data-ng-model="activity.description" rows="4"></textarea>
             </div>
         </div>
 
@@ -169,22 +148,17 @@
                 Note
             </label>
             <div class="col-md-10">
-                <textarea id="note" class="form-control input-sm" data-ng-model="activity.note" rows="4"
-                          data-field="note"
-                          data-autosave="{{activity.updateUrl}}"></textarea>
+                <textarea id="note" class="form-control input-sm" data-ng-model="activity.note" rows="4"></textarea>
             </div>
         </div>
 
         <div class="form-group">
             <!-- Associated User -->
             <label for="associatedUserId" class="col-md-2 control-label small">
-                Navn
+                Ansvarlig
             </label>
             <div class="col-md-10">
-                <select id="associatedUserId" class="form-control input-sm" 
-                        data-field="associatedUserId"
-                        data-autosave="{{activity.updateUrl}}"
-                        data-ng-change="updateUserName()"
+                <select id="associatedUserId" class="form-control input-sm"
                         data-ng-model="activity.associatedUserId" 
                         data-ng-options="user.id as user.name for user in usersWithRoles">
                     <option value=""></option>
@@ -200,5 +174,6 @@
     </form>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-primary" data-ng-click="$close()" data-disabled-on-busy="">Færdig</button>
+    <button class="btn btn-success" data-ng-click="save()" data-disabled-on-busy="">Gem</button>
+    <button class="btn btn-warning" data-ng-click="$dismiss()" data-disabled-on-busy="">Annuller</button>
 </div>
