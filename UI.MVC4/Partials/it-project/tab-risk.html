@@ -4,57 +4,68 @@
         <thead>
             <tr>
                 <th>Risiko</th>
-                <th>Konsekvens</th>
-                <th>Sandsynlighed</th>
-                <th>Produkt</th>
+                <th class="col-sm-0">Konsekvens</th>
+                <th class="col-sm-0">Sandsynlighed</th>
+                <th class="col-sm-0">Produkt</th>
                 <th>Handling</th>
                 <th>Ansvarlig</th>
-                <th></th>
+                <th class="col-sm-0"><!-- control --></th>
             </tr>
         </thead>
         <tbody>
             <tr data-ng-repeat="risk in risks | filter : { show: true }">
                 <td>
-                    <input type="text" class="form-control input-sm" data-ng-model="risk.name" 
+                    <input type="text" class="form-control input-sm" 
+                           data-ng-model="risk.name" 
                            data-field="name"
-                           data-autosave="{{risk.updateUrl}}" data-ng-disabled="!hasWriteAccess"/>
+                           data-autosave="{{risk.updateUrl}}" 
+                           data-ng-disabled="!hasWriteAccess">
                 </td>
                 <td>
-                    <input type="number" class="form-control input-sm" min="1" max="5" data-ng-model="risk.consequence"
+                    <input type="number" class="form-control input-sm" min="1" max="5" 
+                           data-ng-model="risk.consequence"
                            data-field="consequence"
-                           data-autosave="{{risk.updateUrl}}" data-ng-disabled="!hasWriteAccess"/>
+                           data-autosave="{{risk.updateUrl}}" 
+                           data-ng-disabled="!hasWriteAccess">
                 </td>
                 <td>
-                    <input type="number" class="form-control input-sm" min="1" max="5" data-ng-model="risk.probability"
+                    <input type="number" class="form-control input-sm" min="1" max="5" 
+                           data-ng-model="risk.probability"
                            data-field="probability"
-                           data-autosave="{{risk.updateUrl}}" data-ng-disabled="!hasWriteAccess"/>
+                           data-autosave="{{risk.updateUrl}}" 
+                           data-ng-disabled="!hasWriteAccess">
                 </td>
                 <td>
-                    <p class="form-control-static input-sm">{{ product(risk) }}</p>
+                    <span class="form-control-static input-sm">{{ product(risk) }}</span>
                 </td>
                 <td>
-                    <input type="text" class="form-control input-sm" data-ng-model="risk.action" 
-                           data-field="action"
-                           data-autosave="{{risk.updateUrl}}" data-ng-disabled="!hasWriteAccess"/>
+                    <textarea class="form-control input-sm" 
+                              data-ng-model="risk.action" 
+                              data-field="action"
+                              data-autosave="{{risk.updateUrl}}" 
+                              data-ng-disabled="!hasWriteAccess">
+                    </textarea>
                 </td>
                 <td>
-                     <select class="form-control input-sm" 
-                        data-field="responsibleUserId"
-                        data-autosave="{{risk.updateUrl}}"
-                        data-ng-model="risk.responsibleUserId" 
-                        data-ng-options="user.id as user.name for user in usersWithRoles">
+                    <select class="form-control input-sm" 
+                            data-field="responsibleUserId"
+                            data-autosave="{{risk.updateUrl}}"
+                            data-ng-model="risk.responsibleUserId" 
+                            data-ng-options="user.id as user.name for user in usersWithRoles">
                         <option value=""></option>
                     </select>
                 </td>
                 <td>
-                    <button class="btn btn-danger btn-sm" data-ng-click="delete(risk)" data-ng-disabled="!hasWriteAccess">
-                        <i class="glyphicon glyphicon-trash small"></i>
+                    <button class="btn btn-danger btn-sm" 
+                            data-ng-click="delete(risk)" 
+                            data-ng-disabled="!hasWriteAccess">
+                        <span class="glyphicon glyphicon-trash small"></span>
                     </button>
                 </td>
             </tr>                     
             <tr class="active" data-ng-hide="!hasWriteAccess">
                 <td>
-                    <input type="text" class="form-control input-sm" data-ng-model="newRisk.name" />
+                    <input type="text" class="form-control input-sm" data-ng-model="newRisk.name">
                 </td>
                 <td>
                     <input type="number" class="form-control input-sm" min="1" max="5" data-ng-model="newRisk.consequence">
@@ -63,10 +74,10 @@
                     <input type="number" class="form-control input-sm" min="1" max="5" data-ng-model="newRisk.probability">
                 </td>
                 <td>
-                    <p class="form-control-static input-sm text-muted">{{ product(newRisk) }}</p>
+                    <span class="form-control-static input-sm">{{ product(newRisk) }}</span>
                 </td>
                 <td>
-                    <input type="text" class="form-control input-sm" data-ng-model="newRisk.action" />
+                    <textarea class="form-control input-sm" data-ng-model="newRisk.action"></textarea>
                 </td>
                 <td>
                      <select class="form-control input-sm" 
@@ -75,28 +86,26 @@
                         <option value=""></option>
                     </select>
                 </td>
-                <td>
+                <td class="text-right">
                     <button class="btn btn-success btn-sm" data-ng-click="saveNewRisk()">
-                        <i class="glyphicon glyphicon-plus small"></i> Ny
+                        Gem
                     </button>
                 </td>
             </tr>  
             <tr>
                 <td></td>
                 <td></td>
-                <td><p class="form-control-static input-sm text-right">Gennemsnit:</td>
+                <td class="text-right">
+                    <span class="form-control-static input-sm text-right">Gennemsnit:</span>
+                </td>
                 <td>
-                    <p class="form-control-static input-sm">{{ averageProduct() }}
+                    <span class="form-control-static input-sm">{{ averageProduct() }}</span>
                 </td>
                 <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
             </tr>
-            
         </tbody>
-        <tfoot>
- 
-        </tfoot>
     </table>
 </div>

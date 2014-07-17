@@ -474,6 +474,10 @@ a.task-fold {
     padding: 3px 0px;
 }
 
+.col-sm-0 {
+    width: 1%;
+}
+
 body.wait, body.wait * {
     cursor: wait !important;
 }
