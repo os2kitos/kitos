@@ -7,6 +7,8 @@ namespace UI.MVC4.Models
     public class ItProjectOverviewDTO
     {
         public bool IsArchived { get; set; }
+        public bool IsTransversal { get; set; }
+        public bool IsStrategy { get; set; }
 
         //1st column
         public int Id { get; set; }

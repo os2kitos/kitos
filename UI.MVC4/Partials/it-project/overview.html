@@ -25,6 +25,10 @@
             <th>Type
                 <order-by data-order-by="'itProjectType.name'" data-paging="pagination"></order-by>
             </th>
+            
+            <!-- bool markers -->
+            <th class="col-sm-0"></th>
+
             <!-- Phase -->
             <th>Fase
             </th>
@@ -66,6 +70,11 @@
             <td>{{ p.itProjectId }}</td>
             <!-- Type -->
             <td>{{ p.itProjectTypeName }}</td>
+            <!-- Bool markers -->
+            <td class="text-center text-muted">
+                <span data-ng-if="p.isTransversal">(T)</span>
+                <span data-ng-if="p.isStrategy">(S)</span>
+            </td>
             <!-- Phase -->
             <td>{{ p.currentPhase.name }}</td>
             <!-- Status -->
