@@ -64,11 +64,6 @@
                 prevPhase = phase;
             });
             
-            //Returns a phase (activity) given an id
-            function findPhase(id) {
-                return _.findWhere($scope.project.phases, { id: id });
-            }
-            
             //All activities - both activities ("opgaver") and milestones
             $scope.milestonesActivities = [];
             
@@ -132,46 +127,7 @@
 
             _.each(project.taskActivities, addTask);
             _.each(project.milestoneStates, addMilestone);
-
-            function patch(url, field, value) {
-                var payload = {};
-                payload[field] = value;
-
-                return $http({
-                    method: 'PATCH',
-                    url: url,
-                    data: payload
-                });
-            }
-
-            $scope.updateSelectedPhase = function (phase) {
-                patch($scope.project.updateUrl, "currentPhaseId", phase.id)
-                    .success(function (result) {
-                        notify.addSuccessMessage("Feltet er opdateret");
-                        $scope.project.currentPhaseId = phase.id;
-                    })
-                    .error(function () {
-                        notify.addErrorMessage("Fejl!");
-                    });
-            };
-
-
-            $scope.updatePhaseDate = function(phase) {
-                //Update start date of the current phase
-                patch(phase.updateUrl, "startDate", phase.startDate)
-                    .success(function (result) {
-                        //Also update end date of the previous phase
-                        patch(phase.prevPhase.updateUrl, "endDate", phase.startDate).success(function () {
-                            notify.addSuccessMessage("Feltet er opdateret");
-                        }).error(function () {
-                            notify.addErrorMessage("Fejl!");
-                        });
-
-                    }).error(function () {
-                        notify.addErrorMessage("Fejl!");
-                    });
-            };
-            
+      
             $scope.addMilestone = function() {
                 $http.post("api/state", { milestoneForProjectId: project.id }).success(function(result) {
                     var activity = result.response;

@@ -1,14 +1,14 @@
 ﻿<div>
     <form class="form-horizontal fix-label-padding">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                 <!-- Status traffic light -->
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusProject">Status projekt (økonomi, tid og kvalitet):</label>
                     <div class="col-md-7">
                         <span id="statusProject" data-select-status2="" data-ng-model="project.statusProject" data-can-write="hasWriteAccess"
-                            data-field="statusProject"
-                            data-autosave="{{project.updateUrl}}">
+                              data-field="statusProject"
+                              data-autosave="{{project.updateUrl}}">
                         </span>
                     </div>
                 </div>
@@ -16,7 +16,7 @@
                 <!-- Date for status update -->
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
-                    <div class="col-md-7">
+                    <div class="col-md-4">
                         <div class="input-group input-group-sm">
                             <input type="text" class="form-control" id="statusDate"
                                    data-datepicker-popup="dd-MM-yyyy" 
@@ -33,67 +33,17 @@
                     </div>
                 </div>
 
-                <!-- Notes to status of project -->
-                <div class="form-group">
-                    <label class="col-md-5 control-label small" for="note">Bemærkning til samlet status på projekt:</label>
-                    <div class="col-md-7">
-                        <textarea id="note" class="form-control input-sm" rows="4" data-ng-model="project.statusNote"
-                            data-field="statusNote"
-                            data-autosave="{{project.updateUrl}}" data-ng-disabled="!hasWriteAccess"></textarea>
-                    </div>
-                </div>
+               
             </div>
-            <div class="col-md-9">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <span class="small">
-                            Faseplan
-                        </span>
-                            <a class="btn btn-sm btn-link pull-right" data-ng-click="editPhaseNames = !editPhaseNames" data-ng-hide="!hasWriteAccess">
-                                {{ editPhaseNames && "Afslut redigering" || "Rediger fasenavne" }}
-                            </a>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <!-- Phases names -->
-                            <div class="col-md-2 small"></div>
-                            <div data-ng-repeat="phase in project.phases" class="col-md-2">
-                                <input type="text" class="input-sm form-control" data-ng-show="editPhaseNames" data-ng-model="phase.name"
-                                    data-field="name" 
-                                    data-autosave="{{phase.updateUrl}}" data-ng-disabled="!hasWriteAccess"/>
 
-                                <p class="text-center full-width small" data-ng-hide="editPhaseNames">{{phase.name}}</p>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <!-- Phases buttons -->
-                            <div class="col-md-2 small">Aktuel fase:</div>
-                            <span data-ng-repeat="phase in project.phases" class="col-md-2">
-                                <button class="btn btn-xs full-width text-center" data-ng-click="updateSelectedPhase(phase)" data-ng-disabled="!hasWriteAccess">
-                                    <i class="glyphicon glyphicon-ok text-success" data-ng-class="{'invisible': phase.id != project.currentPhaseId}"></i>
-                                </button>
-                            </span>
-                        </div>
-
-                        <div class="form-group">
-                            <!-- Phases buttons -->
-                            <div class="col-md-3 small">Forventet slut/start:</div>
-                            <span data-ng-repeat="phase in project.phases" class="col-md-2" data-ng-hide="$first">
-                                <div class="input-group input-group-sm">
-                                    <input type="text" class="form-control"
-                                           data-datepicker-popup="dd-MM-yyyy" 
-                                           data-is-open="opened['pd' + $index]" 
-                                           data-date-to-string 
-                                           data-is-disabled="!hasWriteAccess"
-                                           data-ng-model="phase.startDate"
-                                           data-ng-change="updatePhaseDate(phase)">
-                                    <span class="input-group-btn">
-                                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'pd' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
-                                    </span>
-                                </div>
-                            </span>
-                        </div>
+            <!-- Notes to status of project -->
+            <div class="col-md-7">
+                <div class="form-group">
+                    <label class="col-md-2 control-label small" for="note">Bemærkning til samlet status på projekt:</label>
+                    <div class="col-md-10">
+                        <textarea id="note" class="form-control input-sm" rows="4" data-ng-model="project.statusNote"
+                                  data-field="statusNote"
+                                  data-autosave="{{project.updateUrl}}" data-ng-disabled="!hasWriteAccess"></textarea>
                     </div>
                 </div>
             </div>
