@@ -31,7 +31,7 @@ namespace UI.MVC4.Controllers.API
                     Repository.AsQueryable()
                               .Where(sys => sys.AccessModifier == AccessModifier.Public || sys.BelongsToId == organizationId);
 
-                if (q != null) paging.Where(sys => sys.Name.Contains(q));
+                if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
 
                 var query = Page(systems, paging);
 

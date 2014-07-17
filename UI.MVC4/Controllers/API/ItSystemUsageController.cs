@@ -45,7 +45,7 @@ namespace UI.MVC4.Controllers.API
             {
                 pagingModel.Where(u => u.OrganizationId == organizationId);
 
-                if (q != null) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
+                if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
 
                 var usages = Page(Repository.AsQueryable(), pagingModel);
                 

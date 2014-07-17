@@ -119,7 +119,8 @@
                         if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
                     }
 
-                    if($scope.pagination.search) url += '&q=' + $scope.pagination.search;
+                    if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
+                    else url += "&q=";
 
                     $http.get(url).success(function (result, status, headers) {
 
