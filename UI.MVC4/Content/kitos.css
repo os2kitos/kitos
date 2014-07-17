@@ -542,6 +542,11 @@ table.table-no-margin {
     margin: 0px;
 }
 
+.table tbody>tr>td.vert-align
+{
+    vertical-align: middle;
+}
+
 tr.sub-sum {
     background-color: rgba(242, 208, 95, 0.37);
 }

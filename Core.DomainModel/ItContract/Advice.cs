@@ -37,6 +37,14 @@ namespace Core.DomainModel.ItContract
         public DateTime? AlarmDate { get; set; }
 
         /// <summary>
+        /// Gets or sets the sent date.
+        /// </summary>
+        /// <value>
+        /// The sent date.
+        /// </value>
+        public DateTime? SentDate { get; set; }
+
+        /// <summary>
         /// Gets or sets the receiver contract role identifier.
         /// </summary>
         /// <remarks>

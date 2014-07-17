@@ -5,106 +5,112 @@
             Advis
         </div>
         <table class="table table-condensed small">
-                  <thead>
-                      <tr>
-                          <th>Aktiv</th>
-                          <th>Advis navn</th>
-                          <th class="col-md-2">Dato</th>
-                          <th>Modtager</th>
-                          <th>Cc</th>
-                          <th>Emne</th>
-                          <th></th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr data-ng-repeat="advice in advices">
-                          <!-- active -->
-                          <td>
-                              <input type="checkbox" class="checkbox"
-                                     data-ng-model="advice.isActive"
-                                     data-ng-disabled="!hasWriteAccess"
-                                     data-autosave="{{advice.updateUrl}}"
-                                     data-field="isActive">
-                          </td>
+        <thead>
+            <tr>
+                <th>Aktiv</th>
+                <th>Sendt</th>
+                <th>Advis navn</th>
+                <th class="col-md-2">Dato</th>
+                <th>Modtager</th>
+                <th>Cc</th>
+                <th>Emne</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="advice in advices">
+                <!-- active -->
+                <td>
+                    <input type="checkbox" class="checkbox"
+                           data-ng-model="advice.isActive"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-autosave="{{advice.updateUrl}}"
+                           data-field="isActive">
+                </td>
 
-                          <!-- name -->
-                          <td>
-                              <input type="text" data-ng-model="advice.name" class="form-control input-sm"
-                                     data-ng-disabled="!hasWriteAccess"
-                                     data-autosave="{{advice.updateUrl}}"
-                                     data-field="name">
-                          </td>
+                <!-- mail sent indicator -->
+                <td class="vert-align">
+                    {{ advice.sentDate | date }}
+                </td>
 
-                          <!-- date -->
-                          <td>
-                              <div class="input-group input-group-sm">
-                                  <input type="text" class="form-control"
-                                         data-datepicker-popup="dd-MM-yyyy" 
-                                         data-is-open="$parent.opened['alarm' + $index]" 
-                                         data-date-to-string 
-                                         data-ng-disabled="!hasWriteAccess" 
-                                         data-ng-model="advice.alarmDate"
-                                         data-autosave="{{advice.updateUrl}}" 
-                                         data-field="alarmDate">
-                                  <span class="input-group-btn">
-                                      <button type="button" class="btn btn-default" data-ng-click="open($event, 'alarm' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
-                                  </span>
-                              </div>
-                          </td>
+                <!-- name -->
+                <td>
+                    <input type="text" data-ng-model="advice.name" class="form-control input-sm"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-autosave="{{advice.updateUrl}}"
+                           data-field="name">
+                </td>
 
-                          <!-- receiver -->
-                          <td>
-                              <select data-ng-model="advice.receiverId" data-placeholder="Vælg rolle" class="form-control input-sm"
-                                      data-ng-disabled="!hasWriteAccess"
-                                      data-field="receiverId"
-                                      data-autosave="{{advice.updateUrl}}"
-                                      data-ng-options="role.id as role.name for role in itContractRoles">
-                                  <option value="">Ingen modtager</option>
-                              </select>
-                          </td>
+                <!-- date -->
+                <td>
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control"
+                               data-datepicker-popup="dd-MM-yyyy" 
+                               data-is-open="$parent.opened['alarm' + $index]" 
+                               data-date-to-string 
+                               data-ng-disabled="!hasWriteAccess" 
+                               data-ng-model="advice.alarmDate"
+                               data-autosave="{{advice.updateUrl}}" 
+                               data-field="alarmDate">
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" data-ng-click="open($event, 'alarm' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
+                        </span>
+                    </div>
+                </td>
 
-                          <!-- cc -->
-                          <td>
-                              <select data-ng-model="advice.carbonCopyReceiverId" data-placeholder="Vælg rolle" class="form-control input-sm"
-                                      data-ng-disabled="!hasWriteAccess"
-                                      data-field="carbonCopyReceiverId"
-                                      data-autosave="{{advice.updateUrl}}"
-                                      data-ng-options="role.id as role.name for role in itContractRoles">
-                                  <option value="">Ingen cc</option>
-                              </select>
-                          </td>
+                <!-- receiver -->
+                <td>
+                    <select data-ng-model="advice.receiverId" data-placeholder="Vælg rolle" class="form-control input-sm"
+                            data-ng-disabled="!hasWriteAccess"
+                            data-field="receiverId"
+                            data-autosave="{{advice.updateUrl}}"
+                            data-ng-options="role.id as role.name for role in itContractRoles">
+                        <option value="">Ingen modtager</option>
+                    </select>
+                </td>
 
-                          <!-- subject -->
-                          <td>
-                              <input type="text" data-ng-model="advice.subject" class="form-control input-sm"
-                                     data-ng-disabled="!hasWriteAccess"
-                                     data-autosave="{{advice.updateUrl}}"
-                                     data-field="subject">
-                          </td>
+                <!-- cc -->
+                <td>
+                    <select data-ng-model="advice.carbonCopyReceiverId" data-placeholder="Vælg rolle" class="form-control input-sm"
+                            data-ng-disabled="!hasWriteAccess"
+                            data-field="carbonCopyReceiverId"
+                            data-autosave="{{advice.updateUrl}}"
+                            data-ng-options="role.id as role.name for role in itContractRoles">
+                        <option value="">Ingen cc</option>
+                    </select>
+                </td>
 
-                          <!-- delete button -->
-                          <td>
-                              <div class="pull-right" data-ng-hide="!hasWriteAccess">
-                                  <a class="btn btn-link btn-xs"
-                                     data-confirmed-click="advice.delete()"
-                                     data-confirm-click="Er du sikker på at du vil slette?">
-                                      <i class="glyphicon glyphicon-trash"></i>
-                                  </a>
-                              </div>
-                          </td>
-                      </tr>
-                  </tbody>
-                  <tfoot data-ng-if="hasWriteAccess">
-                      <tr>
-                          <td colspan="7">
-                              <div class="pull-right">
-                                  <button class="btn btn-success btn-sm" data-ng-click="newAdvice()">
-                                      <i class="glyphicon glyphicon-plus small"></i>Ny
-                                  </button>
-                              </div>
-                          </td>
-                      </tr>
-                  </tfoot>
-              </table>
+                <!-- subject -->
+                <td>
+                    <input type="text" data-ng-model="advice.subject" class="form-control input-sm"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-autosave="{{advice.updateUrl}}"
+                           data-field="subject">
+                </td>
+
+                <!-- delete button -->
+                <td>
+                    <div class="pull-right" data-ng-hide="!hasWriteAccess">
+                        <a class="btn btn-link btn-xs"
+                           data-confirmed-click="advice.delete()"
+                           data-confirm-click="Er du sikker på at du vil slette?">
+                            <i class="glyphicon glyphicon-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot data-ng-if="hasWriteAccess">
+            <tr>
+                <td colspan="7">
+                    <div class="pull-right">
+                        <button class="btn btn-success btn-sm" data-ng-click="newAdvice()">
+                            <i class="glyphicon glyphicon-plus small"></i> Ny
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
     </div>
 </form>
