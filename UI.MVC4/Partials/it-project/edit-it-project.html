@@ -44,14 +44,6 @@
                                data-field="cmdb" 
                                data-autosave="api/itproject/{{project.id}}">
                     </div>
-                
-                    <!-- archived -->
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" data-ng-model="project.isArchived" data-autosave="{{autosaveUrl}}" data-field="isArchived" data-ng-disabled="!hasWriteAccess">
-                            Arkiveret
-                        </label>
-                    </div>
                 </div>
             
                 <!-- 2nd column -->
@@ -81,17 +73,38 @@
                                data-field="folder" 
                                data-autosave="api/itproject/{{project.id}}">
                     </div>
-                
-                    <!-- transversal -->
-                    <div class="checkbox">
+                </div>
+            
+                <!-- full width (left side) -->
+                <div class="col-md-12">
+                    <!-- archived -->
+                    <div class="checkbox-inline">
                         <label>
-                            <input type="checkbox" data-ng-model="isTransversal" data-autosave="{{patchUrl}}" data-field="isTransversal" data-ng-disabled="!hasWriteAccess" />
+                            <input type="checkbox" data-ng-model="project.isArchived" data-autosave="{{autosaveUrl}}" data-field="isArchived" data-ng-disabled="!hasWriteAccess">
+                            Arkiveret
+                        </label>
+                    </div>
+
+                    <!-- transversal -->
+                    <div class="checkbox-inline">
+                        <label>
+                            <input type="checkbox" data-ng-model="project.isTransversal" data-autosave="{{autosaveUrl}}" data-field="isTransversal" data-ng-disabled="!hasWriteAccess">
                             Tværgående
                         </label>
                     </div>
-                </div>
-            
-                <div class="col-md-12">
+                    
+                    <!-- strategy -->
+                    <div class="checkbox-inline">
+                        <label>
+                            <input type="checkbox" 
+                                   data-ng-model="project.isStrategy" 
+                                   data-autosave="{{ autosaveUrl }}" 
+                                   data-field="isStrategy" 
+                                   data-ng-disabled="!hasWriteAccess">
+                            Strategisk
+                        </label>
+                    </div>
+
                     <!-- Parent -->
                     <div class="form-group">
                         <label for="project-parent" class="control-label small">Overordnet projekt</label>
