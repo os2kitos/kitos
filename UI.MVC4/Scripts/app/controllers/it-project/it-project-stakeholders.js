@@ -51,12 +51,11 @@
             resetNew();
 
             $scope.saveNewStakeholder = function() {
+                $scope.$broadcast('show-errors-check-validity');
 
+                if ($scope.stakeholderForm.$invalid) { return; }
+                
                 var row = $scope.new;
-
-                if (!(row.name && row.role && row.downsides && row.benefits && row.significance && row.howToHandle)) return;
-
-                if (row.significance < 1 || row.significance > 5) return;
 
                 var data = {
                     itProjectId: project.id,
