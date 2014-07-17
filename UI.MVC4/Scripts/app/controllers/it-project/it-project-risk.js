@@ -108,7 +108,11 @@
 
             resetNewRisk();
 
-            $scope.saveNewRisk = function() {
+            $scope.saveNewRisk = function () {
+                $scope.$broadcast('show-errors-check-validity');
+
+                if ($scope.riskForm.$invalid) { return; }
+                
                 var risk = $scope.newRisk;
 
                 //name, action or user shouldn't be null or empty
