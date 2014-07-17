@@ -66,17 +66,17 @@
                 </tr>                     
                 <tr class="active" data-ng-hide="!hasWriteAccess">
                     <td>
-                        <div class="form-group" show-errors>
+                        <div class="form-group" data-show-errors>
                             <input type="text" name="name" class="form-control input-sm" required data-ng-model="newRisk.name">
                         </div>
                     </td>
                     <td>
-                        <div class="form-group" show-errors>
+                        <div class="form-group" data-show-errors>
                             <input type="number" name="consequence" class="form-control input-sm" min="1" max="5" required data-ng-model="newRisk.consequence">
                         </div>
                     </td>
                     <td>
-                        <div class="form-group" show-errors>
+                        <div class="form-group" data-show-errors>
                             <input type="number" name="probability" class="form-control input-sm" min="1" max="5" required data-ng-model="newRisk.probability">
                         </div>
                     </td>
@@ -84,12 +84,12 @@
                         <span class="form-control-static input-sm">{{ product(newRisk) }}</span>
                     </td>
                     <td>
-                        <div class="form-group" show-errors>
+                        <div class="form-group" data-show-errors>
                             <textarea name="action" class="form-control input-sm" required data-ng-model="newRisk.action"></textarea>
                         </div>
                     </td>
                     <td>
-                        <div class="form-group" show-errors>
+                        <div class="form-group" data-show-errors>
                             <select name="responsbile" class="form-control input-sm" required
                                     data-ng-model="newRisk.responsibleUserId" 
                                     data-ng-options="user.id as user.name for user in usersWithRoles">
