@@ -23,13 +23,16 @@ namespace UI.MVC4.Controllers.API
             _systemUsageService = systemUsageService;
         }
 
-        public HttpResponseMessage GetPublic([FromUri] int organizationId, [FromUri] PagingModel<ItSystem> paging)
+        public HttpResponseMessage GetPublic([FromUri] int organizationId, [FromUri] PagingModel<ItSystem> paging, [FromUri] string q)
         {
             try
             {
                 var systems =
                     Repository.AsQueryable()
                               .Where(sys => sys.AccessModifier == AccessModifier.Public || sys.BelongsToId == organizationId);
+
+                if (q != null) systems = systems.Where(sys => sys.Name.Contains(q));
+
                 var query = Page(systems, paging);
 
                 return Ok(Map(query));

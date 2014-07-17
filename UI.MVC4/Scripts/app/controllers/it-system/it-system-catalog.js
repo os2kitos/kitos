@@ -119,6 +119,8 @@
                         if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
                     }
 
+                    if($scope.pagination.search) url += '&q=' + $scope.pagination.search;
+
                     $http.get(url).success(function (result, status, headers) {
 
                         var paginationHeader = JSON.parse(headers('X-Pagination'));
