@@ -7,22 +7,14 @@
             resolve: {
                 user: ['userService', function(userService) {
                     return userService.getUser();
-                }],
-                projects: ['$http', 'userService', function ($http, userService) {
-                    return userService.getUser().then(function(user) {
-                        var orgId = user.currentOrganizationId;
-                        return $http.get('api/itproject?catalog&orgId=' + orgId).then(function (result) {
-                            return result.data.response;
-                        });
-                    });
                 }]
             }
         });
     }]);
 
     app.controller('project.CatalogCtrl',
-        ['$scope', '$http', '$state', '$stateParams', '$timeout', 'notify', 'user', 'projects',
-            function ($scope, $http, $state, $stateParams, $timeout, notify, user, projects) {
+        ['$scope', '$http', '$state', '$stateParams', '$timeout', 'notify', 'user',
+            function ($scope, $http, $state, $stateParams, $timeout, notify, user) {
                 
                 $scope.pagination = {
                     skip: 0,
@@ -42,6 +34,8 @@
                         if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
                     }
 
+                    if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
+                    else url += "&q=";
                     
                     $http.get(url).success(function(result, status, headers) {
 
