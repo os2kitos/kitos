@@ -23,8 +23,8 @@ namespace UI.MVC4.Models
 
         public int OrganizationId { get; set; }
         public OrganizationDTO Organization { get; set; }
-        
-        
+
+        public bool MainContractIsActive { get; set; }
         
         public int ItSystemId { get; set; }
         public ItSystemDTO ItSystem { get; set; }
