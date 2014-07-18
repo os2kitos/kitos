@@ -485,6 +485,7 @@
     <Content Include="Partials\it-project\tab-status-goal.html" />
     <Content Include="Partials\it-project\tab-strategy.html" />
     <Content Include="Partials\it-project\tab-status-project.html" />
+    <Content Include="Partials\it-system\overview-row.html" />
     <Content Include="Partials\it-system\tab-edit-interface-details.html" />
     <Content Include="Partials\it-system\tab-edit-interfaces.html" />
     <Content Include="Partials\it-system\tab-edit-kle.html" />
