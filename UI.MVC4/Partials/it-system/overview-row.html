@@ -1,0 +1,32 @@
+﻿<td>
+    <a data-ui-sref="it-system.usage.interfaces({id: usage.id})">{{usage.itSystem.name}}</a>
+    <span data-ng-if="usage.itSystem.accessModifier == 1" class="small text-muted" data-tooltip="Public">
+        (P)
+    </span>
+</td>
+<td>{{ usage.responsibleUnit.name }}
+</td>
+<td>
+    {{ usage.rights | filter:{roleId: chosenRoleId} | joinBy:', ':'user.name' }}
+</td>
+<td data-ng-switch="showSystemId">
+    <span data-ng-switch-when="itSystem.systemId">{{usage.itSystem.systemId}}</span>
+    <span data-ng-switch-when="localSystemId">{{usage.localSystemId}}</span>
+</td>
+<td data-ng-switch="showType">
+    <span data-ng-switch-when="itSystem.appType.name">{{usage.itSystem.appType.name}}</span>
+    <span data-ng-switch-when="itSystem.businessType.name">{{usage.itSystem.businessType.name}}</span>
+</td>
+<td>{{ usage.activeInterfaceUsages }}
+    ({{ usage.itSystem.canUseInterfaceIds.length }})
+</td>
+<td>
+    <span data-ng-if="usage.itSystem.exposedBy != null">
+        {{ usage.itSystem.exposedBy.name }}
+    </span>
+    <span data-ng-if="usage.itSystem.exposedBy == null">
+        {{ usage.itSystem.exposedInterfaceIds.length }}
+    </span>
+</td>
+<td>{{ usage.overviewItSystemName }}
+</td>

@@ -55,8 +55,13 @@
 
                 $scope.$watchCollection('pagination', loadUsages);
 
+                // clear lists 
+                $scope.activeContracts = [];
+                $scope.inactiveContracts = [];
+
                 function loadUsages() {
-                    $scope.systemUsages = [];
+                    $scope.activeSystemUsages = [];
+                    $scope.inactiveSystemUsages = [];
 
                     var url = 'api/itSystemUsage?overview&organizationId=' + user.currentOrganizationId + '&skip=' + $scope.pagination.skip + '&take=' + $scope.pagination.take;
                     
@@ -75,12 +80,16 @@
                         $scope.pagination.count = paginationHeader.TotalCount;
 
                         _.each(result.response, function(usage) {
-
                             usage.itSystem.appType = _.findWhere(appTypes, { id: usage.itSystem.appTypeId });
                             usage.itSystem.businessType = _.findWhere(businessTypes, { id: usage.itSystem.businessTypeId });
-                            
-                            loadOverviewSystem(usage);
 
+                            if (usage.mainContractIsActive) {
+                                $scope.activeSystemUsages.push(usage);
+                            } else {
+                                $scope.inactiveSystemUsages.push(usage);
+                            }
+
+                            loadOverviewSystem(usage);
                         });
 
                         function loadOverviewSystem(usage) {
