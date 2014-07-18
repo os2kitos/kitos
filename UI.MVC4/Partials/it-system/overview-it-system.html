@@ -41,19 +41,19 @@
         </tr>
     </thead>
     <tbody>
-        <!-- for each active contract -->
+        <!-- for each active system -->
         <tr data-ng-repeat="usage in activeSystemUsages" 
             data-ng-include="'partials/it-system/overview-row.html'">
         </tr>
         
-        <!-- when there are no active contracts to show -->
+        <!-- when there are no active systems to show -->
         <tr data-ng-if="activeSystemUsages.length == 0">
             <td colspan="8" class="text-center">
                 <i>Ingen aktive systemer</i>
             </td>
         </tr>
         
-        <!-- "click to show inactive contracts"-row -->
+        <!-- "click to show inactive systems"-row -->
         <tr>
             <td colspan="8">
                 <a data-ng-click="showInactive = !showInactive">
@@ -63,13 +63,13 @@
             </td>
         </tr>
         
-        <!-- for each inactive contract -->
+        <!-- for each inactive system -->
         <tr data-ng-if="showInactive" data-ng-repeat="usage in inactiveSystemUsages" 
             data-ng-include="'partials/it-system/overview-row.html'">
         </tr>
 
         
-        <!-- when there are no active contracts to show -->
+        <!-- when there are no active systems to show -->
         <tr data-ng-if="showInactive && inactiveSystemUsages.length == 0">
             <td colspan="9" class="text-center">
                 <i>Ingen inaktive systemer</i>
