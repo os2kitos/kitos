@@ -1,101 +1,94 @@
 ﻿<!-- interface exposure -->
 <div class="panel panel-default">
     <div class="panel-heading"><strong>IT systemet udstiller følgende snitflader:</strong></div>
-    
+
     <table class="table table-striped table-condensed">
         <thead data-ng-if="interfaceExposures.length > 0">
             <tr>
                 <th>Ønske</th>
                 <th>Aktiv</th>
                 <th class="col-md-2">Snitflade</th>
-                <th class="col-md-1">TSA</th>
                 <th class="col-md-2">Kontrakt ID</th>
+                <th class="col-md-1">TSA</th>
                 <th class="col-md-1">Snitfladetype</th>
                 <th class="col-md-1">Grænseflade</th>
                 <th class="col-md-1">Metode</th>
                 <th class="col-md-1">Anvendes af</th>
-                <th class="col-md-offset-1"></th>
+                <th class="col-md-1">Data</th>
+                <th class="col-md-1">Datatype</th>
             </tr>
         </thead>
         <tbody class="small">
-            <tr data-ng-repeat="exposure in interfaceExposures">
+            <tr data-ng-repeat-start="exposure in interfaceExposures">
                 <!-- wished to be used -->
-                <td>
+                <td rowspan="{{exposure.interface.numRows}}">
                     <input type="checkbox" data-ng-model="exposure.isWishedFor"
-                                data-ng-disabled="!hasWriteAccess"
-                        data-field="isWishedFor"
-                        data-autosave="{{exposure.updateUrl}}"/>
+                           data-ng-disabled="!hasWriteAccess"
+                           data-field="isWishedFor"
+                           data-autosave="{{exposure.updateUrl}}" />
                 </td>
 
                 <!-- active (depends on contract) -->
-                <td>
+                <td rowspan="{{exposure.interface.numRows}}">
                     <span data-ng-if="exposure.itContract.isActive" class="text-success">
                         <i class="glyphicon glyphicon-ok"></i>
                     </span>
                 </td>
-                
+
                 <!-- name of the system -->
-                <td>
+                <td rowspan="{{exposure.interface.numRows}}">
                     <a data-ui-sref="it-system.edit.interface-details({ id: exposure.interface.id })">{{ exposure.interface.name }}</a>
-                </td>
-                
-                <!-- tsa -->
-                <td>
-                    {{exposure.interface.tsa.name}}
                 </td>
 
                 <!-- contract id -->
-                <td>
-                    <a data-ng-if="exposure.itContractId != null" data-ui-sref="it-contract.edit.systems({id: exposure.itContract.id})">
-                        {{exposure.itContract.itContractId}}
+                <td rowspan="{{exposure.interface.numRows}}">
+                    <a data-ng-if="exposure.itContractId != null" data-ui-sref="it-contract.edit.systems({id: exposure.itContract.id})">{{exposure.itContract.itContractId}}
                     </a>
                 </td>
-                
-                <!-- inteface type -->
-                <td>{{exposure.interface.interfaceType.name}}</td>
-                
-                <!-- interface (grænseflade) -->
-                <td>{{exposure.interface.interface.name}}</td>
-                
-                <!-- method -->
-                <td>{{exposure.interface.method.name}}</td>
-                
-                <!-- number of usages -->
-                <td>
-                    {{exposure.interface.canBeUsedByIds.length}}
+
+                <!-- tsa -->
+                <td rowspan="{{exposure.interface.numRows}}">{{exposure.interface.tsa.name}}
                 </td>
 
+
+                <!-- inteface type -->
+                <td rowspan="{{exposure.interface.numRows}}">{{exposure.interface.interfaceType.name}}</td>
+
+                <!-- interface (grænseflade) -->
+                <td rowspan="{{exposure.interface.numRows}}">{{exposure.interface.interface.name}}</td>
+
+                <!-- method -->
+                <td rowspan="{{exposure.interface.numRows}}">{{exposure.interface.method.name}}</td>
+
+                <!-- number of usages -->
+                <td rowspan="{{exposure.interface.numRows}}">{{exposure.interface.canBeUsedByIds.length}}
+                </td>
+
+                <!-- data -->
+                <td rowspan="1">
+                    <span data-ng-if="exposure.interface.dataRows.length > 0">{{exposure.interface.dataRows[0].data}}
+                    </span>
+                </td>
+
+                <!-- data type -->
                 <td>
-                    <!-- data row table -->
-                    <table class="table table-bordered table-condensed small table-fixed table-no-margin" data-ng-if="exposure.interface.dataRows.length > 0">
-                        <thead>
-                            <tr class="info">
-                                <th class="col-md-6">
-                                    Data
-                                </th>
-                                <th class="col-md-6">
-                                    Datatype
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr data-ng-repeat="dataRow in exposure.interface.dataRows">
-                                <td>
-                                    {{dataRow.data}}
-                                </td>
-                                <td>
-                                    {{dataRow.dataType.name}}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="text-center full-width text-muted" data-ng-if="exposure.interface.dataRows.length == 0">
-                        -
-                    </div>
+                    <span data-ng-if="exposure.interface.dataRows.length > 0">{{exposure.interface.dataRows[0].dataType.name}}
+                    </span>
+                </td>
+            </tr>
+            <tr data-ng-repeat="dataRow in exposure.interface.dataRows" data-ng-if="!$first" data-ng-repeat-end="">
+                <!-- data -->
+                <td rowspan="1">
+                    {{dataRow.data}}
+                </td>
+
+                <!-- data type -->
+                <td>
+                    {{dataRow.dataType.name}}
                 </td>
             </tr>
             <tr data-ng-if="interfaceExposures.length == 0">
-               <td colspan="8" class="text-center">Systemet udstiller ingen snitflader</td> 
+                <td colspan="8" class="text-center">Systemet udstiller ingen snitflader</td>
             </tr>
         </tbody>
     </table>
@@ -106,7 +99,7 @@
     <div class="panel-heading">
         <strong>IT systemet kan anvende følgende snitflader:</strong>
     </div>
-    
+
     <table class="table table-striped table-condensed">
         <thead data-ng-if="interfaceUsages.length > 0">
             <tr>
@@ -124,10 +117,10 @@
         </thead>
         <tbody class="small">
             <tr data-ng-repeat="usage in interfaceUsages">
-                 <!-- wished to be used -->
+                <!-- wished to be used -->
                 <td>
-                    <input type="checkbox" data-ng-model="usage.isWishedFor" 
-                                data-ng-disabled="!hasWriteAccess"
+                    <input type="checkbox" data-ng-model="usage.isWishedFor"
+                        data-ng-disabled="!hasWriteAccess"
                         data-field="isWishedFor"
                         data-autosave="{{usage.updateUrl}}">
                 </td>
@@ -138,73 +131,62 @@
                         <i class="glyphicon glyphicon-ok"></i>
                     </span>
                 </td>
-                
+
                 <!-- name of the system -->
                 <td>
                     <a data-ui-sref="it-system.edit.interface-details({ id: usage.interface.id })">{{usage.interface.name}}</a>
                 </td>
-                
+
                 <!-- tsa -->
-                <td>
-                    {{usage.interface.tsa.name}}
+                <td>{{usage.interface.tsa.name}}
                 </td>
 
                 <!-- contract id -->
                 <td>
-                    <a data-ng-if="usage.itContractId != null" data-ui-sref="it-contract.edit.systems({id: usage.itContract.id})">
-                        {{usage.itContract.itContractId}}
+                    <a data-ng-if="usage.itContractId != null" data-ui-sref="it-contract.edit.systems({id: usage.itContract.id})">{{usage.itContract.itContractId}}
                     </a>
                 </td>
-                
+
                 <!-- interface type -->
                 <td>{{usage.interface.interfaceType.name}}</td>
 
                 <!-- infrastructure -->
                 <td>
-                    <input type="hidden" data-ui-select2="itSystemsSelectOptions" data-ng-model="usage.infrastructure" 
-                           class="form-control input-sm" data-ng-disabled="!usage.itContractId || !hasWriteAccess" data-ng-change="updateInfrastructure(usage)">
+                    <input type="hidden" data-ui-select2="itSystemsSelectOptions" data-ng-model="usage.infrastructure"
+                        class="form-control input-sm" data-ng-disabled="!usage.itContractId || !hasWriteAccess" data-ng-change="updateInfrastructure(usage)">
                 </td>
-                
+
                 <!-- interface method -->
-                <td>
-                    {{usage.interface.method.name}}
+                <td>{{usage.interface.method.name}}
                 </td>
 
                 <!-- exposed by -->
                 <td>{{usage.interface.exposedBy.name}}</td>
-                
+
                 <!-- interface data -->
                 <td>
                     <table class="table table-bordered table-condensed small table-fixed table-no-margin" data-ng-if="usage.dataRowUsages.length > 0">
                         <thead>
                             <tr class="info">
-                                <th class="col-md-1">
-                                    Data
+                                <th class="col-md-1">Data
                                 </th>
-                                <th class="col-md-1">
-                                    Datatype
+                                <th class="col-md-1">Datatype
                                 </th>
-                                <th class="col-md-2">
-                                    Frekvens
+                                <th class="col-md-2">Frekvens
                                 </th>
-                                <th class="col-md-2">
-                                    Pris
+                                <th class="col-md-2">Pris
                                 </th>
-                                <th class="col-md-2">
-                                    Mængde
+                                <th class="col-md-2">Mængde
                                 </th>
-                                <th class="col-md-2">
-                                    Økonomi
+                                <th class="col-md-2">Økonomi
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr data-ng-if="usage.showDataRows" data-ng-repeat="dataRowUsage in usage.dataRowUsages">
-                                <td>
-                                    {{dataRowUsage.dataRow.data}}
+                                <td>{{dataRowUsage.dataRow.data}}
                                 </td>
-                                <td>
-                                    {{dataRowUsage.dataRow.dataType.name}}
+                                <td>{{dataRowUsage.dataRow.dataType.name}}
                                 </td>
 
                                 <!-- frequency -->
@@ -220,29 +202,29 @@
 
                                 <!-- price -->
                                 <td>
-                                    <input type="text" data-ng-model="dataRowUsage.price" class="form-control input-sm" 
-                                           data-ng-disabled="!usage.itContractId || !hasWriteAccess" 
+                                    <input type="text" data-ng-model="dataRowUsage.price" class="form-control input-sm"
+                                        data-ng-disabled="!usage.itContractId || !hasWriteAccess"
                                         data-field="price"
                                         data-autosave="{{dataRowUsage.updateUrl}}" />
                                 </td>
 
                                 <!-- amount -->
                                 <td>
-                                    <input type="text" data-ng-model="dataRowUsage.amount" class="form-control input-sm" 
-                                           data-ng-disabled="!usage.itContractId || !hasWriteAccess"
+                                    <input type="text" data-ng-model="dataRowUsage.amount" class="form-control input-sm"
+                                        data-ng-disabled="!usage.itContractId || !hasWriteAccess"
                                         data-field="amount"
                                         data-autosave="{{dataRowUsage.updateUrl}}" />
                                 </td>
 
                                 <!-- economy -->
                                 <td>
-                                    <input type="text" data-ng-model="dataRowUsage.economy" class="form-control input-sm" 
-                                           data-ng-disabled="!usage.itContractId || !hasWriteAccess" 
+                                    <input type="text" data-ng-model="dataRowUsage.economy" class="form-control input-sm"
+                                        data-ng-disabled="!usage.itContractId || !hasWriteAccess"
                                         data-field="economy"
-                                        data-autosave="{{dataRowUsage.updateUrl}}"/>
+                                        data-autosave="{{dataRowUsage.updateUrl}}" />
                                 </td>
                             </tr>
-                            
+
                             <!-- fold out row -->
                             <tr data-ng-if="usage.dataRowUsages.length > 0 && !usage.showDataRows">
                                 <td colspan="6" class="text-center">
@@ -261,7 +243,7 @@
                 </td>
             </tr>
             <tr data-ng-if="interfaceUsages.length == 0">
-               <td colspan="8" class="text-center">Systemet anvender ingen snitflader</td> 
+                <td colspan="8" class="text-center">Systemet anvender ingen snitflader</td>
             </tr>
         </tbody>
     </table>
