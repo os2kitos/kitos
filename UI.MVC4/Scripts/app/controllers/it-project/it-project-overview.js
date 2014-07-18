@@ -42,6 +42,9 @@
                     if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
                 }
 
+                if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
+                else url += "&q=";
+
                 $scope.projects = [];
                 $http.get(url).success(function (result, status, headers) {
 

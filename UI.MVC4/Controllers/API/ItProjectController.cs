@@ -37,7 +37,7 @@ namespace UI.MVC4.Controllers.API
             {
                 //Get all projects inside the organizaton
                 pagingModel.Where(p => p.OrganizationId == orgId);
-                
+
                 var projects = Page(Repository.AsQueryable(), pagingModel);
 
                 return Ok(Map(projects));
@@ -85,12 +85,13 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetOverview(bool? overview, [FromUri] int orgId, [FromUri] PagingModel<ItProject> pagingModel)
+        public HttpResponseMessage GetOverview(bool? overview, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
         {
             try
             {
                 //Get all projects inside the organizaton
                 pagingModel.Where(p => p.OrganizationId == orgId);
+                if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
 
                 var projects = Page(Repository.AsQueryable(), pagingModel);
 
@@ -104,12 +105,13 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetCatalog(bool? catalog, [FromUri] int orgId, [FromUri] PagingModel<ItProject> pagingModel)
+        public HttpResponseMessage GetCatalog(bool? catalog, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
         {
             try
             {
                 //Get all projects inside the organizaton OR public
                 pagingModel.Where(p => p.OrganizationId == orgId || p.AccessModifier == AccessModifier.Public);
+                if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
 
                 var projects = Page(Repository.AsQueryable(), pagingModel);
 

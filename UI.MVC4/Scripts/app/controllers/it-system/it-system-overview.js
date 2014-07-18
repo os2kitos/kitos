@@ -58,12 +58,15 @@
                 function loadUsages() {
                     $scope.systemUsages = [];
 
-                    var url = 'api/itSystemUsage?organizationId=' + user.currentOrganizationId + '&skip=' + $scope.pagination.skip + '&take=' + $scope.pagination.take;
+                    var url = 'api/itSystemUsage?overview&organizationId=' + user.currentOrganizationId + '&skip=' + $scope.pagination.skip + '&take=' + $scope.pagination.take;
                     
                     if ($scope.pagination.orderBy) {
                         url += '&orderBy=' + $scope.pagination.orderBy;
                         if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
                     }
+
+                    if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
+                    else url += "&q=";
                     
                     $http.get(url).success(function(result, status, headers) {
                         $scope.systemUsages = result.response;

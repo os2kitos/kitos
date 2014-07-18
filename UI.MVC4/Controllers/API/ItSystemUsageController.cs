@@ -39,11 +39,13 @@ namespace UI.MVC4.Controllers.API
             } 
         }
 
-        public HttpResponseMessage GetByOrganization(int organizationId, [FromUri] PagingModel<ItSystemUsage> pagingModel)
+        public HttpResponseMessage GetByOrganization(int organizationId, [FromUri] PagingModel<ItSystemUsage> pagingModel, [FromUri] string q, bool? overview)
         {
             try
             {
                 pagingModel.Where(u => u.OrganizationId == organizationId);
+
+                if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
 
                 var usages = Page(Repository.AsQueryable(), pagingModel);
                 

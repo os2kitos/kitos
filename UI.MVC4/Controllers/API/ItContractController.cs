@@ -167,7 +167,7 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetOverview(bool? overview, int organizationId, [FromUri] PagingModel<ItContract> pagingModel )
+        public HttpResponseMessage GetOverview(bool? overview, int organizationId, [FromUri] PagingModel<ItContract> pagingModel, [FromUri] string q)
         {
             try
             {
@@ -176,6 +176,8 @@ namespace UI.MVC4.Controllers.API
 
                 //Get contracts without parents (roots)
                 pagingModel.Where(contract => contract.ParentId == null);
+
+                if (!string.IsNullOrEmpty(q)) pagingModel.Where(contract => contract.Name.Contains(q));
 
                 var contracts = Page(Repository.AsQueryable(), pagingModel);
 
@@ -189,7 +191,7 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetPlan(bool? plan, int organizationId, [FromUri] PagingModel<ItContract> pagingModel )
+        public HttpResponseMessage GetPlan(bool? plan, int organizationId, [FromUri] PagingModel<ItContract> pagingModel, [FromUri] string q)
         {
             try
             {
@@ -198,6 +200,8 @@ namespace UI.MVC4.Controllers.API
 
                 //Get contracts without parents (roots)
                 pagingModel.Where(contract => contract.ParentId == null);
+
+                if (!string.IsNullOrEmpty(q)) pagingModel.Where(contract => contract.Name.Contains(q));
 
                 var contracts = Page(Repository.AsQueryable(), pagingModel);
 
