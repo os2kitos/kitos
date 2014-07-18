@@ -72,6 +72,8 @@
     <Compile Include="Mapping\AdminRoleMap.cs" />
     <Compile Include="Mapping\BusinessTypeMap.cs" />
     <Compile Include="Mapping\ActivityMap.cs" />
+    <Compile Include="Mapping\HandoverTrial.cs" />
+    <Compile Include="Mapping\HandoverTrialTypeMap.cs" />
     <Compile Include="Mapping\EntityMap.cs" />
     <Compile Include="Mapping\EconomyStreamMap.cs" />
     <Compile Include="Mapping\OptionEntityMap.cs" />

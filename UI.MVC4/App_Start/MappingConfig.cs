@@ -138,7 +138,11 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<TerminationDeadline, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
-            
+
+            Mapper.CreateMap<HandoverTrialType, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
+
             Mapper.CreateMap<Config, ConfigDTO>().ReverseMap();
         }
     }
