@@ -62,7 +62,7 @@
                 <td>{{ right.role.name }}</td>
                 <td>{{ right.user.name }}</td>
                 <td>{{ right.user.email }}
-                    <div data-ng-hide="!hasWriteAccess" class="pull-right">
+                    <div data-ng-show="hasWriteAccess" class="pull-right">
                         <a data-ng-click="right.edit = true" class="btn btn-info btn-xs">
                             <i class="glyphicon glyphicon-pencil"></i>
                         </a>
