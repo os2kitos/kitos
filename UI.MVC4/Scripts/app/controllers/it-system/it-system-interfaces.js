@@ -69,6 +69,8 @@
                     _.each(theInterface.dataRows, function (dataRow) {
                         dataRow.dataType = _.findWhere(dataTypes, { id: dataRow.dataTypeId });
                     });
+
+                    theInterface.numRows = theInterface.dataRows.length == 0 ? 1 : theInterface.dataRows.length;
                 }
                 
                 //Interface exposures
