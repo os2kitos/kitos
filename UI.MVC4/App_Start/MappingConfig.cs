@@ -340,6 +340,9 @@ namespace UI.MVC4.App_Start
 
             Mapper.CreateMap<Advice, AdviceDTO>()
                   .ReverseMap();
-            }
+
+            Mapper.CreateMap<HandoverTrial, HandoverTrialDTO>()
+                  .ReverseMap();
+        }
     }
 }
