@@ -112,6 +112,8 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<EconomyYear>>().To<GenericRepository<EconomyYear>>().InRequestScope();
             kernel.Bind<IGenericRepository<Communication>>().To<GenericRepository<Communication>>().InRequestScope();
             kernel.Bind<IGenericRepository<Handover>>().To<GenericRepository<Handover>>().InRequestScope();
+            kernel.Bind<IGenericRepository<HandoverTrial>>().To<GenericRepository<HandoverTrial>>().InRequestScope();
+            kernel.Bind<IGenericRepository<HandoverTrialType>>().To<GenericRepository<HandoverTrialType>>().InRequestScope();
             kernel.Bind<IGenericRepository<Stakeholder>>().To<GenericRepository<Stakeholder>>().InRequestScope();
             kernel.Bind<IGenericRepository<OptionExtend>>().To<GenericRepository<OptionExtend>>().InRequestScope();
             kernel.Bind<IGenericRepository<PriceRegulation>>().To<GenericRepository<PriceRegulation>>().InRequestScope();

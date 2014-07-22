@@ -31,7 +31,7 @@
         });
     }]);
 
-    app.controller('globalConfig.OrgCtrl', ['$rootScope', '$scope', function($rootScope) {
+    app.controller('globalConfig.OrgCtrl', ['$rootScope', function($rootScope) {
         $rootScope.page.title = 'Global konfiguration';
         $rootScope.page.subnav = subnav;
     }]);

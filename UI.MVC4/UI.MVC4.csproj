@@ -214,6 +214,8 @@
   <ItemGroup>
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Controllers\API\HandoverTrialController.cs" />
+    <Compile Include="Controllers\API\HandoverTrialTypeController.cs" />
     <Compile Include="Controllers\API\GenericHierarchyApiController.cs" />
     <Compile Include="Controllers\API\AdminRightsController.cs" />
     <Compile Include="Controllers\API\DataRowController.cs" />
@@ -224,6 +226,7 @@
     <Compile Include="Controllers\API\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Models\ActivitySimpleDTO.cs" />
+    <Compile Include="Models\HandoverTrialDTO.cs" />
     <Compile Include="Models\ItProjectOverviewDTO.cs" />
     <Compile Include="Models\PagingModel.cs" />
     <Compile Include="Controllers\API\PriceRegulationController.cs" />

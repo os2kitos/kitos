@@ -151,6 +151,8 @@ namespace Infrastructure.DataAccess.Migrations
 
             AddOptions<PriceRegulation, ItContract>(context.PriceRegulations, globalUser, "Pris regulering A", "Pris regulering B"); 
 
+            AddOptions<HandoverTrialType, HandoverTrial>(context.HandoverTrialTypes, globalUser, "Prøve 1", "Prøve 2"); 
+
             context.SaveChanges();
 
             #endregion

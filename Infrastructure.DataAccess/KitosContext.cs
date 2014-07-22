@@ -41,6 +41,8 @@ namespace Infrastructure.DataAccess
         public DbSet<GoalStatus> GoalStatus { get; set; }
         public DbSet<GoalType> GoalTypes { get; set; }
         public DbSet<Handover> Handovers { get; set; }
+        public DbSet<HandoverTrial> HandoverTrials { get; set; }
+        public DbSet<HandoverTrialType> HandoverTrialTypes { get; set; }
         public DbSet<Interface> Interfaces { get; set; }
         public DbSet<InterfaceUsage> InterfaceUsages { get; set; }
         public DbSet<InterfaceExposure> InterfaceExposure { get; set; }
@@ -105,6 +107,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new GoalStatusMap());
             modelBuilder.Configurations.Add(new GoalTypeMap());
             modelBuilder.Configurations.Add(new HandoverMap());
+            modelBuilder.Configurations.Add(new HandoverTrialMap());
+            modelBuilder.Configurations.Add(new HandoverTrialTypeMap());
             modelBuilder.Configurations.Add(new InterfaceMap());
             modelBuilder.Configurations.Add(new InterfaceUsageMap());
             modelBuilder.Configurations.Add(new InterfaceExposureMap());

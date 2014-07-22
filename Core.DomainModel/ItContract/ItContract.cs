@@ -358,6 +358,13 @@ namespace Core.DomainModel.ItContract
         public int? OptionExtendId { get; set; }
         public virtual OptionExtend OptionExtend { get; set; }
         public int ExtendMultiplier { get; set; }
+        /// <summary>
+        /// Gets or sets the handover trials.
+        /// </summary>
+        /// <value>
+        /// The handover trials.
+        /// </value>
+        public virtual ICollection<HandoverTrial> HandoverTrials { get; set; }
 
         #endregion
 
