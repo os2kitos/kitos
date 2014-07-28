@@ -25,7 +25,6 @@ namespace Infrastructure.DataAccess
         public DbSet<AgreementElement> AgreementElements { get; set; }
         public DbSet<AppType> AppTypes { get; set; }
         public DbSet<ArchiveType> ArchiveTypes { get; set; }
-        //public DbSet<Assignment> Assignments { get; set; }
         public DbSet<BusinessType> BusinessTypes { get; set; }
         public DbSet<Communication> Communications { get; set; }
         public DbSet<Config> Configs { get; set; }
@@ -76,7 +75,6 @@ namespace Infrastructure.DataAccess
         public DbSet<Risk> Risks { get; set; }
         public DbSet<SensitiveDataType> SensitiveDataTypes { get; set; }
         public DbSet<Stakeholder> Stakeholders { get; set; }
-        //public DbSet<Milestone> Milestones { get; set; }
         public DbSet<TerminationDeadline> TerminationDeadlines { get; set; }
         public DbSet<TaskRef> TaskRefs { get; set; }
         public DbSet<TaskUsage> TaskUsages { get; set; }
@@ -92,7 +90,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new AdviceMap());
             modelBuilder.Configurations.Add(new AgreementElementMap());
             modelBuilder.Configurations.Add(new AppTypeMap());
-            //modelBuilder.Configurations.Add(new AssignmentMap());
             modelBuilder.Configurations.Add(new ArchiveTypeMap());
             modelBuilder.Configurations.Add(new BusinessTypeMap());
             modelBuilder.Configurations.Add(new CommunicationMap());
@@ -138,7 +135,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new RiskMap());
             modelBuilder.Configurations.Add(new SensitiveDataTypeMap());
             modelBuilder.Configurations.Add(new StakeholderMap());
-            //modelBuilder.Configurations.Add(new MilestoneMap());
             modelBuilder.Configurations.Add(new TaskRefMap());
             modelBuilder.Configurations.Add(new TaskUsageMap());
             modelBuilder.Configurations.Add(new TextMap());
