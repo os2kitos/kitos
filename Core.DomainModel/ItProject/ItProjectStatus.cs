@@ -1,11 +1,10 @@
-﻿using System;
-
-namespace Core.DomainModel
+﻿namespace Core.DomainModel.ItProject
 {
     /// <summary>
-    /// Represents a state or milestone. (OIO entity: "Tilstand")
+    /// Base class of Milestone and Assignment.
+    /// Called status for lack of a better word.
     /// </summary>
-    public class State : Entity
+    public abstract class ItProjectStatus : Entity
     {
         /// <summary>
         /// Human readable ID ("brugervendt noegle" in OIO)
@@ -25,33 +24,33 @@ namespace Core.DomainModel
         /// </summary>
         public int TimeEstimate { get; set; }
 
-        /// <summary>
-        /// Which date, the state should be reached
-        /// </summary>
-        public DateTime? Date { get; set; }
-
-        /// <summary>
-        /// Trafic light status for the state
-        /// </summary>
-        public int Status { get; set; }
-
         public int? AssociatedUserId { get; set; }
         /// <summary>
         /// User which is somehow associated with this state
         /// </summary>
         public virtual User AssociatedUser { get; set; }
-
-        public int? AssociatedActivityId { get; set; }
+        
+        public int? AssociatedItProjectId { get; set; }
+        /// <summary>
+        /// Gets or sets the associated it project.
+        /// </summary>
+        /// <value>
+        /// The associated it project.
+        /// </value>
+        public virtual ItProject AssociatedItProject { get; set; }
 
         /// <summary>
-        /// The state might be a milestone for an IT project
+        /// Gets or sets the associated phase identifier.
+        /// This id relates to a phase in the <see cref="AssociatedItProject"/>.
         /// </summary>
-        public virtual ItProject.ItProject MilestoneForProject { get; set; }
-        public int? MilestoneForProjectId { get; set; }
+        /// <value>
+        /// The associated phase identifier.
+        /// </value>
+        public int? AssociatedPhaseId { get; set; }
 
         public override bool HasUserWriteAccess(User user)
         {
-            if (MilestoneForProject != null && MilestoneForProject.HasUserWriteAccess(user)) return true;
+            if (AssociatedItProject != null && AssociatedItProject.HasUserWriteAccess(user)) return true;
 
             return base.HasUserWriteAccess(user);
         }

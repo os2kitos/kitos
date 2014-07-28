@@ -29,11 +29,11 @@ namespace UI.MVC4.Models
 
         //6th
         // The phases of the project
-        public ActivitySimpleDTO Phase1 { get; set; }
-        public ActivitySimpleDTO Phase2 { get; set; }
-        public ActivitySimpleDTO Phase3 { get; set; }
-        public ActivitySimpleDTO Phase4 { get; set; }
-        public ActivitySimpleDTO Phase5 { get; set; }
+        public ItProjectPhaseDTO Phase1 { get; set; }
+        public ItProjectPhaseDTO Phase2 { get; set; }
+        public ItProjectPhaseDTO Phase3 { get; set; }
+        public ItProjectPhaseDTO Phase4 { get; set; }
+        public ItProjectPhaseDTO Phase5 { get; set; }
         public int? CurrentPhaseId { get; set; }
 
         //7th

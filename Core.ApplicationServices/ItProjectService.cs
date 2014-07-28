@@ -10,14 +10,13 @@ namespace Core.ApplicationServices
     public class ItProjectService : IItProjectService
     {
         private readonly IGenericRepository<ItProject> _projectRepository;
-        private readonly IGenericRepository<Activity> _activityRepository;
+        private readonly IGenericRepository<ItProjectPhase> _phaseRepository;
 
         public ItProjectService(IGenericRepository<ItProject> projectRepository, 
-            IGenericRepository<ItProjectType> projectTypeRepository, 
-            IGenericRepository<Activity> activityRepository)
+            IGenericRepository<ItProjectPhase> phaseRepository)
         {
             _projectRepository = projectRepository;
-            _activityRepository = activityRepository;
+            _phaseRepository = phaseRepository;
         }
 
         public IEnumerable<ItProject> GetAll(int? orgId = null, string nameSearch = null, bool includePublic = true)
@@ -139,12 +138,12 @@ namespace Core.ApplicationServices
             _projectRepository.Save();
 
             //deleting phases - must be done afterwards, since they're required on project
-            _activityRepository.DeleteByKey(phase1Id);
-            _activityRepository.DeleteByKey(phase2Id);
-            _activityRepository.DeleteByKey(phase3Id);
-            _activityRepository.DeleteByKey(phase4Id);
-            _activityRepository.DeleteByKey(phase5Id);
-            _activityRepository.Save();
+            _phaseRepository.DeleteByKey(phase1Id);
+            _phaseRepository.DeleteByKey(phase2Id);
+            _phaseRepository.DeleteByKey(phase3Id);
+            _phaseRepository.DeleteByKey(phase4Id);
+            _phaseRepository.DeleteByKey(phase5Id);
+            _phaseRepository.Save();
         }
 
         /// <summary>
@@ -155,8 +154,8 @@ namespace Core.ApplicationServices
         private void CreateDefaultPhases(ItProject project)
         {
             var phase1 = CreatePhase("Afventer", project.ObjectOwner);
-            _activityRepository.Insert(phase1);
-            _activityRepository.Save();
+            _phaseRepository.Insert(phase1);
+            _phaseRepository.Save();
 
             project.Phase1 = phase1;
             project.CurrentPhaseId = phase1.Id;
@@ -175,8 +174,8 @@ namespace Core.ApplicationServices
         private void ClonePhases(ItProject original, ItProject clone)
         {
             var phase1 = CreatePhase(original.Phase1.Name, clone.ObjectOwner);
-            _activityRepository.Insert(phase1);
-            _activityRepository.Save();
+            _phaseRepository.Insert(phase1);
+            _phaseRepository.Save();
 
             clone.Phase1 = phase1;
             clone.CurrentPhaseId = phase1.Id;
@@ -186,9 +185,9 @@ namespace Core.ApplicationServices
             clone.Phase5 = CreatePhase(original.Phase5.Name, clone.ObjectOwner);
         }
 
-        private Activity CreatePhase(string name, User owner)
+        private ItProjectPhase CreatePhase(string name, User owner)
         {
-            return new Activity() {Name = name, ObjectOwner = owner, LastChangedByUser = owner};
+            return new ItProjectPhase() {Name = name, ObjectOwner = owner, LastChangedByUser = owner};
         }
 
         private void AddEconomyYears(ItProject project)

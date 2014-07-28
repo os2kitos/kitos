@@ -72,11 +72,11 @@ namespace UI.MVC4.Models
         public string StatusNote { get; set; }
 
         // The phases of the project
-        public ActivityDTO Phase1 { get; set; }
-        public ActivityDTO Phase2 { get; set; }
-        public ActivityDTO Phase3 { get; set; }
-        public ActivityDTO Phase4 { get; set; }
-        public ActivityDTO Phase5 { get; set; } 
+        public ItProjectPhaseDTO Phase1 { get; set; }
+        public ItProjectPhaseDTO Phase2 { get; set; }
+        public ItProjectPhaseDTO Phase3 { get; set; }
+        public ItProjectPhaseDTO Phase4 { get; set; }
+        public ItProjectPhaseDTO Phase5 { get; set; } 
 
         /// <summary>
         /// The id of current selected phase
@@ -84,10 +84,9 @@ namespace UI.MVC4.Models
         public int? CurrentPhaseId { get; set; }
 
         /// <summary>
-        /// The tasks for "milestones and tasks" table. 
+        /// Milestones and Assignments table. 
         /// </summary>
-        public IEnumerable<ActivityDTO> TaskActivities { get; set; }
-        public virtual ICollection<StateDTO> MilestoneStates { get; set; } 
+        public IEnumerable<ItProjectStatusDTO> ItProjectStatuses { get; set; }
 
         #endregion
 

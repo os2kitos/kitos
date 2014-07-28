@@ -41,7 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Activity.cs" />
+    <Compile Include="Assignment.cs" />
     <Compile Include="AdminRight.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="IHasAccessModifier.cs" />
@@ -56,9 +56,11 @@
     <Compile Include="ItContract\EconomyStream.cs" />
     <Compile Include="ItContract\ProcurementStrategy.cs" />
     <Compile Include="ItContract\TerminationDeadline.cs" />
+    <Compile Include="ItProject\ItProjectPhase.cs" />
     <Compile Include="ItProject\GoalType.cs" />
     <Compile Include="ItProject\EconomyYear.cs" />
     <Compile Include="ItProject\ItProjectPriority.cs" />
+    <Compile Include="ItProject\ItProjectStatus.cs" />
     <Compile Include="ItSystem\AppType.cs" />
     <Compile Include="ItSystem\DataRow.cs" />
     <Compile Include="ItSystem\ArchiveType.cs" />
@@ -102,7 +104,7 @@
     <Compile Include="ItSystem\Method.cs" />
     <Compile Include="ItSystem\BusinessType.cs" />
     <Compile Include="ItSystem\Wish.cs" />
-    <Compile Include="State.cs" />
+    <Compile Include="Milestone.cs" />
     <Compile Include="TaskRef.cs" />
     <Compile Include="Organization.cs" />
     <Compile Include="OrganizationRole.cs" />

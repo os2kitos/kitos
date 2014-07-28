@@ -71,8 +71,9 @@
     <Compile Include="Mapping\AdminRightMap.cs" />
     <Compile Include="Mapping\AdminRoleMap.cs" />
     <Compile Include="Mapping\BusinessTypeMap.cs" />
-    <Compile Include="Mapping\ActivityMap.cs" />
-    <Compile Include="Mapping\HandoverTrial.cs" />
+    <Compile Include="Mapping\AssignmentMap.cs" />
+    <Compile Include="Mapping\ItProjectStatusMap.cs" />
+    <Compile Include="Mapping\HandoverTrialMap.cs" />
     <Compile Include="Mapping\HandoverTrialTypeMap.cs" />
     <Compile Include="Mapping\EntityMap.cs" />
     <Compile Include="Mapping\EconomyStreamMap.cs" />
@@ -81,7 +82,7 @@
     <Compile Include="Mapping\InterfaceExposureMap.cs" />
     <Compile Include="Mapping\GoalTypeMap.cs" />
     <Compile Include="Mapping\RightMap.cs" />
-    <Compile Include="Mapping\StateMap.cs" />
+    <Compile Include="Mapping\MilestoneMap.cs" />
     <Compile Include="Mapping\EconomyYearMap.cs" />
     <Compile Include="Mapping\DataTypeMap.cs" />
     <Compile Include="Mapping\DataRowUsageMap.cs" />

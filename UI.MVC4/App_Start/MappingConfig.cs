@@ -260,19 +260,19 @@ namespace UI.MVC4.App_Start
                 .ReverseMap()
                 .ForMember(dest => dest.ItProject, opt => opt.Ignore());
 
-            Mapper.CreateMap<Activity, ActivityDTO>()
-                .ReverseMap()
-                .ForMember(dest => dest.AssociatedUser, opt => opt.Ignore())
-                .ForMember(dest => dest.ObjectOwner, opt => opt.Ignore());
+            Mapper.CreateMap<ItProjectStatus, ItProjectStatusDTO>()
+                  .Include<Assignment, AssignmentDTO>()
+                  .Include<Milestone, MilestoneDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.AssociatedUser, opt => opt.Ignore())
+                  .ForMember(dest => dest.ObjectOwner, opt => opt.Ignore())
+                  .ForMember(dest => dest.ObjectOwnerId, opt => opt.Ignore());
 
-            //Output only - this mapping should not be reversed
-            Mapper.CreateMap<Activity, ActivitySimpleDTO>();
-
-            Mapper.CreateMap<State, StateDTO>()
-                .ReverseMap()
-                .ForMember(dest => dest.AssociatedUser, opt => opt.Ignore())
-                .ForMember(dest => dest.ObjectOwner, opt => opt.Ignore());
-
+            Mapper.CreateMap<Assignment, AssignmentDTO>()
+                  .ReverseMap();
+            Mapper.CreateMap<Milestone, MilestoneDTO>()
+                  .ReverseMap();
+                
             Mapper.CreateMap<GoalStatus, GoalStatusDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.ItProject, opt => opt.Ignore())
@@ -297,7 +297,10 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
                   .ForMember(dest => dest.ResponsibleOrgUnit, opt => opt.Ignore())
                   .ForMember(dest => dest.Stakeholders, opt => opt.Ignore());
-            
+
+            Mapper.CreateMap<ItProjectPhase, ItProjectPhaseDTO>()
+                  .ReverseMap();
+
             //Output only - this mapping should not be reversed
             Mapper.CreateMap<ItProject, ItProjectCatalogDTO>();
 
