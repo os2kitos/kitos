@@ -214,6 +214,7 @@
   <ItemGroup>
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Controllers\API\ItProjectStatusController.cs" />
     <Compile Include="Controllers\API\ItProjectPhaseController.cs" />
     <Compile Include="Controllers\API\HandoverTrialController.cs" />
     <Compile Include="Controllers\API\HandoverTrialTypeController.cs" />

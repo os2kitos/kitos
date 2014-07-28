@@ -104,6 +104,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IGenericRepository<Wish>>().To<GenericRepository<Wish>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItProject>>().To<GenericRepository<ItProject>>().InRequestScope();
             kernel.Bind<IGenericRepository<ItProjectPhase>>().To<GenericRepository<ItProjectPhase>>().InRequestScope();
+            kernel.Bind<IGenericRepository<ItProjectStatus>>().To<GenericRepository<ItProjectStatus>>().InRequestScope();
             kernel.Bind<IGenericRepository<Risk>>().To<GenericRepository<Risk>>().InRequestScope();
             kernel.Bind<IGenericRepository<Assignment>>().To<GenericRepository<Assignment>>().InRequestScope();
             kernel.Bind<IGenericRepository<Milestone>>().To<GenericRepository<Milestone>>().InRequestScope();
