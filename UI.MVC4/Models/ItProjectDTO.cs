@@ -83,11 +83,6 @@ namespace UI.MVC4.Models
         /// </summary>
         public int? CurrentPhaseId { get; set; }
 
-        /// <summary>
-        /// Milestones and Assignments table. 
-        /// </summary>
-        public IEnumerable<ItProjectStatusDTO> ItProjectStatuses { get; set; }
-
         #endregion
 
         public int? ResponsibleOrgUnitId { get; set; }

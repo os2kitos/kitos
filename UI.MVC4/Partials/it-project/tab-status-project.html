@@ -55,21 +55,39 @@
             <table class="table table-condensed table-striped">
                 <thead>
                     <tr class="small">
-                        <th>Type</th>
-                        <th>Navn</th>
+                        <th>
+                            Type
+                        </th>
+                        <th>
+                            Navn
+                            <order-by data-order-by="'name'" data-paging="pagination"></order-by>
+                        </th>
                         <th>Note</th>
-                        <th>ID</th>
-                        <th>Projektfase</th>
-                        <th>Start</th>
-                        <th>Slut</th>
+                        <th>
+                            ID
+                            <order-by data-order-by="'humanReadableId'" data-paging="pagination"></order-by>
+                        </th>
+                        <th>
+                            Projektfase
+                            <order-by data-order-by="'associatedPhaseId'" data-paging="pagination"></order-by>
+                        </th>
+                        <th>
+                            Start
+                        </th>
+                        <th>
+                            Slut
+                        </th>
                         <th>Status</th>
-                        <th>Ansvarlig: Navn</th>
+                        <th>
+                            Ansvarlig: Navn
+                            <order-by data-order-by="'associatedUser.name'" data-paging="pagination"></order-by>
+                        </th>
                         <th>Ansvarlig: Projektrolle</th>
                         <th class="text-right">Rediger/slet</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-ng-repeat="activity in milestonesActivities | filter:{show:true} | orderBy:'humanReadableId'" class="small">
+                    <tr data-ng-repeat="activity in milestonesActivities | filter:{show:true}" class="small">
                         <!-- Type -->
                         <td>
                             <span data-ng-show="activity.isTask">Opgave</span>
