@@ -59,19 +59,27 @@
             $scope.project.phases = [project.phase1, project.phase2, project.phase3, project.phase4, project.phase5];
             var prevPhase = null;
             _.each($scope.project.phases, function (phase) {
-                phase.updateUrl = "api/activity/" + phase.id;
+                phase.updateUrl = "api/itProjectPhase/" + phase.id;
                 phase.prevPhase = prevPhase;
                 prevPhase = phase;
             });
             
-            //All activities - both activities ("opgaver") and milestones
+            //All Assignments - both Assignments ("opgaver") and milestones
             $scope.milestonesActivities = [];
             
-            function addMilestoneActivity(activity, skipAdding) {
+            function addStatus(activity, skipAdding) {
                 activity.show = true;
 
-                activity.updatePhase = function(id) {
-                    activity.phase = _.findWhere($scope.project.phases, { id: activity.associatedActivityId });
+                if (activity.$type.indexOf('Assignment') > -1 ) {
+                    activity.isTask = true;
+                    activity.updateUrl = "api/Assignment/" + activity.id;
+                } else if (activity.$type.indexOf('Milestone') > -1) {
+                    activity.isMilestone = true;
+                    activity.updateUrl = "api/Milestone/" + activity.id;
+                }
+
+                activity.updatePhase = function() {
+                    activity.phase = _.findWhere($scope.project.phases, { id: activity.associatedPhaseId });
                 };
 
                 activity.updatePhase();
@@ -85,70 +93,85 @@
                 activity.updateUser();
 
                 activity.edit = function() {
-                    return editActivity(activity);
+                    return editStatus(activity);
                 };
 
                 activity.delete = function() {
-
-                    var msg = notify.addInfoMessage("Sletter... ");
+                    var msg = notify.addInfoMessage("Sletter...");
                     $http.delete(activity.updateUrl).success(function() {
-
                         activity.show = false;
-
                         msg.toSuccessMessage("Slettet!");
-
                     }).error(function() {
-
                         msg.toErrorMessage("Fejl! Kunne ikke slette!");
                     });
-
                 };
 
-                if(!skipAdding) $scope.milestonesActivities.push(activity);
+                if (!skipAdding)
+                    $scope.milestonesActivities.push(activity);
 
                 return activity;
             }
 
-            //Add a taskActivity ("opgaver")
-            function addMilestone(milestone) {
-                milestone.isMilestone = true;
-                milestone.updateUrl = "api/state/" + milestone.id;
-
-                return addMilestoneActivity(milestone);
-            }
-
-            //Add a milestoneState ("milepæle")
-            function addTask(task) {
-                task.isTask = true;
-                task.updateUrl = "api/activity/" + task.id;
-
-                return addMilestoneActivity(task);
-            }
-
-            _.each(project.taskActivities, addTask);
-            _.each(project.milestoneStates, addMilestone);
+            _.each(project.itProjectStatuses, function(value) {
+                addStatus(value);
+            });
       
             $scope.addMilestone = function() {
-                $http.post("api/state", { milestoneForProjectId: project.id }).success(function(result) {
-                    var activity = result.response;
-
-                    addMilestone(activity);
-                    editActivity(activity);
-
+                $http.post("api/Milestone", { associatedItProjectId: project.id }).success(function (result) {
+                    var milestone = result.response;
+                    milestone.$type = "Milestone";
+                    milestone.updateUrl = "api/milestone/" + milestone.id;
+                    addStatus(milestone);
+                    editStatus(milestone);
                 });
             };
             
-            $scope.addTask = function () {
-                $http.post("api/activity", { taskForProjectId: project.id }).success(function (result) {
+            $scope.addAssignment = function () {
+                $http.post("api/Assignment", { associatedItProjectId: project.id }).success(function (result) {
                     var activity = result.response;
-
-                    addTask(activity);
-                    editActivity(activity);
-
+                    activity.$type = "Assignment";
+                    activity.updateUrl = "api/assignment/" + activity.id;
+                    addStatus(activity);
+                    editStatus(activity);
                 });
             };
+            
+            $scope.pagination = {
+                skip: 0,
+                take: 50
+            };
+            
+            $scope.$watchCollection('pagination', loadStatues);
 
-            function editActivity(activity) {
+            function loadStatues() {
+                var url = 'api/itProjectStatus/' + project.id + '?project=true';
+
+                url += '&skip=' + $scope.pagination.skip;
+                url += '&take=' + $scope.pagination.take;
+
+                if ($scope.pagination.orderBy) {
+                    url += '&orderBy=' + $scope.pagination.orderBy;
+                    if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+                }
+
+                if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
+                else url += "&q=";
+                
+                $scope.milestonesActivities = [];
+                $http.get(url).success(function (result, status, headers) {
+                    var paginationHeader = JSON.parse(headers('X-Pagination'));
+                    $scope.pagination.count = paginationHeader.TotalCount;
+
+                    _.each(result.response, function (value) {
+                        addStatus(value);
+                    });
+
+                }).error(function () {
+                    notify.addErrorMessage("Kunne ikke hente projekter!");
+                });
+            }
+
+            function editStatus(activity) {
                 var modal = $modal.open({
                     templateUrl: 'partials/it-project/modal-milestone-task-edit.html',
                     controller: ['$scope', 'autofocus', '$modalInstance', function ($modalScope, autofocus, $modalInstance) {
@@ -183,7 +206,7 @@
                                 msg.toSuccessMessage("Ændringerne er gemt!");
                                 angular.extend(activity, result.response);
 
-                                addMilestoneActivity(activity, true);
+                                addStatus(activity, true);
                                 $modalInstance.close();
 
                             }).error(function() {

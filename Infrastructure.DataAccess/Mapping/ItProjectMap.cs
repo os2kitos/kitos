@@ -42,36 +42,6 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasMany(t => t.TaskRefs)
                 .WithMany(t => t.ItProjects);
 
-            this.HasRequired(t => t.Phase1)
-                .WithOptional(d => d.Phase1ForProject)
-                .Map(mc => mc.MapKey("Phase1Id"));
-
-            this.HasRequired(t => t.Phase2)
-                .WithOptional(d => d.Phase2ForProject)
-                .Map(mc => mc.MapKey("Phase2Id"));
-
-            this.HasRequired(t => t.Phase3)
-                .WithOptional(d => d.Phase3ForProject)
-                .Map(mc => mc.MapKey("Phase3Id"));
-
-            this.HasRequired(t => t.Phase4)
-                .WithOptional(d => d.Phase4ForProject)
-                .Map(mc => mc.MapKey("Phase4Id"));
-
-            this.HasRequired(t => t.Phase5)
-                .WithOptional(d => d.Phase5ForProject)
-                .Map(mc => mc.MapKey("Phase5Id"));
-
-            this.HasMany(t => t.TaskActivities)
-                .WithOptional(d => d.TaskForProject)
-                .HasForeignKey(d => d.TaskForProjectId)
-                .WillCascadeOnDelete(true);
-
-            this.HasMany(t => t.MilestoneStates)
-                .WithOptional(d => d.MilestoneForProject)
-                .HasForeignKey(d => d.MilestoneForProjectId)
-                .WillCascadeOnDelete(true);
-
             this.HasOptional(t => t.JointMunicipalProject)
                 .WithMany(t => t.JointMunicipalProjects)
                 .HasForeignKey(d => d.JointMunicipalProjectId)

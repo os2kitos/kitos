@@ -20,6 +20,7 @@ namespace Core.DomainModel.ItProject
             this.CommonPublicProjects = new List<ItProject>();
             this.Children = new List<ItProject>();
             this.Clones = new List<ItProject>();
+            this.ItProjectStatuses = new List<ItProjectStatus>();
 
             // default values
             this.Priority = ItProjectPriority.None; 
@@ -166,11 +167,11 @@ namespace Core.DomainModel.ItProject
         public string StatusNote { get; set; }
 
         // The phases of the project
-        public virtual Activity Phase1 { get; set; }
-        public virtual Activity Phase2 { get; set; } 
-        public virtual Activity Phase3 { get; set; } 
-        public virtual Activity Phase4 { get; set; } 
-        public virtual Activity Phase5 { get; set; } 
+        public virtual ItProjectPhase Phase1 { get; set; }
+        public virtual ItProjectPhase Phase2 { get; set; }
+        public virtual ItProjectPhase Phase3 { get; set; }
+        public virtual ItProjectPhase Phase4 { get; set; }
+        public virtual ItProjectPhase Phase5 { get; set; }
         
         /// <summary>
         /// The id of current selected phase
@@ -178,10 +179,9 @@ namespace Core.DomainModel.ItProject
         public int? CurrentPhaseId { get; set; }
 
         /// <summary>
-        /// The tasks for "milestones and tasks" table. 
+        /// The "milestones and tasks" table. 
         /// </summary>
-        public virtual ICollection<Activity> TaskActivities { get; set; }
-        public virtual ICollection<State> MilestoneStates { get; set; } 
+        public virtual ICollection<ItProjectStatus> ItProjectStatuses { get; set; }
 
         #endregion
 

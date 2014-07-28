@@ -16,8 +16,7 @@ namespace Core.DomainModel
             this.AdminRights = new List<AdminRight>();
 
             this.Wishes = new List<Wish>();
-            this.Activities = new List<Activity>();
-            this.States = new List<State>();
+            this.ItProjectStatuses = new List<ItProjectStatus>();
             this.ResponsibleForRisks = new List<Risk>();
             this.ResponsibleForCommunications = new List<Communication>();
             this.HandoverParticipants = new List<Handover>();
@@ -56,15 +55,10 @@ namespace Core.DomainModel
         public virtual ICollection<Wish> Wishes { get; set; }
 
         /// <summary>
-        /// Activity associated with this user
+        /// Gets or sets the <see cref="Assignment"/> or <see cref="Milestone"/> associated with this user
         /// </summary>
-        public virtual ICollection<Activity> Activities { get; set; }
-
-        /// <summary>
-        /// States associated with this user
-        /// </summary>
-        public virtual ICollection<State> States { get; set; }
-
+        public virtual ICollection<ItProjectStatus> ItProjectStatuses { get; set; }
+        
         /// <summary>
         /// Risks associated with this user
         /// </summary>

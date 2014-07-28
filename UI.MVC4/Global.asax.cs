@@ -23,8 +23,11 @@ namespace UI.MVC4
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             AuthConfig.RegisterAuth();
 
-            //Turns off self reference looping when serializing models in API controlllers
+            // Turns off self reference looping when serializing models in API controlllers
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            
+            // Support polymorphism in web api JSON output
+            GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
 
             // Set JSON serialization in WEB API to use camelCase (javascript) instead of PascalCase (C#)
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();

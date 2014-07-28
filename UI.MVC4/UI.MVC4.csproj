@@ -214,6 +214,8 @@
   <ItemGroup>
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Controllers\API\ItProjectStatusController.cs" />
+    <Compile Include="Controllers\API\ItProjectPhaseController.cs" />
     <Compile Include="Controllers\API\HandoverTrialController.cs" />
     <Compile Include="Controllers\API\HandoverTrialTypeController.cs" />
     <Compile Include="Controllers\API\GenericHierarchyApiController.cs" />
@@ -225,9 +227,10 @@
     <Compile Include="Controllers\API\OptionExtendController.cs" />
     <Compile Include="Controllers\API\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
-    <Compile Include="Models\ActivitySimpleDTO.cs" />
     <Compile Include="Models\HandoverTrialDTO.cs" />
     <Compile Include="Models\ItProjectOverviewDTO.cs" />
+    <Compile Include="Models\ItProjectPhaseDTO.cs" />
+    <Compile Include="Models\ItProjectStatusDTO.cs" />
     <Compile Include="Models\PagingModel.cs" />
     <Compile Include="Controllers\API\PriceRegulationController.cs" />
     <Compile Include="Controllers\API\PaymentModelController.cs" />
@@ -255,7 +258,7 @@
     <Compile Include="Models\ItSystemUsageSimpleDTO.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\API\ActivityController.cs" />
+    <Compile Include="Controllers\API\AssignmentController.cs" />
     <Compile Include="Controllers\API\AdminRoleController.cs" />
     <Compile Include="Controllers\API\AgreementElementController.cs" />
     <Compile Include="Controllers\API\ArchiveTypeController.cs" />
@@ -282,7 +285,7 @@
     <Compile Include="Controllers\API\ItSystemUsageController.cs" />
     <Compile Include="Controllers\API\RiskController.cs" />
     <Compile Include="Controllers\API\StakeholderController.cs" />
-    <Compile Include="Controllers\API\StateController.cs" />
+    <Compile Include="Controllers\API\MilestoneController.cs" />
     <Compile Include="Models\CommunicationDTO.cs" />
     <Compile Include="Filters\CustomDateTimeConverter.cs" />
     <Compile Include="Models\GoalDTO.cs" />
@@ -293,7 +296,7 @@
     <Compile Include="Controllers\API\SensitiveDataTypeController.cs" />
     <Compile Include="Controllers\API\TsaController.cs" />
     <Compile Include="Controllers\API\WishController.cs" />
-    <Compile Include="Models\ActivityDTO.cs" />
+    <Compile Include="Models\AssignmentDTO.cs" />
     <Compile Include="Models\DataRowDTO.cs" />
     <Compile Include="Models\DataRowUsageDTO.cs" />
     <Compile Include="Models\EconomyYearDTO.cs" />
@@ -349,7 +352,7 @@
     <Compile Include="Models\RightInputDTO.cs" />
     <Compile Include="Models\RoleDTO.cs" />
     <Compile Include="Models\StakeholderDTO.cs" />
-    <Compile Include="Models\StateDTO.cs" />
+    <Compile Include="Models\MilestoneDTO.cs" />
     <Compile Include="Models\TaskDelegationDTO.cs" />
     <Compile Include="Models\TaskRefSelectedDTO.cs" />
     <Compile Include="Models\TaskRefUsageDTO.cs" />

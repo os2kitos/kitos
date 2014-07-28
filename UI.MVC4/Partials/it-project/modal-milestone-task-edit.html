@@ -31,7 +31,7 @@
             </label>
             <div class="col-md-4">
                 <select id="phase" class="form-control input-sm" 
-                        data-ng-model="activity.associatedActivityId" 
+                        data-ng-model="activity.associatedPhaseId" 
                         data-ng-options="phase.id as phase.name for phase in phases">
                     <option value=""></option>
                 </select>
@@ -87,7 +87,7 @@
                            data-datepicker-popup="dd-MM-yyyy" 
                            data-is-open="opened.d" 
                            data-date-to-string 
-                           data-ng-model="activity.date"">
+                           data-ng-model="activity.date">
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-default" data-ng-click="open($event, 'd')"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>
