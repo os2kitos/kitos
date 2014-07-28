@@ -119,7 +119,8 @@
             $scope.addMilestone = function() {
                 $http.post("api/Milestone", { associatedItProjectId: project.id }).success(function (result) {
                     var milestone = result.response;
-
+                    milestone.$type = "Milestone";
+                    milestone.updateUrl = "api/milestone/" + milestone.id;
                     addStatus(milestone);
                     editStatus(milestone);
                 });
@@ -128,7 +129,8 @@
             $scope.addAssignment = function () {
                 $http.post("api/Assignment", { associatedItProjectId: project.id }).success(function (result) {
                     var activity = result.response;
-
+                    activity.$type = "Assignment";
+                    activity.updateUrl = "api/assignment/" + activity.id;
                     addStatus(activity);
                     editStatus(activity);
                 });
