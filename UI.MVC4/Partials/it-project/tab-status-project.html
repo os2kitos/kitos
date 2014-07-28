@@ -55,60 +55,77 @@
             <table class="table table-condensed table-striped">
                 <thead>
                     <tr class="small">
-                        <th>Fase</th>
-                        <th>Aktivitetstype</th>
+                        <th>Type</th>
+                        <th>Navn</th>
+                        <th>Note</th>
                         <th>ID</th>
-                        <th>Aktivitet</th>
+                        <th>Projektfase</th>
                         <th>Start</th>
                         <th>Slut</th>
                         <th>Status</th>
-                        <th>Navn</th>
-                        <th>Projektrolle</th>
-                        <th></th>
+                        <th>Ansvarlig: Navn</th>
+                        <th>Ansvarlig: Projektrolle</th>
+                        <th class="text-right">Rediger/slet</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr data-ng-repeat="activity in milestonesActivities | filter:{show:true} | orderBy:'humanReadableId'" class="small">
-                        <td>{{activity.phase.name}}</td>
+                        <!-- Type -->
                         <td>
                             <span data-ng-show="activity.isTask">Opgave</span>
                             <span data-ng-show="activity.isMilestone">Milepæl</span>
                         </td>
-                        <td>{{activity.humanReadableId}}</td>
-                        <td>{{activity.name}}</td>
+                        <!-- Navn -->
                         <td>
-                            <span data-datereader="" data-ng-show="activity.isTask"
-                                  data-ng-model="activity.startDate">
-                            </span>
-                            <span data-ng-show="activity.isMilestone">
-                                -
-                            </span>
+                            <a data-ng-click="activity.edit()" data-ng-show="hasWriteAccess">{{ activity.name }}</a>
+                            <span data-ng-hide="hasWriteAccess">{{ activity.name }}</span>
                         </td>
+                        <!-- Note -->
+                        <td>
+                            <a data-ng-click="activity.edit()" data-ng-show="hasWriteAccess">
+                                <span class="glyphicon glyphicon-comment" data-ng-class="{'faded': !(activity.note || activity.description) }"></span>
+                            </a>
+                            <a data-ng-hide="hasWriteAccess">
+                                <span class="glyphicon glyphicon-comment" data-ng-class="{'faded': !(activity.note || activity.description) }"></span>
+                            </a>
+                        </td>
+                        <!-- ID -->
+                        <td>{{ activity.humanReadableId }}</td>
+                        <!-- Projektfase -->
+                        <td>{{ activity.phase.name }}</td>
+                        <!-- Start -->
+                        <td>
+                            <span data-datereader="" data-ng-show="activity.isTask" data-ng-model="activity.startDate"></span>
+                            <span data-ng-show="activity.isMilestone">-</span>
+                        </td>
+                        <!-- Slut -->
                         <td>
                             <span data-datereader="" data-ng-show="activity.isTask" data-ng-model="activity.endDate"></span>
                             <span data-datereader="" data-ng-show="activity.isMilestone" data-ng-model="activity.date"></span>
                         </td>
+                        <!-- Status -->
                         <td>
                             <span data-ng-show="activity.isTask">
-                                {{activity.statusProcentage}}%
+                                {{ activity.statusProcentage }}%
                             </span>
                             <span data-ng-show="activity.isMilestone">
                                 <span data-select-status2="" data-ng-model="activity.status"></span>
                             </span>
                         </td>
-                        <td>{{activity.associatedUser.name}}</td>
-                        <td>{{activity.associatedUser.roleNames | joinBy:', '}}</td>
-                        <td>
-                            <span class="pull-right">
-                                <a class="btn btn-link btn-xs" data-ng-click="activity.edit()" data-ng-hide="!hasWriteAccess">
-                                    <i class="glyphicon glyphicon-pencil"></i>
-                                </a>
-                                <a class="btn btn-link btn-xs"
-                                    data-confirmed-click="activity.delete()"
-                                    data-confirm-click="Er du sikker på at du vil slette?" data-ng-hide="!hasWriteAccess">
-                                    <i class="glyphicon glyphicon-trash"></i>
-                                </a>
-                            </span>
+                        <!-- Ansvarlig: Navn -->
+                        <td>{{ activity.associatedUser.name }}</td>
+                        <!-- Ansvarlig: Projektrolle -->
+                        <td>{{ activity.associatedUser.roleNames | joinBy:', ' }}</td>
+                        <!-- Control -->
+                        <td class="text-right">
+                            <a class="btn btn-link btn-xs" data-ng-click="activity.edit()" data-ng-hide="!hasWriteAccess">
+                                <i class="glyphicon glyphicon-pencil"></i>
+                            </a>
+                            <a class="btn btn-link btn-xs"
+                                data-confirmed-click="activity.delete()"
+                                data-confirm-click="Er du sikker på at du vil slette?" data-ng-hide="!hasWriteAccess">
+                                <i class="glyphicon glyphicon-trash"></i>
+                            </a>
                         </td>
                     </tr>
                 </tbody>
