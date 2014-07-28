@@ -136,7 +136,7 @@
             
             $scope.pagination = {
                 skip: 0,
-                take: 30
+                take: 50
             };
             
             $scope.$watchCollection('pagination', loadStatues);
