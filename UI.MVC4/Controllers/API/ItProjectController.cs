@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
@@ -17,17 +22,23 @@ namespace UI.MVC4.Controllers.API
         private readonly IItProjectService _itProjectService;
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
+        private readonly IGenericRepository<ItProjectRole> _roleRepository;
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
 
         //TODO: Man, this constructor smells ...
-        public ItProjectController(IGenericRepository<ItProject> repository,
-            IItProjectService itProjectService, IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository, 
-            IGenericRepository<ItSystemUsage> itSystemUsageRepository) 
+        public ItProjectController(
+            IGenericRepository<ItProject> repository,
+            IItProjectService itProjectService, 
+            IGenericRepository<OrganizationUnit> orgUnitRepository, 
+            IGenericRepository<TaskRef> taskRepository, 
+            IGenericRepository<ItSystemUsage> itSystemUsageRepository,
+            IGenericRepository<ItProjectRole> roleRepository) 
             : base(repository)
         {
             _itProjectService = itProjectService;
             _taskRepository = taskRepository;
             _itSystemUsageRepository = itSystemUsageRepository;
+            _roleRepository = roleRepository;
             _orgUnitRepository = orgUnitRepository;
         }
 
@@ -98,6 +109,56 @@ namespace UI.MVC4.Controllers.API
                 var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectOverviewDTO>>(projects);
 
                 return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetExcel(bool? csv, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
+        {
+            try
+            {
+                //Get all projects inside the organizaton
+                pagingModel.Where(p => p.OrganizationId == orgId);
+                if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
+
+                var projects = Page(Repository.AsQueryable(), pagingModel);
+
+                var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectOverviewDTO>>(projects);
+
+                var roles = _roleRepository.Get().ToList();
+
+                var list = new List<dynamic>();
+                foreach (var project in projects)
+                {
+                    var obj = new ExpandoObject() as IDictionary<string, Object>;
+                    obj.Add("Name", project.Name);
+                    obj.Add("OrgUnit", project.ResponsibleOrgUnit.Name);
+                    
+                    foreach (var role in roles)
+                    {
+                        var roleId = role.Id;
+                        obj.Add(role.Name,
+                                String.Join(",", project.Rights.Where(x => x.RoleId == roleId).Select(x => x.User.Name)));
+                    }
+
+                    obj.Add("Type", project.ItProjectType.Name);
+                    list.Add(obj);
+                }
+
+                var s = list.ToCsv();
+                var bytes = Encoding.Unicode.GetBytes(s);
+                var stream = new MemoryStream();
+                stream.Write(bytes, 0, bytes.Length);
+                stream.Seek(0, SeekOrigin.Begin);
+
+                var result = new HttpResponseMessage(HttpStatusCode.OK);
+                result.Content = new StreamContent(stream);
+                result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
+                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "itprojektoversigt.csv" };
+                return result;
             }
             catch (Exception e)
             {
