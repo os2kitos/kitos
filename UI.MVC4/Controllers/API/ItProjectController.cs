@@ -136,6 +136,7 @@ namespace UI.MVC4.Controllers.API
 
                 var list = new List<dynamic>();
                 var header = new ExpandoObject() as IDictionary<string, Object>;
+                header.Add("Arkiveret", "Arkiveret");
                 header.Add("Name", "It Projekt");
                 header.Add("OrgUnit", "Ansv. organisationsenhed");
                 foreach (var role in roles)
@@ -156,6 +157,7 @@ namespace UI.MVC4.Controllers.API
                 foreach (var project in dtos)
                 {
                     var obj = new ExpandoObject() as IDictionary<string, Object>;
+                    obj.Add("Arkiveret", project.IsArchived);
                     obj.Add("Name", project.Name);
                     obj.Add("OrgUnit", project.ResponsibleOrgUnitName);
                     
