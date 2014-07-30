@@ -37,6 +37,7 @@ namespace UI.MVC4.Models
         public int? AppTypeId { get; set; }
         public string AppTypeName { get; set; }
         public int? BusinessTypeId { get; set; }
+        public string BusinessTypeName { get; set; }
 
         public int? InterfaceId { get; set; }
         public int? InterfaceTypeId { get; set; }

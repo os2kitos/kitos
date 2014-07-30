@@ -20,6 +20,7 @@ namespace UI.MVC4.Models
         
         public int? ResponsibleUnitId { get; set; }
         public OrgUnitDTO ResponsibleUnit { get; set; }
+        public string ResponsibleUnitName { get; set; }
 
         public int OrganizationId { get; set; }
         public OrganizationDTO Organization { get; set; }

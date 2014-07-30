@@ -1,8 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Web.Http;
+using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
@@ -15,14 +21,16 @@ namespace UI.MVC4.Controllers.API
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemUsageService _itSystemUsageService;
+        private readonly IGenericRepository<ItSystemRole> _roleRepository;
 
         public ItSystemUsageController(IGenericRepository<ItSystemUsage> repository,
-            IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository, IItSystemUsageService itSystemUsageService) 
+            IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository, IItSystemUsageService itSystemUsageService, IGenericRepository<ItSystemRole> roleRepository) 
             : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
             _taskRepository = taskRepository;
             _itSystemUsageService = itSystemUsageService;
+            _roleRepository = roleRepository;
         }
 
         public HttpResponseMessage GetSearchByOrganization(int organizationId, string q)
@@ -50,6 +58,74 @@ namespace UI.MVC4.Controllers.API
                 var usages = Page(Repository.AsQueryable(), pagingModel);
                 
                 return Ok(Map(usages));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetExcel(int organizationId, [FromUri] PagingModel<ItSystemUsage> pagingModel, [FromUri] string q, bool? csv)
+        {
+            try
+            {
+                pagingModel.Where(u => u.OrganizationId == organizationId);
+
+                if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
+
+                var usages = Page(Repository.AsQueryable(), pagingModel);
+                var dtos = Map(usages);
+
+                var roles = _roleRepository.Get().ToList();
+
+                var list = new List<dynamic>();
+                var header = new ExpandoObject() as IDictionary<string, Object>;
+                header.Add("Aktiv", "Aktiv");
+                header.Add("IT System", "IT System");
+                header.Add("OrgUnit", "Ansv. organisationsenhed");
+                foreach (var role in roles)
+                    header.Add(role.Name, role.Name);
+                header.Add("Gid", "Globalt SystemID");
+                header.Add("Lid", "Lokalt SystemID");
+                header.Add("AppType", "Applikationtype");
+                header.Add("BusiType", "Forretningstype");
+                header.Add("Anvender", "Anvender");
+                header.Add("Udstiller", "Udstiller");
+                header.Add("Overblik", "Overblik");
+                list.Add(header);
+                foreach (var usage in dtos)
+                {
+                    var obj = new ExpandoObject() as IDictionary<string, Object>;
+                    obj.Add("Aktiv", usage.MainContractIsActive);
+                    obj.Add("IT System", usage.ItSystem.Name);
+                    obj.Add("OrgUnit", usage.ResponsibleUnitName);
+                    foreach (var role in roles)
+                    {
+                        var roleId = role.Id;
+                        obj.Add(role.Name,
+                                String.Join(",", usage.Rights.Where(x => x.RoleId == roleId).Select(x => x.User.Name)));
+                    }
+                    obj.Add("Gid", usage.ItSystem.SystemId);
+                    obj.Add("Lid", usage.LocalSystemId);
+                    obj.Add("AppType", usage.ItSystem.AppTypeName);
+                    obj.Add("BusiType", usage.ItSystem.BusinessTypeName);
+                    obj.Add("Anvender", usage.ActiveInterfaceUsages + "(" + usage.ItSystem.CanUseInterfaceIds.Count() + ")");
+                    obj.Add("Udstiller", usage.ItSystem.ExposedBy != null ? usage.ItSystem.ExposedBy.Name : "" + " " + usage.ItSystem.ExposedInterfaceIds.Count());
+                    obj.Add("Overblik", usage.OverviewItSystemName);
+                    list.Add(obj);
+                }
+
+                var s = list.ToCsv();
+                var bytes = Encoding.Unicode.GetBytes(s);
+                var stream = new MemoryStream();
+                stream.Write(bytes, 0, bytes.Length);
+                stream.Seek(0, SeekOrigin.Begin);
+
+                var result = new HttpResponseMessage(HttpStatusCode.OK);
+                result.Content = new StreamContent(stream);
+                result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
+                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "itsystemanvendelsesoversigt.csv" };
+                return result;
             }
             catch (Exception e)
             {
