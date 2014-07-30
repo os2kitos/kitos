@@ -1,10 +1,16 @@
 ﻿<div search-box data-paging="pagination"></div>
+<div class="searchbox-wrapper">
+    <a class="excel-icon" data-ng-href="{{csvUrl}}">
+        <img src="../../Images/excel.png" alt="Hent excelark" width="25">
+    </a>
+</div>
 <!--IT Projekt Oversigt-->
 <table class="table table-striped">
     <thead>
         <tr>
             <!-- Name -->
-            <th>IT Projekt
+            <th>
+                IT Projekt
                 <order-by data-order-by="'name'" data-paging="pagination"></order-by>
             </th>
             <!-- Responsible -->
@@ -23,7 +29,8 @@
                 <order-by data-order-by="chosenId" data-paging="pagination"></order-by>
             </th>
             <!-- Type -->
-            <th>Type
+            <th>
+                Type
                 <order-by data-order-by="'itProjectType.name'" data-paging="pagination"></order-by>
             </th>
             
