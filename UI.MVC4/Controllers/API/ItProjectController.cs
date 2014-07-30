@@ -23,6 +23,7 @@ namespace UI.MVC4.Controllers.API
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
         private readonly IGenericRepository<ItProjectRole> _roleRepository;
+        private readonly IGenericRepository<ItProjectPhase> _phaseRepository;
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
 
         //TODO: Man, this constructor smells ...
@@ -32,13 +33,15 @@ namespace UI.MVC4.Controllers.API
             IGenericRepository<OrganizationUnit> orgUnitRepository, 
             IGenericRepository<TaskRef> taskRepository, 
             IGenericRepository<ItSystemUsage> itSystemUsageRepository,
-            IGenericRepository<ItProjectRole> roleRepository) 
+            IGenericRepository<ItProjectRole> roleRepository,
+            IGenericRepository<ItProjectPhase> phaseRepository)
             : base(repository)
         {
             _itProjectService = itProjectService;
             _taskRepository = taskRepository;
             _itSystemUsageRepository = itSystemUsageRepository;
             _roleRepository = roleRepository;
+            _phaseRepository = phaseRepository;
             _orgUnitRepository = orgUnitRepository;
         }
 
@@ -129,13 +132,30 @@ namespace UI.MVC4.Controllers.API
                 var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectOverviewDTO>>(projects);
 
                 var roles = _roleRepository.Get().ToList();
+                var phases = _phaseRepository.Get().ToList();
 
                 var list = new List<dynamic>();
-                foreach (var project in projects)
+                var header = new ExpandoObject() as IDictionary<string, Object>;
+                header.Add("Name", "It Projekt");
+                header.Add("OrgUnit", "Ansv. organisationsenhed");
+                foreach (var role in roles)
+                    header.Add(role.Name, role.Name);
+                header.Add("ID", "Projekt ID");
+                header.Add("Type", "Type");
+                header.Add("Fase", "Fase");
+                header.Add("Status", "Status projekt");
+                header.Add("Maal", "Status mål");
+                header.Add("Risiko", "Risiko");
+                header.Add("RO", "RO");
+                header.Add("Okonomi", "Økonomi");
+                header.Add("P1", "Prioritet 1");
+                header.Add("P2", "Prioritet 2");
+                list.Add(header);
+                foreach (var project in dtos)
                 {
                     var obj = new ExpandoObject() as IDictionary<string, Object>;
                     obj.Add("Name", project.Name);
-                    obj.Add("OrgUnit", project.ResponsibleOrgUnit.Name);
+                    obj.Add("OrgUnit", project.ResponsibleOrgUnitName);
                     
                     foreach (var role in roles)
                     {
@@ -143,8 +163,16 @@ namespace UI.MVC4.Controllers.API
                         obj.Add(role.Name,
                                 String.Join(",", project.Rights.Where(x => x.RoleId == roleId).Select(x => x.User.Name)));
                     }
-
-                    obj.Add("Type", project.ItProjectType.Name);
+                    obj.Add("ID", project.ItProjectId);
+                    obj.Add("Type", project.ItProjectTypeName);
+                    obj.Add("Fase", phases.SingleOrDefault(x => x.Id == project.CurrentPhaseId));
+                    obj.Add("Status", project.StatusProject);
+                    obj.Add("Maal", project.GoalStatusStatus);
+                    obj.Add("Risiko", project.AverageRisk);
+                    obj.Add("RO", project.Roi);
+                    obj.Add("Okonomi", project.Bc);
+                    obj.Add("P1", project.Priority);
+                    obj.Add("P2", project.PriorityPf);
                     list.Add(obj);
                 }
 
