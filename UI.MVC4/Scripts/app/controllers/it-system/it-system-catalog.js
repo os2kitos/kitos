@@ -108,10 +108,22 @@
                     });
                 }
 
-                $scope.$watchCollection('pagination', loadSystems);
+                $scope.$watchCollection('pagination', function() {
+                    var url = 'api/itSystem/?csv&skip=' + $scope.pagination.skip + "&take=" + $scope.pagination.take + '&organizationId=' + user.currentOrganizationId;
+
+                    if ($scope.pagination.orderBy) {
+                        url += '&orderBy=' + $scope.pagination.orderBy;
+                        if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+                    }
+
+                    if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
+                    else url += "&q=";
+
+                    $scope.csvUrl = url;
+                    loadSystems();
+                });
 
                 function loadSystems() {
-
                     var url = 'api/itSystem/?skip=' + $scope.pagination.skip + "&take=" + $scope.pagination.take + '&organizationId=' + user.currentOrganizationId;
 
                     if ($scope.pagination.orderBy) {
