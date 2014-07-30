@@ -142,6 +142,8 @@ namespace UI.MVC4.Controllers.API
                     header.Add(role.Name, role.Name);
                 header.Add("ID", "Projekt ID");
                 header.Add("Type", "Type");
+                header.Add("Strategisk", "Strategisk");
+                header.Add("Tværgaaende", "Tværgående");
                 header.Add("Fase", "Fase");
                 header.Add("Status", "Status projekt");
                 header.Add("Maal", "Status mål");
@@ -165,6 +167,8 @@ namespace UI.MVC4.Controllers.API
                     }
                     obj.Add("ID", project.ItProjectId);
                     obj.Add("Type", project.ItProjectTypeName);
+                    obj.Add("Strategisk", project.IsStrategy);
+                    obj.Add("Tværgaaende", project.IsTransversal);
                     obj.Add("Fase", phases.SingleOrDefault(x => x.Id == project.CurrentPhaseId));
                     obj.Add("Status", project.StatusProject);
                     obj.Add("Maal", project.GoalStatusStatus);
