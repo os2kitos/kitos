@@ -25,7 +25,7 @@
     }]);
 
     app.controller('org.StructureCtrl', ['$scope', '$http', '$q', '$filter', '$modal', 'notify', 'orgRolesHttp', 'user', 'taskService',
-        function ($scope, $http, $q, $filter, $modal, notify, orgRolesHttp, user, taskService) {
+        function ($scope, $http, $q, $filter, $modal, notify, orgRolesHttp, user) {
 
             $scope.pagination = {
                 skip: 0,
@@ -493,7 +493,6 @@
                     var paginationHeader = JSON.parse(headers('X-Pagination'));
                     $scope.pagination.count = paginationHeader.TotalCount;
                     decorateTasks();
-                    
                 }).error(function() {
                     notify.addErrorMessage("Kunne ikke hente opgaver!");
                 });

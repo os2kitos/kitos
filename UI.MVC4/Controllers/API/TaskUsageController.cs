@@ -1,8 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Web.Http;
+using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -49,6 +55,82 @@ namespace UI.MVC4.Controllers.API
                 }
                 
                 return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetExcel(bool? csv, int orgUnitId, bool onlyStarred, [FromUri] PagingModel<TaskUsage> pagingModel)
+        {
+            try
+            {
+                pagingModel.Where(usage => usage.OrgUnitId == orgUnitId);
+
+                if (onlyStarred) pagingModel.Where(usage => usage.Starred);
+
+                var usages = Page(Repository.AsQueryable(), pagingModel).ToList();
+
+                var dtos = new List<TaskUsageNestedDTO>();
+
+                foreach (var taskUsage in usages)
+                {
+                    var dto = Map<TaskUsage, TaskUsageNestedDTO>(taskUsage);
+                    dto.HasWriteAccess = HasWriteAccess(taskUsage, KitosUser);
+                    dto.SystemUsages = AssociatedSystemUsages(taskUsage);
+                    dto.Projects = AssociatedProjects(taskUsage);
+                    dtos.Add(dto);
+                }
+
+                var list = new List<dynamic>();
+                var header = new ExpandoObject() as IDictionary<string, Object>;
+                header.Add("OrgUnit", "Organisationsenhed");
+                header.Add("KLEID", "KLE ID");
+                header.Add("KLENavn", "KLE Navn");
+                header.Add("Teknologi", "Teknologi");
+                header.Add("Anvendelse", "Anvendelse");
+                header.Add("Kommentar", "Kommentar");
+                header.Add("Projekt", "IT Projekt");
+                header.Add("System", "IT System");
+                list.Add(header);
+
+                // Adding via recursive method so that children are 
+                // placed directly after their parent in the output
+                Action<TaskUsageNestedDTO> addUsageToList = null;
+                addUsageToList = elem =>
+                {
+                    var obj = new ExpandoObject() as IDictionary<string, Object>;
+                    obj.Add("OrgUnit", elem.OrgUnitName);
+                    obj.Add("KLEID", elem.TaskRefTaskKey);
+                    obj.Add("KLENavn", elem.TaskRefDescription);
+                    obj.Add("Teknologi", elem.TechnologyStatus);
+                    obj.Add("Anvendelse", elem.UsageStatus);
+                    obj.Add("Kommentar", elem.Comment);
+                    obj.Add("Projekt", String.Join(",", elem.Projects.Select(x => x.Name)));
+                    obj.Add("System", String.Join(",", elem.SystemUsages.Select(x => x.ItSystemName)));
+                    list.Add(obj);
+                    foreach (var child in elem.Children)
+                    {
+                        addUsageToList(child); // recursive call
+                    }
+                };
+
+                foreach (var usage in dtos)
+                {
+                    addUsageToList(usage);
+                }
+                var s = list.ToCsv();
+                var bytes = Encoding.Unicode.GetBytes(s);
+                var stream = new MemoryStream();
+                stream.Write(bytes, 0, bytes.Length);
+                stream.Seek(0, SeekOrigin.Begin);
+
+                var result = new HttpResponseMessage(HttpStatusCode.OK);
+                result.Content = new StreamContent(stream);
+                result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
+                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "itsystemanvendelsesoversigt.csv" };
+                return result;
             }
             catch (Exception e)
             {

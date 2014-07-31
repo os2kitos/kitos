@@ -4,6 +4,12 @@ namespace UI.MVC4.Models
 {
     public class TaskUsageNestedDTO
     {
+        public TaskUsageNestedDTO()
+        {
+            // initializing selfmade properites to avoid null exceptions
+            SystemUsages = new List<ItSystemUsageSimpleDTO>();
+            Projects = new List<ItProjectSimpleDTO>();
+        }
         public int Id { get; set; }
 
         public int TaskRefId { get; set; }

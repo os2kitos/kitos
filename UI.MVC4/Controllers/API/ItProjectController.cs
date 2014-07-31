@@ -468,7 +468,7 @@ namespace UI.MVC4.Controllers.API
                     {
                         TaskRef = Map<TaskRef, TaskRefDTO>(task),
                         IsSelected = onlySelected || project.TaskRefs.Any(t => t.Id == task.Id)
-                    });
+                    }).ToList(); // must call .ToList here else the output will be wrapped in $type,$values
 
                 return Ok(dtos);
             }
