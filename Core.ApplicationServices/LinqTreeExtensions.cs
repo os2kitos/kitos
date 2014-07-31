@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 
 namespace Core.ApplicationServices
 {
@@ -50,6 +52,48 @@ namespace Core.ApplicationServices
             var types = new Type[] { q.ElementType, exp.Body.Type };
             var mce = Expression.Call(typeof(Queryable), method, types, q.Expression, exp);
             return q.Provider.CreateQuery<T>(mce);
+        }
+    }
+
+    public static class LinqToCSV
+    {
+        public static string ToCsv<T>(this IEnumerable<T> items)
+            where T : class
+        {
+            var csvBuilder = new StringBuilder();
+            var properties = typeof(T).GetProperties();
+            foreach (T item in items)
+            {
+                string line;
+                if (item is ExpandoObject)
+                {
+                    // typeof(T).GetProperties() doesn't work with ExpandoObject so instead we need to cast to IDictionary
+                    var propertyValues = item as IDictionary<string, object>;
+                    line = string.Join(";", propertyValues.Values.Select(p => p.ToCsvValue()).ToArray());
+                }
+                else
+                {
+                    line = string.Join(";", properties.Select(p => p.GetValue(item, null).ToCsvValue()).ToArray());
+                }
+                csvBuilder.AppendLine(line);
+            }
+            return csvBuilder.ToString();
+        }
+
+        private static string ToCsvValue<T>(this T item)
+        {
+            if (item == null) return "\"\"";
+
+            if (item is string)
+            {
+                return string.Format("\"{0}\"", item.ToString().Replace("\"", "\\\""));
+            }
+            double dummy;
+            if (double.TryParse(item.ToString(), out dummy))
+            {
+                return string.Format("{0}", item);
+            }
+            return string.Format("\"{0}\"", item);
         }
     }
 }

@@ -26,6 +26,7 @@ namespace UI.MVC4.Models
         public string Name { get; set; }
         public string SystemId { get; set; }
         public int ObjectOwnerId { get; set; }
+        public string ObjectOwnerName { get; set; }
 
         public AccessModifier AccessModifier { get; set; }
 
@@ -37,6 +38,7 @@ namespace UI.MVC4.Models
         public int? AppTypeId { get; set; }
         public string AppTypeName { get; set; }
         public int? BusinessTypeId { get; set; }
+        public string BusinessTypeName { get; set; }
 
         public int? InterfaceId { get; set; }
         public int? InterfaceTypeId { get; set; }

@@ -161,7 +161,7 @@ namespace UI.MVC4.Controllers.API
                                {
                                    TaskRef = Map<TaskRef, TaskRefDTO>(taskRef),
                                    Usage = Map<TaskUsage, TaskUsageDTO>(taskUsage)
-                               });
+                               }).ToList(); // must call .ToList here else the output will be wrapped in $type,$values
 
                 return Ok(dtos);
             }
@@ -194,7 +194,7 @@ namespace UI.MVC4.Controllers.API
                             {
                                 TaskRef = Map<TaskRef, TaskRefDTO>(usage.TaskRef),
                                 Usage = Map<TaskUsage, TaskUsageDTO>(usage)
-                            });
+                            }).ToList(); // must call .ToList here else the output will be wrapped in $type,$values
 
                 return Ok(dtos);
             }

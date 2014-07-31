@@ -25,14 +25,5 @@ namespace Core.DomainModel.ItProject
         /// The phase end date.
         /// </value>
         public DateTime? EndDate { get; set; }
-
-        public int? AssociatedItProjectId { get; set; }
-        /// <summary>
-        /// Gets or sets the associated it project.
-        /// </summary>
-        /// <value>
-        /// The associated it project.
-        /// </value>
-        public virtual User AssociatedItProject { get; set; }
     }
 }

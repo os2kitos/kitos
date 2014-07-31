@@ -636,9 +636,15 @@ body, .btn {
     text-align: center;
 }
 
-div.searchbox {
+.excel-icon {
     position: absolute;
     right: 0;
+    top: -45px;
+}
+
+div.searchbox {
+    position: absolute;
+    right: 30px;
     top: -45px;
 
     display: inline-block;

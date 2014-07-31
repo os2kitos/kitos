@@ -38,13 +38,26 @@
             loadUsages();
         }
 
-        $scope.$watchCollection('pagination', loadUsages);
+        $scope.$watchCollection('pagination', function() {
+            var url = 'api/taskusage/?csv&orgUnitId=' + $scope.orgUnitId + '&onlyStarred=true';
+
+            url += '&skip=' + $scope.pagination.skip;
+            url += '&take=' + $scope.pagination.take;
+
+            if ($scope.pagination.orderBy) {
+                url += '&orderBy=' + $scope.pagination.orderBy;
+                if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+            }
+
+            $scope.csvUrl = url;
+            loadUsages();
+        });
             
         /* load task usages */
         function loadUsages() {
             if (!$scope.orgUnitId) return;
 
-            var url = 'api/taskusage?orgUnitId=' + $scope.orgUnitId + '&onlyStarred=true';
+            var url = 'api/taskusage/?orgUnitId=' + $scope.orgUnitId + '&onlyStarred=true';
             
             url += '&skip=' + $scope.pagination.skip;
             url += '&take=' + $scope.pagination.take;

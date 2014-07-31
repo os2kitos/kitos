@@ -433,6 +433,7 @@
     <Content Include="favicon.ico" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
+    <Content Include="Images\excel.png" />
     <Content Include="Images\logo.png" />
     <Content Include="Partials\directives\add-user-button.html" />
     <Content Include="Partials\directives\add-user-modal.html" />

@@ -1,7 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Web.Http;
+using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
@@ -43,6 +50,62 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        public HttpResponseMessage GetExcel([FromUri] bool? csv, [FromUri] int organizationId, [FromUri] PagingModel<ItSystem> paging, [FromUri] string q)
+        {
+            try
+            {
+                var systems =
+                    Repository.AsQueryable()
+                              .Where(sys => sys.AccessModifier == AccessModifier.Public || sys.BelongsToId == organizationId);
+
+                if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
+
+                var query = Page(systems, paging);
+
+                var dtos = Map(query);
+                
+                var list = new List<dynamic>();
+                var header = new ExpandoObject() as IDictionary<string, Object>;
+                header.Add("It System", "It System");
+                header.Add("ID", "Globalt SystemID");
+                header.Add("AppType", "Applikationstype");
+                header.Add("BusiType", "Forretningstype");
+                header.Add("KLEID", "KLE ID");
+                header.Add("KLENavn", "KLE Navn");
+                header.Add("Tilhorer", "Tilhører");
+                header.Add("Oprettet", "Oprettet af");
+                list.Add(header);
+                foreach (var system in dtos)
+                {
+                    var obj = new ExpandoObject() as IDictionary<string, Object>;
+                    obj.Add("It Kontrakt", system.Name);
+                    obj.Add("ID", system.SystemId);
+                    obj.Add("AppType", system.AppTypeName);
+                    obj.Add("BusiType", system.BusinessTypeName);
+                    obj.Add("KLEID", String.Join(",", system.TaskRefs.Select(x => x.TaskKey)));
+                    obj.Add("KLENavn", String.Join(",", system.TaskRefs.Select(x => x.Description)));
+                    obj.Add("Tilhorer", system.BelongsToName);
+                    obj.Add("Oprettet", system.ObjectOwnerName);
+                    list.Add(obj);
+                }
+                var s = list.ToCsv();
+                var bytes = Encoding.Unicode.GetBytes(s);
+                var stream = new MemoryStream();
+                stream.Write(bytes, 0, bytes.Length);
+                stream.Seek(0, SeekOrigin.Begin);
+
+                var result = new HttpResponseMessage(HttpStatusCode.OK);
+                result.Content = new StreamContent(stream);
+                result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
+                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "itsystemanvendelsesoversigt.csv" };
+                return result;
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         /// <summary>
         /// Returns the interfaces that a given system exposes
         /// </summary>
@@ -62,7 +125,6 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
         }
-
 
         /// <summary>
         /// Returns the interfaces that a given system can use
@@ -294,7 +356,7 @@ namespace UI.MVC4.Controllers.API
                 {
                     TaskRef = Map<TaskRef, TaskRefDTO>(task),
                     IsSelected = onlySelected || system.TaskRefs.Any(t => t.Id == task.Id)
-                });
+                }).ToList(); // must call .ToList here else the output will be wrapped in $type,$values
 
                 return Ok(dtos);
             }
