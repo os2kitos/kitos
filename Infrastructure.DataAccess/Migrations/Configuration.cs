@@ -52,7 +52,7 @@ namespace Infrastructure.DataAccess.Migrations
             return result;
         }
 
-        private List<TaskRef> GenerateAllTasks(User objectOwner, OrganizationUnit orgUnitOwner)
+        private IEnumerable<TaskRef> GenerateAllTasks(User objectOwner, OrganizationUnit orgUnitOwner)
         {
             var maingroups = GenerateTasks(objectOwner, orgUnitOwner, "KLE-Hovedgruppe", 3);
             var subgroups =
@@ -559,8 +559,8 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region KLE
 
-            var kle = GenerateAllTasks(globalUser, klRootUnit);
-            context.TaskRefs.AddRange(kle);
+            //var kle = GenerateAllTasks(globalUser, klRootUnit);
+            //context.TaskRefs.AddRange(kle);
 
             #endregion
         }
