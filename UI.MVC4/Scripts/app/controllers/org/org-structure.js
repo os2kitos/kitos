@@ -24,7 +24,7 @@
 
     }]);
 
-    app.controller('org.StructureCtrl', ['$scope', '$http', '$q', '$filter', '$modal', 'notify', 'orgRolesHttp', 'user', 'taskService',
+    app.controller('org.StructureCtrl', ['$scope', '$http', '$q', '$filter', '$modal', 'notify', 'orgRolesHttp', 'user',
         function ($scope, $http, $q, $filter, $modal, notify, orgRolesHttp, user) {
 
             $scope.pagination = {
