@@ -21,7 +21,23 @@
                     take: 20
                 };
 
-                $scope.$watchCollection('pagination', loadProjects);
+                $scope.$watchCollection('pagination', function() {
+                    var url = 'api/itProject?csvcat&orgId=' + user.currentOrganizationId;
+
+                    url += '&skip=' + $scope.pagination.skip;
+                    url += '&take=' + $scope.pagination.take;
+
+                    if ($scope.pagination.orderBy) {
+                        url += '&orderBy=' + $scope.pagination.orderBy;
+                        if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+                    }
+
+                    if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
+                    else url += "&q=";
+
+                    $scope.csvUrl = url;
+                    loadProjects();
+                });
                 
                 function loadProjects() {
                     var url = 'api/itProject?catalog&orgId=' + user.currentOrganizationId;

@@ -210,9 +210,62 @@ namespace UI.MVC4.Controllers.API
 
                 var projects = Page(Repository.AsQueryable(), pagingModel);
 
-                var dto = Map<IEnumerable<ItProject>, IEnumerable<ItProjectCatalogDTO>>(projects);
+                var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectCatalogDTO>>(projects);
 
-                return Ok(dto);
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetExcelCat(bool? csvcat, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
+        {
+            try
+            {
+                //Get all projects inside the organizaton OR public
+                pagingModel.Where(p => p.OrganizationId == orgId || p.AccessModifier == AccessModifier.Public);
+                if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
+
+                var projects = Page(Repository.AsQueryable(), pagingModel);
+
+                var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectCatalogDTO>>(projects);
+
+                var list = new List<dynamic>();
+                var header = new ExpandoObject() as IDictionary<string, Object>;
+                header.Add("Name", "It Projekt");
+                header.Add("Org", "Oprettet af: Organisation");
+                header.Add("Navn", "Oprettet af: Navn");
+                header.Add("ID", "Projekt ID");
+                header.Add("Type", "Type");
+                header.Add("Public", "Public");
+                header.Add("Arkiv", "Arkiv");
+                list.Add(header);
+                foreach (var project in dtos)
+                {
+                    var obj = new ExpandoObject() as IDictionary<string, Object>;
+                    obj.Add("Name", project.Name);
+                    obj.Add("Org", project.OrganizationName);
+                    obj.Add("Navn", project.ObjectOwnerName);
+                    obj.Add("ID", project.ItProjectId);
+                    obj.Add("Type", project.ItProjectTypeName);
+                    obj.Add("Public", project.AccessModifier);
+                    obj.Add("Arkiv", project.IsArchived);
+                    list.Add(obj);
+                }
+
+                var s = list.ToCsv();
+                var bytes = Encoding.Unicode.GetBytes(s);
+                var stream = new MemoryStream();
+                stream.Write(bytes, 0, bytes.Length);
+                stream.Seek(0, SeekOrigin.Begin);
+
+                var result = new HttpResponseMessage(HttpStatusCode.OK);
+                result.Content = new StreamContent(stream);
+                result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
+                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "itprojektoversigt.csv" };
+                return result;
             }
             catch (Exception e)
             {
