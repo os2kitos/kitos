@@ -34,16 +34,7 @@ namespace UI.MVC4.Models
         /// <summary>
         /// Whether the contract is active or not
         /// </summary>
-        public bool IsActive
-        {
-            get { 
-                var today = DateTime.Now;
-                var startDate = Concluded ?? today;
-                var endDate = Terminated ?? ExpirationDate ?? DateTime.MaxValue;
-
-                return today >= startDate && today <= endDate;
-            }
-        }
+        public bool IsActive { get; set; }
 
         public IEnumerable<OptionDTO> AgreementElements { get; set; }
 

@@ -344,6 +344,11 @@ namespace Core.DomainModel.ItContract
         /// <summary>
         /// Gets or sets the termination deadline option. (opsigelsesfrist)
         /// </summary>
+        /// <remarks>
+        /// Added months to the <see cref="Terminated"/> contract termination date before the contract expires.
+        /// It's a string but should be treated as an int.
+        /// TODO perhaps a redesign of OptionEntity is in order
+        /// </remarks>
         /// <value>
         /// The termination deadline.
         /// </value>
@@ -463,9 +468,26 @@ namespace Core.DomainModel.ItContract
             {
                 var today = DateTime.Now;
                 var startDate = Concluded ?? today;
-                var endDate = Terminated ?? ExpirationDate ?? DateTime.MaxValue;
+                var endDate = ExpirationDate ?? DateTime.MaxValue;
+                
+                // indgået-dato <= dags dato <= udløbs-dato
+                var conditionA = today >= startDate && today <= endDate;
 
-                return today >= startDate && today <= endDate;
+                if (conditionA)
+                    return true;
+                
+                DateTime? terminationDate = Terminated;
+                if (Terminated.HasValue && TerminationDeadline != null)
+                {
+                    int deadline;
+                    int.TryParse(TerminationDeadline.Name, out deadline);
+                    terminationDate = Terminated.Value.AddMonths(deadline);
+                }
+
+                // dags dato <= opsagt-dato + opsigelsesfrist
+                var conditionB = today <= terminationDate;
+
+                return conditionB;
             }
         }
     }
