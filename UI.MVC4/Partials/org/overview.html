@@ -17,7 +17,7 @@
                 <button data-order-by="'taskRef.description'" data-paging="pagination"></button>
     </div>
     <div class="col-md-2">
-        <div data-ng-class="{'supertext': user.currentConfig.showColumnTechnology || user.currentConfig.showColumnUsage}">
+        <div class="supertext" data-ng-show="user.currentConfig.showColumnTechnology || user.currentConfig.showColumnUsage">
             Digitaliseringsgrad
         </div>
         <div class="subtext">
