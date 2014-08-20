@@ -84,8 +84,7 @@
         }
     ]);
 
-    app.directive('selectUser', [
-        '$rootScope', '$http', '$timeout', function ($rootScope, $http, $timeout) {
+    app.directive('selectUser', function () {
 
             //format of dropdown options
             function formatResult(obj) {
@@ -121,69 +120,66 @@
                 },
                 replace: true,
                 templateUrl: 'partials/directives/select-user.html',
-                controller: [
-                    '$scope', function ($scope) {
-                        $scope.onChange = function () {
+                controller: ['$scope', '$http', '$timeout', function($scope, $http, $timeout) {
+                    $scope.onChange = function () {
 
-                            //for some reason (probably a bugger in select2)
-                            //this is called 2 times, once with the original select value (like 1 or "")
-                            //and once with the object value of select2 {id, text}.
-                            //we only need the last one
-                            if (typeof $scope.userModel !== 'object') return;
+                        //for some reason (probably a bugger in select2)
+                        //this is called 2 times, once with the original select value (like 1 or "")
+                        //and once with the object value of select2 {id, text}.
+                        //we only need the last one
+                        if (typeof $scope.userModel !== 'object') return;
 
-                            //timeout, otherwise we get the bad version of the model.
-                            $timeout($scope.onSelect);
-                        };
+                        //timeout, otherwise we get the bad version of the model.
+                        $timeout($scope.onSelect);
+                    };
 
-                        var userSrc = typeof $scope.orgId !== 'undefined' ? 'api/organization/' + $scope.orgId + '?users&q=' : 'api/user?q=';
+                    var userSrc = typeof $scope.orgId !== 'undefined' ? 'api/organization/' + $scope.orgId + '?users&q=' : 'api/user?q=';
 
-                        $scope.selectUserOptions = {
+                    $scope.selectUserOptions = {
+                        //don't escape markup, otherwise formatResult will be bugged
+                        escapeMarkup: function (m) { return m; },
+                        formatResult: formatResult,
+                        formatSelection: formatSelection,
 
-                            //don't escape markup, otherwise formatResult will be bugged
-                            escapeMarkup: function (m) { return m; },
-                            formatResult: formatResult,
-                            formatSelection: formatSelection,
+                        allowClear: !!$scope.allowClear,
 
-                            allowClear: !!$scope.allowClear,
-
-                            minimumInputLength: 1,
-                            initSelection: function (elem, callback) {
+                        minimumInputLength: 1,
+                        initSelection: function (elem, callback) {
+                        },
+                        ajax: {
+                            data: function (term, page) {
+                                return { query: term };
                             },
-                            ajax: {
-                                data: function (term, page) {
-                                    return { query: term };
-                                },
-                                quietMillis: 500,
-                                transport: function (queryParams) {
-                                    var res = $http.get(userSrc + queryParams.data.query).then(queryParams.success);
-                                    res.abort = function () {
-                                        return null;
-                                    };
+                            quietMillis: 500,
+                            transport: function (queryParams) {
+                                var res = $http.get(userSrc + queryParams.data.query).then(queryParams.success);
+                                res.abort = function () {
+                                    return null;
+                                };
 
-                                    return res;
-                                },
+                                return res;
+                            },
 
-                                results: function (data, page) {
-                                    var results = [];
+                            results: function (data, page) {
+                                var results = [];
 
-                                    _.each(data.data.response, function (user) {
+                                _.each(data.data.response, function (user) {
 
-                                        results.push({
-                                            id: user.id, //select2 mandatory
-                                            text: user.name, //select2 mandatory
-                                            user: user //not mandatory, for extra info when formatting
-                                        });
+                                    results.push({
+                                        id: user.id, //select2 mandatory
+                                        text: user.name, //select2 mandatory
+                                        user: user //not mandatory, for extra info when formatting
                                     });
+                                });
 
-                                    return { results: results };
-                                }
+                                return { results: results };
                             }
-                        };
-                    }
-                ]
+                        }
+                    };
+                }]
             };
         }
-    ]);
+    );
 
     app.directive('selectAccessModifier', [
         function () {

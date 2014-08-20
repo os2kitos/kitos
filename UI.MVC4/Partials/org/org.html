@@ -104,12 +104,12 @@
                                     <input type="text" disabled="disabled" class="form-control input-sm" value="{{ chosenOrgUnit.name }}" /></td>
                                 <td>
                                     <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en organisationsrolle" class="form-control input-sm" data-ng-change="submitRight()">
-                                        <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.id}}">{{orgRole.name}} ({{orgRole.hasWriteAccess && "skriv" || "læs" }})
+                                        <option data-ng-repeat="orgRole in orgRoles" value="{{ orgRole.id }}">{{ orgRole.name }} ({{ orgRole.hasWriteAccess && "skriv" || "læs" }})
                                         </option>
                                     </select>
                                 </td>
                                 <td colspan="2" class="form-group">
-                                    <input data-select-user="foo" data-user-model="selectedUser" data-add-user="true" />
+                                    <input data-select-user="foo" data-org-id="{{ orgId }}" data-user-model="selectedUser" data-add-user="true" />
                                 </td>
                             </tr>
                         </tbody>
