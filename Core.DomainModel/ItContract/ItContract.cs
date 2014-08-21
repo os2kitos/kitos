@@ -469,25 +469,22 @@ namespace Core.DomainModel.ItContract
                 var today = DateTime.Now;
                 var startDate = Concluded ?? today;
                 var endDate = ExpirationDate ?? DateTime.MaxValue;
+
+                if (Terminated.HasValue)
+                {
+                    var terminationDate = Terminated;
+                    if (TerminationDeadline != null)
+                    {
+                        int deadline;
+                        int.TryParse(TerminationDeadline.Name, out deadline);
+                        terminationDate = Terminated.Value.AddMonths(deadline);
+                    }
+                    // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
+                    return today >= startDate && today <= terminationDate;
+                }
                 
                 // indgået-dato <= dags dato <= udløbs-dato
-                var conditionA = today >= startDate && today <= endDate;
-
-                if (conditionA)
-                    return true;
-                
-                DateTime? terminationDate = Terminated;
-                if (Terminated.HasValue && TerminationDeadline != null)
-                {
-                    int deadline;
-                    int.TryParse(TerminationDeadline.Name, out deadline);
-                    terminationDate = Terminated.Value.AddMonths(deadline);
-                }
-
-                // dags dato <= opsagt-dato + opsigelsesfrist
-                var conditionB = today <= terminationDate;
-
-                return conditionB;
+                return today >= startDate && today <= endDate;
             }
         }
     }
