@@ -166,8 +166,11 @@
                         addStatus(value);
                     });
 
-                }).error(function () {
-                    notify.addErrorMessage("Kunne ikke hente projekter!");
+                }).error(function (data, status) {
+                    // only display error when an actual error
+                    // 404 just says that there are no statues
+                    if (status != 404)
+                        notify.addErrorMessage("Kunne ikke hente projekter!");
                 });
             }
 
