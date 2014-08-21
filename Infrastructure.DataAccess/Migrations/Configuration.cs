@@ -559,8 +559,8 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region KLE
 
-            var kle = GenerateAllTasks(globalUser, klRootUnit);
-            context.TaskRefs.AddRange(kle);
+            //var kle = GenerateAllTasks(globalUser, klRootUnit);
+            //context.TaskRefs.AddRange(kle);
 
             #endregion
         }
