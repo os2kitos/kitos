@@ -26,7 +26,7 @@
 
     app.controller('org.StructureCtrl', ['$scope', '$http', '$q', '$filter', '$modal', 'notify', 'orgRolesHttp', 'user',
         function ($scope, $http, $q, $filter, $modal, notify, orgRolesHttp, user) {
-
+            $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
                 take: 15
