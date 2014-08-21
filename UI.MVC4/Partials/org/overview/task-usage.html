@@ -1,5 +1,4 @@
-﻿<div class="row task-usage-root" data-ng-if="!usage.hasDelegations">
-
+﻿<div class="col-md-12 task-usage-root" data-ng-if="!usage.hasDelegations">
     <!-- org unit name -->
     <div class="col-md-3">
         <i class="glyphicon glyphicon-asterisk small invisible"></i>
@@ -14,27 +13,27 @@
     <div class="col-md-2">
         <div class="status-column" data-ng-if="user.currentConfig.showColumnTechnology">
             <span data-select-status2="" data-ng-model="usage.technologyStatus" data-can-write="usage.hasWriteAccess"
-                   data-autosave="{{usage.updateUrl}}" data-field="technologyStatus"></span>
+                    data-autosave="{{usage.updateUrl}}" data-field="technologyStatus"></span>
         </div>
         <div class="status-column" data-ng-if="user.currentConfig.showColumnUsage">
             <span data-select-status2="" data-ng-model="usage.usageStatus" data-can-write="usage.hasWriteAccess"
-                   data-autosave="{{usage.updateUrl}}" data-field="usageStatus"></span>
+                    data-autosave="{{usage.updateUrl}}" data-field="usageStatus"></span>
         </div>
         <div class="status-column">
             <button class="btn btn-link btn-xs"
-                data-tooltip-html-unsafe="<small>{{ usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
-                data-tooltip-trigger="mouseenter"
-                data-tooltip-placement="right"
-                data-ng-click="openComment(usage)"
-                data-ng-if="usage.hasWriteAccess">
+                    data-tooltip-html-unsafe="<small>{{ usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
+                    data-tooltip-trigger="mouseenter"
+                    data-tooltip-placement="right"
+                    data-ng-click="openComment(usage)"
+                    data-ng-if="usage.hasWriteAccess">
                 <i class="glyphicon glyphicon-comment" data-ng-class="{'faded': !usage.comment}"></i>
             </button>
             <button class="btn btn-link btn-xs"
-                data-tooltip-html-unsafe="<small>Læs kommentar</small>"
-                data-tooltip-trigger="mouseenter"
-                data-tooltip-placement="right"
-                data-ng-click="openComment(usage)"
-                data-ng-if="!usage.hasWriteAccess && usage.comment">
+                    data-tooltip-html-unsafe="<small>Læs kommentar</small>"
+                    data-tooltip-trigger="mouseenter"
+                    data-tooltip-placement="right"
+                    data-ng-click="openComment(usage)"
+                    data-ng-if="!usage.hasWriteAccess && usage.comment">
                 <i class="glyphicon glyphicon-comment"></i>
             </button>
         </div>
@@ -54,14 +53,13 @@
 </div>
 
 <div data-ng-if="usage.hasDelegations">
-    <div class="row task-usage-root">
-
+    <div class="col-md-12 task-usage-root">
         <!-- org unit name -->
         <div class="col-md-3">
             <a class="task-fold" data-ng-click="usage.isOpen = !usage.isOpen">
                 <i class="glyphicon small"
-                    data-ng-class="{'glyphicon-chevron-down': usage.isOpen, 'glyphicon-chevron-right': !usage.isOpen}"></i>
-                    {{ usage.orgUnitName }}
+                   data-ng-class="{'glyphicon-chevron-down': usage.isOpen, 'glyphicon-chevron-right': !usage.isOpen}"></i>
+                {{ usage.orgUnitName }}
             </a>
         </div>
 
@@ -76,25 +74,24 @@
 
             <div class="status-column">
                 <button class="btn btn-link btn-xs"
-                    data-tooltip-html-unsafe="<small>{{ usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
-                    data-tooltip-trigger="mouseenter"
-                    data-tooltip-placement="right"
-                    data-ng-click="openComment(usage)"
-                    data-ng-if="usage.hasWriteAccess">
+                        data-tooltip-html-unsafe="<small>{{ usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
+                        data-tooltip-trigger="mouseenter"
+                        data-tooltip-placement="right"
+                        data-ng-click="openComment(usage)"
+                        data-ng-if="usage.hasWriteAccess">
                     <i class="glyphicon glyphicon-comment" data-ng-class="{'faded': !usage.comment}"></i>
                 </button>
                 <button class="btn btn-link btn-xs"
-                    data-tooltip-html-unsafe="<small>Læs kommentar</small>"
-                    data-tooltip-trigger="mouseenter"
-                    data-tooltip-placement="right"
-                    data-ng-click="openComment(usage)"
-                    data-ng-if="!usage.hasWriteAccess && usage.comment">
+                        data-tooltip-html-unsafe="<small>Læs kommentar</small>"
+                        data-tooltip-trigger="mouseenter"
+                        data-tooltip-placement="right"
+                        data-ng-click="openComment(usage)"
+                        data-ng-if="!usage.hasWriteAccess && usage.comment">
                     <i class="glyphicon glyphicon-comment"></i>
                 </button>
             </div>
         </div>
-
-
+            
         <!-- extra info -->
         <div class="col-md-1 text-center">
             <span data-ng-if="usage.projects.length > 0" class="text-success">

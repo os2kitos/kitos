@@ -3,18 +3,18 @@
         <img src="../../Images/excel.png" alt="Hent excelark" width="25">
     </a>
 </div>
-<div class="row">
+
+<div class="col-md-12">
     <div class="col-md-3">
         <div data-ng-model="orgUnitId" data-ng-change="loadUsages()" data-select-org-unit=""></div>
     </div>
     <div class="col-md-1">
         KLE ID
-                <button data-order-by="'taskRef.taskKey'" data-paging="pagination"></button>
+        <button data-order-by="'taskRef.taskKey'" data-paging="pagination"></button>
     </div>
     <div class="col-md-4">
         KLE Navn
-            
-                <button data-order-by="'taskRef.description'" data-paging="pagination"></button>
+        <button data-order-by="'taskRef.description'" data-paging="pagination"></button>
     </div>
     <div class="col-md-2">
         <div class="supertext" data-ng-show="user.currentConfig.showColumnTechnology || user.currentConfig.showColumnUsage">
@@ -33,6 +33,10 @@
 <div data-ng-repeat="usage in taskUsages">
     <div data-ng-include="'partials/org/overview/task-usage.html'"></div>
 </div>
+
 <div class="col-md-12">
     <span data-pagination-buttons="pagination"></span>
 </div>
+
+<!-- insert space to make background draw -->
+&nbsp; 
