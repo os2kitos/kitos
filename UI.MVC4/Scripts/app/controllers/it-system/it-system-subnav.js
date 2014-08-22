@@ -25,7 +25,7 @@
 
                 function create() {
                     var payload = {
-                        name: 'Unavngivent IT system',
+                        name: 'Unavngivet system',
                         belongsToId: user.currentOrganizationId,
                         organizationId: user.currentOrganizationId,
                         userId: user.id,

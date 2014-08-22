@@ -293,6 +293,11 @@
                         payload[attrs.field] = newValue;
 
                         if (newValue !== oldValue) {
+                            if (attrs.required && !newValue) {
+                                notify.addErrorMessage("Feltet må ikke være tomt...");
+                                return; // field is required and new value is empty so abort
+                            }
+                            
                             save(payload);
                         }
                     }

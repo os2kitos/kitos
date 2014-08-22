@@ -22,8 +22,8 @@ namespace Core.DomainModel.ItProject
             this.Clones = new List<ItProject>();
             this.ItProjectStatuses = new List<ItProjectStatus>();
 
-            // default values
-            this.Priority = ItProjectPriority.None; 
+            // default value(s) TODO does these have an effect? Aren't they overwritten when mapped
+            this.Priority = ItProjectPriority.None;
             this.PriorityPf = ItProjectPriority.None;
             this.AccessModifier = AccessModifier.Normal;
         }
