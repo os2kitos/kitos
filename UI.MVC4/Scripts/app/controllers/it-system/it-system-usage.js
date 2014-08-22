@@ -87,9 +87,17 @@
                 });
             }
 
+            if (itSystemUsage.overviewItSystemId) {
+                $scope.usage.overviewItSystem = {
+                    id: itSystemUsage.overviewItSystemId,
+                    text: itSystemUsage.overviewItSystemName
+                };
+            }
+
             $scope.orgUnits = itSystemUsage.usedBy;
             
             $scope.itSytemUsagesSelectOptions = selectLazyLoading('api/itsystemusage', false, ['organizationId=' + itSystemUsage.organizationId]);
+
             function selectLazyLoading(url, excludeSelf, paramAry) {
                 return {
                     minimumInputLength: 1,
@@ -116,12 +124,12 @@
                             var results = [];
 
                             _.each(data.data.response, function (obj) {
-                                if (excludeSelf && obj.id == contract.id)
+                                if (excludeSelf && obj.id == $scope.usageId)
                                     return; // don't add self to result
 
                                 results.push({
                                     id: obj.id,
-                                    text: obj.itSystem.name ? obj.itSystem.name : 'Unavngiven',
+                                    text: obj.itSystem.name ? obj.itSystem.name : 'Unavngivet IT System',
                                     cvr: obj.cvr
                                 });
                             });
