@@ -294,11 +294,11 @@
 
                         if (newValue !== oldValue) {
                             if (attrs.required && !newValue) {
+                                // field is required and new value is empty 
                                 notify.addErrorMessage("Feltet må ikke være tomt...");
-                                return; // field is required and new value is empty so abort
+                            } else {
+                                save(payload);
                             }
-                            
-                            save(payload);
                         }
                     }
 
