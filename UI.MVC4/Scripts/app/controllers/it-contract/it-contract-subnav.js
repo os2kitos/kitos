@@ -20,11 +20,11 @@
                     { func: create, text: 'Opret IT Kontrakt', style: 'btn-success', icon: 'glyphicon-plus' },
                     { func: remove, text: 'Slet IT Kontrakt', style: 'btn-danger', icon: 'glyphicon-minus', showWhen: 'it-contract.edit' }
                 ];
-
+                
                 function create() {
                     var orgId = user.currentOrganizationId;
                     var msg = notify.addInfoMessage("Opretter kontrakt...", false);
-                    $http.post('api/itcontract', { organizationId: orgId })
+                    $http.post('api/itcontract', { organizationId: orgId, name: 'Unavngivet kontrakt' })
                         .success(function(result) {
                             msg.toSuccessMessage("En ny kontrakt er oprettet!");
                             var contract = result.response;

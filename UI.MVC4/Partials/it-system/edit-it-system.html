@@ -21,11 +21,11 @@
                     <!--Name-->
                     <div class="form-group">
                         <label for="system-name" class="control-label small">IT System</label>
-                        <input type="text" id="system-name" class="form-control input-sm" 
+                        <input type="text" id="system-name" class="form-control input-sm" required
                                data-ng-disabled="!hasWriteAccess"
                                data-autosave="{{system.updateUrl}}" 
                                data-field="name" 
-                               data-ng-model="system.name" />
+                               data-ng-model="system.name">
                     </div>
 
                     <!--ID-->
