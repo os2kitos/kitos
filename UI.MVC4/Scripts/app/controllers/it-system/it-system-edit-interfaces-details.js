@@ -59,7 +59,7 @@
 
                 dataRow.updateUrl = "api/dataRow/" + dataRow.id;
                 dataRow.delete = function () {
-                    var msg = notify.addInfoMessage("Fjerne rækken...", false);
+                    var msg = notify.addInfoMessage("Fjerner rækken...", false);
                     $http.delete(dataRow.updateUrl).success(function(result) {
                         dataRow.show = false;
                         msg.toSuccessMessage("Rækken er fjernet!");
