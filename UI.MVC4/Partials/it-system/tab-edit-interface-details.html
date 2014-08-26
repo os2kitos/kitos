@@ -21,7 +21,7 @@
                 <div class="col-md-4">
                     <select id="interface-type" class="form-control input-sm"
                             data-ui-select2="select2AllowClearOpt"
-                            data-placeholder="Vælg TSA"
+                            data-placeholder="Vælg snitfladetype"
                             data-ng-model="system.interfaceTypeId"
                             data-ng-disabled="!hasWriteAccess"
                             data-autosave="{{system.updateUrl}}"
@@ -87,10 +87,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-ng-repeat="dataRow in dataRows">
+                    <tr data-ng-repeat="dataRow in dataRows | filter:{show:true}">
                         <td>
                             <input type="text" class="form-control input-sm" data-ng-model="dataRow.data" data-ng-disabled="!hasWriteAccess"
-                                    data-autosave="{{dataRow.updateUrl}}" data-field="data" />
+                                   data-autosave="{{dataRow.updateUrl}}" data-field="data">
                         </td>
                         <td>
                             <select class="form-control input-sm"
