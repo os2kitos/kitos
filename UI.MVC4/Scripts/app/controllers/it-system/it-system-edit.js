@@ -56,6 +56,10 @@
                 itSystem.belongsTo = (!itSystem.belongsToId) ? null : { id: itSystem.belongsToId, text: itSystem.belongsToName};
                 itSystem.parent = (!itSystem.parentId) ? null : { id: itSystem.parentId, text: itSystem.parentName };
 
+                $scope.select2AllowClearOpt = {
+                    allowClear: true
+                };
+
                 $scope.system = itSystem;
                 $scope.hasWriteAccess = hasWriteAccess;
 
