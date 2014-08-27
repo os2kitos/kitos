@@ -47,12 +47,16 @@ namespace Core.ApplicationServices
             _userRepository.Save();
 
             var reset = GenerateResetRequest(user);
+
             var resetLink = "https://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
+            var resetLinkTestEvo = "https://kitos.roskilde.dk/#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
             const string subject = "Oprettelse af KITOS profil";
             var content = "<h2>Kære " + user.Name + "</h2>" +
                           "<p>Du er blevet oprettet, som bruger i KITOS (Kommunernes IT Overblikssystem) under organisationen " + org.Name + ".</p>" +
-                          "Du bedes klikke <a href='" + resetLink + "'>her</a>, hvor du første gang bliver bedt om at indtaste et nyt password for din KITOS profil" +
-                          "<p>Linket udløber om " + ResetRequestTTL + " timer.</p>";
+                          "<p>Du bedes klikke <a href='" + resetLink + "'>her</a>, hvor du første gang bliver bedt om at indtaste et nyt password for din KITOS profil.</p>" +
+                          "<p>Linket udløber om " + ResetRequestTTL + " timer.</p>" +
+                          "<hr>" +
+                          "<p>Bemærk: Hvis du ved din oprettelse er sket i testmiljøet, så skal du i stedet klikke her: <a href='" + resetLinkTestEvo + "'>KITOS Test</a></p>";
 
             IssuePasswordReset(user, subject, content);
 
@@ -70,9 +74,14 @@ namespace Core.ApplicationServices
             {
                 reset = GenerateResetRequest(user);
                 var resetLink = "https://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
+                var resetLinkTestEvo = "https://kitos.roskilde.dk/#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
                 mailContent = "<p>Du har bedt om at få nulstillet dit password.</p>" +
-                                  "<p><a href='" + resetLink + "'>Klik her for at nulstille passwordet for din KITOS profil</a>.</p>" +
-                                  "<p>Linket udløber om " + ResetRequestTTL + " timer.</p>";
+                              "<p><a href='" + resetLink +
+                              "'>Klik her for at nulstille passwordet for din KITOS profil</a>.</p>" +
+                              "<p>Linket udløber om " + ResetRequestTTL + " timer.</p>" +
+                              "<hr>" +
+                              "<p>Bemærk: Hvis du ved din oprettelse er sket i testmiljøet, så skal du i stedet klikke her: <a href='" +
+                              resetLinkTestEvo + "'>KITOS Test</a></p>";
             }
             const string mailSubject = "Nulstilning af dit KITOS password";
 
