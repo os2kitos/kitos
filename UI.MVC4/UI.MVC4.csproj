@@ -369,11 +369,11 @@
   <ItemGroup>
     <Content Include="Content\bootstrap\bootstrap.css" />
     <Content Include="Content\bootstrap\bootstrap.min.css" />
-    <Content Include="Content\notify\notify.css" />
     <Content Include="Content\css\select2-spinner.gif" />
-    <Content Include="Content\css\select2.css" />
     <Content Include="Content\css\select2.png" />
     <Content Include="Content\css\select2x2.png" />
+    <Content Include="Content\notify\notify.css" />
+    <Content Include="Content\css\select2.css" />
     <Content Include="Content\kitos.css" />
     <Content Include="Content\select2-bootstrap.css" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
@@ -904,6 +904,7 @@
     <Content Include="Scripts\notify\notifyDirective.js" />
     <Content Include="Scripts\notify\notifyFactory.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ar.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_az.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_bg.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ca.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_cs.js" />
@@ -924,6 +925,7 @@
     <Content Include="Scripts\Select2-locales\select2_locale_is.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_it.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ja.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_ka.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ko.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_lt.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_lv.js" />
@@ -935,12 +937,15 @@
     <Content Include="Scripts\Select2-locales\select2_locale_pt-BR.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_pt-PT.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ro.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_rs.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ru.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_sk.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_sv.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_th.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_tr.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ua.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_ug-CN.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_uk.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_vi.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_zh-CN.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_zh-TW.js" />
