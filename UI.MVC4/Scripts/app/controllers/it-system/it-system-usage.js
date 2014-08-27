@@ -81,12 +81,6 @@
             $scope.sensitiveDataTypes = sensitiveDataTypes;
             $scope.usage = itSystemUsage;
 
-            if (itSystemUsage.itSystem.parentId) {
-                $scope.parentSystem = $http.get('api/itsystem/' + itSystemUsage.itSystem.parentId).then(function(result) {
-                    return result.data.response;
-                });
-            }
-
             if (itSystemUsage.overviewItSystemId) {
                 $scope.usage.overviewItSystem = {
                     id: itSystemUsage.overviewItSystemId,
