@@ -47,7 +47,6 @@ namespace Core.ApplicationServices
             _userRepository.Save();
 
             var reset = GenerateResetRequest(user);
-
             var resetLink = "https://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
             var resetLinkTestEvo = "https://kitos.roskilde.dk/#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
             const string subject = "Oprettelse af KITOS profil";
@@ -68,7 +67,7 @@ namespace Core.ApplicationServices
             if (user == null)
                 throw new ArgumentNullException("user");
 
-            string mailContent = "";
+            var mailContent = "";
             var reset = new PasswordResetRequest();
             if (content == null)
             {
