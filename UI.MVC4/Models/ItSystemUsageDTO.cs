@@ -29,6 +29,8 @@ namespace UI.MVC4.Models
         
         public int ItSystemId { get; set; }
         public ItSystemDTO ItSystem { get; set; }
+        
+        public string ItSystemParentName { get; set; }
 
         public int? OverviewItSystemId { get; set; }
         public string OverviewItSystemName { get; set; }
