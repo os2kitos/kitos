@@ -63,7 +63,8 @@
                     <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
                         <label for="system-belongs-to" class="control-label small">Tilhører</label>
                         <input type="hidden" id="system-belongs-to" class="form-control input-sm" 
-                               data-ui-select2="organizationSelectOptions"  
+                               data-ui-select2="organizationSelectOptions" 
+                               data-placeholder="Vælg organisation"
                                data-ng-disabled="!hasWriteAccess"
                                data-autosave="{{system.updateUrl}}" 
                                data-field="belongsToId" 
@@ -84,8 +85,9 @@
                     <div class="form-group">
                         <label for="system-access" class="control-label small">Public</label>
                         <input id="system-access" class="form-control input-sm"
-                               data-autosave="{{system.updateUrl}}" 
-                               data-field="accessModifier"  
+                               data-ui-select2
+                               data-autosave="{{system.updateUrl}}"
+                               data-field="accessModifier"
                                data-ng-disabled="!hasWriteAccess"
                                data-ng-model="system.accessModifier"
                                data-select-access-modifier="">

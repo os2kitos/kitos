@@ -186,7 +186,17 @@
             return {
                 priority: 1,
                 replace: true,
-                templateUrl: 'partials/directives/select-access-modifier.html'
+                templateUrl: 'partials/directives/select-access-modifier.html',
+                controller: [
+                    '$scope', function($scope) {
+                        $scope.options = {
+                            initSelection: function (element, callback) {
+                                var data = { id: element.val(), text: element.val() };
+                                callback(data);
+                            }
+                        };
+                    }
+                ]
             };
         }
     ]);
