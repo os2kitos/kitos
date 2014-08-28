@@ -19,20 +19,42 @@
         </div>
         <div class="form-group">
             <label for="agreement-freq" class="control-label small">Betalingsfrekvens</label>
-            <select id="agreement-freq" class="form-control input-sm" data-ng-disabled="!hasWriteAccess" data-ng-model="contract.paymentFreqencyId" data-ng-options="o.id as o.name for o in paymentFrequencies" data-autosave="{{autosaveUrl}}" data-field="paymentFreqencyId">
+            <select id="agreement-freq" class="form-control input-sm"
+                    data-ui-select2="allowClearOption"
+                    data-placeholder="Vælg betalingsfrekvens"
+                    data-ng-disabled="!hasWriteAccess"
+                    data-ng-model="contract.paymentFreqencyId"
+                    data-autosave="{{autosaveUrl}}"
+                    data-field="paymentFreqencyId">
                 <option value=""></option>
+                <option data-ng-repeat="paymentFrequency in paymentFrequencies" value="{{paymentFrequency.id}}">{{paymentFrequency.name}}</option>
             </select>
         </div>
         <div class="form-group">
             <label for="agreement-payment" class="control-label small">Betalingsmodel</label>
-            <select id="agreement-payment" class="form-control input-sm" data-ng-disabled="!hasWriteAccess" data-ng-model="contract.paymentModelId" data-ng-options="o.id as o.name for o in paymentModels" data-autosave="{{autosaveUrl}}" data-field="paymentModelId">
+            <select id="agreement-payment" class="form-control input-sm"
+                    data-ui-select2="allowClearOption"
+                    data-placeholder="Vælg betalingsmodel"
+                    data-ng-disabled="!hasWriteAccess"
+                    data-ng-model="contract.paymentModelId"
+                    data-ng-options="o.id as o.name for o in paymentModels"
+                    data-autosave="{{autosaveUrl}}"
+                    data-field="paymentModelId">
                 <option value=""></option>
+                <option data-ng-repeat="paymentModel in paymentModels" value="{{paymentModel.id}}">{{paymentModel.name}}</option>
             </select>
         </div>
         <div class="form-group">
             <label for="agreement-price" class="control-label small">Prisregulering</label>
-            <select id="agreement-price" class="form-control input-sm" data-ng-disabled="!hasWriteAccess" data-ng-model="contract.priceRegulationId" data-ng-options="o.id as o.name for o in priceRegulations" data-autosave="{{autosaveUrl}}" data-field="priceRegulationId">
+            <select id="agreement-price" class="form-control input-sm"
+                    data-ui-select2="allowClearOption"
+                    data-placeholder="Vælg prisregulering"
+                    data-ng-disabled="!hasWriteAccess"
+                    data-ng-model="contract.priceRegulationId"
+                    data-autosave="{{autosaveUrl}}"
+                    data-field="priceRegulationId">
                 <option value=""></option>
+                <option data-ng-repeat="priceRegulation in priceRegulations" value="{{priceRegulation.id}}">{{priceRegulation.name}}</option>
             </select>
         </div>
     </div>
