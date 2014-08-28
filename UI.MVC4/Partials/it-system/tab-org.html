@@ -4,11 +4,15 @@
         <div>
             <div class="form-group">
                 <label for="responsible" class="control-label">Vælg ansvarlig organisationsenhed i blandt nedenstående:</label>
-                <select id="responsible" data-ng-options="o.id as o.name for o in orgUnits"
-                    data-ng-disabled="!hasWriteAccess"
-                    data-ng-model="usage.responsibleUnitId" data-field="responsibleUnitId"
-                    data-autosave="api/itsystemusage/{{usageId}}" class="form-control input-sm">
-                    <option value="">Ingen</option>
+                <select id="responsible" class="form-control input-sm"
+                        data-ui-select2="allowClearOption"
+                        data-placeholder="Vælg ansvarlig organisationsenhed"
+                        data-ng-disabled="!hasWriteAccess"
+                        data-ng-model="usage.responsibleUnitId"
+                        data-field="responsibleUnitId"
+                        data-autosave="api/itsystemusage/{{usageId}}">
+                    <option value=""></option>
+                    <option data-ng-repeat="orgUnit in orgUnits" value="{{orgUnit.id}}">{{orgUnit.name}}</option>
                 </select>
             </div>
         </div>
