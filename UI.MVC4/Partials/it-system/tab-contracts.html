@@ -79,10 +79,16 @@
                 Hvilken kontrakt skal afgøre om IT systemet er aktivt:
             </label>
             <div class="col-md-3">
-                <select class="form-control input-sm" data-ng-model="usage.mainContractId" data-ng-change="updateActiveStatus()"
-                    data-ng-disabled="!hasWriteAccess"
-                    data-autosave="api/itsystemusage/{{usageId}}" data-field="mainContractId" data-ng-options="c.id as c.name for c in usage.contracts">
-                    <option value="">Ingen kontrakt</option>
+                <select class="form-control input-sm"
+                        data-ui-select2="allowClearOption"
+                        data-placeholder="Ingen kontrakt"
+                        data-ng-model="usage.mainContractId"
+                        data-ng-change="updateActiveStatus()"
+                        data-ng-disabled="!hasWriteAccess"
+                        data-autosave="api/itsystemusage/{{usageId}}"
+                        data-field="mainContractId">
+                    <option value=""></option>
+                    <option data-ng-repeat="contract in usage.contracts" value="{{contract.id}}">{{contract.name}}</option>
                 </select>
 
             </div>
