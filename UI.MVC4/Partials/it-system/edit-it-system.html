@@ -15,7 +15,7 @@
                                 data-field="appTypeId"
                                 data-ng-disabled="!hasWriteAccess"
                                 data-ng-model="system.appTypeId">
-                            <option></option>
+                            <option value=""></option>
                             <option data-ng-repeat="appType in appTypes" value="{{appType.id}}">{{appType.name}}</option>
                         </select>
                     </div>
@@ -85,7 +85,6 @@
                     <div class="form-group">
                         <label for="system-access" class="control-label small">Public</label>
                         <input id="system-access" class="form-control input-sm"
-                               data-ui-select2
                                data-autosave="{{system.updateUrl}}"
                                data-field="accessModifier"
                                data-ng-disabled="!hasWriteAccess"
@@ -103,7 +102,7 @@
                                 data-field="businessTypeId"
                                 data-ng-disabled="!hasWriteAccess"
                                 data-ng-model="system.businessTypeId">
-                            <option></option>
+                            <option value=""></option>
                             <option data-ng-repeat="businessType in businessTypes" value="{{businessType.id}}">{{businessType.name}}</option>
                         </select>
                     </div>
