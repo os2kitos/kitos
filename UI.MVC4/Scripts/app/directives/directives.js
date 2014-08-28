@@ -293,10 +293,7 @@
                         payload[attrs.field] = newValue;
 
                         if (newValue !== oldValue) {
-                            if (attrs.required && !newValue) {
-                                // field is required and new value is empty 
-                                notify.addErrorMessage("Feltet må ikke være tomt...");
-                            } else {
+                            if (ctrl.$valid) {
                                 save(payload);
                             }
                         }
