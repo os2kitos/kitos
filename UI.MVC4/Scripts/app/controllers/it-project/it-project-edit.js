@@ -45,6 +45,10 @@
                     };
                 }
 
+                $scope.allowClearOption = {
+                    allowClear: true
+                };
+
                 $scope.selectSettings = { dynamicTitle: false, buttonClasses: 'btn btn-default btn-sm' };
                 $scope.selectTranslation = {
                     checkAll: 'Vis alle',
