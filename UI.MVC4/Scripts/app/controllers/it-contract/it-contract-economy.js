@@ -16,38 +16,37 @@
         });
     }]);
 
-    app.controller('contract.EditEconomyCtrl', ['$scope', '$http', 'notify', 'contract', 'orgUnits',
-        function ($scope, $http, notify, contract, orgUnits) {
-            
+    app.controller('contract.EditEconomyCtrl', ['$scope', '$http', '$timeout', '$state', '$stateParams', 'notify', 'contract', 'orgUnits',
+        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits) {
             var baseUrl = "api/economyStream";
 
             var externEconomyStreams = [];
             $scope.externEconomyStreams = externEconomyStreams;
-            _.each(contract.externEconomyStreams, function(stream) {
+            _.each(contract.externEconomyStreams, function (stream) {
                 pushStream(stream, externEconomyStreams);
             });
-            
+
             var internEconomyStreams = [];
             $scope.internEconomyStreams = internEconomyStreams;
             _.each(contract.internEconomyStreams, function (stream) {
                 pushStream(stream, internEconomyStreams);
             });
 
-            
+
             function pushStream(stream, collection) {
                 stream.show = true;
                 stream.updateUrl = baseUrl + "/" + stream.id;
-                
+
                 stream.delete = function () {
                     var msg = notify.addInfoMessage("Sletter række...");
 
-                    $http.delete(this.updateUrl).success(function() {
+                    $http.delete(this.updateUrl).success(function () {
                         stream.show = false;
 
                         msg.toSuccessMessage("Rækken er slettet!");
-                    }).error(function() {
+                    }).error(function () {
                         msg.toErrorMessage("Fejl! Kunne ikke slette rækken!");
-                    });
+                    }).finally(reload);
                 };
 
                 function updateEan() {
@@ -55,7 +54,7 @@
 
                     if (stream.organizationUnitId) {
                         var orgUnit = _.findWhere(orgUnits, { id: parseInt(stream.organizationUnitId) });
-                        
+
                         if (orgUnit && orgUnit.ean) stream.ean = orgUnit.ean;
                     }
                 };
@@ -64,35 +63,41 @@
                 updateEan();
                 collection.push(stream);
             }
-            
-            function postNewStream(field, collection) {
-                
+
+            function postNewStream(field) {
+
                 var stream = {};
                 stream[field] = contract.id;
 
                 var msg = notify.addInfoMessage("Tilføjer ny række...");
-                $http.post(baseUrl, stream).success(function(result) {
+                $http.post(baseUrl, stream).success(function (result) {
                     msg.toSuccessMessage("Rækken er tilføjet!");
 
                     //push result to view
-                    pushStream(result.response, collection);
-
-                }).error(function() {
+                    //pushStream(result.response, collection);
+                }).error(function () {
                     msg.toErrorMessage("Fejl! Kunne ikke tilføje række");
-                });
+                }).finally(reload);
             }
 
-            $scope.newExtern = function() {
-                postNewStream("ExternPaymentForId", externEconomyStreams);
+            $scope.newExtern = function () {
+                postNewStream("ExternPaymentForId");
             };
             $scope.newIntern = function () {
-                postNewStream("InternPaymentForId", internEconomyStreams);
+                postNewStream("InternPaymentForId");
             };
-            
 
-
-
+            // work around for $state.reload() not updating scope
+            // https://github.com/angular-ui/ui-router/issues/582
+            function reload() {
+                return $state.transitionTo($state.current, $stateParams, {
+                    reload: true
+                }).then(function () {
+                    $scope.hideContent = true;
+                    return $timeout(function () {
+                        return $scope.hideContent = false;
+                    }, 1);
+                });
+            };
         }]);
-
-
 })(angular, app);
