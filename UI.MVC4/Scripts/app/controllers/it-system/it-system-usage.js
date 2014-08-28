@@ -81,6 +81,10 @@
             $scope.sensitiveDataTypes = sensitiveDataTypes;
             $scope.usage = itSystemUsage;
 
+            $scope.allowClearOption = {
+                allowClear: true
+            };
+
             if (itSystemUsage.overviewItSystemId) {
                 $scope.usage.overviewItSystem = {
                     id: itSystemUsage.overviewItSystemId,
