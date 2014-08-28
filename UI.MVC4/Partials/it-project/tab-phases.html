@@ -23,7 +23,7 @@
 
                         <div class="form-group">
                             <!-- Phases buttons -->
-                            <div class="col-md-2">Aktuel fase:</div>
+                            <div class="col-md-2">Aktuel fase</div>
                             <span data-ng-repeat="phase in project.phases" class="col-md-2">
                                 <button class="btn btn-xs full-width text-center" data-ng-click="updateSelectedPhase(phase)" data-ng-disabled="!hasWriteAccess">
                                     <i class="glyphicon glyphicon-ok text-success" data-ng-class="{'invisible': phase.id != project.currentPhaseId}"></i>
@@ -33,7 +33,7 @@
 
                         <div class="form-group">
                             <!-- Phases buttons -->
-                            <div class="col-md-3">Forventet slut/start:</div>
+                            <div class="col-md-3">Forventet faseovergang</div>
                             <span data-ng-repeat="phase in project.phases" class="col-md-2" data-ng-hide="$first">
                                 <div class="input-group input-group-sm">
                                     <input type="text" class="form-control"
