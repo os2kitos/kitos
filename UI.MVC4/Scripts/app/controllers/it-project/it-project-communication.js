@@ -59,6 +59,7 @@
             $scope.comm = {
                 itProjectId: $stateParams.id
             };
+
             $scope.save = function () {
                 $scope.$broadcast('show-errors-check-validity');
 
@@ -66,6 +67,10 @@
 
                 $http.post('api/communication', $scope.comm).finally(reload);
             };
+
+            $scope.delete = function(id) {
+                $http.delete('api/communication/' + id).finally(reload);
+            }
             
             // work around for $state.reload() not updating scope
             // https://github.com/angular-ui/ui-router/issues/582
