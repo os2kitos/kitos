@@ -48,7 +48,7 @@
                         </span>
                     </div>
                 </td>
-                <td colspan="2">
+                <td>
                     <div class="form-group">
                         <select class="form-control input-sm" 
                                 data-field="responsibleUserId"
@@ -58,6 +58,11 @@
                             <option value=""></option>
                         </select>
                     </div>
+                </td>
+                <td>
+                    <a class="btn btn-link btn-xs" data-ng-click="delete(c.id)" data-ng-hide="!hasWriteAccess">
+                        <i class="glyphicon glyphicon-trash"></i>
+                    </a>
                 </td>
             </tr>
         </tbody>
