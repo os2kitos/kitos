@@ -34,9 +34,7 @@
         </tr>
     </thead>
     <tbody>
-        
         <tr data-ng-repeat="row in rows" data-ng-class="row.classes">
-            
             <td colspan="15" data-ng-if="row.titlerow">
                 {{row.label}}
             </td>
@@ -48,39 +46,42 @@
             
             <!-- years cols -->
             <td data-ng-repeat-start="column in row.columns" class="td-very-condensed border-left">
-                
                 <!-- if not-readonly -->
-                <input type="text" class="form-control input-sm input-cell" 
-                       data-autosave="{{column.updateUrl}}" 
+                <input type="number" step="1" ng-pattern="/d*/" class="form-control input-sm input-cell"
+                       data-autosave="{{column.updateUrl}}"
                        data-field="{{row.budgetName}}"
-                       data-ng-model="column.budget" 
-                       data-ng-change="row.update()" data-ng-if="!row.readonly" data-ng-disabled="!hasWriteAccess"/>
+                       data-ng-model="column.budget"
+                       data-ng-change="row.update()"
+                       data-ng-if="!row.readonly"
+                       data-ng-disabled="!hasWriteAccess">
                 
                 <!-- if readonly -->
-                <input type="text" class="form-control input-sm input-cell" 
+                <input type="number" class="form-control input-sm input-cell" 
                        data-ng-model="column.budget" readonly="readonly" data-ng-if="row.readonly" />
 
             </td>
             <td data-ng-repeat-end="" class="td-very-condensed">
-                <input type="text" class="form-control input-sm input-cell"
-                       data-autosave="{{column.updateUrl}}" 
+                <!-- if not-readonly -->
+                <input type="number" step="1" ng-pattern="/d*/" class="form-control input-sm input-cell"
+                       data-autosave="{{column.updateUrl}}"
                        data-field="{{row.reaName}}"
-                       data-ng-model="column.rea" 
-                       data-ng-change="row.update()" data-ng-if="!row.readonly" data-ng-disabled="!hasWriteAccess"/>
-                
-                <input type="text" class="form-control input-sm input-cell" 
+                       data-ng-model="column.rea"
+                       data-ng-change="row.update()"
+                       data-ng-if="!row.readonly"
+                       data-ng-disabled="!hasWriteAccess" />
+
+                <!-- if readonly -->
+                <input type="number" class="form-control input-sm input-cell"
                        data-ng-model="column.rea" readonly="readonly" data-ng-if="row.readonly" />
             </td>
             
             <!-- total col -->
             <td class="td-very-condensed border-left" data-ng-if="!row.titlerow">
-                <input type="text" class="form-control input-sm input-cell" data-ng-model="row.total.budget" readonly="readonly" />
+                <input type="number" class="form-control input-sm input-cell" data-ng-model="row.total.budget" readonly="readonly" />
             </td>
             <td class="td-very-condensed" data-ng-if="!row.titlerow">
-                <input type="text" class="form-control input-sm input-cell" data-ng-model="row.total.rea" readonly="readonly" />
+                <input type="number" class="form-control input-sm input-cell" data-ng-model="row.total.rea" readonly="readonly" />
             </td>
         </tr>
-
     </tbody>
-
 </table>
