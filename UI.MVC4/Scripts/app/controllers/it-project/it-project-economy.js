@@ -98,10 +98,8 @@
                 row.update = function() {
                     return update(row);
                 };
-
-                row.update();
-
                 array.push(row);
+                row.update();
             }
             
             function addBusinessExpenses(field, label) {
@@ -163,12 +161,11 @@
                 itExpenses, [itExpensesSumRow],
                 [expensesSumRow],
                 [savingsTitleRow],
-                businessSavings, [businessSavingsSumRow], 
+                businessSavings, [businessSavingsSumRow],
                 itSavings, [itSavingsSumRow],
                 [savingsSumRow],
                 [diffRow]);
-            
-            
+
             //calculates the last column "total" for a given row
             function calcTotalColumn(row) {
                 
