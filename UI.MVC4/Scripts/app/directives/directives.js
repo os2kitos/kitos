@@ -186,7 +186,13 @@
             return {
                 priority: 1,
                 replace: true,
-                templateUrl: 'partials/directives/select-access-modifier.html'
+                templateUrl: 'partials/directives/select-access-modifier.html',
+                controller: ['$scope', 'userService', function ($scope, userService) {
+                        userService.getUser().then(function(user) {
+                            $scope.isGlobalAdmin = user.isGlobalAdmin;
+                        });
+                    }
+                ]
             };
         }
     ]);
