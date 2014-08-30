@@ -10,7 +10,7 @@
         <tbody>
             <tr data-ng-repeat="interface in system.canUseInterfaces | filter: {show:true}">
                 <td>
-                    <a data-ui-sref="it-system.edit({ id: interface.id })">{{ interface.name }}</a>
+                    <a data-ui-sref="it-system.edit.interface-details({ id: interface.id })">{{ interface.name }}</a>
                 </td>
                 <td>
                     <button data-ng-if="hasWriteAccess" class="btn btn-danger btn-xs" data-tooltip="Fjern kan-anvende" data-confirmed-click="interface.delete()"
