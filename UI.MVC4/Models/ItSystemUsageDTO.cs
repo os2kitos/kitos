@@ -9,7 +9,7 @@ namespace UI.MVC4.Models
         public bool IsStatusActive { get; set; }
         public string Note { get; set; }
         public string LocalSystemId { get; set; }
-
+        public string Version { get; set; }
         public string EsdhRef { get; set; }
         public string CmdbRef { get; set; }
         public string DirectoryOrUrlRef { get; set; }

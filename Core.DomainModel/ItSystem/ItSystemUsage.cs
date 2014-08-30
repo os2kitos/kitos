@@ -44,6 +44,13 @@ namespace Core.DomainModel.ItSystem
         /// </value>
         public string LocalSystemId { get; set; }
         /// <summary>
+        /// Gets or sets the version.
+        /// </summary>
+        /// <value>
+        /// The version.
+        /// </value>
+        public string Version { get; set; }
+        /// <summary>
         /// Gets or sets a reference to relevant documents in an extern ESDH system.
         /// </summary>
         /// <value>

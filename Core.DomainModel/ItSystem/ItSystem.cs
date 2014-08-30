@@ -24,7 +24,6 @@ namespace Core.DomainModel.ItSystem
             this.InfrastructureUsage = new List<InterfaceUsage>();
         }
         
-        public string Version { get; set; }
         public string Name { get; set; }
         /// <summary>
         /// Gets or sets the user defined system identifier.
