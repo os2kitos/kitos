@@ -619,8 +619,11 @@ namespace UI.MVC4.Controllers.API
 
         public override HttpResponseMessage Patch(int id, JObject obj)
         {
+            // try get AccessModifier value
+            JToken accessModToken;
+            obj.TryGetValue("accessModifier", out accessModToken);
             // only global admin can set access mod to public
-            if (obj.GetValue("accessModifier").ToObject<AccessModifier>() == AccessModifier.Public && !KitosUser.IsGlobalAdmin)
+            if (accessModToken != null && accessModToken.ToObject<AccessModifier>() == AccessModifier.Public && !KitosUser.IsGlobalAdmin)
             {
                 return Unauthorized();
             }
