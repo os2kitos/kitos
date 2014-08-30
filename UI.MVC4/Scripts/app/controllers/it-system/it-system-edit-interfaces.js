@@ -12,9 +12,14 @@
         });
     }]);
 
-    app.controller('system.SystemInterfacesCtrl', ['$scope', '$http', 'notify', 'itSystem',
-        function ($scope, $http, notify, itSystem) {
+    app.controller('system.SystemInterfacesCtrl', ['$scope', '$http', 'notify', 'itSystem', 'userService',
+        function ($scope, $http, notify, itSystem, userService) {
             $scope.new = {};
+
+            var user;
+            userService.getUser().then(function (userResult) {
+                user = userResult;
+            });
             
             _.each(itSystem.canUseInterfaces, pushInterface);
             
@@ -71,7 +76,7 @@
                         },
                         quietMillis: 500,
                         transport: function (queryParams) {
-                            var res = $http.get(url + '&q=' + queryParams.data.query).then(queryParams.success);
+                            var res = $http.get(url + '&orgId=' + user.currentOrganizationUnitId + '&q=' + queryParams.data.query).then(queryParams.success);
                             res.abort = function () {
                                 return null;
                             };

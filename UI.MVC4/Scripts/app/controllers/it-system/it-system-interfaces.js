@@ -34,24 +34,21 @@
                     return $http.get("api/frequency").then(function (result) {
                         return result.data.response;
                     });
-                }],
-                interfaceSystems: ['$http', function ($http) {
-                    return $http.get("api/itsystem?interfaces").then(function (result) {
-                        return result.data.response;
-                    });
                 }]
-                
             }
         });
     }]);
 
     app.controller('system.EditInterfaces',
         ['$rootScope', '$scope', '$http', 'notify',
-            'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'frequencies',
-            'interfaceSystems', 'itSystemUsage',
+            'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'frequencies', 'itSystemUsage', 'userService',
             function ($rootScope, $scope, $http, notify,                 
-                tsas, interfaces, interfaceTypes, methods, dataTypes, frequencies,
-                interfaceSystems, itSystemUsage) {
+                tsas, interfaces, interfaceTypes, methods, dataTypes, frequencies, itSystemUsage, userService) {
+                var user;
+                userService.getUser().then(function (userResult) {
+                    user = userResult;
+                });
+
 
                 $scope.frequencies = frequencies;
                 
@@ -136,7 +133,7 @@
                             },
                             quietMillis: 500,
                             transport: function (queryParams) {
-                                var res = $http.get(url + '&q=' + queryParams.data.query).then(queryParams.success);
+                                var res = $http.get(url + '&orgId=' + user.currentOrganizationUnitId + '&q=' + queryParams.data.query).then(queryParams.success);
                                 res.abort = function () {
                                     return null;
                                 };
