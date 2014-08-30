@@ -12,6 +12,7 @@ using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using Newtonsoft.Json.Linq;
 using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
@@ -221,6 +222,12 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
+                // only global admin can set access mod to public
+                if (dto.AccessModifier == AccessModifier.Public && !KitosUser.IsGlobalAdmin)
+                {
+                    return Unauthorized();
+                }
+
                 var item = Map(dto);
 
                 item.ObjectOwner = KitosUser;
@@ -428,6 +435,16 @@ namespace UI.MVC4.Controllers.API
             {
                 return Error(e);
             }
+        }
+
+        public override HttpResponseMessage Patch(int id, JObject obj)
+        {
+            // only global admin can set access mod to public
+            if (obj.GetValue("accessModifier").ToObject<AccessModifier>() == AccessModifier.Public && !KitosUser.IsGlobalAdmin)
+            {
+                return Unauthorized();
+            }
+            return base.Patch(id, obj);
         }
     }
 }

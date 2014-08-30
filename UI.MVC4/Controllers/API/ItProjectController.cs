@@ -13,6 +13,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using Newtonsoft.Json.Linq;
 using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
@@ -604,6 +605,26 @@ namespace UI.MVC4.Controllers.API
             var project = Repository.GetByKey(id);
 
             _itProjectService.DeleteProject(project);
+        }
+
+        public override HttpResponseMessage Post(ItProjectDTO dto)
+        {
+            // only global admin can set access mod to public
+            if (dto.AccessModifier == AccessModifier.Public && !KitosUser.IsGlobalAdmin)
+            {
+                return Unauthorized();
+            }
+            return base.Post(dto);
+        }
+
+        public override HttpResponseMessage Patch(int id, JObject obj)
+        {
+            // only global admin can set access mod to public
+            if (obj.GetValue("accessModifier").ToObject<AccessModifier>() == AccessModifier.Public && !KitosUser.IsGlobalAdmin)
+            {
+                return Unauthorized();
+            }
+            return base.Patch(id, obj);
         }
     }
 }
