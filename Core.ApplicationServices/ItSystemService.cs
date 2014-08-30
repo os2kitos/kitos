@@ -19,23 +19,21 @@ namespace Core.ApplicationServices
         public AppType InterfaceAppType { get; private set; }
 
 
-        public IEnumerable<ItSystem> GetSystems(Organization organization, string nameSearch)
+        public IEnumerable<ItSystem> GetSystems(int organizationId, string nameSearch)
         {
-            //TODO filter by organization or public
+            if (nameSearch == null) return _repository.Get(x => x.OrganizationId == organizationId || x.AccessModifier == AccessModifier.Public);
 
-            if (nameSearch == null) return _repository.Get();
-
-            return _repository.Get(system => system.Name.Contains(nameSearch));
+            return _repository.Get(system => system.Name.Contains(nameSearch) && system.OrganizationId == organizationId || system.AccessModifier == AccessModifier.Public);
         }
 
-        public IEnumerable<ItSystem> GetNonInterfaces(Organization organization, string nameSearch)
+        public IEnumerable<ItSystem> GetNonInterfaces(int organizationId, string nameSearch)
         {
-            return GetSystems(organization, nameSearch).Where(system => system.AppType == null || system.AppType.Id != InterfaceAppType.Id);
+            return GetSystems(organizationId, nameSearch).Where(system => system.AppType == null || system.AppType.Id != InterfaceAppType.Id);
         }
 
-        public IEnumerable<ItSystem> GetInterfaces(Organization organization, string nameSearch)
+        public IEnumerable<ItSystem> GetInterfaces(int organizationId, string nameSearch)
         {
-            return GetSystems(organization, nameSearch).Where(system => system.AppType != null && system.AppType.Id == InterfaceAppType.Id);
+            return GetSystems(organizationId, nameSearch).Where(system => system.AppType != null && system.AppType.Id == InterfaceAppType.Id);
         }
 
         public IEnumerable<ItSystem> GetHierarchy(int systemId)

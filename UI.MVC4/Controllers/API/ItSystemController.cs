@@ -149,11 +149,25 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetInterfaces(bool? interfaces)
+        //public HttpResponseMessage GetInterfaces(bool? interfaces)
+        //{
+        //    try
+        //    {
+        //        var systems = _systemService.GetInterfaces(null, null);
+        //        var dtos = Map(systems);
+        //        return Ok(dtos);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return Error(e);
+        //    }
+        //}
+
+        public HttpResponseMessage GetInterfacesSearch(string q, int orgId, bool? interfaces)
         {
             try
             {
-                var systems = _systemService.GetInterfaces(null, null);
+                var systems = _systemService.GetInterfaces(orgId, q);
                 var dtos = Map(systems);
                 return Ok(dtos);
             }
@@ -163,39 +177,25 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetInterfacesSearch(string q, bool? interfaces)
-        {
-            try
-            {
-                var systems = _systemService.GetInterfaces(null, q);
-                var dtos = Map(systems);
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
+        //public HttpResponseMessage GetNonInterfaces(int orgId, bool? nonInterfaces)
+        //{
+        //    try
+        //    {
+        //        var systems = _systemService.GetNonInterfaces(orgId, null);
+        //        var dtos = Map(systems);
+        //        return Ok(dtos);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return Error(e);
+        //    }
+        //}
 
-        public HttpResponseMessage GetNonInterfaces(bool? nonInterfaces)
+        public HttpResponseMessage GetNonInterfacesSearch(string q, int orgId, bool? nonInterfaces)
         {
             try
             {
-                var systems = _systemService.GetNonInterfaces(null, null);
-                var dtos = Map(systems);
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
-
-        public HttpResponseMessage GetNonInterfacesSearch(string q, bool? nonInterfaces)
-        {
-            try
-            {
-                var systems = _systemService.GetNonInterfaces(null, q);
+                var systems = _systemService.GetNonInterfaces(orgId, q);
                 var dtos = Map(systems);
                 return Ok(dtos);
             }
