@@ -12,7 +12,7 @@
     app.controller('system.EditContracts', ['$scope', '$state', '$stateParams', '$timeout', 'itSystemUsage',
         function ($scope, $state, $stateParams, $timeout, itSystemUsage) {
             $scope.reload = function() {
-                reload(); // OMG HACK! TODO refactor! This is to wait for the autosave to finish then reload the view to reflect the change
+                $timeout(reload, 1000); // OMG HACK! TODO refactor! This is to wait for the autosave to finish then reload the view to reflect the change
             }
 
             // work around for $state.reload() not updating scope
