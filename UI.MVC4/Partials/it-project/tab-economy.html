@@ -47,7 +47,7 @@
             <!-- years cols -->
             <td data-ng-repeat-start="column in row.columns" class="td-very-condensed border-left">
                 <!-- if not-readonly -->
-                <input type="number" step="1" ng-pattern="/d*/" class="form-control input-sm input-cell"
+                <input type="number" step="1" data-ng-pattern="/^[0-9]*$/" class="form-control input-sm input-cell"
                        data-autosave="{{column.updateUrl}}"
                        data-field="{{row.budgetName}}"
                        data-ng-model="column.budget"
@@ -62,7 +62,7 @@
             </td>
             <td data-ng-repeat-end="" class="td-very-condensed">
                 <!-- if not-readonly -->
-                <input type="number" step="1" ng-pattern="/d*/" class="form-control input-sm input-cell"
+                <input type="number" step="1" data-ng-pattern="/^[0-9]*$/" class="form-control input-sm input-cell"
                        data-autosave="{{column.updateUrl}}"
                        data-field="{{row.reaName}}"
                        data-ng-model="column.rea"
