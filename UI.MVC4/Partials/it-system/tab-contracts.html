@@ -83,7 +83,7 @@
                         data-ui-select2="allowClearOption"
                         data-placeholder="Ingen kontrakt"
                         data-ng-model="usage.mainContractId"
-                        data-ng-change="updateActiveStatus()"
+                        data-ng-change="reload()"
                         data-ng-disabled="!hasWriteAccess"
                         data-autosave="api/itsystemusage/{{usageId}}"
                         data-field="mainContractId">
@@ -94,10 +94,10 @@
             </div>
             <div class="col-md-4">
                 IT systemet har nu status som: 
-                <strong class="text-success" data-ng-show="systemActive">
+                <strong class="text-success" data-ng-show="usage.mainContractIsActive">
                     Aktivt
                 </strong>
-                <strong class="text-danger" data-ng-hide="systemActive">
+                <strong class="text-danger" data-ng-hide="usage.mainContractIsActive">
                     Inaktivt
                 </strong>
             </div>

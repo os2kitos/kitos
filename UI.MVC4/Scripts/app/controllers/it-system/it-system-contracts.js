@@ -9,16 +9,23 @@
         });
     }]);
 
-    app.controller('system.EditContracts', ['$rootScope', '$scope', '$http', 
-        function ($rootScope, $scope, $http) {
+    app.controller('system.EditContracts', ['$scope', '$state', '$stateParams', '$timeout', 'itSystemUsage',
+        function ($scope, $state, $stateParams, $timeout, itSystemUsage) {
+            $scope.reload = function() {
+                $timeout(reload, 1000); // OMG HACK! TODO refactor! This is to wait for the autosave to finish then reload the view to reflect the change
+            }
 
-            $scope.updateActiveStatus = function () {
-                var mainContract = _.findWhere($scope.usage.contracts, { id: $scope.usage.mainContractId });
-                
-                $scope.systemActive = mainContract ? mainContract.isActive : false;
+            // work around for $state.reload() not updating scope
+            // https://github.com/angular-ui/ui-router/issues/582
+            function reload() {
+                return $state.transitionTo($state.current, $stateParams, {
+                    reload: true
+                }).then(function () {
+                    $scope.hideContent = true;
+                    return $timeout(function () {
+                        return $scope.hideContent = false;
+                    }, 1);
+                });
             };
-
-            $scope.updateActiveStatus();
-
         }]);
 })(angular, app);
