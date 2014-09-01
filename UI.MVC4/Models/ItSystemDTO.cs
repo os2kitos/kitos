@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using Antlr.Runtime;
 using Core.DomainModel;
 
 namespace UI.MVC4.Models
 {
     public class ItSystemDTO
     {
+        public ItSystemDTO()
+        {
+            TaskRefIds = new List<int>();
+            CanUseInterfaceIds = new List<int>();
+        }
+
         public int Id { get; set; }
 
         public int? ParentId { get; set; }
@@ -17,6 +24,16 @@ namespace UI.MVC4.Models
         public IEnumerable<int> CanBeUsedByIds { get; set; }
         public IEnumerable<int> CanUseInterfaceIds { get; set; }
         public IEnumerable<ItSystemSimpleDTO> CanUseInterfaces { get; set; }
+        /// <summary>
+        /// Gets or sets the exposed interface ids.
+        /// </summary>
+        /// <value>
+        /// The exposed interface ids.
+        /// </value>
+        /// <remarks>
+        /// This dones't exist in the model.
+        /// It's a way to bind to <see cref="CanUseInterfaces"/>
+        /// </remarks>
         public IEnumerable<int> ExposedInterfaceIds { get; set; }
         public int? BelongsToId { get; set; }
         public string BelongsToName { get; set; }
@@ -31,6 +48,17 @@ namespace UI.MVC4.Models
 
         public string Description { get; set; }
         public string Url { get; set; }
+
+        /// <summary>
+        /// Gets or sets the task reference ids.
+        /// </summary>
+        /// <value>
+        /// The task reference ids.
+        /// </value>
+        /// <remarks>
+        /// This dones't exist in the model.
+        /// It's a way to bind to <see cref="TaskRefs"/>
+        /// </remarks>
         public IEnumerable<int> TaskRefIds { get; set; }
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
 
