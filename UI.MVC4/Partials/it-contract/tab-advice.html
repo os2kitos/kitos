@@ -60,23 +60,29 @@
 
                 <!-- receiver -->
                 <td>
-                    <select data-ng-model="advice.receiverId" data-placeholder="Vælg rolle" class="form-control input-sm"
+                    <select class="form-control input-sm"
+                            data-ui-select2="allowClearOption"
+                            data-placeholder="Vælg modtager rolle"
+                            data-ng-model="advice.receiverId"
                             data-ng-disabled="!hasWriteAccess"
                             data-field="receiverId"
-                            data-autosave="{{advice.updateUrl}}"
-                            data-ng-options="role.id as role.name for role in itContractRoles">
-                        <option value="">Ingen modtager</option>
+                            data-autosave="{{advice.updateUrl}}">
+                        <option value=""></option>
+                        <option data-ng-repeat="itContractRole in itContractRoles" value="{{itContractRole.id}}">{{itContractRole.name}}</option>
                     </select>
                 </td>
 
                 <!-- cc -->
                 <td>
-                    <select data-ng-model="advice.carbonCopyReceiverId" data-placeholder="Vælg rolle" class="form-control input-sm"
+                    <select class="form-control input-sm"
+                            data-ui-select2="allowClearOption"
+                            data-placeholder="Vælg cc rolle"
+                            data-ng-model="advice.carbonCopyReceiverId"
                             data-ng-disabled="!hasWriteAccess"
                             data-field="carbonCopyReceiverId"
-                            data-autosave="{{advice.updateUrl}}"
-                            data-ng-options="role.id as role.name for role in itContractRoles">
-                        <option value="">Ingen cc</option>
+                            data-autosave="{{advice.updateUrl}}">
+                        <option value=""></option>
+                        <option data-ng-repeat="itContractRole in itContractRoles" value="{{itContractRole.id}}">{{itContractRole.name}}</option>
                     </select>
                 </td>
 
