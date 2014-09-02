@@ -25,8 +25,8 @@
                         return result.data.response;
                     });
                 }],
-                handoverTrials: ['$http', function ($http) {
-                    return $http.get('api/handoverTrial').then(function (result) {
+                handoverTrials: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get('api/handoverTrial/' + $stateParams.id + '?byContract').then(function (result) {
                         return result.data.response;
                     });
                 }]

@@ -11,6 +11,7 @@
                 IT System
                 <order-by data-order-by="'name'" data-paging="pagination"></order-by>
             </th>
+            <th class="col-sm-0"><!-- Public marker --></th>
             <th>
                 Globalt SystemID
                 <order-by data-order-by="'systemId'" data-paging="pagination"></order-by>
@@ -43,6 +44,11 @@
                 <a data-ng-if="system.isInterface" ui-sref="it-system.edit.interface-details({id: system.id})">{{system.name}}</a>
                 <a data-ng-if="!system.isInterface" ui-sref="it-system.edit.interfaces({id: system.id})">{{system.name}}</a>
             </td>
+            <td>
+                <span data-ng-show="{{system.accessModifier == 1}}">
+                    (P)
+                </span>
+            </td>
             <td>{{system.systemId}}</td>
             <td data-ng-switch="showType">
                 <span data-ng-switch-when="appType.name">{{system.appType.name}}</span>
@@ -74,7 +80,7 @@
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="8" class="text-center">
+            <td colspan="9" class="text-center">
                 <span data-pagination-buttons="pagination"></span>
             </td>
         </tr>
