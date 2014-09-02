@@ -16,7 +16,7 @@
 
 <div class="navbar-text navbar-text-small navbar-right navbar-complex">
     <div>
-        <a data-ui-sref="edit-user" data-ui-sref-active="active">{{ user.name }}</a> {{ user.currentOrganizationName }}
+        <a data-ui-sref="edit-user" data-ui-sref-active="active">{{ user.name | limitToDots:15 }}</a> {{ user.currentOrganizationName | limitToDots:15 }}
         <a data-ng-click="logout()">Log ud</a>
     </div>
     
