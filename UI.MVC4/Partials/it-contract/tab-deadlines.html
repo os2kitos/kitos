@@ -16,11 +16,13 @@
                         <td>
                             <div class="form-group">
                                 <select class="form-control input-sm"
+                                        data-ui-select2="allowClearOption"
+                                        data-placeholder="Vælg overtagelsesprøve"
                                         data-ng-model="ht.handoverTrialTypeId"
-                                        data-ng-options="opt.id as opt.name for opt in handoverTrialTypes"
                                         data-autosave="api/handovertrial/{{ ht.id }}"
                                         data-field="handoverTrialTypeId">
                                     <option value=""></option>
+                                    <option data-ng-repeat="handoverTrialType in handoverTrialTypes" value="{{handoverTrialType.id}}">{{handoverTrialType.name}}</option>
                                 </select>
                             </div>
                         </td>
@@ -65,7 +67,13 @@
                     <tr>
                         <td>
                             <div class="form-group">
-                                <select class="form-control input-sm" data-ng-model="handoverTrial.handoverTrialTypeId" data-ng-options="opt.id as opt.name for opt in handoverTrialTypes"></select>
+                                <select class="form-control input-sm"
+                                        data-ui-select2="allowClearOption"
+                                        data-placeholder="Vælg overtagelsesprøve"
+                                        data-ng-model="handoverTrial.handoverTrialTypeId">
+                                    <option value=""></option>
+                                    <option data-ng-repeat="handoverTrialType in handoverTrialTypes" value="{{handoverTrialType.id}}">{{handoverTrialType.name}}</option>
+                                </select>
                             </div>
                         </td>
                         <td>

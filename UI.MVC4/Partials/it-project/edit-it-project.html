@@ -29,10 +29,13 @@
                     <div class="form-group">
                         <label for="project-type" class="control-label small">Type</label>
                         <select id="project-type" class="form-control input-sm"
-                                data-ng-options="o.id as o.name for o in projectTypes"
+                                data-ui-select2=""
                                 data-ng-model="project.itProjectTypeId"
                                 data-field="itProjectTypeId"
-                                data-autosave="{{autosaveUrl}}" data-ng-disabled="!hasWriteAccess">
+                                data-autosave="{{autosaveUrl}}"
+                                data-ng-disabled="!hasWriteAccess">
+                            <option value=""></option>
+                            <option data-ng-repeat="projectType in projectTypes" value="{{projectType.id}}">{{projectType.name}}</option>
                         </select>
                     </div>
                 
