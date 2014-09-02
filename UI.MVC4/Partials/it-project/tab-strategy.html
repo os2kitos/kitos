@@ -6,24 +6,28 @@
         <form role="form">
             <div class="form-group">
                 <label for="jointDrop" class="control-label">Fælleskommunel digitaliseringsstrategi</label>
-                <select class="form-control input-sm" id="jointDrop" 
-                        data-ng-model="jointMunicipalProjectId" 
-                        data-ng-options="project.id as project.name for project in jointMunicipalProjects" 
-                        data-autosave="{{ autosaveUrl }}" 
-                        data-field="jointMunicipalProjectId" 
+                <select class="form-control input-sm" id="jointDrop"
+                        data-ui-select2="allowClearOption"
+                        data-placeholder="Vælg fælleskommunel projekt"
+                        data-ng-model="jointMunicipalProjectId"
+                        data-autosave="{{ autosaveUrl }}"
+                        data-field="jointMunicipalProjectId"
                         data-ng-disabled="!hasWriteAccess">
-                    <option value="">-- Fælleskommunel projekt --</option>
+                    <option value=""></option>
+                    <option data-ng-repeat="jointMunicipalProject in jointMunicipalProjects" value="{{jointMunicipalProject.id}}">{{jointMunicipalProject.name}}</option>
                 </select>
             </div>
             <div class="form-group">
                 <label for="commonDrop" class="control-label">Fællesoffentlig digitaliseringsstrategi</label>
-                <select class="form-control input-sm" id="commonDrop" 
-                        data-ng-model="commonPublicProjectId" 
-                        data-ng-options="project.id as project.name for project in commonPublicProjects" 
-                        data-autosave="{{ autosaveUrl }}" 
-                        data-field="commonPublicProjectId" 
+                <select class="form-control input-sm" id="commonDrop"
+                        data-ui-select2="allowClearOption"
+                        data-placeholder="Vælg fællesoffentlig projekt"
+                        data-ng-model="commonPublicProjectId"
+                        data-autosave="{{ autosaveUrl }}"
+                        data-field="commonPublicProjectId"
                         data-ng-disabled="!hasWriteAccess">
-                    <option value="">-- Fællesoffentlig projekt --</option>
+                    <option value=""></option>
+                    <option data-ng-repeat="commonPublicProject in commonPublicProjects" value="{{commonPublicProject.id}}">{{commonPublicProject.name}}</option>
                 </select>
             </div>
         </form>

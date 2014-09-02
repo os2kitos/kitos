@@ -49,11 +49,12 @@
                     </td>
                     <td>
                         <select class="form-control input-sm" 
+                                data-ui-select2=""
                                 data-field="responsibleUserId"
                                 data-autosave="{{risk.updateUrl}}"
-                                data-ng-model="risk.responsibleUserId" 
-                                data-ng-options="user.id as user.name for user in usersWithRoles">
+                                data-ng-model="risk.responsibleUserId">
                             <option value=""></option>
+                            <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.name}}</option>
                         </select>
                     </td>
                     <td>
@@ -91,9 +92,10 @@
                     <td>
                         <div class="form-group" data-show-errors>
                             <select name="responsbile" class="form-control input-sm" required
-                                    data-ng-model="newRisk.responsibleUserId" 
-                                    data-ng-options="user.id as user.name for user in usersWithRoles">
+                                    data-ui-select2=""
+                                    data-ng-model="newRisk.responsibleUserId">
                                 <option value=""></option>
+                                <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.name}}</option>
                             </select>
                         </div>
                     </td>

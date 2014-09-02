@@ -50,12 +50,13 @@
                 </td>
                 <td>
                     <div class="form-group">
-                        <select class="form-control input-sm" 
+                        <select class="form-control input-sm"
+                                data-ui-select2=""
                                 data-field="responsibleUserId"
                                 data-autosave="api/communication/{{c.id}}"
-                                data-ng-model="c.responsibleUserId" 
-                                data-ng-options="user.id as user.name for user in usersWithRoles">
+                                data-ng-model="c.responsibleUserId">
                             <option value=""></option>
+                            <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.name}}</option>
                         </select>
                     </div>
                 </td>
@@ -106,9 +107,10 @@
                 <td>
                     <div class="form-group" data-show-errors>
                         <select name="responsible" class="form-control input-sm" required
-                                data-ng-model="comm.responsibleUserId" 
-                                data-ng-options="user.id as user.name for user in usersWithRoles">
+                                data-ui-select2=""
+                                data-ng-model="comm.responsibleUserId">
                             <option value=""></option>
+                            <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.name}}</option>
                         </select>
                     </div>
                 </td>
