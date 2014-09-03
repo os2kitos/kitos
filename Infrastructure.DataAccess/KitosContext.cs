@@ -132,6 +132,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItProjectTypeMap());
             modelBuilder.Configurations.Add(new ProcurementStrategyMap());
             modelBuilder.Configurations.Add(new PurchaseFormMap());
+            modelBuilder.Configurations.Add(new ResponsibleOrgUnitMap());
             modelBuilder.Configurations.Add(new RiskMap());
             modelBuilder.Configurations.Add(new SensitiveDataTypeMap());
             modelBuilder.Configurations.Add(new StakeholderMap());

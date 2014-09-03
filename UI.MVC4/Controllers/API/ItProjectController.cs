@@ -312,7 +312,7 @@ namespace UI.MVC4.Controllers.API
                 var project = Repository.GetByKey(id);
                 if (project == null) return NotFound();
 
-                return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(project.UsedByOrgUnits));
+                return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(project.UsedByOrgUnits.Select(x => x.OrganizationUnit)));
             }
             catch (Exception e)
             {
@@ -332,7 +332,7 @@ namespace UI.MVC4.Controllers.API
                 var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
                 if (orgUnit == null) return NotFound();
                 
-                project.UsedByOrgUnits.Add(orgUnit);
+                //project.UsedByOrgUnits.Add(orgUnit); TODO
                 
                 project.LastChanged = DateTime.Now;
                 project.LastChangedByUser = KitosUser;
@@ -365,7 +365,7 @@ namespace UI.MVC4.Controllers.API
                 var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
                 if (orgUnit == null) return NotFound();
                 
-                project.UsedByOrgUnits.Remove(orgUnit);
+                //project.UsedByOrgUnits.Remove(orgUnit); TODO
 
                 project.LastChanged = DateTime.Now;
                 project.LastChangedByUser = KitosUser;

@@ -61,6 +61,7 @@
     <Compile Include="ItProject\EconomyYear.cs" />
     <Compile Include="ItProject\ItProjectPriority.cs" />
     <Compile Include="ItProject\ItProjectStatus.cs" />
+    <Compile Include="ItProject\ResponsibleOrgUnit.cs" />
     <Compile Include="ItSystem\AppType.cs" />
     <Compile Include="ItSystem\DataRow.cs" />
     <Compile Include="ItSystem\ArchiveType.cs" />

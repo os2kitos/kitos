@@ -295,7 +295,7 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.Children, opt => opt.Ignore())
                   .ForMember(dest => dest.ItSystemUsages, opt => opt.Ignore())
                   .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
-                  .ForMember(dest => dest.ResponsibleOrgUnit, opt => opt.Ignore())
+                  //.ForMember(dest => dest.ResponsibleOrgUnit, opt => opt.Ignore())
                   .ForMember(dest => dest.Stakeholders, opt => opt.Ignore());
 
             Mapper.CreateMap<ItProjectPhase, ItProjectPhaseDTO>()
