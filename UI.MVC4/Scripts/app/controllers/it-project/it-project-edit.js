@@ -167,7 +167,7 @@
                 
                 $scope.parentSelectOptions = selectLazyLoading('api/itproject', true, ['orgId=' + user.currentOrganizationId]);
 
-                function selectLazyLoading(url, excludeSelf, format, paramAry) {
+                function selectLazyLoading(url, excludeSelf, paramAry) {
                     return {
                         minimumInputLength: 1,
                         allowClear: true,
