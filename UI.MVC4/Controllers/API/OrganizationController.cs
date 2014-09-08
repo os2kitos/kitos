@@ -36,7 +36,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var orgs = Repository.Get(org => (org.AccessModifier == AccessModifier.Public || org.Id == orgId) && (org.Name.Contains(q) || org.Cvr.Contains(q)));
+                var orgs = Repository.Get(org => (org.AccessModifier == AccessModifier.Public || org.Id == orgId) && (org.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1 || org.Cvr.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1));
                 return Ok(Map(orgs));
             }
             catch (Exception e)
@@ -59,7 +59,7 @@ namespace UI.MVC4.Controllers.API
                 var qry =
                     Repository.AsQueryable().Single(x => x.Id == id).OrgUnits.SelectMany(y => y.Rights)
                               .Select(z => z.User)
-                              .Where(u => u.Name.Contains(q) || u.Email.Contains(q));
+                              .Where(u => u.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1 || u.Email.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
 
                 return Ok(Map<IEnumerable<User>, IEnumerable<UserDTO>>(qry));
             }

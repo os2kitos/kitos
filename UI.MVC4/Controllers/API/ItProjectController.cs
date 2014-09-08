@@ -70,7 +70,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var items = Repository.Get(x => x.Name.Contains(q) && x.OrganizationId == orgId);
+                var items = Repository.Get(x => x.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1 && x.OrganizationId == orgId);
 
                 return Ok(Map(items));
             }
@@ -109,7 +109,7 @@ namespace UI.MVC4.Controllers.API
             {
                 //Get all projects inside the organizaton
                 pagingModel.Where(p => p.OrganizationId == orgId);
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
+                if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
 
                 var projects = Page(Repository.AsQueryable(), pagingModel);
 
@@ -129,7 +129,7 @@ namespace UI.MVC4.Controllers.API
             {
                 //Get all projects inside the organizaton
                 pagingModel.Where(p => p.OrganizationId == orgId);
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
+                if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
 
                 var projects = Page(Repository.AsQueryable(), pagingModel);
 
@@ -210,7 +210,7 @@ namespace UI.MVC4.Controllers.API
             {
                 //Get all projects inside the organizaton OR public
                 pagingModel.Where(p => p.OrganizationId == orgId || p.AccessModifier == AccessModifier.Public);
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
+                if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
 
                 var projects = Page(Repository.AsQueryable(), pagingModel);
 
@@ -230,7 +230,7 @@ namespace UI.MVC4.Controllers.API
             {
                 //Get all projects inside the organizaton OR public
                 pagingModel.Where(p => p.OrganizationId == orgId || p.AccessModifier == AccessModifier.Public);
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
+                if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
 
                 var projects = Page(Repository.AsQueryable(), pagingModel);
 

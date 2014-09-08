@@ -75,7 +75,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var users = Repository.Get(u => u.Name.Contains(q) || u.Email.Contains(q));
+                var users = Repository.Get(u => u.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1 || u.Email.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
                 return Ok(AutoMapper.Mapper.Map<IEnumerable<User>, IEnumerable<UserDTO>>(users));
             }
             catch (Exception e)
