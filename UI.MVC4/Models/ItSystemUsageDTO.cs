@@ -18,9 +18,7 @@ namespace UI.MVC4.Models
         public int? SensitiveDataTypeId { get; set; }
         public int? ArchiveTypeId { get; set; }
         
-        public int? ResponsibleUnitId { get; set; }
-        public OrgUnitDTO ResponsibleUnit { get; set; }
-        public string ResponsibleUnitName { get; set; }
+        public string ResponsibleOrgUnitName { get; set; }
 
         public int OrganizationId { get; set; }
         public OrganizationDTO Organization { get; set; }
@@ -37,7 +35,6 @@ namespace UI.MVC4.Models
 
         public IEnumerable<RightOutputDTO> Rights { get; set; }
         
-        public IEnumerable<OrgUnitDTO> UsedBy { get; set; }
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
 
         public IEnumerable<InterfaceUsageDTO> InterfaceUsages { get; set; }

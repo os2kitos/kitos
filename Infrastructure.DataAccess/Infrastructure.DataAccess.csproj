@@ -71,6 +71,7 @@
     <Compile Include="Mapping\AdminRightMap.cs" />
     <Compile Include="Mapping\AdminRoleMap.cs" />
     <Compile Include="Mapping\BusinessTypeMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOrgUnitUsageMap.cs" />
     <Compile Include="Mapping\ItProjectOrgUnitUsageMap.cs" />
     <Compile Include="Mapping\ItProjectStatusMap.cs" />
     <Compile Include="Mapping\HandoverTrialMap.cs" />

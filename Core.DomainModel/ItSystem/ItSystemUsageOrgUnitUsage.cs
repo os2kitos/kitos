@@ -1,6 +1,6 @@
 ﻿namespace Core.DomainModel.ItSystem
 {
-    public class ItSystemOrgUnitUsage
+    public class ItSystemUsageOrgUnitUsage
     {
         public int ItSystemUsageId { get; set; }
         public virtual ItSystemUsage ItSystemUsage { get; set; }

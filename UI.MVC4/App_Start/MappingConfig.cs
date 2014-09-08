@@ -240,11 +240,13 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.ItContract, opt => opt.Ignore());
 
             Mapper.CreateMap<ItSystemUsage, ItSystemUsageDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.OrgUnits, opt => opt.Ignore())
-                  .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
-                  .ForMember(dest => dest.ItProjects, opt => opt.Ignore())
-                  .ForMember(dest => dest.Contracts, opt => opt.Ignore());
+                .ForMember(dest => dest.ResponsibleOrgUnitName,
+                    opt => opt.MapFrom(src => src.ResponsibleUsage.OrganizationUnit.Name))
+                .ReverseMap()
+                .ForMember(dest => dest.OrgUnits, opt => opt.Ignore())
+                .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
+                .ForMember(dest => dest.ItProjects, opt => opt.Ignore())
+                .ForMember(dest => dest.Contracts, opt => opt.Ignore());
 
             //Simplere mapping than the one above, only one way
             Mapper.CreateMap<ItSystemUsage, ItSystemUsageSimpleDTO>();

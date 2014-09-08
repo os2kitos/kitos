@@ -16,7 +16,7 @@ namespace Core.DomainModel
             this.TaskRefs = new List<TaskRef>();
             this.OwnedTasks = new List<TaskRef>();
             this.DefaultUsers = new List<User>();
-            this.Using = new List<ItSystemUsage>();
+            this.Using = new List<ItSystemUsageOrgUnitUsage>();
             this.UsingItProjects = new List<ItProjectOrgUnitUsage>();
         }
 
@@ -52,7 +52,21 @@ namespace Core.DomainModel
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
 
         public virtual ICollection<TaskRef> OwnedTasks { get; set; }
+        /// <summary>
+        /// Gets or sets the delegated system usages.
+        /// TODO write better summary
+        /// </summary>
+        /// <value>
+        /// The delegated system usages.
+        /// </value>
         public virtual ICollection<ItSystemUsage> DelegatedSystemUsages { get; set; }
+        /// <summary>
+        /// Gets or sets it system usages.
+        /// TODO write better summary
+        /// </summary>
+        /// <value>
+        /// It system usages.
+        /// </value>
         public virtual ICollection<ItSystemUsage> ItSystemUsages { get; set; }
 
         /// <summary>
@@ -63,7 +77,7 @@ namespace Core.DomainModel
         /// <summary>
         /// This Organization Unit is using these IT Systems (Via ItSystemUsage)
         /// </summary>
-        public virtual ICollection<ItSystemUsage> Using { get; set; }
+        public virtual ICollection<ItSystemUsageOrgUnitUsage> Using { get; set; }
 
         /// <summary>
         /// This Organization Unit is using these IT projects

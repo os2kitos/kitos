@@ -24,6 +24,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasMany(t => t.UsingItProjects)
                 .WithRequired(t => t.OrganizationUnit)
                 .HasForeignKey(d => d.OrganizationUnitId);
+
+            this.HasMany(t => t.Using)
+                .WithRequired(t => t.OrganizationUnit)
+                .HasForeignKey(d => d.OrganizationUnitId);
         }
     }
 }

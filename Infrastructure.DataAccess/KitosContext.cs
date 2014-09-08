@@ -55,6 +55,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ItProjectRight> ItProjectRights { get; set; }
         public DbSet<ItProjectRole> ItProjectRoles { get; set; }
         public DbSet<ItProjectOrgUnitUsage> ItProjectOrgUnitUsages { get; set; }
+        public DbSet<ItSystemUsageOrgUnitUsage> ItSystemUsageOrgUnitUsages { get; set; }
         public DbSet<ItSystem> ItSystems { get; set; }
         public DbSet<ItSystemUsage> ItSystemUsages { get; set; }
         public DbSet<ItSystemRight> ItSystemRights { get; set; }
@@ -120,6 +121,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItProjectStatusMap());
             modelBuilder.Configurations.Add(new ItProjectRightMap());
             modelBuilder.Configurations.Add(new ItProjectRoleMap());
+            modelBuilder.Configurations.Add(new ItProjectOrgUnitUsageMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageOrgUnitUsageMap());
             modelBuilder.Configurations.Add(new ItSystemMap());
             modelBuilder.Configurations.Add(new ItSystemUsageMap());
             modelBuilder.Configurations.Add(new ItSystemRightMap());
@@ -133,7 +136,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItProjectTypeMap());
             modelBuilder.Configurations.Add(new ProcurementStrategyMap());
             modelBuilder.Configurations.Add(new PurchaseFormMap());
-            modelBuilder.Configurations.Add(new ItProjectOrgUnitUsageMap());
             modelBuilder.Configurations.Add(new RiskMap());
             modelBuilder.Configurations.Add(new SensitiveDataTypeMap());
             modelBuilder.Configurations.Add(new StakeholderMap());

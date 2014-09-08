@@ -15,7 +15,7 @@ namespace Core.DomainModel.ItSystem
             this.TaskRefs = new List<TaskRef>();
             this.InterfaceUsages = new List<InterfaceUsage>();
             this.InterfaceExposures = new List<InterfaceExposure>();
-            this.UsedBy = new List<OrganizationUnit>();
+            this.UsedBy = new List<ItSystemUsageOrgUnitUsage>();
             this.ItProjects = new List<ItProject.ItProject>();
         }
 
@@ -78,17 +78,14 @@ namespace Core.DomainModel.ItSystem
         /// The local call system.
         /// </value>
         public string LocalCallName { get; set; }
-        public int? ResponsibleUnitId { get; set; }
         /// <summary>
-        /// Gets or sets the organization unit marked as responsible for this it system usage.
+        /// Organization Unit responsible for this system usage.
         /// </summary>
-        /// <remarks>
-        /// Must be an organization unit contained in <see cref="OrgUnits"/>.
-        /// </remarks>
         /// <value>
-        /// The responsible organization unit.
+        /// The responsible org unit.
         /// </value>
-        public virtual OrganizationUnit ResponsibleUnit { get; set; }
+        public virtual ItSystemUsageOrgUnitUsage ResponsibleUsage { get; set; }
+        
         public int OrganizationId { get; set; }
         /// <summary>
         /// Gets or sets the organization marked as responsible for this it system usage.
@@ -156,7 +153,7 @@ namespace Core.DomainModel.ItSystem
         /// <value>
         /// The organization units used by this instance.
         /// </value>
-        public virtual ICollection<OrganizationUnit> UsedBy { get; set; }
+        public virtual ICollection<ItSystemUsageOrgUnitUsage> UsedBy { get; set; }
         /// <summary>
         /// Gets or sets the tasks this instance supports.
         /// </summary>
