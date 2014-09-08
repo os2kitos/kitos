@@ -15,8 +15,8 @@
                         return result.data.response;
                     });
                 }],
-                paymentMilestones: ['$http', function ($http) {
-                    return $http.get('api/paymentMilestone').then(function (result) {
+                paymentMilestones: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get('api/paymentMilestone/' + $stateParams.id + '?contract').then(function (result) {
                         return result.data.response;
                     });
                 }],
