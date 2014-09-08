@@ -51,6 +51,9 @@
                 };
 
                 function remove() {
+                    if (!confirm("Er du sikker på du vil slette projektet?")) {
+                        return;
+                    }
                     var projectId = $state.params.id;
                     var msg = notify.addInfoMessage("Sletter IT Projektet...", false);
                     $http.delete('api/itproject/' + projectId)

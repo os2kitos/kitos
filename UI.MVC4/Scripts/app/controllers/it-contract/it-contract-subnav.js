@@ -36,6 +36,9 @@
                 }
 
                 function remove() {
+                    if (!confirm("Er du sikker på du vil slette kontrakten?")) {
+                        return;
+                    }
                     var contractId = $state.params.id;
                     var msg = notify.addInfoMessage("Sletter IT Kontrakten...", false);
                     $http.delete('api/itcontract/' + contractId)
