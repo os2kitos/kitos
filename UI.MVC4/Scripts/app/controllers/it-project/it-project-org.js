@@ -7,7 +7,7 @@
             resolve: {
                 // re-resolve data from parent cause changes here wont cascade to it
                 project: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itproject/" + $stateParams.id)
+                    return $http.get('api/itproject/' + $stateParams.id)
                         .then(function (result) {
                             return result.data.response;
                         });
@@ -15,11 +15,22 @@
                 isTransversal: ['project', function (project) {
                     return project.isTransversal;
                 }],
-                selectedOrgUnits: ['project', function (project) {
-                    return project.usedByOrgUnits;
+                selectedOrgUnits: ['$http', '$stateParams', function ($http, $stateParams) {
+                    var projectId = $stateParams.id;
+                    return $http.get('api/itProjectOrgUnitUsage/' + projectId)
+                        .then(function(result) {
+                            return result.data.response;
+                        });
                 }],
-                responsibleOrgUnitId: ['project', function (project) {
-                    return project.responsibleOrgUnitId;
+                responsibleOrgUnitId: ['$http', '$stateParams', function ($http, $stateParams) {
+                    var projectId = $stateParams.id;
+                    return $http.get('api/itProjectOrgUnitUsage/' + projectId + '?responsible')
+                        .then(function (result) {
+                            if (result.data.response) 
+                                return result.data.response.id;
+                            return null;
+                        }
+                    );
                 }],
                 orgUnitsTree: ['$http', 'project', function ($http, project) {
                     return $http.get('api/organizationunit/?organization=' + project.organizationId)
@@ -41,6 +52,28 @@
                 var projectId = $stateParams.id;
                 $scope.patchUrl = 'api/itproject/' + projectId;
 
+                $scope.saveResponsible = function() {
+                    var orgUnitId = $scope.responsibleOrgUnitId;
+                    var msg = notify.addInfoMessage("Gemmer... ");
+                    if ($scope.responsibleOrgUnitId) {
+                        $http.post('api/itProjectOrgUnitUsage/?projectId=' + projectId + '&orgUnitId=' + orgUnitId + '&responsible')
+                            .success(function() {
+                                msg.toSuccessMessage("Gemt!");
+                            })
+                            .error(function() {
+                                msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
+                            });
+                    } else {
+                        $http.delete('api/itProjectOrgUnitUsage/?projectId=' + projectId + '&responsible')
+                            .success(function() {
+                                msg.toSuccessMessage("Gemt!");
+                            })
+                            .error(function() {
+                                msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
+                            });
+                    }
+                }
+
                 $scope.save = function(obj) {
                     var msg = notify.addInfoMessage("Gemmer... ");
                     if (obj.selected) {
@@ -58,12 +91,19 @@
                                 msg.toSuccessMessage("Gemt!");
 
                                 var indexOf;
+                                // find the index of the orgunit 
                                 var found = _.filter($scope.selectedOrgUnits, function(element, index) {
                                     var equal = element.id == obj.id;
+                                    // set outer scope indexOf, to be used later
                                     if (equal) indexOf = index;
                                     return equal;
                                 });
+                                // remove orgunit from the responsible dropdown
                                 if (found) $scope.selectedOrgUnits.splice(indexOf, 1);
+
+                                // if responsible is the orgunit being removed unselect it from the dropdown
+                                if (obj.id == $scope.responsibleOrgUnitId)
+                                    $scope.responsibleOrgUnitId = '';
                             })
                             .error(function() {
                                 msg.toErrorMessage("Fejl! Kunne ikke gemmes!");

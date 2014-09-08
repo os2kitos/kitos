@@ -25,6 +25,7 @@ namespace UI.MVC4.Controllers.API
         private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
         private readonly IGenericRepository<ItProjectRole> _roleRepository;
         private readonly IGenericRepository<ItProjectPhase> _phaseRepository;
+        private readonly IGenericRepository<ItProjectOrgUnitUsage> _responsibleOrgUnitRepository;
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
 
         //TODO: Man, this constructor smells ...
@@ -35,7 +36,8 @@ namespace UI.MVC4.Controllers.API
             IGenericRepository<TaskRef> taskRepository, 
             IGenericRepository<ItSystemUsage> itSystemUsageRepository,
             IGenericRepository<ItProjectRole> roleRepository,
-            IGenericRepository<ItProjectPhase> phaseRepository)
+            IGenericRepository<ItProjectPhase> phaseRepository,
+            IGenericRepository<ItProjectOrgUnitUsage> responsibleOrgUnitRepository)
             : base(repository)
         {
             _itProjectService = itProjectService;
@@ -43,6 +45,7 @@ namespace UI.MVC4.Controllers.API
             _itSystemUsageRepository = itSystemUsageRepository;
             _roleRepository = roleRepository;
             _phaseRepository = phaseRepository;
+            _responsibleOrgUnitRepository = responsibleOrgUnitRepository;
             _orgUnitRepository = orgUnitRepository;
         }
 
@@ -312,7 +315,11 @@ namespace UI.MVC4.Controllers.API
                 var project = Repository.GetByKey(id);
                 if (project == null) return NotFound();
 
-                return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(project.UsedByOrgUnits.Select(x => x.OrganizationUnit)));
+                var dtos =
+                    Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(
+                        project.UsedByOrgUnits.Select(x => x.OrganizationUnit));
+
+                return Ok(dtos);
             }
             catch (Exception e)
             {
@@ -332,7 +339,7 @@ namespace UI.MVC4.Controllers.API
                 var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
                 if (orgUnit == null) return NotFound();
                 
-                //project.UsedByOrgUnits.Add(orgUnit); TODO
+                project.UsedByOrgUnits.Add(new ItProjectOrgUnitUsage {ItProjectId = id, OrganizationUnitId = organizationUnit});
                 
                 project.LastChanged = DateTime.Now;
                 project.LastChangedByUser = KitosUser;
@@ -362,10 +369,9 @@ namespace UI.MVC4.Controllers.API
 
                 if(!HasWriteAccess(project)) return Unauthorized();
 
-                var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
-                if (orgUnit == null) return NotFound();
-                
-                //project.UsedByOrgUnits.Remove(orgUnit); TODO
+                var entity = project.UsedByOrgUnits.SingleOrDefault(x => x.ItProjectId == id && x.OrganizationUnitId == organizationUnit);
+                if (entity == null) return NotFound();
+                project.UsedByOrgUnits.Remove(entity);
 
                 project.LastChanged = DateTime.Now;
                 project.LastChangedByUser = KitosUser;

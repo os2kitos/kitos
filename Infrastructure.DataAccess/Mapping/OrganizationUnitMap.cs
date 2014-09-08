@@ -20,6 +20,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(m => m.OrgUnits)
                 .HasForeignKey(o => o.OrganizationId)
                 .WillCascadeOnDelete(true);
+
+            this.HasMany(t => t.UsingItProjects)
+                .WithRequired(t => t.OrganizationUnit)
+                .HasForeignKey(d => d.OrganizationUnitId);
         }
     }
 }

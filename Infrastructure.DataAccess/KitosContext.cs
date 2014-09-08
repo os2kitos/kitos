@@ -54,6 +54,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ItProjectStatus> ItProjectStatuses { get; set; }
         public DbSet<ItProjectRight> ItProjectRights { get; set; }
         public DbSet<ItProjectRole> ItProjectRoles { get; set; }
+        public DbSet<ItProjectOrgUnitUsage> ItProjectOrgUnitUsages { get; set; }
         public DbSet<ItSystem> ItSystems { get; set; }
         public DbSet<ItSystemUsage> ItSystemUsages { get; set; }
         public DbSet<ItSystemRight> ItSystemRights { get; set; }
@@ -132,7 +133,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItProjectTypeMap());
             modelBuilder.Configurations.Add(new ProcurementStrategyMap());
             modelBuilder.Configurations.Add(new PurchaseFormMap());
-            modelBuilder.Configurations.Add(new ResponsibleOrgUnitMap());
+            modelBuilder.Configurations.Add(new ItProjectOrgUnitUsageMap());
             modelBuilder.Configurations.Add(new RiskMap());
             modelBuilder.Configurations.Add(new SensitiveDataTypeMap());
             modelBuilder.Configurations.Add(new StakeholderMap());

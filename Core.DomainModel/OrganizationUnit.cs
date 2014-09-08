@@ -17,7 +17,7 @@ namespace Core.DomainModel
             this.OwnedTasks = new List<TaskRef>();
             this.DefaultUsers = new List<User>();
             this.Using = new List<ItSystemUsage>();
-            this.UsingItProjects = new List<ItProject.ItProject>();
+            this.UsingItProjects = new List<ItProjectOrgUnitUsage>();
         }
 
         public string Name { get; set; }
@@ -68,14 +68,8 @@ namespace Core.DomainModel
         /// <summary>
         /// This Organization Unit is using these IT projects
         /// </summary>
-        public virtual ICollection<ItProject.ItProject> UsingItProjects { get; set; }
-
-        /// <summary>
-        /// This Organization Unit is responsible for these IT Projects
-        /// </summary>
-        //public virtual ICollection<ItProject.ItProject> ResponsibleForItProjects { get; set; }
-        public virtual ICollection<ResponsibleOrgUnit> ResponsibleOrgUnit { get; set; }
-
+        public virtual ICollection<ItProjectOrgUnitUsage> UsingItProjects { get; set; }
+        
         /// <summary>
         /// This Organization Unit is responsible for these IT Contracts
         /// </summary>

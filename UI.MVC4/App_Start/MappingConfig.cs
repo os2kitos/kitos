@@ -175,6 +175,7 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.Children, opt => opt.Ignore());
 
             Mapper.CreateMap<OrganizationUnit, OrgUnitSimpleDTO>();
+            Mapper.CreateMap<OrganizationUnit, SimpleOrgUnitDTO>();
 
             Mapper.CreateMap<PasswordResetRequest, PasswordResetRequestDTO>()
                   .ForMember(dest => dest.UserEmail, opt => opt.MapFrom(src => src.User.Email));
@@ -286,17 +287,19 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<Stakeholder, StakeholderDTO>()
                   .ReverseMap();
 
+            
+
             Mapper.CreateMap<ItProject, ItProjectDTO>()
-                  .ForMember(dest => dest.ChildrenIds,
-                             opt => opt.MapFrom(x => x.Children.Select(y => y.Id)))
-                  .ForMember(dest => dest.ItSystems,
-                             opt => opt.MapFrom(src => src.ItSystemUsages.Select(x => x.ItSystem)))
-                  .ReverseMap()
-                  .ForMember(dest => dest.Children, opt => opt.Ignore())
-                  .ForMember(dest => dest.ItSystemUsages, opt => opt.Ignore())
-                  .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
-                  //.ForMember(dest => dest.ResponsibleOrgUnit, opt => opt.Ignore())
-                  .ForMember(dest => dest.Stakeholders, opt => opt.Ignore());
+                .ForMember(dest => dest.ChildrenIds,
+                    opt => opt.MapFrom(x => x.Children.Select(y => y.Id)))
+                .ForMember(dest => dest.ItSystems,
+                    opt => opt.MapFrom(src => src.ItSystemUsages.Select(x => x.ItSystem)))
+                .ReverseMap()
+                .ForMember(dest => dest.Children, opt => opt.Ignore())
+                .ForMember(dest => dest.ItSystemUsages, opt => opt.Ignore())
+                .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
+                .ForMember(dest => dest.UsedByOrgUnits, opt => opt.Ignore())
+                .ForMember(dest => dest.Stakeholders, opt => opt.Ignore());
 
             Mapper.CreateMap<ItProjectPhase, ItProjectPhaseDTO>()
                   .ReverseMap();
@@ -308,7 +311,8 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<ItProject, ItProjectSimpleDTO>();
 
             //Output only - this mapping should not be reversed
-            Mapper.CreateMap<ItProject, ItProjectOverviewDTO>();
+            Mapper.CreateMap<ItProject, ItProjectOverviewDTO>()
+                .ForMember(dest => dest.ResponsibleOrgUnitName, opt => opt.MapFrom(src => src.ResponsibleUsage.OrganizationUnit.Name));
 
             Mapper.CreateMap<Handover, HandoverDTO>()
                   .ReverseMap()
