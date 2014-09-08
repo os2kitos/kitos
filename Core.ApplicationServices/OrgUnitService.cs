@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Core.DomainModel;
 using Core.DomainServices;
 
@@ -9,14 +8,10 @@ namespace Core.ApplicationServices
     public class OrgUnitService : IOrgUnitService
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
-        private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
-        private readonly IAdminService _adminService;
 
-        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<OrganizationRight> orgRightRepository, IAdminService adminService)
+        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository)
         {
             _orgUnitRepository = orgUnitRepository;
-            _orgRightRepository = orgRightRepository;
-            _adminService = adminService;
         }
         
         public OrganizationUnit GetRoot(OrganizationUnit unit)
