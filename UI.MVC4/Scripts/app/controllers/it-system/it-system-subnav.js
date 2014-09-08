@@ -46,6 +46,9 @@
                 };
 
                 function removeUsage() {
+                    if (!confirm("Er du sikker på at du vil fjerne den lokale anvendelse af systemet? Dette sletter ikke systemet, men vil slette alle lokale detaljer vedrørende anvendelsen.")) {
+                        return;
+                    }
                     var usageId = $state.params.id;
                     var msg = notify.addInfoMessage("Sletter IT System anvendelsen...", false);
                     $http.delete('api/itsystemusage/' + usageId)
@@ -59,6 +62,9 @@
                 }
 
                 function remove() {
+                    if (!confirm("Er du sikker på du vil slette systemet?")) {
+                        return;
+                    }
                     var systemId = $state.params.id;
                     var msg = notify.addInfoMessage("Sletter IT System...", false);
                     $http.delete('api/itsystem/' + systemId)
