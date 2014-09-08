@@ -61,6 +61,7 @@
     <Compile Include="ItProject\EconomyYear.cs" />
     <Compile Include="ItProject\ItProjectPriority.cs" />
     <Compile Include="ItProject\ItProjectStatus.cs" />
+    <Compile Include="ItProject\ItProjectOrgUnitUsage.cs" />
     <Compile Include="ItSystem\AppType.cs" />
     <Compile Include="ItSystem\DataRow.cs" />
     <Compile Include="ItSystem\ArchiveType.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="ItSystem\Frequency.cs" />
     <Compile Include="ItSystem\InterfaceExposure.cs" />
     <Compile Include="ItSystem\InterfaceUsage.cs" />
+    <Compile Include="ItSystem\ItSystemUsageOrgUnitUsage.cs" />
     <Compile Include="ItSystem\ItSystemUsage.cs" />
     <Compile Include="ItSystem\SensitiveDataType.cs" />
     <Compile Include="ItSystem\Tsa.cs" />

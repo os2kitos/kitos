@@ -46,7 +46,6 @@ namespace UI.MVC4.Models
         public int ItProjectTypeId { get; set; }
         public string ItProjectTypeName { get; set; }
         public int OrganizationId { get; set; }
-        public IEnumerable<OrgUnitDTO> UsedByOrgUnits { get; set; }
         public IEnumerable<EconomyYearDTO> EconomyYears { get; set; } 
         public IEnumerable<ItSystemDTO> ItSystems { get; set; }
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
@@ -84,9 +83,6 @@ namespace UI.MVC4.Models
         public int? CurrentPhaseId { get; set; }
 
         #endregion
-
-        public int? ResponsibleOrgUnitId { get; set; }
-        public OrgUnitDTO ResponsibleOrgUnit { get; set; }
 
         public int? OriginalId { get; set; }
         public ItProjectDTO Original { get; set; }

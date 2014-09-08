@@ -1,5 +1,4 @@
 ﻿using Core.DomainModel.ItSystem;
-using System.Data.Entity.ModelConfiguration;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -19,8 +18,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.ItSystemUsages)
                 .Map(t => t.ToTable("OrgUnitSystemUsage"));
 
-            this.HasOptional(t => t.ResponsibleUnit)
-                 .WithMany(t => t.DelegatedSystemUsages);
+            this.HasOptional(t => t.ResponsibleUsage)
+                .WithOptionalPrincipal();
 
             this.HasRequired(t => t.ItSystem)
                 .WithMany(t => t.Usages);
@@ -39,12 +38,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .WillCascadeOnDelete(false);
 
             this.HasMany(t => t.UsedBy)
-                .WithMany(t => t.Using)
-                .Map(mc =>
-                    {
-                        mc.MapLeftKey("UsageId");
-                        mc.MapRightKey("OrgUnitId");
-                    });
+                .WithRequired(t => t.ItSystemUsage)
+                .HasForeignKey(d => d.ItSystemUsageId);
 
             this.HasOptional(t => t.MainContract)
                 .WithMany()

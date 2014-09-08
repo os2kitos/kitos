@@ -29,4 +29,10 @@ namespace UI.MVC4.Models
             get { return Name + ", " + OrganizationName; }
         }
     }
+
+    public class SimpleOrgUnitDTO
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
 }

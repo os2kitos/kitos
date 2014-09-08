@@ -13,7 +13,7 @@ namespace Core.DomainModel.ItProject
             this.Risks = new List<Risk>();
             this.Stakeholders = new List<Stakeholder>();
             this.ItSystemUsages = new List<ItSystemUsage>();
-            this.UsedByOrgUnits = new List<OrganizationUnit>();
+            this.UsedByOrgUnits = new List<ItProjectOrgUnitUsage>();
             this.ItSystemUsages = new List<ItSystemUsage>();
             this.EconomyYears = new List<EconomyYear>();
             this.JointMunicipalProjects = new List<ItProject>();
@@ -122,14 +122,13 @@ namespace Core.DomainModel.ItProject
         public virtual ItProject CommonPublicProject { get; set; }
         public virtual ICollection<ItProject> CommonPublicProjects { get; set; }
 
-        public int? ResponsibleOrgUnitId { get; set; }
         /// <summary>
         /// Organization Unit responsible for this project.
         /// </summary>
         /// <value>
         /// The responsible org unit.
         /// </value>
-        public virtual OrganizationUnit ResponsibleOrgUnit { get; set; }
+        public virtual ItProjectOrgUnitUsage ResponsibleUsage { get; set; }
 
         /// <summary>
         /// Organization units that are using this project.
@@ -137,7 +136,8 @@ namespace Core.DomainModel.ItProject
         /// <value>
         /// Organization units using this project.
         /// </value>
-        public virtual ICollection<OrganizationUnit> UsedByOrgUnits { get; set; }
+        public virtual ICollection<ItProjectOrgUnitUsage> UsedByOrgUnits { get; set; }
+
         /// <summary>
         /// Gets or sets the associated it system usages.
         /// </summary>

@@ -49,7 +49,8 @@ namespace UI.MVC4.Controllers.API
 
                 if (item == null) return NotFound();
 
-                return Ok(Map(item));
+                var dto = Map(item);
+                return Ok(dto);
             }
             catch (Exception e)
             {

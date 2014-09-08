@@ -214,6 +214,7 @@
   <ItemGroup>
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Controllers\API\ItSystemUsageOrgUnitUsageController.cs" />
     <Compile Include="Controllers\API\ItProjectStatusController.cs" />
     <Compile Include="Controllers\API\ItProjectPhaseController.cs" />
     <Compile Include="Controllers\API\HandoverTrialController.cs" />
@@ -226,6 +227,7 @@
     <Compile Include="Controllers\API\ItSystemUsageRightsController.cs" />
     <Compile Include="Controllers\API\OptionExtendController.cs" />
     <Compile Include="Controllers\API\OrganizationUnitRightsController.cs" />
+    <Compile Include="Controllers\API\ItProjectOrgUnitUsageController.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Models\HandoverTrialDTO.cs" />
     <Compile Include="Models\ItProjectOverviewDTO.cs" />

@@ -74,6 +74,7 @@ namespace UI.MVC4.Controllers.API
                 if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
 
                 var usages = Page(Repository.AsQueryable(), pagingModel);
+                // mapping to DTOs for easy lazy loading of needed properties
                 var dtos = Map(usages);
 
                 var roles = _roleRepository.Get().ToList();
@@ -98,7 +99,7 @@ namespace UI.MVC4.Controllers.API
                     var obj = new ExpandoObject() as IDictionary<string, Object>;
                     obj.Add("Aktiv", usage.MainContractIsActive);
                     obj.Add("IT System", usage.ItSystem.Name);
-                    obj.Add("OrgUnit", usage.ResponsibleUnitName);
+                    obj.Add("OrgUnit", usage.ResponsibleOrgUnitName);
                     foreach (var role in roles)
                     {
                         var roleId = role.Id;
@@ -183,21 +184,21 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetOrganizationUnitsUsingThisSystem(int id, [FromUri] int organizationUnit)
-        {
-            try
-            {
-                var usage = Repository.GetByKey(id);
+        //public HttpResponseMessage GetOrganizationUnitsUsingThisSystem(int id, [FromUri] int organizationUnit)
+        //{
+        //    try
+        //    {
+        //        var usage = Repository.GetByKey(id);
 
-                if (usage == null) return NotFound();
+        //        if (usage == null) return NotFound();
 
-                return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(usage.UsedBy));
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
+        //        return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(usage.UsedBy));
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return Error(e);
+        //    }
+        //}
 
         public HttpResponseMessage PostOrganizationUnitsUsingThisSystem(int id, [FromUri] int organizationUnit)
         {
@@ -208,10 +209,10 @@ namespace UI.MVC4.Controllers.API
                 if (!HasWriteAccess(usage)) return Unauthorized();
 
                 var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
-                if(orgUnit == null) return NotFound();
+                if (orgUnit == null) return NotFound();
 
 
-                usage.UsedBy.Add(orgUnit);
+                usage.UsedBy.Add(new ItSystemUsageOrgUnitUsage { ItSystemUsageId = id, OrganizationUnitId = organizationUnit });
 
                 usage.LastChanged = DateTime.Now;
                 usage.LastChangedByUser = KitosUser;
@@ -238,13 +239,16 @@ namespace UI.MVC4.Controllers.API
                 var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
                 if (orgUnit == null) return NotFound();
 
-                usage.UsedBy.Remove(orgUnit);
+                var entity = usage.UsedBy.SingleOrDefault(x => x.ItSystemUsageId == id && x.OrganizationUnitId == organizationUnit);
+                if (entity == null) return NotFound();
+
+                usage.UsedBy.Remove(entity);
 
                 usage.LastChanged = DateTime.Now;
                 usage.LastChangedByUser = KitosUser;
 
                 Repository.Save();
-                
+
                 return Ok();
             }
             catch (Exception e)

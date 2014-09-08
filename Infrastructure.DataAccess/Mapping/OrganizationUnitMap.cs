@@ -1,4 +1,3 @@
-using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel;
 
 namespace Infrastructure.DataAccess.Mapping
@@ -21,6 +20,14 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(m => m.OrgUnits)
                 .HasForeignKey(o => o.OrganizationId)
                 .WillCascadeOnDelete(true);
+
+            this.HasMany(t => t.UsingItProjects)
+                .WithRequired(t => t.OrganizationUnit)
+                .HasForeignKey(d => d.OrganizationUnitId);
+
+            this.HasMany(t => t.Using)
+                .WithRequired(t => t.OrganizationUnit)
+                .HasForeignKey(d => d.OrganizationUnitId);
         }
     }
 }
