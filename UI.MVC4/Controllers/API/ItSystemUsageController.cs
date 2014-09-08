@@ -99,7 +99,7 @@ namespace UI.MVC4.Controllers.API
                     var obj = new ExpandoObject() as IDictionary<string, Object>;
                     obj.Add("Aktiv", usage.MainContractIsActive);
                     obj.Add("IT System", usage.ItSystem.Name);
-                    //obj.Add("OrgUnit", usage.ResponsibleUnitName); TODO
+                    obj.Add("OrgUnit", usage.ResponsibleOrgUnitName);
                     foreach (var role in roles)
                     {
                         var roleId = role.Id;

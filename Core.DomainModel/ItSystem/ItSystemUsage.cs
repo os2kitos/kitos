@@ -82,7 +82,7 @@ namespace Core.DomainModel.ItSystem
         /// Organization Unit responsible for this system usage.
         /// </summary>
         /// <value>
-        /// The responsible org unit.
+        /// The responsible organization unit.
         /// </value>
         public virtual ItSystemUsageOrgUnitUsage ResponsibleUsage { get; set; }
         

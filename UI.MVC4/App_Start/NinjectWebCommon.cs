@@ -1,9 +1,5 @@
 using System.Web.Http;
 using System.Web.Security;
-using Core.DomainModel;
-using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
-using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.ApplicationServices;
 using Infrastructure.DataAccess;

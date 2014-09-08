@@ -5,9 +5,6 @@
             templateUrl: 'partials/it-system/tab-org.html',
             controller: 'system.EditOrg',
             resolve: {
-                //selectedOrgUnits: ['itSystemUsage', function (itSystemUsage) {
-                //    return _.pluck(itSystemUsage.usedBy, 'id');
-                //}],
                 selectedOrgUnits: ['$http', '$stateParams', function ($http, $stateParams) {
                     var systemUsageId = $stateParams.id;
                     return $http.get('api/itSystemUsageOrgUnitUsage/' + systemUsageId)
