@@ -50,8 +50,8 @@
     }]);
 
     app.controller('project.EditStatusProjectCtrl',
-    ['$scope', '$http', 'notify', '$modal', 'project', 'usersWithRoles',
-        function ($scope, $http, notify, $modal, project, usersWithRoles) {
+    ['$scope', '$http', '$state', 'notify', '$modal', 'project', 'usersWithRoles',
+        function ($scope, $http, $state, notify, $modal, project, usersWithRoles) {
             $scope.project = project;
             $scope.project.updateUrl = "api/itproject/" + project.id;
 
@@ -92,8 +92,12 @@
 
                 activity.updateUser();
 
-                activity.edit = function() {
-                    return editStatus(activity);
+                activity.edit = function () {
+                    if (activity.isTask) {
+                        $state.go('.modal', { type: 'assignment', activityId: activity.id });
+                    } else if (activity.isMilestone) {
+                        $state.go('.modal', { type: 'milestone', activityId: activity.id });
+                    }
                 };
 
                 activity.delete = function() {
@@ -115,27 +119,7 @@
             _.each(project.itProjectStatuses, function(value) {
                 addStatus(value);
             });
-      
-            $scope.addMilestone = function() {
-                $http.post("api/Milestone", { associatedItProjectId: project.id }).success(function (result) {
-                    var milestone = result.response;
-                    milestone.$type = "Milestone";
-                    milestone.updateUrl = "api/milestone/" + milestone.id;
-                    addStatus(milestone);
-                    editStatus(milestone);
-                });
-            };
-            
-            $scope.addAssignment = function () {
-                $http.post("api/Assignment", { associatedItProjectId: project.id }).success(function (result) {
-                    var activity = result.response;
-                    activity.$type = "Assignment";
-                    activity.updateUrl = "api/assignment/" + activity.id;
-                    addStatus(activity);
-                    editStatus(activity);
-                });
-            };
-            
+
             $scope.pagination = {
                 skip: 0,
                 take: 50
@@ -173,51 +157,6 @@
                         notify.addErrorMessage("Kunne ikke hente projekter!");
                 });
             }
-
-            function editStatus(activity) {
-                var modal = $modal.open({
-                    templateUrl: 'partials/it-project/modal-milestone-task-edit.html',
-                    controller: ['$scope', 'autofocus', '$modalInstance', function ($modalScope, autofocus, $modalInstance) {
-                        autofocus();
-                        
-                        $modalScope.activity = angular.copy(activity);
-
-                        $modalScope.phases = $scope.project.phases;
-                        $modalScope.usersWithRoles = _.values(usersWithRoles);
-                        
-                        $modalScope.opened = {};
-                        $modalScope.open = function ($event, datepicker) {
-                            $event.preventDefault();
-                            $event.stopPropagation();
-
-                            $modalScope.opened[datepicker] = true;
-                        };
-
-                        $modalScope.save = function () {
-                            var msg = notify.addInfoMessage("Gemmer ændringer...", false);
-
-                            var payload = angular.copy($modalScope.activity);
-                            delete payload.id;
-                            delete payload.objectOwnerId;
-                            delete payload.objectOwner;
-
-                            $http({
-                                method: 'PATCH',
-                                url: $modalScope.activity.updateUrl,
-                                data: payload
-                            }).success(function (result) {
-                                msg.toSuccessMessage("Ændringerne er gemt!");
-                                angular.extend(activity, result.response);
-
-                                addStatus(activity, true);
-                                $modalInstance.close();
-
-                            }).error(function() {
-                                msg.toErrorMessage("Ændringerne kunne ikke gemmes!");
-                            });
-                        };
-                    }]
-                });
-            }
-        }]);
+        }
+    ]);
 })(angular, app);

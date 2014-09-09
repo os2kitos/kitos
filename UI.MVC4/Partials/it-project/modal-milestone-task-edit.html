@@ -1,28 +1,27 @@
 ﻿<div class="modal-header">
-    <span>{{ activity.isTask && "Opgave:" || "Milepæl:" }} {{ activity.name }}
+    <span>
+        {{ isAssignment && "Opgave:" || "Milepæl:" }} {{ activity.name }}
     </span>
 </div>
-<div class="modal-body">
-    <form name="modal.form" novalidate="novalidate" class="form-horizontal">
-
-
+<form name="activityForm" novalidate="novalidate" class="form-horizontal" data-ng-submit="save()">
+    <div class="modal-body">
         <div class="form-group">
             <!-- Name -->
             <label for="name" class="col-md-2 control-label small">
-                {{ activity.isTask && "Opgave" || "Milepæl" }}
+                {{ isAssignment && "Opgave" || "Milepæl" }}
             </label>
             <div class="col-md-10">
                 <input type="text" id="name" data-ng-model="activity.name" class="form-control input-sm" autofocus />
             </div>
         </div>
-        
+
         <div class="form-group">
             <!-- Human readable ID -->
             <label for="humanReadableId" class="col-md-2 control-label small">
-                {{ activity.isTask && "Opgave ID" || "Milepæl ID" }}
+                {{ isAssignment && "Opgave ID" || "Milepæl ID" }}
             </label>
             <div class="col-md-4">
-                <input type="text" id="humanReadableId" data-ng-model="activity.humanReadableId" class="form-control input-sm"/>
+                <input type="text" id="humanReadableId" data-ng-model="activity.humanReadableId" class="form-control input-sm" />
             </div>
 
             <!-- Phase -->
@@ -30,8 +29,8 @@
                 Fase
             </label>
             <div class="col-md-4">
-                <select id="phase" class="form-control input-sm" 
-                        data-ng-model="activity.associatedPhaseId" 
+                <select id="phase" class="form-control input-sm"
+                        data-ng-model="activity.associatedPhaseId"
                         data-ng-options="phase.id as phase.name for phase in phases">
                     <option value=""></option>
                 </select>
@@ -39,7 +38,7 @@
         </div>
 
         <!-- Start/end date if activity is task -->
-        <div class="form-group" data-ng-if="activity.isTask">
+        <div class="form-group" data-ng-if="isAssignment">
             <!-- Start date -->
             <label for="startDate" class="col-md-2 control-label small">
                 Start
@@ -47,9 +46,9 @@
             <div class="col-md-4">
                 <div class="input-group input-group-sm">
                     <input type="text" class="form-control" id="startDate"
-                           data-datepicker-popup="dd-MM-yyyy" 
-                           data-is-open="opened.sd" 
-                           data-date-to-string 
+                           data-datepicker-popup="dd-MM-yyyy"
+                           data-is-open="opened.sd"
+                           data-date-to-string
                            data-ng-model="activity.startDate" />
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-default" data-ng-click="open($event, 'sd')"><i class="glyphicon glyphicon-calendar"></i></button>
@@ -64,9 +63,9 @@
             <div class="col-md-4">
                 <div class="input-group input-group-sm">
                     <input type="text" class="form-control" id="endDate"
-                           data-datepicker-popup="dd-MM-yyyy" 
-                           data-is-open="opened.ed" 
-                           data-date-to-string 
+                           data-datepicker-popup="dd-MM-yyyy"
+                           data-is-open="opened.ed"
+                           data-date-to-string
                            data-ng-model="activity.endDate">
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-default" data-ng-click="open($event, 'ed')"><i class="glyphicon glyphicon-calendar"></i></button>
@@ -76,7 +75,7 @@
         </div>
 
         <!-- just Date if activity is milestone -->
-        <div class="form-group" data-ng-if="activity.isMilestone">
+        <div class="form-group" data-ng-if="isMilestone">
             <!-- Start date -->
             <label for="date" class="col-md-2 control-label small">
                 Dato
@@ -84,9 +83,9 @@
             <div class="col-md-4">
                 <div class="input-group input-group-sm">
                     <input type="text" class="form-control" id="date"
-                           data-datepicker-popup="dd-MM-yyyy" 
-                           data-is-open="opened.d" 
-                           data-date-to-string 
+                           data-datepicker-popup="dd-MM-yyyy"
+                           data-is-open="opened.d"
+                           data-date-to-string
                            data-ng-model="activity.date">
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-default" data-ng-click="open($event, 'd')"><i class="glyphicon glyphicon-calendar"></i></button>
@@ -101,14 +100,14 @@
                 Tidsestimat <small>(timer)</small>
             </label>
             <div class="col-md-4">
-                <input id="timeEstimate" type="number" data-ng-model="activity.timeEstimate" class="form-control input-sm"/>
+                <input id="timeEstimate" type="number" data-ng-model="activity.timeEstimate" class="form-control input-sm" />
             </div>
 
             <!-- Status estimate -->
             <label for="status" class="col-md-2 control-label small">
                 Status
             </label>
-            <div class="col-md-4" data-ng-if="activity.isTask">
+            <div class="col-md-4" data-ng-if="isAssignment">
                 <select id="status" class="form-control input-sm" data-ng-model="activity.statusProcentage">
                     <option value="0">0%</option>
                     <option value="10">10%</option>
@@ -123,7 +122,7 @@
                     <option value="100">100%</option>
                 </select>
             </div>
-            <div class="col-md-4" data-ng-if="activity.isMilestone">
+            <div class="col-md-4" data-ng-if="isMilestone">
                 <span id="status" data-select-status2="" data-ng-model="activity.status"
                       data-can-write="true">
                 </span>
@@ -131,7 +130,7 @@
         </div>
 
         <div class="form-group">
-            
+
             <!-- Description -->
             <label for="description" class="col-md-2 control-label small">
                 Beskrivelse
@@ -142,7 +141,7 @@
         </div>
 
         <div class="form-group">
-            
+
             <!-- Note -->
             <label for="note" class="col-md-2 control-label small">
                 Note
@@ -159,21 +158,22 @@
             </label>
             <div class="col-md-10">
                 <select id="associatedUserId" class="form-control input-sm"
-                        data-ng-model="activity.associatedUserId" 
+                        data-ng-model="activity.associatedUserId"
                         data-ng-options="user.id as user.name for user in usersWithRoles">
                     <option value=""></option>
                 </select>
             </div>
         </div>
-        
+
         <div class="form-group">
             <p class="help-block text-center">
                 Oprettet af {{ activity.objectOwner.name }}
             </p>
         </div>
-    </form>
-</div>
-<div class="modal-footer">
-    <button class="btn btn-success" data-ng-click="save()" data-disabled-on-busy="">Gem</button>
-    <button class="btn btn-warning" data-ng-click="$dismiss()" data-disabled-on-busy="">Annuller</button>
-</div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-success" data-disabled-on-busy="">Gem</button>
+        <button type="button" class="btn btn-warning" data-ng-click="dismiss()" data-disabled-on-busy="">Annuller</button>
+    </div>
+</form>
