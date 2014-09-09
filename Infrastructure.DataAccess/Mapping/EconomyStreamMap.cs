@@ -1,6 +1,4 @@
-using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -15,11 +13,13 @@ namespace Infrastructure.DataAccess.Mapping
             // Relationships
             this.HasOptional(t => t.ExternPaymentFor)
                 .WithMany(d => d.ExternEconomyStreams)
-                .HasForeignKey(t => t.ExternPaymentForId);
+                .HasForeignKey(t => t.ExternPaymentForId)
+                .WillCascadeOnDelete(true);
 
             this.HasOptional(t => t.InternPaymentFor)
                 .WithMany(d => d.InternEconomyStreams)
-                .HasForeignKey(t => t.InternPaymentForId);
+                .HasForeignKey(t => t.InternPaymentForId)
+                .WillCascadeOnDelete(true);
 
             this.HasOptional(t => t.OrganizationUnit)
                 .WithMany(d => d.EconomyStreams)
