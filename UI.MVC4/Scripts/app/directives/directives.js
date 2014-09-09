@@ -264,6 +264,32 @@
         }
     ]);
 
+    app.directive('squareTrafficLight', [
+        function () {
+            return {
+                template: '<progressbar class="status-bar" data-type="{{type}}"></progressbar>',
+                scope: {
+                    status: '=squareTrafficLight'
+                },
+                link: function (scope) {
+                    switch (scope.status) {
+                    case 1:
+                        scope.type = 'danger';
+                        break;
+                    case 2:
+                        scope.type = 'warning';
+                        break;
+                    case 3:
+                        scope.type = 'success';
+                        break;
+                    default:
+                        scope.type = 'default';
+                    }
+                }
+            };
+        }
+    ]);
+
     app.directive('dateToString', ['dateFilter', function(dateFilter) {
         return {
             restrict: 'A',

@@ -86,8 +86,8 @@
             <td>{{ p.currentPhase.name }}</td>
             <!-- Status -->
             <td class="text-center" data-ng-switch="chosenStatus">
-                <span data-select-status2="" data-ng-model="p.statusProject" data-can-write="false" data-ng-switch-when="statusProject"></span>
-                <span data-select-status2="" data-ng-model="p.goalStatusStatus" data-can-write="false" data-ng-switch-when="goalStatus.status"></span>
+                <span data-square-traffic-light="p.statusProject" data-ng-switch-when="statusProject"></span>
+                <span data-square-traffic-light="p.goalStatusStatus" data-ng-switch-when="goalStatus.status"></span>
             </td>
             <!-- Risk/RO/BC -->
             <td class="text-right">
@@ -146,8 +146,8 @@
             <td>{{ p.currentPhase.name }}</td>
             <!-- Status -->
             <td>
-                <span data-select-status2="" data-ng-model="p.statusProject" data-can-write="false" data-ng-if="chosenStatus == 0"></span>
-                <span data-select-status2="" data-ng-model="p.goalStatusStatus" data-can-write="false" data-ng-if="chosenStatus == 1"></span>
+                <span data-square-traffic-light="p.statusProject" data-ng-if="chosenStatus == 0"></span>
+                <span data-square-traffic-light="p.goalStatusStatus" data-ng-if="chosenStatus == 1"></span>
             </td>
             <!-- Risk/RO/BC -->
             <td>
