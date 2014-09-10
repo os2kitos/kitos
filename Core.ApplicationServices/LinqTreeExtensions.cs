@@ -26,11 +26,12 @@ namespace Core.ApplicationServices
             (this T source, Func<T, T> selector)
             where T : class
         {
-            yield return source;
-            var parent = selector(source);
-            if (parent == null)
-                yield break;
-            yield return SelectNestedParents(parent, selector).FirstOrDefault();
+            var current = selector(source);
+            while (current != null)
+            {
+                yield return current;
+                current = selector(current);
+            }
         }
     }
 

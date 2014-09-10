@@ -155,7 +155,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var itContract = Repository.AsQueryable().Single(x => x.Id == id);
+                var itContract = Repository.GetByKey(id);
 
                 if (itContract == null)
                     return NotFound();
