@@ -70,7 +70,7 @@
                 $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem?nonInterfaces', true);
                 $scope.organizationSelectOptions = selectLazyLoading('api/organization?', true);
                 
-                function selectLazyLoading(url, allowClear) {
+                function selectLazyLoading(url, allowClear, paramAry) {
                     return {
                         minimumInputLength: 1,
                         initSelection: function (elem, callback) {
@@ -82,7 +82,8 @@
                             },
                             quietMillis: 500,
                             transport: function (queryParams) {
-                                var res = $http.get(url + '&q=' + queryParams.data.query).then(queryParams.success);
+                                var extraParams = paramAry ? '&' + paramAry.join('&') : '';
+                                var res = $http.get(url + '&q=' + queryParams.data.query + extraParams).then(queryParams.success);
                                 res.abort = function () {
                                     return null;
                                 };
