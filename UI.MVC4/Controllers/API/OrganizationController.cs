@@ -23,7 +23,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var orgs = Repository.Get(org => org.Name.Contains(q));
+                var orgs = Repository.Get(org => org.Name.Contains(q) && org.AccessModifier == AccessModifier.Public || KitosUser.IsGlobalAdmin);
                 return Ok(Map(orgs));
             }
             catch (Exception e)
