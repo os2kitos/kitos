@@ -37,7 +37,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var usages = Repository.AsQueryable().Where(u => u.OrganizationId == organizationId && u.ItSystem.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
+                var usages = Repository.Get(u => u.OrganizationId == organizationId && u.ItSystem.Name.Contains(q));
 
                 return Ok(Map(usages));
             }

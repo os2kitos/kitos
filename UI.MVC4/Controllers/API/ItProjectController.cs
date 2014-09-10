@@ -70,7 +70,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var items = Repository.AsQueryable().Where(x => x.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1 && x.OrganizationId == orgId);
+                var items = Repository.Get(x => x.Name.Contains(q) && x.OrganizationId == orgId);
 
                 return Ok(Map(items));
             }
