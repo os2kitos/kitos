@@ -25,11 +25,6 @@
             $scope.user = user;
             $scope.wishes = wishes;
 
-            function clear() {
-                $scope.text = '';
-                $scope.isPublic = false;
-            }
-
             $scope.save = function () {
                 var payload = {
                     text: $scope.text,
@@ -41,15 +36,22 @@
                 var msg = notify.addInfoMessage("Gemmer... ");
                 $http.post('api/wish', payload).success(function () {
                     msg.toSuccessMessage("Ønsket er gemt!");
-                    clear();
-                    $state.transitionTo($state.current, $stateParams, {
-                        reload: true,
-                        inherit: false,
-                        notify: true
-                    });
+                    // reload current state to reflect changes
+                    $state.go('.', null, { reload: true });
                 }).error(function () {
                     msg.toErrorMessage("Fejl! Ønsket kunne ikke gemmes!");
                 });
             };
+
+            $scope.delete = function(id) {
+                var msg = notify.addInfoMessage("Gemmer... ");
+                $http.delete('api/wish/' + id).success(function() {
+                    msg.toSuccessMessage("Ønsket er slettet!");
+                    // reload current state to reflect changes
+                    $state.go('.', null, { reload: true });
+                }).error(function() {
+                    msg.toErrorMessage("Fejl! Ønsket kunne ikke slettes!");
+                });
+            }
         }]);
 })(angular, app);
