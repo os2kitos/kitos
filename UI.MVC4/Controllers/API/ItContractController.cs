@@ -33,7 +33,7 @@ namespace UI.MVC4.Controllers.API
 
         public virtual HttpResponseMessage Get(string q, int orgId, [FromUri] PagingModel<ItContract> paging)
         {
-            paging.Where(x => x.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1 && x.OrganizationId == orgId);
+            paging.Where(x => x.Name.Contains(q) && x.OrganizationId == orgId);
             return base.GetAll(paging);
         }
 
@@ -184,7 +184,7 @@ namespace UI.MVC4.Controllers.API
                 //Get contracts without parents (roots)
                 pagingModel.Where(contract => contract.ParentId == null);
 
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(contract => contract.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
+                if (!string.IsNullOrEmpty(q)) pagingModel.Where(contract => contract.Name.Contains(q));
 
                 var contracts = Page(Repository.AsQueryable(), pagingModel);
 
@@ -205,7 +205,7 @@ namespace UI.MVC4.Controllers.API
                 //Get contracts within organization
                 pagingModel.Where(contract => contract.OrganizationId == organizationId);
 
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(contract => contract.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
+                if (!string.IsNullOrEmpty(q)) pagingModel.Where(contract => contract.Name.Contains(q));
 
                 var contracts = Page(Repository.AsQueryable(), pagingModel);
 
@@ -273,7 +273,7 @@ namespace UI.MVC4.Controllers.API
                 //Get contracts without parents (roots)
                 pagingModel.Where(contract => contract.ParentId == null);
 
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(contract => contract.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
+                if (!string.IsNullOrEmpty(q)) pagingModel.Where(contract => contract.Name.Contains(q));
 
                 var contracts = Page(Repository.AsQueryable(), pagingModel);
 
@@ -294,7 +294,7 @@ namespace UI.MVC4.Controllers.API
                 //Get contracts within organization
                 pagingModel.Where(contract => contract.OrganizationId == organizationId);
 
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(contract => contract.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
+                if (!string.IsNullOrEmpty(q)) pagingModel.Where(contract => contract.Name.Contains(q));
 
                 var contracts = Page(Repository.AsQueryable(), pagingModel);
 
