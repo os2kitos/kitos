@@ -36,7 +36,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var orgs = Repository.Get(org => (org.AccessModifier == AccessModifier.Public || org.Id == orgId) && (org.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1 || org.Cvr.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1));
+                var orgs = Repository.AsQueryable().Where(org => (org.AccessModifier == AccessModifier.Public || org.Id == orgId) && (org.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1 || org.Cvr.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1));
                 return Ok(Map(orgs));
             }
             catch (Exception e)

@@ -39,7 +39,7 @@ namespace UI.MVC4.Controllers.API
                     Repository.AsQueryable()
                               .Where(sys => sys.AccessModifier == AccessModifier.Public || sys.BelongsToId == organizationId);
 
-                if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
+                if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
 
                 var query = Page(systems, paging);
 
@@ -59,7 +59,7 @@ namespace UI.MVC4.Controllers.API
                     Repository.AsQueryable()
                               .Where(sys => sys.AccessModifier == AccessModifier.Public || sys.BelongsToId == organizationId);
 
-                if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
+                if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
 
                 var query = Page(systems, paging);
 

@@ -37,7 +37,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var usages = Repository.Get(u => u.OrganizationId == organizationId && u.ItSystem.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
+                var usages = Repository.AsQueryable().Where(u => u.OrganizationId == organizationId && u.ItSystem.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
 
                 return Ok(Map(usages));
             }
@@ -53,7 +53,7 @@ namespace UI.MVC4.Controllers.API
             {
                 pagingModel.Where(u => u.OrganizationId == organizationId);
 
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
+                if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
 
                 var usages = Page(Repository.AsQueryable(), pagingModel);
                 
@@ -71,7 +71,7 @@ namespace UI.MVC4.Controllers.API
             {
                 pagingModel.Where(u => u.OrganizationId == organizationId);
 
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
+                if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
 
                 var usages = Page(Repository.AsQueryable(), pagingModel);
                 // mapping to DTOs for easy lazy loading of needed properties
