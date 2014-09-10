@@ -23,7 +23,7 @@
                 data-tooltip-trigger="mouseenter"
                 data-tooltip-placement="right"
                 data-ng-click="openComment(usage)"
-                data-ng-if="usage.orgUnit.hasWriteAccess">
+                data-ng-if="usage.hasWriteAccess">
                 <i class="glyphicon glyphicon-comment" data-ng-class="{'faded': !usage.comment}"></i>
             </button>
             <button class="btn btn-link btn-xs"
