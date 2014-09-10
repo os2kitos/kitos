@@ -20,7 +20,11 @@
                       <td data-ng-bind="wish.user.defaultOrganizationUnitName"></td>
                       <td data-ng-bind="wish.text"></td>
                       <td><input type="checkbox" disabled data-ng-model="wish.isPublic"/></td>
-                      <td></td>
+                      <td>
+                          <a class="btn btn-link btn-xs" data-confirmed-click="delete(wish.id)" data-confirm-click="Er du sikker på at du vil slette?" data-ng-hide="!hasWriteAccess">
+                              <i class="glyphicon glyphicon-trash"></i>
+                          </a>
+                      </td>
                   </tr>
               </tbody>
               <tfoot data-ng-show="hasWriteAccess">

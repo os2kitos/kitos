@@ -51,5 +51,15 @@
                     msg.toErrorMessage("Fejl! Ønsket kunne ikke gemmes!");
                 });
             };
+
+            $scope.delete = function(id) {
+                var msg = notify.addInfoMessage("Gemmer... ");
+                $http.delete('api/wish/' + id).success(function() {
+                    msg.toSuccessMessage("Ønsket er slettet!");
+                    $state.go('.', null, { reload: true });
+                }).error(function() {
+                    msg.toErrorMessage("Fejl! Ønsket kunne ikke slettes!");
+                });
+            }
         }]);
 })(angular, app);
