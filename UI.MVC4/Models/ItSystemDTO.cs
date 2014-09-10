@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Antlr.Runtime;
 using Core.DomainModel;
 
 namespace UI.MVC4.Models
@@ -21,7 +20,6 @@ namespace UI.MVC4.Models
         public int? ExposedById { get; set; }
         public ItSystemDTO ExposedBy { get; set; }
 
-        public IEnumerable<int> CanBeUsedByIds { get; set; }
         public IEnumerable<int> CanUseInterfaceIds { get; set; }
         public IEnumerable<ItSystemSimpleDTO> CanUseInterfaces { get; set; }
         /// <summary>
