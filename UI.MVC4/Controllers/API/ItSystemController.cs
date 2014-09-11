@@ -35,17 +35,25 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var systems = Repository.Get(s => s.BelongsToId == organizationId &&
-                        (KitosUser.IsGlobalAdmin || // global admin sees all
-                         s.ObjectOwnerId == KitosUser.Id || // object owner sees his own objects
-                         s.AccessModifier == AccessModifier.Public || // it's public everyone can see it
-                    // AccessModifier.Normal doesn't make sense here
-                         s.AccessModifier == AccessModifier.Private && s.Rights.Any(x => x.UserId == KitosUser.Id)) // users with roles can see private objects);
-                         );
+                //Get all systems which the user has access to
+                paging.Where(
+                    s =>
+                        // global admin sees all within the context 
+                        KitosUser.IsGlobalAdmin && s.OrganizationId == organizationId ||
+                        // object owner sees his own objects     
+                        s.ObjectOwnerId == KitosUser.Id ||
+                        // it's public everyone can see it
+                        s.AccessModifier == AccessModifier.Public ||
+                        // everyone in the same organization can see normal objects
+                        s.AccessModifier == AccessModifier.Normal &&
+                        s.OrganizationId == organizationId
+                        // it systems doesn't have roles so private doesn't make sense
+                        // only object owners will be albe to see private objects
+                    );
 
                 if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
 
-                var query = Page(systems, paging);
+                var query = Page(Repository.AsQueryable(), paging);
 
                 return Ok(Map(query));
             }
@@ -61,7 +69,19 @@ namespace UI.MVC4.Controllers.API
             {
                 var systems =
                     Repository.AsQueryable()
-                              .Where(sys => sys.AccessModifier == AccessModifier.Public || sys.BelongsToId == organizationId);
+                        .Where(s =>
+                            // global admin sees all within the context 
+                            KitosUser.IsGlobalAdmin && s.OrganizationId == organizationId ||
+                            // object owner sees his own objects     
+                            s.ObjectOwnerId == KitosUser.Id ||
+                            // it's public everyone can see it
+                            s.AccessModifier == AccessModifier.Public ||
+                            // everyone in the same organization can see normal objects
+                            s.AccessModifier == AccessModifier.Normal &&
+                            s.OrganizationId == organizationId
+                            // it systems doesn't have roles so private doesn't make sense
+                            // only object owners will be albe to see private objects
+                        );
 
                 if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
 
@@ -93,8 +113,8 @@ namespace UI.MVC4.Controllers.API
                     obj.Add("Oprettet", system.ObjectOwnerName);
                     list.Add(obj);
                 }
-                var s = list.ToCsv();
-                var bytes = Encoding.Unicode.GetBytes(s);
+                var csvList = list.ToCsv();
+                var bytes = Encoding.Unicode.GetBytes(csvList);
                 var stream = new MemoryStream();
                 stream.Write(bytes, 0, bytes.Length);
                 stream.Seek(0, SeekOrigin.Begin);
