@@ -25,7 +25,6 @@ namespace UI.MVC4.Controllers.API
         private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
         private readonly IGenericRepository<ItProjectRole> _roleRepository;
         private readonly IGenericRepository<ItProjectPhase> _phaseRepository;
-        private readonly IGenericRepository<ItProjectOrgUnitUsage> _responsibleOrgUnitRepository;
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
 
         //TODO: Man, this constructor smells ...
@@ -36,8 +35,7 @@ namespace UI.MVC4.Controllers.API
             IGenericRepository<TaskRef> taskRepository, 
             IGenericRepository<ItSystemUsage> itSystemUsageRepository,
             IGenericRepository<ItProjectRole> roleRepository,
-            IGenericRepository<ItProjectPhase> phaseRepository,
-            IGenericRepository<ItProjectOrgUnitUsage> responsibleOrgUnitRepository)
+            IGenericRepository<ItProjectPhase> phaseRepository)
             : base(repository)
         {
             _itProjectService = itProjectService;
@@ -45,7 +43,6 @@ namespace UI.MVC4.Controllers.API
             _itSystemUsageRepository = itSystemUsageRepository;
             _roleRepository = roleRepository;
             _phaseRepository = phaseRepository;
-            _responsibleOrgUnitRepository = responsibleOrgUnitRepository;
             _orgUnitRepository = orgUnitRepository;
         }
 
@@ -485,14 +482,14 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetItSystemsUsedByThisProject(int id, [FromUri] bool itSystems)
+        public HttpResponseMessage GetItSystemsUsedByThisProject(int id, [FromUri] bool? usages)
         {
             try
             {
                 var project = Repository.GetByKey(id); 
                 if (project == null) return NotFound();
-                
-                return Ok(Map<IEnumerable<ItSystem>, IEnumerable<ItSystemDTO>>(project.ItSystemUsages.Select(x => x.ItSystem)));
+
+                return Ok(Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageDTO>>(project.ItSystemUsages));
             }
             catch (Exception e)
             {
