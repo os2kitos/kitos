@@ -34,8 +34,8 @@
         });
     }]);
 
-    app.controller('system.SystemInterfaceDetailsCtrl', ['$scope', '$http', 'notify', 'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'itSystem',
-        function ($scope, $http, notify, tsas, interfaces, interfaceTypes, methods, dataTypes, itSystem) {
+    app.controller('system.SystemInterfaceDetailsCtrl', ['$scope', '$http', 'notify', 'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'itSystem', 'user',
+        function ($scope, $http, notify, tsas, interfaces, interfaceTypes, methods, dataTypes, itSystem, user) {
 
             $scope.tsas = tsas.data.response;
             $scope.interfaces = interfaces.data.response;
@@ -82,8 +82,8 @@
                 });
             };
             
-            $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem?nonInterfaces');
-            function selectLazyLoading(url) {
+            $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem?nonInterfaces', ['orgId=' + user.currentOrganizationId]);
+            function selectLazyLoading(url, paramAry) {
                 return {
                     allowClear: true,
                     minimumInputLength: 1,
@@ -95,7 +95,8 @@
                         },
                         quietMillis: 500,
                         transport: function (queryParams) {
-                            var res = $http.get(url + '&q=' + queryParams.data.query).then(queryParams.success);
+                            var extraParams = paramAry ? '&' + paramAry.join('&') : '';
+                            var res = $http.get(url + '&q=' + queryParams.data.query + extraParams).then(queryParams.success);
                             res.abort = function () {
                                 return null;
                             };

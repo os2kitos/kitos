@@ -19,21 +19,50 @@ namespace Core.ApplicationServices
         public AppType InterfaceAppType { get; private set; }
 
 
-        public IEnumerable<ItSystem> GetSystems(int organizationId, string nameSearch)
+        public IEnumerable<ItSystem> GetSystems(int organizationId, string nameSearch, User user)
         {
-            if (nameSearch == null) return _repository.Get(x => x.OrganizationId == organizationId || x.AccessModifier == AccessModifier.Public);
+            if (string.IsNullOrWhiteSpace(nameSearch))
+                return _repository.Get(
+                    s =>
+                        // global admin sees all within the context 
+                        user.IsGlobalAdmin && s.OrganizationId == organizationId ||
+                        // object owner sees his own objects     
+                        s.ObjectOwnerId == user.Id ||
+                        // it's public everyone can see it
+                        s.AccessModifier == AccessModifier.Public ||
+                        // everyone in the same organization can see normal objects
+                        s.AccessModifier == AccessModifier.Normal &&
+                        s.OrganizationId == organizationId
+                        // it systems doesn't have roles so private doesn't make sense
+                        // only object owners will be albe to see private objects
+                    );
 
-            return _repository.Get(system => system.Name.Contains(nameSearch) && system.OrganizationId == organizationId || system.AccessModifier == AccessModifier.Public);
+            return _repository.Get(
+                s =>
+                    // filter by name
+                    s.Name.Contains(nameSearch) &&
+                    // global admin sees all within the context 
+                    user.IsGlobalAdmin && s.OrganizationId == organizationId ||
+                    // object owner sees his own objects     
+                    s.ObjectOwnerId == user.Id ||
+                    // it's public everyone can see it
+                    s.AccessModifier == AccessModifier.Public ||
+                    // everyone in the same organization can see normal objects
+                    s.AccessModifier == AccessModifier.Normal &&
+                    s.OrganizationId == organizationId
+                    // it systems doesn't have roles so private doesn't make sense
+                    // only object owners will be albe to see private objects
+                );
         }
 
-        public IEnumerable<ItSystem> GetNonInterfaces(int organizationId, string nameSearch)
+        public IEnumerable<ItSystem> GetNonInterfaces(int organizationId, string nameSearch, User user)
         {
-            return GetSystems(organizationId, nameSearch).Where(system => system.AppType == null || system.AppType.Id != InterfaceAppType.Id);
+            return GetSystems(organizationId, nameSearch, user).Where(system => system.AppType == null || system.AppType.Id != InterfaceAppType.Id);
         }
 
-        public IEnumerable<ItSystem> GetInterfaces(int organizationId, string nameSearch)
+        public IEnumerable<ItSystem> GetInterfaces(int organizationId, string nameSearch, User user)
         {
-            return GetSystems(organizationId, nameSearch).Where(system => system.AppType != null && system.AppType.Id == InterfaceAppType.Id);
+            return GetSystems(organizationId, nameSearch, user).Where(system => system.AppType != null && system.AppType.Id == InterfaceAppType.Id);
         }
 
         public IEnumerable<ItSystem> GetHierarchy(int systemId)

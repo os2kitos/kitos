@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 
 namespace Core.DomainServices
@@ -7,9 +8,9 @@ namespace Core.DomainServices
     {
         AppType InterfaceAppType { get; }
 
-        IEnumerable<ItSystem> GetSystems(int organizationId, string nameSearch);
-        IEnumerable<ItSystem> GetNonInterfaces(int organizationId, string nameSearch);
-        IEnumerable<ItSystem> GetInterfaces(int organizationId, string nameSearch);
+        IEnumerable<ItSystem> GetSystems(int organizationId, string nameSearch, User user);
+        IEnumerable<ItSystem> GetNonInterfaces(int organizationId, string nameSearch, User user);
+        IEnumerable<ItSystem> GetInterfaces(int organizationId, string nameSearch, User user);
         IEnumerable<ItSystem> GetHierarchy(int systemId);
     }
 }
