@@ -35,9 +35,13 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var systems =
-                    Repository.AsQueryable()
-                              .Where(sys => sys.AccessModifier == AccessModifier.Public || sys.BelongsToId == organizationId);
+                var systems = Repository.Get(s => s.BelongsToId == organizationId &&
+                        (KitosUser.IsGlobalAdmin || // global admin sees all
+                         s.ObjectOwnerId == KitosUser.Id || // object owner sees his own objects
+                         s.AccessModifier == AccessModifier.Public || // it's public everyone can see it
+                    // AccessModifier.Normal doesn't make sense here
+                         s.AccessModifier == AccessModifier.Private && s.Rights.Any(x => x.UserId == KitosUser.Id)) // users with roles can see private objects);
+                         );
 
                 if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
 
@@ -149,20 +153,6 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        //public HttpResponseMessage GetInterfaces(bool? interfaces)
-        //{
-        //    try
-        //    {
-        //        var systems = _systemService.GetInterfaces(null, null);
-        //        var dtos = Map(systems);
-        //        return Ok(dtos);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return Error(e);
-        //    }
-        //}
-
         public HttpResponseMessage GetInterfacesSearch(string q, int orgId, bool? interfaces)
         {
             try
@@ -176,20 +166,6 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
         }
-
-        //public HttpResponseMessage GetNonInterfaces(int orgId, bool? nonInterfaces)
-        //{
-        //    try
-        //    {
-        //        var systems = _systemService.GetNonInterfaces(orgId, null);
-        //        var dtos = Map(systems);
-        //        return Ok(dtos);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return Error(e);
-        //    }
-        //}
 
         public HttpResponseMessage GetNonInterfacesSearch(string q, int orgId, bool? nonInterfaces)
         {
