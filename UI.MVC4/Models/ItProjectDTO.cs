@@ -46,8 +46,7 @@ namespace UI.MVC4.Models
         public int ItProjectTypeId { get; set; }
         public string ItProjectTypeName { get; set; }
         public int OrganizationId { get; set; }
-        public IEnumerable<EconomyYearDTO> EconomyYears { get; set; } 
-        public IEnumerable<ItSystemDTO> ItSystems { get; set; }
+        public IEnumerable<EconomyYearDTO> EconomyYears { get; set; }
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
         public IEnumerable<RiskDTO> Risks { get; set; }
         public IEnumerable<StakeholderDTO> Stakeholders { get; set; }
