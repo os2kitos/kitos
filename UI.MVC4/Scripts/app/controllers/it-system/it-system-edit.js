@@ -68,7 +68,7 @@
                 $scope.businessTypes = businessTypes.data.response;
 
                 $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem?nonInterfaces', true);
-                $scope.organizationSelectOptions = selectLazyLoading('api/organization?', true);
+                $scope.organizationSelectOptions = selectLazyLoading('api/organization?', true, ['orgId=' + user.currentOrganizationId]);
                 
                 function selectLazyLoading(url, allowClear, paramAry) {
                     return {
