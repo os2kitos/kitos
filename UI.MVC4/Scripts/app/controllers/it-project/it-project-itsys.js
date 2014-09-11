@@ -7,18 +7,25 @@
             resolve: {
                 user: ['userService', function (userService) {
                     return userService.getUser();
+                }],
+                usages: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get('api/itproject/' + $stateParams.id + '?usages')
+                        .then(function(result) {
+                            return result.data.response;
+                        });
                 }]
             }
         });
     }]);
 
     app.controller('project.EditItsysCtrl',
-    ['$scope', '$http', '$timeout', '$state', '$stateParams', 'user', 'notify', 'project',
-        function ($scope, $http, $timeout, $state, $stateParams, user, notify, project) {
-            $scope.systemUsages = project.itSystems;
+    ['$scope', '$http', '$timeout', '$state', '$stateParams', 'user', 'notify', 'usages',
+        function ($scope, $http, $timeout, $state, $stateParams, user, notify, usages) {
+            var projectId = $stateParams.id;
+            $scope.systemUsages = usages;
 
             $scope.save = function () {
-                $http.post('api/itproject/' + project.id + '?usageId=' + $scope.selectedSystemUsage.id)
+                $http.post('api/itproject/' + projectId + '?usageId=' + $scope.selectedSystemUsage.id)
                     .success(function () {
                         notify.addSuccessMessage("Systemet er tilknyttet.");
                         reload();
@@ -29,7 +36,7 @@
             };
 
             $scope.delete = function(usageId) {
-                $http.delete('api/itproject/' + project.id + '?usageId=' + usageId)
+                $http.delete('api/itproject/' + projectId + '?usageId=' + usageId)
                     .success(function() {
                         notify.addSuccessMessage("Systemets tilknyttning er fjernet.");
                         reload();
@@ -39,17 +46,8 @@
                     });
             };
 
-            // work around for $state.reload() not updating scope
-            // https://github.com/angular-ui/ui-router/issues/582
             function reload() {
-                return $state.transitionTo($state.current, $stateParams, {
-                    reload: true
-                }).then(function () {
-                    $scope.hideContent = true;
-                    return $timeout(function () {
-                        return $scope.hideContent = false;
-                    }, 1);
-                });
+                $state.go('.', null, { reload: true });
             };
 
             //select2 options for looking up it system usages
