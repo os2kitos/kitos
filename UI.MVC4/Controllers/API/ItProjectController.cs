@@ -51,7 +51,20 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 //Get all projects inside the organizaton
-                pagingModel.Where(p => p.OrganizationId == orgId);
+                pagingModel.Where(
+                    p =>
+                        // global admin sees all within the context
+                        KitosUser.IsGlobalAdmin && p.OrganizationId == orgId ||
+                        // object owner sees his own objects
+                        p.ObjectOwnerId == KitosUser.Id ||
+                        // it's public everyone can see it
+                        p.AccessModifier == AccessModifier.Public ||
+                        // everyone in the same organization can see normal objects
+                        p.AccessModifier == AccessModifier.Normal &&
+                        p.OrganizationId == orgId ||
+                        // only users with a role on the object can see private objects
+                        p.AccessModifier == AccessModifier.Private && p.Rights.Any(x => x.UserId == KitosUser.Id)
+                    );
 
                 var projects = Page(Repository.AsQueryable(), pagingModel);
 
@@ -67,7 +80,22 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var items = Repository.Get(x => x.Name.Contains(q) && x.OrganizationId == orgId);
+                var items = Repository.Get(
+                    p =>
+                        // filter by project name
+                        p.Name.Contains(q) &&
+                        // global admin sees all within the context
+                        KitosUser.IsGlobalAdmin && p.OrganizationId == orgId ||
+                        // object owner sees his own objects
+                        p.ObjectOwnerId == KitosUser.Id ||
+                        // it's public everyone can see it
+                        p.AccessModifier == AccessModifier.Public ||
+                        // everyone in the same organization can see normal objects
+                        p.AccessModifier == AccessModifier.Normal &&
+                        p.OrganizationId == orgId ||
+                        // only users with a role on the object can see private objects
+                        p.AccessModifier == AccessModifier.Private && p.Rights.Any(x => x.UserId == KitosUser.Id)
+                    );
 
                 return Ok(Map(items));
             }
@@ -104,8 +132,22 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                //Get all projects inside the organizaton
-                pagingModel.Where(p => p.OrganizationId == orgId);
+                //Get all projects which the user has access to
+                pagingModel.Where(
+                    p =>
+                        // global admin sees all within the context
+                        KitosUser.IsGlobalAdmin && p.OrganizationId == orgId || 
+                        // object owner sees his own objects
+                        p.ObjectOwnerId == KitosUser.Id || 
+                        // it's public everyone can see it
+                        p.AccessModifier == AccessModifier.Public ||
+                        // everyone in the same organization can see normal objects
+                        p.AccessModifier == AccessModifier.Normal &&
+                        p.OrganizationId == orgId ||
+                        // only users with a role on the object can see private objects
+                        p.AccessModifier == AccessModifier.Private && p.Rights.Any(x => x.UserId == KitosUser.Id)
+                    );
+
                 if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
 
                 var projects = Page(Repository.AsQueryable(), pagingModel);

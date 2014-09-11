@@ -37,7 +37,23 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var usages = Repository.Get(u => u.OrganizationId == organizationId && u.ItSystem.Name.Contains(q));
+                var usages = Repository.Get(
+                    u =>
+                        // filter by system usage name
+                        u.ItSystem.Name.Contains(q) &&
+                        // global admin sees all within the context 
+                        KitosUser.IsGlobalAdmin && u.OrganizationId == organizationId ||
+                        // object owner sees his own objects     
+                        u.ObjectOwnerId == KitosUser.Id ||
+                        // it's public everyone can see it
+                        u.ItSystem.AccessModifier == AccessModifier.Public ||
+                        // everyone in the same organization can see normal objects
+                        u.ItSystem.AccessModifier == AccessModifier.Normal &&
+                        u.ItSystem.OrganizationId == organizationId ||
+                        // only users with a role on the object can see private objects
+                        u.ItSystem.AccessModifier == AccessModifier.Private &&
+                        u.Rights.Any(x => x.UserId == KitosUser.Id)
+                    );
 
                 return Ok(Map(usages));
             }
@@ -51,7 +67,21 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                pagingModel.Where(u => u.OrganizationId == organizationId);
+                pagingModel.Where(
+                    u =>
+                        // global admin sees all within the context 
+                        KitosUser.IsGlobalAdmin && u.OrganizationId == organizationId ||
+                        // object owner sees his own objects     
+                        u.ObjectOwnerId == KitosUser.Id ||
+                        // it's public everyone can see it
+                        u.ItSystem.AccessModifier == AccessModifier.Public ||
+                        // everyone in the same organization can see normal objects
+                        u.ItSystem.AccessModifier == AccessModifier.Normal &&
+                        u.ItSystem.OrganizationId == organizationId ||
+                        // only users with a role on the object can see private objects
+                        u.ItSystem.AccessModifier == AccessModifier.Private &&
+                        u.Rights.Any(x => x.UserId == KitosUser.Id)
+                    );
 
                 if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
 
@@ -69,7 +99,21 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                pagingModel.Where(u => u.OrganizationId == organizationId);
+                pagingModel.Where(
+                    u =>
+                        // global admin sees all within the context 
+                        KitosUser.IsGlobalAdmin && u.OrganizationId == organizationId ||
+                        // object owner sees his own objects     
+                        u.ObjectOwnerId == KitosUser.Id ||
+                        // it's public everyone can see it
+                        u.ItSystem.AccessModifier == AccessModifier.Public ||
+                        // everyone in the same organization can see normal objects
+                        u.ItSystem.AccessModifier == AccessModifier.Normal &&
+                        u.ItSystem.OrganizationId == organizationId ||
+                        // only users with a role on the object can see private objects
+                        u.ItSystem.AccessModifier == AccessModifier.Private &&
+                        u.Rights.Any(x => x.UserId == KitosUser.Id)
+                    );
 
                 if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
 
@@ -183,22 +227,6 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
         }
-
-        //public HttpResponseMessage GetOrganizationUnitsUsingThisSystem(int id, [FromUri] int organizationUnit)
-        //{
-        //    try
-        //    {
-        //        var usage = Repository.GetByKey(id);
-
-        //        if (usage == null) return NotFound();
-
-        //        return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(usage.UsedBy));
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return Error(e);
-        //    }
-        //}
 
         public HttpResponseMessage PostOrganizationUnitsUsingThisSystem(int id, [FromUri] int organizationUnit)
         {

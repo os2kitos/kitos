@@ -19,12 +19,28 @@ namespace UI.MVC4.Controllers.API
             _organizationService = organizationService;
         }
 
-        public HttpResponseMessage GetBySearch(string q)
+        public HttpResponseMessage GetBySearch(string q, int orgId)
         {
             try
             {
-                var orgs = Repository.Get(org => org.Name.Contains(q) && org.AccessModifier == AccessModifier.Public || KitosUser.IsGlobalAdmin);
-                return Ok(Map(orgs));
+                var orgs = Repository.Get(
+                    org => 
+                        // filter by project name
+                        org.Name.Contains(q) &&
+                        // global admin sees all within the context
+                        KitosUser.IsGlobalAdmin && org.Id == orgId ||
+                        // object owner sees his own objects
+                        org.ObjectOwnerId == KitosUser.Id ||
+                        // it's public everyone can see it
+                        org.AccessModifier == AccessModifier.Public ||
+                        // everyone in the same organization can see normal objects
+                        org.AccessModifier == AccessModifier.Normal &&
+                        org.Id == orgId ||
+                        // only users with a role on the object can see private objects
+                        org.AccessModifier == AccessModifier.Private && org.Rights.Any(x => x.UserId == KitosUser.Id)
+                    );
+                var dtos = Map(orgs);
+                return Ok(dtos);
             }
             catch (Exception e)
             {
@@ -36,8 +52,25 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var orgs = Repository.Get(org => (org.AccessModifier == AccessModifier.Public || org.Id == orgId) && (org.Name.Contains(q) || org.Cvr.Contains(q)));
-                return Ok(Map(orgs));
+                var orgs = Repository.Get(
+                    org => 
+                        // filter by project name or cvr
+                        org.Name.Contains(q) || org.Cvr.Contains(q) &&
+                        // global admin sees all within the context
+                        KitosUser.IsGlobalAdmin && org.Id == orgId ||
+                        // object owner sees his own objects
+                        org.ObjectOwnerId == KitosUser.Id ||
+                        // it's public everyone can see it
+                        org.AccessModifier == AccessModifier.Public ||
+                        // everyone in the same organization can see normal objects
+                        org.AccessModifier == AccessModifier.Normal &&
+                        org.Id == orgId ||
+                        // only users with a role on the object can see private objects
+                        org.AccessModifier == AccessModifier.Private && org.Rights.Any(x => x.UserId == KitosUser.Id)
+                    );
+                
+                var dtos = Map(orgs);
+                return Ok(dtos);
             }
             catch (Exception e)
             {
