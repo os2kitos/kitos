@@ -177,7 +177,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var systems = _systemService.GetInterfaces(orgId, q);
+                var systems = _systemService.GetInterfaces(orgId, q, KitosUser);
                 var dtos = Map(systems);
                 return Ok(dtos);
             }
@@ -191,7 +191,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var systems = _systemService.GetNonInterfaces(orgId, q);
+                var systems = _systemService.GetNonInterfaces(orgId, q, KitosUser);
                 var dtos = Map(systems);
                 return Ok(dtos);
             }
