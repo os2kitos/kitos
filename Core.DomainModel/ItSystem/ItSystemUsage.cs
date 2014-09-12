@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Core.DomainModel.ItContract;
 
 namespace Core.DomainModel.ItSystem
 {
@@ -9,7 +10,7 @@ namespace Core.DomainModel.ItSystem
     {
         public ItSystemUsage()
         {
-            this.Contracts = new List<ItContract.ItContract>();
+            this.Contracts = new List<ItContractItSystemUsage>();
             this.Wishes = new List<Wish>();
             this.OrgUnits = new List<OrganizationUnit>();
             this.TaskRefs = new List<TaskRef>();
@@ -113,7 +114,6 @@ namespace Core.DomainModel.ItSystem
         public int? OverviewItSystemId { get; set; }
         public virtual ItSystem OverviewItSystem { get; set; }
 
-        public virtual int? MainContractId { get; set; }
         /// <summary>
         /// Gets or sets the main it contract for this instance.
         /// The it contract is used to determine whether this instance
@@ -122,14 +122,14 @@ namespace Core.DomainModel.ItSystem
         /// <value>
         /// The main contract.
         /// </value>
-        public virtual ItContract.ItContract MainContract { get; set; }
+        public virtual ItContractItSystemUsage MainContract { get; set; }
         /// <summary>
         /// Gets or sets it contracts associated with this instance.
         /// </summary>
         /// <value>
         /// The contracts.
         /// </value>
-        public virtual ICollection<ItContract.ItContract> Contracts { get; set; }
+        public virtual ICollection<ItContractItSystemUsage> Contracts { get; set; }
         /// <summary>
         /// Gets or sets the wishes associated with this instance.
         /// </summary>

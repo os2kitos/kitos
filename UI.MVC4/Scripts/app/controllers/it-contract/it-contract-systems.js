@@ -65,7 +65,7 @@
                 };
             }
 
-            formatAssociatedSystems(contract.associatedSystemUsages);            
+            formatAssociatedSystems(contract.associatedSystemUsages);
 
 
             function formatAssociatedInterfaces(associatedInterfaceUsages, associatedInterfaceExposures) {

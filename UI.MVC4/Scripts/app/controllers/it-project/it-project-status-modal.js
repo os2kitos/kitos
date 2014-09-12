@@ -6,7 +6,9 @@
                 function ($state, $stateParams, $modal, project, usersWithRoles) {
                     $modal.open({
                         templateUrl: 'partials/it-project/modal-milestone-task-edit.html',
-                        windowClass: 'modal fade in', // fade in instead of slide from top, fixes strange cursor placement in IE
+                        // fade in instead of slide from top, fixes strange cursor placement in IE
+                        // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
+                        windowClass: 'modal fade in',
                         resolve: {
                             activityId: function() {
                                 return $stateParams.activityId;

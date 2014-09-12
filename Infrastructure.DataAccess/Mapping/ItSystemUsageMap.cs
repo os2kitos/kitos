@@ -42,8 +42,11 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(d => d.ItSystemUsageId);
 
             this.HasOptional(t => t.MainContract)
-                .WithMany()
-                .HasForeignKey(t => t.MainContractId);
+                .WithOptionalPrincipal();
+
+            this.HasMany(t => t.Contracts)
+                .WithRequired(t => t.ItSystemUsage)
+                .HasForeignKey(d => d.ItSystemUsageId);
         }
     }
 }

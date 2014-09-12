@@ -24,7 +24,10 @@ namespace UI.MVC4.Controllers.API
         private readonly IGenericRepository<ItSystemRole> _roleRepository;
 
         public ItSystemUsageController(IGenericRepository<ItSystemUsage> repository,
-            IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository, IItSystemUsageService itSystemUsageService, IGenericRepository<ItSystemRole> roleRepository) 
+            IGenericRepository<OrganizationUnit> orgUnitRepository, 
+            IGenericRepository<TaskRef> taskRepository, 
+            IItSystemUsageService itSystemUsageService, 
+            IGenericRepository<ItSystemRole> roleRepository) 
             : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;

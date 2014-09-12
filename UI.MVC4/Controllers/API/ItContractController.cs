@@ -20,15 +20,20 @@ namespace UI.MVC4.Controllers.API
     {
         private readonly IGenericRepository<AgreementElement> _agreementElementRepository;
         private readonly IGenericRepository<ItContractRole> _roleRepository;
-
+        private readonly IGenericRepository<ItContractItSystemUsage> _itContractItSystemUsageRepository;
         private readonly IGenericRepository<ItSystemUsage> _usageRepository;
+
         public ItContractController(IGenericRepository<ItContract> repository,
-            IGenericRepository<ItSystemUsage> usageRepository, IGenericRepository<AgreementElement> agreementElementRepository, IGenericRepository<ItContractRole> roleRepository) 
+            IGenericRepository<ItSystemUsage> usageRepository, 
+            IGenericRepository<AgreementElement> agreementElementRepository, 
+            IGenericRepository<ItContractRole> roleRepository,
+            IGenericRepository<ItContractItSystemUsage> itContractItSystemUsageRepository) 
             : base(repository)
         {
             _usageRepository = usageRepository;
             _agreementElementRepository = agreementElementRepository;
             _roleRepository = roleRepository;
+            _itContractItSystemUsageRepository = itContractItSystemUsageRepository;
         }
 
         public virtual HttpResponseMessage Get(string q, int orgId, [FromUri] PagingModel<ItContract> paging)
@@ -94,19 +99,19 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 var contract = Repository.GetByKey(id);
+                if (contract == null) return NotFound();
                 if (!HasWriteAccess(contract)) return Unauthorized();
 
-                if (contract.AssociatedSystemUsages.Any(usage => usage.Id == systemUsageId))
-                    return Conflict("The IT system is already associated with the contract");
+                var usage = _usageRepository.GetByKey(systemUsageId);
+                if (usage == null) return NotFound();
 
-                var systemUsage = _usageRepository.GetByKey(systemUsageId);
-
-                contract.AssociatedSystemUsages.Add(systemUsage);
+                if (_itContractItSystemUsageRepository.GetByKey(new object[] {id, systemUsageId}) != null)
+                    return Conflict("The IT system usage is already associated with the contract");
                 
+                contract.AssociatedSystemUsages.Add(new ItContractItSystemUsage {ItContractId = id, ItSystemUsageId = systemUsageId});
                 contract.LastChanged = DateTime.Now;
                 contract.LastChangedByUser = KitosUser;
 
-                Repository.Update(contract);
                 Repository.Save();
                 
                 return Ok(MapSystemUsages(contract));
@@ -130,17 +135,14 @@ namespace UI.MVC4.Controllers.API
                 var contract = Repository.GetByKey(id);
                 if (!HasWriteAccess(contract)) return Unauthorized();
 
-                if (contract.AssociatedSystemUsages.All(usage => usage.Id != systemUsageId))
+                var contractItSystemUsage = _itContractItSystemUsageRepository.GetByKey(new object[] { id, systemUsageId });
+                if (contractItSystemUsage == null)
                     return Conflict("The IT system is not associated with the contract");
 
-                var systemUsage = _usageRepository.GetByKey(systemUsageId);
-
-                contract.AssociatedSystemUsages.Remove(systemUsage);
-
+                contract.AssociatedSystemUsages.Remove(contractItSystemUsage);
                 contract.LastChanged = DateTime.Now;
                 contract.LastChangedByUser = KitosUser;
 
-                Repository.Update(contract);
                 Repository.Save();
                 
                 return Ok(MapSystemUsages(contract));
@@ -354,7 +356,7 @@ namespace UI.MVC4.Controllers.API
 
         private IEnumerable<ItSystemUsageSimpleDTO> MapSystemUsages(ItContract contract)
         {
-            return Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageSimpleDTO>>(contract.AssociatedSystemUsages);
+            return Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageSimpleDTO>>(contract.AssociatedSystemUsages.Select(x => x.ItSystemUsage));
         }
     }
 }
