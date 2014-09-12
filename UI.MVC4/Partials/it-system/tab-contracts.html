@@ -82,13 +82,11 @@
                 <select class="form-control input-sm"
                         data-ui-select2="allowClearOption"
                         data-placeholder="Ingen kontrakt"
-                        data-ng-model="usage.mainContractId"
-                        data-ng-change="reload()"
-                        data-ng-disabled="!hasWriteAccess"
-                        data-autosave="api/itsystemusage/{{usageId}}"
-                        data-field="mainContractId">
+                        data-ng-model="mainContractId"
+                        data-ng-change="saveMainContract()"
+                        data-ng-disabled="!hasWriteAccess">
                     <option value=""></option>
-                    <option data-ng-repeat="contract in usage.contracts" value="{{contract.id}}">{{contract.name}}</option>
+                    <option data-ng-repeat="contract in contracts" value="{{contract.id}}">{{contract.name}}</option>
                 </select>
 
             </div>

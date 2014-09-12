@@ -49,7 +49,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(d => d.ResponsibleOrganizationUnitId);
 
             this.HasMany(t => t.AssociatedSystemUsages)
-                .WithMany(d => d.Contracts);
+                .WithRequired(t => t.ItContract)
+                .HasForeignKey(d => d.ItContractId);
 
             this.HasRequired(t => t.Organization)
                 .WithMany(t => t.Contracts)

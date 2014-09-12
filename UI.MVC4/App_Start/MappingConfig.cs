@@ -241,6 +241,9 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<ItSystemUsage, ItSystemUsageDTO>()
                 .ForMember(dest => dest.ResponsibleOrgUnitName,
                     opt => opt.MapFrom(src => src.ResponsibleUsage.OrganizationUnit.Name))
+                .ForMember(dest => dest.Contracts, opt => opt.MapFrom(src => src.Contracts.Select(x => x.ItContract)))
+                .ForMember(dest => dest.MainContractId, opt => opt.MapFrom(src => src.MainContract.ItContractId))
+                .ForMember(dest => dest.MainContractIsActive, opt => opt.MapFrom(src => src.MainContract.ItContract.IsActive))
                 .ReverseMap()
                 .ForMember(dest => dest.OrgUnits, opt => opt.Ignore())
                 .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
@@ -322,6 +325,7 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.ItProject, opt => opt.Ignore());
 
             Mapper.CreateMap<ItContract, ItContractDTO>()
+                  .ForMember(dest => dest.AssociatedSystemUsages, opt => opt.MapFrom(src => src.AssociatedSystemUsages.Select(x => x.ItSystemUsage)))
                   .ReverseMap()
                   .ForMember(contract => contract.AssociatedSystemUsages, opt => opt.Ignore())
                   .ForMember(contract => contract.AssociatedInterfaceExposures, opt => opt.Ignore())

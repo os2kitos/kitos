@@ -10,6 +10,7 @@ using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using UI.MVC4.Models;
@@ -22,15 +23,21 @@ namespace UI.MVC4.Controllers.API
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemUsageService _itSystemUsageService;
         private readonly IGenericRepository<ItSystemRole> _roleRepository;
+        private readonly IGenericRepository<ItContract> _contractRepository;
 
         public ItSystemUsageController(IGenericRepository<ItSystemUsage> repository,
-            IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository, IItSystemUsageService itSystemUsageService, IGenericRepository<ItSystemRole> roleRepository) 
+            IGenericRepository<OrganizationUnit> orgUnitRepository, 
+            IGenericRepository<TaskRef> taskRepository, 
+            IItSystemUsageService itSystemUsageService, 
+            IGenericRepository<ItSystemRole> roleRepository,
+            IGenericRepository<ItContract> contractRepository) 
             : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
             _taskRepository = taskRepository;
             _itSystemUsageService = itSystemUsageService;
             _roleRepository = roleRepository;
+            _contractRepository = contractRepository;
         }
 
         public HttpResponseMessage GetSearchByOrganization(int organizationId, string q)

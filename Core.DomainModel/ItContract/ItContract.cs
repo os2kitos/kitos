@@ -13,7 +13,7 @@ namespace Core.DomainModel.ItContract
         {
             this.AgreementElements = new List<AgreementElement>();
             this.Children = new List<ItContract>();
-            this.AssociatedSystemUsages = new List<ItSystemUsage>();
+            this.AssociatedSystemUsages = new List<ItContractItSystemUsage>();
             this.AssociatedInterfaceUsages = new List<InterfaceUsage>();
             this.AssociatedInterfaceExposures = new List<InterfaceExposure>();
             this.PaymentMilestones = new List<PaymentMilestone>();
@@ -399,7 +399,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         /// The associated system usages.
         /// </value>
-        public virtual ICollection<ItSystemUsage> AssociatedSystemUsages { get; set; }
+        public virtual ICollection<ItContractItSystemUsage> AssociatedSystemUsages { get; set; }
 
         /// <summary>
         /// The interface usages that the contract is associated to.

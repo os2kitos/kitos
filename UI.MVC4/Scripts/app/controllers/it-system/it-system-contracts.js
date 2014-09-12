@@ -9,23 +9,37 @@
         });
     }]);
 
-    app.controller('system.EditContracts', ['$scope', '$state', '$stateParams', '$timeout', 'itSystemUsage',
-        function ($scope, $state, $stateParams, $timeout, itSystemUsage) {
-            $scope.reload = function() {
-                $timeout(reload, 1000); // OMG HACK! TODO refactor! This is to wait for the autosave to finish then reload the view to reflect the change
-            }
+    app.controller('system.EditContracts', ['$scope', '$http', '$state', '$stateParams', '$timeout', 'itSystemUsage', 'notify',
+        function ($scope, $http, $state, $stateParams, $timeout, itSystemUsage, notify) {
+            var usageId = itSystemUsage.id;
+            $scope.contracts = itSystemUsage.contracts;
+            $scope.mainContractId = itSystemUsage.mainContractId;
 
-            // work around for $state.reload() not updating scope
-            // https://github.com/angular-ui/ui-router/issues/582
             function reload() {
-                return $state.transitionTo($state.current, $stateParams, {
-                    reload: true
-                }).then(function () {
-                    $scope.hideContent = true;
-                    return $timeout(function () {
-                        return $scope.hideContent = false;
-                    }, 1);
-                });
+                $state.go('.', null, { reload: true });
             };
+
+            $scope.saveMainContract = function () {
+                var msg = notify.addInfoMessage("Gemmer... ");
+                if ($scope.mainContractId) {
+                    $http.post('api/ItContractItSystemUsage/?contractId=' + $scope.mainContractId + '&usageId=' + usageId)
+                        .success(function () {
+                            msg.toSuccessMessage("Gemt!");
+                            reload();
+                        })
+                        .error(function () {
+                            msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
+                        });
+                } else {
+                    $http.delete('api/ItContractItSystemUsage/?usageId=' + usageId)
+                        .success(function () {
+                            msg.toSuccessMessage("Gemt!");
+                            reload();
+                        })
+                        .error(function () {
+                            msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
+                        });
+                }
+            }
         }]);
 })(angular, app);
