@@ -6,6 +6,7 @@
                 function ($state, $stateParams, $modal, project, usersWithRoles) {
                     $modal.open({
                         templateUrl: 'partials/it-project/modal-milestone-task-edit.html',
+                        windowClass: 'modal fade in', // fade in instead of slide from top, fixes strange cursor placement in IE
                         resolve: {
                             activityId: function() {
                                 return $stateParams.activityId;
