@@ -11,8 +11,9 @@ app.config(['$httpProvider', 'notifyProvider', function ($httpProvider, notifyPr
     notifyProvider.onlyUniqueMessages(false);
 }]);
 
-app.run(['$rootScope', '$http', '$state', '$modal', 'notify', 'userService', 'uiSelect2Config',
-    function ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config) {
+app.run([
+    '$rootScope', '$http', '$state', '$modal', 'notify', 'userService', 'uiSelect2Config',
+    function($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config) {
         //init info
         $rootScope.page = {
             title: 'Index',
@@ -27,22 +28,21 @@ app.run(['$rootScope', '$http', '$state', '$modal', 'notify', 'userService', 'ui
         uiSelect2Config.dropdownAutoWidth = true;
 
         //logout function for top navigation bar
-        $rootScope.logout = function () {
-            userService.logout().then(function () {
+        $rootScope.logout = function() {
+            userService.logout().then(function() {
                 $state.go('index');
             });
-
         };
 
         //when changing states, we might need to authorize the user
-        $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+        $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
 
             if (toState.noAuth) return; //no need to auth
-            
-            userService.auth(toState.adminRoles).then(function (val) {
+
+            userService.auth(toState.adminRoles).then(function(val) {
                 //Authentication OK!
-                
-            }, function () {
+
+            }, function() {
                 event.preventDefault();
 
                 //Bad authentication
@@ -51,10 +51,9 @@ app.run(['$rootScope', '$http', '$state', '$modal', 'notify', 'userService', 'ui
         });
 
         //when something goes wrong during state change (e.g a rejected resolve)
-        $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
+        $rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
             console.log(error);
             $state.go('index');
         });
-
-
-    }]);
+    }
+]);
