@@ -5,8 +5,8 @@
             abstract: true,
             template: '<ui-view autoscroll="false" />',
             authRoles: ['GlobalAdmin'],
-            controller: ['$rootScope', function ($rootScope) {
-                $rootScope.page.title = 'IT Kontrakt';
+            controller: ['$rootScope', '$state', function ($rootScope, $state) {
+                $rootScope.page.title = 'Global admin';
                 $rootScope.page.subnav = [
                     { state: 'global-admin.organisations', text: 'Organisation' },
                     { state: 'global-admin.global-users', text: 'Glboale administratorer' },

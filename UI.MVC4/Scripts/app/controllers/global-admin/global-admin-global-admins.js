@@ -13,7 +13,6 @@
     app.controller('globalAdmin.globalAdminsCtrl', [
         '$rootScope', '$scope', '$http', 'notify', function($rootScope, $scope, $http, notify) {
             $rootScope.page.title = 'Globale administratorer';
-            $rootScope.page.subnav = subnav;
 
             $scope.globalAdmins = [];
 

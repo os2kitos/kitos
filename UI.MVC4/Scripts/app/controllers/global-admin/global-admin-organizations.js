@@ -13,7 +13,6 @@
     app.controller('globalAdmin.organizationCtrl', [
         '$rootScope', '$scope', '$http', 'notify', function($rootScope, $scope, $http, notify) {
             $rootScope.page.title = 'Ny organisation';
-            $rootScope.page.subnav = subnav;
 
             function init() {
                 $scope.org = {};

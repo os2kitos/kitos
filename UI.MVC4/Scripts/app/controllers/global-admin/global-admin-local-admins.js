@@ -1,6 +1,6 @@
 ﻿(function(ng, app) {
     app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('global-admin.local-admins', {
+        $stateProvider.state('global-admin.local-users', {
             url: '/local-admins',
             templateUrl: 'partials/global-admin/local-admins.html',
             controller: 'globalAdmin.localAdminsCtrl',
@@ -11,7 +11,6 @@
     app.controller('globalAdmin.localAdminsCtrl', [
         '$rootScope', '$scope', '$http', 'notify', function($rootScope, $scope, $http, notify) {
             $rootScope.page.title = 'Lokal administratorer';
-            $rootScope.page.subnav = subnav;
 
             $scope.organizations = {};
             $http.get("api/organization").success(function(result) {
