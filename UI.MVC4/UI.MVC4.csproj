@@ -560,8 +560,12 @@
     <Content Include="Scripts\angular.min.js" />
     <Content Include="Scripts\AngularUI\ui-router.js" />
     <Content Include="Scripts\AngularUI\ui-router.min.js" />
-    <Content Include="Scripts\app\controllers\global-admin\global-admin.js" />
-    <Content Include="Scripts\app\controllers\global-admin\global-config.js" />
+    <Content Include="Scripts\app\controllers\global-admin\global-admin-global-admins.js" />
+    <Content Include="Scripts\app\controllers\global-admin\global-admin-local-admins.js" />
+    <Content Include="Scripts\app\controllers\global-admin\global-admin-organization-modal.js" />
+    <Content Include="Scripts\app\controllers\global-admin\global-admin-organizations.js" />
+    <Content Include="Scripts\app\controllers\global-admin\global-admin-subnav.js" />
+    <Content Include="Scripts\app\controllers\global-config\global-config.js" />
     <Content Include="Scripts\app\controllers\home\edit-user.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-hierarchy.js" />
