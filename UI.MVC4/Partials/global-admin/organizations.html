@@ -1,0 +1,37 @@
+﻿<a class="btn btn-sm btn-success" data-ui-sref="global-admin.organizations.create">OPRET</a>
+<form class="form-inline" role="form">
+    <div class="form-group pull-right">
+        <label for="search" class="control-label">Søg:</label>
+        <input type="text" id="search" class="input-xs form-control" data-ng-model="pagination.search" placeholder="Søg">
+    </div>
+</form>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Navn</th>
+                <th>CVR</th>
+                <th>Type</th>
+                <th><!-- CONTROL --></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="org in organizations">
+                <td>{{ org.name }}</td>
+                <td>{{ org.cvr }}</td>
+                <td data-ng-switch="org.type">
+                    <span data-ng-switch-when="0">Virksomhed</span>
+                    <span data-ng-switch-when="1">Kommune</span>
+                    <span data-ng-switch-when="2">Interessefælleskab</span>
+                </td>
+                <td class="text-right">
+                    <a data-ui-sref="global-admin.organizations.edit({id: {{ org.id }}})" class="btn btn-link btn-sm"><i class="glyphicon glyphicon-pencil"></i></a>
+                    <a class="btn btn-link btn-sm text-danger"
+                       data-confirmed-click="delete(org.id)"
+                       data-confirm-click="Er du sikker på at du vil slette?">
+                        <i class="glyphicon glyphicon-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>

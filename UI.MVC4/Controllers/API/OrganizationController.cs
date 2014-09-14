@@ -19,6 +19,13 @@ namespace UI.MVC4.Controllers.API
             _organizationService = organizationService;
         }
 
+        public virtual HttpResponseMessage Get([FromUri] string q, [FromUri] PagingModel<Organization> paging)
+        {
+            if (!string.IsNullOrWhiteSpace(q))
+                paging.Where(x => x.Name.Contains(q) || x.Cvr.Contains(q));
+            return base.GetAll(paging);
+        }
+
         public HttpResponseMessage GetBySearch(string q, int orgId)
         {
             try

@@ -1,9 +1,9 @@
 ﻿(function(ng, app) {
     app.config([
         '$stateProvider', function($stateProvider) {
-            $stateProvider.state('global-admin.organisations', {
+            $stateProvider.state('global-admin.organizations', {
                 url: '/organisations',
-                templateUrl: 'partials/global-admin/new-organization.html',
+                templateUrl: 'partials/global-admin/organizations.html',
                 controller: 'globalAdmin.organizationCtrl',
                 authRoles: ['GlobalAdmin']
             });
@@ -12,30 +12,49 @@
 
     app.controller('globalAdmin.organizationCtrl', [
         '$rootScope', '$scope', '$http', 'notify', function($rootScope, $scope, $http, notify) {
-            $rootScope.page.title = 'Ny organisation';
+            $rootScope.page.title = 'Organisationer';
 
-            function init() {
-                $scope.org = {};
-                $scope.org.accessModifier = 0;
-                $scope.org.type = 1; // set type to municipality by default
+            $scope.pagination = {
+                skip: 0,
+                take: 1000
             };
 
-            init();
+            $scope.$watchCollection('pagination', function () {
+                loadOrganizations();
+            });
 
-            $scope.submit = function() {
-                if ($scope.addForm.$invalid) return;
+            function loadOrganizations() {
 
-                var payload = $scope.org;
-                $http.post('api/organization', payload)
-                    .success(function(result) {
-                        notify.addSuccessMessage("Organisationen " + result.response.name + " er blevet oprettet!");
-                        delete $scope.org;
-                        init();
+                var url = 'api/organization/';
+                url += '?skip=' + $scope.pagination.skip + "&take=" + $scope.pagination.take;
+
+                if ($scope.pagination.orderBy) {
+                    url += '&orderBy=' + $scope.pagination.orderBy;
+                    if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+                }
+
+                if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
+                else url += "&q=";
+
+                $http.get(url).success(function (result, status, headers) {
+                    var paginationHeader = JSON.parse(headers('X-Pagination'));
+                    $scope.pagination.count = paginationHeader.TotalCount;
+                    $scope.organizations = result.response;
+                }).error(function () {
+                    notify.addErrorMessage("Kunne ikke hente organisationer!");
+                });
+            }
+            
+            $scope.delete = function (orgId) {
+                $http.delete('api/organization/' + orgId)
+                    .success(function() {
+                        notify.addSuccessMessage("Organisationen er blevet slettet!");
+                        loadOrganizations();
                     })
-                    .error(function(result) {
-                        notify.addErrorMessage("Organisationen " + $scope.org.name + " kunne ikke oprettes!");
+                    .error(function () {
+                        notify.addErrorMessage("Kunne ikke slette organisationen!");
                     });
-            };
+            }
         }
     ]);
 })(angular, app);
