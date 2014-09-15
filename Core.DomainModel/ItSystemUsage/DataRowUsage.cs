@@ -1,8 +1,10 @@
-﻿namespace Core.DomainModel.ItSystem
+﻿using Core.DomainModel.ItSystem;
+
+namespace Core.DomainModel.ItSystemUsage
 {
     /// <summary>
     /// Helper object for the local usage of a <see cref="DataRow"/>.
-    /// When an interface (ItSystem) with some DataRows is taken into local usage,
+    /// When an interface with some DataRows is taken into local usage,
     /// a DataRowUsage is created for each DataRow. This allows for adding details
     /// regarding the usage. 
     /// </summary>

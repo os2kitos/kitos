@@ -22,7 +22,7 @@ namespace Core.DomainModel
             this.ItProjects = new List<ItProject.ItProject>();
             this.ItSystems = new List<ItSystem.ItSystem>();
             this.Supplier = new List<ItContract.ItContract>();
-            this.ItSystemUsages = new List<ItSystem.ItSystemUsage>();
+            this.ItSystemUsages = new List<ItSystemUsage.ItSystemUsage>();
             this.Contracts = new List<ItContract.ItContract>();
             this.OrgUnits = new List<OrganizationUnit>();
         }
@@ -63,7 +63,7 @@ namespace Core.DomainModel
         /// <summary>
         /// Local usages of IT systems within this organization
         /// </summary>
-        public virtual ICollection<ItSystem.ItSystemUsage> ItSystemUsages { get; set; }
+        public virtual ICollection<ItSystemUsage.ItSystemUsage> ItSystemUsages { get; set; }
         
         /// <summary>
         /// Local configuration of KITOS

@@ -28,13 +28,5 @@ namespace Core.DomainModel.ItSystem
         /// The organization.
         /// </value>
         public virtual Organization Organization { get; set; }
-
-        /// <summary>
-        /// Gets or sets the usages (binding between system and org).
-        /// </summary>
-        /// <value>
-        /// The usages.
-        /// </value>
-        public virtual ICollection<ItSystemUsage> Usages { get; set; }
     }
 }

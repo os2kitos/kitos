@@ -12,6 +12,7 @@ using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
 using UI.MVC4.Models;

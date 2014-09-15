@@ -1,4 +1,3 @@
-using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
@@ -32,26 +31,18 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.BusinessType)
                 .WithMany(t => t.References)
                 .HasForeignKey(t => t.BusinessTypeId);
-
-            this.HasOptional(t => t.Interface)
-                .WithMany(d => d.References)
-                .HasForeignKey(t => t.InterfaceId);
-
-            this.HasOptional(t => t.InterfaceType)
-                .WithMany(d => d.References)
-                .HasForeignKey(t => t.InterfaceTypeId);
-
-            this.HasOptional(t => t.Method)
-                .WithMany(d => d.References)
-                .HasForeignKey(t => t.MethodId);
             
             this.HasMany(t => t.CanUseInterfaces)
-                .WithMany(d => d.CanBeUsedBy);
+                .WithRequired(t => t.ItSystem)
+                .HasForeignKey(d => d.ItSystemId);
 
             this.HasOptional(t => t.ExposedBy)
                 .WithMany(d => d.ExposedInterfaces)
                 .HasForeignKey(d => d.ExposedById)
                 .WillCascadeOnDelete(false);
+
+            this.HasOptional(t => t.ItInterfaceExhibit)
+                .WithRequired(t => t.ItSystem);
         }
     }
 }

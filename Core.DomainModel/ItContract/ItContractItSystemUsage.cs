@@ -1,6 +1,4 @@
-﻿using Core.DomainModel.ItSystem;
-
-namespace Core.DomainModel.ItContract
+﻿namespace Core.DomainModel.ItContract
 {
     public class ItContractItSystemUsage
     {
@@ -8,6 +6,6 @@ namespace Core.DomainModel.ItContract
         public virtual ItContract ItContract { get; set; }
 
         public int ItSystemUsageId { get; set; }
-        public virtual ItSystemUsage ItSystemUsage { get; set; }
+        public virtual ItSystemUsage.ItSystemUsage ItSystemUsage { get; set; }
     }
 }

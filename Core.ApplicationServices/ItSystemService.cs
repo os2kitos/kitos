@@ -10,13 +10,10 @@ namespace Core.ApplicationServices
     {
         private readonly IGenericRepository<ItSystem> _repository;
 
-        public ItSystemService(IGenericRepository<ItSystem> repository, IGenericRepository<AppType> appTypeRepository)
+        public ItSystemService(IGenericRepository<ItSystem> repository)
         {
             _repository = repository;
-            InterfaceAppType = appTypeRepository.Get(appType => appType.Name == "Snitflade").Single();
         }
-
-        public AppType InterfaceAppType { get; private set; }
 
 
         public IEnumerable<ItSystem> GetSystems(int organizationId, string nameSearch, User user)
@@ -57,12 +54,12 @@ namespace Core.ApplicationServices
 
         public IEnumerable<ItSystem> GetNonInterfaces(int organizationId, string nameSearch, User user)
         {
-            return GetSystems(organizationId, nameSearch, user).Where(system => system.AppType == null || system.AppType.Id != InterfaceAppType.Id);
+            return GetSystems(organizationId, nameSearch, user);
         }
 
         public IEnumerable<ItSystem> GetInterfaces(int organizationId, string nameSearch, User user)
         {
-            return GetSystems(organizationId, nameSearch, user).Where(system => system.AppType != null && system.AppType.Id == InterfaceAppType.Id);
+            return GetSystems(organizationId, nameSearch, user);
         }
 
         public IEnumerable<ItSystem> GetHierarchy(int systemId)

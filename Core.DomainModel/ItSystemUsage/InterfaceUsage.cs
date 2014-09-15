@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using Core.DomainModel.ItSystem;
 
-namespace Core.DomainModel.ItSystem
+namespace Core.DomainModel.ItSystemUsage
 {
     /// <summary>
     /// Represent the local usage of a interface.
@@ -28,11 +29,11 @@ namespace Core.DomainModel.ItSystem
         /// </summary>
         public virtual ItContract.ItContract ItContract { get; set; }
 
-        public int InterfaceId { get; set; }
+        public int ItInterfaceExhibitId { get; set; }
         /// <summary>
         /// The interface that is being used.
         /// </summary>
-        public virtual ItSystem Interface { get; set; }
+        public virtual ItInterfaceExhibit ItInterfaceExhibit { get; set; }
 
         /// <summary>
         /// Local details regarding the usage of the exposed data of the interface
@@ -43,7 +44,9 @@ namespace Core.DomainModel.ItSystem
         /// <summary>
         /// An ItSystem marked as infrastructure for the local usage of the interface.
         /// </summary>
-        public virtual ItSystem Infrastructure { get; set; }
+        public virtual ItSystem.ItSystem Infrastructure { get; set; }
+
+        public virtual ItInterfaceUse ItInterfaceUse { get; set; } // careful ItInterfaceUse has a composite key
         
         /// <summary>
         /// Whether local usage of the interface is wanted or not.

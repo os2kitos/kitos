@@ -38,7 +38,7 @@ namespace Core.DomainModel.ItSystem
         /// <value>
         /// It system usage.
         /// </value>
-        public virtual ItSystemUsage ItSystemUsage { get; set; }
+        public virtual ItSystemUsage.ItSystemUsage ItSystemUsage { get; set; }
         /// <summary>
         /// Determines whether a user has write access to this instance.
         /// </summary>

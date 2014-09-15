@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity.ModelConfiguration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Core.DomainModel.ItSystem;
+﻿using Core.DomainModel.ItSystemUsage;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -20,9 +14,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(t => t.ItSystemUsageId)
                 .WillCascadeOnDelete(true);
 
-            this.HasRequired(t => t.Interface)
+            this.HasRequired(t => t.ItInterfaceExhibit)
                 .WithMany(d => d.InterfaceLocalUsages)
-                .HasForeignKey(t => t.InterfaceId)
+                .HasForeignKey(t => t.ItInterfaceExhibitId)
                 .WillCascadeOnDelete(true);
 
             this.HasOptional(t => t.ItContract)

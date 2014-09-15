@@ -1,5 +1,4 @@
-﻿using System.Data.Entity.ModelConfiguration;
-using Core.DomainModel.ItSystem;
+﻿using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -15,9 +14,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(d => d.References)
                 .HasForeignKey(t => t.DataTypeId);
 
-            this.HasRequired(t => t.ItSystem)
+            this.HasRequired(t => t.ItInterface)
                 .WithMany(d => d.DataRows)
-                .HasForeignKey(t => t.ItSystemId)
+                .HasForeignKey(t => t.ItInterfaceId)
                 .WillCascadeOnDelete(true);
 
         }

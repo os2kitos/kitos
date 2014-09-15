@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 
 namespace Core.ApplicationServices
@@ -9,14 +10,14 @@ namespace Core.ApplicationServices
     {
         private readonly IGenericRepository<ItSystemUsage> _usageRepository;
         private readonly IGenericRepository<ItSystem> _systemRepository;
-        private readonly IGenericRepository<InterfaceExposure> _exposureRepository;
+        private readonly IGenericRepository<ItInterfaceExhibitUsage> _exposureRepository;
         private readonly IGenericRepository<InterfaceUsage> _interfaceUsageRepository;
         private readonly IGenericRepository<DataRowUsage> _dataRowUsageRepository;
 
         public ItSystemUsageService(
             IGenericRepository<ItSystemUsage> usageRepository, 
             IGenericRepository<ItSystem> systemRepository, 
-            IGenericRepository<InterfaceExposure> exposureRepository, 
+            IGenericRepository<ItInterfaceExhibitUsage> exposureRepository, 
             IGenericRepository<InterfaceUsage> interfaceUsageRepository,
             IGenericRepository<DataRowUsage> dataRowUsageRepository)
         {
@@ -43,7 +44,7 @@ namespace Core.ApplicationServices
             CreateAndInsertInterfaceUsage(system.CanUseInterfaces, objectOwner);
             
             // add the interfaceExposures
-            CreateAndInsertExposuedInterfaceUsage(system.ExposedInterfaces, usage, objectOwner);
+            CreateAndInsertExposuedInterfaceUsage(system.ItInterfaceExhibit, usage, objectOwner);
 
             _usageRepository.Save(); // abuse this as UoW
             return usage;
@@ -64,7 +65,7 @@ namespace Core.ApplicationServices
             foreach (var @interface in @interfaces)
             {
                 var interfaceUsage = _interfaceUsageRepository.Create();
-                interfaceUsage.Interface = @interface;
+                interfaceUsage.ItInterfaceExhibit = @interface;
                 interfaceUsage.ObjectOwner = objectOwner;
                 interfaceUsage.LastChangedByUser = objectOwner;
 
@@ -95,7 +96,7 @@ namespace Core.ApplicationServices
             {
                 var interfaceUsage = _exposureRepository.Create();
                 interfaceUsage.ItSystemUsage = usage;
-                interfaceUsage.Interface = @interface;
+                interfaceUsage.ItInterfaceExhibit = @interface;
                 interfaceUsage.ObjectOwner = objectOwner;
                 interfaceUsage.LastChangedByUser = objectOwner;
 

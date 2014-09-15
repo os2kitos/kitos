@@ -11,6 +11,7 @@ using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using UI.MVC4.Models;
 

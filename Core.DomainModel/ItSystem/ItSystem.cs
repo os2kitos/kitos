@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Core.DomainModel.ItSystemUsage;
 
 namespace Core.DomainModel.ItSystem
 {
@@ -9,14 +10,13 @@ namespace Core.DomainModel.ItSystem
     {
         public ItSystem()
         {
-            this.ExposedInterfaces = new List<ItInterface>();
-            this.CanUseInterfaces = new List<ItInterface>();
+            this.CanUseInterfaces = new List<ItInterfaceUse>();
             this.Children = new List<ItSystem>();
             this.TaskRefs = new List<TaskRef>();
-            this.Usages = new List<ItSystemUsage>();
+            this.Usages = new List<ItSystemUsage.ItSystemUsage>();
             this.Wishes = new List<Wish>();
             this.TaskRefs = new List<TaskRef>();
-            this.Overviews = new List<ItSystemUsage>();
+            this.Overviews = new List<ItSystemUsage.ItSystemUsage>();
             this.InfrastructureUsage = new List<InterfaceUsage>();
         }
         
@@ -31,25 +31,22 @@ namespace Core.DomainModel.ItSystem
         /// The organization the it system belongs to.
         /// </value>
         public virtual Organization BelongsTo { get; set; }
-        
+
         /// <summary>
-        /// Gets or sets interfaces this instance exposes.
+        /// Gets or sets exhibited interfaces for this instance.
         /// </summary>
         /// <value>
-        /// Exposed interfaces.
+        /// Exhibited interfaces.
         /// </value>
-        public virtual ICollection<ItInterface> ExposedInterfaces { get; set; }
+        public virtual ItInterfaceExhibit ItInterfaceExhibit { get; set; }
         
         /// <summary>
         /// Gets or sets interfaces that can use this instance.
         /// </summary>
-        /// <remarks>
-        /// Should only be set/used if this instance's <see cref="AppType"/> is not an interface.
-        /// </remarks>
         /// <value>
         /// Usable interfaces.
         /// </value>
-        public virtual ICollection<ItInterface> CanUseInterfaces { get; set; }
+        public virtual ICollection<ItInterfaceUse> CanUseInterfaces { get; set; }
         
         /// <summary>
         /// Gets or sets the sub (child) it systems.
@@ -81,7 +78,7 @@ namespace Core.DomainModel.ItSystem
 
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
 
-        public virtual ICollection<ItSystemUsage> Overviews { get; set; }
+        public virtual ICollection<ItSystemUsage.ItSystemUsage> Overviews { get; set; } // TODO what is this?
 
         /// <summary>
         /// Gets or sets local infrastructure usages of the system, in case the system is not an interface.
@@ -89,6 +86,14 @@ namespace Core.DomainModel.ItSystem
         /// <value>
         /// The infrastructure usage.
         /// </value>
-        public virtual ICollection<InterfaceUsage> InfrastructureUsage { get; set; }
+        public virtual ICollection<InterfaceUsage> InfrastructureUsage { get; set; } // TODO is this used anywhere?
+
+        /// <summary>
+        /// Gets or sets the usages.
+        /// </summary>
+        /// <value>
+        /// The usages.
+        /// </value>
+        public virtual ICollection<ItSystemUsage.ItSystemUsage> Usages { get; set; }
     }
 }

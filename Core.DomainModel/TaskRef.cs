@@ -14,7 +14,7 @@ namespace Core.DomainModel
         {
             this.Children = new List<TaskRef>();
             this.ItSystems = new List<ItSystem.ItSystem>();
-            this.ItSystemUsages = new List<ItSystemUsage>();
+            this.ItSystemUsages = new List<ItSystemUsage.ItSystemUsage>();
             this.ItProjects = new List<ItProject.ItProject>();
         }
         
@@ -78,6 +78,6 @@ namespace Core.DomainModel
         /// <summary>
         /// ItSystemUsages which have been marked with this task
         /// </summary>
-        public virtual ICollection<ItSystemUsage> ItSystemUsages { get; set; }
+        public virtual ICollection<ItSystemUsage.ItSystemUsage> ItSystemUsages { get; set; }
     }
 }

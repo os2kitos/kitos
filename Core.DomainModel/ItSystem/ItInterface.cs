@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Core.DomainModel.ItSystemUsage;
 
 namespace Core.DomainModel.ItSystem
 {
@@ -35,25 +36,19 @@ namespace Core.DomainModel.ItSystem
         /// <summary>
         /// Gets or sets it systems that can use this instance.
         /// </summary>
-        /// <remarks>
-        /// Should only be set/used if this instance's <see cref="AppType"/> is an interface.
-        /// </remarks>
         /// <value>
         /// It systems that can used by this instance.
         /// </value>
-        public virtual ICollection<ItSystem> CanBeUsedBy { get; set; }
+        public virtual ICollection<ItInterfaceUse> CanBeUsedBy { get; set; }
 
-        public int? ExposedById { get; set; }
+        public int? ExhibitedById { get; set; }
         /// <summary>
-        /// Gets or sets it system that exposes this interface instance.
+        /// Gets or sets it system that exhibits this interface instance.
         /// </summary>
-        /// <remarks>
-        /// Should only be set/used if this instance's <see cref="AppType"/> is an interface.
-        /// </remarks>
         /// <value>
-        /// The it system that exposes this instance.
+        /// The it system that exhibits this instance.
         /// </value>
-        public virtual ItSystem ExposedBy { get; set; }
+        public virtual ItInterfaceExhibit ExhibitedBy { get; set; }
 
         /// <summary>
         /// Gets or sets local usages of the system, in case the system is an interface.
@@ -69,6 +64,6 @@ namespace Core.DomainModel.ItSystem
         /// <value>
         /// The interface local exposure.
         /// </value>
-        public virtual ICollection<InterfaceExposure> InterfaceLocalExposure { get; set; }
+        public virtual ICollection<ItInterfaceExhibitUsage> InterfaceLocalExposure { get; set; }
     }
 }

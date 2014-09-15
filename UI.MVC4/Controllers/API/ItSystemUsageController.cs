@@ -11,6 +11,7 @@ using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using UI.MVC4.Models;
 
@@ -199,8 +200,8 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                if (Repository.Get(usage => usage.ItSystemId == dto.ItSystemId 
-                    && usage.OrganizationId == dto.OrganizationId).Any())
+                if (Repository.Get(usage => usage.ItSystemId == dto.ItSystemId
+                                            && usage.OrganizationId == dto.OrganizationId).Any())
                     return Conflict("Usage already exist");
 
                 var sysUsage = _itSystemUsageService.Add(dto.ItSystemId, dto.OrganizationId, KitosUser);

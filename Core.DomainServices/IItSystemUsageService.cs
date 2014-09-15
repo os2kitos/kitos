@@ -1,5 +1,6 @@
 ﻿using Core.DomainModel;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 
 namespace Core.DomainServices
 {

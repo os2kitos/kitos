@@ -1,13 +1,15 @@
-namespace Core.DomainModel.ItSystem
+using Core.DomainModel.ItSystem;
+
+namespace Core.DomainModel.ItSystemUsage
 {
     /// <summary>
-    /// Represent the local exposure of a interface.
-    /// When an <see cref="ItSystem"/>, which exposes an interface, is taken into local usage,
-    /// a InterfaceExposure is created, to allow for adding local details regarding the exposure 
+    /// Represent the local usage of exhibited interface.
+    /// When an <see cref="ItSystem"/>, which exhibits an interface, is taken into local usage,
+    /// a ItInterfaceExhibitUsage is created, to allow for adding local details regarding the exposure 
     /// of the interface. 
     /// It is also used for binding an <see cref="ItContract"/> with the usage.
     /// </summary>
-    public class InterfaceExposure : Entity
+    public class ItInterfaceExhibitUsage : Entity
     {
         public int ItSystemUsageId { get; set; }
         /// <summary>
@@ -21,11 +23,11 @@ namespace Core.DomainModel.ItSystem
         public int? ItContractId { get; set; }
         public virtual ItContract.ItContract ItContract { get; set; }
 
-        public int InterfaceId { get; set; }
+        public int ItInterfaceExhibitId { get; set; }
         /// <summary>
-        /// The interface that is being exposed.
+        /// The interface that is being exhibited.
         /// </summary>
-        public virtual ItSystem Interface { get; set; }
+        public virtual ItInterfaceExhibit ItInterfaceExhibit { get; set; }
 
         /// <summary>
         /// Whether local exposure of the interface is wanted or not.

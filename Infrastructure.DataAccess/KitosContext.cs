@@ -3,6 +3,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Infrastructure.DataAccess.Mapping;
 
 namespace Infrastructure.DataAccess
@@ -44,7 +45,7 @@ namespace Infrastructure.DataAccess
         public DbSet<HandoverTrialType> HandoverTrialTypes { get; set; }
         public DbSet<Interface> Interfaces { get; set; }
         public DbSet<InterfaceUsage> InterfaceUsages { get; set; }
-        public DbSet<InterfaceExposure> InterfaceExposure { get; set; }
+        public DbSet<ItInterfaceExhibitUsage> InterfaceExhibtUsages { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
         public DbSet<ItContractItSystemUsage> ItContractItSystemUsages { get; set; }
@@ -113,7 +114,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new HandoverTrialTypeMap());
             modelBuilder.Configurations.Add(new InterfaceMap());
             modelBuilder.Configurations.Add(new InterfaceUsageMap());
-            modelBuilder.Configurations.Add(new InterfaceExposureMap());
+            modelBuilder.Configurations.Add(new ItInterfaceMap());
+            modelBuilder.Configurations.Add(new ItInterfaceExhibitUsageMap());
             modelBuilder.Configurations.Add(new InterfaceTypeMap());
             modelBuilder.Configurations.Add(new ItContractMap());
             modelBuilder.Configurations.Add(new ItContractItSystemUsageMap());

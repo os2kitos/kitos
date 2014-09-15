@@ -5,17 +5,17 @@ namespace Core.DomainModel.ItSystem
     /// <summary>
     /// 
     /// </summary>
-    public class Method : Entity, IOptionEntity<ItSystem>
+    public class Method : Entity, IOptionEntity<ItInterface>
     {
         public Method()
         {
-            References = new List<ItSystem>();
+            References = new List<ItInterface>();
         }
 
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }
         public string Note { get; set; }
-        public virtual ICollection<ItSystem> References { get; set; }
+        public virtual ICollection<ItInterface> References { get; set; }
     }
 }
