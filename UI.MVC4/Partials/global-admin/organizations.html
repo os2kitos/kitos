@@ -12,6 +12,7 @@
             <th>Navn</th>
             <th>CVR</th>
             <th>Type</th>
+            <th>Public</th>
             <th><!-- CONTROL --></th>
         </tr>
     </thead>
@@ -23,6 +24,11 @@
                 <span data-ng-switch-when="0">Virksomhed</span>
                 <span data-ng-switch-when="1">Kommune</span>
                 <span data-ng-switch-when="2">Interessefælleskab</span>
+            </td>
+            <td data-ng-switch="org.accessModifier">
+                <span data-ng-switch-when="0">Normal</span>
+                <span data-ng-switch-when="1">Public</span>
+                <span data-ng-switch-when="2">Privat</span>
             </td>
             <td class="text-right">
                 <a data-ui-sref="global-admin.organizations.edit({id: {{ org.id }}})" class="btn btn-link btn-sm"><i class="glyphicon glyphicon-pencil"></i></a>
