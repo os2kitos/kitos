@@ -24,7 +24,6 @@ namespace Infrastructure.DataAccess
         public DbSet<AdminRole> AdminRoles { get; set; }
         public DbSet<Advice> Advices { get; set; }
         public DbSet<AgreementElement> AgreementElements { get; set; }
-        public DbSet<AppType> AppTypes { get; set; }
         public DbSet<ArchiveType> ArchiveTypes { get; set; }
         public DbSet<BusinessType> BusinessTypes { get; set; }
         public DbSet<Communication> Communications { get; set; }
@@ -93,7 +92,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new AdminRoleMap());
             modelBuilder.Configurations.Add(new AdviceMap());
             modelBuilder.Configurations.Add(new AgreementElementMap());
-            modelBuilder.Configurations.Add(new AppTypeMap());
             modelBuilder.Configurations.Add(new ArchiveTypeMap());
             modelBuilder.Configurations.Add(new BusinessTypeMap());
             modelBuilder.Configurations.Add(new CommunicationMap());
@@ -115,6 +113,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new InterfaceMap());
             modelBuilder.Configurations.Add(new InterfaceUsageMap());
             modelBuilder.Configurations.Add(new ItInterfaceMap());
+            modelBuilder.Configurations.Add(new ItInterfaceUseMap());
+            modelBuilder.Configurations.Add(new ItInterfaceExhibitMap());
             modelBuilder.Configurations.Add(new ItInterfaceExhibitUsageMap());
             modelBuilder.Configurations.Add(new InterfaceTypeMap());
             modelBuilder.Configurations.Add(new ItContractMap());

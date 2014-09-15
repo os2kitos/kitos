@@ -80,10 +80,6 @@ namespace UI.MVC4.App_Start
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<AppType, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
-
             Mapper.CreateMap<BusinessType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
@@ -216,14 +212,14 @@ namespace UI.MVC4.App_Start
                   .ForMember(dest => dest.DataType, opt => opt.Ignore());
 
             Mapper.CreateMap<ItSystem, ItSystemDTO>()
-                  .ForMember(dest => dest.TaskRefIds, opt => opt.MapFrom(src => src.TaskRefs.Select(x => x.Id)))
-                  .ForMember(dest => dest.CanUseInterfaceIds, opt => opt.MapFrom(src => src.CanUseInterfaces.Select(x => x.Id)))
-                  .ForMember(dest => dest.ExposedInterfaceIds, opt => opt.MapFrom(src => src.ItInterfaceExhibit.Select(x => x.Id)))
-                  .ReverseMap()
-                  .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
-                  .ForMember(dest => dest.CanUseInterfaces, opt => opt.Ignore())
-                  .ForMember(dest => dest.ItInterfaceExhibit, opt => opt.Ignore())
-                  .ForMember(dest => dest.CanBeUsedBy, opt => opt.Ignore());
+                .ForMember(dest => dest.TaskRefIds, opt => opt.MapFrom(src => src.TaskRefs.Select(x => x.Id)))
+                //.ForMember(dest => dest.CanUseInterfaceIds, opt => opt.MapFrom(src => src.CanUseInterfaces.Select(x => x.Id)))
+                //.ForMember(dest => dest.ExposedInterfaceIds, opt => opt.MapFrom(src => src.ItInterfaceExhibit.Select(x => x.Id)))
+                .ReverseMap()
+                .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
+                .ForMember(dest => dest.CanUseInterfaces, opt => opt.Ignore())
+                .ForMember(dest => dest.ItInterfaceExhibit, opt => opt.Ignore());
+                  //.ForMember(dest => dest.CanBeUsedBy, opt => opt.Ignore());
 
             //Simplere mapping than the one above, only one way
             Mapper.CreateMap<ItSystem, ItSystemSimpleDTO>();

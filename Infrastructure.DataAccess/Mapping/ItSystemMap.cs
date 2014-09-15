@@ -24,10 +24,6 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(d => d.BelongingSystems)
                 .HasForeignKey(t => t.BelongsToId);
 
-            this.HasOptional(t => t.AppType)
-                .WithMany(t => t.References)
-                .HasForeignKey(t => t.AppTypeId);
-
             this.HasOptional(t => t.BusinessType)
                 .WithMany(t => t.References)
                 .HasForeignKey(t => t.BusinessTypeId);
@@ -35,11 +31,6 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasMany(t => t.CanUseInterfaces)
                 .WithRequired(t => t.ItSystem)
                 .HasForeignKey(d => d.ItSystemId);
-
-            this.HasOptional(t => t.ExposedBy)
-                .WithMany(d => d.ExposedInterfaces)
-                .HasForeignKey(d => d.ExposedById)
-                .WillCascadeOnDelete(false);
 
             this.HasOptional(t => t.ItInterfaceExhibit)
                 .WithRequired(t => t.ItSystem);

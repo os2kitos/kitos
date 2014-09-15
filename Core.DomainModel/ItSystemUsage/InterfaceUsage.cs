@@ -29,12 +29,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// </summary>
         public virtual ItContract.ItContract ItContract { get; set; }
 
-        public int ItInterfaceExhibitId { get; set; }
-        /// <summary>
-        /// The interface that is being used.
-        /// </summary>
-        public virtual ItInterfaceExhibit ItInterfaceExhibit { get; set; }
-
         /// <summary>
         /// Local details regarding the usage of the exposed data of the interface
         /// </summary>

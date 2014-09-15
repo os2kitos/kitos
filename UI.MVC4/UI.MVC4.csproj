@@ -215,6 +215,7 @@
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="Controllers\API\ItContractItSystemUsageController.cs" />
+    <Compile Include="Controllers\API\ItInterfaceController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageOrgUnitUsageController.cs" />
     <Compile Include="Controllers\API\ItProjectStatusController.cs" />
     <Compile Include="Controllers\API\ItProjectPhaseController.cs" />
@@ -231,6 +232,7 @@
     <Compile Include="Controllers\API\ItProjectOrgUnitUsageController.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Models\HandoverTrialDTO.cs" />
+    <Compile Include="Models\ItInterfaceDTO.cs" />
     <Compile Include="Models\ItProjectOverviewDTO.cs" />
     <Compile Include="Models\ItProjectPhaseDTO.cs" />
     <Compile Include="Models\ItProjectStatusDTO.cs" />
@@ -320,7 +322,6 @@
     <Compile Include="Controllers\API\OrganizationUnitController.cs" />
     <Compile Include="Controllers\API\ItProjectTypeController.cs" />
     <Compile Include="Controllers\API\PurchaseFormController.cs" />
-    <Compile Include="Controllers\API\AppTypeController.cs" />
     <Compile Include="Controllers\API\GlobalAdminController.cs" />
     <Compile Include="Controllers\API\LocalAdminController.cs" />
     <Compile Include="Controllers\API\OrganizationController.cs" />

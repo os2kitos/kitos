@@ -21,14 +21,12 @@ namespace UI.MVC4.Controllers.API
     {
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemService _systemService;
-        private readonly IItSystemUsageService _systemUsageService;
 
-        public ItSystemController(IGenericRepository<ItSystem> repository, IGenericRepository<TaskRef> taskRepository, IItSystemService systemService, IItSystemUsageService systemUsageService) 
+        public ItSystemController(IGenericRepository<ItSystem> repository, IGenericRepository<TaskRef> taskRepository, IItSystemService systemService) 
             : base(repository)
         {
             _taskRepository = taskRepository;
             _systemService = systemService;
-            _systemUsageService = systemUsageService;
         }
 
         public HttpResponseMessage GetPublic([FromUri] int organizationId, [FromUri] PagingModel<ItSystem> paging, [FromUri] string q)
@@ -131,47 +129,47 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        /// <summary>
-        /// Returns the interfaces that a given system exposes
-        /// </summary>
-        /// <param name="itSystemId">The id of the exposing system</param>
-        /// <param name="getExposedInterfaces">flag</param>
-        /// <returns>List of interfaces</returns>
-        public HttpResponseMessage GetExposedInterfaces(int itSystemId, bool? getExposedInterfaces)
-        {
-            try
-            {
-                var interfaces = Repository.Get(system => system.ExposedById == itSystemId);
-                var dtos = Map(interfaces);
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
+        ///// <summary>
+        ///// Returns the interfaces that a given system exposes
+        ///// </summary>
+        ///// <param name="itSystemId">The id of the exposing system</param>
+        ///// <param name="getExposedInterfaces">flag</param>
+        ///// <returns>List of interfaces</returns>
+        //public HttpResponseMessage GetExposedInterfaces(int itSystemId, bool? getExposedInterfaces)
+        //{
+        //    try
+        //    {
+        //        var interfaces = Repository.Get(system => system.ExposedById == itSystemId);
+        //        var dtos = Map(interfaces);
+        //        return Ok(dtos);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return Error(e);
+        //    }
+        //}
 
-        /// <summary>
-        /// Returns the interfaces that a given system can use
-        /// </summary>
-        /// <param name="itSystemId">The id of the system</param>
-        /// <param name="getCanUseInterfaces">flag</param>
-        /// <returns>List of interfaces</returns>
-        public HttpResponseMessage GetCanUseInterfaces(int itSystemId, bool? getCanUseInterfaces)
-        {
-            try
-            {
-                var system = Repository.GetByKey(itSystemId);
-                var interfaces = system.CanUseInterfaces;
+        ///// <summary>
+        ///// Returns the interfaces that a given system can use
+        ///// </summary>
+        ///// <param name="itSystemId">The id of the system</param>
+        ///// <param name="getCanUseInterfaces">flag</param>
+        ///// <returns>List of interfaces</returns>
+        //public HttpResponseMessage GetCanUseInterfaces(int itSystemId, bool? getCanUseInterfaces)
+        //{
+        //    try
+        //    {
+        //        var system = Repository.GetByKey(itSystemId);
+        //        var interfaces = system.CanUseInterfaces;
 
-                var dtos = Map(interfaces);
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
+        //        var dtos = Map(interfaces);
+        //        return Ok(dtos);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return Error(e);
+        //    }
+        //}
 
         public HttpResponseMessage GetInterfacesSearch(string q, int orgId, bool? interfaces)
         {
@@ -229,25 +227,12 @@ namespace UI.MVC4.Controllers.API
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
 
-                foreach (var dataRow in item.DataRows)
-                {
-                    dataRow.ObjectOwner = KitosUser;
-                    dataRow.LastChangedByUser = KitosUser;
-                }
-
                 foreach (var id in dto.TaskRefIds)
                 {
                     var task = _taskRepository.GetByKey(id);
                     item.TaskRefs.Add(task);
                 }
-
-                foreach (var id in dto.CanUseInterfaceIds)
-                {
-                    var intrface = Repository.GetByKey(id);
-                    item.CanUseInterfaces.Add(intrface);
-                }
-
-
+                
                 PostQuery(item);
 
                 return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
@@ -369,69 +354,69 @@ namespace UI.MVC4.Controllers.API
             }
         }
         
-        /// <summary>
-        /// Adds a new can-use-interface to the system
-        /// </summary>
-        /// <param name="id">Id of the system</param>
-        /// <param name="interfaceId">Id of the interface, that can-be-used by the system</param>
-        /// <returns></returns>
-        public HttpResponseMessage PostInterfaceCanBeUsedBySystem(int id, [FromUri] int interfaceId)
-        {
-            try
-            {
-                var system = Repository.GetByKey(id);
-                if (system == null) return NotFound();
-                if (!HasWriteAccess(system)) return Unauthorized();
+        ///// <summary>
+        ///// Adds a new can-use-interface to the system
+        ///// </summary>
+        ///// <param name="id">Id of the system</param>
+        ///// <param name="interfaceId">Id of the interface, that can-be-used by the system</param>
+        ///// <returns></returns>
+        //public HttpResponseMessage PostInterfaceCanBeUsedBySystem(int id, [FromUri] int interfaceId)
+        //{
+        //    try
+        //    {
+        //        var system = Repository.GetByKey(id);
+        //        if (system == null) return NotFound();
+        //        if (!HasWriteAccess(system)) return Unauthorized();
 
-                var theInterface = Repository.GetByKey(interfaceId);
-                if (theInterface == null) return NotFound();
+        //        var theInterface = Repository.GetByKey(interfaceId);
+        //        if (theInterface == null) return NotFound();
 
-                system.CanUseInterfaces.Add(theInterface);
+        //        system.CanUseInterfaces.Add(theInterface);
                 
-                //also update each of the existing SystemUsages to allow them to use the new interface
-                foreach (var systemUsage in system.Usages)
-                {
-                    _systemUsageService.AddInterfaceUsage(systemUsage, theInterface);
-                }
+        //        //also update each of the existing SystemUsages to allow them to use the new interface
+        //        foreach (var systemUsage in system.Usages)
+        //        {
+        //            _systemUsageService.AddInterfaceUsage(systemUsage, theInterface);
+        //        }
 
-                system.LastChanged = DateTime.Now;
-                system.LastChangedByUser = KitosUser;
+        //        system.LastChanged = DateTime.Now;
+        //        system.LastChangedByUser = KitosUser;
 
-                Repository.Save();
+        //        Repository.Save();
 
-                return Created(Map<ItSystem, ItSystemSimpleDTO>(theInterface));
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
+        //        return Created(Map<ItSystem, ItSystemSimpleDTO>(theInterface));
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return Error(e);
+        //    }
+        //}
 
-        public HttpResponseMessage DeleteInterfaceCanBeUsedBySystem(int id, [FromUri] int interfaceId)
-        {
-            try
-            {
-                var system = Repository.GetByKey(id);
-                if (system == null) return NotFound();
-                if (!HasWriteAccess(system)) return Unauthorized();
+        //public HttpResponseMessage DeleteInterfaceCanBeUsedBySystem(int id, [FromUri] int interfaceId)
+        //{
+        //    try
+        //    {
+        //        var system = Repository.GetByKey(id);
+        //        if (system == null) return NotFound();
+        //        if (!HasWriteAccess(system)) return Unauthorized();
 
-                var theInterface = Repository.GetByKey(interfaceId);
-                if (theInterface == null) return NotFound();
+        //        var theInterface = Repository.GetByKey(interfaceId);
+        //        if (theInterface == null) return NotFound();
 
-                system.CanUseInterfaces.Remove(theInterface);
+        //        system.CanUseInterfaces.Remove(theInterface);
 
-                system.LastChanged = DateTime.Now;
-                system.LastChangedByUser = KitosUser;
+        //        system.LastChanged = DateTime.Now;
+        //        system.LastChangedByUser = KitosUser;
 
-                Repository.Save();
+        //        Repository.Save();
 
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
+        //        return Ok();
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return Error(e);
+        //    }
+        //}
 
         public override HttpResponseMessage Patch(int id, JObject obj)
         {

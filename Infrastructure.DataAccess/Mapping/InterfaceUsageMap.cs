@@ -7,16 +7,16 @@ namespace Infrastructure.DataAccess.Mapping
         public InterfaceUsageMap()
         {
             // Table & Column Mappings
-            this.ToTable("InterfaceUsage");
+            this.ToTable("InfUsage");
 
             this.HasRequired(t => t.ItSystemUsage)
                 .WithMany(d => d.InterfaceUsages)
                 .HasForeignKey(t => t.ItSystemUsageId)
                 .WillCascadeOnDelete(true);
 
-            this.HasRequired(t => t.ItInterfaceExhibit)
-                .WithMany(d => d.InterfaceLocalUsages)
-                .HasForeignKey(t => t.ItInterfaceExhibitId)
+            this.HasRequired(t => t.ItInterfaceUse)
+                .WithMany(d => d.InterfaceUsages)
+                .Map(m => m.MapKey(new[] { "infUseId", "infUsageId" })) // have to rename key else it's too long for MySql
                 .WillCascadeOnDelete(true);
 
             this.HasOptional(t => t.ItContract)

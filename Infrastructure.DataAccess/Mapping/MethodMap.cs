@@ -1,9 +1,8 @@
-﻿using System.Data.Entity.ModelConfiguration;
-using Core.DomainModel.ItSystem;
+﻿using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class MethodMap : OptionEntityMap<Method, ItSystem>
+    public class MethodMap : OptionEntityMap<Method, ItInterface>
     {
     }
 }
