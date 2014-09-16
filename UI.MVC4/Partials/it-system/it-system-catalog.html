@@ -14,7 +14,7 @@
             <th class="col-sm-0"><!-- Public marker --></th>
             <th>
                 Globalt SystemID
-                <order-by data-order-by="'systemId'" data-paging="pagination"></order-by>
+                <order-by data-order-by="'itSystemId'" data-paging="pagination"></order-by>
             </th>
             <th>
                 <select data-ng-model="showType">
@@ -41,15 +41,14 @@
     <tbody>
         <tr data-ng-repeat="system in systems">
             <td>
-                <a data-ng-if="system.isInterface" ui-sref="it-system.edit.interface-details({id: system.id})">{{system.name}}</a>
-                <a data-ng-if="!system.isInterface" ui-sref="it-system.edit.interfaces({id: system.id})">{{system.name}}</a>
+                <a data-ui-sref="it-system.edit.interfaces({id: system.id})">{{system.name}}</a>
             </td>
             <td>
                 <span data-ng-show="{{system.accessModifier == 1}}">
                     (P)
                 </span>
             </td>
-            <td>{{system.systemId}}</td>
+            <td>{{system.itSystemId}}</td>
             <td data-ng-switch="showType">
                 <span data-ng-switch-when="appType.name">{{system.appType.name}}</span>
                 <span data-ng-switch-when="businessType.name">{{system.businessType.name}}</span>
@@ -65,7 +64,7 @@
                 </span>
             </td>
             <td>
-                <div data-ng-if="!system.isInterface">
+                <div>
                     <button class="btn btn-xs btn-success" data-ng-click="system.addUsage()" data-tooltip="Tag systemet i lokal anvendelse" data-ng-show="!system.hasUsage">
                         Anvend
                     </button>

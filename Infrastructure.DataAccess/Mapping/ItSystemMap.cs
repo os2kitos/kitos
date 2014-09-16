@@ -32,8 +32,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithRequired(t => t.ItSystem)
                 .HasForeignKey(d => d.ItSystemId);
 
-            this.HasOptional(t => t.ItInterfaceExhibit)
-                .WithRequired(t => t.ItSystem);
+            this.HasMany(t => t.ItInterfaceExhibits)
+                .WithRequired(t => t.ItSystem)
+                .HasForeignKey(d => d.ItSystemId);
         }
     }
 }

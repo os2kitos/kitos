@@ -1,0 +1,59 @@
+﻿<!--<div search-box data-paging="pagination"></div>
+    <div class="searchbox-wrapper">
+        <a class="excel-icon" data-ng-href="{{csvUrl}}">
+            <img src="../../Images/excel.png" alt="Hent excelark" width="25">
+        </a>
+    </div>
+    -->
+<table class="table full-width table-striped">
+    <thead>
+        <tr>
+            <th>
+                Snitflade
+                <!--
+                    <order-by data-order-by="'name'" data-paging="pagination"></order-by>
+                    -->
+            </th>
+            <th class="col-sm-0">
+                <!-- Public marker -->
+            </th>
+            <th>
+                Globalt SnitfladeID
+                <!--
+                <order-by data-order-by="'systemId'" data-paging="pagination"></order-by>
+                -->
+            </th>
+            <th>
+                Oprettet af
+                <!--
+                <order-by data-order-by="'objectOwner.name'" data-paging="pagination"></order-by>
+                -->
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr data-ng-repeat="system in systems">
+            <td>
+                <a data-ui-sref="it-system.interface-edit.interface-details({id: system.id})">{{system.name}}</a>
+            </td>
+            <td>
+                <span data-ng-show="{{system.accessModifier == 1}}">
+                    (P)
+                </span>
+            </td>
+            <td>{{system.itInterfaceId}}</td>
+            <td>
+                <span data-popover-placement="right" data-popover="Oprettet i {{system.organizationName}}" data-popover-trigger="mouseenter">
+                    {{system.objectOwnerName}}
+                </span>
+            </td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="4" class="text-center">
+                <span data-pagination-buttons="pagination"></span>
+            </td>
+        </tr>
+    </tfoot>
+</table>

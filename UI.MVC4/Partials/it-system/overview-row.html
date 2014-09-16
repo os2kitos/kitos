@@ -11,14 +11,15 @@
     {{ usage.rights | filter:{roleId: chosenRoleId} | joinBy:', ':'user.name' }}
 </td>
 <td data-ng-switch="showSystemId">
-    <span data-ng-switch-when="itSystem.systemId">{{usage.itSystem.systemId}}</span>
+    <span data-ng-switch-when="itSystem.systemId">{{usage.itSystem.itSystemId}}</span>
     <span data-ng-switch-when="localSystemId">{{usage.localSystemId}}</span>
 </td>
 <td data-ng-switch="showType">
     <span data-ng-switch-when="itSystem.appType.name">{{usage.itSystem.appType.name}}</span>
     <span data-ng-switch-when="itSystem.businessType.name">{{usage.itSystem.businessType.name}}</span>
 </td>
-<td>{{ usage.activeInterfaceUsages }}
+<td>
+    {{ usage.activeInterfaceUsages }}
     ({{ usage.itSystem.canUseInterfaceIds.length }})
 </td>
 <td>

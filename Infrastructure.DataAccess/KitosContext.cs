@@ -43,7 +43,9 @@ namespace Infrastructure.DataAccess
         public DbSet<HandoverTrial> HandoverTrials { get; set; }
         public DbSet<HandoverTrialType> HandoverTrialTypes { get; set; }
         public DbSet<Interface> Interfaces { get; set; }
+        public DbSet<ItInterfaceUse> ItInterfaceUses { get; set; }
         public DbSet<InterfaceUsage> InterfaceUsages { get; set; }
+        public DbSet<ItInterfaceExhibit> ItInterfaceExhibits { get; set; }
         public DbSet<ItInterfaceExhibitUsage> InterfaceExhibtUsages { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }

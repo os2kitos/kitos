@@ -5,6 +5,25 @@ namespace Core.DomainModel.ItSystem
 {
     public class ItInterface : ItSystemBase
     {
+        public ItInterface()
+        {
+            this.DataRows = new List<DataRow>();
+            this.CanBeUsedBy = new List<ItInterfaceUse>();
+            this.InterfaceLocalUsages = new List<InterfaceUsage>();
+            this.InterfaceLocalExposure = new List<ItInterfaceExhibitUsage>();
+        }
+
+        /// <summary>
+        /// Gets or sets the user defined interface identifier.
+        /// </summary>
+        /// <remarks>
+        /// This identifier is NOT the primary key.
+        /// </remarks>
+        /// <value>
+        /// The user defined interface identifier.
+        /// </value>
+        public string ItInterfaceId { get; set; }
+
         public int? InterfaceId { get; set; }
         /// <summary>
         /// Gets or sets the interface option.
@@ -41,7 +60,7 @@ namespace Core.DomainModel.ItSystem
         /// </value>
         public virtual ICollection<ItInterfaceUse> CanBeUsedBy { get; set; }
 
-        public int? ExhibitedById { get; set; }
+        //public int? ExhibitedById { get; set; } TODO
         /// <summary>
         /// Gets or sets it system that exhibits this interface instance.
         /// </summary>

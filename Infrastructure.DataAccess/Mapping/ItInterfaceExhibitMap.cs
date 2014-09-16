@@ -9,7 +9,10 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("Exhibit");
 
-           
+           // Relationships
+            this.HasRequired(t => t.ItInterface)
+                .WithOptional(t => t.ExhibitedBy)
+                .WillCascadeOnDelete(true);
         }
     }
 }

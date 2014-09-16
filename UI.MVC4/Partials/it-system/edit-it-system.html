@@ -5,21 +5,6 @@
         <div class="col-md-4">
             <div class="row">
                 <div class="col-md-12">
-                    <!--Application type -->
-                    <div class="form-group">
-                        <label for="system-app-type" class="control-label small">Applikationstype</label>
-                        <select id="system-app-type" class="form-control input-sm" autofocus
-                                data-ui-select2="select2AllowClearOpt"
-                                data-placeholder="Vælg applikationstype"
-                                data-autosave="{{system.updateUrl}}"
-                                data-field="appTypeId"
-                                data-ng-disabled="!hasWriteAccess"
-                                data-ng-model="system.appTypeId">
-                            <option value=""></option>
-                            <option data-ng-repeat="appType in appTypes" value="{{appType.id}}">{{appType.name}}</option>
-                        </select>
-                    </div>
-
                     <!--Name-->
                     <div class="form-group">
                         <label for="system-name" class="control-label small">IT System</label>
@@ -36,12 +21,12 @@
                         <input type="text" id="system-id" class="form-control input-sm"
                                data-ng-disabled="!hasWriteAccess"
                                data-autosave="{{system.updateUrl}}" 
-                               data-field="systemId" 
-                               data-ng-model="system.systemId">
+                               data-field="itSystemId" 
+                               data-ng-model="system.itSystemId">
                     </div>
 
                     <!--Parent system-->
-                    <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
+                    <div class="form-group">
                         <label for="system-parent" class="control-label small">Overordnet system</label>
                         <input type="hidden" id="system-parent" class="form-control input-sm" 
                                data-ui-select2="itSystemsSelectOptions" 
@@ -60,7 +45,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <!-- belongs to -->
-                    <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
+                    <div class="form-group">
                         <label for="system-belongs-to" class="control-label small">Tilhører</label>
                         <input type="hidden" id="system-belongs-to" class="form-control input-sm" 
                                data-ui-select2="organizationSelectOptions" 
@@ -83,7 +68,7 @@
                     </div>
 
                     <!--Usage type-->
-                    <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
+                    <div class="form-group">
                         <label for="system-business-type" class="control-label small">Forretningstype</label>
                         <select id="system-business-type" class="form-control input-sm"
                                 data-ui-select2="select2AllowClearOpt"
@@ -133,14 +118,11 @@
 
 <!-- sub tab buttons -->
 <ul class="nav nav-tabs">
-    <li data-ui-sref-active="active" data-ng-if="system.appTypeId != interfaceAppType.id">
+    <li data-ui-sref-active="active">
         <a data-ui-sref="it-system.edit.interfaces">Snitflader</a>
     </li>
-    <li data-ui-sref-active="active" data-ng-if="system.appTypeId != interfaceAppType.id">
+    <li data-ui-sref-active="active">
         <a data-ui-sref="it-system.edit.kle">KLE</a>
-    </li>
-    <li data-ui-sref-active="active" data-ng-if="system.appTypeId == interfaceAppType.id">
-        <a data-ui-sref="it-system.edit.interface-details">Snitflade detaljer</a>
     </li>
 </ul>
 

@@ -207,6 +207,9 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<ItContractRight, RightOutputDTO>();
             Mapper.CreateMap<RightInputDTO, ItContractRight>();
 
+            Mapper.CreateMap<ItInterfaceExhibit, ItInterfaceExhibitDTO>()
+                .ReverseMap();
+
             Mapper.CreateMap<DataRow, DataRowDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.DataType, opt => opt.Ignore());
@@ -214,15 +217,18 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<ItSystem, ItSystemDTO>()
                 .ForMember(dest => dest.TaskRefIds, opt => opt.MapFrom(src => src.TaskRefs.Select(x => x.Id)))
                 //.ForMember(dest => dest.CanUseInterfaceIds, opt => opt.MapFrom(src => src.CanUseInterfaces.Select(x => x.Id)))
-                //.ForMember(dest => dest.ExposedInterfaceIds, opt => opt.MapFrom(src => src.ItInterfaceExhibit.Select(x => x.Id)))
+                //.ForMember(dest => dest.ExposedInterfaceIds, opt => opt.MapFrom(src => src.ItInterfaceExhibits.Select(x => x.Id)))
                 .ReverseMap()
                 .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
                 .ForMember(dest => dest.CanUseInterfaces, opt => opt.Ignore())
-                .ForMember(dest => dest.ItInterfaceExhibit, opt => opt.Ignore());
+                .ForMember(dest => dest.ItInterfaceExhibits, opt => opt.Ignore());
                   //.ForMember(dest => dest.CanBeUsedBy, opt => opt.Ignore());
 
             //Simplere mapping than the one above, only one way
             Mapper.CreateMap<ItSystem, ItSystemSimpleDTO>();
+
+            Mapper.CreateMap<ItInterface, ItInterfaceDTO>()
+                .ReverseMap();
 
             Mapper.CreateMap<DataRowUsage, DataRowUsageDTO>()
                   .ReverseMap();

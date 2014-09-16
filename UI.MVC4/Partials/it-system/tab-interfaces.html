@@ -20,7 +20,7 @@
         <tbody class="small">
             <tr data-ng-repeat-start="exposure in interfaceExposures">
                 <!-- wished to be used -->
-                <td rowspan="{{exposure.interface.numRows}}">
+                <td rowspan="{{exposure.numRows}}">
                     <input type="checkbox" data-ng-model="exposure.isWishedFor"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="isWishedFor"
@@ -28,49 +28,49 @@
                 </td>
 
                 <!-- active (depends on contract) -->
-                <td rowspan="{{exposure.interface.numRows}}">
+                <td rowspan="{{exposure.numRows}}">
                     <span data-ng-if="exposure.itContract.isActive" class="text-success">
                         <i class="glyphicon glyphicon-ok"></i>
                     </span>
                 </td>
 
                 <!-- name of the system -->
-                <td rowspan="{{exposure.interface.numRows}}">
-                    <a data-ui-sref="it-system.edit.interface-details({ id: exposure.interface.id })">{{ exposure.interface.name }}</a>
+                <td rowspan="{{exposure.numRows}}">
+                    <a data-ui-sref="it-system.interface-edit.interface-details({ id: exposure.id })">{{ exposure.name }}</a>
                 </td>
 
                 <!-- contract id -->
-                <td rowspan="{{exposure.interface.numRows}}">
+                <td rowspan="{{exposure.numRows}}">
                     <a data-ng-if="exposure.itContractId != null" data-ui-sref="it-contract.edit.systems({id: exposure.itContract.id})">{{exposure.itContract.itContractId}}
                     </a>
                 </td>
 
                 <!-- tsa -->
-                <td rowspan="{{exposure.interface.numRows}}">{{exposure.interface.tsa.name}}
+                <td rowspan="{{exposure.numRows}}">{{exposure.tsa.name}}
                 </td>
 
                 <!-- inteface type -->
-                <td rowspan="{{exposure.interface.numRows}}">{{exposure.interface.interfaceType.name}}</td>
+                <td rowspan="{{exposure.numRows}}">{{exposure.interfaceType.name}}</td>
 
                 <!-- interface (grænseflade) -->
-                <td rowspan="{{exposure.interface.numRows}}">{{exposure.interface.interface.name}}</td>
+                <td rowspan="{{exposure.numRows}}">{{exposure.interface.name}}</td>
 
                 <!-- method -->
-                <td rowspan="{{exposure.interface.numRows}}">{{exposure.interface.method.name}}</td>
+                <td rowspan="{{exposure.numRows}}">{{exposure.method.name}}</td>
 
                 <!-- data -->
                 <td rowspan="1">
-                    <span data-ng-if="exposure.interface.dataRows.length > 0">{{exposure.interface.dataRows[0].data}}
+                    <span data-ng-if="exposure.dataRows.length > 0">{{exposure.dataRows[0].data}}
                     </span>
                 </td>
 
                 <!-- data type -->
                 <td>
-                    <span data-ng-if="exposure.interface.dataRows.length > 0">{{exposure.interface.dataRows[0].dataType.name}}
+                    <span data-ng-if="exposure.dataRows.length > 0">{{exposure.dataRows[0].dataType.name}}
                     </span>
                 </td>
             </tr>
-            <tr data-ng-repeat="dataRow in exposure.interface.dataRows" data-ng-if="!$first" data-ng-repeat-end="">
+            <tr data-ng-repeat="dataRow in exposure.dataRows" data-ng-if="!$first" data-ng-repeat-end="">
                 <!-- data -->
                 <td rowspan="1">
                     {{dataRow.data}}
@@ -115,7 +115,7 @@
         <tbody class="small">
             <tr data-ng-repeat-start="usage in interfaceUsages">
                 <!-- wished to be used -->
-                <td rowspan="{{usage.interface.numRows}}">
+                <td rowspan="{{usage.numRows}}">
                     <input type="checkbox" data-ng-model="usage.isWishedFor"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="isWishedFor"
@@ -123,36 +123,36 @@
                 </td>
 
                 <!-- active (depends on contract) -->
-                <td rowspan="{{usage.interface.numRows}}">
+                <td rowspan="{{usage.numRows}}">
                     <span data-ng-if="usage.itContract.isActive" class="text-success">
                         <i class="glyphicon glyphicon-ok"></i>
                     </span>
                 </td>
 
                 <!-- name of the system -->
-                <td rowspan="{{usage.interface.numRows}}">
-                    <a data-ui-sref="it-system.edit.interface-details({ id: usage.interface.id })">{{usage.interface.name}}</a>
+                <td rowspan="{{usage.numRows}}">
+                    <a data-ui-sref="it-system.interface-edit.interface-details({ id: usage.id })">{{usage.name}}</a>
                 </td>
 
                 <!-- contract id -->
-                <td rowspan="{{usage.interface.numRows}}">
+                <td rowspan="{{usage.numRows}}">
                     <a data-ng-if="usage.itContractId != null" data-ui-sref="it-contract.edit.systems({id: usage.itContract.id})">{{usage.itContract.itContractId}}
                     </a>
                 </td>
 
                 <!-- tsa -->
-                <td rowspan="{{usage.interface.numRows}}">{{usage.interface.tsa.name}}
+                <td rowspan="{{usage.numRows}}">{{usage.tsa.name}}
                 </td>
 
                 <!-- infrastructure -->
-                <td rowspan="{{usage.interface.numRows}}">
+                <td rowspan="{{usage.numRows}}">
                     <input type="hidden" data-ui-select2="itSystemsSelectOptions" data-ng-model="usage.infrastructure"
                            class="form-control input-sm" data-ng-disabled="!usage.itContractId || !hasWriteAccess" data-ng-change="updateInfrastructure(usage)">
                 </td>
                 
                 <!-- exposed by -->
-                <td rowspan="{{usage.interface.numRows}}">
-                    <a data-ui-sref="it-system.edit.interfaces({ id: usage.interface.exposedBy.id })">{{usage.interface.exposedBy.name}}</a>
+                <td rowspan="{{usage.numRows}}">
+                    <a data-ui-sref="it-system.edit.interfaces({ id: usage.exposedBy.id })">{{usage.exposedBy.name}}</a>
                 </td>
 
                 <!-- data -->
@@ -262,4 +262,3 @@
         </tbody>
     </table>
 </div>
-

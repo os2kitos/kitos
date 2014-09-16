@@ -11,10 +11,6 @@ namespace Infrastructure.DataAccess.Mapping
             this.ToTable("ItInterface");
 
             // Relationships
-            this.HasOptional(t => t.ExhibitedBy)
-                .WithMany(t => t.ItInterfaces)
-                .HasForeignKey(d => d.ExhibitedById);
-
             this.HasMany(t => t.CanBeUsedBy)
                 .WithRequired(t => t.ItInterface)
                 .HasForeignKey(d => d.ItInterfaceId);

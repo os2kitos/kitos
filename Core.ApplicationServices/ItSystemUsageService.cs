@@ -52,7 +52,7 @@ namespace Core.ApplicationServices
         //    foreach (var @interface in @interfaces)
         //    {
         //        var interfaceUsage = _interfaceUsageRepository.Create();
-        //        interfaceUsage.ItInterfaceExhibit = @interface;
+        //        interfaceUsage.ItInterfaceExhibits = @interface;
         //        interfaceUsage.ObjectOwner = objectOwner;
         //        interfaceUsage.LastChangedByUser = objectOwner;
 

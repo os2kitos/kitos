@@ -10,16 +10,27 @@ namespace Core.DomainModel.ItSystem
     {
         public ItSystem()
         {
+            this.ItInterfaceExhibits = new List<ItInterfaceExhibit>();
             this.CanUseInterfaces = new List<ItInterfaceUse>();
             this.Children = new List<ItSystem>();
             this.TaskRefs = new List<TaskRef>();
-            this.Usages = new List<ItSystemUsage.ItSystemUsage>();
             this.Wishes = new List<Wish>();
-            this.TaskRefs = new List<TaskRef>();
             this.Overviews = new List<ItSystemUsage.ItSystemUsage>();
+            this.Usages = new List<ItSystemUsage.ItSystemUsage>();
             this.InfrastructureUsage = new List<InterfaceUsage>();
         }
-        
+
+        /// <summary>
+        /// Gets or sets the user defined system identifier.
+        /// </summary>
+        /// <remarks>
+        /// This identifier is NOT the primary key.
+        /// </remarks>
+        /// <value>
+        /// The user defined system identifier.
+        /// </value>
+        public string ItSystemId { get; set; }
+
         public int? BelongsToId { get; set; }
         /// <summary>
         /// Gets or sets the organization the system belongs to.
@@ -38,7 +49,7 @@ namespace Core.DomainModel.ItSystem
         /// <value>
         /// Exhibited interfaces.
         /// </value>
-        public virtual ItInterfaceExhibit ItInterfaceExhibit { get; set; }
+        public virtual ICollection<ItInterfaceExhibit> ItInterfaceExhibits { get; set; }
         
         /// <summary>
         /// Gets or sets interfaces that can use this instance.

@@ -154,12 +154,12 @@ namespace UI.MVC4.Controllers.API
                         obj.Add(role.Name,
                                 String.Join(",", usage.Rights.Where(x => x.RoleId == roleId).Select(x => x.User.Name)));
                     }
-                    obj.Add("Gid", usage.ItSystem.SystemId);
+                    obj.Add("Gid", usage.ItSystem.ItSystemId);
                     obj.Add("Lid", usage.LocalSystemId);
                     obj.Add("AppType", usage.ItSystem.AppTypeName);
                     obj.Add("BusiType", usage.ItSystem.BusinessTypeName);
-                    obj.Add("Anvender", usage.ActiveInterfaceUsages + "(" + usage.ItSystem.CanUseInterfaceIds.Count() + ")");
-                    obj.Add("Udstiller", usage.ItSystem.ExposedBy != null ? usage.ItSystem.ExposedBy.Name : "" + " " + usage.ItSystem.ExposedInterfaceIds.Count());
+                    //obj.Add("Anvender", usage.ActiveInterfaceUsages + "(" + usage.ItSystem.CanUseInterfaceIds.Count() + ")"); TODO
+                    //obj.Add("Udstiller", usage.ItSystem.ExposedBy != null ? usage.ItSystem.ExposedBy.Name : "" + " " + usage.ItSystem.ExposedInterfaceIds.Count()); TODO
                     obj.Add("Overblik", usage.OverviewItSystemName);
                     list.Add(obj);
                 }

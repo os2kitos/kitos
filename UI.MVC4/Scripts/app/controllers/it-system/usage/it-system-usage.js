@@ -5,14 +5,6 @@
             templateUrl: 'partials/it-system/usage-it-system.html',
             controller: 'system.UsageCtrl',
             resolve: {
-                appTypes: [
-                    '$http', function($http) {
-                        return $http.get('api/apptype')
-                            .then(function(result) {
-                                return result.data.response;
-                            });
-                    }
-                ],
                 businessTypes: [
                     '$http', function($http) {
                         return $http.get('api/businesstype')
@@ -45,13 +37,6 @@
                             });
                     }
                 ],
-                interfaceAppType: [
-                    '$http', function($http) {
-                        return $http.get('api/apptype?interfaceAppType').then(function(result) {
-                            return result.data.response;
-                        });
-                    }
-                ],
                 hasWriteAccess: [
                     '$http', '$stateParams', function($http, $stateParams) {
                         return $http.get('api/itsystemusage/' + $stateParams.id + "?hasWriteAccess")
@@ -64,18 +49,16 @@
         });
     }]);
 
-    app.controller('system.UsageCtrl', ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'itSystemUsage', 'appTypes',
-        'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'interfaceAppType', 'hasWriteAccess', 'autofocus',
-        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, appTypes, businessTypes, archiveTypes, sensitiveDataTypes, interfaceAppType, hasWriteAccess, autofocus) {
+    app.controller('system.UsageCtrl', ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'itSystemUsage',
+        'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'hasWriteAccess', 'autofocus',
+        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, businessTypes, archiveTypes, sensitiveDataTypes, hasWriteAccess, autofocus) {
             $rootScope.page.title = 'IT System - Anvendelse';
 
             autofocus();
 
             $scope.hasWriteAccess = hasWriteAccess;
-            $scope.interfaceAppType = interfaceAppType;
             $scope.usageId = $stateParams.id;
             $scope.status = [{ id: true, name: 'Aktiv' }, { id: false, name: 'Inaktiv' }];
-            $scope.appTypes = appTypes;
             $scope.businessTypes = businessTypes;
             $scope.archiveTypes = archiveTypes;
             $scope.sensitiveDataTypes = sensitiveDataTypes;

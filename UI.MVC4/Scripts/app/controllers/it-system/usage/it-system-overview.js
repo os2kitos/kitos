@@ -6,11 +6,6 @@
                 templateUrl: 'partials/it-system/overview-it-system.html',
                 controller: 'system.OverviewCtrl',
                 resolve: {
-                    appTypes: [
-                        '$http', function($http) {
-                            return $http.get("api/apptype");
-                        }
-                    ],
                     businessTypes: [
                         '$http', function($http) {
                             return $http.get("api/businesstype");
@@ -38,16 +33,16 @@
     ]);
 
     app.controller('system.OverviewCtrl',
-        ['$rootScope', '$scope', '$http', 'notify', 'appTypes', 'businessTypes', 'organizations', 'user', 'itSystemRoles',
-            function ($rootScope, $scope, $http, notify, appTypesHttp, businessTypesHttp, organizationsHttp, user, itSystemRoles) {
+        [
+            '$rootScope', '$scope', '$http', 'notify', 'businessTypes', 'organizations', 'user', 'itSystemRoles',
+            function($rootScope, $scope, $http, notify, businessTypesHttp, organizationsHttp, user, itSystemRoles) {
                 $rootScope.page.title = 'IT System - Overblik';
                 $scope.itSystemRoles = itSystemRoles;
                 $scope.pagination = {
                     skip: 0,
                     take: 20
                 };
-                
-                var appTypes = appTypesHttp.data.response;
+
                 var businessTypes = businessTypesHttp.data.response;
 
                 $scope.showSystemId = 'localSystemId';
@@ -63,7 +58,7 @@
 
                     if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
                     else url += "&q=";
-                    
+
                     $scope.csvUrl = url;
                     loadUsages();
                 });
@@ -77,7 +72,7 @@
                     $scope.inactiveSystemUsages = [];
 
                     var url = 'api/itSystemUsage?overview&organizationId=' + user.currentOrganizationId + '&skip=' + $scope.pagination.skip + '&take=' + $scope.pagination.take;
-                    
+
                     if ($scope.pagination.orderBy) {
                         url += '&orderBy=' + $scope.pagination.orderBy;
                         if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
@@ -85,15 +80,14 @@
 
                     if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
                     else url += "&q=";
-                    
+
                     $http.get(url).success(function(result, status, headers) {
                         $scope.systemUsages = result.response;
-                        
+
                         var paginationHeader = JSON.parse(headers('X-Pagination'));
                         $scope.pagination.count = paginationHeader.TotalCount;
 
                         _.each(result.response, function(usage) {
-                            usage.itSystem.appType = _.findWhere(appTypes, { id: usage.itSystem.appTypeId });
                             usage.itSystem.businessType = _.findWhere(businessTypes, { id: usage.itSystem.businessTypeId });
 
                             if (usage.mainContractIsActive) {
@@ -115,5 +109,7 @@
 
                     });
                 }
-            }]);
+            }
+        ]
+    );
 })(angular, app);

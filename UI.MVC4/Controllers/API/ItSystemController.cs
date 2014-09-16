@@ -102,7 +102,7 @@ namespace UI.MVC4.Controllers.API
                 {
                     var obj = new ExpandoObject() as IDictionary<string, Object>;
                     obj.Add("It Kontrakt", system.Name);
-                    obj.Add("ID", system.SystemId);
+                    obj.Add("ID", system.ItSystemId);
                     obj.Add("AppType", system.AppTypeName);
                     obj.Add("BusiType", system.BusinessTypeName);
                     obj.Add("KLEID", String.Join(",", system.TaskRefs.Select(x => x.TaskKey)));
@@ -400,7 +400,7 @@ namespace UI.MVC4.Controllers.API
         //        if (system == null) return NotFound();
         //        if (!HasWriteAccess(system)) return Unauthorized();
 
-        //        var theInterface = Repository.GetByKey(interfaceId);
+        //        var theInterface = _canUseInterfaceRepository.GetByKey(interfaceId);
         //        if (theInterface == null) return NotFound();
 
         //        system.CanUseInterfaces.Remove(theInterface);
