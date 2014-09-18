@@ -46,7 +46,7 @@ namespace UI.MVC4.Controllers.API
                         // filter by system usage name
                         u.ItSystem.Name.Contains(q) &&
                         // global admin sees all within the context 
-                        KitosUser.IsGlobalAdmin && u.OrganizationId == organizationId ||
+                        (KitosUser.IsGlobalAdmin && u.OrganizationId == organizationId ||
                         // object owner sees his own objects     
                         u.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
@@ -56,7 +56,7 @@ namespace UI.MVC4.Controllers.API
                         u.ItSystem.OrganizationId == organizationId ||
                         // only users with a role on the object can see private objects
                         u.ItSystem.AccessModifier == AccessModifier.Private &&
-                        u.Rights.Any(x => x.UserId == KitosUser.Id)
+                        u.Rights.Any(x => x.UserId == KitosUser.Id))
                     );
 
                 return Ok(Map(usages));

@@ -38,14 +38,14 @@ namespace Core.ApplicationServices
                     // filter by name
                     s.Name.Contains(nameSearch) &&
                     // global admin sees all within the context 
-                    user.IsGlobalAdmin && s.OrganizationId == organizationId ||
+                    (user.IsGlobalAdmin && s.OrganizationId == organizationId ||
                     // object owner sees his own objects     
                     s.ObjectOwnerId == user.Id ||
                     // it's public everyone can see it
                     s.AccessModifier == AccessModifier.Public ||
                     // everyone in the same organization can see normal objects
                     s.AccessModifier == AccessModifier.Normal &&
-                    s.OrganizationId == organizationId
+                    s.OrganizationId == organizationId)
                     // it systems doesn't have roles so private doesn't make sense
                     // only object owners will be albe to see private objects
                 );
