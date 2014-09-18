@@ -2,17 +2,17 @@
 
 namespace Core.DomainModel.ItSystem
 {
-    public class Tsa : Entity, IOptionEntity<ItSystem>
+    public class Tsa : Entity, IOptionEntity<ItInterface>
     {
         public Tsa()
         {
-            References = new List<ItSystem>();
+            References = new List<ItInterface>();
         }
 
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }
         public string Note { get; set; }
-        public virtual ICollection<ItSystem> References { get; set; }
+        public virtual ICollection<ItInterface> References { get; set; }
     }
 }
