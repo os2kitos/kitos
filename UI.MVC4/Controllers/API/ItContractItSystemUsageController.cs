@@ -1,6 +1,5 @@
 ﻿using System.Net.Http;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 

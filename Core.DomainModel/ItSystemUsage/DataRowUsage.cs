@@ -8,9 +8,11 @@ namespace Core.DomainModel.ItSystemUsage
     /// a DataRowUsage is created for each DataRow. This allows for adding details
     /// regarding the usage. 
     /// </summary>
-    public class DataRowUsage : Entity
+    public class DataRowUsage
     {
-        public int InterfaceUsageId { get; set; }
+        public int ItSystemUsageId { get; set; }
+        public int ItSystemId { get; set; }
+        public int ItInterfaceId { get; set; }
         /// <summary>
         /// The local usage of an interface, which this DataRowUsage is bound to.
         /// </summary>

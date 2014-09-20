@@ -10,7 +10,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// of the interface.
     /// It is also used for binding an <see cref="ItContract"/> with the usage.
     /// </summary>
-    public class InterfaceUsage : Entity
+    public class InterfaceUsage
     {
         public InterfaceUsage()
         {
@@ -40,18 +40,13 @@ namespace Core.DomainModel.ItSystemUsage
         /// </summary>
         public virtual ItSystem.ItSystem Infrastructure { get; set; }
 
+        public int ItInterfaceId { get; set; }
+        public int ItSystemId { get; set; }
         public virtual ItInterfaceUse ItInterfaceUse { get; set; } // careful ItInterfaceUse has a composite key
         
         /// <summary>
         /// Whether local usage of the interface is wanted or not.
         /// </summary>
         public bool IsWishedFor { get; set; }
-
-        public override bool HasUserWriteAccess(User user)
-        {
-            if (ItSystemUsage != null && ItSystemUsage.HasUserWriteAccess(user)) return true;
-
-            return base.HasUserWriteAccess(user);
-        }
     }
 }

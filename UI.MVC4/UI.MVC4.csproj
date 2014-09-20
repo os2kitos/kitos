@@ -214,6 +214,7 @@
   <ItemGroup>
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Controllers\API\ItInterfaceExhibitUsageController.cs" />
     <Compile Include="Controllers\API\ItContractItSystemUsageController.cs" />
     <Compile Include="Controllers\API\ExhibitController.cs" />
     <Compile Include="Controllers\API\ItInterfaceController.cs" />
@@ -236,6 +237,8 @@
     <Compile Include="Models\HandoverTrialDTO.cs" />
     <Compile Include="Models\ItInterfaceDTO.cs" />
     <Compile Include="Models\ItInterfaceExhibitDTO.cs" />
+    <Compile Include="Models\ItInterfaceExhibitUsageDTO.cs" />
+    <Compile Include="Models\ItInterfaceUseDTO.cs" />
     <Compile Include="Models\ItProjectOverviewDTO.cs" />
     <Compile Include="Models\ItProjectPhaseDTO.cs" />
     <Compile Include="Models\ItProjectStatusDTO.cs" />

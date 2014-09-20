@@ -1,11 +1,15 @@
-﻿using Core.DomainModel.ItSystemUsage;
+﻿using System.Data.Entity.ModelConfiguration;
+using Core.DomainModel.ItSystemUsage;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    class ItInterfaceExhibitUsageMap : EntityMap<ItInterfaceExhibitUsage>
+    class ItInterfaceExhibitUsageMap : EntityTypeConfiguration<ItInterfaceExhibitUsage>
     {
         public ItInterfaceExhibitUsageMap()
         {
+            // Primary key
+            this.HasKey(x => new { x.ItSystemUsageId, x.ItInterfaceExhibitId });
+
             // Table & Column Mappings
             this.ToTable("ItInterfaceExhibitUsage");
 

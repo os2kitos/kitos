@@ -62,19 +62,19 @@ namespace Core.ApplicationServices
         //    }
         //}
 
-        private void CreateAndInsertDataRowUsage(IEnumerable<DataRow> dataRows, User objectOwner)
-        {
-            foreach (var dataRow in dataRows)
-            {
-                var dataRowUsage = new DataRowUsage()
-                {
-                    DataRowId = dataRow.Id,
-                    ObjectOwner = objectOwner,
-                    LastChangedByUser = objectOwner
-                };
+        //private void CreateAndInsertDataRowUsage(IEnumerable<DataRow> dataRows, User objectOwner)
+        //{
+        //    foreach (var dataRow in dataRows)
+        //    {
+        //        var dataRowUsage = new DataRowUsage()
+        //        {
+        //            DataRowId = dataRow.Id,
+        //            ObjectOwner = objectOwner,
+        //            LastChangedByUser = objectOwner
+        //        };
 
-                _dataRowUsageRepository.Insert(dataRowUsage); // saveChanges is called in callee
-            }
-        }
+        //        _dataRowUsageRepository.Insert(dataRowUsage); // saveChanges is called in callee
+        //    }
+        //}
     }
 }

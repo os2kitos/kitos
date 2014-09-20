@@ -36,12 +36,12 @@
                     });
                 }],
                 canUseInterfaces: ['$http', 'itSystemUsage', function ($http, itSystemUsage) {
-                    return $http.get('api/itInterfaceUse/?sysid=' + itSystemUsage.itSystem.id).then(function (result) {
+                    return $http.get('api/itInterfaceUse/?interfaces&sysid=' + itSystemUsage.itSystem.id).then(function (result) {
                         return result.data.response;
                     });
                 }],
                 exhibits: ['$http', 'itSystemUsage', function ($http, itSystemUsage) {
-                    return $http.get('api/exhibit/?sysid=' + itSystemUsage.itSystem.id).then(function (result) {
+                    return $http.get('api/exhibit/?interfaces&sysid=' + itSystemUsage.itSystem.id).then(function (result) {
                         return result.data.response;
                     });
                 }],

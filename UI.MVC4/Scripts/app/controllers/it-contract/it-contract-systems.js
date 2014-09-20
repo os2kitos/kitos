@@ -1,29 +1,89 @@
-﻿(function (ng, app) {
-    app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-contract.edit.systems', {
-            url: '/systems',
-            templateUrl: 'partials/it-contract/tab-systems.html',
-            controller: 'contract.EditSystemsCtrl',
-            resolve: {
-                user: ['userService', function (userService) {
-                    return userService.getUser();
-                }]
-            }
-        });
-    }]);
+﻿(function(ng, app) {
+    app.config([
+        '$stateProvider', function($stateProvider) {
+            $stateProvider.state('it-contract.edit.systems', {
+                url: '/systems',
+                templateUrl: 'partials/it-contract/tab-systems.html',
+                controller: 'contract.EditSystemsCtrl',
+                resolve: {
+                    user: [
+                        'userService', function(userService) {
+                            return userService.getUser();
+                        }
+                    ],
+                    exhibitedInterfaces: [
+                        '$http', 'contract', function($http, contract) {
+                            return $http.get('api/ItInterfaceExhibitUsage/?contractId=' + contract.id).then(function(result) {
+                                return result.data.response;
+                            });
+                        }
+                    ],
+                    usedInterfaces: [
+                        '$http', 'contract', function($http, contract) {
+                            return $http.get('api/InterfaceUsage/?contractId=' + contract.id).then(function(result) {
+                                return result.data.response;
+                            });
+                        }
+                    ]
+                }
+            });
+        }
+    ]);
 
-    app.controller('contract.EditSystemsCtrl', ['$scope', '$http', 'notify', 'user', 'contract',
-        function ($scope, $http, notify, user, contract) {
-            
+    app.controller('contract.EditSystemsCtrl', [
+        '$scope', '$http', '$state', 'notify', 'user', 'contract', 'exhibitedInterfaces', 'usedInterfaces',
+        function($scope, $http, $state, notify, user, contract, exhibitedInterfaces, usedInterfaces) {
+
+            $scope.exhibitedInterfaces = exhibitedInterfaces;
+            $scope.usedInterfaces = usedInterfaces;
+
+            $scope.deleteExhibit = function(exhibitId, usageId) {
+                $http({
+                        method: 'PATCH',
+                        url: 'api/itInterfaceExhibitUsage/?usageId=' + usageId + '&exhibitId=' + exhibitId,
+                        data: {
+                            itContractId: null
+                        }
+                    })
+                    .success(function() {
+                        notify.addSuccessMessage('Snitfladerelationen er slettet.');
+                        reload();
+                    })
+                    .error(function() {
+                        notify.addSuccessMessage('Fejl! Snitfladerelationen kunne ikke slettes.');
+                    });
+            }
+
+            $scope.deleteUsed = function(usageId, sysId, interfaceId) {
+                $http({
+                        method: 'PATCH',
+                        url: 'api/interfaceUsage/?usageId=' + usageId + '&sysId=' + sysId + '&interfaceId=' + interfaceId,
+                        data: {
+                            itContractId: null
+                        }
+                    })
+                    .success(function() {
+                        notify.addSuccessMessage('Snitfladerelationen er slettet.');
+                        reload();
+                    })
+                    .error(function() {
+                        notify.addSuccessMessage('Fejl! Snitfladerelationen kunne ikke slettes.');
+                    });
+            }
+
+            function reload() {
+                $state.go('.', null, { reload: true });
+            }
+
             function formatAssociatedSystems(associatedSystemUsages) {
-                
+
                 //helper functions
                 function deleteAssociatedSystem(associatedSystem) {
-                    return $http.delete("api/itContract/" + contract.id + "?systemUsageId=" + associatedSystem.id);
+                    return $http.delete('api/itContract/' + contract.id + '?systemUsageId=' + associatedSystem.id);
                 }
-                
+
                 function postAssociatedSystem(associatedSystem) {
-                    return $http.post("api/itContract/" + contract.id + "?systemUsageId=" + associatedSystem.selectedSystem.id);
+                    return $http.post('api/itContract/' + contract.id + '?systemUsageId=' + associatedSystem.selectedSystem.id);
                 }
 
                 //for each row of associated system
@@ -34,13 +94,13 @@
                     //delete the row
                     systemUsage.delete = function() {
                         deleteAssociatedSystem(systemUsage).success(function() {
-                            notify.addSuccessMessage("Rækken er slettet.");
+                            notify.addSuccessMessage('Rækken er slettet.');
                             systemUsage.show = false;
                         }).error(function() {
-                            notify.addErrorMessage("Kunne ikke slette rækken");
+                            notify.addErrorMessage('Kunne ikke slette rækken');
                         });
                     };
-                    
+
                 });
 
                 $scope.associatedSystemUsages = associatedSystemUsages;
@@ -50,7 +110,7 @@
                         //post new binding
                         postAssociatedSystem($scope.newAssociatedSystemUsage).success(function(result) {
 
-                            notify.addSuccessMessage("Rækken er tilføjet.");
+                            notify.addSuccessMessage('Rækken er tilføjet.');
 
                             //then reformat and redraw the rows
                             formatAssociatedSystems(result.response);
@@ -58,7 +118,7 @@
                         }).error(function(result) {
 
                             //couldn't add new binding
-                            notify.addErrorMessage("Fejl! Kunne ikke tilføje rækken!");
+                            notify.addErrorMessage('Fejl! Kunne ikke tilføje rækken!');
 
                         });
                     }
@@ -67,147 +127,64 @@
 
             formatAssociatedSystems(contract.associatedSystemUsages);
 
+            $scope.newAssociatedInterfaceSave = function() {
+                var url = '';
+                if ($scope.newAssociatedInterfaceRelation == 'exhibit')
+                    url = 'api/itInterfaceExhibitUsage?usageId=' + $scope.newAssociatedInterfaceSelectedSystemUsage.id + '&exhibitId=' + $scope.newAssociatedInterfaceSelectedInterfaceUsage.id;
 
-            function formatAssociatedInterfaces(associatedInterfaceUsages, associatedInterfaceExposures) {
-                
-                function patchContractId(associatedInterface, contractId) {
-                    return $http({
+                if ($scope.newAssociatedInterfaceRelation == 'using')
+                    url = 'api/interfaceUsage?usageId=' + $scope.newAssociatedInterfaceSelectedSystemUsage.id
+                        + '&sysId=' + $scope.newAssociatedInterfaceSelectedInterfaceUsage.id.sysId
+                        + '&interfaceId=' + $scope.newAssociatedInterfaceSelectedInterfaceUsage.id.intfId;
+
+                $http({
                         method: 'PATCH',
-                        url: associatedInterface.baseUrl + associatedInterface.id,
+                        url: url,
                         data: {
-                            itContractId: contractId
+                            itContractId: contract.id
                         }
+                    })
+                    .success(function() {
+                        reload();
                     });
-                }
-
-                $scope.associatedInterfaces = [];
-                function pushAssociatedInterface(associatedInterface) {
-
-                    associatedInterface.show = true;
-                    
-
-                    associatedInterface.delete = function () {
-
-                        patchContractId(associatedInterface, null).success(function () {
-                            notify.addSuccessMessage("Kontrakten er ikke længere tilknyttet snitfladerelationen");
-                            associatedInterface.show = false;
-                        }).error(function () {
-                            notify.addErrorMessage("Fejl! Kontrakten blev ikke fjernet fra snitfladerelationen");
-                        });
-                    };
-
-                    $scope.associatedInterfaces.push(associatedInterface);
-                }
-                
-                function pushAssociatedUsage(associatedUsage) {
-                    associatedUsage.relation = "Usage";
-                    associatedUsage.baseUrl = "api/interfaceUsage/";
-                    pushAssociatedInterface(associatedUsage);
-                }
-
-                function pushAssociatedExposure(associatedExposure) {
-                    associatedExposure.relation = "Exposure";
-                    associatedExposure.baseUrl = "api/interfaceExposure/";
-                    pushAssociatedInterface(associatedExposure);
-                }
-
-                _.each(associatedInterfaceExposures, pushAssociatedExposure);
-                _.each(associatedInterfaceUsages, pushAssociatedUsage);
-
-
-                function initNewRow() {
-                    var newInterface = {};
-                    $scope.newAssociatedInterface = newInterface;
-
-                    //this is called when the system select or the relation select is changed
-                    newInterface.loadInterfaceList = function() {
-
-                        //if not both are set to something valid, use default values
-                        if (!newInterface.selectedSystem || !newInterface.relation) {
-
-                            newInterface.usagesOrExposures = [];
-                            newInterface.placeholder = "Vælg først IT system og relation";
-
-                            return;
-                        }
-
-                        //if a system and a relation have been selected, the user can now find an interface
-
-                        //whether the user is looking for an exposed interface
-                        //or a used interface depends on the relation field
-                        if (newInterface.relation == "Exposure") {
-                            newInterface.usagesOrExposures = _.where(newInterface.selectedSystem.usage.interfaceExposures, { itContractId: null });
-                            newInterface.placeholder = "Vælg udstilte snitflade";
-
-                        } else if (newInterface.relation == "Usage") {
-                            newInterface.usagesOrExposures = _.where(newInterface.selectedSystem.usage.interfaceUsages, { itContractId: null });
-                            newInterface.placeholder = "Vælg anvendte snitflade";
-                        }
-                    };
-
-                    //initial setup
-                    newInterface.loadInterfaceList();
-
-                    //save function for the new row
-                    newInterface.save = function() {
-                        if (!newInterface.interfaceId) return;
-
-                        newInterface.baseUrl = newInterface.relation == "Exposure" ? "api/interfaceExposure/" : "api/interfaceUsage/";
-                        newInterface.id = newInterface.interfaceId;
-
-                        patchContractId(newInterface, contract.id).success(function(result) {
-                            notify.addSuccessMessage("Kontrakten er knyttet til snitfladerelationen");
-
-                            if (newInterface.relation == "Exposure") pushAssociatedExposure(result.response);
-                            else pushAssociatedUsage(result.response);
-
-                            initNewRow();
-                            
-                        }).error(function() {
-                            notify.addErrorMessage("Fejl! Kontrakten blev ikke knyttet til snitfladerelationen");
-                        });
-
-                    };
-                }
-
-                initNewRow();
             }
 
-            formatAssociatedInterfaces(contract.associatedInterfaceUsages, contract.associatedInterfaceExposures);
-            
-
-            //select2 options for looking up it system usages
-            $scope.itSystemUsagesSelectOptions = {
+            // select2 options for looking up a system's interfaces
+            $scope.itInterfaceUsagesSelectOptions = {
                 minimumInputLength: 1,
-                initSelection: function (elem, callback) {
+                initSelection: function(elem, callback) {
                 },
                 ajax: {
-                    data: function (term, page) {
+                    data: function(term, page) {
                         return { query: term };
                     },
                     quietMillis: 500,
-                    transport: function (queryParams) {
-                        var res = $http.get('api/itSystemUsage?organizationId=' + user.currentOrganizationId + '&q=' + queryParams.data.query).then(queryParams.success);
-                        res.abort = function () {
+                    transport: function(queryParams) {
+                        var url = '';
+                        if ($scope.newAssociatedInterfaceRelation == 'exhibit')
+                            url = 'api/exhibit?sysId=' + $scope.newAssociatedInterfaceSelectedSystemUsage.itSystemId + '&q=' + queryParams.data.query;
+
+                        if ($scope.newAssociatedInterfaceRelation == 'using')
+                            url = 'api/itInterfaceUse?sysId=' + $scope.newAssociatedInterfaceSelectedSystemUsage.itSystemId + '&q=' + queryParams.data.query;
+
+                        var res = $http.get(url).then(queryParams.success);
+                        res.abort = function() {
                             return null;
                         };
 
                         return res;
                     },
 
-                    results: function (data, page) {
+                    results: function(data, page) {
                         var results = [];
 
-                        //for each system usages
-                        _.each(data.data.response, function (usage) {
-
+                        // for each interface usages
+                        _.each(data.data.response, function(usage) {
                             results.push({
-                                //the id of the system usage is the id, that is selected
-                                id: usage.id,
-                                //but the name of the system is the label for the select2
-                                text: usage.itSystem.name,
-                                //saving the usage for later use
-                                usage: usage
+                                // use the id of the interface usage
+                                id: $scope.newAssociatedInterfaceRelation == 'using' ? { intfId: usage.itInterfaceId, sysId: usage.itSystemId } : usage.id,
+                                // use the name of the actual interface
+                                text: usage.itInterfaceName,
                             });
                         });
 
@@ -215,7 +192,45 @@
                     }
                 }
             };
-            
 
-        }]);
+            // select2 options for looking up it system usages
+            $scope.itSystemUsagesSelectOptions = {
+                minimumInputLength: 1,
+                initSelection: function(elem, callback) {
+                },
+                ajax: {
+                    data: function(term, page) {
+                        return { query: term };
+                    },
+                    quietMillis: 500,
+                    transport: function(queryParams) {
+                        var res = $http.get('api/itSystemUsage?organizationId=' + user.currentOrganizationId + '&q=' + queryParams.data.query).then(queryParams.success);
+                        res.abort = function() {
+                            return null;
+                        };
+
+                        return res;
+                    },
+
+                    results: function(data, page) {
+                        var results = [];
+
+                        // for each system usages
+                        _.each(data.data.response, function(usage) {
+                            results.push({
+                                // the id of the system usage id, that is selected
+                                id: usage.id,
+                                // name of the system is the label for the select2
+                                text: usage.itSystem.name,
+                                // the if the system id that is selected
+                                itSystemId: usage.itSystem.id,
+                            });
+                        });
+
+                        return { results: results };
+                    }
+                }
+            };
+        }
+    ]);
 })(angular, app);

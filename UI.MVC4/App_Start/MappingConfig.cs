@@ -210,6 +210,9 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<ItInterfaceExhibit, ItInterfaceExhibitDTO>()
                 .ReverseMap();
 
+            Mapper.CreateMap<ItInterfaceExhibitUsage, ItInterfaceExhibitUsageDTO>()
+                .ReverseMap();
+
             Mapper.CreateMap<DataRow, DataRowDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.DataType, opt => opt.Ignore());
@@ -229,6 +232,9 @@ namespace UI.MVC4.App_Start
 
             Mapper.CreateMap<ItInterface, ItInterfaceDTO>()
                 .ReverseMap();
+
+            Mapper.CreateMap<ItInterfaceUse, ItInterfaceUseDTO>()
+                  .ReverseMap();
 
             Mapper.CreateMap<DataRowUsage, DataRowUsageDTO>()
                   .ReverseMap();

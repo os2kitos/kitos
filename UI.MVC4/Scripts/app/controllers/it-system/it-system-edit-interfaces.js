@@ -8,7 +8,7 @@
                 resolve: {
                     interfaces: [
                         '$http', 'itSystem', function ($http, itSystem) {
-                            return $http.get('api/itInterfaceUse/?sysId=' + itSystem.id).then(function(result) {
+                            return $http.get('api/itInterfaceUse/?interfaces&sysId=' + itSystem.id).then(function(result) {
                                 return result.data.response;
                             });
                         }

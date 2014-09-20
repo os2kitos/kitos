@@ -45,8 +45,10 @@ namespace UI.MVC4.Controllers.API
                     u =>
                         // filter by system usage name
                         u.ItSystem.Name.Contains(q) &&
-                        // global admin sees all within the context 
-                        (KitosUser.IsGlobalAdmin && u.OrganizationId == organizationId ||
+                        // system usage is only within the context 
+                        u.OrganizationId == organizationId &&
+                        // global admin sees all 
+                        (KitosUser.IsGlobalAdmin ||
                         // object owner sees his own objects     
                         u.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
@@ -73,8 +75,10 @@ namespace UI.MVC4.Controllers.API
             {
                 pagingModel.Where(
                     u =>
-                        // global admin sees all within the context 
-                        KitosUser.IsGlobalAdmin && u.OrganizationId == organizationId ||
+                        // system usage is only within the context 
+                        u.OrganizationId == organizationId &&
+                        // global admin sees all 
+                        (KitosUser.IsGlobalAdmin ||
                         // object owner sees his own objects     
                         u.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
@@ -84,7 +88,7 @@ namespace UI.MVC4.Controllers.API
                         u.ItSystem.OrganizationId == organizationId ||
                         // only users with a role on the object can see private objects
                         u.ItSystem.AccessModifier == AccessModifier.Private &&
-                        u.Rights.Any(x => x.UserId == KitosUser.Id)
+                        u.Rights.Any(x => x.UserId == KitosUser.Id))
                     );
 
                 if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
@@ -105,8 +109,10 @@ namespace UI.MVC4.Controllers.API
             {
                 pagingModel.Where(
                     u =>
-                        // global admin sees all within the context 
-                        KitosUser.IsGlobalAdmin && u.OrganizationId == organizationId ||
+                        // system usage is only within the context 
+                        u.OrganizationId == organizationId &&
+                        // global admin sees all 
+                        (KitosUser.IsGlobalAdmin ||
                         // object owner sees his own objects     
                         u.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
@@ -116,7 +122,7 @@ namespace UI.MVC4.Controllers.API
                         u.ItSystem.OrganizationId == organizationId ||
                         // only users with a role on the object can see private objects
                         u.ItSystem.AccessModifier == AccessModifier.Private &&
-                        u.Rights.Any(x => x.UserId == KitosUser.Id)
+                        u.Rights.Any(x => x.UserId == KitosUser.Id))
                     );
 
                 if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));

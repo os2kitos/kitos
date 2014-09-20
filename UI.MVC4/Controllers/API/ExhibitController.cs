@@ -19,13 +19,27 @@ namespace UI.MVC4.Controllers.API
             _repository = repository;
         }
 
-        public HttpResponseMessage GetInterfacesBySystem(int sysId)
+        public HttpResponseMessage GetInterfacesBySystem(int sysId, bool? interfaces)
         {
             try
             {
                 var exhibits = _repository.Get(x => x.ItSystemId == sysId);
-                var interfaces = exhibits.Select(x => x.ItInterface);
-                var dtos = Mapper.Map<IEnumerable<ItInterfaceDTO>>(interfaces);
+                var intfs = exhibits.Select(x => x.ItInterface);
+                var dtos = Mapper.Map<IEnumerable<ItInterfaceDTO>>(intfs);
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetBySystem(int sysId, string q)
+        {
+            try
+            {
+                var exhibit = _repository.Get(x => x.ItSystemId == sysId && x.ItSystem.Name.Contains(q));
+                var dtos = Map(exhibit);
                 return Ok(dtos);
             }
             catch (Exception e)

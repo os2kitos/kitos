@@ -3,13 +3,13 @@ using Core.DomainModel.ItSystem;
 namespace Core.DomainModel.ItSystemUsage
 {
     /// <summary>
-    /// Represent the local usage of exhibited interface.
+    /// Represent the local usage of an exhibited interface.
     /// When an <see cref="ItSystem"/>, which exhibits an interface, is taken into local usage,
     /// a ItInterfaceExhibitUsage is created, to allow for adding local details regarding the exposure 
     /// of the interface. 
     /// It is also used for binding an <see cref="ItContract"/> with the usage.
     /// </summary>
-    public class ItInterfaceExhibitUsage : Entity
+    public class ItInterfaceExhibitUsage
     {
         public int ItSystemUsageId { get; set; }
         /// <summary>
@@ -33,12 +33,5 @@ namespace Core.DomainModel.ItSystemUsage
         /// Whether local exposure of the interface is wanted or not.
         /// </summary>
         public bool IsWishedFor { get; set; }
-
-        public override bool HasUserWriteAccess(User user)
-        {
-            if (ItSystemUsage != null && ItSystemUsage.HasUserWriteAccess(user)) return true;
-
-            return base.HasUserWriteAccess(user);
-        }
     }
 }

@@ -9,6 +9,9 @@ using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
+    /// <remarks>
+    /// cannot derive from GenericApiController as this entity uses a composite key
+    /// </remarks>>
     public class ItInterfaceUseController : BaseApiController
     {
         private readonly IGenericRepository<ItInterfaceUse> _repository;
@@ -18,14 +21,28 @@ namespace UI.MVC4.Controllers.API
             _repository = repository;
         }
 
-        public HttpResponseMessage GetBySystem(int sysId)
+        public HttpResponseMessage GetInterfaceBySystem(int sysId, bool? interfaces)
         {
             try
             {
                 var items = _repository.Get(x => x.ItSystemId == sysId);
-                var interfaces = items.Select(x => x.ItInterface);
-                var dtos = Mapper.Map<IEnumerable<ItInterfaceDTO>>(interfaces);
+                var intfs = items.Select(x => x.ItInterface);
+                var dtos = Mapper.Map<IEnumerable<ItInterfaceDTO>>(intfs);
 
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetBySystem(int sysId, string q)
+        {
+            try
+            {
+                var items = _repository.Get(x => x.ItSystemId == sysId && x.ItSystem.Name.Contains(q));
+                var dtos = Map<IEnumerable<ItInterfaceUse>, IEnumerable<ItInterfaceUseDTO>>(items);
                 return Ok(dtos);
             }
             catch (Exception e)
