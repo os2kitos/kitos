@@ -5,6 +5,15 @@
         <div class="col-md-6">
             <div class="row">
                 <div class="col-md-12">
+                    <!--AppType-->
+                    <div class="form-group">
+                        <label for="system-type" class="control-label small">Applikationstype</label>
+                        <select id="system-type" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystem.appType">
+                            <option value="0">Fagsystem</option>
+                            <option value="1">Fælleskommunal</option>
+                        </select>
+                    </div>
+
                     <!--Name-->
                     <div class="form-group">
                         <label for="system-name" class="control-label small">IT System</label>
@@ -16,17 +25,17 @@
                     <!--ID-->
                     <div class="form-group">
                         <label for="system-id" class="control-label small">System ID</label>
-                        <input type="text" id="system-id" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystem.systemId">
+                        <input type="text" id="system-id" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystem.itSystemId">
                     </div>
 
                     <!--Parent system-->
-                    <div class="form-group" data-ng-if="usage.itSystem.appTypeId != interfaceAppType.id">
+                    <div class="form-group">
                         <label for="system-parent" class="control-label small">Overordnet system</label>
                         <input type="text" id="system-parent" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystemParentName">
                     </div>
 
                     <!--Belongs to-->
-                    <div class="form-group" data-ng-if="usage.itSystem.appTypeId != interfaceAppType.id">
+                    <div class="form-group">
                         <label for="system-belongs-to" class="control-label small">Tilhører</label>
                         <input type="text" id="system-belongs-to" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystem.belongsToName">
                     </div>
@@ -49,7 +58,7 @@
                     </div>
 
                     <!--Usage type-->
-                    <div class="form-group" data-ng-if="usage.itSystem.appTypeId != interfaceAppType.id">
+                    <div class="form-group">
                         <label for="system-business-type" class="control-label small">Forretningstype</label>
                         <select id="system-business-type" class="form-control input-sm" disabled data-ui-select2="" data-ng-model="usage.itSystem.businessTypeId">
                             <option data-ng-repeat="businessType in businessTypes" value="{{businessType.id}}">{{businessType.name}}</option>
@@ -198,22 +207,30 @@
 </form>
 
 <ul class="nav nav-tabs">
-    <li data-ui-sref-active="active" data-ng-if="usage.itSystem.appTypeId != interfaceAppType.id">
+    <li data-ui-sref-active="active">
         <a data-ui-sref="it-system.usage.interfaces">Snitflader</a>
     </li>
-    <li data-ui-sref-active="active" data-ng-if="usage.itSystem.appTypeId != interfaceAppType.id">
+    <li data-ui-sref-active="active">
         <a data-ui-sref="it-system.usage.contracts">Kontrakter</a>
     </li>
-    <li data-ui-sref-active="active" data-ng-if="usage.itSystem.appTypeId != interfaceAppType.id">
+    <li data-ui-sref-active="active">
         <a data-ui-sref="it-system.usage.hierarchy">Hierarki</a>
     </li>
-    <li data-ui-sref-active="active"><a data-ui-sref="it-system.usage.roles">Systemroller</a></li>
-    <li data-ui-sref-active="active"><a data-ui-sref="it-system.usage.wishes">Ændringsønske</a></li>
-    <li data-ui-sref-active="active"><a data-ui-sref="it-system.usage.org">Organisation</a></li>
-    <li data-ui-sref-active="active" data-ng-if="usage.itSystem.appTypeId != interfaceAppType.id">
+    <li data-ui-sref-active="active">
+        <a data-ui-sref="it-system.usage.roles">Systemroller</a>
+    </li>
+    <li data-ui-sref-active="active">
+        <a data-ui-sref="it-system.usage.wishes">Ændringsønske</a>
+    </li>
+    <li data-ui-sref-active="active">
+        <a data-ui-sref="it-system.usage.org">Organisation</a>
+    </li>
+    <li data-ui-sref-active="active">
         <a data-ui-sref="it-system.usage.kle">KLE</a>
     </li>
-    <li data-ui-sref-active="active"><a data-ui-sref="it-system.usage.proj">IT Projekter</a></li>
+    <li data-ui-sref-active="active">
+        <a data-ui-sref="it-system.usage.proj">IT Projekter</a>
+    </li>
 </ul>
 
 <!-- sub tabs view -->

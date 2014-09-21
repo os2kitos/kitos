@@ -71,7 +71,10 @@
     <Compile Include="Mapping\AdminRightMap.cs" />
     <Compile Include="Mapping\AdminRoleMap.cs" />
     <Compile Include="Mapping\BusinessTypeMap.cs" />
+    <Compile Include="Mapping\ItInterfaceExhibitMap.cs" />
+    <Compile Include="Mapping\ItInterfaceUseMap.cs" />
     <Compile Include="Mapping\ItContractItSystemUsageMap.cs" />
+    <Compile Include="Mapping\ItInterfaceMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOrgUnitUsageMap.cs" />
     <Compile Include="Mapping\ItProjectOrgUnitUsageMap.cs" />
     <Compile Include="Mapping\ItProjectStatusMap.cs" />
@@ -81,7 +84,7 @@
     <Compile Include="Mapping\EconomyStreamMap.cs" />
     <Compile Include="Mapping\OptionEntityMap.cs" />
     <Compile Include="Mapping\ProcurementStrategyMap.cs" />
-    <Compile Include="Mapping\InterfaceExposureMap.cs" />
+    <Compile Include="Mapping\ItInterfaceExhibitUsageMap.cs" />
     <Compile Include="Mapping\GoalTypeMap.cs" />
     <Compile Include="Mapping\RightMap.cs" />
     <Compile Include="Mapping\EconomyYearMap.cs" />
@@ -120,7 +123,6 @@
     <Compile Include="Mapping\RiskMap.cs" />
     <Compile Include="Mapping\AdviceMap.cs" />
     <Compile Include="Mapping\StakeholderMap.cs" />
-    <Compile Include="Mapping\AppTypeMap.cs" />
     <Compile Include="Mapping\TextMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />

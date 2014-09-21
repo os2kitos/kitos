@@ -1,4 +1,4 @@
-﻿<div class="panel panel-default"  data-ng-if="system.appTypeId == interfaceAppType.id">
+﻿<div class="panel panel-default">
     <div class="panel-body">
         <div class="col-md-6">
             <div class="form-group">
@@ -63,15 +63,15 @@
             </div>
 
             <div class="form-group">
+                <!-- Exhibited by -->
                 <label for="interface-exposed-by" class="control-label col-md-2 small">Udstillet af</label>
                 <div class="col-md-4">
                     <input type="text" id="interface-exposed-by" class="form-control input-sm"
                            data-ui-select2="itSystemsSelectOptions"
                            data-placeholder="Vælg IT System"
-                            data-ng-disabled="!hasWriteAccess"
-                            data-autosave="{{system.updateUrl}}"
-                            data-field="exposedById"
-                            data-ng-model="system.exposedByObj">
+                           data-ng-disabled="!hasWriteAccess"
+                           data-ng-change="save()"
+                           data-ng-model="exposedByObj">
                         
                 </div>
             </div>

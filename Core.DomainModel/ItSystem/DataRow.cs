@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using Core.DomainModel.ItSystemUsage;
 
 namespace Core.DomainModel.ItSystem
 {
     /// <summary>
-    /// Represents that an interface (ItSystem) exposes some data.
+    /// Represents that an interface exposes some data.
     /// The interface will have a datarow for each piece of data that the
     /// interface exposes.
     /// </summary>
@@ -14,11 +15,11 @@ namespace Core.DomainModel.ItSystem
             this.Usages = new List<DataRowUsage>();
         }
 
-        public int ItSystemId { get; set; }
+        public int ItInterfaceId { get; set; }
         /// <summary>
         /// The interface which exposes the data
         /// </summary>
-        public virtual ItSystem ItSystem { get; set; }
+        public virtual ItInterface ItInterface { get; set; }
 
         public int? DataTypeId { get; set; }
         /// <summary>

@@ -11,6 +11,7 @@ using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using UI.MVC4.Models;
 
@@ -87,7 +88,22 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
         }
-        
+
+        public virtual HttpResponseMessage GetExhibitedInterfaces(int id, bool? exhibit)
+        {
+            try
+            {
+                var contract = Repository.GetByKey(id);
+                var exhibits = contract.AssociatedInterfaceExposures.Select(x => x.ItInterfaceExhibit);
+                var dtos = Map<IEnumerable<ItInterfaceExhibit>, IEnumerable<ItInterfaceExhibitDTO>>(exhibits);
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         /// <summary>
         /// Adds an ItSystemUsage to the list of associated ItSystemUsages for that contract
         /// </summary>

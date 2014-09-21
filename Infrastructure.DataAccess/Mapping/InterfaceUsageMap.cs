@@ -1,28 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity.ModelConfiguration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Core.DomainModel.ItSystem;
+﻿using System.Data.Entity.ModelConfiguration;
+using Core.DomainModel.ItSystemUsage;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    class InterfaceUsageMap : EntityMap<InterfaceUsage>
+    class InterfaceUsageMap : EntityTypeConfiguration<InterfaceUsage>
     {
         public InterfaceUsageMap()
         {
+            // Primary key
+            this.HasKey(x => new { x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId });
+
             // Table & Column Mappings
-            this.ToTable("InterfaceUsage");
+            this.ToTable("InfUsage");
 
             this.HasRequired(t => t.ItSystemUsage)
                 .WithMany(d => d.InterfaceUsages)
                 .HasForeignKey(t => t.ItSystemUsageId)
                 .WillCascadeOnDelete(true);
 
-            this.HasRequired(t => t.Interface)
-                .WithMany(d => d.InterfaceLocalUsages)
-                .HasForeignKey(t => t.InterfaceId)
+            this.HasRequired(t => t.ItInterfaceUse)
+                .WithMany(t => t.InterfaceUsages)
+                .HasForeignKey(d => new {d.ItSystemId, d.ItInterfaceId})
+                //.Map(m => m.MapKey(new[] { "infUseId", "infUsageId" })) // have to rename key else it's too long for MySql
                 .WillCascadeOnDelete(true);
 
             this.HasOptional(t => t.ItContract)
@@ -33,7 +32,6 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.Infrastructure)
                 .WithMany(d => d.InfrastructureUsage)
                 .HasForeignKey(t => t.InfrastructureId);
-
         }
     }
 }

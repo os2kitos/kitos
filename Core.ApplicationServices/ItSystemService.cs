@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
@@ -10,13 +9,10 @@ namespace Core.ApplicationServices
     {
         private readonly IGenericRepository<ItSystem> _repository;
 
-        public ItSystemService(IGenericRepository<ItSystem> repository, IGenericRepository<AppType> appTypeRepository)
+        public ItSystemService(IGenericRepository<ItSystem> repository)
         {
             _repository = repository;
-            InterfaceAppType = appTypeRepository.Get(appType => appType.Name == "Snitflade").Single();
         }
-
-        public AppType InterfaceAppType { get; private set; }
 
 
         public IEnumerable<ItSystem> GetSystems(int organizationId, string nameSearch, User user)
@@ -42,14 +38,14 @@ namespace Core.ApplicationServices
                     // filter by name
                     s.Name.Contains(nameSearch) &&
                     // global admin sees all within the context 
-                    user.IsGlobalAdmin && s.OrganizationId == organizationId ||
+                    (user.IsGlobalAdmin && s.OrganizationId == organizationId ||
                     // object owner sees his own objects     
                     s.ObjectOwnerId == user.Id ||
                     // it's public everyone can see it
                     s.AccessModifier == AccessModifier.Public ||
                     // everyone in the same organization can see normal objects
                     s.AccessModifier == AccessModifier.Normal &&
-                    s.OrganizationId == organizationId
+                    s.OrganizationId == organizationId)
                     // it systems doesn't have roles so private doesn't make sense
                     // only object owners will be albe to see private objects
                 );
@@ -57,12 +53,12 @@ namespace Core.ApplicationServices
 
         public IEnumerable<ItSystem> GetNonInterfaces(int organizationId, string nameSearch, User user)
         {
-            return GetSystems(organizationId, nameSearch, user).Where(system => system.AppType == null || system.AppType.Id != InterfaceAppType.Id);
+            return GetSystems(organizationId, nameSearch, user);
         }
 
         public IEnumerable<ItSystem> GetInterfaces(int organizationId, string nameSearch, User user)
         {
-            return GetSystems(organizationId, nameSearch, user).Where(system => system.AppType != null && system.AppType.Id == InterfaceAppType.Id);
+            return GetSystems(organizationId, nameSearch, user);
         }
 
         public IEnumerable<ItSystem> GetHierarchy(int systemId)

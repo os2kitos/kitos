@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 
 namespace Core.DomainModel.ItContract
 {
@@ -15,7 +15,7 @@ namespace Core.DomainModel.ItContract
             this.Children = new List<ItContract>();
             this.AssociatedSystemUsages = new List<ItContractItSystemUsage>();
             this.AssociatedInterfaceUsages = new List<InterfaceUsage>();
-            this.AssociatedInterfaceExposures = new List<InterfaceExposure>();
+            this.AssociatedInterfaceExposures = new List<ItInterfaceExhibitUsage>();
             this.PaymentMilestones = new List<PaymentMilestone>();
             this.InternEconomyStreams = new List<EconomyStream>();
             this.ExternEconomyStreams = new List<EconomyStream>();
@@ -414,7 +414,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         /// The associated interface exposures.
         /// </value>
-        public virtual ICollection<InterfaceExposure> AssociatedInterfaceExposures { get; set; }
+        public virtual ICollection<ItInterfaceExhibitUsage> AssociatedInterfaceExposures { get; set; }
 
         #endregion
 

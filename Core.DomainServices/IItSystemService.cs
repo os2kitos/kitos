@@ -6,8 +6,6 @@ namespace Core.DomainServices
 {
     public interface IItSystemService
     {
-        AppType InterfaceAppType { get; }
-
         IEnumerable<ItSystem> GetSystems(int organizationId, string nameSearch, User user);
         IEnumerable<ItSystem> GetNonInterfaces(int organizationId, string nameSearch, User user);
         IEnumerable<ItSystem> GetInterfaces(int organizationId, string nameSearch, User user);

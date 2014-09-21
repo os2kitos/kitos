@@ -9,7 +9,7 @@ namespace UI.MVC4.Models
         public ItSystemDTO()
         {
             TaskRefIds = new List<int>();
-            CanUseInterfaceIds = new List<int>();
+            //CanUseInterfaceIds = new List<int>();
         }
 
         public int Id { get; set; }
@@ -17,11 +17,11 @@ namespace UI.MVC4.Models
         public int? ParentId { get; set; }
         public string ParentName { get; set; }
 
-        public int? ExposedById { get; set; }
-        public ItSystemDTO ExposedBy { get; set; }
+        //public int? ExposedById { get; set; }
+        //public ItSystemDTO ExposedBy { get; set; }
 
-        public IEnumerable<int> CanUseInterfaceIds { get; set; }
-        public IEnumerable<ItSystemSimpleDTO> CanUseInterfaces { get; set; }
+        //public IEnumerable<int> CanUseInterfaceIds { get; set; }
+        //public IEnumerable<ItSystemSimpleDTO> CanUseInterfaces { get; set; }
         /// <summary>
         /// Gets or sets the exposed interface ids.
         /// </summary>
@@ -38,7 +38,7 @@ namespace UI.MVC4.Models
         public int OrganizationId { get; set; }
         public string OrganizationName { get; set; }
         public string Name { get; set; }
-        public string SystemId { get; set; }
+        public string ItSystemId { get; set; }
         public int ObjectOwnerId { get; set; }
         public string ObjectOwnerName { get; set; }
 
@@ -60,8 +60,7 @@ namespace UI.MVC4.Models
         public IEnumerable<int> TaskRefIds { get; set; }
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
 
-        public int? AppTypeId { get; set; }
-        public string AppTypeName { get; set; }
+        public int AppType { get; set; }
         public int? BusinessTypeId { get; set; }
         public string BusinessTypeName { get; set; }
 

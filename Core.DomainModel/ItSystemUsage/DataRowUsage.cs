@@ -1,14 +1,20 @@
-﻿namespace Core.DomainModel.ItSystem
+﻿using Core.DomainModel.ItSystem;
+
+namespace Core.DomainModel.ItSystemUsage
 {
     /// <summary>
     /// Helper object for the local usage of a <see cref="DataRow"/>.
-    /// When an interface (ItSystem) with some DataRows is taken into local usage,
+    /// When an interface with some DataRows is taken into local usage,
     /// a DataRowUsage is created for each DataRow. This allows for adding details
     /// regarding the usage. 
     /// </summary>
-    public class DataRowUsage : Entity
+    /// TODO the db schema for this is wrong, it needs to be deleted when a contract relation to a InterfaceUsage is removed so it needs to somehow attach itself to the relation between ItContract and InterfaceUsage
+    public class DataRowUsage
     {
-        public int InterfaceUsageId { get; set; }
+        public int ItSystemUsageId { get; set; }
+        public int ItSystemId { get; set; }
+        public int ItInterfaceId { get; set; }
+
         /// <summary>
         /// The local usage of an interface, which this DataRowUsage is bound to.
         /// </summary>

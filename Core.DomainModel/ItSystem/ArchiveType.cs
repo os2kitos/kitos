@@ -5,11 +5,11 @@ namespace Core.DomainModel.ItSystem
     /// <summary>
     /// Dropdown option for ItSystem, whether it has been archived or not.
     /// </summary>
-    public class ArchiveType : Entity, IOptionEntity<ItSystemUsage>
+    public class ArchiveType : Entity, IOptionEntity<ItSystemUsage.ItSystemUsage>
     {
         public ArchiveType()
         {
-            this.References = new List<ItSystemUsage>();
+            this.References = new List<ItSystemUsage.ItSystemUsage>();
         }
 
         public string Name { get; set; }
@@ -20,6 +20,6 @@ namespace Core.DomainModel.ItSystem
         /// <summary>
         /// The ItSystems that has been marked with this ArchiveType 
         /// </summary>
-        public virtual ICollection<ItSystemUsage> References { get; set; }
+        public virtual ICollection<ItSystemUsage.ItSystemUsage> References { get; set; }
     }
 }

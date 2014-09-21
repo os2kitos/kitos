@@ -19,5 +19,11 @@ namespace UI.MVC4.Models
         public string InfrastructureName { get; set; }
 
         public bool IsWishedFor { get; set; }
+        
+        public int ItInterfaceId { get; set; }
+        public int ItSystemId { get; set; }
+
+        public string ItInterfaceUseItSystemName { get; set; }
+        public string ItInterfaceUseItInterfaceName { get; set; }
     }
 }

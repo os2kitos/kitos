@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 
 namespace Core.DomainModel.ItProject
 {
@@ -12,9 +12,9 @@ namespace Core.DomainModel.ItProject
             this.TaskRefs = new List<TaskRef>();
             this.Risks = new List<Risk>();
             this.Stakeholders = new List<Stakeholder>();
-            this.ItSystemUsages = new List<ItSystemUsage>();
+            this.ItSystemUsages = new List<ItSystemUsage.ItSystemUsage>();
             this.UsedByOrgUnits = new List<ItProjectOrgUnitUsage>();
-            this.ItSystemUsages = new List<ItSystemUsage>();
+            this.ItSystemUsages = new List<ItSystemUsage.ItSystemUsage>();
             this.EconomyYears = new List<EconomyYear>();
             this.JointMunicipalProjects = new List<ItProject>();
             this.CommonPublicProjects = new List<ItProject>();
@@ -147,7 +147,7 @@ namespace Core.DomainModel.ItProject
         /// <value>
         /// Associated it system usages.
         /// </value>
-        public virtual ICollection<ItSystemUsage> ItSystemUsages { get; set; }
+        public virtual ICollection<ItSystemUsage.ItSystemUsage> ItSystemUsages { get; set; }
         public virtual ICollection<EconomyYear> EconomyYears { get; set; }
 
         #region Status project tab

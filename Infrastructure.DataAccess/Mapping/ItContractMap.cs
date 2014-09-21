@@ -40,6 +40,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.References)
                 .Map(mc =>
                     {
+                        // have to rename key else it's too long for MySql
                         mc.MapLeftKey("ItContractId");
                         mc.MapRightKey("ElemId");
                     });

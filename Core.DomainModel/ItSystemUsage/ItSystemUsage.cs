@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystem;
 
-namespace Core.DomainModel.ItSystem
+namespace Core.DomainModel.ItSystemUsage
 {
     /// <summary>
     /// Represents an organisation's usage of an it system.
@@ -15,7 +16,7 @@ namespace Core.DomainModel.ItSystem
             this.OrgUnits = new List<OrganizationUnit>();
             this.TaskRefs = new List<TaskRef>();
             this.InterfaceUsages = new List<InterfaceUsage>();
-            this.InterfaceExposures = new List<InterfaceExposure>();
+            this.ItInterfaceExhibitUsages = new List<ItInterfaceExhibitUsage>();
             this.UsedBy = new List<ItSystemUsageOrgUnitUsage>();
             this.ItProjects = new List<ItProject.ItProject>();
         }
@@ -103,7 +104,7 @@ namespace Core.DomainModel.ItSystem
         /// <value>
         /// It system.
         /// </value>
-        public virtual ItSystem ItSystem { get; set; }
+        public virtual ItSystem.ItSystem ItSystem { get; set; }
 
         public int? ArchiveTypeId { get; set; }
         public virtual ArchiveType ArchiveType { get; set; }
@@ -112,7 +113,7 @@ namespace Core.DomainModel.ItSystem
         public virtual SensitiveDataType SensitiveDataType { get; set; }
 
         public int? OverviewItSystemId { get; set; }
-        public virtual ItSystem OverviewItSystem { get; set; }
+        public virtual ItSystem.ItSystem OverviewItSystem { get; set; }
 
         /// <summary>
         /// Gets or sets the main it contract for this instance.
@@ -168,7 +169,7 @@ namespace Core.DomainModel.ItSystem
         /// <summary>
         /// The local exposures of interfaces.
         /// </summary>
-        public virtual ICollection<InterfaceExposure> InterfaceExposures { get; set; }
+        public virtual ICollection<ItInterfaceExhibitUsage> ItInterfaceExhibitUsages { get; set; }
         /// <summary>
         /// Gets or sets the associated it projects.
         /// </summary>

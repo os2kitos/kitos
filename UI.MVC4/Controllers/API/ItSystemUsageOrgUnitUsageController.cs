@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using AutoMapper;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using UI.MVC4.Models;
 

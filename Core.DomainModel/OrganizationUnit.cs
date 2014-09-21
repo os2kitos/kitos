@@ -59,7 +59,7 @@ namespace Core.DomainModel
         /// <value>
         /// The delegated system usages.
         /// </value>
-        public virtual ICollection<ItSystemUsage> DelegatedSystemUsages { get; set; }
+        public virtual ICollection<ItSystemUsage.ItSystemUsage> DelegatedSystemUsages { get; set; }
         /// <summary>
         /// Gets or sets it system usages.
         /// TODO write better summary
@@ -67,7 +67,7 @@ namespace Core.DomainModel
         /// <value>
         /// It system usages.
         /// </value>
-        public virtual ICollection<ItSystemUsage> ItSystemUsages { get; set; }
+        public virtual ICollection<ItSystemUsage.ItSystemUsage> ItSystemUsages { get; set; }
 
         /// <summary>
         /// Users which have set this as their default OrganizationUnit

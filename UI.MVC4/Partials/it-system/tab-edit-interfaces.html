@@ -1,4 +1,4 @@
-﻿<div class="panel panel-default" data-ng-if="system.appTypeId != interfaceAppType.id">
+﻿<div class="panel panel-default">
     <div class="panel-heading">IT systemet kan anvende disse snitflader:</div>
     <table class="table table-condensed">
         <thead>
@@ -8,9 +8,9 @@
             </tr>
         </thead>
         <tbody>
-            <tr data-ng-repeat="interface in system.canUseInterfaces | filter: {show:true}">
+            <tr data-ng-repeat="interface in canUseInterfaces | filter: {show:true}">
                 <td>
-                    <a data-ui-sref="it-system.edit.interface-details({ id: interface.id })">{{ interface.name }}</a>
+                    <a data-ui-sref="it-system.interface-edit.interface-details({ id: interface.id })">{{ interface.name }}</a>
                 </td>
                 <td>
                     <button data-ng-if="hasWriteAccess" class="btn btn-danger btn-xs" data-tooltip="Fjern kan-anvende" data-confirmed-click="interface.delete()"

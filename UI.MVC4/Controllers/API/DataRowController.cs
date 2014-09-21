@@ -12,5 +12,22 @@ namespace UI.MVC4.Controllers.API
             : base(repository)
         {
         }
+
+        public virtual HttpResponseMessage GetByInterface(int interfaceId)
+        {
+            try
+            {
+                var item = Repository.Get(x => x.ItInterfaceId == interfaceId);
+
+                if (item == null) return NotFound();
+
+                var dto = Map(item);
+                return Ok(dto);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
     }
 }

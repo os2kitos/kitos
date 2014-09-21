@@ -5,28 +5,26 @@
         <div class="col-md-4">
             <div class="row">
                 <div class="col-md-12">
-                    <!--Application type -->
+                    <!--AppType-->
                     <div class="form-group">
-                        <label for="system-app-type" class="control-label small">Applikationstype</label>
-                        <select id="system-app-type" class="form-control input-sm" autofocus
-                                data-ui-select2="select2AllowClearOpt"
-                                data-placeholder="Vælg applikationstype"
-                                data-autosave="{{system.updateUrl}}"
-                                data-field="appTypeId"
+                        <label for="system-type" class="control-label small">Applikationstype</label>
+                        <select id="system-type" class="form-control input-sm" required
                                 data-ng-disabled="!hasWriteAccess"
-                                data-ng-model="system.appTypeId">
-                            <option value=""></option>
-                            <option data-ng-repeat="appType in appTypes" value="{{appType.id}}">{{appType.name}}</option>
+                                data-autosave="{{system.updateUrl}}"
+                                data-field="appType"
+                                data-ng-model="system.appType">
+                            <option value="0">Fagsystem</option>
+                            <option value="1">Fælleskommunal</option>
                         </select>
                     </div>
-
+                    
                     <!--Name-->
                     <div class="form-group">
                         <label for="system-name" class="control-label small">IT System</label>
                         <input type="text" id="system-name" class="form-control input-sm" required
                                data-ng-disabled="!hasWriteAccess"
-                               data-autosave="{{system.updateUrl}}" 
-                               data-field="name" 
+                               data-autosave="{{system.updateUrl}}"
+                               data-field="name"
                                data-ng-model="system.name">
                     </div>
 
@@ -35,19 +33,19 @@
                         <label for="system-id" class="control-label small">System ID</label>
                         <input type="text" id="system-id" class="form-control input-sm"
                                data-ng-disabled="!hasWriteAccess"
-                               data-autosave="{{system.updateUrl}}" 
-                               data-field="systemId" 
-                               data-ng-model="system.systemId">
+                               data-autosave="{{system.updateUrl}}"
+                               data-field="itSystemId"
+                               data-ng-model="system.itSystemId">
                     </div>
 
                     <!--Parent system-->
-                    <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
+                    <div class="form-group">
                         <label for="system-parent" class="control-label small">Overordnet system</label>
-                        <input type="hidden" id="system-parent" class="form-control input-sm" 
-                               data-ui-select2="itSystemsSelectOptions" 
+                        <input type="hidden" id="system-parent" class="form-control input-sm"
+                               data-ui-select2="itSystemsSelectOptions"
                                data-ng-disabled="!hasWriteAccess"
-                               data-autosave="{{system.updateUrl}}" 
-                               data-field="parentId" 
+                               data-autosave="{{system.updateUrl}}"
+                               data-field="parentId"
                                data-placeholder="Vælg system"
                                data-ng-model="system.parent">
                     </div>
@@ -60,14 +58,14 @@
             <div class="row">
                 <div class="col-md-12">
                     <!-- belongs to -->
-                    <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
+                    <div class="form-group">
                         <label for="system-belongs-to" class="control-label small">Tilhører</label>
-                        <input type="hidden" id="system-belongs-to" class="form-control input-sm" 
-                               data-ui-select2="organizationSelectOptions" 
+                        <input type="hidden" id="system-belongs-to" class="form-control input-sm"
+                               data-ui-select2="organizationSelectOptions"
                                data-placeholder="Vælg organisation"
                                data-ng-disabled="!hasWriteAccess"
-                               data-autosave="{{system.updateUrl}}" 
-                               data-field="belongsToId" 
+                               data-autosave="{{system.updateUrl}}"
+                               data-field="belongsToId"
                                data-ng-model="system.belongsTo">
                     </div>
 
@@ -83,7 +81,7 @@
                     </div>
 
                     <!--Usage type-->
-                    <div class="form-group" data-ng-if="system.appTypeId != interfaceAppType.id">
+                    <div class="form-group">
                         <label for="system-business-type" class="control-label small">Forretningstype</label>
                         <select id="system-business-type" class="form-control input-sm"
                                 data-ui-select2="select2AllowClearOpt"
@@ -99,7 +97,7 @@
                 </div>
             </div>
         </div>
-            
+
         <!-- Right side -->
         <div class="col-md-4">
             <div class="row">
@@ -108,19 +106,18 @@
                     <div class="form-group">
                         <label for="system-description" class="control-label small">Beskrivelse</label>
                         <textarea id="system-description" class="form-control input-sm" rows="7"
-                                  data-autosave="{{system.updateUrl}}" 
-                                  data-field="description" 
+                                  data-autosave="{{system.updateUrl}}"
+                                  data-field="description"
                                   data-ng-disabled="!hasWriteAccess"
-                                  data-ng-model="system.description">
-                        </textarea>
+                                  data-ng-model="system.description"></textarea>
                     </div>
 
                     <!--Further description-->
                     <div class="form-group">
                         <label for="system-url" class="control-label small">Link til yderligere beskrivelse</label>
                         <input type="text" id="system-url" class="form-control input-sm" placeholder="http://"
-                               data-autosave="{{system.updateUrl}}" 
-                               data-field="url" 
+                               data-autosave="{{system.updateUrl}}"
+                               data-field="url"
                                data-ng-disabled="!hasWriteAccess"
                                data-ng-model="system.url">
                         <span class="help-block">Skal starte med http://</span>
@@ -133,14 +130,11 @@
 
 <!-- sub tab buttons -->
 <ul class="nav nav-tabs">
-    <li data-ui-sref-active="active" data-ng-if="system.appTypeId != interfaceAppType.id">
+    <li data-ui-sref-active="active">
         <a data-ui-sref="it-system.edit.interfaces">Snitflader</a>
     </li>
-    <li data-ui-sref-active="active" data-ng-if="system.appTypeId != interfaceAppType.id">
+    <li data-ui-sref-active="active">
         <a data-ui-sref="it-system.edit.kle">KLE</a>
-    </li>
-    <li data-ui-sref-active="active" data-ng-if="system.appTypeId == interfaceAppType.id">
-        <a data-ui-sref="it-system.edit.interface-details">Snitflade detaljer</a>
     </li>
 </ul>
 

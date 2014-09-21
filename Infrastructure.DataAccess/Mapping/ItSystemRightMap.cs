@@ -1,7 +1,5 @@
-﻿using System.Data.Entity.ModelConfiguration;
-using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
-using Core.DomainModel.ItSystem;
+﻿using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 
 namespace Infrastructure.DataAccess.Mapping
 {

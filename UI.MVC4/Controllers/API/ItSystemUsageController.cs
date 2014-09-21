@@ -11,6 +11,7 @@ using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using UI.MVC4.Models;
 
@@ -44,8 +45,10 @@ namespace UI.MVC4.Controllers.API
                     u =>
                         // filter by system usage name
                         u.ItSystem.Name.Contains(q) &&
-                        // global admin sees all within the context 
-                        KitosUser.IsGlobalAdmin && u.OrganizationId == organizationId ||
+                        // system usage is only within the context 
+                        u.OrganizationId == organizationId &&
+                        // global admin sees all 
+                        (KitosUser.IsGlobalAdmin ||
                         // object owner sees his own objects     
                         u.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
@@ -55,7 +58,7 @@ namespace UI.MVC4.Controllers.API
                         u.ItSystem.OrganizationId == organizationId ||
                         // only users with a role on the object can see private objects
                         u.ItSystem.AccessModifier == AccessModifier.Private &&
-                        u.Rights.Any(x => x.UserId == KitosUser.Id)
+                        u.Rights.Any(x => x.UserId == KitosUser.Id))
                     );
 
                 return Ok(Map(usages));
@@ -72,8 +75,10 @@ namespace UI.MVC4.Controllers.API
             {
                 pagingModel.Where(
                     u =>
-                        // global admin sees all within the context 
-                        KitosUser.IsGlobalAdmin && u.OrganizationId == organizationId ||
+                        // system usage is only within the context 
+                        u.OrganizationId == organizationId &&
+                        // global admin sees all 
+                        (KitosUser.IsGlobalAdmin ||
                         // object owner sees his own objects     
                         u.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
@@ -83,7 +88,7 @@ namespace UI.MVC4.Controllers.API
                         u.ItSystem.OrganizationId == organizationId ||
                         // only users with a role on the object can see private objects
                         u.ItSystem.AccessModifier == AccessModifier.Private &&
-                        u.Rights.Any(x => x.UserId == KitosUser.Id)
+                        u.Rights.Any(x => x.UserId == KitosUser.Id))
                     );
 
                 if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
@@ -104,8 +109,10 @@ namespace UI.MVC4.Controllers.API
             {
                 pagingModel.Where(
                     u =>
-                        // global admin sees all within the context 
-                        KitosUser.IsGlobalAdmin && u.OrganizationId == organizationId ||
+                        // system usage is only within the context 
+                        u.OrganizationId == organizationId &&
+                        // global admin sees all 
+                        (KitosUser.IsGlobalAdmin ||
                         // object owner sees his own objects     
                         u.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
@@ -115,7 +122,7 @@ namespace UI.MVC4.Controllers.API
                         u.ItSystem.OrganizationId == organizationId ||
                         // only users with a role on the object can see private objects
                         u.ItSystem.AccessModifier == AccessModifier.Private &&
-                        u.Rights.Any(x => x.UserId == KitosUser.Id)
+                        u.Rights.Any(x => x.UserId == KitosUser.Id))
                     );
 
                 if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
@@ -153,12 +160,12 @@ namespace UI.MVC4.Controllers.API
                         obj.Add(role.Name,
                                 String.Join(",", usage.Rights.Where(x => x.RoleId == roleId).Select(x => x.User.Name)));
                     }
-                    obj.Add("Gid", usage.ItSystem.SystemId);
+                    obj.Add("Gid", usage.ItSystem.ItSystemId);
                     obj.Add("Lid", usage.LocalSystemId);
-                    obj.Add("AppType", usage.ItSystem.AppTypeName);
+                    obj.Add("AppType", usage.ItSystem.AppType == 0 ? "Fagsystem" : "Fælleskommunal");
                     obj.Add("BusiType", usage.ItSystem.BusinessTypeName);
-                    obj.Add("Anvender", usage.ActiveInterfaceUsages + "(" + usage.ItSystem.CanUseInterfaceIds.Count() + ")");
-                    obj.Add("Udstiller", usage.ItSystem.ExposedBy != null ? usage.ItSystem.ExposedBy.Name : "" + " " + usage.ItSystem.ExposedInterfaceIds.Count());
+                    //obj.Add("Anvender", usage.ActiveInterfaceUsages + "(" + usage.ItSystem.CanUseInterfaceIds.Count() + ")"); TODO
+                    //obj.Add("Udstiller", usage.ItSystem.ExposedBy != null ? usage.ItSystem.ExposedBy.Name : "" + " " + usage.ItSystem.ExposedInterfaceIds.Count()); TODO
                     obj.Add("Overblik", usage.OverviewItSystemName);
                     list.Add(obj);
                 }
@@ -199,8 +206,8 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                if (Repository.Get(usage => usage.ItSystemId == dto.ItSystemId 
-                    && usage.OrganizationId == dto.OrganizationId).Any())
+                if (Repository.Get(usage => usage.ItSystemId == dto.ItSystemId
+                                            && usage.OrganizationId == dto.OrganizationId).Any())
                     return Conflict("Usage already exist");
 
                 var sysUsage = _itSystemUsageService.Add(dto.ItSystemId, dto.OrganizationId, KitosUser);

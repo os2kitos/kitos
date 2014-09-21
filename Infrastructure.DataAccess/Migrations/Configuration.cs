@@ -6,6 +6,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 
 namespace Infrastructure.DataAccess.Migrations
 {
@@ -107,19 +108,19 @@ namespace Infrastructure.DataAccess.Migrations
             
             AddOptions<ItProjectType, ItProject>(context.ProjectTypes, globalUser, "Fællesoffentlig", "Fælleskommunal");
             
-            AddOptions<AppType, ItSystem>(context.AppTypes, globalUser, "Snitflade", "Fagsystem", "Selvbetjening");
+            //AddOptions<AppType, ItSystem>(context.AppTypes, globalUser, "Snitflade", "Fagsystem", "Selvbetjening");
 
             AddOptions<BusinessType, ItSystem>(context.BusinessTypes, globalUser, "Forretningstype 1", "Forretningstype 2", "Forretningstype 3");
 
-            AddOptions<Interface, ItSystem>(context.Interfaces, globalUser, "Grænseflade 1", "Grænseflade 2", "Grænseflade 3");
-            
-            AddOptions<Tsa, ItSystem>(context.Tsas, globalUser, "Ja", "Nej");
-            
-            AddOptions<InterfaceType, ItSystem>(context.InterfaceTypes, globalUser, "WS");
+            AddOptions<Interface, ItInterface>(context.Interfaces, globalUser, "Grænseflade 1", "Grænseflade 2", "Grænseflade 3");
+
+            AddOptions<Tsa, ItInterface>(context.Tsas, globalUser, "Ja", "Nej");
+
+            AddOptions<InterfaceType, ItInterface>(context.InterfaceTypes, globalUser, "WS");
 
             AddOptions<DataType, DataRow>(context.DataTypes, globalUser, "Datatype 1", "Datatype 2", "Datatype 3");
 
-            AddOptions<Method, ItSystem>(context.Methods, globalUser, "Batch", "Request-Response");
+            AddOptions<Method, ItInterface>(context.Methods, globalUser, "Batch", "Request-Response");
 
             AddOptions<ContractType, ItContract>(context.ContractTypes, globalUser, "Hovedkontrakt", "Tillægskontrakt", "Snitflade");
 
