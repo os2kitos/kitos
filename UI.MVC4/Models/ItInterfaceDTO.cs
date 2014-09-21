@@ -9,11 +9,12 @@ namespace UI.MVC4.Models
         public string Name { get; set; }
         public string Url { get; set; }
         public string Description { get; set; }
-        public string ItInterfaceId { get; set; }
+        public int ItInterfaceId { get; set; }
         public string OrganizationId { get; set; }
         public string OrganizationName { get; set; }
         public string ObjectOwnerName { get; set; }
         public AccessModifier AccessModifier { get; set; }
+        public int? ExhibitedById { get; set; }
         public int? ExhibitedByItSystemId { get; set; }
         public string ExhibitedByItSystemName { get; set; }
         public int? TsaId { get; set; }

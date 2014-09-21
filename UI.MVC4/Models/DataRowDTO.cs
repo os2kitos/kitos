@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace UI.MVC4.Models
+﻿namespace UI.MVC4.Models
 {
     public class DataRowDTO
     {
@@ -9,6 +7,5 @@ namespace UI.MVC4.Models
         public string Data { get; set; }
         public int? DataTypeId { get; set; }
         public int ItInterfaceId { get; set; }
-        public IEnumerable<DataRowUsageDTO> Usages { get; set; }
     }
 }

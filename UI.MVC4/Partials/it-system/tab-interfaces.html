@@ -21,7 +21,7 @@
             <tr data-ng-repeat-start="exposure in interfaceExposures">
                 <!-- wished to be used -->
                 <td rowspan="{{exposure.numRows}}">
-                    <input type="checkbox" data-ng-model="exposure.isWishedFor"
+                    <input type="checkbox" data-ng-model="exposure.usage.isWishedFor"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="isWishedFor"
                            data-autosave="{{exposure.updateUrl}}" />
@@ -29,7 +29,7 @@
 
                 <!-- active (depends on contract) -->
                 <td rowspan="{{exposure.numRows}}">
-                    <span data-ng-if="exposure.itContract.isActive" class="text-success">
+                    <span data-ng-if="exposure.usage.itContract.isActive" class="text-success">
                         <i class="glyphicon glyphicon-ok"></i>
                     </span>
                 </td>
@@ -41,7 +41,7 @@
 
                 <!-- contract id -->
                 <td rowspan="{{exposure.numRows}}">
-                    <a data-ng-if="exposure.itContractId != null" data-ui-sref="it-contract.edit.systems({id: exposure.itContract.id})">{{exposure.itContract.itContractId}}
+                    <a data-ng-if="exposure.usage.itContractId != null" data-ui-sref="it-contract.edit.systems({id: exposure.usage.itContractId})">{{exposure.usage.itContract.itContractId}}
                     </a>
                 </td>
 
@@ -116,7 +116,7 @@
             <tr data-ng-repeat-start="usage in interfaceUsages">
                 <!-- wished to be used -->
                 <td rowspan="{{usage.numRows}}">
-                    <input type="checkbox" data-ng-model="usage.isWishedFor"
+                    <input type="checkbox" data-ng-model="usage.usage.isWishedFor"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="isWishedFor"
                            data-autosave="{{usage.updateUrl}}">
@@ -124,7 +124,7 @@
 
                 <!-- active (depends on contract) -->
                 <td rowspan="{{usage.numRows}}">
-                    <span data-ng-if="usage.itContract.isActive" class="text-success">
+                    <span data-ng-if="usage.usage.itContract.isActive" class="text-success">
                         <i class="glyphicon glyphicon-ok"></i>
                     </span>
                 </td>
@@ -136,7 +136,7 @@
 
                 <!-- contract id -->
                 <td rowspan="{{usage.numRows}}">
-                    <a data-ng-if="usage.itContractId != null" data-ui-sref="it-contract.edit.systems({id: usage.itContract.id})">{{usage.itContract.itContractId}}
+                    <a data-ng-if="usage.usage.itContractId != null" data-ui-sref="it-contract.edit.systems({id: usage.usage.itContractId})">{{usage.usage.itContract.itContractId}}
                     </a>
                 </td>
 

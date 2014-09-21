@@ -37,12 +37,24 @@
                 }],
                 canUseInterfaces: ['$http', 'itSystemUsage', function ($http, itSystemUsage) {
                     return $http.get('api/itInterfaceUse/?interfaces&sysid=' + itSystemUsage.itSystem.id).then(function (result) {
-                        return result.data.response;
+                        var interfaces = result.data.response;
+                        _.each(interfaces, function(data) {
+                            $http.get('api/interfaceUsage/?usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + data.id).success(function(usageResult) {
+                                data.usage = usageResult.response;
+                            });
+                        });
+                        return interfaces;
                     });
                 }],
                 exhibits: ['$http', 'itSystemUsage', function ($http, itSystemUsage) {
                     return $http.get('api/exhibit/?interfaces&sysid=' + itSystemUsage.itSystem.id).then(function (result) {
-                        return result.data.response;
+                        var interfaces = result.data.response;
+                        _.each(interfaces, function(data) {
+                            $http.get('api/itInterfaceExhibitUsage/?usageId=' + itSystemUsage.id + '&exhibitId=' + data.exhibitedById).success(function (usageResult) {
+                                data.usage = usageResult.response;
+                            });
+                        });
+                        return interfaces;
                     });
                 }],
             }
@@ -84,14 +96,14 @@
 
             //Interface exposures
             _.each(exhibits, function(interfaceExposure) {
-                interfaceExposure.updateUrl = 'api/interfaceExposure/' + interfaceExposure.id;
+                interfaceExposure.updateUrl = 'api/itInterfaceExhibitUsage/?usageId=' + itSystemUsage.id + '&exhibitId=' + interfaceExposure.id;
                 resolveTypes(interfaceExposure);
             });
             $scope.interfaceExposures = exhibits;
 
             //Interface usages
             _.each(canUseInterfaces, function(interfaceUsage) {
-                interfaceUsage.updateUrl = 'api/interfaceUsage/' + interfaceUsage.id;
+                interfaceUsage.updateUrl = 'api/interfaceUsage/?usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + interfaceUsage.id;
 
                 //for the select2
                 if (interfaceUsage.infrastructureId) {

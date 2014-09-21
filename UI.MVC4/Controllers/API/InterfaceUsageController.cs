@@ -17,6 +17,20 @@ namespace UI.MVC4.Controllers.API
             _repository = repository;
         }
 
+        public HttpResponseMessage Get(int usageId, int sysId, int interfaceId)
+        {
+            try
+            {
+                var item = _repository.GetByKey(new object[] {usageId, sysId, interfaceId});
+                var dto = Map<InterfaceUsage, InterfaceUsageDTO>(item);
+                return Ok(dto);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetByContract(int contractId)
         {
             try

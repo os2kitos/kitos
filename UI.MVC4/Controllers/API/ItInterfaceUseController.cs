@@ -41,7 +41,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var items = _repository.Get(x => x.ItSystemId == sysId && x.ItSystem.Name.Contains(q));
+                var items = _repository.Get(x => x.ItSystemId == sysId && x.ItInterface.Name.Contains(q));
                 var dtos = Map<IEnumerable<ItInterfaceUse>, IEnumerable<ItInterfaceUseDTO>>(items);
                 return Ok(dtos);
             }
