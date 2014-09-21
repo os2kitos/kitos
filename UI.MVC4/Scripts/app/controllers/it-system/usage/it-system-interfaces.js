@@ -38,11 +38,6 @@
                 canUseInterfaces: ['$http', 'itSystemUsage', function ($http, itSystemUsage) {
                     return $http.get('api/itInterfaceUse/?interfaces&sysid=' + itSystemUsage.itSystem.id).then(function (result) {
                         var interfaces = result.data.response;
-                        _.each(interfaces, function(data) {
-                            $http.get('api/interfaceUsage/?usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + data.id).success(function(usageResult) {
-                                data.usage = usageResult.response;
-                            });
-                        });
                         return interfaces;
                     });
                 }],
@@ -80,7 +75,7 @@
                 return interfaceSystem.canBeUsed || interfaceSystem.usage || $scope.showAllInterfaces;
             };
 
-            //resolving complex types from ids
+            // resolving complex types from ids
             function resolveTypes(theInterface) {
                 theInterface.interfaceType = _.findWhere(interfaceTypes, { id: theInterface.interfaceTypeId });
                 theInterface.interface = _.findWhere(interfaces, { id: theInterface.interfaceId });
@@ -94,18 +89,18 @@
                 theInterface.numRows = theInterface.dataRows.length == 0 ? 1 : theInterface.dataRows.length;
             }
 
-            //Interface exposures
+            // Interface exposures
             _.each(exhibits, function(interfaceExposure) {
                 interfaceExposure.updateUrl = 'api/itInterfaceExhibitUsage/?usageId=' + itSystemUsage.id + '&exhibitId=' + interfaceExposure.id;
                 resolveTypes(interfaceExposure);
             });
             $scope.interfaceExposures = exhibits;
 
-            //Interface usages
+            // Interface usages
             _.each(canUseInterfaces, function(interfaceUsage) {
                 interfaceUsage.updateUrl = 'api/interfaceUsage/?usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + interfaceUsage.id;
 
-                //for the select2
+                // for the select2
                 if (interfaceUsage.infrastructureId) {
                     interfaceUsage.infrastructure = {
                         id: interfaceUsage.infrastructureId,
@@ -113,9 +108,15 @@
                     };
                 }
 
-                _.each(interfaceUsage.dataRows, function(dataRow) {
-                    dataRow.updateUrl = 'api/dataRow/' + dataRow.id;
-                    dataRow.dataType = _.findWhere(dataTypes, { id: dataRow.dataTypeId });
+                $http.get('api/interfaceUsage/?usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + interfaceUsage.id).success(function (usageResult) {
+                    interfaceUsage.usage = usageResult.response;
+                }).finally(function() {
+                    _.each(interfaceUsage.dataRows, function (dataRow) {
+                        dataRow.updateUrl = 'api/dataRowUsage/?rowId=' + dataRow.id + '&usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + interfaceUsage.id;
+                        dataRow.dataType = _.findWhere(dataTypes, { id: dataRow.dataTypeId });
+                        if (interfaceUsage.usage)
+                            dataRow.usage = _.findWhere(interfaceUsage.usage.dataRowUsages, { dataRowId: dataRow.id });
+                    });
                 });
 
                 resolveTypes(interfaceUsage);
@@ -150,7 +151,7 @@
             function selectLazyLoading(url) {
                 return {
                     minimumInputLength: 1,
-                    initSelection: function(elem, callback) {
+                    initSelection: function (elem, callback) {
                     },
                     ajax: {
                         data: function(term, page) {

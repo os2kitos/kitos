@@ -46,7 +46,7 @@ namespace UI.MVC4.Controllers.API
         }
 
         /// <summary>
-        /// Patches IsWishedFor or ItContractId only.
+        /// Patches IsWishedFor, ItContractId and InfrastructureId only.
         /// If the entry doesn't exist it's created.
         /// </summary>
         /// <param name="usageId"></param>
@@ -78,6 +78,10 @@ namespace UI.MVC4.Controllers.API
                 var contractToken = obj.GetValue("itContractId");
                 if (contractToken != null)
                     item.ItContractId = contractToken.Value<int?>();
+
+                var infraToken = obj.GetValue("infrastructureId");
+                if (infraToken != null)
+                    item.InfrastructureId = infraToken.Value<int?>();
 
                 _repository.Save();
                 var outDto = Map<InterfaceUsage, InterfaceUsageDTO>(item);

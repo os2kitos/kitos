@@ -146,8 +146,13 @@
 
                 <!-- infrastructure -->
                 <td rowspan="{{usage.numRows}}">
-                    <input type="hidden" data-ui-select2="itSystemsSelectOptions" data-ng-model="usage.infrastructure"
-                           class="form-control input-sm" data-ng-disabled="!usage.itContractId || !hasWriteAccess" data-ng-change="updateInfrastructure(usage)">
+                    <input type="hidden" class="form-control input-sm"
+                           data-ui-select2="itSystemsSelectOptions"
+                           data-ng-model="usage.usage.infrastructureId"
+                           data-ng-show="usage.usage.itContract.isActive"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-field="infrastructureId"
+                           data-autosave="{{usage.updateUrl}}">
                 </td>
                 
                 <!-- exposed by -->
@@ -157,103 +162,111 @@
 
                 <!-- data -->
                 <td>
-                    <span data-ng-if="usage.dataRowUsages.length > 0">
-                        {{usage.dataRowUsages[0].dataRow.data}}
+                    <span data-ng-if="usage.numRows > 0">
+                        {{usage.dataRows[0].data}}
                     </span>
                 </td>
                 
                 <!-- datatype -->
                 <td>
-                    <span data-ng-if="usage.dataRowUsages.length > 0">
-                        {{usage.dataRowUsages[0].dataRow.dataType.name}}
+                    <span data-ng-if="usage.numRows">
+                        {{usage.dataRows[0].dataType.name}}
                     </span>
                 </td>
                 
                 <!-- frequency -->
                 <td>
-                    <span data-ng-if="usage.dataRowUsages.length > 0">
-                        <select data-ng-model="usage.dataRowUsages[0].frequencyId"
-                                            class="form-control input-sm"
-                                            data-ng-disabled="!usage.itContractId || !hasWriteAccess"
-                                            data-ng-options="freq.id as freq.name for freq in frequencies"
-                                            data-field="frequencyId"
-                                            data-autosave="{{usage.dataRowUsages[0].updateUrl}}">
-                        </select>
+                    <span data-ng-if="usage.numRows > 0">
+                        <select data-ng-model="usage.dataRows[0].usage.frequencyId"
+                                class="form-control input-sm"
+                                data-ng-show="usage.usage.itContract.isActive"
+                                data-ng-disabled="!hasWriteAccess"
+                                data-ng-options="freq.id as freq.name for freq in frequencies"
+                                data-field="frequencyId"
+                                data-autosave="{{usage.dataRows[0].updateUrl}}"></select>
                     </span>
                 </td>
 
                 <!-- price -->
                 <td>
-                    <span data-ng-if="usage.dataRowUsages.length > 0">
-                        <input type="text" data-ng-model="usage.dataRowUsages[0].price" class="form-control input-sm"
-                            data-ng-disabled="!usage.itContractId || !hasWriteAccess"
-                            data-field="price"
-                            data-autosave="{{usage.dataRowUsages[0].updateUrl}}" />
+                    <span data-ng-if="usage.numRows > 0">
+                        <input type="text" data-ng-model="usage.dataRows[0].usage.price" class="form-control input-sm"
+                               data-ng-show="usage.usage.itContract.isActive"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-field="price"
+                               data-autosave="{{usage.dataRows[0].updateUrl}}" />
                     </span>
                 </td>
 
                 <!-- amount -->
                 <td>
-                    <span data-ng-if="usage.dataRowUsages.length > 0">
-                        <input type="text" data-ng-model="usage.dataRowUsages[0].amount" class="form-control input-sm"
-                            data-ng-disabled="!usage.itContractId || !hasWriteAccess"
-                            data-field="amount"
-                            data-autosave="{{usage.dataRowUsages[0].updateUrl}}" />
+                    <span data-ng-if="usage.numRows > 0">
+                        <input type="text" data-ng-model="usage.dataRows[0].usage.amount" class="form-control input-sm"
+                               data-ng-show="usage.usage.itContract.isActive"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-field="amount"
+                               data-autosave="{{usage.dataRows[0].updateUrl}}" />
                     </span>
                 </td>
 
                 <!-- economy -->
                 <td>
-                    <span data-ng-if="usage.dataRowUsages.length > 0">
-                        <input type="text" data-ng-model="usage.dataRowUsages[0].economy" class="form-control input-sm"
-                            data-ng-disabled="!usage.itContractId || !hasWriteAccess"
-                            data-field="economy"
-                            data-autosave="{{usage.dataRowUsages[0].updateUrl}}" />
+                    <span data-ng-if="usage.numRows > 0">
+                        <input type="text" data-ng-model="usage.dataRows[0].usage.economy" class="form-control input-sm"
+                               data-ng-show="usage.usage.itContract.isActive"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-field="economy"
+                               data-autosave="{{usage.dataRows[0].updateUrl}}" />
                     </span>
                 </td>
             </tr>
-            <tr data-ng-repeat="dataRowUsage in usage.dataRowUsages" data-ng-if="!$first" data-ng-repeat-end="">
+            <tr data-ng-repeat="dataRow in usage.dataRows" data-ng-if="!$first" data-ng-repeat-end="">
                 <!-- data -->
-                <td>{{dataRowUsage.dataRow.data}}
+                <td>
+                    {{dataRow.data}}
                 </td>
 
                 <!-- datatype -->
-                <td>{{dataRowUsage.dataRow.dataType.name}}
+                <td>
+                    {{dataRow.dataType.name}}
                 </td>
 
                 <!-- frequency -->
                 <td>
-                    <select data-ng-model="dataRowUsage.frequencyId"
-                        class="form-control input-sm"
-                        data-ng-disabled="!usage.itContractId || !hasWriteAccess"
-                        data-ng-options="freq.id as freq.name for freq in frequencies"
-                        data-field="frequencyId"
-                        data-autosave="{{dataRowUsage.updateUrl}}">
-                    </select>
+                    <select data-ng-model="dataRow.usage.frequencyId"
+                            class="form-control input-sm"
+                            data-ng-show="usage.usage.itContract.isActive"
+                            data-ng-disabled="!hasWriteAccess"
+                            data-ng-options="freq.id as freq.name for freq in frequencies"
+                            data-field="frequencyId"
+                            data-autosave="{{dataRow.updateUrl}}"></select>
                 </td>
 
                 <!-- price -->
                 <td>
-                    <input type="text" data-ng-model="dataRowUsage.price" class="form-control input-sm"
-                        data-ng-disabled="!usage.itContractId || !hasWriteAccess"
-                        data-field="price"
-                        data-autosave="{{dataRowUsage.updateUrl}}" />
+                    <input type="text" data-ng-model="dataRow.usage.price" class="form-control input-sm"
+                           data-ng-show="usage.usage.itContract.isActive"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-field="price"
+                           data-autosave="{{dataRow.updateUrl}}" />
                 </td>
 
                 <!-- amount -->
                 <td>
-                    <input type="text" data-ng-model="dataRowUsage.amount" class="form-control input-sm"
-                        data-ng-disabled="!usage.itContractId || !hasWriteAccess"
-                        data-field="amount"
-                        data-autosave="{{dataRowUsage.updateUrl}}" />
+                    <input type="text" data-ng-model="dataRow.usage.amount" class="form-control input-sm"
+                           data-ng-show="usage.usage.itContract.isActive"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-field="amount"
+                           data-autosave="{{dataRow.updateUrl}}" />
                 </td>
 
                 <!-- economy -->
                 <td>
-                    <input type="text" data-ng-model="dataRowUsage.economy" class="form-control input-sm"
-                        data-ng-disabled="!usage.itContractId || !hasWriteAccess"
-                        data-field="economy"
-                        data-autosave="{{dataRowUsage.updateUrl}}" />
+                    <input type="text" data-ng-model="dataRow.usage.economy" class="form-control input-sm"
+                           data-ng-show="usage.usage.itContract.isActive"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-field="economy"
+                           data-autosave="{{dataRow.updateUrl}}" />
                 </td>
             </tr>
             <tr data-ng-if="interfaceUsages.length == 0">

@@ -103,7 +103,7 @@ namespace UI.MVC4.Controllers.API
                     var obj = new ExpandoObject() as IDictionary<string, Object>;
                     obj.Add("It Kontrakt", system.Name);
                     obj.Add("ID", system.ItSystemId);
-                    obj.Add("AppType", system.AppTypeName);
+                    obj.Add("AppType", system.AppType == 0 ? "Fagsystem" : "Fælleskommunal");
                     obj.Add("BusiType", system.BusinessTypeName);
                     obj.Add("KLEID", String.Join(",", system.TaskRefs.Select(x => x.TaskKey)));
                     obj.Add("KLENavn", String.Join(",", system.TaskRefs.Select(x => x.Description)));

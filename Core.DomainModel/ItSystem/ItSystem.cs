@@ -31,6 +31,8 @@ namespace Core.DomainModel.ItSystem
         /// </value>
         public string ItSystemId { get; set; }
 
+        public ItSystemType AppType { get; set; }
+
         public int? BelongsToId { get; set; }
         /// <summary>
         /// Gets or sets the organization the system belongs to.

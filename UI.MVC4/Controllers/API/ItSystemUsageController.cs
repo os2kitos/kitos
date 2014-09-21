@@ -162,7 +162,7 @@ namespace UI.MVC4.Controllers.API
                     }
                     obj.Add("Gid", usage.ItSystem.ItSystemId);
                     obj.Add("Lid", usage.LocalSystemId);
-                    obj.Add("AppType", usage.ItSystem.AppTypeName);
+                    obj.Add("AppType", usage.ItSystem.AppType == 0 ? "Fagsystem" : "Fælleskommunal");
                     obj.Add("BusiType", usage.ItSystem.BusinessTypeName);
                     //obj.Add("Anvender", usage.ActiveInterfaceUsages + "(" + usage.ItSystem.CanUseInterfaceIds.Count() + ")"); TODO
                     //obj.Add("Udstiller", usage.ItSystem.ExposedBy != null ? usage.ItSystem.ExposedBy.Name : "" + " " + usage.ItSystem.ExposedInterfaceIds.Count()); TODO

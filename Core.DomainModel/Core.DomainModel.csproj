@@ -76,6 +76,7 @@
     <Compile Include="ItSystem\ItSystemBase.cs" />
     <Compile Include="ItSystemUsage\ItSystemUsageOrgUnitUsage.cs" />
     <Compile Include="ItSystemUsage\ItSystemUsage.cs" />
+    <Compile Include="ItSystem\ItSystemType.cs" />
     <Compile Include="ItSystem\SensitiveDataType.cs" />
     <Compile Include="ItSystem\Tsa.cs" />
     <Compile Include="OrganizationUnit.cs" />
