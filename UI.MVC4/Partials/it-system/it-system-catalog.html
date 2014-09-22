@@ -11,13 +11,11 @@
                 IT System
                 <order-by data-order-by="'name'" data-paging="pagination"></order-by>
             </th>
-            <th class="col-sm-0"><!-- Public marker --></th>
-            <th>
-                Globalt SystemID
-                <order-by data-order-by="'itSystemId'" data-paging="pagination"></order-by>
+            <th class="col-sm-0">
+                (P)
             </th>
             <th>
-                <select data-ng-model="showType" data-ng-init="showType = 'appType'">
+                <select data-ng-model="showType" data-ng-init="showType = 'businessType'">
                     <option value="appType">Applikationstype</option>
                     <option value="businessType">Forretningstype</option>
                 </select>
@@ -25,12 +23,12 @@
             <th>KLE ID</th>
             <th>KLE Navn</th>
             <th>
-                Tilhører
+                Ophavsrettighedsejer
                 <order-by data-order-by="'belongsTo.name'" data-paging="pagination"></order-by>
             </th>
             <th>
                 Oprettet af
-                <order-by data-order-by="'objectOwner.name'" data-paging="pagination"></order-by>
+                <order-by data-order-by="'organization.name'" data-paging="pagination"></order-by>
             </th>
             <th>Anvendelse</th>
         </tr>
@@ -45,7 +43,6 @@
                     (P)
                 </span>
             </td>
-            <td>{{system.itSystemId}}</td>
             <td data-ng-switch="showType">
                 <span data-ng-switch-when="appType">{{system.appTypeOptionName}}</span>
                 <span data-ng-switch-when="businessType">{{system.businessTypeName}}</span>
@@ -57,7 +54,8 @@
                 {{system.belongsTo.name}}
             </td>
             <td>
-                <span data-popover-placement="right" data-popover="Oprettet i {{system.organization.name}}" data-popover-trigger="mouseenter">{{system.user.name}}
+                <span data-popover-placement="right" data-popover="Oprettet af {{system.user.name}}" data-popover-trigger="mouseenter">
+                    {{system.organization.name}}
                 </span>
             </td>
             <td>
@@ -76,7 +74,7 @@
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="9" class="text-center">
+            <td colspan="8" class="text-center">
                 <span data-pagination-buttons="pagination"></span>
             </td>
         </tr>
