@@ -5,16 +5,18 @@
         <div class="col-md-4">
             <div class="row">
                 <div class="col-md-12">
-                    <!--AppType-->
+                    <!--AppTypeOption-->
                     <div class="form-group">
                         <label for="system-type" class="control-label small">Applikationstype</label>
-                        <select id="system-type" class="form-control input-sm" required
+                        <select id="system-type" class="form-control input-sm"
+                                data-ui-select2="select2AllowClearOpt"
+                                data-placeholder="Vælg applikationstype"
                                 data-ng-disabled="!hasWriteAccess"
                                 data-autosave="{{system.updateUrl}}"
-                                data-field="appType"
-                                data-ng-model="system.appType">
-                            <option value="0">Fagsystem</option>
-                            <option value="1">Fælleskommunal</option>
+                                data-field="appTypeOptionId"
+                                data-ng-model="system.appTypeOptionId">
+                            <option value=""></option>
+                            <option data-ng-repeat="appTypeOption in appTypeOptions" value="{{appTypeOption.id}}">{{appTypeOption.name}}</option>
                         </select>
                     </div>
                     

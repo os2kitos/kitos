@@ -71,6 +71,7 @@
     <Compile Include="Mapping\AdminRightMap.cs" />
     <Compile Include="Mapping\AdminRoleMap.cs" />
     <Compile Include="Mapping\BusinessTypeMap.cs" />
+    <Compile Include="Mapping\ItSystemTypeOptionMap.cs" />
     <Compile Include="Mapping\ItInterfaceExhibitMap.cs" />
     <Compile Include="Mapping\ItInterfaceUseMap.cs" />
     <Compile Include="Mapping\ItContractItSystemUsageMap.cs" />

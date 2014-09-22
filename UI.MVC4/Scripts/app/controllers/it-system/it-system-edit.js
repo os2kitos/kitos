@@ -23,6 +23,13 @@
                         return $http.get("api/businesstype");
                     }
                 ],
+                appTypeOptions: [
+                    '$http', function ($http) {
+                        return $http.get("api/itSystemTypeOption").then(function (result) {
+                            return result.data.response;
+                        });
+                    }
+                ],
                 user: [
                     'userService', function(userService) {
                         return userService.getUser();
@@ -34,8 +41,8 @@
 
     app.controller('system.EditCtrl',
     [
-        '$rootScope', '$scope', '$http', '$state', 'notify', 'itSystem', 'hasWriteAccess', 'businessTypes', 'user', 'autofocus',
-        function($rootScope, $scope, $http, $state, notify, itSystem, hasWriteAccess, businessTypes, user, autofocus) {
+        '$rootScope', '$scope', '$http', '$state', 'notify', 'itSystem', 'hasWriteAccess', 'businessTypes', 'user', 'autofocus', 'appTypeOptions',
+        function ($rootScope, $scope, $http, $state, notify, itSystem, hasWriteAccess, businessTypes, user, autofocus, appTypeOptions) {
             $rootScope.page.title = 'IT System - Rediger system';
             autofocus();
 
@@ -47,6 +54,7 @@
                 allowClear: true
             };
 
+            $scope.appTypeOptions = appTypeOptions;
             $scope.system = itSystem;
             $scope.hasWriteAccess = hasWriteAccess;
             $scope.businessTypes = businessTypes.data.response;
