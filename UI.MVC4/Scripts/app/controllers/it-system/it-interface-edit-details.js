@@ -107,7 +107,7 @@
                 });
             };
 
-            $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem?', ['orgId=' + user.currentOrganizationId]);
+            $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem?', ['organizationId=' + user.currentOrganizationId]);
 
             function selectLazyLoading(url, paramAry) {
                 return {
