@@ -38,7 +38,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var exhibit = _repository.Get(x => x.ItSystemId == sysId && x.ItSystem.Name.Contains(q));
+                var exhibit = _repository.Get(x => x.ItSystemId == sysId && x.ItInterface.Name.Contains(q));
                 var dtos = Map(exhibit);
                 return Ok(dtos);
             }
