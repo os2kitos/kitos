@@ -35,7 +35,7 @@ namespace UI.MVC4.Controllers.API
                         // filter by project name
                         org.Name.Contains(q) &&
                         // global admin sees all within the context
-                        KitosUser.IsGlobalAdmin && org.Id == orgId ||
+                        (KitosUser.IsGlobalAdmin && org.Id == orgId ||
                         // object owner sees his own objects
                         org.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
@@ -44,7 +44,7 @@ namespace UI.MVC4.Controllers.API
                         org.AccessModifier == AccessModifier.Normal &&
                         org.Id == orgId ||
                         // only users with a role on the object can see private objects
-                        org.AccessModifier == AccessModifier.Private && org.Rights.Any(x => x.UserId == KitosUser.Id)
+                        org.AccessModifier == AccessModifier.Private && org.Rights.Any(x => x.UserId == KitosUser.Id))
                     );
                 var dtos = Map(orgs);
                 return Ok(dtos);
@@ -64,7 +64,7 @@ namespace UI.MVC4.Controllers.API
                         // filter by project name or cvr
                         org.Name.Contains(q) || org.Cvr.Contains(q) &&
                         // global admin sees all within the context
-                        KitosUser.IsGlobalAdmin && org.Id == orgId ||
+                        (KitosUser.IsGlobalAdmin && org.Id == orgId ||
                         // object owner sees his own objects
                         org.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
@@ -73,7 +73,7 @@ namespace UI.MVC4.Controllers.API
                         org.AccessModifier == AccessModifier.Normal &&
                         org.Id == orgId ||
                         // only users with a role on the object can see private objects
-                        org.AccessModifier == AccessModifier.Private && org.Rights.Any(x => x.UserId == KitosUser.Id)
+                        org.AccessModifier == AccessModifier.Private && org.Rights.Any(x => x.UserId == KitosUser.Id))
                     );
                 
                 var dtos = Map(orgs);
