@@ -17,13 +17,10 @@
                 <order-by data-order-by="'itSystemId'" data-paging="pagination"></order-by>
             </th>
             <th>
-                <select data-ng-model="showType">
-                    <option value="appType.name">Applikationstype
-                    </option>
-                    <option value="businessType.name">Forretningstype
-                    </option>
+                <select data-ng-model="showType" data-ng-init="showType = 'appType'">
+                    <option value="appType">Applikationstype</option>
+                    <option value="businessType">Forretningstype</option>
                 </select>
-                <order-by data-order-by="showType" data-paging="pagination"></order-by>
             </th>
             <th>KLE ID</th>
             <th>KLE Navn</th>
@@ -50,8 +47,8 @@
             </td>
             <td>{{system.itSystemId}}</td>
             <td data-ng-switch="showType">
-                <span data-ng-switch-when="appType.name">{{system.appType.name}}</span>
-                <span data-ng-switch-when="businessType.name">{{system.businessType.name}}</span>
+                <span data-ng-switch-when="appType">{{system.appTypeOptionName}}</span>
+                <span data-ng-switch-when="businessType">{{system.businessTypeName}}</span>
             </td>
             <td>{{system.taskId}}</td>
             <td>{{system.taskName}}</td>

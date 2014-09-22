@@ -32,7 +32,7 @@ namespace Core.DomainModel.ItSystem
         public string ItSystemId { get; set; }
 
         public int? AppTypeOptionId { get; set; }
-        public ItSystemTypeOption AppTypeOption { get; set; }
+        public virtual ItSystemTypeOption AppTypeOption { get; set; }
 
         public int? BelongsToId { get; set; }
         /// <summary>

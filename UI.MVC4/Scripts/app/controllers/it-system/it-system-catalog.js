@@ -5,11 +5,6 @@
             templateUrl: 'partials/it-system/it-system-catalog.html',
             controller: 'system.CatalogCtrl',
             resolve: {
-                businessTypes: [
-                    '$http', function ($http) {
-                        return $http.get('api/businesstype');
-                    }
-                ],
                 organizations: [
                     '$http', function ($http) {
                         return $http.get('api/organization');
@@ -26,18 +21,15 @@
 
     app.controller('system.CatalogCtrl',
     [
-        '$rootScope', '$scope', '$http', 'notify', '$state', 'businessTypes', 'organizations', 'user',
-        function($rootScope, $scope, $http, notify, $state, businessTypesHttp, organizationsHttp, user) {
+        '$rootScope', '$scope', '$http', 'notify', '$state', 'organizations', 'user',
+        function($rootScope, $scope, $http, notify, $state, organizationsHttp, user) {
             $rootScope.page.title = 'IT System - Katalog';
 
             $scope.pagination = {
                 skip: 0,
                 take: 20
             };
-
-            //$scope.showType = 'appType.name';
-
-            var businessTypes = businessTypesHttp.data.response;
+            
             var organizations = organizationsHttp.data.response;
 
             function loadUser(system) {
@@ -128,8 +120,6 @@
 
                     $scope.systems = [];
                     _.each(result.response, function(system) {
-                        system.businessType = _.findWhere(businessTypes, { id: system.businessTypeId });
-
                         system.belongsTo = _.findWhere(organizations, { id: system.belongsToId });
 
                         system.usageUrl = 'api/itsystemusage?itSystemId=' + system.id + '&organizationId=' + user.currentOrganizationId;
