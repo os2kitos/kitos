@@ -37,6 +37,10 @@ namespace UI.MVC4.Models
         
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
 
+        public int InterfaceExhibitCount { get; set; }
+        public int InterfaceUseCount { get; set; }
+        public int ActiveInterfaceUseCount { get; set; }
+        
         public IEnumerable<InterfaceUsageDTO> InterfaceUsages { get; set; }
         public IEnumerable<InterfaceExposureDTO> InterfaceExposures { get; set; }
 
@@ -44,14 +48,5 @@ namespace UI.MVC4.Models
 
         public int? MainContractId { get; set; }
         public IEnumerable<ItContractSystemDTO> Contracts { get; set; }
-
-        public int ActiveInterfaceUsages {
-            get
-            {
-                if (InterfaceUsages == null) return 0;
-
-                return InterfaceUsages.Count(usage => usage.ItContract != null && usage.ItContract.IsActive);
-            } 
-        }
     }
 }
