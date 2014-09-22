@@ -15,13 +15,22 @@
                     -->
             </th>
             <th class="col-sm-0">
-                <!-- Public marker -->
+                (P)
             </th>
             <th>
-                Globalt SnitfladeID
-                <!--
-                <order-by data-order-by="'systemId'" data-paging="pagination"></order-by>
-                -->
+                Snitfaldetype
+            </th>
+            <th>
+                Grænseflade
+            </th>
+            <th>
+                Methode
+            </th>
+            <th>
+                TSA
+            </th>
+            <th>
+                Udstillet af
             </th>
             <th>
                 Oprettet af
@@ -41,17 +50,31 @@
                     (P)
                 </span>
             </td>
-            <td>{{system.itInterfaceId}}</td>
             <td>
-                <span data-popover-placement="right" data-popover="Oprettet i {{system.organizationName}}" data-popover-trigger="mouseenter">
-                    {{system.objectOwnerName}}
+                {{system.interfaceTypeName}}
+            </td>
+            <td>
+                {{system.interfaceName}}
+            </td>
+            <td>
+                {{system.methodName}}
+            </td>
+            <td>
+                {{system.tsaName}}
+            </td>
+            <td>
+                {{system.exhibitedByItSystemName}}
+            </td>
+            <td>
+                <span data-popover-placement="right" data-popover="Oprettet af {{system.objectOwnerName}}" data-popover-trigger="mouseenter">
+                    {{system.organizationName}}
                 </span>
             </td>
         </tr>
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="4" class="text-center">
+            <td colspan="8" class="text-center">
                 <span data-pagination-buttons="pagination"></span>
             </td>
         </tr>
