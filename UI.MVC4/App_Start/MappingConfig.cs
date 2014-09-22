@@ -235,6 +235,7 @@ namespace UI.MVC4.App_Start
             Mapper.CreateMap<ItSystem, ItSystemSimpleDTO>();
 
             Mapper.CreateMap<ItInterface, ItInterfaceDTO>()
+                .ForMember(dest => dest.InterfaceTypeName, opt => opt.MapFrom(src => src.InterfaceType.Name)) // have to map here else the EF proxy class type name is used :(
                 .ReverseMap();
 
             Mapper.CreateMap<ItInterfaceUse, ItInterfaceUseDTO>()

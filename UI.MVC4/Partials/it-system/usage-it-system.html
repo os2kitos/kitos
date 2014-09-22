@@ -8,9 +8,8 @@
                     <!--AppTypeOption-->
                     <div class="form-group">
                         <label for="system-type" class="control-label small">Applikationstype</label>
-                        <select id="system-type" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystem.appTypeOptionId">
-                            <option value="1">Fagsystem</option>
-                            <option value="2">Selvbetjening</option>
+                        <select id="system-type" class="form-control input-sm" disabled="disabled">
+                            <option value="">{{usage.itSystem.appTypeOptionName}}</option>
                         </select>
                     </div>
 
@@ -36,7 +35,7 @@
 
                     <!--Belongs to-->
                     <div class="form-group">
-                        <label for="system-belongs-to" class="control-label small">Tilhører</label>
+                        <label for="system-belongs-to" class="control-label small">Ophavsrettighedsejer</label>
                         <input type="text" id="system-belongs-to" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystem.belongsToName">
                     </div>
                 </div>
