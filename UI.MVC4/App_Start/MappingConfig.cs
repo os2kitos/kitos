@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using System.Net.NetworkInformation;
 using AutoMapper;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
