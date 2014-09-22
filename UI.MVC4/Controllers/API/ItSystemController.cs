@@ -91,7 +91,7 @@ namespace UI.MVC4.Controllers.API
                 var header = new ExpandoObject() as IDictionary<string, Object>;
                 header.Add("It System", "It System");
                 header.Add("ID", "Globalt SystemID");
-                header.Add("AppType", "Applikationstype");
+                header.Add("AppTypeOption", "Applikationstype");
                 header.Add("BusiType", "Forretningstype");
                 header.Add("KLEID", "KLE ID");
                 header.Add("KLENavn", "KLE Navn");
@@ -103,7 +103,7 @@ namespace UI.MVC4.Controllers.API
                     var obj = new ExpandoObject() as IDictionary<string, Object>;
                     obj.Add("It Kontrakt", system.Name);
                     obj.Add("ID", system.ItSystemId);
-                    obj.Add("AppType", system.AppType == 0 ? "Fagsystem" : "Fælleskommunal");
+                    obj.Add("AppType", system.AppTypeOptionName);
                     obj.Add("BusiType", system.BusinessTypeName);
                     obj.Add("KLEID", String.Join(",", system.TaskRefs.Select(x => x.TaskKey)));
                     obj.Add("KLENavn", String.Join(",", system.TaskRefs.Select(x => x.Description)));

@@ -63,6 +63,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ItSystemUsage> ItSystemUsages { get; set; }
         public DbSet<ItSystemRight> ItSystemRights { get; set; }
         public DbSet<ItSystemRole> ItSystemRoles { get; set; }
+        public DbSet<ItSystemTypeOption> ItSystemTypeOptions { get; set; }
         public DbSet<Method> Methods { get; set; }
         public DbSet<OptionExtend> OptionExtention { get; set; }
         public DbSet<Organization> Organizations { get; set; }
@@ -133,6 +134,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemUsageMap());
             modelBuilder.Configurations.Add(new ItSystemRightMap());
             modelBuilder.Configurations.Add(new ItSystemRoleMap());
+            modelBuilder.Configurations.Add(new ItSystemTypeOptionMap());
             modelBuilder.Configurations.Add(new MethodMap());
             modelBuilder.Configurations.Add(new OrganizationMap());
             modelBuilder.Configurations.Add(new OrganizationUnitMap());

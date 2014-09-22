@@ -22,6 +22,7 @@ namespace UI.MVC4.Models
 
         //public IEnumerable<int> CanUseInterfaceIds { get; set; }
         //public IEnumerable<ItSystemSimpleDTO> CanUseInterfaces { get; set; }
+
         /// <summary>
         /// Gets or sets the exposed interface ids.
         /// </summary>
@@ -60,7 +61,9 @@ namespace UI.MVC4.Models
         public IEnumerable<int> TaskRefIds { get; set; }
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
 
-        public int AppType { get; set; }
+        public int? AppTypeOptionId { get; set; }
+        public string AppTypeOptionName { get; set; }
+
         public int? BusinessTypeId { get; set; }
         public string BusinessTypeName { get; set; }
 

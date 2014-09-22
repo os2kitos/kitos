@@ -2,7 +2,7 @@
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class DataTypeMap : OptionEntityMap<DataType, DataRow>
+    public class ItSystemTypeOptionMap : OptionEntityMap<ItSystemTypeOption, ItSystem>
     {
     }
 }

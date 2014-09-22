@@ -31,7 +31,8 @@ namespace Core.DomainModel.ItSystem
         /// </value>
         public string ItSystemId { get; set; }
 
-        public ItSystemType AppType { get; set; }
+        public int? AppTypeOptionId { get; set; }
+        public ItSystemTypeOption AppTypeOption { get; set; }
 
         public int? BelongsToId { get; set; }
         /// <summary>

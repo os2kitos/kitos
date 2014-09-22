@@ -108,7 +108,7 @@ namespace Infrastructure.DataAccess.Migrations
             
             AddOptions<ItProjectType, ItProject>(context.ProjectTypes, globalUser, "Fællesoffentlig", "Fælleskommunal");
             
-            //AddOptions<AppType, ItSystem>(context.AppTypes, globalUser, "Snitflade", "Fagsystem", "Selvbetjening");
+            AddOptions<ItSystemTypeOption, ItSystem>(context.ItSystemTypeOptions, globalUser, "Fagsystem", "Selvbetjening");
 
             AddOptions<BusinessType, ItSystem>(context.BusinessTypes, globalUser, "Forretningstype 1", "Forretningstype 2", "Forretningstype 3");
 
