@@ -15,20 +15,15 @@
     <span data-ng-switch-when="localSystemId">{{usage.localSystemId}}</span>
 </td>
 <td data-ng-switch="showType">
-    <span data-ng-switch-when="itSystem.appType.name">{{usage.itSystem.appType.name}}</span>
-    <span data-ng-switch-when="itSystem.businessType.name">{{usage.itSystem.businessType.name}}</span>
+    <span data-ng-switch-when="appType">{{usage.itSystem.appType.name}}</span>
+    <span data-ng-switch-when="businessType">{{usage.itSystem.businessType.name}}</span>
 </td>
 <td>
-    {{ usage.activeInterfaceUsages }}
-    ({{ usage.itSystem.canUseInterfaceIds.length }})
+    {{ usage.activeInterfaceUseCount }} ({{ usage.interfaceUseCount }})
 </td>
 <td>
-    <span data-ng-if="usage.itSystem.exposedBy != null">
-        {{ usage.itSystem.exposedBy.name }}
-    </span>
-    <span data-ng-if="usage.itSystem.exposedBy == null">
-        {{ usage.itSystem.exposedInterfaceIds.length }}
-    </span>
+    {{ usage.interfaceExhibitCount }}
 </td>
-<td>{{ usage.overviewItSystemName }}
+<td>
+    {{ usage.overviewItSystemName }}
 </td>

@@ -29,13 +29,10 @@
                 <order-by data-order-by="showSystemId" data-paging="pagination"></order-by>
             </th>
             <th>
-                <select data-ng-model="showType">
-                    <option value="itSystem.appType.name">Applikationstype
-                    </option>
-                    <option value="itSystem.businessType.name">Forretningstype
-                    </option>
+                <select data-ng-model="showType" data-ng-init="showType = 'appType'">
+                    <option value="appType">Applikationstype</option>
+                    <option value="businessType">Forretningstype</option>
                 </select>
-                <order-by data-order-by="showType" data-paging="pagination"></order-by>
             </th>
             <th>Anvender</th>
             <th>Udstiller</th>
