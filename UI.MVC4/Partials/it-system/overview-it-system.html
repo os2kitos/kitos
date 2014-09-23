@@ -20,16 +20,7 @@
                 </select>
             </th>
             <th>
-                <select data-ng-model="showSystemId">
-                    <option value="itSystem.systemId">Globalt SystemID
-                    </option>
-                    <option value="localSystemId">Lokalt SystemID
-                    </option>
-                </select>
-                <order-by data-order-by="showSystemId" data-paging="pagination"></order-by>
-            </th>
-            <th>
-                <select data-ng-model="showType" data-ng-init="showType = 'appType'">
+                <select data-ng-model="showType" data-ng-init="showType = 'businessType'">
                     <option value="appType">Applikationstype</option>
                     <option value="businessType">Forretningstype</option>
                 </select>
