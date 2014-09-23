@@ -15,14 +15,14 @@
                                data-ng-model="interface.name">
                     </div>
 
-                    <!-- ID -->
+                    <!-- Version -->
                     <div class="form-group">
-                        <label for="interface-id" class="control-label small">Snitflade ID</label>
-                        <input type="text" id="interface-id" class="form-control input-sm"
+                        <label for="interface-version" class="control-label small">Version</label>
+                        <input type="text" id="interface-version" class="form-control input-sm"
                                data-ng-disabled="!hasWriteAccess"
                                data-autosave="{{interface.updateUrl}}"
-                               data-field="itInterfaceId"
-                               data-ng-model="interface.itInterfaceId">
+                               data-field="version"
+                               data-ng-model="interface.version">
                     </div>
                 </div>
             </div>
@@ -32,7 +32,19 @@
         <div class="col-md-4">
             <div class="row">
                 <div class="col-md-12">
-                   <!-- Access modifier -->
+                    <!-- belongs to -->
+                    <div class="form-group">
+                        <label for="belongs-to" class="control-label small">Rettighedshaver</label>
+                        <input type="hidden" id="belongs-to" class="form-control input-sm"
+                               data-ui-select2="organizationSelectOptions"
+                               data-placeholder="Vælg organisation"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-autosave="{{interface.updateUrl}}"
+                               data-field="belongsToId"
+                               data-ng-model="interface.belongsTo">
+                    </div>
+
+                    <!-- Access modifier -->
                     <div class="form-group">
                         <label for="interface-access" class="control-label small">Public</label>
                         <input id="interface-access" class="form-control input-sm"

@@ -26,5 +26,8 @@ namespace UI.MVC4.Models
         public int? MethodId { get; set; }
         public string MethodName { get; set; }
         public IEnumerable<DataRowDTO> DataRows { get; set; }
+        public int? BelongsToId { get; set; }
+        public string BelongsToName { get; set; }
+        public string Version { get; set; }
     }
 }

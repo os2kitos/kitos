@@ -33,18 +33,6 @@ namespace Core.DomainModel.ItSystem
         public int? AppTypeOptionId { get; set; }
         public virtual ItSystemTypeOption AppTypeOption { get; set; }
 
-        public int? BelongsToId { get; set; }
-        /// <summary>
-        /// Gets or sets the organization the system belongs to.
-        /// </summary>
-        /// <remarks>
-        /// Belongs to is a OIO term - think "produced by".
-        /// </remarks>
-        /// <value>
-        /// The organization the it system belongs to.
-        /// </value>
-        public virtual Organization BelongsTo { get; set; }
-
         /// <summary>
         /// Gets or sets exhibited interfaces for this instance.
         /// </summary>
