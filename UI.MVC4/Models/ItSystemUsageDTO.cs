@@ -29,7 +29,7 @@ namespace UI.MVC4.Models
         
         public string ItSystemParentName { get; set; }
 
-        public int? OverviewItSystemId { get; set; }
+        public int? OverviewId { get; set; }
         public string OverviewItSystemName { get; set; }
 
         public IEnumerable<RightOutputDTO> Rights { get; set; }
