@@ -32,7 +32,6 @@
                         name: 'Unavngivet system',
                         belongsToId: user.currentOrganizationId,
                         organizationId: user.currentOrganizationId,
-                        userId: user.id,
                         taskRefIds: [],
                     };
 
@@ -82,17 +81,18 @@
                 function createInterface() {
                     var payload = {
                         name: 'Unavngivet snitflade',
+                        belongsToId: user.currentOrganizationId,
                         organizationId: user.currentOrganizationId,
                     };
 
                     var msg = notify.addInfoMessage('Opretter snitflade...', false);
                     $http.post('api/itinterface', payload)
                         .success(function (result) {
-                            msg.toSuccessMessage('En ny snitfalde er oprettet!');
+                            msg.toSuccessMessage('En ny snitflade er oprettet!');
                             var interfaceId = result.response.id;
                             $state.go('it-system.interface-edit.interface-details', { id: interfaceId });
                         }).error(function () {
-                            msg.toErrorMessage('Fejl! Kunne ikke oprette snitfalde!');
+                            msg.toErrorMessage('Fejl! Kunne ikke oprette snitflade!');
                         });
                 }
 
