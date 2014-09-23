@@ -171,6 +171,37 @@ namespace UI.MVC4.Controllers.API
         //    }
         //}
 
+        public HttpResponseMessage GetInterfacesSearch(string q, int orgId, int excludeId)
+        {
+            try
+            {
+                var systems = Repository.Get(
+                    s =>
+                        // filter by name
+                        s.Name.Contains(q) &&
+                        // exclude system with id
+                        s.Id != excludeId &&
+                        // global admin sees all within the context 
+                        (KitosUser.IsGlobalAdmin && s.OrganizationId == orgId ||
+                         // object owner sees his own objects     
+                         s.ObjectOwnerId == KitosUser.Id ||
+                         // it's public everyone can see it
+                         s.AccessModifier == AccessModifier.Public ||
+                         // everyone in the same organization can see normal objects
+                         s.AccessModifier == AccessModifier.Normal &&
+                         s.OrganizationId == orgId)
+                        // it systems doesn't have roles so private doesn't make sense
+                        // only object owners will be albe to see private objects
+                    );
+                var dtos = Map(systems);
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetInterfacesSearch(string q, int orgId, bool? interfaces)
         {
             try
