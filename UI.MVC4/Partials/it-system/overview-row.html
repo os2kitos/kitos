@@ -10,13 +10,9 @@
 <td>
     {{ usage.rights | filter:{roleId: chosenRoleId} | joinBy:', ':'user.name' }}
 </td>
-<td data-ng-switch="showSystemId">
-    <span data-ng-switch-when="itSystem.systemId">{{usage.itSystem.itSystemId}}</span>
-    <span data-ng-switch-when="localSystemId">{{usage.localSystemId}}</span>
-</td>
 <td data-ng-switch="showType">
-    <span data-ng-switch-when="appType">{{usage.itSystem.appType.name}}</span>
-    <span data-ng-switch-when="businessType">{{usage.itSystem.businessType.name}}</span>
+    <span data-ng-switch-when="appType">{{usage.itSystem.appTypeOptionName}}</span>
+    <span data-ng-switch-when="businessType">{{usage.itSystem.businessTypeName}}</span>
 </td>
 <td>
     {{ usage.activeInterfaceUseCount }} ({{ usage.interfaceUseCount }})
