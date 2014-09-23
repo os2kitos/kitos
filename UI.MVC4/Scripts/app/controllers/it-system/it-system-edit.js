@@ -58,8 +58,8 @@
             $scope.system = itSystem;
             $scope.hasWriteAccess = hasWriteAccess;
             $scope.businessTypes = businessTypes.data.response;
-            $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem?nonInterfaces', true);
-            $scope.organizationSelectOptions = selectLazyLoading('api/organization?', true, ['orgId=' + user.currentOrganizationId]);
+            $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem', true, ['excludeId=' + itSystem.id, 'orgId=' + user.currentOrganizationId]);
+            $scope.organizationSelectOptions = selectLazyLoading('api/organization', true, ['orgId=' + user.currentOrganizationId]);
 
             function selectLazyLoading(url, allowClear, paramAry) {
                 return {
@@ -74,7 +74,7 @@
                         quietMillis: 500,
                         transport: function(queryParams) {
                             var extraParams = paramAry ? '&' + paramAry.join('&') : '';
-                            var res = $http.get(url + '&q=' + queryParams.data.query + extraParams).then(queryParams.success);
+                            var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
                             res.abort = function() {
                                 return null;
                             };
