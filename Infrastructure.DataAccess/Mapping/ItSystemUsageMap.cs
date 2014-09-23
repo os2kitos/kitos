@@ -32,9 +32,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.SensitiveDataTypeId);
 
-            this.HasOptional(t => t.OverviewItSystem)
-                .WithMany(t => t.Overviews)
-                .HasForeignKey(d => d.OverviewItSystemId)
+            this.HasOptional(t => t.Overview)
+                .WithMany()
+                .HasForeignKey(d => d.OverviewId)
                 .WillCascadeOnDelete(false);
 
             this.HasMany(t => t.UsedBy)

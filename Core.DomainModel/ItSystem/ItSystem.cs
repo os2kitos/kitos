@@ -15,7 +15,6 @@ namespace Core.DomainModel.ItSystem
             this.Children = new List<ItSystem>();
             this.TaskRefs = new List<TaskRef>();
             this.Wishes = new List<Wish>();
-            this.Overviews = new List<ItSystemUsage.ItSystemUsage>();
             this.Usages = new List<ItSystemUsage.ItSystemUsage>();
             this.InfrastructureUsage = new List<InterfaceUsage>();
         }
@@ -91,8 +90,6 @@ namespace Core.DomainModel.ItSystem
         public virtual ICollection<Wish> Wishes { get; set; }
 
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
-
-        public virtual ICollection<ItSystemUsage.ItSystemUsage> Overviews { get; set; } // TODO what is this?
 
         /// <summary>
         /// Gets or sets local infrastructure usages of the system, in case the system is not an interface.

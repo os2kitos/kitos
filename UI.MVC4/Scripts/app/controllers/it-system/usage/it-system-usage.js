@@ -68,9 +68,9 @@
                 allowClear: true
             };
 
-            if (itSystemUsage.overviewItSystemId) {
-                $scope.usage.overviewItSystem = {
-                    id: itSystemUsage.overviewItSystemId,
+            if (itSystemUsage.overviewId) {
+                $scope.usage.overview = {
+                    id: itSystemUsage.overviewId,
                     text: itSystemUsage.overviewItSystemName
                 };
             }
@@ -110,7 +110,7 @@
 
                                 results.push({
                                     id: obj.id,
-                                    text: obj.itSystem.name ? obj.itSystem.name : 'Unavngivet IT System',
+                                    text: obj.itSystem.name,
                                     cvr: obj.cvr
                                 });
                             });
