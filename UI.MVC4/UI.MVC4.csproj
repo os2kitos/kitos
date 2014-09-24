@@ -908,7 +908,7 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff" />
-    <None Include="Properties\PublishProfiles\Kitos - Debug.pubxml" />
+    <None Include="Properties\PublishProfiles\Kitos - Prodmiljø.pubxml" />
     <None Include="Properties\PublishProfiles\Kitos - Testmiljø.pubxml" />
     <None Include="Scripts\jquery-2.1.0.intellisense.js" />
     <Content Include="Scripts\jquery-2.1.0.js" />
