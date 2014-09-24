@@ -115,18 +115,17 @@
             _.each(canUseInterfaces, function(canUseInterface) {
                 canUseInterface.updateUrl = 'api/interfaceUsage/?usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + canUseInterface.id;
 
-                // for the select2
-                if (canUseInterface.infrastructureId) {
-                    canUseInterface.infrastructure = {
-                        id: canUseInterface.infrastructureId,
-                        text: canUseInterface.infrastructureName
-                    };
-                }
-
                 $http.get('api/interfaceUsage/?usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + canUseInterface.id).success(function (usageResult) {
                     var usage = usageResult.response;
                     canUseInterface.usage = usage;
-                    canUseInterface.infrastructure = { id: usage.infrastructureId, text: usage.infrastructureName };
+
+                    // for the select2
+                    if (usage.infrastructureId) {
+                        canUseInterface.infrastructure = {
+                            id: usage.infrastructureId,
+                            text: usage.infrastructureName
+                        };
+                    }
                 }).finally(function() {
                     _.each(canUseInterface.dataRows, function (dataRow) {
                         dataRow.updateUrl = 'api/dataRowUsage/?rowId=' + dataRow.id + '&usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + canUseInterface.id;
