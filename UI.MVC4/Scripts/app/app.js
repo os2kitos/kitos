@@ -13,7 +13,7 @@ app.config(['$httpProvider', 'notifyProvider', function ($httpProvider, notifyPr
 
 app.run([
     '$rootScope', '$http', '$state', '$modal', 'notify', 'userService', 'uiSelect2Config',
-    function($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config) {
+    function ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config) {
         //init info
         $rootScope.page = {
             title: 'Index',

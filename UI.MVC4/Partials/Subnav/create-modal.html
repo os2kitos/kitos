@@ -1,0 +1,18 @@
+﻿<div class="modal-header">
+    <h3 class="modal-title">Opret {{type}}</h3>
+</div>
+<form name="createForm" role="form" data-ng-submit="submit()" novalidate>
+    <div class="modal-body">
+        <div class="form-group has-feedback" data-show-errors="{ showSuccess: true }">
+            <label class="control-label" for="name">Navn</label>
+            <input type="text" class="form-control" name="name" id="name" placeholder="navn" required data-ng-model="name" data-unique>
+            <span class="glyphicon form-control-feedback" data-ng-class="{ 'glyphicon-remove': createForm.name.$invalid && !createForm.name.$pristine, 'glyphicon-ok': createForm.name.$valid }"></span>
+            <span class="help-block" data-ng-show="createForm.name.$error.required">Navn er påkrævet!</span>
+            <span class="help-block" data-ng-show="createForm.name.$error.available">Navnet er brugt!</span>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" data-ng-disabled="createForm.$invalid">OK</button>
+        <button type="button" class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
+    </div>
+</form>

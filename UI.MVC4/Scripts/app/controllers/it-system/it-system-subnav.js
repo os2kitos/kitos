@@ -9,7 +9,7 @@
                     return userService.getUser();
                 }]
             },
-            controller: ['$rootScope', '$http', '$state', 'notify', 'user', function ($rootScope, $http, $state, notify, user) {
+            controller: ['$rootScope', '$http', '$state', '$modal', 'notify', 'user', function ($rootScope, $http, $state, $modal, notify, user) {
                 $rootScope.page.title = 'IT System';
                 $rootScope.page.subnav = [
                     { state: 'it-system.overview', text: 'Overblik' },
@@ -28,22 +28,39 @@
                 ];
 
                 function createSystem() {
-                    var payload = {
-                        name: 'Unavngivet system',
-                        belongsToId: user.currentOrganizationId,
-                        organizationId: user.currentOrganizationId,
-                        taskRefIds: [],
-                    };
+                    var modalInstance = $modal.open({
+                        // fade in instead of slide from top, fixes strange cursor placement in IE
+                        // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
+                        windowClass: 'modal fade in',
+                        templateUrl: 'partials/subnav/create-modal.html',
+                        controller: ['$scope', '$modalInstance', function ($scope, $modalInstance) {
+                            $scope.type = 'IT System';
 
-                    var msg = notify.addInfoMessage('Opretter system...', false);
-                    $http.post('api/itsystem', payload)
-                        .success(function(result) {
-                            msg.toSuccessMessage('Et nyt system er oprettet!');
-                            var systemId = result.response.id;
-                            $state.go('it-system.edit.interfaces', { id: systemId });
-                        }).error(function() {
-                            msg.toErrorMessage('Fejl! Kunne ikke oprette et nyt system!');
-                        });
+                            $scope.submit = function() {
+                                var payload = {
+                                    name: $scope.name,
+                                    belongsToId: user.currentOrganizationId,
+                                    organizationId: user.currentOrganizationId,
+                                    taskRefIds: [],
+                                };
+
+                                var msg = notify.addInfoMessage('Opretter system...', false);
+                                $http.post('api/itsystem', payload)
+                                    .success(function(result) {
+                                        msg.toSuccessMessage('Et nyt system er oprettet!');
+                                        var systemId = result.response.id;
+                                        $modalInstance.close(systemId);
+                                    }).error(function() {
+                                        msg.toErrorMessage('Fejl! Kunne ikke oprette et nyt system!');
+                                    });
+                            };
+                        }]
+                    });
+
+                    modalInstance.result.then(function (id) {
+                        // modal was closed with OK
+                        $state.go('it-system.edit.interfaces', { id: id });
+                    });
                 };
 
                 function removeSystem() {
