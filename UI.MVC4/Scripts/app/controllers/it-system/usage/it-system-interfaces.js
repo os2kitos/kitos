@@ -5,53 +5,74 @@
             templateUrl: 'partials/it-system/tab-interfaces.html',
             controller: 'system.EditInterfaces',
             resolve: {
-                tsas: ['$http', function ($http) {
-                    return $http.get('api/tsa').then(function (result) {
-                        return result.data.response;
-                    });
-                }],
-                interfaces: ['$http', function ($http) {
-                    return $http.get('api/interface').then(function (result) {
-                        return result.data.response;
-                    });
-                }],
-                interfaceTypes: ['$http', function ($http) {
-                    return $http.get('api/interfacetype').then(function (result) {
-                        return result.data.response;
-                    });
-                }],
-                methods: ['$http', function ($http) {
-                    return $http.get('api/method').then(function (result) {
-                        return result.data.response;
-                    });
-                }],
-                dataTypes: ['$http', function ($http) {
-                    return $http.get('api/datatype').then(function (result) {
-                        return result.data.response;
-                    });
-                }],
-                frequencies: ['$http', function ($http) {
-                    return $http.get('api/frequency').then(function (result) {
-                        return result.data.response;
-                    });
-                }],
-                canUseInterfaces: ['$http', 'itSystemUsage', function ($http, itSystemUsage) {
-                    return $http.get('api/itInterfaceUse/?interfaces&sysid=' + itSystemUsage.itSystem.id).then(function (result) {
-                        var interfaces = result.data.response;
-                        return interfaces;
-                    });
-                }],
-                exhibits: ['$http', 'itSystemUsage', function ($http, itSystemUsage) {
-                    return $http.get('api/exhibit/?interfaces&sysid=' + itSystemUsage.itSystem.id).then(function (result) {
-                        var interfaces = result.data.response;
-                        _.each(interfaces, function(data) {
-                            $http.get('api/itInterfaceExhibitUsage/?usageId=' + itSystemUsage.id + '&exhibitId=' + data.exhibitedById).success(function (usageResult) {
-                                data.usage = usageResult.response;
-                            });
+                tsas: [
+                    '$http', function($http) {
+                        return $http.get('api/tsa').then(function(result) {
+                            return result.data.response;
                         });
-                        return interfaces;
-                    });
-                }],
+                    }
+                ],
+                interfaces: [
+                    '$http', function($http) {
+                        return $http.get('api/interface').then(function(result) {
+                            return result.data.response;
+                        });
+                    }
+                ],
+                interfaceTypes: [
+                    '$http', function($http) {
+                        return $http.get('api/interfacetype').then(function(result) {
+                            return result.data.response;
+                        });
+                    }
+                ],
+                methods: [
+                    '$http', function($http) {
+                        return $http.get('api/method').then(function(result) {
+                            return result.data.response;
+                        });
+                    }
+                ],
+                dataTypes: [
+                    '$http', function($http) {
+                        return $http.get('api/datatype').then(function(result) {
+                            return result.data.response;
+                        });
+                    }
+                ],
+                frequencies: [
+                    '$http', function($http) {
+                        return $http.get('api/frequency').then(function(result) {
+                            return result.data.response;
+                        });
+                    }
+                ],
+                canUseInterfaces: [
+                    '$http', 'itSystemUsage', function($http, itSystemUsage) {
+                        return $http.get('api/itInterfaceUse/?interfaces&sysid=' + itSystemUsage.itSystem.id).then(function(result) {
+                            var interfaces = result.data.response;
+                            return interfaces;
+                        });
+                    }
+                ],
+                exhibits: [
+                    '$http', 'itSystemUsage', function($http, itSystemUsage) {
+                        return $http.get('api/exhibit/?interfaces&sysid=' + itSystemUsage.itSystem.id).then(function(result) {
+                            var interfaces = result.data.response;
+                            _.each(interfaces, function(data) {
+                                $http.get('api/itInterfaceExhibitUsage/?usageId=' + itSystemUsage.id + '&exhibitId=' + data.exhibitedById).success(function(usageResult) {
+                                    data.usage = usageResult.response;
+                                });
+                            });
+                            return interfaces;
+                        });
+                    }
+                ],
+                interfaceUsage: [
+                    '$http', function($http) {
+                        // TODO
+                    }
+                ]
             }
         });
     }]);
