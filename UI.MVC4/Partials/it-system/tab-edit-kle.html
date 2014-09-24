@@ -2,10 +2,6 @@
     <div class="panel-heading">
         <i class="glyphicon glyphicon-tasks"></i>
         Tilknyttede opgaver
-                        <a class="pull-right" data-ng-show="hasWriteAccess" data-ng-click="changeTaskView()">
-                            <span data-ng-if="!showAllTasks">Vis alle</span>
-                            <span data-ng-if="showAllTasks">Vis valgte</span>
-                        </a>
     </div>
     <div class="panel-body">
         <div data-kle-filter="selectedTaskGroup"></div>
@@ -13,7 +9,12 @@
     <table class="table table-condensed">
         <thead>
             <tr>
-                <th>Valgt</th>                
+                <th>
+                    <a data-ng-click="changeTaskView()">
+                        <span data-ng-if="!showAllTasks">Vis alle</span>
+                        <span data-ng-if="showAllTasks">Vis valgte</span>
+                    </a>
+                </th>                
                 <th class="col-md-2">KLE ID
                                     <button data-order-by="'taskKey'" data-paging="pagination"></button>
                 </th>
