@@ -5,53 +5,74 @@
             templateUrl: 'partials/it-system/tab-interfaces.html',
             controller: 'system.EditInterfaces',
             resolve: {
-                tsas: ['$http', function ($http) {
-                    return $http.get('api/tsa').then(function (result) {
-                        return result.data.response;
-                    });
-                }],
-                interfaces: ['$http', function ($http) {
-                    return $http.get('api/interface').then(function (result) {
-                        return result.data.response;
-                    });
-                }],
-                interfaceTypes: ['$http', function ($http) {
-                    return $http.get('api/interfacetype').then(function (result) {
-                        return result.data.response;
-                    });
-                }],
-                methods: ['$http', function ($http) {
-                    return $http.get('api/method').then(function (result) {
-                        return result.data.response;
-                    });
-                }],
-                dataTypes: ['$http', function ($http) {
-                    return $http.get('api/datatype').then(function (result) {
-                        return result.data.response;
-                    });
-                }],
-                frequencies: ['$http', function ($http) {
-                    return $http.get('api/frequency').then(function (result) {
-                        return result.data.response;
-                    });
-                }],
-                canUseInterfaces: ['$http', 'itSystemUsage', function ($http, itSystemUsage) {
-                    return $http.get('api/itInterfaceUse/?interfaces&sysid=' + itSystemUsage.itSystem.id).then(function (result) {
-                        var interfaces = result.data.response;
-                        return interfaces;
-                    });
-                }],
-                exhibits: ['$http', 'itSystemUsage', function ($http, itSystemUsage) {
-                    return $http.get('api/exhibit/?interfaces&sysid=' + itSystemUsage.itSystem.id).then(function (result) {
-                        var interfaces = result.data.response;
-                        _.each(interfaces, function(data) {
-                            $http.get('api/itInterfaceExhibitUsage/?usageId=' + itSystemUsage.id + '&exhibitId=' + data.exhibitedById).success(function (usageResult) {
-                                data.usage = usageResult.response;
-                            });
+                tsas: [
+                    '$http', function($http) {
+                        return $http.get('api/tsa').then(function(result) {
+                            return result.data.response;
                         });
-                        return interfaces;
-                    });
-                }],
+                    }
+                ],
+                interfaces: [
+                    '$http', function($http) {
+                        return $http.get('api/interface').then(function(result) {
+                            return result.data.response;
+                        });
+                    }
+                ],
+                interfaceTypes: [
+                    '$http', function($http) {
+                        return $http.get('api/interfacetype').then(function(result) {
+                            return result.data.response;
+                        });
+                    }
+                ],
+                methods: [
+                    '$http', function($http) {
+                        return $http.get('api/method').then(function(result) {
+                            return result.data.response;
+                        });
+                    }
+                ],
+                dataTypes: [
+                    '$http', function($http) {
+                        return $http.get('api/datatype').then(function(result) {
+                            return result.data.response;
+                        });
+                    }
+                ],
+                frequencies: [
+                    '$http', function($http) {
+                        return $http.get('api/frequency').then(function(result) {
+                            return result.data.response;
+                        });
+                    }
+                ],
+                canUseInterfaces: [
+                    '$http', 'itSystemUsage', function($http, itSystemUsage) {
+                        return $http.get('api/itInterfaceUse/?interfaces&sysid=' + itSystemUsage.itSystem.id).then(function(result) {
+                            var interfaces = result.data.response;
+                            return interfaces;
+                        });
+                    }
+                ],
+                exhibits: [
+                    '$http', 'itSystemUsage', function($http, itSystemUsage) {
+                        return $http.get('api/exhibit/?interfaces&sysid=' + itSystemUsage.itSystem.id).then(function(result) {
+                            var interfaces = result.data.response;
+                            _.each(interfaces, function(data) {
+                                $http.get('api/itInterfaceExhibitUsage/?usageId=' + itSystemUsage.id + '&exhibitId=' + data.exhibitedById).success(function(usageResult) {
+                                    data.usage = usageResult.response;
+                                });
+                            });
+                            return interfaces;
+                        });
+                    }
+                ],
+                user: [
+                    'userService', function (userService) {
+                        return userService.getUser();
+                    }
+                ]
             }
         });
     }]);
@@ -59,15 +80,9 @@
     app.controller('system.EditInterfaces',
     [
         '$rootScope', '$scope', '$http', 'notify',
-        'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'frequencies', 'itSystemUsage', 'userService', 'canUseInterfaces', 'exhibits',
+        'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'frequencies', 'itSystemUsage', 'userService', 'canUseInterfaces', 'exhibits', 'user',
         function($rootScope, $scope, $http, notify,
-            tsas, interfaces, interfaceTypes, methods, dataTypes, frequencies, itSystemUsage, userService, canUseInterfaces, exhibits) {
-
-            var user;
-            userService.getUser().then(function(userResult) {
-                user = userResult;
-            });
-
+            tsas, interfaces, interfaceTypes, methods, dataTypes, frequencies, itSystemUsage, userService, canUseInterfaces, exhibits, user) {
 
             $scope.frequencies = frequencies;
 
@@ -97,29 +112,30 @@
             $scope.interfaceExposures = exhibits;
 
             // Interface usages
-            _.each(canUseInterfaces, function(interfaceUsage) {
-                interfaceUsage.updateUrl = 'api/interfaceUsage/?usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + interfaceUsage.id;
+            _.each(canUseInterfaces, function(canUseInterface) {
+                canUseInterface.updateUrl = 'api/interfaceUsage/?usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + canUseInterface.id;
 
-                // for the select2
-                if (interfaceUsage.infrastructureId) {
-                    interfaceUsage.infrastructure = {
-                        id: interfaceUsage.infrastructureId,
-                        text: interfaceUsage.infrastructureName
-                    };
-                }
+                $http.get('api/interfaceUsage/?usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + canUseInterface.id).success(function (usageResult) {
+                    var usage = usageResult.response;
+                    canUseInterface.usage = usage;
 
-                $http.get('api/interfaceUsage/?usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + interfaceUsage.id).success(function (usageResult) {
-                    interfaceUsage.usage = usageResult.response;
+                    // for the select2
+                    if (usage.infrastructureId) {
+                        canUseInterface.infrastructure = {
+                            id: usage.infrastructureId,
+                            text: usage.infrastructureName
+                        };
+                    }
                 }).finally(function() {
-                    _.each(interfaceUsage.dataRows, function (dataRow) {
-                        dataRow.updateUrl = 'api/dataRowUsage/?rowId=' + dataRow.id + '&usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + interfaceUsage.id;
+                    _.each(canUseInterface.dataRows, function (dataRow) {
+                        dataRow.updateUrl = 'api/dataRowUsage/?rowId=' + dataRow.id + '&usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + canUseInterface.id;
                         dataRow.dataType = _.findWhere(dataTypes, { id: dataRow.dataTypeId });
-                        if (interfaceUsage.usage)
-                            dataRow.usage = _.findWhere(interfaceUsage.usage.dataRowUsages, { dataRowId: dataRow.id });
+                        if (canUseInterface.usage)
+                            dataRow.usage = _.findWhere(canUseInterface.usage.dataRowUsages, { dataRowId: dataRow.id });
                     });
                 });
 
-                resolveTypes(interfaceUsage);
+                resolveTypes(canUseInterface);
             });
             $scope.interfaceUsages = canUseInterfaces;
 
