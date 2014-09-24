@@ -68,9 +68,9 @@
                         });
                     }
                 ],
-                interfaceUsage: [
-                    '$http', function($http) {
-                        // TODO
+                user: [
+                    'userService', function (userService) {
+                        return userService.getUser();
                     }
                 ]
             }
@@ -80,15 +80,9 @@
     app.controller('system.EditInterfaces',
     [
         '$rootScope', '$scope', '$http', 'notify',
-        'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'frequencies', 'itSystemUsage', 'userService', 'canUseInterfaces', 'exhibits',
+        'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'frequencies', 'itSystemUsage', 'userService', 'canUseInterfaces', 'exhibits', 'user',
         function($rootScope, $scope, $http, notify,
-            tsas, interfaces, interfaceTypes, methods, dataTypes, frequencies, itSystemUsage, userService, canUseInterfaces, exhibits) {
-
-            var user;
-            userService.getUser().then(function(userResult) {
-                user = userResult;
-            });
-
+            tsas, interfaces, interfaceTypes, methods, dataTypes, frequencies, itSystemUsage, userService, canUseInterfaces, exhibits, user) {
 
             $scope.frequencies = frequencies;
 
@@ -118,29 +112,31 @@
             $scope.interfaceExposures = exhibits;
 
             // Interface usages
-            _.each(canUseInterfaces, function(interfaceUsage) {
-                interfaceUsage.updateUrl = 'api/interfaceUsage/?usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + interfaceUsage.id;
+            _.each(canUseInterfaces, function(canUseInterface) {
+                canUseInterface.updateUrl = 'api/interfaceUsage/?usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + canUseInterface.id;
 
                 // for the select2
-                if (interfaceUsage.infrastructureId) {
-                    interfaceUsage.infrastructure = {
-                        id: interfaceUsage.infrastructureId,
-                        text: interfaceUsage.infrastructureName
+                if (canUseInterface.infrastructureId) {
+                    canUseInterface.infrastructure = {
+                        id: canUseInterface.infrastructureId,
+                        text: canUseInterface.infrastructureName
                     };
                 }
 
-                $http.get('api/interfaceUsage/?usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + interfaceUsage.id).success(function (usageResult) {
-                    interfaceUsage.usage = usageResult.response;
+                $http.get('api/interfaceUsage/?usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + canUseInterface.id).success(function (usageResult) {
+                    var usage = usageResult.response;
+                    canUseInterface.usage = usage;
+                    canUseInterface.infrastructure = { id: usage.infrastructureId, text: usage.infrastructureName };
                 }).finally(function() {
-                    _.each(interfaceUsage.dataRows, function (dataRow) {
-                        dataRow.updateUrl = 'api/dataRowUsage/?rowId=' + dataRow.id + '&usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + interfaceUsage.id;
+                    _.each(canUseInterface.dataRows, function (dataRow) {
+                        dataRow.updateUrl = 'api/dataRowUsage/?rowId=' + dataRow.id + '&usageId=' + itSystemUsage.id + '&sysId=' + itSystemUsage.itSystem.id + '&interfaceId=' + canUseInterface.id;
                         dataRow.dataType = _.findWhere(dataTypes, { id: dataRow.dataTypeId });
-                        if (interfaceUsage.usage)
-                            dataRow.usage = _.findWhere(interfaceUsage.usage.dataRowUsages, { dataRowId: dataRow.id });
+                        if (canUseInterface.usage)
+                            dataRow.usage = _.findWhere(canUseInterface.usage.dataRowUsages, { dataRowId: dataRow.id });
                     });
                 });
 
-                resolveTypes(interfaceUsage);
+                resolveTypes(canUseInterface);
             });
             $scope.interfaceUsages = canUseInterfaces;
 

@@ -31,6 +31,20 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        public HttpResponseMessage GetByUsage(int usageId)
+        {
+            try
+            {
+                var items = _repository.Get(x => x.ItSystemUsageId == usageId);
+                var dtos = Map<IEnumerable<InterfaceUsage>, IEnumerable<InterfaceUsageDTO>>(items);
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetByContract(int contractId)
         {
             try
