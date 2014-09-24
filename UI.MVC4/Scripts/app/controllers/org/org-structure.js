@@ -29,7 +29,7 @@
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
-                take: 15
+                take: 50
             };
 
             //cache
