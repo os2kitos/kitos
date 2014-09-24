@@ -22,6 +22,8 @@
                 take: 50
             };
 
+            $scope.showAllTasks = true;
+
             $scope.$watch("selectedTaskGroup", function (newVal, oldVal) {
                 $scope.pagination.skip = 0;
                 loadTasks();
