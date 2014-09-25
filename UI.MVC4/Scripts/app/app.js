@@ -1,15 +1,19 @@
 ﻿var app = angular.module('app', ['ui.router', 'ui.bootstrap', 'ui.select2', 'ngAnimate', 'notify', 'ui.utils', 'angularjs-dropdown-multiselect', 'ngSanitize']);
 
-app.config(['$urlRouterProvider', function ($urlRouterProvider) {
-    $urlRouterProvider.otherwise('/');
-}]);
+app.config([
+    '$urlRouterProvider', function($urlRouterProvider) {
+        $urlRouterProvider.otherwise('/');
+    }
+]);
 
-app.config(['$httpProvider', 'notifyProvider', function ($httpProvider, notifyProvider) {
-    $httpProvider.interceptors.push("httpBusyInterceptor");
+app.config([
+    '$httpProvider', 'notifyProvider', function($httpProvider, notifyProvider) {
+        $httpProvider.interceptors.push("httpBusyInterceptor");
 
-    notifyProvider.globalTimeToLive(5000);
-    notifyProvider.onlyUniqueMessages(false);
-}]);
+        notifyProvider.globalTimeToLive(5000);
+        notifyProvider.onlyUniqueMessages(false);
+    }
+]);
 
 app.run([
     '$rootScope', '$http', '$state', '$modal', 'notify', 'userService', 'uiSelect2Config',

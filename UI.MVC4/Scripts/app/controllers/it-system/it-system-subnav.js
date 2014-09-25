@@ -34,11 +34,13 @@
                         windowClass: 'modal fade in',
                         templateUrl: 'partials/subnav/create-modal.html',
                         controller: ['$scope', '$modalInstance', function ($scope, $modalInstance) {
+                            $scope.formData = {};
                             $scope.type = 'IT System';
+                            $scope.checkAvailbleUrl = 'api/itSystem/';
 
                             $scope.submit = function() {
                                 var payload = {
-                                    name: $scope.name,
+                                    name: $scope.formData.name,
                                     belongsToId: user.currentOrganizationId,
                                     organizationId: user.currentOrganizationId,
                                     taskRefIds: [],

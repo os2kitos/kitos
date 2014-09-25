@@ -2,18 +2,35 @@
     'use strict';
 
     app.directive('unique', [
-            '$http', function($http) {
+            '$http', 'userService', function ($http, userService) {
                 return {
                     require: 'ngModel',
-                    link: function(scope, element, sttrs, ctrl) {
+                    link: function (scope, element, attrs, ctrl) {
+                        var user;
+                        userService.getUser().then(function(result) {
+                            user = result;
+                        });
+                        var validateAsync = _.debounce(function (viewValue) {
+                            $http.get(attrs.unique + '?checkname=' + viewValue + '&orgId=' + user.currentOrganizationId)
+                                .success(function() {
+                                    ctrl.$setValidity('available', true);
+                                    ctrl.$setValidity('lookup', true);
+                                })
+                                .error(function(data, status) {
+                                    // conflict
+                                    if (status == 409) {
+                                        ctrl.$setValidity('available', false);
+                                    } else {
+                                        // something went wrong
+                                        ctrl.$setValidity('lookup', false);
+                                    }
+                                });
+                        }, 500);
+
                         ctrl.$parsers.unshift(function(viewValue) {
-                            if (viewValue == 'dinmor') {
-                                ctrl.$setValidity('available', false);
-                                return undefined;
-                            } else {
-                                ctrl.$setValidity('available', true);
-                                return viewValue;
-                            }
+                            validateAsync(viewValue);
+                            // async returns breaks the setting of $modelValue so just returning
+                            return viewValue;
                         });
                     }
                 };
@@ -921,21 +938,12 @@
     ]);
 
     app.directive('showErrors', [
-            '$timeout', 'showErrorsConfig', function($timeout, showErrorsConfig) {
-                var getShowSuccess, linkFn;
-                getShowSuccess = function(options) {
-                    var showSuccess;
-                    showSuccess = showErrorsConfig.showSuccess;
-                    if (options && options.showSuccess != null) {
-                        showSuccess = options.showSuccess;
-                    }
-                    return showSuccess;
-                };
+            '$timeout', function($timeout) {
+                var linkFn;
                 linkFn = function(scope, el, attrs, formCtrl) {
-                    var blurred, inputEl, inputName, inputNgEl, options, showSuccess, toggleClasses;
+                    var blurred, inputEl, inputName, inputNgEl, showSuccess, toggleClasses;
                     blurred = false;
-                    options = scope.$eval(attrs.showErrors);
-                    showSuccess = getShowSuccess(options);
+                    showSuccess = true;
                     inputEl = el[0].querySelector('[name]');
                     inputNgEl = angular.element(inputEl);
                     inputName = inputNgEl.attr('name');
