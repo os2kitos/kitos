@@ -253,6 +253,9 @@ namespace UI.MVC4.Controllers.API
                     return Unauthorized();
                 }
 
+                if (!IsAvailable(dto.Name, dto.OrganizationId))
+                    return Conflict("Name is already taken!");
+
                 var item = Map(dto);
 
                 item.ObjectOwner = KitosUser;
@@ -385,70 +388,6 @@ namespace UI.MVC4.Controllers.API
             }
         }
         
-        ///// <summary>
-        ///// Adds a new can-use-interface to the system
-        ///// </summary>
-        ///// <param name="id">Id of the system</param>
-        ///// <param name="interfaceId">Id of the interface, that can-be-used by the system</param>
-        ///// <returns></returns>
-        //public HttpResponseMessage PostInterfaceCanBeUsedBySystem(int id, [FromUri] int interfaceId)
-        //{
-        //    try
-        //    {
-        //        var system = Repository.GetByKey(id);
-        //        if (system == null) return NotFound();
-        //        if (!HasWriteAccess(system)) return Unauthorized();
-
-        //        var theInterface = Repository.GetByKey(interfaceId);
-        //        if (theInterface == null) return NotFound();
-
-        //        system.CanUseInterfaces.Add(theInterface);
-                
-        //        //also update each of the existing SystemUsages to allow them to use the new interface
-        //        foreach (var systemUsage in system.Usages)
-        //        {
-        //            _systemUsageService.AddInterfaceUsage(systemUsage, theInterface);
-        //        }
-
-        //        system.LastChanged = DateTime.Now;
-        //        system.LastChangedByUser = KitosUser;
-
-        //        Repository.Save();
-
-        //        return Created(Map<ItSystem, ItSystemSimpleDTO>(theInterface));
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return Error(e);
-        //    }
-        //}
-
-        //public HttpResponseMessage DeleteInterfaceCanBeUsedBySystem(int id, [FromUri] int interfaceId)
-        //{
-        //    try
-        //    {
-        //        var system = Repository.GetByKey(id);
-        //        if (system == null) return NotFound();
-        //        if (!HasWriteAccess(system)) return Unauthorized();
-
-        //        var theInterface = _canUseInterfaceRepository.GetByKey(interfaceId);
-        //        if (theInterface == null) return NotFound();
-
-        //        system.CanUseInterfaces.Remove(theInterface);
-
-        //        system.LastChanged = DateTime.Now;
-        //        system.LastChangedByUser = KitosUser;
-
-        //        Repository.Save();
-
-        //        return Ok();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return Error(e);
-        //    }
-        //}
-
         public override HttpResponseMessage Patch(int id, JObject obj)
         {
             // try get AccessModifier value
@@ -459,7 +398,36 @@ namespace UI.MVC4.Controllers.API
             {
                 return Unauthorized();
             }
+
+            // try get name value
+            JToken nameToken;
+            obj.TryGetValue("name", out nameToken);
+            if (nameToken != null)
+            {
+                var orgId = Repository.GetByKey(id).OrganizationId;
+                if (!IsAvailable(nameToken.Value<string>(), orgId))
+                    return Conflict("Name is already taken!");
+            }
+
             return base.Patch(id, obj);
+        }
+
+        public HttpResponseMessage GetNameAvailable(string checkname, int orgId)
+        {
+            try
+            {
+                return IsAvailable(checkname, orgId) ? Ok() : Conflict("Name is already taken!");
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        private bool IsAvailable(string name, int orgId)
+        {
+            var system = Repository.Get(x => x.Name == name && x.OrganizationId == orgId);
+            return !system.Any();
         }
     }
 }

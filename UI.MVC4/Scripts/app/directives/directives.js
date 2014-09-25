@@ -1,8 +1,45 @@
-﻿(function (ng, app) {
+﻿(function(ng, app) {
     'use strict';
 
+    app.directive('unique', [
+            '$http', 'userService', function ($http, userService) {
+                return {
+                    require: 'ngModel',
+                    link: function (scope, element, attrs, ctrl) {
+                        var user;
+                        userService.getUser().then(function(result) {
+                            user = result;
+                        });
+                        var validateAsync = _.debounce(function (viewValue) {
+                            $http.get(attrs.unique + '?checkname=' + viewValue + '&orgId=' + user.currentOrganizationId)
+                                .success(function() {
+                                    ctrl.$setValidity('available', true);
+                                    ctrl.$setValidity('lookup', true);
+                                })
+                                .error(function(data, status) {
+                                    // conflict
+                                    if (status == 409) {
+                                        ctrl.$setValidity('available', false);
+                                    } else {
+                                        // something went wrong
+                                        ctrl.$setValidity('lookup', false);
+                                    }
+                                });
+                        }, 500);
+
+                        ctrl.$parsers.unshift(function(viewValue) {
+                            validateAsync(viewValue);
+                            // async returns breaks the setting of $modelValue so just returning
+                            return viewValue;
+                        });
+                    }
+                };
+            }
+        ]
+    );
+
     app.directive('addUserButton', [
-        '$http', '$modal', function ($http, $modal) {
+        '$http', '$modal', function($http, $modal) {
             return {
                 scope: {
                     userResult: '=?addUser',
@@ -10,23 +47,25 @@
                 },
                 replace: true,
                 templateUrl: 'partials/directives/add-user-button.html',
-                link: function (scope, element, attr) {
+                link: function(scope, element, attr) {
 
-                    scope.open = function () {
+                    scope.open = function() {
                         var modal = $modal.open({
                             backdrop: "static", //modal can't be closed by clicking outside modal
                             templateUrl: 'partials/directives/add-user-modal.html',
                             resolve: {
-                                user: ['userService', function (userService) {
-                                    return userService.getUser();
-                                }]
+                                user: [
+                                    'userService', function(userService) {
+                                        return userService.getUser();
+                                    }
+                                ]
                             },
                             controller: [
-                                '$scope', 'notify', '$modalInstance', 'user', 'autofocus', function ($scope, notify, $modalInstance, user, autofocus) {
+                                '$scope', 'notify', '$modalInstance', 'user', 'autofocus', function($scope, notify, $modalInstance, user, autofocus) {
                                     autofocus();
                                     $scope.newUser = {};
 
-                                    $scope.addUser = function () {
+                                    $scope.addUser = function() {
 
                                         if ($scope.newUser.email != $scope.newUser.repeatEmail) {
                                             notify.addErrorMessage("Email addresserne er ikke ens.");
@@ -45,7 +84,7 @@
 
                                         var msg = notify.addInfoMessage("Opretter bruger, sender email...", false);
 
-                                        $http.post("api/user", data, { handleBusy: true }).success(function (result, status) {
+                                        $http.post("api/user", data, { handleBusy: true }).success(function(result, status) {
                                             var userResult = result.response;
                                             if (status == 201) {
                                                 msg.toSuccessMessage(userResult.name + " er oprettet i KITOS");
@@ -54,26 +93,26 @@
                                             }
 
                                             $modalInstance.close(userResult);
-                                        }).error(function (result) {
+                                        }).error(function(result) {
                                             msg.toErrorMessage("Fejl! Noget gik galt ved oprettelsen af " + name + "!");
                                         });
                                     };
 
-                                    $scope.cancel = function () {
+                                    $scope.cancel = function() {
                                         $modalInstance.dismiss('cancel');
                                     };
                                 }
                             ]
                         });
 
-                        modal.result.then(function (userResult) {
+                        modal.result.then(function(userResult) {
                             scope.userResult = userResult;
 
                             scope.selectResult = {
                                 id: userResult.id,
                                 text: userResult.name
                             };
-                        }, function () {
+                        }, function() {
                             scope.userResult = null;
                             scope.selectResult = null;
                         });
@@ -84,7 +123,7 @@
         }
     ]);
 
-    app.directive('selectUser', function () {
+    app.directive('selectUser', function() {
 
             //format of dropdown options
             function formatResult(obj) {
@@ -120,74 +159,77 @@
                 },
                 replace: true,
                 templateUrl: 'partials/directives/select-user.html',
-                controller: ['$scope', '$http', '$timeout', function($scope, $http, $timeout) {
-                    $scope.onChange = function () {
+                controller: [
+                    '$scope', '$http', '$timeout', function($scope, $http, $timeout) {
+                        $scope.onChange = function() {
 
-                        //for some reason (probably a bugger in select2)
-                        //this is called 2 times, once with the original select value (like 1 or "")
-                        //and once with the object value of select2 {id, text}.
-                        //we only need the last one
-                        if (typeof $scope.userModel !== 'object') return;
+                            //for some reason (probably a bugger in select2)
+                            //this is called 2 times, once with the original select value (like 1 or "")
+                            //and once with the object value of select2 {id, text}.
+                            //we only need the last one
+                            if (typeof $scope.userModel !== 'object') return;
 
-                        //timeout, otherwise we get the bad version of the model.
-                        $timeout($scope.onSelect);
-                    };
+                            //timeout, otherwise we get the bad version of the model.
+                            $timeout($scope.onSelect);
+                        };
 
-                    var userSrc = typeof $scope.orgId !== 'undefined' ? 'api/organization/' + $scope.orgId + '?users&q=' : 'api/user?q=';
+                        var userSrc = typeof $scope.orgId !== 'undefined' ? 'api/organization/' + $scope.orgId + '?users&q=' : 'api/user?q=';
 
-                    $scope.selectUserOptions = {
-                        //don't escape markup, otherwise formatResult will be bugged
-                        escapeMarkup: function (m) { return m; },
-                        formatResult: formatResult,
-                        formatSelection: formatSelection,
+                        $scope.selectUserOptions = {
+                            //don't escape markup, otherwise formatResult will be bugged
+                            escapeMarkup: function(m) { return m; },
+                            formatResult: formatResult,
+                            formatSelection: formatSelection,
 
-                        allowClear: !!$scope.allowClear,
+                            allowClear: !!$scope.allowClear,
 
-                        minimumInputLength: 1,
-                        initSelection: function (elem, callback) {
-                        },
-                        ajax: {
-                            data: function (term, page) {
-                                return { query: term };
+                            minimumInputLength: 1,
+                            initSelection: function(elem, callback) {
                             },
-                            quietMillis: 500,
-                            transport: function (queryParams) {
-                                var res = $http.get(userSrc + queryParams.data.query).then(queryParams.success);
-                                res.abort = function () {
-                                    return null;
-                                };
+                            ajax: {
+                                data: function(term, page) {
+                                    return { query: term };
+                                },
+                                quietMillis: 500,
+                                transport: function(queryParams) {
+                                    var res = $http.get(userSrc + queryParams.data.query).then(queryParams.success);
+                                    res.abort = function() {
+                                        return null;
+                                    };
 
-                                return res;
-                            },
+                                    return res;
+                                },
 
-                            results: function (data, page) {
-                                var results = [];
+                                results: function(data, page) {
+                                    var results = [];
 
-                                _.each(data.data.response, function (user) {
+                                    _.each(data.data.response, function(user) {
 
-                                    results.push({
-                                        id: user.id, //select2 mandatory
-                                        text: user.name, //select2 mandatory
-                                        user: user //not mandatory, for extra info when formatting
+                                        results.push({
+                                            id: user.id, //select2 mandatory
+                                            text: user.name, //select2 mandatory
+                                            user: user //not mandatory, for extra info when formatting
+                                        });
                                     });
-                                });
 
-                                return { results: results };
+                                    return { results: results };
+                                }
                             }
-                        }
-                    };
-                }]
+                        };
+                    }
+                ]
             };
         }
     );
 
     app.directive('selectAccessModifier', [
-        function () {
+        function() {
             return {
                 priority: 1,
                 replace: true,
                 templateUrl: 'partials/directives/select-access-modifier.html',
-                controller: ['$scope', 'userService', function ($scope, userService) {
+                controller: [
+                    '$scope', 'userService', function($scope, userService) {
                         userService.getUser().then(function(user) {
                             $scope.isGlobalAdmin = user.isGlobalAdmin;
                         });
@@ -197,8 +239,9 @@
         }
     ]);
 
-    app.directive('selectStatus2', ['$timeout',
-        function ($timeout) {
+    app.directive('selectStatus2', [
+        '$timeout',
+        function($timeout) {
             return {
                 scope: {
                     canWrite: '=',
@@ -206,15 +249,15 @@
                 require: 'ngModel',
                 templateUrl: 'partials/directives/select-status2.html',
 
-                link: function (scope, element, attr, ngModel) {
-                    scope.setModel = function (n) {
+                link: function(scope, element, attr, ngModel) {
+                    scope.setModel = function(n) {
                         //only update on change
                         if (scope.model == n) return;
 
                         //save new value
                         scope.model = n;
 
-                        $timeout(function () {
+                        $timeout(function() {
                             //then trigger event
                             ngModel.$setViewValue(scope.model);
 
@@ -224,7 +267,7 @@
                     };
 
                     //read value from ngModel
-                    ngModel.$render = function () {
+                    ngModel.$render = function() {
                         scope.model = ngModel.$viewValue;
                     };
                 }
@@ -233,7 +276,7 @@
     ]);
 
     app.directive('showStatus', [
-        '$timeout', function ($timeout) {
+        '$timeout', function($timeout) {
             return {
                 scope: {
                     status: '=showStatus'
@@ -241,12 +284,12 @@
                 replace: false,
                 templateUrl: 'partials/directives/show-status.html',
 
-                link: function (scope, element, attr) {
+                link: function(scope, element, attr) {
                     scope.ready = false;
                     update();
 
                     function update() {
-                        $timeout(function () {
+                        $timeout(function() {
                             if (!scope.status) {
                                 update();
                                 return;
@@ -254,7 +297,8 @@
                             scope.ready = true;
                         });
                     }
-                    scope.$watch("status", function (newval, oldval) {
+
+                    scope.$watch("status", function(newval, oldval) {
                         if (newval === oldval) return;
 
                         update();
@@ -265,13 +309,13 @@
     ]);
 
     app.directive('squareTrafficLight', [
-        function () {
+        function() {
             return {
                 template: '<progressbar class="status-bar" data-value="value" data-type="{{type}}"></progressbar>',
                 scope: {
                     status: '=squareTrafficLight'
                 },
-                link: function (scope) {
+                link: function(scope) {
                     switch (scope.status) {
                     case 1:
                         scope.type = 'danger';
@@ -293,29 +337,31 @@
         }
     ]);
 
-    app.directive('dateToString', ['dateFilter', function(dateFilter) {
-        return {
-            restrict: 'A',
-            require: 'ngModel',
-            link: function (scope, element, attr, ctrl) {
-                ctrl.$parsers.push(function (value) {
-                    if (value instanceof Date)
-                        return dateFilter(value, 'yyyy-MM-dd');
-                    return value;
-                });
-            }
-        };
-    }]);
+    app.directive('dateToString', [
+        'dateFilter', function(dateFilter) {
+            return {
+                restrict: 'A',
+                require: 'ngModel',
+                link: function(scope, element, attr, ctrl) {
+                    ctrl.$parsers.push(function(value) {
+                        if (value instanceof Date)
+                            return dateFilter(value, 'yyyy-MM-dd');
+                        return value;
+                    });
+                }
+            };
+        }
+    ]);
 
     app.directive('autosave', [
-        '$http', '$timeout', 'notify', function ($http, $timeout, notify) {
+        '$http', '$timeout', 'notify', function($http, $timeout, notify) {
             return {
                 restrict: 'A',
                 require: 'ngModel',
                 priority: 0,
-                link: function (scope, element, attrs, ctrl) {
+                link: function(scope, element, attrs, ctrl) {
                     var oldValue;
-                    $timeout(function () {
+                    $timeout(function() {
                         oldValue = ctrl.$modelValue; // get initial value
                     });
 
@@ -348,7 +394,7 @@
                     function saveSelect2() {
                         // ctrl.$viewValue reflects the old state.
                         // using timeout to wait for the value to update
-                        $timeout(function () {
+                        $timeout(function() {
                             var newValue;
 
                             var viewValue = ctrl.$viewValue;
@@ -359,7 +405,7 @@
                             } else {
                                 newValue = viewValue;
                             }
-                           
+
                             var payload = {};
                             payload[attrs.field] = newValue;
 
@@ -372,32 +418,32 @@
                         if (e.added) {
                             id = e.added.id;
                             $http.post(attrs.autosave + '?' + attrs.field + '=' + id)
-                            .success(function () {
-                                msg.toSuccessMessage("Feltet er opdateret.");
-                            })
-                            .error(function () {
-                                msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
-                            });
+                                .success(function() {
+                                    msg.toSuccessMessage("Feltet er opdateret.");
+                                })
+                                .error(function() {
+                                    msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                                });
                         } else if (e.removed) {
                             id = e.removed.id;
                             $http.delete(attrs.autosave + '?' + attrs.field + '=' + id)
-                            .success(function () {
-                                msg.toSuccessMessage("Feltet er opdateret.");
-                            })
-                            .error(function () {
-                                msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
-                            });
+                                .success(function() {
+                                    msg.toSuccessMessage("Feltet er opdateret.");
+                                })
+                                .error(function() {
+                                    msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                                });
                         }
                     }
 
                     function save(payload) {
                         var msg = notify.addInfoMessage("Gemmer...", false);
                         $http({ method: 'PATCH', url: attrs.autosave, data: payload })
-                            .success(function () {
+                            .success(function() {
                                 msg.toSuccessMessage("Feltet er opdateret.");
                                 oldValue = ctrl.$modelValue;
                             })
-                            .error(function () {
+                            .error(function() {
                                 msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                             });
                     }
@@ -419,51 +465,56 @@
         }
     ]);
 
-    app.directive('datereader', [function () {
-        return {
-            scope: true,
-            template: '<span>{{dateStr}}</span>',
-            require: 'ngModel',
-            link: function (scope, element, attr, ctrl) {
+    app.directive('datereader', [
+        function() {
+            return {
+                scope: true,
+                template: '<span>{{dateStr}}</span>',
+                require: 'ngModel',
+                link: function(scope, element, attr, ctrl) {
 
-                scope.date = {};
+                    scope.date = {};
 
-                function read() {
-                    if (angular.isUndefined(ctrl.$modelValue) || ctrl.$modelValue == null) scope.dateStr = "";
-                    else scope.dateStr = moment(ctrl.$modelValue).format("DD-MM-YY", "da", true);
+                    function read() {
+                        if (angular.isUndefined(ctrl.$modelValue) || ctrl.$modelValue == null) scope.dateStr = "";
+                        else scope.dateStr = moment(ctrl.$modelValue).format("DD-MM-YY", "da", true);
+                    }
+
+                    read();
+                    ctrl.$render = read;
                 }
+            };
+        }
+    ]);
 
-                read();
-                ctrl.$render = read;
-            }
-        };
-    }]);
+    app.directive('simpleComment', [
+        function() {
+            return {
+                scope: true,
+                require: 'ngModel',
+                template: '<button class="btn btn-link btn-sm" data-ng-disabled="disabled" data-popover="{{comment}}"><i class="glyphicon glyphicon-comment small" data-ng-class="ngClassObj"></i></button>',
+                link: function(scope, element, attr, ctrl) {
 
-    app.directive('simpleComment', [function () {
-        return {
-            scope: true,
-            require: 'ngModel',
-            template: '<button class="btn btn-link btn-sm" data-ng-disabled="disabled" data-popover="{{comment}}"><i class="glyphicon glyphicon-comment small" data-ng-class="ngClassObj"></i></button>',
-            link: function (scope, element, attr, ctrl) {
+                    function setDisabled(disabled) {
+                        scope.disabled = disabled;
+                        scope.ngClassObj = { 'faded': disabled };
+                    }
 
-                function setDisabled(disabled) {
-                    scope.disabled = disabled;
-                    scope.ngClassObj = { 'faded': disabled };
+                    setDisabled(true);
+
+                    ctrl.$render = function() {
+                        setDisabled(!ctrl.$viewValue);
+
+                        scope.comment = ctrl.$viewValue;
+                    };
                 }
+            };
+        }
+    ]);
 
-                setDisabled(true);
-
-                ctrl.$render = function () {
-                    setDisabled(!ctrl.$viewValue);
-
-                    scope.comment = ctrl.$viewValue;
-                };
-            }
-        };
-    }]);
-
-    app.directive('selectOrgUnit', ['$http', '$timeout', '$sce', 'userService',
-        function ($http, $timeout, $sce, userService) {
+    app.directive('selectOrgUnit', [
+        '$http', '$timeout', '$sce', 'userService',
+        function($http, $timeout, $sce, userService) {
             return {
                 scope: {
                     extraOptions: '=?',
@@ -474,10 +525,10 @@
                 require: 'ngModel',
                 priority: 0,
                 templateUrl: 'partials/directives/select-org-unit.html',
-                link: function (scope, element, attrs, ctrl) {
+                link: function(scope, element, attrs, ctrl) {
                     //this is called when the user selects something from select2
-                    element.bind('change', function () {
-                        $timeout(function () {
+                    element.bind('change', function() {
+                        $timeout(function() {
                             //update the view value
                             ctrl.$setViewValue(scope.select.selected);
 
@@ -487,7 +538,7 @@
                     });
 
                     //when the outer ngModel is changed, update the inner model
-                    ctrl.$render = function () {
+                    ctrl.$render = function() {
                         scope.select.selected = ctrl.$viewValue;
                     };
 
@@ -499,10 +550,10 @@
                         allowClear: !!scope.allowClear,
 
                         //don't format markup in result
-                        escapeMarkup: function (m) { return m; },
+                        escapeMarkup: function(m) { return m; },
 
                         //when an option has been selected, print the no-html version
-                        formatSelection: function (item) {
+                        formatSelection: function(item) {
 
                             var option;
                             if (item.id) {
@@ -518,7 +569,7 @@
                     };
 
                     if (scope.extraOptions) {
-                        _.each(scope.extraOptions, function (extraOption) {
+                        _.each(scope.extraOptions, function(extraOption) {
                             var option = {
                                 id: extraOption.id,
                                 text: extraOption.text,
@@ -529,9 +580,9 @@
                     }
 
                     //loads the org unit roots
-                    userService.getUser().then(function (user) {
+                    userService.getUser().then(function(user) {
 
-                        $http.get('api/organizationUnit?organization=' + user.currentOrganizationId, { cache: true }).success(function (result) {
+                        $http.get('api/organizationUnit?organization=' + user.currentOrganizationId, { cache: true }).success(function(result) {
 
                             //recursive function for added indentation, 
                             //and pushing org units to the list in the right order (depth-first)
@@ -544,7 +595,7 @@
 
                                 options.push(option);
 
-                                _.each(orgUnit.children, function (child) {
+                                _.each(orgUnit.children, function(child) {
                                     //indentation is non breaking spaces (alt+255)
                                     return visit(child, indentation + "    ");
                                 });
@@ -567,330 +618,378 @@
 
             };
         }
-
     ]);
 
-    app.directive('suggestNew', ['$http', 'notify', function ($http, notify) {
-        return {
-            scope: {
-                url: '@'
-            },
-            templateUrl: 'partials/local-config/suggest-new.html',
-            link: function (scope, element, attrs) {
-                scope.suggest = function () {
-                    var data = {
-                        "isSuggestion": true,
-                        "name": scope.suggestion
+    app.directive('suggestNew', [
+        '$http', 'notify', function($http, notify) {
+            return {
+                scope: {
+                    url: '@'
+                },
+                templateUrl: 'partials/local-config/suggest-new.html',
+                link: function(scope, element, attrs) {
+                    scope.suggest = function() {
+                        var data = {
+                            "isSuggestion": true,
+                            "name": scope.suggestion
+                        };
+
+                        $http.post(scope.url, data).success(function(result) {
+                            notify.addSuccessMessage('Foreslag sendt!');
+                            scope.suggestion = "";
+                        }).error(function(result) {
+                            notify.addErrorMessage('Kunne ikke sende foreslag!');
+                        });
+                    };
+                }
+            };
+        }
+    ]);
+
+    app.directive('suggestNewRole', [
+        '$http', 'notify', function($http, notify) {
+            return {
+                scope: {
+                    url: '@'
+                },
+                templateUrl: 'partials/local-config/suggest-new-role.html',
+                link: function(scope, element, attrs) {
+                    scope.suggest = function() {
+
+                        var data = {
+                            "isSuggestion": true,
+                            "name": scope.suggestion,
+                            "hasReadAccess": true,
+                            "hasWriteAccess": scope.writeAccess
+                        };
+
+                        $http.post(scope.url, data).success(function(result) {
+                            notify.addSuccessMessage('Foreslag sendt!');
+                            scope.suggestion = "";
+                        }).error(function(result) {
+                            notify.addErrorMessage('Kunne ikke sende foreslag!');
+                        });
+                    };
+                }
+            };
+        }
+    ]);
+
+    app.directive('optionList', [
+        '$http', function($http) {
+            return {
+                scope: {
+                    optionsUrl: '@',
+                    title: '@',
+                },
+                templateUrl: 'partials/local-config/optionlist.html',
+                link: function(scope, element, attrs) {
+
+                    scope.list = [];
+
+                    $http.get(scope.optionsUrl + '?nonsuggestions').success(function(result) {
+                        _.each(result.response, function(v) {
+                            scope.list.push({
+                                id: v.id,
+                                name: v.name,
+                                note: v.note
+                            });
+                        });
+                    });
+                }
+            };
+        }
+    ]);
+
+    app.directive('globalOptionList', [
+        '$http', '$timeout', '$state', '$stateParams', 'notify', function($http, $timeout, $state, $stateParams, notify) {
+            return {
+                scope: {
+                    optionsUrl: '@',
+                    title: '@',
+                },
+                templateUrl: 'partials/global-config/optionlist.html',
+                link: function(scope, element, attrs) {
+                    scope.list = [];
+                    $http.get(scope.optionsUrl + '?nonsuggestions').success(function(result) {
+                        _.each(result.response, function(v) {
+                            scope.list.push({
+                                id: v.id,
+                                name: v.name,
+                                note: v.note,
+                                isActive: v.isActive
+                            });
+                        });
+                    });
+
+                    scope.suggestions = [];
+                    $http.get(scope.optionsUrl + '?suggestions').success(function(result) {
+                        _.each(result.response, function(v) {
+                            scope.suggestions.push({
+                                id: v.id,
+                                name: v.name,
+                                note: v.note
+                            });
+                        });
+                    });
+
+                    scope.approve = function(id) {
+                        var msg = notify.addInfoMessage("Gemmer...", false);
+                        $http({ method: 'PATCH', url: scope.optionsUrl + '/' + id, data: { isSuggestion: false } })
+                            .success(function() {
+                                msg.toSuccessMessage("Valgmuligheden er opdateret.");
+                                // reload page to show changes
+                                reload();
+                            })
+                            .error(function() {
+                                msg.toErrorMessage("Fejl! Valgmuligheden kunne ikke ændres!");
+                            });
                     };
 
-                    $http.post(scope.url, data).success(function (result) {
-                        notify.addSuccessMessage('Foreslag sendt!');
-                        scope.suggestion = "";
-                    }).error(function (result) {
-                        notify.addErrorMessage('Kunne ikke sende foreslag!');
+                    // work around for $state.reload() not updating scope
+                    // https://github.com/angular-ui/ui-router/issues/582
+                    function reload() {
+                        return $state.transitionTo($state.current, $stateParams, {
+                            reload: true
+                        }).then(function() {
+                            scope.hideContent = true;
+                            return $timeout(function() {
+                                return scope.hideContent = false;
+                            }, 1);
+                        });
+                    };
+                }
+            };
+        }
+    ]);
+
+    app.directive('globalOptionRoleList', [
+        '$http', '$timeout', '$state', '$stateParams', 'notify', function($http, $timeout, $state, $stateParams, notify) {
+            return {
+                scope: {
+                    optionsUrl: '@',
+                    title: '@',
+                },
+                templateUrl: 'partials/global-config/optionrolelist.html',
+                link: function(scope, element, attrs) {
+                    scope.list = [];
+                    $http.get(scope.optionsUrl + '?nonsuggestions').success(function(result) {
+                        _.each(result.response, function(v) {
+                            scope.list.push({
+                                id: v.id,
+                                name: v.name,
+                                note: v.note,
+                                isActive: v.isActive,
+                                hasWriteAccess: v.hasWriteAccess
+                            });
+                        });
                     });
-                };
-            }
-        };
-    }]);
 
-    app.directive('suggestNewRole', ['$http', 'notify', function ($http, notify) {
-        return {
-            scope: {
-                url: '@'
-            },
-            templateUrl: 'partials/local-config/suggest-new-role.html',
-            link: function (scope, element, attrs) {
-                scope.suggest = function () {
+                    scope.suggestions = [];
+                    $http.get(scope.optionsUrl + '?suggestions').success(function(result) {
+                        _.each(result.response, function(v) {
+                            scope.suggestions.push({
+                                id: v.id,
+                                name: v.name,
+                                note: v.note
+                            });
+                        });
+                    });
 
-                    var data = {
-                        "isSuggestion": true,
-                        "name": scope.suggestion,
-                        "hasReadAccess": true,
-                        "hasWriteAccess": scope.writeAccess
+                    scope.approve = function(id) {
+                        var msg = notify.addInfoMessage("Gemmer...", false);
+                        $http({ method: 'PATCH', url: scope.optionsUrl + '/' + id, data: { isSuggestion: false } })
+                            .success(function() {
+                                msg.toSuccessMessage("Rollen er opdateret.");
+                                // reload page to show changes
+                                reload();
+                            })
+                            .error(function() {
+                                msg.toErrorMessage("Fejl! Rollen kunne ikke ændres!");
+                            });
                     };
 
-                    $http.post(scope.url, data).success(function (result) {
-                        notify.addSuccessMessage('Foreslag sendt!');
-                        scope.suggestion = "";
-                    }).error(function (result) {
-                        notify.addErrorMessage('Kunne ikke sende foreslag!');
-                    });
-                };
-            }
-        };
-    }]);
-
-    app.directive('optionList', ['$http', function ($http) {
-        return {
-            scope: {
-                optionsUrl: '@',
-                title: '@',
-            },
-            templateUrl: 'partials/local-config/optionlist.html',
-            link: function (scope, element, attrs) {
-
-                scope.list = [];
-
-                $http.get(scope.optionsUrl + '?nonsuggestions').success(function (result) {
-                    _.each(result.response, function (v) {
-                        scope.list.push({
-                            id: v.id,
-                            name: v.name,
-                            note: v.note
+                    // work around for $state.reload() not updating scope
+                    // https://github.com/angular-ui/ui-router/issues/582
+                    function reload() {
+                        return $state.transitionTo($state.current, $stateParams, {
+                            reload: true
+                        }).then(function() {
+                            scope.hideContent = true;
+                            return $timeout(function() {
+                                return scope.hideContent = false;
+                            }, 1);
                         });
+                    };
+                }
+            };
+        }
+    ]);
+
+    app.directive('kleFilter', [
+        'taskService', function(taskService) {
+            return {
+                scope: {
+                    //the output of filtering tasks
+                    selectedGroup: "=kleFilter"
+                },
+                templateUrl: 'partials/directives/kle-filter.html',
+                link: function(scope, element, attrs) {
+
+                    //loading main groups
+                    taskService.getRoots().then(function(roots) {
+                        scope.maingroups = roots;
                     });
-                });
-            }
-        };
-    }]);
-    
-    app.directive('globalOptionList', ['$http', '$timeout', '$state', '$stateParams', 'notify', function ($http, $timeout, $state, $stateParams, notify) {
-        return {
-            scope: {
-                optionsUrl: '@',
-                title: '@',
-            },
-            templateUrl: 'partials/global-config/optionlist.html',
-            link: function (scope, element, attrs) {
-                scope.list = [];
-                $http.get(scope.optionsUrl + '?nonsuggestions').success(function (result) {
-                    _.each(result.response, function (v) {
-                        scope.list.push({
-                            id: v.id,
-                            name: v.name,
-                            note: v.note,
-                            isActive: v.isActive
+
+                    //called when selected a main group
+                    scope.maingroupChanged = function() {
+                        scope.taskList = [];
+
+                        if (!scope.selectedMaingroup) return;
+
+                        //load groups
+                        taskService.getChildren(scope.selectedMaingroup).then(function(groups) {
+                            scope.selectedGroup = null;
+                            scope.groups = groups;
                         });
+                    };
+                }
+            };
+        }
+    ]);
+
+
+    app.directive('paginationButtons', [
+        function() {
+            return {
+                scope: {
+                    //the output of filtering tasks
+                    pagination: "=paginationButtons"
+                },
+                templateUrl: 'partials/directives/pagination.html',
+                link: function(scope, element, attrs) {
+                    scope.less = function() {
+                        scope.pagination.skip -= scope.pagination.take;
+                        if (scope.pagination.skip < 0) scope.pagination.skip = 0;
+                    };
+
+                    scope.more = function() {
+                        scope.pagination.skip += scope.pagination.take;
+                    };
+                }
+            };
+        }
+    ]);
+
+    app.directive('orderBy', [
+        function() {
+            return {
+                scope: {
+                    orderBy: '=orderBy',
+                    pagination: '=paging',
+                },
+                replace: true,
+                templateUrl: 'partials/directives/order-by.html',
+                link: function(scope, element, attrs) {
+                    scope.order = function() {
+                        scope.pagination.skip = 0;
+
+                        if (scope.pagination.orderBy == scope.orderBy) {
+                            scope.pagination.descending = !scope.pagination.descending;
+                        } else {
+                            scope.pagination.orderBy = scope.orderBy;
+                            scope.pagination.descending = false;
+                        }
+                    };
+                }
+
+            };
+
+        }
+    ]);
+
+    app.directive('searchBox', [
+        '$timeout', function($timeout) {
+            return {
+                scope: {
+                    pagination: '=paging'
+                },
+                replace: true,
+                templateUrl: 'partials/directives/search-box.html',
+                link: function(scope, element, attrs) {
+                    var updatePromise = null;
+
+                    function doUpdate() {
+                        scope.pagination.skip = 0;
+                        scope.pagination.search = scope.search;
+
+                        updatePromise = null;
+                    }
+
+
+                    scope.update = function() {
+                        if (updatePromise) $timeout.cancel(updatePromise);
+
+                        updatePromise = $timeout(doUpdate, 200);
+                    };
+                }
+            };
+        }
+    ]);
+
+    app.directive('showErrors', [
+            '$timeout', function($timeout) {
+                var linkFn;
+                linkFn = function(scope, el, attrs, formCtrl) {
+                    var blurred, inputEl, inputName, inputNgEl, showSuccess, toggleClasses;
+                    blurred = false;
+                    showSuccess = true;
+                    inputEl = el[0].querySelector('[name]');
+                    inputNgEl = angular.element(inputEl);
+                    inputName = inputNgEl.attr('name');
+                    if (!inputName) {
+                        throw 'show-errors element has no child input elements with a \'name\' attribute';
+                    }
+                    inputNgEl.bind('blur', function() {
+                        blurred = true;
+                        return toggleClasses(formCtrl[inputName].$invalid);
                     });
-                });
-                
-                scope.suggestions = [];
-                $http.get(scope.optionsUrl + '?suggestions').success(function (result) {
-                    _.each(result.response, function (v) {
-                        scope.suggestions.push({
-                            id: v.id,
-                            name: v.name,
-                            note: v.note
-                        });
+                    scope.$watch(function() {
+                        return formCtrl[inputName] && formCtrl[inputName].$invalid;
+                    }, function(invalid) {
+                        if (!blurred) {
+                            return;
+                        }
+                        return toggleClasses(invalid);
                     });
-                });
-
-                scope.approve = function (id) {
-                    var msg = notify.addInfoMessage("Gemmer...", false);
-                    $http({ method: 'PATCH', url: scope.optionsUrl + '/' + id, data: { isSuggestion: false } })
-                        .success(function () {
-                            msg.toSuccessMessage("Valgmuligheden er opdateret.");
-                            // reload page to show changes
-                            reload();
-                        })
-                        .error(function () {
-                            msg.toErrorMessage("Fejl! Valgmuligheden kunne ikke ændres!");
-                        });
-                };
-
-                // work around for $state.reload() not updating scope
-                // https://github.com/angular-ui/ui-router/issues/582
-                function reload() {
-                    return $state.transitionTo($state.current, $stateParams, {
-                        reload: true
-                    }).then(function () {
-                        scope.hideContent = true;
-                        return $timeout(function () {
-                            return scope.hideContent = false;
-                        }, 1);
+                    scope.$on('show-errors-check-validity', function() {
+                        return toggleClasses(formCtrl[inputName].$invalid);
                     });
-                };
-            }
-        };
-    }]);
-
-    app.directive('globalOptionRoleList', ['$http', '$timeout', '$state', '$stateParams', 'notify', function ($http, $timeout, $state, $stateParams, notify) {
-        return {
-            scope: {
-                optionsUrl: '@',
-                title: '@',
-            },
-            templateUrl: 'partials/global-config/optionrolelist.html',
-            link: function (scope, element, attrs) {
-                scope.list = [];
-                $http.get(scope.optionsUrl + '?nonsuggestions').success(function (result) {
-                    _.each(result.response, function (v) {
-                        scope.list.push({
-                            id: v.id,
-                            name: v.name,
-                            note: v.note,
-                            isActive: v.isActive,
-                            hasWriteAccess: v.hasWriteAccess
-                        });
+                    scope.$on('show-errors-reset', function() {
+                        return $timeout(function() {
+                            el.removeClass('has-error');
+                            el.removeClass('has-success');
+                            return blurred = false;
+                        }, 0, false);
                     });
-                });
-
-                scope.suggestions = [];
-                $http.get(scope.optionsUrl + '?suggestions').success(function (result) {
-                    _.each(result.response, function (v) {
-                        scope.suggestions.push({
-                            id: v.id,
-                            name: v.name,
-                            note: v.note
-                        });
-                    });
-                });
-                
-                scope.approve = function(id) {
-                    var msg = notify.addInfoMessage("Gemmer...", false);
-                    $http({ method: 'PATCH', url: scope.optionsUrl + '/' + id, data: { isSuggestion: false } })
-                        .success(function () {
-                            msg.toSuccessMessage("Rollen er opdateret.");
-                            // reload page to show changes
-                            reload();
-                        })
-                        .error(function () {
-                            msg.toErrorMessage("Fejl! Rollen kunne ikke ændres!");
-                        });
+                    return toggleClasses = function(invalid) {
+                        el.toggleClass('has-error', invalid);
+                        if (showSuccess) {
+                            return el.toggleClass('has-success', !invalid);
+                        }
+                    };
                 };
-                
-                // work around for $state.reload() not updating scope
-                // https://github.com/angular-ui/ui-router/issues/582
-                function reload() {
-                    return $state.transitionTo($state.current, $stateParams, {
-                        reload: true
-                    }).then(function () {
-                        scope.hideContent = true;
-                        return $timeout(function () {
-                            return scope.hideContent = false;
-                        }, 1);
-                    });
-                };
-            }
-        };
-    }]);
-    
-    app.directive('kleFilter', ['taskService', function (taskService) {
-        return {
-            scope: {
-                //the output of filtering tasks
-                selectedGroup: "=kleFilter"
-            },
-            templateUrl: 'partials/directives/kle-filter.html',
-            link: function (scope, element, attrs) {
-
-                //loading main groups
-                taskService.getRoots().then(function (roots) {
-                    scope.maingroups = roots;
-                });
-
-                //called when selected a main group
-                scope.maingroupChanged = function () {
-                    scope.taskList = [];
-                    
-                    if (!scope.selectedMaingroup) return;
-
-                    //load groups
-                    taskService.getChildren(scope.selectedMaingroup).then(function (groups) {
-                        scope.selectedGroup = null;
-                        scope.groups = groups;
-                    });
-                };
-            }
-        };
-    }]);
-    
-
-    app.directive('paginationButtons', [function () {
-        return {
-            scope: {
-                //the output of filtering tasks
-                pagination: "=paginationButtons"
-            },
-            templateUrl: 'partials/directives/pagination.html',
-            link: function (scope, element, attrs) {
-                scope.less = function() {
-                    scope.pagination.skip -= scope.pagination.take;
-                    if (scope.pagination.skip < 0) scope.pagination.skip = 0;
-                };
-
-                scope.more = function() {
-                    scope.pagination.skip += scope.pagination.take;
-                };
-            }
-        };
-    }]);
-
-    app.directive('orderBy', [function() {
-        return {
-            scope: {
-                orderBy: '=orderBy',
-                pagination: '=paging',
-            },
-            replace: true,
-            templateUrl: 'partials/directives/order-by.html',
-            link: function (scope, element, attrs) {
-                scope.order = function () {
-                    scope.pagination.skip = 0;
-
-                    if (scope.pagination.orderBy == scope.orderBy) {
-                        scope.pagination.descending = !scope.pagination.descending;
-                    } else {
-                        scope.pagination.orderBy = scope.orderBy;
-                        scope.pagination.descending = false;
+                return {
+                    restrict: 'A',
+                    require: '^form',
+                    compile: function(elem, attrs) {
+                        if (!elem.hasClass('form-group')) {
+                            throw 'show-errors element does not have the \'form-group\' class';
+                        }
+                        return linkFn;
                     }
                 };
             }
-
-        };
-
-    }]);
-
-    app.directive('searchBox', ['$timeout', function ($timeout) {
-        return {
-            scope: {
-                pagination: '=paging'
-            },
-            replace: true,
-            templateUrl: 'partials/directives/search-box.html',
-            link: function (scope, element, attrs) {
-               var updatePromise = null;
-
-                function doUpdate() {
-                    scope.pagination.skip = 0;
-                    scope.pagination.search = scope.search;
-
-                    updatePromise = null;
-                }
-
-
-                scope.update = function () {
-                    if (updatePromise) $timeout.cancel(updatePromise);
-
-                    updatePromise = $timeout(doUpdate, 200);
-                };
-            }
-        };
-    }]);
-
-    app.directive('showErrors', [function() {
-        return {
-            restrict: 'A',
-            require: '^form',
-            link: function(scope, el, attrs, formCtrl) {
-                // find the text box element, which has the 'name' attribute
-                var inputEl = el[0].querySelector('[name]');
-                // convert the native text box element to an angular element
-                var inputNgEl = angular.element(inputEl);
-                // get the name on the text box so we know the property to check
-                // on the form controller
-                var inputName = inputNgEl.attr('name');
-
-                scope.$on('show-errors-check-validity', function () {
-                    el.toggleClass('has-error', formCtrl[inputName].$invalid);
-                });
-
-                // only apply the has-error class after the user leaves the text box
-                inputNgEl.bind('blur', function() {
-                    el.toggleClass('has-error', formCtrl[inputName].$invalid);
-                });
-            }
-        };
-    }]);
+        ]
+    );
 })(angular, app);

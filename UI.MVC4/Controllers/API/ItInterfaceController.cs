@@ -4,6 +4,7 @@ using System.Net.Http;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using Newtonsoft.Json.Linq;
 using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
@@ -88,6 +89,9 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
+                if (!IsAvailable(dto.Name, dto.OrganizationId))
+                    return Conflict("Name is already taken!");
+
                 var item = Map(dto);
 
                 item.ObjectOwner = KitosUser;
@@ -107,6 +111,39 @@ namespace UI.MVC4.Controllers.API
             {
                 return Error(e);
             }
+        }
+
+        public override HttpResponseMessage Patch(int id, JObject obj)
+        {
+            // try get name value
+            JToken nameToken;
+            obj.TryGetValue("name", out nameToken);
+            if (nameToken != null)
+            {
+                var orgId = Repository.GetByKey(id).OrganizationId;
+                if (!IsAvailable(nameToken.Value<string>(), orgId))
+                    return Conflict("Name is already taken!");
+            }
+
+            return base.Patch(id, obj);
+        }
+
+        public HttpResponseMessage GetNameAvailable(string checkname, int orgId)
+        {
+            try
+            {
+                return IsAvailable(checkname, orgId) ? Ok() : Conflict("Name is already taken!");
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        private bool IsAvailable(string name, int orgId)
+        {
+            var system = Repository.Get(x => x.Name == name && x.OrganizationId == orgId);
+            return !system.Any();
         }
     }
 }

@@ -541,6 +541,7 @@
     <Content Include="Partials\org\org.html" />
     <Content Include="Partials\org\overview\task-usage.html" />
     <Content Include="Partials\shared\org-tree-item.html" />
+    <Content Include="Partials\subnav\create-modal.html" />
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />
     <Content Include="Partials\topnav\topnav.html" />
@@ -614,6 +615,7 @@
     <Content Include="Scripts\app\controllers\it-system\it-interface-catalog.js" />
     <Content Include="Scripts\app\controllers\it-system\it-interface-edit.js" />
     <Content Include="Scripts\app\controllers\it-system\it-interface-edit-details.js" />
+    <Content Include="Scripts\app\controllers\it-system\it-system-create-modal.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-edit-interfaces.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-edit-kle.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-edit.js" />
@@ -1062,9 +1064,6 @@
       <Project>{6CD15363-5401-43C5-9479-02FDDFA881DC}</Project>
       <Name>Infrastructure.DataAccess</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
