@@ -10,7 +10,7 @@ namespace UI.MVC4.Models
         public string Url { get; set; }
         public string Description { get; set; }
         public string ItInterfaceId { get; set; }
-        public string OrganizationId { get; set; }
+        public int OrganizationId { get; set; }
         public string OrganizationName { get; set; }
         public string ObjectOwnerName { get; set; }
         public AccessModifier AccessModifier { get; set; }

@@ -98,21 +98,40 @@
                 }
 
                 function createInterface() {
-                    var payload = {
-                        name: 'Unavngivet snitflade',
-                        belongsToId: user.currentOrganizationId,
-                        organizationId: user.currentOrganizationId,
-                    };
+                    var modalInstance = $modal.open({
+                        // fade in instead of slide from top, fixes strange cursor placement in IE
+                        // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
+                        windowClass: 'modal fade in',
+                        templateUrl: 'partials/subnav/create-modal.html',
+                        controller: ['$scope', '$modalInstance', function ($scope, $modalInstance) {
+                            $scope.formData = {};
+                            $scope.type = 'IT Snitflade';
+                            $scope.checkAvailbleUrl = 'api/itInterface/';
 
-                    var msg = notify.addInfoMessage('Opretter snitflade...', false);
-                    $http.post('api/itinterface', payload)
-                        .success(function (result) {
-                            msg.toSuccessMessage('En ny snitflade er oprettet!');
-                            var interfaceId = result.response.id;
-                            $state.go('it-system.interface-edit.interface-details', { id: interfaceId });
-                        }).error(function () {
-                            msg.toErrorMessage('Fejl! Kunne ikke oprette snitflade!');
-                        });
+                            $scope.submit = function () {
+                                var payload = {
+                                    name: $scope.formData.name,
+                                    belongsToId: user.currentOrganizationId,
+                                    organizationId: user.currentOrganizationId,
+                                };
+
+                                var msg = notify.addInfoMessage('Opretter snitflade...', false);
+                                $http.post('api/itinterface', payload)
+                                    .success(function (result) {
+                                        msg.toSuccessMessage('En ny snitflade er oprettet!');
+                                        var interfaceId = result.response.id;
+                                        $modalInstance.close(interfaceId);
+                                    }).error(function () {
+                                        msg.toErrorMessage('Fejl! Kunne ikke oprette snitflade!');
+                                    });
+                            };
+                        }]
+                    });
+
+                    modalInstance.result.then(function (id) {
+                        // modal was closed with OK
+                        $state.go('it-system.interface-edit.interface-details', { id: id });
+                    });
                 }
 
                 function removeInterface() {
