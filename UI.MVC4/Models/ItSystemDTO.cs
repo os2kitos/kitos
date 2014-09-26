@@ -13,7 +13,7 @@ namespace UI.MVC4.Models
         }
 
         public int Id { get; set; }
-
+        public Guid Uuid { get; set; }
         public int? ParentId { get; set; }
         public string ParentName { get; set; }
 

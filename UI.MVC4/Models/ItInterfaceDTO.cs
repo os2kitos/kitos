@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.DomainModel;
 
 namespace UI.MVC4.Models
@@ -6,6 +7,7 @@ namespace UI.MVC4.Models
     public class ItInterfaceDTO
     {
         public int Id { get; set; }
+        public Guid Uuid { get; set; }
         public string Name { get; set; }
         public string Url { get; set; }
         public string Description { get; set; }
