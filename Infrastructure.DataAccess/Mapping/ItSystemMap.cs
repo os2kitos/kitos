@@ -7,7 +7,10 @@ namespace Infrastructure.DataAccess.Mapping
         public ItSystemMap()
         {
             // Properties
-            this.Property(x => x.Name).IsRequired();
+            this.Property(x => x.Name).IsRequired()
+                .HasUniqueIndexAnnotation("IX_NamePerOrg", 0);
+            this.Property(x => x.OrganizationId)
+                .HasUniqueIndexAnnotation("IX_NamePerOrg", 1);
 
             // Table & Column Mappings
             this.ToTable("ItSystem");
