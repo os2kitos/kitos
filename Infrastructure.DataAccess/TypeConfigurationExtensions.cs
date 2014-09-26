@@ -4,6 +4,9 @@ using System.Data.Entity.ModelConfiguration.Configuration;
 
 namespace Infrastructure.DataAccess
 {
+    /// <summary>
+    /// Stolen from http://stackoverflow.com/questions/18889218/unique-key-constraints-for-multiple-columns-in-entity-framework
+    /// </summary>
     internal static class TypeConfigurationExtensions
     {
         public static PrimitivePropertyConfiguration HasUniqueIndexAnnotation(

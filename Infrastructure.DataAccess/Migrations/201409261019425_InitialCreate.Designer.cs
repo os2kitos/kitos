@@ -6,14 +6,14 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Data.Entity.Migrations.Infrastructure;
     using System.Resources;
     
-    [GeneratedCode("EntityFramework.Migrations", "6.1.0-30225")]
+    [GeneratedCode("EntityFramework.Migrations", "6.1.1-30610")]
     public sealed partial class Start : IMigrationMetadata
     {
         private readonly ResourceManager Resources = new ResourceManager(typeof(Start));
         
         string IMigrationMetadata.Id
         {
-            get { return "201409231132541_Start"; }
+            get { return "201409261019425_Start"; }
         }
         
         string IMigrationMetadata.Source

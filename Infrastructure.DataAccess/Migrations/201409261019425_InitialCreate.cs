@@ -85,7 +85,8 @@ namespace Infrastructure.DataAccess.Migrations
                         AppTypeOptionId = c.Int(),
                         ParentId = c.Int(),
                         BusinessTypeId = c.Int(),
-                        Name = c.String(unicode: false),
+                        Name = c.String(nullable: false, maxLength: 50, storeType: "nvarchar"),
+                        Uuid = c.Guid(nullable: false),
                         Description = c.String(unicode: false),
                         Url = c.String(unicode: false),
                         AccessModifier = c.Int(nullable: false),
@@ -106,7 +107,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.AppTypeOptionId)
                 .Index(t => t.ParentId)
                 .Index(t => t.BusinessTypeId)
-                .Index(t => t.OrganizationId)
+                .Index(t => new { t.OrganizationId, t.Name }, unique: true, name: "IX_NamePerOrg")
                 .Index(t => t.BelongsToId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
@@ -257,7 +258,8 @@ namespace Infrastructure.DataAccess.Migrations
                         InterfaceTypeId = c.Int(),
                         TsaId = c.Int(),
                         MethodId = c.Int(),
-                        Name = c.String(unicode: false),
+                        Name = c.String(nullable: false, maxLength: 50, storeType: "nvarchar"),
+                        Uuid = c.Guid(nullable: false),
                         Description = c.String(unicode: false),
                         Url = c.String(unicode: false),
                         AccessModifier = c.Int(nullable: false),
@@ -280,7 +282,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.InterfaceTypeId)
                 .Index(t => t.TsaId)
                 .Index(t => t.MethodId)
-                .Index(t => t.OrganizationId)
+                .Index(t => new { t.OrganizationId, t.Name }, unique: true, name: "IX_NamePerOrg")
                 .Index(t => t.BelongsToId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
@@ -2238,7 +2240,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ItInterface", new[] { "LastChangedByUserId" });
             DropIndex("dbo.ItInterface", new[] { "ObjectOwnerId" });
             DropIndex("dbo.ItInterface", new[] { "BelongsToId" });
-            DropIndex("dbo.ItInterface", new[] { "OrganizationId" });
+            DropIndex("dbo.ItInterface", "IX_NamePerOrg");
             DropIndex("dbo.ItInterface", new[] { "MethodId" });
             DropIndex("dbo.ItInterface", new[] { "TsaId" });
             DropIndex("dbo.ItInterface", new[] { "InterfaceTypeId" });
@@ -2265,7 +2267,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ItSystem", new[] { "LastChangedByUserId" });
             DropIndex("dbo.ItSystem", new[] { "ObjectOwnerId" });
             DropIndex("dbo.ItSystem", new[] { "BelongsToId" });
-            DropIndex("dbo.ItSystem", new[] { "OrganizationId" });
+            DropIndex("dbo.ItSystem", "IX_NamePerOrg");
             DropIndex("dbo.ItSystem", new[] { "BusinessTypeId" });
             DropIndex("dbo.ItSystem", new[] { "ParentId" });
             DropIndex("dbo.ItSystem", new[] { "AppTypeOptionId" });
