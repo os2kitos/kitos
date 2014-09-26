@@ -7,6 +7,8 @@ namespace Infrastructure.DataAccess.Mapping
         public ItInterfaceMap()
         {
             // Properties
+            this.Property(x => x.Name).IsRequired();
+
             // Table & Column Mappings
             this.ToTable("ItInterface");
 
