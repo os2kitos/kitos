@@ -129,7 +129,7 @@ namespace UI.MVC4.Controllers.API
                     Request.Headers.TryGetValues("X-Auth", out header);
                     if (header != null && header.FirstOrDefault() == "a06b0b59-3cdf-4199-915f-f9b12c71d4c7")
                     {
-                        return UserRepository.Get(u => u.Email == "erik.helweg@gmail.com").First();
+                        return UserRepository.Get(u => u.Email == "support@kitos.dk").First();
                     }
                     if (header != null && header.FirstOrDefault() == "afc79f24-1a3e-40eb-8f7e-9167dce342b3")
                     {

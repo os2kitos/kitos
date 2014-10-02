@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using Core.ApplicationServices;
@@ -13,7 +12,7 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<Infrastructure.DataAccess.KitosContext>
+    internal sealed class Configuration : DbMigrationsConfiguration<KitosContext>
     {
 
         public Configuration()
@@ -29,72 +28,71 @@ namespace Infrastructure.DataAccess.Migrations
         /// Seeds the specified context.
         /// </summary>
         /// <param name="context">The context.</param>
-        protected override void Seed(Infrastructure.DataAccess.KitosContext context)
+        protected override void Seed(KitosContext context)
         {
             #region USERS
 
             var cryptoService = new CryptoService();
 
-            var brian = CreateUser("Brian", "briana2604@hotmail.com", "123", cryptoService);
-            brian.IsGlobalAdmin = true;
+            var globalAdmin = CreateUser("Global admin", "support@kitos.dk", "KitosAgent", cryptoService);
+            globalAdmin.IsGlobalAdmin = true;
             
-            var agent = CreateUser("Agent", "erik.helweg@gmail.com", "123", cryptoService);
-            agent.IsGlobalAdmin = true;
-
-            context.Users.AddOrUpdate(x => x.Email, brian, agent);
+            context.Users.AddOrUpdate(x => x.Email, globalAdmin);
             context.SaveChanges();
+
+            globalAdmin = context.Users.Single(x => x.Email == "support@kitos.dk");
             
             #endregion
 
             #region OPTIONS
+
+            AddOptions<ItProjectType, ItProject>(context.ProjectTypes, globalAdmin, "Fællesoffentlig", "Fælleskommunal", "Lokal", "Tværkommunal", "SKAL", "Udvikling", "Implementering");
+
+            AddOptions<GoalType, Goal>(context.GoalTypes, globalAdmin, "Effektivitet", "Kvalitet", "Service");
+
+            AddOptions<ItSystemTypeOption, ItSystem>(context.ItSystemTypeOptions, globalAdmin, "Fagsystem", "Selvbetjening", "Applikation", "Brugerinterface", "Programmeringsinterface", "Applikationsservice", "Applikationskomponent", "Applikationsfunktion", "Applikationsmodul");
+
+            AddOptions<BusinessType, ItSystem>(context.BusinessTypes, globalAdmin, "Desing, visualisering og grafik", "Kommunikation", "Hjemmesider og portaler", "Selvbetjening og indberetning", "E-læring", "ESDH og Journalisering", "Specialsystemer", "Processtyring", "IT management", "Økonomi og betaling", "Løn, personale og HR", "BI og ledelsesinformation", "Master data og registre", "GIS", "Bruger- og rettighedsstyring", "Sikkerhed og overvågning", "Sagsbærende", "Administrativt");
+
+            AddOptions<ArchiveType, ItSystemUsage>(context.ArchiveTypes, globalAdmin, "Arkiveret", "Ikke arkiveret", "Arkiveringspligt", "ikke arkiveringspligt");
+
+            AddOptions<DataType, DataRow>(context.DataTypes, globalAdmin, "Person", "Virksomhed", "Sag", "Dokument", "Organisation", "Klassikfikation", "Ejendom", "GIS", "Andet");
+
+            AddOptions<Frequency, DataRowUsage>(context.Frequencies, globalAdmin, "Dagligt", "Ugentligt", "Månedligt", "Årligt", "Kvartal", "Halvårligt"); 
+
+            AddOptions<InterfaceType, ItInterface>(context.InterfaceTypes, globalAdmin, "Webservice", "API", "iFrame", "Link", "Link - dybt", "Andet");
             
-            AddOptions<ItProjectType, ItProject>(context.ProjectTypes, brian, "Fællesoffentlig", "Fælleskommunal");
+            AddOptions<Interface, ItInterface>(context.Interfaces, globalAdmin, "CSV", "WS SOAP", "WS REST", "MOX", "OIO REST", "LDAP", "User interface", "ODBC (SQL)", "Andet");
+
+            AddOptions<Method, ItInterface>(context.Methods, globalAdmin, "Batch", "Request-Response", "Store and forward", "Publish-subscribe", "App interface", "Andet");
+
+            AddOptions<SensitiveDataType, ItSystemUsage>(context.SensitiveDataTypes, globalAdmin, "Ja", "Nej");
             
-            AddOptions<ItSystemTypeOption, ItSystem>(context.ItSystemTypeOptions, brian, "Fagsystem", "Selvbetjening");
+            AddOptions<Tsa, ItInterface>(context.Tsas, globalAdmin, "Ja", "Nej");
 
-            AddOptions<BusinessType, ItSystem>(context.BusinessTypes, brian, "Forretningstype 1", "Forretningstype 2", "Forretningstype 3");
+            AddOptions<ContractType, ItContract>(context.ContractTypes, globalAdmin, "Hovedkontrakt", "Tillægskontrakt", "Snitflade", "Serviceaftale", "Databehandleraftale");
 
-            AddOptions<Interface, ItInterface>(context.Interfaces, brian, "Grænseflade 1", "Grænseflade 2", "Grænseflade 3");
+            AddOptions<ContractTemplate, ItContract>(context.ContractTemplates, globalAdmin, "K01", "K02", "K03", "Egen", "KOMBIT", "Leverandør", "OPI", "Anden");
 
-            AddOptions<Tsa, ItInterface>(context.Tsas, brian, "Ja", "Nej");
+            AddOptions<PurchaseForm, ItContract>(context.PurchaseForms, globalAdmin, "SKI", "SKI 02.18", "SKI 02.19", "Udbud", "EU udbud", "Direkte tildeling", "Annoncering");
 
-            AddOptions<InterfaceType, ItInterface>(context.InterfaceTypes, brian, "WS");
-
-            AddOptions<DataType, DataRow>(context.DataTypes, brian, "Datatype 1", "Datatype 2", "Datatype 3");
-
-            AddOptions<Method, ItInterface>(context.Methods, brian, "Batch", "Request-Response");
-
-            AddOptions<ContractType, ItContract>(context.ContractTypes, brian, "Hovedkontrakt", "Tillægskontrakt", "Snitflade");
-
-            AddOptions<ContractTemplate, ItContract>(context.ContractTemplates, brian, "K01", "K02", "K03");
-
-            AddOptions<PurchaseForm, ItContract>(context.PurchaseForms, brian, "SKI", "SKI 02.19", "Udbud");
-
-            AddOptions<ProcurementStrategy, ItContract>(context.ProcurementStrategies, brian, "Strategi 1", "Strategi 2", "Strategi 3");
-
-            AddOptions<AgreementElement, ItContract>(context.AgreementElements, brian, 
+            AddOptions<PaymentModel, ItContract>(context.PaymentModels, globalAdmin, "Licens", "icens - flatrate", "Licens - forbrug", "Licens - indbyggere", "Licens - pr. sag", "Gebyr", "Engangsydelse");
+            
+            AddOptions<AgreementElement, ItContract>(context.AgreementElements, globalAdmin, 
                 "Licens", "Udvikling", "Drift", "Vedligehold", "Support", 
                 "Serverlicenser", "Serverdrift", "Databaselicenser", "Backup", "Overvågning");
 
-            AddOptions<Frequency, DataRowUsage>(context.Frequencies, brian, "Dagligt", "Ugentligt", "Månedligt", "Årligt"); 
-            
-            AddOptions<ArchiveType, ItSystemUsage>(context.ArchiveTypes, brian, "Arkiveret", "Ikke arkiveret");
+            AddOptions<OptionExtend, ItContract>(context.OptionExtention, globalAdmin, "2 x 1 år", "1 x 1 år", "1 x ½ år");
 
-            AddOptions<SensitiveDataType, ItSystemUsage>(context.SensitiveDataTypes, brian, "Ja", "Nej");
+            AddOptions<PaymentFreqency, ItContract>(context.PaymentFreqencies, globalAdmin, "Månedligt", "Kvartalsvis", "Halvårligt", "Årligt");
 
-            AddOptions<GoalType, Goal>(context.GoalTypes, brian, "Måltype 1", "Måltype 2");
+            AddOptions<PriceRegulation, ItContract>(context.PriceRegulations, globalAdmin, "TSA", "KL pris og lønskøn", "Nettoprisindeks");
 
-            AddOptions<OptionExtend, ItContract>(context.OptionExtention, brian, "2 x 1 år");
+            AddOptions<ProcurementStrategy, ItContract>(context.ProcurementStrategies, globalAdmin, "Direkte tildeling", "Annoncering", "Udbud", "EU udbud", "Mini-udbud", "SKI - direkte tildeling", "SKI - mini-udbud", "Underhåndsbud");
 
-            AddOptions<TerminationDeadline, ItContract>(context.TerminationDeadlines, brian, "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
+            AddOptions<TerminationDeadline, ItContract>(context.TerminationDeadlines, globalAdmin, "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
 
-            AddOptions<PaymentFreqency, ItContract>(context.PaymentFreqencies, brian, "Frekvens A", "Frekvens B");
-
-            AddOptions<PaymentModel, ItContract>(context.PaymentModels, brian, "Model A", "Model B");
-
-            AddOptions<PriceRegulation, ItContract>(context.PriceRegulations, brian, "Pris regulering A", "Pris regulering B"); 
-
-            AddOptions<HandoverTrialType, HandoverTrial>(context.HandoverTrialTypes, brian, "Prøve 1", "Prøve 2"); 
+            AddOptions<HandoverTrialType, HandoverTrial>(context.HandoverTrialTypes, globalAdmin, "Funktionsprøve", "Driftovertagelsesprøve"); 
 
             context.SaveChanges();
 
@@ -106,8 +104,8 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 Name = "LocalAdmin",
                 IsActive = true,
-                ObjectOwner = brian,
-                LastChangedByUser = brian
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
             };
             context.AdminRoles.AddOrUpdate(x => x.Name, localAdmin);
             context.SaveChanges();
@@ -122,8 +120,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Name = "Chef",
                 Note = "Lederen af en organisationsenhed",
                 HasWriteAccess = true,
-                ObjectOwner = brian,
-                LastChangedByUser = brian
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
             };
 
             var resourcePerson = new OrganizationRole()
@@ -132,8 +130,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Name = "Ressourceperson",
                 Note = "...",
                 HasWriteAccess = true,
-                ObjectOwner = brian,
-                LastChangedByUser = brian
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
             };
 
             var employee = new OrganizationRole()
@@ -142,11 +140,51 @@ namespace Infrastructure.DataAccess.Migrations
                 Name = "Medarbejder",
                 Note = "...",
                 HasWriteAccess = false,
-                ObjectOwner = brian,
-                LastChangedByUser = brian
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
             };
 
-            context.OrganizationRoles.AddOrUpdate(role => role.Name, boss, resourcePerson, employee);
+            var digitalConsultant = new OrganizationRole()
+            {
+                IsActive = true,
+                Name = "Digitaliseringskonsulent",
+                Note = "...",
+                HasWriteAccess = true,
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
+            };
+
+            var itConsultant = new OrganizationRole()
+            {
+                IsActive = true,
+                Name = "IT konsulent",
+                Note = "...",
+                HasWriteAccess = true,
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
+            };
+
+            var leader = new OrganizationRole()
+            {
+                IsActive = true,
+                Name = "Leder",
+                Note = "...",
+                HasWriteAccess = true,
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
+            };
+
+            var director = new OrganizationRole()
+            {
+                IsActive = true,
+                Name = "Direktør",
+                Note = "...",
+                HasWriteAccess = false,
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
+            };
+
+            context.OrganizationRoles.AddOrUpdate(role => role.Name, boss, resourcePerson, employee, digitalConsultant, itConsultant, leader, director);
             context.SaveChanges();
 
             #endregion
@@ -156,31 +194,163 @@ namespace Infrastructure.DataAccess.Migrations
             context.ItProjectRoles.AddOrUpdate(r => r.Name,
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Projektejer",
-                    ObjectOwner = brian,
-                    LastChangedByUser = brian
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Projektleder",
-                    ObjectOwner = brian,
-                    LastChangedByUser = brian
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Delprojektleder",
-                    ObjectOwner = brian,
-                    LastChangedByUser = brian
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Projektdeltager",
-                    ObjectOwner = brian,
-                    LastChangedByUser = brian
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
+                },
+                new ItProjectRole()
+                {
+                    HasWriteAccess = true,
+                    IsActive = true,
+                    Name = "Teknisk projektleder",
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
+                },
+                new ItProjectRole()
+                {
+                    HasWriteAccess = true,
+                    IsActive = true,
+                    Name = "IT konsulnet",
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
+                },
+                new ItProjectRole()
+                {
+                    HasWriteAccess = true,
+                    IsActive = true,
+                    Name = "Implementeringskonsulent",
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
+                },
+                new ItProjectRole()
+                {
+                    HasWriteAccess = true,
+                    IsActive = true,
+                    Name = "Proceskonsulent",
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
+                },
+                new ItProjectRole()
+                {
+                    HasWriteAccess = true,
+                    IsActive = true,
+                    Name = "Juridisk konsulent",
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
+                },
+                new ItProjectRole()
+                {
+                    HasWriteAccess = true,
+                    IsActive = true,
+                    Name = "IT arkitekt",
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
+                },
+                new ItProjectRole()
+                {
+                    HasWriteAccess = true,
+                    IsActive = true,
+                    Name = "Testansvarlig",
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
+                },
+                new ItProjectRole()
+                {
+                    HasWriteAccess = true,
+                    IsActive = true,
+                    Name = "Support",
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
+                },
+                new ItProjectRole()
+                {
+                    HasWriteAccess = true,
+                    IsActive = true,
+                    Name = "Programleder",
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
+                },
+                new ItProjectRole()
+                {
+                    HasWriteAccess = true,
+                    IsActive = true,
+                    Name = "Styregruppeformand",
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
+                },
+                new ItProjectRole()
+                {
+                    HasWriteAccess = true,
+                    IsActive = true,
+                    Name = "Styregruppemedlem",
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
+                },
+                new ItProjectRole()
+                {
+                    HasWriteAccess = true,
+                    IsActive = true,
+                    Name = "Forretningsejer",
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
+                },
+                new ItProjectRole()
+                {
+                    HasWriteAccess = true,
+                    IsActive = true,
+                    Name = "Forretningsansvarlig",
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
+                },
+                new ItProjectRole()
+                {
+                    HasWriteAccess = true,
+                    IsActive = true,
+                    Name = "Gevinstejer",
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
+                },
+                new ItProjectRole()
+                {
+                    HasWriteAccess = true,
+                    IsActive = true,
+                    Name = "Gevinsansvarlig",
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
+                },
+                new ItProjectRole()
+                {
+                    HasWriteAccess = true,
+                    IsActive = true,
+                    Name = "Rådgiver",
+                    ObjectOwner = globalAdmin,
+                    LastChangedByUser = globalAdmin
                 });
             context.SaveChanges();
 
@@ -188,27 +358,97 @@ namespace Infrastructure.DataAccess.Migrations
             
             #region SYSTEM ROLES
 
-            var systemRole1 = new ItSystemRole()
+            var systemOwnerRole = new ItSystemRole()
             {
                 HasReadAccess = true,
                 HasWriteAccess = true,
                 IsActive = true,
-                Name = "Systemrolle 1",
-                ObjectOwner = brian,
-                LastChangedByUser = brian
+                Name = "Systemejer",
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
             };
 
-            var systemRole2 = new ItSystemRole()
+            var systemResponsibleRole = new ItSystemRole()
             {
                 HasReadAccess = true,
-                HasWriteAccess = false,
+                HasWriteAccess = true,
                 IsActive = true,
-                Name = "Systemrolle 2",
-                ObjectOwner = brian,
-                LastChangedByUser = brian
+                Name = "Systemansvarlig",
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
             };
 
-            context.ItSystemRoles.AddOrUpdate(x => x.Name, systemRole1, systemRole2);
+            var businessOwnerRole = new ItSystemRole()
+            {
+                HasReadAccess = true,
+                HasWriteAccess = true,
+                IsActive = true,
+                Name = "Forretningsejer",
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
+            };
+
+            var superuserResponsibleRole = new ItSystemRole()
+            {
+                HasReadAccess = true,
+                HasWriteAccess = true,
+                IsActive = true,
+                Name = "Superbrugeransvarlig",
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
+            };
+
+            var superuserRole = new ItSystemRole()
+            {
+                HasReadAccess = true,
+                HasWriteAccess = true,
+                IsActive = true,
+                Name = "Superbruger",
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
+            };
+
+            var securityResponsibleRole = new ItSystemRole()
+            {
+                HasReadAccess = true,
+                HasWriteAccess = true,
+                IsActive = true,
+                Name = "Sikkerhedsansvarlig",
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
+            };
+
+            var chanceManagerRole = new ItSystemRole()
+            {
+                HasReadAccess = true,
+                HasWriteAccess = true,
+                IsActive = true,
+                Name = "Changemanager",
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
+            };
+
+            var dataOwnerRole = new ItSystemRole()
+            {
+                HasReadAccess = true,
+                HasWriteAccess = true,
+                IsActive = true,
+                Name = "Dataejer",
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
+            };
+
+            var systemAdminRole = new ItSystemRole()
+            {
+                HasReadAccess = true,
+                HasWriteAccess = true,
+                IsActive = true,
+                Name = "Systemadminstrator",
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
+            };
+
+            context.ItSystemRoles.AddOrUpdate(x => x.Name, systemOwnerRole, systemResponsibleRole, businessOwnerRole, superuserResponsibleRole, superuserRole, securityResponsibleRole, chanceManagerRole, dataOwnerRole, systemAdminRole);
             context.SaveChanges();
 
             #endregion
@@ -218,24 +458,45 @@ namespace Infrastructure.DataAccess.Migrations
             context.ItContractRoles.AddOrUpdate(x => x.Name, new ItContractRole()
             {
                 HasWriteAccess = true,
-                Name = "Kontraktrolle A",
+                Name = "Kontraktejer",
                 IsActive = true,
-                ObjectOwner = brian,
-                LastChangedByUser = brian
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
             }, new ItContractRole()
             {
                 HasWriteAccess = true,
-                Name = "Kontraktrolle B",
+                Name = "Kontraktmanager",
                 IsActive = true,
-                ObjectOwner = brian,
-                LastChangedByUser = brian
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
             }, new ItContractRole()
             {
-                HasWriteAccess = false,
-                Name = "Kontraktrolle C",
+                HasWriteAccess = true,
+                Name = "Juridisk rådgiver",
                 IsActive = true,
-                ObjectOwner = brian,
-                LastChangedByUser = brian
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
+            }, new ItContractRole()
+            {
+                HasWriteAccess = true,
+                Name = "Konsulent",
+                IsActive = true,
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
+            }, new ItContractRole()
+            {
+                HasWriteAccess = true,
+                Name = "Fakturamodtager",
+                IsActive = true,
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
+            }, new ItContractRole()
+            {
+                HasWriteAccess = true,
+                Name = "Budgetansvarlig",
+                IsActive = true,
+                ObjectOwner = globalAdmin,
+                LastChangedByUser = globalAdmin
             });
             context.SaveChanges();
 
@@ -243,21 +504,32 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region ORGANIZATIONS
 
-            var commonOrganization = CreateOrganization("Fælles Kommune", OrganizationType.Municipality, brian);
+            var commonOrganization = CreateOrganization("Fælles Kommune", OrganizationType.Municipality, globalAdmin);
 
             context.Organizations.AddOrUpdate(x => x.Name, commonOrganization);
             context.SaveChanges();
 
-            SetUserCreatedOrganization(brian, commonOrganization);
-            SetUserCreatedOrganization(agent, commonOrganization);
+            commonOrganization = context.Organizations.Single(x => x.Name == "Fælles Kommune");
+
+            SetUserCreatedOrganization(globalAdmin, commonOrganization);
 
             #endregion
 
             #region TEXTS
 
             context.Texts.AddOrUpdate(x => x.Id,
-                                      new Text() { Value = "Om kitos blablabla", ObjectOwner = brian, LastChangedByUser = brian },
-                                      new Text() { Value = "Status blablabla", ObjectOwner = brian, LastChangedByUser = brian });
+                                      new Text() { Value = @"KITOS - Kommunernes IT OverbliksSystem er et IT System, som er udviklet i de 3 første kvartaler i 2014 af Roskilde, Sorø, Ringsted, Syddjurs og Ballerup kommune. 
+Et væsentligt formål med projektet er at skabe et ensartet grundlag for hvordan vi som kommuner kan øge vores modenhed og evne til fremadrettet at 1) skabe overblik over 2) dokumentere og 3) analysere på vores samlede IT portefølje m.v. I forlængelse heraf er det en løsning, som skal hjælpe os med at understøtte det vidensbehov, som vi mener at monopolbruddet kræver – herunder kvalificere vores evne til at udnytte rammearkitekturen. 
+KITOS er bygget op omkring flg. moduler: 
+1.	IT understøttelse af organisation
+2.	IT Projekter
+3.	IT Systemer
+4.	IT Kontrakter
+ Løsningen er ’overdraget’ til det digitale fællesskab OS2, som vil sørge for forvaltning af KITOS med hensyn til hosting, vedligeholdelse, videreudvikling, administration etc, så den også i praksis vil være mulig for andre kommuner at bruge.
+De første kommuner tager KITOS i brug i oktober 2014.
+Du kan læse mere om OS2KITOS på os2web.dk > Projekter > KITOS
+Kontakt: info@kitos.dk", ObjectOwner = globalAdmin, LastChangedByUser = globalAdmin },
+                                      new Text() { Value = "Der er p.t ingen driftsforstyrrelser", ObjectOwner = globalAdmin, LastChangedByUser = globalAdmin });
 
             #endregion
         }

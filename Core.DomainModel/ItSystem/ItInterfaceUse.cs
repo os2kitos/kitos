@@ -5,7 +5,7 @@ namespace Core.DomainModel.ItSystem
 {
     /// <summary>
     /// Represents what <see cref="ItInterface"/> 
-    /// an <see cref="ItSystem"/> can use (anvender).
+    /// an <see cref="ItSystem"/> can use (kan anvende / anvender).
     /// This is an M:M relation.
     /// </summary>
     public class ItInterfaceUse
