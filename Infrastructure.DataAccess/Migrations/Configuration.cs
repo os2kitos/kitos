@@ -194,6 +194,7 @@ namespace Infrastructure.DataAccess.Migrations
             context.ItProjectRoles.AddOrUpdate(r => r.Name,
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Projektejer",
                     ObjectOwner = globalAdmin,
@@ -201,6 +202,7 @@ namespace Infrastructure.DataAccess.Migrations
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Projektleder",
                     ObjectOwner = globalAdmin,
@@ -208,6 +210,7 @@ namespace Infrastructure.DataAccess.Migrations
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Delprojektleder",
                     ObjectOwner = globalAdmin,
@@ -215,6 +218,7 @@ namespace Infrastructure.DataAccess.Migrations
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Projektdeltager",
                     ObjectOwner = globalAdmin,
@@ -222,6 +226,7 @@ namespace Infrastructure.DataAccess.Migrations
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Teknisk projektleder",
                     ObjectOwner = globalAdmin,
@@ -229,6 +234,7 @@ namespace Infrastructure.DataAccess.Migrations
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "IT konsulnet",
                     ObjectOwner = globalAdmin,
@@ -236,6 +242,7 @@ namespace Infrastructure.DataAccess.Migrations
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Implementeringskonsulent",
                     ObjectOwner = globalAdmin,
@@ -243,6 +250,7 @@ namespace Infrastructure.DataAccess.Migrations
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Proceskonsulent",
                     ObjectOwner = globalAdmin,
@@ -250,6 +258,7 @@ namespace Infrastructure.DataAccess.Migrations
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Juridisk konsulent",
                     ObjectOwner = globalAdmin,
@@ -257,6 +266,7 @@ namespace Infrastructure.DataAccess.Migrations
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "IT arkitekt",
                     ObjectOwner = globalAdmin,
@@ -264,6 +274,7 @@ namespace Infrastructure.DataAccess.Migrations
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Testansvarlig",
                     ObjectOwner = globalAdmin,
@@ -271,6 +282,7 @@ namespace Infrastructure.DataAccess.Migrations
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Support",
                     ObjectOwner = globalAdmin,
@@ -278,6 +290,7 @@ namespace Infrastructure.DataAccess.Migrations
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Programleder",
                     ObjectOwner = globalAdmin,
@@ -285,6 +298,7 @@ namespace Infrastructure.DataAccess.Migrations
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Styregruppeformand",
                     ObjectOwner = globalAdmin,
@@ -292,6 +306,7 @@ namespace Infrastructure.DataAccess.Migrations
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Styregruppemedlem",
                     ObjectOwner = globalAdmin,
@@ -299,6 +314,7 @@ namespace Infrastructure.DataAccess.Migrations
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Forretningsejer",
                     ObjectOwner = globalAdmin,
@@ -306,6 +322,7 @@ namespace Infrastructure.DataAccess.Migrations
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Forretningsansvarlig",
                     ObjectOwner = globalAdmin,
@@ -313,6 +330,7 @@ namespace Infrastructure.DataAccess.Migrations
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Gevinstejer",
                     ObjectOwner = globalAdmin,
@@ -320,6 +338,7 @@ namespace Infrastructure.DataAccess.Migrations
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Gevinsansvarlig",
                     ObjectOwner = globalAdmin,
@@ -327,6 +346,7 @@ namespace Infrastructure.DataAccess.Migrations
                 },
                 new ItProjectRole()
                 {
+                    HasWriteAccess = true,
                     IsActive = true,
                     Name = "Rådgiver",
                     ObjectOwner = globalAdmin,
