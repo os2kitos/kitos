@@ -115,13 +115,13 @@ namespace UI.MVC4.Controllers.API
         {
             return NotAllowed();
         }
-        
+
         /// <summary>
         /// Returns every task that a given OrgUnit can use. This depends on the task usages of the parent OrgUnit.
         /// For every task returned, possibly a taskUsage is returned too, if the OrgUnit is currently using that task.
         /// </summary>
         /// <param name="id">ID of the OrgUnit</param>
-        /// <param name="taskGroup">Optional id of a taskgroup</param>
+        /// <param name="taskGroup">Optional id to filter by task group</param>
         /// <param name="tasks">Routing qualifier</param>
         /// <param name="pagingModel">Paging options</param>
         /// <returns>List of (task, taskUsage), where the taskUsage might be null</returns>
@@ -132,29 +132,40 @@ namespace UI.MVC4.Controllers.API
                 var orgUnit = Repository.GetByKey(id);
 
                 IQueryable<TaskRef> taskQuery;
-                //if the org unit has a parent, only select those tasks that is in use by the parent org unit
+                // if the org unit has a parent, only select those tasks that is in use by the parent org unit
                 if (orgUnit.ParentId.HasValue)
                 {
-                    //this is not so good performance wise
+                    // this is not so good performance wise
                     var orgUnitQueryable = Repository.AsQueryable().Where(unit => unit.Id == id);
                     taskQuery = orgUnitQueryable.SelectMany(u => u.Parent.TaskUsages.Select(usage => usage.TaskRef).Where(x => x.AccessModifier == AccessModifier.Public)); // TODO add support for normal
 
-                    //it would have been better with:
-                    //pagingModel.Where(taskRef => taskRef.Usages.Any(usage => usage.OrgUnitId == orgUnit.ParentId));
-                    //but we cant because of a bug in the mysql connector: http://bugs.mysql.com/bug.php?id=70722
+                    // it would have been better with:
+                    // pagingModel.Where(taskRef => taskRef.Usages.Any(usage => usage.OrgUnitId == orgUnit.ParentId));
+                    // but we cant because of a bug in the mysql connector: http://bugs.mysql.com/bug.php?id=70722
                 }
                 else
                 {
                     taskQuery = _taskRepository.AsQueryable().Where(x => x.AccessModifier == AccessModifier.Public); // TODO add support for normal
                 }
 
-                //if a task group is given, only find the tasks in that group
-                if (taskGroup.HasValue) pagingModel.Where(taskRef => taskRef.ParentId.Value == taskGroup.Value && taskRef.AccessModifier == AccessModifier.Public); // TODO add support for normal
-                else pagingModel.Where(taskRef => taskRef.Children.Count == 0);
-
+                // if a task group is given, only find the tasks in that group and sub groups
+                if (taskGroup.HasValue)
+                {
+                    pagingModel.Where(
+                        taskRef =>
+                            (taskRef.ParentId.Value == taskGroup.Value ||
+                             taskRef.Parent.ParentId.Value == taskGroup.Value) &&
+                             !taskRef.Children.Any() &&
+                            taskRef.AccessModifier == AccessModifier.Public); // TODO add support for normal
+                }
+                else
+                {
+                    // else get all task leaves
+                    pagingModel.Where(taskRef => !taskRef.Children.Any());
+                }
                 var theTasks = Page(taskQuery, pagingModel).ToList();
 
-                //convert tasks to DTO containing both the task and possibly also a taskUsage, if that exists
+                // convert tasks to DTO containing both the task and possibly also a taskUsage, if that exists
                 var dtos = (from taskRef in theTasks
                            let taskUsage = taskRef.Usages.FirstOrDefault(usage => usage.OrgUnitId == id)
                            select new TaskRefUsageDTO()

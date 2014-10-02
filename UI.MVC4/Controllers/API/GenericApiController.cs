@@ -80,10 +80,10 @@ namespace UI.MVC4.Controllers.API
 
         protected virtual TModel PostQuery(TModel item)
         {
-            Repository.Insert(item);
+            var insertedItem = Repository.Insert(item);
             Repository.Save();
 
-            return item; // TODO this doesn't need to return
+            return insertedItem;
         }
 
         // POST api/T
@@ -96,9 +96,9 @@ namespace UI.MVC4.Controllers.API
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
 
-                PostQuery(item);
+                var savedItem = PostQuery(item);
 
-                return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
+                return Created(Map(savedItem), new Uri(Request.RequestUri + "/" + savedItem.Id));
             }
             catch (ConflictException e)
             {

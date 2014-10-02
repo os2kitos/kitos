@@ -464,7 +464,7 @@
             // default kle sort order
             $scope.pagination.orderBy = 'taskKey';
 
-            //change between show all tasks and only show active tasks
+            // change between show all tasks and only show active tasks
             $scope.changeTaskView = function() {
                 $scope.showAllTasks = !$scope.showAllTasks;
                 $scope.pagination.orderBy = $scope.showAllTasks ? 'taskKey' : 'taskRef.taskKey';
@@ -505,7 +505,7 @@
                 
                 if (showMessage) var msg = notify.addInfoMessage("Opretter tilknytning...", false);
                 
-                url = 'api/taskUsage/';
+                var url = 'api/taskUsage/';
 
                 var payload = {
                     taskRefId: refUsage.taskRef.id,

@@ -1,65 +1,62 @@
-﻿(function (ng, app) {
-    
-    app.factory('taskService', ['$http', '$q', '$rootScope', 'userService', function ($http, $q, $rootScope, userService) {
+﻿(function(ng, app) {
+    app.factory('taskService', [
+        '$http', '$q', '$rootScope', 'userService', function($http, $q, $rootScope, userService) {
+            var baseUrl = 'api/taskRef/';
 
-        var baseUrl = 'api/taskRef/';
+            function getRoots() {
+                var deferred = $q.defer();
 
+                userService.getUser().then(function(user) {
 
-        function getRoots() {
-            var deferred = $q.defer();
+                    var url = baseUrl + '?roots&orgId=' + user.currentOrganizationId + "&take=200";
 
-            userService.getUser().then(function(user) {
+                    $http.get(url).success(function(result) {
 
-                var url = baseUrl + '?roots&orgId=' + user.currentOrganizationId + "&take=200";
+                        deferred.resolve(result.response);
 
-                $http.get(url).success(function(result) {
-
-                    deferred.resolve(result.response);
-
-                }).error(reject("Couldn't load tasks"));
+                    }).error(reject("Couldn't load tasks"));
 
 
-            }, reject("Couldn't acquire user!"));
-            
-            function reject(reason) {
-                return function() {
-                    deferred.reject(reason);
-                };
+                }, reject("Couldn't acquire user!"));
+
+                function reject(reason) {
+                    return function() {
+                        deferred.reject(reason);
+                    };
+                }
+
+                return deferred.promise;
             }
 
-            return deferred.promise;
-        }
+            function getChildren(id) {
+                var deferred = $q.defer();
 
-        function getChildren(id) {
-            var deferred = $q.defer();
+                userService.getUser().then(function(user) {
 
-            userService.getUser().then(function (user) {
-                
-                var url = baseUrl + id + '?children&orgId=' + user.currentOrganizationId;
-                
-                $http.get(url).success(function (result) {
+                    var url = baseUrl + id + '?children&orgId=' + user.currentOrganizationId;
 
-                    deferred.resolve(result.response);
+                    $http.get(url).success(function(result) {
 
-                }).error(reject("Couldn't load tasks"));
+                        deferred.resolve(result.response);
+
+                    }).error(reject("Couldn't load tasks"));
 
 
-            }, reject("Couldn't acquire user!"));
+                }, reject("Couldn't acquire user!"));
 
-            function reject(reason) {
-                return function () {
-                    deferred.reject(reason);
-                };
+                function reject(reason) {
+                    return function() {
+                        deferred.reject(reason);
+                    };
+                }
+
+                return deferred.promise;
             }
 
-            return deferred.promise;
+            return {
+                getRoots: getRoots,
+                getChildren: getChildren
+            };
         }
-        return {
-            getRoots: getRoots,
-            getChildren: getChildren
-        };
-
-    }]);
-
-
+    ]);
 })(angular, app);

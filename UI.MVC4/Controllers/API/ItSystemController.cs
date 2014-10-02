@@ -267,9 +267,9 @@ namespace UI.MVC4.Controllers.API
                     item.TaskRefs.Add(task);
                 }
                 
-                PostQuery(item);
+                var savedItem = PostQuery(item);
 
-                return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
+                return Created(Map(savedItem), new Uri(Request.RequestUri + "/" + savedItem.Id));
             }
             catch (Exception e)
             {
@@ -368,9 +368,14 @@ namespace UI.MVC4.Controllers.API
                     taskQuery = _taskRepository.AsQueryable();
                 }
 
-                //if a task group is given, only find the tasks in that group
-                if (taskGroup.HasValue) pagingModel.Where(taskRef => taskRef.ParentId.Value == taskGroup.Value);
-                else pagingModel.Where(taskRef => taskRef.Children.Count == 0);
+                // if a task group is given, only find the tasks in that group
+                if (taskGroup.HasValue)
+                    pagingModel.Where(taskRef => (taskRef.ParentId.Value == taskGroup.Value ||
+                                                  taskRef.Parent.ParentId.Value == taskGroup.Value) &&
+                                                 !taskRef.Children.Any() &&
+                                                 taskRef.AccessModifier == AccessModifier.Public); // TODO add support for normal
+                else 
+                    pagingModel.Where(taskRef => taskRef.Children.Count == 0);
 
                 var theTasks = Page(taskQuery, pagingModel).ToList();
 

@@ -3,7 +3,7 @@ namespace Infrastructure.DataAccess.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class Start : DbMigration
+    public partial class InitialCreate : DbMigration
     {
         public override void Up()
         {
@@ -62,9 +62,9 @@ namespace Infrastructure.DataAccess.Migrations
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
-                        Name = c.String(unicode: false),
+                        Name = c.String(maxLength: 100, storeType: "nvarchar"),
                         Type = c.Int(),
-                        Cvr = c.String(unicode: false),
+                        Cvr = c.String(maxLength: 10, storeType: "nvarchar"),
                         AccessModifier = c.Int(nullable: false),
                         ObjectOwnerId = c.Int(nullable: false),
                         LastChanged = c.DateTime(nullable: false, precision: 0),
@@ -73,6 +73,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.User", t => t.LastChangedByUserId, cascadeDelete: true)
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId, cascadeDelete: true)
+                .Index(t => t.Name)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
             
@@ -85,7 +86,7 @@ namespace Infrastructure.DataAccess.Migrations
                         AppTypeOptionId = c.Int(),
                         ParentId = c.Int(),
                         BusinessTypeId = c.Int(),
-                        Name = c.String(nullable: false, maxLength: 50, storeType: "nvarchar"),
+                        Name = c.String(nullable: false, maxLength: 100, storeType: "nvarchar"),
                         Uuid = c.Guid(nullable: false),
                         Description = c.String(unicode: false),
                         Url = c.String(unicode: false),
@@ -258,7 +259,7 @@ namespace Infrastructure.DataAccess.Migrations
                         InterfaceTypeId = c.Int(),
                         TsaId = c.Int(),
                         MethodId = c.Int(),
-                        Name = c.String(nullable: false, maxLength: 50, storeType: "nvarchar"),
+                        Name = c.String(nullable: false, maxLength: 100, storeType: "nvarchar"),
                         Uuid = c.Guid(nullable: false),
                         Description = c.String(unicode: false),
                         Url = c.String(unicode: false),
@@ -2273,6 +2274,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ItSystem", new[] { "AppTypeOptionId" });
             DropIndex("dbo.Organization", new[] { "LastChangedByUserId" });
             DropIndex("dbo.Organization", new[] { "ObjectOwnerId" });
+            DropIndex("dbo.Organization", new[] { "Name" });
             DropIndex("dbo.User", new[] { "LastChangedByUserId" });
             DropIndex("dbo.User", new[] { "ObjectOwnerId" });
             DropIndex("dbo.User", new[] { "DefaultOrganizationUnitId" });

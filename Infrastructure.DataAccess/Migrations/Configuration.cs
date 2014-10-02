@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using Core.ApplicationServices;
@@ -13,7 +12,7 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<Infrastructure.DataAccess.KitosContext>
+    internal sealed class Configuration : DbMigrationsConfiguration<KitosContext>
     {
 
         public Configuration()
@@ -29,7 +28,7 @@ namespace Infrastructure.DataAccess.Migrations
         /// Seeds the specified context.
         /// </summary>
         /// <param name="context">The context.</param>
-        protected override void Seed(Infrastructure.DataAccess.KitosContext context)
+        protected override void Seed(KitosContext context)
         {
             #region USERS
 
@@ -43,6 +42,9 @@ namespace Infrastructure.DataAccess.Migrations
 
             context.Users.AddOrUpdate(x => x.Email, brian, agent);
             context.SaveChanges();
+
+            brian = context.Users.Single(x => x.Email == "briana2604@hotmail.com");
+            agent = context.Users.Single(x => x.Email == "erik.helweg@gmail.com");
             
             #endregion
 
@@ -248,6 +250,8 @@ namespace Infrastructure.DataAccess.Migrations
             context.Organizations.AddOrUpdate(x => x.Name, commonOrganization);
             context.SaveChanges();
 
+            commonOrganization = context.Organizations.Single(x => x.Name == "Fælles Kommune");
+
             SetUserCreatedOrganization(brian, commonOrganization);
             SetUserCreatedOrganization(agent, commonOrganization);
 
@@ -258,6 +262,13 @@ namespace Infrastructure.DataAccess.Migrations
             context.Texts.AddOrUpdate(x => x.Id,
                                       new Text() { Value = "Om kitos blablabla", ObjectOwner = brian, LastChangedByUser = brian },
                                       new Text() { Value = "Status blablabla", ObjectOwner = brian, LastChangedByUser = brian });
+
+            #endregion
+
+            #region KLE
+
+            var kle = GenerateAllTasks(agent, commonOrganization.GetRoot());
+            context.TaskRefs.AddRange(kle);
 
             #endregion
         }

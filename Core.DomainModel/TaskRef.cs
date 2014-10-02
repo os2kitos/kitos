@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
 {
