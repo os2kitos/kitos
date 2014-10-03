@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
@@ -21,11 +22,13 @@ namespace UI.MVC4.Controllers.API
     public class TaskUsageController : GenericHierarchyApiController<TaskUsage, TaskUsageDTO>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
+        private readonly IGenericRepository<TaskRef> _taskRepository;
 
-        public TaskUsageController(IGenericRepository<TaskUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository) 
+        public TaskUsageController(IGenericRepository<TaskUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository) 
             : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
+            _taskRepository = taskRepository;
         }
 
         public HttpResponseMessage Get(int orgUnitId, [FromUri] PagingModel<TaskUsage> pagingModel)
@@ -55,6 +58,57 @@ namespace UI.MVC4.Controllers.API
                 }
                 
                 return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage PostTaskGroup(int orgUnitId, int? taskId)
+        {
+            try
+            {
+                var orgUnit = _orgUnitRepository.GetByKey(orgUnitId);
+                if (orgUnit == null)
+                    return NotFound();
+
+                List<TaskRef> tasks;
+                if (taskId.HasValue)
+                {
+                    // get child leaves of taskId that havn't got a usage in the org unit
+                    tasks = _taskRepository.Get(
+                        x =>
+                            (x.ParentId == taskId || x.Parent.ParentId == taskId) && !x.Children.Any() &&
+                            x.AccessModifier == AccessModifier.Public &&
+                            x.Usages.All(y => y.OrgUnitId != orgUnitId)).ToList();
+                }
+                else
+                {
+                    // no taskId was specified so get everything
+                    tasks = _taskRepository.Get(
+                        x =>
+                            !x.Children.Any() &&
+                            x.AccessModifier == AccessModifier.Public &&
+                            x.Usages.All(y => y.OrgUnitId != orgUnitId)).ToList();
+                }
+                
+                if (!tasks.Any())
+                    return NotFound();
+
+                foreach (var task in tasks)
+                {
+                    Repository.Insert(new TaskUsage()
+                    {
+                        OrgUnitId = orgUnitId,
+                        TaskRefId = task.Id,
+                        ObjectOwner = KitosUser,
+                        LastChanged = DateTime.Now,
+                        LastChangedByUser = KitosUser
+                    });
+                }
+                Repository.Save();
+                return Ok();
             }
             catch (Exception e)
             {

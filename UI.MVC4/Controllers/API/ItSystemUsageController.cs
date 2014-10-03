@@ -295,7 +295,7 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage PostTasksUsedByThisSystem(int id, [FromUri] int taskId)
+        public HttpResponseMessage PostTasksUsedByThisSystem(int id, [FromUri] int? taskId)
         {
             try
             {
@@ -303,17 +303,37 @@ namespace UI.MVC4.Controllers.API
                 if (usage == null) return NotFound();
                 if (!HasWriteAccess(usage)) return Unauthorized();
 
-                var task = _taskRepository.GetByKey(taskId);
-                if (task == null) return NotFound();
+                List<TaskRef> tasks;
+                if (taskId.HasValue)
+                {
+                    // get child leaves of taskId that havn't got a usage in the system
+                    tasks = _taskRepository.Get(
+                        x =>
+                            (x.Id == taskId || x.ParentId == taskId || x.Parent.ParentId == taskId) && !x.Children.Any() &&
+                            x.AccessModifier == AccessModifier.Public &&
+                            x.ItSystemUsages.All(y => y.Id != id)).ToList();
+                }
+                else
+                {
+                    // no taskId was specified so get everything
+                    tasks = _taskRepository.Get(
+                        x =>
+                            !x.Children.Any() &&
+                            x.AccessModifier == AccessModifier.Public &&
+                            x.ItSystemUsages.All(y => y.Id != id)).ToList();
+                }
 
-                usage.TaskRefs.Add(task);
+                if (!tasks.Any())
+                    return NotFound();
 
+                foreach (var task in tasks)
+                {
+                    usage.TaskRefs.Add(task);
+                }
                 usage.LastChanged = DateTime.Now;
                 usage.LastChangedByUser = KitosUser;
-
                 Repository.Save();
-
-                return Created(Map<TaskRef, TaskRefDTO>(task));
+                return Ok();
             }
             catch (Exception e)
             {
@@ -380,8 +400,13 @@ namespace UI.MVC4.Controllers.API
                 }
 
                 //if a task group is given, only find the tasks in that group
-                if (taskGroup.HasValue) pagingModel.Where(taskRef => taskRef.ParentId.Value == taskGroup.Value);
-                else pagingModel.Where(taskRef => taskRef.Children.Count == 0);
+                if (taskGroup.HasValue)
+                    pagingModel.Where(taskRef => (taskRef.ParentId.Value == taskGroup.Value ||
+                                                  taskRef.Parent.ParentId.Value == taskGroup.Value) &&
+                                                 !taskRef.Children.Any() &&
+                                                 taskRef.AccessModifier == AccessModifier.Public); // TODO add support for normal
+                else 
+                    pagingModel.Where(taskRef => taskRef.Children.Count == 0);
 
                 var theTasks = Page(taskQuery, pagingModel).ToList();
 

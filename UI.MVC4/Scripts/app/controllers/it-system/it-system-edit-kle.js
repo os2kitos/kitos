@@ -1,20 +1,20 @@
-﻿(function (ng, app) {
-
-
-    app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
-
-        $stateProvider.state('it-system.edit.kle', {
-            url: '/kle',
-            templateUrl: 'partials/it-system/tab-edit-kle.html',
-            controller: 'system.SystemKleCtrl',
-            resolve: {
-            }
-        });
-    }]);
+﻿(function(ng, app) {
+    app.config([
+        '$stateProvider', function($stateProvider) {
+            $stateProvider.state('it-system.edit.kle', {
+                url: '/kle',
+                templateUrl: 'partials/it-system/tab-edit-kle.html',
+                controller: 'system.SystemKleCtrl',
+                resolve: {
+            
+                }
+            });
+        }
+    ]);
 
     app.controller('system.SystemKleCtrl', [
-        '$scope', '$http', 'notify', 'itSystem',
-        function($scope, $http, notify, itSystem) {
+        '$scope', '$http', '$state', 'notify', 'itSystem',
+        function($scope, $http, $state, notify, itSystem) {
             var systemId = itSystem.id;
             var baseUrl = 'api/itSystem/' + systemId;
 
@@ -31,7 +31,7 @@
             });
             $scope.$watchCollection('pagination', loadTasks);
 
-            //change between show all tasks and only show active tasks
+            // change between show all tasks and only show active tasks
             $scope.changeTaskView = function() {
                 $scope.showAllTasks = !$scope.showAllTasks;
                 $scope.pagination.skip = 0;
@@ -39,13 +39,9 @@
             };
 
             function loadTasks() {
-
                 var url = baseUrl + "?tasks";
-
                 url += '&onlySelected=' + !$scope.showAllTasks;
-
                 url += '&taskGroup=' + $scope.selectedTaskGroup;
-
                 url += '&skip=' + $scope.pagination.skip + '&take=' + $scope.pagination.take;
 
                 if ($scope.pagination.orderBy) {
@@ -61,7 +57,6 @@
                 }).error(function() {
                     notify.addErrorMessage("Kunne ikke hente opgaver!");
                 });
-
             }
 
             function add(task) {
@@ -109,6 +104,22 @@
                     }
                 });
             };
+
+            $scope.selectTaskGroup = function () {
+                var url = baseUrl + '?taskId=' + $scope.selectedTaskGroup;
+
+                var msg = notify.addInfoMessage("Opretter tilknytning...", false);
+                $http.post(url).success(function () {
+                    msg.toSuccessMessage("Tilknytningen er oprettet");
+                    reload();
+                }).error(function () {
+                    msg.toErrorMessage("Fejl! Kunne ikke oprette tilknytningen!");
+                });
+            };
+
+            function reload() {
+                $state.go('.', null, { reload: true });
+            }
         }
     ]);
 })(angular, app);

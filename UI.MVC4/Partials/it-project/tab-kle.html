@@ -42,6 +42,9 @@
                 <td colspan="3" class="text-center">
                     <span data-pagination-buttons="pagination"></span>
                     <span>
+                        <button class="btn btn-success btn-sm" data-confirmed-click="selectTaskGroup()" data-confirm-click="Er du sikker?" data-ng-if="hasWriteAccess">
+                            Vælg alle sider
+                        </button>
                         <button class="btn btn-success btn-sm" data-ng-click="selectAllTasks()" data-ng-if="hasWriteAccess">
                             Vælg alle
                         </button>
