@@ -57,16 +57,16 @@ namespace UI.MVC4.Controllers.API
         {
             if (newParentId == null) return;
             
-            //the parent-to-be of item
+            // the parent-to-be of item
             var parent = Repository.GetByKey(newParentId);
 
             do
             {
-                //did we find a loop?
+                // did we find a loop?
                 if (parent.Id == item.Id) 
                     throw new Exception("Self reference detected");
 
-                //otherwise, check next parent
+                // otherwise, check next parent
                 parent = parent.Parent;
             } while (parent != null);
         }

@@ -425,26 +425,45 @@ namespace UI.MVC4.Controllers.API
             }
         }
         
-        public HttpResponseMessage PostTaskToProject(int id, [FromUri] int taskId)
+        public HttpResponseMessage PostTaskToProject(int id, [FromUri] int? taskId)
         {
             try
             {
-                var project = Repository.GetByKey(id); 
+                var project = Repository.GetByKey(id);
                 if (project == null) return NotFound();
-
                 if (!HasWriteAccess(project)) return Unauthorized();
 
-                var task = _taskRepository.GetByKey(taskId);
-                if (task == null) return NotFound();
-                
-                project.TaskRefs.Add(task);
+                List<TaskRef> tasks;
+                if (taskId.HasValue)
+                {
+                    // get child leaves of taskId that havn't got a usage in the system
+                    tasks = _taskRepository.Get(
+                        x =>
+                            (x.Id == taskId || x.ParentId == taskId || x.Parent.ParentId == taskId) && !x.Children.Any() &&
+                            x.AccessModifier == AccessModifier.Public &&
+                            x.ItProjects.All(y => y.Id != id)).ToList();
+                }
+                else
+                {
+                    // no taskId was specified so get everything
+                    tasks = _taskRepository.Get(
+                        x =>
+                            !x.Children.Any() &&
+                            x.AccessModifier == AccessModifier.Public &&
+                            x.ItProjects.All(y => y.Id != id)).ToList();
+                }
 
+                if (!tasks.Any())
+                    return NotFound();
+
+                foreach (var task in tasks)
+                {
+                    project.TaskRefs.Add(task);
+                }
                 project.LastChanged = DateTime.Now;
                 project.LastChangedByUser = KitosUser;
-
                 Repository.Save();
-
-                return Created(Map<TaskRef, TaskRefDTO>(task));
+                return Ok();
             }
             catch (Exception e)
             {
@@ -612,7 +631,7 @@ namespace UI.MVC4.Controllers.API
             {
                 var projects = _itProjectService.GetAll(orgId, includePublic: false);
 
-                //TODO: if list is empty, return empty list, not NotFound()
+                // TODO: if list is empty, return empty list, not NotFound()
                 if (projects == null) return NotFound();
 
                 return Ok(Map(projects));

@@ -291,7 +291,7 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage PostTasksUsedByThisSystem(int id, [FromUri] int taskId)
+        public HttpResponseMessage PostTasksUsedByThisSystem(int id, [FromUri] int? taskId)
         {
             try
             {
@@ -299,17 +299,37 @@ namespace UI.MVC4.Controllers.API
                 if (system == null) return NotFound();
                 if (!HasWriteAccess(system)) return Unauthorized();
 
-                var task = _taskRepository.GetByKey(taskId);
-                if (task == null) return NotFound();
+                List<TaskRef> tasks;
+                if (taskId.HasValue)
+                {
+                    // get child leaves of taskId that havn't got a usage in the system
+                    tasks = _taskRepository.Get(
+                        x =>
+                            (x.Id == taskId || x.ParentId == taskId || x.Parent.ParentId == taskId) && !x.Children.Any() &&
+                            x.AccessModifier == AccessModifier.Public && 
+                            x.ItSystems.All(y => y.Id != id)).ToList();
+                }
+                else
+                {
+                    // no taskId was specified so get everything
+                    tasks = _taskRepository.Get(
+                        x =>
+                            !x.Children.Any() &&
+                            x.AccessModifier == AccessModifier.Public &&
+                            x.ItSystems.All(y => y.Id != id)).ToList();
+                }
 
-                system.TaskRefs.Add(task);
+                if (!tasks.Any())
+                    return NotFound();
 
+                foreach (var task in tasks)
+                {
+                    system.TaskRefs.Add(task);
+                }
                 system.LastChanged = DateTime.Now;
                 system.LastChangedByUser = KitosUser;
-
                 Repository.Save();
-
-                return Created(Map<TaskRef, TaskRefDTO>(task));
+                return Ok();
             }
             catch (Exception e)
             {

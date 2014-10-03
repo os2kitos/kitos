@@ -13,7 +13,7 @@
     ]);
 
     app.controller('system.EditKle', [
-        '$scope', '$http', '$stateParams', 'notify', function($scope, $http, $stateParams, notify) {
+        '$scope', '$http', '$state', '$stateParams', 'notify', function($scope, $http, $state, $stateParams, notify) {
             var usageId = $stateParams.id;
             var baseUrl = 'api/itSystemUsage/' + usageId;
 
@@ -109,6 +109,22 @@
                     }
                 });
             };
+
+            $scope.selectTaskGroup = function () {
+                var url = baseUrl + '?taskId=' + $scope.selectedTaskGroup;
+
+                var msg = notify.addInfoMessage("Opretter tilknytning...", false);
+                $http.post(url).success(function () {
+                    msg.toSuccessMessage("Tilknytningen er oprettet");
+                    reload();
+                }).error(function () {
+                    msg.toErrorMessage("Fejl! Kunne ikke oprette tilknytningen!");
+                });
+            };
+
+            function reload() {
+                $state.go('.', null, { reload: true });
+            }
         }
     ]);
 })(angular, app);
