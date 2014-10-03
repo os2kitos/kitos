@@ -10,8 +10,8 @@ namespace Core.ApplicationServices
 {
     public class UserService : IUserService
     {
-        //TODO: where do these go?
-        private const int ResetRequestTTL = 12;
+        // TODO load from config
+        private const int ResetRequestTtl = 100;
 
         private readonly IGenericRepository<User> _userRepository;
         private readonly IGenericRepository<Organization> _orgRepository;
@@ -30,7 +30,7 @@ namespace Core.ApplicationServices
 
         public User AddUser(User user)
         {
-            //hash his salt and default password
+            // hash his salt and default password
             user.Salt = _cryptoService.Encrypt(DateTime.Now + " spices");
 #if DEBUG
             user.Password = _cryptoService.Encrypt("arne123" + user.Salt); //TODO: Don't use default password
@@ -53,7 +53,7 @@ namespace Core.ApplicationServices
             var content = "<h2>Kære " + user.Name + "</h2>" +
                           "<p>Du er blevet oprettet, som bruger i KITOS (Kommunernes IT Overblikssystem) under organisationen " + org.Name + ".</p>" +
                           "<p>Du bedes klikke <a href='" + resetLink + "'>her</a>, hvor du første gang bliver bedt om at indtaste et nyt password for din KITOS profil.</p>" +
-                          "<p>Linket udløber om " + ResetRequestTTL + " timer.</p>" +
+                          "<p>Linket udløber om " + ResetRequestTtl + " timer.</p>" +
                           "<hr>" +
                           "<p>Bemærk: Hvis du ved din oprettelse er sket i testmiljøet, så skal du i stedet klikke her: <a href='" + resetLinkTestEvo + "'>KITOS Test</a></p>";
 
@@ -77,7 +77,7 @@ namespace Core.ApplicationServices
                 mailContent = "<p>Du har bedt om at få nulstillet dit password.</p>" +
                               "<p><a href='" + resetLink +
                               "'>Klik her for at nulstille passwordet for din KITOS profil</a>.</p>" +
-                              "<p>Linket udløber om " + ResetRequestTTL + " timer.</p>" +
+                              "<p>Linket udløber om " + ResetRequestTtl + " timer.</p>" +
                               "<hr>" +
                               "<p>Bemærk: Hvis du ved din oprettelse er sket i testmiljøet, så skal du i stedet klikke her: <a href='" +
                               resetLinkTestEvo + "'>KITOS Test</a></p>";
@@ -118,9 +118,9 @@ namespace Core.ApplicationServices
             if (passwordReset == null) return null;
 
             var timespan = DateTime.Now - passwordReset.Time;
-            if (timespan.TotalHours > ResetRequestTTL)
+            if (timespan.TotalHours > ResetRequestTtl)
             {
-                //the reset request is too old, delete it
+                // the reset request is too old, delete it
                 _passwordResetRequestRepository.DeleteByKey(passwordReset.Id);
                 _passwordResetRequestRepository.Save();
                 return null;
