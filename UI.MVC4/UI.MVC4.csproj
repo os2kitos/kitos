@@ -601,6 +601,7 @@
     <Content Include="Scripts\app\controllers\it-project\it-project-stakeholders.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-overview.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-status-goal.js" />
+    <Content Include="Scripts\app\controllers\it-project\it-project-status-goal-modal.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-status-modal.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-status-project.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-catalog.js" />

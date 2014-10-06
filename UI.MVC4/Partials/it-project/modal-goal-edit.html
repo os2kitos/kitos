@@ -1,79 +1,73 @@
 ﻿<div class="modal-header">
     Mål: {{ goal.name }}
 </div>
-<div class="modal-body">
-    <form name="modal.form" novalidate="novalidate" class="form-horizontal">
+<form name="goalForm" novalidate="novalidate" class="form-horizontal" data-ng-submit="save()">
+    <div class="modal-body">
         <div class="form-group">
             <!-- Name -->
             <label for="name" class="col-md-2 control-label small">
                 Målnavn:
             </label>
             <div class="col-md-6">
-                <input type="text" id="name" data-ng-model="goal.name" class="form-control input-sm"
-                       data-field="name"
-                       data-autosave="{{goal.updateUrl}}" autofocus />
+                <input type="text" id="name" class="form-control input-sm"
+                       data-ng-model="goal.name"
+                       autofocus>
             </div>
-            
+
             <!-- Human readable ID -->
             <label for="humanReadableId" class="col-md-1 control-label small">
                 ID:
             </label>
             <div class="col-md-3">
-                <input type="text" id="humanReadableId" data-ng-model="goal.humanReadableId" class="form-control input-sm"
-                       data-field="humanReadableId"
-                       data-autosave="{{goal.updateUrl}}" />
+                <input type="text" id="humanReadableId" class="form-control input-sm"
+                       data-ng-model="goal.humanReadableId">
             </div>
         </div>
-        
+
         <div class="form-group">
             <!-- Goal type -->
             <label for="type" class="col-md-2 control-label small">
                 Type:
             </label>
             <div class="col-md-4">
-                <select id="type" class="input-sm form-control" data-ng-model="goal.goalTypeId" data-ng-options="type.id as type.name for type in goalTypes"
-                    data-field="goalTypeId"
-                    data-autosave="{{goal.updateUrl}}"/>
+                <select id="type" class="input-sm form-control" required
+                        data-ng-model="goal.goalTypeId"
+                        data-ng-options="type.id as type.name for type in goalTypes"></select>
             </div>
 
             <!-- Measurable -->
             <div class="col-md-2">
                 <label class="checkbox checkbox-inline">
                     <input type="checkbox" id="measurable"
-                           data-field="measurable"
-                           data-autosave="{{goal.updateUrl}}"
-                           data-ng-model="goal.measurable" />
+                           data-ng-model="goal.measurable">
                     <strong>Målbart</strong>
                 </label>
             </div>
-           
+
             <!-- Status traffic light -->
             <label class="control-label col-md-1">
                 Status:
             </label>
             <div class="col-md-3">
-                <span id="statusGoal" data-select-status2="" data-ng-model="goal.status"
-                      data-field="status"
-                      data-autosave="{{goal.updateUrl}}"
+                <span id="statusGoal"
+                      data-select-status2=""
+                      data-ng-model="goal.status"
                       data-can-write="true">
                 </span>
             </div>
         </div>
-        
-        
+
         <div class="form-group">
-            
             <!-- Description -->
             <label for="description" class="col-md-2 control-label small">
                 Beskrivelse
             </label>
             <div class="col-md-10">
-                <textarea id="description" class="form-control input-sm" data-ng-model="goal.description" rows="4"
-                          data-field="description"
-                          data-autosave="{{goal.updateUrl}}"></textarea>
+                <textarea id="description" class="form-control input-sm" rows="4"
+                          data-ng-model="goal.description"></textarea>
             </div>
         </div>
-        
+
         <!-- sub goal 1 -->
         <div class="well well-sm">
             <p>Delmål 1</p>
@@ -83,12 +77,10 @@
                 <div class="col-md-3">
                     <div class="input-group input-group-sm">
                         <input type="text" class="form-control" id="subGoalDate1"
-                               data-datepicker-popup="dd-MM-yyyy" 
-                               data-is-open="opened.sgd1" 
-                               data-date-to-string 
-                               data-ng-model="goal.subGoalDate1"
-                               data-autosave="{{goal.updateUrl}}"
-                               data-field="subGoalDate1">
+                               data-datepicker-popup="dd-MM-yyyy"
+                               data-is-open="opened.sgd1"
+                               data-date-to-string
+                               data-ng-model="goal.subGoalDate1">
                         <span class="input-group-btn">
                             <button type="button" class="btn btn-default" data-ng-click="open($event, 'sgd1')"><i class="glyphicon glyphicon-calendar"></i></button>
                         </span>
@@ -97,23 +89,18 @@
                 <label for="subGoal1" class="col-md-1 control-label small">Mål</label>
                 <div class="col-md-3">
                     <input type="text" class="form-control input-sm" id="subGoal1"
-                           data-field="subGoal1"
-                           data-autosave="{{goal.updateUrl}}"
-                           data-ng-model="goal.subGoal1" />
+                           data-ng-model="goal.subGoal1">
                 </div>
 
                 <label for="subGoalRea1" class="col-md-1 control-label small">Rea</label>
                 <div class="col-md-3">
                     <input type="text" class="form-control input-sm" id="subGoalRea1"
-                           data-field="subGoalRea1"
-                           data-autosave="{{goal.updateUrl}}"
-                           data-ng-model="goal.subGoalRea1" />
+                           data-ng-model="goal.subGoalRea1">
                 </div>
-
             </div>
         </div>
-        
-          <!-- sub goal 2 -->
+
+        <!-- sub goal 2 -->
         <div class="well well-sm">
             <p>Delmål 2</p>
 
@@ -122,12 +109,10 @@
                 <div class="col-md-3">
                     <div class="input-group input-group-sm">
                         <input type="text" class="form-control" id="subGoalDate2"
-                               data-datepicker-popup="dd-MM-yyyy" 
-                               data-is-open="opened.sgd2" 
-                               data-date-to-string 
-                               data-ng-model="goal.subGoalDate2"
-                               data-autosave="{{goal.updateUrl}}"
-                               data-field="subGoalDate2">
+                               data-datepicker-popup="dd-MM-yyyy"
+                               data-is-open="opened.sgd2"
+                               data-date-to-string
+                               data-ng-model="goal.subGoalDate2">
                         <span class="input-group-btn">
                             <button type="button" class="btn btn-default" data-ng-click="open($event, 'sgd2')"><i class="glyphicon glyphicon-calendar"></i></button>
                         </span>
@@ -136,25 +121,18 @@
                 <label for="subGoal2" class="col-md-1 control-label small">Mål</label>
                 <div class="col-md-3">
                     <input type="text" class="form-control input-sm" id="subGoal2"
-                           data-field="subGoal2"
-                           data-autosave="{{goal.updateUrl}}"
-                           data-ng-model="goal.subGoal2" />
+                           data-ng-model="goal.subGoal2">
                 </div>
 
                 <label for="subGoalRea2" class="col-md-1 control-label small">Rea</label>
                 <div class="col-md-3">
                     <input type="text" class="form-control input-sm" id="subGoalRea2"
-                           data-field="subGoalRea2"
-                           data-autosave="{{goal.updateUrl}}"
-                           data-ng-model="goal.subGoalRea2" />
+                           data-ng-model="goal.subGoalRea2">
                 </div>
-
             </div>
         </div>
-        
-        
-        
-          <!-- sub goal 3 -->
+
+        <!-- sub goal 3 -->
         <div class="well well-sm">
             <p>Delmål 3</p>
 
@@ -163,12 +141,10 @@
                 <div class="col-md-3">
                     <div class="input-group input-group-sm">
                         <input type="text" class="form-control" id="subGoalDate3"
-                               data-datepicker-popup="dd-MM-yyyy" 
-                               data-is-open="opened.sgd3" 
-                               data-date-to-string 
-                               data-ng-model="goal.subGoalDate3"
-                               data-autosave="{{goal.updateUrl}}"
-                               data-field="subGoalDate3">
+                               data-datepicker-popup="dd-MM-yyyy"
+                               data-is-open="opened.sgd3"
+                               data-date-to-string
+                               data-ng-model="goal.subGoalDate3">
                         <span class="input-group-btn">
                             <button type="button" class="btn btn-default" data-ng-click="open($event, 'sgd3')"><i class="glyphicon glyphicon-calendar"></i></button>
                         </span>
@@ -177,36 +153,31 @@
                 <label for="subGoal3" class="col-md-1 control-label small">Mål</label>
                 <div class="col-md-3">
                     <input type="text" class="form-control input-sm" id="subGoal3"
-                           data-field="subGoal3"
-                           data-autosave="{{goal.updateUrl}}"
-                           data-ng-model="goal.subGoal3" />
+                           data-ng-model="goal.subGoal3">
                 </div>
 
                 <label for="subGoalRea3" class="col-md-1 control-label small">Rea</label>
                 <div class="col-md-3">
                     <input type="text" class="form-control input-sm" id="subGoalRea3"
-                           data-field="subGoalRea3"
-                           data-autosave="{{goal.updateUrl}}"
-                           data-ng-model="goal.subGoalRea3" />
+                           data-ng-model="goal.subGoalRea3">
                 </div>
-
             </div>
         </div>
 
         <div class="form-group">
-            
             <!-- Note -->
             <label for="note" class="col-md-2 control-label small">
                 Note
             </label>
             <div class="col-md-10">
-                <textarea id="note" class="form-control input-sm" data-ng-model="goal.note" rows="4"
-                          data-field="note"
-                          data-autosave="{{goal.updateUrl}}"></textarea>
+                <textarea id="note" class="form-control input-sm" rows="4"
+                          data-ng-model="goal.note"></textarea>
             </div>
         </div>
-    </form>
-</div>
-<div class="modal-footer">
-    <button class="btn btn-primary" data-ng-click="$close()" data-disabled-on-busy="">Færdig</button>
-</div>
+
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-success" data-disabled-on-busy="">Gem</button>
+            <button type="button" class="btn btn-warning" data-ng-click="dismiss()" data-disabled-on-busy="">Annuller</button>
+        </div>
+    </div>
+</form>
