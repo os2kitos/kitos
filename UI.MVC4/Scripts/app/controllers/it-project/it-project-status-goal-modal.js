@@ -57,6 +57,10 @@
             $scope.goal = goal ? goal : {};
             $scope.goalTypes = goalTypes;
 
+            // if new set required goal type to first so it's a valid form
+            if (isNewGoal)
+                $scope.goal.goalTypeId = _.first(goalTypes).id;
+
             autofocus();
 
             $scope.opened = {};
