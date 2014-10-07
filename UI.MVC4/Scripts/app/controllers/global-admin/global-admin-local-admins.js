@@ -13,7 +13,8 @@
             $rootScope.page.title = 'Lokal administratorer';
 
             $scope.organizations = {};
-            $http.get("api/organization").success(function(result) {
+
+            $http.get("api/organization/?take=1000").success(function(result) {
                 _.each(result.response, function(org) {
                     $scope.organizations[org.id] = org;
                 });
@@ -60,7 +61,6 @@
                     roleId: rId,
                 };
 
-                console.log(data);
                 var msg = notify.addInfoMessage("Arbejder ...", false);
 
                 $http.post("api/adminrights/" + oId, data, { handleBusy: true }).success(function(result) {
@@ -165,6 +165,7 @@
                     msg.toErrorMessage("Fejl!");
                 });
             };
+
             $scope.rightSortBy = "userName";
             $scope.rightSortReverse = false;
             $scope.rightSort = function(right) {
