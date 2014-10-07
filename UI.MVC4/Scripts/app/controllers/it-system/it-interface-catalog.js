@@ -28,18 +28,20 @@
                 take: 20
             };
 
+            $scope.csvUrl = 'api/itInterface/?csv&organizationId=' + user.currentOrganizationId;
+
             $scope.$watchCollection('pagination', function () {
-                var url = 'api/itInterface/?csv&skip=' + $scope.pagination.skip + '&take=' + $scope.pagination.take + '&organizationId=' + user.currentOrganizationId;
+                //var url = 'api/itInterface/?csv&skip=' + $scope.pagination.skip + '&take=' + $scope.pagination.take + '&organizationId=' + user.currentOrganizationId;
 
-                if ($scope.pagination.orderBy) {
-                    url += '&orderBy=' + $scope.pagination.orderBy;
-                    if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
-                }
+                //if ($scope.pagination.orderBy) {
+                //    url += '&orderBy=' + $scope.pagination.orderBy;
+                //    if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+                //}
 
-                if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
-                else url += '&q=';
+                //if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
+                //else url += '&q=';
 
-                $scope.csvUrl = url;
+                //$scope.csvUrl = url;
                 loadSystems();
             });
 
