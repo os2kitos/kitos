@@ -39,6 +39,7 @@
                 $rootScope.page.title = 'IT System - Overblik';
                 $scope.itSystemRoles = itSystemRoles;
                 $scope.pagination = {
+                    search: '',
                     skip: 0,
                     take: 20
                 };
@@ -85,7 +86,7 @@
                         $scope.systemUsages = result.response;
 
                         var paginationHeader = JSON.parse(headers('X-Pagination'));
-                        $scope.pagination.count = paginationHeader.TotalCount;
+                        $scope.totalCount = paginationHeader.TotalCount;
 
                         _.each(result.response, function(usage) {
                             usage.itSystem.businessType = _.findWhere(businessTypes, { id: usage.itSystem.businessTypeId });

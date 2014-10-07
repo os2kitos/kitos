@@ -26,6 +26,7 @@
             $rootScope.page.title = 'IT System - Katalog';
 
             $scope.pagination = {
+                search: '',
                 skip: 0,
                 take: 20
             };
@@ -116,7 +117,7 @@
                 $http.get(url).success(function(result, status, headers) {
 
                     var paginationHeader = JSON.parse(headers('X-Pagination'));
-                    $scope.pagination.count = paginationHeader.TotalCount;
+                    $scope.totalCount = paginationHeader.TotalCount;
 
                     $scope.systems = [];
                     _.each(result.response, function(system) {

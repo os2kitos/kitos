@@ -469,7 +469,7 @@
                     $scope.taskRefUsageList = result.response;
 
                     var paginationHeader = JSON.parse(headers('X-Pagination'));
-                    $scope.pagination.count = paginationHeader.TotalCount;
+                    $scope.totalCount = paginationHeader.TotalCount;
                     decorateTasks();
                 }).error(function() {
                     notify.addErrorMessage("Kunne ikke hente opgaver!");

@@ -23,6 +23,7 @@
             $rootScope.page.title = 'Snitflade - Katalog';
 
             $scope.pagination = {
+                search: '',
                 skip: 0,
                 take: 20
             };
@@ -54,9 +55,8 @@
                 else url += '&q=';
 
                 $http.get(url).success(function (result, status, headers) {
-
                     var paginationHeader = JSON.parse(headers('X-Pagination'));
-                    $scope.pagination.count = paginationHeader.TotalCount;
+                    $scope.totalCount = paginationHeader.TotalCount;
 
                     $scope.systems = [];
                     _.each(result.response, function (system) {

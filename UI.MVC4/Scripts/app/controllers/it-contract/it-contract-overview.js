@@ -21,6 +21,7 @@
     app.controller('contract.OverviewCtrl', ['$scope', '$http', 'notify', 'user', 'itContractRoles',
             function ($scope, $http, notify, user, itContractRoles) {
                 $scope.pagination = {
+                    search: '',
                     skip: 0,
                     take: 1000
                 };
@@ -97,7 +98,7 @@
 
                     $http.get(url).success(function (result, status, headers) {
                         var paginationHeader = JSON.parse(headers('X-Pagination'));
-                        $scope.pagination.count = paginationHeader.TotalCount;
+                        $scope.totalCount = paginationHeader.TotalCount;
 
                         // clear lists 
                         $scope.activeContracts = [];

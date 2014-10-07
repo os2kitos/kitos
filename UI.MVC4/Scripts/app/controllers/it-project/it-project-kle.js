@@ -63,7 +63,7 @@
                     $scope.tasklist = result.response;
 
                     var paginationHeader = JSON.parse(headers('X-Pagination'));
-                    $scope.pagination.count = paginationHeader.TotalCount;
+                    $scope.totalCount = paginationHeader.TotalCount;
 
                 }).error(function() {
                     notify.addErrorMessage("Kunne ikke hente opgaver!");
