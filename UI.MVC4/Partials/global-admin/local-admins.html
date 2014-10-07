@@ -56,9 +56,13 @@
         <tbody>
             <tr>
                 <td>
-                    <select data-ui-select2="" name="selectOrg" data-ng-model="newOrg" class="form-control input-sm" data-placeholder="Vælg organisation">
+                    <select name="selectOrg" class="form-control input-sm"
+                            data-placeholder="Vælg organisation"
+                            data-ui-select2=""
+                            data-ng-model="newOrg">
                         <option></option>
-                        <option data-ng-repeat="org in organizations" value="{{org.id}}">{{org.name}}
+                        <option data-ng-repeat="org in organizations" value="{{org.id}}">
+                            {{org.name}}
                         </option>
                     </select>
                 </td>
