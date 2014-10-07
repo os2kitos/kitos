@@ -121,6 +121,7 @@
             });
 
             $scope.pagination = {
+                search: '',
                 skip: 0,
                 take: 50
             };

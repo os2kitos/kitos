@@ -23,6 +23,7 @@
             $rootScope.page.title = 'Snitflade - Katalog';
 
             $scope.pagination = {
+                search: '',
                 skip: 0,
                 take: 20
             };

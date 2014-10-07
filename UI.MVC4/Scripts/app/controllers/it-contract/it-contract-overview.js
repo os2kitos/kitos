@@ -21,6 +21,7 @@
     app.controller('contract.OverviewCtrl', ['$scope', '$http', 'notify', 'user', 'itContractRoles',
             function ($scope, $http, notify, user, itContractRoles) {
                 $scope.pagination = {
+                    search: '',
                     skip: 0,
                     take: 1000
                 };

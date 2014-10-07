@@ -39,6 +39,7 @@
                 $rootScope.page.title = 'IT System - Overblik';
                 $scope.itSystemRoles = itSystemRoles;
                 $scope.pagination = {
+                    search: '',
                     skip: 0,
                     take: 20
                 };

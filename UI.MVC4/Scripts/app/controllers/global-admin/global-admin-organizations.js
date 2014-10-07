@@ -15,6 +15,7 @@
             $rootScope.page.title = 'Organisationer';
 
             $scope.pagination = {
+                search: '',
                 skip: 0,
                 take: 1000
             };

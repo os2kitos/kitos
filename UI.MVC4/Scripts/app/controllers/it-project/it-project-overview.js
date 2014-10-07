@@ -21,6 +21,7 @@
     ['$scope', '$http', 'notify', 'projectRoles', 'user',
         function ($scope, $http, notify, projectRoles, user) {
             $scope.pagination = {
+                search: '',
                 skip: 0,
                 take: 10
             };
@@ -29,7 +30,7 @@
 
             $scope.projectRoles = projectRoles;
             
-            $scope.$watchCollection('pagination', function() {
+            $scope.$watchCollection('pagination', function (newVal, oldVal) {
                 var url = 'api/itProject?csv&orgId=' + user.currentOrganizationId;
 
                 url += '&skip=' + $scope.pagination.skip;

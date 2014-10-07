@@ -15,6 +15,7 @@
     app.controller('contract.PlanCtrl', ['$scope', '$http', 'notify','user',
             function ($scope, $http, notify, user) {
                 $scope.pagination = {
+                    search: '',
                     skip: 0,
                     take: 20
                 };
