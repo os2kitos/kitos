@@ -38,7 +38,7 @@
 
                 $http.get(url).success(function (result, status, headers) {
                     var paginationHeader = JSON.parse(headers('X-Pagination'));
-                    $scope.pagination.count = paginationHeader.TotalCount;
+                    $scope.totalCount = paginationHeader.TotalCount;
                     $scope.organizations = result.response;
                 }).error(function () {
                     notify.addErrorMessage("Kunne ikke hente organisationer!");

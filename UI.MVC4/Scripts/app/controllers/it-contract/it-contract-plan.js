@@ -84,7 +84,7 @@
 
                     $http.get(url).success(function (result, status, headers) {
                         var paginationHeader = JSON.parse(headers('X-Pagination'));
-                        $scope.pagination.count = paginationHeader.TotalCount;
+                        $scope.totalCount = paginationHeader.TotalCount;
 
                         // clear list
                         $scope.activeContracts = [];

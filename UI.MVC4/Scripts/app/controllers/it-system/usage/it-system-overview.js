@@ -85,7 +85,7 @@
                         $scope.systemUsages = result.response;
 
                         var paginationHeader = JSON.parse(headers('X-Pagination'));
-                        $scope.pagination.count = paginationHeader.TotalCount;
+                        $scope.totalCount = paginationHeader.TotalCount;
 
                         _.each(result.response, function(usage) {
                             usage.itSystem.businessType = _.findWhere(businessTypes, { id: usage.itSystem.businessTypeId });
