@@ -20,6 +20,8 @@
                     take: 20
                 };
 
+                $scope.csvUrl = 'api/itcontract?csvplan&organizationId=' + user.currentOrganizationId;
+
                 $scope.activeContracts = [];
                 $scope.inactiveContracts = [];
 
@@ -54,19 +56,19 @@
                 }
 
                 $scope.$watchCollection('pagination', function() {
-                    var url = 'api/itcontract?csvplan&organizationId=' + user.currentOrganizationId;
+                    //var url = 'api/itcontract?csvplan&organizationId=' + user.currentOrganizationId;
 
-                    url += '&skip=' + $scope.pagination.skip + "&take=" + $scope.pagination.take;
+                    //url += '&skip=' + $scope.pagination.skip + "&take=" + $scope.pagination.take;
 
-                    if ($scope.pagination.orderBy) {
-                        url += '&orderBy=' + $scope.pagination.orderBy;
-                        if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
-                    }
+                    //if ($scope.pagination.orderBy) {
+                    //    url += '&orderBy=' + $scope.pagination.orderBy;
+                    //    if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+                    //}
 
-                    if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
-                    else url += "&q=";
+                    //if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
+                    //else url += "&q=";
 
-                    $scope.csvUrl = url;
+                    //$scope.csvUrl = url;
                     loadContracts();
                 });
 

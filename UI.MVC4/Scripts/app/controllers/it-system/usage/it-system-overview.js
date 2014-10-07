@@ -44,23 +44,25 @@
                     take: 20
                 };
 
+                $scope.csvUrl = 'api/itSystemUsage?csv&organizationId=' + user.currentOrganizationId;
+
                 var businessTypes = businessTypesHttp.data.response;
 
                 $scope.showSystemId = 'localSystemId';
                 $scope.showType = 'itSystem.appType.name';
 
                 $scope.$watchCollection('pagination', function() {
-                    var url = 'api/itSystemUsage?csv&organizationId=' + user.currentOrganizationId + '&skip=' + $scope.pagination.skip + '&take=' + $scope.pagination.take;
+                    //var url = 'api/itSystemUsage?csv&organizationId=' + user.currentOrganizationId + '&skip=' + $scope.pagination.skip + '&take=' + $scope.pagination.take;
 
-                    if ($scope.pagination.orderBy) {
-                        url += '&orderBy=' + $scope.pagination.orderBy;
-                        if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
-                    }
+                    //if ($scope.pagination.orderBy) {
+                    //    url += '&orderBy=' + $scope.pagination.orderBy;
+                    //    if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+                    //}
 
-                    if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
-                    else url += "&q=";
+                    //if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
+                    //else url += "&q=";
 
-                    $scope.csvUrl = url;
+                    //$scope.csvUrl = url;
                     loadUsages();
                 });
 

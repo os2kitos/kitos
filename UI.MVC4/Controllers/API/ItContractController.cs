@@ -216,16 +216,15 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetExcel(bool? csv, int organizationId, [FromUri] PagingModel<ItContract> pagingModel, [FromUri] string q)
+        public HttpResponseMessage GetExcel(bool? csv, int organizationId)
         {
             try
             {
                 //Get contracts within organization
-                pagingModel.Where(contract => contract.OrganizationId == organizationId);
+                var contracts = Repository.Get(contract => contract.OrganizationId == organizationId);
 
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(contract => contract.Name.Contains(q));
-
-                var contracts = Page(Repository.AsQueryable(), pagingModel);
+                //if (!string.IsNullOrEmpty(q)) pagingModel.Where(contract => contract.Name.Contains(q));
+                //var contracts = Page(Repository.AsQueryable(), pagingModel);
 
                 var overviewDtos = AutoMapper.Mapper.Map<IEnumerable<ItContractOverviewDTO>>(contracts);
                 var roles = _roleRepository.Get().ToList();
@@ -272,7 +271,7 @@ namespace UI.MVC4.Controllers.API
                 var result = new HttpResponseMessage(HttpStatusCode.OK);
                 result.Content = new StreamContent(stream);
                 result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "itsystemanvendelsesoversigt.csv" };
+                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "itkontraktoverblikøkonomi.csv" };
                 return result;
             }
             catch (Exception e)
@@ -305,16 +304,15 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetExcelPlan(bool? csvplan, int organizationId, [FromUri] PagingModel<ItContract> pagingModel, [FromUri] string q)
+        public HttpResponseMessage GetExcelPlan(bool? csvplan, int organizationId)
         {
             try
             {
                 //Get contracts within organization
-                pagingModel.Where(contract => contract.OrganizationId == organizationId);
+                var contracts = Repository.Get(contract => contract.OrganizationId == organizationId);
 
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(contract => contract.Name.Contains(q));
-
-                var contracts = Page(Repository.AsQueryable(), pagingModel);
+                //if (!string.IsNullOrEmpty(q)) pagingModel.Where(contract => contract.Name.Contains(q));
+                //var contracts = Page(Repository.AsQueryable(), pagingModel);
 
                 var overviewDtos = AutoMapper.Mapper.Map<IEnumerable<ItContractPlanDTO>>(contracts);
 
@@ -361,7 +359,7 @@ namespace UI.MVC4.Controllers.API
                 var result = new HttpResponseMessage(HttpStatusCode.OK);
                 result.Content = new StreamContent(stream);
                 result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "itsystemanvendelsesoversigt.csv" };
+                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "itkontraktoverbliktid.csv" };
                 return result;
             }
             catch (Exception e)

@@ -61,7 +61,7 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetExcel([FromUri] bool? csv, [FromUri] int organizationId, [FromUri] PagingModel<ItSystem> paging, [FromUri] string q)
+        public HttpResponseMessage GetExcel([FromUri] bool? csv, [FromUri] int organizationId)
         {
             try
             {
@@ -81,33 +81,33 @@ namespace UI.MVC4.Controllers.API
                             // only object owners will be albe to see private objects
                         );
 
-                if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
+                //if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
 
-                var query = Page(systems, paging);
+                //var query = Page(systems, paging);
 
-                var dtos = Map(query);
+                var dtos = Map(systems);
                 
                 var list = new List<dynamic>();
                 var header = new ExpandoObject() as IDictionary<string, Object>;
                 header.Add("It System", "It System");
-                header.Add("ID", "Globalt SystemID");
+                header.Add("Public", "(P)");
                 header.Add("AppTypeOption", "Applikationstype");
                 header.Add("BusiType", "Forretningstype");
                 header.Add("KLEID", "KLE ID");
                 header.Add("KLENavn", "KLE Navn");
-                header.Add("Tilhorer", "Tilhører");
+                header.Add("Rettighedshaver", "Rettighedshaver");
                 header.Add("Oprettet", "Oprettet af");
                 list.Add(header);
                 foreach (var system in dtos)
                 {
                     var obj = new ExpandoObject() as IDictionary<string, Object>;
                     obj.Add("It Kontrakt", system.Name);
-                    obj.Add("ID", system.ItSystemId);
+                    obj.Add("Public", system.AccessModifier == AccessModifier.Public ? "(P)" : "");
                     obj.Add("AppType", system.AppTypeOptionName);
                     obj.Add("BusiType", system.BusinessTypeName);
                     obj.Add("KLEID", String.Join(",", system.TaskRefs.Select(x => x.TaskKey)));
                     obj.Add("KLENavn", String.Join(",", system.TaskRefs.Select(x => x.Description)));
-                    obj.Add("Tilhorer", system.BelongsToName);
+                    obj.Add("Rettighedshaver", system.BelongsToName);
                     obj.Add("Oprettet", system.ObjectOwnerName);
                     list.Add(obj);
                 }
@@ -120,7 +120,7 @@ namespace UI.MVC4.Controllers.API
                 var result = new HttpResponseMessage(HttpStatusCode.OK);
                 result.Content = new StreamContent(stream);
                 result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "itsystemanvendelsesoversigt.csv" };
+                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "itsystemkatalog.csv" };
                 return result;
             }
             catch (Exception e)
@@ -128,48 +128,6 @@ namespace UI.MVC4.Controllers.API
                 return Error(e);
             }
         }
-
-        ///// <summary>
-        ///// Returns the interfaces that a given system exposes
-        ///// </summary>
-        ///// <param name="itSystemId">The id of the exposing system</param>
-        ///// <param name="getExposedInterfaces">flag</param>
-        ///// <returns>List of interfaces</returns>
-        //public HttpResponseMessage GetExposedInterfaces(int itSystemId, bool? getExposedInterfaces)
-        //{
-        //    try
-        //    {
-        //        var interfaces = Repository.Get(system => system.ExposedById == itSystemId);
-        //        var dtos = Map(interfaces);
-        //        return Ok(dtos);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return Error(e);
-        //    }
-        //}
-
-        ///// <summary>
-        ///// Returns the interfaces that a given system can use
-        ///// </summary>
-        ///// <param name="itSystemId">The id of the system</param>
-        ///// <param name="getCanUseInterfaces">flag</param>
-        ///// <returns>List of interfaces</returns>
-        //public HttpResponseMessage GetCanUseInterfaces(int itSystemId, bool? getCanUseInterfaces)
-        //{
-        //    try
-        //    {
-        //        var system = Repository.GetByKey(itSystemId);
-        //        var interfaces = system.CanUseInterfaces;
-
-        //        var dtos = Map(interfaces);
-        //        return Ok(dtos);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return Error(e);
-        //    }
-        //}
 
         public HttpResponseMessage GetInterfacesSearch(string q, int orgId, int excludeId)
         {

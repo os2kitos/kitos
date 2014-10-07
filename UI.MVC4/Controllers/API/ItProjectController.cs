@@ -13,6 +13,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
+using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json.Linq;
 using UI.MVC4.Models;
 
@@ -162,15 +163,15 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetExcel(bool? csv, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
+        public HttpResponseMessage GetExcel(bool? csv, [FromUri] int orgId)
         {
             try
             {
                 //Get all projects inside the organizaton
-                pagingModel.Where(p => p.OrganizationId == orgId);
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
-
-                var projects = Page(Repository.AsQueryable(), pagingModel);
+                var projects = Repository.Get(p => p.OrganizationId == orgId);
+                
+                //if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
+                //var projects = Page(Repository.AsQueryable(), pagingModel);
 
                 var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectOverviewDTO>>(projects);
 
@@ -214,7 +215,7 @@ namespace UI.MVC4.Controllers.API
                     obj.Add("Type", project.ItProjectTypeName);
                     obj.Add("Strategisk", project.IsStrategy);
                     obj.Add("Tværgaaende", project.IsTransversal);
-                    obj.Add("Fase", phases.SingleOrDefault(x => x.Id == project.CurrentPhaseId));
+                    obj.Add("Fase", phases.SingleOrDefault(x => x.Id == project.CurrentPhaseId).IfNotNull(x => x.Name));
                     obj.Add("Status", project.StatusProject);
                     obj.Add("Maal", project.GoalStatusStatus);
                     obj.Add("Risiko", project.AverageRisk);

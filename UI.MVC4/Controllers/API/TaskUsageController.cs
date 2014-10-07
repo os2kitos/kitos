@@ -116,15 +116,14 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetExcel(bool? csv, int orgUnitId, bool onlyStarred, [FromUri] PagingModel<TaskUsage> pagingModel)
+        public HttpResponseMessage GetExcel(bool? csv, int orgUnitId, bool onlyStarred)
         {
             try
             {
-                pagingModel.Where(usage => usage.OrgUnitId == orgUnitId);
+                var usages = Repository.Get(usage => usage.OrgUnitId == orgUnitId && usage.Starred == onlyStarred);
 
-                if (onlyStarred) pagingModel.Where(usage => usage.Starred);
-
-                var usages = Page(Repository.AsQueryable(), pagingModel).ToList();
+                //if (onlyStarred) pagingModel.Where(usage => usage.Starred);
+                //var usages = Page(Repository.AsQueryable(), pagingModel).ToList();
 
                 var dtos = new List<TaskUsageNestedDTO>();
 
@@ -183,7 +182,7 @@ namespace UI.MVC4.Controllers.API
                 var result = new HttpResponseMessage(HttpStatusCode.OK);
                 result.Content = new StreamContent(stream);
                 result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "itsystemanvendelsesoversigt.csv" };
+                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "organisationsoverblik.csv" };
                 return result;
             }
             catch (Exception e)

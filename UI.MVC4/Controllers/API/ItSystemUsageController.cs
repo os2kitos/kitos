@@ -103,11 +103,11 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetExcel(int organizationId, [FromUri] PagingModel<ItSystemUsage> pagingModel, [FromUri] string q, bool? csv)
+        public HttpResponseMessage GetExcel(bool? csv, int organizationId)
         {
             try
             {
-                pagingModel.Where(
+                var usages = Repository.Get(
                     u =>
                         // system usage is only within the context 
                         u.OrganizationId == organizationId &&
@@ -125,9 +125,9 @@ namespace UI.MVC4.Controllers.API
                         u.Rights.Any(x => x.UserId == KitosUser.Id))
                     );
 
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
-
-                var usages = Page(Repository.AsQueryable(), pagingModel);
+                //if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
+                //var usages = Page(Repository.AsQueryable(), pagingModel);
+                
                 // mapping to DTOs for easy lazy loading of needed properties
                 var dtos = Map(usages);
 
@@ -140,9 +140,7 @@ namespace UI.MVC4.Controllers.API
                 header.Add("OrgUnit", "Ansv. organisationsenhed");
                 foreach (var role in roles)
                     header.Add(role.Name, role.Name);
-                header.Add("Gid", "Globalt SystemID");
-                header.Add("Lid", "Lokalt SystemID");
-                header.Add("AppTypeOption", "Applikationtype");
+                header.Add("AppType", "Applikationtype");
                 header.Add("BusiType", "Forretningstype");
                 header.Add("Anvender", "Anvender");
                 header.Add("Udstiller", "Udstiller");
@@ -160,12 +158,10 @@ namespace UI.MVC4.Controllers.API
                         obj.Add(role.Name,
                                 String.Join(",", usage.Rights.Where(x => x.RoleId == roleId).Select(x => x.User.Name)));
                     }
-                    obj.Add("Gid", usage.ItSystem.ItSystemId);
-                    obj.Add("Lid", usage.LocalSystemId);
                     obj.Add("AppType", usage.ItSystem.AppTypeOptionName);
                     obj.Add("BusiType", usage.ItSystem.BusinessTypeName);
-                    //obj.Add("Anvender", usage.ActiveInterfaceUsages + "(" + usage.ItSystem.CanUseInterfaceIds.Count() + ")"); TODO
-                    //obj.Add("Udstiller", usage.ItSystem.ExposedBy != null ? usage.ItSystem.ExposedBy.Name : "" + " " + usage.ItSystem.ExposedInterfaceIds.Count()); TODO
+                    obj.Add("Anvender", usage.ActiveInterfaceUseCount + "(" + usage.InterfaceUseCount+ ")");
+                    obj.Add("Udstiller", usage.InterfaceExhibitCount);
                     obj.Add("Overblik", usage.OverviewItSystemName);
                     list.Add(obj);
                 }
