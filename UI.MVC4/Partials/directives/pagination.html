@@ -5,14 +5,14 @@
         </button>
     </div>
 
-    <div class="col-md-4 text-center ">
-        <span data-ng-if="pagination.skip + pagination.take < pagination.count || pagination.skip > 0">
-            Viser {{pagination.skip+1}}-{{ pagination.count < pagination.skip+pagination.take ? pagination.count : pagination.skip + pagination.take }} af {{pagination.count}} linjer
+    <div class="col-md-4 text-center">
+        <span data-ng-if="pagination.skip + pagination.take < totalCount || pagination.skip > 0">
+            Viser {{ pagination.skip + 1 }}-{{ totalCount < pagination.skip + pagination.take ? totalCount : pagination.skip + pagination.take }} af {{ totalCount }} linjer
         </span>
     </div>
 
     <div class="col-md-4">
-        <button class="btn btn-primary btn-sm pull-right" data-ng-show="pagination.skip + pagination.take < pagination.count" data-ng-click="more()">
+        <button class="btn btn-primary btn-sm pull-right" data-ng-show="pagination.skip + pagination.take < totalCount" data-ng-click="more()">
             Næste <i class="glyphicon glyphicon-chevron-right small"></i>
         </button>
     </div>
