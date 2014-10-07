@@ -1,3 +1,4 @@
+using System.Configuration;
 using System.Web.Http;
 using System.Web.Security;
 using Core.DomainServices;
@@ -67,7 +68,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<IUserRepository>().To<UserRepository>().InRequestScope();
             kernel.Bind<IMailClient>().To<MailClient>().InRequestScope();
             kernel.Bind<ICryptoService>().To<CryptoService>();
-            kernel.Bind<IUserService>().To<UserService>().InRequestScope();
+            kernel.Bind<IUserService>().To<UserService>().InRequestScope().WithConstructorArgument("ttl", Properties.Settings.Default.ResetPasswordTTL);
             kernel.Bind<IOrgUnitService>().To<OrgUnitService>().InRequestScope();
             kernel.Bind<IAdminService>().To<AdminService>().InRequestScope();
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InRequestScope();
