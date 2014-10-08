@@ -209,7 +209,7 @@ namespace UI.MVC4.Controllers.API
                     {
                         var roleId = role.Id;
                         obj.Add(role.Name,
-                                String.Join(",", project.Rights.Where(x => x.RoleId == roleId).Select(x => x.User.Name)));
+                                String.Join(",", project.Rights.Where(x => x.RoleId == roleId).Select(x => x.UserName)));
                     }
                     obj.Add("ID", project.ItProjectId);
                     obj.Add("Type", project.ItProjectTypeName);

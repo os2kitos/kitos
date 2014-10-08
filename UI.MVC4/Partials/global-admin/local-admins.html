@@ -8,25 +8,20 @@
     <table class="full-width table">
         <thead>
             <tr>
-                <th>
-                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('orgName')">Organisation</button></th>
-                <th>
-                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('userName')">Navn</button></th>
-                <th colspan="2">
-                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('userEmail')">Email</button></th>
+                <th>Organisation</th>
+                <th>Navn</th>
+                <th>Email</th>
+                <th><!-- CONTROL --></th>
             </tr>
         </thead>
         <!-- for each right -->
-        <tbody data-ng-repeat="right in adminRights | filter : { show: true } | orderBy : rightSort : rightSortReverse">
-
-            <!-- show -->
-            <tr data-ng-hide="right.edit">
-                <td>{{ organizations[right.objectId].name }}</td>
-                <td>{{ right.user.name }}</td>
-                <td>{{ right.user.email }}</td>
+        <tbody data-ng-repeat="right in adminRights">
+            <tr>
+                <td>{{ right.objectName }}</td>
+                <td>{{ right.userName }}</td>
+                <td>{{ right.userEmail }}</td>
                 <td class="text-right">
                     <div>
-                        <a data-ng-click="right.edit = true" class="btn btn-link btn-sm"><i class="glyphicon glyphicon-pencil"></i></a>
                         <a class="btn btn-link btn-sm text-danger"
                             data-confirmed-click="deleteLocalAdmin(right)"
                             data-confirm-click="Er du sikker på at du vil slette?">
@@ -35,36 +30,16 @@
                     </div>
                 </td>
             </tr>
-
-            <!-- edit -->
-            <tr data-ng-show="right.edit">
-                <td>
-                    <select data-ui-select2="" name="selectOrg" data-ng-model="right.orgForSelect" class="form-control input-sm">
-                        <option data-ng-repeat="org in organizations" value="{{org.id}}">{{org.name}}</option>
-                    </select>
-                </td>
-                <td colspan="2">
-                    <input data-select-user="foo" data-user-model="right.userForSelect" />
-                </td>
-                <td>
-                    <input type="submit" class="btn btn-primary btn-sm" data-ng-click="updateLocalAdmin(right)" value="Gem" />
-                </td>
-            </tr>
         </tbody>
 
         <!-- add-new-right row -->
         <tbody>
             <tr>
                 <td>
-                    <select name="selectOrg" class="form-control input-sm"
-                            data-placeholder="Vælg organisation"
-                            data-ui-select2=""
-                            data-ng-model="newOrg">
-                        <option></option>
-                        <option data-ng-repeat="org in organizations" value="{{org.id}}">
-                            {{org.name}}
-                        </option>
-                    </select>
+                    <input type="hidden" id="selectOrg" class="form-control input-sm"
+                           data-placeholder="Vælg organisation"
+                           data-ui-select2="organizationSelectOptions"
+                           data-ng-model="newOrg">
                 </td>
                 <td colspan="3" class="form-group">
                     <input data-select-user="foo" data-user-model="newUser" />

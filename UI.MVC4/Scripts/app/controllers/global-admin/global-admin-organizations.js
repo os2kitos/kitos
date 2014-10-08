@@ -17,7 +17,7 @@
             $scope.pagination = {
                 search: '',
                 skip: 0,
-                take: 1000
+                take: 100
             };
 
             $scope.$watchCollection('pagination', function () {

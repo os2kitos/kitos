@@ -253,7 +253,7 @@ namespace UI.MVC4.Controllers.API
                     {
                         var roleId = role.Id;
                         obj.Add(role.Name,
-                                String.Join(",", contract.Rights.Where(x => x.RoleId == roleId).Select(x => x.User.Name)));
+                                String.Join(",", contract.Rights.Where(x => x.RoleId == roleId).Select(x => x.UserName)));
                     }
                     obj.Add("Leverandor", contract.SupplierName);
                     obj.Add("Anskaffelse", contract.AcquisitionSum);

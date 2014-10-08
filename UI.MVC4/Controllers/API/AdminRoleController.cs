@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
+﻿using System.Net.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
@@ -37,7 +32,7 @@ namespace UI.MVC4.Controllers.API
             return NotAllowed();
         }
 
-        public override HttpResponseMessage Patch(int id, Newtonsoft.Json.Linq.JObject obj)
+        public override HttpResponseMessage Patch(int id, JObject obj)
         {
             return NotAllowed();
         }
