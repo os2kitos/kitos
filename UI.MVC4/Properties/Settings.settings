@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="ResetPasswordTTL" Type="System.TimeSpan" Scope="Application">
-      <Value Profile="(Default)">200.00:00:00</Value>
+      <Value Profile="(Default)">3.00:00:00</Value>
     </Setting>
   </Settings>
 </SettingsFile>
