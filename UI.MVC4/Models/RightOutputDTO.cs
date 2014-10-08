@@ -14,7 +14,9 @@ namespace UI.MVC4.Models
         public int UserId { get; set; }
         public string UserName { get; set; }
         public string UserEmail { get; set; }
-        
+
+        public UserDTO User { get; set; }
+
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }
     }
