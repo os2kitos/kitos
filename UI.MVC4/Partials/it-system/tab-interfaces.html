@@ -147,7 +147,8 @@
                 <!-- infrastructure -->
                 <td rowspan="{{usage.numRows}}">
                     <input type="hidden" class="form-control input-sm"
-                           data-ui-select2="itSystemsSelectOptions"
+                           data-placeholder="Vælg infrastruktur"
+                           data-ui-select2="itSystemUsageSelectOptions"
                            data-ng-model="usage.infrastructure"
                            data-ng-show="usage.usage.itContract.isActive"
                            data-ng-disabled="!hasWriteAccess"

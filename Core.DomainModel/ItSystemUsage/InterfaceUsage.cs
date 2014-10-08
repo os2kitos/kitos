@@ -38,7 +38,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// <summary>
         /// An ItSystem marked as infrastructure for the local usage of the interface.
         /// </summary>
-        public virtual ItSystem.ItSystem Infrastructure { get; set; }
+        public virtual ItSystemUsage Infrastructure { get; set; }
 
         public int ItInterfaceId { get; set; }
         public int ItSystemId { get; set; }
