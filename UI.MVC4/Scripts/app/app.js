@@ -9,7 +9,10 @@ app.config([
 app.config([
     '$httpProvider', 'notifyProvider', function($httpProvider, notifyProvider) {
         $httpProvider.interceptors.push("httpBusyInterceptor");
-
+        // for some reason templates aren't updated so this is needed
+        $httpProvider.defaults.headers.get = {
+            'Cache-Control': 'no-cache'
+        };
         notifyProvider.globalTimeToLive(5000);
         notifyProvider.onlyUniqueMessages(false);
     }
