@@ -73,11 +73,10 @@
                                 data-placeholder="Vælg indkøbsform"
                                 data-ng-disabled="!hasWriteAccess"
                                 data-ng-model="contract.purchaseFormId"
-                                data-ng-options="o.id as o.name for o in purchaseForms"
                                 data-autosave="{{ autoSaveUrl }}"
                                 data-field="purchaseFormId">
                             <option value=""></option>
-                            <option data-ng-repeat="procurementStratey in procurementStrategies" value="{{procurementStratey.id}}">{{procurementStratey.name}}</option>
+                            <option data-ng-repeat="purchaseForm in purchaseForms" value="{{purchaseForm.id}}">{{purchaseForm.name}}</option>
                         </select>
                     </div>
 
