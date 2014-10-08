@@ -156,7 +156,7 @@ namespace UI.MVC4.Controllers.API
                     {
                         var roleId = role.Id;
                         obj.Add(role.Name,
-                                String.Join(",", usage.Rights.Where(x => x.RoleId == roleId).Select(x => x.User.Name)));
+                                String.Join(",", usage.Rights.Where(x => x.RoleId == roleId).Select(x => x.UserName)));
                     }
                     obj.Add("AppType", usage.ItSystem.AppTypeOptionName);
                     obj.Add("BusiType", usage.ItSystem.BusinessTypeName);
