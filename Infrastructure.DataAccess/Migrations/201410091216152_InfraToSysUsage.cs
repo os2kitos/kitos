@@ -10,7 +10,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("InfUsage", "InfrastructureId", "ItSystem");
             AddForeignKey("InfUsage", "InfrastructureId", "ItSystemUsage", "Id");
         }
-        
+
         public override void Down()
         {
             DropForeignKey("InfUsage", "InfrastructureId", "ItSystemUsage");
