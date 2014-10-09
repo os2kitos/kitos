@@ -7,14 +7,14 @@ namespace Infrastructure.DataAccess.Migrations
     {
         public override void Up()
         {
-            DropForeignKey("dbo.InfUsage", "InfrastructureId", "dbo.ItSystem");
-            AddForeignKey("dbo.InfUsage", "InfrastructureId", "dbo.ItSystemUsage", "Id");
+            DropForeignKey("InfUsage", "InfrastructureId", "ItSystem");
+            AddForeignKey("InfUsage", "InfrastructureId", "ItSystemUsage", "Id");
         }
         
         public override void Down()
         {
-            DropForeignKey("dbo.InfUsage", "InfrastructureId", "dbo.ItSystemUsage");
-            AddForeignKey("dbo.InfUsage", "InfrastructureId", "dbo.ItSystem", "Id");
+            DropForeignKey("InfUsage", "InfrastructureId", "ItSystemUsage");
+            AddForeignKey("InfUsage", "InfrastructureId", "ItSystem", "Id");
         }
     }
 }

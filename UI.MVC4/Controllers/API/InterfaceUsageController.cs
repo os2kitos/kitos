@@ -95,7 +95,7 @@ namespace UI.MVC4.Controllers.API
 
                 var infraToken = obj.GetValue("infrastructureId");
                 if (infraToken != null)
-                    item.InfrastructureId = infraToken.Value<int?>();
+                    item.InfrastructureId2 = infraToken.Value<int?>();
 
                 _repository.Save();
                 var outDto = Map<InterfaceUsage, InterfaceUsageDTO>(item);
