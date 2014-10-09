@@ -19,7 +19,6 @@ namespace Core.DomainModel.ItSystemUsage
             this.ItInterfaceExhibitUsages = new List<ItInterfaceExhibitUsage>();
             this.UsedBy = new List<ItSystemUsageOrgUnitUsage>();
             this.ItProjects = new List<ItProject.ItProject>();
-            this.InfrastructureUsages = new List<InterfaceUsage>();
         }
 
         /// <summary>
@@ -190,7 +189,5 @@ namespace Core.DomainModel.ItSystemUsage
         /// Associated it projects.
         /// </value>
         public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
-
-        public virtual ICollection<InterfaceUsage> InfrastructureUsages { get; set; }
     }
 }

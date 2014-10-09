@@ -133,6 +133,10 @@
     <Compile Include="Migrations\201410021644216_InitialCreate.Designer.cs">
       <DependentUpon>201410021644216_InitialCreate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201410091216152_InfraToSysUsage.cs" />
+    <Compile Include="Migrations\201410091216152_InfraToSysUsage.Designer.cs">
+      <DependentUpon>201410091216152_InfraToSysUsage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\BackupConfiguration.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -161,6 +165,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201410021644216_InitialCreate.resx">
       <DependentUpon>201410021644216_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201410091216152_InfraToSysUsage.resx">
+      <DependentUpon>201410091216152_InfraToSysUsage.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
