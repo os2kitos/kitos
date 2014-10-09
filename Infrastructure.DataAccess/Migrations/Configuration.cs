@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using Core.ApplicationServices;
@@ -41,7 +42,7 @@ namespace Infrastructure.DataAccess.Migrations
             context.SaveChanges();
 
             globalAdmin = context.Users.Single(x => x.Email == "support@kitos.dk");
-            
+
             #endregion
 
             #region OPTIONS
@@ -104,8 +105,8 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 Name = "LocalAdmin",
                 IsActive = true,
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             };
             context.AdminRoles.AddOrUpdate(x => x.Name, localAdmin);
             context.SaveChanges();
@@ -120,8 +121,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Name = "Chef",
                 Note = "Lederen af en organisationsenhed",
                 HasWriteAccess = true,
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             };
 
             var resourcePerson = new OrganizationRole()
@@ -130,8 +131,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Name = "Ressourceperson",
                 Note = "...",
                 HasWriteAccess = true,
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             };
 
             var employee = new OrganizationRole()
@@ -140,8 +141,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Name = "Medarbejder",
                 Note = "...",
                 HasWriteAccess = false,
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             };
 
             var digitalConsultant = new OrganizationRole()
@@ -150,8 +151,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Name = "Digitaliseringskonsulent",
                 Note = "...",
                 HasWriteAccess = true,
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             };
 
             var itConsultant = new OrganizationRole()
@@ -160,8 +161,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Name = "IT konsulent",
                 Note = "...",
                 HasWriteAccess = true,
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             };
 
             var leader = new OrganizationRole()
@@ -170,8 +171,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Name = "Leder",
                 Note = "...",
                 HasWriteAccess = true,
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             };
 
             var director = new OrganizationRole()
@@ -180,8 +181,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Name = "Direktør",
                 Note = "...",
                 HasWriteAccess = false,
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             };
 
             context.OrganizationRoles.AddOrUpdate(role => role.Name, boss, resourcePerson, employee, digitalConsultant, itConsultant, leader, director);
@@ -197,160 +198,160 @@ namespace Infrastructure.DataAccess.Migrations
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "Projektejer",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "Projektleder",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "Delprojektleder",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "Projektdeltager",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "Teknisk projektleder",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "IT konsulnet",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "Implementeringskonsulent",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "Proceskonsulent",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "Juridisk konsulent",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "IT arkitekt",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "Testansvarlig",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "Support",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "Programleder",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "Styregruppeformand",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "Styregruppemedlem",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "Forretningsejer",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "Forretningsansvarlig",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "Gevinstejer",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "Gevinsansvarlig",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsActive = true,
                     Name = "Rådgiver",
-                    ObjectOwner = globalAdmin,
-                    LastChangedByUser = globalAdmin
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 });
             context.SaveChanges();
 
@@ -364,8 +365,8 @@ namespace Infrastructure.DataAccess.Migrations
                 HasWriteAccess = true,
                 IsActive = true,
                 Name = "Systemejer",
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             };
 
             var systemResponsibleRole = new ItSystemRole()
@@ -374,8 +375,8 @@ namespace Infrastructure.DataAccess.Migrations
                 HasWriteAccess = true,
                 IsActive = true,
                 Name = "Systemansvarlig",
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             };
 
             var businessOwnerRole = new ItSystemRole()
@@ -384,8 +385,8 @@ namespace Infrastructure.DataAccess.Migrations
                 HasWriteAccess = true,
                 IsActive = true,
                 Name = "Forretningsejer",
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             };
 
             var superuserResponsibleRole = new ItSystemRole()
@@ -394,8 +395,8 @@ namespace Infrastructure.DataAccess.Migrations
                 HasWriteAccess = true,
                 IsActive = true,
                 Name = "Superbrugeransvarlig",
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             };
 
             var superuserRole = new ItSystemRole()
@@ -404,8 +405,8 @@ namespace Infrastructure.DataAccess.Migrations
                 HasWriteAccess = true,
                 IsActive = true,
                 Name = "Superbruger",
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             };
 
             var securityResponsibleRole = new ItSystemRole()
@@ -414,8 +415,8 @@ namespace Infrastructure.DataAccess.Migrations
                 HasWriteAccess = true,
                 IsActive = true,
                 Name = "Sikkerhedsansvarlig",
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             };
 
             var chanceManagerRole = new ItSystemRole()
@@ -424,8 +425,8 @@ namespace Infrastructure.DataAccess.Migrations
                 HasWriteAccess = true,
                 IsActive = true,
                 Name = "Changemanager",
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             };
 
             var dataOwnerRole = new ItSystemRole()
@@ -434,8 +435,8 @@ namespace Infrastructure.DataAccess.Migrations
                 HasWriteAccess = true,
                 IsActive = true,
                 Name = "Dataejer",
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             };
 
             var systemAdminRole = new ItSystemRole()
@@ -444,8 +445,8 @@ namespace Infrastructure.DataAccess.Migrations
                 HasWriteAccess = true,
                 IsActive = true,
                 Name = "Systemadminstrator",
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             };
 
             context.ItSystemRoles.AddOrUpdate(x => x.Name, systemOwnerRole, systemResponsibleRole, businessOwnerRole, superuserResponsibleRole, superuserRole, securityResponsibleRole, chanceManagerRole, dataOwnerRole, systemAdminRole);
@@ -460,43 +461,43 @@ namespace Infrastructure.DataAccess.Migrations
                 HasWriteAccess = true,
                 Name = "Kontraktejer",
                 IsActive = true,
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             }, new ItContractRole()
             {
                 HasWriteAccess = true,
                 Name = "Kontraktmanager",
                 IsActive = true,
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             }, new ItContractRole()
             {
                 HasWriteAccess = true,
                 Name = "Juridisk rådgiver",
                 IsActive = true,
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             }, new ItContractRole()
             {
                 HasWriteAccess = true,
                 Name = "Konsulent",
                 IsActive = true,
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             }, new ItContractRole()
             {
                 HasWriteAccess = true,
                 Name = "Fakturamodtager",
                 IsActive = true,
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             }, new ItContractRole()
             {
                 HasWriteAccess = true,
                 Name = "Budgetansvarlig",
                 IsActive = true,
-                ObjectOwner = globalAdmin,
-                LastChangedByUser = globalAdmin
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             });
             context.SaveChanges();
 
@@ -528,8 +529,10 @@ KITOS er bygget op omkring flg. moduler:
  Løsningen er ’overdraget’ til det digitale fællesskab OS2, som vil sørge for forvaltning af KITOS med hensyn til hosting, vedligeholdelse, videreudvikling, administration etc, så den også i praksis vil være mulig for andre kommuner at bruge.
 De første kommuner tager KITOS i brug i oktober 2014.
 Du kan læse mere om OS2KITOS på os2web.dk > Projekter > KITOS
-Kontakt: info@kitos.dk", ObjectOwner = globalAdmin, LastChangedByUser = globalAdmin },
-                                      new Text() { Value = "Der er p.t ingen driftsforstyrrelser", ObjectOwner = globalAdmin, LastChangedByUser = globalAdmin });
+Kontakt: info@kitos.dk", 
+                       ObjectOwnerId = globalAdmin.Id, 
+                       LastChangedByUserId = globalAdmin.Id },
+                                      new Text() { Value = "Der er p.t ingen driftsforstyrrelser", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
 
             #endregion
         }
@@ -600,8 +603,8 @@ Kontakt: info@kitos.dk", ObjectOwner = globalAdmin, LastChangedByUser = globalAd
                     IsSuggestion = isSuggestion,
                     Name = name,
                     Note = note,
-                    ObjectOwner = objectOwner,
-                    LastChangedByUser = objectOwner
+                    ObjectOwnerId = objectOwner.Id,
+                    LastChangedByUserId = objectOwner.Id
                 };
         }
 
@@ -638,8 +641,8 @@ Kontakt: info@kitos.dk", ObjectOwner = globalAdmin, LastChangedByUser = globalAd
                     Email = email,
                     Salt = salt,
                     Password = cryptoService.Encrypt(password + salt),
-                    ObjectOwner = objectOwner,
-                    LastChangedByUser = objectOwner
+                    ObjectOwnerId = objectOwner != null ? objectOwner.Id : (int?) null,
+                    LastChangedByUserId = objectOwner != null ? objectOwner.Id : (int?)null
                 };
         }
 
@@ -650,15 +653,15 @@ Kontakt: info@kitos.dk", ObjectOwner = globalAdmin, LastChangedByUser = globalAd
                 Name = name,
                 Config = Config.Default(objectOwner),
                 Type = organizationType,
-                ObjectOwner = objectOwner,
-                LastChangedByUser = objectOwner
+                ObjectOwnerId = objectOwner != null ? objectOwner.Id : (int?)null,
+                LastChangedByUserId = objectOwner != null ? objectOwner.Id : (int?)null
             };
 
             org.OrgUnits.Add(new OrganizationUnit()
             {
                 Name = org.Name,
-                ObjectOwner = objectOwner,
-                LastChangedByUser = objectOwner
+                ObjectOwnerId = objectOwner != null ? objectOwner.Id : (int?)null,
+                LastChangedByUserId = objectOwner != null ? objectOwner.Id : (int?)null
             });
 
             return org;
