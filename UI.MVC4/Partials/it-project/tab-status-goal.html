@@ -93,7 +93,12 @@
                         
                         <!-- Goal name -->
                         <td>
-                            {{goal.name}}
+                            <a class="btn btn-link btn-xs" data-ng-click="goal.edit()" data-ng-show="hasWriteAccess">
+                                {{goal.name}}
+                            </a>
+                            <span data-ng-hide="hasWriteAccess">
+                                {{goal.name}}
+                            </span>
                         </td>
                         
                         <!-- Description -->
