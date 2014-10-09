@@ -30,7 +30,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .WillCascadeOnDelete(true);
 
             this.HasOptional(t => t.Infrastructure)
-                .WithMany(d => d.InfrastructureUsage)
+                .WithMany()
                 .HasForeignKey(t => t.InfrastructureId);
         }
     }

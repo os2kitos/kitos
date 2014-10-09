@@ -123,7 +123,7 @@
                     if (usage.infrastructureId) {
                         canUseInterface.infrastructure = {
                             id: usage.infrastructureId,
-                            text: usage.infrastructureName
+                            text: usage.infrastructureItSystemName
                         };
                     }
                 }).finally(function() {
@@ -139,33 +139,10 @@
             });
             $scope.interfaceUsages = canUseInterfaces;
 
-            function patch(url, field, value) {
-
-                var data = {};
-                data[field] = value;
-
-                return $http({ method: 'PATCH', url: url, data: data }).success(function(result) {
-                    notify.addSuccessMessage('Feltet er opdateret');
-                }).error(function(result) {
-                    notify.addErrorMessage('Fejl! Feltet kunne ikke opdateres!');
-                });
-            }
-
-            function patchUsage(usage, field, value) {
-
-                var url = 'api/interfaceusage/' + usage.id;
-
-                return patch(url, field, value);
-            }
-
-            $scope.updateInfrastructure = function(usage) {
-                return patchUsage(usage, 'infrastructureId', usage.infrastructure.id);
-            };
-
-            $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem?nonInterfaces');
-
-            function selectLazyLoading(url) {
+            $scope.itSystemUsageSelectOptions = selectLazyLoading('api/itsystemusage', ['organizationId=' + itSystemUsage.organizationId]);
+            function selectLazyLoading(url, paramAry) {
                 return {
+                    allowClear: true,
                     minimumInputLength: 1,
                     initSelection: function (elem, callback) {
                     },
@@ -174,8 +151,9 @@
                             return { query: term };
                         },
                         quietMillis: 500,
-                        transport: function(queryParams) {
-                            var res = $http.get(url + '&orgId=' + user.currentOrganizationUnitId + '&q=' + queryParams.data.query).then(queryParams.success);
+                        transport: function (queryParams) {
+                            var extraParams = paramAry ? '&' + paramAry.join('&') : '';
+                            var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
                             res.abort = function() {
                                 return null;
                             };
@@ -187,10 +165,9 @@
                             var results = [];
 
                             _.each(data.data.response, function(obj) {
-
                                 results.push({
                                     id: obj.id,
-                                    text: obj.name
+                                    text: obj.itSystem.name
                                 });
                             });
 

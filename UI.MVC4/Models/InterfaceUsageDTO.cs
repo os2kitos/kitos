@@ -16,7 +16,7 @@ namespace UI.MVC4.Models
         public ItContractSystemDTO ItContract { get; set; }
 
         public int? InfrastructureId { get; set; }
-        public string InfrastructureName { get; set; }
+        public string InfrastructureItSystemName { get; set; }
 
         public bool IsWishedFor { get; set; }
         
