@@ -3,7 +3,6 @@ using System.Net.Http;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
-using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
@@ -46,15 +45,15 @@ namespace UI.MVC4.Controllers.API
 
                 var economyToken = obj.GetValue("economy");
                 if (economyToken != null)
-                    item.Economy = economyToken.Value<int>();
+                    item.Economy = economyToken.Value<int?>();
 
                 var priceToken = obj.GetValue("price");
                 if (priceToken != null)
-                    item.Price = priceToken.Value<int>();
+                    item.Price = priceToken.Value<int?>();
 
                 var amountToken = obj.GetValue("amount");
                 if (amountToken != null)
-                    item.Amount = amountToken.Value<int>();
+                    item.Amount = amountToken.Value<int?>();
 
                 var freqToken = obj.GetValue("frequencyId");
                 if (freqToken != null)
