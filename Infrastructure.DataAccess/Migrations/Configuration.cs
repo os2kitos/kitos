@@ -40,8 +40,14 @@ namespace Infrastructure.DataAccess.Migrations
 
             var globalAdmin = CreateUser("Global admin", "support@kitos.dk", "KitosAgent", cryptoService);
             globalAdmin.IsGlobalAdmin = true;
-            
-            context.Users.AddOrUpdate(x => x.Email, globalAdmin);
+
+            //var user1 = CreateUser("Test bruger1", "1@test", "test", cryptoService);
+            //var user2 = CreateUser("Test bruger2", "2@test", "test", cryptoService);
+            //var user3 = CreateUser("Test bruger3", "3@test", "test", cryptoService);
+            //var user4 = CreateUser("Test bruger4", "4@test", "test", cryptoService);
+            //var user5 = CreateUser("Test bruger5", "5@test", "test", cryptoService);
+
+            context.Users.AddOrUpdate(x => x.Email, globalAdmin/*, user1, user2, user3, user4, user5*/);
             context.SaveChanges();
 
             globalAdmin = context.Users.Single(x => x.Email == "support@kitos.dk");
@@ -509,13 +515,19 @@ namespace Infrastructure.DataAccess.Migrations
             #region ORGANIZATIONS
 
             var commonOrganization = CreateOrganization("Fælles Kommune", OrganizationType.Municipality, globalAdmin);
+            //var muni1 = CreateOrganization("Test kommune1", OrganizationType.Municipality, globalAdmin);
+            //var muni2 = CreateOrganization("Test kommune2", OrganizationType.Municipality, globalAdmin);
 
-            context.Organizations.AddOrUpdate(x => x.Name, commonOrganization);
+            context.Organizations.AddOrUpdate(x => x.Name, commonOrganization/*, muni1, muni2*/);
             context.SaveChanges();
 
             commonOrganization = context.Organizations.Single(x => x.Name == "Fælles Kommune");
 
             SetUserCreatedOrganization(globalAdmin, commonOrganization);
+            //SetUserCreatedOrganization(user1, commonOrganization);
+            //SetUserCreatedOrganization(user2, muni1);
+            //SetUserCreatedOrganization(user3, muni2);
+
 
             #endregion
 
@@ -538,6 +550,14 @@ Kontakt: info@kitos.dk",
                                       new Text() { Value = "Der er p.t ingen driftsforstyrrelser", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
 
             #endregion
+
+            //#region KLE
+
+            //var orgUnit = context.Organizations.Single(x => x.Name == "Fælles Kommune").OrgUnits.First();
+            //var kle = GenerateAllTasks(globalAdmin, orgUnit);
+            //context.TaskRefs.AddRange(kle);
+
+            //#endregion
         }
 
         #region Helper methods
