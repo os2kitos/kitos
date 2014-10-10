@@ -198,6 +198,13 @@ namespace UI.MVC4.Controllers.API
                 var usageQuery = _taskUsageRepository.AsQueryable();
                 pagingModel.Where(usage => usage.OrgUnitId == id);
 
+                // if a task group is given, only find the tasks in that group and sub groups
+                if (taskGroup.HasValue)
+                {
+                    pagingModel.Where(taskUsage => taskUsage.TaskRef.ParentId.Value == taskGroup.Value ||
+                                                   taskUsage.TaskRef.Parent.ParentId.Value == taskGroup.Value);
+                }
+
                 var theUsages = Page(usageQuery, pagingModel).ToList();
 
                 var dtos = (from usage in theUsages
