@@ -35,16 +35,16 @@ namespace Core.DomainModel.ItSystemUsage
         /// <summary>
         /// How much the data of the DataRow is used
         /// </summary>
-        public int Amount { get; set; }
+        public int? Amount { get; set; }
         
         /// <summary>
         /// Details regarding total economy of the usage of DataRow
         /// </summary>
-        public int Economy { get; set; }
+        public int? Economy { get; set; }
         
         /// <summary>
         /// Details regarding the price of this DataRow
         /// </summary>
-        public int Price { get; set; }
+        public int? Price { get; set; }
     }
 }

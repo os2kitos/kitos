@@ -3,7 +3,6 @@ using System.Net.Http;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
-using UI.MVC4.Models;
 
 namespace UI.MVC4.Controllers.API
 {
@@ -30,7 +29,7 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var key = new object[] { rowId, usageId, sysId, interfaceId };
+                var key = new object[] {rowId, usageId, sysId, interfaceId};
                 var item = _repository.GetByKey(key);
                 // create if doesn't exists
                 if (item == null)
@@ -46,19 +45,53 @@ namespace UI.MVC4.Controllers.API
 
                 var economyToken = obj.GetValue("economy");
                 if (economyToken != null)
-                    item.Economy = economyToken.Value<int>();
+                    try
+                    {
+                        item.Economy = economyToken.Value<int?>(); // throws error on empty string :(
+                    }
+                    catch
+                    {
+                        // if above fails it's a null-ish value
+                        item.Economy = null;
+                    }
 
                 var priceToken = obj.GetValue("price");
                 if (priceToken != null)
-                    item.Price = priceToken.Value<int>();
+                    try
+                    {
+                        item.Price = priceToken.Value<int?>(); // throws error on empty string :(
+                    }
+                    catch
+                    {
+                        // if above fails it's a null-ish value
+                        item.Price = null;
+                    }
+
 
                 var amountToken = obj.GetValue("amount");
                 if (amountToken != null)
-                    item.Amount = amountToken.Value<int>();
+                    try
+                    {
+                        item.Amount = amountToken.Value<int?>(); // throws error on empty string :(
+                    }
+                    catch
+                    {
+                        // if above fails it's a null-ish value
+                        item.Amount = null;
+                    }
+
 
                 var freqToken = obj.GetValue("frequencyId");
                 if (freqToken != null)
-                    item.FrequencyId = freqToken.Value<int?>();
+                    try
+                    {
+                        item.FrequencyId = freqToken.Value<int?>(); // throws error on empty string :(
+                    }
+                    catch
+                    {
+                        // if above fails it's a null-ish value
+                        item.FrequencyId = null;
+                    }
 
                 _repository.Save();
                 return Ok();

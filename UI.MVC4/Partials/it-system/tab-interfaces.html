@@ -170,7 +170,7 @@
                 
                 <!-- datatype -->
                 <td>
-                    <span data-ng-if="usage.numRows">
+                    <span data-ng-if="usage.numRows > 0">
                         {{usage.dataRows[0].dataType.name}}
                     </span>
                 </td>
@@ -184,7 +184,8 @@
                                 data-ng-disabled="!hasWriteAccess"
                                 data-ng-options="freq.id as freq.name for freq in frequencies"
                                 data-field="frequencyId"
-                                data-autosave="{{usage.dataRows[0].updateUrl}}"></select>
+                                data-autosave="{{usage.dataRows[0].updateUrl}}">
+                        </select>
                     </span>
                 </td>
 
