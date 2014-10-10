@@ -337,7 +337,7 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage DeleteTasksUsedByThisSystem(int id, [FromUri] int taskId)
+        public HttpResponseMessage DeleteTasksUsedByThisSystem(int id, [FromUri] int? taskId)
         {
             try
             {
@@ -345,16 +345,32 @@ namespace UI.MVC4.Controllers.API
                 if (usage == null) return NotFound();
                 if (!HasWriteAccess(usage)) return Unauthorized();
 
-                var task = _taskRepository.GetByKey(taskId);
-                if (task == null) return NotFound();
+                List<TaskRef> tasks;
+                if (taskId.HasValue)
+                {
+                    tasks =
+                        usage.TaskRefs.Where(
+                            x =>
+                                (x.Id == taskId || x.ParentId == taskId || x.Parent.ParentId == taskId) &&
+                                !x.Children.Any())
+                            .ToList();
+                }
+                else
+                {
+                    // no taskId was specified so get everything
+                    tasks = usage.TaskRefs.ToList();
+                }
 
-                usage.TaskRefs.Remove(task);
+                if (!tasks.Any())
+                    return NotFound();
 
+                foreach (var task in tasks)
+                {
+                    usage.TaskRefs.Remove(task);
+                }
                 usage.LastChanged = DateTime.Now;
                 usage.LastChangedByUser = KitosUser;
-
                 Repository.Save();
-
                 return Ok();
             }
             catch (Exception e)

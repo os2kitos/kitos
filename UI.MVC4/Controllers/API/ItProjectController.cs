@@ -472,25 +472,40 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
-        public HttpResponseMessage DeleteTasksToProject(int id, [FromUri] int taskId)
+        public HttpResponseMessage DeleteTaskToProject(int id, [FromUri] int? taskId)
         {
             try
             {
-                var project = Repository.GetByKey(id); 
+                var project = Repository.GetByKey(id);
                 if (project == null) return NotFound();
-
                 if (!HasWriteAccess(project)) return Unauthorized();
 
-                var task = _taskRepository.GetByKey(taskId);
-                if (task == null) return NotFound();
+                List<TaskRef> tasks;
+                if (taskId.HasValue)
+                {
+                    tasks =
+                        project.TaskRefs.Where(
+                            x =>
+                                (x.Id == taskId || x.ParentId == taskId || x.Parent.ParentId == taskId) &&
+                                !x.Children.Any())
+                            .ToList();
+                }
+                else
+                {
+                    // no taskId was specified so get everything
+                    tasks = project.TaskRefs.ToList();
+                }
 
-                project.TaskRefs.Remove(task);
+                if (!tasks.Any())
+                    return NotFound();
 
+                foreach (var task in tasks)
+                {
+                    project.TaskRefs.Remove(task);
+                }
                 project.LastChanged = DateTime.Now;
                 project.LastChangedByUser = KitosUser;
-
                 Repository.Save();
-
                 return Ok();
             }
             catch (Exception e)
