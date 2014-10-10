@@ -76,8 +76,11 @@
                             msg.toSuccessMessage('IT System  er slettet!');
                             $state.go('it-system.catalog');
                         })
-                        .error(function () {
-                            msg.toErrorMessage('Fejl! Kunne ikke slette IT System!');
+                        .error(function (data, status) {
+                            if (status == 409)
+                                msg.toErrorMessage('Fejl! IT Systemet er i lokal anvendelse!');
+                            else 
+                                msg.toErrorMessage('Fejl! Kunne ikke slette IT System!');
                         });
                 }
 
