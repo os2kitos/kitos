@@ -29,6 +29,25 @@ namespace UI.MVC4.Controllers.API
             _systemService = systemService;
         }
 
+        // DELETE api/T
+        public override HttpResponseMessage Delete(int id)
+        {
+            try
+            {
+                var item = Repository.GetByKey(id);
+
+                // check if system has any usages, if it does it's may not be deleted
+                if (item.Usages.Any())
+                    return Conflict("Cannot delete a system in use!");
+                
+                return base.Delete(id);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetPublic([FromUri] int organizationId, [FromUri] PagingModel<ItSystem> paging, [FromUri] string q)
         {
             try
