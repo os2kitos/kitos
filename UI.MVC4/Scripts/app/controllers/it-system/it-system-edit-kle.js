@@ -117,6 +117,18 @@
                 });
             };
 
+            $scope.removeTaskGroup = function () {
+                var url = baseUrl + '?taskId=' + $scope.selectedTaskGroup;
+
+                var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
+                $http.delete(url).success(function () {
+                    msg.toSuccessMessage("Tilknytningen er fjernet");
+                    reload();
+                }).error(function () {
+                    msg.toErrorMessage("Fejl! Kunne ikke fjerne tilknytningen!");
+                });
+            };
+
             function reload() {
                 $state.go('.', null, { reload: true });
             }

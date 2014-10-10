@@ -7,7 +7,6 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
@@ -106,6 +105,42 @@ namespace UI.MVC4.Controllers.API
                         LastChanged = DateTime.Now,
                         LastChangedByUser = KitosUser
                     });
+                }
+                Repository.Save();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage DeleteTaskGroup(int orgUnitId, int? taskId)
+        {
+            try
+            {
+                var orgUnit = _orgUnitRepository.GetByKey(orgUnitId);
+                if (orgUnit == null)
+                    return NotFound();
+
+                List<TaskUsage> taskUsages;
+                if (taskId.HasValue)
+                {
+                    taskUsages = orgUnit.TaskUsages.Where(
+                        taskUsage => taskUsage.TaskRef.ParentId == taskId || taskUsage.TaskRef.Parent.ParentId == taskId).ToList();
+                }
+                else
+                {
+                    // no taskId was specified so get everything
+                    taskUsages = orgUnit.TaskUsages.ToList();
+                }
+
+                if (!taskUsages.Any())
+                    return NotFound();
+
+                foreach (var taskUsage in taskUsages)
+                {
+                    Repository.DeleteByKey(taskUsage.Id);
                 }
                 Repository.Save();
                 return Ok();
