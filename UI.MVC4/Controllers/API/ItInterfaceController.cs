@@ -24,6 +24,25 @@ namespace UI.MVC4.Controllers.API
         {
         }
 
+        // DELETE api/ItInterface
+        public override HttpResponseMessage Delete(int id)
+        {
+            try
+            {
+                var item = Repository.GetByKey(id);
+
+                // check if the itinterface has any usages, if it does it's may not be deleted
+                if (item.ExhibitedBy != null || item.CanBeUsedBy.Any())
+                    return Conflict("Cannot delete an itinterface in use!");
+
+                return base.Delete(id);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetSearch(string q, int orgId)
         {
             try

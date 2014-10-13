@@ -148,8 +148,11 @@
                             msg.toSuccessMessage('Snitflade er slettet!');
                             $state.go('it-system.interfaceCatalog');
                         })
-                        .error(function () {
-                            msg.toErrorMessage('Fejl! Kunne ikke slette Snitfladen!');
+                        .error(function (data, status) {
+                            if (status == 409)
+                                msg.toErrorMessage('Fejl! Kan ikke slette snitflade, den er tilknyttet et IT System, som er i lokal anvendelse!');
+                            else
+                                msg.toErrorMessage('Fejl! Kunne ikke slette Snitfladen!');
                         });
                 }
             }]
