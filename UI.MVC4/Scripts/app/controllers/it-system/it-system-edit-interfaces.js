@@ -65,12 +65,15 @@
 
             $scope.interfacesSelectOptions = selectLazyLoading('api/itInterface', false, ['sysId=' + itSystem.id, 'orgId=' + user.currentOrganizationId]);
 
+            function formatInterface(inf) {
+                return '<div>' + inf.text + '</div>' + '<div class="small">' + inf.organizationName + '</div>';
+            }
+
             function selectLazyLoading(url, allowClear, paramAry) {
                 return {
                     minimumInputLength: 1,
-                    initSelection: function(elem, callback) {
-                    },
                     allowClear: allowClear,
+                    formatResult: formatInterface,
                     ajax: {
                         data: function(term, page) {
                             return { query: term };
@@ -92,7 +95,8 @@
                             _.each(data.data.response, function(obj) {
                                 results.push({
                                     id: obj.id,
-                                    text: obj.name
+                                    text: obj.name,
+                                    organizationName: obj.organizationName
                                 });
                             });
 
