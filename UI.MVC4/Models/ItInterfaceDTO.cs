@@ -31,5 +31,13 @@ namespace UI.MVC4.Models
         public int? BelongsToId { get; set; }
         public string BelongsToName { get; set; }
         public string Version { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether this instance has a usage in any organization.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance has a usage; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsUsed { get; set; }
     }
 }

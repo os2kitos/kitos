@@ -223,6 +223,7 @@ namespace UI.MVC4.App_Start
 
             Mapper.CreateMap<ItSystem, ItSystemDTO>()
                 .ForMember(dest => dest.TaskRefIds, opt => opt.MapFrom(src => src.TaskRefs.Select(x => x.Id)))
+                .ForMember(dest => dest.IsUsed, opt => opt.MapFrom(src => src.Usages.Any()))
                 //.ForMember(dest => dest.CanUseInterfaceIds, opt => opt.MapFrom(src => src.CanUseInterfaces.Select(x => x.Id)))
                 //.ForMember(dest => dest.ExposedInterfaceIds, opt => opt.MapFrom(src => src.ItInterfaceExhibits.Select(x => x.Id)))
                 .ReverseMap()
@@ -236,6 +237,7 @@ namespace UI.MVC4.App_Start
 
             Mapper.CreateMap<ItInterface, ItInterfaceDTO>()
                 .ForMember(dest => dest.InterfaceTypeName, opt => opt.MapFrom(src => src.InterfaceType.Name)) // have to map here else the EF proxy class type name is used :(
+                .ForMember(dest => dest.IsUsed, opt => opt.MapFrom(src => src.ExhibitedBy.ItSystem.Usages.Any()))
                 .ReverseMap();
 
             Mapper.CreateMap<ItInterfaceUse, ItInterfaceUseDTO>()
