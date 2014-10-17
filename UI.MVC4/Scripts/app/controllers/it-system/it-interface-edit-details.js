@@ -156,8 +156,10 @@
                 if (itInterface.isUsed) { // BUG this value only updates on reload
                     // clearing or changing the value must result in a dialog prompt
                     if (!$scope.exposedByObj) {
-                        if (!confirm('Der er IT Systemer, som er i Lokal anvendelse som har denne snitfladerelation tilknyttet. Er du sikker på at du vil fjerne relationen?'))
+                        if (!confirm('Der er IT Systemer, som er i Lokal anvendelse som har denne snitfladerelation tilknyttet. Er du sikker på at du vil fjerne relationen?')) {
+                            $scope.exposedByObj = { id: itInterface.exhibitedByItSystemId, text: itInterface.exhibitedByItSystemName };
                             return;
+                        }
                     }
                     // TODO need previous value to prompt when value is changed (not cleared)
                 }
