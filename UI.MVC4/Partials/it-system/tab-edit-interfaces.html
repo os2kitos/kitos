@@ -14,7 +14,7 @@
                 </td>
                 <td>
                     <button data-ng-if="hasWriteAccess" class="btn btn-danger btn-xs" data-tooltip="Fjern kan-anvende" data-confirmed-click="interface.delete()"
-                            data-confirm-click="Er du sikker på at du vil fjerne opmærkingen? Dette sletter ikke snitfladen.">
+                            data-confirm-click="{{ system.isUsed && 'Der er IT Systemer, som er i Lokal anvendelse som har denne snitfladerelation tilknyttet. Er du sikker på at du vil fjerne relationen?' || 'Er du sikker på at du vil fjerne opmærkingen? Dette sletter ikke snitfladen.' }}">
                         <i class="glyphicon glyphicon-trash"></i>
                     </button>
                 </td>

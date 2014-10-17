@@ -148,10 +148,20 @@
 
             $scope.save = function () {
                 // select2 is calling save twice,
-                // checking for object will discard the wrong call
+                // checking for object will discard the incorrect call
                 if (typeof $scope.exposedByObj !== 'object')
                     return;
 
+                // check if this interface is exhibited by any system that is in use (itsystemusage)
+                if (itInterface.isUsed) { // BUG this value only updates on reload
+                    // clearing or changing the value must result in a dialog prompt
+                    if (!$scope.exposedByObj) {
+                        if (!confirm('Der er IT Systemer, som er i Lokal anvendelse som har denne snitfladerelation tilknyttet. Er du sikker på at du vil fjerne relationen?'))
+                            return;
+                    }
+                    // TODO need previous value to prompt when value is changed (not cleared)
+                }
+                
                 var msg = notify.addInfoMessage("Gemmer...", false);
                 if ($scope.exposedByObj) {
                     // POST
