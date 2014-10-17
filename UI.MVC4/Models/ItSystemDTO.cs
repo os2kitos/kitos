@@ -76,5 +76,13 @@ namespace UI.MVC4.Models
 
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether this instance has a usage in any organization.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance has a usage; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsUsed { get; set; }
     }
 }
