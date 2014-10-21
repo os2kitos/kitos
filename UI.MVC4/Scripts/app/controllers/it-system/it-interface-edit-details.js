@@ -58,8 +58,8 @@
     }]);
 
     app.controller('system.SystemInterfaceDetailsCtrl', [
-        '$scope', '$http', '$timeout', 'notify', 'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'user', 'itInterface', 'dataRows',
-        function ($scope, $http, $timeout, notify, tsas, interfaces, interfaceTypes, methods, dataTypes, user, itInterface, dataRows) {
+        '$scope', '$http', '$timeout', '$state', 'notify', 'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'user', 'itInterface', 'dataRows',
+        function ($scope, $http, $timeout, $state, notify, tsas, interfaces, interfaceTypes, methods, dataTypes, user, itInterface, dataRows) {
 
             $scope.tsas = tsas;
             $scope.interfaces = interfaces;
@@ -146,6 +146,10 @@
                 };
             }
 
+            function reload() {
+                $state.go('.', null, { reload: true });
+            }
+
             $scope.save = function () {
                 // select2 is calling save twice,
                 // checking for object will discard the incorrect call
@@ -153,7 +157,7 @@
                     return;
 
                 // check if this interface is exhibited by any system that is in use (itsystemusage)
-                if (itInterface.isUsed) { // BUG this value only updates on reload
+                if (itInterface.isUsed) {
                     // clearing or changing the value must result in a dialog prompt
                     if (!$scope.exposedByObj) {
                         if (!confirm('Der er IT Systemer, som er i Lokal anvendelse som har denne snitfladerelation tilknyttet. Er du sikker på at du vil fjerne relationen?')) {
@@ -166,20 +170,38 @@
                 
                 var msg = notify.addInfoMessage("Gemmer...", false);
                 if ($scope.exposedByObj) {
-                    // POST
-                    var payload = {
-                        id: itInterface.id,
-                        itSystemId: $scope.exposedByObj.id
-                    };
-                    $http.post('api/exhibit', payload).success(function() {
-                        msg.toSuccessMessage("Feltet er opdateret.");
-                    }).error(function() {
-                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
-                    });
+                    if (itInterface.exhibitedByItSystemId) {
+                        // PATCH
+                        var payload = {
+                            itSystemId: $scope.exposedByObj.id
+                        };
+                        var url = 'api/exhibit/' + itInterface.id;
+                        $http({ method: 'PATCH', url: url, data: payload })
+                            .success(function() {
+                                msg.toSuccessMessage("Feltet er opdateret.");
+                                reload();
+                            })
+                            .error(function() {
+                                msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                            });
+                    } else {
+                        // POST
+                        var payload = {
+                            id: itInterface.id,
+                            itSystemId: $scope.exposedByObj.id
+                        };
+                        $http.post('api/exhibit', payload).success(function() {
+                            msg.toSuccessMessage("Feltet er opdateret.");
+                            reload();
+                        }).error(function() {
+                            msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                        });
+                    }
                 } else {
                     // DELETE
                     $http.delete('api/exhibit/' + itInterface.id).success(function() {
                         msg.toSuccessMessage("Feltet er opdateret.");
+                        reload();
                     }).error(function() {
                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                     });
