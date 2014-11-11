@@ -318,7 +318,7 @@
                                 'newEan': unit.ean,
                                 'newParent': unit.parentId,
                                 'orgId': unit.organizationId,
-                                'isRoot': unit.parentId == 0
+                                'isRoot': unit.parentId == undefined
                             };
 
                             // only allow changing the parent if user is admin, and the unit isn't at the root
