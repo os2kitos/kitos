@@ -14,7 +14,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(t => t.OrganizationId)
                 .WillCascadeOnDelete(false);
 
-            this.HasRequired(t => t.ItProjectType)
+            this.HasOptional(t => t.ItProjectType)
                 .WithMany(d => d.References)
                 .HasForeignKey(t => t.ItProjectTypeId);
 

@@ -142,6 +142,10 @@
     <Compile Include="Migrations\201410101230382_DataRowFieldsToNullable.Designer.cs">
       <DependentUpon>201410101230382_DataRowFieldsToNullable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201411111257484_MakeNullable.cs" />
+    <Compile Include="Migrations\201411111257484_MakeNullable.Designer.cs">
+      <DependentUpon>201411111257484_MakeNullable.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\BackupConfiguration.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -176,6 +180,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201410101230382_DataRowFieldsToNullable.resx">
       <DependentUpon>201410101230382_DataRowFieldsToNullable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201411111257484_MakeNullable.resx">
+      <DependentUpon>201411111257484_MakeNullable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

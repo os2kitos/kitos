@@ -23,7 +23,7 @@ namespace Core.DomainModel.ItProject
         public bool Measurable { get; set; }
         public TrafficLight Status { get; set; }
 
-        public int GoalTypeId { get; set; }
+        public int? GoalTypeId { get; set; }
         public virtual GoalType GoalType { get; set; }
 
         public int GoalStatusId { get; set; }

@@ -53,7 +53,7 @@ namespace Core.DomainModel.ItProject
         public virtual ItProject Parent { get; set; }
         public virtual ICollection<ItProject> Children { get; set; }
 
-        public int ItProjectTypeId { get; set; }
+        public int? ItProjectTypeId { get; set; }
         public virtual ItProjectType ItProjectType { get; set; }
 
 
