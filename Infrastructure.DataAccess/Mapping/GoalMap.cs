@@ -17,7 +17,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.Goals)
                 .HasForeignKey(d => d.GoalStatusId);
 
-            this.HasRequired(t => t.GoalType)
+            this.HasOptional(t => t.GoalType)
                 .WithMany(d => d.References)
                 .HasForeignKey(t => t.GoalTypeId);
         }
