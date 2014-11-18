@@ -31,5 +31,14 @@ namespace UI.MVC4.Properties {
                 return ((global::System.TimeSpan)(this["ResetPasswordTTL"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://localhost/#/reset-password/")]
+        public string ResetPasswordUrl {
+            get {
+                return ((string)(this["ResetPasswordUrl"]));
+            }
+        }
     }
 }
