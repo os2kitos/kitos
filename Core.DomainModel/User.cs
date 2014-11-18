@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -29,6 +30,7 @@ namespace Core.DomainModel
         public string Password { get; set; }
         public string Salt { get; set; }
         public bool IsGlobalAdmin { get; set; }
+        public Guid? Uuid { get; set; }
 
         public int? CreatedInId { get; set; }
         public virtual Organization CreatedIn { get; set; }

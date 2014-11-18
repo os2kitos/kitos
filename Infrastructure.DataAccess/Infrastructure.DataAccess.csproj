@@ -155,6 +155,10 @@
     <Compile Include="Migrations\201411111257484_MakeNullable.Designer.cs">
       <DependentUpon>201411111257484_MakeNullable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201411181232099_Xauth.cs" />
+    <Compile Include="Migrations\201411181232099_Xauth.Designer.cs">
+      <DependentUpon>201411181232099_Xauth.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\BackupConfiguration.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -192,6 +196,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201411111257484_MakeNullable.resx">
       <DependentUpon>201411111257484_MakeNullable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201411181232099_Xauth.resx">
+      <DependentUpon>201411181232099_Xauth.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
