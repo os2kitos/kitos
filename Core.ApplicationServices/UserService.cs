@@ -62,7 +62,8 @@ namespace Core.ApplicationServices
                           org.Name + ".</p>" +
                           "<p>Du bedes klikke <a href='" + resetLink +
                           "'>her</a>, hvor du første gang bliver bedt om at indtaste et nyt password for din KITOS profil.</p>" +
-                          "<p>Linket udløber om " + _ttl.TotalDays + " dage.</p>";
+                          "<p>Linket udløber om " + _ttl.TotalDays + " dage.</p>" +
+                          "<p><a href='" + _baseUrl + "docs/Vejledning%20til%20slutbrugeren.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>";
 
             IssuePasswordReset(user, subject, content);
 
@@ -83,7 +84,8 @@ namespace Core.ApplicationServices
                 mailContent = "<p>Du har bedt om at få nulstillet dit password.</p>" +
                               "<p><a href='" + resetLink +
                               "'>Klik her for at nulstille passwordet for din KITOS profil</a>.</p>" +
-                              "<p>Linket udløber om " + _ttl.TotalDays + " dage.</p>";
+                              "<p>Linket udløber om " + _ttl.TotalDays + " dage.</p>" +
+                              "<p><a href='" + _baseUrl + "docs/Vejledning%20til%20slutbrugeren.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>";
             }
             const string mailSubject = "Nulstilning af dit KITOS password";
 
