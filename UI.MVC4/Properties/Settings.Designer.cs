@@ -35,9 +35,9 @@ namespace UI.MVC4.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("https://localhost:44300/")]
-        public string ResetPasswordUrl {
+        public string BaseUrl {
             get {
-                return ((string)(this["ResetPasswordUrl"]));
+                return ((string)(this["BaseUrl"]));
             }
         }
     }

@@ -70,7 +70,7 @@ namespace UI.MVC4.App_Start
             kernel.Bind<ICryptoService>().To<CryptoService>();
             kernel.Bind<IUserService>().To<UserService>().InRequestScope()
                 .WithConstructorArgument("ttl", Settings.Default.ResetPasswordTTL)
-                .WithConstructorArgument("baseUrl", Settings.Default.ResetPasswordUrl);
+                .WithConstructorArgument("baseUrl", Settings.Default.BaseUrl);
             kernel.Bind<IOrgUnitService>().To<OrgUnitService>().InRequestScope();
             kernel.Bind<IAdminService>().To<AdminService>().InRequestScope();
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InRequestScope();
