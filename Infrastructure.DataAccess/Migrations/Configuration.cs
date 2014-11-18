@@ -36,21 +36,27 @@ namespace Infrastructure.DataAccess.Migrations
         {
             #region USERS
 
-            var cryptoService = new CryptoService();
+            context.Users.AddOrUpdate(x => x.Name,
+                new User
+                {
+                    Name = "Global admin",
+                    Email = "support@kitos.dk",
+                    Salt = "uH3U0wqme2mc83FvSwkDrd9fm-3MycFR0ugaKtREJBw1",
+                    Password = "h3hNNY9J3SBUNCgaoccGo1WCRDxt4v9oUjD5uZhQ78M1",
+                    IsGlobalAdmin = true
+                });
 
-            var globalAdmin = CreateUser("Global admin", "support@kitos.dk", "KitosAgent", cryptoService);
-            globalAdmin.IsGlobalAdmin = true;
-
+            //var cryptoService = new CryptoService();
             //var user1 = CreateUser("Test bruger1", "1@test", "test", cryptoService);
             //var user2 = CreateUser("Test bruger2", "2@test", "test", cryptoService);
             //var user3 = CreateUser("Test bruger3", "3@test", "test", cryptoService);
             //var user4 = CreateUser("Test bruger4", "4@test", "test", cryptoService);
             //var user5 = CreateUser("Test bruger5", "5@test", "test", cryptoService);
-
-            context.Users.AddOrUpdate(x => x.Email, globalAdmin/*, user1, user2, user3, user4, user5*/);
+            //context.Users.AddOrUpdate(x => x.Email, /*, user1, user2, user3, user4, user5*/);
+            
             context.SaveChanges();
 
-            globalAdmin = context.Users.Single(x => x.Email == "support@kitos.dk");
+            var globalAdmin = context.Users.Single(x => x.Email == "support@kitos.dk");
 
             #endregion
 
