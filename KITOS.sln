@@ -28,41 +28,31 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{952113
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug @ Test Mijlø|Any CPU = Debug @ Test Mijlø|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A76A8E41-74F7-4443-A5F3-059B5414D83B}.Debug @ Test Mijlø|Any CPU.ActiveCfg = Debug @ Test Mijlø|Any CPU
-		{A76A8E41-74F7-4443-A5F3-059B5414D83B}.Debug @ Test Mijlø|Any CPU.Build.0 = Debug @ Test Mijlø|Any CPU
 		{A76A8E41-74F7-4443-A5F3-059B5414D83B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A76A8E41-74F7-4443-A5F3-059B5414D83B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A76A8E41-74F7-4443-A5F3-059B5414D83B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A76A8E41-74F7-4443-A5F3-059B5414D83B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}.Debug @ Test Mijlø|Any CPU.ActiveCfg = Debug @ Test Mijlø|Any CPU
-		{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}.Debug @ Test Mijlø|Any CPU.Build.0 = Debug @ Test Mijlø|Any CPU
 		{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F0986888-8F35-4559-8FBA-428BC9EC9ADD}.Debug @ Test Mijlø|Any CPU.ActiveCfg = Debug @ Test Mijlø|Any CPU
-		{F0986888-8F35-4559-8FBA-428BC9EC9ADD}.Debug @ Test Mijlø|Any CPU.Build.0 = Debug @ Test Mijlø|Any CPU
 		{F0986888-8F35-4559-8FBA-428BC9EC9ADD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F0986888-8F35-4559-8FBA-428BC9EC9ADD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0986888-8F35-4559-8FBA-428BC9EC9ADD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0986888-8F35-4559-8FBA-428BC9EC9ADD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6CD15363-5401-43C5-9479-02FDDFA881DC}.Debug @ Test Mijlø|Any CPU.ActiveCfg = Debug @ Test Mijlø|Any CPU
-		{6CD15363-5401-43C5-9479-02FDDFA881DC}.Debug @ Test Mijlø|Any CPU.Build.0 = Debug @ Test Mijlø|Any CPU
 		{6CD15363-5401-43C5-9479-02FDDFA881DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6CD15363-5401-43C5-9479-02FDDFA881DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CD15363-5401-43C5-9479-02FDDFA881DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6CD15363-5401-43C5-9479-02FDDFA881DC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}.Debug @ Test Mijlø|Any CPU.ActiveCfg = Debug @ Test Mijlø|Any CPU
-		{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}.Debug @ Test Mijlø|Any CPU.Build.0 = Debug @ Test Mijlø|Any CPU
 		{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1055,9 +1055,6 @@
     <Content Include="Scripts\version.json" />
     <Content Include="Scripts\underscore.min.map" />
     <Content Include="Scripts\jquery-2.1.0.min.map" />
-    <None Include="Web.Debug %40 Test Mijlø.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
