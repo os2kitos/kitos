@@ -11,7 +11,7 @@ namespace Core.ApplicationServices
     public class UserService : IUserService
     {
         private readonly TimeSpan _ttl;
-        private readonly string _resetPasswordUrl;
+        private readonly string _baseUrl;
         private readonly IGenericRepository<User> _userRepository;
         private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IGenericRepository<PasswordResetRequest> _passwordResetRequestRepository;
@@ -19,7 +19,7 @@ namespace Core.ApplicationServices
         private readonly ICryptoService _cryptoService;
 
         public UserService(TimeSpan ttl,
-            string resetPasswordUrl,
+            string baseUrl,
             IGenericRepository<User> userRepository, 
             IGenericRepository<Organization> orgRepository, 
             IGenericRepository<PasswordResetRequest> passwordResetRequestRepository, 
@@ -27,7 +27,7 @@ namespace Core.ApplicationServices
             ICryptoService cryptoService)
         {
             _ttl = ttl;
-            _resetPasswordUrl = resetPasswordUrl;
+            _baseUrl = baseUrl;
             _userRepository = userRepository;
             _orgRepository = orgRepository;
             _passwordResetRequestRepository = passwordResetRequestRepository;
@@ -54,7 +54,7 @@ namespace Core.ApplicationServices
             _userRepository.Save();
 
             var reset = GenerateResetRequest(user);
-            var resetLink = _resetPasswordUrl + HttpUtility.UrlEncode(reset.Hash);
+            var resetLink = _baseUrl + "#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
 
             const string subject = "Oprettelse af KITOS profil";
             var content = "<h2>Kære " + user.Name + "</h2>" +
@@ -62,7 +62,8 @@ namespace Core.ApplicationServices
                           org.Name + ".</p>" +
                           "<p>Du bedes klikke <a href='" + resetLink +
                           "'>her</a>, hvor du første gang bliver bedt om at indtaste et nyt password for din KITOS profil.</p>" +
-                          "<p>Linket udløber om " + _ttl.TotalHours + " timer.</p>";
+                          "<p>Linket udløber om " + _ttl.TotalDays + " dage.</p>" +
+                          "<p><a href='" + _baseUrl + "docs/Vejledning%20til%20slutbrugeren.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>";
 
             IssuePasswordReset(user, subject, content);
 
@@ -79,15 +80,12 @@ namespace Core.ApplicationServices
             if (content == null)
             {
                 reset = GenerateResetRequest(user);
-                var resetLink = "https://kitos.dk/#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
-                var resetLinkTestEvo = "https://kitos.roskilde.dk/#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
+                var resetLink = _baseUrl + "#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
                 mailContent = "<p>Du har bedt om at få nulstillet dit password.</p>" +
                               "<p><a href='" + resetLink +
                               "'>Klik her for at nulstille passwordet for din KITOS profil</a>.</p>" +
-                              "<p>Linket udløber om " + _ttl.TotalHours + " timer.</p>" +
-                              "<hr>" +
-                              "<p>Bemærk: Hvis du ved din oprettelse er sket i testmiljøet, så skal du i stedet klikke her: <a href='" +
-                              resetLinkTestEvo + "'>KITOS Test</a></p>";
+                              "<p>Linket udløber om " + _ttl.TotalDays + " dage.</p>" +
+                              "<p><a href='" + _baseUrl + "docs/Vejledning%20til%20slutbrugeren.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>";
             }
             const string mailSubject = "Nulstilning af dit KITOS password";
 
