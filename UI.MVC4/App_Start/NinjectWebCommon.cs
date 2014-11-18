@@ -1,10 +1,10 @@
-using System.Configuration;
 using System.Web.Http;
 using System.Web.Security;
 using Core.DomainServices;
 using Core.ApplicationServices;
 using Infrastructure.DataAccess;
 using UI.MVC4.Infrastructure;
+using UI.MVC4.Properties;
 
 [assembly: WebActivator.PreApplicationStartMethod(typeof(UI.MVC4.App_Start.NinjectWebCommon), "Start")]
 [assembly: WebActivator.ApplicationShutdownMethodAttribute(typeof(UI.MVC4.App_Start.NinjectWebCommon), "Stop")]
@@ -63,12 +63,14 @@ namespace UI.MVC4.App_Start
         private static void RegisterServices(IKernel kernel)
         {
             kernel.Bind<KitosContext>().ToSelf().InRequestScope();
-
+            
             kernel.Bind(typeof(IGenericRepository<>)).To(typeof(GenericRepository<>)).InRequestScope();
             kernel.Bind<IUserRepository>().To<UserRepository>().InRequestScope();
             kernel.Bind<IMailClient>().To<MailClient>().InRequestScope();
             kernel.Bind<ICryptoService>().To<CryptoService>();
-            kernel.Bind<IUserService>().To<UserService>().InRequestScope().WithConstructorArgument("ttl", Properties.Settings.Default.ResetPasswordTTL);
+            kernel.Bind<IUserService>().To<UserService>().InRequestScope()
+                .WithConstructorArgument("ttl", Settings.Default.ResetPasswordTTL)
+                .WithConstructorArgument("resetPasswordUrl", Settings.Default.ResetPasswordUrl);
             kernel.Bind<IOrgUnitService>().To<OrgUnitService>().InRequestScope();
             kernel.Bind<IAdminService>().To<AdminService>().InRequestScope();
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InRequestScope();
