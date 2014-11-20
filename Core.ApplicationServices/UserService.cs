@@ -12,6 +12,7 @@ namespace Core.ApplicationServices
     {
         private readonly TimeSpan _ttl;
         private readonly string _baseUrl;
+        private readonly string _mailSuffix;
         private readonly IGenericRepository<User> _userRepository;
         private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IGenericRepository<PasswordResetRequest> _passwordResetRequestRepository;
@@ -20,6 +21,7 @@ namespace Core.ApplicationServices
 
         public UserService(TimeSpan ttl,
             string baseUrl,
+            string mailSuffix,
             IGenericRepository<User> userRepository, 
             IGenericRepository<Organization> orgRepository, 
             IGenericRepository<PasswordResetRequest> passwordResetRequestRepository, 
@@ -28,6 +30,7 @@ namespace Core.ApplicationServices
         {
             _ttl = ttl;
             _baseUrl = baseUrl;
+            _mailSuffix = mailSuffix;
             _userRepository = userRepository;
             _orgRepository = orgRepository;
             _passwordResetRequestRepository = passwordResetRequestRepository;
@@ -56,14 +59,16 @@ namespace Core.ApplicationServices
             var reset = GenerateResetRequest(user);
             var resetLink = _baseUrl + "#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
 
-            const string subject = "Oprettelse af KITOS profil";
+            var subject = "Oprettelse af KITOS profil " + _mailSuffix;
             var content = "<h2>Kære " + user.Name + "</h2>" +
                           "<p>Du er blevet oprettet, som bruger i KITOS (Kommunernes IT Overblikssystem) under organisationen " +
                           org.Name + ".</p>" +
                           "<p>Du bedes klikke <a href='" + resetLink +
                           "'>her</a>, hvor du første gang bliver bedt om at indtaste et nyt password for din KITOS profil.</p>" +
-                          "<p>Linket udløber om " + _ttl.TotalDays + " dage.</p>" +
-                          "<p><a href='" + _baseUrl + "docs/Vejledning%20til%20slutbrugeren.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>";
+                          "<p>Linket udløber om " + _ttl.TotalDays + " dage. <a href='" + resetLink + "'>Klik her</a>, " +
+                          "hvis dit link er udløbet og du vil blive ledt til 'Glemt password' proceduren.</p>" +
+                          "<p><a href='" + _baseUrl +
+                          "docs/Vejledning%20til%20slutbrugeren.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>";
 
             IssuePasswordReset(user, subject, content);
 

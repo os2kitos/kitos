@@ -40,5 +40,14 @@ namespace UI.MVC4.Properties {
                 return ((string)(this["BaseUrl"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("(i dev)")]
+        public string MailSuffix {
+            get {
+                return ((string)(this["MailSuffix"]));
+            }
+        }
     }
 }
