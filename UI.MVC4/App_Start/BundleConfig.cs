@@ -46,11 +46,11 @@ namespace UI.MVC4
                 "~/Scripts/angular-ui-util/ui-utils.js"));
 
             // angular app files
-            bundles.Add(new ScriptBundle("~/Scripts/app").IncludeDirectory(
+            bundles.Add(new ScriptBundle("~/Scripts/appbundle").IncludeDirectory(
                 "~/Scripts/app", "*.js", true));
 
             // css
-            bundles.Add(new StyleBundle("~/Content/css").Include(
+            bundles.Add(new StyleBundle("~/Content/cssbundle").Include(
                 "~/Content/bootstrap/bootstrap.css",
                 "~/Content/notify/notify.css",
                 "~/Content/css/select2.css",
