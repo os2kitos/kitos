@@ -23,7 +23,8 @@
             $scope.pagination = {
                 search: '',
                 skip: 0,
-                take: 10
+                take: 50,
+                orderBy: 'Name'
             };
 
             $scope.csvUrl = 'api/itProject?csv&orgId=' + user.currentOrganizationId;
@@ -32,20 +33,6 @@
             $scope.projectRoles = projectRoles;
             
             $scope.$watchCollection('pagination', function (newVal, oldVal) {
-                //var url = 'api/itProject?csv&orgId=' + user.currentOrganizationId;
-
-                //url += '&skip=' + $scope.pagination.skip;
-                //url += '&take=' + $scope.pagination.take;
-
-                //if ($scope.pagination.orderBy) {
-                //    url += '&orderBy=' + $scope.pagination.orderBy;
-                //    if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
-                //}
-
-                //if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
-                //else url += "&q=";
-
-                //$scope.csvUrl = url;
                 loadProjects();
             });
 
