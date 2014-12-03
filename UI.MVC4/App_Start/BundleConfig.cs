@@ -7,6 +7,10 @@ namespace UI.MVC4
         // For more information on Bundling, visit http://go.microsoft.com/fwlink/?LinkId=254725
         public static void RegisterBundles(BundleCollection bundles)
         {
+            // disable bundling and minification... it causes issues :(
+            // TODO fix the errors when bundling and minifying
+            BundleTable.EnableOptimizations = false;
+
             // jQuery and plugins
             bundles.Add(new ScriptBundle("~/Scripts/jquery").Include(
                 "~/Scripts/jquery-{version}.js",
@@ -53,7 +57,7 @@ namespace UI.MVC4
             bundles.Add(new StyleBundle("~/Content/cssbundle").Include(
                 "~/Content/bootstrap/bootstrap.css",
                 "~/Content/notify/notify.css",
-                "~/Content/css/select2.css",
+                "~/Content/select2.css",
                 "~/Content/select2-bootstrap.css",
                 "~/Content/kitos.css"));
         }
