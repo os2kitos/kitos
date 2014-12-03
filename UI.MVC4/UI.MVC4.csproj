@@ -391,11 +391,11 @@
   <ItemGroup>
     <Content Include="Content\bootstrap\bootstrap.css" />
     <Content Include="Content\bootstrap\bootstrap.min.css" />
-    <Content Include="Content\css\select2-spinner.gif" />
-    <Content Include="Content\css\select2.png" />
-    <Content Include="Content\css\select2x2.png" />
+    <Content Include="Content\select2-spinner.gif" />
+    <Content Include="Content\select2.png" />
+    <Content Include="Content\select2x2.png" />
     <Content Include="Content\notify\notify.css" />
-    <Content Include="Content\css\select2.css" />
+    <Content Include="Content\select2.css" />
     <Content Include="Content\kitos.css" />
     <Content Include="Content\select2-bootstrap.css" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
