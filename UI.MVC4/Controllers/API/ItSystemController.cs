@@ -55,8 +55,10 @@ namespace UI.MVC4.Controllers.API
                 //Get all systems which the user has access to
                 paging.Where(
                     s =>
-                        // global admin sees all within the context 
-                        KitosUser.IsGlobalAdmin && s.OrganizationId == organizationId ||
+                        // limit to within the context
+                        s.OrganizationId == organizationId &&
+                        // global admin sees all
+                        (KitosUser.IsGlobalAdmin ||
                         // object owner sees his own objects     
                         s.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
@@ -66,7 +68,7 @@ namespace UI.MVC4.Controllers.API
                         s.OrganizationId == organizationId
                         // it systems doesn't have roles so private doesn't make sense
                         // only object owners will be albe to see private objects
-                    );
+                    ));
 
                 if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
 
@@ -87,8 +89,10 @@ namespace UI.MVC4.Controllers.API
                 var systems =
                     Repository.AsQueryable()
                         .Where(s =>
-                            // global admin sees all within the context 
-                            KitosUser.IsGlobalAdmin && s.OrganizationId == organizationId ||
+                            // limit to within the context 
+                            s.OrganizationId == organizationId &&
+                            // global admin sees all 
+                            (KitosUser.IsGlobalAdmin ||
                             // object owner sees his own objects     
                             s.ObjectOwnerId == KitosUser.Id ||
                             // it's public everyone can see it
@@ -98,7 +102,7 @@ namespace UI.MVC4.Controllers.API
                             s.OrganizationId == organizationId
                             // it systems doesn't have roles so private doesn't make sense
                             // only object owners will be albe to see private objects
-                        );
+                        ));
 
                 //if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
 
@@ -158,8 +162,10 @@ namespace UI.MVC4.Controllers.API
                         s.Name.Contains(q) &&
                         // exclude system with id
                         s.Id != excludeId &&
-                        // global admin sees all within the context 
-                        (KitosUser.IsGlobalAdmin && s.OrganizationId == orgId ||
+                        // limit to within the context 
+                        s.OrganizationId == orgId &&
+                        // global admin sees all 
+                        (KitosUser.IsGlobalAdmin ||
                          // object owner sees his own objects     
                          s.ObjectOwnerId == KitosUser.Id ||
                          // it's public everyone can see it

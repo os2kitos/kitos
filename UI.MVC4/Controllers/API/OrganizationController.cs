@@ -36,8 +36,10 @@ namespace UI.MVC4.Controllers.API
                     org => 
                         // filter by project name
                         org.Name.Contains(q) &&
-                        // global admin sees all within the context
-                        (KitosUser.IsGlobalAdmin && org.Id == orgId ||
+                        // limit to within the context
+                        org.Id == orgId &&
+                        // global admin sees all 
+                        (KitosUser.IsGlobalAdmin ||
                         // object owner sees his own objects
                         org.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
@@ -64,9 +66,11 @@ namespace UI.MVC4.Controllers.API
                 var orgs = Repository.Get(
                     org => 
                         // filter by project name or cvr
-                        org.Name.Contains(q) || org.Cvr.Contains(q) &&
-                        // global admin sees all within the context
-                        (KitosUser.IsGlobalAdmin && org.Id == orgId ||
+                        (org.Name.Contains(q) || org.Cvr.Contains(q)) &&
+                        // limit to within the context
+                        org.Id == orgId &&
+                        // global admin sees all 
+                        (KitosUser.IsGlobalAdmin ||
                         // object owner sees his own objects
                         org.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it

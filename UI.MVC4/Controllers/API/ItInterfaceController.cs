@@ -78,9 +78,10 @@ namespace UI.MVC4.Controllers.API
             try
             {
                 pagingModel.Where(s =>
-                    // global admin sees all within the context 
-                    KitosUser.IsGlobalAdmin &&
-                    s.OrganizationId == organizationId ||
+                    // limit to within the context 
+                    s.OrganizationId == organizationId &&
+                    // global admin sees all 
+                    (KitosUser.IsGlobalAdmin ||
                     // object owner sees his own objects     
                     s.ObjectOwnerId == KitosUser.Id ||
                     // it's public everyone can see it
@@ -90,7 +91,7 @@ namespace UI.MVC4.Controllers.API
                     s.OrganizationId == organizationId
                     // it systems doesn't have roles so private doesn't make sense
                     // only object owners will be albe to see private objects
-                    );
+                    ));
 
                 if (!string.IsNullOrEmpty(q)) pagingModel.Where(s => s.Name.Contains(q));
 
@@ -111,9 +112,10 @@ namespace UI.MVC4.Controllers.API
             {
                 var interfaces = Repository.Get(
                     x =>
-                        // global admin sees all within the context 
-                        KitosUser.IsGlobalAdmin &&
-                        x.OrganizationId == organizationId ||
+                        // limit to within the context 
+                        x.OrganizationId == organizationId &&
+                        // global admin sees all 
+                        (KitosUser.IsGlobalAdmin ||
                         // object owner sees his own objects     
                         x.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
@@ -123,7 +125,7 @@ namespace UI.MVC4.Controllers.API
                         x.OrganizationId == organizationId
                         // it systems doesn't have roles so private doesn't make sense
                         // only object owners will be albe to see private objects
-                    );
+                    ));
                 var dtos = Map(interfaces);
                 
                 var list = new List<dynamic>();
@@ -187,9 +189,10 @@ namespace UI.MVC4.Controllers.API
                         s.Name.Contains(q) &&
                         // filter (remove) interfaces already used by the system
                         s.CanBeUsedBy.Count(x => x.ItSystemId == sysId) == 0 &&
-                        // global admin sees all within the context 
-                        (KitosUser.IsGlobalAdmin &&
-                         s.OrganizationId == orgId ||
+                        // limit to within the context 
+                        s.OrganizationId == orgId &&
+                        // global admin sees all 
+                        (KitosUser.IsGlobalAdmin ||
                          // object owner sees his own objects     
                          s.ObjectOwnerId == KitosUser.Id ||
                          // it's public everyone can see it
