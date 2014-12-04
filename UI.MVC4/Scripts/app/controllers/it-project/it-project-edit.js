@@ -38,6 +38,11 @@
 
                 $scope.project = project;
                 $scope.projectTypes = projectTypes;
+
+                if (!_.find(projectTypes, function(type) { return type.id == project.itProjectTypeId; })) {
+                    $scope.projectTypes.unshift({ id: project.itProjectTypeId, name: project.itProjectTypeName });
+                }
+
                 if ($scope.project.parentId) {
                     $scope.project.parent = {
                         id: $scope.project.parentId,
