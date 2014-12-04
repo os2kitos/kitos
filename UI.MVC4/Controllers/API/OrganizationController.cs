@@ -12,11 +12,13 @@ namespace UI.MVC4.Controllers.API
     public class OrganizationController : GenericApiController<Organization, OrganizationDTO>
     {
         private readonly IOrganizationService _organizationService;
+        private readonly IGenericRepository<User> _useRepository;
 
-        public OrganizationController(IGenericRepository<Organization> repository, IOrganizationService organizationService) 
+        public OrganizationController(IGenericRepository<Organization> repository, IOrganizationService organizationService, IGenericRepository<User> useRepository) 
             : base(repository)
         {
             _organizationService = organizationService;
+            _useRepository = useRepository;
         }
 
         public virtual HttpResponseMessage Get([FromUri] string q, [FromUri] PagingModel<Organization> paging)
@@ -96,17 +98,21 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
-                var qry =
-                    Repository.AsQueryable().Single(x => x.Id == id).OrgUnits.SelectMany(y => y.Rights)
-                              .Select(z => z.User)
-                              .Where(u => u.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1 || u.Email.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
+                // OLD METHOD
+                // gets users with a role in the organization
+                //var qry =
+                //    Repository.AsQueryable().Single(x => x.Id == id).OrgUnits.SelectMany(y => y.Rights)
+                //              .Select(z => z.User)
+                //              .Where(u => u.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1 || u.Email.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
+
+                var qry = _useRepository.Get(x => x.CreatedInId == id && (x.Name.Contains(q) || x.Email.Contains(q)));
 
                 return Ok(Map<IEnumerable<User>, IEnumerable<UserDTO>>(qry));
             }
             catch (Exception e)
             {
                 return Error(e);
-            }            
+            }
         }
 
         protected override Organization PostQuery(Organization item)

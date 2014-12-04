@@ -10,17 +10,22 @@
                         .then(function (result) {
                             return result.data.response;
                         });
+                }],
+                user: ['userService', function (userService) {
+                    return userService.getUser().then(function (user) {
+                        return user;
+                    });
                 }]
             }
         });
     }]);
 
-    app.controller('system.EditRoles', ['$scope', '$http', 'notify', 'itSystemUsage', 'itSystemRoles', function ($scope, $http, notify, itSystemUsage, itSystemRoles) {
+    app.controller('system.EditRoles', ['$scope', '$http', 'notify', 'itSystemUsage', 'itSystemRoles', 'user', function ($scope, $http, notify, itSystemUsage, itSystemRoles, user) {
         var usageId = itSystemUsage.id;
 
         $scope.itSystemRoles = itSystemRoles;
         $scope.newRole = 1;
-        $scope.orgId = itSystemUsage.organizationId;
+        $scope.orgId = user.currentOrganizationId;
         
         $scope.rights = [];
         _.each(itSystemUsage.rights, function (right) {

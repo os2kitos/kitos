@@ -25,17 +25,22 @@
                         .then(function (result) {
                             return result.data.response;
                         });
+                }],
+                user: ['userService', function (userService) {
+                    return userService.getUser().then(function (user) {
+                        return user;
+                    });
                 }]
             }
         });
     }]);
 
     app.controller('project.EditRolesCtrl',
-    ['$rootScope', '$scope', '$http', 'notify', 'project', 'itProjectRights', 'itProjectRoles',
-        function($rootScope, $scope, $http, notify, project, itProjectRights, itProjectRoles) {
+    ['$rootScope', '$scope', '$http', 'notify', 'project', 'itProjectRights', 'itProjectRoles', 'user',
+        function($rootScope, $scope, $http, notify, project, itProjectRights, itProjectRoles, user) {
             var projectId = project.id;
 
-            $scope.orgId = project.organizationId;
+            $scope.orgId = user.currentOrganizationId;
             $scope.itProjectRoles = itProjectRoles;
             $scope.newRole = 1;
 
