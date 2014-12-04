@@ -8,7 +8,7 @@
     {{ usage.responsibleOrgUnitName }}
 </td>
 <td>
-    {{ usage.rights | filter:{roleId: chosenRoleId} | joinBy:', ':'user.name' }}
+    {{ usage.rights | filter:{roleId:chosenRoleId}:true | joinBy:', ':'user.name' }}
 </td>
 <td data-ng-switch="showType">
     <span data-ng-switch-when="appType">{{usage.itSystem.appTypeOptionName}}</span>

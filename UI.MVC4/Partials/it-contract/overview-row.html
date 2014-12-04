@@ -18,7 +18,7 @@
 <!-- name of users with the selected role -->
 <td>
     <span data-ng-if="chosenRoleId">
-        {{ contract.rights | filter:{roleId:chosenRoleId} | joinBy:', ':'user.name'}}
+        {{ contract.rights | filter:{roleId:chosenRoleId}:true | joinBy:', ':'user.name' }}
     </span>
     <span data-ng-if="!chosenRoleId">
         {{ contract.contractSignerName }}
