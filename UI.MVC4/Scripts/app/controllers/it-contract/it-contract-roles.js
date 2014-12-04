@@ -16,15 +16,20 @@
                         .then(function (result) {
                             return result.data.response;
                         });
+                }],
+                user: ['userService', function(userService) {
+                    return userService.getUser().then(function(user) {
+                        return user;
+                    });
                 }]
             }
         });
     }]);
 
-    app.controller('contract.EditRolesCtrl', ['$scope', '$http', 'notify', 'contract', 'itContractRights', 'itContractRoles',
-        function ($scope, $http, notify, contract, itContractRights, itContractRoles) {
+    app.controller('contract.EditRolesCtrl', ['$scope', '$http', 'notify', 'contract', 'itContractRights', 'itContractRoles', 'user',
+        function ($scope, $http, notify, contract, itContractRights, itContractRoles, user) {
             var contractId = contract.id;
-            $scope.orgId = contract.organizationId;
+            $scope.orgId = user.currentOrganizationId;
 
             //normal user roles
             $scope.itContractRoles = itContractRoles;
