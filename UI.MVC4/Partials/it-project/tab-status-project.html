@@ -149,6 +149,11 @@
                 </tbody>
                 <tfoot>
                     <tr>
+                        <td colspan="11" class="text-center">
+                            <span data-pagination-buttons="pagination" data-pagination-total-count="totalCount"></span>
+                        </td>
+                    </tr>
+                    <tr>
                         <td colspan="11" class="text-right">
                             <button class="btn btn-success btn-sm" data-ui-sref="it-project.edit.status-project.modal({type: 'assignment', activityId: ''})" data-ng-hide="!hasWriteAccess">Tilføj opgave</button>
                             <button class="btn btn-primary btn-sm" data-ui-sref="it-project.edit.status-project.modal({type: 'milestone', activityId: ''})" data-ng-hide="!hasWriteAccess">Tilføj milepæl</button>
