@@ -11,7 +11,7 @@
                 {{ isAssignment && "Opgave" || "Milepæl" }}
             </label>
             <div class="col-md-10">
-                <input type="text" id="name" data-ng-model="activity.name" class="form-control input-sm" autofocus />
+                <input type="text" id="name" data-ng-model="activity.name" class="form-control input-sm" data-ng-disabled="!hasWriteAccess" autofocus />
             </div>
         </div>
 
@@ -21,7 +21,7 @@
                 {{ isAssignment && "Opgave ID" || "Milepæl ID" }}
             </label>
             <div class="col-md-4">
-                <input type="text" id="humanReadableId" data-ng-model="activity.humanReadableId" class="form-control input-sm" />
+                <input type="text" id="humanReadableId" data-ng-model="activity.humanReadableId" class="form-control input-sm" data-ng-disabled="!hasWriteAccess" />
             </div>
 
             <!-- Phase -->
@@ -30,6 +30,7 @@
             </label>
             <div class="col-md-4">
                 <select id="phase" class="form-control input-sm"
+                        data-ng-disabled="!hasWriteAccess"
                         data-ng-model="activity.associatedPhaseId"
                         data-ng-options="phase.id as phase.name for phase in phases">
                     <option value=""></option>
@@ -49,9 +50,10 @@
                            data-datepicker-popup="dd-MM-yyyy"
                            data-is-open="opened.sd"
                            data-date-to-string
-                           data-ng-model="activity.startDate" />
+                           data-ng-model="activity.startDate"
+                           data-ng-disabled="!hasWriteAccess" />
                     <span class="input-group-btn">
-                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'sd')"><i class="glyphicon glyphicon-calendar"></i></button>
+                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'sd')" data-ng-disabled="!hasWriteAccess"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>
                 </div>
             </div>
@@ -66,9 +68,10 @@
                            data-datepicker-popup="dd-MM-yyyy"
                            data-is-open="opened.ed"
                            data-date-to-string
-                           data-ng-model="activity.endDate">
+                           data-ng-model="activity.endDate"
+                           data-ng-disabled="!hasWriteAccess">
                     <span class="input-group-btn">
-                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'ed')"><i class="glyphicon glyphicon-calendar"></i></button>
+                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'ed')" data-ng-disabled="!hasWriteAccess"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>
                 </div>
             </div>
@@ -86,9 +89,10 @@
                            data-datepicker-popup="dd-MM-yyyy"
                            data-is-open="opened.d"
                            data-date-to-string
-                           data-ng-model="activity.date">
+                           data-ng-model="activity.date"
+                           data-ng-disabled="!hasWriteAccess">
                     <span class="input-group-btn">
-                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'd')"><i class="glyphicon glyphicon-calendar"></i></button>
+                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'd')" data-ng-disabled="!hasWriteAccess"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>
                 </div>
             </div>
@@ -100,7 +104,7 @@
                 Tidsestimat <small>(timer)</small>
             </label>
             <div class="col-md-4">
-                <input id="timeEstimate" type="number" data-ng-model="activity.timeEstimate" class="form-control input-sm" />
+                <input id="timeEstimate" type="number" data-ng-model="activity.timeEstimate" class="form-control input-sm" data-ng-disabled="!hasWriteAccess" />
             </div>
 
             <!-- Status estimate -->
@@ -108,7 +112,7 @@
                 Status
             </label>
             <div class="col-md-4" data-ng-if="isAssignment">
-                <select id="status" class="form-control input-sm" data-ng-model="activity.statusProcentage">
+                <select id="status" class="form-control input-sm" data-ng-model="activity.statusProcentage" data-ng-disabled="!hasWriteAccess">
                     <option value="0">0%</option>
                     <option value="10">10%</option>
                     <option value="20">20%</option>
@@ -123,8 +127,17 @@
                 </select>
             </div>
             <div class="col-md-4" data-ng-if="isMilestone">
-                <span id="status" data-select-status2="" data-ng-model="activity.status"
-                      data-can-write="true">
+                <span id="status"
+                      data-select-status2=""
+                      data-ng-model="activity.status"
+                      data-can-write="true"
+                      data-ng-show="hasWriteAccess">
+                </span>
+                <span id="status"
+                      data-select-status2=""
+                      data-ng-model="activity.status"
+                      data-can-write="false"
+                      data-ng-hide="hasWriteAccess">
                 </span>
             </div>
         </div>
@@ -136,7 +149,7 @@
                 Beskrivelse
             </label>
             <div class="col-md-10">
-                <textarea id="description" class="form-control input-sm" data-ng-model="activity.description" rows="4"></textarea>
+                <textarea id="description" class="form-control input-sm" data-ng-model="activity.description" rows="4" data-ng-disabled="!hasWriteAccess"></textarea>
             </div>
         </div>
 
@@ -147,7 +160,7 @@
                 Note
             </label>
             <div class="col-md-10">
-                <textarea id="note" class="form-control input-sm" data-ng-model="activity.note" rows="4"></textarea>
+                <textarea id="note" class="form-control input-sm" data-ng-model="activity.note" rows="4" data-ng-disabled="!hasWriteAccess"></textarea>
             </div>
         </div>
 
@@ -158,6 +171,7 @@
             </label>
             <div class="col-md-10">
                 <select id="associatedUserId" class="form-control input-sm"
+                        data-ng-disabled="!hasWriteAccess"
                         data-ng-model="activity.associatedUserId"
                         data-ng-options="user.id as user.name for user in usersWithRoles">
                     <option value=""></option>
@@ -172,8 +186,11 @@
         </div>
 
     </div>
-    <div class="modal-footer">
-        <button type="submit" class="btn btn-success" data-disabled-on-busy="">Gem</button>
+    <div class="modal-footer" data-ng-show="hasWriteAccess">
+        <button type="submit" class="btn btn-success" data-disabled-on-busy="" data-ng-disabled="!hasWriteAccess">Gem</button>
         <button type="button" class="btn btn-warning" data-ng-click="dismiss()" data-disabled-on-busy="">Annuller</button>
+    </div>
+    <div class="modal-footer" data-ng-hide="hasWriteAccess">
+        <button type="button" class="btn btn-success" data-ng-click="dismiss()">Luk</button>
     </div>
 </form>

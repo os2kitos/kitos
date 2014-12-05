@@ -40,6 +40,23 @@
                                     }
                                 }
                                 return null;
+                            }],
+                            hasWriteAccess: ['$http', function ($http) {
+                                var id = $stateParams.activityId;
+                                if (id) {
+                                    if ($stateParams.type == 'assignment') {
+                                        return $http.get("api/assignment/" + $stateParams.activityId + "?hasWriteAccess")
+                                            .then(function(result) {
+                                                return result.data.response;
+                                            });
+                                    } else if ($stateParams.type == 'milestone') {
+                                        return $http.get("api/milestone/" + $stateParams.activityId + "?hasWriteAccess")
+                                            .then(function (result) {
+                                                return result.data.response;
+                                            });
+                                    }
+                                }
+                                return false;
                             }]
                         },
                         controller: 'project.statusModalCtrl'
@@ -58,10 +75,11 @@
     }]);
 
     app.controller('project.statusModalCtrl',
-    ['$scope', '$http', 'autofocus', 'project', 'usersWithRoles', 'activity', 'notify', 'activityId', 'activityType',
-        function ($scope, $http, autofocus, project, usersWithRoles, activity, notify, activityId, activityType) {
+    ['$scope', '$http', 'autofocus', 'project', 'usersWithRoles', 'activity', 'notify', 'activityId', 'activityType', 'hasWriteAccess',
+        function ($scope, $http, autofocus, project, usersWithRoles, activity, notify, activityId, activityType, hasWriteAccess) {
             var isNewActivity = activity == null;
             
+            $scope.hasWriteAccess = hasWriteAccess;
             $scope.isAssignment = activityType == 'assignment';
             $scope.isMilestone = activityType == 'milestone';
             // set to empty object if falsy
