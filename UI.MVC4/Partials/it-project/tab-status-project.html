@@ -95,15 +95,11 @@
                         </td>
                         <!-- Navn -->
                         <td>
-                            <a data-ng-click="activity.edit()" data-ng-show="hasWriteAccess">{{ activity.name }}</a>
-                            <span data-ng-hide="hasWriteAccess">{{ activity.name }}</span>
+                            <a data-ng-click="activity.edit()">{{ activity.name }}</a>
                         </td>
                         <!-- Note -->
                         <td>
-                            <a data-ng-click="activity.edit()" data-ng-show="hasWriteAccess">
-                                <span class="glyphicon glyphicon-comment" data-ng-class="{'faded': !(activity.note || activity.description) }"></span>
-                            </a>
-                            <a data-ng-hide="hasWriteAccess">
+                            <a data-ng-click="activity.edit()">
                                 <span class="glyphicon glyphicon-comment" data-ng-class="{'faded': !(activity.note || activity.description) }"></span>
                             </a>
                         </td>
@@ -136,12 +132,15 @@
                         <td>{{ activity.associatedUser.roleNames | joinBy:', ' }}</td>
                         <!-- Control -->
                         <td class="text-right">
-                            <a class="btn btn-link btn-xs" data-ng-click="activity.edit()" data-ng-hide="!hasWriteAccess">
+                            <a class="btn btn-link btn-xs" data-ng-click="activity.edit()" data-ng-hide="hasWriteAccess">
+                                <i class="glyphicon glyphicon-eye-open"></i>
+                            </a>
+                            <a class="btn btn-link btn-xs" data-ng-click="activity.edit()" data-ng-show="hasWriteAccess">
                                 <i class="glyphicon glyphicon-pencil"></i>
                             </a>
                             <a class="btn btn-link btn-xs"
-                                data-confirmed-click="activity.delete()"
-                                data-confirm-click="Er du sikker på at du vil slette?" data-ng-hide="!hasWriteAccess">
+                               data-confirmed-click="activity.delete()"
+                               data-confirm-click="Er du sikker på at du vil slette?" data-ng-show="hasWriteAccess">
                                 <i class="glyphicon glyphicon-trash"></i>
                             </a>
                         </td>

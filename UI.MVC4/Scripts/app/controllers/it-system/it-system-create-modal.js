@@ -12,7 +12,7 @@
                         resolve: {
                             
                         },
-                        controller: 'project.statusModalCtrl'
+                        controller: 'system.statusModalCtrl'
                     }).result.then(function () {
                         // OK
                         // GOTO parent state and reload
@@ -27,7 +27,7 @@
         });
     }]);
 
-    app.controller('project.statusModalCtrl',
+    app.controller('system.statusModalCtrl',
     ['$scope', '$http', 'autofocus', 'project', 'usersWithRoles', 'activity', 'notify', 'activityId', 'activityType',
         function ($scope, $http, autofocus, project, usersWithRoles, activity, notify, activityId, activityType) {
             var isNewActivity = activity == null;
