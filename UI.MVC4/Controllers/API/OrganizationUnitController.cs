@@ -17,7 +17,7 @@ namespace UI.MVC4.Controllers.API
         private readonly IGenericRepository<TaskUsage> _taskUsageRepository;
 
         public OrganizationUnitController(IGenericRepository<OrganizationUnit> repository,
-            IOrgUnitService orgUnitService, IGenericRepository<TaskRef> taskRepository, IGenericRepository<TaskUsage> taskUsageRepository ) 
+            IOrgUnitService orgUnitService, IGenericRepository<TaskRef> taskRepository, IGenericRepository<TaskUsage> taskUsageRepository)
             : base(repository)
         {
             _orgUnitService = orgUnitService;

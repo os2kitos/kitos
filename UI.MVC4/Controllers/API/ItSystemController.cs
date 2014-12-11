@@ -55,11 +55,9 @@ namespace UI.MVC4.Controllers.API
                 //Get all systems which the user has access to
                 paging.Where(
                     s =>
-                        // limit to within the context
-                        s.OrganizationId == organizationId &&
                         // global admin sees all
                         (KitosUser.IsGlobalAdmin ||
-                        // object owner sees his own objects     
+                        // object owner sees his own objects 
                         s.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
                         s.AccessModifier == AccessModifier.Public ||
@@ -89,9 +87,7 @@ namespace UI.MVC4.Controllers.API
                 var systems =
                     Repository.AsQueryable()
                         .Where(s =>
-                            // limit to within the context 
-                            s.OrganizationId == organizationId &&
-                            // global admin sees all 
+                            // global admin sees all
                             (KitosUser.IsGlobalAdmin ||
                             // object owner sees his own objects     
                             s.ObjectOwnerId == KitosUser.Id ||
@@ -162,8 +158,6 @@ namespace UI.MVC4.Controllers.API
                         s.Name.Contains(q) &&
                         // exclude system with id
                         s.Id != excludeId &&
-                        // limit to within the context 
-                        s.OrganizationId == orgId &&
                         // global admin sees all 
                         (KitosUser.IsGlobalAdmin ||
                          // object owner sees his own objects     

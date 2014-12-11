@@ -20,10 +20,8 @@ namespace Core.ApplicationServices
             if (string.IsNullOrWhiteSpace(nameSearch))
                 return _repository.Get(
                     s =>
-                        // limit to within the context 
-                        s.OrganizationId == organizationId &&
-                        // global admin sees all 
-                        (user.IsGlobalAdmin ||
+                        // global admin sees all within the context 
+                        user.IsGlobalAdmin && s.OrganizationId == organizationId ||
                         // object owner sees his own objects
                         s.ObjectOwnerId == user.Id ||
                         // it's public everyone can see it
@@ -33,16 +31,14 @@ namespace Core.ApplicationServices
                         s.OrganizationId == organizationId
                         // it systems doesn't have roles so private doesn't make sense
                         // only object owners will be albe to see private objects
-                    ));
+                    );
 
             return _repository.Get(
                 s =>
                     // filter by name
                     s.Name.Contains(nameSearch) &&
-                    // limit to within the context
-                    s.OrganizationId == organizationId &&
-                    // global admin sees all
-                    (user.IsGlobalAdmin ||
+                    // global admin sees all within the context 
+                    (user.IsGlobalAdmin && s.OrganizationId == organizationId ||
                     // object owner sees his own objects     
                     s.ObjectOwnerId == user.Id ||
                     // it's public everyone can see it
