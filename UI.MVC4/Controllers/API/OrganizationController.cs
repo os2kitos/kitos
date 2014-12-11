@@ -32,25 +32,42 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
+                //var orgs = Repository.Get(
+                //    org => 
+                //        // filter by project name
+                //        org.Name.Contains(q) &&
+                //        // global admin sees all 
+                //        (KitosUser.IsGlobalAdmin ||
+                //        // object owner sees his own objects
+                //        org.ObjectOwnerId == KitosUser.Id ||
+                //        // it's public everyone can see it
+                //        org.AccessModifier == AccessModifier.Public ||
+                //        // everyone in the same organization can see normal objects
+                //        org.AccessModifier == AccessModifier.Normal &&
+                //        org.Id == orgId ||
+                //        // user with a role on the object can see it
+                //        org.Rights.Any(x => x.UserId == KitosUser.Id) ||
+                //        // !SPECIAL CASE! user with a role on a org unit can see it
+                //        org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id)))
+                //    );
+
+                // MySql.Data v6.9.5 can't do org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id))
+                // so have to do it the slow way :(
+
                 var orgs = Repository.Get(
-                    org => 
-                        // filter by project name
-                        org.Name.Contains(q) &&
-                        // limit to within the context
-                        org.Id == orgId &&
-                        // global admin sees all 
-                        (KitosUser.IsGlobalAdmin ||
-                        // object owner sees his own objects
-                        org.ObjectOwnerId == KitosUser.Id ||
-                        // it's public everyone can see it
+                    org =>
+                        // filter by project name or cvr
+                        (org.Name.Contains(q) || org.Cvr.Contains(q))).ToList();
+
+                // filter locally
+                var orgs2 = orgs.Where(org => KitosUser.IsGlobalAdmin || org.ObjectOwnerId == KitosUser.Id ||
+                    // it's public everyone can see it
                         org.AccessModifier == AccessModifier.Public ||
-                        // everyone in the same organization can see normal objects
+                    // everyone in the same organization can see normal objects
                         org.AccessModifier == AccessModifier.Normal &&
-                        org.Id == orgId ||
-                        // only users with a role on the object can see private objects
-                        org.AccessModifier == AccessModifier.Private && org.Rights.Any(x => x.UserId == KitosUser.Id))
-                    );
-                var dtos = Map(orgs);
+                        org.Id == orgId || org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id)));
+
+                var dtos = Map(orgs2);
                 return Ok(dtos);
             }
             catch (Exception e)
@@ -63,26 +80,42 @@ namespace UI.MVC4.Controllers.API
         {
             try
             {
+                //var orgs = Repository.Get(
+                //    org => 
+                //        // filter by project name or cvr
+                //        (org.Name.Contains(q) || org.Cvr.Contains(q)) &&
+                //        // global admin sees all 
+                //        (KitosUser.IsGlobalAdmin ||
+                //        // object owner sees his own objects
+                //        org.ObjectOwnerId == KitosUser.Id ||
+                //        // it's public everyone can see it
+                //        org.AccessModifier == AccessModifier.Public ||
+                //        // everyone in the same organization can see normal objects
+                //        org.AccessModifier == AccessModifier.Normal &&
+                //        org.Id == orgId ||
+                //        // user with a role on the object can see it
+                //        org.Rights.Any(x => x.UserId == KitosUser.Id) ||
+                //        // !SPECIAL CASE! user with a role on a org unit can see it
+                //        org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id)))
+                //    );
+
+                // MySql.Data v6.9.5 can't do org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id))
+                // so have to do it the slow way :(
+
                 var orgs = Repository.Get(
-                    org => 
+                    org =>
                         // filter by project name or cvr
-                        (org.Name.Contains(q) || org.Cvr.Contains(q)) &&
-                        // limit to within the context
-                        org.Id == orgId &&
-                        // global admin sees all 
-                        (KitosUser.IsGlobalAdmin ||
-                        // object owner sees his own objects
-                        org.ObjectOwnerId == KitosUser.Id ||
+                        (org.Name.Contains(q) || org.Cvr.Contains(q))).ToList();
+                
+                // filter locally
+                var orgs2 = orgs.Where(org => KitosUser.IsGlobalAdmin || org.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
                         org.AccessModifier == AccessModifier.Public ||
                         // everyone in the same organization can see normal objects
                         org.AccessModifier == AccessModifier.Normal &&
-                        org.Id == orgId ||
-                        // only users with a role on the object can see private objects
-                        org.AccessModifier == AccessModifier.Private && org.Rights.Any(x => x.UserId == KitosUser.Id))
-                    );
+                        org.Id == orgId || org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id)));
                 
-                var dtos = Map(orgs);
+                var dtos = Map(orgs2);
                 return Ok(dtos);
             }
             catch (Exception e)
