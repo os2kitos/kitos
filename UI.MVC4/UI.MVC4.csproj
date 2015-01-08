@@ -542,6 +542,8 @@
     <Content Include="Partials\local-config\optionlist.html" />
     <Content Include="Partials\local-config\suggest-new.html" />
     <Content Include="Partials\mox\mox-order.html" />
+    <Content Include="Partials\mox\mox-test.html" />
+    <Content Include="Partials\mox\mox-overview.html" />
     <Content Include="Partials\org\add-task-modal.html" />
     <Content Include="Partials\org\edit-org-unit-modal.html" />
     <Content Include="Partials\org\overview.html" />
@@ -650,6 +652,7 @@
     <Content Include="Scripts\app\controllers\local-config\local-config-org.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-subnav.js" />
     <Content Include="Scripts\app\controllers\mox\mox-order.js" />
+    <Content Include="Scripts\app\controllers\mox\mox-test.js" />
     <Content Include="Scripts\app\controllers\mox\mox-overview.js" />
     <Content Include="Scripts\app\controllers\mox\mox-subnav.js" />
     <Content Include="Scripts\app\controllers\org\org-structure.js" />
