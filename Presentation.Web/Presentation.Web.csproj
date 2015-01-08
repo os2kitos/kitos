@@ -300,7 +300,6 @@
     <Compile Include="Controllers\API\GoalController.cs" />
     <Compile Include="Controllers\API\GoalStatusController.cs" />
     <Compile Include="Controllers\API\GoalTypeController.cs" />
-    <Compile Include="Controllers\API\InterfaceExposureController.cs" />
     <Compile Include="Controllers\API\DataRowUsageController.cs" />
     <Compile Include="Controllers\API\DataTypeController.cs" />
     <Compile Include="Controllers\API\FrequencyController.cs" />
