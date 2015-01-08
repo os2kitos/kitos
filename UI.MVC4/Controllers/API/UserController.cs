@@ -42,6 +42,24 @@ namespace UI.MVC4.Controllers.API
             }
         }
 
+        public HttpResponseMessage PostTokenRequest(bool? token, int userId)
+        {
+            try
+            {
+                var user = Repository.GetByKey(userId);
+                if (user == null)
+                    return NotFound();
+
+                user.Uuid = Guid.NewGuid();
+                PatchQuery(user);
+                return Ok(user.Uuid);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         //TODO REWRITE THIS, perhaps so it's passed along at login?
         public HttpResponseMessage Get(bool? organizations)
         {
