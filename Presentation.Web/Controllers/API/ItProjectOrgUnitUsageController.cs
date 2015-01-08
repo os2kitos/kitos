@@ -1,0 +1,95 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using AutoMapper;
+using Core.DomainModel.ItProject;
+using Core.DomainServices;
+using Presentation.Web.Models;
+
+namespace Presentation.Web.Controllers.API
+{
+    public class ItProjectOrgUnitUsageController : BaseApiController
+    {
+        private readonly IGenericRepository<ItProjectOrgUnitUsage> _responsibleOrgUnitRepository;
+        private readonly IGenericRepository<ItProject> _projectRepository;
+
+        public ItProjectOrgUnitUsageController(IGenericRepository<ItProjectOrgUnitUsage> responsibleOrgUnitRepository, IGenericRepository<ItProject> projectRepository)
+        {
+            _responsibleOrgUnitRepository = responsibleOrgUnitRepository;
+            _projectRepository = projectRepository;
+        }
+
+        public HttpResponseMessage GetOrgUnitsByProject(int id)
+        {
+            try
+            {
+                var items = _responsibleOrgUnitRepository.Get(x => x.ItProjectId == id);
+                var orgUnits = items.Select(x => x.OrganizationUnit);
+                var dtos = Mapper.Map<IEnumerable<SimpleOrgUnitDTO>>(orgUnits);
+
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage GetResponsibleByProject(int id, bool? responsible)
+        {
+            try
+            {
+                var project = _projectRepository.GetByKey(id);
+                
+                if (project.ResponsibleUsage == null) return Ok(); // TODO should be NotFound but ui router resolve redirects to mainpage on 404
+                
+                var organizationUnit = project.ResponsibleUsage.OrganizationUnit;
+                var dtos = Mapper.Map<SimpleOrgUnitDTO>(organizationUnit);
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage PostSetResponsibleOrgUnit(int projectId, int orgUnitId, bool? responsible)
+        {
+            try
+            {
+                var entity = _responsibleOrgUnitRepository.GetByKey(new object[] {projectId, orgUnitId});
+                var project = _projectRepository.GetByKey(projectId);
+
+                project.ResponsibleUsage = entity;
+
+                _responsibleOrgUnitRepository.Save();
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage DeleteResponsibleOrgUnit(int projectId, bool? responsible)
+        {
+            try
+            {
+                var project = _projectRepository.GetByKey(projectId);
+                // WARNING: force loading so setting it to null will be tracked
+                var forceLoad = project.ResponsibleUsage;
+                project.ResponsibleUsage = null;
+                
+                _projectRepository.Save();
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+    }
+}
