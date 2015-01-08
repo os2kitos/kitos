@@ -12,6 +12,7 @@ namespace UI.MVC4.Models
         public string DefaultOrganizationUnitName { get; set; }
         public int? DefaultOrganizationUnitOrganizationId { get; set; }
         public bool IsGlobalAdmin { get; set; }
+        public Guid? Uuid { get; set; }
         public List<AdminRightDTO> AdminRights { get; set; }
 
         public int? CreatedInId { get; set; }

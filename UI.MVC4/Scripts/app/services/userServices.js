@@ -29,6 +29,7 @@
                 id: response.id,
                 name: response.name,
                 email: response.email,
+                uuid: response.uuid,
                 
                 isGlobalAdmin: response.isGlobalAdmin,
                 isLocalAdmin: isLocalAdmin,
