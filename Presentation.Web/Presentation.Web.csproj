@@ -115,16 +115,19 @@
       <HintPath>..\packages\Newtonsoft.Json.6.0.7\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Ninject">
-      <HintPath>..\packages\Ninject.3.2.0.0\lib\net45-full\Ninject.dll</HintPath>
+      <HintPath>..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Ninject.Web.Common">
-      <HintPath>..\packages\Ninject.Web.Common.3.2.0.0\lib\net45-full\Ninject.Web.Common.dll</HintPath>
+      <HintPath>..\packages\Ninject.Web.Common.3.2.3.0\lib\net45-full\Ninject.Web.Common.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Ninject.Web.Mvc">
       <HintPath>..\packages\Ninject.MVC5.3.2.1.0\lib\net45-full\Ninject.Web.Mvc.dll</HintPath>
     </Reference>
     <Reference Include="Ninject.Web.WebApi">
-      <HintPath>..\packages\Ninject.Web.WebApi.3.2.0.0\lib\net45-full\Ninject.Web.WebApi.dll</HintPath>
+      <HintPath>..\packages\Ninject.Web.WebApi.3.2.3.0\lib\net45-full\Ninject.Web.WebApi.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -207,7 +210,8 @@
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="WebActivatorEx">
-      <HintPath>..\packages\WebActivatorEx.2.0\lib\net40\WebActivatorEx.dll</HintPath>
+      <HintPath>..\packages\WebActivatorEx.2.0.6\lib\net40\WebActivatorEx.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="WebGrease, Version=1.6.5135.21930, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -403,6 +407,15 @@
     <Content Include="Content\select2.css" />
     <Content Include="Content\kitos.css" />
     <Content Include="Content\select2-bootstrap.css" />
+    <Content Include="Content\themes\base\accordion.css" />
+    <Content Include="Content\themes\base\all.css" />
+    <Content Include="Content\themes\base\autocomplete.css" />
+    <Content Include="Content\themes\base\base.css" />
+    <Content Include="Content\themes\base\button.css" />
+    <Content Include="Content\themes\base\core.css" />
+    <Content Include="Content\themes\base\datepicker.css" />
+    <Content Include="Content\themes\base\dialog.css" />
+    <Content Include="Content\themes\base\draggable.css" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
@@ -416,47 +429,17 @@
     <Content Include="Content\themes\base\images\ui-icons_454545_256x240.png" />
     <Content Include="Content\themes\base\images\ui-icons_888888_256x240.png" />
     <Content Include="Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
-    <Content Include="Content\themes\base\jquery-ui.css" />
-    <Content Include="Content\themes\base\jquery.ui.accordion.css" />
-    <Content Include="Content\themes\base\jquery.ui.all.css" />
-    <Content Include="Content\themes\base\jquery.ui.autocomplete.css" />
-    <Content Include="Content\themes\base\jquery.ui.base.css" />
-    <Content Include="Content\themes\base\jquery.ui.button.css" />
-    <Content Include="Content\themes\base\jquery.ui.core.css" />
-    <Content Include="Content\themes\base\jquery.ui.datepicker.css" />
-    <Content Include="Content\themes\base\jquery.ui.dialog.css" />
-    <Content Include="Content\themes\base\jquery.ui.progressbar.css" />
-    <Content Include="Content\themes\base\jquery.ui.resizable.css" />
-    <Content Include="Content\themes\base\jquery.ui.selectable.css" />
-    <Content Include="Content\themes\base\jquery.ui.slider.css" />
-    <Content Include="Content\themes\base\jquery.ui.tabs.css" />
-    <Content Include="Content\themes\base\jquery.ui.theme.css" />
-    <Content Include="Content\themes\base\minified\images\ui-bg_flat_0_aaaaaa_40x100.png" />
-    <Content Include="Content\themes\base\minified\images\ui-bg_flat_75_ffffff_40x100.png" />
-    <Content Include="Content\themes\base\minified\images\ui-bg_glass_55_fbf9ee_1x400.png" />
-    <Content Include="Content\themes\base\minified\images\ui-bg_glass_65_ffffff_1x400.png" />
-    <Content Include="Content\themes\base\minified\images\ui-bg_glass_75_dadada_1x400.png" />
-    <Content Include="Content\themes\base\minified\images\ui-bg_glass_75_e6e6e6_1x400.png" />
-    <Content Include="Content\themes\base\minified\images\ui-bg_glass_95_fef1ec_1x400.png" />
-    <Content Include="Content\themes\base\minified\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
-    <Content Include="Content\themes\base\minified\images\ui-icons_222222_256x240.png" />
-    <Content Include="Content\themes\base\minified\images\ui-icons_2e83ff_256x240.png" />
-    <Content Include="Content\themes\base\minified\images\ui-icons_454545_256x240.png" />
-    <Content Include="Content\themes\base\minified\images\ui-icons_888888_256x240.png" />
-    <Content Include="Content\themes\base\minified\images\ui-icons_cd0a0a_256x240.png" />
-    <Content Include="Content\themes\base\minified\jquery-ui.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.accordion.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.autocomplete.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.button.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.core.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.datepicker.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.dialog.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.progressbar.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.resizable.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.selectable.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.slider.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.tabs.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
+    <Content Include="Content\themes\base\menu.css" />
+    <Content Include="Content\themes\base\progressbar.css" />
+    <Content Include="Content\themes\base\resizable.css" />
+    <Content Include="Content\themes\base\selectable.css" />
+    <Content Include="Content\themes\base\selectmenu.css" />
+    <Content Include="Content\themes\base\slider.css" />
+    <Content Include="Content\themes\base\sortable.css" />
+    <Content Include="Content\themes\base\spinner.css" />
+    <Content Include="Content\themes\base\tabs.css" />
+    <Content Include="Content\themes\base\theme.css" />
+    <Content Include="Content\themes\base\tooltip.css" />
     <Content Include="favicon.ico" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -678,7 +661,6 @@
     <Content Include="Scripts\angular-animate.min.js.map" />
     <Content Include="Scripts\angular.min.js.map" />
     <Content Include="Scripts\holder.js" />
-    <Content Include="Scripts\holder.min.js" />
     <Content Include="Scripts\i18n\angular-locale_af-na.js" />
     <Content Include="Scripts\i18n\angular-locale_af-za.js" />
     <Content Include="Scripts\i18n\angular-locale_af.js" />
@@ -933,16 +915,17 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="Scripts\jquery-2.1.0.intellisense.js" />
-    <Content Include="Scripts\jquery-2.1.0.js" />
-    <Content Include="Scripts\jquery-2.1.0.min.js" />
-    <Content Include="Scripts\jquery-ui-1.10.4.js" />
-    <Content Include="Scripts\jquery-ui-1.10.4.min.js" />
+    <None Include="Scripts\jquery-2.1.3.intellisense.js" />
+    <Content Include="Scripts\jquery-2.1.3.js" />
+    <Content Include="Scripts\jquery-2.1.3.min.js" />
+    <Content Include="Scripts\jquery-ui-1.11.2.js" />
+    <Content Include="Scripts\jquery-ui-1.11.2.min.js" />
+    <Content Include="Scripts\form.control.js" />
     <Content Include="Scripts\lodash.js" />
     <Content Include="Scripts\lodash.min.js" />
-    <Content Include="Scripts\form.control.js" />
-    <Content Include="Scripts\moment-with-langs.js" />
-    <Content Include="Scripts\moment-with-langs.min.js" />
+    <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Scripts\moment-with-locales.js" />
+    <Content Include="Scripts\moment-with-locales.min.js" />
     <Content Include="Scripts\moment.js" />
     <Content Include="Scripts\moment.min.js" />
     <Content Include="Scripts\notify\notify.js" />
@@ -1030,12 +1013,13 @@
     <Content Include="Views\Shared\_TopNavigation.old.cshtml" />
     <Content Include="Views\Shared\_TopNavigation.cshtml" />
     <Content Include="Scripts\version.json" />
-    <Content Include="Scripts\underscore.min.map" />
-    <Content Include="Scripts\jquery-2.1.0.min.map" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Scripts\jquery-2.1.3.min.map" />
+    <Content Include="Scripts\underscore.min.map" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Content\themes\base\minified\images\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">
@@ -1098,12 +1082,14 @@
     </VisualStudio>
   </ProjectExtensions>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
-  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
-    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
-    <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
-  </Target>
   <Import Project="..\packages\AutoMapper.3.3.0\tools\AutoMapper.targets" Condition="Exists('..\packages\AutoMapper.3.3.0\tools\AutoMapper.targets')" />
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
