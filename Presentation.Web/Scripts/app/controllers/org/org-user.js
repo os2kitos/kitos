@@ -3,7 +3,7 @@
         '$stateProvider', function ($stateProvider) {
             $stateProvider.state('organization.user', {
                 url: '/user',
-                templateUrl: 'partials/org/org-user.html',
+                templateUrl: 'partials/org/user/org-user.html',
                 controller: 'org.UserCtrl',
                 resolve: {
                     user: ['userService', function (userService) {

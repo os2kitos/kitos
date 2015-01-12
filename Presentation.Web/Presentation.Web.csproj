@@ -534,7 +534,6 @@
     <Content Include="Partials\local-config\suggest-new.html" />
     <Content Include="Partials\org\add-task-modal.html" />
     <Content Include="Partials\org\edit-org-unit-modal.html" />
-    <Content Include="Partials\org\org-user.html" />
     <Content Include="Partials\org\overview.html" />
     <Content Include="Partials\org\overview\comment-modal.html" />
     <Content Include="Partials\org\overview\task-foldout-leaf.html" />
@@ -543,6 +542,7 @@
     <Content Include="Partials\org\org-unit.html" />
     <Content Include="Partials\org\org.html" />
     <Content Include="Partials\org\overview\task-usage.html" />
+    <Content Include="Partials\org\user\org-user.html" />
     <Content Include="Partials\shared\org-tree-item.html" />
     <Content Include="Partials\subnav\create-modal.html" />
     <Content Include="Partials\subnav\subnav.html" />
