@@ -1,0 +1,40 @@
+﻿<div class="modal-header">
+    <h3>Rediger bruger</h3>
+</div>
+<div class="modal-body">
+    <form name="editUser.form" novalidate="novalidate" class="form-horizontal">
+        <div class="form-group">
+            <label for="name" class="col-md-3 control-label">
+                Navn
+            </label>
+            <div class="col-md-8">
+                <input type="text" name="name" data-ng-model="name" class="form-control" data-ng-required="true" autofocus />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="email" class="col-md-3 control-label">
+                Email-adresse
+            </label>
+            <div class="col-md-8">
+                <input type="email" name="email" data-ng-model="email" class="form-control" data-ng-required="true" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="repeatEmail" class="col-md-3 control-label">
+                Gentag email-adresse
+            </label>
+            <div class="col-md-8">
+                <input type="email" name="repeatEmail" data-ng-model="repeatEmail" class="form-control" data-match="email" data-ng-required="true" />
+            </div>
+        </div>
+        <div class="form-group">
+            <p class="help-block col-md-offset-3">
+                Vedkommendes oplysninger vil blive opdateret i systemet.
+            </p>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" data-ng-click="ok()" data-ng-disabled="editUser.form.$invalid || editUser.form.$pristine">Gem ændringer</button>
+    <button class="btn btn-warning" data-ng-click="cancel()">Annuller</button>
+</div>
