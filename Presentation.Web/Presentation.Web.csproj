@@ -534,6 +534,7 @@
     <Content Include="Partials\local-config\suggest-new.html" />
     <Content Include="Partials\org\add-task-modal.html" />
     <Content Include="Partials\org\edit-org-unit-modal.html" />
+    <Content Include="Partials\org\org-user.html" />
     <Content Include="Partials\org\overview.html" />
     <Content Include="Partials\org\overview\comment-modal.html" />
     <Content Include="Partials\org\overview\task-foldout-leaf.html" />
@@ -646,6 +647,7 @@
     <Content Include="Scripts\app\controllers\org\org-structure.js" />
     <Content Include="Scripts\app\controllers\org\org-subnav.js" />
     <Content Include="Scripts\app\controllers\org\org-overview.js" />
+    <Content Include="Scripts\app\controllers\org\org-user.js" />
     <Content Include="Scripts\app\directives\angularjs-dropdown-multiselect.js" />
     <Content Include="Scripts\app\directives\directives.js" />
     <Content Include="Scripts\app\directives\filters.js" />

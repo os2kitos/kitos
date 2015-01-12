@@ -83,6 +83,19 @@ namespace Presentation.Web.Controllers.API
                 return Error(e);
             }
         }
+
+        public HttpResponseMessage GetByOrganization(int orgId)
+        {
+            try
+            {
+                var users = Repository.Get(u => u.CreatedInId == orgId);
+                return Ok(Map(users));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
     }
 
 }
