@@ -163,6 +163,10 @@
     <Compile Include="Migrations\201501081324371_InfUsageIndex.Designer.cs">
       <DependentUpon>201501081324371_InfUsageIndex.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201501121147229_UserAddIsLocked.cs" />
+    <Compile Include="Migrations\201501121147229_UserAddIsLocked.Designer.cs">
+      <DependentUpon>201501121147229_UserAddIsLocked.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\BackupConfiguration.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -206,6 +210,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201501081324371_InfUsageIndex.resx">
       <DependentUpon>201501081324371_InfUsageIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201501121147229_UserAddIsLocked.resx">
+      <DependentUpon>201501121147229_UserAddIsLocked.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
