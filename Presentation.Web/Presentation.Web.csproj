@@ -542,6 +542,7 @@
     <Content Include="Partials\org\org-unit.html" />
     <Content Include="Partials\org\org.html" />
     <Content Include="Partials\org\overview\task-usage.html" />
+    <Content Include="Partials\org\user\org-createuser-modal.html" />
     <Content Include="Partials\org\user\org-edituser-modal.html" />
     <Content Include="Partials\org\user\org-user.html" />
     <Content Include="Partials\shared\org-tree-item.html" />

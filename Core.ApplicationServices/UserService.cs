@@ -38,7 +38,7 @@ namespace Core.ApplicationServices
             _cryptoService = cryptoService;
         }
 
-        public User AddUser(User user)
+        public User AddUser(User user, bool sendMailOnCreation)
         {
             // hash his salt and default password
             user.Salt = _cryptoService.Encrypt(DateTime.Now + " spices");
@@ -55,6 +55,9 @@ namespace Core.ApplicationServices
 
             _userRepository.Insert(user);
             _userRepository.Save();
+
+            if (!sendMailOnCreation) //stop here if we dont want to send mail right away
+                return user;
 
             var reset = GenerateResetRequest(user);
             var resetLink = _baseUrl + "#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);

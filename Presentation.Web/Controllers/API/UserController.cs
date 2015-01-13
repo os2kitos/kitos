@@ -12,6 +12,7 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
+        private bool _sendMailOnCreation;
 
         public UserController(IGenericRepository<User> repository, IUserService userService, IOrganizationService organizationService) : base(repository)
         {
@@ -32,9 +33,22 @@ namespace Presentation.Web.Controllers.API
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
 
-                _userService.AddUser(item);
+                _userService.AddUser(item, _sendMailOnCreation);
 
                 return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage Post(UserDTO dto, bool sendAdvisMailOnCreation)
+        {
+            try
+            {
+                _sendMailOnCreation = sendAdvisMailOnCreation;
+                return Post(dto);
             }
             catch (Exception e)
             {
