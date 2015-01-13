@@ -86,7 +86,7 @@ namespace Core.ApplicationServices
 
             IssuePasswordReset(user, subject, content);
 
-            user.LastAdvisDate = DateTime.Now;
+            user.LastAdvisDate = DateTime.Now.Date;
             _userRepository.Update(user);
             _userRepository.Save();
         }

@@ -14,7 +14,7 @@
                 <!--Edit user column-->
             </th>
             <th>
-                Default org.enhed 
+                Default org.enhed
             </th>
             <th>
                 Advis
@@ -27,7 +27,7 @@
 
     <tbody>
         <tr data-ng-repeat="user in users">
-            <td >
+            <td>
                 <button type="button" class="btn btn-link btn-xs" data-ng-click="toggleStatus(user)">
                     <span data-ng-if="user.isLocked" class="glyphicon glyphicon-lock text-warning"></span>
                     <span data-ng-if="!user.isLocked" class="glyphicon glyphicon-ok text-success"></span>
@@ -41,15 +41,21 @@
                 </button>
             </td>
             <td>{{user.defaultOrganizationUnitName}}</td>
-            <td>advis</td>
+            <td>
+                <button type="button" data-ng-if="user.lastAdvisDate === null" class="btn btn-success btn-xs" data-ng-click="sendAdvis(user)">
+                    Send Advis
+                </button>
+                <button type="button" data-ng-if="user.lastAdvisDate !== null" class="btn btn-warning btn-xs" data-ng-click="sendAdvis(user)">
+                    {{user.lastAdvisDate}}
+                </button>
+            </td>
             <td>{{user.objectOwnerName}}</td>
         </tr>
     </tbody>
 
     <tfoot>
         <tr>
-            <td>
-            </td>
+            <td></td>
         </tr>
     </tfoot>
 </table>
