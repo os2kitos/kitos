@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
+using Newtonsoft.Json.Linq;
+using Ninject.Web.Common;
 using Presentation.Web.Models;
+using WebGrease.Css.Extensions;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -12,7 +17,6 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
-        private bool _sendMailOnCreation;
 
         public UserController(IGenericRepository<User> repository, IUserService userService, IOrganizationService organizationService) : base(repository)
         {
@@ -24,31 +28,47 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                //check if user already exists. If so, just return him
-                var existingUser = Repository.Get(u => u.Email == dto.Email).FirstOrDefault();
-                if (existingUser != null) return Ok(Map(existingUser));
+                //do some string magic to determine parameters, and actions
+                List<string> parameters = null;
+                bool sendMailOnCreation = false;
+                bool sendReminder = false;
 
+                if(!string.IsNullOrWhiteSpace(Request.RequestUri.Query))
+                    parameters = new List<string>(Request.RequestUri.Query.Replace("?", string.Empty).Split('&'));
+                if (parameters != null)
+                {
+                    foreach (var parameter in parameters)
+                    {
+                        if (parameter.StartsWith("sendAdvisMailOnCreation"))
+                        {
+                            sendMailOnCreation = bool.Parse(parameter.Replace("sendAdvisMailOnCreation=", string.Empty));
+                        }
+                        if (parameter.StartsWith("sendAdvisReminder"))
+                        {
+                            sendReminder = bool.Parse(parameter.Replace("sendAdvisReminder=", string.Empty));
+                        }
+                    }
+                }
+
+                //check if user already exists and we are not sending a reminder. If so, just return him
+                var existingUser = Repository.Get(u => u.Email == dto.Email).FirstOrDefault();
+                if (existingUser != null && !sendReminder) return Ok(Map(existingUser));
+                //if we are sending a reminder:
+                if (existingUser != null && sendReminder)
+                {
+                    _userService.IssueAdvisMail(existingUser, true);
+                    return Ok(Map(existingUser));
+                }
+                
+                //otherwise we are creating a new user
                 var item = Map(dto);
 
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
 
-                _userService.AddUser(item, _sendMailOnCreation);
+                item = _userService.AddUser(item, sendMailOnCreation);
 
                 return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
-
-        public HttpResponseMessage Post(UserDTO dto, bool sendAdvisMailOnCreation)
-        {
-            try
-            {
-                _sendMailOnCreation = sendAdvisMailOnCreation;
-                return Post(dto);
             }
             catch (Exception e)
             {
