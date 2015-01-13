@@ -44,6 +44,7 @@ namespace Presentation.Web.Controllers.API
                 var user = _userRepository.GetByEmail(loginDto.Email);
                 if (user.IsLocked)
                     return Unauthorized("User is locked");
+
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
 
                 var userApiModel = AutoMapper.Mapper.Map<User, UserDTO>(user);
