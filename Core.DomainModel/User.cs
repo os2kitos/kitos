@@ -32,6 +32,7 @@ namespace Core.DomainModel
         public bool IsGlobalAdmin { get; set; }
         public Guid? Uuid { get; set; }
         public bool IsLocked { get; set; }
+        public DateTime? LastAdvisDate { get; set; }
 
         public int? CreatedInId { get; set; }
         public virtual Organization CreatedIn { get; set; }

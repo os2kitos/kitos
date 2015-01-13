@@ -15,6 +15,7 @@ namespace Presentation.Web.Models
         public List<AdminRightDTO> AdminRights { get; set; }
         public string ObjectOwnerName { get; set; }
         public bool IsLocked { get; set; }
+        public DateTime? LastAdvisDate { get; set; }
 
         public int? CreatedInId { get; set; }
         public DateTime LastChanged { get; set; }
