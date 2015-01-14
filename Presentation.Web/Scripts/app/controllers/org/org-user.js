@@ -10,14 +10,6 @@
                         'userService', function (userService) {
                             return userService.getUser();
                         }
-                    ],
-                    users: [
-                        '$http', 'user', function ($http, user) {
-
-                            return $http.get('api/user?orgId=' + user.currentOrganizationId).then(function (result) {
-                                return result.data.response;
-                            });
-                        }
                     ]
                 }
             });
@@ -25,14 +17,55 @@
     ]);
 
     app.controller('org.UserCtrl', [
-            '$scope', '$http', '$state', '$modal', '$q', 'notify', 'users', 'user',
-            function ($scope, $http, $state, $modal, $q, notify, users, user) {
+            '$scope', '$http', '$state', '$modal', '$q', 'notify', 'user',
+            function ($scope, $http, $state, $modal, $q, notify, user) {
 
-                ////Set current user's writeaccessrights for each other user in the list
-                setCanEdit(users).then(function (canEditResult) {
-                    $scope.users = canEditResult;
+                $scope.pagination = {
+                    search: '',
+                    skip: 0,
+                    take: 10,
+                    orderBy: 'Name'
+                };
+
+                $scope.$watchCollection('pagination', function (newVal, oldVal) {
+                    loadUsers();
                 });
 
+                function loadUsers() {
+                    var deferred = $q.defer();
+
+                    var url = 'api/user?orgId=' + user.currentOrganizationId;
+                    url += '&usePaging';
+                    url += '&skip=' + $scope.pagination.skip;
+                    url += '&take=' + $scope.pagination.take;
+
+                    if ($scope.pagination.orderBy) {
+                        url += '&orderBy=' + $scope.pagination.orderBy;
+                        if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+                    }
+
+                    if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
+                    else url += "&q=";
+
+                    $scope.users = [];
+                    $http.get(url).success(function (result, status, headers) {
+
+                        var paginationHeader = JSON.parse(headers('X-Pagination'));
+                        $scope.totalCount = paginationHeader.TotalCount;
+
+                        ////Set current user's writeaccessrights for each other user in the returned list
+                        setCanEdit(result.response).then(function (canEditResult) {
+                            $scope.users = canEditResult;
+                            deferred.resolve();
+                        });
+
+                    }).error(function () {
+                        notify.addErrorMessage("Kunne ikke hente brugere!");
+                        deferred.reject();
+                    });
+
+                    return deferred.promise;
+                }
 
                 function setCanEdit(canEditUsers) {
                     return $q.all(_.map(canEditUsers, function (iteratee) {
@@ -54,18 +87,6 @@
                         return deferred.promise;
                     }));
                 }
-
-                ////Set current user's writeaccessrights for each other user in the list
-                //_.each(users, function (iteratee, index, list) {
-                //    $http.get("api/user/" + iteratee.id + "?hasWriteAccess")
-                //                    .then(function (result) {
-                //                        iteratee.canEdit = result.data.response;
-                //                        $scope.users.push();
-                //                    });
-                //});
-
-
-
 
                 $scope.toggleStatus = function (userToToggle) {
                     userToToggle.isLocked = !userToToggle.isLocked;

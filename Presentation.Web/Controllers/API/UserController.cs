@@ -131,11 +131,15 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetByOrganization(int orgId)
+        public HttpResponseMessage GetByOrganization(int orgId, bool? usePaging, [FromUri] PagingModel<User> pagingModel)
         {
             try
             {
-                var users = Repository.Get(u => u.CreatedInId == orgId);
+                //Get all users inside the organizaton
+                pagingModel.Where(u => u.CreatedInId == orgId);
+
+                var users = Page(Repository.AsQueryable(), pagingModel);
+
                 return Ok(Map(users));
             }
             catch (Exception e)

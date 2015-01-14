@@ -1,61 +1,81 @@
-﻿<table class="table table-condensed table-striped">
-    <thead>
-        <tr>
-            <th>
-                Status
-            </th>
-            <th>
-                Navn
-            </th>
-            <th>
-                Email
-            </th>
-            <th>
-                <!--Edit user column-->
-            </th>
-            <th>
-                Default org.enhed
-            </th>
-            <th>
-                Advis
-            </th>
-            <th>
-                Oprettet af
-            </th>
-        </tr>
-    </thead>
+﻿<h3>
+    {{ currentUser.currentOrganizationName}}
+</h3>
 
-    <tbody>
-        <tr data-ng-repeat="user in users">
-            <td>
-                <button type="button" class="btn btn-link btn-xs" data-ng-click="toggleStatus(user)" data-ng-disabled="!user.canBeEdited">
-                    <span data-ng-if="user.isLocked" class="glyphicon glyphicon-lock text-warning"></span>
-                    <span data-ng-if="!user.isLocked" class="glyphicon glyphicon-ok text-success"></span>
-                </button>
-            </td>
-            <td>{{user.name}}</td>
-            <td>{{user.email}}</td>
-            <td>
-                <button type="button" class="btn btn-info btn-xs" data-ng-click="editUser(user)" data-ng-disabled="!user.canBeEdited">
-                    <span class="glyphicon glyphicon-pencil"></span>
-                </button>
-            </td>
-            <td>{{user.defaultOrganizationUnitName}}</td>
-            <td>
-                <button type="button" data-ng-if="user.lastAdvisDate === null" class="btn btn-success btn-xs" data-ng-click="sendAdvis(user, false)" data-ng-disabled="!user.canBeEdited">
-                    Send Advis
-                </button>
-                <button type="button" data-ng-if="user.lastAdvisDate !== null" class="btn btn-warning btn-xs" data-ng-click="sendAdvis(user, true)" data-ng-disabled="!user.canBeEdited">
-                    {{user.lastAdvisDate | date:'dd-MM-yy'}}
-                </button>
-            </td>
-            <td>{{user.objectOwnerName}}</td>
-        </tr>
-    </tbody>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <i class="glyphicon glyphicon-user"></i>
+    </div>
 
-    <tfoot>
-        <tr>
-            <td></td>
-        </tr>
-    </tfoot>
-</table>
+    <table class="table table-condensed table-striped">
+        <thead>
+            <tr>
+                <th>
+                    Status
+                    <order-by data-order-by="'status'" data-paging="pagination"></order-by>
+                </th>
+                <th>
+                    <button class="btn btn-link btn-header" data-ng-click="sortChange('name')">Navn</button>
+                    
+                </th>
+                <th>
+                    <button class="btn btn-link btn-header" data-ng-click="sortChange('email')">Email</button>
+                </th>
+                <th>
+                    <!--EditUser button column-->
+                </th>
+                <th>
+                    <button class="btn btn-link btn-header" data-ng-click="sortChange('defaultOrganizationUnitName')">Default org.enhed</button>
+                </th>
+                <th>
+                    <button class="btn btn-link btn-header" data-ng-click="sortChange('lastAdvisDate')">Advis</button>
+                </th>
+                <th>
+                    <button class="btn btn-link btn-header" data-ng-click="sortChange('objectOwnerName')">Oprettet af</button>
+                </th>
+                <!--<th>
+                    <button class="btn btn-link btn-header" data-ng-click="sortChange('module')">Modul</button>
+                </th>
+                <th>
+                    <button class="btn btn-link btn-header" data-ng-click="sortChange('roles')">Rolle</button>
+                </th>-->
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr data-ng-repeat="user in users">
+                <td>
+                    <button type="button" class="btn btn-link btn-xs" data-ng-click="toggleStatus(user)" data-ng-disabled="!user.canBeEdited">
+                        <span data-ng-if="user.isLocked" class="glyphicon glyphicon-lock text-warning"></span>
+                        <span data-ng-if="!user.isLocked" class="glyphicon glyphicon-ok text-success"></span>
+                    </button>
+                </td>
+                <td>{{user.name}}</td>
+                <td>{{user.email}}</td>
+                <td>
+                    <button type="button" class="btn btn-info btn-xs" data-ng-click="editUser(user)" data-ng-disabled="!user.canBeEdited">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </button>
+                </td>
+                <td>{{user.defaultOrganizationUnitName}}</td>
+                <td>
+                    <button type="button" data-ng-if="user.lastAdvisDate === null" class="btn btn-success btn-xs btn-block" data-ng-click="sendAdvis(user, false)" data-ng-disabled="!user.canBeEdited">
+                        Send Advis
+                    </button>
+                    <button type="button" data-ng-if="user.lastAdvisDate !== null" class="btn btn-warning btn-xs btn-block" data-ng-click="sendAdvis(user, true)" data-ng-disabled="!user.canBeEdited">
+                        {{user.lastAdvisDate | date:'dd-MM-yy'}}
+                    </button>
+                </td>
+                <td>{{user.objectOwnerName}}</td>
+            </tr>
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <td colspan="10" class="text-center">
+                    <span data-pagination-buttons="pagination" data-pagination-total-count="totalCount"></span>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
