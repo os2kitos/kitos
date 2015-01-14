@@ -18,12 +18,13 @@ namespace Presentation.Web.Controllers.API
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
 
-        public UserController(IGenericRepository<User> repository, IUserService userService, IOrganizationService organizationService) : base(repository)
+        public UserController(IGenericRepository<User> repository, IUserService userService, IOrganizationService organizationService)
+            : base(repository)
         {
             _userService = userService;
             _organizationService = organizationService;
         }
-        
+
         public override HttpResponseMessage Post(UserDTO dto)
         {
             try
@@ -32,34 +33,46 @@ namespace Presentation.Web.Controllers.API
                 List<string> parameters = null;
                 bool sendMailOnCreation = false;
                 bool sendReminder = false;
+                bool sendAdvis = false;
 
-                if(!string.IsNullOrWhiteSpace(Request.RequestUri.Query))
+                if (!string.IsNullOrWhiteSpace(Request.RequestUri.Query))
                     parameters = new List<string>(Request.RequestUri.Query.Replace("?", string.Empty).Split('&'));
                 if (parameters != null)
                 {
                     foreach (var parameter in parameters)
                     {
-                        if (parameter.StartsWith("sendAdvisMailOnCreation"))
+                        if (parameter.StartsWith("sendMailOnCreation"))
                         {
-                            sendMailOnCreation = bool.Parse(parameter.Replace("sendAdvisMailOnCreation=", string.Empty));
+                            sendMailOnCreation = bool.Parse(parameter.Replace("sendMailOnCreation=", string.Empty));
                         }
-                        if (parameter.StartsWith("sendAdvisReminder"))
+                        if (parameter.StartsWith("sendReminder"))
                         {
-                            sendReminder = bool.Parse(parameter.Replace("sendAdvisReminder=", string.Empty));
+                            sendReminder = bool.Parse(parameter.Replace("sendReminder=", string.Empty));
+                        }
+                        if (parameter.StartsWith("sendAdvis"))
+                        {
+                            sendAdvis = bool.Parse(parameter.Replace("sendAdvis=", string.Empty));
                         }
                     }
                 }
 
-                //check if user already exists and we are not sending a reminder. If so, just return him
+                //check if user already exists and we are not sending a reminder or advis. If so, just return him
                 var existingUser = Repository.Get(u => u.Email == dto.Email).FirstOrDefault();
-                if (existingUser != null && !sendReminder) return Ok(Map(existingUser));
+                if (existingUser != null && !sendReminder && !sendAdvis)
+                    return Ok(Map(existingUser));
                 //if we are sending a reminder:
                 if (existingUser != null && sendReminder)
                 {
                     _userService.IssueAdvisMail(existingUser, true);
                     return Ok(Map(existingUser));
                 }
-                
+                //if we are sending an advis:
+                if (existingUser != null && sendAdvis)
+                {
+                    _userService.IssueAdvisMail(existingUser, false);
+                    return Ok(Map(existingUser));
+                }
+
                 //otherwise we are creating a new user
                 var item = Map(dto);
 
