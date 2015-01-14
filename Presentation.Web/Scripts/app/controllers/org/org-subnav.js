@@ -48,7 +48,7 @@
                                     email: $modalScope.email,
                                     createdInId: user.currentOrganizationId
                                 };
-                                var params = sendMail ? { sendAdvisMailOnCreation: sendMail } : null; //set params if sendMail is true
+                                var params = sendMail ? { sendMailOnCreation: sendMail } : null; //set params if sendMail is true
 
                                 var msg = notify.addInfoMessage("Opretter bruger", false);
                                 $http.post("api/user", newUser, { handleBusy: true, params: params }).success(function (result, status) {

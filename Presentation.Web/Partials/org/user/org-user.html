@@ -42,10 +42,10 @@
             </td>
             <td>{{user.defaultOrganizationUnitName}}</td>
             <td>
-                <button type="button" data-ng-if="user.lastAdvisDate === null" class="btn btn-success btn-xs" data-ng-click="sendAdvis(user)">
+                <button type="button" data-ng-if="user.lastAdvisDate === null" class="btn btn-success btn-xs" data-ng-click="sendAdvis(user, false)">
                     Send Advis
                 </button>
-                <button type="button" data-ng-if="user.lastAdvisDate !== null" class="btn btn-warning btn-xs" data-ng-click="sendAdvis(user)">
+                <button type="button" data-ng-if="user.lastAdvisDate !== null" class="btn btn-warning btn-xs" data-ng-click="sendAdvis(user, true)">
                     {{user.lastAdvisDate}}
                 </button>
             </td>
