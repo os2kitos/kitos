@@ -7,14 +7,14 @@
                 controller: 'org.UserCtrl',
                 resolve: {
                     user: [
-                        'userService', function(userService) {
+                        'userService', function (userService) {
                             return userService.getUser();
                         }
                     ],
                     users: [
-                        '$http', 'user', function($http, user) {
+                        '$http', 'user', function ($http, user) {
 
-                            return $http.get('api/user?orgId=' + user.currentOrganizationId).then(function(result) {
+                            return $http.get('api/user?orgId=' + user.currentOrganizationId).then(function (result) {
                                 return result.data.response;
                             });
                         }
@@ -25,117 +25,158 @@
     ]);
 
     app.controller('org.UserCtrl', [
-        '$scope', '$http', '$state', '$modal', '$q', 'notify', 'users',
-        function($scope, $http, $state, $modal, $q, notify, users) {
-            $scope.users = users;
+            '$scope', '$http', '$state', '$modal', '$q', 'notify', 'users', 'user',
+            function ($scope, $http, $state, $modal, $q, notify, users, user) {
 
-            $scope.toggleStatus = function(user) {
-                user.isLocked = !user.isLocked;
-                var success = user.isLocked ? user.name + " er låst" : user.name + " er låst op";
-                updateUser(user, success).then( //success
-                    function(successMessage) {
-                        notify.addSuccessMessage(successMessage);
-                    },
-                    //failure
-                    function(errorMessage) {
-                        notify.addErrorMessage(errorMessage);
-                    },
-                    //update
-                    function(updateMessage) {
-                        notify.addInfoMessage(updateMessage);
-                    });
-            }
-
-            $scope.editUser = function(user) {
-
-                var modal = $modal.open({
-                    // fade in instead of slide from top, fixes strange cursor placement in IE
-                    // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
-                    windowClass: 'modal fade in',
-                    templateUrl: 'partials/org/user/org-edituser-modal.html',
-                    controller: [
-                        '$scope', '$modalInstance', 'notify', 'autofocus', function($modalScope, $modalInstance, modalnotify, autofocus) {
-                            autofocus();
-                            $modalScope.busy = false;
-                            $modalScope.name = user.name;
-                            $modalScope.email = user.email;
-                            $modalScope.repeatEmail = user.email;
-                            $modalScope.ok = function() {
-                                $modalScope.busy = true;
-                                user.name = $modalScope.name;
-                                user.email = $modalScope.email;
-                                updateUser(user, user.name + " er ændret.", true).then(
-                                    //success
-                                    function(successMessage) {
-                                        modalnotify.addSuccessMessage(successMessage);
-                                        $modalInstance.close();
-                                    },
-                                    //failure
-                                    function(errorMessage) {
-                                        modalnotify.addErrorMessage(errorMessage);
-                                        $modalInstance.close();
-                                    },
-                                    //update
-                                    function(updateMessage) {
-                                        modalnotify.addInfoMessage(updateMessage);
-                                    });
-                            };
-                            $modalScope.cancel = function() {
-                                $modalInstance.close();
-                            };
-                        }
-                    ]
+                ////Set current user's writeaccessrights for each other user in the list
+                setCanEdit(users).then(function (canEditResult) {
+                    $scope.users = canEditResult;
                 });
 
-                modal.result.then(
-                    function() {
-                        reload();
-                    });
-            }
 
-            $scope.sendAdvis = function (user, reminder) {
-                var params = {};
-                var type;
-                if (reminder) {
-                    params.sendReminder = true;
-                    type = "påmindelse";
-                } else {
-                    params.sendAdvis = true;
-                    type = "advis";
+                function setCanEdit(canEditUsers) {
+                    return $q.all(_.map(canEditUsers, function (iteratee) {
+                        var deferred = $q.defer();
+
+                        setTimeout(function () {
+                            $http.get("api/user/" + iteratee.id + "?hasWriteAccess")
+                            .success(function (result) {
+                                iteratee.canBeEdited = result.response;
+                                deferred.resolve(iteratee);
+                            })
+                            .error(function (result) {
+                                iteratee.canBeEdited = false;
+                                deferred.reject(result);
+                            }
+                            );
+                        }, 0);
+
+                        return deferred.promise;
+                    }));
                 }
-                    
-                var msg = notify.addInfoMessage("Sender " + type + " til " + user.email, false);
-                var http = $http.post("api/user", user, { handleBusy: true, params: params }).success(function (result) {
-                    msg.toSuccessMessage("Advis sendt til " + user.email);
-                }).error(function (result) {
-                    msg.toErrorMessage("Kunne ikke sende " + type + "!");
-                });
 
-                http.then(function() {
-                    reload();
-                });
-            }
+                ////Set current user's writeaccessrights for each other user in the list
+                //_.each(users, function (iteratee, index, list) {
+                //    $http.get("api/user/" + iteratee.id + "?hasWriteAccess")
+                //                    .then(function (result) {
+                //                        iteratee.canEdit = result.data.response;
+                //                        $scope.users.push();
+                //                    });
+                //});
 
-            function reload() {
-                $state.go('.', null, { reload: true });
-            }
 
-            function updateUser(user, successmessage, showNotify) {
 
-                var deferred = $q.defer();
 
-                setTimeout(function() {
-                    if (showNotify)
-                        deferred.notify('Ændrer...');
-                    $http({ method: 'PATCH', url: "api/user/" + user.id, data: user, handleBusy: true }).success(function(result) {
-                        deferred.resolve(successmessage);
-                    }).error(function(result) {
-                        deferred.reject("Fejl! " + user.name + " kunne ikke ændres!");
+                $scope.toggleStatus = function (userToToggle) {
+                    userToToggle.isLocked = !userToToggle.isLocked;
+                    var success = userToToggle.isLocked ? userToToggle.name + " er låst" : userToToggle.name + " er låst op";
+                    updateUser(userToToggle, success).then( //success
+                        function (successMessage) {
+                            notify.addSuccessMessage(successMessage);
+                        },
+                        //failure
+                        function (errorMessage) {
+                            notify.addErrorMessage(errorMessage);
+                        },
+                        //update
+                        function (updateMessage) {
+                            notify.addInfoMessage(updateMessage);
+                        });
+                }
+
+                $scope.editUser = function (userToEdit) {
+
+                    var modal = $modal.open({
+                        // fade in instead of slide from top, fixes strange cursor placement in IE
+                        // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
+                        windowClass: 'modal fade in',
+                        templateUrl: 'partials/org/user/org-edituser-modal.html',
+                        controller: [
+                            '$scope', '$modalInstance', 'notify', 'autofocus', function ($modalScope, $modalInstance, modalnotify, autofocus) {
+                                autofocus();
+                                $modalScope.busy = false;
+                                $modalScope.name = userToEdit.name;
+                                $modalScope.email = userToEdit.email;
+                                $modalScope.repeatEmail = userToEdit.email;
+                                $modalScope.ok = function () {
+                                    $modalScope.busy = true;
+                                    userToEdit.name = $modalScope.name;
+                                    userToEdit.email = $modalScope.email;
+                                    updateUser(userToEdit, userToEdit.name + " er ændret.", true).then(
+                                        //success
+                                        function (successMessage) {
+                                            modalnotify.addSuccessMessage(successMessage);
+                                            $modalInstance.close();
+                                        },
+                                        //failure
+                                        function (errorMessage) {
+                                            modalnotify.addErrorMessage(errorMessage);
+                                            $modalInstance.close();
+                                        },
+                                        //update
+                                        function (updateMessage) {
+                                            modalnotify.addInfoMessage(updateMessage);
+                                        });
+                                };
+                                $modalScope.cancel = function () {
+                                    $modalInstance.close();
+                                };
+                            }
+                        ]
                     });
-                }, 0);
 
-                return deferred.promise;
+                    modal.result.then(
+                        function () {
+                            reload();
+                        });
+                }
+
+                $scope.sendAdvis = function (userToAdvis, reminder) {
+                    var params = {};
+                    var type;
+                    if (reminder) {
+                        params.sendReminder = true;
+                        type = "påmindelse";
+                    } else {
+                        params.sendAdvis = true;
+                        type = "advis";
+                    }
+
+                    var msg = notify.addInfoMessage("Sender " + type + " til " + userToAdvis.email, false);
+                    $http.post("api/user", userToAdvis, { handleBusy: true, params: params })
+                        .success(function (result) {
+                            msg.toSuccessMessage("Advis sendt til " + userToAdvis.email);
+                        })
+                        .error(function (result) {
+                            msg.toErrorMessage("Kunne ikke sende " + type + "!");
+                        })
+                        .then(function () {
+                            reload();
+                        });
+                }
+
+                function reload() {
+                    $state.go('.', null, { reload: true });
+                }
+
+                function updateUser(userToUpdate, successmessage, showNotify) {
+
+                    var deferred = $q.defer();
+
+                    setTimeout(function () {
+                        if (showNotify)
+                            deferred.notify('Ændrer...');
+                        $http({ method: 'PATCH', url: "api/user/" + userToUpdate.id, data: userToUpdate, handleBusy: true })
+                            .success(function (result) {
+                                deferred.resolve(successmessage);
+                            })
+                            .error(function (result) {
+                                deferred.reject("Fejl! " + userToUpdate.name + " kunne ikke ændres!");
+                            });
+                    }, 0);
+
+                    return deferred.promise;
+                }
             }
-        }
     ]);
 })(angular, app);

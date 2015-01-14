@@ -28,7 +28,7 @@
     <tbody>
         <tr data-ng-repeat="user in users">
             <td>
-                <button type="button" class="btn btn-link btn-xs" data-ng-click="toggleStatus(user)">
+                <button type="button" class="btn btn-link btn-xs" data-ng-click="toggleStatus(user)" data-ng-disabled="!user.canBeEdited">
                     <span data-ng-if="user.isLocked" class="glyphicon glyphicon-lock text-warning"></span>
                     <span data-ng-if="!user.isLocked" class="glyphicon glyphicon-ok text-success"></span>
                 </button>
@@ -36,17 +36,17 @@
             <td>{{user.name}}</td>
             <td>{{user.email}}</td>
             <td>
-                <button type="button" class="btn btn-info btn-xs" data-ng-click="editUser(user)">
+                <button type="button" class="btn btn-info btn-xs" data-ng-click="editUser(user)" data-ng-disabled="!user.canBeEdited">
                     <span class="glyphicon glyphicon-pencil"></span>
                 </button>
             </td>
             <td>{{user.defaultOrganizationUnitName}}</td>
             <td>
-                <button type="button" data-ng-if="user.lastAdvisDate === null" class="btn btn-success btn-xs" data-ng-click="sendAdvis(user, false)">
+                <button type="button" data-ng-if="user.lastAdvisDate === null" class="btn btn-success btn-xs" data-ng-click="sendAdvis(user, false)" data-ng-disabled="!user.canBeEdited">
                     Send Advis
                 </button>
-                <button type="button" data-ng-if="user.lastAdvisDate !== null" class="btn btn-warning btn-xs" data-ng-click="sendAdvis(user, true)">
-                    {{user.lastAdvisDate}}
+                <button type="button" data-ng-if="user.lastAdvisDate !== null" class="btn btn-warning btn-xs" data-ng-click="sendAdvis(user, true)" data-ng-disabled="!user.canBeEdited">
+                    {{user.lastAdvisDate | date:'dd-MM-yy'}}
                 </button>
             </td>
             <td>{{user.objectOwnerName}}</td>
