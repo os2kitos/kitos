@@ -12,32 +12,36 @@
             <tr>
                 <th>
                     Status
-                    <order-by data-order-by="'status'" data-paging="pagination"></order-by>
+                    <button  data-order-by="'IsLocked'" data-paging="pagination"></button>
                 </th>
                 <th>
-                    <button class="btn btn-link btn-header" data-ng-click="sortChange('name')">Navn</button>
-                    
+                    Navn
+                    <button data-order-by="'Name'" data-paging="pagination"></button>
                 </th>
                 <th>
-                    <button class="btn btn-link btn-header" data-ng-click="sortChange('email')">Email</button>
+                    Email
+                    <button data-order-by="'Email'" data-paging="pagination"></button>
                 </th>
                 <th>
                     <!--EditUser button column-->
                 </th>
                 <th>
-                    <button class="btn btn-link btn-header" data-ng-click="sortChange('defaultOrganizationUnitName')">Default org.enhed</button>
+                    Default org.enhed
+                    <button data-order-by="'DefaultOrganizationUnit.Name'" data-paging="pagination"></button>
                 </th>
                 <th>
-                    <button class="btn btn-link btn-header" data-ng-click="sortChange('lastAdvisDate')">Advis</button>
+                    Advis
+                    <button data-order-by="'LastAdvisDate'" data-paging="pagination"></button>
                 </th>
                 <th>
-                    <button class="btn btn-link btn-header" data-ng-click="sortChange('objectOwnerName')">Oprettet af</button>
+                    Oprettet af
+                    <button data-order-by="'ObjectOwner.Name'" data-paging="pagination"></button>
                 </th>
                 <!--<th>
                     <button class="btn btn-link btn-header" data-ng-click="sortChange('module')">Modul</button>
                 </th>
                 <th>
-                    <button class="btn btn-link btn-header" data-ng-click="sortChange('roles')">Rolle</button>
+                    Rolle
                 </th>-->
             </tr>
         </thead>

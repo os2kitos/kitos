@@ -135,7 +135,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                //Get all users inside the organizaton
+                //Get all users inside the organization
                 pagingModel.Where(u => u.CreatedInId == orgId);
 
                 var users = Page(Repository.AsQueryable(), pagingModel);
