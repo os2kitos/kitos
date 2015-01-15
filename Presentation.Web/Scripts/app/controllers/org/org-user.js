@@ -243,11 +243,13 @@
                     $scope.chosenModule = $stateParams.lastModule;
                 else
                     $scope.chosenModule = '0';
-
+                
                 $scope.$watchCollection('pagination', function (newVal, oldVal) {
-                    loadUsers()
-                        .then(
-                        $scope.getRightsForModule($scope.chosenModule)).then(function () { });
+                    loadUsers().then(function() {
+                        $scope.getRightsForModule($scope.chosenModule).then(function() {
+                            
+                        });
+                    });
                 });
             }
     ]);
