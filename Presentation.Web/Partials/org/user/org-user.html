@@ -12,7 +12,7 @@
             <tr>
                 <th>
                     Status
-                    <button  data-order-by="'IsLocked'" data-paging="pagination"></button>
+                    <button data-order-by="'IsLocked'" data-paging="pagination"></button>
                 </th>
                 <th>
                     Navn
@@ -38,7 +38,7 @@
                     <button data-order-by="'ObjectOwner.Name'" data-paging="pagination"></button>
                 </th>
                 <th>
-                    <select data-ng-model="chosenModule" ng-change="updateModule(chosenModule)">
+                    <select data-ng-model="chosenModule" ng-change="getRightsForModule(chosenModule)">
                         <option value="0">Organisation</option>
                         <option value="1">IT Projekter</option>
                         <option value="2">IT Systemer</option>
@@ -60,7 +60,7 @@
                     </button>
                 </td>
                 <td>{{user.name}}</td>
-                <td>{{user.email}}</td>
+                <td>{{user.email}} </td>
                 <td>
                     <button type="button" class="btn btn-info btn-xs" data-ng-click="editUser(user)" data-ng-disabled="!user.canBeEdited">
                         <span class="glyphicon glyphicon-pencil"></span>
@@ -76,6 +76,20 @@
                     </button>
                 </td>
                 <td>{{user.objectOwnerName}}</td>
+                <td colspan="2">
+                    <table class="table table-condensed table-striped">
+                        <tbody>
+                            <tr data-ng-repeat="right in user.rights">
+                                <td>
+                                    {{right.objectName}}
+                                </td>
+                                <td>
+                                    {{right.roleName}} ({{right.hasWriteAccess && "S" || "L" }})
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
             </tr>
         </tbody>
 

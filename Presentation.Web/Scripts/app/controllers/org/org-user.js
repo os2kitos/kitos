@@ -20,25 +20,87 @@
             '$scope', '$http', '$state', '$modal', '$q', '$stateParams', 'notify', 'user',
             function ($scope, $http, $state, $modal, $q, $stateParams, notify, user) {
 
-                $scope.currentUser = user;
+                function loadUsers() {
+                    var deferred = $q.defer();
 
-                $scope.pagination = {
-                    search: '',
-                    skip: 0,
-                    take: 10,
-                    orderBy: 'Name'
-                };
+                    var url = 'api/user?orgId=' + user.currentOrganizationId;
+                    url += '&usePaging';
+                    url += '&skip=' + $scope.pagination.skip;
+                    url += '&take=' + $scope.pagination.take;
 
-                //set or re-set the chosen module based on state
-                if ($stateParams.lastModule)
-                    $scope.chosenModule = $stateParams.lastModule;
-                else
-                    $scope.chosenModule = '0';
+                    if ($scope.pagination.orderBy) {
+                        url += '&orderBy=' + $scope.pagination.orderBy;
+                        if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+                    }
 
-                $scope.$watchCollection('pagination', function (newVal, oldVal) {
-                    loadUsers()
-                        .then($scope.updateModule($scope.chosenModule));
-                });
+                    if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
+                    else url += "&q=";
+
+                    $scope.users = [];
+                    $http.get(url).success(function (result, status, headers) {
+
+                        var paginationHeader = JSON.parse(headers('X-Pagination'));
+                        $scope.totalCount = paginationHeader.TotalCount;
+
+                        ////Set current user's writeaccessrights for each other user in the returned list
+                        setCanEdit(result.response).then(function (canEditResult) {
+                            $scope.users = canEditResult;
+                            deferred.resolve();
+                        });
+
+                    }).error(function () {
+                        notify.addErrorMessage("Kunne ikke hente brugere!");
+                        deferred.reject();
+                    });
+
+                    return deferred.promise;
+                }
+
+                //Goes through a collection of users, and for each user sets canBeEdited flag
+                //Returns a flattened promise, that resolves when all users in the collection has been resolved
+                function setCanEdit(userCollection) {
+                    return $q.all(_.map(userCollection, function (iteratee) {
+                        var deferred = $q.defer();
+
+                        setTimeout(function () {
+                            $http.get("api/user/" + iteratee.id + "?hasWriteAccess")
+                            .success(function (result) {
+                                iteratee.canBeEdited = result.response;
+                                deferred.resolve(iteratee);
+                            })
+                            .error(function (result) {
+                                iteratee.canBeEdited = false;
+                                deferred.reject(result);
+                            }
+                            );
+                        }, 0);
+
+                        return deferred.promise;
+                    }));
+                }
+
+                function updateUser(userToUpdate, successmessage, showNotify) {
+
+                    var deferred = $q.defer();
+
+                    setTimeout(function () {
+                        if (showNotify)
+                            deferred.notify('Ændrer...');
+                        $http({ method: 'PATCH', url: "api/user/" + userToUpdate.id, data: userToUpdate, handleBusy: true })
+                            .success(function (result) {
+                                deferred.resolve(successmessage);
+                            })
+                            .error(function (result) {
+                                deferred.reject("Fejl! " + userToUpdate.name + " kunne ikke ændres!");
+                            });
+                    }, 0);
+
+                    return deferred.promise;
+                }
+
+                function reload() {
+                    $state.go('.', { lastModule: $scope.chosenModule }, { reload: true });
+                }
 
                 $scope.toggleStatus = function (userToToggle) {
                     userToToggle.isLocked = !userToToggle.isLocked;
@@ -57,15 +119,46 @@
                         });
                 }
 
-                $scope.updateModule = function (chosenModule) {
-                    var deferred = $q.defer();
+                $scope.getRightsForModule = function (chosenModule) {
+                    //return a flat promise, that fullfills when all rights have been retrieved
+                    return $q.all(_.map($scope.users, function (iteratee) {
+                        var deferred = $q.defer();
 
-                    setTimeout(function () {
-                        //$scope.chosenModule = chosenModule;
-                        deferred.resolve();
-                    }, 0);
+                        setTimeout(function () {
+                            var httpUrl = 'api/';
 
-                    return deferred.promise;
+                            switch (chosenModule) {
+                                //Organisation selected
+                                case '0':
+                                    httpUrl += 'organizationunitrights?orgId=' + user.currentOrganizationId;
+                                    break;
+                                    //ITProjects selected
+                                case '1':
+                                    httpUrl += 'itprojectrights?';
+                                    break;
+                                    //ITSystems selected
+                                case '2':
+                                    httpUrl += 'itsystemusagerights?';
+                                    break;
+                                    //ITContracts selected
+                                case '3':
+                                    httpUrl += 'itcontractrights?';
+                                    break;
+                            }
+
+                            httpUrl += '&userId=' + iteratee.id;
+                            return $http.get(httpUrl, { handleBusy: true })
+                                .success(function (result) {
+                                    iteratee.rights = result.response;
+                                    deferred.resolve();
+                                })
+                                .error(function (result) {
+                                    deferred.reject();
+                                });
+                        }, 0);
+
+                        return deferred.promise;
+                    }));
                 }
 
                 $scope.editUser = function (userToEdit) {
@@ -136,89 +229,26 @@
                         .then(function () { });
                 }
 
+                $scope.currentUser = user;
 
+                $scope.pagination = {
+                    search: '',
+                    skip: 0,
+                    take: 10,
+                    orderBy: 'Name'
+                };
 
-                function loadUsers() {
-                    var deferred = $q.defer();
+                //set or re-set the chosen module based on state
+                if ($stateParams.lastModule)
+                    $scope.chosenModule = $stateParams.lastModule;
+                else
+                    $scope.chosenModule = '0';
 
-                    var url = 'api/user?orgId=' + user.currentOrganizationId;
-                    url += '&usePaging';
-                    url += '&skip=' + $scope.pagination.skip;
-                    url += '&take=' + $scope.pagination.take;
-
-                    if ($scope.pagination.orderBy) {
-                        url += '&orderBy=' + $scope.pagination.orderBy;
-                        if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
-                    }
-
-                    if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
-                    else url += "&q=";
-
-                    $scope.users = [];
-                    $http.get(url).success(function (result, status, headers) {
-
-                        var paginationHeader = JSON.parse(headers('X-Pagination'));
-                        $scope.totalCount = paginationHeader.TotalCount;
-
-                        ////Set current user's writeaccessrights for each other user in the returned list
-                        setCanEdit(result.response).then(function (canEditResult) {
-                            $scope.users = canEditResult;
-                            deferred.resolve();
-                        });
-
-                    }).error(function () {
-                        notify.addErrorMessage("Kunne ikke hente brugere!");
-                        deferred.reject();
-                    });
-
-                    return deferred.promise;
-                }
-
-                //Goes through a collection of users, and for each user sets canBeEdited flag
-                //Returns a flattened promise, that resolves when all users in the collection has been resolved
-                function setCanEdit(userCollection) {
-                    return $q.all(_.map(userCollection, function (iteratee) {
-                        var deferred = $q.defer();
-
-                        setTimeout(function () {
-                            $http.get("api/user/" + iteratee.id + "?hasWriteAccess")
-                            .success(function (result) {
-                                iteratee.canBeEdited = result.response;
-                                deferred.resolve(iteratee);
-                            })
-                            .error(function (result) {
-                                iteratee.canBeEdited = false;
-                                deferred.reject(result);
-                            }
-                            );
-                        }, 0);
-
-                        return deferred.promise;
-                    }));
-                }
-
-                function reload() {
-                    $state.go('.', { lastModule: $scope.chosenModule }, { reload: true });
-                }
-
-                function updateUser(userToUpdate, successmessage, showNotify) {
-
-                    var deferred = $q.defer();
-
-                    setTimeout(function () {
-                        if (showNotify)
-                            deferred.notify('Ændrer...');
-                        $http({ method: 'PATCH', url: "api/user/" + userToUpdate.id, data: userToUpdate, handleBusy: true })
-                            .success(function (result) {
-                                deferred.resolve(successmessage);
-                            })
-                            .error(function (result) {
-                                deferred.reject("Fejl! " + userToUpdate.name + " kunne ikke ændres!");
-                            });
-                    }, 0);
-
-                    return deferred.promise;
-                }
+                $scope.$watchCollection('pagination', function (newVal, oldVal) {
+                    loadUsers()
+                        .then(
+                        $scope.getRightsForModule($scope.chosenModule)).then(function () { });
+                });
             }
     ]);
 })(angular, app);
