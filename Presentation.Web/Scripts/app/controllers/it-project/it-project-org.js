@@ -43,8 +43,8 @@
     }]);
 
     app.controller('project.EditOrgCtrl',
-        ['$scope', '$http', '$stateParams', 'notify', 'isTransversal', 'orgUnitsTree', 'selectedOrgUnits', 'responsibleOrgUnitId',
-            function ($scope, $http, $stateParams, notify, isTransversal, orgUnitsTree, selectedOrgUnits, responsibleOrgUnitId) {
+        ['$scope', '$http', '$stateParams', 'notify', 'isTransversal', 'orgUnitsTree', 'selectedOrgUnits', 'responsibleOrgUnitId', 'user',
+            function ($scope, $http, $stateParams, notify, isTransversal, orgUnitsTree, selectedOrgUnits, responsibleOrgUnitId, user) {
                 $scope.orgUnitsTree = orgUnitsTree;
                 $scope.isTransversal = isTransversal;
                 $scope.selectedOrgUnits = selectedOrgUnits;
@@ -86,7 +86,7 @@
                                 msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                             });
                     } else {
-                        $http.delete('api/itproject/' + projectId + '?organizationunit=' + obj.id)
+                        $http.delete('api/itproject/' + projectId + '?organizationunit=' + obj.id + '&organizationId=' + user.currentOrganizationId)
                             .success(function() {
                                 msg.toSuccessMessage("Gemt!");
 

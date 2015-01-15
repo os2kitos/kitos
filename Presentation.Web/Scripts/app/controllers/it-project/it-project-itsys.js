@@ -36,7 +36,7 @@
             };
 
             $scope.delete = function(usageId) {
-                $http.delete('api/itproject/' + projectId + '?usageId=' + usageId)
+                $http.delete('api/itproject/' + projectId + '?usageId=' + usageId + '&organizationId=' + user.currentOrganizationId)
                     .success(function() {
                         notify.addSuccessMessage("Systemets tilknyttning er fjernet.");
                         reload();

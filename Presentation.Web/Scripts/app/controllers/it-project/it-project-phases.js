@@ -17,16 +17,16 @@
     }]);
 
     app.controller('project.EditPhasesCtrl',
-    ['$scope', '$http', 'notify', '$modal', 'project',
-        function ($scope, $http, notify, $modal, project) {
+    ['$scope', '$http', 'notify', '$modal', 'project', 'user',
+        function ($scope, $http, notify, $modal, project, user) {
             $scope.project = project;
-            $scope.project.updateUrl = "api/itproject/" + project.id;
+            $scope.project.updateUrl = "api/itproject/" + project.id + '?organizationId=' + user.currentOrganizationId;
 
             //Setup phases
             $scope.project.phases = [project.phase1, project.phase2, project.phase3, project.phase4, project.phase5];
             var prevPhase = null;
             _.each($scope.project.phases, function (phase) {
-                phase.updateUrl = "api/itprojectphase/" + phase.id;
+                phase.updateUrl = "api/itprojectphase/" + phase.id + '?organizationId=' + user.currentOrganizationId;
                 phase.prevPhase = prevPhase;
                 prevPhase = phase;
             });

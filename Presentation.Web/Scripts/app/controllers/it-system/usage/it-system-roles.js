@@ -84,7 +84,7 @@
             var rId = right.roleId;
             var uId = right.userId;
 
-            $http.delete("api/itsystemusagerights/" + usageId + "?rId=" + rId + "&uId=" + uId).success(function (deleteResult) {
+            $http.delete("api/itsystemusagerights/" + usageId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
                 right.show = false;
                 notify.addSuccessMessage('Rollen er slettet!');
             }).error(function (deleteResult) {
@@ -113,7 +113,7 @@
 
             //otherwise, we should delete the old entry, then add a new one
 
-            $http.delete("api/itsystemusagerights/" + usageId + "?rId=" + rIdOld + "&uId=" + uIdOld).success(function (deleteResult) {
+            $http.delete("api/itsystemusagerights/" + usageId + "?rId=" + rIdOld + "&uId=" + uIdOld + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
 
                 var data = {
                     "roleId": rIdNew,

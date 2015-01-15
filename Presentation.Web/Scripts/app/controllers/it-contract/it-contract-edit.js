@@ -63,8 +63,8 @@
                         }
                     ],
                     hasWriteAccess: [
-                        '$http', '$stateParams', function ($http, $stateParams) {
-                            return $http.get("api/itcontract/" + $stateParams.id + "?hasWriteAccess")
+                        '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
+                            return $http.get("api/itcontract/" + $stateParams.id + "?hasWriteAccess&organizationId=" + user.currentOrganizationId)
                                 .then(function (result) {
                                     return result.data.response;
                                 });
@@ -139,7 +139,7 @@
                     var result = $scope.procurementPlans[id];
                     payload = { procurementPlanHalf: result.half, procurementPlanYear: result.year };
                 }
-                patch(payload, $scope.autoSaveUrl);
+                patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
             };
 
             $scope.procurementPlanOption = {

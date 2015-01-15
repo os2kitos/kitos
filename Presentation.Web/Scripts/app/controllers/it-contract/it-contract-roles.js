@@ -91,7 +91,7 @@
                 var rId = right.roleId;
                 var uId = right.userId;
 
-                $http.delete("api/itcontractrights/" + contractId + "?rId=" + rId + "&uId=" + uId).success(function (deleteResult) {
+                $http.delete("api/itcontractrights/" + contractId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
                     right.show = false;
                     notify.addSuccessMessage('Rollen er slettet!');
                 }).error(function (deleteResult) {

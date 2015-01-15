@@ -51,8 +51,8 @@
     }]);
 
     app.controller('project.EditCommunicationCtrl',
-    ['$scope', '$http', '$timeout', '$state', '$stateParams', 'comms', 'usersWithRoles',
-        function ($scope, $http, $timeout, $state, $stateParams, comms, usersWithRoles) {
+    ['$scope', '$http', '$timeout', '$state', '$stateParams', 'comms', 'usersWithRoles', 'user',
+        function ($scope, $http, $timeout, $state, $stateParams, comms, usersWithRoles, user) {
             $scope.comms = comms;
             $scope.usersWithRoles = _.values(usersWithRoles);
             
@@ -69,7 +69,7 @@
             };
 
             $scope.delete = function(id) {
-                $http.delete('api/communication/' + id).finally(reload);
+                $http.delete('api/communication/' + id + '?organizationId=' + user.currentOrganizationId).finally(reload);
             }
             
             // work around for $state.reload() not updating scope

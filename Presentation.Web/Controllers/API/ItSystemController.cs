@@ -30,7 +30,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         // DELETE api/T
-        public override HttpResponseMessage Delete(int id)
+        public override HttpResponseMessage Delete(int id, int organizationId)
         {
             try
             {
@@ -40,7 +40,7 @@ namespace Presentation.Web.Controllers.API
                 if (item.Usages.Any())
                     return Conflict("Cannot delete a system in use!");
                 
-                return base.Delete(id);
+                return base.Delete(id, organizationId);
             }
             catch (Exception e)
             {
@@ -268,13 +268,13 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage PostTasksUsedByThisSystem(int id, [FromUri] int? taskId)
+        public HttpResponseMessage PostTasksUsedByThisSystem(int id, int organizationId, [FromUri] int? taskId)
         {
             try
             {
                 var system = Repository.GetByKey(id);
                 if (system == null) return NotFound();
-                if (!HasWriteAccess(system)) return Unauthorized();
+                if (!HasWriteAccess(system, organizationId)) return Unauthorized();
 
                 List<TaskRef> tasks;
                 if (taskId.HasValue)
@@ -314,13 +314,13 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage DeleteTasksUsedByThisSystem(int id, [FromUri] int? taskId)
+        public HttpResponseMessage DeleteTasksUsedByThisSystem(int id, int organizationId, [FromUri] int? taskId)
         {
             try
             {
                 var system = Repository.GetByKey(id);
                 if (system == null) return NotFound();
-                if (!HasWriteAccess(system)) return Unauthorized();
+                if (!HasWriteAccess(system, organizationId)) return Unauthorized();
 
                 List<TaskRef> tasks;
                 if (taskId.HasValue)
@@ -406,7 +406,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
         
-        public override HttpResponseMessage Patch(int id, JObject obj)
+        public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
         {
             // try get AccessModifier value
             JToken accessModToken;
@@ -427,7 +427,7 @@ namespace Presentation.Web.Controllers.API
                     return Conflict("Name is already taken!");
             }
 
-            return base.Patch(id, obj);
+            return base.Patch(id, organizationId, obj);
         }
 
         public HttpResponseMessage GetNameAvailable(string checkname, int orgId)

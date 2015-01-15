@@ -21,8 +21,8 @@
                 user: ['userService', function (userService) {
                     return userService.getUser();
                 }],
-                hasWriteAccess: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itproject/" + $stateParams.id + "?hasWriteAccess")
+                hasWriteAccess: ['$http', '$stateParams', 'user', function ($http, $stateParams, user) {
+                    return $http.get("api/itproject/" + $stateParams.id + "?hasWriteAccess&organizationId=" + user.currentOrganizationId)
                         .then(function (result) {
                             return result.data.response;
                         });
@@ -154,7 +154,7 @@
                         });
                     }
                     if (_.size(payload) > 0) {
-                        $http({ method: 'PATCH', url: $scope.autosaveUrl, data: payload }).success(function (result) {
+                        $http({ method: 'PATCH', url: $scope.autosaveUrl + '?organizationId=' + user.currentOrganizationId, data: payload }).success(function (result) {
                             $scope.project.isStatusGoalVisible = result.response.isStatusGoalVisible;
                             $scope.project.isStrategyVisible = result.response.isStrategyVisible;
                             $scope.project.isHierarchyVisible = result.response.isHierarchyVisible;

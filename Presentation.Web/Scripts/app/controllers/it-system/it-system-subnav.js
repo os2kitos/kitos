@@ -71,7 +71,7 @@
                     }
                     var systemId = $state.params.id;
                     var msg = notify.addInfoMessage('Sletter IT System...', false);
-                    $http.delete('api/itsystem/' + systemId)
+                    $http.delete('api/itsystem/' + systemId + '?organizationId=' + user.currentOrganizationId)
                         .success(function (result) {
                             msg.toSuccessMessage('IT System  er slettet!');
                             $state.go('it-system.catalog');
@@ -90,7 +90,7 @@
                     }
                     var usageId = $state.params.id;
                     var msg = notify.addInfoMessage('Sletter IT System anvendelsen...', false);
-                    $http.delete('api/itsystemusage/' + usageId)
+                    $http.delete('api/itsystemusage/' + usageId + '?organizationId=' + user.currentOrganizationId)
                         .success(function (result) {
                             msg.toSuccessMessage('IT System anvendelsen er slettet!');
                             $state.go('it-system.overview');
@@ -143,7 +143,7 @@
                     }
                     var interfaceId = $state.params.id;
                     var msg = notify.addInfoMessage('Sletter Snitflade...', false);
-                    $http.delete('api/itinterface/' + interfaceId)
+                    $http.delete('api/itinterface/' + interfaceId + '?organizationId=' + user.currentOrganizationId)
                         .success(function (result) {
                             msg.toSuccessMessage('Snitflade er slettet!');
                             $state.go('it-system.interfaceCatalog');

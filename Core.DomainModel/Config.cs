@@ -40,12 +40,13 @@ namespace Core.DomainModel
         /// Should only be editable by local admin
         /// </summary>
         /// <param name="user"></param>
+        /// <param name="organizationId"></param>
         /// <returns></returns>
-        public override bool HasUserWriteAccess(User user)
+        public override bool HasUserWriteAccess(User user, int organizationId)
         {
             if (Organization != null && user.AdminRights.Any(right => right.ObjectId == Organization.Id)) return true;
 
-            return base.HasUserWriteAccess(user);
+            return base.HasUserWriteAccess(user, organizationId);
         }
     }
 }

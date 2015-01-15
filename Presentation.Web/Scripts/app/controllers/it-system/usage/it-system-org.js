@@ -32,8 +32,8 @@
         });
     }]);
 
-    app.controller('system.EditOrg', ['$scope', '$http', '$stateParams', 'selectedOrgUnits', 'responsibleOrgUnitId', 'orgUnitsTree', 'notify',
-        function ($scope, $http, $stateParams, selectedOrgUnits, responsibleOrgUnitId, orgUnitsTree, notify) {
+    app.controller('system.EditOrg', ['$scope', '$http', '$stateParams', 'selectedOrgUnits', 'responsibleOrgUnitId', 'orgUnitsTree', 'notify', 'user',
+        function ($scope, $http, $stateParams, selectedOrgUnits, responsibleOrgUnitId, orgUnitsTree, notify, user) {
             $scope.orgUnitsTree = orgUnitsTree;
             $scope.selectedOrgUnits = selectedOrgUnits;
             $scope.responsibleOrgUnitId = responsibleOrgUnitId;
@@ -73,7 +73,7 @@
                             msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                         });
                 } else {
-                    $http.delete('api/itsystemusage/' + usageId + '?organizationunit=' + obj.id)
+                    $http.delete('api/itsystemusage/' + usageId + '?organizationunit=' + obj.id + '&organizationId=' + user.currentOrganizationId)
                         .success(function() {
                             msg.toSuccessMessage("Gemt!");
 

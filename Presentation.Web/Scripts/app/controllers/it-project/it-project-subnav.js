@@ -56,7 +56,7 @@
                     }
                     var projectId = $state.params.id;
                     var msg = notify.addInfoMessage("Sletter IT Projektet...", false);
-                    $http.delete('api/itproject/' + projectId)
+                    $http.delete('api/itproject/' + projectId + '?organizationId=' + user.currentOrganizationId)
                         .success(function(result) {
                             msg.toSuccessMessage("IT Projektet er slettet!");
                             $state.go('it-project.overview');

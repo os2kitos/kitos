@@ -28,7 +28,7 @@
         };
 
         $scope.delete = function(projectId) {
-            $http.delete('api/itproject/' + projectId + '?usageId=' + usageId)
+            $http.delete('api/itproject/' + projectId + '?usageId=' + usageId + '&organizationId=' + user.currentOrganizationId)
                 .success(function() {
                     notify.addSuccessMessage("Projektets tilknyttning er fjernet.");
                     reload();

@@ -85,7 +85,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public override HttpResponseMessage Patch(int id, JObject obj)
+        public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
         {
             try
             {
@@ -108,10 +108,10 @@ namespace Presentation.Web.Controllers.API
             {
                 return Error(e);
             }
-            return base.Patch(id, obj);
+            return base.Patch(id, organizationId, obj);
         }
 
-        public override HttpResponseMessage Put(int id, JObject jObject)
+        public override HttpResponseMessage Put(int id, int organizationId, JObject jObject)
         {
             return NotAllowed();
         }

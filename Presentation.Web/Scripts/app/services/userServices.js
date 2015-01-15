@@ -131,7 +131,7 @@
 
                 deferred.resolve(loadUser(data));
                 
-            };
+            }
 
             return deferred.promise;
         }

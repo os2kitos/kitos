@@ -30,12 +30,12 @@ namespace Presentation.Web.Controllers.API
             _taskRepository = taskRepository;
         }
 
-        public HttpResponseMessage Get(int orgUnitId, [FromUri] PagingModel<TaskUsage> pagingModel)
+        public HttpResponseMessage Get(int orgUnitId, int organizationId, [FromUri] PagingModel<TaskUsage> pagingModel)
         {
-            return Get(orgUnitId, false, pagingModel);
+            return Get(orgUnitId, organizationId, false, pagingModel);
         }
 
-        public HttpResponseMessage Get(int orgUnitId, bool onlyStarred, [FromUri] PagingModel<TaskUsage> pagingModel)
+        public HttpResponseMessage Get(int orgUnitId, int organizationId, bool onlyStarred, [FromUri] PagingModel<TaskUsage> pagingModel)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace Presentation.Web.Controllers.API
                 foreach (var taskUsage in usages)
                 {
                     var dto = Map<TaskUsage, TaskUsageNestedDTO>(taskUsage);
-                    dto.HasWriteAccess = HasWriteAccess(taskUsage, KitosUser);
+                    dto.HasWriteAccess = HasWriteAccess(taskUsage, KitosUser, organizationId);
                     dto.SystemUsages = AssociatedSystemUsages(taskUsage);
                     dto.Projects = AssociatedProjects(taskUsage);
                     dtos.Add(dto);
@@ -156,16 +156,11 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var usages = Repository.Get(usage => usage.OrgUnitId == orgUnitId && usage.Starred == onlyStarred);
-
-                //if (onlyStarred) pagingModel.Where(usage => usage.Starred);
-                //var usages = Page(Repository.AsQueryable(), pagingModel).ToList();
-
                 var dtos = new List<TaskUsageNestedDTO>();
 
                 foreach (var taskUsage in usages)
                 {
                     var dto = Map<TaskUsage, TaskUsageNestedDTO>(taskUsage);
-                    dto.HasWriteAccess = HasWriteAccess(taskUsage, KitosUser);
                     dto.SystemUsages = AssociatedSystemUsages(taskUsage);
                     dto.Projects = AssociatedProjects(taskUsage);
                     dtos.Add(dto);
@@ -239,7 +234,7 @@ namespace Presentation.Web.Controllers.API
             return base.PostQuery(item);
         }
         
-        public override HttpResponseMessage Put(int id, JObject jObject)
+        public override HttpResponseMessage Put(int id, int organizationId, JObject jObject)
         {
             return NotAllowed();
         }

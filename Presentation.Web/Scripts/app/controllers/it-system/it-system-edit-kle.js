@@ -13,8 +13,8 @@
     ]);
 
     app.controller('system.SystemKleCtrl', [
-        '$scope', '$http', '$state', 'notify', 'itSystem',
-        function($scope, $http, $state, notify, itSystem) {
+        '$scope', '$http', '$state', 'notify', 'itSystem', 'user',
+        function($scope, $http, $state, notify, itSystem, user) {
             var systemId = itSystem.id;
             var baseUrl = 'api/itSystem/' + systemId;
 
@@ -66,7 +66,7 @@
             }
 
             function remove(task) {
-                return $http.delete(baseUrl + '?taskId=' + task.taskRef.id).success(function(result) {
+                return $http.delete(baseUrl + '?taskId=' + task.taskRef.id + '&organizationId=' + user.currentOrganizationId).success(function(result) {
                     task.isSelected = false;
                 });
             }
@@ -118,7 +118,7 @@
             };
 
             $scope.removeTaskGroup = function () {
-                var url = baseUrl + '?taskId=' + $scope.selectedTaskGroup;
+                var url = baseUrl + '?taskId=' + $scope.selectedTaskGroupc + '&organizationId=' + user.currentOrganizationId;
 
                 var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
                 $http.delete(url).success(function () {

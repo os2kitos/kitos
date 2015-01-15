@@ -354,12 +354,17 @@
     ]);
 
     app.directive('autosave', [
-        '$http', '$timeout', 'notify', function($http, $timeout, notify) {
+        '$http', '$timeout', 'notify', 'userService', function ($http, $timeout, notify, userService) {
             return {
                 restrict: 'A',
                 require: 'ngModel',
                 priority: 0,
                 link: function(scope, element, attrs, ctrl) {
+                    var user;
+                    userService.getUser().then(function (result) {
+                        user = result;
+                    });
+
                     var oldValue;
                     $timeout(function() {
                         oldValue = ctrl.$modelValue; // get initial value
@@ -417,7 +422,7 @@
                         var id, msg = notify.addInfoMessage("Gemmer...", false);
                         if (e.added) {
                             id = e.added.id;
-                            $http.post(attrs.autosave + '?' + attrs.field + '=' + id)
+                            $http.post(attrs.autosave + '?organizationId=' + user.currentOrganizationId + '&' + attrs.field + '=' + id)
                                 .success(function() {
                                     msg.toSuccessMessage("Feltet er opdateret.");
                                 })
@@ -426,7 +431,7 @@
                                 });
                         } else if (e.removed) {
                             id = e.removed.id;
-                            $http.delete(attrs.autosave + '?' + attrs.field + '=' + id)
+                            $http.delete(attrs.autosave + '?organizationId=' + user.currentOrganizationId + '&' + attrs.field + '=' + id)
                                 .success(function() {
                                     msg.toSuccessMessage("Feltet er opdateret.");
                                 })
@@ -438,7 +443,7 @@
 
                     function save(payload) {
                         var msg = notify.addInfoMessage("Gemmer...", false);
-                        $http({ method: 'PATCH', url: attrs.autosave, data: payload })
+                        $http({ method: 'PATCH', url: attrs.autosave + '?organizationId=' + user.currentOrganizationId, data: payload })
                             .success(function() {
                                 msg.toSuccessMessage("Feltet er opdateret.");
                                 oldValue = ctrl.$modelValue;

@@ -78,5 +78,13 @@ namespace Core.DomainModel
         {
             return OrgUnits.FirstOrDefault(u => u.Parent == null);
         }
+
+        public override bool HasUserWriteAccess(User user, int organizationId)
+        {
+            // check that object belongs to the requwested organization context
+            if (Id != organizationId)
+                return false;
+            return base.HasUserWriteAccess(user, organizationId);
+        }
     }
 }

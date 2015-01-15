@@ -98,7 +98,7 @@
                     //delete the project
                     project.delete = function() {
                         var msg = notify.addInfoMessage("Sletter projekt...", false);
-                        $http.delete(project.baseUrl).success(function(result) {
+                        $http.delete(project.baseUrl + '?organizationId=' + user.currentOrganizationId).success(function (result) {
                             project.show = false;
 
                             msg.toSuccessMessage("Projektet er slettet!");

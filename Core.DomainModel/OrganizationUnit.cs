@@ -94,17 +94,17 @@ namespace Core.DomainModel
         /// </summary>
         public virtual ICollection<EconomyStream> EconomyStreams { get; set; }
 
-        public override bool HasUserWriteAccess(User user)
+        public override bool HasUserWriteAccess(User user, int organizationId)
         {
             //if user has write access to the organisation, 
             //user has write access to the org unit
-            if (Organization.HasUserWriteAccess(user)) return true;
+            if (Organization.HasUserWriteAccess(user, organizationId)) return true;
 
             //Check rights on this org unit
-            if (base.HasUserWriteAccess(user)) return true;
+            if (base.HasUserWriteAccess(user, organizationId)) return true;
 
             //Check rights on parent org unit
-            if (Parent != null && Parent.HasUserWriteAccess(user)) return true;
+            if (Parent != null && Parent.HasUserWriteAccess(user, organizationId)) return true;
 
             return false;
         }

@@ -79,7 +79,7 @@
 
                 //helper functions
                 function deleteAssociatedSystem(associatedSystem) {
-                    return $http.delete('api/itContract/' + contract.id + '?systemUsageId=' + associatedSystem.id);
+                    return $http.delete('api/itContract/' + contract.id + '?systemUsageId=' + associatedSystem.id + '&organizationId=' + user.currentOrganizationId);
                 }
 
                 function postAssociatedSystem(associatedSystem) {

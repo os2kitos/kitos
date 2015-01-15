@@ -20,8 +20,8 @@
         });
     }]);
 
-    app.controller('contract.EditAdviceCtrl', ['$scope', '$http', '$state', '$stateParams', '$timeout', 'notify', 'contract', 'advices', 'itContractRoles',
-        function ($scope, $http, $state, $stateParams, $timeout, notify, contract, advices, itContractRoles) {
+    app.controller('contract.EditAdviceCtrl', ['$scope', '$http', '$state', '$stateParams', '$timeout', 'notify', 'contract', 'advices', 'itContractRoles', 'user',
+        function ($scope, $http, $state, $stateParams, $timeout, notify, contract, advices, itContractRoles, user) {
             $scope.itContractRoles = itContractRoles;
             $scope.advices = advices;
             var baseUrl = "api/advice";
@@ -34,7 +34,7 @@
                 advice.delete = function () {
                     var msg = notify.addInfoMessage("Sletter rækken...", false);
                     
-                    $http.delete(advice.updateUrl).success(function(result) {
+                    $http.delete(advice.updateUrl + '?organizationId=' + user.currentOrganizationId).success(function (result) {
                         msg.toSuccessMessage("Rækken er slettet!");
                         reload();
                     }).error(function () {

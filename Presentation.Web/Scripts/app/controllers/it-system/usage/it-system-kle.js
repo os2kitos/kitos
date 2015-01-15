@@ -13,7 +13,8 @@
     ]);
 
     app.controller('system.EditKle', [
-        '$scope', '$http', '$state', '$stateParams', 'notify', function($scope, $http, $state, $stateParams, notify) {
+        '$scope', '$http', '$state', '$stateParams', 'notify', 'user',
+        function ($scope, $http, $state, $stateParams, notify, user) {
             var usageId = $stateParams.id;
             var baseUrl = 'api/itSystemUsage/' + usageId;
 
@@ -71,7 +72,7 @@
             }
 
             function remove(task) {
-                return $http.delete(baseUrl + '?taskId=' + task.taskRef.id).success(function(result) {
+                return $http.delete(baseUrl + '?taskId=' + task.taskRef.id + '&organizationId=' + user.currentOrganizationId).success(function (result) {
                     task.isSelected = false;
                 });
             }
@@ -123,7 +124,7 @@
             };
 
             $scope.removeTaskGroup = function () {
-                var url = baseUrl + '?taskId=' + $scope.selectedTaskGroup;
+                var url = baseUrl + '?taskId=' + $scope.selectedTaskGroup + '&organizationId=' + user.currentOrganizationId;
 
                 var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
                 $http.delete(url).success(function () {

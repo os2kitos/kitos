@@ -50,11 +50,11 @@ namespace Core.DomainModel
 
         public string Comment { get; set; }
 
-        public override bool HasUserWriteAccess(User user)
+        public override bool HasUserWriteAccess(User user, int organizationId)
         {
-            if (OrgUnit != null && OrgUnit.HasUserWriteAccess(user)) return true;
+            if (OrgUnit != null && OrgUnit.HasUserWriteAccess(user, organizationId)) return true;
 
-            return base.HasUserWriteAccess(user);
+            return base.HasUserWriteAccess(user, organizationId);
         }
     }
 }

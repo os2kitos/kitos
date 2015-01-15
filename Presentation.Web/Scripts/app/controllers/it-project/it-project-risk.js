@@ -55,8 +55,8 @@
         });
     }]);
 
-    app.controller('project.EditRiskCtrl', ['$scope', '$http', '$stateParams', 'notify', 'risks', 'usersWithRoles',
-        function($scope, $http, $stateParams, notify, risks, usersWithRoles) {
+    app.controller('project.EditRiskCtrl', ['$scope', '$http', '$stateParams', 'notify', 'risks', 'usersWithRoles', 'user',
+        function($scope, $http, $stateParams, notify, risks, usersWithRoles, user) {
 
             var projectId = $stateParams.id;
 
@@ -78,7 +78,7 @@
             };
 
             $scope.delete = function(risk) {
-                $http.delete(risk.updateUrl).success(function(result) {
+                $http.delete(risk.updateUrl + '?organizationId=' + user.currentOrganizationId).success(function (result) {
                     risk.show = false;
 
                     notify.addSuccessMessage("Rækken er slettet");

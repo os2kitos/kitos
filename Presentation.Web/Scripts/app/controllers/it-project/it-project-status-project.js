@@ -50,8 +50,8 @@
     }]);
 
     app.controller('project.EditStatusProjectCtrl',
-    ['$scope', '$http', '$state', 'notify', '$modal', 'project', 'usersWithRoles',
-        function ($scope, $http, $state, notify, $modal, project, usersWithRoles) {
+    ['$scope', '$http', '$state', 'notify', '$modal', 'project', 'usersWithRoles', 'user',
+        function ($scope, $http, $state, notify, $modal, project, usersWithRoles, user) {
             $scope.project = project;
             $scope.project.updateUrl = "api/itproject/" + project.id;
 
@@ -102,7 +102,7 @@
 
                 activity.delete = function() {
                     var msg = notify.addInfoMessage("Sletter...");
-                    $http.delete(activity.updateUrl).success(function() {
+                    $http.delete(activity.updateUrl + '?organizationId=' + user.currentOrganizationId).success(function () {
                         activity.show = false;
                         msg.toSuccessMessage("Slettet!");
                     }).error(function() {
