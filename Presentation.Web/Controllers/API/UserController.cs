@@ -1,12 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Web.Http;
+using AutoMapper;
+using Core.ApplicationServices;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using Ninject;
 using Ninject.Web.Common;
 using Presentation.Web.Models;
 using WebGrease.Css.Extensions;
@@ -17,12 +27,16 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
+        private readonly IKernel _kernel;
 
-        public UserController(IGenericRepository<User> repository, IUserService userService, IOrganizationService organizationService)
+        public UserController(IGenericRepository<User> repository, IUserService userService, IOrganizationService organizationService, IKernel kernel)
             : base(repository)
         {
             _userService = userService;
             _organizationService = organizationService;
+
+            //todo: this is bad crosscutting of concerns. refactor / extract into separate controller
+            _kernel = kernel; //we need this for retrieving userroles when creating a csv file.
         }
 
         public override HttpResponseMessage Post(UserDTO dto)
@@ -131,13 +145,18 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetByOrganization(int orgId, bool? usePaging, [FromUri] PagingModel<User> pagingModel)
+        public HttpResponseMessage GetByOrganization(int orgId, bool? usePaging, [FromUri] PagingModel<User> pagingModel, [FromUri] string q)
         {
             try
             {
+                if (!string.IsNullOrWhiteSpace(q))
+                    pagingModel.Where(u =>
+                        u.Name.Contains(q)
+                        || u.Email.Contains(q));
+
                 //Get all users inside the organization
                 pagingModel.Where(u => u.CreatedInId == orgId);
-
+                
                 var users = Page(Repository.AsQueryable(), pagingModel);
 
                 return Ok(Map(users));
@@ -147,6 +166,119 @@ namespace Presentation.Web.Controllers.API
                 return Error(e);
             }
         }
+
+        public HttpResponseMessage GetExcel([FromUri] bool? csv, [FromUri] int orgId)
+        {
+            try
+            {
+                var users = Repository.Get(u => u.CreatedInId == orgId);
+
+                var dtos = Map(users);
+
+                var list = new List<dynamic>();
+                var header = new ExpandoObject() as IDictionary<string, Object>;
+                header.Add("Status", "Status");
+                header.Add("Navn", "Navn");
+                header.Add("Organisationsenhed", "Default org.enhed");
+                header.Add("Advis", "Advis");
+                header.Add("Oprettet", "Oprettet Af");
+                header.Add("OrgRoller", "Organisations roller");
+                header.Add("ITProjektRoller", "ITProjekt roller");
+                header.Add("ITSystemRoller", "ITSystem roller");
+                header.Add("ITKontraktRoller", "ITKontrakt roller");
+                list.Add(header);
+
+                foreach (var user in dtos)
+                {
+                    var obj = new ExpandoObject() as IDictionary<string, Object>;
+                    obj.Add("Status", user.IsLocked ? "Låst" : "Ikke låst");
+                    obj.Add("Navn", user.Name);
+                    obj.Add("Organisationsenhed", user.DefaultOrganizationUnitName);
+                    obj.Add("Advis", user.LastAdvisDate.HasValue ? user.LastAdvisDate.Value.ToString("dd-MM-yy") : "Ikke sendt");
+                    obj.Add("Oprettet", user.ObjectOwnerName);
+                    obj.Add("OrgRoller", GetOrgRights(orgId, user.Id));
+                    obj.Add("ITProjektRoller", GetProjectRights(user.Id));
+                    obj.Add("ITSystemRoller", GetSystemRights(user.Id));
+                    obj.Add("ITKontraktRoller", GetContractRights(user.Id));
+                    list.Add(obj);
+                }
+                
+                var csvList = list.ToCsv();
+                var bytes = Encoding.Unicode.GetBytes(csvList);
+                var stream = new MemoryStream();
+                stream.Write(bytes, 0, bytes.Length);
+                stream.Seek(0, SeekOrigin.Begin);
+
+                var result = new HttpResponseMessage(HttpStatusCode.OK);
+                result.Content = new StreamContent(stream);
+                result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
+                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "brugerkatalog.csv" };
+                return result;
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        #region GetRights
+        private string GetOrgRights(int orgId, int userId)
+        {
+            var rightsRepository = _kernel.Get<IGenericRepository<OrganizationRight>>();
+            var orgUnitService = _kernel.Get<IOrgUnitService>();
+
+            var orgUnits = orgUnitService.GetSubTree(orgId);
+
+            var theRights = new List<OrganizationRight>();
+            foreach (var orgUnit in orgUnits)
+            {
+                var id = orgUnit.Id;
+                theRights.AddRange(rightsRepository.Get(r => r.ObjectId == id && r.UserId == userId));
+            }
+            var dtos = Mapper.Map<List<RightOutputDTO>>(theRights);
+
+            return StringifyRights(dtos);
+        }
+
+        private string GetProjectRights(int userId)
+        {
+            var rightsRepository = _kernel.Get<IGenericRepository<ItProjectRight>>();
+
+            var theRights = rightsRepository.Get(r => r.UserId == userId);
+
+            return StringifyRights(Mapper.Map<List<RightOutputDTO>>(theRights));
+        }
+
+        private string GetSystemRights(int userId)
+        {
+            var rightsRepository = _kernel.Get<IGenericRepository<ItSystemRight>>();
+
+            var theRights = rightsRepository.Get(r => r.UserId == userId);
+
+            return StringifyRights(Mapper.Map<List<RightOutputDTO>>(theRights));
+        }
+
+        private string GetContractRights(int userId)
+        {
+            var rightsRepository = _kernel.Get<IGenericRepository<ItContractRight>>();
+
+            var theRights = rightsRepository.Get(r => r.UserId == userId);
+
+            return StringifyRights(Mapper.Map<List<RightOutputDTO>>(theRights));
+        }
+
+        private static string StringifyRights(List<RightOutputDTO> dtos)
+        {
+            var builder = new StringBuilder();
+            foreach (var dto in dtos)
+            {
+                builder.Append(dto.ObjectName).Append(':').Append(dto.RoleName);
+                if (dtos.Last() != dto)
+                    builder.Append(',');
+            }
+            return builder.ToString();
+        } 
+        #endregion
     }
 
 }

@@ -33,8 +33,10 @@
                         if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
                     }
 
-                    if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
-                    else url += "&q=";
+                    if ($scope.pagination.search)
+                        url += '&q=' + $scope.pagination.search;
+                    else
+                        url += "&q=";
 
                     $scope.users = [];
                     $http.get(url).success(function (result, status, headers) {
@@ -228,7 +230,7 @@
                         })
                         .then(function () { });
                 }
-
+                
                 $scope.currentUser = user;
 
                 $scope.pagination = {
@@ -237,6 +239,8 @@
                     take: 10,
                     orderBy: 'Name'
                 };
+
+                $scope.csvUrl = 'api/user/?csv&orgId=' + user.currentOrganizationId;
 
                 //set or re-set the chosen module based on state
                 if ($stateParams.lastModule)
