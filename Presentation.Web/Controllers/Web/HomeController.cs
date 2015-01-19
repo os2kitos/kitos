@@ -9,6 +9,7 @@ namespace Presentation.Web.Controllers.Web
 
         public ActionResult Index()
         {
+
             return View();
         }
 
