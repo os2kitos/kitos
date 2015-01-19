@@ -79,7 +79,7 @@
         function ($scope, $http, autofocus, project, usersWithRoles, activity, notify, activityId, activityType, hasWriteAccess) {
             var isNewActivity = activity == null;
             
-            $scope.hasWriteAccess = hasWriteAccess;
+            $scope.hasWriteAccess = isNewActivity ? true : hasWriteAccess;
             $scope.isAssignment = activityType == 'assignment';
             $scope.isMilestone = activityType == 'milestone';
             // set to empty object if falsy
