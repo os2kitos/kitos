@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -64,7 +65,62 @@ namespace Core.ApplicationServices
 
         public void Import(Stream stream)
         {
-            
+            // var set = _mox.Import(stream);
+            var set = new DataSet();
+            var orgTable = set.Tables[1];
+            // existing orgUnits
+            var exising =
+                orgTable.AsEnumerable()
+                    .Where(x => !String.IsNullOrWhiteSpace(x.Field<string>(2)))
+                    .Select(x => new OrgUnit {Id = x.Field<int>(2), Name = x.Field<string>(3)}).ToList();
+
+            // filter (remove) orgunits without an ID and groupby parent
+            var newOrgUnitsGrouped =
+                orgTable.AsEnumerable()
+                    .Where(x => String.IsNullOrWhiteSpace(x.Field<string>(2)))
+                    .Select(x => new OrgUnit { Name = x.Field<string>(3), Parent = x.Field<string>(5), Ean = x.Field<long?>(4)})
+                    .GroupBy(x => x.Parent).ToList();
+
+            //var a = newOrgUnitsGrouped.Where(x => x.Key == "");
+
+
+            while (newOrgUnitsGrouped.GetEnumerator().MoveNext())
+            {
+                var current = newOrgUnitsGrouped.GetEnumerator().Current;
+                // if parentless (root) or parent already exists
+                var any = exising.SingleOrDefault(x => x.Name == current.Key);
+                if (current.Key == "" || any != null)
+                {
+                    // then FIRE zhe missiles! TODO
+                    foreach (var orgUnit in current)
+                    {
+
+                        // TODO 
+                        //var orgUnitEntity = _orgUnitRepository.Insert(new OrganizationUnit
+                        //{
+                        //    Name = orgUnit.Name,
+                        //    Ean = orgUnit.Ean,
+                        //    ParentId = any.Id
+                        //});
+                        //orgUnit.Id = orgUnitEntity.Id;
+                        exising.Add(orgUnit);
+                    }
+                    
+                }
+                else
+                {
+                    // else add to end of list, to try and add it after parent have been added
+                    newOrgUnitsGrouped.Add(current);
+                }
+            }
+        }
+
+        private class OrgUnit
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public long? Ean { get; set; }
+            public string Parent { get; set; }
         }
 
         #region Table Helpers
