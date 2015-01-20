@@ -6,7 +6,7 @@ namespace Core.ApplicationServices
 {
     public interface IMox
     {
-        IOrderedEnumerable<string> Import(Stream stream);
+        DataSet Import(Stream stream);
 
         Stream Export(DataSet data, Stream stream);
     }

@@ -64,7 +64,9 @@ namespace Core.ApplicationServices
 
         public void Import(Stream stream)
         {
-            
+            var dataSet = _mox.Import(stream);
+
+            int i = 1;
         }
 
         #region Table Helpers
