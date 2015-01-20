@@ -57,6 +57,7 @@
     <Compile Include="ItSystemService.cs" />
     <Compile Include="ItSystemUsageService.cs" />
     <Compile Include="LinqTreeExtensions.cs" />
+    <Compile Include="MoxService.cs" />
     <Compile Include="OrganizationService.cs" />
     <Compile Include="OrgUnitService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -230,6 +230,7 @@
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\NinjectWebCommon.cs" />
+    <Compile Include="Controllers\API\MoxController.cs" />
     <Compile Include="Controllers\API\ItSystemTypeOptionController.cs" />
     <Compile Include="Controllers\API\ItInterfaceExhibitUsageController.cs" />
     <Compile Include="Controllers\API\ItContractItSystemUsageController.cs" />
@@ -669,6 +670,7 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="Content\mox\OS2KITOS MOX Skabelon Organisation.xlsx" />
     <None Include="Properties\PublishProfiles\Kitos - Prodmiljø.pubxml" />
     <None Include="Properties\PublishProfiles\Kitos - Testmiljø.pubxml" />
     <None Include="Properties\Settings.settings">

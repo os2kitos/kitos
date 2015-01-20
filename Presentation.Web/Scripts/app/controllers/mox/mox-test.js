@@ -3,7 +3,7 @@
         $stateProvider.state('mox.test', {
             url: '/test',
             templateUrl: 'partials/mox/mox-test.html',
-            controller: 'mox.OrderCtrl',
+            controller: 'mox.TestCtrl',
             resolve: {
                 user: [
                     'userService', function (userService) {
@@ -14,7 +14,7 @@
         });
     }]);
 
-    app.controller('mox.OrderCtrl', ['$scope', '$http', 'notify', 'user',
+    app.controller('mox.TestCtrl', ['$scope', '$http', 'notify', 'user',
             function ($scope, $http, notify, user) {
                 $scope.token = user.uuid;
                 $scope.data = { brugerid: user.email };
