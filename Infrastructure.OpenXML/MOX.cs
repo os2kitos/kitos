@@ -2,6 +2,7 @@
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using Core.ApplicationServices;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Drawing.Charts;
@@ -59,17 +60,29 @@ namespace Infrastructure.OpenXML
     
                     var dataRow = dataTable.NewRow();
 
+                    var hasValue = false;
                     for (int i = 0; i < row.Descendants<Cell>().Count(); i++)
                     {
-                        dataRow[i] = GetCellValue(spreadsheetDocument, row.Descendants<Cell>().ElementAt(i));
+                        var cellValue = GetCellValue(spreadsheetDocument, row.Descendants<Cell>().ElementAt(i));
+                        dataRow[i] = cellValue;
+                        if (!string.IsNullOrWhiteSpace(cellValue))
+                        {
+                            hasValue = true;
+                        }
                     }
 
-                    dataTable.Rows.Add(dataRow);
+                    if (hasValue)
+                    {
+                        dataTable.Rows.Add(dataRow);
+                    }
+                    
                 }
 
-                //dataTable.Rows.RemoveAt(0); // removes header row
+                //dataTable.Rows.RemoveAt(0); // removes header row?
 
-                dataSet.Tables.Add(dataTable);
+                if (dataTable != null)
+                    dataSet.Tables.Add(dataTable);
+                
             }
 
             return dataSet;
@@ -109,31 +122,41 @@ namespace Infrastructure.OpenXML
                 var workSheetPart = (WorksheetPart)workbookPart.GetPartById(id);
                 var sheetData = workSheetPart.Worksheet.GetFirstChild<SheetData>();
 
-                //var lastRow = sheetData.Elements<Row>().LastOrDefault();
-                //var lastRowIndex = lastRow.RowIndex + 1;
+                //Get 8 first rows
+                var rows = sheetData.Elements<Row>().Where(r => r.RowIndex < 8).ToArray();
 
-                //if (lastRow != null)
-                //{
+                //Remove all rows
+                sheetData.RemoveAllChildren();
 
-                //} 
+                //Append 8 first rows again
+                foreach (var row in  rows)
+                {
+                    sheetData.AppendChild(row);
+                }
+
 
                 foreach (DataRow row in table.Rows)
                 {
-                    var newRow = new Row();
+                    var newRow = new Row();// { RowIndex = rowIndex };
 
                     foreach (DataColumn column in table.Columns)
                     {
+                        
                         var newCell = new Cell()
                         {
                             CellValue = new CellValue(row[column].ToString()),
                             DataType = CellValues.String
                         };
 
+                        //TODO: Altid int?
+                        int t;
+                        newCell.DataType = int.TryParse(row[column].ToString(), out t) ? CellValues.Number : CellValues.String;
+
                         newRow.AppendChild(newCell);
                     }
-
+                    //sheetData.InsertAt(newRow, 8);
                     sheetData.AppendChild(newRow);
-
+                    //rowIndex++;
                 }
 
             }

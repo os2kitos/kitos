@@ -11,7 +11,7 @@ namespace Core.ApplicationServices
     public interface IMoxService
     {
         Stream Export(Stream stream, int organizationId, User kitosUser);
-        void Import(Stream stream);
+        void Import(Stream stream, int organizationId, User kitosUser);
     }
 
     public class MoxService : IMoxService
@@ -63,54 +63,67 @@ namespace Core.ApplicationServices
             return _mox.Export(set, stream);
         }
 
-        public void Import(Stream stream)
+        private static long? ToNullableLong(string s)
         {
-            // var set = _mox.Import(stream);
-            var set = new DataSet();
+            long i;
+            if (long.TryParse(s, out i)) return i;
+            return null;
+        }
+
+        public void Import(Stream stream, int organizationId, User kitosUser)
+        {
+            var set = _mox.Import(stream);
             var orgTable = set.Tables[1];
+
             // existing orgUnits
             var exising =
                 orgTable.AsEnumerable()
-                    .Where(x => !String.IsNullOrWhiteSpace(x.Field<string>(2)))
-                    .Select(x => new OrgUnit {Id = x.Field<int>(2), Name = x.Field<string>(3)}).ToList();
+                    .Where(x => !String.IsNullOrEmpty(x.Field<string>(1)))
+                    .Select(x => new OrgUnit { Id = Convert.ToInt32(x.Field<string>(1)), Name = x.Field<string>(2) }).ToList();
 
             // filter (remove) orgunits without an ID and groupby parent
             var newOrgUnitsGrouped =
                 orgTable.AsEnumerable()
-                    .Where(x => String.IsNullOrWhiteSpace(x.Field<string>(2)))
-                    .Select(x => new OrgUnit { Name = x.Field<string>(3), Parent = x.Field<string>(5), Ean = x.Field<long?>(4)})
+                    .Where(x => String.IsNullOrEmpty(x.Field<string>(1)))
+                    .Select(x => new OrgUnit { Name = x.Field<string>(2), Parent = x.Field<string>(4), Ean = ToNullableLong(x.Field<string>(3)) })
                     .GroupBy(x => x.Parent).ToList();
 
             //var a = newOrgUnitsGrouped.Where(x => x.Key == "");
 
-
-            while (newOrgUnitsGrouped.GetEnumerator().MoveNext())
+            var count = newOrgUnitsGrouped.Count();
+            for (var i = 0; i < count; i++)
             {
-                var current = newOrgUnitsGrouped.GetEnumerator().Current;
+                var current = newOrgUnitsGrouped[i];
                 // if parentless (root) or parent already exists
-                var any = exising.SingleOrDefault(x => x.Name == current.Key);
-                if (current.Key == "" || any != null)
+                var existingParent = exising.SingleOrDefault(x => x.Name == current.Key);
+                if (current.Key == "" || existingParent != null)
                 {
                     // then FIRE zhe missiles! TODO
                     foreach (var orgUnit in current)
                     {
 
                         // TODO 
-                        //var orgUnitEntity = _orgUnitRepository.Insert(new OrganizationUnit
-                        //{
-                        //    Name = orgUnit.Name,
-                        //    Ean = orgUnit.Ean,
-                        //    ParentId = any.Id
-                        //});
-                        //orgUnit.Id = orgUnitEntity.Id;
+                        var orgUnitEntity = _orgUnitRepository.Insert(new OrganizationUnit
+                        {
+                            Name = orgUnit.Name,
+                            Ean = orgUnit.Ean,
+                            ParentId = existingParent == null ? 0 : existingParent.Id,
+                            ObjectOwnerId = kitosUser.Id,
+                            LastChangedByUserId = kitosUser.Id,
+                            LastChanged = DateTime.Now,
+                            OrganizationId = organizationId
+                        });
+                        
+                        orgUnit.Id = orgUnitEntity.Id;
                         exising.Add(orgUnit);
                     }
-                    
+                    _orgUnitRepository.Save();
                 }
                 else
                 {
                     // else add to end of list, to try and add it after parent have been added
                     newOrgUnitsGrouped.Add(current);
+                    count++;
                 }
             }
         }

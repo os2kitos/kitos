@@ -57,6 +57,10 @@
       <Project>{F0986888-8F35-4559-8FBA-428BC9EC9ADD}</Project>
       <Name>Core.ApplicationServices</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
+      <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
+      <Name>Core.DomainModel</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

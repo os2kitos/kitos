@@ -60,7 +60,7 @@ namespace Presentation.Web.Controllers.API
                 var buffer = await file.ReadAsByteArrayAsync();
                 var stream = new MemoryStream(buffer);
                 stream.Seek(0, SeekOrigin.Begin);
-                _moxService.Import(stream);
+                _moxService.Import(stream, organizationId, KitosUser);
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
