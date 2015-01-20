@@ -56,9 +56,11 @@ namespace Presentation.Web.Controllers.API
                 await Request.Content.ReadAsMultipartAsync(provider);
 
                 var file = provider.Contents.First();
-                var filename = Path.GetFileName(file.Headers.ContentDisposition.FileName);
+                //var filename = Path.GetFileName(file.Headers.ContentDisposition.FileName);
                 var buffer = await file.ReadAsByteArrayAsync();
                 var stream = new MemoryStream(buffer);
+
+                _moxService.Import(stream);
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }

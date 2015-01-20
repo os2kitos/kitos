@@ -10,6 +10,7 @@ namespace Core.ApplicationServices
     public interface IMoxService
     {
         Stream Export(Stream stream, int organizationId, User kitosUser);
+        void Import(Stream stream);
     }
 
     public class MoxService : IMoxService
@@ -60,6 +61,13 @@ namespace Core.ApplicationServices
 
             return _mox.Export(set, stream);
         }
+
+        public void Import(Stream stream)
+        {
+            
+        }
+
+        #region Table Helpers
 
         private static DataTable GetOrganizationTable(IEnumerable<OrganizationUnit> orgUnits)
         {
@@ -170,5 +178,7 @@ namespace Core.ApplicationServices
 
             return table;
         }
+
+        #endregion
     }
 }
