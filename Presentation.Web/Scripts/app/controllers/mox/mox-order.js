@@ -16,6 +16,8 @@
 
     app.controller('mox.OrderCtrl', ['$scope', '$http', 'notify', 'user',
             function ($scope, $http, notify, user) {
+                $scope.tmplUrl = 'api/mox?organizationId=' + user.currentOrganizationId;
+
                 $scope.submit = function () {
                     var formData = new FormData();
                     // need to convert our json object to a string version of json otherwise

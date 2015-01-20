@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="AdminService.cs" />
     <Compile Include="CryptoService.cs" />
+    <Compile Include="IMox.cs" />
     <Compile Include="ItProjectService.cs" />
     <Compile Include="ItSystemService.cs" />
     <Compile Include="ItSystemUsageService.cs" />

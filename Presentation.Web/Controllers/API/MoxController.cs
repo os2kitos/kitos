@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -22,18 +21,23 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage Get(int organizationId)
         {
-            using (var stream = new MemoryStream())
+            var dir = HttpContext.Current.Server.MapPath("~/Content/mox/");
+            var file = File.OpenRead(dir + "OS2KITOS MOX Skabelon Organisation.xlsx");
+            var stream = new MemoryStream();
+            
+            file.CopyTo(stream);
+            const string filename = "OS2KITOS MOX Skabelon Organisation.xlsx";
+            _moxService.Export(stream, organizationId, KitosUser);
+            stream.Seek(0, SeekOrigin.Begin);
+            var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StreamContent(stream) };
+            var mimeType = MimeMapping.GetMimeMapping(filename);
+            result.Content.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
+            result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
             {
-                _moxService.Import(stream, organizationId, KitosUser);
-                stream.Seek(0, SeekOrigin.Begin);
-                var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StreamContent(stream) };
-                result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
-                {
-                    FileName = "OS2KITOS MOX Skabelon Organisation.xlsx"
-                };
-                return result;
-            }            
+                FileName = filename
+            };
+            return result;
+            
         }
 
         public async Task<HttpResponseMessage> Post(int organizationId)

@@ -1559,6 +1559,10 @@
       <Project>{6CD15363-5401-43C5-9479-02FDDFA881DC}</Project>
       <Name>Infrastructure.DataAccess</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.OpenXML\Infrastructure.OpenXML.csproj">
+      <Project>{5AE358F5-4F11-47FE-94BE-1588F357DCDC}</Project>
+      <Name>Infrastructure.OpenXML</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

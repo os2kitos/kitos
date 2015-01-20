@@ -2,17 +2,14 @@
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Web;
 using Core.DomainModel;
-using Core.DomainModel.ItProject;
 using Core.DomainServices;
 
 namespace Core.ApplicationServices
 {
     public interface IMoxService
     {
-        Stream Import(Stream stream, int organizationId, User kitosUser);
+        Stream Export(Stream stream, int organizationId, User kitosUser);
     }
 
     public class MoxService : IMoxService
@@ -21,19 +18,22 @@ namespace Core.ApplicationServices
         private readonly IGenericRepository<OrganizationRole> _orgRoleRepository;
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IGenericRepository<User> _userRepository;
+        private readonly IMox _mox;
 
         public MoxService(IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<OrganizationRole> orgRoleRepository,
             IGenericRepository<TaskRef> taskRepository,
-            IGenericRepository<User> userRepository)
+            IGenericRepository<User> userRepository,
+            IMox mox)
         {
             _orgUnitRepository = orgUnitRepository;
             _orgRoleRepository = orgRoleRepository;
             _taskRepository = taskRepository;
             _userRepository = userRepository;
+            _mox = mox;
         }
 
-        public Stream Import(Stream stream, int organizationId, User kitosUser)
+        public Stream Export(Stream stream, int organizationId, User kitosUser)
         {
             var orgUnits = _orgUnitRepository.Get(x => x.OrganizationId == organizationId).ToList();
             dynamic orgRoles = null;
@@ -58,7 +58,7 @@ namespace Core.ApplicationServices
             set.Tables.Add(GetTaskTable(tasks));
             set.Tables.Add(GetUserTable(users));
 
-            return null;
+            return _mox.Export(set, stream);
         }
 
         private static DataTable GetOrganizationTable(IEnumerable<OrganizationUnit> orgUnits)
@@ -68,10 +68,15 @@ namespace Core.ApplicationServices
             table.Columns.Add();
             table.Columns.Add();
             table.Columns.Add();
+            table.Columns.Add();
 
             foreach (var orgUnit in orgUnits)
             {
-                table.Rows.Add("", orgUnit.Id, orgUnit.Ean, orgUnit.Parent.Name);
+                var parent = "";
+                if (orgUnit.Parent != null)
+                    parent = orgUnit.Parent.Name;
+                
+                table.Rows.Add("", orgUnit.Id, orgUnit.Name, orgUnit.Ean, parent);
             }
 
             return table;
@@ -156,7 +161,11 @@ namespace Core.ApplicationServices
             foreach (var user in users)
             {
                 var lookupString = user.Name + " " + user.Email;
-                table.Rows.Add("", lookupString, user.Id, user.Name, user.Email, user.DefaultOrganizationUnitId, user.DefaultOrganizationUnit.Name);
+                var defaultOrgUnitName = "";
+                if (user.DefaultOrganizationUnit != null)
+                    defaultOrgUnitName = user.DefaultOrganizationUnit.Name;
+
+                table.Rows.Add("", lookupString, user.Id, user.Name, user.Email, user.DefaultOrganizationUnitId, defaultOrgUnitName);
             }
 
             return table;

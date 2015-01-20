@@ -1,68 +1,52 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Web;
-using System.Net;
 using System.Data;
 using System.IO;
 using System.Linq;
+using Core.ApplicationServices;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
-using DataTable = DocumentFormat.OpenXml.Drawing.Charts.DataTable;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace Infrastructure.OpenXML
 {
-
-    public interface IMox
-    {
-        IOrderedEnumerable<string> Import(Stream stream);
-
-        Stream Export(DataSet data);
-    }
-
     public class Mox : IMox
     {
 
         public IOrderedEnumerable<string> Import(Stream stream)
         {
-            var spreadsheetDocument = SpreadsheetDocument.Open(stream, true);
-            
+            SpreadsheetDocument.Open(stream, true);
+
             throw new NotImplementedException();
         }
 
-        public Stream Export(DataSet data)
+        public Stream Export(DataSet data, Stream stream)
         {
-            var stream = new MemoryStream();
+            //Open document
+            var spreadsheetDocument = SpreadsheetDocument.Open(stream, true);
 
-            //Create document
-            var spreadsheetDocument = SpreadsheetDocument.Create(stream, SpreadsheetDocumentType.Workbook, true);
-
-            //Add a WorkbookPart to the document
-            var workbookPart = spreadsheetDocument.AddWorkbookPart();
-            workbookPart.Workbook = new Workbook();
-
-            //Add a WorksheetPart to the WorkbookPart
-            var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
-            worksheetPart.Worksheet = new Worksheet(new SheetData());
-
-            //Add Sheets to the Workbook
-            var sheets = spreadsheetDocument.WorkbookPart.Workbook.AppendChild<Sheets>(new Sheets());
+            //Open a WorkbookPart
+            var workbookPart = spreadsheetDocument.WorkbookPart;
 
             //Loop through data
-            foreach (System.Data.DataTable table in data.Tables)
+            foreach (DataTable table in data.Tables)
             {
-                
-                var newSheet = new Sheet()
-                {
-                    Id = spreadsheetDocument.WorkbookPart.GetIdOfPart(worksheetPart),
-                    SheetId = 1,
-                    Name = table.TableName
-                };
+                var id = workbookPart.Workbook.Descendants<Sheet>().First(x => x.Name == table.TableName).Id;
+                var workSheetPart = (WorksheetPart)workbookPart.GetPartById(id);
+                var sheetData = workSheetPart.Worksheet.GetFirstChild<SheetData>();
+
+                //var lastRow = sheetData.Elements<Row>().LastOrDefault();
+                //var lastRowIndex = lastRow.RowIndex + 1;
+
+                //if (lastRow != null)
+                //{
+
+                //} 
 
                 foreach (DataRow row in table.Rows)
                 {
                     var newRow = new Row();
-                    
+
                     foreach (DataColumn column in table.Columns)
                     {
                         var newCell = new Cell()
@@ -74,10 +58,10 @@ namespace Infrastructure.OpenXML
                         newRow.AppendChild(newCell);
                     }
 
-                    newSheet.AppendChild(newRow);
+                    sheetData.AppendChild(newRow);
+
                 }
 
-                sheets.Append(newSheet);
             }
 
             workbookPart.Workbook.Save(); //TODO: Test if nessesary?
@@ -86,5 +70,4 @@ namespace Infrastructure.OpenXML
             return stream;
         }
     }
-
 }
