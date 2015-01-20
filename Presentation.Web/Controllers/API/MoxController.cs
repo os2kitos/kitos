@@ -55,11 +55,11 @@ namespace Presentation.Web.Controllers.API
                 // Read the form data.
                 await Request.Content.ReadAsMultipartAsync(provider);
 
-                var file = provider.Contents.First();
+                var file = provider.Contents[1];
                 //var filename = Path.GetFileName(file.Headers.ContentDisposition.FileName);
                 var buffer = await file.ReadAsByteArrayAsync();
                 var stream = new MemoryStream(buffer);
-
+                stream.Seek(0, SeekOrigin.Begin);
                 _moxService.Import(stream);
 
                 return Request.CreateResponse(HttpStatusCode.OK);

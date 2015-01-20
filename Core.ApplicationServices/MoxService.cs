@@ -114,7 +114,7 @@ namespace Core.ApplicationServices
                 }
             }
         }
-
+            
         private class OrgUnit
         {
             public int Id { get; set; }
