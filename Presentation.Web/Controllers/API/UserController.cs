@@ -45,9 +45,9 @@ namespace Presentation.Web.Controllers.API
             {
                 //do some string magic to determine parameters, and actions
                 List<string> parameters = null;
-                bool sendMailOnCreation = false;
-                bool sendReminder = false;
-                bool sendAdvis = false;
+                var sendMailOnCreation = false;
+                var sendReminder = false;
+                var sendAdvis = false;
 
                 if (!string.IsNullOrWhiteSpace(Request.RequestUri.Query))
                     parameters = new List<string>(Request.RequestUri.Query.Replace("?", string.Empty).Split('&'));
