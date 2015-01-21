@@ -8,31 +8,25 @@ using Core.DomainServices;
 
 namespace Core.ApplicationServices
 {
-    public interface IMoxService
-    {
-        Stream Export(Stream stream, int organizationId, User kitosUser);
-        void Import(Stream stream, int organizationId, User kitosUser);
-    }
-
     public class MoxService : IMoxService
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<OrganizationRole> _orgRoleRepository;
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IGenericRepository<User> _userRepository;
-        private readonly IMox _mox;
+        private readonly IExcelHandler _excelHandler;
 
         public MoxService(IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<OrganizationRole> orgRoleRepository,
             IGenericRepository<TaskRef> taskRepository,
             IGenericRepository<User> userRepository,
-            IMox mox)
+            IExcelHandler excelHandler)
         {
             _orgUnitRepository = orgUnitRepository;
             _orgRoleRepository = orgRoleRepository;
             _taskRepository = taskRepository;
             _userRepository = userRepository;
-            _mox = mox;
+            _excelHandler = excelHandler;
         }
 
         public Stream Export(Stream stream, int organizationId, User kitosUser)
@@ -60,7 +54,7 @@ namespace Core.ApplicationServices
             set.Tables.Add(GetTaskTable(tasks));
             set.Tables.Add(GetUserTable(users));
 
-            return _mox.Export(set, stream);
+            return _excelHandler.Export(set, stream);
         }
 
         private static long? ToNullableLong(string s)
@@ -72,7 +66,7 @@ namespace Core.ApplicationServices
 
         public void Import(Stream stream, int organizationId, User kitosUser)
         {
-            var set = _mox.Import(stream);
+            var set = _excelHandler.Import(stream);
             var orgTable = set.Tables[1];
 
             // existing orgUnits
@@ -88,8 +82,6 @@ namespace Core.ApplicationServices
                     .Select(x => new OrgUnit { Name = x.Field<string>(2), Parent = x.Field<string>(4), Ean = ToNullableLong(x.Field<string>(3)) })
                     .GroupBy(x => x.Parent).ToList();
 
-            //var a = newOrgUnitsGrouped.Where(x => x.Key == "");
-
             var count = newOrgUnitsGrouped.Count();
             for (var i = 0; i < count; i++)
             {
@@ -98,11 +90,8 @@ namespace Core.ApplicationServices
                 var existingParent = exising.SingleOrDefault(x => x.Name == current.Key);
                 if (current.Key == "" || existingParent != null)
                 {
-                    // then FIRE zhe missiles! TODO
                     foreach (var orgUnit in current)
                     {
-
-                        // TODO 
                         var orgUnitEntity = _orgUnitRepository.Insert(new OrganizationUnit
                         {
                             Name = orgUnit.Name,
