@@ -2,18 +2,14 @@
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using Core.ApplicationServices;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Wordprocessing;
 using DataTable = System.Data.DataTable;
 
 namespace Infrastructure.OpenXML
 {
-    public class Mox : IMox
+    public class ExcelHandler : IExcelHandler
     {
 
         public DataSet Import(Stream stream)
@@ -31,11 +27,7 @@ namespace Infrastructure.OpenXML
 
             foreach (var sheet in sheets)
             {
-                //if (sheet.Name != "Organisation")
-                //{
-                //    continue;
-                //}
-                
+               
                 var dataTable = new DataTable() { TableName = sheet.Name };
                 
                 var relationshipId = sheet.Id.Value;
@@ -88,7 +80,7 @@ namespace Infrastructure.OpenXML
             return dataSet;
         }
 
-        private string GetCellValue(SpreadsheetDocument document, Cell cell)
+        private static string GetCellValue(SpreadsheetDocument document, Cell cell)
         {
             var stringTablePart = document.WorkbookPart.SharedStringTablePart;
 
@@ -154,9 +146,7 @@ namespace Infrastructure.OpenXML
 
                         newRow.AppendChild(newCell);
                     }
-                    //sheetData.InsertAt(newRow, 8);
                     sheetData.AppendChild(newRow);
-                    //rowIndex++;
                 }
 
             }
