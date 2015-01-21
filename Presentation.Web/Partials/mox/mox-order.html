@@ -1,12 +1,12 @@
-﻿
-<a data-ng-href="{{tmplUrl}}">Hent excel-ark til import af organisationer.</a>
-
-Udfyld...
-
-<form role="form" data-ng-submit="submit()">
+﻿<form role="form" data-ng-submit="submit()">
     <div class="form-group">
-        <label for="file">Fil</label>
+        <label>Step 1 - Hent og udfyld ark:</label> <br />
+        <a data-ng-href="{{tmplUrl}}" class="form-control text-primary"><span class="glyphicon glyphicon-file"></span> Hent excel-ark til import af organisationer.</a>
+    </div>
+
+    <div class="form-group">
+        <label for="file">Step 2 - Upload udfyldt ark:</label>
         <input type="file" id="file" name="file" class="form-control" data-file-model="file">
     </div>
-    <button type="submit">Submit</button>
+    <button type="submit" class="btn btn-default">Upload</button>
 </form>
