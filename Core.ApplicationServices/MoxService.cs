@@ -88,25 +88,31 @@ namespace Core.ApplicationServices
                 var current = newOrgUnitsGrouped[i];
                 // if parentless (root) or parent already exists
                 var existingParent = exising.SingleOrDefault(x => x.Name == current.Key);
-                if (current.Key == "" || existingParent != null)
+                if (string.IsNullOrEmpty(current.Key) || existingParent != null)
                 {
+                    var proxyOrgUnits = new List<OrganizationUnit>();
                     foreach (var orgUnit in current)
                     {
                         var orgUnitEntity = _orgUnitRepository.Insert(new OrganizationUnit
                         {
                             Name = orgUnit.Name,
                             Ean = orgUnit.Ean,
-                            ParentId = existingParent == null ? 0 : existingParent.Id,
+                            ParentId = existingParent == null ? null : (int?)existingParent.Id,
                             ObjectOwnerId = kitosUser.Id,
                             LastChangedByUserId = kitosUser.Id,
                             LastChanged = DateTime.Now,
                             OrganizationId = organizationId
                         });
-                        
-                        orgUnit.Id = orgUnitEntity.Id;
+                        proxyOrgUnits.Add(orgUnitEntity);
                         exising.Add(orgUnit);
                     }
                     _orgUnitRepository.Save();
+
+                    foreach (var orgUnit in current)
+                    {
+                        var foundProxy = proxyOrgUnits.Single(x => x.Name == orgUnit.Name && x.Ean == orgUnit.Ean);
+                        orgUnit.Id = foundProxy.Id;
+                    }
                 }
                 else
                 {
