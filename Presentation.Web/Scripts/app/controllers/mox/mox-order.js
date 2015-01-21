@@ -19,6 +19,7 @@
                 $scope.tmplUrl = 'api/mox?organizationId=' + user.currentOrganizationId;
 
                 $scope.submit = function () {
+                    var msg = notify.addInfoMessage("Læser excel ark...", false);
                     var formData = new FormData();
                     // need to convert our json object to a string version of json otherwise
                     // the browser will do a 'toString()' on the object which will result 
@@ -40,9 +41,11 @@
                         // populate the headers properly including the boundary parameter.
                         headers: { 'Content-Type': undefined },
                     }).success(function (data, status) {
-                        console.log('Submitted with status:' + status);
+                        msg.toSuccessMessage("Excel arket er blevet læst og værdier er blevet sat ind i systemet.");
+                        //console.log('Submitted with status:' + status);
                     }).error(function (data, status) {
-                        console.log('Error ' + status + ' occured: ' + data);
+                        msg.toErrorMessage("Fejl! Der er en fejl i excel arket.");
+                        //console.log('Error ' + status + ' occured: ' + data);
                     });
                 };
             }]);
