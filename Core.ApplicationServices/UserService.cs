@@ -22,10 +22,10 @@ namespace Core.ApplicationServices
         public UserService(TimeSpan ttl,
             string baseUrl,
             string mailSuffix,
-            IGenericRepository<User> userRepository, 
-            IGenericRepository<Organization> orgRepository, 
-            IGenericRepository<PasswordResetRequest> passwordResetRequestRepository, 
-            IMailClient mailClient, 
+            IGenericRepository<User> userRepository,
+            IGenericRepository<Organization> orgRepository,
+            IGenericRepository<PasswordResetRequest> passwordResetRequestRepository,
+            IMailClient mailClient,
             ICryptoService cryptoService)
         {
             _ttl = ttl;
@@ -38,7 +38,7 @@ namespace Core.ApplicationServices
             _cryptoService = cryptoService;
         }
 
-        public User AddUser(User user)
+        public User AddUser(User user, bool sendMailOnCreation)
         {
             // hash his salt and default password
             user.Salt = _cryptoService.Encrypt(DateTime.Now + " spices");
@@ -55,11 +55,25 @@ namespace Core.ApplicationServices
 
             _userRepository.Insert(user);
             _userRepository.Save();
+            var savedUser = _userRepository.Get(u => u.Id == user.Id).FirstOrDefault();
+
+            if (sendMailOnCreation)
+                IssueAdvisMail(savedUser, false);
+
+            return savedUser;
+        }
+
+        public void IssueAdvisMail(User user, bool reminder)
+        {
+            if (user == null || _userRepository.GetByKey(user.Id) == null)
+                throw new ArgumentNullException("user");
+
+            var org = _orgRepository.GetByKey(user.CreatedInId);
 
             var reset = GenerateResetRequest(user);
             var resetLink = _baseUrl + "#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
 
-            var subject = "Oprettelse af KITOS profil " + _mailSuffix;
+            var subject = (reminder ? "Påmindelse: " : string.Empty) + "Oprettelse af KITOS profil " + _mailSuffix;
             var content = "<h2>Kære " + user.Name + "</h2>" +
                           "<p>Du er blevet oprettet, som bruger i KITOS (Kommunernes IT Overblikssystem) under organisationen " +
                           org.Name + ".</p>" +
@@ -72,7 +86,9 @@ namespace Core.ApplicationServices
 
             IssuePasswordReset(user, subject, content);
 
-            return user;
+            user.LastAdvisDate = DateTime.Now.Date;
+            _userRepository.Update(user);
+            _userRepository.Save();
         }
 
         public PasswordResetRequest IssuePasswordReset(User user, string subject, string content)
@@ -113,7 +129,7 @@ namespace Core.ApplicationServices
             var now = DateTime.Now;
             var hash = _cryptoService.Encrypt(now + user.Email);
 
-            var request = new PasswordResetRequest { Hash = hash, Time = now, UserId = user.Id, ObjectOwner = user, LastChangedByUser = user};
+            var request = new PasswordResetRequest { Hash = hash, Time = now, UserId = user.Id, ObjectOwner = user, LastChangedByUser = user };
 
             _passwordResetRequestRepository.Insert(request);
             _passwordResetRequestRepository.Save();
@@ -144,7 +160,7 @@ namespace Core.ApplicationServices
             if (passwordResetRequest == null)
                 throw new ArgumentNullException("passwordResetRequest");
 
-            if(!IsValidPassword(newPassword))
+            if (!IsValidPassword(newPassword))
                 throw new ArgumentException("New password is invalid");
 
             var user = passwordResetRequest.User;

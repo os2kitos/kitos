@@ -42,6 +42,8 @@ namespace Presentation.Web.Controllers.API
                     throw new ArgumentException();
 
                 var user = _userRepository.GetByEmail(loginDto.Email);
+                if (user.IsLocked)
+                    return Unauthorized("User is locked");
 
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
 

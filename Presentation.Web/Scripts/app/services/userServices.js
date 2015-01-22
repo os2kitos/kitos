@@ -104,8 +104,9 @@
                     });
 
 
-                }).error(function(result) {
-                    loadUserDeferred.reject("Not authorized");
+                }).error(function (result) {
+                    
+                    loadUserDeferred.reject(result);
                     loadUserDeferred = null;
                     clearSavedOrgId();
                 });

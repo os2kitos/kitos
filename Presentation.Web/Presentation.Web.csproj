@@ -542,6 +542,9 @@
     <Content Include="Partials\org\org-unit.html" />
     <Content Include="Partials\org\org.html" />
     <Content Include="Partials\org\overview\task-usage.html" />
+    <Content Include="Partials\org\user\org-createuser-modal.html" />
+    <Content Include="Partials\org\user\org-edituser-modal.html" />
+    <Content Include="Partials\org\user\org-user.html" />
     <Content Include="Partials\shared\org-tree-item.html" />
     <Content Include="Partials\subnav\create-modal.html" />
     <Content Include="Partials\subnav\subnav.html" />
@@ -646,6 +649,7 @@
     <Content Include="Scripts\app\controllers\org\org-structure.js" />
     <Content Include="Scripts\app\controllers\org\org-subnav.js" />
     <Content Include="Scripts\app\controllers\org\org-overview.js" />
+    <Content Include="Scripts\app\controllers\org\org-user.js" />
     <Content Include="Scripts\app\directives\angularjs-dropdown-multiselect.js" />
     <Content Include="Scripts\app\directives\directives.js" />
     <Content Include="Scripts\app\directives\filters.js" />

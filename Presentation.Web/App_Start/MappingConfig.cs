@@ -203,7 +203,8 @@ namespace Presentation.Web
             Mapper.CreateMap<AdminRight, RightOutputDTO>();
             Mapper.CreateMap<RightInputDTO, AdminRight>();
 
-            Mapper.CreateMap<ItSystemRight, RightOutputDTO>();
+            Mapper.CreateMap<ItSystemRight, RightOutputDTO>()
+                .ForMember(dto => dto.ObjectName, opt => opt.MapFrom(src => src.Object.ItSystem.Name));
             Mapper.CreateMap<RightInputDTO, ItSystemRight>();
 
             Mapper.CreateMap<ItProjectRight, RightOutputDTO>();
