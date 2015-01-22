@@ -108,6 +108,7 @@ namespace Presentation.Web.Controllers.API
         /// Adds an ItSystemUsage to the list of associated ItSystemUsages for that contract
         /// </summary>
         /// <param name="id">ID of the contract</param>
+        /// <param name="organizationId"></param>
         /// <param name="systemUsageId">ID of the system usage</param>
         /// <returns>List of associated ItSystemUsages</returns>
         public HttpResponseMessage PostSystemUsage(int id, int organizationId, int systemUsageId)

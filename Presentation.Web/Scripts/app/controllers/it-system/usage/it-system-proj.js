@@ -17,7 +17,7 @@
 
         var usageId = $stateParams.id;
         $scope.save = function () {
-            $http.post('api/itproject/' + $scope.selectedProject.id + '?usageId=' + usageId)
+            $http.post('api/itproject/' + $scope.selectedProject.id + '?usageId=' + usageId + '&organizationId=' + user.currentOrganizationId)
                 .success(function () {
                     notify.addSuccessMessage("Projektet er tilknyttet.");
                     reload();

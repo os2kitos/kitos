@@ -444,7 +444,10 @@
 
                     function save(payload) {
                         var msg = notify.addInfoMessage("Gemmer...", false);
-                        $http({ method: 'PATCH', url: attrs.autosave + '?organizationId=' + user.currentOrganizationId, data: payload })
+                        if (!attrs.appendurl)
+                            attrs.appendurl = '';
+
+                        $http({ method: 'PATCH', url: attrs.autosave + '?organizationId=' + user.currentOrganizationId + attrs.appendurl, data: payload })
                             .success(function() {
                                 msg.toSuccessMessage("Feltet er opdateret.");
                                 oldValue = ctrl.$modelValue;

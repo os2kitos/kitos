@@ -64,7 +64,7 @@
             $scope.save = function(obj) {
                 var msg = notify.addInfoMessage("Gemmer... ");
                 if (obj.selected) {
-                    $http.post('api/itsystemusage/' + usageId + '?organizationunit=' + obj.id)
+                    $http.post('api/itsystemusage/' + usageId + '?organizationunit=' + obj.id + '&organizationId=' + user.currentOrganizationId)
                         .success(function() {
                             msg.toSuccessMessage("Gemt!");
                             $scope.selectedOrgUnits.push(obj);

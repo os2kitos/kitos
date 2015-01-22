@@ -119,6 +119,7 @@
                     <input type="checkbox" data-ng-model="usage.usage.isWishedFor"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="isWishedFor"
+                           data-appendurl="{{usage.urlParams}}"
                            data-autosave="{{usage.updateUrl}}">
                 </td>
 
@@ -153,6 +154,7 @@
                            data-ng-show="usage.usage.itContract.isActive"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="infrastructureId"
+                           data-appendurl="{{usage.urlParams}}"
                            data-autosave="{{usage.updateUrl}}">
                 </td>
                 
@@ -184,6 +186,7 @@
                                 data-ng-disabled="!hasWriteAccess"
                                 data-ng-options="freq.id as freq.name for freq in frequencies"
                                 data-field="frequencyId"
+                                data-appendurl="{{usage.dataRows[0].urlParams}}"
                                 data-autosave="{{usage.dataRows[0].updateUrl}}">
                             <option value=""></option>
                         </select>
@@ -197,6 +200,7 @@
                                data-ng-show="usage.usage.itContract.isActive"
                                data-ng-disabled="!hasWriteAccess"
                                data-field="price"
+                               data-appendurl="{{usage.dataRows[0].urlParams}}"
                                data-autosave="{{usage.dataRows[0].updateUrl}}" />
                     </span>
                 </td>
@@ -208,6 +212,7 @@
                                data-ng-show="usage.usage.itContract.isActive"
                                data-ng-disabled="!hasWriteAccess"
                                data-field="amount"
+                               data-appendurl="{{usage.dataRows[0].urlParams}}"
                                data-autosave="{{usage.dataRows[0].updateUrl}}" />
                     </span>
                 </td>
@@ -219,6 +224,7 @@
                                data-ng-show="usage.usage.itContract.isActive"
                                data-ng-disabled="!hasWriteAccess"
                                data-field="economy"
+                               data-appendurl="{{usage.dataRows[0].urlParams}}"
                                data-autosave="{{usage.dataRows[0].updateUrl}}" />
                     </span>
                 </td>
@@ -242,6 +248,7 @@
                             data-ng-disabled="!hasWriteAccess"
                             data-ng-options="freq.id as freq.name for freq in frequencies"
                             data-field="frequencyId"
+                            data-appendurl="{{dataRow.urlParams}}"
                             data-autosave="{{dataRow.updateUrl}}"></select>
                 </td>
 
@@ -251,6 +258,7 @@
                            data-ng-show="usage.usage.itContract.isActive"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="price"
+                           data-appendurl="{{dataRow.urlParams}}"
                            data-autosave="{{dataRow.updateUrl}}" />
                 </td>
 
@@ -260,6 +268,7 @@
                            data-ng-show="usage.usage.itContract.isActive"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="amount"
+                           data-appendurl="{{dataRow.urlParams}}"
                            data-autosave="{{dataRow.updateUrl}}" />
                 </td>
 
@@ -269,6 +278,7 @@
                            data-ng-show="usage.usage.itContract.isActive"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="economy"
+                           data-appendurl="{{dataRow.urlParams}}"
                            data-autosave="{{dataRow.updateUrl}}" />
                 </td>
             </tr>
