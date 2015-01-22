@@ -249,7 +249,8 @@
                 require: 'ngModel',
                 templateUrl: 'partials/directives/select-status2.html',
 
-                link: function(scope, element, attr, ngModel) {
+                link: function (scope, element, attr, ngModel) {
+
                     scope.setModel = function(n) {
                         //only update on change
                         if (scope.model == n) return;
