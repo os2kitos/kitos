@@ -58,7 +58,7 @@
                 };
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);
-                $http.post("api/adminrights/" + oId, data, { handleBusy: true }).success(function(result) {
+                $http.post("api/adminrights/" + oId + "?organizationId=" + oId, data, { handleBusy: true }).success(function (result) {
                     msg.toSuccessMessage(user.text + " er blevet lokal administrator for " + orgName);
                     reload();
                 }).error(function() {

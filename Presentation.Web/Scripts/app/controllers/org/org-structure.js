@@ -51,7 +51,7 @@
                 $scope.orgUnits[orgUnit.id] = orgUnit;
 
                 if (!inheritWriteAccess) {
-                    $http.get('api/organizationUnit/' + orgUnit.id + '?hasWriteAccess&organizationId=' + user-currentOrganizationId).success(function(result) {
+                    $http.get('api/organizationUnit/' + orgUnit.id + '?hasWriteAccess&organizationId=' + user.currentOrganizationId).success(function(result) {
                         orgUnit.hasWriteAccess = result.response;
 
                         _.each(orgUnit.children, function(u) {

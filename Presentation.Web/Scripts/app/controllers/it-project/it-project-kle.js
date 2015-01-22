@@ -72,7 +72,7 @@
             }
 
             function add(task) {
-                return $http.post(baseUrl + '?taskId=' + task.taskRef.id).success(function(result) {
+                return $http.post(baseUrl + '?taskId=' + task.taskRef.id + '&organizationId=' + user.currentOrganizationId).success(function (result) {
                     task.isSelected = true;
                 });
             }

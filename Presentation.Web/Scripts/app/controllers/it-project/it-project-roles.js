@@ -73,7 +73,7 @@
                     "userId": uId
                 };
 
-                $http.post("api/itprojectrights/" + oId, data).success(function (result) {
+                $http.post("api/itprojectrights/" + oId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
                     notify.addSuccessMessage(result.response.user.name + " er knyttet i rollen");
 
                     $scope.rights.push({
@@ -137,7 +137,7 @@
                         "userId": uIdNew
                     };
 
-                    $http.post("api/itprojectrights/" + projectId, data).success(function (result) {
+                    $http.post("api/itprojectrights/" + projectId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
 
                         right.roleId = result.response.roleId;
                         right.user = result.response.user;

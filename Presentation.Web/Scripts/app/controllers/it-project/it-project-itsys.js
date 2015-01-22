@@ -25,7 +25,7 @@
             $scope.systemUsages = usages;
 
             $scope.save = function () {
-                $http.post('api/itproject/' + projectId + '?usageId=' + $scope.selectedSystemUsage.id)
+                $http.post('api/itproject/' + projectId + '?usageId=' + $scope.selectedSystemUsage.id + '&organizationId=' + user.currentOrganizationId)
                     .success(function () {
                         notify.addSuccessMessage("Systemet er tilknyttet.");
                         reload();

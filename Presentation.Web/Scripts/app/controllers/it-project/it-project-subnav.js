@@ -40,7 +40,7 @@
 
                             if (orgUnitId) {
                                 // add users default org unit to the new project
-                                $http.post('api/itproject/' + projectId + '?organizationunit=' + orgUnitId);
+                                $http.post('api/itproject/' + projectId + '?organizationunit=' + orgUnitId + '&organizationId=' + user.currentOrganizationId);
                             }
 
                             $state.go('it-project.edit.status-project', { id: projectId });
