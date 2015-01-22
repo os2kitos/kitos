@@ -260,7 +260,7 @@
 
                         $http({
                             method: 'PATCH',
-                            url: 'api/itContract/' + contract.id,
+                            url: 'api/itContract/' + contract.id + '?organizationId=' + user.currentOrganizationId,
                             data: {
                                 contractSignerId: signerId
                             }

@@ -65,10 +65,11 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         /// <param name="usageId"></param>
         /// <param name="sysId"></param>
+        /// <param name="organizationId"></param>
         /// <param name="obj"></param>
         /// <param name="interfaceId"></param>
         /// <returns></returns>
-        public HttpResponseMessage PatchOrCreate(int usageId, int interfaceId, int sysId, JObject obj)
+        public HttpResponseMessage PatchOrCreate(int usageId, int interfaceId, int sysId, int organizationId, JObject obj)
         {
             try
             {

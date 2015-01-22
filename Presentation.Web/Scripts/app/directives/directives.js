@@ -444,7 +444,10 @@
 
                     function save(payload) {
                         var msg = notify.addInfoMessage("Gemmer...", false);
-                        $http({ method: 'PATCH', url: attrs.autosave + '?organizationId=' + user.currentOrganizationId, data: payload })
+                        if (!attrs.appendurl)
+                            attrs.appendurl = '';
+
+                        $http({ method: 'PATCH', url: attrs.autosave + '?organizationId=' + user.currentOrganizationId + attrs.appendurl, data: payload })
                             .success(function() {
                                 msg.toSuccessMessage("Feltet er opdateret.");
                                 oldValue = ctrl.$modelValue;
@@ -770,7 +773,7 @@
     ]);
 
     app.directive('globalOptionRoleList', [
-        '$http', '$timeout', '$state', '$stateParams', 'notify', function($http, $timeout, $state, $stateParams, notify) {
+        '$http', '$timeout', '$state', '$stateParams', 'notify', 'userService', function($http, $timeout, $state, $stateParams, notify, userService) {
             return {
                 scope: {
                     optionsUrl: '@',
@@ -778,6 +781,10 @@
                 },
                 templateUrl: 'partials/global-config/optionrolelist.html',
                 link: function(scope, element, attrs) {
+                    var user;
+                    userService.getUser().then(function (result) {
+                        user = result;
+                    });
                     scope.list = [];
                     $http.get(scope.optionsUrl + '?nonsuggestions').success(function(result) {
                         _.each(result.response, function(v) {
@@ -804,7 +811,7 @@
 
                     scope.approve = function(id) {
                         var msg = notify.addInfoMessage("Gemmer...", false);
-                        $http({ method: 'PATCH', url: scope.optionsUrl + '/' + id, data: { isSuggestion: false } })
+                        $http({ method: 'PATCH', url: scope.optionsUrl + '/' + id + '?organizationId=' + user.currentOrganizationId, data: { isSuggestion: false } })
                             .success(function() {
                                 msg.toSuccessMessage("Rollen er opdateret.");
                                 // reload page to show changes

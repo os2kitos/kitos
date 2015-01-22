@@ -12,11 +12,18 @@
                             // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                             windowClass: 'modal fade in',
                             resolve: {
-                                org: ['$http', function ($http) {
-                                        return $http.get('api/organization/' + $stateParams.id).then(function (result) {
+                                org: [
+                                    '$http', function($http) {
+                                        return $http.get('api/organization/' + $stateParams.id).then(function(result) {
                                             return result.data.response;
                                         });
-                                    }]
+                                    }
+                                ],
+                                user: [
+                                    'userService', function(userService) {
+                                        return userService.getUser();
+                                    }
+                                ]
                             },
                             controller: 'globalAdmin.editOrganizationCtrl',
                         }).result.then(function() {
@@ -35,7 +42,7 @@
     ]);
 
     app.controller('globalAdmin.editOrganizationCtrl', [
-        '$rootScope', '$scope', '$http', 'notify', 'org', function ($rootScope, $scope, $http, notify, org) {
+        '$rootScope', '$scope', '$http', 'notify', 'org', 'user', function ($rootScope, $scope, $http, notify, org, user) {
             $rootScope.page.title = 'Rediger organisation';
             $scope.title = 'Rediger organisation';
             $scope.org = org;
@@ -54,7 +61,7 @@
 
                 $http({
                     method: 'PATCH',
-                    url: 'api/organization/' + org.id,
+                    url: 'api/organization/' + org.id + '?organizationId=' + user.currentOrganizationId,
                     data: payload
                 }).success(function(result) {
                     notify.addSuccessMessage("Ændringerne er blevet gemt!");

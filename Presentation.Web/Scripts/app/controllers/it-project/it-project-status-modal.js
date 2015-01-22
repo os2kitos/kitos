@@ -13,6 +13,9 @@
                             activityId: function() {
                                 return $stateParams.activityId;
                             },
+                            user: function() {
+                                return user;
+                            },
                             activityType: function () {
                                 return $stateParams.type;
                             },
@@ -75,8 +78,8 @@
     }]);
 
     app.controller('project.statusModalCtrl',
-    ['$scope', '$http', 'autofocus', 'project', 'usersWithRoles', 'activity', 'notify', 'activityId', 'activityType', 'hasWriteAccess',
-        function ($scope, $http, autofocus, project, usersWithRoles, activity, notify, activityId, activityType, hasWriteAccess) {
+    ['$scope', '$http', 'autofocus', 'project', 'usersWithRoles', 'activity', 'notify', 'activityId', 'activityType', 'hasWriteAccess', 'user',
+        function ($scope, $http, autofocus, project, usersWithRoles, activity, notify, activityId, activityType, hasWriteAccess, user) {
             var isNewActivity = activity == null;
             
             $scope.hasWriteAccess = isNewActivity ? true : hasWriteAccess;
@@ -111,7 +114,7 @@
                 var msg = notify.addInfoMessage("Gemmer ændringer...", false);
                 $http({
                     method: isNewActivity ? 'POST' : 'PATCH',
-                    url: 'api/' + activityType + '/' + activityId,
+                    url: 'api/' + activityType + '/' + activityId + '?organizationId=' + user.currentOrganizationId,
                     data: payload
                 }).success(function () {
                     msg.toSuccessMessage("Ændringerne er gemt!");

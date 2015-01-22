@@ -60,7 +60,7 @@
             }
 
             function add(task) {
-                return $http.post(baseUrl + '?taskId=' + task.taskRef.id).success(function(result) {
+                return $http.post(baseUrl + '?taskId=' + task.taskRef.id + '&organizationId=' + user.currentOrganizationId).success(function (result) {
                     task.isSelected = true;
                 });
             }
@@ -106,7 +106,7 @@
             };
 
             $scope.selectTaskGroup = function () {
-                var url = baseUrl + '?taskId=' + $scope.selectedTaskGroup;
+                var url = baseUrl + '?taskId=' + $scope.selectedTaskGroup + '&organizationId=' + user.currentOrganizationId;
 
                 var msg = notify.addInfoMessage("Opretter tilknytning...", false);
                 $http.post(url).success(function () {

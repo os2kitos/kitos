@@ -118,7 +118,7 @@
             };
 
             $scope.selectTaskGroup = function() {
-                var url = baseUrl + '?taskId=' + $scope.selectedTaskGroup;
+                var url = baseUrl + '?taskId=' + $scope.selectedTaskGroup + '&organizationId=' + user.currentOrganizationId;
 
                 var msg = notify.addInfoMessage("Opretter tilknytning...", false);
                 $http.post(url).success(function() {

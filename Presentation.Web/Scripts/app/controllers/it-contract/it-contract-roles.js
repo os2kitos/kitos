@@ -63,7 +63,7 @@
                     "userId": uId
                 };
 
-                $http.post("api/itcontractrights/" + contractId, data).success(function (result) {
+                $http.post("api/itcontractrights/" + contractId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
                     notify.addSuccessMessage(result.response.user.name + " er knyttet i rollen");
 
                     $scope.rights.push({
@@ -120,14 +120,14 @@
 
                 //otherwise, we should delete the old entry, then add a new one
 
-                $http.delete("api/itcontractrights/" + contractId + "?rId=" + rIdOld + "&uId=" + uIdOld).success(function (deleteResult) {
+                $http.delete("api/itcontractrights/" + contractId + "?rId=" + rIdOld + "&uId=" + uIdOld + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
 
                     var data = {
                         "roleId": rIdNew,
                         "userId": uIdNew
                     };
 
-                    $http.post("api/itcontractrights/" + contractId, data).success(function (result) {
+                    $http.post("api/itcontractrights/" + contractId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
 
                         right.roleId = result.response.roleId;
                         right.user = result.response.user;

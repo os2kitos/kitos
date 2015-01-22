@@ -26,7 +26,7 @@
             $scope.project.phases = [project.phase1, project.phase2, project.phase3, project.phase4, project.phase5];
             var prevPhase = null;
             _.each($scope.project.phases, function (phase) {
-                phase.updateUrl = "api/itprojectphase/" + phase.id + '?organizationId=' + user.currentOrganizationId;
+                phase.updateUrl = "api/itprojectphase/" + phase.id;
                 phase.prevPhase = prevPhase;
                 prevPhase = phase;
             });
