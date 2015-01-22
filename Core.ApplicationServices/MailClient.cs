@@ -34,6 +34,7 @@ namespace Core.ApplicationServices
         public void Send(MailMessage message)
         {
             _client.Send(message);
+            
         }
     }
 }
