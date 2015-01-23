@@ -168,7 +168,7 @@
                     "userId": uId
                 };
 
-                $http.post("api/organizationUnitRights/" + oId, data).success(function(result) {
+                $http.post("api/organizationUnitRights/" + oId + '?organizationId=' + user.currentOrganizationId, data).success(function(result) {
                     notify.addSuccessMessage(result.response.user.name + " er knyttet i rollen");
 
                     $scope.chosenOrgUnit.orgRights.push({
@@ -498,7 +498,7 @@
             function removeUsage(refUsage, showMessage) {
                 if (showMessage) var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
 
-                var url = 'api/taskUsage/' + refUsage.usage.id + '&organizationId=' + user.currentOrganizationId;
+                var url = 'api/taskUsage/' + refUsage.usage.id + '?organizationId=' + user.currentOrganizationId;
 
                 $http.delete(url).success(function(result) {
                     refUsage.usage = null;
