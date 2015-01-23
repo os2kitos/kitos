@@ -36,7 +36,7 @@
                 orderBy: 'taskRef.taskKey'
             };
 
-            $scope.csvUrl = 'api/taskusage/?csv&orgUnitId=' + $scope.orgUnitId + '&onlyStarred=true';
+            $scope.csvUrl = 'api/taskusage/?csv&orgUnitId=' + $scope.orgUnitId + '&onlyStarred=true' + '&organizationId=' + user.currentOrganizationId;
 
             $scope.$watchCollection('pagination', function() {
                 //var url = 'api/taskusage/?csv&orgUnitId=' + $scope.orgUnitId + '&onlyStarred=true';
@@ -57,7 +57,7 @@
             function loadUsages() {
                 if (!$scope.orgUnitId) return;
 
-                var url = 'api/taskusage/?orgUnitId=' + $scope.orgUnitId + '&onlyStarred=true';
+                var url = 'api/taskusage/?orgUnitId=' + $scope.orgUnitId + '&onlyStarred=true' + '&organizationId=' + user.currentOrganizationId;
 
                 url += '&skip=' + $scope.pagination.skip;
                 url += '&take=' + $scope.pagination.take;

@@ -65,7 +65,7 @@
                         var deferred = $q.defer();
 
                         setTimeout(function () {
-                            $http.get("api/user/" + iteratee.id + "?hasWriteAccess")
+                            $http.get("api/user/" + iteratee.id + "?hasWriteAccess" + '&organizationId=' + user.currentOrganizationId)
                             .success(function (result) {
                                 iteratee.canBeEdited = result.response;
                                 deferred.resolve(iteratee);

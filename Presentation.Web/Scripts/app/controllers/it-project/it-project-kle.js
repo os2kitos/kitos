@@ -22,8 +22,8 @@
 
     app.controller('project.EditKleCtrl',
     [
-        '$scope', '$http', '$state', '$stateParams', 'notify',
-        function($scope, $http, $state, $stateParams, notify) {
+        '$scope', '$http', '$state', '$stateParams', 'notify', 'user',
+        function($scope, $http, $state, $stateParams, notify, user) {
             var projectId = $stateParams.id;
             var baseUrl = 'api/itProject/' + projectId;
 
@@ -72,13 +72,13 @@
             }
 
             function add(task) {
-                return $http.post(baseUrl + '?taskId=' + task.taskRef.id).success(function(result) {
+                return $http.post(baseUrl + '?taskId=' + task.taskRef.id + '&organizationId=' + user.currentOrganizationId).success(function (result) {
                     task.isSelected = true;
                 });
             }
 
             function remove(task) {
-                return $http.delete(baseUrl + '?taskId=' + task.taskRef.id).success(function(result) {
+                return $http.delete(baseUrl + '?taskId=' + task.taskRef.id + '&organizationId=' + user.currentOrganizationId).success(function (result) {
                     task.isSelected = false;
                 });
             }
@@ -118,7 +118,7 @@
             };
 
             $scope.selectTaskGroup = function() {
-                var url = baseUrl + '?taskId=' + $scope.selectedTaskGroup;
+                var url = baseUrl + '?taskId=' + $scope.selectedTaskGroup + '&organizationId=' + user.currentOrganizationId;
 
                 var msg = notify.addInfoMessage("Opretter tilknytning...", false);
                 $http.post(url).success(function() {
@@ -130,7 +130,7 @@
             };
 
             $scope.removeTaskGroup = function () {
-                var url = baseUrl + '?taskId=' + $scope.selectedTaskGroup;
+                var url = baseUrl + '?taskId=' + $scope.selectedTaskGroup + '&organizationId=' + user.currentOrganizationId;
 
                 var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
                 $http.delete(url).success(function () {

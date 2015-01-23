@@ -57,7 +57,7 @@
             } else {
                 $http({
                     method: 'PATCH',
-                    url: 'api/user/' + _user.id,
+                    url: 'api/user/' + _user.id + '?organizationId=' + _user.currentOrganizationId,
                     data: payload
                 }).success(function (result) {
                     var newUser = result.response;
@@ -132,7 +132,7 @@
 
                 deferred.resolve(loadUser(data));
                 
-            };
+            }
 
             return deferred.promise;
         }

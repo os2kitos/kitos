@@ -85,7 +85,7 @@
                 dataRow.updateUrl = 'api/dataRow/' + dataRow.id;
                 dataRow.delete = function() {
                     var msg = notify.addInfoMessage('Fjerner rækken...', false);
-                    $http.delete(dataRow.updateUrl).success(function(result) {
+                    $http.delete(dataRow.updateUrl + '?organizationId=' + user.currentOrganizationId).success(function (result) {
                         dataRow.show = false;
                         msg.toSuccessMessage('Rækken er fjernet!');
                     }).error(function() {
@@ -175,7 +175,7 @@
                         var payload = {
                             itSystemId: $scope.exposedByObj.id
                         };
-                        var url = 'api/exhibit/' + itInterface.id;
+                        var url = 'api/exhibit/' + itInterface.id + '?organizationId=' + user.currentOrganizationId;
                         $http({ method: 'PATCH', url: url, data: payload })
                             .success(function() {
                                 msg.toSuccessMessage("Feltet er opdateret.");
@@ -199,7 +199,7 @@
                     }
                 } else {
                     // DELETE
-                    $http.delete('api/exhibit/' + itInterface.id).success(function() {
+                    $http.delete('api/exhibit/' + itInterface.id + '?organizationId=' + user.currentOrganizationId).success(function () {
                         msg.toSuccessMessage("Feltet er opdateret.");
                         reload();
                     }).error(function() {

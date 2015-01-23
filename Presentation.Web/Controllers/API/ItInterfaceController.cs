@@ -25,7 +25,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         // DELETE api/ItInterface
-        public override HttpResponseMessage Delete(int id)
+        public override HttpResponseMessage Delete(int id, int organizationId)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace Presentation.Web.Controllers.API
                 if (item.ExhibitedBy != null || item.CanBeUsedBy.Any())
                     return Conflict("Cannot delete an itinterface in use!");
 
-                return base.Delete(id);
+                return base.Delete(id, organizationId);
             }
             catch (Exception e)
             {
@@ -237,7 +237,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public override HttpResponseMessage Patch(int id, JObject obj)
+        public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
         {
             // try get name value
             JToken nameToken;
@@ -249,7 +249,7 @@ namespace Presentation.Web.Controllers.API
                     return Conflict("Name is already taken!");
             }
 
-            return base.Patch(id, obj);
+            return base.Patch(id, organizationId, obj);
         }
 
         public HttpResponseMessage GetNameAvailable(string checkname, int orgId)

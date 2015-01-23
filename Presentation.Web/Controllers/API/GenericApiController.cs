@@ -64,13 +64,14 @@ namespace Presentation.Web.Controllers.API
         /// to the object with the given id
         /// </summary>
         /// <param name="id">The id of the object</param>
+        /// <param name="organizationId"></param>
         /// <param name="hasWriteAccess">Route qualifier</param>
         /// <returns>True or false</returns>
-        public HttpResponseMessage GetHasWriteAccess(int id, bool? hasWriteAccess)
+        public HttpResponseMessage GetHasWriteAccess(int id, int organizationId, bool? hasWriteAccess)
         {
             try
             {
-                return Ok(HasWriteAccess(id));
+                return Ok(HasWriteAccess(id, organizationId));
             }
             catch (Exception e)
             {
@@ -119,9 +120,9 @@ namespace Presentation.Web.Controllers.API
         }
 
         // PUT api/T
-        public virtual HttpResponseMessage Put(int id, JObject obj)
+        public virtual HttpResponseMessage Put(int id, int organizationId, JObject obj)
         {
-            return Patch(id, obj);
+            return Patch(id, organizationId, obj);
         }
 
         protected virtual void DeleteQuery(int id)
@@ -131,12 +132,12 @@ namespace Presentation.Web.Controllers.API
         }
 
         // DELETE api/T
-        public virtual HttpResponseMessage Delete(int id)
+        public virtual HttpResponseMessage Delete(int id, int organizationId)
         {
             try
             {
                 var item = Repository.GetByKey(id);
-                if (!HasWriteAccess(item)) return Unauthorized();
+                if (!HasWriteAccess(item, organizationId)) return Unauthorized();
 
                 DeleteQuery(id);
 
@@ -157,13 +158,13 @@ namespace Presentation.Web.Controllers.API
         }
 
         // PATCH api/T
-        public virtual HttpResponseMessage Patch(int id, JObject obj)
+        public virtual HttpResponseMessage Patch(int id, int organizationId, JObject obj)
         {
             try
             {
                 var item = Repository.GetByKey(id);
                 if (item == null) return NotFound();
-                if (!HasWriteAccess(item)) return Unauthorized();
+                if (!HasWriteAccess(item, organizationId)) return Unauthorized();
                 
                 var itemType = item.GetType();
                 // get name of mapped property
@@ -244,20 +245,22 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         /// <param name="obj">The object</param>
         /// <param name="user">The user</param>
+        /// <param name="organizationId"></param>
         /// <returns>True iff user has write access to obj</returns>
-        protected bool HasWriteAccess(TModel obj, User user)
+        protected bool HasWriteAccess(TModel obj, User user, int organizationId)
         {
-            return obj.HasUserWriteAccess(user);
+            return obj.HasUserWriteAccess(user, organizationId);
         }
 
         /// <summary>
         /// Checks if the current authenticated user has write access to a given object. 
         /// </summary>
         /// <param name="objId">The id of object</param>
+        /// <param name="organizationId"></param>
         /// <returns>True iff user has write access to the object with objId</returns>
-        protected bool HasWriteAccess(int objId)
+        protected bool HasWriteAccess(int objId, int organizationId)
         {
-            return HasWriteAccess(objId, KitosUser);
+            return HasWriteAccess(objId, KitosUser, organizationId);
         }
 
         /// <summary>
@@ -265,21 +268,23 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         /// <param name="objId">The id of object</param>
         /// <param name="user">The user</param>
+        /// <param name="organizationId"></param>
         /// <returns>True iff user has write access to the object with objId</returns>
-        protected bool HasWriteAccess(int objId, User user)
+        protected bool HasWriteAccess(int objId, User user, int organizationId)
         {
             var obj = Repository.GetByKey(objId);
-            return HasWriteAccess(obj, user);
+            return HasWriteAccess(obj, user, organizationId);
         }
 
         /// <summary>
         /// Checks if the current authenticated user has write access to a given object. 
         /// </summary>
         /// <param name="obj">The object</param>
+        /// <param name="organizationId"></param>
         /// <returns>True iff user has write access to obj</returns>
-        protected bool HasWriteAccess(TModel obj)
+        protected bool HasWriteAccess(TModel obj, int organizationId)
         {
-            return HasWriteAccess(obj, KitosUser);
+            return HasWriteAccess(obj, KitosUser, organizationId);
         }
 
         #endregion

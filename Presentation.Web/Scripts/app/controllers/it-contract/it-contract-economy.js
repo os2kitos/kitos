@@ -16,8 +16,8 @@
         });
     }]);
 
-    app.controller('contract.EditEconomyCtrl', ['$scope', '$http', '$timeout', '$state', '$stateParams', 'notify', 'contract', 'orgUnits',
-        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits) {
+    app.controller('contract.EditEconomyCtrl', ['$scope', '$http', '$timeout', '$state', '$stateParams', 'notify', 'contract', 'orgUnits', 'user',
+        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits, user) {
             var baseUrl = "api/economyStream";
 
             var externEconomyStreams = [];
@@ -40,7 +40,7 @@
                 stream.delete = function () {
                     var msg = notify.addInfoMessage("Sletter række...");
 
-                    $http.delete(this.updateUrl).success(function () {
+                    $http.delete(this.updateUrl + '?organizationId=' + user.currentOrganizationId).success(function () {
                         stream.show = false;
 
                         msg.toSuccessMessage("Rækken er slettet!");

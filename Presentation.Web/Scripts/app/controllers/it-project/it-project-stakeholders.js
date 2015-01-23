@@ -19,8 +19,8 @@
     }]);
 
     app.controller('project.EditStakeholdersCtrl',
-    ['$rootScope', '$scope', '$http', 'notify', 'project',
-        function($rootScope, $scope, $http, notify, project) {
+    ['$rootScope', '$scope', '$http', 'notify', 'project', 'user',
+        function($rootScope, $scope, $http, notify, project, user) {
 
             $scope.stakeholders = [];
 
@@ -31,7 +31,7 @@
 
                 stakeholder.delete = function() {
                     var msg = notify.addInfoMessage("Sletter...");
-                    $http.delete(stakeholder.updateUrl).success(function() {
+                    $http.delete(stakeholder.updateUrl + '?organizationId=' + user.currentOrganizationId).success(function () {
                         stakeholder.show = false;
                         msg.toSuccessMessage("Rækken er slettet");
                     }).error(function() {

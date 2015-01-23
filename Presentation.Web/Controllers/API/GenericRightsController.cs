@@ -57,13 +57,14 @@ namespace Presentation.Web.Controllers.API
         /// Post a new right to the object
         /// </summary>
         /// <param name="id">The id of the object</param>
+        /// <param name="organizationId"></param>
         /// <param name="dto">DTO of right</param>
         /// <returns></returns>
-        public HttpResponseMessage PostRight(int id, RightInputDTO dto)
+        public HttpResponseMessage PostRight(int id, int organizationId, RightInputDTO dto)
         {
             try
             {
-                if (!HasWriteAccess(id, KitosUser))
+                if (!HasWriteAccess(id, organizationId, KitosUser))
                     return Unauthorized();
 
                 var right = AutoMapper.Mapper.Map<RightInputDTO, TRight>(dto);
@@ -94,12 +95,13 @@ namespace Presentation.Web.Controllers.API
         /// <param name="id">ID of object</param>
         /// <param name="rId">ID of role</param>
         /// <param name="uId">ID of user in role</param>
+        /// <param name="organizationId"></param>
         /// <returns></returns>
-        public HttpResponseMessage Delete(int id, [FromUri] int rId, [FromUri] int uId)
+        public HttpResponseMessage Delete(int id, [FromUri] int rId, [FromUri] int uId, int organizationId)
         {
             try
             {
-                if (!HasWriteAccess(id, KitosUser))
+                if (!HasWriteAccess(id, organizationId, KitosUser))
                     return Unauthorized();
 
                 var right = RightRepository.Get(r => r.ObjectId == id && r.RoleId == rId && r.UserId == uId).FirstOrDefault();
@@ -117,11 +119,11 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        private bool HasWriteAccess(int objectId, User user)
+        private bool HasWriteAccess(int objectId, int organizationId, User user)
         {
             var obj = _objectRepository.GetByKey(objectId);
 
-            return obj.HasUserWriteAccess(user);
+            return obj.HasUserWriteAccess(user, organizationId);
         }
     }
 }

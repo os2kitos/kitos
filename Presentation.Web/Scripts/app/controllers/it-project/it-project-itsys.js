@@ -25,7 +25,7 @@
             $scope.systemUsages = usages;
 
             $scope.save = function () {
-                $http.post('api/itproject/' + projectId + '?usageId=' + $scope.selectedSystemUsage.id)
+                $http.post('api/itproject/' + projectId + '?usageId=' + $scope.selectedSystemUsage.id + '&organizationId=' + user.currentOrganizationId)
                     .success(function () {
                         notify.addSuccessMessage("Systemet er tilknyttet.");
                         reload();
@@ -36,7 +36,7 @@
             };
 
             $scope.delete = function(usageId) {
-                $http.delete('api/itproject/' + projectId + '?usageId=' + usageId)
+                $http.delete('api/itproject/' + projectId + '?usageId=' + usageId + '&organizationId=' + user.currentOrganizationId)
                     .success(function() {
                         notify.addSuccessMessage("Systemets tilknyttning er fjernet.");
                         reload();

@@ -20,6 +20,11 @@
                                 return result.data.response;
                             });
                         }
+                    ],
+                    user: [
+                        'userService', function (userService) {
+                            return userService.getUser();
+                        }
                     ]
                 }
             });
@@ -27,8 +32,8 @@
     ]);
 
     app.controller('globalAdmin.localAdminsCtrl', [
-        '$rootScope', '$scope', '$http', '$state', 'notify', 'localAdminRole', 'adminRights',
-        function($rootScope, $scope, $http, $state, notify, localAdminRole, adminRights) {
+        '$rootScope', '$scope', '$http', '$state', 'notify', 'localAdminRole', 'adminRights', 'user',
+        function($rootScope, $scope, $http, $state, notify, localAdminRole, adminRights, user) {
             $rootScope.page.title = 'Lokal administratorer';
             $scope.adminRights = adminRights;
 
@@ -53,7 +58,7 @@
                 };
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);
-                $http.post("api/adminrights/" + oId, data, { handleBusy: true }).success(function(result) {
+                $http.post("api/adminrights/" + oId + "?organizationId=" + oId, data, { handleBusy: true }).success(function (result) {
                     msg.toSuccessMessage(user.text + " er blevet lokal administrator for " + orgName);
                     reload();
                 }).error(function() {
@@ -83,7 +88,7 @@
                 var uId = right.userId;
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);
-                $http.delete("api/adminrights/" + oId + "?rId=" + rId + "&uId=" + uId).success(function(deleteResult) {
+                $http.delete("api/adminrights/" + oId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function(deleteResult) {
                     msg.toSuccessMessage(right.userName + " er ikke længere lokal administrator");
                     reload();
                 }).error(function(deleteResult) {

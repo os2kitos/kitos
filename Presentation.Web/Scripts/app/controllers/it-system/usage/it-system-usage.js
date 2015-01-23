@@ -38,11 +38,16 @@
                     }
                 ],
                 hasWriteAccess: [
-                    '$http', '$stateParams', function($http, $stateParams) {
-                        return $http.get('api/itsystemusage/' + $stateParams.id + "?hasWriteAccess")
+                    '$http', '$stateParams', 'user', function($http, $stateParams, user) {
+                        return $http.get('api/itsystemusage/' + $stateParams.id + "?hasWriteAccess&organizationId=" + user.currentOrganizationId)
                             .then(function(result) {
                                 return result.data.response;
                             });
+                    }
+                ],
+                user: [
+                    'userService', function (userService) {
+                        return userService.getUser();
                     }
                 ]
             }

@@ -5,13 +5,20 @@
                 url: '/organisations',
                 templateUrl: 'partials/global-admin/organizations.html',
                 controller: 'globalAdmin.organizationCtrl',
-                authRoles: ['GlobalAdmin']
+                authRoles: ['GlobalAdmin'],
+                resolve: {
+                    user: [
+                        'userService', function (userService) {
+                            return userService.getUser();
+                        }
+                    ]
+                }
             });
         }
     ]);
 
     app.controller('globalAdmin.organizationCtrl', [
-        '$rootScope', '$scope', '$http', 'notify', function($rootScope, $scope, $http, notify) {
+        '$rootScope', '$scope', '$http', 'notify', 'user', function($rootScope, $scope, $http, notify, user) {
             $rootScope.page.title = 'Organisationer';
 
             $scope.pagination = {
@@ -47,7 +54,7 @@
             }
             
             $scope.delete = function (orgId) {
-                $http.delete('api/organization/' + orgId)
+                $http.delete('api/organization/' + orgId + '?organizationId=' + user.currentOrganizationId)
                     .success(function() {
                         notify.addSuccessMessage("Organisationen er blevet slettet!");
                         loadOrganizations();

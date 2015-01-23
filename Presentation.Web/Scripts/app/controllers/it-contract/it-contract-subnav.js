@@ -41,7 +41,7 @@
                     }
                     var contractId = $state.params.id;
                     var msg = notify.addInfoMessage("Sletter IT Kontrakten...", false);
-                    $http.delete('api/itcontract/' + contractId)
+                    $http.delete('api/itcontract/' + contractId + '?organizationId=' + user.currentOrganizationId)
                         .success(function (result) {
                             msg.toSuccessMessage("IT Kontrakten er slettet!");
                             $state.go('it-contract.overview');

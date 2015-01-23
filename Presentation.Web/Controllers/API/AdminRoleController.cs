@@ -22,7 +22,7 @@ namespace Presentation.Web.Controllers.API
             return Ok(dto);
         }
 
-        public override HttpResponseMessage Delete(int id)
+        public override HttpResponseMessage Delete(int id, int organizationId)
         {
             return NotAllowed();
         }
@@ -32,12 +32,7 @@ namespace Presentation.Web.Controllers.API
             return NotAllowed();
         }
 
-        public override HttpResponseMessage Patch(int id, JObject obj)
-        {
-            return NotAllowed();
-        }
-
-        public override HttpResponseMessage Put(int id, JObject jObject)
+        public override HttpResponseMessage Put(int id, int organizationId, JObject jObject)
         {
             return NotAllowed();
         }

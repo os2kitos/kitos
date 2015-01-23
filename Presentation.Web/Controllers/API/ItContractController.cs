@@ -43,12 +43,12 @@ namespace Presentation.Web.Controllers.API
             return base.GetAll(paging);
         }
 
-        public virtual HttpResponseMessage PostAgreementElement(int id, int elemId)
+        public virtual HttpResponseMessage PostAgreementElement(int id, int organizationId, int elemId)
         {
             try
             {
                 var contract = Repository.GetByKey(id);
-                if (!HasWriteAccess(contract)) return Unauthorized();
+                if (!HasWriteAccess(contract, organizationId)) return Unauthorized();
 
                 var elem = _agreementElementRepository.GetByKey(elemId);
 
@@ -66,12 +66,12 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public virtual HttpResponseMessage DeleteAgreementElement(int id, int elemId)
+        public virtual HttpResponseMessage DeleteAgreementElement(int id, int organizationId, int elemId)
         {
             try
             {
                 var contract = Repository.GetByKey(id);
-                if (!HasWriteAccess(contract)) return Unauthorized();
+                if (!HasWriteAccess(contract, organizationId)) return Unauthorized();
 
                 var elem = _agreementElementRepository.GetByKey(elemId);
 
@@ -108,15 +108,16 @@ namespace Presentation.Web.Controllers.API
         /// Adds an ItSystemUsage to the list of associated ItSystemUsages for that contract
         /// </summary>
         /// <param name="id">ID of the contract</param>
+        /// <param name="organizationId"></param>
         /// <param name="systemUsageId">ID of the system usage</param>
         /// <returns>List of associated ItSystemUsages</returns>
-        public HttpResponseMessage PostSystemUsage(int id, int systemUsageId)
+        public HttpResponseMessage PostSystemUsage(int id, int organizationId, int systemUsageId)
         {
             try
             {
                 var contract = Repository.GetByKey(id);
                 if (contract == null) return NotFound();
-                if (!HasWriteAccess(contract)) return Unauthorized();
+                if (!HasWriteAccess(contract, organizationId)) return Unauthorized();
 
                 var usage = _usageRepository.GetByKey(systemUsageId);
                 if (usage == null) return NotFound();
@@ -142,14 +143,15 @@ namespace Presentation.Web.Controllers.API
         /// Removes an ItSystemUsage from the list of associated ItSystemUsages for that contract
         /// </summary>
         /// <param name="id">ID of the contract</param>
+        /// <param name="organizationId"></param>
         /// <param name="systemUsageId">ID of the system usage</param>
         /// <returns>List of associated ItSystemUsages</returns>
-        public HttpResponseMessage DeleteSystemUsage(int id, int systemUsageId)
+        public HttpResponseMessage DeleteSystemUsage(int id, int organizationId, int systemUsageId)
         {
             try
             {
                 var contract = Repository.GetByKey(id);
-                if (!HasWriteAccess(contract)) return Unauthorized();
+                if (!HasWriteAccess(contract, organizationId)) return Unauthorized();
 
                 var contractItSystemUsage = _itContractItSystemUsageRepository.GetByKey(new object[] { id, systemUsageId });
                 if (contractItSystemUsage == null)
