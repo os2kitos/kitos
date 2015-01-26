@@ -11,6 +11,7 @@ namespace Presentation.Web.Models
 
         public int RoleId { get; set; }
         public string RoleName { get; set; }
+        public bool RoleHasWriteAccess { get; set; }
 
         public int UserId { get; set; }
         public string UserName { get; set; }

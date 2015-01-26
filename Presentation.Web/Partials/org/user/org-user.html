@@ -46,10 +46,11 @@
                 </th>
                 <th>
                     <select data-ng-model="chosenModule" ng-change="getRightsForModule(chosenModule)">
-                        <option value="0">Organisation</option>
-                        <option value="1">IT Projekter</option>
-                        <option value="2">IT Systemer</option>
-                        <option value="3">IT Kontrakter</option>
+                        <option value="0">Vælg modul</option>
+                        <option value="1">Organisation</option>
+                        <option value="2">IT Projekter</option>
+                        <option value="3">IT Systemer</option>
+                        <option value="4">IT Kontrakter</option>
                     </select>
                 </th>
                 <th>
@@ -91,7 +92,7 @@
                                     {{right.objectName}}
                                 </td>
                                 <td>
-                                    {{right.roleName}} ({{right.hasWriteAccess && "S" || "L" }})
+                                    {{right.roleName}} ({{right.roleHasWriteAccess && "S" || "L" }})
                                 </td>
                             </tr>
                         </tbody>

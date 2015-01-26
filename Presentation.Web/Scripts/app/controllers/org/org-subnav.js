@@ -38,9 +38,11 @@
                         windowClass: 'modal fade in',
                         templateUrl: 'partials/org/user/org-createuser-modal.html',
                         controller: ['$scope', '$modalInstance', '$http', 'notify', 'autofocus', function ($modalScope, $modalInstance, $http, notify, autofocus) {
+
+                            $modalScope.checkAvailbleUrl = 'api/user';
+
                             autofocus();
                             $modalScope.busy = false;
-
                             $modalScope.create = function (sendMail) {
                                 $modalScope.busy = true;
                                 var newUser = {
@@ -49,7 +51,7 @@
                                     createdInId: user.currentOrganizationId
                                 };
                                 var params = sendMail ? { sendMailOnCreation: sendMail } : null; //set params if sendMail is true
-
+                                
                                 var msg = notify.addInfoMessage("Opretter bruger", false);
                                 $http.post("api/user", newUser, { handleBusy: true, params: params }).success(function (result, status) {
                                     var userResult = result.response;

@@ -179,6 +179,7 @@ namespace Presentation.Web.Controllers.API
                 var header = new ExpandoObject() as IDictionary<string, Object>;
                 header.Add("Status", "Status");
                 header.Add("Navn", "Navn");
+                header.Add("Email", "Email");
                 header.Add("Organisationsenhed", "Default org.enhed");
                 header.Add("Advis", "Advis");
                 header.Add("Oprettet", "Oprettet Af");
@@ -193,6 +194,7 @@ namespace Presentation.Web.Controllers.API
                     var obj = new ExpandoObject() as IDictionary<string, Object>;
                     obj.Add("Status", user.IsLocked ? "Låst" : "Ikke låst");
                     obj.Add("Navn", user.Name);
+                    obj.Add("Email", user.Email);
                     obj.Add("Organisationsenhed", user.DefaultOrganizationUnitName);
                     obj.Add("Advis", user.LastAdvisDate.HasValue ? user.LastAdvisDate.Value.ToString("dd-MM-yy") : "Ikke sendt");
                     obj.Add("Oprettet", user.ObjectOwnerName);
@@ -279,6 +281,24 @@ namespace Presentation.Web.Controllers.API
             return builder.ToString();
         } 
         #endregion
+
+        public HttpResponseMessage GetNameAvailable(string checkname, int orgId)
+        {
+            try
+            {
+                return IsAvailable(checkname, orgId) ? Ok() : Conflict("Name is already taken!");
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        private bool IsAvailable(string email, int orgId)
+        {
+            var users = Repository.Get(u => u.Email == email && u.CreatedInId == orgId);
+            return !users.Any();
+        }
     }
 
 }
