@@ -17,6 +17,8 @@ namespace Presentation.Web.Controllers.API
         protected readonly IGenericRepository<TRight> RightRepository;
         private readonly IGenericRepository<TObject> _objectRepository;
 
+
+
         protected GenericRightsController(IGenericRepository<TRight> rightRepository, IGenericRepository<TObject> objectRepository )
         {
             RightRepository = rightRepository;

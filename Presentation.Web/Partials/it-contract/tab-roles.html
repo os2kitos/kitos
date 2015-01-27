@@ -60,7 +60,7 @@
             <!-- show -->
             <tr data-ng-hide="right.edit">
                 <td>{{ right.role.name }}</td>
-                <td>{{ right.user.name }}</td>
+                <td>{{ right.user.name }} <span data-ng-show="right.user.isLocked">(Låst)</span></td>
                 <td>{{ right.user.email }}
                     <div data-ng-show="hasWriteAccess" class="pull-right">
                         <a data-ng-click="right.edit = true" class="btn btn-info btn-xs">

@@ -227,7 +227,7 @@
                         "userId": uIdNew
                     };
 
-                    $http.post("api/organizationUnitRights/" + oIdNew, data).success(function(result) {
+                    $http.post("api/organizationUnitRights/" + oIdNew + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
                         right.roleId = result.response.roleId;
                         right.user = result.response.user;
                         right.userId = result.response.userId;
