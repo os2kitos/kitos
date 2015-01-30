@@ -38,6 +38,7 @@ namespace Core.DomainModel
         public virtual Organization CreatedIn { get; set; }
         
         public int? DefaultOrganizationUnitId { get; set; }
+
         /// <summary>
         /// The organization unit that the user has selected as his default.
         /// </summary>

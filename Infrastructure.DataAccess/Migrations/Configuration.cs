@@ -123,7 +123,15 @@ namespace Infrastructure.DataAccess.Migrations
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
             };
-            context.AdminRoles.AddOrUpdate(x => x.Name, localAdmin);
+            var orgRole = new AdminRole
+            {
+                Name = "Medarbejder",
+                IsActive = true,
+                HasWriteAccess = false,
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
+            };
+            context.AdminRoles.AddOrUpdate(x => x.Name, localAdmin, orgRole);
             context.SaveChanges();
 
             #endregion
