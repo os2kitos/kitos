@@ -50,16 +50,13 @@
                         var validateAsync = _.debounce(function (viewValue) {
                             $http.get(attrs.uniqueEmail + '?checkname=' + viewValue + '&orgId=' + user.currentOrganizationId)
                                 .success(function () {
-
                                     scope.emailExists = false;
-
                                     ctrl.$setValidity('available', true);
                                     ctrl.$setValidity('lookup', true);
                                 })
                                 .error(function (data, status) {
                                     // conflict
                                     if (status == 409) {
-                                        //ctrl.$setValidity('available', false);
                                         scope.emailExists = true;
                                     } else {
                                         // something went wrong
