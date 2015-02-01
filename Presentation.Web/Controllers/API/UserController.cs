@@ -299,9 +299,18 @@ namespace Presentation.Web.Controllers.API
 
         private bool IsAvailable(string email, int orgId)
         {
-            var users = Repository.Get(u => u.Email == email && u.AdminRights.Count(r => r.ObjectId == orgId) != 0);
+            var users = Repository.Get(u => u.Email == email);
 
             return !users.Any();
+        }
+
+        public HttpResponseMessage GetUserExistsWithRole(string email, int orgId, bool? userExistsWithRole)
+        {
+            var users = Repository.Get(u => u.Email == email && u.AdminRights.Count(r => r.Role.Name == "Medarbejder") > 0);
+
+            if (users.Any()) return Ok();
+
+            return NotFound();
         }
     }
 

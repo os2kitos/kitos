@@ -8,7 +8,7 @@
                 Email-adresse
             </label>
             <div class="col-md-8">
-                <input type="email" name="email" data-ng-model="email" class="form-control" data-ng-required="true" data-unique-email="{{checkAvailbleUrl}}" autofocus data-ng-disabled="busy"/>
+                <input type="email" name="email" data-ng-model="email" class="form-control" data-ng-required="true" data-unique-org-user="{{checkAvailbleUrl}}" data-unique-email="{{checkAvailbleUrl}}" autofocus data-ng-disabled="busy" />
                 <span class="glyphicon form-control-feedback" data-ng-class="{ 'glyphicon-remove': createForm.name.$invalid && createForm.name.$dirty, 'glyphicon-ok': createForm.name.$valid }"></span>
             </div>
         </div>
@@ -48,13 +48,14 @@
             <p class="help-block col-md-offset-3" data-ng-hide="emailExists">
                 En ny bruger vil blive oprettet i systemet.
             </p>
-            <span class="help-block col-md-offset-3" data-ng-show="emailExists">Brugeren findes allerede.</span>
+            <span class="help-block col-md-offset-3" data-ng-show="emailExists && !userExists">Brugeren findes allerede.</span>
+            <span class="help-block col-md-offset-3" data-ng-show="userExists">Brugeren er allered tilknyttet.</span>
             <span class="help-block col-md-offset-3" data-ng-show="createUser.form.email.$error.lookup">Der skete en fejl ved tjek om E-Mail er i brug!</span>
         </div>
     </form>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-success" data-ng-show="emailExists" data-ng-click="create(false)">Tilknyt bruger</button>
+    <button class="btn btn-success" data-ng-show="emailExists" data-ng-disabled="userExists" data-ng-click="create(false)">Tilknyt bruger</button>
     <button class="btn btn-primary" data-ng-hide="emailExists" data-ng-click="create(false)" data-ng-disabled="createUser.form.$invalid || createUser.form.$pristine || busy" data-disabled-on-busy="">Opret bruger</button>
     <button class="btn btn-success" data-ng-hide="emailExists" data-ng-click="create(true)" data-ng-disabled="createUser.form.$invalid || createUser.form.$pristine || busy" data-disabled-on-busy="">Opret bruger og send advis</button>
     <button class="btn btn-warning" data-ng-click="cancel()" data-ng-disabled="busy" data-disabled-on-busy="">Annuller</button>
