@@ -116,8 +116,7 @@
 
                                         var data = {
                                             "name": name,
-                                            "email": email,
-                                            "createdInId": user.currentOrganizationId
+                                            "email": email
                                         };
 
                                         var msg = notify.addInfoMessage("Opretter bruger, sender email...", false);

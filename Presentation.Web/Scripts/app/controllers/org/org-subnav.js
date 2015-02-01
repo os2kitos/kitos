@@ -62,7 +62,6 @@
                                 var newUser = {
                                     name: $modalScope.name,
                                     email: $modalScope.email,
-                                    createdInId: user.currentOrganizationId,
                                     lastName: $modalScope.lastname,
                                     phoneNumber: $modalScope.phonenumber
                                 };
