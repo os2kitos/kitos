@@ -282,7 +282,7 @@ namespace Presentation.Web.Controllers.API
         } 
         #endregion
 
-        public HttpResponseMessage GetNameAvailable(string checkname, int orgId)
+        public HttpResponseMessage GetNameIsAvailable(string checkname, int orgId)
         {
             try
             {
