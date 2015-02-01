@@ -212,7 +212,7 @@ namespace Core.DomainModel.ItProject
         public override bool HasUserWriteAccess(User user, int organizationId)
         {
             // check that object belongs to the requwested organization context
-            if (OrganizationId != organizationId)
+            if (OrganizationId != organizationId && !user.IsGlobalAdmin)
                 return false;
             return base.HasUserWriteAccess(user, organizationId);
         }

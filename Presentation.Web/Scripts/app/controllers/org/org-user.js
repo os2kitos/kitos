@@ -121,6 +121,21 @@
                         });
                 }
 
+                //remove a users organizationRole - thereby removing their readaccess for this organization
+                $scope.deleteOrgRole = function (u) {
+                    var oId = u.adminRights[0].organizationId;
+                    var rId = u.adminRights[0].roleId;
+                    var uId = u.id;
+
+                    var msg = notify.addInfoMessage("Arbejder ...", false);
+                    $http.delete("api/adminrights/" + oId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
+                        msg.toSuccessMessage(u.name + " er ikke længere tilknyttet organisationen");
+                        reload();
+                    }).error(function (deleteResult) {
+                        msg.toErrorMessage("Kunne ikke fjerne " + user.adminRights.userName + " fra organisationen");
+                    });
+                };
+
                 $scope.getRightsForModule = function (chosenModule) {
                     //return a flat promise, that fullfills when all rights have been retrieved
                     return $q.all(_.map($scope.users, function (iteratee) {

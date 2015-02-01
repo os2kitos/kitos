@@ -7,9 +7,16 @@
             resolve: {
                 user: ['userService', function (userService) {
                     return userService.getUser();
-                }]
+                }],
+                organizationRoles: [
+                        '$http', function ($http) {
+                            return $http.get('api/adminrole').then(function (result) {
+                                return result.data.response;
+                            });
+                        }
+                ],
             },
-            controller: ['$rootScope', '$modal', '$state', 'user', function ($rootScope, $modal, $state, user) {
+            controller: ['$rootScope', '$modal', '$state', 'user', 'organizationRoles', function ($rootScope, $modal, $state, user, organizationRoles) {
                 $rootScope.page.title = 'Organisation';
 
                 var subnav = [];
@@ -31,6 +38,9 @@
                     $state.go('.', null, { reload: true });
                 }
 
+                var orgUserRole = _.find(organizationRoles, function (role) { return role.name == 'Medarbejder'; });
+
+
                 function createUser() {
                     var modal = $modal.open({
                         // fade in instead of slide from top, fixes strange cursor placement in IE
@@ -38,6 +48,10 @@
                         windowClass: 'modal fade in',
                         templateUrl: 'partials/org/user/org-createuser-modal.html',
                         controller: ['$scope', '$modalInstance', '$http', 'notify', 'autofocus', function ($modalScope, $modalInstance, $http, notify, autofocus) {
+                            if (!orgUserRole && !user.currentOrganizationId) {
+                                notify.addErrorMessage("Fejl! Kunne ikke oprette bruger.", true);
+                                return;
+                            }
 
                             $modalScope.checkAvailbleUrl = 'api/user';
 
@@ -50,16 +64,24 @@
                                     email: $modalScope.email,
                                     createdInId: user.currentOrganizationId
                                 };
-                                var params = sendMail ? { sendMailOnCreation: sendMail } : null; //set params if sendMail is true
+                                var params = sendMail ? { sendMailOnCreation: sendMail, organizationId: user.currentOrganizationId } : null; //set params if sendMail is true
                                 
                                 var msg = notify.addInfoMessage("Opretter bruger", false);
                                 $http.post("api/user", newUser, { handleBusy: true, params: params }).success(function (result, status) {
                                     var userResult = result.response;
-                                    if (status == 201) {
+                                    var oId = user.currentOrganizationId;
+
+                                    var data = {
+                                        userId: userResult.id,
+                                        roleId: orgUserRole.id,
+                                    };
+
+                                    $http.post("api/adminrights/" + oId + "?organizationId=" + oId, data, { handleBusy: true }).success(function (result) {
                                         msg.toSuccessMessage(userResult.name + " er oprettet i KITOS");
-                                    } else {
-                                        msg.toInfoMessage("En bruger med den email-adresse fandtes allerede i systemet.");
-                                    }
+                                        reload();
+                                    }).error(function() {
+                                        msg.toErrorMessage("Kunne ikke tilknytte " + user.name + ' til organisationen!');
+                                    });
 
                                     $modalInstance.close(userResult);
                                 }).error(function (result) {

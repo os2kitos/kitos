@@ -123,7 +123,15 @@ namespace Infrastructure.DataAccess.Migrations
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
             };
-            context.AdminRoles.AddOrUpdate(x => x.Name, localAdmin);
+            var orgRole = new AdminRole
+            {
+                Name = "Medarbejder",
+                IsActive = true,
+                HasWriteAccess = false,
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
+            };
+            context.AdminRoles.AddOrUpdate(x => x.Name, localAdmin, orgRole);
             context.SaveChanges();
 
             #endregion
@@ -529,7 +537,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             commonOrganization = context.Organizations.Single(x => x.Name == "Fælles Kommune");
 
-            SetUserCreatedOrganization(globalAdmin, commonOrganization);
+            //SetUserCreatedOrganization(globalAdmin, commonOrganization);
             //SetUserCreatedOrganization(user1, commonOrganization);
             //SetUserCreatedOrganization(user2, muni1);
             //SetUserCreatedOrganization(user3, muni2);
@@ -703,7 +711,6 @@ Kontakt: info@kitos.dk",
         /// <param name="organization"></param>
         private static void SetUserCreatedOrganization(User user, Organization organization)
         {
-            user.CreatedIn = organization;
             user.DefaultOrganizationUnit = organization.GetRoot();
         }
 

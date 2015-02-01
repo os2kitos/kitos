@@ -48,6 +48,7 @@ namespace Presentation.Web.Controllers.API
                 var sendMailOnCreation = false;
                 var sendReminder = false;
                 var sendAdvis = false;
+                int? orgId = null;
 
                 if (!string.IsNullOrWhiteSpace(Request.RequestUri.Query))
                     parameters = new List<string>(Request.RequestUri.Query.Replace("?", string.Empty).Split('&'));
@@ -67,6 +68,10 @@ namespace Presentation.Web.Controllers.API
                         {
                             sendAdvis = bool.Parse(parameter.Replace("sendAdvis=", string.Empty));
                         }
+                        if (parameter.StartsWith("organizationId="))
+                        {
+                            orgId = int.Parse(parameter.Replace("organizationId=", string.Empty));
+                        }
                     }
                 }
 
@@ -77,13 +82,13 @@ namespace Presentation.Web.Controllers.API
                 //if we are sending a reminder:
                 if (existingUser != null && sendReminder)
                 {
-                    _userService.IssueAdvisMail(existingUser, true);
+                    _userService.IssueAdvisMail(existingUser, true, orgId);
                     return Ok(Map(existingUser));
                 }
                 //if we are sending an advis:
                 if (existingUser != null && sendAdvis)
                 {
-                    _userService.IssueAdvisMail(existingUser, false);
+                    _userService.IssueAdvisMail(existingUser, false, orgId);
                     return Ok(Map(existingUser));
                 }
 
@@ -93,7 +98,7 @@ namespace Presentation.Web.Controllers.API
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
 
-                item = _userService.AddUser(item, sendMailOnCreation);
+                item = _userService.AddUser(item, sendMailOnCreation, orgId);
 
                 return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
             }
@@ -155,8 +160,8 @@ namespace Presentation.Web.Controllers.API
                         || u.Email.Contains(q));
 
                 //Get all users inside the organization
-                pagingModel.Where(u => u.CreatedInId == orgId);
-                
+                pagingModel.Where(u => u.AdminRights.Count(r => r.ObjectId == orgId) != 0 );
+
                 var users = Page(Repository.AsQueryable(), pagingModel);
 
                 return Ok(Map(users));
@@ -171,7 +176,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var users = Repository.Get(u => u.CreatedInId == orgId);
+                var users = Repository.Get(u => u.AdminRights.Count(r => r.ObjectId == orgId) != 0);
 
                 var dtos = Map(users);
 
@@ -296,7 +301,8 @@ namespace Presentation.Web.Controllers.API
 
         private bool IsAvailable(string email, int orgId)
         {
-            var users = Repository.Get(u => u.Email == email && u.CreatedInId == orgId);
+            var users = Repository.Get(u => u.Email == email && u.AdminRights.Count(r => r.ObjectId == orgId) != 0);
+
             return !users.Any();
         }
     }

@@ -38,7 +38,7 @@ namespace Core.ApplicationServices
             _cryptoService = cryptoService;
         }
 
-        public User AddUser(User user, bool sendMailOnCreation)
+        public User AddUser(User user, bool sendMailOnCreation, int? orgId)
         {
             // hash his salt and default password
             user.Salt = _cryptoService.Encrypt(DateTime.Now + " spices");
@@ -49,26 +49,24 @@ namespace Core.ApplicationServices
 #endif
             // user isn't an EF proxy class so navigation properites aren't set,
             // so we need to fetch org name ourself
-            var org = _orgRepository.GetByKey(user.CreatedInId);
-
-            user.DefaultOrganizationUnitId = org.GetRoot().Id;
+            user.DefaultOrganizationUnitId = orgId;
 
             _userRepository.Insert(user);
             _userRepository.Save();
             var savedUser = _userRepository.Get(u => u.Id == user.Id).FirstOrDefault();
 
-            if (sendMailOnCreation)
-                IssueAdvisMail(savedUser, false);
+            if (sendMailOnCreation && orgId != null)
+                IssueAdvisMail(savedUser, false, (int)orgId);
 
             return savedUser;
         }
 
-        public void IssueAdvisMail(User user, bool reminder)
+        public void IssueAdvisMail(User user, bool reminder, int? orgId)
         {
             if (user == null || _userRepository.GetByKey(user.Id) == null)
                 throw new ArgumentNullException("user");
-
-            var org = _orgRepository.GetByKey(user.CreatedInId);
+        
+            var org = _orgRepository.GetByKey(orgId);
 
             var reset = GenerateResetRequest(user);
             var resetLink = _baseUrl + "#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);

@@ -6,9 +6,8 @@
 </div>
 
 <div class="panel panel-default">
-    
     <div class="panel-heading">
-        
+
         <h3 class="panel-title">
             <i class="glyphicon glyphicon-user"></i> {{ currentUser.currentOrganizationName}}
         </h3>
@@ -17,10 +16,6 @@
     <table class="table table-condensed table-striped table-fixed">
         <thead>
             <tr>
-                <th>
-                    Status
-                    <button data-order-by="'IsLocked'" data-paging="pagination"></button>
-                </th>
                 <th>
                     Navn
                     <button data-order-by="'Name'" data-paging="pagination"></button>
@@ -56,17 +51,13 @@
                 <th>
                     Rolle
                 </th>
+                <th>
+                    <!-- Control -->
+                </th>
             </tr>
         </thead>
-
         <tbody>
             <tr data-ng-repeat="user in users">
-                <td>
-                    <button type="button" class="btn btn-link btn-xs" data-ng-click="toggleStatus(user)" data-ng-disabled="!user.canBeEdited">
-                        <span data-ng-if="user.isLocked" class="glyphicon glyphicon-lock text-warning"></span>
-                        <span data-ng-if="!user.isLocked" class="glyphicon glyphicon-ok text-success"></span>
-                    </button>
-                </td>
                 <td>{{user.name}}</td>
                 <td>{{user.email}} </td>
                 <td>
@@ -97,6 +88,11 @@
                             </tr>
                         </tbody>
                     </table>
+                </td>
+                <td>
+                    <button class="btn btn-link btn-xs" data-ng-click="deleteOrgRole(user)" data-ng-disabled="!user.canBeEdited">
+                        Fjern tilknytning
+                    </button>
                 </td>
             </tr>
         </tbody>
