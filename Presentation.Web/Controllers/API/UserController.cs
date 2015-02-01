@@ -182,7 +182,6 @@ namespace Presentation.Web.Controllers.API
 
                 var list = new List<dynamic>();
                 var header = new ExpandoObject() as IDictionary<string, Object>;
-                header.Add("Status", "Status");
                 header.Add("Navn", "Navn");
                 header.Add("Email", "Email");
                 header.Add("Organisationsenhed", "Default org.enhed");
@@ -197,7 +196,6 @@ namespace Presentation.Web.Controllers.API
                 foreach (var user in dtos)
                 {
                     var obj = new ExpandoObject() as IDictionary<string, Object>;
-                    obj.Add("Status", user.IsLocked ? "Låst" : "Ikke låst");
                     obj.Add("Navn", user.Name);
                     obj.Add("Email", user.Email);
                     obj.Add("Organisationsenhed", user.DefaultOrganizationUnitName);
