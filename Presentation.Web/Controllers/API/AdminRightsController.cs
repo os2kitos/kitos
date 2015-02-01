@@ -41,8 +41,9 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var rId = RightRepository.Get().SingleOrDefault(r => r.ObjectId == orgId && r.UserId == uId);
-                RightRepository.DeleteByKey(rId);
+                var rId = RightRepository.Get().Where(r => r.ObjectId == orgId && r.UserId == uId);
+                
+                if(rId.Any()) RightRepository.DeleteByKey(rId);
 
                 return Ok();
             }

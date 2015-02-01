@@ -36,13 +36,6 @@ namespace Presentation.Web.Controllers.API
             {
                 var orgUnits = Repository.Get(x => x.Rights.Any(y => y.UserId == KitosUser.Id)).ToList();
 
-                //if (KitosUser.CreatedIn != null)
-                //{
-                //    var rootOrgUnit = KitosUser.CreatedIn.GetRoot();
-
-                //    orgUnits.Add(rootOrgUnit);
-                //}
-
                 orgUnits = orgUnits.Distinct().ToList();
 
                 return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitSimpleDTO>>(orgUnits));

@@ -709,11 +709,11 @@ Kontakt: info@kitos.dk",
         /// </summary>
         /// <param name="user"></param>
         /// <param name="organization"></param>
-        //private static void SetUserCreatedOrganization(User user, Organization organization)
-        //{
-        //    user.CreatedIn = organization;
-        //    user.DefaultOrganizationUnit = organization.GetRoot();
-        //}
+        private static void SetUserCreatedOrganization(User user, Organization organization)
+        {
+            user.CreatedIn = organization;
+            user.DefaultOrganizationUnit = organization.GetRoot();
+        }
 
         #endregion
     }
