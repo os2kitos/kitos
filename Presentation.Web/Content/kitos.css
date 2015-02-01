@@ -660,3 +660,8 @@ div.searchbox-wrapper {
     font-size: 12px;
     line-height: 1.3;
 }
+
+/* Textarea resize */
+.resize-vertical {
+    resize: vertical;
+}

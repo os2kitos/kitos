@@ -48,7 +48,6 @@
                         windowClass: 'modal fade in',
                         templateUrl: 'partials/org/user/org-createuser-modal.html',
                         controller: ['$scope', '$modalInstance', '$http', 'notify', 'autofocus', function ($modalScope, $modalInstance, $http, notify, autofocus) {
-
                             if (!orgUserRole && !user.currentOrganizationId) {
                                 notify.addErrorMessage("Fejl! Kunne ikke oprette bruger.", true);
                                 return;
@@ -65,7 +64,7 @@
                                     email: $modalScope.email,
                                     createdInId: user.currentOrganizationId
                                 };
-                                var params = sendMail ? { sendMailOnCreation: sendMail } : null; //set params if sendMail is true
+                                var params = sendMail ? { sendMailOnCreation: sendMail, organizationId: user.currentOrganizationId } : null; //set params if sendMail is true
                                 
                                 var msg = notify.addInfoMessage("Opretter bruger", false);
                                 $http.post("api/user", newUser, { handleBusy: true, params: params }).success(function (result, status) {
@@ -78,7 +77,7 @@
                                     };
 
                                     $http.post("api/adminrights/" + oId + "?organizationId=" + oId, data, { handleBusy: true }).success(function (result) {
-                                        msg.toSuccessMessage(user.name + " er oprettet i KITOS");
+                                        msg.toSuccessMessage(userResult.name + " er oprettet i KITOS");
                                         reload();
                                     }).error(function() {
                                         msg.toErrorMessage("Kunne ikke tilknytte " + user.name + ' til organisationen!');

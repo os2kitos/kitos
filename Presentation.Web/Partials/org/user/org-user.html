@@ -17,10 +17,10 @@
     <table class="table table-condensed table-striped table-fixed">
         <thead>
             <tr>
-                <th>
+                <!--<th>
                     Status
                     <button data-order-by="'IsLocked'" data-paging="pagination"></button>
-                </th>
+                </th>-->
                 <th>
                     Navn
                     <button data-order-by="'Name'" data-paging="pagination"></button>
@@ -56,20 +56,20 @@
                 <th>
                     Rolle
                 </th>
+                <th>
+                    
+                </th>
             </tr>
         </thead>
 
         <tbody>
             <tr data-ng-repeat="user in users">
-                <td>
-                    <button class="btn btn-link btn-xs" data-ng-click="deleteOrgRole(user)" data-ng-disabled="!user.canBeEdited">
-                        REMOVE
-                    </button>
+                <!--<td>
                     <button type="button" class="btn btn-link btn-xs" data-ng-click="toggleStatus(user)" data-ng-disabled="!user.canBeEdited">
                         <span data-ng-if="user.isLocked" class="glyphicon glyphicon-lock text-warning"></span>
                         <span data-ng-if="!user.isLocked" class="glyphicon glyphicon-ok text-success"></span>
                     </button>
-                </td>
+                </td>-->
                 <td>{{user.name}}</td>
                 <td>{{user.email}} </td>
                 <td>
@@ -90,16 +90,21 @@
                 <td colspan="2">
                     <table data-ng-if="user.rights" class="full-width table table-condensed table-striped table-no-margin">
                         <tbody>
-                            <tr data-ng-repeat="right in user.rights">
-                                <td>
-                                    {{right.objectName}}
-                                </td>
-                                <td>
-                                    {{right.roleName}} ({{right.roleHasWriteAccess && "S" || "L" }})
-                                </td>
-                            </tr>
+                        <tr data-ng-repeat="right in user.rights">
+                            <td>
+                                {{right.objectName}}
+                            </td>
+                            <td>
+                                {{right.roleName}} ({{right.roleHasWriteAccess && "S" || "L" }})
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
+                </td>
+                <td>
+                    <button class="btn btn-link btn-xs" data-ng-click="deleteOrgRole(user)" data-ng-disabled="!user.canBeEdited">
+                        Fjern tilknytning
+                    </button>
                 </td>
             </tr>
         </tbody>

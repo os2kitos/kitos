@@ -537,7 +537,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             commonOrganization = context.Organizations.Single(x => x.Name == "Fælles Kommune");
 
-            SetUserCreatedOrganization(globalAdmin, commonOrganization);
+            //SetUserCreatedOrganization(globalAdmin, commonOrganization);
             //SetUserCreatedOrganization(user1, commonOrganization);
             //SetUserCreatedOrganization(user2, muni1);
             //SetUserCreatedOrganization(user3, muni2);
@@ -709,11 +709,11 @@ Kontakt: info@kitos.dk",
         /// </summary>
         /// <param name="user"></param>
         /// <param name="organization"></param>
-        private static void SetUserCreatedOrganization(User user, Organization organization)
-        {
-            user.CreatedIn = organization;
-            user.DefaultOrganizationUnit = organization.GetRoot();
-        }
+        //private static void SetUserCreatedOrganization(User user, Organization organization)
+        //{
+        //    user.CreatedIn = organization;
+        //    user.DefaultOrganizationUnit = organization.GetRoot();
+        //}
 
         #endregion
     }

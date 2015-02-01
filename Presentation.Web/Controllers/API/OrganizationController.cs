@@ -142,7 +142,11 @@ namespace Presentation.Web.Controllers.API
                 //              .Select(z => z.User)
                 //              .Where(u => u.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1 || u.Email.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
 
-                var qry = _useRepository.Get(x => x.CreatedInId == id && (x.Name.Contains(q) || x.Email.Contains(q)));
+                //var qry = _useRepository.Get(x => x.CreatedInId == id && (x.Name.Contains(q) || x.Email.Contains(q)));
+                var qry =
+                    _useRepository.Get(
+                        u =>
+                            u.AdminRights.Count(r => r.ObjectId == id) != 0 && u.Name.Contains(q) || u.Email.Contains(q));
 
                 return Ok(Map<IEnumerable<User>, IEnumerable<UserDTO>>(qry));
             }
