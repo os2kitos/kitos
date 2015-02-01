@@ -11,9 +11,6 @@
                 <input type="email" name="email" data-ng-model="email" class="form-control" data-ng-required="true" data-unique-email="{{checkAvailbleUrl}}" autofocus data-ng-disabled="busy"/>
                 <span class="glyphicon form-control-feedback" data-ng-class="{ 'glyphicon-remove': createForm.name.$invalid && createForm.name.$dirty, 'glyphicon-ok': createForm.name.$valid }"></span>
             </div>
-            <div data-ng-show="userExists">
-                <p>someValue er sat!</p>
-            </div>
         </div>
         <div class="form-group" data-ng-hide="emailExists">
             <label for="repeatEmail" class="col-md-3 control-label">
