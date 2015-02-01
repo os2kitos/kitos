@@ -54,6 +54,7 @@
                             }
 
                             $modalScope.checkAvailbleUrl = 'api/user';
+                            $modalScope.checkOrgUserUrl = 'api/user';
 
                             autofocus();
                             $modalScope.busy = false;
