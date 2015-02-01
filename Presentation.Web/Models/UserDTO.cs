@@ -18,7 +18,6 @@ namespace Presentation.Web.Models
         public bool IsGlobalAdmin { get; set; }
         public List<AdminRightDTO> AdminRights { get; set; }
         public string ObjectOwnerName { get; set; }
-        public bool IsLocked { get; set; }
         [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime? LastAdvisDate { get; set; }
 
