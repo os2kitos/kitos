@@ -88,7 +88,7 @@
                     setTimeout(function () {
                         if (showNotify)
                             deferred.notify('Ændrer...');
-                        $http({ method: 'PATCH', url: "api/user/" + userToUpdate.id, data: userToUpdate, handleBusy: true })
+                        $http({ method: 'PATCH', url: "api/user/" + userToUpdate.id + "?organizationId=" + user.currentOrganizationId, data: userToUpdate, handleBusy: true })
                             .success(function (result) {
                                 deferred.resolve(successmessage);
                             })
@@ -130,20 +130,24 @@
                             var httpUrl = 'api/';
 
                             switch (chosenModule) {
-                                //Organisation selected
+                                //Choose Modul selected
                                 case '0':
+                                    iteratee.rights = '';
+                                    return deferred.resolve();
+                                //Organisation selected
+                                case '1':
                                     httpUrl += 'organizationunitrights?orgId=' + user.currentOrganizationId;
                                     break;
-                                    //ITProjects selected
-                                case '1':
+                                //ITProjects selected
+                                case '2':
                                     httpUrl += 'itprojectrights?';
                                     break;
-                                    //ITSystems selected
-                                case '2':
+                                //ITSystems selected
+                                case '3':
                                     httpUrl += 'itsystemusagerights?';
                                     break;
-                                    //ITContracts selected
-                                case '3':
+                                //ITContracts selected
+                                case '4':
                                     httpUrl += 'itcontractrights?';
                                     break;
                             }
