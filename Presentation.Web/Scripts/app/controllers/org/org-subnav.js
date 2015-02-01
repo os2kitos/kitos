@@ -62,7 +62,8 @@
                                 var newUser = {
                                     name: $modalScope.name,
                                     email: $modalScope.email,
-                                    createdInId: user.currentOrganizationId
+                                    lastName: $modalScope.lastName,
+                                    phoneNumber: $modalScope.phoneNumber
                                 };
                                 var params = sendMail ? { sendMailOnCreation: sendMail, organizationId: user.currentOrganizationId } : null; //set params if sendMail is true
                                 

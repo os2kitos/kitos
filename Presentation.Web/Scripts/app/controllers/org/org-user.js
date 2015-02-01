@@ -195,10 +195,14 @@
                                 $modalScope.name = userToEdit.name;
                                 $modalScope.email = userToEdit.email;
                                 $modalScope.repeatEmail = userToEdit.email;
+                                $modalScope.lastName = userToEdit.lastName;
+                                $modalScope.phoneNumber = userToEdit.phoneNumber;
                                 $modalScope.ok = function () {
                                     $modalScope.busy = true;
                                     userToEdit.name = $modalScope.name;
                                     userToEdit.email = $modalScope.email;
+                                    userToEdit.lastName = $modalScope.lastName;
+                                    userToEdit.phoneNumber = $modalScope.phoneNumber;
                                     var msg = notify.addInfoMessage("Ændrer");
                                     updateUser(userToEdit, userToEdit.name + " er ændret.", true).then(
                                         //success
