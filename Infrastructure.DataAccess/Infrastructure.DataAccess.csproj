@@ -168,6 +168,10 @@
     <Compile Include="Migrations\201411181232099_Xauth.Designer.cs">
       <DependentUpon>201411181232099_Xauth.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201501081324371_InfUsageIndex.cs" />
+    <Compile Include="Migrations\201501081324371_InfUsageIndex.Designer.cs">
+      <DependentUpon>201501081324371_InfUsageIndex.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\201501121147229_UserAddIsLocked.cs" />
     <Compile Include="Migrations\201501121147229_UserAddIsLocked.Designer.cs">
       <DependentUpon>201501121147229_UserAddIsLocked.cs</DependentUpon>
@@ -224,6 +228,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201411181232099_Xauth.resx">
       <DependentUpon>201411181232099_Xauth.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201501081324371_InfUsageIndex.resx">
+      <DependentUpon>201501081324371_InfUsageIndex.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201501121147229_UserAddIsLocked.resx">
       <DependentUpon>201501121147229_UserAddIsLocked.cs</DependentUpon>
