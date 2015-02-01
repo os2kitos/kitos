@@ -160,12 +160,9 @@ namespace Presentation.Web.Controllers.API
                         || u.Email.Contains(q));
 
                 //Get all users inside the organization
-                //pagingModel.Where(u => u.CreatedInId == orgId);
-
                 pagingModel.Where(u => u.AdminRights.Count(r => r.ObjectId == orgId) != 0 );
 
                 var users = Page(Repository.AsQueryable(), pagingModel);
-
 
                 return Ok(Map(users));
             }
@@ -179,7 +176,6 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                //var users = Repository.Get(u => u.CreatedInId == orgId);
                 var users = Repository.Get(u => u.AdminRights.Count(r => r.ObjectId == orgId) != 0);
 
                 var dtos = Map(users);

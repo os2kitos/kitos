@@ -711,7 +711,6 @@ Kontakt: info@kitos.dk",
         /// <param name="organization"></param>
         private static void SetUserCreatedOrganization(User user, Organization organization)
         {
-            user.CreatedIn = organization;
             user.DefaultOrganizationUnit = organization.GetRoot();
         }
 

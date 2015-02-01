@@ -49,9 +49,6 @@ namespace Core.ApplicationServices
 #endif
             // user isn't an EF proxy class so navigation properites aren't set,
             // so we need to fetch org name ourself
-
-            //var org = _orgRepository.GetByKey(user.CreatedInId);
-
             user.DefaultOrganizationUnitId = orgId;
 
             _userRepository.Insert(user);
