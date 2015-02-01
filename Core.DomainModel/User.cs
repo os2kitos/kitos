@@ -26,12 +26,13 @@ namespace Core.DomainModel
         }
 
         public string Name { get; set; }
+        public string LastName { get; set; }
+        public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
         public string Salt { get; set; }
         public bool IsGlobalAdmin { get; set; }
         public Guid? Uuid { get; set; }
-        public bool IsLocked { get; set; }
         public DateTime? LastAdvisDate { get; set; }        
         public int? DefaultOrganizationUnitId { get; set; }
 

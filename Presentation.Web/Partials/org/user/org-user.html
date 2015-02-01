@@ -58,7 +58,7 @@
         </thead>
         <tbody>
             <tr data-ng-repeat="user in users">
-                <td>{{user.name}}</td>
+                <td>{{user.name}} {{user.lastName}}</td>
                 <td>{{user.email}} </td>
                 <td>
                     <button type="button" class="btn btn-info btn-xs" data-ng-click="editUser(user)" data-ng-disabled="!user.canBeEdited">
