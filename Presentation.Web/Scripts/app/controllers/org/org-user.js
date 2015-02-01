@@ -130,23 +130,23 @@
                             var httpUrl = 'api/';
 
                             switch (chosenModule) {
-                                    //Choose Modul selected
+                                //Choose Modul selected
                                 case '0':
                                     iteratee.rights = '';
                                     return deferred.resolve();
-                                    //Organisation selected
+                                //Organisation selected
                                 case '1':
                                     httpUrl += 'organizationunitrights?orgId=' + user.currentOrganizationId;
                                     break;
-                                    //ITProjects selected
+                                //ITProjects selected
                                 case '2':
                                     httpUrl += 'itprojectrights?';
                                     break;
-                                    //ITSystems selected
+                                //ITSystems selected
                                 case '3':
                                     httpUrl += 'itsystemusagerights?';
                                     break;
-                                    //ITContracts selected
+                                //ITContracts selected
                                 case '4':
                                     httpUrl += 'itcontractrights?';
                                     break;
