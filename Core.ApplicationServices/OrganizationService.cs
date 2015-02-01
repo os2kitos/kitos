@@ -27,8 +27,6 @@ namespace Core.ApplicationServices
                 .Get(x => x.UserId == user.Id)
                 .Select(x => x.Object.Organization).ToList();
 
-            //if(user.CreatedIn != null) orgs.Add(user.CreatedIn);
-
             orgs.AddRange(_admRightRepository.Get(x => x.UserId == user.Id).Select(x => x.Object));
 
             orgs = orgs.Distinct().ToList();
