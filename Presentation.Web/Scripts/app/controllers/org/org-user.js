@@ -234,13 +234,16 @@
                 $scope.sendAdvis = function (userToAdvis, reminder) {
                     var params = {};
                     var type;
+                    
                     if (reminder) {
                         params.sendReminder = true;
                         type = "påmindelse";
+                        
                     } else {
                         params.sendAdvis = true;
                         type = "advis";
                     }
+                    params.organizationId = user.currentOrganizationId;
 
                     var msg = notify.addInfoMessage("Sender " + type + " til " + userToAdvis.email, false);
                     $http.post("api/user", userToAdvis, { handleBusy: true, params: params })
