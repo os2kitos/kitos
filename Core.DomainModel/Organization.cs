@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -37,7 +38,7 @@ namespace Core.DomainModel
         /// </remarks>
         public string Cvr { get; set; }
         public AccessModifier AccessModifier { get; set; }
-        
+        public Guid? Uuid { get; set; }
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
 
         /// <summary>
