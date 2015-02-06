@@ -26,7 +26,23 @@
                 Navn
             </label>
             <div class="col-md-8">
-                <input type="text" id="username" data-ng-model="user.name" class="form-control" data-ng-blur="patch('name', user.name)" />
+                <input type="text" id="username" data-ng-model="user.name" class="form-control" data-ng-blur="patch('name', user.name)"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="lastname" class="col-md-3 control-label">
+                Navn
+            </label>
+            <div class="col-md-8">
+                <input type="text" id="lastname" data-ng-model="user.lastName" class="form-control" data-ng-blur="patch('lastName', user.lastName)"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="phone" class="col-md-3 control-label">
+                Telefon
+            </label>
+            <div class="col-md-8">
+                <input type="text" id="phone" data-ng-model="user.phoneNumber" class="form-control" data-ng-blur="patch('phoneNumber', user.phoneNumber)" />
             </div>
         </div>
         <div class="form-group">

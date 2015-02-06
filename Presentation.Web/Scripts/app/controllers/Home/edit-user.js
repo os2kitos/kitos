@@ -30,7 +30,9 @@
             function init(user) {
                 $scope.user = {
                     name: user.name,
+                    lastName: user.lastName,
                     email: user.email,
+                    phoneNumber: user.phoneNumber,
                     defaultOrganizationUnitId: user.defaultOrganizationUnitId,
                     isUsingDefaultOrgUnit: user.isUsingDefaultOrgUnit,
                     currentOrganizationName: user.currentOrganizationName,
