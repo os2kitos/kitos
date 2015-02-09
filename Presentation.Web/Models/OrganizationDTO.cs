@@ -16,5 +16,6 @@ namespace Presentation.Web.Models
         public OrgUnitSimpleDTO Root { get; set; }
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }
+        public Guid? Uuid { get; set; }
     }
 }
