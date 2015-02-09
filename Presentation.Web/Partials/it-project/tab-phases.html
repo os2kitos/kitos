@@ -40,11 +40,11 @@
                                         data-datepicker-popup="dd-MM-yyyy"
                                         data-is-open="opened['pd' + $index]"
                                         data-date-to-string
-                                        data-is-disabled="!hasWriteAccess"
+                                        data-ng-disabled="!hasWriteAccess"
                                         data-ng-model="phase.startDate"
                                         data-ng-change="updatePhaseDate(phase)">
                                     <span class="input-group-btn">
-                                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'pd' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'pd' + $index)" data-ng-disabled="!hasWriteAccess"><i class="glyphicon glyphicon-calendar"></i></button>
                                     </span>
                                 </div>
                             </span>

@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.2-31219")]
-    public sealed partial class AddedOrgUUID : IMigrationMetadata
+    public sealed partial class AddedItProjectPhaseNavigationProp : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedOrgUUID));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedItProjectPhaseNavigationProp));
         
         string IMigrationMetadata.Id
         {
-            get { return "201502060918090_AddedOrgUUID"; }
+            get { return "201502091439436_AddedItProjectPhaseNavigationProp"; }
         }
         
         string IMigrationMetadata.Source

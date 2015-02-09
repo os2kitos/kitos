@@ -25,5 +25,8 @@ namespace Core.DomainModel.ItProject
         /// The phase end date.
         /// </value>
         public DateTime? EndDate { get; set; }
+        public virtual ItProject ItProject { get; set; }
+        public int ItProjectId { get; set; }
+
     }
 }
