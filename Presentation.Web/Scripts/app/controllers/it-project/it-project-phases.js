@@ -56,10 +56,10 @@
 
             $scope.updatePhaseDate = function (phase) {
                 //Update start date of the current phase
-                patch(phase.updateUrl, "startDate", phase.startDate)
+                patch(phase.updateUrl + "?organizationId=" + user.currentOrganizationId, "startDate", phase.startDate)
                     .success(function (result) {
                         //Also update end date of the previous phase
-                        patch(phase.prevPhase.updateUrl, "endDate", phase.startDate).success(function () {
+                        patch(phase.prevPhase.updateUrl + "?organizationId=" + user.currentOrganizationId, "endDate", phase.startDate).success(function () {
                             notify.addSuccessMessage("Feltet er opdateret");
                         }).error(function () {
                             notify.addErrorMessage("Fejl!");
