@@ -15,7 +15,6 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json.Linq;
-using Ninject.Infrastructure.Language;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
@@ -152,7 +151,7 @@ namespace Presentation.Web.Controllers.API
 
                 if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
 
-                var projects = Page(Repository.AsQueryable(), pagingModel).ToEnumerable();
+                var projects = Page(Repository.AsQueryable(), pagingModel);
 
                 var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectOverviewDTO>>(projects);
 

@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201502060918090_AddedOrgUUID"; }
+            get { return "201502091610206_AddedOrgUUID"; }
         }
         
         string IMigrationMetadata.Source
