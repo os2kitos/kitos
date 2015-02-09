@@ -188,6 +188,10 @@
     <Compile Include="Migrations\201502011747173_AddedUserLastNameAndPhoneNumber.Designer.cs">
       <DependentUpon>201502011747173_AddedUserLastNameAndPhoneNumber.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201502060918090_AddedOrgUUID.cs" />
+    <Compile Include="Migrations\201502060918090_AddedOrgUUID.Designer.cs">
+      <DependentUpon>201502060918090_AddedOrgUUID.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\201502091439436_AddedItProjectPhaseNavigationProp.cs" />
     <Compile Include="Migrations\201502091439436_AddedItProjectPhaseNavigationProp.Designer.cs">
       <DependentUpon>201502091439436_AddedItProjectPhaseNavigationProp.cs</DependentUpon>
@@ -247,9 +251,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201502011747173_AddedUserLastNameAndPhoneNumber.resx">
       <DependentUpon>201502011747173_AddedUserLastNameAndPhoneNumber.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201502091439436_AddedItProjectPhaseNavigationProp.resx">
-      <DependentUpon>201502091439436_AddedItProjectPhaseNavigationProp.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
