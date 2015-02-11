@@ -16,17 +16,21 @@
 
             //the current org unit is the default org unit for this organization if the user has selected one
             //otherwise it's the root of this organization
-            var currentOrgUnitId = user.defaultOrganizationUnitId;
-            var currentOrgUnitName = user.defaultOrganizationUnitName;
-            var isUsingDefaultOrgUnit = true;
-            
-            if (response.defaultOrganizationUnitOrganizationId != currOrg.id) {
+            var currentOrgUnitId;
+            var currentOrgUnitName;
+            var isUsingDefaultOrgUnit;
+
+            if (defaultOrgUnitId == null) {
                 currentOrgUnitId = currOrg.root.id;
                 currentOrgUnitName = currOrg.root.name;
 
                 isUsingDefaultOrgUnit = false;
-            }
+            } else {
+                currentOrgUnitId = defaultOrgUnit.id;
+                currentOrgUnitName = defaultOrgUnit.name;
 
+                isUsingDefaultOrgUnit = true;
+            }
 
             _user = {
                 isAuth: true,
@@ -253,10 +257,14 @@
                         return orgAndUnit.organization;
                     });
 
+                    $modalScope.orgChooser = {
+                        selectedId : null
+                    };
+
                     $modalScope.ok = function () {
 
                         var selectedOrgAndUnit = _.find(orgsAndDefaultUnits, function(orgAndUnit) {
-                            return orgAndUnit.organization.id == storedOrgId;
+                            return orgAndUnit.organization.id == $modalScope.orgChooser.selectedId;
                         });
 
                         $modalInstance.close(selectedOrgAndUnit);

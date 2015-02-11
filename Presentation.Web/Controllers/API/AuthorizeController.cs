@@ -33,7 +33,7 @@ namespace Presentation.Web.Controllers.API
             {
                 Organization = AutoMapper.Mapper.Map<Organization, OrganizationDTO>(x.Key),
                 DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(x.Value)
-            });
+            }).ToList();
 
             return new LoginResponseDTO()
             {
