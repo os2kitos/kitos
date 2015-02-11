@@ -30,11 +30,11 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         /// <param name="byUser">Routing qualifier</param>
         /// <returns></returns>
-        public HttpResponseMessage GetByUser(bool? byUser)
+        public HttpResponseMessage GetByUser(bool? byUser, int organizationId)
         {
             try
             {
-                var orgUnits = Repository.Get(x => x.Rights.Any(y => y.UserId == KitosUser.Id)).ToList();
+                var orgUnits = Repository.Get(x => x.Rights.Any(y => y.UserId == KitosUser.Id) && x.OrganizationId == organizationId).ToList();
 
                 orgUnits = orgUnits.Distinct().ToList();
 
