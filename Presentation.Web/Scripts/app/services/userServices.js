@@ -5,16 +5,19 @@
     app.factory('userService', ['$http', '$q', '$rootScope', '$modal', function ($http, $q, $rootScope, $modal) {
         
         //formats and saves the user
-        function saveUser(response, currOrg) {
-            var isLocalAdmin = _.some(response.adminRights, function(userRight) {
+        function saveUser(user, orgAndDefaultUnit) {
+            var currOrg = orgAndDefaultUnit.organization;
+            var defaultOrgUnit = orgAndDefaultUnit.defaultOrgUnit;
+            var defaultOrgUnitId = defaultOrgUnit == null ? null : defaultOrgUnit.id;
+
+            var isLocalAdmin = _.some(user.adminRights, function(userRight) {
                 return userRight.roleName == "LocalAdmin" && userRight.organizationId == currOrg.id;
             });
 
-            //the current org unit is either:
-            //a) the user selected default org unit (persisted in db) iff it belongs to the currently selected organization context 
-            //b) the root of the currently selected organization context otherwise
-            var currentOrgUnitId = response.defaultOrganizationUnitId;
-            var currentOrgUnitName = response.defaultOrganizationUnitName;
+            //the current org unit is the default org unit for this organization if the user has selected one
+            //otherwise it's the root of this organization
+            var currentOrgUnitId = user.defaultOrganizationUnitId;
+            var currentOrgUnitName = user.defaultOrganizationUnitName;
             var isUsingDefaultOrgUnit = true;
             
             if (response.defaultOrganizationUnitOrganizationId != currOrg.id) {
@@ -24,21 +27,23 @@
                 isUsingDefaultOrgUnit = false;
             }
 
+
             _user = {
                 isAuth: true,
-                id: response.id,
-                name: response.name,
-                lastName: response.lastName,
-                email: response.email,
-                phoneNumber: response.phoneNumber,
-                
-                isGlobalAdmin: response.isGlobalAdmin,
+                id: user.id,
+                name: user.name,
+                lastName: user.lastName,
+                email: user.email,
+                phoneNumber: user.phoneNumber,
+
+                isGlobalAdmin: user.isGlobalAdmin,
                 isLocalAdmin: isLocalAdmin,
-                
+
                 currentOrganizationUnitId: currentOrgUnitId,
                 currentOrganizationUnitName: currentOrgUnitName,
-                defaultOrganizationUnitId: response.defaultOrganizationUnitId,
                 isUsingDefaultOrgUnit: isUsingDefaultOrgUnit,
+
+                defaultOrganizationUnitId: defaultOrgUnitId,
                 
                 currentOrganization: currOrg,
                 currentOrganizationId: currOrg.id,
@@ -96,8 +101,11 @@
 
                 httpDeferred.success(function (result) {
 
-                    resolveOrganization().then(function(currOrg) {
-                        saveUser(result.response, currOrg);
+                    var user = result.response.user;
+                    var orgsAndDefaultUnits = result.response.organizations;
+
+                    resolveOrganization2(orgsAndDefaultUnits).then(function (orgAndDefaultUnit) {
+                        saveUser(user, orgAndDefaultUnit);
                         loadUserDeferred.resolve(_user);
 
                     }, function() {
