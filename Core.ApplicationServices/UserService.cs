@@ -82,6 +82,8 @@ namespace Core.ApplicationServices
                           "<p><a href='" + _baseUrl +
                           "docs/Vejledning%20til%20slutbrugeren.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>";
 
+            subject = subject.Replace('\r', ' ').Replace('\n', ' ');
+
             IssuePasswordReset(user, subject, content);
 
             user.LastAdvisDate = DateTime.Now.Date;
