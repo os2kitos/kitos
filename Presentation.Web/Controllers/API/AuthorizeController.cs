@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
+using System.Web.Mvc;
 using System.Web.Security;
 using Core.DomainModel;
 using Core.DomainServices;
@@ -12,20 +14,42 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
+        private readonly IOrganizationService _organizationService;
+        
 
-        public AuthorizeController(IUserRepository userRepository, IUserService userService)
+        public AuthorizeController(IUserRepository userRepository, IUserService userService,  IOrganizationService organizationService)
         {
             _userRepository = userRepository;
             _userService = userService;
+            _organizationService = organizationService;
+        }
+
+        private LoginResponseDTO CreateResponse(User user)
+        {
+            var userDto = AutoMapper.Mapper.Map<User, UserDTO>(user);
+
+            var orgsAndDefaultUnits = _organizationService.GetByUser(user);
+            var orgsAndDefaultUnitsDto = orgsAndDefaultUnits.Select(x => new LoginOrganizationDTO()
+            {
+                Organization = AutoMapper.Mapper.Map<Organization, OrganizationDTO>(x.Key),
+                DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(x.Value)
+            });
+
+            return new LoginResponseDTO()
+            {
+                User = userDto,
+                Organizations = orgsAndDefaultUnitsDto
+            };
+
         }
 
         public HttpResponseMessage GetLogin()
         { 
             try
             {
-                var userApiModel = AutoMapper.Mapper.Map<User, UserDTO>(KitosUser);
+                var response = CreateResponse(KitosUser);
 
-                return Ok(userApiModel);
+                return Ok(response);
             }
             catch (Exception e)
             {
@@ -45,9 +69,9 @@ namespace Presentation.Web.Controllers.API
 
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
 
-                var userApiModel = AutoMapper.Mapper.Map<User, UserDTO>(user);
+                var response = CreateResponse(user);
 
-                return Created(userApiModel);
+                return Created(response);
             }
             catch (ArgumentException)
             {

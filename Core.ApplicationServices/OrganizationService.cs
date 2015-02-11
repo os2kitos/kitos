@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Web.UI.WebControls.WebParts;
 using Core.DomainModel;
 using Core.DomainServices;
 
@@ -18,20 +19,22 @@ namespace Core.ApplicationServices
             _admRightRepository = admRightRepository;
         }
 
-        public ICollection<Organization> GetByUser(User user)
+
+        /* returns a list of <Organization, OrgUnit> of the organizations that a user is member of, together with the 
+         * default organization unit of that user in that organization (possibly null) */
+        public ICollection<KeyValuePair<Organization, OrganizationUnit>> GetByUser(User user)
         {
+            //if a user is global admin, return a list of all organizations, and no default organization unit.
+            //this might not be optimal, because the global admin might also have selected some default org unit, but it'll work for now
+            //(fake it till you make it)
+            if (user.IsGlobalAdmin)
+                return _orgRepository.Get().Select(org => new KeyValuePair<Organization, OrganizationUnit>(org, null)).ToList();
 
-            if (user.IsGlobalAdmin) return _orgRepository.Get().ToList();
-
-            var orgs = _orgRightRepository
-                .Get(x => x.UserId == user.Id)
-                .Select(x => x.Object.Organization).ToList();
-
-            orgs.AddRange(_admRightRepository.Get(x => x.UserId == user.Id).Select(x => x.Object));
-
-            orgs = orgs.Distinct().ToList();
-
-            return orgs;
+            //otherwise, select from admin rights
+            return
+                _admRightRepository.Get(x => x.UserId == user.Id)
+                    .Select(x => new KeyValuePair<Organization, OrganizationUnit>(x.Object, x.DefaultOrgUnit))
+                    .ToList();
         }
 
         public void SetupDefaultOrganization(Organization org, User objectOwner)

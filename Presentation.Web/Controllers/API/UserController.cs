@@ -108,35 +108,6 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        //TODO REWRITE THIS, perhaps so it's passed along at login?
-        public HttpResponseMessage Get(bool? organizations)
-        {
-            try
-            {
-                var user = KitosUser;
-
-                var orgs = _organizationService.GetByUser(user);
-                var dtos = AutoMapper.Mapper.Map<ICollection<Organization>, ICollection<OrganizationDTO>>(orgs);
-
-                //if the user has selected a default org unit, use the responding organization as default organization
-                var defaultOrgId = (user.DefaultOrganizationUnit == null)
-                                       ? 0
-                                       : user.DefaultOrganizationUnit.OrganizationId;
-
-                var result = new UserOrganizationsDTO()
-                    {
-                        Organizations = dtos,
-                        DefaultOrganizationId = defaultOrgId
-                    };
-
-                return Ok(result);
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
-
         public HttpResponseMessage GetBySearch(string q)
         {
             try
