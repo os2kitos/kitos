@@ -198,11 +198,89 @@
         //when a user logs in, the user is prompted with a select-organization modal.
         //the organization that is selected here, will be saved in local storage, for the next
         //time the user is visiting.
+        function resolveOrganization2(orgsAndDefaultUnits) {
+
+            var deferred = $q.defer();
+
+            //first, if the user is only member of one organization, just use that
+            if (orgsAndDefaultUnits.length == 1) {
+                var firstOrgAndDefaultUnit = orgsAndDefaultUnits[0];
+                setSavedOrgId(firstOrgAndDefaultUnit.organization.id);
+
+                deferred.resolve(firstOrgAndDefaultUnit);
+                return deferred.promise;
+            }
+            
+            //else, try to get previous selected organization id from the local storage
+            var storedOrgId = getSavedOrgId();
+
+            if (storedOrgId) {
+
+                //given the saved org id, find the organization in the list of organization and default org units
+                var foundOrgAndDefaultUnit = _.find(orgsAndDefaultUnits, function(orgAndUnit) {
+                    return orgAndUnit.organization.id == storedOrgId;
+                });
+
+                if (foundOrgAndDefaultUnit != null) {
+                    deferred.resolve(foundOrgAndDefaultUnit);
+                    return deferred.promise;
+                }
+
+                //if we get to this point, the stored org id was useless - i.e. it referred to an organization, that the user no longer is a member of.
+                //so clear it
+                clearSavedOrgId();
+            }
+
+            //if we get to this point, there is more than organization to choose from,
+            //and we couldn't use the stored organization id.
+            //last resort we have to prompt the user to select an organization
+
+            var modal = $modal.open({
+                backdrop: 'static',
+                templateUrl: 'partials/home/choose-organization.html',
+                controller: ['$scope', '$modalInstance', 'autofocus', function ($modalScope, $modalInstance, autofocus) {
+                    autofocus();
+
+                    $modalScope.organizations = _.map(orgsAndDefaultUnits, function(orgAndUnit) {
+                        return orgAndUnit.organization;
+                    });
+
+                    $modalScope.ok = function () {
+
+                        var selectedOrgAndUnit = _.find(orgsAndDefaultUnits, function(orgAndUnit) {
+                            return orgAndUnit.organization.id == storedOrgId;
+                        });
+
+                        $modalInstance.close(selectedOrgAndUnit);
+
+                    };
+
+                }]
+            });
+
+            modal.result.then(function (selectedOrgAndUnit) {
+
+                setSavedOrgId(selectedOrgAndUnit.organization.id);
+                deferred.resolve(selectedOrgAndUnit);
+
+            }, function () {
+
+                deferred.reject("Modal dismissed");
+            });
+
+            return deferred.promise;
+        }
+
+        //resolve which organization context, the user will be working in.
+        //when a user logs in, the user is prompted with a select-organization modal.
+        //the organization that is selected here, will be saved in local storage, for the next
+        //time the user is visiting.
+        /*
         function resolveOrganization() {
 
             var deferred = $q.defer();
             
-            //first try to get previous selected organization id from the local storage
+            //first, try to get previous selected organization id from the local storage
             var storedOrgId = getSavedOrgId();
 
             if (storedOrgId) {
@@ -287,6 +365,7 @@
 
             return deferred.promise;
         }
+        */
 
 
         return {
