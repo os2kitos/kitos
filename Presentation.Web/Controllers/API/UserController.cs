@@ -306,7 +306,7 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage GetUserExistsWithRole(string email, int orgId, bool? userExistsWithRole)
         {
-            var users = Repository.Get(u => u.Email == email && u.AdminRights.Count(r => r.Role.Name == "Medarbejder") > 0);
+            var users = Repository.Get(u => u.Email == email && u.AdminRights.Count(r => r.ObjectId == orgId) > 0);
 
             if (users.Any()) return Ok();
 
