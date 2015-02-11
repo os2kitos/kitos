@@ -110,6 +110,7 @@
                 delete payload.id;
                 delete payload.objectOwnerId;
                 delete payload.objectOwner;
+                delete payload.associatedUser;
 
                 var msg = notify.addInfoMessage("Gemmer ændringer...", false);
                 $http({
