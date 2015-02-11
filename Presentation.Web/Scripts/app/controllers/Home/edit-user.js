@@ -12,7 +12,7 @@
                 }],
                 orgUnits: ['userService', '$http', function (userService, $http) {
                     return userService.getUser().then(function (user) {
-                        return $http.get('api/organizationunit/?byUser').then(function (result) {
+                        return $http.get('api/organizationunit/?byUser&organizationId=' + user.currentOrganizationId).then(function (result) {
                             return result.data.response;
                         });
                     });
@@ -42,7 +42,10 @@
 
             init(user);
 
-            $scope.orgUnits = orgUnits;
+            //check if user has any organizationunits to choose from
+            if (orgUnits.length > 0) $scope.orgUnits = orgUnits;
+            //if not -> choose organization.root
+            else $scope.orgUnits = [user.currentOrganization.root];
 
             //can't use autosave - need to patch through userService!
             $scope.patch = function (field, value) {
