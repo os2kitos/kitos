@@ -11,5 +11,7 @@
         public virtual User User { get; set; }
         public virtual AdminRole Role { get; set; }
         public virtual Organization Object { get; set; }
+        public int? DefaultOrgUnitId { get; set; }
+        public virtual Organization DefaultOrgUnit { get; set; }
     }
 }
