@@ -28,5 +28,10 @@ namespace Core.DomainModel.ItProject
         public virtual ItProject ItProject { get; set; }
         public int ItProjectId { get; set; }
 
+        public override bool HasUserWriteAccess(User user, int organizationId)
+        {
+            return ItProject.HasUserWriteAccess(user, organizationId);
+        }
+
     }
 }
