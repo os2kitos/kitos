@@ -43,6 +43,8 @@
                 isGlobalAdmin: user.isGlobalAdmin,
                 isLocalAdmin: isLocalAdmin,
 
+                orgAndDefaultUnit: orgAndDefaultUnit,
+
                 currentOrganizationUnitId: currentOrgUnitId,
                 currentOrganizationUnitName: currentOrgUnitName,
                 isUsingDefaultOrgUnit: isUsingDefaultOrgUnit,
@@ -73,7 +75,8 @@
                 }).success(function (result) {
                     var newUser = result.response;
                     
-                    saveUser(newUser, _user.currentOrganization);
+                    //updating the user. the organization and default org unit is unchanged
+                    saveUser(newUser, _user.orgAndDefaultUnit);
                     loadUserDeferred = null;
                     deferred.resolve(_user);
 
@@ -111,6 +114,7 @@
                     resolveOrganization2(orgsAndDefaultUnits).then(function (orgAndDefaultUnit) {
                         saveUser(user, orgAndDefaultUnit);
                         loadUserDeferred.resolve(_user);
+                        loadUserDeferred = null;
 
                     }, function() {
                         loadUserDeferred.reject("No organization selected");
@@ -287,109 +291,37 @@
             return deferred.promise;
         }
 
-        //resolve which organization context, the user will be working in.
-        //when a user logs in, the user is prompted with a select-organization modal.
-        //the organization that is selected here, will be saved in local storage, for the next
-        //time the user is visiting.
-        /*
-        function resolveOrganization() {
-
+        //updates the users default org unit in the current organization
+        function updateDefaultOrgUnit(newDefaultOrgUnitId) {
             var deferred = $q.defer();
-            
-            //first, try to get previous selected organization id from the local storage
-            var storedOrgId = getSavedOrgId();
 
-            if (storedOrgId) {
-                
-                //given the saved org id, fetch the org details and config from the server 
-                $http.get("api/organization/" + storedOrgId).success(function(result) {
-                    deferred.resolve(result.response);
-                    
-                }).error(function(result) {
-
-                    //the saved org was probably bad
-                    clearSavedOrgId();
-                    
-                    //prompt the user to select an org via modal
-                    openModal();
-                });
-
-            } else {
-
-                //no previous selected org in local storage. 
-                
-                //prompt the user to select an org via modal
-                openModal();
+            var payload = {
+                orgId: _user.currentOrganizationId,
+                orgUnitId: newDefaultOrgUnitId
             }
-            
-            //helper function for displaying the choose-organization modal
-            function openModal() {
-                //fetch the relevant organizations
-                $http.get("api/user?organizations").success(function (result) {
 
-                    var organizations = result.response.organizations;
-
-                    //if there's only one, just select that
-                    if (organizations.length == 1) {
-
-                        var firstOrg = organizations[0];
-                        setSavedOrgId(firstOrg.id);
-
-                        deferred.resolve(firstOrg);
-
-                    } else {
-
-                        //otherwise, open a modal 
-                        var modal = $modal.open({
-                            backdrop: 'static',
-                            templateUrl: 'partials/home/choose-organization.html',
-                            controller: ['$scope', '$modalInstance', 'autofocus', function ($modalScope, $modalInstance, autofocus) {
-                                autofocus();
-                                $modalScope.orgChooser = {
-                                    selectedId: result.response.defaultOrganizationId
-                                };
-                                
-                                $modalScope.organizations = organizations;
-
-                                $modalScope.ok = function () {
-
-                                    var selectedOrg = _.findWhere(organizations, { id: $modalScope.orgChooser.selectedId });
-
-                                    $modalInstance.close(selectedOrg);
-
-                                };
-
-                            }]
-                        });
-
-                        modal.result.then(function (selectedOrg) {
-
-                            setSavedOrgId(selectedOrg.id);
-                            deferred.resolve(selectedOrg);
-
-                        }, function () {
-
-                            deferred.reject("Modal dismissed");
-                        });
-
-                    }
-
-                }).error(function () {
-                    deferred.reject("Request for the users organizations failed!");
+            $http.post('api/user?updateDefaultOrgUnit', payload).success(function (result) {
+                //now we gotta update the saved user in the userService.
+                //the simplest is just to re-auth the user.
+                getUser().then(function(user) {
+                    deferred.resolve(user);
+                }, function() {
+                    deferred.reject("Couldn't update default org unit!");
                 });
-            }
+            }).error(function() {
+                deferred.reject("Couldn't update default org unit!");
+            });
 
             return deferred.promise;
         }
-        */
-
 
         return {
             getUser: getUser,
             login: login,
             logout: logout,
             auth: auth,
-            patchUser: patchUser
+            patchUser: patchUser,
+            updateDefaultOrgUnit: updateDefaultOrgUnit
         };
 
     }]);

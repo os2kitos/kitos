@@ -24,7 +24,7 @@ namespace Presentation.Web.Controllers.API
             _organizationService = organizationService;
         }
 
-        private LoginResponseDTO CreateResponse(User user)
+        private LoginResponseDTO CreateLoginResponse(User user)
         {
             var userDto = AutoMapper.Mapper.Map<User, UserDTO>(user);
 
@@ -47,7 +47,7 @@ namespace Presentation.Web.Controllers.API
         { 
             try
             {
-                var response = CreateResponse(KitosUser);
+                var response = CreateLoginResponse(KitosUser);
 
                 return Ok(response);
             }
@@ -69,7 +69,7 @@ namespace Presentation.Web.Controllers.API
 
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
 
-                var response = CreateResponse(user);
+                var response = CreateLoginResponse(user);
 
                 return Created(response);
             }

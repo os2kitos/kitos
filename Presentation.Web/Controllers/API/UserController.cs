@@ -283,6 +283,19 @@ namespace Presentation.Web.Controllers.API
 
             return NotFound();
         }
-    }
 
+        public HttpResponseMessage PostDefaultOrgUnit(bool? updateDefaultOrgUnit, UpdateDefaultOrgUnitDto dto)
+        {
+            try
+            {
+                _organizationService.SetDefaultOrgUnit(KitosUser, dto.OrgId, dto.OrgUnitId);
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+    }
 }

@@ -60,6 +60,15 @@
                 });
             };
 
+            $scope.updateDefaultOrgUnit = function() {
+                userService.updateDefaultOrgUnit($scope.user.defaultOrganizationUnitId).then(function(newUser) {
+                    init(newUser);
+                    notify.addSuccessMessage("Feltet er opdateret!");
+                }, function() {
+                    notify.addErrorMessage("Fejl! Kunne ikke opdatere feltet!");
+                });
+            };
+
         }]);
 
 })(angular, app);
