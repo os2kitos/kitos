@@ -65,7 +65,7 @@
                         <span class="glyphicon glyphicon-pencil"></span>
                     </button>
                 </td>
-                <td>{{user.defaultOrganizationUnitName ? null : rootUnitName}}</td>
+                <td>{{user.defaultOrganizationUnitName == null ? rootUnitName : user.defaultOrganizationUnitName}}</td>
                 <td>
                     <button type="button" data-ng-if="user.lastAdvisDate === null" class="btn btn-success btn-xs btn-block" data-ng-click="sendAdvis(user, false)" data-ng-disabled="!user.canBeEdited">
                         Send Advis

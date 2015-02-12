@@ -133,7 +133,13 @@ namespace Presentation.Web.Controllers.API
                 //Get all users inside the organization
                 pagingModel.Where(u => u.AdminRights.Count(r => r.ObjectId == orgId) != 0 );
 
-                var users = Page(Repository.AsQueryable(), pagingModel);
+                var users = Page(Repository.AsQueryable(), pagingModel).ToList();
+
+                foreach (var user in users)
+                {
+                    user.DefaultOrganizationUnit = user.AdminRights.First(x => x.ObjectId == orgId).DefaultOrgUnit;
+                    user.DefaultOrganizationUnitId = user.DefaultOrganizationUnit != null ? (int?)user.DefaultOrganizationUnit.Id : null;
+                }
 
                 return Ok(Map(users));
             }
