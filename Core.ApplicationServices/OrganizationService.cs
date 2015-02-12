@@ -24,24 +24,30 @@ namespace Core.ApplicationServices
          * default organization unit of that user in that organization (possibly null) */
         public ICollection<KeyValuePair<Organization, OrganizationUnit>> GetByUser(User user)
         {
-            //if a user is global admin, return a list of all organizations, and no default organization unit.
-            //this might not be optimal, because the global admin might also have selected some default org unit, but it'll work for now
-            //(fake it till you make it)
-            var result = 
+            //select from admin rights
+            var result = _admRightRepository.Get(x => x.UserId == user.Id)
+                .Select(x => new KeyValuePair<Organization, OrganizationUnit>(x.Object, x.DefaultOrgUnit)).ToList();
 
+            //if the user is global admin, the list should include all organization, even if the user doesn't have an 
+            //explicit role on the organization
             if (user.IsGlobalAdmin)
-                return _orgRepository.Get().Select(org => new KeyValuePair<Organization, OrganizationUnit>(org, null)).ToList();
+            {
+                var remainingOrgs =
+                    _orgRepository.Get()
+                    .Where(org => result.All(kvp => kvp.Key != org))
+                    .Select(org => new KeyValuePair<Organization, OrganizationUnit>(org, null));
 
-            //otherwise, select from admin rights
-            return
-                _admRightRepository.Get(x => x.UserId == user.Id)
-                    .Select(x => new KeyValuePair<Organization, OrganizationUnit>(x.Object, x.DefaultOrgUnit))
-                    .ToList();
+                result.AddRange(remainingOrgs);
+
+            }
+
+            return result;
         }
 
         public void SetDefaultOrgUnit(User user, int orgId, int orgUnitId)
         {
-            var right = _admRightRepository.Get(r => r.UserId == user.Id && r.ObjectId == orgId).Single();
+            //TODO this should probably be Single() ?
+            var right = _admRightRepository.Get(r => r.UserId == user.Id && r.ObjectId == orgId).First();
             right.DefaultOrgUnitId = orgUnitId;
 
             _admRightRepository.Update(right);

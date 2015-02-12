@@ -23,7 +23,7 @@
     }]);
 
     app.controller('home.EditUserCtrl', ['$rootScope', '$scope', 'notify', 'userService', 'user', 'orgUnits',
-        function ($rootScope, $scope, notify, userService, user, orgUnits) {
+        function($rootScope, $scope, notify, userService, user, orgUnits) {
             $rootScope.page.title = 'Profil indstillinger';
             $rootScope.page.subnav = [];
 
@@ -38,14 +38,20 @@
                     currentOrganizationName: user.currentOrganizationName,
                     currentOrganizationUnitName: user.currentOrganizationUnitName
                 };
+
             }
 
             init(user);
 
             //check if user has any organizationunits to choose from
-            if (orgUnits.length > 0) $scope.orgUnits = orgUnits;
+            if (orgUnits.length > 0) {
+                $scope.orgUnits = orgUnits;
             //if not -> choose organization.root
-            else $scope.orgUnits = [user.currentOrganization.root];
+            } else {
+                $scope.orgUnits = [user.currentOrganization.root];
+                $scope.fakeDefaultOrganizationUnitId = user.currentOrganization.root.id;
+                $scope.noOrgUnits = true;
+            }
 
             //can't use autosave - need to patch through userService!
             $scope.patch = function (field, value) {
@@ -67,6 +73,10 @@
                 }, function() {
                     notify.addErrorMessage("Fejl! Kunne ikke opdatere feltet!");
                 });
+            };
+
+            $scope.fakeUpdateDefaultOrgUnit = function () {
+                notify.addSuccessMessage("Feltet er opdateret!");
             };
 
         }]);
