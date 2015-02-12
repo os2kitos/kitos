@@ -16,7 +16,7 @@
                     ],
                     adminRights: [
                         '$http', function($http) {
-                            return $http.get('api/adminrights').then(function(result) {
+                            return $http.get('api/adminrights/?roleName=LocalAdmin&roleWithName=true').then(function (result) {
                                 return result.data.response;
                             });
                         }
