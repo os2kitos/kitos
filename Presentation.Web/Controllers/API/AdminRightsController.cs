@@ -31,6 +31,21 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        public virtual HttpResponseMessage GetRightsWithRoleName(string roleName, bool roleWithName)
+        {
+            try
+            {
+                if (!IsGlobalAdmin()) return Unauthorized();
+                var theRights = RightRepository.Get(x => x.Role.Name == roleName);
+                var dtos = Map<IEnumerable<AdminRight>, IEnumerable<RightOutputDTO>>(theRights);
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         /// <summary>
         /// Removes AdminRights for a given user within a given organization
         /// </summary>
