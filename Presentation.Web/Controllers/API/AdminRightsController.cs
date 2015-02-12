@@ -31,7 +31,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public virtual HttpResponseMessage GetRightsWithRoleName(string roleName, bool roleWithName)
+        public virtual HttpResponseMessage GetRightsWithRoleName(string roleName, bool? roleWithName)
         {
             try
             {
