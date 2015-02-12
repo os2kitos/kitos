@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.2-31219")]
-    public sealed partial class AddedAdminRightDefaultOrgUnit : IMigrationMetadata
+    public sealed partial class AddedDefaultOrgUnitToAdminRight : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedAdminRightDefaultOrgUnit));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedDefaultOrgUnitToAdminRight));
         
         string IMigrationMetadata.Id
         {
-            get { return "201502111311191_AddedAdminRightDefaultOrgUnit"; }
+            get { return "201502121301345_AddedDefaultOrgUnitToAdminRight"; }
         }
         
         string IMigrationMetadata.Source
