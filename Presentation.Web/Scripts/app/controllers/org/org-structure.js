@@ -131,7 +131,7 @@
                     node.orgRights = data.response;
 
                     _.each(node.orgRights, function(right) {
-                        right.userForSelect = { id: right.user.id, text: right.user.name };
+                        right.userForSelect = { id: right.user.id, text: right.user.name + " " + right.user.lastName };
                         right.roleForSelect = right.roleId;
                         right.show = true;
                     });
@@ -169,14 +169,14 @@
                 };
 
                 $http.post("api/organizationUnitRights/" + oId + '?organizationId=' + user.currentOrganizationId, data).success(function(result) {
-                    notify.addSuccessMessage(result.response.user.name + " er knyttet i rollen");
+                    notify.addSuccessMessage(result.response.user.name + ' ' + user.lastName + " er knyttet i rollen");
 
                     $scope.chosenOrgUnit.orgRights.push({
                         "objectId": result.response.objectId,
                         "roleId": result.response.roleId,
                         "userId": result.response.userId,
                         "user": result.response.user,
-                        'userForSelect': { id: result.response.userId, text: result.response.user.name },
+                        'userForSelect': { id: result.response.userId, text: result.response.user.name + " " + result.response.user.lastName },
                         'roleForSelect': result.response.roleId,
                         show: true
                     });
@@ -234,7 +234,7 @@
 
                         right.edit = false;
 
-                        notify.addSuccessMessage(right.user.name + " er knyttet i rollen");
+                        notify.addSuccessMessage(right.user.qualifiedName + " er knyttet i rollen");
                     }).error(function(result) {
                         // we successfully deleted the old entry, but didn't add a new one
                         // fuck
@@ -247,7 +247,7 @@
                 }).error(function(deleteResult) {
 
                     // couldn't delete the old entry, just reset select options
-                    right.userForSelect = { id: right.user.id, text: right.user.name };
+                    right.userForSelect = { id: right.user.id, text: right.user.name + " " + right.user.lastName };
                     right.roleForSelect = right.roleId;
 
                     notify.addErrorMessage('Fejl!');
