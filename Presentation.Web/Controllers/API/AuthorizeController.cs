@@ -24,25 +24,6 @@ namespace Presentation.Web.Controllers.API
             _organizationService = organizationService;
         }
 
-        private LoginResponseDTO CreateLoginResponse(User user)
-        {
-            var userDto = AutoMapper.Mapper.Map<User, UserDTO>(user);
-
-            var orgsAndDefaultUnits = _organizationService.GetByUser(user);
-            var orgsAndDefaultUnitsDto = orgsAndDefaultUnits.Select(x => new LoginOrganizationDTO()
-            {
-                Organization = AutoMapper.Mapper.Map<Organization, OrganizationDTO>(x.Key),
-                DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(x.Value)
-            }).ToList();
-
-            return new LoginResponseDTO()
-            {
-                User = userDto,
-                Organizations = orgsAndDefaultUnitsDto
-            };
-
-        }
-
         public HttpResponseMessage GetLogin()
         { 
             try
@@ -111,6 +92,31 @@ namespace Presentation.Web.Controllers.API
             {
                 return Error(e);
             }
+        }
+
+        //helper function
+        private LoginResponseDTO CreateLoginResponse(User user)
+        {
+            var userDto = AutoMapper.Mapper.Map<User, UserDTO>(user);
+
+            //getting all the organizations that the user is member of
+            var organizations = _organizationService.GetOrganizations(user);
+            //getting the default org units (one or null for each organization)
+            var defaultUnits = organizations.Select(org => _organizationService.GetDefaultUnit(org, user));
+
+            //creating dtos
+            var orgsDto = organizations.Zip(defaultUnits, (org, defaultUnit) => new OrganizationAndDefaultUnitDTO()
+            {
+                Organization = AutoMapper.Mapper.Map<Organization, OrganizationDTO>(org),
+                DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(defaultUnit)
+            });
+
+            return new LoginResponseDTO()
+            {
+                User = userDto,
+                Organizations = orgsDto
+            };
+
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Presentation.Web.Models
     }
 
 
-    public class LoginOrganizationDTO
+    public class OrganizationAndDefaultUnitDTO
     {
         public OrganizationDTO Organization { get; set; }
         public OrgUnitSimpleDTO DefaultOrgUnit { get; set; }
@@ -20,7 +20,7 @@ namespace Presentation.Web.Models
     public class LoginResponseDTO
     {
         public UserDTO User { get; set; }
-        public IEnumerable<LoginOrganizationDTO> Organizations { get; set; }
+        public IEnumerable<OrganizationAndDefaultUnitDTO> Organizations { get; set; }
         
     }
 }

@@ -7,40 +7,27 @@ namespace Core.ApplicationServices
 {
     public class OrganizationService : IOrganizationService
     {
-        private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
         private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IGenericRepository<AdminRight> _admRightRepository;
 
-        public OrganizationService(IGenericRepository<OrganizationRight> orgRightRepository, IGenericRepository<Organization> orgRepository, IGenericRepository<AdminRight> admRightRepository)
+        public OrganizationService(IGenericRepository<Organization> orgRepository, IGenericRepository<AdminRight> admRightRepository)
         {
-            _orgRightRepository = orgRightRepository;
             _orgRepository = orgRepository;
             _admRightRepository = admRightRepository;
         }
 
-
-        /* returns a list of <Organization, OrgUnit> of the organizations that a user is member of, together with the 
-         * default organization unit of that user in that organization (possibly null) */
-        public ICollection<KeyValuePair<Organization, OrganizationUnit>> GetByUser(User user)
+        //returns a list of organizations that the user is a member of
+        public IEnumerable<Organization> GetOrganizations(User user)
         {
-            //select from admin rights
-            var result = _admRightRepository.Get(x => x.UserId == user.Id)
-                .Select(x => new KeyValuePair<Organization, OrganizationUnit>(x.Object, x.DefaultOrgUnit)).ToList();
+            if (user.IsGlobalAdmin) return _orgRepository.Get();
+            else return _admRightRepository.Get().Select(r => r.Object);
+        }
 
-            //if the user is global admin, the list should include all organization, even if the user doesn't have an 
-            //explicit role on the organization
-            if (user.IsGlobalAdmin)
-            {
-                var remainingOrgs =
-                    _orgRepository.Get()
-                    .Where(org => result.All(kvp => kvp.Key != org))
-                    .Select(org => new KeyValuePair<Organization, OrganizationUnit>(org, null));
-
-                result.AddRange(remainingOrgs);
-
-            }
-
-            return result;
+        //returns the default org unit for that user inside that organization
+        //or null if none has been chosen
+        public OrganizationUnit GetDefaultUnit(Organization organization, User user)
+        {
+            return _admRightRepository.Get(r => r.ObjectId == organization.Id && r.UserId == user.Id).Select(r => r.DefaultOrgUnit).FirstOrDefault();
         }
 
         public void SetDefaultOrgUnit(User user, int orgId, int orgUnitId)
