@@ -20,6 +20,8 @@
             '$scope', '$http', '$state', '$modal', '$q', '$stateParams', 'notify', 'user',
             function ($scope, $http, $state, $modal, $q, $stateParams, notify, user) {
 
+                $scope.rootUnitName = user.currentOrganization.root.name;
+
                 function loadUsers() {
                     var deferred = $q.defer();
 

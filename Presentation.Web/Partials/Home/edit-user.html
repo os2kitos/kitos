@@ -7,15 +7,19 @@
                 Standard valgt enhed
             </label>
             <div class="col-md-8">
-                <select id="default-unit" data-ng-model="user.defaultOrganizationUnitId" data-ng-change="patch('defaultOrganizationUnitId', user.defaultOrganizationUnitId)"
-                    class="form-control" data-ng-options="orgUnit.id as orgUnit.qualifiedName for orgUnit in orgUnits">
-                </select>
+                <select data-ng-if="!noOrgUnits" id="default-unit" data-ng-model="user.defaultOrganizationUnitId" data-ng-change="updateDefaultOrgUnit()"
+                        class="form-control" data-ng-options="orgUnit.id as orgUnit.qualifiedName for orgUnit in orgUnits"></select>
 
-                <div data-ng-if="!user.isUsingDefaultOrgUnit" class="help-block text-primary">
+                <div data-ng-if="!noOrgUnits && !user.isUsingDefaultOrgUnit" class="help-block text-primary">
                     <i class="glyphicon glyphicon-exclamation-sign"></i>
-                    Bemærk: Du har valgt en standard enhed, som hører under en anden organisation end den, som du er logget ind i nu.
-                        Så længe du er logget ind i {{user.currentOrganizationName}} anvendes enheden {{user.currentOrganizationUnitName}} som standard enhed.
+                    Bemærk: Du har ikke valgt en standard enhed i denne organisation.
+                    Så længe du er logget ind i {{user.currentOrganizationName}} anvendes derfor enheden {{user.currentOrganizationUnitName}} som standard enhed.
                         
+                </div>
+                
+                <div data-ng-if="noOrgUnits" class="help-block text-primary">
+                    <select id="default-unit" data-ng-model="fakeDefaultOrganizationUnitId" data-ng-change="fakeUpdateDefaultOrgUnit()"
+                            class="form-control" data-ng-options="orgUnit.id as orgUnit.qualifiedName for orgUnit in orgUnits"></select>
                 </div>
 
 

@@ -12,7 +12,7 @@
                 }],
                 orgUnits: ['userService', '$http', function (userService, $http) {
                     return userService.getUser().then(function (user) {
-                        return $http.get('api/organizationunit/?byUser').then(function (result) {
+                        return $http.get('api/organizationunit/?byUser&organizationId=' + user.currentOrganizationId).then(function (result) {
                             return result.data.response;
                         });
                     });
@@ -23,7 +23,7 @@
     }]);
 
     app.controller('home.EditUserCtrl', ['$rootScope', '$scope', 'notify', 'userService', 'user', 'orgUnits',
-        function ($rootScope, $scope, notify, userService, user, orgUnits) {
+        function($rootScope, $scope, notify, userService, user, orgUnits) {
             $rootScope.page.title = 'Profil indstillinger';
             $rootScope.page.subnav = [];
 
@@ -38,11 +38,20 @@
                     currentOrganizationName: user.currentOrganizationName,
                     currentOrganizationUnitName: user.currentOrganizationUnitName
                 };
+
             }
 
             init(user);
 
-            $scope.orgUnits = orgUnits;
+            //check if user has any organizationunits to choose from
+            if (orgUnits.length > 0) {
+                $scope.orgUnits = orgUnits;
+            //if not -> choose organization.root
+            } else {
+                $scope.orgUnits = [user.currentOrganization.root];
+                $scope.fakeDefaultOrganizationUnitId = user.currentOrganization.root.id;
+                $scope.noOrgUnits = true;
+            }
 
             //can't use autosave - need to patch through userService!
             $scope.patch = function (field, value) {
@@ -55,6 +64,19 @@
                 }, function() {
                     notify.addErrorMessage("Fejl! Kunne ikke opdatere feltet!");
                 });
+            };
+
+            $scope.updateDefaultOrgUnit = function() {
+                userService.updateDefaultOrgUnit($scope.user.defaultOrganizationUnitId).then(function(newUser) {
+                    init(newUser);
+                    notify.addSuccessMessage("Feltet er opdateret!");
+                }, function() {
+                    notify.addErrorMessage("Fejl! Kunne ikke opdatere feltet!");
+                });
+            };
+
+            $scope.fakeUpdateDefaultOrgUnit = function () {
+                notify.addSuccessMessage("Feltet er opdateret!");
             };
 
         }]);

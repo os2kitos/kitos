@@ -33,7 +33,9 @@ namespace Core.DomainModel
         public string Salt { get; set; }
         public bool IsGlobalAdmin { get; set; }
         public Guid? Uuid { get; set; }
-        public DateTime? LastAdvisDate { get; set; }        
+        public DateTime? LastAdvisDate { get; set; }   
+
+        //TODO REMOVE THIS - replaced by admin rights default org unit
         public int? DefaultOrganizationUnitId { get; set; }
 
         /// <summary>
