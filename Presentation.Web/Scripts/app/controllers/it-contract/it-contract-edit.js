@@ -243,7 +243,7 @@
                 if (signer) {
                     userForSelect = {
                         id: signer.id,
-                        text: signer.name
+                        text: signer.qualifiedName
                     };
                 }
 
