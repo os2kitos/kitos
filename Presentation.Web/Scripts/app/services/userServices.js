@@ -219,8 +219,8 @@
             var deferred = $q.defer();
 
             //first, if the user is only member of one organization, just use that
-            if (orgsAndDefaultUnits.length == 1) {
-                var firstOrgAndDefaultUnit = orgsAndDefaultUnits[0];
+            if (orgsAndDefaultUnits.$values.length == 1) {
+                var firstOrgAndDefaultUnit = orgsAndDefaultUnits.$values[0];
                 setSavedOrgId(firstOrgAndDefaultUnit.organization.id);
 
                 deferred.resolve(firstOrgAndDefaultUnit);
@@ -233,7 +233,7 @@
             if (storedOrgId) {
 
                 //given the saved org id, find the organization in the list of organization and default org units
-                var foundOrgAndDefaultUnit = _.find(orgsAndDefaultUnits, function(orgAndUnit) {
+                var foundOrgAndDefaultUnit = _.find(orgsAndDefaultUnits.$values, function(orgAndUnit) {
                     return orgAndUnit.organization.id == storedOrgId;
                 });
 
@@ -257,7 +257,7 @@
                 controller: ['$scope', '$modalInstance', 'autofocus', function ($modalScope, $modalInstance, autofocus) {
                     autofocus();
 
-                    $modalScope.organizations = _.map(orgsAndDefaultUnits, function(orgAndUnit) {
+                    $modalScope.organizations = _.map(orgsAndDefaultUnits.$values, function (orgAndUnit) {
                         return orgAndUnit.organization;
                     });
 
@@ -267,7 +267,7 @@
 
                     $modalScope.ok = function () {
 
-                        var selectedOrgAndUnit = _.find(orgsAndDefaultUnits, function(orgAndUnit) {
+                        var selectedOrgAndUnit = _.find(orgsAndDefaultUnits.$values, function(orgAndUnit) {
                             return orgAndUnit.organization.id == $modalScope.orgChooser.selectedId;
                         });
 

@@ -134,7 +134,7 @@
                         msg.toSuccessMessage(u.name + " er ikke længere tilknyttet organisationen");
                         reload();
                     }).error(function (deleteResult) {
-                        msg.toErrorMessage("Kunne ikke fjerne " + user.adminRights.userName + " fra organisationen");
+                        msg.toErrorMessage("Kunne ikke fjerne " + user.name + " fra organisationen");
                     });
                 };
 
