@@ -130,11 +130,12 @@
                     var uId = u.id;
 
                     var msg = notify.addInfoMessage("Arbejder ...", false);
-                    $http.delete("api/adminrights/" + oId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
-                        msg.toSuccessMessage(u.name + " er ikke længere tilknyttet organisationen");
+
+                    $http.delete("api/adminrights/?orgId=" + oId + "&userId=" + uId + "&byOrganization=").success(function (deleteResult) {
+                        msg.toSuccessMessage(u.name + " " + u.lastName + " er ikke længere tilknyttet organisationen");
                         reload();
                     }).error(function (deleteResult) {
-                        msg.toErrorMessage("Kunne ikke fjerne " + user.name + " fra organisationen");
+                        msg.toErrorMessage("Kunne ikke fjerne " + u.name + " " + u.lastName + " fra organisationen");
                     });
                 };
 

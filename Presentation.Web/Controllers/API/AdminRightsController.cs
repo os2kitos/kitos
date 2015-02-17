@@ -67,5 +67,33 @@ namespace Presentation.Web.Controllers.API
                 return Error(e);
             }
         }
+
+        /// <summary>
+        /// Deletes all adminRights for a given user withing a given organization
+        /// </summary>
+        /// <param name="orgId"></param>
+        /// <param name="userId"></param>
+        /// <param name="byOrganization"></param>
+        /// <returns></returns>
+        public HttpResponseMessage DeleteByOrganization(int orgId, int userId, bool? byOrganization)
+        {
+            try
+            {
+                var rights = RightRepository.Get(r => r.ObjectId == orgId && r.UserId == userId).Select(x => x.Id).Distinct();
+
+                foreach (var right in rights)
+                {
+                    RightRepository.DeleteByKey(right);
+                }
+
+                RightRepository.Save();
+                
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
     }
 }
