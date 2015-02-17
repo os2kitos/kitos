@@ -145,10 +145,12 @@
                                         if ($scope.newUser.form.$invalid) return;
 
                                         var name = $scope.newUser.name;
+                                        var lastName = $scope.newUser.lastName;
                                         var email = $scope.newUser.email;
 
                                         var data = {
                                             "name": name,
+                                            "lastName" : lastName,
                                             "email": email
                                         };
 
@@ -157,7 +159,7 @@
                                         $http.post("api/user", data, { handleBusy: true }).success(function(result, status) {
                                             var userResult = result.response;
                                             if (status == 201) {
-                                                msg.toSuccessMessage(userResult.name + " er oprettet i KITOS");
+                                                msg.toSuccessMessage(userResult.name + " " + userResult.lastName + " er oprettet i KITOS");
                                             } else {
                                                 msg.toInfoMessage("En bruger med den email-adresse fandtes allerede i systemet.");
                                             }
