@@ -22,14 +22,17 @@
 
                 $scope.rootUnitName = user.currentOrganization.root.name;
 
-                $scope.isLocalAdmin = function(selectedUser) {
+                function isLocalAdmin(selectedUser) {
 
                     var uId = selectedUser.id;
                     var oId = user.currentOrganizationId;
 
-                    $http.get("api/adminrights/?roleName=LocalAdmin&userId=" + uId + "&organizationId=" + oId + "&orgRightsForUserWithRole=").success(function (result) {
+                    return $http.get("api/adminrights/?roleName=LocalAdmin&userId=" + uId + "&organizationId=" + oId + "&orgRightsForUserWithRole=").success(function (result) {
+                        return result.response;
+
                         if (result.response === true) {
                             //If user is a LocalAdmin
+                            
                             var sure = confirm(selectedUser.name + " " + selectedUser.lastName + " er også lokaladministrator!\n\nVil du fortsat fjerne tilknytning?");
 
                             if (sure) $scope.deleteOrgRole(selectedUser);
@@ -39,7 +42,7 @@
                             $scope.deleteOrgRole(selectedUser);
                         }
                     }).error(function (error) {
-                        notify.addErrorMessage("Fejl. Kontakt systemadministrator!");
+                        notify.addErrorMessage("Fejl. Noget gik galt!");
                     });
                 }
 
@@ -123,6 +126,21 @@
                     return deferred.promise;
                 }
 
+                function deleteOrgRoleAction(u) {
+                    var oId = u.adminRights[0].organizationId;
+                    var rId = u.adminRights[0].roleId;
+                    var uId = u.id;
+
+                    var msg = notify.addInfoMessage("Arbejder ...", false);
+
+                    $http.delete("api/adminrights/?orgId=" + oId + "&userId=" + uId + "&byOrganization=").success(function (deleteResult) {
+                        msg.toSuccessMessage(u.name + " " + u.lastName + " er ikke længere tilknyttet organisationen");
+                        reload();
+                    }).error(function (deleteResult) {
+                        msg.toErrorMessage("Kunne ikke fjerne " + u.name + " " + u.lastName + " fra organisationen");
+                    });
+                }
+
                 function reload() {
                     $state.go('.', { lastModule: $scope.chosenModule }, { reload: true });
                 }
@@ -146,17 +164,17 @@
 
                 //remove a users organizationRole - thereby removing their readaccess for this organization
                 $scope.deleteOrgRole = function (u) {
-                    var oId = u.adminRights[0].organizationId;
-                    var rId = u.adminRights[0].roleId;
-                    var uId = u.id;
-
-                    var msg = notify.addInfoMessage("Arbejder ...", false);
-
-                    $http.delete("api/adminrights/?orgId=" + oId + "&userId=" + uId + "&byOrganization=").success(function (deleteResult) {
-                        msg.toSuccessMessage(u.name + " " + u.lastName + " er ikke længere tilknyttet organisationen");
-                        reload();
-                    }).error(function (deleteResult) {
-                        msg.toErrorMessage("Kunne ikke fjerne " + u.name + " " + u.lastName + " fra organisationen");
+                    isLocalAdmin(u).then(function (response) {
+                        if (response.data.response === true) {
+                            var confirmBox = confirm(u.name + " " + u.lastName + " er også lokaladministrator!\n\nVil du fortsat fjerne tilknytning?");
+                            if (confirmBox) {
+                                deleteOrgRoleAction(u);
+                            } else {
+                                notify.addInfoMessage("Handling afbrudt!");
+                            }
+                        } else {
+                            deleteOrgRoleAction(u);
+                        }
                     });
                 };
 

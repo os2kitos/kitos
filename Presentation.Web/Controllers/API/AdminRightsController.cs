@@ -100,7 +100,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var rights = RightRepository.Get(r => r.ObjectId == orgId && r.UserId == userId).Select(x => x.Id).Distinct();
+                var rights = RightRepository.Get(r => r.ObjectId == orgId && r.UserId == userId).Select(x => x.Id);
 
                 foreach (var right in rights)
                 {
