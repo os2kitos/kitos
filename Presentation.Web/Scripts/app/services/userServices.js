@@ -37,7 +37,7 @@
                 id: response.id,
                 name: response.name,
                 lastName: response.lastName,
-                qualifiedName: response.qualifiedName,
+                fullName: response.fullName,
                 email: response.email,
                 phoneNumber: response.phoneNumber,
                 

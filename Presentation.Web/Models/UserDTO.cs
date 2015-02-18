@@ -23,7 +23,7 @@ namespace Presentation.Web.Models
         public DateTime LastChanged { get; set; }
         public int? LastChangedByUserId { get; set; }
 
-        public string QualifiedName
+        public string FullName
         {
             get { return Name + " " + LastName; }
         }

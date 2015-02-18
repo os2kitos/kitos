@@ -234,7 +234,7 @@
 
                         right.edit = false;
 
-                        notify.addSuccessMessage(right.user.qualifiedName + " er knyttet i rollen");
+                        notify.addSuccessMessage(right.user.fullName + " er knyttet i rollen");
                     }).error(function(result) {
                         // we successfully deleted the old entry, but didn't add a new one
                         // fuck

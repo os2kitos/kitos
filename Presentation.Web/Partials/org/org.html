@@ -62,7 +62,7 @@
                             <tr data-ng-hide="right.edit">
                                 <td>{{ orgUnits[right.objectId].name }}</td>
                                 <td>{{ orgRoles[right.roleId].name }}</td>
-                                <td>{{ right.user.qualifiedName }}</td>
+                                <td>{{ right.user.fullName }}</td>
                                 <td class="relative-position">{{ right.user.email }}
                                     <div data-ng-show="chosenOrgUnit.hasWriteAccess" class="pull-right">
                                         <a data-ng-click="right.edit = true" class="btn btn-info btn-xs">

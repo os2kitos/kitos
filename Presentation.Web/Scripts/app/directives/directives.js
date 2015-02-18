@@ -279,7 +279,7 @@
 
                                         results.push({
                                             id: user.id, //select2 mandatory
-                                            text: user.qualifiedName, //select2 mandatory
+                                            text: user.fullName, //select2 mandatory
                                             user: user //not mandatory, for extra info when formatting
                                         });
                                     });
