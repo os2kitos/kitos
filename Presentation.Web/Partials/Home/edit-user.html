@@ -8,7 +8,7 @@
             </label>
             <div class="col-md-8">
                 <select data-ng-if="!noOrgUnits" id="default-unit" data-ng-model="user.defaultOrganizationUnitId" data-ng-change="updateDefaultOrgUnit()"
-                        class="form-control" data-ng-options="orgUnit.id as orgUnit.fullName for orgUnit in orgUnits"></select>
+                        class="form-control" data-ng-options="orgUnit.id as orgUnit.qualifiedName for orgUnit in orgUnits"></select>
 
                 <div data-ng-if="!noOrgUnits && !user.isUsingDefaultOrgUnit" class="help-block text-primary">
                     <i class="glyphicon glyphicon-exclamation-sign"></i>
