@@ -252,42 +252,36 @@
             //and we couldn't use the stored organization id.
             //last resort we have to prompt the user to select an organization
 
-                        var modal = $modal.open({
-                            backdrop: 'static',
-                            templateUrl: 'partials/home/choose-organization.html',
-                            controller: ['$scope', '$modalInstance', 'autofocus', function ($modalScope, $modalInstance, autofocus) {
-                                autofocus();
+            var modal = $modal.open({
+                backdrop: 'static',
+                templateUrl: 'partials/home/choose-organization.html',
+                controller: ['$scope', '$modalInstance', 'autofocus', function ($modalScope, $modalInstance, autofocus) {
+                    autofocus();
 
                     $modalScope.organizations = _.map(orgsAndDefaultUnits, function(orgAndUnit) {
                         return orgAndUnit.organization;
                     });
 
-                                $modalScope.orgChooser = {
+                    $modalScope.orgChooser = {
                         selectedId : null
-                                };
+                    };
                                 
-                                $modalScope.ok = function () {
-
+                    $modalScope.ok = function () {
                         var selectedOrgAndUnit = _.find(orgsAndDefaultUnits, function(orgAndUnit) {
                             return orgAndUnit.organization.id == $modalScope.orgChooser.selectedId;
                         });
 
                         $modalInstance.close(selectedOrgAndUnit);
-
-                                };
-
-                            }]
-                        });
+                    };
+                }]
+            });
 
             modal.result.then(function (selectedOrgAndUnit) {
-
                 setSavedOrgId(selectedOrgAndUnit.organization.id);
                 deferred.resolve(selectedOrgAndUnit);
-
-                        }, function () {
-
-                            deferred.reject("Modal dismissed");
-                        });
+            }, function () {
+                deferred.reject("Modal dismissed");
+            });
 
             return deferred.promise;
         }
