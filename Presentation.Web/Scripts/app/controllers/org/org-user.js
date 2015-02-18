@@ -22,6 +22,27 @@
 
                 $scope.rootUnitName = user.currentOrganization.root.name;
 
+                $scope.isLocalAdmin = function(selectedUser) {
+
+                    var uId = selectedUser.id;
+                    var oId = user.currentOrganizationId;
+
+                    $http.get("api/adminrights/?roleName=LocalAdmin&userId=" + uId + "&organizationId=" + oId + "&orgRightsForUserWithRole=").success(function (result) {
+                        if (result.response === true) {
+                            //If user is a LocalAdmin
+                            var sure = confirm(selectedUser.name + " " + selectedUser.lastName + " er også lokaladministrator!\n\nVil du fortsat fjerne tilknytning?");
+
+                            if (sure) $scope.deleteOrgRole(selectedUser);
+                            else notify.addErrorMessage("Handlingen blev afbrudt!");
+                        } else {
+                            //If user is not a LocalAdmin - just proceed with removing the user from the organization
+                            $scope.deleteOrgRole(selectedUser);
+                        }
+                    }).error(function (error) {
+                        notify.addErrorMessage("Fejl. Kontakt systemadministrator!");
+                    });
+                }
+
                 function loadUsers() {
                     var deferred = $q.defer();
 
