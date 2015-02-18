@@ -131,7 +131,6 @@ namespace Presentation.Web.Controllers.API
                         || u.Email.Contains(q));
 
                 //Get all users inside the organization
-                //pagingModel.Where(u => u.AdminRights.Count(r => r.ObjectId == orgId) != 0 );
                 pagingModel.Where(u => u.AdminRights.Any(r => r.Role.Name == "Medarbejder"));
 
                 var users = Page(Repository.AsQueryable(), pagingModel).ToList();
