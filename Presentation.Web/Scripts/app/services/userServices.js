@@ -34,12 +34,12 @@
 
             _user = {
                 isAuth: true,
-                id: response.id,
-                name: response.name,
-                lastName: response.lastName,
-                fullName: response.fullName,
-                email: response.email,
-                phoneNumber: response.phoneNumber,
+                id: user.id,
+                name: user.name,
+                lastName: user.lastName,
+                fullName: user.fullName,
+                email: user.email,
+                phoneNumber: user.phoneNumber,
 
                 isGlobalAdmin: user.isGlobalAdmin,
                 isLocalAdmin: isLocalAdmin,
