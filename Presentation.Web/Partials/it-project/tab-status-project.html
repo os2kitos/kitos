@@ -80,7 +80,7 @@
                         <th>Status</th>
                         <th>
                             Ansvarlig: Navn
-                            <button data-order-by="'associatedUser.name'" data-paging="pagination"></button>
+                            <button data-order-by="'associatedUser.fullName'" data-paging="pagination"></button>
                         </th>
                         <th>Ansvarlig: Projektrolle</th>
                         <th class="text-right">Rediger/slet</th>
@@ -127,7 +127,7 @@
                             </span>
                         </td>
                         <!-- Ansvarlig: Navn -->
-                        <td>{{ activity.associatedUser.name }}</td>
+                        <td>{{ activity.associatedUser.fullName }}</td>
                         <!-- Ansvarlig: Projektrolle -->
                         <td>{{ activity.associatedUser.roleNames | joinBy:', ' }}</td>
                         <!-- Control -->

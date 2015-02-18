@@ -34,11 +34,12 @@
 
             _user = {
                 isAuth: true,
-                id: user.id,
-                name: user.name,
-                lastName: user.lastName,
-                email: user.email,
-                phoneNumber: user.phoneNumber,
+                id: response.id,
+                name: response.name,
+                lastName: response.lastName,
+                fullName: response.fullName,
+                email: response.email,
+                phoneNumber: response.phoneNumber,
 
                 isGlobalAdmin: user.isGlobalAdmin,
                 isLocalAdmin: isLocalAdmin,
@@ -272,19 +273,14 @@
                         });
 
                         $modalInstance.close(selectedOrgAndUnit);
-
                     };
-
                 }]
             });
 
             modal.result.then(function (selectedOrgAndUnit) {
-
                 setSavedOrgId(selectedOrgAndUnit.organization.id);
                 deferred.resolve(selectedOrgAndUnit);
-
             }, function () {
-
                 deferred.reject("Modal dismissed");
             });
 
