@@ -131,7 +131,7 @@ namespace Presentation.Web.Controllers.API
                         || u.Email.Contains(q));
 
                 //Get all users inside the organization
-                pagingModel.Where(u => u.AdminRights.Count(r => r.ObjectId == orgId) != 0 );
+                pagingModel.Where(u => u.AdminRights.Any(r => r.Role.Name == "Medarbejder"));
 
                 var users = Page(Repository.AsQueryable(), pagingModel).ToList();
 
@@ -283,7 +283,7 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage GetUserExistsWithRole(string email, int orgId, bool? userExistsWithRole)
         {
-            var users = Repository.Get(u => u.Email == email && u.AdminRights.Count(r => r.ObjectId == orgId) > 0);
+            var users = Repository.Get(u => u.Email == email && u.AdminRights.Any(r => r.Role.Name == "Medarbejder"));
 
             if (users.Any()) return Ok();
 

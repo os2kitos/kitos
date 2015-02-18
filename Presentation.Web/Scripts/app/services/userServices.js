@@ -19,7 +19,7 @@
             var currentOrgUnitId;
             var currentOrgUnitName;
             var isUsingDefaultOrgUnit;
-            
+
             if (defaultOrgUnitId == null) {
                 currentOrgUnitId = currOrg.root.id;
                 currentOrgUnitName = currOrg.root.name;
@@ -40,16 +40,16 @@
                 fullName: response.fullName,
                 email: response.email,
                 phoneNumber: response.phoneNumber,
-                
+
                 isGlobalAdmin: user.isGlobalAdmin,
                 isLocalAdmin: isLocalAdmin,
-                
+
                 orgAndDefaultUnit: orgAndDefaultUnit,
 
                 currentOrganizationUnitId: currentOrgUnitId,
                 currentOrganizationUnitName: currentOrgUnitName,
                 isUsingDefaultOrgUnit: isUsingDefaultOrgUnit,
-                
+
                 defaultOrganizationUnitId: defaultOrgUnitId,
                 
                 currentOrganization: currOrg,
@@ -218,10 +218,10 @@
         function resolveOrganization2(orgsAndDefaultUnits) {
 
             var deferred = $q.defer();
-            
+
             //first, if the user is only member of one organization, just use that
-            if (orgsAndDefaultUnits.length == 1) {
-                var firstOrgAndDefaultUnit = orgsAndDefaultUnits[0];
+            if (orgsAndDefaultUnits.$values.length == 1) {
+                var firstOrgAndDefaultUnit = orgsAndDefaultUnits.$values[0];
                 setSavedOrgId(firstOrgAndDefaultUnit.organization.id);
 
                 deferred.resolve(firstOrgAndDefaultUnit);
@@ -232,12 +232,12 @@
             var storedOrgId = getSavedOrgId();
 
             if (storedOrgId) {
-                
+
                 //given the saved org id, find the organization in the list of organization and default org units
-                var foundOrgAndDefaultUnit = _.find(orgsAndDefaultUnits, function(orgAndUnit) {
+                var foundOrgAndDefaultUnit = _.find(orgsAndDefaultUnits.$values, function(orgAndUnit) {
                     return orgAndUnit.organization.id == storedOrgId;
                 });
-                    
+
                 if (foundOrgAndDefaultUnit != null) {
                     deferred.resolve(foundOrgAndDefaultUnit);
                     return deferred.promise;
@@ -247,7 +247,7 @@
                 //so clear it
                 clearSavedOrgId();
             }
-            
+
             //if we get to this point, there is more than organization to choose from,
             //and we couldn't use the stored organization id.
             //last resort we have to prompt the user to select an organization
@@ -258,16 +258,17 @@
                 controller: ['$scope', '$modalInstance', 'autofocus', function ($modalScope, $modalInstance, autofocus) {
                     autofocus();
 
-                    $modalScope.organizations = _.map(orgsAndDefaultUnits, function(orgAndUnit) {
+                    $modalScope.organizations = _.map(orgsAndDefaultUnits.$values, function (orgAndUnit) {
                         return orgAndUnit.organization;
                     });
 
                     $modalScope.orgChooser = {
                         selectedId : null
                     };
-                                
+
                     $modalScope.ok = function () {
-                        var selectedOrgAndUnit = _.find(orgsAndDefaultUnits, function(orgAndUnit) {
+
+                        var selectedOrgAndUnit = _.find(orgsAndDefaultUnits.$values, function(orgAndUnit) {
                             return orgAndUnit.organization.id == $modalScope.orgChooser.selectedId;
                         });
 
@@ -293,7 +294,7 @@
             var payload = {
                 orgId: _user.currentOrganizationId,
                 orgUnitId: newDefaultOrgUnitId
-                    }
+            }
 
             $http.post('api/user?updateDefaultOrgUnit', payload).success(function (result) {
                 //now we gotta update the saved user in the userService.
@@ -305,7 +306,7 @@
                 });
             }).error(function() {
                 deferred.reject("Couldn't update default org unit!");
-                });
+            });
 
             return deferred.promise;
         }
