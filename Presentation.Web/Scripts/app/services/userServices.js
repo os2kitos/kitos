@@ -245,7 +245,7 @@
 
                 //if we get to this point, the stored org id was useless - i.e. it referred to an organization, that the user no longer is a member of.
                 //so clear it
-                    clearSavedOrgId();
+                clearSavedOrgId();
             }
             
             //if we get to this point, there is more than organization to choose from,
