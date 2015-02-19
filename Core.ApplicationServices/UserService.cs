@@ -82,8 +82,6 @@ namespace Core.ApplicationServices
                           "<p><a href='" + _baseUrl +
                           "docs/Vejledning%20til%20slutbrugeren.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>";
 
-            subject = subject.Replace('\r', ' ').Replace('\n', ' ');
-
             IssuePasswordReset(user, subject, content);
 
             user.LastAdvisDate = DateTime.Now.Date;
@@ -108,11 +106,11 @@ namespace Core.ApplicationServices
                               "<p>Linket udløber om " + _ttl.TotalDays + " dage.</p>" +
                               "<p><a href='" + _baseUrl + "docs/Vejledning%20til%20slutbrugeren.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>";
             }
-            const string mailSubject = "Nulstilning af dit KITOS password";
+            var mailSubject = "Nulstilning af dit KITOS password" + _mailSuffix;
 
             var message = new MailMessage()
                 {
-                    Subject = subject ?? mailSubject,
+                    Subject = (subject ?? mailSubject).Replace('\r', ' ').Replace('\n', ' '),
                     Body = content ?? mailContent,
                     IsBodyHtml = true,
                     BodyEncoding = Encoding.UTF8,
