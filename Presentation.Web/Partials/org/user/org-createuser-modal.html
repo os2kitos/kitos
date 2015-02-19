@@ -55,7 +55,7 @@
     </form>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-success" data-ng-show="emailExists" data-ng-disabled="userExists" data-ng-click="create(false)">Tilknyt bruger</button>
+    <button class="btn btn-success" data-ng-show="emailExists" data-ng-disabled="userExists && emailExists" data-ng-click="create(false)">Tilknyt bruger</button>
     <button class="btn btn-primary" data-ng-hide="emailExists" data-ng-click="create(false)" data-ng-disabled="createUser.form.$invalid || createUser.form.$pristine || busy" data-disabled-on-busy="">Opret bruger</button>
     <button class="btn btn-success" data-ng-hide="emailExists" data-ng-click="create(true)" data-ng-disabled="createUser.form.$invalid || createUser.form.$pristine || busy" data-disabled-on-busy="">Opret bruger og send advis</button>
     <button class="btn btn-warning" data-ng-click="cancel()" data-ng-disabled="busy" data-disabled-on-busy="">Annuller</button>
