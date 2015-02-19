@@ -1,5 +1,4 @@
-﻿@using Microsoft.VisualStudio.Web.PageInspector.Runtime
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" data-ng-app="app">
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
@@ -10,7 +9,7 @@
     @Styles.Render("~/Content/cssbundle")
     @if (ViewBag.Environment != "Prod")
     {
-        if (ViewBag.Environment == "Dev")
+        if (ViewBag.Environment == "Test")
         {
             <style>
                 #navbar-top {
