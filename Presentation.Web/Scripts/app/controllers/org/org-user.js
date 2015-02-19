@@ -121,7 +121,7 @@
 
                     var msg = notify.addInfoMessage("Arbejder ...", false);
 
-                    $http.delete("api/adminrights/?orgId=" + oId + "&userId=" + uId + "&byOrganization=").success(function (deleteResult) {
+                    $http.delete("api/adminrights/?orgId=" + user.currentOrganizationId + "&userId=" + uId + "&byOrganization=").success(function (deleteResult) {
                         msg.toSuccessMessage(u.name + " " + u.lastName + " er ikke længere tilknyttet organisationen");
                         reload();
                     }).error(function (deleteResult) {
