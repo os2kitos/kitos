@@ -10,11 +10,23 @@
     @Styles.Render("~/Content/cssbundle")
     @if (ViewBag.Environment != "Prod")
     {
-        <style>
-            .navbar .navbar-inverse .navbar-static-top {
-                background-color: red !important;
-            }
-        </style>
+        if (ViewBag.Environment == "Dev")
+        {
+            <style>
+                #navbar-top {
+                    background-color: red !important;
+                }
+            </style>
+        }
+        else if (ViewBag.Environment == "Sandbox")
+        {
+            <style>
+                #navbar-top {
+                    background-color: sandybrown !important;
+                }
+            </style>
+        }
+
     }
 </head>
 <body data-ng-cloak>

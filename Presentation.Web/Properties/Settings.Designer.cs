@@ -52,10 +52,10 @@ namespace Presentation.Web.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int Environment {
+        [global::System.Configuration.DefaultSettingValueAttribute("Dev")]
+        public string Environment {
             get {
-                return ((int)(this["Environment"]));
+                return ((string)(this["Environment"]));
             }
         }
     }
