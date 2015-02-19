@@ -2,7 +2,9 @@
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using Core.ApplicationServices;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
 using DataTable = System.Data.DataTable;
@@ -40,19 +42,22 @@ namespace Infrastructure.OpenXML
 
                 var columns = rows.Max(x => x.Descendants<Cell>().Count());
 
-                for (int i = 0; i < columns; i++)
+                for (var i = 0; i < columns; i++)
                 {
                     dataTable.Columns.Add();
                 }
 
-                foreach (var row in rows) //Includes header row
+                foreach (var row in rows)
                 {
-                    if(row.RowIndex < 8)
+                    //skip header row
+                    if(row.RowIndex < 2)
                         continue;
     
                     var dataRow = dataTable.NewRow();
 
                     var hasValue = false;
+                    for(var i = =; i < row.Co)
+
                     for (int i = 0; i < row.Descendants<Cell>().Count(); i++)
                     {
                         var cellValue = GetCellValue(spreadsheetDocument, row.Descendants<Cell>().ElementAt(i));
@@ -71,9 +76,8 @@ namespace Infrastructure.OpenXML
                 }
 
                 //dataTable.Rows.RemoveAt(0); // removes header row?
-
-                if (dataTable != null)
-                    dataSet.Tables.Add(dataTable);
+                
+                dataSet.Tables.Add(dataTable);
                 
             }
 
@@ -114,18 +118,37 @@ namespace Infrastructure.OpenXML
                 var workSheetPart = (WorksheetPart)workbookPart.GetPartById(id);
                 var sheetData = workSheetPart.Worksheet.GetFirstChild<SheetData>();
 
-                //Get 8 first rows
-                var rows = sheetData.Elements<Row>().Where(r => r.RowIndex < 8).ToArray();
-
-                //Remove all rows
-                sheetData.RemoveAllChildren();
-
-                //Append 8 first rows again
-                foreach (var row in  rows)
+                /*
+                 //cell format is a kind of style that can be applied to cells 
+                var unlockedCellFormat = new CellFormat()
                 {
-                    sheetData.AppendChild(row);
-                }
+                    ApplyProtection = false,
+                    Protection = new Protection() { Locked = false }
+                };
+                
+                // append the unlocked cell format to the stylesheet
+                var unlockedStyle = workbookPart.AddNewPart<WorkbookStylesPart>();
+                unlockedStyle.Stylesheet.CellFormats.AppendChild<CellFormat>(unlockedCellFormat);
+                unlockedStyle.Stylesheet.Save();
+                 
+                var lockedCellFormat = new CellFormat()
+                {
+                    ApplyProtection = true,
+                    Protection = new Protection() { Locked = true }
+                };
 
+
+                // append the locked cell format to the stylesheet
+                var workbookStylesPart = workbookPart.GetPartsOfType<WorkbookStylesPart>().FirstOrDefault() ?? workbookPart.AddNewPart<WorkbookStylesPart>();
+                workbookStylesPart.Stylesheet.CellFormats.AppendChild<CellFormat>(lockedCellFormat);
+                workbookStylesPart.Stylesheet.Save();
+                var lockedStyleIndex = UInt32Value.FromUInt32((uint)workbookStylesPart.Stylesheet.CellFormats.Count());
+                 */
+
+                //Delete all rows except for the header row
+                var headerRow = sheetData.Elements<Row>().FirstOrDefault();
+                sheetData.RemoveAllChildren();
+                sheetData.AppendChild(headerRow);
 
                 foreach (DataRow row in table.Rows)
                 {
@@ -133,13 +156,14 @@ namespace Infrastructure.OpenXML
 
                     foreach (DataColumn column in table.Columns)
                     {
-                        
+
                         var newCell = new Cell()
                         {
                             CellValue = new CellValue(row[column].ToString()),
-                            DataType = CellValues.String
+                            DataType = CellValues.String,
+                            //StyleIndex = lockedStyleIndex //locked style
                         };
-
+                        
                         //TODO: Altid int?
                         int t;
                         newCell.DataType = int.TryParse(row[column].ToString(), out t) ? CellValues.Number : CellValues.String;
@@ -149,7 +173,24 @@ namespace Infrastructure.OpenXML
                     sheetData.AppendChild(newRow);
                 }
 
+
+                /* disabled until more information on the subject is found - or at least until i can test it properly
+                //this is also necessary to enable protection of cells. 
+                //a strong password is not really necessary for our application..... afterall this is not a security feature,
+                //but more of a UX thing - to avoid that the user accidentally edits stuff he can't
+                var sheetProtection = new SheetProtection();
+                sheetProtection.Password = "password";
+
+                //really, i have no idea what this means.......... see http://stackoverflow.com/questions/20257842/read-only-or-lock-the-particular-cells-or-rows-using-open-xml-sdk
+                sheetProtection.Sheet = true;
+                sheetProtection.Objects = true;
+                sheetProtection.Scenarios = true;         
+
+                workSheetPart.Worksheet.InsertAfter(sheetProtection, sheetData);
+                workSheetPart.Worksheet.Save();
+                 */
             }
+            
 
             workbookPart.Workbook.Save(); //TODO: Test if nessesary?
             spreadsheetDocument.Close(); //TODO: Make sure this dosn't clear stream

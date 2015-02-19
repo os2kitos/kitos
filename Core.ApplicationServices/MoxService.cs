@@ -63,17 +63,23 @@ namespace Core.ApplicationServices
             if (long.TryParse(s, out i)) return i;
             return null;
         }
-
+        
+        /* imports organization units into an organization */
         public void Import(Stream stream, int organizationId, User kitosUser)
         {
             var set = _excelHandler.Import(stream);
             var orgTable = set.Tables[1];
 
             // existing orgUnits
-            var exising =
+            var existingDatarows =
                 orgTable.AsEnumerable()
-                    .Where(x => !String.IsNullOrEmpty(x.Field<string>(1)))
-                    .Select(x => new OrgUnit { Id = Convert.ToInt32(x.Field<string>(1)), Name = x.Field<string>(2) }).ToList();
+                    .Where(x => !String.IsNullOrEmpty(x.Field<string>(1)));
+
+            var existing = existingDatarows.Select(x => new OrgUnit
+            {
+                Id = Convert.ToInt32(Convert.ToDouble(x.Field<string>(1))), 
+                Name = x.Field<string>(2)
+            }).ToList();
 
             // filter (remove) orgunits without an ID and groupby parent
             var newOrgUnitsGrouped =
@@ -87,7 +93,7 @@ namespace Core.ApplicationServices
             {
                 var current = newOrgUnitsGrouped[i];
                 // if parentless (root) or parent already exists
-                var existingParent = exising.SingleOrDefault(x => x.Name == current.Key);
+                var existingParent = existing.SingleOrDefault(x => x.Name == current.Key);
                 if (string.IsNullOrEmpty(current.Key) || existingParent != null)
                 {
                     var proxyOrgUnits = new List<OrganizationUnit>();
@@ -104,7 +110,7 @@ namespace Core.ApplicationServices
                             OrganizationId = organizationId
                         });
                         proxyOrgUnits.Add(orgUnitEntity);
-                        exising.Add(orgUnit);
+                        existing.Add(orgUnit);
                     }
                     _orgUnitRepository.Save();
 
@@ -140,7 +146,6 @@ namespace Core.ApplicationServices
             table.Columns.Add();
             table.Columns.Add();
             table.Columns.Add();
-            table.Columns.Add();
 
             foreach (var orgUnit in orgUnits)
             {
@@ -148,7 +153,7 @@ namespace Core.ApplicationServices
                 if (orgUnit.Parent != null)
                     parent = orgUnit.Parent.Name;
                 
-                table.Rows.Add("", orgUnit.Id, orgUnit.Name, orgUnit.Ean, parent);
+                table.Rows.Add(orgUnit.Id, orgUnit.Name, orgUnit.Ean, parent);
             }
 
             return table;
@@ -160,11 +165,10 @@ namespace Core.ApplicationServices
             table.Columns.Add();
             table.Columns.Add();
             table.Columns.Add();
-            table.Columns.Add();
 
             foreach (var orgRole in orgRoles)
             {
-                table.Rows.Add("", orgRole.OrgUnit, orgRole.Role, orgRole.User);
+                table.Rows.Add(orgRole.OrgUnit, orgRole.Role, orgRole.User);
             }
 
             return table;
@@ -176,11 +180,10 @@ namespace Core.ApplicationServices
             table.Columns.Add();
             table.Columns.Add();
             table.Columns.Add();
-            table.Columns.Add();
 
             foreach (var orgRole in orgRoles)
             {
-                table.Rows.Add("", orgRole.OrgUnit, orgRole.Task, orgRole.Overview);
+                table.Rows.Add(orgRole.OrgUnit, orgRole.Task, orgRole.Overview);
             }
 
             return table;
@@ -195,7 +198,7 @@ namespace Core.ApplicationServices
 
             foreach (var role in roles)
             {
-                table.Rows.Add("", role.Name, role.Id);
+                table.Rows.Add(role.Name, role.Id);
             }
 
             return table;
@@ -208,12 +211,11 @@ namespace Core.ApplicationServices
             table.Columns.Add();
             table.Columns.Add();
             table.Columns.Add();
-            table.Columns.Add();
 
             foreach (var task in tasks)
             {
                 var lookupString = task.TaskKey + " " + task.Description;
-                table.Rows.Add("", lookupString, task.Id, task.TaskKey, task.Description);
+                table.Rows.Add(lookupString, task.Id, task.TaskKey, task.Description);
             }
 
             return table;
@@ -228,7 +230,6 @@ namespace Core.ApplicationServices
             table.Columns.Add();
             table.Columns.Add();
             table.Columns.Add();
-            table.Columns.Add();
 
             foreach (var user in users)
             {
@@ -237,7 +238,7 @@ namespace Core.ApplicationServices
                 if (user.DefaultOrganizationUnit != null)
                     defaultOrgUnitName = user.DefaultOrganizationUnit.Name;
 
-                table.Rows.Add("", lookupString, user.Id, user.Name, user.Email, user.DefaultOrganizationUnitId, defaultOrgUnitName);
+                table.Rows.Add(lookupString, user.Id, user.Name, user.Email, user.DefaultOrganizationUnitId, defaultOrgUnitName);
             }
 
             return table;
