@@ -6,11 +6,12 @@
         <p>Du er medlem er flere organisationer. Vælg, hvilken en du vil arbejde i:</p>
 
         <select class="form-control" autofocus data-ng-model="orgChooser.selectedId" data-ng-options="org.id as org.name for org in organizations">
+            <option value='' disabled>Vælg organisation</option>
         </select>
 
     </div>
     <div class="modal-footer">
-        <button class="btn btn-primary" data-ng-click="ok()" data-ng-disabled="selectedId == 0">OK</button>
+        <button class="btn btn-primary" data-ng-click="ok()" data-ng-disabled="orgChooser.selectedId == string.empty">OK</button>
     </div>
 </div>
 <div data-ng-if="organizations.length == 0">
