@@ -115,8 +115,6 @@
                 }
 
                 function deleteOrgRoleAction(u) {
-                    var oId = u.adminRights[0].organizationId;
-                    var rId = u.adminRights[0].roleId;
                     var uId = u.id;
 
                     var msg = notify.addInfoMessage("Arbejder ...", false);
