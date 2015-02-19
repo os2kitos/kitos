@@ -137,7 +137,9 @@ namespace Presentation.Web.Controllers.API
 
                 foreach (var user in users)
                 {
-                    user.DefaultOrganizationUnit = user.AdminRights.FirstOrDefault(x => x.ObjectId == orgId).DefaultOrgUnit;
+                    var right = user.AdminRights.FirstOrDefault(x => x.ObjectId == orgId);
+                    if (right != null)
+                        user.DefaultOrganizationUnit = right.DefaultOrgUnit;
                     user.DefaultOrganizationUnitId = user.DefaultOrganizationUnit != null ? (int?)user.DefaultOrganizationUnit.Id : null;
                 }
 
