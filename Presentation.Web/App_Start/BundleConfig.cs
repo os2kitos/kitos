@@ -7,10 +7,6 @@ namespace Presentation.Web
         // For more information on Bundling, visit http://go.microsoft.com/fwlink/?LinkId=254725
         public static void RegisterBundles(BundleCollection bundles)
         {
-            // disable bundling and minification... it causes issues :(
-            // TODO fix the errors when bundling and minifying
-            BundleTable.EnableOptimizations = false;
-
             // jQuery and plugins
             bundles.Add(new ScriptBundle("~/Scripts/jquery").Include(
                 "~/Scripts/jquery-{version}.js",
