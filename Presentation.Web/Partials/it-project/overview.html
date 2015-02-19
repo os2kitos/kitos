@@ -72,7 +72,7 @@
             <!-- Responsible -->
             <td>{{ p.responsibleOrgUnitName }}</td>
             <!-- Role -->
-            <td>{{ p.rights | filter:{roleId:chosenRoleId}:true | joinBy:', ':'user.name' }}</td>
+            <td>{{ p.rights | filter:{roleId:chosenRoleId}:true | joinBy:', ':'user.fullName' }}</td>
             <!-- ID -->
             <td>{{ p.itProjectId }}</td>
             <!-- Type -->
