@@ -11,5 +11,8 @@
     <Setting Name="MailSuffix" Type="System.String" Scope="Application">
       <Value Profile="(Default)">(i dev)</Value>
     </Setting>
+    <Setting Name="Environment" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Dev</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -1,4 +1,5 @@
 ﻿using System.Web.Mvc;
+using Presentation.Web.Properties;
 
 namespace Presentation.Web.Controllers.Web
 {
@@ -9,6 +10,8 @@ namespace Presentation.Web.Controllers.Web
 
         public ActionResult Index()
         {
+            ViewBag.Environment = Settings.Default.Environment;
+
             return View();
         }
 
