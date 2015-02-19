@@ -49,5 +49,14 @@ namespace Presentation.Web.Properties {
                 return ((string)(this["MailSuffix"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int Environment {
+            get {
+                return ((int)(this["Environment"]));
+            }
+        }
     }
 }

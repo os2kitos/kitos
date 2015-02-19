@@ -77,7 +77,8 @@ namespace Presentation.Web.App_Start
             kernel.Bind<IUserService>().To<UserService>().InRequestScope()
                 .WithConstructorArgument("ttl", Settings.Default.ResetPasswordTTL)
                 .WithConstructorArgument("baseUrl", Settings.Default.BaseUrl)
-                .WithConstructorArgument("mailSuffix", Settings.Default.MailSuffix);
+                .WithConstructorArgument("mailSuffix", Settings.Default.MailSuffix)
+                .WithConstructorArgument("environment", Settings.Default.Environment);
             kernel.Bind<IOrgUnitService>().To<OrgUnitService>().InRequestScope();
             kernel.Bind<IAdminService>().To<AdminService>().InRequestScope();
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InRequestScope();
