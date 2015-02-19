@@ -79,10 +79,10 @@
                                     };
 
                                     $http.post("api/adminrights/" + oId + "?organizationId=" + oId, data, { handleBusy: true }).success(function (result) {
-                                        msg.toSuccessMessage(userResult.name + " er oprettet i KITOS");
+                                        msg.toSuccessMessage(userResult.fullName + " er oprettet i KITOS");
                                         reload();
                                     }).error(function() {
-                                        msg.toErrorMessage("Kunne ikke tilknytte " + user.name + ' til organisationen!');
+                                        msg.toErrorMessage("Kunne ikke tilknytte " + user.fullName + ' til organisationen!');
                                     });
 
                                     $modalInstance.close(userResult);
