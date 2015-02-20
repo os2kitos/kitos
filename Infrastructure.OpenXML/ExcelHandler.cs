@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using Core.ApplicationServices;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
@@ -16,7 +19,7 @@ namespace Infrastructure.OpenXML
 
         public DataSet Import(Stream stream)
         {
-            DataSet dataSet = new DataSet();
+            var dataSet = new DataSet();
             
             //Open document
             var spreadsheetDocument = SpreadsheetDocument.Open(stream, true);
@@ -38,11 +41,11 @@ namespace Infrastructure.OpenXML
                 var workSheet = worksheetPart.Worksheet;
                 var sheetData = workSheet.GetFirstChild<SheetData>();
 
-                var rows = sheetData.Descendants<Row>();
+                var rows = sheetData.Descendants<Row>().ToList();
 
-                var columns = rows.Max(x => x.Descendants<Cell>().Count());
+                var numColumns = rows.Max(x => x.Descendants<Cell>().Count());
 
-                for (var i = 0; i < columns; i++)
+                for (var i = 0; i < numColumns; i++)
                 {
                     dataTable.Columns.Add();
                 }
@@ -55,27 +58,30 @@ namespace Infrastructure.OpenXML
     
                     var dataRow = dataTable.NewRow();
 
-                    var hasValue = false;
-                    for(var i = =; i < row.Co)
+                    var cells = GetCells(row, numColumns);
 
-                    for (int i = 0; i < row.Descendants<Cell>().Count(); i++)
+                    var i = 0;
+                    bool rowHasValue = false;
+
+                    foreach (var cell in cells)
                     {
-                        var cellValue = GetCellValue(spreadsheetDocument, row.Descendants<Cell>().ElementAt(i));
+                        var cellValue = GetCellValue(spreadsheetDocument, cell);
                         dataRow[i] = cellValue;
+                        
                         if (!string.IsNullOrWhiteSpace(cellValue))
                         {
-                            hasValue = true;
+                            rowHasValue = true;
                         }
+
+                        i++;
                     }
 
-                    if (hasValue)
+                    if (rowHasValue)
                     {
                         dataTable.Rows.Add(dataRow);
                     }
                     
                 }
-
-                //dataTable.Rows.RemoveAt(0); // removes header row?
                 
                 dataSet.Tables.Add(dataTable);
                 
@@ -84,8 +90,88 @@ namespace Infrastructure.OpenXML
             return dataSet;
         }
 
+        //returns a list of cells of length @numColumns.
+        //if there's a blank cell between two non blank cell, this list will properly reflect that
+        //by inserting empty cells the right places.
+        //likewise, if the row doesn't have @numColumns cells, empty cells will be appended.
+        private IEnumerable<Cell> GetCells(Row row, int numColumns)
+        {
+            var result = new List<Cell>();
+
+            var i = 0;
+            foreach (var cell in row.Descendants<Cell>())
+            {
+                string columnName = GetColumnName(cell.CellReference);
+                //column index is the real index of the cell
+                int columnIndex = ConvertColumnNameToNumber(columnName);
+
+                //for every missing cell between the previous and the current index, add a new cell
+                for (; i < columnIndex; i++)
+                {
+                    result.Add(new Cell());
+                }
+
+                //then add the current cell
+                result.Add(cell);
+                i++;
+            }
+
+            //add all remaining cells until we reach last column
+            for (; i < numColumns; i++)
+            {
+                result.Add(new Cell());
+            }
+
+            return result;
+        } 
+
+        /// <summary>
+        /// Given a cell name, parses the specified cell to get the column name.
+        /// See http://stackoverflow.com/questions/3837981/reading-excel-open-xml-is-ignoring-blank-cells
+        /// </summary>
+        /// <param name="cellReference">Address of the cell (ie. B2)</param>
+        /// <returns>Column Name (ie. B)</returns>
+        private static string GetColumnName(string cellReference)
+        {
+            // Match the column name portion of the cell name.
+            Regex regex = new Regex("[A-Za-z]+");
+            Match match = regex.Match(cellReference);
+
+            return match.Value;
+        }
+
+        /// <summary>
+        /// Given just the column name (no row index),
+        /// it will return the zero based column index.
+        /// See http://stackoverflow.com/questions/3837981/reading-excel-open-xml-is-ignoring-blank-cells
+        /// </summary>
+        /// <param name="columnName">Column Name (ie. A or AB)</param>
+        /// <returns>Zero based index if the conversion was successful</returns>
+        /// <exception cref="ArgumentException">thrown if the given string
+        /// contains characters other than uppercase letters</exception>
+        private static int ConvertColumnNameToNumber(string columnName)
+        {
+            Regex alpha = new Regex("^[A-Z]+$");
+            if (!alpha.IsMatch(columnName)) throw new ArgumentException();
+
+            char[] colLetters = columnName.ToCharArray();
+            Array.Reverse(colLetters);
+
+            int convertedValue = 0;
+            for (int i = 0; i < colLetters.Length; i++)
+            {
+                char letter = colLetters[i];
+                int current = i == 0 ? letter - 65 : letter - 64; // ASCII 'A' = 65
+                convertedValue += current * (int)Math.Pow(26, i);
+            }
+
+            return convertedValue;
+        }
+
         private static string GetCellValue(SpreadsheetDocument document, Cell cell)
         {
+            if (cell == null) return "";
+
             var stringTablePart = document.WorkbookPart.SharedStringTablePart;
 
             var value = "";
