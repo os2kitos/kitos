@@ -57,35 +57,48 @@ namespace Core.ApplicationServices
             return _excelHandler.Export(set, stream);
         }
 
-        private static long? ToNullableLong(string s)
+        private static long? StringToEAN(string s)
         {
-            long i;
-            if (long.TryParse(s, out i)) return i;
-            return null;
+            if (string.IsNullOrEmpty(s)) return null;
+
+            //if the ean was properly entered, excel will treat is as a Number,
+            //which is bascially a string in double format i.e "12345678.0"
+            //so try to parse as double first
+            double dbl;
+            if (!double.TryParse(s, out dbl)) return null;
+
+            //then convert to long
+            return Convert.ToInt64(dbl);
         }
         
         /* imports organization units into an organization */
         public void Import(Stream stream, int organizationId, User kitosUser)
         {
             var set = _excelHandler.Import(stream);
-            var orgTable = set.Tables[1];
+            var orgTable = set.Tables[0];
 
             // existing orgUnits
             var existingDatarows =
                 orgTable.AsEnumerable()
-                    .Where(x => !String.IsNullOrEmpty(x.Field<string>(1)));
+                    .Where(x => !String.IsNullOrEmpty(x.Field<string>(0)));
 
             var existing = existingDatarows.Select(x => new OrgUnit
             {
-                Id = Convert.ToInt32(Convert.ToDouble(x.Field<string>(1))), 
-                Name = x.Field<string>(2)
+                Id = Convert.ToInt32(Convert.ToDouble(x.Field<string>(0))), 
+                Name = x.Field<string>(1)
             }).ToList();
 
             // filter (remove) orgunits without an ID and groupby parent
             var newOrgUnitsGrouped =
                 orgTable.AsEnumerable()
-                    .Where(x => String.IsNullOrEmpty(x.Field<string>(1)))
-                    .Select(x => new OrgUnit { Name = x.Field<string>(2), Parent = x.Field<string>(4), Ean = ToNullableLong(x.Field<string>(3)) })
+                    .Where(x => String.IsNullOrEmpty(x.Field<string>(0)))
+                    .Where(x => !String.IsNullOrEmpty(x.Field<string>(3)))
+                    .Select(x => new OrgUnit
+                    {
+                        Name = x.Field<string>(1), 
+                        Parent = x.Field<string>(3), 
+                        Ean = StringToEAN(x.Field<string>(2))
+                    })
                     .GroupBy(x => x.Parent).ToList();
 
             var count = newOrgUnitsGrouped.Count();
