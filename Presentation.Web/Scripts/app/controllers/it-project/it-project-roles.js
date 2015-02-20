@@ -46,9 +46,8 @@
         function($rootScope, $scope, $http, notify, project, itProjectRights, itProjectRoles, user) {
             var projectId = project.id;
 
-            $scope.activeItProjectRoles = _.where(itProjectRoles, { isActive: true });
-
             $scope.orgId = user.currentOrganizationId;
+            $scope.activeItProjectRoles = _.where(itProjectRoles, { isActive: true });
             $scope.itProjectRoles = itProjectRoles;
             $scope.newRole = 1;
 
