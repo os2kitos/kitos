@@ -8,24 +8,30 @@
             controller: 'project.EditRolesCtrl',
             resolve: {
                 // re-resolve data from parent cause changes here wont cascade to it
-                project: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itproject/" + $stateParams.id)
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }],
-                itProjectRights: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itprojectrights/" + $stateParams.id)
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }],
-                itProjectRoles: ['$http', function ($http) {
-                    return $http.get("api/itprojectrole/")
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }],
+                project: [
+                    '$http', '$stateParams', function($http, $stateParams) {
+                        return $http.get("api/itproject/" + $stateParams.id)
+                            .then(function(result) {
+                                return result.data.response;
+                            });
+                    }
+                ],
+                itProjectRights: [
+                    '$http', '$stateParams', function($http, $stateParams) {
+                        return $http.get("api/itprojectrights/" + $stateParams.id)
+                            .then(function(result) {
+                                return result.data.response;
+                            });
+                    }
+                ],
+                itProjectRoles: [
+                    '$http', function($http) {
+                        return $http.get("api/itprojectrole/?nonsuggestions=")
+                            .then(function(result) {
+                                return result.data.response;
+                            });
+                    }
+                ],
                 user: ['userService', function (userService) {
                     return userService.getUser().then(function (user) {
                         return user;
@@ -39,6 +45,8 @@
     ['$rootScope', '$scope', '$http', 'notify', 'project', 'itProjectRights', 'itProjectRoles', 'user',
         function($rootScope, $scope, $http, notify, project, itProjectRights, itProjectRoles, user) {
             var projectId = project.id;
+
+            $scope.activeItProjectRoles = _.where(itProjectRoles, { isActive: true });
 
             $scope.orgId = user.currentOrganizationId;
             $scope.itProjectRoles = itProjectRoles;
