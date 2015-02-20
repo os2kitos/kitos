@@ -14,24 +14,21 @@
                             .then(function(result) {
                                 return result.data.response;
                             });
-                    }
-                ],
+                }],
                 itProjectRights: [
                     '$http', '$stateParams', function($http, $stateParams) {
                         return $http.get("api/itprojectrights/" + $stateParams.id)
                             .then(function(result) {
                                 return result.data.response;
                             });
-                    }
-                ],
+                }],
                 itProjectRoles: [
                     '$http', function($http) {
                         return $http.get("api/itprojectrole/?nonsuggestions=")
                             .then(function(result) {
                                 return result.data.response;
                             });
-                    }
-                ],
+                }],
                 user: ['userService', function (userService) {
                     return userService.getUser().then(function (user) {
                         return user;
