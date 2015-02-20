@@ -57,6 +57,22 @@ namespace Core.ApplicationServices
             return _excelHandler.Export(set, stream);
         }
 
+        
+        /* imports organization units into an organization */
+        public IEnumerable<MoxImportError> Import(Stream stream, int organizationId, User kitosUser)
+        {
+            var errors = new List<MoxImportError>();
+
+            var set = _excelHandler.Import(stream);
+
+            //importing org units
+            var orgTable = set.Tables[0];
+            errors.AddRange(ImportOrgUnits(orgTable, organizationId, kitosUser));
+
+            return errors;
+        }
+
+
         private static long? StringToEAN(string s)
         {
             if (string.IsNullOrEmpty(s)) return null;
@@ -70,84 +86,162 @@ namespace Core.ApplicationServices
             //then convert to long
             return Convert.ToInt64(dbl);
         }
-        
-        /* imports organization units into an organization */
-        public void Import(Stream stream, int organizationId, User kitosUser)
+
+        private static int? StringToId(string s)
         {
-            var set = _excelHandler.Import(stream);
-            var orgTable = set.Tables[0];
+            if (String.IsNullOrEmpty(s)) return null;
+            return Convert.ToInt32(Convert.ToDouble(s));
+        }
 
-            // existing orgUnits
-            var existingDatarows =
-                orgTable.AsEnumerable()
-                    .Where(x => !String.IsNullOrEmpty(x.Field<string>(0)));
+        private IEnumerable<MoxImportError> ImportOrgUnits(DataTable orgTable, int organizationId, User kitosUser)
+        {
+            var errors = new List<MoxImportError>();
 
-            var existing = existingDatarows.Select(x => new OrgUnit
+            //resolvedRows are the orgUnits that already has been added to the DB.
+            //the key is the name of the orgUnit;
+            var resolvedRows = new Dictionary<string, OrgUnitRow>();
+
+            //unresolved rows are orgUnits which still needs to be added to the DB.
+            var unresolvedRows = new List<OrgUnitRow>();
+
+            //preliminary pass and error checking
+            //split the rows into the old org units (already in db)
+            //and the new rows that the users has added to the sheet
+            var rowIndex = 2;
+            foreach(var row in orgTable.AsEnumerable())
             {
-                Id = Convert.ToInt32(Convert.ToDouble(x.Field<string>(0))), 
-                Name = x.Field<string>(1)
-            }).ToList();
+                //a row is new if the first column, the id, is empty
+                var id = StringToId(row.Field<string>(0));
+                var isNew = (id == null);
 
-            // filter (remove) orgunits without an ID and groupby parent
-            var newOrgUnitsGrouped =
-                orgTable.AsEnumerable()
-                    .Where(x => String.IsNullOrEmpty(x.Field<string>(0)))
-                    .Where(x => !String.IsNullOrEmpty(x.Field<string>(3)))
-                    .Select(x => new OrgUnit
-                    {
-                        Name = x.Field<string>(1), 
-                        Parent = x.Field<string>(3), 
-                        Ean = StringToEAN(x.Field<string>(2))
-                    })
-                    .GroupBy(x => x.Parent).ToList();
-
-            var count = newOrgUnitsGrouped.Count();
-            for (var i = 0; i < count; i++)
-            {
-                var current = newOrgUnitsGrouped[i];
-                // if parentless (root) or parent already exists
-                var existingParent = existing.SingleOrDefault(x => x.Name == current.Key);
-                if (string.IsNullOrEmpty(current.Key) || existingParent != null)
+                var orgUnitRow = new OrgUnitRow()
                 {
-                    var proxyOrgUnits = new List<OrganizationUnit>();
-                    foreach (var orgUnit in current)
+                    RowIndex = rowIndex, //needed for error reporting
+                    IsNew = isNew,
+                    Id = id,
+                    Name = row.Field<string>(1),
+                    Ean = StringToEAN(row.Field<string>(2)),
+                    Parent = row.Field<string>(3)
+                };
+
+                rowIndex++;
+                
+                //error checking
+                //name cannot be empty
+                if (String.IsNullOrWhiteSpace(orgUnitRow.Name))
+                {
+                    errors.Add(new MoxImportOrgUnitNoNameError(orgUnitRow.RowIndex));
+                    continue;
+                }
+                //parent cannot be empty on a new row
+                else if (orgUnitRow.IsNew && String.IsNullOrWhiteSpace(orgUnitRow.Parent))
+                {
+                    errors.Add(new MoxImportOrgUnitBadParentError(orgUnitRow.RowIndex));
+                    continue;
+                }
+                
+                if(isNew) unresolvedRows.Add(orgUnitRow);
+                else resolvedRows.Add(orgUnitRow.Name, orgUnitRow);
+
+            }
+
+            //do the actually passes, trying to resolve parents
+            var oneMorePass = true;
+            while (oneMorePass)
+            {
+                oneMorePass = false;
+
+                var notResolvedInThisPass = new List<OrgUnitRow>();
+                var resolvedInThisPass = new List<OrgUnitRow>();
+
+                foreach (var orgUnitRow in unresolvedRows)
+                {
+                    //try to locate a parent
+                    OrgUnitRow parent;
+                    if (resolvedRows.TryGetValue(orgUnitRow.Parent, out parent))
                     {
+
+                        //since a parent was found, insert the new org unit in the DB.
                         var orgUnitEntity = _orgUnitRepository.Insert(new OrganizationUnit
                         {
-                            Name = orgUnit.Name,
-                            Ean = orgUnit.Ean,
-                            ParentId = existingParent == null ? null : (int?)existingParent.Id,
+                            Name = orgUnitRow.Name,
+                            Ean = orgUnitRow.Ean,
+                            ParentId = parent.Id,
                             ObjectOwnerId = kitosUser.Id,
                             LastChangedByUserId = kitosUser.Id,
                             LastChanged = DateTime.Now,
                             OrganizationId = organizationId
                         });
-                        proxyOrgUnits.Add(orgUnitEntity);
-                        existing.Add(orgUnit);
+
+                        orgUnitRow.Proxy = orgUnitEntity;
+                        resolvedInThisPass.Add(orgUnitRow);
                     }
+                    else
+                    {
+                        notResolvedInThisPass.Add(orgUnitRow);
+                    }
+                }
+
+                if (resolvedInThisPass.Any())
+                {
+                    oneMorePass = true;
+                    //save repository - so the ids of the newly added org units are resolved
                     _orgUnitRepository.Save();
 
-                    foreach (var orgUnit in current)
+                    foreach (var orgUnitRow in resolvedInThisPass)
                     {
-                        var foundProxy = proxyOrgUnits.Single(x => x.Name == orgUnit.Name && x.Ean == orgUnit.Ean);
-                        orgUnit.Id = foundProxy.Id;
+                        orgUnitRow.Id = orgUnitRow.Proxy.Id;
+                        resolvedRows.Add(orgUnitRow.Name, orgUnitRow);
                     }
                 }
-                else
+
+                //if there's still some unresolve rows left, try again
+                if (notResolvedInThisPass.Any())
                 {
-                    // else add to end of list, to try and add it after parent have been added
-                    newOrgUnitsGrouped.Add(current);
-                    count++;
+                    unresolvedRows = notResolvedInThisPass;
                 }
+            }
+
+            //at this point, if there's is any unresolvedRows, we should report some errors
+            foreach (var orgUnitRow in unresolvedRows)
+            {
+                errors.Add(new MoxImportOrgUnitBadParentError(orgUnitRow.RowIndex));
+            }
+            
+            return errors;
+        }
+
+        public class MoxImportOrgUnitBadParentError : MoxImportError
+        {
+            public MoxImportOrgUnitBadParentError(int row)
+            {
+                Row = row;
+                Column = "D";
+                SheetName = "Organisation";
+                Message = "Overordnet enhed må ikke være blank og skal henvise til anden enhed.";
+            }
+        }
+
+        public class MoxImportOrgUnitNoNameError : MoxImportError
+        {
+            public MoxImportOrgUnitNoNameError(int row)
+            {
+                Row = row;
+                Column = "B";
+                SheetName = "Organisation";
+                Message = "Enheden skal have et navn.";
             }
         }
             
-        private class OrgUnit
+        private class OrgUnitRow
         {
-            public int Id { get; set; }
+            public int RowIndex { get; set; }
+            public bool IsNew { get; set; }
+            public int? Id { get; set; }
             public string Name { get; set; }
             public long? Ean { get; set; }
             public string Parent { get; set; }
+            public OrganizationUnit Proxy { get; set; }
         }
 
         #region Table Helpers

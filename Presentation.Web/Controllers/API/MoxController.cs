@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -6,6 +9,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -59,9 +63,19 @@ namespace Presentation.Web.Controllers.API
                 var buffer = await file.ReadAsByteArrayAsync();
                 var stream = new MemoryStream(buffer);
                 stream.Seek(0, SeekOrigin.Begin);
-                _moxService.Import(stream, organizationId, KitosUser);
+                var errors = _moxService.Import(stream, organizationId, KitosUser);
 
-                return Request.CreateResponse(HttpStatusCode.OK);
+                if (errors.Any())
+                {
+                    var errorsDto =
+                        AutoMapper.Mapper.Map<IEnumerable<MoxImportError>, IEnumerable<MoxImportErrorDTO>>(errors);
+
+                    return Request.CreateResponse(HttpStatusCode.OK, errorsDto);
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.OK);
+                }
             }
             catch (System.Exception e)
             {

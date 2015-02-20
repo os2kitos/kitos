@@ -260,6 +260,7 @@
     <Compile Include="Models\ItProjectOverviewDTO.cs" />
     <Compile Include="Models\ItProjectPhaseDTO.cs" />
     <Compile Include="Models\ItProjectStatusDTO.cs" />
+    <Compile Include="Models\MoxImportErrorDTO.cs" />
     <Compile Include="Models\PagingModel.cs" />
     <Compile Include="Controllers\API\PriceRegulationController.cs" />
     <Compile Include="Controllers\API\PaymentModelController.cs" />
