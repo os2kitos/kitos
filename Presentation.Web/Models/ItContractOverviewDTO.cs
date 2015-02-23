@@ -15,6 +15,12 @@ namespace Presentation.Web.Models
         public string ResponsibleOrganizationUnitName { get; set; }
         public string SupplierName { get; set; }
         public string ContractSignerName { get; set; }
+        public string ContractSignerLastName { get; set; }
+
+        public string ContractSignerFullName
+        {
+            get { return ContractSignerName + " " + ContractSignerLastName; }
+        }
 
         public IEnumerable<RightOutputDTO> Rights { get; set; }
 
