@@ -21,7 +21,7 @@
         {{ contract.rights | filter:{roleId:chosenRoleId}:true | joinBy:', ':'user.fullName' }}
     </span>
     <span data-ng-if="!chosenRoleId">
-        {{ contract.contractSignerName }} {{ contract.contractSignerLastName}}
+        {{ contract.contractSignerFullName}}
     </span>
 </td>
 
