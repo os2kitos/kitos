@@ -21,7 +21,6 @@ namespace Core.ApplicationServices
         {
             if (user.IsGlobalAdmin) return _orgRepository.Get();
             return _orgRepository.Get(o => o.Rights.Count(r => r.ObjectId == o.Id && r.UserId == user.Id) > 0);
-
         }
 
         //returns the default org unit for that user inside that organization
