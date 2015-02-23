@@ -6,7 +6,7 @@
             controller: 'system.EditRoles',
             resolve: {
                 itSystemRoles: ['$http', function ($http) {
-                    return $http.get("api/itsystemrole/")
+                    return $http.get("api/itsystemrole/?nonsuggestions=")
                         .then(function (result) {
                             return result.data.response;
                         });
@@ -23,6 +23,7 @@
     app.controller('system.EditRoles', ['$scope', '$http', 'notify', 'itSystemUsage', 'itSystemRoles', 'user', function ($scope, $http, notify, itSystemUsage, itSystemRoles, user) {
         var usageId = itSystemUsage.id;
 
+        $scope.activeItSystemRoles = _.where(itSystemRoles, { isActive: true });
         $scope.itSystemRoles = itSystemRoles;
         $scope.newRole = 1;
         $scope.orgId = user.currentOrganizationId;

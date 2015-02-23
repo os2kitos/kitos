@@ -84,7 +84,9 @@
                                 </td>
                                 <td>
                                     <select data-ui-select2="" name="selectRole" data-ng-model="right.roleForSelect" class="form-control input-sm">
-                                        <option data-ng-repeat="orgRole in orgRoles" value="{{orgRole.id}}">{{orgRole.name}} ({{orgRole.hasWriteAccess && "skriv" || "læs" }})
+                                        <option data-ng-show="orgRoles[right.roleId].isActive == false" disabled="true" value="{{orgRoles[right.roleId].id}}">{{orgRoles[right.roleId].name}} {{orgRoles[right.roleId].isActive == true ? "" : "(Inaktiv rolle)"}}</option>
+                                        <option data-ng-repeat="orgRole in activeOrgRoles" value="{{orgRole.id}}">
+                                            {{orgRole.name}} ({{orgRole.hasWriteAccess && "skriv" || "læs" }})
                                         </option>
                                     </select>
                                 </td>
@@ -108,7 +110,7 @@
                                             data-ng-model="newRole"
                                             data-placeholder="Vælg en organisationsrolle"
                                             data-ng-change="submitRight()">
-                                        <option data-ng-repeat="orgRole in orgRoles" value="{{ orgRole.id }}">{{ orgRole.name }} ({{ orgRole.hasWriteAccess && "skriv" || "læs" }})</option>
+                                        <option data-ng-repeat="orgRole in activeOrgRoles" value="{{ orgRole.id }}">{{ orgRole.name }} ({{ orgRole.hasWriteAccess && "skriv" || "læs" }})</option>
                                     </select>
                                 </td>
                                 <td colspan="2" class="form-group">

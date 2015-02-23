@@ -12,7 +12,7 @@
                         });
                 }],
                 itContractRoles: ['$http', function ($http) {
-                    return $http.get("api/itcontractrole/")
+                    return $http.get("api/itcontractrole/?nonsuggestions=")
                         .then(function (result) {
                             return result.data.response;
                         });
@@ -32,6 +32,7 @@
             $scope.orgId = user.currentOrganizationId;
 
             //normal user roles
+            $scope.activeItContractRoles = _.where(itContractRoles, { isActive: true });
             $scope.itContractRoles = itContractRoles;
             $scope.newRole = itContractRoles.length > 0 ? 1 : 0;
 
