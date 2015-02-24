@@ -12,6 +12,12 @@ namespace Presentation.Web.Models
     {
         public int Id { get; set; }
         public string ObjectOwnerName { get; set; }
+        public string ObjectOwnerLastName { get; set; }
+
+        public string ObjectOwnerFullName
+        {
+            get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
+        }
         public string ItProjectId { get; set; }
         public string Background { get; set; }
         public bool IsTransversal { get; set; }

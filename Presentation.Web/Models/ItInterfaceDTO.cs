@@ -15,6 +15,11 @@ namespace Presentation.Web.Models
         public int OrganizationId { get; set; }
         public string OrganizationName { get; set; }
         public string ObjectOwnerName { get; set; }
+        public string ObjectOwnerLastName { get; set; }
+        public string ObjectOwnerFullName
+        {
+            get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
+        }
         public AccessModifier AccessModifier { get; set; }
         public int? ExhibitedById { get; set; }
         public int? ExhibitedByItSystemId { get; set; }

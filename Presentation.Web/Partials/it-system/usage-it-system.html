@@ -12,15 +12,14 @@
                             <option value="">{{usage.itSystem.appTypeOptionName}}</option>
                         </select>
                     </div>
-
+                </div>
+                <!-- 1st column -->
+                <div class="col-md-6">
                     <!--Name-->
                     <div class="form-group">
                         <label for="system-name" class="control-label small">IT System</label>
                         <input type="text" id="system-name" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystem.name">
                     </div>
-                </div>
-                <!-- 1st column -->
-                <div class="col-md-6">
                     <!--Parent system-->
                     <div class="form-group">
                         <label for="system-parent" class="control-label small">Overordnet system</label>
@@ -36,6 +35,11 @@
 
                 <!-- 2st column -->
                 <div class="col-md-6">
+                    <!-- Object owner -->
+                    <div class="form-group">
+                        <label class="control-label small">Oprettet af</label>
+                        <input class="form-control input-sm" disabled="true" type="text" value="{{usage.itSystem.objectOwnerFullName}}"/>
+                    </div>
                     <!--Access modifier -->
                     <div class="form-group">
                         <label for="system-access" class="control-label small">Public</label>
@@ -49,7 +53,10 @@
                             <option data-ng-repeat="appType in appTypes" value="{{appType.id}}">{{appType.name}}</option>
                         </select>
                     </div>
+                </div>
 
+                <!-- full width -->
+                <div class="col-md-12">
                     <!--Usage type-->
                     <div class="form-group">
                         <label for="system-business-type" class="control-label small">Forretningstype</label>
@@ -57,10 +64,6 @@
                             <option data-ng-repeat="businessType in businessTypes" value="{{businessType.id}}">{{businessType.name}}</option>
                         </select>
                     </div>
-                </div>
-
-                <!-- full width -->
-                <div class="col-md-12">
                     <!-- Description and URL -->
                     <div class="form-group">
                         <label for="system-description" class="control-label small">Beskrivelse</label>
@@ -88,13 +91,13 @@
                                data-autosave="api/itsystemusage/{{usageId}}">
                     </div>
 
-                    <!-- version -->
+                    <!-- local call name -->
                     <div class="form-group">
-                        <label for="version" class="control-label small">Version</label>
-                        <input id="version" type="text" class="form-control input-sm"
+                        <label for="localcallname" class="control-label small">Lokal kaldenavn</label>
+                        <input id="localcallname" type="text" class="form-control input-sm"
+                               data-ng-model="usage.localCallName"
                                data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="usage.version"
-                               data-field="version"
+                               data-field="localCallName"
                                data-autosave="api/itsystemusage/{{usageId}}">
                     </div>
 
@@ -122,18 +125,36 @@
                                data-field="esdhRef"
                                data-autosave="api/itsystemusage/{{usageId}}">
                     </div>
+
+                    <!-- link ref -->
+                    <div class="form-group">
+                        <label for="url" class="control-label small">Mappe/URL ref.</label>
+                        <input id="url" type="text" class="form-control input-sm"
+                               data-ng-model="usage.directoryOrUrlRef"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-field="directoryOrUrlRef"
+                               data-autosave="api/itsystemusage/{{usageId}}">
+                    </div>
                 </div>
 
                 <!-- 4th column -->
                 <div class="col-md-6">
-                    <!-- local call name -->
+                    <!-- version -->
                     <div class="form-group">
-                        <label for="localcallname" class="control-label small">Lokal kaldenavn</label>
-                        <input id="localcallname" type="text" class="form-control input-sm"
-                               data-ng-model="usage.localCallName"
+                        <label for="version" class="control-label small">Version</label>
+                        <input id="version" type="text" class="form-control input-sm"
                                data-ng-disabled="!hasWriteAccess"
-                               data-field="localCallName"
+                               data-ng-model="usage.version"
+                               data-field="version"
                                data-autosave="api/itsystemusage/{{usageId}}">
+                    </div>
+
+                    <!-- Object owner -->
+                    <div class="form-group">
+                        <label for="usage-owner" class="control-label small">Oprettet af</label>
+                        <input type="text" id="usage-owner" class="form-control input-sm" 
+                               data-ng-disabled="true"
+                               value="{{usage.objectOwnerFullName}}">
                     </div>
 
                     <!-- overview system -->
@@ -175,15 +196,6 @@
 
                 <!-- full width -->
                 <div class="col-md-12">
-                    <!-- link ref -->
-                    <div class="form-group">
-                        <label for="url" class="control-label small">Mappe/URL ref.</label>
-                        <input id="url" type="text" class="form-control input-sm"
-                               data-ng-model="usage.directoryOrUrlRef"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-field="directoryOrUrlRef"
-                               data-autosave="api/itsystemusage/{{usageId}}">
-                    </div>
 
                     <!-- note -->
                     <div class="form-group">
