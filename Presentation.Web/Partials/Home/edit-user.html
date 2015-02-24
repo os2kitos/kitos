@@ -3,20 +3,28 @@
 <form name="profileForm" class="form-horizontal">
     <div>
         <div class="form-group">
+            <label class="col-md-3 control-label">Test</label>
+            <div class="col-md-8">
+                <div data-ng-model="user.defaultOrganizationUnitId" data-ng-change="updateDefaultOrgUnit()" data-select-org-unit=""></div>
+            </div>
+
+        </div>
+
+        <div class="form-group">
             <label for="default-unit" class="col-md-3 control-label">
                 Standard valgt enhed
             </label>
             <div class="col-md-8">
-                <select data-ng-if="!noOrgUnits" id="default-unit" data-ng-model="user.defaultOrganizationUnitId" data-ng-change="updateDefaultOrgUnit()"
+                <select data-ng-if="!noOrgUnits" id="default-unit" data-ng-change="updateDefaultOrgUnit()"
                         class="form-control" data-ng-options="orgUnit.id as orgUnit.qualifiedName for orgUnit in orgUnits"></select>
 
                 <div data-ng-if="!noOrgUnits && !user.isUsingDefaultOrgUnit" class="help-block text-primary">
                     <i class="glyphicon glyphicon-exclamation-sign"></i>
                     Bemærk: Du har ikke valgt en standard enhed i denne organisation.
                     Så længe du er logget ind i {{user.currentOrganizationName}} anvendes derfor enheden {{user.currentOrganizationUnitName}} som standard enhed.
-                        
+
                 </div>
-                
+
                 <div data-ng-if="noOrgUnits" class="help-block text-primary">
                     <select id="default-unit" data-ng-model="fakeDefaultOrganizationUnitId" data-ng-change="fakeUpdateDefaultOrgUnit()"
                             class="form-control" data-ng-options="orgUnit.id as orgUnit.qualifiedName for orgUnit in orgUnits"></select>
@@ -46,7 +54,7 @@
                 Telefon
             </label>
             <div class="col-md-8">
-                <input type="text" id="phone" data-ng-model="user.phoneNumber" class="form-control" data-ng-blur="patch('phoneNumber', user.phoneNumber)" />
+                <input type="text" id="phone" data-ng-model="user.phoneNumber" class="form-control" data-ng-blur="patch('phoneNumber', user.phoneNumber)"/>
             </div>
         </div>
         <div class="form-group">
@@ -54,7 +62,7 @@
                 Email
             </label>
             <div class="col-md-8">
-                <input type="text" id="usermail" data-ng-model="user.email" class="form-control" data-ng-blur="patch('email', user.email)" />
+                <input type="text" id="usermail" data-ng-model="user.email" class="form-control" data-ng-blur="patch('email', user.email)"/>
             </div>
         </div>
     </div>
