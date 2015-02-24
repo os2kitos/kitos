@@ -42,7 +42,11 @@ namespace Presentation.Web.Models
         public string ItSystemId { get; set; }
         public int ObjectOwnerId { get; set; }
         public string ObjectOwnerName { get; set; }
-
+        public string ObjectOwnerLastName { get; set; }
+        public string ObjectOwnerFullName
+        {
+            get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
+        }
         public AccessModifier AccessModifier { get; set; }
 
         public string Description { get; set; }

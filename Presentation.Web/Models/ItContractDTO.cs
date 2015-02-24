@@ -73,5 +73,12 @@ namespace Presentation.Web.Models
         public IEnumerable<AdviceDTO> Advices { get; set; }
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }
+
+        public string ObjectOwnerName { get; set; }
+        public string ObjectOwnerLastName { get; set; }
+        public string ObjectOwnerFullName
+        {
+            get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
+        }
     }
 }
