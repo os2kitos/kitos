@@ -63,19 +63,14 @@ namespace Presentation.Web.Controllers.API
                 var buffer = await file.ReadAsByteArrayAsync();
                 var stream = new MemoryStream(buffer);
                 stream.Seek(0, SeekOrigin.Begin);
-                var errors = _moxService.Import(stream, organizationId, KitosUser);
-
-                if (errors.Any())
-                {
-                    var errorsDto =
-                        AutoMapper.Mapper.Map<IEnumerable<MoxImportError>, IEnumerable<MoxImportErrorDTO>>(errors);
-
-                    return Request.CreateResponse(HttpStatusCode.OK, errorsDto);
-                }
-                else
-                {
-                    return Request.CreateResponse(HttpStatusCode.OK);
-                }
+                _moxService.Import(stream, organizationId, KitosUser);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (MoxImportException e)
+            {
+                var errorsDto =
+                    AutoMapper.Mapper.Map<IEnumerable<MoxImportError>, IEnumerable<MoxImportErrorDTO>>(e.Errors);
+                return Request.CreateResponse(HttpStatusCode.Conflict, errorsDto);
             }
             catch (System.Exception e)
             {
