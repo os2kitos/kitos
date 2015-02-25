@@ -1,13 +1,20 @@
-﻿using System.EnterpriseServices;
+﻿using System;
+using System.EnterpriseServices;
+using System.Linq;
 using System.Web.Http;
+using System.Web.Http.OData.Routing;
+using System.Web.OData;
 using System.Web.OData.Builder;
 using System.Web.OData.Extensions;
+using System.Web.OData.Routing;
+using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Infrastructure.DataAccess;
+using Microsoft.OData.Edm;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -70,7 +77,16 @@ namespace Presentation.Web
             //builder.EntitySet<ItProjectRole>("ItProjectRoles");
             //builder.EntitySet<ItProjectOrgUnitUsage>("ItProjectOrgUnitUsages");
             //builder.EntitySet<ItSystemUsageOrgUnitUsage>("ItSystemUsageOrgUnitUsages");
-            builder.EntitySet<ItSystem>("ItSystems").EntityType.HasKey(x => x.Id);
+            //builder.EntitySet<ItSystem>("ItSystems").EntityType.HasKey(x => x.Id);
+
+            var itSystems = builder.EntitySet<ItSystem>("ItSystems");
+            itSystems.EntityType.HasKey(x => x.Id);
+            itSystems.EntityType.Property(x => x.Name);
+            itSystems.EntityType.Property(x => x.Description);
+            itSystems.EntityType.Property(x => x.ParentId);
+            itSystems.EntityType.HasOptional(x => x.Parent).IsNavigable();
+            
+
             //builder.EntitySet<ItSystemUsage>("ItSystemUsages");
             //builder.EntitySet<ItSystemRight>("ItSystemRights");
             //builder.EntitySet<ItSystemRole>("ItSystemRoles");

@@ -11,6 +11,8 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Infrastructure.DataAccess;
+using Ninject.Infrastructure.Language;
+using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -40,14 +42,15 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        public SingleResult<ItSystem> Get([FromODataUri] int key)
+        public ItSystem Get([FromODataUri] int key)
         {
-            IQueryable<ItSystem> result = db.ItSystems.Where(x => x.Id == key);
-            return SingleResult.Create(result);
+            return _itSystemRepository.GetByKey(key);
         }
 
         public async Task<IHttpActionResult> Post(ItSystem itSystem)
         {
+            
+            
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
