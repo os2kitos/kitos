@@ -140,8 +140,8 @@ namespace Presentation.Web.Controllers.API
                     p =>
                         // global admin sees all within the context
                         KitosUser.IsGlobalAdmin && p.OrganizationId == orgId ||
-                        // object owner sees his own objects
-                        p.ObjectOwnerId == KitosUser.Id || 
+                        // object owner sees his own objects within the context
+                        p.ObjectOwnerId == KitosUser.Id && p.OrganizationId == orgId || 
                         // it's public everyone can see it
                         p.AccessModifier == AccessModifier.Public ||
                         // everyone in the same organization can see normal objects
