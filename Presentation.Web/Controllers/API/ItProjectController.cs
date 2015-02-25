@@ -54,17 +54,18 @@ namespace Presentation.Web.Controllers.API
                 //Get all projects inside the organizaton
                 pagingModel.Where(
                     p =>
-                        // global admin sees all within the context
-                        KitosUser.IsGlobalAdmin && p.OrganizationId == orgId ||
-                        // object owner sees his own objects
-                        p.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
                         p.AccessModifier == AccessModifier.Public ||
+                        // or limit all to within the context
+                        p.OrganizationId == orgId &&
+                        // global admin sees all 
+                        (KitosUser.IsGlobalAdmin ||
+                        // object owner sees his own objects
+                        p.ObjectOwnerId == KitosUser.Id ||
                         // everyone in the same organization can see normal objects
-                        p.AccessModifier == AccessModifier.Normal &&
-                        p.OrganizationId == orgId ||
+                        p.AccessModifier == AccessModifier.Normal ||
                         // only users with a role on the object can see private objects
-                        p.AccessModifier == AccessModifier.Private && p.Rights.Any(x => x.UserId == KitosUser.Id)
+                        p.AccessModifier == AccessModifier.Private && p.Rights.Any(x => x.UserId == KitosUser.Id))
                     );
 
                 var projects = Page(Repository.AsQueryable(), pagingModel);
@@ -85,15 +86,16 @@ namespace Presentation.Web.Controllers.API
                     p =>
                         // filter by project name
                         p.Name.Contains(q) &&
+                        // it's public everyone can see it
+                        (p.AccessModifier == AccessModifier.Public ||
+                        // or limit all to within the context
+                        p.OrganizationId == orgId) &&
                         // global admin sees all within the context
-                        (KitosUser.IsGlobalAdmin && p.OrganizationId == orgId ||
+                        (KitosUser.IsGlobalAdmin ||
                         // object owner sees his own objects
                         p.ObjectOwnerId == KitosUser.Id ||
-                        // it's public everyone can see it
-                        p.AccessModifier == AccessModifier.Public ||
                         // everyone in the same organization can see normal objects
                         p.AccessModifier == AccessModifier.Normal &&
-                        p.OrganizationId == orgId ||
                         // only users with a role on the object can see private objects
                         p.AccessModifier == AccessModifier.Private && p.Rights.Any(x => x.UserId == KitosUser.Id))
                     );
