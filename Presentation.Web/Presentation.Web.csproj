@@ -464,6 +464,7 @@
     <Content Include="Partials\directives\datewriter.html" />
     <Content Include="Partials\directives\select-access-modifier.html" />
     <Content Include="Partials\directives\select-org-unit.html" />
+    <Content Include="Partials\directives\select-user-org-unit.html" />
     <Content Include="Partials\directives\select-user.html" />
     <Content Include="Partials\directives\show-status.html" />
     <Content Include="Partials\global-admin\global-admins.html" />
