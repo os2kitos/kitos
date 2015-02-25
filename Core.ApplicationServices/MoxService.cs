@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Transactions;
 using Core.DomainModel;
 using Core.DomainServices;
 
@@ -59,17 +60,31 @@ namespace Core.ApplicationServices
 
         
         /* imports organization units into an organization */
-        public IEnumerable<MoxImportError> Import(Stream stream, int organizationId, User kitosUser)
+        public void Import(Stream stream, int organizationId, User kitosUser)
         {
-            var errors = new List<MoxImportError>();
+            var scope = new TransactionScope(TransactionScopeOption.RequiresNew);
+            using (scope)
+            {
+                var errors = new List<MoxImportError>();
 
-            var set = _excelHandler.Import(stream);
+                var set = _excelHandler.Import(stream);
 
-            //importing org units
-            var orgTable = set.Tables[0];
-            errors.AddRange(ImportOrgUnits(orgTable, organizationId, kitosUser));
+                //importing org units
+                var orgTable = set.Tables[0];
+                errors.AddRange(ImportOrgUnits(orgTable, organizationId, kitosUser));
 
-            return errors;
+                //how to import something else
+                //var anotherTable = set.Tables[1];
+                //errors.AddRange(ImportFooBar(anotherTable, foo, bar)
+
+                //then finally, did we notice any errors?
+                if (errors.Any()) throw new MoxImportException() {Errors = errors};
+
+                //if we got here, we're home frreeeee
+                scope.Complete();
+
+            }
+
         }
 
 
@@ -131,23 +146,33 @@ namespace Core.ApplicationServices
                 if (String.IsNullOrWhiteSpace(orgUnitRow.Name))
                 {
                     errors.Add(new MoxImportOrgUnitNoNameError(orgUnitRow.RowIndex));
-                    continue;
+                }
+                //name cannot be duplicate
+                else if (unresolvedRows.Any(x => x.Name == orgUnitRow.Name) || resolvedRows.ContainsKey(orgUnitRow.Name))
+                {
+                    errors.Add(new MoxImportOrgUnitDuplicateError(orgUnitRow.RowIndex));
                 }
                 //parent cannot be empty on a new row
                 else if (orgUnitRow.IsNew && String.IsNullOrWhiteSpace(orgUnitRow.Parent))
                 {
                     errors.Add(new MoxImportOrgUnitBadParentError(orgUnitRow.RowIndex));
-                    continue;
+                } 
+
+                //otherwise we're good - add the row to either resolved or unresolved
+                else if (isNew)
+                {
+                    unresolvedRows.Add(orgUnitRow);
                 }
-                
-                if(isNew) unresolvedRows.Add(orgUnitRow);
-                else resolvedRows.Add(orgUnitRow.Name, orgUnitRow);
+                else
+                {
+                    resolvedRows.Add(orgUnitRow.Name, orgUnitRow);
+                }
 
             }
 
             //do the actually passes, trying to resolve parents
             var oneMorePass = true;
-            while (oneMorePass)
+            while (oneMorePass && unresolvedRows.Any())
             {
                 oneMorePass = false;
 
@@ -196,10 +221,7 @@ namespace Core.ApplicationServices
                 }
 
                 //if there's still some unresolve rows left, try again
-                if (notResolvedInThisPass.Any())
-                {
-                    unresolvedRows = notResolvedInThisPass;
-                }
+                unresolvedRows = notResolvedInThisPass;
             }
 
             //at this point, if there's is any unresolvedRows, we should report some errors
@@ -211,6 +233,7 @@ namespace Core.ApplicationServices
             return errors;
         }
 
+
         public class MoxImportOrgUnitBadParentError : MoxImportError
         {
             public MoxImportOrgUnitBadParentError(int row)
@@ -218,7 +241,7 @@ namespace Core.ApplicationServices
                 Row = row;
                 Column = "D";
                 SheetName = "Organisation";
-                Message = "Overordnet enhed må ikke være blank og skal henvise til anden enhed.";
+                Message = "Overordnet enhed må ikke være blank og skal henvise til gyldig enhed.";
             }
         }
 
@@ -230,6 +253,17 @@ namespace Core.ApplicationServices
                 Column = "B";
                 SheetName = "Organisation";
                 Message = "Enheden skal have et navn.";
+            }
+        }
+
+        public class MoxImportOrgUnitDuplicateError : MoxImportError
+        {
+            public MoxImportOrgUnitDuplicateError(int row)
+            {
+                Row = row;
+                Column = "B";
+                SheetName = "Organisation";
+                Message = "Der findes allerede en enhed med dette navn.";
             }
         }
             
