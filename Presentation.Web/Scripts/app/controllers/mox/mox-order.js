@@ -17,6 +17,8 @@
     app.controller('mox.OrderCtrl', ['$scope', '$http', 'notify', 'user',
             function ($scope, $http, notify, user) {
                 $scope.tmplUrl = 'api/mox?organizationId=' + user.currentOrganizationId;
+                $scope.data = {};
+
 
                 $scope.submit = function () {
                     var msg = notify.addInfoMessage("Læser excel ark...", false);
@@ -45,6 +47,14 @@
                         //console.log('Submitted with status:' + status);
                     }).error(function (data, status) {
                         msg.toErrorMessage("Fejl! Der er en fejl i excel arket.");
+
+                        if (status == 409) {
+                            $scope.data.showMoxErrors = true;
+                            $scope.data.errors = data;
+                        } else {
+                            $scope.data.showGenericError = true;
+                        }
+
                         //console.log('Error ' + status + ' occured: ' + data);
                     });
                 };
