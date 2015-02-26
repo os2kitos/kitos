@@ -12,30 +12,30 @@
         </h3>
     </div>
 
-    <table class="table table-condensed table-striped table-fixed">
+    <table class="table table-condensed table-striped tablehttps://localhost:44300/contract/overview-fixed">
         <thead>
             <tr>
-                <th class="col-md-2">
+                <th width="200">
                     Navn
                     <button data-order-by="'Name'" data-paging="pagination"></button>
                 </th>
-                <th class="col-md-2">
+                <th width="200">
                     Email
                     <button data-order-by="'Email'" data-paging="pagination"></button>
                 </th>
-                <th class="col-md-2">
+                <th width="180">
                     Default org.enhed
                     <button data-order-by="'DefaultOrganizationUnit.Name'" data-paging="pagination"></button>
                 </th>
-                <th class="col-md-1">
+                <th width="80">
                     Advis
                     <button data-order-by="'LastAdvisDate'" data-paging="pagination"></button>
                 </th>
-                <th class="col-md-2">
+                <th width="180">
                     Oprettet af
                     <button data-order-by="'ObjectOwner.Name'" data-paging="pagination"></button>
                 </th>
-                <th class="col-md-1 text-left">
+                <th width="160">
                     <select data-ng-model="chosenModule" ng-change="getRightsForModule(chosenModule)">
                         <option value="0">Vælg modul</option>
                         <option value="1">Organisation</option>
@@ -44,10 +44,10 @@
                         <option value="4">IT Kontrakter</option>
                     </select>
                 </th>
-                <th class="col-md-1">
+                <th width="160" class="text-left">
                     Rolle
                 </th>
-                <th class="col-md-1">
+                <th width="63">
                     <!-- Control -->
                 </th>
             </tr>
@@ -67,13 +67,13 @@
                 </td>
                 <td>{{user.adminRights.objectOwnerFullName}}</td>
                 <td colspan="2">
-                    <table data-ng-if="user.rights" class="full-width table table-condensed table-striped table-no-margin">
+                    <table data-ng-if="user.rights" class="full-width table table-condensed table-striped table-no-margin text-left">
                         <tbody>
                             <tr data-ng-repeat="right in user.rights">
-                                <td>
+                                <td class="text-left">
                                     {{right.objectName}}
                                 </td>
-                                <td>
+                                <td class="text-left">
                                     {{right.roleName}} ({{right.roleHasWriteAccess && "S" || "L" }})
                                 </td>
                             </tr>
