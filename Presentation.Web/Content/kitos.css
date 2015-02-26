@@ -665,3 +665,9 @@ div.searchbox-wrapper {
 .resize-vertical {
     resize: vertical;
 }
+
+/* disabled inputfield */
+.disabled-input {
+    background-color: #ddd;
+    cursor: not-allowed;
+}
