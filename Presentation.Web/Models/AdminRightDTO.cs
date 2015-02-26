@@ -11,5 +11,6 @@
         {
             get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
         }
+        public string DefaultOrgUnitName { get; set; }
     }
 }
