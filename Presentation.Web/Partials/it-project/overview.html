@@ -105,8 +105,8 @@
 
                 <div data-ng-switch-when="priorityPf">
                     <div class="btn-group btn-group-sm" data-toggle="buttons">
-                        <label class="btn btn-star" data-ng-class="{ 'unstarred': !p.isPriorityLocked }" data-ng-disabled="!p.canBeEdited">
-                            <input type="checkbox" data-ng-model="p.isPriorityLocked" data-autosave="api/itproject/{{p.id}}" data-field="isPriorityLocked" class="form-control input-xs">
+                        <label class="btn btn-star" data-ng-class="{ 'unstarred': !p.isPriorityLocked }" data-ng-disabled="!p.canBeEdited" data-ng-click="p.isPriorityLocked = !p.isPriorityLocked">
+                            <input type="checkbox" data-ng-model="p.isPriorityLocked" data-autosave="api/itproject/{{p.id}}" data-field="isPriorityLocked" class="input-xs">
                             <i class="glyphicon glyphicon-lock"></i>
                         </label>
                     </div>
