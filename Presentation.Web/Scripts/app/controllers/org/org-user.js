@@ -78,10 +78,7 @@
                     return $q.all(_.map(userCollection, function (iteratee) {
                         var deferred = $q.defer();
 
-                        //Finds the "Medarbejder" to determine which user added the user to the given organization
-                        iteratee.adminRights = _.find(iteratee.adminRights, function (right) {
-                            return right.roleName == "Medarbejder";
-                        });
+                        iteratee.adminRights = _.findWhere(iteratee.adminRights, { roleName: "Medarbejder", organizationId: user.currentOrganizationId });
 
                         setTimeout(function () {
                             $http.get("api/user/" + iteratee.id + "?hasWriteAccess" + '&organizationId=' + user.currentOrganizationId)
