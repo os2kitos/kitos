@@ -34,38 +34,14 @@
         </tr>
     </thead>
     <tbody>
-        <!-- for each active system -->
-        <tr data-ng-repeat="usage in activeSystemUsages" 
-            data-ng-include="'partials/it-system/overview-row.html'">
-        </tr>
+        <!-- for each itsystem -->
+        <tr data-ng-repeat="usage in itSystemUsage"
+            data-ng-include="'partials/it-system/overview-row.html'"></tr>
         
-        <!-- when there are no active systems to show -->
-        <tr data-ng-if="activeSystemUsages.length == 0">
+        <!-- when there are no itsystems to show -->
+        <tr data-ng-if="itSystemUsage.length == 0">
             <td colspan="8" class="text-center">
                 <i>Ingen aktive systemer</i>
-            </td>
-        </tr>
-        
-        <!-- "click to show inactive systems"-row -->
-        <tr>
-            <td colspan="8">
-                <a data-ng-click="showInactive = !showInactive">
-                    <i class="glyphicon" data-ng-class="{'glyphicon-chevron-right': !showInactive, 'glyphicon-chevron-down': showInactive}"></i>
-                    Klik for at {{ showInactive && 'skjule' || 'vise' }} inaktive IT systemer
-                </a>
-            </td>
-        </tr>
-        
-        <!-- for each inactive system -->
-        <tr data-ng-if="showInactive" data-ng-repeat="usage in inactiveSystemUsages" 
-            data-ng-include="'partials/it-system/overview-row.html'">
-        </tr>
-
-        
-        <!-- when there are no active systems to show -->
-        <tr data-ng-if="showInactive && inactiveSystemUsages.length == 0">
-            <td colspan="9" class="text-center">
-                <i>Ingen inaktive systemer</i>
             </td>
         </tr>
     </tbody>
