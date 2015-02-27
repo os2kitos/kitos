@@ -55,18 +55,20 @@ namespace Presentation.Web.Controllers.API
                 //Get all systems which the user has access to
                 paging.Where(
                     s =>
-                        // global admin sees all
-                        (KitosUser.IsGlobalAdmin ||
-                        // object owner sees his own objects 
-                        s.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
                         s.AccessModifier == AccessModifier.Public ||
+                        // It's in the right context
+                        s.OrganizationId == organizationId &&
+                        // global admin sees all within the context
+                        (KitosUser.IsGlobalAdmin ||
+                        // object owner sees his own objects within the given context
+                        s.ObjectOwnerId == KitosUser.Id ||
                         // everyone in the same organization can see normal objects
                         s.AccessModifier == AccessModifier.Normal &&
-                        s.OrganizationId == organizationId
+                        s.OrganizationId == organizationId)
                         // it systems doesn't have roles so private doesn't make sense
                         // only object owners will be albe to see private objects
-                    ));
+                    );
 
                 if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
 
