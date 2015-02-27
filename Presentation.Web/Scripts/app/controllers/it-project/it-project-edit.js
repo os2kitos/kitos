@@ -170,7 +170,7 @@
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.autosaveUrl = "api/itproject/" + project.id;
                 
-                $scope.parentSelectOptions = selectLazyLoading('api/itproject', true, ['orgId=' + user.currentOrganizationId]);
+                $scope.parentSelectOptions = selectLazyLoading('api/itproject', true, ['overview', 'orgId=' + user.currentOrganizationId]);
 
                 function selectLazyLoading(url, excludeSelf, paramAry) {
                     return {
