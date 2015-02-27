@@ -78,7 +78,7 @@
                                         roleId: orgUserRole.id,
                                     };
 
-                                    $http.post("api/adminrights/" + oId + "?organizationId=" + oId, data, { handleBusy: true }).success(function (result) {
+                                    $http.post("api/adminrights/?rightByOrganizationRight&organizationId=" + oId + "&userId=" + user.id, data, { handleBusy: true }).success(function (result) {
                                         msg.toSuccessMessage(userResult.fullName + " er oprettet i KITOS");
                                         reload();
                                     }).error(function() {
