@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -37,7 +38,7 @@ namespace Core.DomainModel
         /// </remarks>
         public string Cvr { get; set; }
         public AccessModifier AccessModifier { get; set; }
-        
+        public Guid? Uuid { get; set; }
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
 
         /// <summary>
@@ -77,6 +78,14 @@ namespace Core.DomainModel
         public OrganizationUnit GetRoot()
         {
             return OrgUnits.FirstOrDefault(u => u.Parent == null);
+        }
+
+        public override bool HasUserWriteAccess(User user, int organizationId)
+        {
+            // check that object belongs to the requwested organization context
+            if (Id != organizationId && !user.IsGlobalAdmin)
+                return false;
+            return base.HasUserWriteAccess(user, organizationId);
         }
     }
 }

@@ -7,33 +7,37 @@ namespace Core.ApplicationServices
 {
     public class OrganizationService : IOrganizationService
     {
-        private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
         private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IGenericRepository<AdminRight> _admRightRepository;
 
-        public OrganizationService(IGenericRepository<OrganizationRight> orgRightRepository, IGenericRepository<Organization> orgRepository, IGenericRepository<AdminRight> admRightRepository)
+        public OrganizationService(IGenericRepository<Organization> orgRepository, IGenericRepository<AdminRight> admRightRepository)
         {
-            _orgRightRepository = orgRightRepository;
             _orgRepository = orgRepository;
             _admRightRepository = admRightRepository;
         }
 
-        public ICollection<Organization> GetByUser(User user)
+        //returns a list of organizations that the user is a member of
+        public IEnumerable<Organization> GetOrganizations(User user)
         {
+            if (user.IsGlobalAdmin) return _orgRepository.Get();
+            else return _admRightRepository.Get().Select(r => r.Object);
+        }
 
-            if (user.IsGlobalAdmin) return _orgRepository.Get().ToList();
+        //returns the default org unit for that user inside that organization
+        //or null if none has been chosen
+        public OrganizationUnit GetDefaultUnit(Organization organization, User user)
+        {
+            return _admRightRepository.Get(r => r.ObjectId == organization.Id && r.UserId == user.Id).Select(r => r.DefaultOrgUnit).FirstOrDefault();
+        }
 
-            var orgs = _orgRightRepository
-                .Get(x => x.UserId == user.Id)
-                .Select(x => x.Object.Organization).ToList();
+        public void SetDefaultOrgUnit(User user, int orgId, int orgUnitId)
+        {
+            //TODO this should probably be Single() ?
+            var right = _admRightRepository.Get(r => r.UserId == user.Id && r.ObjectId == orgId).First();
+            right.DefaultOrgUnitId = orgUnitId;
 
-            if(user.CreatedIn != null) orgs.Add(user.CreatedIn);
-
-            orgs.AddRange(_admRightRepository.Get(x => x.UserId == user.Id).Select(x => x.Object));
-
-            orgs = orgs.Distinct().ToList();
-
-            return orgs;
+            _admRightRepository.Update(right);
+            _admRightRepository.Save();
         }
 
         public void SetupDefaultOrganization(Organization org, User objectOwner)

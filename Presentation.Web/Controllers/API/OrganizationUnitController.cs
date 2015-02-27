@@ -30,18 +30,11 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         /// <param name="byUser">Routing qualifier</param>
         /// <returns></returns>
-        public HttpResponseMessage GetByUser(bool? byUser)
+        public HttpResponseMessage GetByUser(bool? byUser, int organizationId)
         {
             try
             {
-                var orgUnits = Repository.Get(x => x.Rights.Any(y => y.UserId == KitosUser.Id)).ToList();
-
-                if (KitosUser.CreatedIn != null)
-                {
-                    var rootOrgUnit = KitosUser.CreatedIn.GetRoot();
-
-                    orgUnits.Add(rootOrgUnit);
-                }
+                var orgUnits = Repository.Get(x => x.Rights.Any(y => y.UserId == KitosUser.Id) && x.OrganizationId == organizationId).ToList();
 
                 orgUnits = orgUnits.Distinct().ToList();
 
@@ -85,7 +78,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public override HttpResponseMessage Patch(int id, JObject obj)
+        public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
         {
             try
             {
@@ -108,10 +101,10 @@ namespace Presentation.Web.Controllers.API
             {
                 return Error(e);
             }
-            return base.Patch(id, obj);
+            return base.Patch(id, organizationId, obj);
         }
 
-        public override HttpResponseMessage Put(int id, JObject jObject)
+        public override HttpResponseMessage Put(int id, int organizationId, JObject jObject)
         {
             return NotAllowed();
         }

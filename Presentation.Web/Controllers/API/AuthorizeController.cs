@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
+using System.Web.Mvc;
 using System.Web.Security;
 using Core.DomainModel;
 using Core.DomainServices;
@@ -12,20 +14,23 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
+        private readonly IOrganizationService _organizationService;
+        
 
-        public AuthorizeController(IUserRepository userRepository, IUserService userService)
+        public AuthorizeController(IUserRepository userRepository, IUserService userService,  IOrganizationService organizationService)
         {
             _userRepository = userRepository;
             _userService = userService;
+            _organizationService = organizationService;
         }
 
         public HttpResponseMessage GetLogin()
         { 
             try
             {
-                var userApiModel = AutoMapper.Mapper.Map<User, UserDTO>(KitosUser);
+                var response = CreateLoginResponse(KitosUser);
 
-                return Ok(userApiModel);
+                return Ok(response);
             }
             catch (Exception e)
             {
@@ -45,9 +50,9 @@ namespace Presentation.Web.Controllers.API
 
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
 
-                var userApiModel = AutoMapper.Mapper.Map<User, UserDTO>(user);
+                var response = CreateLoginResponse(user);
 
-                return Created(userApiModel);
+                return Created(response);
             }
             catch (ArgumentException)
             {
@@ -87,6 +92,31 @@ namespace Presentation.Web.Controllers.API
             {
                 return Error(e);
             }
+        }
+
+        //helper function
+        private LoginResponseDTO CreateLoginResponse(User user)
+        {
+            var userDto = AutoMapper.Mapper.Map<User, UserDTO>(user);
+
+            //getting all the organizations that the user is member of
+            var organizations = _organizationService.GetOrganizations(user);
+            //getting the default org units (one or null for each organization)
+            var defaultUnits = organizations.Select(org => _organizationService.GetDefaultUnit(org, user));
+
+            //creating dtos
+            var orgsDto = organizations.Zip(defaultUnits, (org, defaultUnit) => new OrganizationAndDefaultUnitDTO()
+            {
+                Organization = AutoMapper.Mapper.Map<Organization, OrganizationDTO>(org),
+                DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(defaultUnit)
+            });
+
+            return new LoginResponseDTO()
+            {
+                User = userDto,
+                Organizations = orgsDto
+            };
+
         }
     }
 }

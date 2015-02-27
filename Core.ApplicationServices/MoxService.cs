@@ -33,27 +33,27 @@ namespace Core.ApplicationServices
         public Stream Export(Stream stream, int organizationId, User kitosUser)
         {
             var orgUnits = _orgUnitRepository.Get(x => x.OrganizationId == organizationId).ToList();
-            dynamic orgRoles = null;
-            dynamic orgTasks = null;
-            foreach (var orgUnit in orgUnits)
-            {
-                var unitName = orgUnit.Name;
-                orgRoles = orgUnit.Rights.Select(x => new {OrgUnit = unitName, Role = x.Role.Name, User = x.User.Name});
-                orgTasks =
-                    orgUnit.TaskUsages.Select(x => new { OrgUnit = unitName, Task = x.TaskRefId, Overview = x.Starred });
-            }
+            //dynamic orgRoles = null;
+            //dynamic orgTasks = null;
+            //foreach (var orgUnit in orgUnits)
+            //{
+            //    var unitName = orgUnit.Name;
+            //    orgRoles = orgUnit.Rights.Select(x => new {OrgUnit = unitName, Role = x.Role.Name, User = x.User.Name});
+            //    orgTasks =
+            //        orgUnit.TaskUsages.Select(x => new { OrgUnit = unitName, Task = x.TaskRefId, Overview = x.Starred });
+            //}
 
-            var roles = _orgRoleRepository.Get(x => x.IsActive && !x.IsSuggestion);
-            var tasks = _taskRepository.Get(x => x.AccessModifier == AccessModifier.Public);
-            var users = _userRepository.Get(x => x.CreatedInId == organizationId);
+            //var roles = _orgRoleRepository.Get(x => x.IsActive && !x.IsSuggestion);
+            //var tasks = _taskRepository.Get(x => x.AccessModifier == AccessModifier.Public);
+            //var users = _userRepository.Get(x => x.CreatedInId == organizationId);
 
             var set = new DataSet();
             set.Tables.Add(GetOrganizationTable(orgUnits));
-            set.Tables.Add(GetOrgRoleTable(orgRoles));
-            set.Tables.Add(GetOrgTaskTable(orgTasks));
-            set.Tables.Add(GetRoleTable(roles));
-            set.Tables.Add(GetTaskTable(tasks));
-            set.Tables.Add(GetUserTable(users));
+            //set.Tables.Add(GetOrgRoleTable(orgRoles));
+            //set.Tables.Add(GetOrgTaskTable(orgTasks));
+            //set.Tables.Add(GetRoleTable(roles));
+            //set.Tables.Add(GetTaskTable(tasks));
+            //set.Tables.Add(GetUserTable(users));
 
             return _excelHandler.Export(set, stream);
         }

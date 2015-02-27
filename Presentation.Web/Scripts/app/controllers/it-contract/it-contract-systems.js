@@ -57,7 +57,7 @@
             $scope.deleteUsed = function(usageId, sysId, interfaceId) {
                 $http({
                         method: 'PATCH',
-                        url: 'api/interfaceUsage/?usageId=' + usageId + '&sysId=' + sysId + '&interfaceId=' + interfaceId,
+                        url: 'api/interfaceUsage/?usageId=' + usageId + '&sysId=' + sysId + '&interfaceId=' + interfaceId + '&organizationId=' + user.currentOrganizationId,
                         data: {
                             itContractId: null
                         }
@@ -79,11 +79,11 @@
 
                 //helper functions
                 function deleteAssociatedSystem(associatedSystem) {
-                    return $http.delete('api/itContract/' + contract.id + '?systemUsageId=' + associatedSystem.id);
+                    return $http.delete('api/itContract/' + contract.id + '?systemUsageId=' + associatedSystem.id + '&organizationId=' + user.currentOrganizationId);
                 }
 
                 function postAssociatedSystem(associatedSystem) {
-                    return $http.post('api/itContract/' + contract.id + '?systemUsageId=' + associatedSystem.selectedSystem.id);
+                    return $http.post('api/itContract/' + contract.id + '?systemUsageId=' + associatedSystem.selectedSystem.id + '&organizationId=' + user.currentOrganizationId);
                 }
 
                 //for each row of associated system
@@ -135,7 +135,8 @@
                 if ($scope.newAssociatedInterfaceRelation == 'using')
                     url = 'api/interfaceUsage?usageId=' + $scope.newAssociatedInterfaceSelectedSystemUsage.id
                         + '&sysId=' + $scope.newAssociatedInterfaceSelectedInterfaceUsage.id.sysId
-                        + '&interfaceId=' + $scope.newAssociatedInterfaceSelectedInterfaceUsage.id.intfId;
+                        + '&interfaceId=' + $scope.newAssociatedInterfaceSelectedInterfaceUsage.id.intfId
+                        + '&organizationId=' + user.currentOrganizationId;
 
                 $http({
                         method: 'PATCH',

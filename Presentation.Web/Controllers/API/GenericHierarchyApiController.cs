@@ -30,7 +30,7 @@ namespace Presentation.Web.Controllers.API
             return base.GetAll(paging);
         }
 
-        public override HttpResponseMessage Patch(int id, JObject obj)
+        public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace Presentation.Web.Controllers.API
             {
                 return Error(e.Message);
             }
-            return base.Patch(id, obj);
+            return base.Patch(id, organizationId, obj);
         }
 
         private void CheckForHierarchyLoop(TModel item, int? newParentId)

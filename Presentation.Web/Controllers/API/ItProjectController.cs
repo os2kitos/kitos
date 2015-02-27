@@ -367,14 +367,14 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage PostOrganizationUnitsUsingThisProject(int id, [FromUri] int organizationUnit)
+        public HttpResponseMessage PostOrganizationUnitsUsingThisProject(int id, int organizationId, [FromUri] int organizationUnit)
         {
             try
             {
                 var project = Repository.GetByKey(id);
                 if (project == null) return NotFound();
 
-                if (!HasWriteAccess(project)) return Unauthorized();
+                if (!HasWriteAccess(project, organizationId)) return Unauthorized();
 
                 var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
                 if (orgUnit == null) return NotFound();
@@ -398,16 +398,17 @@ namespace Presentation.Web.Controllers.API
         /// Removes an Organization Unit from the project.UsedByOrgUnits list.
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="organizationId"></param>
         /// <param name="organizationUnit"></param>
         /// <returns></returns>
-        public HttpResponseMessage DeleteOrganizationUnitsUsingThisProject(int id, [FromUri] int organizationUnit)
+        public HttpResponseMessage DeleteOrganizationUnitsUsingThisProject(int id, int organizationId, [FromUri] int organizationUnit)
         {
             try
             {
                 var project = Repository.GetByKey(id);
                 if (project == null) return NotFound();
 
-                if(!HasWriteAccess(project)) return Unauthorized();
+                if (!HasWriteAccess(project, organizationId)) return Unauthorized();
 
                 var entity = project.UsedByOrgUnits.SingleOrDefault(x => x.ItProjectId == id && x.OrganizationUnitId == organizationUnit);
                 if (entity == null) return NotFound();
@@ -426,13 +427,13 @@ namespace Presentation.Web.Controllers.API
             }
         }
         
-        public HttpResponseMessage PostTaskToProject(int id, [FromUri] int? taskId)
+        public HttpResponseMessage PostTaskToProject(int id, int organizationId, [FromUri] int? taskId)
         {
             try
             {
                 var project = Repository.GetByKey(id);
                 if (project == null) return NotFound();
-                if (!HasWriteAccess(project)) return Unauthorized();
+                if (!HasWriteAccess(project, organizationId)) return Unauthorized();
 
                 List<TaskRef> tasks;
                 if (taskId.HasValue)
@@ -472,13 +473,13 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage DeleteTaskToProject(int id, [FromUri] int? taskId)
+        public HttpResponseMessage DeleteTaskToProject(int id, int organizationId, [FromUri] int? taskId)
         {
             try
             {
                 var project = Repository.GetByKey(id);
                 if (project == null) return NotFound();
-                if (!HasWriteAccess(project)) return Unauthorized();
+                if (!HasWriteAccess(project, organizationId)) return Unauthorized();
 
                 List<TaskRef> tasks;
                 if (taskId.HasValue)
@@ -579,14 +580,14 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage PostItSystemsUsedByThisProject(int id, [FromUri] int usageId)
+        public HttpResponseMessage PostItSystemsUsedByThisProject(int id, int organizationId, [FromUri] int usageId)
         {
             try
             {
                 var project = Repository.GetByKey(id); 
                 if (project == null) return NotFound();
 
-                if (!HasWriteAccess(project)) return Unauthorized();
+                if (!HasWriteAccess(project, organizationId)) return Unauthorized();
 
                 //TODO: should also we check for write access to the system usage?
                 var systemUsage = _itSystemUsageRepository.GetByKey(usageId);
@@ -607,14 +608,14 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage DeleteItSystemsUsedByThisProject(int id, [FromUri] int usageId)
+        public HttpResponseMessage DeleteItSystemsUsedByThisProject(int id, int organizationId, [FromUri] int usageId)
         {
             try
             {
                 var project = Repository.GetByKey(id); 
                 if (project == null) return NotFound();
 
-                if (!HasWriteAccess(project)) return Unauthorized();
+                if (!HasWriteAccess(project, organizationId)) return Unauthorized();
 
                 var systemUsage = _itSystemUsageRepository.GetByKey(usageId);
 
@@ -702,7 +703,7 @@ namespace Presentation.Web.Controllers.API
             return base.Post(dto);
         }
 
-        public override HttpResponseMessage Patch(int id, JObject obj)
+        public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
         {
             // try get AccessModifier value
             JToken accessModToken;
@@ -712,7 +713,7 @@ namespace Presentation.Web.Controllers.API
             {
                 return Unauthorized();
             }
-            return base.Patch(id, obj);
+            return base.Patch(id, organizationId, obj);
         }
     }
 }

@@ -51,7 +51,7 @@
                 $scope.orgUnits[orgUnit.id] = orgUnit;
 
                 if (!inheritWriteAccess) {
-                    $http.get('api/organizationUnit/' + orgUnit.id + '?hasWriteAccess').success(function(result) {
+                    $http.get('api/organizationUnit/' + orgUnit.id + '?hasWriteAccess&organizationId=' + user.currentOrganizationId).success(function(result) {
                         orgUnit.hasWriteAccess = result.response;
 
                         _.each(orgUnit.children, function(u) {
@@ -131,7 +131,7 @@
                     node.orgRights = data.response;
 
                     _.each(node.orgRights, function(right) {
-                        right.userForSelect = { id: right.user.id, text: right.user.name };
+                        right.userForSelect = { id: right.user.id, text: right.user.fullName };
                         right.roleForSelect = right.roleId;
                         right.show = true;
                     });
@@ -168,15 +168,15 @@
                     "userId": uId
                 };
 
-                $http.post("api/organizationUnitRights/" + oId, data).success(function(result) {
-                    notify.addSuccessMessage(result.response.user.name + " er knyttet i rollen");
+                $http.post("api/organizationUnitRights/" + oId + '?organizationId=' + user.currentOrganizationId, data).success(function(result) {
+                    notify.addSuccessMessage(result.response.user.fullName + " er knyttet i rollen");
 
                     $scope.chosenOrgUnit.orgRights.push({
                         "objectId": result.response.objectId,
                         "roleId": result.response.roleId,
                         "userId": result.response.userId,
                         "user": result.response.user,
-                        'userForSelect': { id: result.response.userId, text: result.response.user.name },
+                        'userForSelect': { id: result.response.userId, text: result.response.user.fullName },
                         'roleForSelect': result.response.roleId,
                         show: true
                     });
@@ -193,7 +193,7 @@
                 var rId = right.roleId;
                 var uId = right.userId;
 
-                $http.delete("api/organizationUnitRights/" + oId + "?rId=" + rId + "&uId=" + uId).success(function(deleteResult) {
+                $http.delete("api/organizationUnitRights/" + oId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
                     right.show = false;
                     notify.addSuccessMessage('Rollen er slettet!');
                 }).error(function(deleteResult) {
@@ -221,20 +221,20 @@
 
                 //otherwise, we should delete the old entry, then add a new one
 
-                $http.delete("api/organizationUnitRights/" + oIdOld + "?rId=" + rIdOld + "&uId=" + uIdOld).success(function(deleteResult) {
+                $http.delete("api/organizationUnitRights/" + oIdOld + "?rId=" + rIdOld + "&uId=" + uIdOld + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
                     var data = {
                         "roleId": rIdNew,
                         "userId": uIdNew
                     };
 
-                    $http.post("api/organizationUnitRights/" + oIdNew, data).success(function(result) {
+                    $http.post("api/organizationUnitRights/" + oIdNew + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
                         right.roleId = result.response.roleId;
                         right.user = result.response.user;
                         right.userId = result.response.userId;
 
                         right.edit = false;
 
-                        notify.addSuccessMessage(right.user.name + " er knyttet i rollen");
+                        notify.addSuccessMessage(right.user.fullName + " er knyttet i rollen");
                     }).error(function(result) {
                         // we successfully deleted the old entry, but didn't add a new one
                         // fuck
@@ -247,7 +247,7 @@
                 }).error(function(deleteResult) {
 
                     // couldn't delete the old entry, just reset select options
-                    right.userForSelect = { id: right.user.id, text: right.user.name };
+                    right.userForSelect = { id: right.user.id, text: right.user.fullName };
                     right.roleForSelect = right.roleId;
 
                     notify.addErrorMessage('Fejl!');
@@ -347,7 +347,7 @@
 
                                 var id = unit.id;
 
-                                $http({ method: 'PATCH', url: "api/organizationUnit/" + id, data: data }).success(function(result) {
+                                $http({ method: 'PATCH', url: "api/organizationUnit/" + id + '?organizationId=' + user.currentOrganizationId, data: data }).success(function (result) {
                                     notify.addSuccessMessage(name + " er ændret.");
 
                                     $modalInstance.close(result.response);
@@ -405,7 +405,7 @@
 
                                 $modalScope.submitting = true;
 
-                                $http.delete("api/organizationUnit/" + unit.id).success(function() {
+                                $http.delete("api/organizationUnit/" + unit.id + '&organizationId=' + user.currentOrganizationId).success(function () {
                                     $modalInstance.close();
                                     notify.addSuccessMessage(unit.name + " er slettet!");
 
@@ -498,7 +498,7 @@
             function removeUsage(refUsage, showMessage) {
                 if (showMessage) var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
 
-                url = 'api/taskUsage/' + refUsage.usage.id;
+                var url = 'api/taskUsage/' + refUsage.usage.id + '?organizationId=' + user.currentOrganizationId;
 
                 $http.delete(url).success(function(result) {
                     refUsage.usage = null;
@@ -528,7 +528,7 @@
 
                         var url = 'api/taskUsage/' + refUsage.usage.id;
                         var msg = notify.addInfoMessage("Opdaterer...", false);
-                        $http({ method: 'PATCH', url: url, data: payload }).success(function() {
+                        $http({ method: 'PATCH', url: url + '?organizationId=' + user.currentOrganizationId, data: payload }).success(function () {
                             refUsage.usage.starred = !refUsage.usage.starred;
                             msg.toSuccessMessage("Feltet er opdateret");
                         }).error(function() {

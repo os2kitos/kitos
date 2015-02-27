@@ -34,8 +34,8 @@
         });
     }]);
 
-    app.controller('contract.DeadlinesCtrl', ['$scope', '$http', '$timeout', '$state', '$stateParams', 'notify', 'contract', 'optionExtensions', 'terminationDeadlines', 'paymentMilestones', 'handoverTrialTypes', 'handoverTrials',
-        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, optionExtensions, terminationDeadlines, paymentMilestones, handoverTrialTypes, handoverTrials) {
+    app.controller('contract.DeadlinesCtrl', ['$scope', '$http', '$timeout', '$state', '$stateParams', 'notify', 'contract', 'optionExtensions', 'terminationDeadlines', 'paymentMilestones', 'handoverTrialTypes', 'handoverTrials', 'user',
+        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, optionExtensions, terminationDeadlines, paymentMilestones, handoverTrialTypes, handoverTrials, user) {
             $scope.contract = contract;
             $scope.autosaveUrl = 'api/itcontract/' + contract.id;
             $scope.optionExtensions = optionExtensions;
@@ -62,7 +62,7 @@
 
             $scope.deleteMilestone = function(id) {
                 var msg = notify.addInfoMessage("Sletter...", false);
-                $http.delete('api/paymentmilestone/' + id)
+                $http.delete('api/paymentmilestone/' + id + '?organizationId=' + user.currentOrganizationId)
                     .success(function() {
                         msg.toSuccessMessage("Slettet");
                         reload();
@@ -90,7 +90,7 @@
             
             $scope.deleteTrial = function (id) {
                 var msg = notify.addInfoMessage("Sletter...", false);
-                $http.delete('api/handoverTrial/' + id)
+                $http.delete('api/handoverTrial/' + id + '?organizationId=' + user.currentOrganizationId)
                     .success(function() {
                         msg.toSuccessMessage("Slettet");
                         reload();

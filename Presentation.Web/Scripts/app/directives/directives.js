@@ -38,6 +38,77 @@
         ]
     );
 
+    app.directive('uniqueEmail', [
+            '$http', 'userService', function ($http, userService) {
+                return {
+                    require: 'ngModel',
+                    link: function (scope, element, attrs, ctrl) {
+                        var user;
+                        userService.getUser().then(function (result) {
+                            user = result;
+                        });
+                        var validateAsync = _.debounce(function (viewValue) {
+                            $http.get(attrs.uniqueEmail + '?checkname=' + viewValue + '&orgId=' + user.currentOrganizationId)
+                                .success(function () {
+                                    scope.emailExists = false;
+                                    ctrl.$setValidity('available', true);
+                                    ctrl.$setValidity('lookup', true);
+                                })
+                                .error(function (data, status) {
+                                    // conflict
+                                    if (status == 409) {
+                                        scope.emailExists = true;
+                                    } else {
+                                        // something went wrong
+                                        ctrl.$setValidity('lookup', false);
+                                    }
+                                });
+                        }, 500);
+
+                        ctrl.$parsers.unshift(function (viewValue) {
+                            validateAsync(viewValue);
+                            // async returns breaks the setting of $modelValue so just returning
+                            return viewValue;
+                        });
+                    }
+                };
+            }
+    ]
+    );
+
+    app.directive('uniqueOrgUser', [
+            '$http', 'userService', function ($http, userService) {
+                return {
+                    require: 'ngModel',
+                    link: function (scope, element, attrs, ctrl) {
+                        var user;
+                        userService.getUser().then(function (result) {
+                            user = result;
+                        });
+                        var validateAsync = _.debounce(function (email) {
+                            $http.get(attrs.uniqueOrgUser + '?email=' + email + '&orgId=' + user.currentOrganizationId + '&userExistsWithRole')
+                                .success(function () {
+                                    ctrl.$setValidity('available', true);
+                                    ctrl.$setValidity('lookup', true);
+                                    scope.userExists = true;
+                                })
+                                .error(function (data, status) {
+                                    //User dosn't exist in organization
+                                    scope.userExists = false;
+                                });
+                        }, 500);
+
+                        ctrl.$parsers.unshift(function (email) {
+                            validateAsync(email);
+                            // async returns breaks the setting of $modelValue so just returning
+                            return email;
+                        });
+                    }
+                };
+            }
+    ]
+    );
+
     app.directive('addUserButton', [
         '$http', '$modal', function($http, $modal) {
             return {
@@ -74,12 +145,13 @@
                                         if ($scope.newUser.form.$invalid) return;
 
                                         var name = $scope.newUser.name;
+                                        var lastName = $scope.newUser.lastName;
                                         var email = $scope.newUser.email;
 
                                         var data = {
                                             "name": name,
-                                            "email": email,
-                                            "createdInId": user.currentOrganizationId
+                                            "lastName" : lastName,
+                                            "email": email
                                         };
 
                                         var msg = notify.addInfoMessage("Opretter bruger, sender email...", false);
@@ -87,7 +159,7 @@
                                         $http.post("api/user", data, { handleBusy: true }).success(function(result, status) {
                                             var userResult = result.response;
                                             if (status == 201) {
-                                                msg.toSuccessMessage(userResult.name + " er oprettet i KITOS");
+                                                msg.toSuccessMessage(userResult.name + " " + userResult.fullName + " er oprettet i KITOS");
                                             } else {
                                                 msg.toInfoMessage("En bruger med den email-adresse fandtes allerede i systemet.");
                                             }
@@ -207,7 +279,7 @@
 
                                         results.push({
                                             id: user.id, //select2 mandatory
-                                            text: user.name, //select2 mandatory
+                                            text: user.fullName, //select2 mandatory
                                             user: user //not mandatory, for extra info when formatting
                                         });
                                     });
@@ -249,7 +321,8 @@
                 require: 'ngModel',
                 templateUrl: 'partials/directives/select-status2.html',
 
-                link: function(scope, element, attr, ngModel) {
+                link: function (scope, element, attr, ngModel) {
+
                     scope.setModel = function(n) {
                         //only update on change
                         if (scope.model == n) return;
@@ -354,12 +427,17 @@
     ]);
 
     app.directive('autosave', [
-        '$http', '$timeout', 'notify', function($http, $timeout, notify) {
+        '$http', '$timeout', 'notify', 'userService', function ($http, $timeout, notify, userService) {
             return {
                 restrict: 'A',
                 require: 'ngModel',
                 priority: 0,
                 link: function(scope, element, attrs, ctrl) {
+                    var user;
+                    userService.getUser().then(function (result) {
+                        user = result;
+                    });
+
                     var oldValue;
                     $timeout(function() {
                         oldValue = ctrl.$modelValue; // get initial value
@@ -417,7 +495,7 @@
                         var id, msg = notify.addInfoMessage("Gemmer...", false);
                         if (e.added) {
                             id = e.added.id;
-                            $http.post(attrs.autosave + '?' + attrs.field + '=' + id)
+                            $http.post(attrs.autosave + '?organizationId=' + user.currentOrganizationId + '&' + attrs.field + '=' + id)
                                 .success(function() {
                                     msg.toSuccessMessage("Feltet er opdateret.");
                                 })
@@ -426,7 +504,7 @@
                                 });
                         } else if (e.removed) {
                             id = e.removed.id;
-                            $http.delete(attrs.autosave + '?' + attrs.field + '=' + id)
+                            $http.delete(attrs.autosave + '?organizationId=' + user.currentOrganizationId + '&' + attrs.field + '=' + id)
                                 .success(function() {
                                     msg.toSuccessMessage("Feltet er opdateret.");
                                 })
@@ -438,7 +516,10 @@
 
                     function save(payload) {
                         var msg = notify.addInfoMessage("Gemmer...", false);
-                        $http({ method: 'PATCH', url: attrs.autosave, data: payload })
+                        if (!attrs.appendurl)
+                            attrs.appendurl = '';
+
+                        $http({ method: 'PATCH', url: attrs.autosave + '?organizationId=' + user.currentOrganizationId + attrs.appendurl, data: payload })
                             .success(function() {
                                 msg.toSuccessMessage("Feltet er opdateret.");
                                 oldValue = ctrl.$modelValue;
@@ -764,7 +845,7 @@
     ]);
 
     app.directive('globalOptionRoleList', [
-        '$http', '$timeout', '$state', '$stateParams', 'notify', function($http, $timeout, $state, $stateParams, notify) {
+        '$http', '$timeout', '$state', '$stateParams', 'notify', 'userService', function($http, $timeout, $state, $stateParams, notify, userService) {
             return {
                 scope: {
                     optionsUrl: '@',
@@ -772,6 +853,10 @@
                 },
                 templateUrl: 'partials/global-config/optionrolelist.html',
                 link: function(scope, element, attrs) {
+                    var user;
+                    userService.getUser().then(function (result) {
+                        user = result;
+                    });
                     scope.list = [];
                     $http.get(scope.optionsUrl + '?nonsuggestions').success(function(result) {
                         _.each(result.response, function(v) {
@@ -798,7 +883,7 @@
 
                     scope.approve = function(id) {
                         var msg = notify.addInfoMessage("Gemmer...", false);
-                        $http({ method: 'PATCH', url: scope.optionsUrl + '/' + id, data: { isSuggestion: false } })
+                        $http({ method: 'PATCH', url: scope.optionsUrl + '/' + id + '?organizationId=' + user.currentOrganizationId, data: { isSuggestion: false } })
                             .success(function() {
                                 msg.toSuccessMessage("Rollen er opdateret.");
                                 // reload page to show changes

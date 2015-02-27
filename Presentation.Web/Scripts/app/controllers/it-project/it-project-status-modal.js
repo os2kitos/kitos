@@ -2,8 +2,8 @@
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-project.edit.status-project.modal', {
             url: '/modal/:type/:activityId',
-            onEnter: ['$state', '$stateParams', '$modal', 'project', 'usersWithRoles',
-                function ($state, $stateParams, $modal, project, usersWithRoles) {
+            onEnter: ['$state', '$stateParams', '$modal', 'project', 'usersWithRoles', 'user',
+                function ($state, $stateParams, $modal, project, usersWithRoles, user) {
                     $modal.open({
                         templateUrl: 'partials/it-project/modal-milestone-task-edit.html',
                         // fade in instead of slide from top, fixes strange cursor placement in IE
@@ -12,6 +12,9 @@
                         resolve: {
                             activityId: function() {
                                 return $stateParams.activityId;
+                            },
+                            user: function() {
+                                return user;
                             },
                             activityType: function () {
                                 return $stateParams.type;
@@ -45,12 +48,12 @@
                                 var id = $stateParams.activityId;
                                 if (id) {
                                     if ($stateParams.type == 'assignment') {
-                                        return $http.get("api/assignment/" + $stateParams.activityId + "?hasWriteAccess")
+                                        return $http.get("api/assignment/" + $stateParams.activityId + "?hasWriteAccess&organizationId=" + user.currentOrganizationId)
                                             .then(function(result) {
                                                 return result.data.response;
                                             });
                                     } else if ($stateParams.type == 'milestone') {
-                                        return $http.get("api/milestone/" + $stateParams.activityId + "?hasWriteAccess")
+                                        return $http.get("api/milestone/" + $stateParams.activityId + "?hasWriteAccess&organizationId=" + user.currentOrganizationId)
                                             .then(function (result) {
                                                 return result.data.response;
                                             });
@@ -75,8 +78,8 @@
     }]);
 
     app.controller('project.statusModalCtrl',
-    ['$scope', '$http', 'autofocus', 'project', 'usersWithRoles', 'activity', 'notify', 'activityId', 'activityType', 'hasWriteAccess',
-        function ($scope, $http, autofocus, project, usersWithRoles, activity, notify, activityId, activityType, hasWriteAccess) {
+    ['$scope', '$http', 'autofocus', 'project', 'usersWithRoles', 'activity', 'notify', 'activityId', 'activityType', 'hasWriteAccess', 'user',
+        function ($scope, $http, autofocus, project, usersWithRoles, activity, notify, activityId, activityType, hasWriteAccess, user) {
             var isNewActivity = activity == null;
             
             $scope.hasWriteAccess = isNewActivity ? true : hasWriteAccess;
@@ -107,11 +110,12 @@
                 delete payload.id;
                 delete payload.objectOwnerId;
                 delete payload.objectOwner;
+                delete payload.associatedUser;
 
                 var msg = notify.addInfoMessage("Gemmer ændringer...", false);
                 $http({
                     method: isNewActivity ? 'POST' : 'PATCH',
-                    url: 'api/' + activityType + '/' + activityId,
+                    url: 'api/' + activityType + '/' + activityId + '?organizationId=' + user.currentOrganizationId,
                     data: payload
                 }).success(function () {
                     msg.toSuccessMessage("Ændringerne er gemt!");

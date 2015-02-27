@@ -40,7 +40,7 @@
 
                             if (orgUnitId) {
                                 // add users default org unit to the new project
-                                $http.post('api/itproject/' + projectId + '?organizationunit=' + orgUnitId);
+                                $http.post('api/itproject/' + projectId + '?organizationunit=' + orgUnitId + '&organizationId=' + user.currentOrganizationId);
                             }
 
                             $state.go('it-project.edit.status-project', { id: projectId });
@@ -56,7 +56,7 @@
                     }
                     var projectId = $state.params.id;
                     var msg = notify.addInfoMessage("Sletter IT Projektet...", false);
-                    $http.delete('api/itproject/' + projectId)
+                    $http.delete('api/itproject/' + projectId + '?organizationId=' + user.currentOrganizationId)
                         .success(function(result) {
                             msg.toSuccessMessage("IT Projektet er slettet!");
                             $state.go('it-project.overview');

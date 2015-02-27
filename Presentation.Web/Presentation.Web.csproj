@@ -251,6 +251,7 @@
     <Compile Include="Controllers\API\OptionExtendController.cs" />
     <Compile Include="Controllers\API\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\API\ItProjectOrgUnitUsageController.cs" />
+    <Compile Include="Models\UpdateDefaultOrgUnitDto.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Models\HandoverTrialDTO.cs" />
     <Compile Include="Models\ItInterfaceDTO.cs" />
@@ -399,6 +400,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\bootstrap-theme.css" />
+    <Content Include="Content\bootstrap-theme.min.css" />
+    <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap\bootstrap.css" />
     <Content Include="Content\bootstrap\bootstrap.min.css" />
     <Content Include="Content\css\select2-spinner.gif" />
@@ -447,6 +452,7 @@
     <Content Include="Content\themes\base\tooltip.css" />
     <Content Include="favicon.ico" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Images\excel.png" />
     <Content Include="Images\logo.png" />
@@ -547,6 +553,9 @@
     <Content Include="Partials\org\org-unit.html" />
     <Content Include="Partials\org\org.html" />
     <Content Include="Partials\org\overview\task-usage.html" />
+    <Content Include="Partials\org\user\org-createuser-modal.html" />
+    <Content Include="Partials\org\user\org-edituser-modal.html" />
+    <Content Include="Partials\org\user\org-user.html" />
     <Content Include="Partials\shared\org-tree-item.html" />
     <Content Include="Partials\subnav\create-modal.html" />
     <Content Include="Partials\subnav\subnav.html" />
@@ -655,6 +664,7 @@
     <Content Include="Scripts\app\controllers\org\org-structure.js" />
     <Content Include="Scripts\app\controllers\org\org-subnav.js" />
     <Content Include="Scripts\app\controllers\org\org-overview.js" />
+    <Content Include="Scripts\app\controllers\org\org-user.js" />
     <Content Include="Scripts\app\directives\angularjs-dropdown-multiselect.js" />
     <Content Include="Scripts\app\directives\directives.js" />
     <Content Include="Scripts\app\directives\filters.js" />
@@ -666,12 +676,19 @@
     <Content Include="Scripts\app\utility\underscore.mixin.js" />
     <Content Include="Scripts\app\utility\utility.js" />
     <Content Include="Scripts\app\services\httpServices.js" />
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\bootstrap3-wysihtml5.js" />
     <Content Include="Scripts\holder.js" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="Content\mox\OS2KITOS MOX Skabelon Organisation.xlsx" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Content\bootstrap-theme.css.map" />
+    <Content Include="Content\bootstrap.css.map" />
     <None Include="Properties\PublishProfiles\Kitos - Prodmiljø.pubxml" />
     <None Include="Properties\PublishProfiles\Kitos - Testmiljø.pubxml" />
     <None Include="Properties\Settings.settings">
@@ -1448,6 +1465,7 @@
     <Content Include="Scripts\notify\notify.js" />
     <Content Include="Scripts\notify\notifyDirective.js" />
     <Content Include="Scripts\notify\notifyFactory.js" />
+    <Content Include="Scripts\npm.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ar.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_az.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_bg.js" />
@@ -1533,6 +1551,9 @@
     <Content Include="Scripts\jquery-2.1.3.min.map" />
     <Content Include="Scripts\underscore.min.map" />
     <Content Include="Scripts\version.json" />
+    <None Include="Web.Sandbox.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1574,6 +1595,15 @@
     <OutputPath>bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Sandbox|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>

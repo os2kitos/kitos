@@ -49,7 +49,7 @@
                 right.role = _.findWhere(itProjectRoles, { id: right.roleId });
                 right.show = true;
 
-                right.userForSelect = { id: right.user.id, text: right.user.name };
+                right.userForSelect = { id: right.user.id, text: right.user.fullName };
                 right.roleForSelect = right.roleId;
 
                 $scope.rights.push(right);
@@ -73,15 +73,15 @@
                     "userId": uId
                 };
 
-                $http.post("api/itprojectrights/" + oId, data).success(function (result) {
-                    notify.addSuccessMessage(result.response.user.name + " er knyttet i rollen");
+                $http.post("api/itprojectrights/" + oId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
+                    notify.addSuccessMessage(result.response.user.fullName + " er knyttet i rollen");
 
                     $scope.rights.push({
                         objectId: result.response.objectId,
                         roleId: result.response.roleId,
                         userId: result.response.userId,
                         user: result.response.user,
-                        userForSelect: { id: result.response.userId, text: result.response.user.name },
+                        userForSelect: { id: result.response.userId, text: result.response.user.fullName },
                         roleForSelect: result.response.roleId,
                         role: _.findWhere(itProjectRoles, { id: result.response.roleId }),
                         show: true
@@ -101,7 +101,7 @@
                 var rId = right.roleId;
                 var uId = right.userId;
 
-                $http.delete("api/itprojectrights/" + projectId + "?rId=" + rId + "&uId=" + uId).success(function (deleteResult) {
+                $http.delete("api/itprojectrights/" + projectId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
                     right.show = false;
                     notify.addSuccessMessage('Rollen er slettet!');
                 }).error(function (deleteResult) {
@@ -130,14 +130,14 @@
 
                 //otherwise, we should delete the old entry, then add a new one
 
-                $http.delete("api/itprojectrights/" + projectId + "?rId=" + rIdOld + "&uId=" + uIdOld).success(function (deleteResult) {
+                $http.delete("api/itprojectrights/" + projectId + "?rId=" + rIdOld + "&uId=" + uIdOld + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
 
                     var data = {
                         "roleId": rIdNew,
                         "userId": uIdNew
                     };
 
-                    $http.post("api/itprojectrights/" + projectId, data).success(function (result) {
+                    $http.post("api/itprojectrights/" + projectId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
 
                         right.roleId = result.response.roleId;
                         right.user = result.response.user;
@@ -147,7 +147,7 @@
 
                         right.edit = false;
 
-                        notify.addSuccessMessage(right.user.name + " er knyttet i rollen");
+                        notify.addSuccessMessage(right.user.fullName + " er knyttet i rollen");
 
                     }).error(function (result) {
 
@@ -162,7 +162,7 @@
                 }).error(function (deleteResult) {
 
                     //couldn't delete the old entry, just reset select options
-                    right.userForSelect = { id: right.user.id, text: right.user.name };
+                    right.userForSelect = { id: right.user.id, text: right.user.fullName };
                     right.roleForSelect = right.roleId;
 
                     notify.addErrorMessage('Fejl!');
@@ -176,7 +176,7 @@
                     case "roleName":
                         return right.role.name;
                     case "userName":
-                        return right.user.name;
+                        return right.user.fullName;
                     case "userEmail":
                         return right.user.email;
                     default:

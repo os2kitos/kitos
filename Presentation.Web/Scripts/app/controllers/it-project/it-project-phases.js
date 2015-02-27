@@ -17,10 +17,10 @@
     }]);
 
     app.controller('project.EditPhasesCtrl',
-    ['$scope', '$http', 'notify', '$modal', 'project',
-        function ($scope, $http, notify, $modal, project) {
+    ['$scope', '$http', 'notify', '$modal', 'project', 'user',
+        function ($scope, $http, notify, $modal, project, user) {
             $scope.project = project;
-            $scope.project.updateUrl = "api/itproject/" + project.id;
+            $scope.project.updateUrl = "api/itproject/" + project.id + '?organizationId=' + user.currentOrganizationId;
 
             //Setup phases
             $scope.project.phases = [project.phase1, project.phase2, project.phase3, project.phase4, project.phase5];
@@ -56,10 +56,10 @@
 
             $scope.updatePhaseDate = function (phase) {
                 //Update start date of the current phase
-                patch(phase.updateUrl, "startDate", phase.startDate)
+                patch(phase.updateUrl + "?organizationId=" + user.currentOrganizationId, "startDate", phase.startDate)
                     .success(function (result) {
                         //Also update end date of the previous phase
-                        patch(phase.prevPhase.updateUrl, "endDate", phase.startDate).success(function () {
+                        patch(phase.prevPhase.updateUrl + "?organizationId=" + user.currentOrganizationId, "endDate", phase.startDate).success(function () {
                             notify.addSuccessMessage("Feltet er opdateret");
                         }).error(function () {
                             notify.addErrorMessage("Fejl!");

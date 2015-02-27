@@ -51,10 +51,11 @@
                 userService.login($scope.email, $scope.password, $scope.remember)
                     .then(function() {
                         notify.addSuccessMessage("Du er nu logget ind!");
-
-                    }, function() {
-                        notify.addErrorMessage("Forkert brugernavn eller password!");
-
+                    }, function (error) {
+                        if (error.response === "User is locked")
+                            notify.addErrorMessage("Brugeren er låst! Kontakt administrator.");
+                        else
+                            notify.addErrorMessage("Forkert brugernavn eller password!");
                     });
             };
         }

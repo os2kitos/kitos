@@ -1,0 +1,108 @@
+﻿<div search-box data-paging="pagination"></div>
+<div class="searchbox-wrapper">
+    <a class="excel-icon" data-ng-href="{{csvUrl}}">
+        <img src="../../Images/excel.png" alt="Hent excelark" width="25">
+    </a>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+
+        <h3 class="panel-title">
+            <i class="glyphicon glyphicon-user"></i> {{ currentUser.currentOrganizationName}}
+        </h3>
+    </div>
+
+    <table class="table table-condensed table-striped table-fixed">
+        <thead>
+            <tr>
+                <th>
+                    Navn
+                    <button data-order-by="'Name'" data-paging="pagination"></button>
+                </th>
+                <th>
+                    Email
+                    <button data-order-by="'Email'" data-paging="pagination"></button>
+                </th>
+                <th>
+                    <!--EditUser button column-->
+                </th>
+                <th>
+                    Default org.enhed
+                    <button data-order-by="'DefaultOrganizationUnit.Name'" data-paging="pagination"></button>
+                </th>
+                <th>
+                    Advis
+                    <button data-order-by="'LastAdvisDate'" data-paging="pagination"></button>
+                </th>
+                <th>
+                    Oprettet af
+                    <button data-order-by="'ObjectOwner.Name'" data-paging="pagination"></button>
+                </th>
+                <th>
+                    <select data-ng-model="chosenModule" ng-change="getRightsForModule(chosenModule)">
+                        <option value="0">Vælg modul</option>
+                        <option value="1">Organisation</option>
+                        <option value="2">IT Projekter</option>
+                        <option value="3">IT Systemer</option>
+                        <option value="4">IT Kontrakter</option>
+                    </select>
+                </th>
+                <th>
+                    Rolle
+                </th>
+                <th>
+                    <!-- Control -->
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="user in users">
+                <td>{{user.name}} {{user.lastName}}</td>
+                <td>{{user.email}} </td>
+                <td>
+                    <button type="button" class="btn btn-info btn-xs" data-ng-click="editUser(user)" data-ng-disabled="!user.canBeEdited">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </button>
+                </td>
+                <td>{{user.defaultOrganizationUnitName == null ? rootUnitName : user.defaultOrganizationUnitName}}</td>
+                <td>
+                    <button type="button" data-ng-if="user.lastAdvisDate === null" class="btn btn-success btn-xs btn-block" data-ng-click="sendAdvis(user, false)" data-ng-disabled="!user.canBeEdited">
+                        Send Advis
+                    </button>
+                    <button type="button" data-ng-if="user.lastAdvisDate !== null" class="btn btn-warning btn-xs btn-block" data-ng-click="sendAdvis(user, true)" data-ng-disabled="!user.canBeEdited">
+                        {{user.lastAdvisDate | date:'dd-MM-yy'}}
+                    </button>
+                </td>
+                <td>{{user.objectOwnerName}}</td>
+                <td colspan="2">
+                    <table data-ng-if="user.rights" class="full-width table table-condensed table-striped table-no-margin">
+                        <tbody>
+                            <tr data-ng-repeat="right in user.rights">
+                                <td>
+                                    {{right.objectName}}
+                                </td>
+                                <td>
+                                    {{right.roleName}} ({{right.roleHasWriteAccess && "S" || "L" }})
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="text-right">
+                    <button class="btn btn-danger btn-xs" data-ng-click="deleteOrgRole(user)" data-ng-disabled="!user.canBeEdited">
+                        <span class="glyphicon glyphicon-trash"></span>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+
+        <tfoot data-ng-show="totalCount > users.length">
+            <tr>
+                <td colspan="9" class="text-center">
+                    <span data-pagination-buttons="pagination" data-pagination-total-count="totalCount"></span>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

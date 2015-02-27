@@ -189,5 +189,13 @@ namespace Core.DomainModel.ItSystemUsage
         /// Associated it projects.
         /// </value>
         public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
+
+        public override bool HasUserWriteAccess(User user, int organizationId)
+        {
+            // check that object belongs to the requwested organization context
+            if (OrganizationId != organizationId)
+                return false;
+            return base.HasUserWriteAccess(user, organizationId);
+        }
     }
 }

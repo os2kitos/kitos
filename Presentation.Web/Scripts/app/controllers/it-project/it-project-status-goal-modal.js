@@ -2,8 +2,8 @@
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-project.edit.status-goal.modal', {
             url: '/modal/:goalId',
-            onEnter: ['$state', '$stateParams', '$modal', 'goalTypes', 'project',
-                function ($state, $stateParams, $modal, goalTypes, project) {
+            onEnter: ['$state', '$stateParams', '$modal', 'goalTypes', 'project', 'user',
+                function ($state, $stateParams, $modal, goalTypes, project, user) {
                     $modal.open({
                         size: 'lg',
                         templateUrl: 'partials/it-project/modal-goal-edit.html',
@@ -13,6 +13,9 @@
                         resolve: {
                             goalId: function() {
                                 return $stateParams.goalId;
+                            },
+                            user: function () {
+                                return user;
                             },
                             // workaround to get data inherited from parent state
                             goalTypes: function() {
@@ -49,8 +52,8 @@
     }]);
 
     app.controller('project.statusGoalModalCtrl',
-    ['$scope', '$http', 'autofocus', 'goal', 'notify', 'goalId', 'goalTypes', 'project',
-        function ($scope, $http, autofocus, goal, notify, goalId, goalTypes, project) {
+    ['$scope', '$http', 'autofocus', 'goal', 'notify', 'goalId', 'goalTypes', 'project', 'user',
+        function ($scope, $http, autofocus, goal, notify, goalId, goalTypes, project, user) {
             var isNewGoal = goal == null;
             
             // set to empty object if falsy
@@ -81,7 +84,7 @@
                 var msg = notify.addInfoMessage("Gemmer ændringer...", false);
                 $http({
                     method: isNewGoal ? 'POST' : 'PATCH',
-                    url: 'api/goal/' + goalId,
+                    url: 'api/goal/' + goalId + '?organizationId=' + user.currentOrganizationId,
                     data: payload
                 }).success(function () {
                     msg.toSuccessMessage("Ændringerne er gemt!");

@@ -44,6 +44,9 @@ namespace Core.ApplicationServices
 
         public ItProject AddProject(ItProject project)
         {
+            _projectRepository.Insert(project);
+            _projectRepository.Save();
+            
             CreateDefaultPhases(project);
             AddEconomyYears(project);
 
@@ -59,7 +62,6 @@ namespace Core.ApplicationServices
                     LastChangedByUser = project.ObjectOwner
                 };
 
-            _projectRepository.Insert(project);
             _projectRepository.Save();
 
             return project;
@@ -153,16 +155,22 @@ namespace Core.ApplicationServices
         /// <returns></returns>
         private void CreateDefaultPhases(ItProject project)
         {
-            var phase1 = CreatePhase("Afventer", project.ObjectOwner);
+            var phase1 = CreatePhase("Afventer", project.ObjectOwner, project);
             _phaseRepository.Insert(phase1);
             _phaseRepository.Save();
 
             project.Phase1 = phase1;
             project.CurrentPhaseId = phase1.Id;
-            project.Phase2 = CreatePhase("Foranalyse", project.ObjectOwner);
-            project.Phase3 = CreatePhase("Gennemførsel", project.ObjectOwner);
-            project.Phase4 = CreatePhase("Overlevering", project.ObjectOwner);
-            project.Phase5 = CreatePhase("Drift", project.ObjectOwner);
+            project.Phase2 = CreatePhase("Foranalyse", project.ObjectOwner, project);
+            project.Phase3 = CreatePhase("Gennemførsel", project.ObjectOwner, project);
+            project.Phase4 = CreatePhase("Overlevering", project.ObjectOwner, project);
+            project.Phase5 = CreatePhase("Drift", project.ObjectOwner, project);
+
+            _phaseRepository.Insert(project.Phase2);
+            _phaseRepository.Insert(project.Phase3);
+            _phaseRepository.Insert(project.Phase4);
+            _phaseRepository.Insert(project.Phase5);
+            _phaseRepository.Save();
         }
 
         /// <summary>
@@ -173,21 +181,21 @@ namespace Core.ApplicationServices
         /// <returns></returns>
         private void ClonePhases(ItProject original, ItProject clone)
         {
-            var phase1 = CreatePhase(original.Phase1.Name, clone.ObjectOwner);
+            var phase1 = CreatePhase(original.Phase1.Name, clone.ObjectOwner, clone);
             _phaseRepository.Insert(phase1);
             _phaseRepository.Save();
 
             clone.Phase1 = phase1;
             clone.CurrentPhaseId = phase1.Id;
-            clone.Phase2 = CreatePhase(original.Phase2.Name, clone.ObjectOwner);
-            clone.Phase3 = CreatePhase(original.Phase3.Name, clone.ObjectOwner);
-            clone.Phase4 = CreatePhase(original.Phase4.Name, clone.ObjectOwner);
-            clone.Phase5 = CreatePhase(original.Phase5.Name, clone.ObjectOwner);
+            clone.Phase2 = CreatePhase(original.Phase2.Name, clone.ObjectOwner, clone);
+            clone.Phase3 = CreatePhase(original.Phase3.Name, clone.ObjectOwner, clone);
+            clone.Phase4 = CreatePhase(original.Phase4.Name, clone.ObjectOwner, clone);
+            clone.Phase5 = CreatePhase(original.Phase5.Name, clone.ObjectOwner, clone);
         }
 
-        private ItProjectPhase CreatePhase(string name, User owner)
+        private ItProjectPhase CreatePhase(string name, User owner, ItProject project)
         {
-            return new ItProjectPhase() {Name = name, ObjectOwner = owner, LastChangedByUser = owner};
+            return new ItProjectPhase() { Name = name, ObjectOwner = owner, LastChangedByUser = owner, ItProject = project };
         }
 
         private void AddEconomyYears(ItProject project)

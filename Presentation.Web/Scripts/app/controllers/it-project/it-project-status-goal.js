@@ -28,8 +28,8 @@
     ]);
 
     app.controller('project.EditStatusGoalCtrl', [
-        '$scope', '$http', 'notify', '$modal', '$state', 'project', 'goalTypes',
-        function ($scope, $http, notify, $modal, $state, project, goalTypes) {
+        '$scope', '$http', 'notify', '$modal', '$state', 'project', 'goalTypes', 'user',
+        function ($scope, $http, notify, $modal, $state, project, goalTypes, user) {
             $scope.goalStatus = project.goalStatus;
             $scope.goalStatus.updateUrl = "api/goalStatus/" + project.goalStatus.id;
 
@@ -61,7 +61,7 @@
 
                 goal.delete = function() {
                     var msg = notify.addInfoMessage("Sletter... ");
-                    $http.delete(goal.updateUrl).success(function() {
+                    $http.delete(goal.updateUrl + '?organizationId=' + user.currentOrganizationId).success(function () {
                         goal.show = false;
                         msg.toSuccessMessage("Slettet!");
                     }).error(function() {

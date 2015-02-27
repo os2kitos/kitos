@@ -12,8 +12,8 @@
                             return result.data.response;
                         });
                 }],
-                hasWriteAccess: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itsystem/" + $stateParams.id + "?hasWriteAccess")
+                hasWriteAccess: ['$http', '$stateParams', 'user', function ($http, $stateParams, user) {
+                    return $http.get("api/itsystem/" + $stateParams.id + "?hasWriteAccess&organizationId=" + user.currentOrganizationId)
                         .then(function (result) {
                             return result.data.response;
                         });

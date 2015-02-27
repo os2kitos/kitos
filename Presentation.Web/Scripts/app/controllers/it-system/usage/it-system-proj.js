@@ -17,7 +17,7 @@
 
         var usageId = $stateParams.id;
         $scope.save = function () {
-            $http.post('api/itproject/' + $scope.selectedProject.id + '?usageId=' + usageId)
+            $http.post('api/itproject/' + $scope.selectedProject.id + '?usageId=' + usageId + '&organizationId=' + user.currentOrganizationId)
                 .success(function () {
                     notify.addSuccessMessage("Projektet er tilknyttet.");
                     reload();
@@ -28,7 +28,7 @@
         };
 
         $scope.delete = function(projectId) {
-            $http.delete('api/itproject/' + projectId + '?usageId=' + usageId)
+            $http.delete('api/itproject/' + projectId + '?usageId=' + usageId + '&organizationId=' + user.currentOrganizationId)
                 .success(function() {
                     notify.addSuccessMessage("Projektets tilknyttning er fjernet.");
                     reload();

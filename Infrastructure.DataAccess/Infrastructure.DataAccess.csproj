@@ -42,6 +42,15 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Sandbox|AnyCPU'">
+    <OutputPath>bin\Sandbox\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -163,6 +172,34 @@
     <Compile Include="Migrations\201501081324371_InfUsageIndex.Designer.cs">
       <DependentUpon>201501081324371_InfUsageIndex.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201501121147229_UserAddIsLocked.cs" />
+    <Compile Include="Migrations\201501121147229_UserAddIsLocked.Designer.cs">
+      <DependentUpon>201501121147229_UserAddIsLocked.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201501131442397_Add-User-LastAdvisDate.cs" />
+    <Compile Include="Migrations\201501131442397_Add-User-LastAdvisDate.Designer.cs">
+      <DependentUpon>201501131442397_Add-User-LastAdvisDate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201502011724241_RemovedUserCreatedInAndIsLocked.cs" />
+    <Compile Include="Migrations\201502011724241_RemovedUserCreatedInAndIsLocked.Designer.cs">
+      <DependentUpon>201502011724241_RemovedUserCreatedInAndIsLocked.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201502011747173_AddedUserLastNameAndPhoneNumber.cs" />
+    <Compile Include="Migrations\201502011747173_AddedUserLastNameAndPhoneNumber.Designer.cs">
+      <DependentUpon>201502011747173_AddedUserLastNameAndPhoneNumber.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201502091439436_AddedItProjectPhaseNavigationProp.cs" />
+    <Compile Include="Migrations\201502091439436_AddedItProjectPhaseNavigationProp.Designer.cs">
+      <DependentUpon>201502091439436_AddedItProjectPhaseNavigationProp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201502091610206_AddedOrgUUID.cs" />
+    <Compile Include="Migrations\201502091610206_AddedOrgUUID.Designer.cs">
+      <DependentUpon>201502091610206_AddedOrgUUID.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201502121301345_AddedDefaultOrgUnitToAdminRight.cs" />
+    <Compile Include="Migrations\201502121301345_AddedDefaultOrgUnitToAdminRight.Designer.cs">
+      <DependentUpon>201502121301345_AddedDefaultOrgUnitToAdminRight.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\BackupConfiguration.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -206,6 +243,27 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201501081324371_InfUsageIndex.resx">
       <DependentUpon>201501081324371_InfUsageIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201501121147229_UserAddIsLocked.resx">
+      <DependentUpon>201501121147229_UserAddIsLocked.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201501131442397_Add-User-LastAdvisDate.resx">
+      <DependentUpon>201501131442397_Add-User-LastAdvisDate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201502011724241_RemovedUserCreatedInAndIsLocked.resx">
+      <DependentUpon>201502011724241_RemovedUserCreatedInAndIsLocked.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201502011747173_AddedUserLastNameAndPhoneNumber.resx">
+      <DependentUpon>201502011747173_AddedUserLastNameAndPhoneNumber.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201502091439436_AddedItProjectPhaseNavigationProp.resx">
+      <DependentUpon>201502091439436_AddedItProjectPhaseNavigationProp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201502091610206_AddedOrgUUID.resx">
+      <DependentUpon>201502091610206_AddedOrgUUID.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201502121301345_AddedDefaultOrgUnitToAdminRight.resx">
+      <DependentUpon>201502121301345_AddedDefaultOrgUnitToAdminRight.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

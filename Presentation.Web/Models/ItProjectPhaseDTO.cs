@@ -12,6 +12,6 @@ namespace Presentation.Web.Models
         public DateTime? StartDate { get; set; }
         [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime? EndDate { get; set; }
-        public int? AssociatedItProjectId { get; set; } 
+        public int? ItProjectId { get; set; }
     }
 }

@@ -26,16 +26,18 @@ namespace Core.DomainModel
         }
 
         public string Name { get; set; }
+        public string LastName { get; set; }
+        public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
         public string Salt { get; set; }
         public bool IsGlobalAdmin { get; set; }
         public Guid? Uuid { get; set; }
+        public DateTime? LastAdvisDate { get; set; }   
 
-        public int? CreatedInId { get; set; }
-        public virtual Organization CreatedIn { get; set; }
-        
+        //TODO REMOVE THIS - replaced by admin rights default org unit
         public int? DefaultOrganizationUnitId { get; set; }
+
         /// <summary>
         /// The organization unit that the user has selected as his default.
         /// </summary>
@@ -81,11 +83,11 @@ namespace Core.DomainModel
         /// </summary>
         public virtual ICollection<ItContract.ItContract> SignerForContracts { get; set; }
 
-        public override bool HasUserWriteAccess(User user)
+        public override bool HasUserWriteAccess(User user, int organizationId)
         {
             if (user.Id == this.Id) return true;
 
-            return base.HasUserWriteAccess(user);
+            return base.HasUserWriteAccess(user, organizationId);
         }
     }
 }

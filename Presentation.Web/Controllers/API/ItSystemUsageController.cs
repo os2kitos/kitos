@@ -217,7 +217,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage Delete(int itSystemId, int organizationId)
+        public override HttpResponseMessage Delete(int itSystemId, int organizationId)
         {
             try
             {
@@ -225,7 +225,7 @@ namespace Presentation.Web.Controllers.API
                 if (usage == null) return NotFound();
 
                 //This will make sure we check for permissions and such...
-                return Delete(usage.Id);
+                return base.Delete(usage.Id, organizationId);
 
             }
             catch (Exception e)
@@ -234,13 +234,13 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage PostOrganizationUnitsUsingThisSystem(int id, [FromUri] int organizationUnit)
+        public HttpResponseMessage PostOrganizationUnitsUsingThisSystem(int id, [FromUri] int organizationUnit, int organizationId)
         {
             try
             {
                 var usage = Repository.GetByKey(id);
                 if (usage == null) return NotFound();
-                if (!HasWriteAccess(usage)) return Unauthorized();
+                if (!HasWriteAccess(usage, organizationId)) return Unauthorized();
 
                 var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
                 if (orgUnit == null) return NotFound();
@@ -261,14 +261,14 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage DeleteOrganizationUnitsUsingThisSystem(int id, [FromUri] int organizationUnit)
+        public HttpResponseMessage DeleteOrganizationUnitsUsingThisSystem(int id, [FromUri] int organizationUnit, int organizationId)
         {
             try
             {
                 var usage = Repository.GetByKey(id);
                 if (usage == null) return NotFound();
 
-                if (!HasWriteAccess(usage)) return Unauthorized();
+                if (!HasWriteAccess(usage, organizationId)) return Unauthorized();
 
                 var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
                 if (orgUnit == null) return NotFound();
@@ -291,13 +291,13 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage PostTasksUsedByThisSystem(int id, [FromUri] int? taskId)
+        public HttpResponseMessage PostTasksUsedByThisSystem(int id, int organizationId, [FromUri] int? taskId)
         {
             try
             {
                 var usage = Repository.GetByKey(id);
                 if (usage == null) return NotFound();
-                if (!HasWriteAccess(usage)) return Unauthorized();
+                if (!HasWriteAccess(usage, organizationId)) return Unauthorized();
 
                 List<TaskRef> tasks;
                 if (taskId.HasValue)
@@ -337,13 +337,13 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage DeleteTasksUsedByThisSystem(int id, [FromUri] int? taskId)
+        public HttpResponseMessage DeleteTasksUsedByThisSystem(int id, int organizationId, [FromUri] int? taskId)
         {
             try
             {
                 var usage = Repository.GetByKey(id);
                 if (usage == null) return NotFound();
-                if (!HasWriteAccess(usage)) return Unauthorized();
+                if (!HasWriteAccess(usage, organizationId)) return Unauthorized();
 
                 List<TaskRef> tasks;
                 if (taskId.HasValue)
