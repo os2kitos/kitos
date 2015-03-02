@@ -112,6 +112,48 @@
 
                     });
                 }
+
+                //KENDO
+                $scope.mainGridOptions = {
+                    dataSource: {
+                        type: "odata",
+                        transport: {
+                            read: {
+                                beforeSend: function (req) {
+                                    req.setRequestHeader('Accept', 'application/json;odata=fullmetadata');
+                                },
+                                url: "/OData/ItSystems",
+                                dataType: "json",
+                                cache: false
+                            },
+                            parameterMap: function (options, type) {
+                                var d = kendo.data.transports.odata.parameterMap(options);
+                                delete d.$inlinecount; // <-- remove inlinecount parameter
+                                d.$count = true;
+                                return d;
+                            },
+                            schema: {
+                                data: function (data) {
+                                    return data.value; // <-- The result is just the data, it doesn't need to be unpacked.
+                                },
+                                total: function (data) {
+                                    return data['@odata.count']; // <-- The total items count is the data length, there is no .Count to unpack.
+
+                                }
+                            },
+                            pageSize: 5,
+                            serverPaging: false,
+                            serverSorting: true,
+                        },
+
+                    },
+                    columns: [{
+                        field: "Id"
+                    }, {
+                        field: "Name"
+                    }]
+                };
+                //KENDO SLUT
             }
         ]
     );
