@@ -4,8 +4,10 @@ using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Results;
 using System.Web.OData;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
@@ -47,17 +49,30 @@ namespace Presentation.Web.Controllers.OData
             return _itSystemRepository.GetByKey(key);
         }
 
-        public async Task<IHttpActionResult> Post(ItSystem itSystem)
+        public IHttpActionResult Post(ItSystem itSystem)
         {
-            
-            
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                var created = _itSystemRepository.Insert(itSystem);
+                _itSystemRepository.Save();
+
+                return Created(created);
+
             }
-            db.ItSystems.Add(itSystem);
-            await db.SaveChangesAsync();
-            return Created(itSystem);
+            catch (Exception e)
+            {
+                return BadRequest();
+            }
+
+            
+            
+            //if (!ModelState.IsValid)
+            //{
+            //    return BadRequest(ModelState);
+            //}
+            //db.ItSystems.Add(itSystem);
+            ////await db.SaveChangesAsync();
+            //return Created(itSystem);
         }
 
         public async Task<IHttpActionResult> Patch([FromODataUri] int key, Delta<ItSystem> itSystem)
