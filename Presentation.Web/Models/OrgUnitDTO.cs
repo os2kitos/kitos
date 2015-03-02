@@ -13,6 +13,14 @@ namespace Presentation.Web.Models
 
         public long? Ean { get; set; }
 
+        public string ObjectOwnerName { get; set; }
+        public string ObjectOwnerLastName { get; set; }
+
+        public string ObjectOwnerFullName
+        {
+            get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
+        }
+
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }
     }
