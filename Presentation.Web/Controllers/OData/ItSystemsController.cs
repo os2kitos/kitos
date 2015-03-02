@@ -93,34 +93,9 @@ namespace Presentation.Web.Controllers.OData
             }
         }
 
-        public async Task<IHttpActionResult> Put([FromODataUri] int key, ItSystem update)
+        public IHttpActionResult Put([FromODataUri] int key, ItSystem update)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (key != update.Id)
-            {
-                return BadRequest();
-            }
-            db.Entry(update).State = EntityState.Modified;
-            try
-            {
-                await db.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!SystemExists(key))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            return Updated(update);
+            return StatusCode(HttpStatusCode.MethodNotAllowed);
         }
 
         public IHttpActionResult Delete([FromODataUri] int key)
@@ -132,8 +107,10 @@ namespace Presentation.Web.Controllers.OData
             }
             try
             {
+                //Get children
                 var systems = _systemService.GetHierarchy(key);
 
+                //Set each child's parent to null
                 foreach (var system in systems)
                 {
                     if(system == entity) continue;
@@ -143,10 +120,11 @@ namespace Presentation.Web.Controllers.OData
 
                 _itSystemRepository.Save();
 
+                //Delete ItSystem
                 _itSystemRepository.DeleteByKey(key);
                 _itSystemRepository.Save();
 
-                return Ok();
+                return StatusCode(HttpStatusCode.NoContent);
             }
             catch (Exception e)
             {
