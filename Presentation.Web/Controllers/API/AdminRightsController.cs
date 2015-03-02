@@ -121,10 +121,11 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                // if user has any role within the organization they should be able to add new adminrights
-                if (!RightRepository.Get().Any(r => r.UserId == userId && r.ObjectId == organizationId))
-                    return Unauthorized();
-
+                // if user has any role within the organization (or global admin) they should be able to add new adminrights
+                if (!KitosUser.IsGlobalAdmin)
+                    if (!RightRepository.Get(r => r.UserId == userId && r.ObjectId == organizationId).Any())
+                        return Unauthorized();
+                
                 right.ObjectId = organizationId;
                 right.ObjectOwner = KitosUser;
                 right.LastChangedByUser = KitosUser;
