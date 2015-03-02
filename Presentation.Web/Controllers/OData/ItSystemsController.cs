@@ -61,51 +61,36 @@ namespace Presentation.Web.Controllers.OData
             }
             catch (Exception e)
             {
-                return BadRequest();
+                return InternalServerError(e);
             }
-
-            
-            
-            //if (!ModelState.IsValid)
-            //{
-            //    return BadRequest(ModelState);
-            //}
-            //db.ItSystems.Add(itSystem);
-            ////await db.SaveChangesAsync();
-            //return Created(itSystem);
         }
 
-        public async Task<IHttpActionResult> Patch([FromODataUri] int key, Delta<ItSystem> itSystem)
+        public IHttpActionResult Patch([FromODataUri] int key, Delta<ItSystem> delta)
         {
+            Validate(delta.GetEntity());
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var entity = await db.ItSystems.FindAsync(key);
+            var entity = _itSystemRepository.GetByKey(key);
             if (entity == null)
             {
                 return NotFound();
             }
 
-            itSystem.Patch(entity);
-
             try
             {
-                await db.SaveChangesAsync();
+                delta.Patch(entity);
+                _itSystemRepository.Save();
+
+                return Updated(entity);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception e)
             {
-                if (!SystemExists(key))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return InternalServerError(e);
             }
-            return Updated(entity);
         }
 
         public async Task<IHttpActionResult> Put([FromODataUri] int key, ItSystem update)
@@ -138,24 +123,35 @@ namespace Presentation.Web.Controllers.OData
             return Updated(update);
         }
 
-        public async Task<IHttpActionResult> Delete([FromODataUri] int key)
+        public IHttpActionResult Delete([FromODataUri] int key)
         {
-            var itSystem = await db.ItSystems.FindAsync(key);
-            if (itSystem == null)
+            var entity = _itSystemRepository.GetByKey(key);
+            if (entity == null)
             {
                 return NotFound();
             }
-            db.ItSystems.Remove(itSystem);
-            await db.SaveChangesAsync();
-            return StatusCode(HttpStatusCode.NoContent);
-        }
+            try
+            {
+                var systems = _systemService.GetHierarchy(key);
 
-        protected override void Dispose(bool disposing)
-        {
-            db.Dispose();
-            base.Dispose(disposing);
-        }
-        
+                foreach (var system in systems)
+                {
+                    if(system == entity) continue;
 
+                    system.Parent = null;
+                }
+
+                _itSystemRepository.Save();
+
+                _itSystemRepository.DeleteByKey(key);
+                _itSystemRepository.Save();
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return InternalServerError(e);
+            }
+        }
     }
 }

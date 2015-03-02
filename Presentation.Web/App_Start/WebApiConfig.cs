@@ -36,6 +36,19 @@ namespace Presentation.Web
             //config.EnableQuerySupport();
 
             //OData
+
+
+            config.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+
+            config.MapODataServiceRoute(
+                routeName: "odata",
+                routePrefix: "odata",
+                model: GetModel());
+        }
+
+        public static IEdmModel GetModel()
+        {
             var builder = new ODataModelBuilder();
 
             //builder.EntitySet<AdminRight>("AdminRights");
@@ -85,7 +98,7 @@ namespace Presentation.Web
             itSystems.EntityType.Property(x => x.Description);
             itSystems.EntityType.Property(x => x.ParentId);
             itSystems.EntityType.HasOptional(x => x.Parent).IsNavigable();
-            
+
 
             //builder.EntitySet<ItSystemUsage>("ItSystemUsages");
             //builder.EntitySet<ItSystemRight>("ItSystemRights");
@@ -116,13 +129,7 @@ namespace Presentation.Web
             //builder.EntitySet<User>("Users");
             //builder.EntitySet<Wish>("Wishes");
 
-            config.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-
-            config.MapODataServiceRoute(
-                routeName: "odata",
-                routePrefix: "odata",
-                model: builder.GetEdmModel());
+            return builder.GetEdmModel();
         }
     }
 }
