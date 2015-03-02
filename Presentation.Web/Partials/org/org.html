@@ -32,10 +32,12 @@
 
             <!-- if an org unit has been selected -->
             <div class="col-md-12" data-ng-show="chosenOrgUnit">
-                <h3>{{ chosenOrgUnit.name }} 
+                <h3>
+                    {{ chosenOrgUnit.name }}
                     <span class="text-muted">({{ chosenOrgUnit.organization.name }})</span>
+                    
                 </h3>
-
+                <p class="text-muted">Oprettet af {{ chosenOrgUnit.objectOwnerFullName }}</p>
                 <!-- Organization Roles -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -46,13 +48,17 @@
                         <thead>
                             <tr>
                                 <th>
-                                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('orgUnitName')">Organisationsenhed</button></th>
+                                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('orgUnitName')">Organisationsenhed</button>
+                                </th>
                                 <th>
-                                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('roleName')">Organisationsrolle</button></th>
+                                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('roleName')">Organisationsrolle</button>
+                                </th>
                                 <th>
-                                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('userName')">Navn</button></th>
+                                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('userName')">Navn</button>
+                                </th>
                                 <th>
-                                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('userEmail')">Email</button></th>
+                                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('userEmail')">Email</button>
+                                </th>
                             </tr>
                         </thead>
                         <!-- for each right -->
@@ -63,14 +69,15 @@
                                 <td>{{ orgUnits[right.objectId].name }}</td>
                                 <td>{{ orgRoles[right.roleId].name }}</td>
                                 <td>{{ right.user.fullName }}</td>
-                                <td class="relative-position">{{ right.user.email }}
+                                <td class="relative-position">
+                                    {{ right.user.email }}
                                     <div data-ng-show="chosenOrgUnit.hasWriteAccess" class="pull-right">
                                         <a data-ng-click="right.edit = true" class="btn btn-info btn-xs">
                                             <i class="glyphicon glyphicon-pencil"></i>
                                         </a>
                                         <a class="btn btn-danger btn-xs"
-                                            data-confirmed-click="deleteRight(right)"
-                                            data-confirm-click="Er du sikker på at du vil fjerne denne rolle fra denne person? Du sletter ikke personen.">
+                                           data-confirmed-click="deleteRight(right)"
+                                           data-confirm-click="Er du sikker på at du vil fjerne denne rolle fra denne person? Du sletter ikke personen.">
                                             <i class="glyphicon glyphicon-trash"></i>
                                         </a>
                                     </div>
@@ -91,7 +98,7 @@
                                     </select>
                                 </td>
                                 <td colspan="2" class="relative-position">
-                                    <input data-select-user="foo" data-org-id="{{ orgId }}"  data-user-model="right.userForSelect" />
+                                    <input data-select-user="foo" data-org-id="{{ orgId }}" data-user-model="right.userForSelect" />
                                     <div class="pull-outside-table">
                                         <input type="submit" class="btn btn-success btn-sm" data-ng-click="updateRight(right)" value="Gem" />
                                     </div>
@@ -103,7 +110,8 @@
                         <tbody data-ng-show="chosenOrgUnit.hasWriteAccess">
                             <tr>
                                 <td>
-                                    <input type="text" disabled="disabled" class="form-control input-sm" value="{{ chosenOrgUnit.name }}" /></td>
+                                    <input type="text" disabled="disabled" class="form-control input-sm" value="{{ chosenOrgUnit.name }}" />
+                                </td>
                                 <td>
                                     <select class="form-control input-sm" name="selectRole"
                                             data-ui-select2=""
@@ -138,10 +146,12 @@
                                         <span data-ng-if="showAllTasks">Vis valgte</span>
                                     </a>
                                 </th>
-                                <th class="col-md-2">KLE ID
+                                <th class="col-md-2">
+                                    KLE ID
                                     <button data-order-by="showAllTasks && 'taskKey' || 'taskRef.taskKey'" data-paging="pagination"></button>
                                 </th>
-                                <th class="col-md-7">KLE Navn
+                                <th class="col-md-7">
+                                    KLE Navn
                                     <button data-order-by="showAllTasks && 'description' || 'taskRef.description'" data-paging="pagination"></button>
                                 </th>
                                 <th>Overblik</th>
@@ -162,10 +172,10 @@
                                 </td>
                                 <td>
                                     <button class="btn btn-link btn-star" data-ng-if="task.usage"
-                                        data-ng-class="{'unstarred': !task.usage.starred}"
-                                        data-ng-click="task.toggleStar()"
-                                        data-ng-disabled="!chosenOrgUnit.hasWriteAccess"
-                                        data-tooltip="Vis under overblik?">
+                                            data-ng-class="{'unstarred': !task.usage.starred}"
+                                            data-ng-click="task.toggleStar()"
+                                            data-ng-disabled="!chosenOrgUnit.hasWriteAccess"
+                                            data-tooltip="Vis under overblik?">
                                         <i class="glyphicon glyphicon-star"></i>
                                     </button>
                                 </td>
