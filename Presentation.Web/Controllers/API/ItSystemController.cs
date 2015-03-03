@@ -64,8 +64,7 @@ namespace Presentation.Web.Controllers.API
                         // object owner sees his own objects within the given context
                         s.ObjectOwnerId == KitosUser.Id ||
                         // everyone in the same organization can see normal objects
-                        s.AccessModifier == AccessModifier.Normal &&
-                        s.OrganizationId == organizationId)
+                        s.AccessModifier == AccessModifier.Normal)
                         // it systems doesn't have roles so private doesn't make sense
                         // only object owners will be albe to see private objects
                     );
