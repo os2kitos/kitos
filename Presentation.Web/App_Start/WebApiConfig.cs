@@ -95,9 +95,9 @@ namespace Presentation.Web
             var itSystems = builder.EntitySet<ItSystem>("ItSystems");
             itSystems.EntityType.HasKey(x => x.Id);
             itSystems.EntityType.Property(x => x.Name);
-            itSystems.EntityType.Property(x => x.Description);
-            itSystems.EntityType.Property(x => x.ParentId);
-            itSystems.EntityType.HasOptional(x => x.Parent).IsNavigable();
+            //itSystems.EntityType.Property(x => x.Description);
+            //itSystems.EntityType.Property(x => x.ParentId);
+            //itSystems.EntityType.HasOptional(x => x.Parent).IsNavigable();
 
 
             //builder.EntitySet<ItSystemUsage>("ItSystemUsages");
