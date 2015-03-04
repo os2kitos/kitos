@@ -6,77 +6,78 @@
 </div>
 <table class="table full-width table-striped">
     <thead>
-        <tr>
-            <th>
-                IT System
-                <button data-order-by="'name'" data-paging="pagination"></button>
-            </th>
-            <th class="col-sm-0">
-                (P)
-            </th>
-            <th>
-                <select data-ng-model="showType" data-ng-init="showType = 'businessType'">
-                    <option value="appType">Applikationstype</option>
-                    <option value="businessType">Forretningstype</option>
-                </select>
-            </th>
-            <th>KLE ID</th>
-            <th>KLE Navn</th>
-            <th>
-                Rettighedshaver
-                <button data-order-by="'belongsTo.name'" data-paging="pagination"></button>
-            </th>
-            <th>
-                Oprettet af
-                <button data-order-by="'organization.name'" data-paging="pagination"></button>
-            </th>
-            <th>Anvendelse</th>
-        </tr>
+    <tr>
+        <th>
+            IT System
+            <button data-order-by="'name'" data-paging="pagination"></button>
+        </th>
+        <th class="col-sm-0">
+            (P)
+        </th>
+        <th>
+            <select data-ng-model="showType" data-ng-init="showType = 'businessType'">
+                <option value="appType">Applikationstype</option>
+                <option value="businessType">Forretningstype</option>
+            </select>
+        </th>
+        <th>KLE ID</th>
+        <th>KLE Navn</th>
+        <th>
+            Rettighedshaver
+            <button data-order-by="'belongsTo.name'" data-paging="pagination"></button>
+        </th>
+        <th>
+            Oprettet af
+            <button data-order-by="'organization.name'" data-paging="pagination"></button>
+        </th>
+        <th>Anvendelse</th>
+    </tr>
     </thead>
     <tbody>
-        <tr data-ng-repeat="system in systems">
-            <td>
-                <a data-ui-sref="it-system.edit.interfaces({id: system.id})">{{system.name}}</a>
-            </td>
-            <td>
-                <span data-ng-show="{{system.accessModifier == 1}}">
+    <tr data-ng-repeat="system in systems">
+        <td>
+            <a data-ui-sref="it-system.edit.interfaces({id: system.id})">{{system.name}}</a>
+        </td>
+        <td>
+            <span data-ng-show="{{system.accessModifier == 1}}">
                     (P)
                 </span>
-            </td>
-            <td data-ng-switch="showType">
-                <span data-ng-switch-when="appType">{{system.appTypeOptionName}}</span>
-                <span data-ng-switch-when="businessType">{{system.businessTypeName}}</span>
-            </td>
-            <td>{{system.taskId}}</td>
-            <td>{{system.taskName}}</td>
-            <td>
-                <!-- name of organization -->
-                {{system.belongsToName}}
-            </td>
-            <td>
-                <span data-popover-placement="right" data-popover="Oprettet af {{system.user.fullName}}" data-popover-trigger="mouseenter">
+        </td>
+        <td data-ng-switch="showType">
+            <span data-ng-switch-when="appType">{{system.appTypeOptionName}}</span>
+            <span data-ng-switch-when="businessType">{{system.businessTypeName}}</span>
+        </td>
+        <td>{{system.taskId}}</td>
+        <td>{{system.taskName}}</td>
+        <td>
+            <!-- name of organization -->
+            {{system.belongsToName}}
+        </td>
+        <td>
+            <span data-popover-placement="right" data-popover="Oprettet af {{system.user.fullName}}" data-popover-trigger="mouseenter">
                     {{system.organization.name}}
                 </span>
-            </td>
-            <td>
-                <div>
-                    <button class="btn btn-xs btn-success" data-ng-click="system.addUsage()" data-tooltip="Tag systemet i lokal anvendelse" data-ng-show="!system.hasUsage">
-                        Anvend
-                    </button>
-                    <button class="btn btn-xs btn-danger" data-confirmed-click="system.deleteUsage()"
+        </td>
+        <td>
+            <div>
+                <button class="btn btn-xs btn-success" data-ng-click="system.addUsage()" data-tooltip="Tag systemet i lokal anvendelse" data-ng-show="!system.hasUsage">
+                    Anvend
+                </button>
+                <button class="btn btn-xs btn-danger" data-confirmed-click="system.deleteUsage()"
                         data-confirm-click="Er du sikker på at du vil fjerne den lokale anvendelse af systemet? Dette sletter ikke systemet, men vil slette alle lokale detaljer vedrørende anvendelsen."
                         data-tooltip="Slet lokal anvendelse af systemet" data-ng-show="system.hasUsage">
-                        Fjern anv.
-                    </button>
-                </div>
-            </td>
-        </tr>
+                    Fjern anv.
+                </button>
+            </div>
+        </td>
+    </tr>
     </tbody>
     <tfoot>
-        <tr>
-            <td colspan="8" class="text-center">
-                <span data-pagination-buttons="pagination" data-pagination-total-count="totalCount"></span>
-            </td>
-        </tr>
+    <tr>
+        <td colspan="8" class="text-center">
+            <span data-pagination-buttons="pagination" data-pagination-total-count="totalCount"></span>
+        </td>
+    </tr>
     </tfoot>
 </table>
+<div data-kendo-grid options="itSystemCatalogueGrid"></div>

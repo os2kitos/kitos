@@ -114,44 +114,37 @@
                 }
 
                 //KENDO
-                $scope.loadGrid = function() {
-                    $scope.mainGridOptions = {
-                        dataSource: {
-                            type: "odata",
-                            transport: {
-                                read: {
-                                    beforeSend: function (req) {
-                                        req.setRequestHeader('Accept', 'application/json;odata=fullmetadata');
-                                    },
-                                    url: "/OData/ItSystems",
-                                    dataType: "json"
-                                },
-                                parameterMap: function (options, type) {
-                                    var d = kendo.data.transports.odata.parameterMap(options);
-                                    delete d.$inlinecount; // <-- remove inlinecount parameter
-                                    d.$count = true;
-                                    return d;
-                                },
-                                schema: {
-                                    data: function (data) {
-                                        return data["value"];
-                                    },
-                                    total: function(data) {
-                                        return data["odata.count"];
-                                    }
-                                }
+                $scope.mainGridOptions = {
+                    dataSource: {
+                        type: "odata-v4", // IMPORTANT!! "odata" != "odata-v4" https://github.com/telerik/ui-for-aspnet-mvc-examples/blob/master/grid/odata-v4-web-api-binding-wrappers/KendoUIMVC5/Views/Home/Index.cshtml
+                        transport: {
+                            read: {
+                                url: "/odata/ItSystems?$select=Id,Name,Description"
                             }
-
                         },
-                        columns: [
-                            { field: "Id", title: "ItSystem Id" },
-                            { field: "Name", title: "ItSystem navn" }
-                        ]
-                    };
-                }
+                        pageSize: 5,
+                        serverPaging: true,
+                        serverSorting: true
+                    },
+                    sortable: true,
+                    groupable: {
+                        messages: {
+                            empty: "Drag a column header and drop it here to group by that column"
+                        }
+                    },
+                    pageable: true,
+                    reorderable: true,
+                    resizable: true,
+                    columns: [
+                        { field: "Id", title: "ID", width: "40px" },
+                        { field: "Name", title: "Navn" },
+                        { field: "Description", title: "Beskrivelse" }
+                    ],
+                    error: function(e) {
+                        console.log(e);
+                    }
+                };
                 //KENDO SLUT
-
-                $scope.loadGrid();
             }
         ]
     );

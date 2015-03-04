@@ -46,9 +46,6 @@ namespace Presentation.Web
                 "~/Scripts/notify/*.js",
                 "~/Scripts/angular-ui-util/ui-utils.js"));
 
-            bundles.Add(new ScriptBundle("~/Scripts/kendobundle").IncludeDirectory(
-                "~/Scripts/kendo/2014.3.1119", "*.js", false));
-
             // angular app files
             bundles.Add(new ScriptBundle("~/Scripts/appbundle").IncludeDirectory(
                 "~/Scripts/app", "*.js", true));
@@ -59,13 +56,7 @@ namespace Presentation.Web
                 "~/Content/notify/notify.css",
                 "~/Content/select2.css",
                 "~/Content/select2-bootstrap.css",
-                "~/Content/kitos.css",
-                "~/Content/kendo/2014.3.1119/kendo.default.min.css",
-                "~/Content/kendo/2014.3.1119/kendo.common.min.css",
-                "~/Content/kendo/2014.3.1119/kendo.rtl.min.css",
-                "~/Content/kendo/2014.3.1119/kendo.dataviz.min.css",
-                "~/Content/kendo/2014.3.1119/kendo.dataviz.default.min.css",
-                "~/Content/kendo/2014.3.1119/kendo.mobile.all.min.css"));
+                "~/Content/kitos.css"));
         }
     }
 }

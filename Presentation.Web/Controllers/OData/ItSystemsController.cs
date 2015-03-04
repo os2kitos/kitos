@@ -1,40 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Results;
 using System.Web.OData;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using Infrastructure.DataAccess;
-using Ninject.Infrastructure.Language;
-using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.OData
 {
     public class ItSystemsController : ODataController
     {
-        private readonly IGenericRepository<TaskRef> _taskRepository;
-        private readonly IItSystemService _systemService;
         private readonly IGenericRepository<ItSystem> _itSystemRepository;
+        private readonly IItSystemService _systemService;
         public ItSystemsController(IGenericRepository<ItSystem> itSystemRepository, IGenericRepository<ItSystem> repository, IGenericRepository<TaskRef> taskRepository, IItSystemService systemService)
         {
-            _taskRepository = taskRepository;
-            _systemService = systemService;
             _itSystemRepository = itSystemRepository;
+            _systemService = systemService;
         }
         
-        KitosContext db = new KitosContext();
+        //KitosContext db = new KitosContext();
 
         private bool SystemExists(int key)
         {
-            return db.ItSystems.Any(s => s.Id == key);
+            return _itSystemRepository.Get().Any(s => s.Id == key);
         }
 
         [EnableQuery]
@@ -47,6 +36,7 @@ namespace Presentation.Web.Controllers.OData
         public ItSystem Get([FromODataUri] int key)
         {
             return _itSystemRepository.GetByKey(key);
+
         }
 
         public IHttpActionResult Post(ItSystem itSystem)
@@ -113,7 +103,7 @@ namespace Presentation.Web.Controllers.OData
                 //Set each child's parent to null
                 foreach (var system in systems)
                 {
-                    if(system == entity) continue;
+                    if (system == entity) continue;
 
                     system.Parent = null;
                 }

@@ -36,15 +36,14 @@ namespace Presentation.Web
             //config.EnableQuerySupport();
 
             //OData
-
-
-            config.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-
             config.MapODataServiceRoute(
                 routeName: "odata",
                 routePrefix: "odata",
                 model: GetModel());
+
+
+            config.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
         }
 
         public static IEdmModel GetModel()
@@ -92,12 +91,13 @@ namespace Presentation.Web
             //builder.EntitySet<ItSystemUsageOrgUnitUsage>("ItSystemUsageOrgUnitUsages");
             //builder.EntitySet<ItSystem>("ItSystems").EntityType.HasKey(x => x.Id);
 
+
             var itSystems = builder.EntitySet<ItSystem>("ItSystems");
             itSystems.EntityType.HasKey(x => x.Id);
             itSystems.EntityType.Property(x => x.Name);
-            //itSystems.EntityType.Property(x => x.Description);
-            //itSystems.EntityType.Property(x => x.ParentId);
-            //itSystems.EntityType.HasOptional(x => x.Parent).IsNavigable();
+            itSystems.EntityType.Property(x => x.Description);
+            itSystems.EntityType.Property(x => x.ParentId);
+            itSystems.EntityType.HasOptional(x => x.Parent).IsNavigable();
 
 
             //builder.EntitySet<ItSystemUsage>("ItSystemUsages");
