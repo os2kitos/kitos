@@ -388,6 +388,7 @@
     <Compile Include="Models\TextDTO.cs" />
     <Compile Include="Models\UserDTO.cs" />
     <Compile Include="Models\UserOrganizationsDTO.cs" />
+    <Compile Include="Models\UserOverviewDTO.cs" />
     <Compile Include="Models\UserProfileDTO.cs" />
     <Compile Include="Models\WishDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

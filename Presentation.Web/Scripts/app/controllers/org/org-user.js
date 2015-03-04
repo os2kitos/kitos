@@ -37,8 +37,8 @@
                 function loadUsers() {
                     var deferred = $q.defer();
 
-                    var url = 'api/user?orgId=' + user.currentOrganizationId;
-                    url += '&usePaging';
+                    var url = 'api/user?overview';
+                    url += '&orgId=' + user.currentOrganizationId;
                     url += '&skip=' + $scope.pagination.skip;
                     url += '&take=' + $scope.pagination.take;
 
@@ -58,11 +58,14 @@
                         var paginationHeader = JSON.parse(headers('X-Pagination'));
                         $scope.totalCount = paginationHeader.TotalCount;
 
+                        $scope.users = result.response;
+                        deferred.resolve();
+
                         ////Set current user's writeaccessrights for each other user in the returned list
-                        setCanEdit(result.response).then(function (canEditResult) {
-                            $scope.users = canEditResult;
-                            deferred.resolve();
-                        });
+                        //setCanEdit(result.response).then(function (canEditResult) {
+                        //    $scope.users = canEditResult;
+                        //    deferred.resolve();
+                        //});
 
                     }).error(function () {
                         notify.addErrorMessage("Kunne ikke hente brugere!");
