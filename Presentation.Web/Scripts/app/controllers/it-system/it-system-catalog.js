@@ -80,6 +80,19 @@
                 });
             }
 
+            function addODataUsage(system) {
+                return $http.post('api/itsystemusage', {
+                    itSystemId: system.Id,
+                    organizationId: user.currentOrganizationId
+                }).success(function (result) {
+                    notify.addSuccessMessage('Systemet er taget i anvendelse');
+                    system.hasUsage = true;
+                    system.usage = result.response;
+                }).error(function (result) {
+                    notify.addErrorMessage('Systemet kunne ikke tages i anvendelse!');
+                });
+            }
+
             function deleteUsage(system) {
 
                 return $http.delete(system.usageUrl).success(function(result) {
@@ -151,12 +164,12 @@
                     type: "odata-v4", // IMPORTANT!! "odata" != "odata-v4" https://github.com/telerik/ui-for-aspnet-mvc-examples/blob/master/grid/odata-v4-web-api-binding-wrappers/KendoUIMVC5/Views/Home/Index.cshtml
                     transport: {
                         read: {
-                            url: "/odata/ItSystems?$select=Id,Name,Description"
+                            url: "/odata/ItSystems?$expand=AppTypeOption,BusinessType,BelongsTo,Organization,ObjectOwner,Usages"
                         }
                     },
                     pageSize: 5,
                     serverPaging: true,
-                    serverSorting: true
+                    serverSorting: true,
                 },
                 sortable: true,
                 groupable: {
@@ -167,16 +180,64 @@
                 pageable: true,
                 reorderable: true,
                 resizable: true,
+                columnMenu: true,
                 columns: [
                     //{ field: "Id", title: "ID", width: "40px" },
                     { field: "Name", title: "It System" },
-                    { field: "Description", title: "Beskrivelse" }
+                    { field: "AccessModifier", title: "(P)", width: "80px" },
+                    {
+                        field: "AppTypeOption", title: "Applikationstype",
+                        template: function (data) { return data.AppTypeOption ? data.AppTypeOption.Name : "" }
+                    },
+                    {
+                        field: "BusinessType", title: "Forretningtype",
+                        template: function (data) { return data.BusinessType ? data.BusinessType.Name : "" }
+                    },
+                    {
+                        field: "TaskRefs", title: "KLE ID", width: "70px",
+                        template: function (data) { return data.TaskRefs ? data.TaskRefs[0].Id : ""  }
+                    },
+                    {
+                        field: "TaskRefs", title: "KLE Navn",
+                        template: function (data) { return data.TaskRefs ? data.TaskRefs[0].Navn : "" }
+                    },
+                    {
+                        field: "BelongsTo", title: "Rettighedshaver",
+                        template: function (data) { return data.BelongsTo.Name }
+                    },
+                    {
+                        field: "Organization", title: "Oprettet i",
+                        template: function(data) { return data.Organization.Name }
+                    },
+                    {
+                        field: "ObjectOwner", title: "Oprettet af",
+                        template: function (data) { return data.ObjectOwner.Name + " " + data.ObjectOwner.LastName }
+                    },
+                    {
+                        field: "Usage",
+                        command: 1 == 1 ? {
+                            text: "Anvend",
+                            click: test
+                        } : {
+                            text: "Fjern anv.",
+                            click: test
+                        },
+                        title: "Anvendelse",
+                        width: "95px"
+                    }
                 ],
                 error: function(e) {
                     console.log(e);
                 }
             };
             //KENDO SLUT
+
+            function test(e) {
+                e.preventDefault();
+
+                var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+                addODataUsage(dataItem);
+            }
         }
     ]);
 })(angular, app);

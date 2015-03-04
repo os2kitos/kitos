@@ -14,6 +14,7 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Infrastructure.DataAccess;
+using Microsoft.Ajax.Utilities;
 using Microsoft.OData.Edm;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -49,6 +50,8 @@ namespace Presentation.Web
         public static IEdmModel GetModel()
         {
             var builder = new ODataModelBuilder();
+
+            builder.AddEnumType(typeof (AccessModifier));
 
             //builder.EntitySet<AdminRight>("AdminRights");
             //builder.EntitySet<AdminRole>("AdminRoles");
@@ -98,7 +101,46 @@ namespace Presentation.Web
             itSystems.EntityType.Property(x => x.Description);
             itSystems.EntityType.Property(x => x.ParentId);
             itSystems.EntityType.HasOptional(x => x.Parent).IsNavigable();
+            itSystems.EntityType.EnumProperty(x => x.AccessModifier);
+            itSystems.EntityType.Property(x => x.AppTypeOptionId);
+            itSystems.EntityType.HasOptional(x => x.AppTypeOption).IsNavigable();
+            itSystems.EntityType.Property(x => x.BusinessTypeId);
+            itSystems.EntityType.HasOptional(x => x.BusinessType).IsNavigable();
+            itSystems.EntityType.HasMany(x => x.TaskRefs).IsNavigable();
+            itSystems.EntityType.Property(x => x.BelongsToId);
+            itSystems.EntityType.HasOptional(x => x.BelongsTo).IsNavigable();
+            itSystems.EntityType.Property(x => x.OrganizationId);
+            itSystems.EntityType.HasOptional(x => x.Organization).IsNavigable();
+            itSystems.EntityType.Property(x => x.ObjectOwnerId);
+            itSystems.EntityType.HasOptional(x => x.ObjectOwner).IsNavigable();
+            itSystems.EntityType.HasMany(x => x.Usages).IsNavigable();
 
+            var itSystemTypeOptions = builder.EntitySet<ItSystemTypeOption>("ItSystemTypeOptions");
+            itSystemTypeOptions.EntityType.HasKey(x => x.Id);
+            itSystemTypeOptions.EntityType.Property(x => x.Name);
+
+            var businessTypes = builder.EntitySet<BusinessType>("BusinessTypes");
+            businessTypes.EntityType.HasKey(x => x.Id);
+            businessTypes.EntityType.Property(x => x.Name);
+
+            var taskRefs = builder.EntitySet<TaskRef>("TaskRefs");
+            taskRefs.EntityType.HasKey(x => x.Id);
+            taskRefs.EntityType.Property(x => x.TaskKey);
+
+            var organizations = builder.EntitySet<Organization>("Organizations");
+            organizations.EntityType.HasKey(x => x.Id);
+            organizations.EntityType.Property(x => x.Name);
+
+            var users = builder.EntitySet<User>("Users");
+            users.EntityType.HasKey(x => x.Id);
+            users.EntityType.Property(x => x.Name);
+            users.EntityType.Property(x => x.LastName);
+
+            var usages = builder.EntitySet<ItSystemUsage>("ItSystemUsages");
+            usages.EntityType.HasKey(x => x.Id);
+            usages.EntityType.HasRequired(x => x.ItSystem).IsNavigable();
+            usages.EntityType.Property(x => x.OrganizationId);
+            usages.EntityType.HasOptional(x => x.Organization).IsNavigable();
 
             //builder.EntitySet<ItSystemUsage>("ItSystemUsages");
             //builder.EntitySet<ItSystemRight>("ItSystemRights");
