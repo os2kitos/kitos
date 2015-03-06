@@ -80,14 +80,13 @@
                 });
             }
 
-            function addODataUsage(system) {
+            function addODataUsage(systemId) {
                 return $http.post('api/itsystemusage', {
-                    itSystemId: system.Id,
+                    itSystemId: systemId,
                     organizationId: user.currentOrganizationId
                 }).success(function (result) {
                     notify.addSuccessMessage('Systemet er taget i anvendelse');
-                    system.hasUsage = true;
-                    system.usage = result.response;
+                    $scope.mainGrid.dataSource.read();
                 }).error(function (result) {
                     notify.addErrorMessage('Systemet kunne ikke tages i anvendelse!');
                 });
@@ -99,6 +98,17 @@
                     notify.addSuccessMessage('Anvendelse af systemet er fjernet');
                     system.hasUsage = false;
                 }).error(function(result) {
+                    notify.addErrorMessage('Anvendelse af systemet kunne ikke fjernes!');
+                });
+            }
+
+            function deleteODataUsage(systemId) {
+                var url = 'api/itsystemusage?itSystemId=' + systemId + '&organizationId=' + user.currentOrganizationId;
+
+                return $http.delete(url).success(function (result) {
+                    notify.addSuccessMessage('Anvendelse af systemet er fjernet');
+                    $scope.mainGrid.dataSource.read();
+                }).error(function (result) {
                     notify.addErrorMessage('Anvendelse af systemet kunne ikke fjernes!');
                 });
             }
@@ -158,6 +168,18 @@
                 });
             }
 
+            function onChange(arg) {
+                console.log(arg);
+            }
+
+            function onDataBinding(arg) {
+                console.log("binding...");
+            }
+
+            function onDataBound(arg) {
+                console.log("bound!");
+            }
+
             //KENDO
             $scope.itSystemCatalogueGrid = {
                 dataSource: {
@@ -167,23 +189,37 @@
                             url: "/odata/ItSystems?$expand=AppTypeOption,BusinessType,BelongsTo,Organization,ObjectOwner,Usages"
                         }
                     },
-                    pageSize: 5,
+                    pageSize: 10,
                     serverPaging: true,
                     serverSorting: true,
+                    serverFiltering: true
+                },
+                change: onChange,
+                dataBound: onDataBound,
+                dataBinding: onDataBinding,
+                toolbar: [
+                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" }
+                ],
+                excel: {
+                    fileName: "IT System Katalog.xlsx",
+                    filterable: false,
+                    allPages: true,
+                },
+                pageable: {
+                    refresh: true,
+                    pageSizes: true,
+                    buttonCount: 5
                 },
                 sortable: true,
-                groupable: {
-                    messages: {
-                        empty: "Drag a column header and drop it here to group by that column"
-                    }
-                },
-                pageable: true,
                 reorderable: true,
                 resizable: true,
                 columnMenu: true,
                 columns: [
                     //{ field: "Id", title: "ID", width: "40px" },
-                    { field: "Name", title: "It System" },
+                    {
+                        field: "Name", title: "It System",
+                        template: function (data) { return '<a href="/#/system/edit/'+ data.Id +'/interfaces">' + data.Name + '</a>' }
+                    },
                     { field: "AccessModifier", title: "(P)", width: "80px" },
                     {
                         field: "AppTypeOption", title: "Applikationstype",
@@ -194,11 +230,11 @@
                         template: function (data) { return data.BusinessType ? data.BusinessType.Name : "" }
                     },
                     {
-                        field: "TaskRefs", title: "KLE ID", width: "70px",
-                        template: function (data) { return data.TaskRefs ? data.TaskRefs[0].Id : ""  }
+                        field: "TaskRefs", title: "KLE ID", width: "70px", sortable: false,
+                        template: function (data) { return data.TaskRefs ? data.TaskRefs[0].Id : "" }
                     },
                     {
-                        field: "TaskRefs", title: "KLE Navn",
+                        field: "TaskRefs", title: "KLE Navn", sortable: false,
                         template: function (data) { return data.TaskRefs ? data.TaskRefs[0].Navn : "" }
                     },
                     {
@@ -214,16 +250,14 @@
                         template: function (data) { return data.ObjectOwner.Name + " " + data.ObjectOwner.LastName }
                     },
                     {
-                        field: "Usage",
-                        command: 1 == 1 ? {
-                            text: "Anvend",
-                            click: test
-                        } : {
-                            text: "Fjern anv.",
-                            click: test
+                        field: "Usages",
+                        template: function(data) {
+                            return _.find(data.Usages, function (d) { return d.OrganizationId == user.currentOrganizationId }) ?
+                                '<button class="btn btn-danger col-md-7" data-ng-click="removeUsage(' + data.Id + ')">Fjern anv.</button>' :
+                                '<button class="btn btn-success col-md-7" data-ng-click="enableUsage(' + data.Id + ')">Anvend</button>';
                         },
                         title: "Anvendelse",
-                        width: "95px"
+                        width: "110px",
                     }
                 ],
                 error: function(e) {
@@ -232,11 +266,34 @@
             };
             //KENDO SLUT
 
+            $scope.enableUsage = function (dataItem) {
+                addODataUsage(dataItem);
+            }
+            $scope.removeUsage = function(dataItem) {
+                deleteODataUsage(dataItem);
+            }
+
             function test(e) {
                 e.preventDefault();
 
                 var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
                 addODataUsage(dataItem);
+            }
+
+            $scope.saveOptions = function() {
+                localStorage["kendo-grid-options"] = kendo.stringify($scope.mainGrid.getOptions());
+            };
+
+            $scope.loadOptions = function() {
+                var options = localStorage["kendo-grid-options"];
+                if (options) {
+                    $scope.mainGrid.setOptions(
+                    {
+                        dataSource: {
+                            sort: JSON.parse(options).dataSource.sort
+                        }
+                    });
+                }
             }
         }
     ]);

@@ -13,7 +13,8 @@ namespace Presentation.Web
                 "~/Scripts/jquery-ui-{version}.js",
                 "~/Scripts/holder.js",
                 "~/Scripts/select2.js",
-                "~/Scripts/moment.js"));
+                "~/Scripts/moment.js",
+                "~/Scripts/jszip.js"));
 
             /*
             bundles.Add(new ScriptBundle("~/bundles/jqueryui").Include(

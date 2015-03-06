@@ -1594,6 +1594,8 @@
     <Content Include="Scripts\jquery-ui-1.11.2.js" />
     <Content Include="Scripts\jquery-ui-1.11.2.min.js" />
     <Content Include="Scripts\form.control.js" />
+    <Content Include="Scripts\jszip.js" />
+    <Content Include="Scripts\jszip.min.js" />
     <Content Include="Scripts\kendo\angular.min.js" />
     <Content Include="Scripts\kendo\cultures\kendo.culture.af-ZA.min.js" />
     <Content Include="Scripts\kendo\cultures\kendo.culture.af.min.js" />
