@@ -30,7 +30,7 @@
                 skip: 0,
                 take: 20
             };
-            
+
             $scope.csvUrl = 'api/itSystem/?csv&organizationId=' + user.currentOrganizationId;
 
             var organizations = organizationsHttp.data.response;
@@ -84,10 +84,10 @@
                 return $http.post('api/itsystemusage', {
                     itSystemId: systemId,
                     organizationId: user.currentOrganizationId
-                }).success(function (result) {
+                }).success(function(result) {
                     notify.addSuccessMessage('Systemet er taget i anvendelse');
                     $scope.mainGrid.dataSource.read();
-                }).error(function (result) {
+                }).error(function(result) {
                     notify.addErrorMessage('Systemet kunne ikke tages i anvendelse!');
                 });
             }
@@ -105,10 +105,10 @@
             function deleteODataUsage(systemId) {
                 var url = 'api/itsystemusage?itSystemId=' + systemId + '&organizationId=' + user.currentOrganizationId;
 
-                return $http.delete(url).success(function (result) {
+                return $http.delete(url).success(function(result) {
                     notify.addSuccessMessage('Anvendelse af systemet er fjernet');
                     $scope.mainGrid.dataSource.read();
-                }).error(function (result) {
+                }).error(function(result) {
                     notify.addErrorMessage('Anvendelse af systemet kunne ikke fjernes!');
                 });
             }
@@ -173,12 +173,55 @@
             }
 
             function onDataBinding(arg) {
-                console.log("binding...");
+                //when data is being bound...
             }
 
             function onDataBound(arg) {
-                console.log("bound!");
+                //when data is bound....
             }
+
+            $scope.showDetails = function(usage) {
+                $scope.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usage });
+                $scope.usageGrid.dataSource.read();
+                $scope.modal.center().open();
+            }
+
+            function detailsBound(e) {
+                var grid = e.sender;
+                if (grid.dataSource.total() == 0) {
+                    var colCount = grid.columns.length;
+                    $(e.sender.wrapper)
+                        .find('tbody')
+                        .append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data">System anvendens ikke</td></tr>');
+                }
+            };
+
+            //Details grid
+            $scope.usageDetailsGrid = {
+                    dataSource: {
+                    type: "odata-v4",
+                        transport:
+                    {
+                        read: {
+                            url: "/odata/ItSystemUsages?$expand=Organization"
+                        }
+                    },
+                    pageSize: 10,
+                        serverPaging:
+                    true,
+                        serverSorting:
+                    true,
+                        serverFiltering:
+                    true
+                },
+                columns: [
+                    {
+                        field: "Organization.Name",
+                        title: "Organisation"
+                    }
+                ],
+                dataBound: detailsBound
+            };
 
             //KENDO
             $scope.itSystemCatalogueGrid = {
@@ -186,7 +229,7 @@
                     type: "odata-v4", // IMPORTANT!! "odata" != "odata-v4" https://github.com/telerik/ui-for-aspnet-mvc-examples/blob/master/grid/odata-v4-web-api-binding-wrappers/KendoUIMVC5/Views/Home/Index.cshtml
                     transport: {
                         read: {
-                            url: "/odata/ItSystems?$expand=AppTypeOption,BusinessType,BelongsTo,Organization,ObjectOwner,Usages"
+                            url: "/odata/ItSystems?$expand=AppTypeOption,BusinessType,BelongsTo,Organization,ObjectOwner,Usages($expand=Organization)"
                         }
                     },
                     pageSize: 10,
@@ -198,12 +241,12 @@
                 dataBound: onDataBound,
                 dataBinding: onDataBinding,
                 toolbar: [
-                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" }
+                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                 ],
                 excel: {
                     fileName: "IT System Katalog.xlsx",
                     filterable: false,
-                    allPages: true,
+                    allPages: true
                 },
                 pageable: {
                     refresh: true,
@@ -213,51 +256,71 @@
                 sortable: true,
                 reorderable: true,
                 resizable: true,
+                filterable: true,
+                groupable: true,
                 columnMenu: true,
                 columns: [
                     //{ field: "Id", title: "ID", width: "40px" },
                     {
                         field: "Name", title: "It System",
-                        template: function (data) { return '<a href="/#/system/edit/'+ data.Id +'/interfaces">' + data.Name + '</a>' }
-                    },
-                    { field: "AccessModifier", title: "(P)", width: "80px" },
-                    {
-                        field: "AppTypeOption", title: "Applikationstype",
-                        template: function (data) { return data.AppTypeOption ? data.AppTypeOption.Name : "" }
+                        // <a data-ui-sref="it-contract.edit.deadlines">
+                        //template: function (data) { return '<a href="/#/system/edit/'+ data.Id +'/interfaces">' + data.Name + '</a>' }
+                        template: '<a data-ui-sref="it-system.edit.interfaces({id: #:data.Id#})" data-ng-bind="dataItem.Name"></a>',
                     },
                     {
-                        field: "BusinessType", title: "Forretningtype",
-                        template: function (data) { return data.BusinessType ? data.BusinessType.Name : "" }
+                        field: "AccessModifier", title: "(p)", width: 80
                     },
                     {
-                        field: "TaskRefs", title: "KLE ID", width: "70px", sortable: false,
-                        template: function (data) { return data.TaskRefs ? data.TaskRefs[0].Id : "" }
+                        field: "AppTypeOption.Name", title: "Applikationstype", groupable: false,
+                        //template: function (data) { return data.AppTypeOption ? data.AppTypeOption.Name : "" }
+                        template: '<span data-ng-bind="dataItem.AppTypeOption.Name"></span>'
                     },
                     {
-                        field: "TaskRefs", title: "KLE Navn", sortable: false,
-                        template: function (data) { return data.TaskRefs ? data.TaskRefs[0].Navn : "" }
+                        field: "BusinessType.Name", title: "Forretningtype", groupable: false,
+                        //template: function (data) { return data.BusinessType ? data.BusinessType.Name : "" }
+                        template: '<span data-ng-bind="dataItem.BusinessType.Name"></span>'
                     },
                     {
-                        field: "BelongsTo", title: "Rettighedshaver",
-                        template: function (data) { return data.BelongsTo.Name }
+                        field: "TaskRefs.Id", title: "KLE ID", width: "70px", sortable: false, groupable: false,
+                        //template: function (data) { return data.TaskRefs ? data.TaskRefs[0].Id : "" }
+                        template: '<span data-ng-bind="dataItem.TaskRefs[0].Id"></span>',
                     },
                     {
-                        field: "Organization", title: "Oprettet i",
-                        template: function(data) { return data.Organization.Name }
+                        field: "TaskRefs.Name", title: "KLE Navn", sortable: false, groupable: false,
+                        //template: function (data) { return data.TaskRefs ? data.TaskRefs[0].Name : "" }
+                        template: '<span data-ng-bind="dataItem.TaskRefs[0].Name"></span>'
                     },
                     {
-                        field: "ObjectOwner", title: "Oprettet af",
-                        template: function (data) { return data.ObjectOwner.Name + " " + data.ObjectOwner.LastName }
+                        field: "BelongsTo.Name", title: "Rettighedshaver",
+                        //template: function (data) { return data.BelongsTo.Name }
+                        template: '<span data-ng-bind="dataItem.BelongsTo.Name"></span>'
                     },
                     {
-                        field: "Usages",
-                        template: function(data) {
-                            return _.find(data.Usages, function (d) { return d.OrganizationId == user.currentOrganizationId }) ?
-                                '<button class="btn btn-danger col-md-7" data-ng-click="removeUsage(' + data.Id + ')">Fjern anv.</button>' :
-                                '<button class="btn btn-success col-md-7" data-ng-click="enableUsage(' + data.Id + ')">Anvend</button>';
-                        },
+                        field: "Organization.Name", title: "Oprettet i",
+                        //template: function(data) { return data.Organization.Name }
+                        template: '<span data-ng-bind="dataItem.Organization.Name"></span>'
+                    },
+                    {
+                        field: "ObjectOwner.Name", title: "Oprettet af",
+                        //template: function (data) { return data.ObjectOwner.Name + " " + data.ObjectOwner.LastName }
+                        template: '<span>{{ dataItem.ObjectOwner.Name + " " + dataItem.ObjectOwner.LastName }}</span>'
+                    },
+                    {
+                        field: "Usages.length", title: "Anvender", width: 95, sortable: { sort: length },
+                        template: '<a class="col-md-7 text-center" data-ng-click="showDetails(#: data.Id#)">#: data.Usages.length#</a>'
+                        //command: { text: "Vis", click: showDetails }
+                    },
+                    {
                         title: "Anvendelse",
                         width: "110px",
+                        field: "Usages", sortable: false, groupable: false, filterable: false, columnMenu: false,
+                        //template: function(data) {
+                        //    return _.find(data.Usages, function (d) { return d.OrganizationId == user.currentOrganizationId }) ?
+                        //        '<button class="btn btn-danger col-md-7" data-ng-click="removeUsage(' + data.Id + ')">Fjern anv.</button>' :
+                        //        '<button class="btn btn-success col-md-7" data-ng-click="enableUsage(' + data.Id + ')">Anvend</button>';
+                        //},
+                        template: '<button class="btn btn-success col-md-7" data-ng-click="enableUsage(#: data.Id#)" data-ng-show="!systemHasUsages(dataItem)">Anvend</button>' +
+                                  '<button class="btn btn-danger  col-md-7" data-ng-click="removeUsage(#: data.Id#)" data-ng-show="systemHasUsages(dataItem)">Fjern anv.</button>'
                     }
                 ],
                 error: function(e) {
@@ -266,20 +329,21 @@
             };
             //KENDO SLUT
 
+            //Grid methods
+            $scope.systemHasUsages = function(system) {
+                return _.find(system.Usages, function (d) { return d.OrganizationId == user.currentOrganizationId });
+            }
+
             $scope.enableUsage = function (dataItem) {
                 addODataUsage(dataItem);
             }
-            $scope.removeUsage = function(dataItem) {
-                deleteODataUsage(dataItem);
+            $scope.removeUsage = function (dataItem) {
+                var sure = confirm("Er du sikker på at du vil fjerne den lokale anvendelse af systemet? Dette sletter ikke systemet, men vil slette alle lokale detaljer vedrørende anvendelsen.");
+
+                if(sure) deleteODataUsage(dataItem);
             }
 
-            function test(e) {
-                e.preventDefault();
-
-                var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
-                addODataUsage(dataItem);
-            }
-
+            //Grid state
             $scope.saveOptions = function() {
                 localStorage["kendo-grid-options"] = kendo.stringify($scope.mainGrid.getOptions());
             };
@@ -287,12 +351,7 @@
             $scope.loadOptions = function() {
                 var options = localStorage["kendo-grid-options"];
                 if (options) {
-                    $scope.mainGrid.setOptions(
-                    {
-                        dataSource: {
-                            sort: JSON.parse(options).dataSource.sort
-                        }
-                    });
+                    $scope.mainGrid.setOptions(JSON.parse(options));
                 }
             }
         }

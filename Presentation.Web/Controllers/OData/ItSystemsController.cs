@@ -26,7 +26,7 @@ namespace Presentation.Web.Controllers.OData
             return _itSystemRepository.Get().Any(s => s.Id == key);
         }
 
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 2)]
         public IQueryable<ItSystem> Get()
         {
             return _itSystemRepository.AsQueryable();

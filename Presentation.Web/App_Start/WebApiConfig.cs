@@ -141,6 +141,7 @@ namespace Presentation.Web
             usages.EntityType.HasRequired(x => x.ItSystem).IsNavigable();
             usages.EntityType.Property(x => x.OrganizationId);
             usages.EntityType.HasOptional(x => x.Organization).IsNavigable();
+            usages.EntityType.Property(x => x.ItSystemId);
 
             //builder.EntitySet<ItSystemUsage>("ItSystemUsages");
             //builder.EntitySet<ItSystemRight>("ItSystemRights");
