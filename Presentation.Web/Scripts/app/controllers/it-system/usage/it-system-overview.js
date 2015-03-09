@@ -113,32 +113,50 @@
                     });
                 }
 
-                //KENDO
+                //overview grid options
                 $scope.mainGridOptions = {
                     dataSource: {
-                        type: "odata-v4", // IMPORTANT!! "odata" != "odata-v4" https://github.com/telerik/ui-for-aspnet-mvc-examples/blob/master/grid/odata-v4-web-api-binding-wrappers/KendoUIMVC5/Views/Home/Index.cshtml
+                        type: "odata-v4",
                         transport: {
                             read: {
-                                url: "/odata/ItSystems?$select=Id,Name,Description"
+                                url: "/odata/ItSystemUsages?$expand=ItSystem($expand=Parent,AppTypeOption,BusinessType),Organization,ResponsibleUsage&$filter=OrganizationId eq " + user.currentOrganizationId
                             }
                         },
                         pageSize: 5,
                         serverPaging: true,
                         serverSorting: true
                     },
-                    sortable: true,
-                    groupable: {
-                        messages: {
-                            empty: "Drag a column header and drop it here to group by that column"
-                        }
+                    toolbar: [
+                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
+                    ],
+                    excel: {
+                        fileName: "IT System Katalog.xlsx",
+                        filterable: false,
+                        allPages: true
                     },
-                    pageable: true,
+                    pageable: {
+                        refresh: true,
+                        pageSizes: true,
+                        buttonCount: 5
+                    },
+                    sortable: true,
+                    groupable: true,
+                    columnMenu: true,
                     reorderable: true,
                     resizable: true,
                     columns: [
-                        { field: "Id", title: "ID", width: "40px" },
-                        { field: "Name", title: "Navn" },
-                        { field: "Description", title: "Beskrivelse" }
+                        { field: "ItSystem.Name", title: "IT System" },
+                        { field: "ResponsibleUsage", title: "Ansv. organisationsenhed", template: "<span data-ng-bind='dataItem.ResponsibleUsage.OrganizationUnit.Name'></span>" },
+                        {
+                            field: "ItSystem.AppTypeOption", title: "Applikationstype",
+                            template: "<span data-ng-bind='dataItem.ItSystem.AppTypeOption.Name'></span>"
+                        },
+                        {
+                            field: "ItSystem.BusinessType", title: "Forretningstype",
+                            template: "<span data-ng-bind='dataItem.ItSystem.BusinessType.Name'></span>"
+                        },
+                        { field: "", title: "Anvender" },
+                        { field: "", title: "Udstiller" }
                     ],
                     error: function(e) {
                         console.log(e);

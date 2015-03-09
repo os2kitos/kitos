@@ -25,47 +25,47 @@
         function($rootScope, $scope, $http, notify, $state, organizationsHttp, user) {
             $rootScope.page.title = 'IT System - Katalog';
 
-            $scope.pagination = {
-                search: '',
-                skip: 0,
-                take: 20
-            };
+            //$scope.pagination = {
+            //    search: '',
+            //    skip: 0,
+            //    take: 20
+            //};
 
-            $scope.csvUrl = 'api/itSystem/?csv&organizationId=' + user.currentOrganizationId;
+            //$scope.csvUrl = 'api/itSystem/?csv&organizationId=' + user.currentOrganizationId;
 
-            var organizations = organizationsHttp.data.response;
+            //var organizations = organizationsHttp.data.response;
 
-            function loadUser(system) {
-                return $http.get('api/user/' + system.objectOwnerId, { cache: true })
-                    .success(function(result) {
-                        system.user = result.response;
-                    });
-            }
+            //function loadUser(system) {
+            //    return $http.get('api/user/' + system.objectOwnerId, { cache: true })
+            //        .success(function(result) {
+            //            system.user = result.response;
+            //        });
+            //}
 
-            function loadOrganization(system) {
-                return $http.get('api/organization/' + system.organizationId, { cache: true })
-                    .success(function(result) {
-                        system.organization = result.response;
-                    });
-            }
+            //function loadOrganization(system) {
+            //    return $http.get('api/organization/' + system.organizationId, { cache: true })
+            //        .success(function(result) {
+            //            system.organization = result.response;
+            //        });
+            //}
 
-            function loadTaskRef(system) {
-                if (system.taskRefIds.length == 0) return null;
+            //function loadTaskRef(system) {
+            //    if (system.taskRefIds.length == 0) return null;
 
-                return $http.get('api/taskref/' + system.taskRefIds[0])
-                    .success(function(result) {
-                        system.taskId = result.response.taskKey;
-                        system.taskName = result.response.description;
-                    });
-            }
+            //    return $http.get('api/taskref/' + system.taskRefIds[0])
+            //        .success(function(result) {
+            //            system.taskId = result.response.taskKey;
+            //            system.taskName = result.response.description;
+            //        });
+            //}
 
-            function loadUsage(system) {
-                return $http.get(system.usageUrl)
-                    .success(function(result) {
-                        system.hasUsage = true;
-                        system.usage = result.response;
-                    });
-            }
+            //function loadUsage(system) {
+            //    return $http.get(system.usageUrl)
+            //        .success(function(result) {
+            //            system.hasUsage = true;
+            //            system.usage = result.response;
+            //        });
+            //}
 
             function addUsage(system) {
                 return $http.post('api/itsystemusage', {
@@ -125,78 +125,71 @@
                 //else url += '&q=';
 
                 //$scope.csvUrl = url;
-                loadSystems();
+                //loadSystems();
             });
 
-            function loadSystems() {
-                var url = 'api/itSystem/?skip=' + $scope.pagination.skip + '&take=' + $scope.pagination.take + '&organizationId=' + user.currentOrganizationId;
+            //function loadSystems() {
+            //    var url = 'api/itSystem/?skip=' + $scope.pagination.skip + '&take=' + $scope.pagination.take + '&organizationId=' + user.currentOrganizationId;
 
-                if ($scope.pagination.orderBy) {
-                    url += '&orderBy=' + $scope.pagination.orderBy;
-                    if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
-                }
+            //    if ($scope.pagination.orderBy) {
+            //        url += '&orderBy=' + $scope.pagination.orderBy;
+            //        if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
+            //    }
 
-                if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
-                else url += '&q=';
+            //    if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
+            //    else url += '&q=';
 
-                $http.get(url).success(function(result, status, headers) {
+            //    $http.get(url).success(function(result, status, headers) {
 
-                    var paginationHeader = JSON.parse(headers('X-Pagination'));
-                    $scope.totalCount = paginationHeader.TotalCount;
+            //        var paginationHeader = JSON.parse(headers('X-Pagination'));
+            //        $scope.totalCount = paginationHeader.TotalCount;
 
-                    $scope.systems = [];
-                    _.each(result.response, function(system) {
-                        system.belongsTo = _.findWhere(organizations, { id: system.belongsToId });
+            //        $scope.systems = [];
+            //        _.each(result.response, function(system) {
+            //            system.belongsTo = _.findWhere(organizations, { id: system.belongsToId });
 
-                        system.usageUrl = 'api/itsystemusage?itSystemId=' + system.id + '&organizationId=' + user.currentOrganizationId;
+            //            system.usageUrl = 'api/itsystemusage?itSystemId=' + system.id + '&organizationId=' + user.currentOrganizationId;
 
-                        loadUser(system);
-                        loadOrganization(system);
-                        loadTaskRef(system);
-                        loadUsage(system);
+            //            loadUser(system);
+            //            loadOrganization(system);
+            //            loadTaskRef(system);
+            //            loadUsage(system);
 
-                        system.addUsage = function() {
-                            addUsage(system);
-                        };
+            //            system.addUsage = function() {
+            //                addUsage(system);
+            //            };
 
-                        system.deleteUsage = function() {
-                            deleteUsage(system);
-                        };
+            //            system.deleteUsage = function() {
+            //                deleteUsage(system);
+            //            };
 
-                        $scope.systems.push(system);
-                    });
-                });
-            }
+            //            $scope.systems.push(system);
+            //        });
+            //    });
+            //}
 
-            function onChange(arg) {
-                console.log(arg);
-            }
-
-            function onDataBinding(arg) {
-                //when data is being bound...
-            }
-
-            function onDataBound(arg) {
-                //when data is bound....
-            }
-
-            $scope.showDetails = function(usage) {
-                $scope.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usage });
-                $scope.usageGrid.dataSource.read();
+            //Usage Details
+            $scope.showUsageDetails = function (usageId, systemName) {
+                //Filter by usageId
+                $scope.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
+                //Set modal title
+                $scope.modal.setOptions({ title: "Anvendelse af " + systemName });
+                //Open modal
                 $scope.modal.center().open();
             }
 
+            //usagedetails grid empty-grid handling
             function detailsBound(e) {
                 var grid = e.sender;
                 if (grid.dataSource.total() == 0) {
                     var colCount = grid.columns.length;
                     $(e.sender.wrapper)
                         .find('tbody')
-                        .append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data">System anvendens ikke</td></tr>');
+                        .append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data text-muted">System anvendens ikke</td></tr>');
                 }
             };
 
-            //Details grid
+            //usagedetails grid
             $scope.usageDetailsGrid = {
                     dataSource: {
                     type: "odata-v4",
@@ -223,13 +216,13 @@
                 dataBound: detailsBound
             };
 
-            //KENDO
+            //catalog grid
             $scope.itSystemCatalogueGrid = {
                 dataSource: {
-                    type: "odata-v4", // IMPORTANT!! "odata" != "odata-v4" https://github.com/telerik/ui-for-aspnet-mvc-examples/blob/master/grid/odata-v4-web-api-binding-wrappers/KendoUIMVC5/Views/Home/Index.cshtml
+                    type: "odata-v4",
                     transport: {
                         read: {
-                            url: "/odata/ItSystems?$expand=AppTypeOption,BusinessType,BelongsTo,Organization,ObjectOwner,Usages($expand=Organization)"
+                            url: "/odata/ItSystems?$expand=AppTypeOption,BusinessType,BelongsTo,Organization,ObjectOwner,Usages($expand=Organization)&$filter=OrganizationId eq " + user.currentOrganizationId  + " or AccessModifier eq Core.DomainModel.AccessModifier'1'"
                         }
                     },
                     pageSize: 10,
@@ -237,9 +230,6 @@
                     serverSorting: true,
                     serverFiltering: true
                 },
-                change: onChange,
-                dataBound: onDataBound,
-                dataBinding: onDataBinding,
                 toolbar: [
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                 ],
@@ -307,7 +297,7 @@
                     },
                     {
                         field: "Usages.length", title: "Anvender", width: 95, sortable: { sort: length },
-                        template: '<a class="col-md-7 text-center" data-ng-click="showDetails(#: data.Id#)">#: data.Usages.length#</a>'
+                        template: '<a class="col-md-7 text-center" data-ng-click="showUsageDetails(#: data.Id#,\'#: data.Name#\')">#: data.Usages.length#</a>'
                         //command: { text: "Vis", click: showDetails }
                     },
                     {

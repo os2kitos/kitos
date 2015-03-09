@@ -1,6 +1,7 @@
 ﻿using System;
 using System.EnterpriseServices;
 using System.Linq;
+using System.Web.Compilation;
 using System.Web.Http;
 using System.Web.Http.OData.Routing;
 using System.Web.OData;
@@ -131,6 +132,10 @@ namespace Presentation.Web
             organizations.EntityType.HasKey(x => x.Id);
             organizations.EntityType.Property(x => x.Name);
 
+            var orgUnits = builder.EntitySet<OrganizationUnit>("OrganizationUnits");
+            orgUnits.EntityType.HasKey(x => x.Id);
+            orgUnits.EntityType.Property(x => x.Name);
+
             var users = builder.EntitySet<User>("Users");
             users.EntityType.HasKey(x => x.Id);
             users.EntityType.Property(x => x.Name);
@@ -142,6 +147,15 @@ namespace Presentation.Web
             usages.EntityType.Property(x => x.OrganizationId);
             usages.EntityType.HasOptional(x => x.Organization).IsNavigable();
             usages.EntityType.Property(x => x.ItSystemId);
+            usages.EntityType.HasOptional(x => x.ResponsibleUsage);
+            usages.EntityType.HasOptional(x => x.MainContract);
+
+            var systemOrgUnitUsages = builder.EntitySet<ItSystemUsageOrgUnitUsage>("ItSystemUsageOrgUnitUsages");
+            systemOrgUnitUsages.EntityType.HasKey(x => x.ItSystemUsageId).HasKey(x => x.OrganizationUnitId);
+            systemOrgUnitUsages.EntityType.HasOptional(x => x.OrganizationUnit);
+
+            var contractItSystemUsages = builder.EntitySet<ItContractItSystemUsage>("ItContractItSystemUsages");
+            contractItSystemUsages.EntityType.HasKey(x => x.ItContractId).HasKey(x => x.ItSystemUsageId);
 
             //builder.EntitySet<ItSystemUsage>("ItSystemUsages");
             //builder.EntitySet<ItSystemRight>("ItSystemRights");
