@@ -168,6 +168,8 @@
             //    });
             //}
 
+
+
             //Usage Details
             $scope.showUsageDetails = function (usageId, systemName) {
                 //Filter by usageId
@@ -232,6 +234,10 @@
                 },
                 toolbar: [
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
+                    {
+                        name: "clearFilter", text: "Ryd filtrering",
+                        template: "<a class='k-button k-button-icontext' data-ng-click='clearOptions()'>#: data.text#</a>"
+                    }
                 ],
                 excel: {
                     fileName: "IT System Katalog.xlsx",
@@ -296,7 +302,7 @@
                         template: '<span>{{ dataItem.ObjectOwner.Name + " " + dataItem.ObjectOwner.LastName }}</span>'
                     },
                     {
-                        field: "Usages.length", title: "Anvender", width: 95, sortable: { sort: length },
+                        field: "Usages", title: "Anvender", width: 95, sortable: { sort: length },
                         template: '<a class="col-md-7 text-center" data-ng-click="showUsageDetails(#: data.Id#,\'#: data.Name#\')">#: data.Usages.length#</a>'
                         //command: { text: "Vis", click: showDetails }
                     },
@@ -311,13 +317,22 @@
                         //},
                         template: '<button class="btn btn-success col-md-7" data-ng-click="enableUsage(#: data.Id#)" data-ng-show="!systemHasUsages(dataItem)">Anvend</button>' +
                                   '<button class="btn btn-danger  col-md-7" data-ng-click="removeUsage(#: data.Id#)" data-ng-show="systemHasUsages(dataItem)">Fjern anv.</button>'
-                    }
+                    },
                 ],
+                dataBound: onDataBound,
+                columnResize: onDataBound,
                 error: function(e) {
                     console.log(e);
                 }
             };
-            //KENDO SLUT
+
+            function test(e) {
+                $scope.saveOptions();
+            }
+
+            function onDataBound(e) {
+                if ($scope.mainGrid) $scope.saveOptions();
+            }
 
             //Grid methods
             $scope.systemHasUsages = function(system) {
@@ -335,15 +350,24 @@
 
             //Grid state
             $scope.saveOptions = function() {
-                localStorage["kendo-grid-options"] = kendo.stringify($scope.mainGrid.getOptions());
+                localStorage["kendo-grid-it-system-catalog-options"] = kendo.stringify($scope.mainGrid.getOptions());
             };
 
             $scope.loadOptions = function() {
-                var options = localStorage["kendo-grid-options"];
-                if (options) {
+                var options = localStorage["kendo-grid-it-system-catalog-options"];
+                if (options !== 'undefined') {
                     $scope.mainGrid.setOptions(JSON.parse(options));
                 }
             }
+
+            $scope.clearOptions = function () {
+                localStorage["kendo-grid-it-system-catalog-options"] = undefined;
+                $state.go($state.current, {}, { reload: true });
+            }
+
+            $scope.$on("kendoRendered", function (e) {
+                $scope.loadOptions();
+            });
         }
     ]);
 })(angular, app);

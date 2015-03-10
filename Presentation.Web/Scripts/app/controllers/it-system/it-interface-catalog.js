@@ -66,6 +66,50 @@
                     });
                 });
             }
+
+            $scope.itInterfaceOptions = {
+                dataSource: {
+                    type: "odata-v4",
+                    transport: {
+                        read: {
+                            url: "/odata/ItInterfaces"
+                        }
+                    },
+                    pageSize: 5,
+                    serverPaging: true,
+                    serverSorting: true
+                },
+                toolbar: [
+                { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
+                ],
+                excel: {
+                    fileName: "IT System Katalog.xlsx",
+                    filterable: false,
+                    allPages: true
+                },
+                pageable: {
+                    refresh: true,
+                    pageSizes: true,
+                    buttonCount: 5
+                },
+                sortable: true,
+                groupable: true,
+                columnMenu: true,
+                reorderable: true,
+                resizable: true,
+                columns: [
+                    {
+                        field: "Name", title: "Snitflade",
+                        template: "<a data-ui-sref='it-system.interface-edit.interface-details({id: #: data.Id#})' data-ng-bind='dataItem.Name'></a>"
+                    },
+                    {
+                        field: "AccessModifier", title: "Tilgængelighed", width: 125
+                    }
+                ],
+                error: function (e) {
+                    console.log(e);
+                }
+            };
         }
     ]);
 })(angular, app);

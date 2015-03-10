@@ -263,6 +263,8 @@
     <Compile Include="Controllers\API\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\API\ItProjectOrgUnitUsageController.cs" />
     <Compile Include="Controllers\OData\BaseController.cs" />
+    <Compile Include="Controllers\OData\InterfacesController.cs" />
+    <Compile Include="Controllers\OData\ItInterfacesController.cs" />
     <Compile Include="Controllers\OData\ItSystemsController.cs" />
     <Compile Include="Controllers\OData\ItSystemUsagesController.cs" />
     <Compile Include="Models\UpdateDefaultOrgUnitDto.cs" />

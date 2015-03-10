@@ -149,6 +149,8 @@ namespace Presentation.Web
             usages.EntityType.Property(x => x.ItSystemId);
             usages.EntityType.HasOptional(x => x.ResponsibleUsage);
             usages.EntityType.HasOptional(x => x.MainContract);
+            usages.EntityType.Property(x => x.OverviewId);
+            usages.EntityType.HasOptional(x => x.Overview);
 
             var systemOrgUnitUsages = builder.EntitySet<ItSystemUsageOrgUnitUsage>("ItSystemUsageOrgUnitUsages");
             systemOrgUnitUsages.EntityType.HasKey(x => x.ItSystemUsageId).HasKey(x => x.OrganizationUnitId);
@@ -156,6 +158,20 @@ namespace Presentation.Web
 
             var contractItSystemUsages = builder.EntitySet<ItContractItSystemUsage>("ItContractItSystemUsages");
             contractItSystemUsages.EntityType.HasKey(x => x.ItContractId).HasKey(x => x.ItSystemUsageId);
+            contractItSystemUsages.EntityType.HasOptional(x => x.ItContract);
+
+            var contracts = builder.EntitySet<ItContract>("ItContracts");
+            contracts.EntityType.HasKey(x => x.Id);
+            contracts.EntityType.Property(x => x.IsActive);
+
+            var interfaces = builder.EntitySet<Interface>("Interfaces");
+            interfaces.EntityType.HasKey(x => x.Id);
+            interfaces.EntityType.Property(x => x.Name);
+
+            var itInterfaces = builder.EntitySet<ItInterface>("ItInterfaces");
+            itInterfaces.EntityType.HasKey(x => x.Id);
+            itInterfaces.EntityType.Property(x => x.Name);
+            itInterfaces.EntityType.EnumProperty(x => x.AccessModifier);
 
             //builder.EntitySet<ItSystemUsage>("ItSystemUsages");
             //builder.EntitySet<ItSystemRight>("ItSystemRights");

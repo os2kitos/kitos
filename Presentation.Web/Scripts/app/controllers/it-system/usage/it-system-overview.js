@@ -119,12 +119,12 @@
                         type: "odata-v4",
                         transport: {
                             read: {
-                                url: "/odata/ItSystemUsages?$expand=ItSystem($expand=Parent,AppTypeOption,BusinessType),Organization,ResponsibleUsage&$filter=OrganizationId eq " + user.currentOrganizationId
+                                url: "/odata/ItSystemUsages?$expand=ItSystem($expand=Parent,AppTypeOption,BusinessType),ItSystem($expand=Usages),Organization,ResponsibleUsage,Overview($expand=ItSystem),MainContract($expand=ItContract)&$filter=OrganizationId eq " + user.currentOrganizationId
                             }
                         },
                         pageSize: 5,
                         serverPaging: true,
-                        serverSorting: true
+                        serverSorting: false
                     },
                     toolbar: [
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
@@ -145,8 +145,18 @@
                     reorderable: true,
                     resizable: true,
                     columns: [
-                        { field: "ItSystem.Name", title: "IT System" },
-                        { field: "ResponsibleUsage", title: "Ansv. organisationsenhed", template: "<span data-ng-bind='dataItem.ResponsibleUsage.OrganizationUnit.Name'></span>" },
+                        {
+                            field: "ItSystem.Name", title: "IT System",
+                            template: "<a data-ui-sref='it-system.usage.interfaces({id: #: data.Id#})' data-ng-bind='dataItem.ItSystem.Name'></a>"
+                        },
+                        {
+                            field: "MainContract", title: "Aktiv", width: 70,
+                            template: "<span data-ng-bind='dataItem.MainContract.ItContract.IsActive ? \"Ja\" : \"Nej\"'></span>"
+                        },
+                        {
+                            field: "ResponsibleUsage", title: "Ansv. organisationsenhed",
+                            template: "<span data-ng-bind='dataItem.ResponsibleUsage.OrganizationUnit.Name'></span>"
+                        },
                         {
                             field: "ItSystem.AppTypeOption", title: "Applikationstype",
                             template: "<span data-ng-bind='dataItem.ItSystem.AppTypeOption.Name'></span>"
@@ -155,8 +165,15 @@
                             field: "ItSystem.BusinessType", title: "Forretningstype",
                             template: "<span data-ng-bind='dataItem.ItSystem.BusinessType.Name'></span>"
                         },
-                        { field: "", title: "Anvender" },
-                        { field: "", title: "Udstiller" }
+                        {
+                            field: "", title: "Anvender",
+                            template: "<span data-ng-bind='dataItem.ItSystem.Usages.length'></span>"
+                        },
+                        { field: "", title: "Udstiller" },
+                        {
+                            field: "Overview", title: "Overblik",
+                            template: "<span data-ng-bind='dataItem.Overview.ItSystem.Name'></span>"
+                        }
                     ],
                     error: function(e) {
                         console.log(e);
