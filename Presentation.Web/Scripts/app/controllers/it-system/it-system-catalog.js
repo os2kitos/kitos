@@ -21,8 +21,8 @@
 
     app.controller('system.CatalogCtrl',
     [
-        '$rootScope', '$scope', '$http', 'notify', '$state', 'organizations', 'user',
-        function($rootScope, $scope, $http, notify, $state, organizationsHttp, user) {
+        '$rootScope', '$scope', '$http', 'notify', '$state', 'organizations', 'user', '$timeout',
+        function ($rootScope, $scope, $http, notify, $state, organizationsHttp, user, $timeout) {
             $rootScope.page.title = 'IT System - Katalog';
 
             //$scope.pagination = {
@@ -198,8 +198,9 @@
                         transport:
                     {
                         read: {
-                            url: "/odata/ItSystemUsages?$expand=Organization"
-                        }
+                            url: "/odata/ItSystemUsages?$expand=Organization",
+                            dataType: "json"
+                        },
                     },
                     pageSize: 10,
                         serverPaging:
@@ -224,8 +225,20 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: "/odata/ItSystems?$expand=AppTypeOption,BusinessType,BelongsTo,Organization,ObjectOwner,Usages($expand=Organization)&$filter=OrganizationId eq " + user.currentOrganizationId  + " or AccessModifier eq Core.DomainModel.AccessModifier'1'"
-                        }
+                            url: "/odata/ItSystems?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization)&$filter=OrganizationId eq " + user.currentOrganizationId + " or AccessModifier eq Core.DomainModel.AccessModifier'1'",
+                            dataType: "json"
+                        },
+                    },
+                    schema: {
+                        parse: function(data) {
+                            $.each(data.value, function(i, elem) {
+                                elem.AppTypeOption = elem.AppTypeOption ? elem.AppTypeOption : { Name: "" };
+                                elem.BusinessType = elem.BusinessType ? elem.BusinessType : { Name: "" };
+                                elem.UsagesLength = elem.Usages ? elem.Usages.length : 0;
+                                elem.TaskRefs = elem.TaskRefs ? elem.TaskRefs : { TaskKey : "" }
+                            });
+                            return data;
+                        },
                     },
                     pageSize: 10,
                     serverPaging: true,
@@ -235,7 +248,8 @@
                 toolbar: [
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
-                        name: "clearFilter", text: "Ryd filtrering",
+                        name: "clearFilter",
+                        text: "Ryd filtrering",
                         template: "<a class='k-button k-button-icontext' data-ng-click='clearOptions()'>#: data.text#</a>"
                     }
                 ],
@@ -249,11 +263,13 @@
                     pageSizes: true,
                     buttonCount: 5
                 },
-                sortable: true,
+                sortable: {
+                    mode: "multiple"
+                },
                 reorderable: true,
                 resizable: true,
                 filterable: true,
-                groupable: true,
+                groupable: false,
                 columnMenu: true,
                 columns: [
                     //{ field: "Id", title: "ID", width: "40px" },
@@ -267,24 +283,19 @@
                         field: "AccessModifier", title: "(p)", width: 80
                     },
                     {
-                        field: "AppTypeOption.Name", title: "Applikationstype", groupable: false,
+                        field: "AppTypeOption.Name", title: "Applikationstype",
                         //template: function (data) { return data.AppTypeOption ? data.AppTypeOption.Name : "" }
                         template: '<span data-ng-bind="dataItem.AppTypeOption.Name"></span>'
                     },
                     {
-                        field: "BusinessType.Name", title: "Forretningtype", groupable: false,
+                        field: "BusinessType.Name", title: "Forretningtype",
                         //template: function (data) { return data.BusinessType ? data.BusinessType.Name : "" }
                         template: '<span data-ng-bind="dataItem.BusinessType.Name"></span>'
                     },
                     {
-                        field: "TaskRefs.Id", title: "KLE ID", width: "70px", sortable: false, groupable: false,
-                        //template: function (data) { return data.TaskRefs ? data.TaskRefs[0].Id : "" }
-                        template: '<span data-ng-bind="dataItem.TaskRefs[0].Id"></span>',
-                    },
-                    {
-                        field: "TaskRefs.Name", title: "KLE Navn", sortable: false, groupable: false,
+                        field: "TaskRefs.length" || "", title: "KLE Navn", sortable: true,
                         //template: function (data) { return data.TaskRefs ? data.TaskRefs[0].Name : "" }
-                        template: '<span data-ng-bind="dataItem.TaskRefs[0].Name"></span>'
+                        template: '<span data-ng-bind="dataItem.TaskRefs[0].TaskKey"></span>'
                     },
                     {
                         field: "BelongsTo.Name", title: "Rettighedshaver",
@@ -302,14 +313,14 @@
                         template: '<span>{{ dataItem.ObjectOwner.Name + " " + dataItem.ObjectOwner.LastName }}</span>'
                     },
                     {
-                        field: "Usages", title: "Anvender", width: 95, sortable: { sort: length },
-                        template: '<a class="col-md-7 text-center" data-ng-click="showUsageDetails(#: data.Id#,\'#: data.Name#\')">#: data.Usages.length#</a>'
+                        field: "Usages.length" || 0, title: "Anvender", width: 95,
+                        template: '<a class="col-md-7 text-center" data-ng-click="showUsageDetails(#: data.Id#,\'#: data.Name#\')">#: data.UsagesLength#</a>'
                         //command: { text: "Vis", click: showDetails }
                     },
                     {
                         title: "Anvendelse",
                         width: "110px",
-                        field: "Usages", sortable: false, groupable: false, filterable: false, columnMenu: false,
+                        field: "Usages", sortable: false, filterable: false, columnMenu: false,
                         //template: function(data) {
                         //    return _.find(data.Usages, function (d) { return d.OrganizationId == user.currentOrganizationId }) ?
                         //        '<button class="btn btn-danger col-md-7" data-ng-click="removeUsage(' + data.Id + ')">Fjern anv.</button>' :
@@ -319,19 +330,24 @@
                                   '<button class="btn btn-danger  col-md-7" data-ng-click="removeUsage(#: data.Id#)" data-ng-show="systemHasUsages(dataItem)">Fjern anv.</button>'
                     },
                 ],
-                dataBound: onDataBound,
-                columnResize: onDataBound,
+                dataBound: saveGridOptions,
+                columnResize: saveGridOptions,
+                columnHide: saveGridOptions,
+                columnShow: saveGridOptions,
+                columnReorder: saveGridOptions,
                 error: function(e) {
                     console.log(e);
                 }
             };
 
-            function test(e) {
-                $scope.saveOptions();
-            }
-
-            function onDataBound(e) {
-                if ($scope.mainGrid) $scope.saveOptions();
+            function saveGridOptions(e) {
+                if ($scope.mainGrid) {
+                    // timeout fixes columnReorder saves before the column is actually reordered 
+                    // http://stackoverflow.com/questions/21270748/kendo-grid-saving-state-in-columnreorder-event
+                    $timeout(function() {
+                        localStorage["kendo-grid-it-system-catalog-options"] = kendo.stringify($scope.mainGrid.getOptions());
+                    });
+                }      
             }
 
             //Grid methods
@@ -348,20 +364,15 @@
                 if(sure) deleteODataUsage(dataItem);
             }
 
-            //Grid state
-            $scope.saveOptions = function() {
-                localStorage["kendo-grid-it-system-catalog-options"] = kendo.stringify($scope.mainGrid.getOptions());
-            };
-
             $scope.loadOptions = function() {
                 var options = localStorage["kendo-grid-it-system-catalog-options"];
-                if (options !== 'undefined') {
+                if (options) {
                     $scope.mainGrid.setOptions(JSON.parse(options));
                 }
             }
 
             $scope.clearOptions = function () {
-                localStorage["kendo-grid-it-system-catalog-options"] = undefined;
+                localStorage.removeItem("kendo-grid-it-system-catalog-options");
                 $state.go($state.current, {}, { reload: true });
             }
 

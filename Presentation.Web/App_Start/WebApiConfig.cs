@@ -44,6 +44,8 @@ namespace Presentation.Web
                 model: GetModel());
 
 
+            config.EnableCaseInsensitive(true);
+
             config.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
         }
@@ -52,7 +54,7 @@ namespace Presentation.Web
         {
             var builder = new ODataModelBuilder();
 
-            builder.AddEnumType(typeof (AccessModifier));
+            builder.AddEnumType(typeof(AccessModifier));
 
             //builder.EntitySet<AdminRight>("AdminRights");
             //builder.EntitySet<AdminRole>("AdminRoles");
@@ -167,11 +169,14 @@ namespace Presentation.Web
             var interfaces = builder.EntitySet<Interface>("Interfaces");
             interfaces.EntityType.HasKey(x => x.Id);
             interfaces.EntityType.Property(x => x.Name);
+            interfaces.EntityType.ComplexProperty(x => x.References);
 
             var itInterfaces = builder.EntitySet<ItInterface>("ItInterfaces");
             itInterfaces.EntityType.HasKey(x => x.Id);
             itInterfaces.EntityType.Property(x => x.Name);
             itInterfaces.EntityType.EnumProperty(x => x.AccessModifier);
+            itInterfaces.EntityType.Property(x => x.BelongsToId);
+            itInterfaces.EntityType.HasOptional(x => x.BelongsTo);
 
             //builder.EntitySet<ItSystemUsage>("ItSystemUsages");
             //builder.EntitySet<ItSystemRight>("ItSystemRights");
