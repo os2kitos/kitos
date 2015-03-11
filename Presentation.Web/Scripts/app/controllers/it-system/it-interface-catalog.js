@@ -72,7 +72,7 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: "/odata/ItInterfaces"
+                            url: "/odata/ItInterfaces?$expand=Interface"
                         }
                     },
                     pageSize: 5,
@@ -104,7 +104,30 @@
                     },
                     {
                         field: "AccessModifier", title: "Tilgængelighed", width: 125
-                    }
+                    },
+                    {
+                        field: "InterfaceType.Name", title: "Snitfladetype",
+                        template: "<span data-ng-bind='dataItem.InterfaceType.Name'></span>"
+                    },
+                    {
+                        field: "Interface.Name", title: "Grænseflade",
+                        template: "<span data-ng-bind='dataItem.Interface.Name'></span>"
+                    },
+                    {
+                        field: "", title: "Metode"
+                    },
+                    {
+                        field: "", title: "TSA"
+                    },
+                    {
+                        field: "", title: "Udstillet af"
+                    },
+                    {
+                        field: "", title: "Rettighedshaver"
+                    },
+                    {
+                        field: "", title: "Oprettet af"
+                    },
                 ],
                 error: function (e) {
                     console.log(e);

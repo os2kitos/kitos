@@ -119,7 +119,7 @@
                         type: "odata-v4",
                         transport: {
                             read: {
-                                url: "/odata/ItSystemUsages?$expand=ItSystem($expand=Parent,AppTypeOption,BusinessType),ItSystem($expand=Usages),Organization,ResponsibleUsage,Overview($expand=ItSystem),MainContract($expand=ItContract)&$filter=OrganizationId eq " + user.currentOrganizationId
+                                url: "/odata/ItSystemUsages?$expand=ItSystem($expand=Parent,AppTypeOption,BusinessType),ItSystem($expand=Usages),Organization,ResponsibleUsage,Overview($expand=ItSystem),MainContract($expand=ItContract),Rights($expand=Role)&$filter=OrganizationId eq " + user.currentOrganizationId
                             }
                         },
                         pageSize: 5,
@@ -127,7 +127,7 @@
                         serverSorting: false
                     },
                     toolbar: [
-                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
+                        { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     ],
                     excel: {
                         fileName: "IT System Katalog.xlsx",
@@ -138,6 +138,9 @@
                         refresh: true,
                         pageSizes: true,
                         buttonCount: 5
+                    },
+                    dataBound: function() {
+                        this.expandRow(this.tbody.find("tr.k-master-row").first());
                     },
                     sortable: true,
                     columnMenu: true,
@@ -165,20 +168,56 @@
                             template: "<span data-ng-bind='dataItem.ItSystem.BusinessType.Name'></span>"
                         },
                         {
-                            field: "", title: "Anvender",
-                            template: "<span data-ng-bind='dataItem.ItSystem.Usages.length'></span>"
+                            field: "ItSystem.Usages", title: "Anvender",
+                            template: "<span data-ng-bind='dataItem.ItSystem.Usages.length || 0'></span>"
                         },
-                        { field: "", title: "Udstiller" },
+                        {
+                            field: "ItSystem.ItInterfaceExhibits", title: "Udstiller",
+                            template: "<span data-ng-bind='dataItem.ItSystem.ItInterfaceExhibits.length || 0'></span>"
+                        },
                         {
                             field: "Overview", title: "Overblik",
                             template: "<span data-ng-bind='dataItem.Overview.ItSystem.Name'></span>"
-                        }
+                        },
                     ],
                     error: function(e) {
                         console.log(e);
                     }
                 };
                 //KENDO SLUT
+
+                $scope.detailGridOptions = function (dataItem) {
+                    return {
+                        dataSource: {
+                            type: "odata-v4",
+                            transport: {
+                                read: "/odata/ItSystemRights?$expand=Role,User,ObjectOwner"
+                            },
+                            serverPaging: true,
+                            serverSorting: true,
+                            serverFiltering: true,
+                            pageSize: 5,
+                            filter: { field: "ObjectId", operator: "eq", value: dataItem.Id }
+                        },
+                        scrollable: false,
+                        sortable: true,
+                        pageable: true,
+                        columns: [
+                            {
+                                field: "Role.Name", title: "Rolle",
+                                template: "<span data-ng-bind='dataItem.Role.Name'></span>"
+                            },
+                            {
+                                field: "User.Name", title: "Bruger",
+                                template: "<span>{{dataItem.User.Name}} {{dataItem.User.LastName}}</span>"
+                            },
+                            {
+                                field: "ObjectOwner.Name", title: "Oprettet af",
+                                template: "<span>{{dataItem.ObjectOwner.Name}} {{dataItem.ObjectOwner.LastName}}</span>"
+                            }
+                        ]
+                    };
+                };
             }
         ]
     );

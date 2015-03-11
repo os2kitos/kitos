@@ -1,83 +1,9 @@
-﻿<div search-box data-paging="pagination"></div>
-<div class="searchbox-wrapper">
-    <a class="excel-icon" data-ng-href="{{csvUrl}}">
-        <img src="../../Images/excel.png" alt="Hent excelark" width="25">
-    </a>
-</div>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>
-                IT System 
-                <button data-order-by="'itSystem.name'" data-paging="pagination"></button>
-            </th>
-            <th>
-                Ansv. organisationsenhed
-            </th>
-            <th>
-                <select data-ng-model="chosenRoleId" data-ng-init="chosenRoleId = 1" data-ng-options="r.id as r.name for r in itSystemRoles">
-                    <option value="">-- Vælg rolle --</option>
-                </select>
-            </th>
-            <th>
-                <select data-ng-model="showType" data-ng-init="showType = 'businessType'">
-                    <option value="appType">Applikationstype</option>
-                    <option value="businessType">Forretningstype</option>
-                </select>
-            </th>
-            <th>Anvender</th>
-            <th>Udstiller</th>
-            <th>
-                Overblik
-                <button data-order-by="'overviewItSystem.name'" data-paging="pagination"></button>
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- for each active system -->
-        <tr data-ng-repeat="usage in activeSystemUsages" 
-            data-ng-include="'partials/it-system/overview-row.html'">
-        </tr>
-        
-        <!-- when there are no active systems to show -->
-        <tr data-ng-if="activeSystemUsages.length == 0">
-            <td colspan="8" class="text-center">
-                <i>Ingen aktive systemer</i>
-            </td>
-        </tr>
-        
-        <!-- "click to show inactive systems"-row -->
-        <tr>
-            <td colspan="8">
-                <a data-ng-click="showInactive = !showInactive">
-                    <i class="glyphicon" data-ng-class="{'glyphicon-chevron-right': !showInactive, 'glyphicon-chevron-down': showInactive}"></i>
-                    Klik for at {{ showInactive && 'skjule' || 'vise' }} inaktive IT systemer
-                </a>
-            </td>
-        </tr>
-        
-        <!-- for each inactive system -->
-        <tr data-ng-if="showInactive" data-ng-repeat="usage in inactiveSystemUsages" 
-            data-ng-include="'partials/it-system/overview-row.html'">
-        </tr>
-
-        
-        <!-- when there are no active systems to show -->
-        <tr data-ng-if="showInactive && inactiveSystemUsages.length == 0">
-            <td colspan="9" class="text-center">
-                <i>Ingen inaktive systemer</i>
-            </td>
-        </tr>
-    </tbody>
-    <tfoot>
-        <tr>
-            <td colspan="8" class="text-center">
-                <span data-pagination-buttons="pagination" data-pagination-total-count="totalCount"></span>
-            </td>
-        </tr>
-    </tfoot>
-</table>
-
-<div>
-    <div data-kendo-grid options="mainGridOptions"></div>
+﻿<div>
+    <div data-kendo-grid options="mainGridOptions">
+        <div k-detail-template>
+            <div>
+                <div kendo-grid k-options="detailGridOptions(dataItem)"></div>
+            </div>
+        </div>
+    </div>
 </div>
