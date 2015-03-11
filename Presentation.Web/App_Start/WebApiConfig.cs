@@ -54,7 +54,7 @@ namespace Presentation.Web
         {
             var builder = new ODataModelBuilder();
 
-            builder.AddEnumType(typeof(AccessModifier));
+            builder.AddEnumType(typeof (AccessModifier));
 
             //builder.EntitySet<AdminRight>("AdminRights");
             //builder.EntitySet<AdminRole>("AdminRoles");

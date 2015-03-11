@@ -140,7 +140,6 @@
                         buttonCount: 5
                     },
                     sortable: true,
-                    groupable: true,
                     columnMenu: true,
                     reorderable: true,
                     resizable: true,
