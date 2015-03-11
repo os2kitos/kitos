@@ -9,12 +9,12 @@ namespace Presentation.Web.Controllers.OData
 {
     public class BaseController<T> : ODataController where T : class
     {
-        protected ODataValidationSettings ValidationSettings = new ODataValidationSettings();
+        protected ODataValidationSettings ValidationSettings;
         protected IGenericRepository<T> Repository;
 
         public BaseController(IGenericRepository<T> repository)
         {
-            ValidationSettings.AllowedQueryOptions = AllowedQueryOptions.All;
+            ValidationSettings = new ODataValidationSettings {AllowedQueryOptions = AllowedQueryOptions.All};
             Repository = repository;
         }
 
@@ -31,24 +31,9 @@ namespace Presentation.Web.Controllers.OData
             return Ok(entity);
         }
 
-        //public IQueryable<T> GetQueryable(ODataQueryOptions<T> queryOptions)
-        //{
-        //    return Repository.AsQueryable();
-        //}
-
-        //public IQueryable<T> GetQueryable(int key, ODataQueryOptions<T> queryOptions)
-        //{
-        //    var result = new List<T>();
-
-        //    var entity = Repository.GetByKey(key);
-        //    result.Add(entity);
-
-        //    return result.AsQueryable();
-        //}
-
-        protected IHttpActionResult Put(int key, Delta<T> delta)
+        protected IHttpActionResult Put(int key, T entity)
         {
-            return StatusCode(HttpStatusCode.MethodNotAllowed);
+            return StatusCode(HttpStatusCode.NotImplemented);
         }
 
         protected IHttpActionResult Post(T entity)
