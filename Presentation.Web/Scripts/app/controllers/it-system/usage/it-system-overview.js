@@ -63,7 +63,7 @@
                     //else url += "&q=";
 
                     //$scope.csvUrl = url;
-                    loadUsages();
+                    //loadUsages();
                 });
 
                 // clear lists 
@@ -113,13 +113,13 @@
                     });
                 }
 
-                //overview grid options
+                // overview grid options
                 $scope.mainGridOptions = {
                     dataSource: {
                         type: "odata-v4",
                         transport: {
                             read: {
-                                url: "/odata/ItSystemUsages?$expand=ItSystem($expand=Parent,AppTypeOption,BusinessType),ItSystem($expand=Usages),Organization,ResponsibleUsage,Overview($expand=ItSystem),MainContract($expand=ItContract),Rights($expand=Role)&$filter=OrganizationId eq " + user.currentOrganizationId
+                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=Parent,AppTypeOption,BusinessType),ItSystem($expand=Usages),Organization,ResponsibleUsage,Overview($expand=ItSystem),MainContract($expand=ItContract),Rights($expand=Role)"
                             }
                         },
                         pageSize: 5,
@@ -184,20 +184,18 @@
                         console.log(e);
                     }
                 };
-                //KENDO SLUT
 
                 $scope.detailGridOptions = function (dataItem) {
                     return {
                         dataSource: {
                             type: "odata-v4",
                             transport: {
-                                read: "/odata/ItSystemRights?$expand=Role,User,ObjectOwner"
+                                read: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages(" + dataItem.Id + ")/Rights?$expand=Role,User,ObjectOwner"
                             },
                             serverPaging: true,
                             serverSorting: true,
                             serverFiltering: true,
                             pageSize: 5,
-                            filter: { field: "ObjectId", operator: "eq", value: dataItem.Id }
                         },
                         scrollable: false,
                         sortable: true,

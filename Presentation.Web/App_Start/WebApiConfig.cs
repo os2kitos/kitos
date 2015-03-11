@@ -124,6 +124,7 @@ namespace Presentation.Web
             organizations.EntityType.HasKey(x => x.Id);
             organizations.EntityType.Property(x => x.Name);
             organizations.EntityType.HasMany(x => x.ItSystems).IsNavigable();
+            organizations.EntityType.HasMany(x => x.ItSystemUsages).IsNavigable();
 
             var orgUnits = builder.EntitySet<OrganizationUnit>("OrganizationUnits");
             orgUnits.EntityType.HasKey(x => x.Id);

@@ -78,17 +78,14 @@
                         transport:
                     {
                         read: {
-                            url: "/odata/ItSystemUsages?$expand=Organization",
+                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=Organization",
                             dataType: "json"
                         },
                     },
                     pageSize: 10,
-                        serverPaging:
-                    true,
-                        serverSorting:
-                    true,
-                        serverFiltering:
-                    true
+                    serverPaging: true,
+                    serverSorting: true,
+                    serverFiltering: true
                 },
                 columns: [
                     {
@@ -105,7 +102,7 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: "/odata/ItSystems?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization)",
+                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystems?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization)",
                             dataType: "json"
                         },
                     },
@@ -124,23 +121,6 @@
                     serverPaging: true,
                     serverSorting: true,
                     serverFiltering: true,
-                    filter: {
-                        extra: false,
-                        logic: "or",
-                        filters: [
-                            {
-                                field: "OrganizationId",
-                                operator: "eq",
-                                value: user.currentOrganizationId
-                            },
-                            // TODO: implement this!
-                            //{
-                            //    field: "AccessModifier",
-                            //    operator: "eq",
-                            //    value: "Core.DomainModel.AccessModifier'1'"
-                            //}
-                        ]
-                    } 
                 },
                 toolbar: [
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
