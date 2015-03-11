@@ -133,6 +133,7 @@ namespace Presentation.Web
             var organizations = builder.EntitySet<Organization>("Organizations");
             organizations.EntityType.HasKey(x => x.Id);
             organizations.EntityType.Property(x => x.Name);
+            organizations.EntityType.HasMany(x => x.ItSystems).IsNavigable();
 
             var orgUnits = builder.EntitySet<OrganizationUnit>("OrganizationUnits");
             orgUnits.EntityType.HasKey(x => x.Id);
