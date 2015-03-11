@@ -117,6 +117,7 @@ namespace Presentation.Web
             itSystems.EntityType.Property(x => x.ObjectOwnerId);
             itSystems.EntityType.HasOptional(x => x.ObjectOwner).IsNavigable();
             itSystems.EntityType.HasMany(x => x.Usages).IsNavigable();
+            itSystems.EntityType.HasMany(x => x.ItInterfaceExhibits).IsNavigable();
 
             var itSystemTypeOptions = builder.EntitySet<ItSystemTypeOption>("ItSystemTypeOptions");
             itSystemTypeOptions.EntityType.HasKey(x => x.Id);
@@ -154,6 +155,22 @@ namespace Presentation.Web
             usages.EntityType.HasOptional(x => x.MainContract);
             usages.EntityType.Property(x => x.OverviewId);
             usages.EntityType.HasOptional(x => x.Overview);
+            usages.EntityType.HasMany(x => x.Rights).IsNavigable();
+
+            var itSystemRights = builder.EntitySet<ItSystemRight>("ItSystemRights");
+            itSystemRights.EntityType.HasKey(x => x.Id);
+            itSystemRights.EntityType.Property(x => x.RoleId);
+            itSystemRights.EntityType.HasOptional(x => x.Role).IsNavigable();
+            itSystemRights.EntityType.Property(x => x.ObjectId);
+            itSystemRights.EntityType.HasOptional(x => x.Object).IsNavigable();
+            itSystemRights.EntityType.Property(x => x.UserId);
+            itSystemRights.EntityType.HasOptional(x => x.User).IsNavigable();
+            itSystemRights.EntityType.Property(x => x.ObjectOwnerId);
+            itSystemRights.EntityType.HasOptional(x => x.ObjectOwner).IsNavigable();
+
+            var roles = builder.EntitySet<ItSystemRole>("ItSystemRoles");
+            roles.EntityType.HasKey(x => x.Id);
+            roles.EntityType.Property(x => x.Name);
 
             var systemOrgUnitUsages = builder.EntitySet<ItSystemUsageOrgUnitUsage>("ItSystemUsageOrgUnitUsages");
             systemOrgUnitUsages.EntityType.HasKey(x => x.ItSystemUsageId).HasKey(x => x.OrganizationUnitId);
@@ -178,6 +195,24 @@ namespace Presentation.Web
             itInterfaces.EntityType.EnumProperty(x => x.AccessModifier);
             itInterfaces.EntityType.Property(x => x.BelongsToId);
             itInterfaces.EntityType.HasOptional(x => x.BelongsTo);
+            itInterfaces.EntityType.Property(x => x.InterfaceId);
+            itInterfaces.EntityType.HasOptional(x => x.Interface);
+            itInterfaces.EntityType.Property(x => x.InterfaceTypeId);
+            itInterfaces.EntityType.HasOptional(x => x.InterfaceType);
+
+            var interfaceTypes = builder.EntitySet<InterfaceType>("InterfaceType");
+            interfaceTypes.EntityType.HasKey(x => x.Id);
+            interfaceTypes.EntityType.Property(x => x.Name);
+
+            var itInterfaceExihibits = builder.EntitySet<ItInterfaceExhibit>("ItInterfaceExhibits");
+            itInterfaceExihibits.EntityType.HasKey(x => x.Id);
+            itInterfaceExihibits.EntityType.Property(x => x.ItSystemId);
+            itInterfaceExihibits.EntityType.HasRequired(x => x.ItSystem);
+
+            var itInterfaceExhibitUsage = builder.EntitySet<ItInterfaceExhibitUsage>("ItInterfaceExhibitUsages");
+            itInterfaceExhibitUsage.EntityType.HasKey(x => x.ItContractId)
+                .HasKey(x => x.ItInterfaceExhibitId)
+                .HasKey(x => x.ItSystemUsageId);
 
             //builder.EntitySet<ItSystemUsage>("ItSystemUsages");
             //builder.EntitySet<ItSystemRight>("ItSystemRights");

@@ -266,6 +266,7 @@
     <Compile Include="Controllers\OData\OrganizationsController.cs" />
     <Compile Include="Controllers\OData\InterfacesController.cs" />
     <Compile Include="Controllers\OData\ItInterfacesController.cs" />
+    <Compile Include="Controllers\OData\ItSystemRightsController.cs" />
     <Compile Include="Controllers\OData\ItSystemsController.cs" />
     <Compile Include="Controllers\OData\ItSystemUsagesController.cs" />
     <Compile Include="Models\UpdateDefaultOrgUnitDto.cs" />
