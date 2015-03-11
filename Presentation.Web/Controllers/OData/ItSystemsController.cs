@@ -1,5 +1,6 @@
 ﻿using System.Linq;
-using System.Web.Http.OData;
+using System.Web.Http;
+using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
@@ -16,10 +17,10 @@ namespace Presentation.Web.Controllers.OData
         // GET /Organizations(1)/ItSystems
         [EnableQuery]
         [ODataRoute("Organizations({key})/ItSystems")]
-        public IQueryable<ItSystem> GetItSystems(int key)
+        public IHttpActionResult GetItSystems(int key)
         {
             var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
-            return result;
+            return Ok(result);
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using System.Web.Http.OData;
+using System.Web.OData;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
