@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Query;
@@ -13,48 +10,48 @@ namespace Presentation.Web.Controllers.OData
     public class BaseController<T> : ODataController where T : class
     {
         protected ODataValidationSettings ValidationSettings = new ODataValidationSettings();
-        protected IGenericRepository<T> Repo;
+        protected IGenericRepository<T> Repository;
 
         public BaseController(IGenericRepository<T> repository)
         {
             ValidationSettings.AllowedQueryOptions = AllowedQueryOptions.All;
-            Repo = repository;
+            Repository = repository;
         }
 
         [EnableQuery]
-        public virtual IQueryable<T> Get()
+        public IHttpActionResult Get()
         {
-            return Repo.AsQueryable();
+            return Ok(Repository.AsQueryable());
         }
 
         [EnableQuery(MaxExpansionDepth = 4)]
-        public virtual IQueryable<T> Get([FromODataUri] int key)
+        public IHttpActionResult Get(int key)
         {
-            var result = new List<T> {Repo.GetByKey(key)};
-            return result.AsQueryable();
+            var entity = Repository.GetByKey(key);
+            return Ok(entity);
         }
 
-        public virtual IQueryable<T> GetQueryable(ODataQueryOptions<T> queryOptions)
-        {
-            return Repo.AsQueryable();
-        }
+        //public IQueryable<T> GetQueryable(ODataQueryOptions<T> queryOptions)
+        //{
+        //    return Repository.AsQueryable();
+        //}
 
-        public virtual IQueryable<T> GetQueryable(int key, ODataQueryOptions<T> queryOptions)
-        {
-            var result = new List<T>();
+        //public IQueryable<T> GetQueryable(int key, ODataQueryOptions<T> queryOptions)
+        //{
+        //    var result = new List<T>();
 
-            var entity = Repo.GetByKey(key);
-            result.Add(entity);
+        //    var entity = Repository.GetByKey(key);
+        //    result.Add(entity);
 
-            return result.AsQueryable();
-        }
+        //    return result.AsQueryable();
+        //}
 
         protected IHttpActionResult Put(int key, Delta<T> delta)
         {
             return StatusCode(HttpStatusCode.MethodNotAllowed);
         }
 
-        protected IHttpActionResult POst(T entity)
+        protected IHttpActionResult Post(T entity)
         {
             Validate(entity);
 
@@ -62,8 +59,8 @@ namespace Presentation.Web.Controllers.OData
 
             try
             {
-                entity = Repo.Insert(entity);
-                Repo.Save();
+                entity = Repository.Insert(entity);
+                Repository.Save();
             }
             catch (Exception e)
             {
@@ -79,13 +76,14 @@ namespace Presentation.Web.Controllers.OData
 
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var entity = Repo.GetByKey(key);
-            if(entity == null) return BadRequest("Unable to find entity with id " + key);
+            var entity = Repository.GetByKey(key);
+            if(entity == null) 
+                return NotFound();
 
             try
             {
                 delta.Patch(entity);
-                Repo.Save();
+                Repository.Save();
             }
             catch (Exception e)
             {
@@ -97,17 +95,21 @@ namespace Presentation.Web.Controllers.OData
 
         protected IHttpActionResult Delete(int key)
         {
+            var entity = Repository.GetByKey(key);
+            if (entity == null)
+                return NotFound();
+            
             try
             {
-                Repo.DeleteByKey(key);
-                Repo.Save();
+                Repository.DeleteByKey(key);
+                Repository.Save();
             }
             catch (Exception e)
             {
                 return InternalServerError(e);
             }
 
-            return Ok();
+            return StatusCode(HttpStatusCode.NoContent);
         }
     }
 }
