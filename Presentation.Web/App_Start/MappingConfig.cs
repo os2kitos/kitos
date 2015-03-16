@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using AutoMapper;
+using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -376,6 +377,9 @@ namespace Presentation.Web
 
             Mapper.CreateMap<HandoverTrial, HandoverTrialDTO>()
                   .ReverseMap();
+
+            //Output only - this mapping should not be reversed
+            Mapper.CreateMap<MoxImportError, MoxImportErrorDTO>();
         }
     }
 }

@@ -38,7 +38,7 @@ namespace Presentation.Web.Controllers.API
             //todo: this is bad crosscutting of concerns. refactor / extract into separate controller
             _kernel = kernel; //we need this for retrieving userroles when creating a csv file.
         }
-
+        
         public override HttpResponseMessage Post(UserDTO dto)
         {
             try
@@ -101,6 +101,24 @@ namespace Presentation.Web.Controllers.API
                 item = _userService.AddUser(item, sendMailOnCreation, orgId);
 
                 return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        public HttpResponseMessage PostTokenRequest(bool? token, int userId)
+        {
+            try
+            {
+                var user = Repository.GetByKey(userId);
+                if (user == null)
+                    return NotFound();
+
+                user.Uuid = Guid.NewGuid();
+                PatchQuery(user);
+                return Ok(user.Uuid);
             }
             catch (Exception e)
             {
@@ -210,7 +228,7 @@ namespace Presentation.Web.Controllers.API
                 list.Add(header);
 
                 foreach (var user in dtos)
-                {
+                    {
                     var obj = new ExpandoObject() as IDictionary<string, Object>;
                     obj.Add("Navn", user.Name);
                     obj.Add("Email", user.Email);
@@ -298,7 +316,7 @@ namespace Presentation.Web.Controllers.API
                     builder.Append(',');
             }
             return builder.ToString();
-        } 
+        }
         #endregion
 
         public HttpResponseMessage GetNameIsAvailable(string checkname, int orgId)
@@ -327,7 +345,7 @@ namespace Presentation.Web.Controllers.API
             if (users.Any()) return Ok();
 
             return NotFound();
-        }
+    }
 
         public HttpResponseMessage PostDefaultOrgUnit(bool? updateDefaultOrgUnit, UpdateDefaultOrgUnitDto dto)
         {
