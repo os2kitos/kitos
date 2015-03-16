@@ -169,6 +169,43 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        public HttpResponseMessage GetOverview(bool? overview, int orgId, [FromUri] PagingModel<User> pagingModel, [FromUri] string q)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(q))
+                    pagingModel.Where(u =>
+                        u.Name.Contains(q)
+                        || u.Email.Contains(q));
+
+                //Get all users inside the organization
+                pagingModel.Where(u => u.AdminRights.Count(r => r.Role.Name == "Medarbejder" && r.ObjectId == orgId) > 0);
+
+                var users = Page(Repository.AsQueryable(), pagingModel).ToList();
+                var dtos = new List<UserOverviewDTO>();
+
+                foreach (var user in users)
+                {
+                    var right = user.AdminRights.FirstOrDefault(x => x.ObjectId == orgId);
+                    if (right != null)
+                        user.DefaultOrganizationUnit = right.DefaultOrgUnit;
+
+                    user.DefaultOrganizationUnitId = user.DefaultOrganizationUnit != null ? (int?)user.DefaultOrganizationUnit.Id : null;
+
+                    var newDTO = Map<User, UserOverviewDTO>(user);
+
+                    newDTO.CanBeEdited = HasWriteAccess(user, KitosUser, orgId);
+                    dtos.Add(newDTO);
+                }
+
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetExcel([FromUri] bool? csv, [FromUri] int orgId)
         {
             try

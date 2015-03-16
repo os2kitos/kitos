@@ -8,7 +8,7 @@
                 resolve: {
                     orgRolesHttp: [
                         '$http', function($http) {
-                            return $http.get('api/organizationRole');
+                            return $http.get('api/organizationRole/?nonsuggestions=');
                         }
                     ]
                 }
@@ -31,6 +31,7 @@
             //flatten map of all loaded orgUnits
             $scope.orgUnits = {};
 
+            $scope.activeOrgRoles = _.where(orgRolesHttp.data.response, { isActive: true });
             $scope.orgRoles = {};
             _.each(orgRolesHttp.data.response, function(orgRole) {
                 $scope.orgRoles[orgRole.id] = orgRole;
@@ -405,7 +406,7 @@
 
                                 $modalScope.submitting = true;
 
-                                $http.delete("api/organizationUnit/" + unit.id + '&organizationId=' + user.currentOrganizationId).success(function () {
+                                $http.delete("api/organizationUnit/" + unit.id + '?organizationId=' + user.currentOrganizationId).success(function () {
                                     $modalInstance.close();
                                     notify.addSuccessMessage(unit.name + " er slettet!");
 

@@ -6,7 +6,7 @@
             controller: 'system.EditRoles',
             resolve: {
                 itSystemRoles: ['$http', function ($http) {
-                    return $http.get("api/itsystemrole/")
+                    return $http.get("api/itsystemrole/?nonsuggestions=")
                         .then(function (result) {
                             return result.data.response;
                         });
@@ -23,6 +23,7 @@
     app.controller('system.EditRoles', ['$scope', '$http', 'notify', 'itSystemUsage', 'itSystemRoles', 'user', function ($scope, $http, notify, itSystemUsage, itSystemRoles, user) {
         var usageId = itSystemUsage.id;
 
+        $scope.activeItSystemRoles = _.where(itSystemRoles, { isActive: true });
         $scope.itSystemRoles = itSystemRoles;
         $scope.newRole = 1;
         $scope.orgId = user.currentOrganizationId;
@@ -32,7 +33,7 @@
             right.role = _.findWhere(itSystemRoles, { id: right.roleId });
             right.show = true;
             
-            right.userForSelect = { id: right.user.id, text: right.user.name };
+            right.userForSelect = { id: right.user.id, text: right.user.fullName };
             right.roleForSelect = right.roleId;
             
             $scope.rights.push(right);
@@ -57,14 +58,14 @@
             };
 
             $http.post("api/itsystemusagerights/" + usageId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
-                notify.addSuccessMessage(result.response.user.name + " er knyttet i rollen");
+                notify.addSuccessMessage(result.response.user.fullName + " er knyttet i rollen");
 
                 $scope.rights.push({
                     objectId: result.response.objectId,
                     roleId: result.response.roleId,
                     userId: result.response.userId,
                     user: result.response.user,
-                    userForSelect: { id: result.response.userId, text: result.response.user.name },
+                    userForSelect: { id: result.response.userId, text: result.response.user.fullName },
                     roleForSelect: result.response.roleId,
                     role: _.findWhere(itSystemRoles, { id: result.response.roleId }),
                     show: true
@@ -130,7 +131,7 @@
 
                     right.edit = false;
 
-                    notify.addSuccessMessage(right.user.name + " er knyttet i rollen");
+                    notify.addSuccessMessage(right.user.fullName + " er knyttet i rollen");
 
                 }).error(function (result) {
 
@@ -145,7 +146,7 @@
             }).error(function (deleteResult) {
 
                 //couldn't delete the old entry, just reset select options
-                right.userForSelect = { id: right.user.id, text: right.user.name };
+                right.userForSelect = { id: right.user.id, text: right.user.fullName };
                 right.roleForSelect = right.roleId;
 
                 notify.addErrorMessage('Fejl!');

@@ -164,6 +164,8 @@ namespace Presentation.Web
             Mapper.CreateMap<User, UserProfileDTO>()
                   .ReverseMap();
 
+            Mapper.CreateMap<User, UserOverviewDTO>();
+
             Mapper.CreateMap<Wish, WishDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.User, opt => opt.Ignore())

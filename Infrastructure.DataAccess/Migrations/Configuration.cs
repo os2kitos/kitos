@@ -36,10 +36,11 @@ namespace Infrastructure.DataAccess.Migrations
         {
             #region USERS
 
-            context.Users.AddOrUpdate(x => x.Name,
+            context.Users.AddOrUpdate(x => x.Email,
                 new User
                 {
-                    Name = "Global admin",
+                    Name = "Global",
+                    LastName = "admin",
                     Email = "support@kitos.dk",
                     Salt = "uH3U0wqme2mc83FvSwkDrd9fm-3MycFR0ugaKtREJBw1",
                     Password = "h3hNNY9J3SBUNCgaoccGo1WCRDxt4v9oUjD5uZhQ78M1",

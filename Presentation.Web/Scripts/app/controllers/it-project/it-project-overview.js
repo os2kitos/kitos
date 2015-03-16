@@ -18,8 +18,8 @@
     }]);
 
     app.controller('project.EditOverviewCtrl',
-    ['$scope', '$http', 'notify', 'projectRoles', 'user',
-        function ($scope, $http, notify, projectRoles, user) {
+    ['$scope', '$http', 'notify', 'projectRoles', 'user', '$q',
+        function ($scope, $http, notify, projectRoles, user, $q) {
             $scope.pagination = {
                 search: '',
                 skip: 0,
@@ -37,6 +37,8 @@
             });
 
             function loadProjects() {
+                var deferred = $q.defer();
+
                 var url = 'api/itProject?overview&orgId=' + user.currentOrganizationId;
 
                 url += '&skip=' + $scope.pagination.skip;
@@ -56,11 +58,34 @@
                     var paginationHeader = JSON.parse(headers('X-Pagination'));
                     $scope.totalCount = paginationHeader.TotalCount;
 
-                    _.each(result.response, pushProject);
+                    setCanEdit(result.response).then(function(canEditResult) {
+                        _.each(canEditResult, pushProject);
+                    });
 
                 }).error(function () {
                     notify.addErrorMessage("Kunne ikke hente projekter!");
                 });
+            }
+
+            function setCanEdit(projectCollection) {
+                return $q.all(_.map(projectCollection, function(iteratee) {
+                    var deferred = $q.defer();
+
+                    setTimeout(function() {
+                        $http.get("api/itProject/" + iteratee.id + "?hasWriteAccess" + '&organizationId=' + user.currentOrganizationId)
+                            .success(function(result) {
+                                iteratee.canBeEdited = result.response;
+                                deferred.resolve(iteratee);
+                            })
+                            .error(function(result) {
+                                iteratee.canBeEdited = false;
+                                deferred.reject(result);
+                                }
+                            );
+                    }, 0);
+
+                    return deferred.promise;
+                }));
             }
             
             function pushProject(project) {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
+using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
@@ -34,7 +35,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var orgUnits = Repository.Get(x => x.Rights.Any(y => y.UserId == KitosUser.Id) && x.OrganizationId == organizationId).ToList();
+                var orgUnits = Repository.Get(x => x.Rights.Any(y => y.UserId == KitosUser.Id) && x.OrganizationId == organizationId).SelectNestedChildren(x => x.Children).ToList();
 
                 orgUnits = orgUnits.Distinct().ToList();
 

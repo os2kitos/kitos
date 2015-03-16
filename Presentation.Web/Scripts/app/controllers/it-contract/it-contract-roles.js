@@ -12,7 +12,7 @@
                         });
                 }],
                 itContractRoles: ['$http', function ($http) {
-                    return $http.get("api/itcontractrole/")
+                    return $http.get("api/itcontractrole/?nonsuggestions=")
                         .then(function (result) {
                             return result.data.response;
                         });
@@ -32,6 +32,7 @@
             $scope.orgId = user.currentOrganizationId;
 
             //normal user roles
+            $scope.activeItContractRoles = _.where(itContractRoles, { isActive: true });
             $scope.itContractRoles = itContractRoles;
             $scope.newRole = itContractRoles.length > 0 ? 1 : 0;
 
@@ -40,7 +41,7 @@
                 right.role = _.findWhere(itContractRoles, { id: right.roleId });
                 right.show = true;
 
-                right.userForSelect = { id: right.user.id, text: right.user.name };
+                right.userForSelect = { id: right.user.id, text: right.user.fullName };
                 right.roleForSelect = right.roleId;
 
                 $scope.rights.push(right);
@@ -64,14 +65,14 @@
                 };
 
                 $http.post("api/itcontractrights/" + contractId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
-                    notify.addSuccessMessage(result.response.user.name + " er knyttet i rollen");
+                    notify.addSuccessMessage(result.response.user.fullName + " er knyttet i rollen");
 
                     $scope.rights.push({
                         objectId: result.response.objectId,
                         roleId: result.response.roleId,
                         userId: result.response.userId,
                         user: result.response.user,
-                        userForSelect: { id: result.response.userId, text: result.response.user.name },
+                        userForSelect: { id: result.response.userId, text: result.response.user.fullName },
                         roleForSelect: result.response.roleId,
                         role: _.findWhere(itContractRoles, { id: result.response.roleId }),
                         show: true
@@ -137,7 +138,7 @@
 
                         right.edit = false;
 
-                        notify.addSuccessMessage(right.user.name + " er knyttet i rollen");
+                        notify.addSuccessMessage(right.user.fullName + " er knyttet i rollen");
 
                     }).error(function (result) {
 
@@ -152,7 +153,7 @@
                 }).error(function (deleteResult) {
 
                     //couldn't delete the old entry, just reset select options
-                    right.userForSelect = { id: right.user.id, text: right.user.name };
+                    right.userForSelect = { id: right.user.id, text: right.user.fullName };
                     right.roleForSelect = right.roleId;
 
                     notify.addErrorMessage('Fejl!');

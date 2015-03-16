@@ -47,5 +47,12 @@ namespace Presentation.Web.Models
 
         public int? MainContractId { get; set; }
         public IEnumerable<ItContractSystemDTO> Contracts { get; set; }
+
+        public string ObjectOwnerName { get; set; }
+        public string ObjectOwnerLastName { get; set; }
+        public string ObjectOwnerFullName
+        {
+            get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
+        }
     }
 }

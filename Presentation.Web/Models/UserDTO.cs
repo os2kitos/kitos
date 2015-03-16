@@ -19,6 +19,7 @@ namespace Presentation.Web.Models
         public Guid? Uuid { get; set; }
         public List<AdminRightDTO> AdminRights { get; set; }
         public string ObjectOwnerName { get; set; }
+        public string ObjectOwnerLastName { get; set; }
         [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime? LastAdvisDate { get; set; }
         public DateTime LastChanged { get; set; }

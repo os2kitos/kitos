@@ -136,16 +136,17 @@ namespace Core.ApplicationServices
             var phase4Id = project.Phase4.Id;
             var phase5Id = project.Phase5.Id;
             
-            _projectRepository.DeleteByKey(project.Id);
-            _projectRepository.Save();
-
-            //deleting phases - must be done afterwards, since they're required on project
+            //deleting phases
             _phaseRepository.DeleteByKey(phase1Id);
             _phaseRepository.DeleteByKey(phase2Id);
             _phaseRepository.DeleteByKey(phase3Id);
             _phaseRepository.DeleteByKey(phase4Id);
             _phaseRepository.DeleteByKey(phase5Id);
+
             _phaseRepository.Save();
+
+            _projectRepository.DeleteByKey(project.Id);
+            _projectRepository.Save();
         }
 
         /// <summary>

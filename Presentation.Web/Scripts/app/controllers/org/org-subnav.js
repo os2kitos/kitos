@@ -78,11 +78,11 @@
                                         roleId: orgUserRole.id,
                                     };
 
-                                    $http.post("api/adminrights/" + oId + "?organizationId=" + oId, data, { handleBusy: true }).success(function (result) {
-                                        msg.toSuccessMessage(userResult.name + " er oprettet i KITOS");
+                                    $http.post("api/adminrights/?rightByOrganizationRight&organizationId=" + oId + "&userId=" + user.id, data, { handleBusy: true }).success(function (result) {
+                                        msg.toSuccessMessage(userResult.fullName + " er oprettet i KITOS");
                                         reload();
                                     }).error(function() {
-                                        msg.toErrorMessage("Kunne ikke tilknytte " + user.name + ' til organisationen!');
+                                        msg.toErrorMessage("Kunne ikke tilknytte " + user.fullName + ' til organisationen!');
                                     });
 
                                     $modalInstance.close(userResult);

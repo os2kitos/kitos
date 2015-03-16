@@ -65,6 +65,14 @@
 
                 <!-- 2nd column -->
                 <div class="col-md-6">
+                    <!-- Object owner -->
+                    <div class="form-group">
+                        <label for="object-owner" class="control-label small">Oprettet af</label>
+                        <input type="text" id="object-owner" class="form-control input-sm"
+                               data-ng-disabled="true"
+                               value="{{contract.objectOwnerFullName}}">
+                    </div>
+
                     <!-- Purchase form -->
                     <div class="form-group">
                         <label for="contract-purchaseform" class="control-label small">Indkøbsform</label>
@@ -123,26 +131,26 @@
                             <option data-ng-repeat="contractTemplate in contractTemplates" value="{{contractTemplate.id}}">{{contractTemplate.name}}</option>
                         </select>
                     </div>
-
-                    <!-- Folder -->
-                    <div class="form-group">
-                        <label for="contract-folder" class="control-label small">Mappe</label>
-                        <input type="text" id="contract-folder" class="form-control input-sm" 
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="contract.folder" 
-                               data-autosave="{{ autoSaveUrl }}" 
-                               data-field="folder">
-                    </div>
                 </div>
 
                 <div class="col-md-12">
+                    <!-- Folder -->
+                    <div class="form-group">
+                        <label for="contract-folder" class="control-label small">Mappe</label>
+                        <input type="text" id="contract-folder" class="form-control input-sm"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-model="contract.folder"
+                               data-autosave="{{ autoSaveUrl }}"
+                               data-field="folder">
+                    </div>
+
                     <!-- Note -->
                     <div class="form-group">
                         <label for="contract-note" class="control-label small">Bemærkning</label>
-                        <textarea id="contract-note" class="form-control input-sm" 
+                        <textarea id="contract-note" class="form-control input-sm"
                                   data-ng-disabled="!hasWriteAccess"
-                                  data-ng-model="contract.note" 
-                                  data-autosave="{{ autoSaveUrl }}" 
+                                  data-ng-model="contract.note"
+                                  data-autosave="{{ autoSaveUrl }}"
                                   data-field="note">
                         </textarea>
                     </div>

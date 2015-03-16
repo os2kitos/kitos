@@ -39,8 +39,9 @@
             <!-- edit -->
             <tr data-ng-show="right.edit">
                 <td>
-                    <select data-ui-select2="" name="selectRole" data-ng-model="right.roleForSelect" class="form-control input-sm" >
-                        <option data-ng-repeat="systemRole in itSystemRoles" value="{{systemRole.id}}">{{systemRole.name}} ({{systemRole.hasWriteAccess && "skriv" || "læs" }})
+                    <select data-ui-select2="" name="selectRole" data-ng-model="right.roleForSelect" class="form-control input-sm">
+                        <option data-ng-show="right.role.isActive == false" disabled="true" value="{{right.role.id}}">{{right.role.name}} {{right.role.isActive == true ? "" : "(Inaktiv rolle)"}}</option>
+                        <option data-ng-repeat="systemRole in activeItSystemRoles" value="{{systemRole.id}}">{{systemRole.name}} ({{systemRole.hasWriteAccess && "skriv" || "læs" }})
                         </option>
                     </select>
                 </td>
@@ -59,7 +60,8 @@
                 <td>
                     <select data-ui-select2="" name="selectRole" data-ng-model="newRole" data-placeholder="Vælg en systemrolle" class="form-control input-sm" data-ng-change="submitRight()">
                         <option value=""></option>
-                        <option data-ng-repeat="systemRole in itSystemRoles" value="{{systemRole.id}}">{{systemRole.name}} ({{systemRole.hasWriteAccess && "skriv" || "læs" }})
+                        <option data-ng-repeat="systemRole in activeItSystemRoles" value="{{systemRole.id}}">
+                            {{systemRole.name}} ({{systemRole.hasWriteAccess && "skriv" || "læs" }})
                         </option>
                     </select>
                 </td>

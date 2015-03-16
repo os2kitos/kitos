@@ -7,39 +7,35 @@
 
 <div class="panel panel-default">
     <div class="panel-heading">
-
         <h3 class="panel-title">
-            <i class="glyphicon glyphicon-user"></i> {{ currentUser.currentOrganizationName}}
+            <span class="glyphicon glyphicon-user"></span> {{ currentUser.currentOrganizationName}}
         </h3>
     </div>
 
-    <table class="table table-condensed table-striped table-fixed">
+    <table class="table table-condensed table-striped">
         <thead>
             <tr>
-                <th>
+                <th width="200">
                     Navn
                     <button data-order-by="'Name'" data-paging="pagination"></button>
                 </th>
-                <th>
+                <th width="200">
                     Email
                     <button data-order-by="'Email'" data-paging="pagination"></button>
                 </th>
-                <th>
-                    <!--EditUser button column-->
-                </th>
-                <th>
+                <th width="180">
                     Default org.enhed
                     <button data-order-by="'DefaultOrganizationUnit.Name'" data-paging="pagination"></button>
                 </th>
-                <th>
+                <th width="80">
                     Advis
                     <button data-order-by="'LastAdvisDate'" data-paging="pagination"></button>
                 </th>
-                <th>
+                <th width="180">
                     Oprettet af
                     <button data-order-by="'ObjectOwner.Name'" data-paging="pagination"></button>
                 </th>
-                <th>
+                <th width="160">
                     <select data-ng-model="chosenModule" ng-change="getRightsForModule(chosenModule)">
                         <option value="0">Vælg modul</option>
                         <option value="1">Organisation</option>
@@ -48,24 +44,19 @@
                         <option value="4">IT Kontrakter</option>
                     </select>
                 </th>
-                <th>
+                <th width="160" class="text-left">
                     Rolle
                 </th>
-                <th>
+                <th width="63">
                     <!-- Control -->
                 </th>
             </tr>
         </thead>
         <tbody>
             <tr data-ng-repeat="user in users">
-                <td>{{user.name}} {{user.lastName}}</td>
+                <td>{{user.fullName}}</td>
                 <td>{{user.email}} </td>
-                <td>
-                    <button type="button" class="btn btn-info btn-xs" data-ng-click="editUser(user)" data-ng-disabled="!user.canBeEdited">
-                        <span class="glyphicon glyphicon-pencil"></span>
-                    </button>
-                </td>
-                <td>{{user.defaultOrganizationUnitName == null ? rootUnitName : user.defaultOrganizationUnitName}}</td>
+                <td>{{user.adminRights.defaultOrgUnitName == null ? rootUnitName : user.defaultOrganizationUnitName}}</td>
                 <td>
                     <button type="button" data-ng-if="user.lastAdvisDate === null" class="btn btn-success btn-xs btn-block" data-ng-click="sendAdvis(user, false)" data-ng-disabled="!user.canBeEdited">
                         Send Advis
@@ -74,22 +65,25 @@
                         {{user.lastAdvisDate | date:'dd-MM-yy'}}
                     </button>
                 </td>
-                <td>{{user.objectOwnerName}}</td>
+                <td>{{user.adminRights.objectOwnerFullName}}</td>
                 <td colspan="2">
-                    <table data-ng-if="user.rights" class="full-width table table-condensed table-striped table-no-margin">
+                    <table data-ng-if="user.rights" class="full-width table table-condensed table-striped table-no-margin text-left">
                         <tbody>
                             <tr data-ng-repeat="right in user.rights">
-                                <td>
+                                <td class="text-left">
                                     {{right.objectName}}
                                 </td>
-                                <td>
+                                <td class="text-left">
                                     {{right.roleName}} ({{right.roleHasWriteAccess && "S" || "L" }})
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </td>
-                <td class="text-right">
+                <td class="text-right col-md-1">
+                    <button type="button" class="btn btn-info btn-xs" data-ng-click="editUser(user)" data-ng-disabled="!user.canBeEdited">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </button>
                     <button class="btn btn-danger btn-xs" data-ng-click="deleteOrgRole(user)" data-ng-disabled="!user.canBeEdited">
                         <span class="glyphicon glyphicon-trash"></span>
                     </button>
