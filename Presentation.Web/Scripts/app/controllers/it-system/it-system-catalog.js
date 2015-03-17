@@ -5,11 +5,6 @@
             templateUrl: 'partials/it-system/it-system-catalog.html',
             controller: 'system.CatalogCtrl',
             resolve: {
-                //organizations: [
-                //    '$http', function ($http) {
-                //        return $http.get('api/organization');
-                //    }
-                //],
                 user: [
                     'userService', function (userService) {
                         return userService.getUser();
