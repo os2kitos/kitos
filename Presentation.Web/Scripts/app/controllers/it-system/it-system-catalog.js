@@ -5,11 +5,11 @@
             templateUrl: 'partials/it-system/it-system-catalog.html',
             controller: 'system.CatalogCtrl',
             resolve: {
-                organizations: [
-                    '$http', function ($http) {
-                        return $http.get('api/organization');
-                    }
-                ],
+                //organizations: [
+                //    '$http', function ($http) {
+                //        return $http.get('api/organization');
+                //    }
+                //],
                 user: [
                     'userService', function (userService) {
                         return userService.getUser();
@@ -21,8 +21,8 @@
 
     app.controller('system.CatalogCtrl',
     [
-        '$rootScope', '$scope', '$http', 'notify', '$state', 'organizations', 'user', '$timeout',
-        function ($rootScope, $scope, $http, notify, $state, organizationsHttp, user, $timeout) {
+        '$rootScope', '$scope', '$http', 'notify', '$state', 'user', '$timeout',
+        function ($rootScope, $scope, $http, notify, $state, user, $timeout) {
             $rootScope.page.title = 'IT System - Katalog';
             
             // adds system to usage within the current context
@@ -50,16 +50,6 @@
                 });
             }
 
-            // show usageDetailsGrid
-            $scope.showUsageDetails = function (usageId, systemName) {
-                //Filter by usageId
-                $scope.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
-                //Set modal title
-                $scope.modal.setOptions({ title: "Anvendelse af " + systemName });
-                //Open modal
-                $scope.modal.center().open();
-            }
-
             //usagedetails grid empty-grid handling
             function detailsBound(e) {
                 var grid = e.sender;
@@ -71,17 +61,49 @@
                 }
             };
 
+            // saves grid state to localStorage
+            function saveGridOptions(e) {
+                if ($scope.mainGrid) {
+                    // timeout fixes columnReorder saves before the column is actually reordered 
+                    // http://stackoverflow.com/questions/21270748/kendo-grid-saving-state-in-columnreorder-event
+                    $timeout(function () {
+                        var options = $scope.mainGrid.getOptions();
+                        delete options.dataSource.transport; //delete datasource.transport from options before saving state - would remember requestUrl including orgId from last request
+                        localStorage["kendo-grid-it-system-catalog-options"] = kendo.stringify(options);
+                    });
+                }
+            }
+
+            // loads kendo grid options from localstorage
+            function loadOptions() {
+                var options = localStorage["kendo-grid-it-system-catalog-options"];
+                if (options) {
+                    $scope.mainGrid.setOptions(JSON.parse(options));
+                }
+            }
+
+            // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
+            $scope.showUsageDetails = function (usageId, systemName) {
+                //Filter by usageId
+                $scope.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
+                //Set modal title
+                $scope.modal.setOptions({ title: "Anvendelse af " + systemName });
+                //Open modal
+                $scope.modal.center().open();
+            }
+
             //usagedetails grid
             $scope.usageDetailsGrid = {
                     dataSource: {
                     type: "odata-v4",
                         transport:
-                    {
-                        read: {
-                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=Organization",
-                            dataType: "json"
+                        {
+                            read: {
+                                url: "/odata/ItSystemUsages?$expand=Organization",
+                                dataType: "json",
+                                cache: false
+                            },
                         },
-                    },
                     pageSize: 10,
                     serverPaging: true,
                     serverSorting: true,
@@ -96,15 +118,20 @@
                 dataBound: detailsBound
             };
             
-            //catalog grid
+            //catalog grid (mainGrid)
             $scope.itSystemCatalogueGrid = {
                 dataSource: {
                     type: "odata-v4",
                     transport: {
                         read: {
                             url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystems?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization)",
-                            dataType: "json"
+                            dataType: "json",
+                            cache: false
                         },
+                        parameterMap: function (options, type) {
+                            //options.foo = "bar"; // do something here
+                            return kendo.data.transports["odata-v4"].parameterMap(options, type);
+                        }
                     },
                     schema: {
                         parse: function(data) {
@@ -165,7 +192,7 @@
                         template: '<span data-ng-bind="dataItem.BusinessType.Name"></span>'
                     },
                     {
-                        field: "TaskRefs", title: "KLE", width: 100, sortable: false,
+                        field: "TaskRefs", title: "KLE", width: 100, sortable: false, filterable: false,
                         template: '<span data-ng-bind="dataItem.TaskRefs[0].TaskKey"></span>'
                     },
                     {
@@ -202,17 +229,6 @@
                 }
             };
 
-            // saves grid state to localStorage
-            function saveGridOptions(e) {
-                if ($scope.mainGrid) {
-                    // timeout fixes columnReorder saves before the column is actually reordered 
-                    // http://stackoverflow.com/questions/21270748/kendo-grid-saving-state-in-columnreorder-event
-                    $timeout(function() {
-                        localStorage["kendo-grid-it-system-catalog-options"] = kendo.stringify($scope.mainGrid.getOptions());
-                    });
-                }      
-            }
-
             // returns bool if system is being used by system within current context
             $scope.systemHasUsages = function(system) {
                 return _.find(system.Usages, function (d) { return d.OrganizationId == user.currentOrganizationId });
@@ -229,24 +245,16 @@
 
                 if(sure) deleteODataUsage(dataItem);
             }
-            
-            // loads
-            $scope.loadOptions = function() {
-                var options = localStorage["kendo-grid-it-system-catalog-options"];
-                if (options) {
-                    $scope.mainGrid.setOptions(JSON.parse(options));
-                }
-            }
-
+          
             // clears grid filters by removing the localStorageItem and reloading the page
             $scope.clearOptions = function () {
                 localStorage.removeItem("kendo-grid-it-system-catalog-options");
                 $state.go($state.current, {}, { reload: true });
             }
 
-            //
+            // fires when kendo is finished rendering all its goodies
             $scope.$on("kendoRendered", function (e) {
-                $scope.loadOptions();
+                loadOptions();
             });
         }
     ]);

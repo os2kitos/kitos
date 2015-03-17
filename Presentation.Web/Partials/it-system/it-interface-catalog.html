@@ -46,7 +46,7 @@
     <tbody>
         <tr data-ng-repeat="system in systems">
             <td>
-                <a data-ui-sref="it-system.interface-edit.interface-details({id: data.id})">{{system.name}}</a>
+                <a data-ui-sref="it-system.interface-edit.interface-details({id: system.id})">{{system.name}}</a>
             </td>
             <td>
                 <span data-ng-show="{{system.accessModifier == 1}}">
