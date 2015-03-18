@@ -23,6 +23,7 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.Name)
                 .IsRequired();
             this.Property(t => t.Email)
+                .HasMaxLength(100)
                 .IsRequired()
                 .HasColumnAnnotation(IndexAnnotation.AnnotationName, new IndexAnnotation(new[] {new IndexAttribute("IX_Email") {IsUnique = true}}));
             this.Property(t => t.Password)
