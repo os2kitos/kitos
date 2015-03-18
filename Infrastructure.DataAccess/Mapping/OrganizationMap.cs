@@ -15,7 +15,10 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Table & Column Mappings
             this.ToTable("Organization");
-            this.Property(t => t.Cvr).HasMaxLength(10).IsOptional();
+            this.Property(t => t.Cvr)
+                .HasMaxLength(10)
+                .IsOptional()
+                .HasColumnAnnotation(IndexAnnotation.AnnotationName, new IndexAnnotation(new[] { new IndexAttribute("IX_Cvr") { IsUnique = true } }));
             this.Property(t => t.Type).IsOptional();
 
             // Relationships

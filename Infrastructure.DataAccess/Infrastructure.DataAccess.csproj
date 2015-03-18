@@ -200,6 +200,10 @@
     <Compile Include="Migrations\201502121301345_AddedDefaultOrgUnitToAdminRight.Designer.cs">
       <DependentUpon>201502121301345_AddedDefaultOrgUnitToAdminRight.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201503181330400_AddedUniqueOrgUnitEanAndOrgCvr.cs" />
+    <Compile Include="Migrations\201503181330400_AddedUniqueOrgUnitEanAndOrgCvr.Designer.cs">
+      <DependentUpon>201503181330400_AddedUniqueOrgUnitEanAndOrgCvr.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\BackupConfiguration.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -264,6 +268,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201502121301345_AddedDefaultOrgUnitToAdminRight.resx">
       <DependentUpon>201502121301345_AddedDefaultOrgUnitToAdminRight.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503181330400_AddedUniqueOrgUnitEanAndOrgCvr.resx">
+      <DependentUpon>201503181330400_AddedUniqueOrgUnitEanAndOrgCvr.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
