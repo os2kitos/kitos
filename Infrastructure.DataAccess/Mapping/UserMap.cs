@@ -1,4 +1,6 @@
-﻿using Core.DomainModel;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity.Infrastructure.Annotations;
+using Core.DomainModel;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -21,7 +23,8 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.Name)
                 .IsRequired();
             this.Property(t => t.Email)
-                .IsRequired();
+                .IsRequired()
+                .HasColumnAnnotation(IndexAnnotation.AnnotationName, new IndexAnnotation(new[] {new IndexAttribute("IX_Email") {IsUnique = true}}));
             this.Property(t => t.Password)
                 .IsRequired();
             this.Property(t => t.Salt)
