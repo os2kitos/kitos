@@ -38,7 +38,7 @@ namespace Presentation.Web.Controllers.API
             //todo: this is bad crosscutting of concerns. refactor / extract into separate controller
             _kernel = kernel; //we need this for retrieving userroles when creating a csv file.
         }
-
+        
         public override HttpResponseMessage Post(UserDTO dto)
         {
             try
@@ -108,6 +108,24 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        public HttpResponseMessage PostTokenRequest(bool? token, int userId)
+        {
+            try
+            {
+                var user = Repository.GetByKey(userId);
+                if (user == null)
+                    return NotFound();
+
+                user.Uuid = Guid.NewGuid();
+                PatchQuery(user);
+                return Ok(user.Uuid);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetBySearch(string q)
         {
             try
@@ -151,6 +169,43 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        public HttpResponseMessage GetOverview(bool? overview, int orgId, [FromUri] PagingModel<User> pagingModel, [FromUri] string q)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(q))
+                    pagingModel.Where(u =>
+                        u.Name.Contains(q)
+                        || u.Email.Contains(q));
+
+                //Get all users inside the organization
+                pagingModel.Where(u => u.AdminRights.Count(r => r.Role.Name == "Medarbejder" && r.ObjectId == orgId) > 0);
+
+                var users = Page(Repository.AsQueryable(), pagingModel).ToList();
+                var dtos = new List<UserOverviewDTO>();
+
+                foreach (var user in users)
+                {
+                    var right = user.AdminRights.FirstOrDefault(x => x.ObjectId == orgId);
+                    if (right != null)
+                        user.DefaultOrganizationUnit = right.DefaultOrgUnit;
+
+                    user.DefaultOrganizationUnitId = user.DefaultOrganizationUnit != null ? (int?)user.DefaultOrganizationUnit.Id : null;
+
+                    var newDTO = Map<User, UserOverviewDTO>(user);
+
+                    newDTO.CanBeEdited = HasWriteAccess(user, KitosUser, orgId);
+                    dtos.Add(newDTO);
+                }
+
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
         public HttpResponseMessage GetExcel([FromUri] bool? csv, [FromUri] int orgId)
         {
             try
@@ -173,7 +228,7 @@ namespace Presentation.Web.Controllers.API
                 list.Add(header);
 
                 foreach (var user in dtos)
-                {
+                    {
                     var obj = new ExpandoObject() as IDictionary<string, Object>;
                     obj.Add("Navn", user.Name);
                     obj.Add("Email", user.Email);
@@ -261,7 +316,7 @@ namespace Presentation.Web.Controllers.API
                     builder.Append(',');
             }
             return builder.ToString();
-        } 
+        }
         #endregion
 
         public HttpResponseMessage GetNameIsAvailable(string checkname, int orgId)
@@ -290,7 +345,7 @@ namespace Presentation.Web.Controllers.API
             if (users.Any()) return Ok();
 
             return NotFound();
-        }
+    }
 
         public HttpResponseMessage PostDefaultOrgUnit(bool? updateDefaultOrgUnit, UpdateDefaultOrgUnitDto dto)
         {

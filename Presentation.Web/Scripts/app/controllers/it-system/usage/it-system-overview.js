@@ -71,8 +71,7 @@
                 $scope.inactiveContracts = [];
 
                 function loadUsages() {
-                    $scope.activeSystemUsages = [];
-                    $scope.inactiveSystemUsages = [];
+                    $scope.itSystemUsage = [];
 
                     var url = 'api/itSystemUsage?overview&organizationId=' + user.currentOrganizationId + '&skip=' + $scope.pagination.skip + '&take=' + $scope.pagination.take;
 
@@ -93,11 +92,7 @@
                         _.each(result.response, function(usage) {
                             usage.itSystem.businessType = _.findWhere(businessTypes, { id: usage.itSystem.businessTypeId });
 
-                            if (usage.mainContractIsActive) {
-                                $scope.activeSystemUsages.push(usage);
-                            } else {
-                                $scope.inactiveSystemUsages.push(usage);
-                            }
+                            $scope.itSystemUsage.push(usage);
 
                             loadOverviewSystem(usage);
                         });

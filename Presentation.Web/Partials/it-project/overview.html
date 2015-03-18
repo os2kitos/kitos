@@ -96,7 +96,7 @@
                 <span data-ng-if="chosenEco == 2">{{ p.bc }}</span>
             </td>
             <td class="text-right" data-ng-switch="chosenPriority">
-                <select data-ng-model="p.priority" data-autosave="api/itproject/{{p.id}}" data-field="priority" data-ng-disabled="p.isPriorityLocked" data-ng-switch-when="priority">
+                <select data-ng-model="p.priority" data-autosave="api/itproject/{{p.id}}" data-field="priority" data-ng-disabled="p.isPriorityLocked || !p.canBeEdited" data-ng-switch-when="priority" data-ng-class="{'disabled-input': !p.canBeEdited}">
                     <option value="0">-- Vælg --</option>
                     <option value="3">Høj</option>
                     <option value="2">Mellem</option>
@@ -105,13 +105,13 @@
 
                 <div data-ng-switch-when="priorityPf">
                     <div class="btn-group btn-group-sm" data-toggle="buttons">
-                        <label class="btn btn-star" data-ng-class="{ 'unstarred': !p.isPriorityLocked }">
+                        <label class="btn btn-star" data-ng-class="{ 'unstarred': !p.isPriorityLocked }" data-ng-disabled="!p.canBeEdited" data-ng-click="p.isPriorityLocked = !p.isPriorityLocked">
                             <input type="checkbox" data-ng-model="p.isPriorityLocked" data-autosave="api/itproject/{{p.id}}" data-field="isPriorityLocked">
                             <i class="glyphicon glyphicon-lock"></i>
                         </label>
                     </div>
 
-                    <select data-ng-model="p.priorityPf" data-autosave="api/itproject/{{p.id}}" data-field="priorityPf">
+                    <select data-ng-model="p.priorityPf" data-autosave="api/itproject/{{p.id}}" data-field="priorityPf" data-ng-disabled="!p.canBeEdited" data-ng-class="{'disabled-input': !p.canBeEdited}">
                         <option value="0">-- Vælg --</option>
                         <option value="3">Høj</option>
                         <option value="2">Mellem</option>
@@ -156,7 +156,7 @@
                 <span data-ng-if="chosenEco == 2">{{ p.bc }}</span>
             </td>
             <td>
-                <select data-ng-model="p.priority" data-autosave="api/itproject/{{p.id}}" data-field="priority" data-ng-disabled="p.isPriorityLocked" data-ng-if="chosenPriority == 0">
+                <select data-ng-model="p.priority" data-autosave="api/itproject/{{p.id}}" data-field="priority" data-ng-disabled="p.isPriorityLocked" data-ng-if=" chosenpriority= =0">
                     <option value="0">-- Vælg --</option>
                     <option value="3">Høj</option>
                     <option value="2">Mellem</option>
@@ -165,7 +165,7 @@
 
                 <div class="btn-group btn-group-sm" data-toggle="buttons" data-ng-if="chosenPriority == 1">
                     <label class="btn btn-star" data-ng-class="{ 'unstarred': p.isPriorityLocked }">
-                        <input type="checkbox" data-ng-model="p.isPriorityLocked" data-autosave="api/itproject/{{p.id}}" data-field="isPriorityLocked">
+                        <input type="checkbox" data-ng-model="p.isPriorityLocked" data-autosave="api/itproject/{{p.id}}" data-field="isPriorityLocked" data-ng-disabled="!p.canBeEdited">
                         <i class="glyphicon glyphicon-lock"></i>
                     </label>
                 </div>

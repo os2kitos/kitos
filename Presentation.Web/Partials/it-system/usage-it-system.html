@@ -5,6 +5,11 @@
         <div class="col-md-6">
             <div class="row">
                 <div class="col-md-12">
+                    
+                   
+                </div>
+                <!-- 1st column -->
+                <div class="col-md-6">
                     <!--AppTypeOption-->
                     <div class="form-group">
                         <label for="system-type" class="control-label small">Applikationstype</label>
@@ -12,9 +17,7 @@
                             <option value="">{{usage.itSystem.appTypeOptionName}}</option>
                         </select>
                     </div>
-                </div>
-                <!-- 1st column -->
-                <div class="col-md-6">
+
                     <!--Name-->
                     <div class="form-group">
                         <label for="system-name" class="control-label small">IT System</label>
@@ -26,15 +29,17 @@
                         <input type="text" id="system-parent" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystemParentName">
                     </div>
 
+
+                </div>
+
+                <!-- 2st column -->
+                <div class="col-md-6">
                     <!--Belongs to-->
                     <div class="form-group">
                         <label for="system-belongs-to" class="control-label small">Rettighedshaver</label>
                         <input type="text" id="system-belongs-to" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystem.belongsToName">
                     </div>
-                </div>
 
-                <!-- 2st column -->
-                <div class="col-md-6">
                     <!-- Object owner -->
                     <div class="form-group">
                         <label class="control-label small">Oprettet af</label>
@@ -45,15 +50,8 @@
                         <label for="system-access" class="control-label small">Public</label>
                         <input id="system-access" class="form-control input-sm" disabled data-select-access-modifier="" data-ng-model="usage.itSystem.accessModifier">
                     </div>
-
-                    <!--Application type -->
-                    <div class="form-group">
-                        <label for="system-app-type" class="control-label small">Applikationstype</label>
-                        <select id="system-app-type" class="form-control input-sm" disabled data-ui-select2="" data-ng-model="usage.itSystem.appTypeId">
-                            <option data-ng-repeat="appType in appTypes" value="{{appType.id}}">{{appType.name}}</option>
-                        </select>
-                    </div>
                 </div>
+                
 
                 <!-- full width -->
                 <div class="col-md-12">

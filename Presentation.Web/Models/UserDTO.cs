@@ -16,6 +16,7 @@ namespace Presentation.Web.Models
         public string DefaultOrganizationUnitName { get; set; }
         public int? DefaultOrganizationUnitOrganizationId { get; set; }
         public bool IsGlobalAdmin { get; set; }
+        public Guid? Uuid { get; set; }
         public List<AdminRightDTO> AdminRights { get; set; }
         public string ObjectOwnerName { get; set; }
         public string ObjectOwnerLastName { get; set; }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{2AC4CFA8-D99E-4DF2-9E2D-202E3A7BD29E}"
 EndProject
@@ -18,12 +18,22 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.DataAccess", "Infrastructure.DataAccess\Infrastructure.DataAccess.csproj", "{6CD15363-5401-43C5-9479-02FDDFA881DC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Presentation.Web", "Presentation.Web\Presentation.Web.csproj", "{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5AE358F5-4F11-47FE-94BE-1588F357DCDC} = {5AE358F5-4F11-47FE-94BE-1588F357DCDC}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{57E0F1AF-B1AD-4D8A-9D25-789E4ED417D5}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.OpenXML", "Infrastructure.OpenXML\Infrastructure.OpenXML.csproj", "{5AE358F5-4F11-47FE-94BE-1588F357DCDC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{ADCACC1D-F538-464C-9102-F4C1D6FA35D3} = {ADCACC1D-F538-464C-9102-F4C1D6FA35D3}
+		{A76A8E41-74F7-4443-A5F3-059B5414D83B} = {A76A8E41-74F7-4443-A5F3-059B5414D83B}
+		{F0986888-8F35-4559-8FBA-428BC9EC9ADD} = {F0986888-8F35-4559-8FBA-428BC9EC9ADD}
 	EndProjectSection
 EndProject
 Global
@@ -62,8 +72,14 @@ Global
 		{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}.Sandbox|Any CPU.ActiveCfg = Sandbox|Any CPU
-		{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}.Sandbox|Any CPU.Build.0 = Sandbox|Any CPU
+		{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}.Sandbox|Any CPU.ActiveCfg = Debug @ Test Mijlø|Any CPU
+		{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}.Sandbox|Any CPU.Build.0 = Debug @ Test Mijlø|Any CPU
+		{5AE358F5-4F11-47FE-94BE-1588F357DCDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AE358F5-4F11-47FE-94BE-1588F357DCDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AE358F5-4F11-47FE-94BE-1588F357DCDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AE358F5-4F11-47FE-94BE-1588F357DCDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AE358F5-4F11-47FE-94BE-1588F357DCDC}.Sandbox|Any CPU.ActiveCfg = Release|Any CPU
+		{5AE358F5-4F11-47FE-94BE-1588F357DCDC}.Sandbox|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,5 +90,6 @@ Global
 		{F0986888-8F35-4559-8FBA-428BC9EC9ADD} = {2AC4CFA8-D99E-4DF2-9E2D-202E3A7BD29E}
 		{6CD15363-5401-43C5-9479-02FDDFA881DC} = {500B4C1D-B871-49A0-94E7-BD0623101EF6}
 		{E75385A3-EA7C-4DFF-B989-BEE64BC506ED} = {D21A2EA9-3046-47BC-BE3D-88E1F3640F04}
+		{5AE358F5-4F11-47FE-94BE-1588F357DCDC} = {500B4C1D-B871-49A0-94E7-BD0623101EF6}
 	EndGlobalSection
 EndGlobal

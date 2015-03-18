@@ -406,7 +406,7 @@
 
                                 $modalScope.submitting = true;
 
-                                $http.delete("api/organizationUnit/" + unit.id + '&organizationId=' + user.currentOrganizationId).success(function () {
+                                $http.delete("api/organizationUnit/" + unit.id + '?organizationId=' + user.currentOrganizationId).success(function () {
                                     $modalInstance.close();
                                     notify.addSuccessMessage(unit.name + " er slettet!");
 

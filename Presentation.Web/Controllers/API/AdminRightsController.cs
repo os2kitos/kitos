@@ -116,5 +116,30 @@ namespace Presentation.Web.Controllers.API
                 return Error(e);
             }
         }
+
+        public HttpResponseMessage PostRightByOrganizationRight(bool? rightByOrganizationRight, int organizationId, int userId, AdminRight right)
+        {
+            try
+            {
+                // if user has any role within the organization (or global admin) they should be able to add new adminrights
+                if (!KitosUser.IsGlobalAdmin)
+                    if (!RightRepository.Get(r => r.UserId == userId && r.ObjectId == organizationId).Any())
+                        return Unauthorized();
+                
+                right.ObjectId = organizationId;
+                right.ObjectOwner = KitosUser;
+                right.LastChangedByUser = KitosUser;
+                right.LastChanged = DateTime.Now;
+
+                RightRepository.Insert(right);
+                RightRepository.Save();
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
     }
 }

@@ -12,8 +12,6 @@ namespace Presentation.Web.Controllers.API
 {
     public class ItSystemUsageRightsController : GenericRightsController<ItSystemUsage, ItSystemRight, ItSystemRole>
     {
-        private readonly IItSystemService _systemService;
-
         public ItSystemUsageRightsController(IGenericRepository<ItSystemRight> rightRepository, IGenericRepository<ItSystemUsage> objectRepository) : base(rightRepository, objectRepository)
         {}
 

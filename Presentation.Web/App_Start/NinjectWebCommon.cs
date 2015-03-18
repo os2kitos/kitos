@@ -2,6 +2,7 @@ using System.Web.Security;
 using Core.ApplicationServices;
 using Core.DomainServices;
 using Infrastructure.DataAccess;
+using Infrastructure.OpenXML;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Properties;
 
@@ -85,6 +86,8 @@ namespace Presentation.Web.App_Start
             kernel.Bind<IItProjectService>().To<ItProjectService>().InRequestScope();
             kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InRequestScope();
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
+            kernel.Bind<IMoxService>().To<MoxService>().InRequestScope();
+            kernel.Bind<IExcelHandler>().To<ExcelHandler>().InRequestScope();
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);

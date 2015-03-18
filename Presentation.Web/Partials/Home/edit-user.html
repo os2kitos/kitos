@@ -2,29 +2,14 @@
 
 <form name="profileForm" class="form-horizontal">
     <div>
+        <!-- Default organizationunit -->
         <div class="form-group">
-            <label for="default-unit" class="col-md-3 control-label">
-                Standard valgt enhed
-            </label>
+            <label class="col-md-3 control-label">Standard valgt enhed</label>
             <div class="col-md-8">
-                <select data-ng-if="!noOrgUnits" id="default-unit" data-ng-model="user.defaultOrganizationUnitId" data-ng-change="updateDefaultOrgUnit()"
-                        class="form-control" data-ng-options="orgUnit.id as orgUnit.qualifiedName for orgUnit in orgUnits"></select>
-
-                <div data-ng-if="!noOrgUnits && !user.isUsingDefaultOrgUnit" class="help-block text-primary">
-                    <i class="glyphicon glyphicon-exclamation-sign"></i>
-                    Bemærk: Du har ikke valgt en standard enhed i denne organisation.
-                    Så længe du er logget ind i {{user.currentOrganizationName}} anvendes derfor enheden {{user.currentOrganizationUnitName}} som standard enhed.
-                        
-                </div>
-                
-                <div data-ng-if="noOrgUnits" class="help-block text-primary">
-                    <select id="default-unit" data-ng-model="fakeDefaultOrganizationUnitId" data-ng-change="fakeUpdateDefaultOrgUnit()"
-                            class="form-control" data-ng-options="orgUnit.id as orgUnit.qualifiedName for orgUnit in orgUnits"></select>
-                </div>
-
-
+                <div data-ng-model="user.defaultOrganizationUnitId" data-ng-change="updateDefaultOrgUnit()" data-select-user-org-unit=""></div>
             </div>
         </div>
+        <!-- User name -->
         <div class="form-group">
             <label for="username" class="col-md-3 control-label">
                 Fornavn
@@ -33,6 +18,7 @@
                 <input type="text" id="username" data-ng-model="user.name" class="form-control" data-ng-blur="patch('name', user.name)"/>
             </div>
         </div>
+        <!-- User lastname -->
         <div class="form-group">
             <label for="lastname" class="col-md-3 control-label">
                 Efternavn
@@ -41,20 +27,22 @@
                 <input type="text" id="lastname" data-ng-model="user.lastName" class="form-control" data-ng-blur="patch('lastName', user.lastName)"/>
             </div>
         </div>
+        <!-- User phonenumber -->
         <div class="form-group">
             <label for="phone" class="col-md-3 control-label">
                 Telefon
             </label>
             <div class="col-md-8">
-                <input type="text" id="phone" data-ng-model="user.phoneNumber" class="form-control" data-ng-blur="patch('phoneNumber', user.phoneNumber)" />
+                <input type="text" id="phone" data-ng-model="user.phoneNumber" class="form-control" data-ng-blur="patch('phoneNumber', user.phoneNumber)"/>
             </div>
         </div>
+        <!-- User email -->
         <div class="form-group">
             <label for="usermail" class="col-md-3 control-label">
                 Email
             </label>
             <div class="col-md-8">
-                <input type="text" id="usermail" data-ng-model="user.email" class="form-control" data-ng-blur="patch('email', user.email)" />
+                <input type="text" id="usermail" data-ng-model="user.email" class="form-control" data-ng-blur="patch('email', user.email)"/>
             </div>
         </div>
     </div>
