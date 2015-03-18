@@ -36,7 +36,9 @@ namespace Infrastructure.DataAccess.Migrations
         {
             #region USERS
 
-            context.Users.AddOrUpdate(x => x.Email,
+            // don't overwrite global admin if it already exists
+            // cause it'll overwrite UUID
+            var globalAdmin = context.Users.SingleOrDefault(x => x.Email == "support@kitos.dk") ?? context.Users.Add(
                 new User
                 {
                     Name = "Global",
@@ -53,11 +55,9 @@ namespace Infrastructure.DataAccess.Migrations
             //var user3 = CreateUser("Test bruger3", "3@test", "test", cryptoService);
             //var user4 = CreateUser("Test bruger4", "4@test", "test", cryptoService);
             //var user5 = CreateUser("Test bruger5", "5@test", "test", cryptoService);
-            //context.Users.AddOrUpdate(x => x.Email, /*, user1, user2, user3, user4, user5*/);
-            
-            context.SaveChanges();
+            //context.Users.AddOrUpdate(x => x.Email, , user1, user2, user3, user4, user5);
 
-            var globalAdmin = context.Users.Single(x => x.Email == "support@kitos.dk");
+            context.SaveChanges();
 
             #endregion
 
