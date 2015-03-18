@@ -240,16 +240,7 @@ namespace Core.ApplicationServices
                         ObjectOwnerId = kitosUser.Id
                     });
                     _adminRightRepository.Save();
-
-                    
                 }
-            }
-
-            //at this point, if there's is any unresolvedRows, we should report some errors
-            foreach (var orgUnitRow in unresolvedRows)
-            {
-                //TODO: Implement user-errors
-               
             }
 
             return errors;
@@ -278,9 +269,7 @@ namespace Core.ApplicationServices
 
                 //if we got here, we're home frreeeee
                 scope.Complete();
-
             }
-
         }
 
 
