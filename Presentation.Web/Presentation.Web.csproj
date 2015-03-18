@@ -535,7 +535,10 @@
     <Content Include="Partials\it-system\tab-roles.html" />
     <Content Include="Partials\it-system\tab-wishes.html" />
     <Content Include="Partials\it-system\usage-it-system.html" />
+    <Content Include="Partials\local-config\import-organization.html" />
+    <Content Include="Partials\local-config\import-users.html" />
     <Content Include="Partials\local-config\tab-contract.html" />
+    <Content Include="Partials\local-config\tab-import.html" />
     <Content Include="Partials\local-config\tab-system.html" />
     <Content Include="Partials\local-config\tab-project.html" />
     <Content Include="Partials\local-config\tab-org.html" />
@@ -654,6 +657,9 @@
     <Content Include="Scripts\app\controllers\it-system\usage\it-system-usage.js" />
     <Content Include="Scripts\app\controllers\it-system\usage\it-system-wishes.js" />
     <Content Include="Scripts\app\controllers\it-system\usage\it-system-interfaces.js" />
+    <Content Include="Scripts\app\controllers\local-config\local-config-import-org.js" />
+    <Content Include="Scripts\app\controllers\local-config\local-config-import-users.js" />
+    <Content Include="Scripts\app\controllers\local-config\local-config-import.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-system.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-contract.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-project.js" />
