@@ -7,7 +7,7 @@ namespace Infrastructure.DataAccess.Migrations
     {
         public override void Up()
         {
-            AlterColumn("User", "Email", c => c.String(nullable: false, maxLength: 120, storeType: "nvarchar"));
+            AlterColumn("User", "Email", c => c.String(nullable: false, maxLength: 100, storeType: "nvarchar"));
             CreateIndex("User", "Email", unique: true);
         }
         
