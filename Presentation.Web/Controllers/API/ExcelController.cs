@@ -24,12 +24,12 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage Get(int organizationId)
         {
-            var dir = HttpContext.Current.Server.MapPath("~/Content/mox/");
-            var file = File.OpenRead(dir + "OS2KITOS MOX Skabelon Organisation.xlsx");
+            var dir = HttpContext.Current.Server.MapPath("~/Content/excel/");
+            var file = File.OpenRead(dir + "OS2KITOS Excel Skabelon Organisation.xlsx");
             var stream = new MemoryStream();
             
             file.CopyTo(stream);
-            const string filename = "OS2KITOS MOX Skabelon Organisation.xlsx";
+            const string filename = "OS2KITOS Excel Skabelon Organisation.xlsx";
             _excelService.Export(stream, organizationId, KitosUser);
             stream.Seek(0, SeekOrigin.Begin);
             var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StreamContent(stream) };
@@ -45,12 +45,12 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage Get(int organizationId, bool? exportUsers)
         {
-            var dir = HttpContext.Current.Server.MapPath("~/Content/mox/");
-            var file = File.OpenRead(dir + "OS2KITOS MOX Skabelon Brugere.xlsx");
+            var dir = HttpContext.Current.Server.MapPath("~/Content/excel/");
+            var file = File.OpenRead(dir + "OS2KITOS Excel Skabelon Brugere.xlsx");
             var stream = new MemoryStream();
             
             file.CopyTo(stream);
-            const string filename = "OS2KITOS MOX Skabelon Brugere.xlsx";
+            const string filename = "OS2KITOS Excel Skabelon Brugere.xlsx";
             _excelService.ExportUsers(stream, organizationId, KitosUser);
             stream.Seek(0, SeekOrigin.Begin);
             var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StreamContent(stream) };

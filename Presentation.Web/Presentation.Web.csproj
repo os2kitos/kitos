@@ -684,12 +684,14 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="Content\mox\OS2KITOS MOX Skabelon Organisation.xlsx" />
+    <Content Include="Content\excel\OS2KITOS Excel Skabelon Organisation.xlsx" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
+    <Content Include="Content\excel\OS2KITOS Excel Skabelon Brugere.xlsx" />
+    <Content Include="Content\excel\OS2KITOS Excel Skabelon Organisation.OLD.xlsx" />
     <None Include="Properties\PublishProfiles\Kitos - Prodmiljø.pubxml" />
     <None Include="Properties\PublishProfiles\Kitos - Testmiljø.pubxml" />
     <None Include="Properties\Settings.settings">
