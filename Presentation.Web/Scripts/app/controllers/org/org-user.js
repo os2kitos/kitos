@@ -108,11 +108,16 @@
                         if (showNotify)
                             deferred.notify('Ændrer...');
                         $http({ method: 'PATCH', url: "api/user/" + userToUpdate.id + "?organizationId=" + user.currentOrganizationId, data: userToUpdate, handleBusy: true })
-                            .success(function (result) {
+                            .success(function(result) {
                                 deferred.resolve(successmessage);
                             })
-                            .error(function (result) {
-                                deferred.reject("Fejl! " + userToUpdate.name + " kunne ikke ændres!");
+                            .error(function(result, status) {
+                                if (status === 409) {
+                                    deferred.reject("Fejl! Kan ikke ændre Email for " + userToUpdate.fullName + " da den allerede findes!");
+                                    reload();
+                                } else {
+                                    deferred.reject("Fejl! " + userToUpdate.fullName + " kunne ikke ændres!");
+                                }
                             });
                     }, 0);
 

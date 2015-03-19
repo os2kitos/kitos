@@ -5,7 +5,7 @@ using System.Web;
 
 namespace Presentation.Web.Models
 {
-    public class MoxImportErrorDTO
+    public class ExcelImportErrorDTO
     {
         public string SheetName { get; set; }
         public int Row { get; set; }

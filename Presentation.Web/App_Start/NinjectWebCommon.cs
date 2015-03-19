@@ -86,7 +86,7 @@ namespace Presentation.Web.App_Start
             kernel.Bind<IItProjectService>().To<ItProjectService>().InRequestScope();
             kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InRequestScope();
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
-            kernel.Bind<IMoxService>().To<MoxService>().InRequestScope();
+            kernel.Bind<IExcelService>().To<ExcelService>().InRequestScope();
             kernel.Bind<IExcelHandler>().To<ExcelHandler>().InRequestScope();
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs

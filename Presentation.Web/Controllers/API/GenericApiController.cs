@@ -227,7 +227,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return e.InnerException.InnerException.Message.Contains("Duplicate entry") ? Conflict(e.Message) : Error(e);
             }
         }
 
