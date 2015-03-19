@@ -200,9 +200,9 @@
     <Compile Include="Migrations\201502121301345_AddedDefaultOrgUnitToAdminRight.Designer.cs">
       <DependentUpon>201502121301345_AddedDefaultOrgUnitToAdminRight.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201503181333494_AddedUniqueUserEmail.cs" />
-    <Compile Include="Migrations\201503181333494_AddedUniqueUserEmail.Designer.cs">
-      <DependentUpon>201503181333494_AddedUniqueUserEmail.cs</DependentUpon>
+    <Compile Include="Migrations\201503190811353_AddedUniqueUserEmail.cs" />
+    <Compile Include="Migrations\201503190811353_AddedUniqueUserEmail.Designer.cs">
+      <DependentUpon>201503190811353_AddedUniqueUserEmail.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs" />
     <Compile Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.Designer.cs">
@@ -273,8 +273,8 @@
     <EmbeddedResource Include="Migrations\201502121301345_AddedDefaultOrgUnitToAdminRight.resx">
       <DependentUpon>201502121301345_AddedDefaultOrgUnitToAdminRight.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201503181333494_AddedUniqueUserEmail.resx">
-      <DependentUpon>201503181333494_AddedUniqueUserEmail.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201503190811353_AddedUniqueUserEmail.resx">
+      <DependentUpon>201503190811353_AddedUniqueUserEmail.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.resx">
       <DependentUpon>201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs</DependentUpon>
