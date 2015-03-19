@@ -5,14 +5,16 @@ using Core.DomainModel;
 
 namespace Core.ApplicationServices
 {
-    public interface IMoxService
+    public interface IExcelService
     {
         Stream Export(Stream stream, int organizationId, User kitosUser);
+        Stream ExportUsers(Stream stream, int organizationId, User kitosUser);
         void Import(Stream stream, int organizationId, User kitosUser);
+        void ImportUsers(Stream stream, int organizationId, User kitosUser);
     }
 
-    public class MoxImportException : Exception
+    public class ExcelImportException : Exception
     {
-        public List<MoxImportError> Errors { get; set; }
+        public List<ExcelImportError> Errors { get; set; }
     }
 }

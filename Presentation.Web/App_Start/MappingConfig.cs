@@ -379,7 +379,7 @@ namespace Presentation.Web
                   .ReverseMap();
 
             //Output only - this mapping should not be reversed
-            Mapper.CreateMap<MoxImportError, MoxImportErrorDTO>();
+            Mapper.CreateMap<ExcelImportError, ExcelImportErrorDTO>();
         }
     }
 }

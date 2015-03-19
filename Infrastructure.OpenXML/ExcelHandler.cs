@@ -16,7 +16,6 @@ namespace Infrastructure.OpenXML
 {
     public class ExcelHandler : IExcelHandler
     {
-
         public DataSet Import(Stream stream)
         {
             var dataSet = new DataSet();

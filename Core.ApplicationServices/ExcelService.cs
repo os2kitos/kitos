@@ -9,27 +9,42 @@ using Core.DomainServices;
 
 namespace Core.ApplicationServices
 {
-    public class MoxService : IMoxService
+    public class ExcelService : IExcelService
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<OrganizationRole> _orgRoleRepository;
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IGenericRepository<User> _userRepository;
+        private readonly IGenericRepository<AdminRight> _adminRightRepository;
         private readonly IExcelHandler _excelHandler;
 
-        public MoxService(IGenericRepository<OrganizationUnit> orgUnitRepository,
+        public ExcelService(IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<OrganizationRole> orgRoleRepository,
             IGenericRepository<TaskRef> taskRepository,
             IGenericRepository<User> userRepository,
+            IGenericRepository<AdminRight> adminRightRepository,
             IExcelHandler excelHandler)
         {
             _orgUnitRepository = orgUnitRepository;
             _orgRoleRepository = orgRoleRepository;
             _taskRepository = taskRepository;
             _userRepository = userRepository;
+            _adminRightRepository = adminRightRepository;
             _excelHandler = excelHandler;
         }
 
+        // Export Users
+        public Stream ExportUsers(Stream stream, int organizationId, User kitosUSer)
+        {
+            var users = _userRepository.Get(x => x.AdminRights.Count(r => r.ObjectId == organizationId) > 0);
+
+            var set = new DataSet();
+            set.Tables.Add(GetUserTable(users));
+
+            return _excelHandler.Export(set, stream);
+        }
+
+        /* Export Organizations */
         public Stream Export(Stream stream, int organizationId, User kitosUser)
         {
             var orgUnits = _orgUnitRepository.Get(x => x.OrganizationId == organizationId).ToList();
@@ -58,6 +73,178 @@ namespace Core.ApplicationServices
             return _excelHandler.Export(set, stream);
         }
 
+        public void ImportUsers(Stream stream, int organizationId, User kitosUser)
+        {
+            var scope = new TransactionScope(TransactionScopeOption.RequiresNew);
+            using (scope)
+            {
+                var errors = new List<ExcelImportError>();
+
+                var set = _excelHandler.Import(stream);
+
+                //importing org units
+                var userTable = set.Tables[5];
+                errors.AddRange(ImportUsersTransaction(userTable, organizationId, kitosUser));
+
+                //how to import something else
+                //var anotherTable = set.Tables[1];
+                //errors.AddRange(ImportFooBar(anotherTable, foo, bar)
+
+                //then finally, did we notice any errors?
+                if (errors.Any()) throw new ExcelImportException() { Errors = errors };
+
+                //if we got here, we're home frreeeee
+                scope.Complete();
+
+            }
+        }
+
+        private IEnumerable<ExcelImportError> ImportUsersTransaction(DataTable userTable, int organizationId,
+            User kitosUser)
+        {
+            var errors = new List<ExcelImportError>();
+
+            //resolvedRows are the orgUnits that already has been added to the DB.
+            //the key is the name of the orgUnit;
+            var resolvedRows = new Dictionary<string, UserRow>();
+
+            //unresolved rows are orgUnits which still needs to be added to the DB.
+            var unresolvedRows = new List<UserRow>();
+
+            //preliminary pass and error checking
+            //split the rows into the old org units (already in db)
+            //and the new rows that the users has added to the sheet
+            var rowIndex = 2;
+            foreach (var row in userTable.AsEnumerable())
+            {
+                //a row is new if the first column, the id, is empty
+                var id = StringToId(row.Field<string>(1));
+                var isNew = (id == null);
+
+                var userRow = new UserRow()
+                {
+                    RowIndex = rowIndex, //needed for error reporting
+                    IsNew = isNew,
+                    Id = id,
+                    Name = row.Field<string>(2),
+                    LastName = row.Field<string>(3),
+                    Email = row.Field<string>(4),
+                    Phone = row.Field<string>(5)
+                };
+
+                rowIndex++;
+
+                //error checking
+                //name cannot be empty
+                if (String.IsNullOrWhiteSpace(userRow.Name))
+                {
+                    var error = new ExcelImportError()                    
+                    {
+                        Row = userRow.RowIndex,
+                        Column = "C",
+                        Message = "Fornavn mangler",
+                        SheetName = "Brugere"
+                    };
+
+                    errors.Add(error);
+                }
+                else if (String.IsNullOrWhiteSpace(userRow.LastName))
+                {
+                    var error = new ExcelImportError()
+                    {
+                        Row = userRow.RowIndex,
+                        Column = "D",
+                        Message = "Efternavn(e) mangler",
+                        SheetName = "Brugere"
+                    };
+
+                    errors.Add(error);
+                }
+                //email cannot be empty
+                else if (String.IsNullOrWhiteSpace(userRow.Email))
+                {
+                    var error = new ExcelImportError()
+                    {
+                        Row = userRow.RowIndex,
+                        Column = "E",
+                        Message = "Email mangler",
+                        SheetName = "Brugere"
+                    };
+
+                    errors.Add(error);
+                }
+
+                //otherwise we're good - add the row to either resolved or unresolved
+                else if (isNew)
+                {
+                    unresolvedRows.Add(userRow);
+                }
+                else
+                {
+                    resolvedRows.Add(userRow.Name, userRow);
+                }
+
+            }
+
+            //do the actually passes, trying to resolve parents
+            var oneMorePass = true;
+            while (oneMorePass && unresolvedRows.Any())
+            {
+                oneMorePass = false;
+
+                var notResolvedInThisPass = new List<UserRow>();
+                var resolvedInThisPass = new List<UserRow>();
+
+                foreach (var userRow in unresolvedRows)
+                {
+                    var userEntity = new User()
+                    {
+                        Name = userRow.Name,
+                        LastName = userRow.LastName,
+                        Email = userRow.Email,
+                        PhoneNumber = userRow.Phone,
+                        ObjectOwnerId = kitosUser.Id,
+                        LastChangedByUserId = kitosUser.Id,
+                        LastChanged = DateTime.Now,
+                        IsGlobalAdmin = false,
+                        Password = "mangler at blive indsat",
+                        Salt = "mangler at blive indsat"
+                    };
+
+                    //If user dosnt exist create a new one.
+                    if (!_userRepository.Get(x => x.Email == userEntity.Email).Any())
+                    {
+                        _userRepository.Insert(userEntity);
+                        _userRepository.Save();
+                    }
+                    else
+                    {
+                        //Get user to ensure we're using the correct information
+                        userEntity = _userRepository.Get(x => x.Email == userEntity.Email).First();
+                    }
+
+                    resolvedInThisPass.Add(userRow);
+
+                    //If adminRight exists, no further action is needed
+                    if(_adminRightRepository.Get(x => x.User.Email == userEntity.Email).Any())
+                        continue;
+
+                    //Create the adminright within the organization
+                    _adminRightRepository.Insert(new AdminRight()
+                    {
+                        ObjectId = organizationId,
+                        UserId = userEntity.Id,
+                        RoleId = 2,
+                        LastChangedByUserId = kitosUser.Id,
+                        LastChanged = DateTime.Now,
+                        ObjectOwnerId = kitosUser.Id
+                    });
+                    _adminRightRepository.Save();
+                }
+            }
+
+            return errors;
+        }
         
         /* imports organization units into an organization */
         public void Import(Stream stream, int organizationId, User kitosUser)
@@ -65,7 +252,7 @@ namespace Core.ApplicationServices
             var scope = new TransactionScope(TransactionScopeOption.RequiresNew);
             using (scope)
             {
-                var errors = new List<MoxImportError>();
+                var errors = new List<ExcelImportError>();
 
                 var set = _excelHandler.Import(stream);
 
@@ -78,13 +265,11 @@ namespace Core.ApplicationServices
                 //errors.AddRange(ImportFooBar(anotherTable, foo, bar)
 
                 //then finally, did we notice any errors?
-                if (errors.Any()) throw new MoxImportException() {Errors = errors};
+                if (errors.Any()) throw new ExcelImportException() {Errors = errors};
 
                 //if we got here, we're home frreeeee
                 scope.Complete();
-
             }
-
         }
 
 
@@ -108,9 +293,9 @@ namespace Core.ApplicationServices
             return Convert.ToInt32(Convert.ToDouble(s));
         }
 
-        private IEnumerable<MoxImportError> ImportOrgUnits(DataTable orgTable, int organizationId, User kitosUser)
+        private IEnumerable<ExcelImportError> ImportOrgUnits(DataTable orgTable, int organizationId, User kitosUser)
         {
-            var errors = new List<MoxImportError>();
+            var errors = new List<ExcelImportError>();
 
             //resolvedRows are the orgUnits that already has been added to the DB.
             //the key is the name of the orgUnit;
@@ -145,17 +330,17 @@ namespace Core.ApplicationServices
                 //name cannot be empty
                 if (String.IsNullOrWhiteSpace(orgUnitRow.Name))
                 {
-                    errors.Add(new MoxImportOrgUnitNoNameError(orgUnitRow.RowIndex));
+                    errors.Add(new ExcelImportOrgUnitNoNameError(orgUnitRow.RowIndex));
                 }
                 //name cannot be duplicate
                 else if (unresolvedRows.Any(x => x.Name == orgUnitRow.Name) || resolvedRows.ContainsKey(orgUnitRow.Name))
                 {
-                    errors.Add(new MoxImportOrgUnitDuplicateError(orgUnitRow.RowIndex));
+                    errors.Add(new ExcelImportOrgUnitDuplicateError(orgUnitRow.RowIndex));
                 }
                 //parent cannot be empty on a new row
                 else if (orgUnitRow.IsNew && String.IsNullOrWhiteSpace(orgUnitRow.Parent))
                 {
-                    errors.Add(new MoxImportOrgUnitBadParentError(orgUnitRow.RowIndex));
+                    errors.Add(new ExcelImportOrgUnitBadParentError(orgUnitRow.RowIndex));
                 } 
 
                 //otherwise we're good - add the row to either resolved or unresolved
@@ -227,16 +412,16 @@ namespace Core.ApplicationServices
             //at this point, if there's is any unresolvedRows, we should report some errors
             foreach (var orgUnitRow in unresolvedRows)
             {
-                errors.Add(new MoxImportOrgUnitBadParentError(orgUnitRow.RowIndex));
+                errors.Add(new ExcelImportOrgUnitBadParentError(orgUnitRow.RowIndex));
             }
             
             return errors;
         }
 
 
-        public class MoxImportOrgUnitBadParentError : MoxImportError
+        public class ExcelImportOrgUnitBadParentError : ExcelImportError
         {
-            public MoxImportOrgUnitBadParentError(int row)
+            public ExcelImportOrgUnitBadParentError(int row)
             {
                 Row = row;
                 Column = "D";
@@ -245,9 +430,9 @@ namespace Core.ApplicationServices
             }
         }
 
-        public class MoxImportOrgUnitNoNameError : MoxImportError
+        public class ExcelImportOrgUnitNoNameError : ExcelImportError
         {
-            public MoxImportOrgUnitNoNameError(int row)
+            public ExcelImportOrgUnitNoNameError(int row)
             {
                 Row = row;
                 Column = "B";
@@ -256,15 +441,26 @@ namespace Core.ApplicationServices
             }
         }
 
-        public class MoxImportOrgUnitDuplicateError : MoxImportError
+        public class ExcelImportOrgUnitDuplicateError : ExcelImportError
         {
-            public MoxImportOrgUnitDuplicateError(int row)
+            public ExcelImportOrgUnitDuplicateError(int row)
             {
                 Row = row;
                 Column = "B";
                 SheetName = "Organisation";
                 Message = "Der findes allerede en enhed med dette navn.";
             }
+        }
+
+        private class UserRow
+        {
+            public int RowIndex { get; set; }
+            public bool IsNew { get; set; }
+            public int? Id { get; set; }
+            public string Name { get; set; }
+            public string LastName { get; set; }
+            public string Phone { get; set; }
+            public string Email { get; set; }
         }
             
         private class OrgUnitRow
@@ -379,7 +575,7 @@ namespace Core.ApplicationServices
                 if (user.DefaultOrganizationUnit != null)
                     defaultOrgUnitName = user.DefaultOrganizationUnit.Name;
 
-                table.Rows.Add(lookupString, user.Id, user.Name, user.Email, user.DefaultOrganizationUnitId, defaultOrgUnitName);
+                table.Rows.Add(lookupString, user.Id, user.Name, user.LastName, user.Email, user.PhoneNumber);
             }
 
             return table;
