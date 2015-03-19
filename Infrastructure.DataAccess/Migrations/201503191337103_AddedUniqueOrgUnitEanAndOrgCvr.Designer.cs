@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201503181330400_AddedUniqueOrgUnitEanAndOrgCvr"; }
+            get { return "201503191337103_AddedUniqueOrgUnitEanAndOrgCvr"; }
         }
         
         string IMigrationMetadata.Source

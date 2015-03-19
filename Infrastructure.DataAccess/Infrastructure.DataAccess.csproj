@@ -204,6 +204,10 @@
     <Compile Include="Migrations\201503181333494_AddedUniqueUserEmail.Designer.cs">
       <DependentUpon>201503181333494_AddedUniqueUserEmail.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs" />
+    <Compile Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.Designer.cs">
+      <DependentUpon>201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\BackupConfiguration.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -271,6 +275,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201503181333494_AddedUniqueUserEmail.resx">
       <DependentUpon>201503181333494_AddedUniqueUserEmail.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.resx">
+      <DependentUpon>201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
