@@ -118,7 +118,7 @@ namespace Core.ApplicationServices
             foreach (var row in userTable.AsEnumerable())
             {
                 //a row is new if the first column, the id, is empty
-                var id = StringToId(row.Field<string>(1));
+                var id = StringToId(row.Field<string>(0));
                 var isNew = (id == null);
 
                 var userRow = new UserRow()
@@ -126,10 +126,10 @@ namespace Core.ApplicationServices
                     RowIndex = rowIndex, //needed for error reporting
                     IsNew = isNew,
                     Id = id,
-                    Name = row.Field<string>(2),
-                    LastName = row.Field<string>(3),
-                    Email = row.Field<string>(4),
-                    Phone = row.Field<string>(5)
+                    Name = row.Field<string>(1),
+                    LastName = row.Field<string>(2),
+                    Email = row.Field<string>(3),
+                    Phone = row.Field<string>(4)
                 };
 
                 rowIndex++;
@@ -141,7 +141,7 @@ namespace Core.ApplicationServices
                     var error = new ExcelImportError()                    
                     {
                         Row = userRow.RowIndex,
-                        Column = "C",
+                        Column = "B",
                         Message = "Fornavn mangler",
                         SheetName = "Brugere"
                     };
@@ -153,7 +153,7 @@ namespace Core.ApplicationServices
                     var error = new ExcelImportError()
                     {
                         Row = userRow.RowIndex,
-                        Column = "D",
+                        Column = "C",
                         Message = "Efternavn(e) mangler",
                         SheetName = "Brugere"
                     };
@@ -166,7 +166,7 @@ namespace Core.ApplicationServices
                     var error = new ExcelImportError()
                     {
                         Row = userRow.RowIndex,
-                        Column = "E",
+                        Column = "D",
                         Message = "Email mangler",
                         SheetName = "Brugere"
                     };
@@ -226,7 +226,7 @@ namespace Core.ApplicationServices
                     resolvedInThisPass.Add(userRow);
 
                     //If adminRight exists, no further action is needed
-                    if(_adminRightRepository.Get(x => x.User.Email == userEntity.Email).Any())
+                    if(_adminRightRepository.Get(x => x.User.Email == userEntity.Email && x.ObjectId == organizationId).Any())
                         continue;
 
                     //Create the adminright within the organization
@@ -566,16 +566,14 @@ namespace Core.ApplicationServices
             table.Columns.Add();
             table.Columns.Add();
             table.Columns.Add();
-            table.Columns.Add();
 
             foreach (var user in users)
             {
-                var lookupString = user.Name + " " + user.Email;
                 var defaultOrgUnitName = "";
                 if (user.DefaultOrganizationUnit != null)
                     defaultOrgUnitName = user.DefaultOrganizationUnit.Name;
 
-                table.Rows.Add(lookupString, user.Id, user.Name, user.LastName, user.Email, user.PhoneNumber);
+                table.Rows.Add( user.Id, user.Name, user.LastName, user.Email, user.PhoneNumber);
             }
 
             return table;

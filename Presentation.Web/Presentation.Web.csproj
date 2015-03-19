@@ -690,8 +690,8 @@
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
-    <Content Include="Content\excel\OS2KITOS Excel Skabelon Brugere.xlsx" />
     <Content Include="Content\excel\OS2KITOS Excel Skabelon Organisation.OLD.xlsx" />
+    <Content Include="Content\excel\OS2KITOS Excel Skabelon Brugere.xlsx" />
     <None Include="Properties\PublishProfiles\Kitos - Prodmiljø.pubxml" />
     <None Include="Properties\PublishProfiles\Kitos - Testmiljø.pubxml" />
     <None Include="Properties\Settings.settings">
