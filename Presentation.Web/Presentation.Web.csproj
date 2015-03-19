@@ -535,16 +535,16 @@
     <Content Include="Partials\it-system\tab-roles.html" />
     <Content Include="Partials\it-system\tab-wishes.html" />
     <Content Include="Partials\it-system\usage-it-system.html" />
-    <Content Include="Partials\local-config\import-organization.html" />
-    <Content Include="Partials\local-config\import-users.html" />
     <Content Include="Partials\local-config\tab-contract.html" />
-    <Content Include="Partials\local-config\tab-import.html" />
     <Content Include="Partials\local-config\tab-system.html" />
     <Content Include="Partials\local-config\tab-project.html" />
     <Content Include="Partials\local-config\tab-org.html" />
     <Content Include="Partials\local-config\suggest-new-role.html" />
     <Content Include="Partials\local-config\optionlist.html" />
     <Content Include="Partials\local-config\suggest-new.html" />
+    <Content Include="Partials\mox\mox-order.html" />
+    <Content Include="Partials\mox\mox-test.html" />
+    <Content Include="Partials\mox\mox-overview.html" />
     <Content Include="Partials\org\add-task-modal.html" />
     <Content Include="Partials\org\edit-org-unit-modal.html" />
     <Content Include="Partials\org\overview.html" />
@@ -654,9 +654,6 @@
     <Content Include="Scripts\app\controllers\it-system\usage\it-system-usage.js" />
     <Content Include="Scripts\app\controllers\it-system\usage\it-system-wishes.js" />
     <Content Include="Scripts\app\controllers\it-system\usage\it-system-interfaces.js" />
-    <Content Include="Scripts\app\controllers\local-config\local-config-import-org.js" />
-    <Content Include="Scripts\app\controllers\local-config\local-config-import-users.js" />
-    <Content Include="Scripts\app\controllers\local-config\local-config-import.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-system.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-contract.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-project.js" />
@@ -1563,7 +1560,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Content\themes\base\minified\images\" />
-    <Folder Include="Partials\mox\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">
