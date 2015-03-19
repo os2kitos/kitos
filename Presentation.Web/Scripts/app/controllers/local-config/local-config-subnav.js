@@ -2,7 +2,7 @@
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('local-config', {
             url: '/local-config',
-            abstract: false,
+            abstract: true,
             template: '<ui-view autoscroll="false" />',
             resolve: {
                 config: ['$http', 'userService', function ($http, userService) {
