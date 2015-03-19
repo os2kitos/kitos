@@ -44,8 +44,8 @@ namespace Core.ApplicationServices
             return _excelHandler.Export(set, stream);
         }
 
-        /* Export Organizations */
-        public Stream Export(Stream stream, int organizationId, User kitosUser)
+        /* Export OrganizationUnits */
+        public Stream ExportOrganizationUnits(Stream stream, int organizationId, User kitosUser)
         {
             var orgUnits = _orgUnitRepository.Get(x => x.OrganizationId == organizationId).ToList();
             //dynamic orgRoles = null;
@@ -247,7 +247,7 @@ namespace Core.ApplicationServices
         }
         
         /* imports organization units into an organization */
-        public void Import(Stream stream, int organizationId, User kitosUser)
+        public void ImportOrganizationUnits(Stream stream, int organizationId, User kitosUser)
         {
             var scope = new TransactionScope(TransactionScopeOption.RequiresNew);
             using (scope)
@@ -335,7 +335,11 @@ namespace Core.ApplicationServices
                 //name cannot be duplicate
                 else if (unresolvedRows.Any(x => x.Name == orgUnitRow.Name) || resolvedRows.ContainsKey(orgUnitRow.Name))
                 {
-                    errors.Add(new ExcelImportOrgUnitDuplicateError(orgUnitRow.RowIndex));
+                    errors.Add(new ExcelImportOrgUnitDuplicateNameError(orgUnitRow.RowIndex));
+                }
+                else if (orgUnitRow.IsNew && orgUnitRow.Ean != null && _orgUnitRepository.AsQueryable().Any(x => x.Ean == orgUnitRow.Ean))
+                {
+                    errors.Add(new ExcelImportOrgUnitDuplicateEanError(orgUnitRow.RowIndex));
                 }
                 //parent cannot be empty on a new row
                 else if (orgUnitRow.IsNew && String.IsNullOrWhiteSpace(orgUnitRow.Parent))
@@ -441,14 +445,25 @@ namespace Core.ApplicationServices
             }
         }
 
-        public class ExcelImportOrgUnitDuplicateError : ExcelImportError
+        public class ExcelImportOrgUnitDuplicateNameError : ExcelImportError
         {
-            public ExcelImportOrgUnitDuplicateError(int row)
+            public ExcelImportOrgUnitDuplicateNameError(int row)
             {
                 Row = row;
                 Column = "B";
                 SheetName = "Organisation";
                 Message = "Der findes allerede en enhed med dette navn.";
+            }
+        }
+
+        public class ExcelImportOrgUnitDuplicateEanError : ExcelImportError
+        {
+            public ExcelImportOrgUnitDuplicateEanError(int row)
+            {
+                Row = row;
+                Column = "C";
+                SheetName = "Organisation";
+                Message = "Der findes allerede en enhed i KITOS med dette EAN nummer.";
             }
         }
 

@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -30,7 +28,7 @@ namespace Presentation.Web.Controllers.API
             
             file.CopyTo(stream);
             const string filename = "OS2KITOS Excel Skabelon Organisation.xlsx";
-            _excelService.Export(stream, organizationId, KitosUser);
+            _excelService.ExportOrganizationUnits(stream, organizationId, KitosUser);
             stream.Seek(0, SeekOrigin.Begin);
             var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StreamContent(stream) };
             var mimeType = MimeMapping.GetMimeMapping(filename);
@@ -84,7 +82,7 @@ namespace Presentation.Web.Controllers.API
                 var buffer = await file.ReadAsByteArrayAsync();
                 var stream = new MemoryStream(buffer);
                 stream.Seek(0, SeekOrigin.Begin);
-                _excelService.Import(stream, organizationId, KitosUser);
+                _excelService.ImportOrganizationUnits(stream, organizationId, KitosUser);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (ExcelImportException e)
