@@ -13,13 +13,13 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class MoxController : BaseApiController
+    public class ExcelController : BaseApiController
     {
-        private readonly IMoxService _moxService;
+        private readonly IExcelService _excelService;
 
-        public MoxController(IMoxService moxService)
+        public ExcelController(IExcelService excelService)
         {
-            _moxService = moxService;
+            _excelService = excelService;
         }
 
         public HttpResponseMessage Get(int organizationId)
@@ -30,7 +30,7 @@ namespace Presentation.Web.Controllers.API
             
             file.CopyTo(stream);
             const string filename = "OS2KITOS MOX Skabelon Organisation.xlsx";
-            _moxService.Export(stream, organizationId, KitosUser);
+            _excelService.Export(stream, organizationId, KitosUser);
             stream.Seek(0, SeekOrigin.Begin);
             var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StreamContent(stream) };
             var mimeType = MimeMapping.GetMimeMapping(filename);
@@ -51,7 +51,7 @@ namespace Presentation.Web.Controllers.API
             
             file.CopyTo(stream);
             const string filename = "OS2KITOS MOX Skabelon Brugere.xlsx";
-            _moxService.ExportUsers(stream, organizationId, KitosUser);
+            _excelService.ExportUsers(stream, organizationId, KitosUser);
             stream.Seek(0, SeekOrigin.Begin);
             var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StreamContent(stream) };
             var mimeType = MimeMapping.GetMimeMapping(filename);
@@ -84,13 +84,13 @@ namespace Presentation.Web.Controllers.API
                 var buffer = await file.ReadAsByteArrayAsync();
                 var stream = new MemoryStream(buffer);
                 stream.Seek(0, SeekOrigin.Begin);
-                _moxService.Import(stream, organizationId, KitosUser);
+                _excelService.Import(stream, organizationId, KitosUser);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
-            catch (MoxImportException e)
+            catch (ExcelImportException e)
             {
                 var errorsDto =
-                    AutoMapper.Mapper.Map<IEnumerable<MoxImportError>, IEnumerable<MoxImportErrorDTO>>(e.Errors);
+                    AutoMapper.Mapper.Map<IEnumerable<ExcelImportError>, IEnumerable<ExcelImportErrorDTO>>(e.Errors);
                 return Request.CreateResponse(HttpStatusCode.Conflict, errorsDto);
             }
             catch (System.Exception e)
@@ -119,13 +119,13 @@ namespace Presentation.Web.Controllers.API
                 var buffer = await file.ReadAsByteArrayAsync();
                 var stream = new MemoryStream(buffer);
                 stream.Seek(0, SeekOrigin.Begin);
-                _moxService.ImportUsers(stream, organizationId, KitosUser);
+                _excelService.ImportUsers(stream, organizationId, KitosUser);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
-            catch (MoxImportException e)
+            catch (ExcelImportException e)
             {
                 var errorsDto =
-                    AutoMapper.Mapper.Map<IEnumerable<MoxImportError>, IEnumerable<MoxImportErrorDTO>>(e.Errors);
+                    AutoMapper.Mapper.Map<IEnumerable<ExcelImportError>, IEnumerable<ExcelImportErrorDTO>>(e.Errors);
                 return Request.CreateResponse(HttpStatusCode.Conflict, errorsDto);
             }
             catch (System.Exception e)

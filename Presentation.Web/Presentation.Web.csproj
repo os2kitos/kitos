@@ -230,7 +230,7 @@
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\NinjectWebCommon.cs" />
-    <Compile Include="Controllers\API\MoxController.cs" />
+    <Compile Include="Controllers\API\ExcelController.cs" />
     <Compile Include="Controllers\API\ItSystemTypeOptionController.cs" />
     <Compile Include="Controllers\API\ItInterfaceExhibitUsageController.cs" />
     <Compile Include="Controllers\API\ItContractItSystemUsageController.cs" />
@@ -261,7 +261,7 @@
     <Compile Include="Models\ItProjectOverviewDTO.cs" />
     <Compile Include="Models\ItProjectPhaseDTO.cs" />
     <Compile Include="Models\ItProjectStatusDTO.cs" />
-    <Compile Include="Models\MoxImportErrorDTO.cs" />
+    <Compile Include="Models\ExcelImportErrorDTO.cs" />
     <Compile Include="Models\PagingModel.cs" />
     <Compile Include="Controllers\API\PriceRegulationController.cs" />
     <Compile Include="Controllers\API\PaymentModelController.cs" />
@@ -662,10 +662,6 @@
     <Content Include="Scripts\app\controllers\local-config\local-config-project.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-org.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-subnav.js" />
-    <Content Include="Scripts\app\controllers\mox\mox-order.js" />
-    <Content Include="Scripts\app\controllers\mox\mox-test.js" />
-    <Content Include="Scripts\app\controllers\mox\mox-overview.js" />
-    <Content Include="Scripts\app\controllers\mox\mox-subnav.js" />
     <Content Include="Scripts\app\controllers\org\org-structure.js" />
     <Content Include="Scripts\app\controllers\org\org-subnav.js" />
     <Content Include="Scripts\app\controllers\org\org-overview.js" />

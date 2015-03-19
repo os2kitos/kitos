@@ -19,10 +19,10 @@
     app.controller('local-config.import.ImportOrgCtrl', [
         '$rootScope', '$scope', '$http', 'notify', 'config', 'user',
         function ($rootScope, $scope, $http, notify, config, user) {
-            $scope.orgUrl = 'api/mox?organizationId=' + user.currentOrganizationId;
+            $scope.orgUrl = 'api/excel?organizationId=' + user.currentOrganizationId;
             $scope.orgData = {};
 
-            $scope.usersUrl = 'api/mox?organizationId=' + user.currentOrganizationId + '&exportUsers';
+            $scope.usersUrl = 'api/excel?organizationId=' + user.currentOrganizationId + '&exportUsers';
             $scope.userData = {};
 
             $scope.test = function () {
@@ -40,7 +40,7 @@
                 if ($scope.file) {
                     formData.append('file', $scope.file, $scope.file.name);
                 }
-                $http.post('/api/mox?organizationId=' + user.currentOrganizationId, formData, {
+                $http.post('/api/excel?organizationId=' + user.currentOrganizationId, formData, {
                     // angular.identity, a bit of Angular magic to parse our FormData object
                     transformRequest: angular.identity,
                     // IMPORTANT!!! You might think this should be set to 'multipart/form-data' 
@@ -58,7 +58,7 @@
                     msg.toErrorMessage("Fejl! Der er en fejl i excel arket.");
 
                     if (status == 409) {
-                        $scope.orgData.showMoxErrors = true;
+                        $scope.orgData.showExcelErrors = true;
                         $scope.orgData.errors = data;
                     } else {
                         $scope.orgData.showGenericError = true;

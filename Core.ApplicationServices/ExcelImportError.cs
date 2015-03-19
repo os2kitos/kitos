@@ -1,6 +1,6 @@
 namespace Core.ApplicationServices
 {
-    public class MoxImportError
+    public class ExcelImportError
     {
         public string SheetName { get; set; }
         public int Row { get; set; }

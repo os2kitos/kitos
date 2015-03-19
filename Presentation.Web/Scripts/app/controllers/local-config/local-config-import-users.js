@@ -20,7 +20,7 @@
         '$rootScope', '$scope', '$http', 'notify', 'config', 'user',
         function ($rootScope, $scope, $http, notify, config, user) {
 
-            $scope.usersUrl = 'api/mox?organizationId=' + user.currentOrganizationId + '&exportUsers';
+            $scope.usersUrl = 'api/excel?organizationId=' + user.currentOrganizationId + '&exportUsers';
             $scope.userData = {};
 
             $scope.submitUsers = function () {
@@ -34,7 +34,7 @@
                     formData.append('userFile', $scope.userFile, $scope.userFile.name);
                 }
 
-                $http.post('/api/mox?organizationId=' + user.currentOrganizationId + '&importUsers', formData, {
+                $http.post('/api/excel?organizationId=' + user.currentOrganizationId + '&importUsers', formData, {
                     // angular.identity, a bit of Angular magic to parse our FormData object
                     transformRequest: angular.identity,
                     // read why it's undefined at $scope.submitOrg
@@ -46,7 +46,7 @@
                     msg.toErrorMessage("Fejl! Der er en fejl i excel arket.");
 
                     if (status == 409) {
-                        $scope.userData.showMoxErrors = true;
+                        $scope.userData.showExcelErrors = true;
                         $scope.userData.errors = data;
                     } else {
                         $scope.userData.showGenericError = true;
