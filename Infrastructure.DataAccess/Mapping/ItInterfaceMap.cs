@@ -14,10 +14,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(x => x.Name)
                 .HasMaxLength(100) // http://stackoverflow.com/questions/1827063/mysql-error-key-specification-without-a-key-length
                 .IsRequired()
-                .HasUniqueIndexAnnotation("IX_NamePerOrg", 1);
+                .HasUniqueIndexAnnotation("IX_NamePerOrg", 2);
             this.Property(x => x.ItInterfaceId)
                 .HasMaxLength(100)
-                .HasUniqueIndexAnnotation("IX_NamePerOrg", 2);
+                .HasUniqueIndexAnnotation("IX_NamePerOrg", 1);
             
             // Table & Column Mappings
             this.ToTable("ItInterface");

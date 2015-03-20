@@ -208,6 +208,10 @@
     <Compile Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.Designer.cs">
       <DependentUpon>201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201503200853551_AddedUniqueItInterfaceIdToNamePerOrg.cs" />
+    <Compile Include="Migrations\201503200853551_AddedUniqueItInterfaceIdToNamePerOrg.Designer.cs">
+      <DependentUpon>201503200853551_AddedUniqueItInterfaceIdToNamePerOrg.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\BackupConfiguration.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -278,6 +282,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.resx">
       <DependentUpon>201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503200853551_AddedUniqueItInterfaceIdToNamePerOrg.resx">
+      <DependentUpon>201503200853551_AddedUniqueItInterfaceIdToNamePerOrg.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
