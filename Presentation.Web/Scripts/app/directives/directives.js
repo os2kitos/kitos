@@ -524,8 +524,12 @@
                                 msg.toSuccessMessage("Feltet er opdateret.");
                                 oldValue = ctrl.$modelValue;
                             })
-                            .error(function() {
-                                msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                            .error(function(result, status) {
+                                if (status === 409) {
+                                    msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
+                                } else {
+                                    msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                                }
                             });
                     }
 
