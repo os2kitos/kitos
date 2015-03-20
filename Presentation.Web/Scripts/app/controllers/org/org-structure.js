@@ -348,13 +348,17 @@
 
                                 var id = unit.id;
 
-                                $http({ method: 'PATCH', url: "api/organizationUnit/" + id + '?organizationId=' + user.currentOrganizationId, data: data }).success(function (result) {
+                                $http({ method: 'PATCH', url: "api/organizationUnit/" + id + '?organizationId=' + user.currentOrganizationId, data: data }).success(function(result) {
                                     notify.addSuccessMessage(name + " er ændret.");
 
                                     $modalInstance.close(result.response);
-                                }).error(function(result) {
+                                }).error(function(result, status) {
                                     $modalScope.submitting = false;
-                                    notify.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
+                                    if (status === 409) {
+                                        notify.addErrorMessage("Fejl! " + name + " kunne ikke ændres da EAN værdien allerede findes i KITOS!");
+                                    } else {
+                                        notify.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
+                                    }
                                 });
 
                             };
@@ -383,9 +387,13 @@
                                     notify.addSuccessMessage(name + " er gemt.");
 
                                     $modalInstance.close(result.response);
-                                }).error(function(result) {
+                                }).error(function (result, status) {
                                     $modalScope.submitting = false;
-                                    notify.addErrorMessage("Fejl! " + name + " kunne ikke gemmes!");
+                                    if (status === 409) {
+                                        notify.addErrorMessage("Fejl! " + name + " kunne ikke ændres da EAN værdien allerede findes i KITOS!");
+                                    } else {
+                                        notify.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
+                                    }
                                 });
                             };
 

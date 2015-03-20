@@ -107,6 +107,12 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
+                // check if inner message is a duplicate, if so return conflict
+                if (e.InnerException != null)
+                    if (e.InnerException.InnerException != null)
+                        if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
+                            return Conflict(e.InnerException.InnerException.Message);
+
                 return Error(e);
             }
         }
@@ -227,7 +233,13 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return e.InnerException.InnerException.Message.Contains("Duplicate entry") ? Conflict(e.Message) : Error(e);
+                // check if inner message is a duplicate, if so return conflict
+                if (e.InnerException != null)
+                    if (e.InnerException.InnerException != null)
+                        if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
+                            return Conflict(e.InnerException.InnerException.Message);
+                        
+                return Error(e);
             }
         }
 
