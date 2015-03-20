@@ -264,6 +264,24 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        public HttpResponseMessage GetItInterfaceNameUniqueConstraint (string checkitinterfaceid, string checkname, int orgId)
+        {
+            try
+            {
+                return IsItInterfaceIdAndNameUnique(checkitinterfaceid, checkname, orgId) ? Ok() : Conflict("Name and ItInterfaceId is already taken by a single interface!");
+            }
+            catch (Exception e)
+            {
+                return Error(e);
+            }
+        }
+
+        private bool IsItInterfaceIdAndNameUnique(string itInterfaceId, string name, int orgId)
+        {
+            var system = Repository.Get(x => x.ItInterfaceId == itInterfaceId && x.Name == name && x.OrganizationId == orgId);
+            return !system.Any();
+        }
+
         private bool IsAvailable(string name, int orgId)
         {
             var system = Repository.Get(x => x.Name == name && x.OrganizationId == orgId);

@@ -559,6 +559,7 @@
     <Content Include="Partials\org\user\org-edituser-modal.html" />
     <Content Include="Partials\org\user\org-user.html" />
     <Content Include="Partials\shared\org-tree-item.html" />
+    <Content Include="Partials\subnav\create-itinterface-modal.html" />
     <Content Include="Partials\subnav\create-modal.html" />
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />

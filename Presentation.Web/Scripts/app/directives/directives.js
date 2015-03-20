@@ -73,8 +73,30 @@
                     }
                 };
             }
-    ]
+        ]
     );
+
+    app.directive('uniqueItInterfaceIdName', ['$http', 'userService',
+        function ($http, userService) {
+            return {
+                require: 'ngModel',
+                link: function (scope, element, attrs, ngModel) {
+                    var user;
+                    userService.getUser().then(function (result) {
+                        user = result;
+                    });
+
+
+                    ngModel.$asyncValidators.uniqueConstraint = function (value) {
+                        var name = scope.createForm.name.$viewValue;
+                        var itInterfaceId = scope.createForm.itInterfaceId.$viewValue;
+
+                        return $http.get('/api/itinterface?checkitinterfaceid=' + itInterfaceId + '&checkname=' + name + '&orgId=' + user.currentOrganizationId);
+                    }
+                }
+            }
+        }
+    ]);
 
     app.directive('uniqueOrgUser', [
             '$http', 'userService', function ($http, userService) {

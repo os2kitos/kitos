@@ -1,0 +1,24 @@
+﻿<div class="modal-header">
+    <h3 class="modal-title">Opret {{type}}</h3>
+</div>
+<form name="createForm" role="form" data-ng-submit="submit()" novalidate >
+    <div class="modal-body">
+        <div class="form-group has-feedback" data-show-errors>
+            <label class="control-label" for="name">Navn</label>
+            <input type="text" class="form-control" name="name" id="name" placeholder="navn" required data-ng-model="formData.name" data-unique-it-interface-id-name="{{checkAvailbleUrl}}">
+            <label class="control-label" for="itInterfaceId">Snitflade Id</label>
+            <input type="text" class="form-control" name="itInterfaceId" id="itInterfaceId" placeholder="Snitflade ID" required data-ng-model="formData.itInterfaceId" data-unique-it-interface-id-name="{{checkAvailbleUrl}}">
+
+            <span class="help-block" data-ng-show="createForm.name.$error.required">Navn er påkrævet!</span>
+            <span class="help-block" data-ng-show="createForm.name.$error.lookup">Der skete en fejl ved tjek om navnet er ledig!</span>
+            <span class="help-block" data-ng-show="createForm.itInterfaceId.$error.lookup">Der skete en fejl ved tjek om Snitflade ID er ledig!</span>
+            <span class="help-block" data-ng-show="createForm.itInterfaceId.$error.required">Snitflade ID er påkrævet!</span>
+            <span class="help-block" data-ng-show="createForm.name.$error.available && createForm.itInterfaceId.$error.available">Snitflade med samme navn og ID findes allerede.</span>
+            <span class="help-block" data-ng-show="createForm.$asyncValidators.uniqueConstraint">async!</span>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" data-ng-disabled="createForm.$invalid">OK</button>
+        <button type="button" class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
+    </div>
+</form>
