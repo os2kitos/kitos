@@ -273,7 +273,7 @@ namespace Presentation.Web.Controllers.API
                 var result = new HttpResponseMessage(HttpStatusCode.OK);
                 result.Content = new StreamContent(stream);
                 result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "itkontraktoverblikøkonomi.csv" };
+                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileNameStar = "itkontraktoverblikøkonomi.csv", DispositionType = "ISO-8859-1" };
                 return result;
             }
             catch (Exception e)
@@ -361,7 +361,7 @@ namespace Presentation.Web.Controllers.API
                 var result = new HttpResponseMessage(HttpStatusCode.OK);
                 result.Content = new StreamContent(stream);
                 result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "itkontraktoverbliktid.csv" };
+                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileNameStar = "itkontraktoverbliktid.csv", DispositionType = "ISO-8859-1" };
                 return result;
             }
             catch (Exception e)
