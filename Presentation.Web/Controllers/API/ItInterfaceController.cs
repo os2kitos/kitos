@@ -161,7 +161,7 @@ namespace Presentation.Web.Controllers.API
                 var result = new HttpResponseMessage(HttpStatusCode.OK);
                 result.Content = new StreamContent(stream);
                 result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "snitfladekatalog.csv" };
+                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileNameStar = "snitfladekatalog.csv", DispositionType = "ISO-8859-1" };
                 return result;
             }
             catch (Exception e)
