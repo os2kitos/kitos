@@ -16,19 +16,19 @@
                     </div>
 
                     <!-- Version -->
-                    <label>Version</label>
-                    <select id="interface-version" class="form-control input-sm"
-                            data-ui-select2="select2AllowClearOpt"
-                            data-placeholder="Vælg version"
-                            data-autosave="{{interface.updateUrl}}"
-                            data-field="businessTypeId"
-                            data-ng-disabled="!hasWriteAccess"
-                            data-ng-model="interface.versionId">
-                        <option value=""></option>
-                        <option data-ng-repeat="version in versions" value="{{version.id}}">{{version.name}}</option>
-                    </select>
-
-
+                    <div class="form-group">
+                        <label for="interface-version" class="control-label small">Kontrakttype</label>
+                        <select id="interface-version" class="form-control input-sm"
+                                data-ui-select2="allowClearOption"
+                                data-placeholder="Vælg kontrakttype"
+                                data-ng-disabled="!hasWriteAccess"
+                                data-ng-model="interface.versionId"
+                                data-autosave="{{ autoSaveUrl }}"
+                                data-field="versionId">
+                            <option value=""></option>
+                            <option data-ng-repeat="version in versions" value="{{version.id}}">{{version.name}}</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>

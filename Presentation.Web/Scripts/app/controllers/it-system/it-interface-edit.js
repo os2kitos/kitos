@@ -29,10 +29,11 @@
                     }
                 ],
                 versions: [
-                    '$http', function ($http) {
-                        return $http.get("api/version").then(function (result) {
-                            return result.data.response;
-                        });
+                    '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
+                        return $http.get('api/version/')
+                            .then(function (result) {
+                                return result.data.response;
+                            });
                     }
                 ]
             }
@@ -47,6 +48,7 @@
             autofocus();
 
             $scope.versions = versions;
+
             itInterface.belongsTo = (!itInterface.belongsToId) ? null : { id: itInterface.belongsToId, text: itInterface.belongsToName };
             itInterface.updateUrl = 'api/itInterface/' + itInterface.id;
             $scope.interface = itInterface;
