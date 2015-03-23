@@ -16,14 +16,19 @@
                     </div>
 
                     <!-- Version -->
-                    <div class="form-group">
-                        <label for="interface-version" class="control-label small">Version</label>
-                        <input type="text" id="interface-version" class="form-control input-sm"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-autosave="{{interface.updateUrl}}"
-                               data-field="version"
-                               data-ng-model="interface.version">
-                    </div>
+                    <label>Version</label>
+                    <select id="interface-version" class="form-control input-sm"
+                            data-ui-select2="select2AllowClearOpt"
+                            data-placeholder="Vælg version"
+                            data-autosave="{{interface.updateUrl}}"
+                            data-field="businessTypeId"
+                            data-ng-disabled="!hasWriteAccess"
+                            data-ng-model="interface.versionId">
+                        <option value=""></option>
+                        <option data-ng-repeat="version in versions" value="{{version.id}}">{{version.name}}</option>
+                    </select>
+
+
                 </div>
             </div>
         </div>
