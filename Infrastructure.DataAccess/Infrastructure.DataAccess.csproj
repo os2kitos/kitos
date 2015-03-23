@@ -147,6 +147,7 @@
     <Compile Include="Mapping\StakeholderMap.cs" />
     <Compile Include="Mapping\TextMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
+    <Compile Include="Mapping\VersionMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
     <Compile Include="Migrations\201410021644216_InitialCreate.cs" />
     <Compile Include="Migrations\201410021644216_InitialCreate.Designer.cs">
@@ -207,6 +208,14 @@
     <Compile Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs" />
     <Compile Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.Designer.cs">
       <DependentUpon>201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201503231032437_AddedItInterfaceVersionAsObject.cs" />
+    <Compile Include="Migrations\201503231032437_AddedItInterfaceVersionAsObject.Designer.cs">
+      <DependentUpon>201503231032437_AddedItInterfaceVersionAsObject.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201503231048251_MadeVersionIdNullable.cs" />
+    <Compile Include="Migrations\201503231048251_MadeVersionIdNullable.Designer.cs">
+      <DependentUpon>201503231048251_MadeVersionIdNullable.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\BackupConfiguration.cs" />
     <Compile Include="Migrations\Configuration.cs" />
@@ -278,6 +287,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.resx">
       <DependentUpon>201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503231032437_AddedItInterfaceVersionAsObject.resx">
+      <DependentUpon>201503231032437_AddedItInterfaceVersionAsObject.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503231048251_MadeVersionIdNullable.resx">
+      <DependentUpon>201503231048251_MadeVersionIdNullable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

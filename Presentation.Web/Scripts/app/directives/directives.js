@@ -894,16 +894,18 @@
     ]);
 
     app.directive('globalOptionList', [
-        '$http', '$timeout', '$state', '$stateParams', 'notify', function($http, $timeout, $state, $stateParams, notify) {
+        '$http', '$timeout', '$state', '$stateParams', 'notify', function ($http, $timeout, $state, $stateParams, notify) {
             return {
                 scope: {
                     optionsUrl: '@',
                     title: '@',
+                    orgid: '@'
                 },
                 templateUrl: 'partials/global-config/optionlist.html',
-                link: function(scope, element, attrs) {
+                link: function (scope, element, attrs) {
+
                     scope.list = [];
-                    $http.get(scope.optionsUrl + '?nonsuggestions').success(function(result) {
+                    $http.get(scope.optionsUrl + '?organizationId=' + scope.orgid + '&nonsuggestions').success(function (result) {
                         _.each(result.response, function(v) {
                             scope.list.push({
                                 id: v.id,
@@ -915,7 +917,7 @@
                     });
 
                     scope.suggestions = [];
-                    $http.get(scope.optionsUrl + '?suggestions').success(function(result) {
+                    $http.get(scope.optionsUrl + '?organizationId=' + scope.orgid + '&suggestions').success(function(result) {
                         _.each(result.response, function(v) {
                             scope.suggestions.push({
                                 id: v.id,
@@ -927,7 +929,7 @@
 
                     scope.approve = function(id) {
                         var msg = notify.addInfoMessage("Gemmer...", false);
-                        $http({ method: 'PATCH', url: scope.optionsUrl + '/' + id, data: { isSuggestion: false } })
+                        $http({ method: 'PATCH', url: scope.optionsUrl + '/' + id + '?organizationId=' + scope.orgid, data: { isSuggestion: false } })
                             .success(function() {
                                 msg.toSuccessMessage("Valgmuligheden er opdateret.");
                                 // reload page to show changes

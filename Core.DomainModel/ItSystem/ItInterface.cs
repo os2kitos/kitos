@@ -19,7 +19,8 @@ namespace Core.DomainModel.ItSystem
         /// <value>
         /// The version.
         /// </value>
-        public string Version { get; set; }
+        public int? VersionId { get; set; }
+        public virtual Version Version { get; set; }
 
         /// <summary>
         /// Gets or sets the user defined interface identifier.
