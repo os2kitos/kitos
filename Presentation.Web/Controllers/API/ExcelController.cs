@@ -35,11 +35,9 @@ namespace Presentation.Web.Controllers.API
             result.Content.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
             result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
             {
-                FileNameStar = filename,
-                DispositionType = "ISO-8859-1"
+                FileNameStar = filename
             };
             return result;
-            
         }
 
         public HttpResponseMessage Get(int organizationId, bool? exportUsers)
@@ -57,11 +55,9 @@ namespace Presentation.Web.Controllers.API
             result.Content.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
             result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
             {
-                FileNameStar = filename,
-                DispositionType = "ISO-8859-1"
+                FileNameStar = filename
             };
-            return result;
-            
+            return result;            
         }
 
         public async Task<HttpResponseMessage> Post(int organizationId)
