@@ -86,7 +86,6 @@
                         user = result;
                     });
 
-
                     ngModel.$asyncValidators.uniqueConstraint = function (value) {
                         var name = scope.createForm.name.$viewValue;
                         var itInterfaceId = scope.createForm.itInterfaceId.$viewValue;

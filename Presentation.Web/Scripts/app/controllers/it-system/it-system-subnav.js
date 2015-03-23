@@ -111,6 +111,13 @@
                             $scope.type = 'IT Snitflade';
                             $scope.checkAvailbleUrl = 'api/itInterface/';
 
+                            $scope.validateName = function() {
+                                $scope.createForm.name.$validate();
+                            }
+                            $scope.validateItInterfaceId = function() {
+                                $scope.createForm.itInterfaceId.$validate();
+                            }
+                            
                             $scope.submit = function () {
                                 console.log($scope.formData);
                                 var payload = {

@@ -5,9 +5,9 @@
     <div class="modal-body">
         <div class="form-group has-feedback" data-show-errors>
             <label class="control-label" for="name">Navn</label>
-            <input type="text" class="form-control" name="name" id="name" placeholder="navn" required data-ng-model="formData.name" data-unique-it-interface-id-name="{{checkAvailbleUrl}}">
+            <input type="text" class="form-control" name="name" id="name" data-ng-change="validateItInterfaceId()" placeholder="navn" required data-ng-model="formData.name" data-unique-it-interface-id-name="{{checkAvailbleUrl}}">
             <label class="control-label" for="itInterfaceId">Snitflade Id</label>
-            <input type="text" class="form-control" name="itInterfaceId" id="itInterfaceId" placeholder="Snitflade ID" required data-ng-model="formData.itInterfaceId" data-unique-it-interface-id-name="{{checkAvailbleUrl}}">
+            <input type="text" class="form-control" name="itInterfaceId" data-ng-change="validateName()" id="itInterfaceId" placeholder="Snitflade ID" required data-ng-model="formData.itInterfaceId" data-unique-it-interface-id-name="{{checkAvailbleUrl}}">
 
             <span class="help-block" data-ng-show="createForm.name.$error.required">Navn er påkrævet!</span>
             <span class="help-block" data-ng-show="createForm.name.$error.lookup">Der skete en fejl ved tjek om navnet er ledig!</span>
