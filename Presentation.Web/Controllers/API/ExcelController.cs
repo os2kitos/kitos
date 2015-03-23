@@ -35,7 +35,8 @@ namespace Presentation.Web.Controllers.API
             result.Content.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
             result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
             {
-                FileName = filename
+                FileNameStar = filename,
+                DispositionType = "ISO-8859-1"
             };
             return result;
             
@@ -56,7 +57,8 @@ namespace Presentation.Web.Controllers.API
             result.Content.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
             result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
             {
-                FileName = filename
+                FileNameStar = filename,
+                DispositionType = "ISO-8859-1"
             };
             return result;
             
