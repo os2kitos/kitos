@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.2-31219")]
-    public sealed partial class MadeVersionIdNullable : IMigrationMetadata
+    public sealed partial class AddedItInterfaceVersion : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(MadeVersionIdNullable));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedItInterfaceVersion));
         
         string IMigrationMetadata.Id
         {
-            get { return "201503231048251_MadeVersionIdNullable"; }
+            get { return "201503231536271_AddedItInterfaceVersion"; }
         }
         
         string IMigrationMetadata.Source
