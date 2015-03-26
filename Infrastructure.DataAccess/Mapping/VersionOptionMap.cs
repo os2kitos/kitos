@@ -2,7 +2,7 @@
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class VersionMap : OptionEntityMap<Version, ItInterface>
+    public class VersionOptionMap : OptionEntityMap<VersionOption, ItInterface>
     {
     }
 }

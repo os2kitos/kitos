@@ -36,9 +36,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(d => d.References)
                 .HasForeignKey(t => t.MethodId);
 
-            this.HasOptional(t => t.Version)
+            this.HasOptional(t => t.VersionOption)
                 .WithMany(d => d.References)
-                .HasForeignKey(t => t.VersionId);
+                .HasForeignKey(t => t.VersionOptionId);
         }
     }
 }

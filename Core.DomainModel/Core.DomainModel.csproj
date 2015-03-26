@@ -97,7 +97,7 @@
     <Compile Include="ItSystem\ItSystemTypeOption.cs" />
     <Compile Include="ItSystem\SensitiveDataType.cs" />
     <Compile Include="ItSystem\Tsa.cs" />
-    <Compile Include="ItSystem\Version.cs" />
+    <Compile Include="ItSystem\VersionOption.cs" />
     <Compile Include="OrganizationUnit.cs" />
     <Compile Include="OrganizationRight.cs" />
     <Compile Include="HasRightsEntity.cs" />

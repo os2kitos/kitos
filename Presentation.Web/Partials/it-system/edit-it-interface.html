@@ -15,18 +15,18 @@
                                data-ng-model="interface.name">
                     </div>
 
-                    <!-- Version -->
+                    <!-- versionOptions -->
                     <div class="form-group">
-                        <label for="interface-version" class="control-label small">Version</label>
-                        <select id="interface-version" class="form-control input-sm"
+                        <label for="interface-versionOption" class="control-label small">Version</label>
+                        <select id="interface-versionOption" class="form-control input-sm"
                                 data-ui-select2="allowClearOption"
-                                data-placeholder="Vælg kontrakttype"
+                                data-placeholder="Vælg version"
                                 data-ng-disabled="!hasWriteAccess"
                                 data-ng-model="interface.versionId"
                                 data-autosave="{{ autoSaveUrl }}"
-                                data-field="versionId">
+                                data-field="versionOptionId">
                             <option value=""></option>
-                            <option data-ng-repeat="version in versions" value="{{version.id}}">{{version.name}}</option>
+                            <option data-ng-repeat="versionOption in versionOptions" value="{{versionOption.id}}">{{versionOption.name}}</option>
                         </select>
                     </div>
                 </div>

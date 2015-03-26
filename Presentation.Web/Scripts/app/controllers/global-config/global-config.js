@@ -10,7 +10,7 @@
 
         $stateProvider.state('config', {
             url: '/global-config',
-            abstract: false,
+            abstract: true,
             template: '<ui-view autoscroll="false" />',
             resolve: {
                 user: [

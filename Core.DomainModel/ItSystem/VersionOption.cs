@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class Version : Entity, IOptionEntity<ItInterface>
+    public class VersionOption : Entity, IOptionEntity<ItInterface>
     {
-        public Version()
+        public VersionOption()
         {
             References = new List<ItInterface>();
         }

@@ -78,7 +78,7 @@ namespace Presentation.Web
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<Version, OptionDTO>()
+            Mapper.CreateMap<VersionOption, OptionDTO>()
                 .ReverseMap()
                 .ForMember(dest => dest.References, opt => opt.Ignore());
 

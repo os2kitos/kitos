@@ -8,9 +8,9 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class VersionController : GenericOptionApiController<Core.DomainModel.ItSystem.Version, ItInterface, OptionDTO>
+    public class VersionOptionController : GenericOptionApiController<Core.DomainModel.ItSystem.VersionOption, ItInterface, OptionDTO>
     {
-        public VersionController(IGenericRepository<Core.DomainModel.ItSystem.Version> repository)
+        public VersionOptionController(IGenericRepository<Core.DomainModel.ItSystem.VersionOption> repository)
             : base(repository)
         {
         }

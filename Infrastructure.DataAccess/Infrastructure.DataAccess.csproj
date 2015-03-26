@@ -147,7 +147,7 @@
     <Compile Include="Mapping\StakeholderMap.cs" />
     <Compile Include="Mapping\TextMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
-    <Compile Include="Mapping\VersionMap.cs" />
+    <Compile Include="Mapping\VersionOptionMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
     <Compile Include="Migrations\201410021644216_InitialCreate.cs" />
     <Compile Include="Migrations\201410021644216_InitialCreate.Designer.cs">
@@ -209,9 +209,9 @@
     <Compile Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.Designer.cs">
       <DependentUpon>201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201503231536271_AddedItInterfaceVersion.cs" />
-    <Compile Include="Migrations\201503231536271_AddedItInterfaceVersion.Designer.cs">
-      <DependentUpon>201503231536271_AddedItInterfaceVersion.cs</DependentUpon>
+    <Compile Include="Migrations\201503261801462_AddedVersionOption.cs" />
+    <Compile Include="Migrations\201503261801462_AddedVersionOption.Designer.cs">
+      <DependentUpon>201503261801462_AddedVersionOption.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\BackupConfiguration.cs" />
     <Compile Include="Migrations\Configuration.cs" />
@@ -284,8 +284,8 @@
     <EmbeddedResource Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.resx">
       <DependentUpon>201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201503231536271_AddedItInterfaceVersion.resx">
-      <DependentUpon>201503231536271_AddedItInterfaceVersion.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201503261801462_AddedVersionOption.resx">
+      <DependentUpon>201503261801462_AddedVersionOption.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
