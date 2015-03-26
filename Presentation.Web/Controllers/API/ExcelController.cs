@@ -14,22 +14,89 @@ namespace Presentation.Web.Controllers.API
     public class ExcelController : BaseApiController
     {
         private readonly IExcelService _excelService;
+        private readonly string _mapPath = HttpContext.Current.Server.MapPath("~/Content/excel/");
 
         public ExcelController(IExcelService excelService)
         {
             _excelService = excelService;
         }
 
+        #region Excel Users
+
+        public HttpResponseMessage Get(int organizationId, bool? exportUsers)
+        {
+            const string filename = "OS2KITOS Excel Skabelon Brugere.xlsx";
+            var file = File.OpenRead(_mapPath + filename);
+            var stream = new MemoryStream();
+
+            file.CopyTo(stream);
+            _excelService.ExportUsers(stream, organizationId, KitosUser);
+            stream.Seek(0, SeekOrigin.Begin);
+            return GetResponseMessage(stream, filename);
+        }
+
+        public async Task<HttpResponseMessage> Post(int organizationId, bool? importUsers)
+        {
+            // check if the request contains multipart/form-data.
+            if (!Request.Content.IsMimeMultipartContent())
+                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+
+            // read multipart form data
+            var stream = await ReadMultipartRequestAsync();
+
+            try
+            {
+                _excelService.ImportUsers(stream, organizationId, KitosUser);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (ExcelImportException e)
+            {
+                return Request.CreateResponse(HttpStatusCode.Conflict, GetErrorMessages(e));
+            }
+        }
+        
+        #endregion
+
+        #region Excel OrganizationUnits
+
         public HttpResponseMessage Get(int organizationId)
         {
-            var dir = HttpContext.Current.Server.MapPath("~/Content/excel/");
-            var file = File.OpenRead(dir + "OS2KITOS Excel Skabelon Organisation.xlsx");
-            var stream = new MemoryStream();
-            
-            file.CopyTo(stream);
             const string filename = "OS2KITOS Excel Skabelon Organisation.xlsx";
+            var file = File.OpenRead(_mapPath + filename);
+            var stream = new MemoryStream();
+
+            file.CopyTo(stream);
             _excelService.ExportOrganizationUnits(stream, organizationId, KitosUser);
             stream.Seek(0, SeekOrigin.Begin);
+            return GetResponseMessage(stream, filename);
+        }
+
+        public async Task<HttpResponseMessage> Post(int organizationId)
+        {
+            // check if the request contains multipart/form-data.
+            if (!Request.Content.IsMimeMultipartContent())
+                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+
+            // read multipart form data
+            var stream = await ReadMultipartRequestAsync();
+
+            try
+            {
+                _excelService.ImportOrganizationUnits(stream, organizationId, KitosUser);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (ExcelImportException e)
+            {
+                return Request.CreateResponse(HttpStatusCode.Conflict, GetErrorMessages(e));
+            }
+        }
+
+        #endregion
+
+        #region Helpers
+
+        private static HttpResponseMessage GetResponseMessage(Stream stream, string filename)
+        {
             var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StreamContent(stream) };
             var mimeType = MimeMapping.GetMimeMapping(filename);
             result.Content.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
@@ -40,94 +107,24 @@ namespace Presentation.Web.Controllers.API
             return result;
         }
 
-        public HttpResponseMessage Get(int organizationId, bool? exportUsers)
+        private static IEnumerable<ExcelImportErrorDTO> GetErrorMessages(ExcelImportException e)
         {
-            var dir = HttpContext.Current.Server.MapPath("~/Content/excel/");
-            var file = File.OpenRead(dir + "OS2KITOS Excel Skabelon Brugere.xlsx");
-            var stream = new MemoryStream();
-            
-            file.CopyTo(stream);
-            const string filename = "OS2KITOS Excel Skabelon Brugere.xlsx";
-            _excelService.ExportUsers(stream, organizationId, KitosUser);
+            return AutoMapper.Mapper.Map<IEnumerable<ExcelImportError>, IEnumerable<ExcelImportErrorDTO>>(e.Errors);
+        }
+
+        private async Task<MemoryStream> ReadMultipartRequestAsync()
+        {
+            var provider = new MultipartMemoryStreamProvider();
+            // Read the form data.
+            await Request.Content.ReadAsMultipartAsync(provider);
+
+            var file = provider.Contents[1];
+            var buffer = await file.ReadAsByteArrayAsync();
+            var stream = new MemoryStream(buffer);
             stream.Seek(0, SeekOrigin.Begin);
-            var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StreamContent(stream) };
-            var mimeType = MimeMapping.GetMimeMapping(filename);
-            result.Content.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
-            result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
-            {
-                FileNameStar = filename
-            };
-            return result;            
+            return stream;
         }
 
-        public async Task<HttpResponseMessage> Post(int organizationId)
-        {
-            // Check if the request contains multipart/form-data.
-            if (!Request.Content.IsMimeMultipartContent())
-            {
-                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
-            }
-
-            var provider = new MultipartMemoryStreamProvider();
-
-            try
-            {
-                // Read the form data.
-                await Request.Content.ReadAsMultipartAsync(provider);
-
-                var file = provider.Contents[1];
-                //var filename = Path.GetFileName(file.Headers.ContentDisposition.FileName);
-                var buffer = await file.ReadAsByteArrayAsync();
-                var stream = new MemoryStream(buffer);
-                stream.Seek(0, SeekOrigin.Begin);
-                _excelService.ImportOrganizationUnits(stream, organizationId, KitosUser);
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch (ExcelImportException e)
-            {
-                var errorsDto =
-                    AutoMapper.Mapper.Map<IEnumerable<ExcelImportError>, IEnumerable<ExcelImportErrorDTO>>(e.Errors);
-                return Request.CreateResponse(HttpStatusCode.Conflict, errorsDto);
-            }
-            catch (System.Exception e)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
-            }
-        }
-
-        public async Task<HttpResponseMessage> Post(int organizationId, bool? importUsers)
-        {
-            // Check if the request contains multipart/form-data.
-            if (!Request.Content.IsMimeMultipartContent())
-            {
-                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
-            }
-
-            var provider = new MultipartMemoryStreamProvider();
-
-            try
-            {
-                // Read the form data.
-                await Request.Content.ReadAsMultipartAsync(provider);
-
-                var file = provider.Contents[1];
-                //var filename = Path.GetFileName(file.Headers.ContentDisposition.FileName);
-                var buffer = await file.ReadAsByteArrayAsync();
-                var stream = new MemoryStream(buffer);
-                stream.Seek(0, SeekOrigin.Begin);
-                _excelService.ImportUsers(stream, organizationId, KitosUser);
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch (ExcelImportException e)
-            {
-                var errorsDto =
-                    AutoMapper.Mapper.Map<IEnumerable<ExcelImportError>, IEnumerable<ExcelImportErrorDTO>>(e.Errors);
-                return Request.CreateResponse(HttpStatusCode.Conflict, errorsDto);
-            }
-            catch (System.Exception e)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
-            }
-        }
+        #endregion
     }
 }
