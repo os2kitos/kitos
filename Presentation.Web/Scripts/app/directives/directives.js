@@ -76,8 +76,8 @@
         ]
     );
 
-    app.directive('uniqueItInterfaceIdName', ['$http', 'userService',
-        function ($http, userService) {
+    app.directive('uniqueItInterfaceIdName', ['$http', 'userService', '$q',
+        function ($http, userService, $q) {
             return {
                 require: 'ngModel',
                 link: function (scope, element, attrs, ngModel) {
@@ -85,12 +85,25 @@
                     userService.getUser().then(function (result) {
                         user = result;
                     });
-
-                    ngModel.$asyncValidators.uniqueConstraint = function (value) {
+                    
+                    ngModel.$asyncValidators.uniqueConstraint = function(value) {
+                        var deffered = $q.defer();
                         var name = scope.createForm.name.$viewValue;
                         var itInterfaceId = scope.createForm.itInterfaceId.$viewValue;
 
-                        return $http.get('/api/itinterface?checkitinterfaceid=' + itInterfaceId + '&checkname=' + name + '&orgId=' + user.currentOrganizationId);
+                        $http.get('/api/itinterface?checkitinterfaceid=' + itInterfaceId + '&checkname=' + name + '&orgId=' + user.currentOrganizationId)
+                            .success(function (data) {
+                                console.log("success");
+                                scope.uniqueConstraintError = true;
+                                deffered.resolve();
+                            })
+                            .error(function (data) {
+                                console.log("error");
+                                scope.uniqueConstraintError = true;
+                                deffered.reject();
+                        });
+
+                        return deffered.promise;
                     }
                 }
             }

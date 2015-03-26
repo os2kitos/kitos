@@ -114,9 +114,11 @@
                             $scope.validateName = function() {
                                 $scope.createForm.name.$validate();
                             }
-                            $scope.validateItInterfaceId = function() {
+                            $scope.validateItInterfaceId = function () {
                                 $scope.createForm.itInterfaceId.$validate();
                             }
+
+                            $scope.uniqueConstraintError = false;
                             
                             $scope.submit = function () {
                                 console.log($scope.formData);

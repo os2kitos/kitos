@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.2-31219")]
-    public sealed partial class AddedUniqueItInterfaceIdToNamePerOrg : IMigrationMetadata
+    public sealed partial class AddedUniqueItInterfaceToNamePerOrg : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedUniqueItInterfaceIdToNamePerOrg));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedUniqueItInterfaceToNamePerOrg));
         
         string IMigrationMetadata.Id
         {
-            get { return "201503200853551_AddedUniqueItInterfaceIdToNamePerOrg"; }
+            get { return "201503262102361_AddedUniqueItInterfaceToNamePerOrg"; }
         }
         
         string IMigrationMetadata.Source

@@ -3,14 +3,14 @@ namespace Infrastructure.DataAccess.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class AddedUniqueItInterfaceIdToNamePerOrg : DbMigration
+    public partial class AddedUniqueItInterfaceToNamePerOrg : DbMigration
     {
         public override void Up()
         {
             DropForeignKey("ItInterface", "FK_ItInterface_Organization_OrganizationId");
             DropIndex("ItInterface", "IX_NamePerOrg");
-            AlterColumn("ItInterface", "ItInterfaceId", c => c.String(maxLength: 100, storeType: "nvarchar"));
-            CreateIndex("ItInterface", new[] { "OrganizationId", "ItInterfaceId", "Name" }, unique: true, name: "IX_NamePerOrg");
+            AlterColumn("ItInterface", "ItInterfaceId", c => c.String(nullable: false, maxLength: 100, storeType: "nvarchar"));
+            CreateIndex("ItInterface", new[] { "OrganizationId", "Name", "ItInterfaceId" }, unique: true, name: "IX_NamePerOrg");
             AddForeignKey("ItInterface", "OrganizationId", "Organization");
         }
         

@@ -13,8 +13,7 @@
             <span class="help-block" data-ng-show="createForm.name.$error.lookup">Der skete en fejl ved tjek om navnet er ledig!</span>
             <span class="help-block" data-ng-show="createForm.itInterfaceId.$error.lookup">Der skete en fejl ved tjek om Snitflade ID er ledig!</span>
             <span class="help-block" data-ng-show="createForm.itInterfaceId.$error.required">Snitflade ID er påkrævet!</span>
-            <span class="help-block" data-ng-show="createForm.name.$error.available && createForm.itInterfaceId.$error.available">Snitflade med samme navn og ID findes allerede.</span>
-            <span class="help-block" data-ng-show="createForm.$asyncValidators.uniqueConstraint">async!</span>
+            <span class="help-block" data-ng-show="uniqueConstraintError">Snitflade med samme navn og ID findes allerede.</span>
         </div>
     </div>
     <div class="modal-footer">
