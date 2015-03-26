@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using Core.ApplicationServices;
-using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
 using DataTable = System.Data.DataTable;
@@ -19,29 +16,24 @@ namespace Infrastructure.OpenXML
         public DataSet Import(Stream stream)
         {
             var dataSet = new DataSet();
-            
-            //Open document
+
+            // Open document
             var spreadsheetDocument = SpreadsheetDocument.Open(stream, true);
 
-            //Open WorkbookPart
+            // Open WorkbookPart
             var workbookPart = spreadsheetDocument.WorkbookPart;
-            
-            //Open Sheets
+
+            // Open Sheets
             var sheets = workbookPart.Workbook.GetFirstChild<Sheets>().Elements<Sheet>();
 
             foreach (var sheet in sheets)
             {
-               
-                var dataTable = new DataTable() { TableName = sheet.Name };
-                
+                var dataTable = new DataTable { TableName = sheet.Name };
                 var relationshipId = sheet.Id.Value;
-
-                var worksheetPart = (WorksheetPart) workbookPart.GetPartById(relationshipId);
+                var worksheetPart = (WorksheetPart)workbookPart.GetPartById(relationshipId);
                 var workSheet = worksheetPart.Worksheet;
                 var sheetData = workSheet.GetFirstChild<SheetData>();
-
                 var rows = sheetData.Descendants<Row>().ToList();
-
                 var numColumns = rows.Max(x => x.Descendants<Cell>().Count());
 
                 for (var i = 0; i < numColumns; i++)
@@ -52,21 +44,21 @@ namespace Infrastructure.OpenXML
                 foreach (var row in rows)
                 {
                     //skip header row
-                    if(row.RowIndex < 2)
+                    if (row.RowIndex < 2)
                         continue;
-    
+
                     var dataRow = dataTable.NewRow();
 
                     var cells = GetCells(row, numColumns);
 
                     var i = 0;
-                    bool rowHasValue = false;
+                    var rowHasValue = false;
 
                     foreach (var cell in cells)
                     {
                         var cellValue = GetCellValue(spreadsheetDocument, cell);
                         dataRow[i] = cellValue;
-                        
+
                         if (!string.IsNullOrWhiteSpace(cellValue))
                         {
                             rowHasValue = true;
@@ -79,50 +71,54 @@ namespace Infrastructure.OpenXML
                     {
                         dataTable.Rows.Add(dataRow);
                     }
-                    
-                }
-                
-                dataSet.Tables.Add(dataTable);
-                
-            }
 
+                }
+                dataSet.Tables.Add(dataTable);
+            }
             return dataSet;
         }
 
-        //returns a list of cells of length @numColumns.
-        //if there's a blank cell between two non blank cell, this list will properly reflect that
-        //by inserting empty cells the right places.
-        //likewise, if the row doesn't have @numColumns cells, empty cells will be appended.
-        private IEnumerable<Cell> GetCells(Row row, int numColumns)
+        /// <summary>
+        /// Gets a list of cells with the specified length.
+        /// </summary>
+        /// <param name="row">The row.</param>
+        /// <param name="numColumns">The number of columns.</param>
+        /// <returns>returns a list of cells of length <see cref="numColumns"/>.</returns>
+        /// <remarks>
+        /// if there's a blank cell between two non blank cell, this list will properly reflect that
+        /// by inserting empty cells the right places.
+        /// likewise, if the row doesn't have @numColumns cells, empty cells will be appended.        
+        /// </remarks>
+        private static IEnumerable<Cell> GetCells(Row row, int numColumns)
         {
             var result = new List<Cell>();
 
             var i = 0;
             foreach (var cell in row.Descendants<Cell>())
             {
-                string columnName = GetColumnName(cell.CellReference);
-                //column index is the real index of the cell
-                int columnIndex = ConvertColumnNameToNumber(columnName);
+                var columnName = GetColumnName(cell.CellReference);
+                // column index is the real index of the cell
+                var columnIndex = ConvertColumnNameToNumber(columnName);
 
-                //for every missing cell between the previous and the current index, add a new cell
+                // for every missing cell between the previous and the current index, add a new cell
                 for (; i < columnIndex; i++)
                 {
                     result.Add(new Cell());
                 }
 
-                //then add the current cell
+                // then add the current cell
                 result.Add(cell);
                 i++;
             }
 
-            //add all remaining cells until we reach last column
+            // add all remaining cells until we reach last column
             for (; i < numColumns; i++)
             {
                 result.Add(new Cell());
             }
 
             return result;
-        } 
+        }
 
         /// <summary>
         /// Given a cell name, parses the specified cell to get the column name.
@@ -133,8 +129,8 @@ namespace Infrastructure.OpenXML
         private static string GetColumnName(string cellReference)
         {
             // Match the column name portion of the cell name.
-            Regex regex = new Regex("[A-Za-z]+");
-            Match match = regex.Match(cellReference);
+            var regex = new Regex("[A-Za-z]+");
+            var match = regex.Match(cellReference);
 
             return match.Value;
         }
@@ -150,17 +146,17 @@ namespace Infrastructure.OpenXML
         /// contains characters other than uppercase letters</exception>
         private static int ConvertColumnNameToNumber(string columnName)
         {
-            Regex alpha = new Regex("^[A-Z]+$");
+            var alpha = new Regex("^[A-Z]+$");
             if (!alpha.IsMatch(columnName)) throw new ArgumentException();
 
-            char[] colLetters = columnName.ToCharArray();
+            var colLetters = columnName.ToCharArray();
             Array.Reverse(colLetters);
 
-            int convertedValue = 0;
-            for (int i = 0; i < colLetters.Length; i++)
+            var convertedValue = 0;
+            for (var i = 0; i < colLetters.Length; i++)
             {
-                char letter = colLetters[i];
-                int current = i == 0 ? letter - 65 : letter - 64; // ASCII 'A' = 65
+                var letter = colLetters[i];
+                var current = i == 0 ? letter - 65 : letter - 64; // ASCII 'A' = 65
                 convertedValue += current * (int)Math.Pow(26, i);
             }
 
@@ -172,38 +168,34 @@ namespace Infrastructure.OpenXML
             if (cell == null) return "";
 
             var stringTablePart = document.WorkbookPart.SharedStringTablePart;
-
             var value = "";
 
-            if(cell.CellValue != null)
+            if (cell.CellValue != null)
                 value = cell.CellValue.InnerXml;
 
             if (cell.DataType != null && cell.DataType.Value == CellValues.SharedString)
             {
                 return stringTablePart.SharedStringTable.ChildElements[Int32.Parse(value)].InnerText;
             }
-            else
-            {
-                return value;
-            }
+            return value;
         }
 
         public Stream Export(DataSet data, Stream stream)
         {
-            //Open document
+            // Open document
             var spreadsheetDocument = SpreadsheetDocument.Open(stream, true);
 
-            //Open a WorkbookPart
+            // Open a WorkbookPart
             var workbookPart = spreadsheetDocument.WorkbookPart;
 
-            //Loop through data
+            // Loop through data
             foreach (DataTable table in data.Tables)
             {
                 var id = workbookPart.Workbook.Descendants<Sheet>().First(x => x.Name == table.TableName).Id;
                 var workSheetPart = (WorksheetPart)workbookPart.GetPartById(id);
                 var sheetData = workSheetPart.Worksheet.GetFirstChild<SheetData>();
 
-                /*
+                /* disabled until more information on the subject is found... see last comment section
                  //cell format is a kind of style that can be applied to cells 
                 var unlockedCellFormat = new CellFormat()
                 {
@@ -230,34 +222,31 @@ namespace Infrastructure.OpenXML
                 var lockedStyleIndex = UInt32Value.FromUInt32((uint)workbookStylesPart.Stylesheet.CellFormats.Count());
                  */
 
-                //Delete all rows except for the header row
+                // Delete all rows except for the header row
                 var headerRow = sheetData.Elements<Row>().FirstOrDefault();
                 sheetData.RemoveAllChildren();
                 sheetData.AppendChild(headerRow);
 
                 foreach (DataRow row in table.Rows)
                 {
-                    var newRow = new Row();// { RowIndex = rowIndex };
+                    var newRow = new Row();
 
                     foreach (DataColumn column in table.Columns)
                     {
-
-                        var newCell = new Cell()
+                        var newCell = new Cell
                         {
                             CellValue = new CellValue(row[column].ToString()),
                             DataType = CellValues.String,
                             //StyleIndex = lockedStyleIndex //locked style
                         };
-                        
+
                         //TODO: Altid int?
                         int t;
                         newCell.DataType = int.TryParse(row[column].ToString(), out t) ? CellValues.Number : CellValues.String;
-
                         newRow.AppendChild(newCell);
                     }
                     sheetData.AppendChild(newRow);
                 }
-
 
                 /* disabled until more information on the subject is found - or at least until i can test it properly
                 //this is also necessary to enable protection of cells. 
@@ -275,10 +264,9 @@ namespace Infrastructure.OpenXML
                 workSheetPart.Worksheet.Save();
                  */
             }
-            
 
             workbookPart.Workbook.Save(); //TODO: Test if nessesary?
-            spreadsheetDocument.Close(); //TODO: Make sure this dosn't clear stream
+            spreadsheetDocument.Close();
 
             return stream;
         }
