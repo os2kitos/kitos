@@ -25,17 +25,20 @@ namespace Infrastructure.DataAccess.Migrations
             AddColumn("ItInterface", "VersionOptionId", c => c.Int());
             CreateIndex("ItInterface", "VersionOptionId");
             AddForeignKey("ItInterface", "VersionOptionId", "VersionOptions", "Id");
+            AddForeignKey("VersionOptions", "ObjectOwnerId", "User", "Id");
+            AddForeignKey("VersionOptions", "LastChangedByUserId", "User", "Id");
             DropColumn("ItInterface", "Version");
+
         }
         
         public override void Down()
         {
             AddColumn("ItInterface", "Version", c => c.String(unicode: false));
             DropForeignKey("ItInterface", "VersionOptionId", "VersionOptions");
-            DropForeignKey("VersionOptions", "FK_dbo.VersionOptions_dbo.User_ObjectOwnerId");
-            DropForeignKey("VersionOptions", "FK_dbo.VersionOptions_dbo.User_LastChangedByUserId");
-            DropIndex("VersionOptions", new[] { "LastChangedByUserId" });
-            DropIndex("VersionOptions", new[] { "ObjectOwnerId" });
+            DropForeignKey("VersionOptions", "FK_VersionOptions_User_ObjectOwnerId");
+            DropForeignKey("VersionOptions", "FK_VersionOptions_User_LastChangedByUserId");
+            DropIndex("VersionOptions", "FK_VersionOptions_User_ObjectOwnerId");
+            DropIndex("VersionOptions", "FK_VersionOptions_User_LastChangedByUserId");
             DropIndex("ItInterface", new[] { "VersionOptionId" });
             DropColumn("ItInterface", "VersionOptionId");
             DropTable("VersionOptions");
