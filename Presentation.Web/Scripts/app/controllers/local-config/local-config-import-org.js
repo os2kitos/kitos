@@ -3,44 +3,29 @@
         '$stateProvider', function($stateProvider) {
             $stateProvider.state('local-config.import.organization', {
                 url: '/organization',
-                templateUrl: 'partials/local-config/import-organization.html',
+                templateUrl: 'partials/local-config/import-template.html',
                 controller: 'local-config.import.ImportOrgCtrl',
-                resolve: {
-                    user: [
-                        'userService', function(userService) {
-                            return userService.getUser();
-                        }
-                    ]
-                }
             });
         }
     ]);
 
     app.controller('local-config.import.ImportOrgCtrl', [
-        '$rootScope', '$scope', '$http', 'notify', 'config', 'user',
-        function ($rootScope, $scope, $http, notify, config, user) {
-            $scope.orgUrl = 'api/excel?organizationId=' + user.currentOrganizationId;
-            $scope.orgData = {};
-
-            $scope.usersUrl = 'api/excel?organizationId=' + user.currentOrganizationId + '&exportUsers';
-            $scope.userData = {};
-
-            $scope.test = function () {
-                console.log("TEST");
-            }
+        '$rootScope', '$scope', '$http', 'notify', 'user',
+        function ($rootScope, $scope, $http, notify, user) {
+            $scope.url = 'api/excel?organizationId=' + user.currentOrganizationId + '&exportOrgUnits';
+            $scope.title = 'organisationsenheder';
 
             //Import OrganizationUnits
-            $scope.submitOrg = function () {
+            $scope.submit = function () {
                 var msg = notify.addInfoMessage("Læser excel ark...", false);
                 var formData = new FormData();
                 // need to convert our json object to a string version of json otherwise
                 // the browser will do a 'toString()' on the object which will result 
                 // in the value '[Object object]' on the server.
-                formData.append('model', angular.toJson($scope.orgData));
                 if ($scope.file) {
                     formData.append('file', $scope.file, $scope.file.name);
                 }
-                $http.post('/api/excel?organizationId=' + user.currentOrganizationId, formData, {
+                $http.post('/api/excel?organizationId=' + user.currentOrganizationId + '&importOrgUnits', formData, {
                     // angular.identity, a bit of Angular magic to parse our FormData object
                     transformRequest: angular.identity,
                     // IMPORTANT!!! You might think this should be set to 'multipart/form-data' 
@@ -53,15 +38,15 @@
                     headers: { 'Content-Type': undefined },
                 }).success(function (data, status) {
                     msg.toSuccessMessage("Excel arket er blevet læst og værdier er blevet sat ind i systemet.");
-                    //console.log('Submitted with status:' + status);
+                    $scope.errorData = {};
                 }).error(function (data, status) {
                     msg.toErrorMessage("Fejl! Der er en fejl i excel arket.");
-
+                    $scope.errorData = {};
                     if (status == 409) {
-                        $scope.orgData.showExcelErrors = true;
-                        $scope.orgData.errors = data;
+                        $scope.errorData.showExcelErrors = true;
+                        $scope.errorData.errors = data;
                     } else {
-                        $scope.orgData.showGenericError = true;
+                        $scope.errorData.showGenericError = true;
                     }
                 });
             }
