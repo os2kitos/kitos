@@ -254,6 +254,7 @@
     <Compile Include="Controllers\API\OptionExtendController.cs" />
     <Compile Include="Controllers\API\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\API\ItProjectOrgUnitUsageController.cs" />
+    <Compile Include="Controllers\API\VersionOptionController.cs" />
     <Compile Include="Controllers\OData\BaseController.cs" />
     <Compile Include="Controllers\OData\OrganizationsController.cs" />
     <Compile Include="Controllers\OData\InterfacesController.cs" />
@@ -666,8 +667,7 @@
     <Content Include="Partials\it-system\tab-roles.html" />
     <Content Include="Partials\it-system\tab-wishes.html" />
     <Content Include="Partials\it-system\usage-it-system.html" />
-    <Content Include="Partials\local-config\import-organization.html" />
-    <Content Include="Partials\local-config\import-users.html" />
+    <Content Include="Partials\local-config\import-template.html" />
     <Content Include="Partials\local-config\tab-contract.html" />
     <Content Include="Partials\local-config\tab-import.html" />
     <Content Include="Partials\local-config\tab-system.html" />
@@ -690,6 +690,7 @@
     <Content Include="Partials\org\user\org-edituser-modal.html" />
     <Content Include="Partials\org\user\org-user.html" />
     <Content Include="Partials\shared\org-tree-item.html" />
+    <Content Include="Partials\subnav\create-itinterface-modal.html" />
     <Content Include="Partials\subnav\create-modal.html" />
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />
@@ -786,6 +787,7 @@
     <Content Include="Scripts\app\controllers\it-system\usage\it-system-wishes.js" />
     <Content Include="Scripts\app\controllers\it-system\usage\it-system-interfaces.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-import-org.js" />
+    <Content Include="Scripts\app\controllers\local-config\local-config-import-contracts.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-import-users.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-import.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-system.js" />
@@ -815,12 +817,14 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="Content\excel\OS2KITOS Excel Skabelon Organisation.xlsx" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
+    <Content Include="Content\excel\OS2KITOS IT Kontrakter.xlsx" />
+    <Content Include="Content\excel\OS2KITOS Brugere.xlsx" />
+    <Content Include="Content\excel\OS2KITOS Organisationsenheder.xlsx" />
     <Content Include="Content\kendo\images\kendoui.ttf" />
     <Content Include="Content\kendo\images\kendoui.woff" />
     <Content Include="Content\kendo\fonts\DejaVu\DejaVuSans-Bold.ttf" />

@@ -147,6 +147,7 @@
     <Compile Include="Mapping\StakeholderMap.cs" />
     <Compile Include="Mapping\TextMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
+    <Compile Include="Mapping\VersionOptionMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
     <Compile Include="Migrations\201410021644216_InitialCreate.cs" />
     <Compile Include="Migrations\201410021644216_InitialCreate.Designer.cs">
@@ -207,6 +208,18 @@
     <Compile Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs" />
     <Compile Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.Designer.cs">
       <DependentUpon>201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201503240921390_AddedItInterfaceNoteField.cs" />
+    <Compile Include="Migrations\201503240921390_AddedItInterfaceNoteField.Designer.cs">
+      <DependentUpon>201503240921390_AddedItInterfaceNoteField.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201503270921214_AddedUniqueItInterfaceToNamePerOrg.cs" />
+    <Compile Include="Migrations\201503270921214_AddedUniqueItInterfaceToNamePerOrg.Designer.cs">
+      <DependentUpon>201503270921214_AddedUniqueItInterfaceToNamePerOrg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201503271154378_AddedItInterfaceVersionOption.cs" />
+    <Compile Include="Migrations\201503271154378_AddedItInterfaceVersionOption.Designer.cs">
+      <DependentUpon>201503271154378_AddedItInterfaceVersionOption.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\BackupConfiguration.cs" />
     <Compile Include="Migrations\Configuration.cs" />
@@ -278,6 +291,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.resx">
       <DependentUpon>201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503240921390_AddedItInterfaceNoteField.resx">
+      <DependentUpon>201503240921390_AddedItInterfaceNoteField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503270921214_AddedUniqueItInterfaceToNamePerOrg.resx">
+      <DependentUpon>201503270921214_AddedUniqueItInterfaceToNamePerOrg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503271154378_AddedItInterfaceVersionOption.resx">
+      <DependentUpon>201503271154378_AddedItInterfaceVersionOption.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

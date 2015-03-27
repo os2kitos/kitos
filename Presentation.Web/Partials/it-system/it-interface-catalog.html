@@ -9,6 +9,9 @@
     <thead>
         <tr>
             <th>
+                Snitflade ID
+            </th>
+            <th>
                 Snitflade
                 <!--
                     <button data-order-by="'name'" data-paging="pagination"></button>
@@ -45,6 +48,9 @@
     </thead>
     <tbody>
         <tr data-ng-repeat="system in systems">
+            <td>
+                {{system.itInterfaceId}}
+            </td>
             <td>
                 <a data-ui-sref="it-system.interface-edit.interface-details({id: system.id})">{{system.name}}</a>
             </td>

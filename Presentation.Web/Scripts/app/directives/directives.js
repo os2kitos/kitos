@@ -73,8 +73,41 @@
                     }
                 };
             }
-    ]
+        ]
     );
+
+    app.directive('uniqueItInterfaceIdName', ['$http', 'userService', '$q',
+        function ($http, userService, $q) {
+            return {
+                require: 'ngModel',
+                link: function (scope, element, attrs, ngModel) {
+                    var user;
+                    userService.getUser().then(function (result) {
+                        user = result;
+
+                        ngModel.$asyncValidators.uniqueConstraint = function (value) {
+                            var deffered = $q.defer();
+                            var name = scope.createForm.name.$viewValue;
+                            var itInterfaceId = scope.createForm.itInterfaceId.$viewValue;
+
+                            $http.get('/api/itinterface?checkitinterfaceid=' + itInterfaceId + '&checkname=' + name + '&orgId=' + user.currentOrganizationId)
+                                .success(function (data) {
+                                    console.log("success");
+                                    scope.uniqueConstraintError = false;
+                                    deffered.resolve();
+                                })
+                                .error(function (data) {
+                                    console.log("error");
+                                    scope.uniqueConstraintError = true;
+                                    deffered.reject();
+                                });
+                            return deffered.promise;
+                        }
+                    });
+                }
+            }
+        }
+    ]);
 
     app.directive('uniqueOrgUser', [
             '$http', 'userService', function ($http, userService) {
@@ -894,16 +927,18 @@
     ]);
 
     app.directive('globalOptionList', [
-        '$http', '$timeout', '$state', '$stateParams', 'notify', function($http, $timeout, $state, $stateParams, notify) {
+        '$http', '$timeout', '$state', '$stateParams', 'notify', function ($http, $timeout, $state, $stateParams, notify) {
             return {
                 scope: {
                     optionsUrl: '@',
                     title: '@',
+                    orgid: '@'
                 },
                 templateUrl: 'partials/global-config/optionlist.html',
-                link: function(scope, element, attrs) {
+                link: function (scope, element, attrs) {
+
                     scope.list = [];
-                    $http.get(scope.optionsUrl + '?nonsuggestions').success(function(result) {
+                    $http.get(scope.optionsUrl + '?organizationId=' + scope.orgid + '&nonsuggestions').success(function (result) {
                         _.each(result.response, function(v) {
                             scope.list.push({
                                 id: v.id,
@@ -915,7 +950,7 @@
                     });
 
                     scope.suggestions = [];
-                    $http.get(scope.optionsUrl + '?suggestions').success(function(result) {
+                    $http.get(scope.optionsUrl + '?organizationId=' + scope.orgid + '&suggestions').success(function(result) {
                         _.each(result.response, function(v) {
                             scope.suggestions.push({
                                 id: v.id,
@@ -927,7 +962,7 @@
 
                     scope.approve = function(id) {
                         var msg = notify.addInfoMessage("Gemmer...", false);
-                        $http({ method: 'PATCH', url: scope.optionsUrl + '/' + id, data: { isSuggestion: false } })
+                        $http({ method: 'PATCH', url: scope.optionsUrl + '/' + id + '?organizationId=' + scope.orgid, data: { isSuggestion: false } })
                             .success(function() {
                                 msg.toSuccessMessage("Valgmuligheden er opdateret.");
                                 // reload page to show changes

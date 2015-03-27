@@ -15,14 +15,29 @@
                                data-ng-model="interface.name">
                     </div>
 
-                    <!-- Version -->
+                    <!-- ItInterfaceId -->
                     <div class="form-group">
-                        <label for="interface-version" class="control-label small">Version</label>
-                        <input type="text" id="interface-version" class="form-control input-sm"
+                        <label for="interface-itInterfaceId" class="control-label small">Snitflade ID</label>
+                        <input type="text" id="interface-itInterfaceId" class="form-control input-sm" required
                                data-ng-disabled="!hasWriteAccess"
                                data-autosave="{{interface.updateUrl}}"
-                               data-field="version"
-                               data-ng-model="interface.version">
+                               data-field="itInterfaceId"
+                               data-ng-model="interface.itInterfaceId" />
+                    </div>
+
+                    <!-- VersionOptions -->
+                    <div class="form-group">
+                        <label for="interface-versionOption" class="control-label small">Version</label>
+                        <select id="interface-versionOption" class="form-control input-sm"
+                                data-ui-select2="allowClearOption"
+                                data-placeholder="Vælg version"
+                                data-ng-disabled="!hasWriteAccess"
+                                data-ng-model="interface.versionOptionId"
+                                data-autosave="{{interface.updateUrl}}"
+                                data-field="versionOptionId">
+                            <option value=""></option>
+                            <option data-ng-repeat="versionOption in versionOptions" value="{{versionOption.id}}">{{versionOption.name}}</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -88,6 +103,16 @@
                                data-ng-disabled="!hasWriteAccess"
                                data-ng-model="interface.url">
                         <span class="help-block">Skal starte med http://</span>
+                    </div>
+
+                    <!-- Note -->
+                    <div class="form-group">
+                        <label for="interface-note" class="control-label small">Note</label>
+                        <textarea id="interface-note" class="form-control input-sm" rows="4"
+                                  data-autosave="{{interface.updateUrl}}"
+                                  data-field="note"
+                                  data-ng-disabled="!hasWriteAccess"
+                                  data-ng-model="interface.note"></textarea>
                     </div>
                 </div>
             </div>

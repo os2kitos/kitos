@@ -19,7 +19,8 @@ namespace Core.DomainModel.ItSystem
         /// <value>
         /// The version.
         /// </value>
-        public string Version { get; set; }
+        public int? VersionOptionId { get; set; }
+        public virtual VersionOption VersionOption { get; set; }
 
         /// <summary>
         /// Gets or sets the user defined interface identifier.
@@ -59,7 +60,7 @@ namespace Core.DomainModel.ItSystem
         public virtual Method Method { get; set; }
 
         public virtual ICollection<DataRow> DataRows { get; set; }
-
+        public string Note { get; set; }
         /// <summary>
         /// Gets or sets it systems that can use this instance.
         /// </summary>
