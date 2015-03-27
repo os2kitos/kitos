@@ -2,24 +2,22 @@
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('local-config.import', {
             url: '/import',
-            abstract: false,
+            abstract: true,
             templateUrl: 'partials/local-config/tab-import.html',
             resolve: {
-                config: ['$http', 'userService', function ($http, userService) {
-                    return userService.getUser().then(function (user) {
-                        return user.currentConfig;
-                    });
-                }]
+                user: [
+                    'userService', function (userService) {
+                        return userService.getUser();
+                    }
+                ]
             },
-            controller: ['$rootScope', '$scope', 'config',
-                function($rootScope, $scope, config) {
+            controller: ['$rootScope',
+                function ($rootScope) {
                     $rootScope.page.importsubnav = [
                         { state: 'local-config.import.organization', text: 'Organisation' },
-                        { state: 'local-config.import.users', text: 'Brugere' }
+                        { state: 'local-config.import.users', text: 'Brugere' },
+                        { state: 'local-config.import.contracts', text: 'IT Kontrakter' }
                     ];
-
-                    $scope.config = config;
-                    $scope.config.autosaveUrl = "api/config/" + config.id;
                 }
             ]
         });

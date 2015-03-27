@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Transactions;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
 using Core.DomainServices;
 
 namespace Core.ApplicationServices
@@ -12,28 +13,31 @@ namespace Core.ApplicationServices
     public class ExcelService : IExcelService
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
-        private readonly IGenericRepository<OrganizationRole> _orgRoleRepository;
-        private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IGenericRepository<User> _userRepository;
+        private readonly IGenericRepository<ItContract> _itContractRepository;
         private readonly IGenericRepository<AdminRight> _adminRightRepository;
         private readonly IExcelHandler _excelHandler;
 
         public ExcelService(IGenericRepository<OrganizationUnit> orgUnitRepository,
-            IGenericRepository<OrganizationRole> orgRoleRepository,
-            IGenericRepository<TaskRef> taskRepository,
             IGenericRepository<User> userRepository,
+            IGenericRepository<ItContract> itContractRepository,
             IGenericRepository<AdminRight> adminRightRepository,
             IExcelHandler excelHandler)
         {
             _orgUnitRepository = orgUnitRepository;
-            _orgRoleRepository = orgRoleRepository;
-            _taskRepository = taskRepository;
             _userRepository = userRepository;
+            _itContractRepository = itContractRepository;
             _adminRightRepository = adminRightRepository;
             _excelHandler = excelHandler;
         }
 
-        // Export Users
+        /// <summary>
+        /// Exports users.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <param name="organizationId">The organization identifier.</param>
+        /// <param name="kitosUSer">The kitos u ser.</param>
+        /// <returns></returns>
         public Stream ExportUsers(Stream stream, int organizationId, User kitosUSer)
         {
             var users = _userRepository.Get(x => x.AdminRights.Count(r => r.ObjectId == organizationId) > 0);
@@ -44,31 +48,18 @@ namespace Core.ApplicationServices
             return _excelHandler.Export(set, stream);
         }
 
-        /* Export OrganizationUnits */
+        /// <summary>
+        /// Exports organization units.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <param name="organizationId">The organization identifier.</param>
+        /// <param name="kitosUser">The kitos user.</param>
+        /// <returns></returns>
         public Stream ExportOrganizationUnits(Stream stream, int organizationId, User kitosUser)
         {
             var orgUnits = _orgUnitRepository.Get(x => x.OrganizationId == organizationId).ToList();
-            //dynamic orgRoles = null;
-            //dynamic orgTasks = null;
-            //foreach (var orgUnit in orgUnits)
-            //{
-            //    var unitName = orgUnit.Name;
-            //    orgRoles = orgUnit.Rights.Select(x => new {OrgUnit = unitName, Role = x.Role.Name, User = x.User.Name});
-            //    orgTasks =
-            //        orgUnit.TaskUsages.Select(x => new { OrgUnit = unitName, Task = x.TaskRefId, Overview = x.Starred });
-            //}
-
-            //var roles = _orgRoleRepository.Get(x => x.IsActive && !x.IsSuggestion);
-            //var tasks = _taskRepository.Get(x => x.AccessModifier == AccessModifier.Public);
-            //var users = _userRepository.Get(x => x.CreatedInId == organizationId);
-
             var set = new DataSet();
             set.Tables.Add(GetOrganizationTable(orgUnits));
-            //set.Tables.Add(GetOrgRoleTable(orgRoles));
-            //set.Tables.Add(GetOrgTaskTable(orgTasks));
-            //set.Tables.Add(GetRoleTable(roles));
-            //set.Tables.Add(GetTaskTable(tasks));
-            //set.Tables.Add(GetUserTable(users));
 
             return _excelHandler.Export(set, stream);
         }
@@ -79,51 +70,211 @@ namespace Core.ApplicationServices
             using (scope)
             {
                 var errors = new List<ExcelImportError>();
-
                 var set = _excelHandler.Import(stream);
 
-                //importing org units
-                var userTable = set.Tables[5];
+                // importing org units
+                var userTable = set.Tables[0];
                 errors.AddRange(ImportUsersTransaction(userTable, organizationId, kitosUser));
 
-                //how to import something else
-                //var anotherTable = set.Tables[1];
-                //errors.AddRange(ImportFooBar(anotherTable, foo, bar)
-
-                //then finally, did we notice any errors?
+                // then finally, did we notice any errors?
                 if (errors.Any()) throw new ExcelImportException() { Errors = errors };
 
-                //if we got here, we're home frreeeee
+                // if we got here, we're home frreeeee
                 scope.Complete();
-
             }
         }
 
-        private IEnumerable<ExcelImportError> ImportUsersTransaction(DataTable userTable, int organizationId,
-            User kitosUser)
+        public void ExportItContracts(Stream stream, int organizationId, User kitosUser)
+        {
+            var contracts = _itContractRepository.Get(x => x.OrganizationId == organizationId);
+
+            var set = new DataSet();
+            set.Tables.Add(GetItContractTable(contracts));
+
+            _excelHandler.Export(set, stream);
+        }
+
+        public void ImportItContracts(Stream stream, int organizationId, User kitosUser)
+        {
+            // read excel stream to DataSet
+            var contractDataSet = _excelHandler.Import(stream);
+            // get contracts table
+            var contractDataTable = contractDataSet.Tables[0];
+            // import contracts
+            var errors = ImportItContractsTransaction(contractDataTable, organizationId, kitosUser).ToList();
+
+            // then finally, did we notice any errors?
+            if (errors.Any()) 
+                throw new ExcelImportException { Errors = errors };
+        }
+
+        private IEnumerable<ExcelImportError> ImportItContractsTransaction(DataTable contractTable, int organizationId, User kitosUser)
         {
             var errors = new List<ExcelImportError>();
+            
+            // select only contracts that should be inserted
+            var newContracts = contractTable.Select("[Column1] IS NULL OR [Column1] = ''").AsEnumerable().ToList();
+            var firstRow = newContracts.FirstOrDefault();
+            
+            // if nothing to add then abort here
+            if (firstRow == null)
+            {
+                errors.Add(new ExcelImportError { Message = "Intet at importere!"});
+                return errors;
+            }
 
-            //resolvedRows are the orgUnits that already has been added to the DB.
-            //the key is the name of the orgUnit;
-            var resolvedRows = new Dictionary<string, UserRow>();
+            var rowIndex = contractTable.Rows.IndexOf(firstRow) + 2; // adding 2 to get it to lign up with row numbers in excel
+            foreach (var row in newContracts)
+            {
+                var contractRow = new ContractRow
+                {
+                    RowIndex = rowIndex,
+                    Name = row.Field<string>(1),
+                    ItContractId = row.Field<string>(2),
+                    Esdh = row.Field<string>(3),
+                    Folder = row.Field<string>(4),
+                    Note = row.Field<string>(5),
+                    ConcludedText = row.Field<string>(6),
+                    IrrevocableToText = row.Field<string>(7),
+                    ExpirationDateText = row.Field<string>(8),
+                    TerminatedText = row.Field<string>(9),
+                };
 
-            //unresolved rows are orgUnits which still needs to be added to the DB.
+                // validate that name exists
+                if (String.IsNullOrEmpty(contractRow.Name) || String.IsNullOrWhiteSpace(contractRow.Name))
+                {
+                    var error = new ExcelImportError
+                    {
+                        Row = contractRow.RowIndex,
+                        Column = "B",
+                        Message = "IT Kontrakt Navn mangler",
+                        SheetName = "IT Kontrakter"
+                    };
+                    errors.Add(error);
+                }
+                    
+                // validate Concluded is a date
+                try
+                {
+                    // is something entered?
+                    if (!String.IsNullOrEmpty(contractRow.ConcludedText) && !String.IsNullOrWhiteSpace(contractRow.ConcludedText))
+                        contractRow.Concluded = DateTime.FromOADate(Double.Parse(contractRow.ConcludedText)).Date;
+                }
+                catch (Exception)
+                {
+                    var error = new ExcelImportError
+                    {
+                        Row = contractRow.RowIndex,
+                        Column = "G",
+                        Message = "Indgået er ikke en gyldig dato",
+                        SheetName = "IT Kontrakter"
+                    };
+                    errors.Add(error);
+                }
+                    
+                // validate IrrevocableTo is a date
+                try
+                {
+                    // is something entered?
+                    if (!String.IsNullOrEmpty(contractRow.IrrevocableToText) && !String.IsNullOrWhiteSpace(contractRow.IrrevocableToText))
+                        contractRow.IrrevocableTo = DateTime.FromOADate(Double.Parse(contractRow.IrrevocableToText)).Date;
+                }
+                catch (Exception)
+                {
+                    var error = new ExcelImportError
+                    {
+                        Row = contractRow.RowIndex,
+                        Column = "H",
+                        Message = "'Uopsigeligt til' er ikke en gyldig dato",
+                        SheetName = "IT Kontrakter"
+                    };
+                    errors.Add(error);
+                }
+
+                // validate ExpirationDate is a date
+                try
+                {
+                    // is something entered?
+                    if (!String.IsNullOrEmpty(contractRow.ExpirationDateText) && !String.IsNullOrWhiteSpace(contractRow.ExpirationDateText))
+                        contractRow.ExpirationDate = DateTime.FromOADate(Double.Parse(contractRow.ExpirationDateText)).Date;
+                }
+                catch (Exception)
+                {
+                    var error = new ExcelImportError
+                    {
+                        Row = contractRow.RowIndex,
+                        Column = "I",
+                        Message = "Udløbsdato er ikke en gyldig dato",
+                        SheetName = "IT Kontrakter"
+                    };
+                    errors.Add(error);
+                }
+
+                // validate Terminated is a date
+                try
+                {
+                    // is something entered?
+                    if (!String.IsNullOrEmpty(contractRow.TerminatedText) && !String.IsNullOrWhiteSpace(contractRow.TerminatedText))
+                        contractRow.Terminated = DateTime.FromOADate(Double.Parse(contractRow.TerminatedText)).Date;
+                }
+                catch (Exception)
+                {
+                    var error = new ExcelImportError
+                    {
+                        Row = contractRow.RowIndex,
+                        Column = "J",
+                        Message = "'Kontrakten opsagt' er ikke en gyldig dato",
+                        SheetName = "IT Kontrakter"
+                    };
+                    errors.Add(error);
+                }
+
+                _itContractRepository.Insert(new ItContract
+                {
+                    Name = contractRow.Name,
+                    ItContractId = contractRow.ItContractId,
+                    Esdh = contractRow.Esdh,
+                    Folder = contractRow.Folder,
+                    Note = contractRow.Note,
+                    Concluded = contractRow.Concluded,
+                    IrrevocableTo = contractRow.IrrevocableTo,
+                    ExpirationDate = contractRow.ExpirationDate,
+                    Terminated = contractRow.Terminated,
+                    OrganizationId = organizationId,
+                    LastChangedByUserId = kitosUser.Id,
+                    LastChanged = DateTime.Now,
+                    ObjectOwnerId = kitosUser.Id
+                });
+
+                rowIndex++;
+            }
+            // no errors found, it's safe to save to DB
+            if (!errors.Any())
+                _itContractRepository.Save();
+            
+            return errors;
+        }
+
+        private IEnumerable<ExcelImportError> ImportUsersTransaction(DataTable userTable, int organizationId, User kitosUser)
+        {
+            var errors = new List<ExcelImportError>();
+            
+            // unresolved rows are orgUnits which still needs to be added to the DB.
             var unresolvedRows = new List<UserRow>();
 
-            //preliminary pass and error checking
-            //split the rows into the old org units (already in db)
-            //and the new rows that the users has added to the sheet
+            // preliminary pass and error checking
+            // split the rows into the old org units (already in db)
+            // and the new rows that the users has added to the sheet
             var rowIndex = 2;
             foreach (var row in userTable.AsEnumerable())
             {
-                //a row is new if the first column, the id, is empty
+                // a row is new if the first column, the id, is empty
                 var id = StringToId(row.Field<string>(0));
                 var isNew = (id == null);
 
                 var userRow = new UserRow()
                 {
-                    RowIndex = rowIndex, //needed for error reporting
+                    RowIndex = rowIndex, // needed for error reporting
                     IsNew = isNew,
                     Id = id,
                     Name = row.Field<string>(1),
@@ -134,11 +285,11 @@ namespace Core.ApplicationServices
 
                 rowIndex++;
 
-                //error checking
-                //name cannot be empty
+                // error checking
+                // firstname cannot be empty
                 if (String.IsNullOrWhiteSpace(userRow.Name))
                 {
-                    var error = new ExcelImportError()                    
+                    var error = new ExcelImportError()
                     {
                         Row = userRow.RowIndex,
                         Column = "B",
@@ -148,7 +299,8 @@ namespace Core.ApplicationServices
 
                     errors.Add(error);
                 }
-                else if (String.IsNullOrWhiteSpace(userRow.LastName))
+                // lastname cannot be empty
+                if (String.IsNullOrWhiteSpace(userRow.LastName))
                 {
                     var error = new ExcelImportError()
                     {
@@ -160,8 +312,8 @@ namespace Core.ApplicationServices
 
                     errors.Add(error);
                 }
-                //email cannot be empty
-                else if (String.IsNullOrWhiteSpace(userRow.Email))
+                // email cannot be empty
+                if (String.IsNullOrWhiteSpace(userRow.Email))
                 {
                     var error = new ExcelImportError()
                     {
@@ -174,30 +326,23 @@ namespace Core.ApplicationServices
                     errors.Add(error);
                 }
 
-                //otherwise we're good - add the row to either resolved or unresolved
-                else if (isNew)
+                if (isNew && !errors.Any())
                 {
                     unresolvedRows.Add(userRow);
                 }
-                else
-                {
-                    resolvedRows.Add(userRow.Name, userRow);
-                }
-
             }
 
-            //do the actually passes, trying to resolve parents
+            // do the actually passes, trying to resolve parents
             var oneMorePass = true;
             while (oneMorePass && unresolvedRows.Any())
             {
                 oneMorePass = false;
 
-                var notResolvedInThisPass = new List<UserRow>();
                 var resolvedInThisPass = new List<UserRow>();
 
                 foreach (var userRow in unresolvedRows)
                 {
-                    var userEntity = new User()
+                    var userEntity = new User
                     {
                         Name = userRow.Name,
                         LastName = userRow.LastName,
@@ -211,7 +356,7 @@ namespace Core.ApplicationServices
                         Salt = "mangler at blive indsat"
                     };
 
-                    //If user dosnt exist create a new one.
+                    // if user dosnt exist create a new one.
                     if (!_userRepository.Get(x => x.Email == userEntity.Email).Any())
                     {
                         _userRepository.Insert(userEntity);
@@ -219,18 +364,18 @@ namespace Core.ApplicationServices
                     }
                     else
                     {
-                        //Get user to ensure we're using the correct information
+                        // fetch user to ensure we're using the correct information
                         userEntity = _userRepository.Get(x => x.Email == userEntity.Email).First();
                     }
 
                     resolvedInThisPass.Add(userRow);
 
-                    //If adminRight exists, no further action is needed
-                    if(_adminRightRepository.Get(x => x.User.Email == userEntity.Email && x.ObjectId == organizationId).Any())
+                    // if adminRight exists, no further action is needed
+                    if (_adminRightRepository.Get(x => x.User.Email == userEntity.Email && x.ObjectId == organizationId).Any())
                         continue;
 
-                    //Create the adminright within the organization
-                    _adminRightRepository.Insert(new AdminRight()
+                    // create the adminright within the organization
+                    _adminRightRepository.Insert(new AdminRight
                     {
                         ObjectId = organizationId,
                         UserId = userEntity.Id,
@@ -242,11 +387,16 @@ namespace Core.ApplicationServices
                     _adminRightRepository.Save();
                 }
             }
-
             return errors;
         }
-        
-        /* imports organization units into an organization */
+
+        /// <summary>
+        /// Imports organization units into an organization.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <param name="organizationId">The organization identifier.</param>
+        /// <param name="kitosUser">The kitos user.</param>
+        /// <exception cref="ExcelImportException"></exception>
         public void ImportOrganizationUnits(Stream stream, int organizationId, User kitosUser)
         {
             var scope = new TransactionScope(TransactionScopeOption.RequiresNew);
@@ -256,30 +406,25 @@ namespace Core.ApplicationServices
 
                 var set = _excelHandler.Import(stream);
 
-                //importing org units
+                // importing org units
                 var orgTable = set.Tables[0];
                 errors.AddRange(ImportOrgUnits(orgTable, organizationId, kitosUser));
 
-                //how to import something else
-                //var anotherTable = set.Tables[1];
-                //errors.AddRange(ImportFooBar(anotherTable, foo, bar)
+                // then finally, did we notice any errors?
+                if (errors.Any()) throw new ExcelImportException() { Errors = errors };
 
-                //then finally, did we notice any errors?
-                if (errors.Any()) throw new ExcelImportException() {Errors = errors};
-
-                //if we got here, we're home frreeeee
+                // if we got here, we're home frreeeee
                 scope.Complete();
             }
         }
-
-
-        private static long? StringToEAN(string s)
+        
+        private static long? StringToEan(string s)
         {
             if (string.IsNullOrEmpty(s)) return null;
 
-            //if the ean was properly entered, excel will treat is as a Number,
-            //which is bascially a string in double format i.e "12345678.0"
-            //so try to parse as double first
+            // if the ean was properly entered, excel will treat is as a Number,
+            // which is bascially a string in double format i.e "12345678.0"
+            // so try to parse as double first
             double dbl;
             if (!double.TryParse(s, out dbl)) return null;
 
@@ -289,7 +434,8 @@ namespace Core.ApplicationServices
 
         private static int? StringToId(string s)
         {
-            if (String.IsNullOrEmpty(s)) return null;
+            if (String.IsNullOrEmpty(s)) 
+                return null;
             return Convert.ToInt32(Convert.ToDouble(s));
         }
 
@@ -297,42 +443,42 @@ namespace Core.ApplicationServices
         {
             var errors = new List<ExcelImportError>();
 
-            //resolvedRows are the orgUnits that already has been added to the DB.
-            //the key is the name of the orgUnit;
+            // resolvedRows are the orgUnits that already has been added to the DB.
+            // the key is the name of the orgUnit;
             var resolvedRows = new Dictionary<string, OrgUnitRow>();
 
-            //unresolved rows are orgUnits which still needs to be added to the DB.
+            // unresolved rows are orgUnits which still needs to be added to the DB.
             var unresolvedRows = new List<OrgUnitRow>();
 
-            //preliminary pass and error checking
-            //split the rows into the old org units (already in db)
-            //and the new rows that the users has added to the sheet
+            // preliminary pass and error checking
+            // split the rows into the old org units (already in db)
+            // and the new rows that the users has added to the sheet
             var rowIndex = 2;
-            foreach(var row in orgTable.AsEnumerable())
+            foreach (var row in orgTable.AsEnumerable())
             {
-                //a row is new if the first column, the id, is empty
+                // a row is new if the first column, the id, is empty
                 var id = StringToId(row.Field<string>(0));
                 var isNew = (id == null);
 
-                var orgUnitRow = new OrgUnitRow()
+                var orgUnitRow = new OrgUnitRow
                 {
-                    RowIndex = rowIndex, //needed for error reporting
+                    RowIndex = rowIndex, // needed for error reporting
                     IsNew = isNew,
                     Id = id,
                     Name = row.Field<string>(1),
-                    Ean = StringToEAN(row.Field<string>(2)),
+                    Ean = StringToEan(row.Field<string>(2)),
                     Parent = row.Field<string>(3)
                 };
 
                 rowIndex++;
-                
-                //error checking
-                //name cannot be empty
+
+                // error checking
+                // name cannot be empty
                 if (String.IsNullOrWhiteSpace(orgUnitRow.Name))
                 {
                     errors.Add(new ExcelImportOrgUnitNoNameError(orgUnitRow.RowIndex));
                 }
-                //name cannot be duplicate
+                // name cannot be duplicate
                 else if (unresolvedRows.Any(x => x.Name == orgUnitRow.Name) || resolvedRows.ContainsKey(orgUnitRow.Name))
                 {
                     errors.Add(new ExcelImportOrgUnitDuplicateNameError(orgUnitRow.RowIndex));
@@ -341,13 +487,13 @@ namespace Core.ApplicationServices
                 {
                     errors.Add(new ExcelImportOrgUnitDuplicateEanError(orgUnitRow.RowIndex));
                 }
-                //parent cannot be empty on a new row
+                // parent cannot be empty on a new row
                 else if (orgUnitRow.IsNew && String.IsNullOrWhiteSpace(orgUnitRow.Parent))
                 {
                     errors.Add(new ExcelImportOrgUnitBadParentError(orgUnitRow.RowIndex));
-                } 
+                }
 
-                //otherwise we're good - add the row to either resolved or unresolved
+                // otherwise we're good - add the row to either resolved or unresolved
                 else if (isNew)
                 {
                     unresolvedRows.Add(orgUnitRow);
@@ -359,7 +505,7 @@ namespace Core.ApplicationServices
 
             }
 
-            //do the actually passes, trying to resolve parents
+            // do the actually passes, trying to resolve parents
             var oneMorePass = true;
             while (oneMorePass && unresolvedRows.Any())
             {
@@ -370,12 +516,12 @@ namespace Core.ApplicationServices
 
                 foreach (var orgUnitRow in unresolvedRows)
                 {
-                    //try to locate a parent
+                    // try to locate a parent
                     OrgUnitRow parent;
                     if (resolvedRows.TryGetValue(orgUnitRow.Parent, out parent))
                     {
 
-                        //since a parent was found, insert the new org unit in the DB.
+                        // since a parent was found, insert the new org unit in the DB.
                         var orgUnitEntity = _orgUnitRepository.Insert(new OrganizationUnit
                         {
                             Name = orgUnitRow.Name,
@@ -399,7 +545,7 @@ namespace Core.ApplicationServices
                 if (resolvedInThisPass.Any())
                 {
                     oneMorePass = true;
-                    //save repository - so the ids of the newly added org units are resolved
+                    // save repository - so the ids of the newly added org units are resolved
                     _orgUnitRepository.Save();
 
                     foreach (var orgUnitRow in resolvedInThisPass)
@@ -409,19 +555,14 @@ namespace Core.ApplicationServices
                     }
                 }
 
-                //if there's still some unresolve rows left, try again
+                // if there's still some unresolve rows left, try again
                 unresolvedRows = notResolvedInThisPass;
             }
 
-            //at this point, if there's is any unresolvedRows, we should report some errors
-            foreach (var orgUnitRow in unresolvedRows)
-            {
-                errors.Add(new ExcelImportOrgUnitBadParentError(orgUnitRow.RowIndex));
-            }
-            
+            // at this point, if there's is any unresolvedRows, we should report some errors
+            errors.AddRange(unresolvedRows.Select(orgUnitRow => new ExcelImportOrgUnitBadParentError(orgUnitRow.RowIndex)));
             return errors;
         }
-
 
         public class ExcelImportOrgUnitBadParentError : ExcelImportError
         {
@@ -429,8 +570,8 @@ namespace Core.ApplicationServices
             {
                 Row = row;
                 Column = "D";
-                SheetName = "Organisation";
-                Message = "Overordnet enhed må ikke være blank og skal henvise til gyldig enhed.";
+                SheetName = "Organisationsenheder";
+                Message = "Overordnet enhed må ikke være blank og skal henvise til en gyldig enhed.";
             }
         }
 
@@ -440,7 +581,7 @@ namespace Core.ApplicationServices
             {
                 Row = row;
                 Column = "B";
-                SheetName = "Organisation";
+                SheetName = "Organisationsenheder";
                 Message = "Enheden skal have et navn.";
             }
         }
@@ -451,7 +592,7 @@ namespace Core.ApplicationServices
             {
                 Row = row;
                 Column = "B";
-                SheetName = "Organisation";
+                SheetName = "Organisationsenheder";
                 Message = "Der findes allerede en enhed med dette navn.";
             }
         }
@@ -462,7 +603,7 @@ namespace Core.ApplicationServices
             {
                 Row = row;
                 Column = "C";
-                SheetName = "Organisation";
+                SheetName = "Organisationsenheder";
                 Message = "Der findes allerede en enhed i KITOS med dette EAN nummer.";
             }
         }
@@ -477,7 +618,7 @@ namespace Core.ApplicationServices
             public string Phone { get; set; }
             public string Email { get; set; }
         }
-            
+
         private class OrgUnitRow
         {
             public int RowIndex { get; set; }
@@ -489,11 +630,29 @@ namespace Core.ApplicationServices
             public OrganizationUnit Proxy { get; set; }
         }
 
+        private class ContractRow
+        {
+            public int RowIndex { get; set; }
+            public string Name { get; set; }
+            public string ItContractId { get; set; }
+            public string Esdh { get; set; }
+            public string Folder { get; set; }
+            public string Note { get; set; }
+            public DateTime? Concluded { get; set; }
+            public DateTime? IrrevocableTo { get; set; }
+            public DateTime? ExpirationDate { get; set; }
+            public DateTime? Terminated { get; set; }
+            public string ConcludedText { get; set; }
+            public string IrrevocableToText { get; set; }
+            public string ExpirationDateText { get; set; }
+            public string TerminatedText { get; set; }
+        }
+
         #region Table Helpers
 
         private static DataTable GetOrganizationTable(IEnumerable<OrganizationUnit> orgUnits)
         {
-            var table = new DataTable("Organisation");
+            var table = new DataTable("Organisationsenheder");
             table.Columns.Add();
             table.Columns.Add();
             table.Columns.Add();
@@ -504,70 +663,8 @@ namespace Core.ApplicationServices
                 var parent = "";
                 if (orgUnit.Parent != null)
                     parent = orgUnit.Parent.Name;
-                
+
                 table.Rows.Add(orgUnit.Id, orgUnit.Name, orgUnit.Ean, parent);
-            }
-
-            return table;
-        }
-
-        private static DataTable GetOrgRoleTable(IEnumerable<dynamic> orgRoles)
-        {
-            var table = new DataTable("Organisationsrolle");
-            table.Columns.Add();
-            table.Columns.Add();
-            table.Columns.Add();
-
-            foreach (var orgRole in orgRoles)
-            {
-                table.Rows.Add(orgRole.OrgUnit, orgRole.Role, orgRole.User);
-            }
-
-            return table;
-        }
-
-        private static DataTable GetOrgTaskTable(IEnumerable<dynamic> orgRoles)
-        {
-            var table = new DataTable("Organisationsopgaver");
-            table.Columns.Add();
-            table.Columns.Add();
-            table.Columns.Add();
-
-            foreach (var orgRole in orgRoles)
-            {
-                table.Rows.Add(orgRole.OrgUnit, orgRole.Task, orgRole.Overview);
-            }
-
-            return table;
-        }
-
-        private static DataTable GetRoleTable(IEnumerable<OrganizationRole> roles)
-        {
-            var table = new DataTable("Rolle");
-            table.Columns.Add();
-            table.Columns.Add();
-            table.Columns.Add();
-
-            foreach (var role in roles)
-            {
-                table.Rows.Add(role.Name, role.Id);
-            }
-
-            return table;
-        }
-
-        private static DataTable GetTaskTable(IEnumerable<TaskRef> tasks)
-        {
-            var table = new DataTable("Opgave");
-            table.Columns.Add();
-            table.Columns.Add();
-            table.Columns.Add();
-            table.Columns.Add();
-
-            foreach (var task in tasks)
-            {
-                var lookupString = task.TaskKey + " " + task.Description;
-                table.Rows.Add(lookupString, task.Id, task.TaskKey, task.Description);
             }
 
             return table;
@@ -575,7 +672,7 @@ namespace Core.ApplicationServices
 
         private static DataTable GetUserTable(IEnumerable<User> users)
         {
-            var table = new DataTable("Bruger");
+            var table = new DataTable("Brugere");
             table.Columns.Add();
             table.Columns.Add();
             table.Columns.Add();
@@ -583,12 +680,26 @@ namespace Core.ApplicationServices
             table.Columns.Add();
 
             foreach (var user in users)
-            {
-                var defaultOrgUnitName = "";
-                if (user.DefaultOrganizationUnit != null)
-                    defaultOrgUnitName = user.DefaultOrganizationUnit.Name;
+                table.Rows.Add(user.Id, user.Name, user.LastName, user.Email, user.PhoneNumber);
+            
+            return table;
+        }
 
-                table.Rows.Add( user.Id, user.Name, user.LastName, user.Email, user.PhoneNumber);
+        private static DataTable GetItContractTable(IEnumerable<ItContract> itContracts)
+        {
+            var table = new DataTable("IT Kontrakter");
+            
+            // add columns according to fields added below
+            for (var i = 0; i < 10; i++)
+                table.Columns.Add();
+
+            foreach (var contract in itContracts)
+            {
+                var concluded = contract.Concluded.HasValue ? contract.Concluded.Value.ToShortDateString() : null;
+                var irrevocableTo = contract.IrrevocableTo.HasValue ? contract.IrrevocableTo.Value.ToShortDateString() : null;
+                var expirationDate = contract.ExpirationDate.HasValue ? contract.ExpirationDate.Value.ToShortDateString() : null;
+                var terminated = contract.Terminated.HasValue ? contract.Terminated.Value.ToShortDateString() : null;
+                table.Rows.Add(contract.Id, contract.Name, contract.ItContractId, contract.Esdh, contract.Folder, contract.Note, concluded, irrevocableTo, expirationDate, terminated);
             }
 
             return table;
