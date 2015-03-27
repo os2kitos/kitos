@@ -102,7 +102,6 @@
                                 scope.uniqueConstraintError = true;
                                 deffered.reject();
                         });
-
                         return deffered.promise;
                     }
                 }
