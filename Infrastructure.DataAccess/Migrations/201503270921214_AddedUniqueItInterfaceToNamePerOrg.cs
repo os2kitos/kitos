@@ -9,6 +9,7 @@ namespace Infrastructure.DataAccess.Migrations
         {
             DropForeignKey("ItInterface", "FK_ItInterface_Organization_OrganizationId");
             DropIndex("ItInterface", "IX_NamePerOrg");
+            Sql("UPDATE ItInterface SET ItInterfaceId='' WHERE ItInterfaceId IS NULL");
             AlterColumn("ItInterface", "ItInterfaceId", c => c.String(nullable: false, maxLength: 100, storeType: "nvarchar"));
             CreateIndex("ItInterface", new[] { "OrganizationId", "Name", "ItInterfaceId" }, unique: true, name: "IX_NamePerOrg");
             AddForeignKey("ItInterface", "OrganizationId", "Organization");
