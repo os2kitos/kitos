@@ -212,6 +212,10 @@
     <Compile Include="Migrations\201503240921390_AddedItInterfaceNoteField.Designer.cs">
       <DependentUpon>201503240921390_AddedItInterfaceNoteField.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201503270921214_AddedUniqueItInterfaceToNamePerOrg.cs" />
+    <Compile Include="Migrations\201503270921214_AddedUniqueItInterfaceToNamePerOrg.Designer.cs">
+      <DependentUpon>201503270921214_AddedUniqueItInterfaceToNamePerOrg.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\BackupConfiguration.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -285,6 +289,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201503240921390_AddedItInterfaceNoteField.resx">
       <DependentUpon>201503240921390_AddedItInterfaceNoteField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503270921214_AddedUniqueItInterfaceToNamePerOrg.resx">
+      <DependentUpon>201503270921214_AddedUniqueItInterfaceToNamePerOrg.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
