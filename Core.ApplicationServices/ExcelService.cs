@@ -465,9 +465,9 @@ namespace Core.ApplicationServices
                     RowIndex = rowIndex, // needed for error reporting
                     IsNew = isNew,
                     Id = id,
-                    Name = row.Field<string>(1),
-                    Ean = StringToEan(row.Field<string>(2)),
-                    Parent = row.Field<string>(3)
+                    Parent = row.Field<string>(1),
+                    Name = row.Field<string>(2),
+                    Ean = StringToEan(row.Field<string>(3))
                 };
 
                 rowIndex++;
@@ -477,6 +477,18 @@ namespace Core.ApplicationServices
                 if (String.IsNullOrWhiteSpace(orgUnitRow.Name))
                 {
                     errors.Add(new ExcelImportOrgUnitNoNameError(orgUnitRow.RowIndex));
+                }
+                // ean must be valid
+                if (isNew && orgUnitRow.Ean.HasValue && orgUnitRow.Ean.ToString().Length != 13)
+                {
+                    var error = new ExcelImportError()
+                    {
+                        Row = orgUnitRow.RowIndex,
+                        Column = "D",
+                        Message = "EAN værdien er ikke gyldig",
+                        SheetName = "Organisationsenheder"
+                    };
+                    errors.Add(error);
                 }
                 // name cannot be duplicate
                 else if (unresolvedRows.Any(x => x.Name == orgUnitRow.Name) || resolvedRows.ContainsKey(orgUnitRow.Name))
@@ -569,7 +581,7 @@ namespace Core.ApplicationServices
             public ExcelImportOrgUnitBadParentError(int row)
             {
                 Row = row;
-                Column = "D";
+                Column = "B";
                 SheetName = "Organisationsenheder";
                 Message = "Overordnet enhed må ikke være blank og skal henvise til en gyldig enhed.";
             }
@@ -580,7 +592,7 @@ namespace Core.ApplicationServices
             public ExcelImportOrgUnitNoNameError(int row)
             {
                 Row = row;
-                Column = "B";
+                Column = "C";
                 SheetName = "Organisationsenheder";
                 Message = "Enheden skal have et navn.";
             }
@@ -591,7 +603,7 @@ namespace Core.ApplicationServices
             public ExcelImportOrgUnitDuplicateNameError(int row)
             {
                 Row = row;
-                Column = "B";
+                Column = "C";
                 SheetName = "Organisationsenheder";
                 Message = "Der findes allerede en enhed med dette navn.";
             }
@@ -602,7 +614,7 @@ namespace Core.ApplicationServices
             public ExcelImportOrgUnitDuplicateEanError(int row)
             {
                 Row = row;
-                Column = "C";
+                Column = "D";
                 SheetName = "Organisationsenheder";
                 Message = "Der findes allerede en enhed i KITOS med dette EAN nummer.";
             }
@@ -664,7 +676,7 @@ namespace Core.ApplicationServices
                 if (orgUnit.Parent != null)
                     parent = orgUnit.Parent.Name;
 
-                table.Rows.Add(orgUnit.Id, orgUnit.Name, orgUnit.Ean, parent);
+                table.Rows.Add(orgUnit.Id, parent, orgUnit.Name, orgUnit.Ean);
             }
 
             return table;
