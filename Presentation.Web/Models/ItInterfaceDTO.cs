@@ -12,6 +12,7 @@ namespace Presentation.Web.Models
         public string Name { get; set; }
         public string Url { get; set; }
         public string Description { get; set; }
+        public string Note { get; set; }
         public string ItInterfaceId { get; set; }
         public int OrganizationId { get; set; }
         public string OrganizationName { get; set; }
