@@ -92,12 +92,10 @@
 
                             $http.get('/api/itinterface?checkitinterfaceid=' + itInterfaceId + '&checkname=' + name + '&orgId=' + user.currentOrganizationId)
                                 .success(function (data) {
-                                    console.log("success");
                                     scope.uniqueConstraintError = false;
                                     deffered.resolve();
                                 })
                                 .error(function (data) {
-                                    console.log("error");
                                     scope.uniqueConstraintError = true;
                                     deffered.reject();
                                 });

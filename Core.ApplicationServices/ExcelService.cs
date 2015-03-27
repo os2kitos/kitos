@@ -258,7 +258,17 @@ namespace Core.ApplicationServices
         private IEnumerable<ExcelImportError> ImportUsersTransaction(DataTable userTable, int organizationId, User kitosUser)
         {
             var errors = new List<ExcelImportError>();
-            
+
+            var newUsers = userTable.Select("[Column1] IS NULL OR [Column1] = ''").AsEnumerable().ToList();
+            var firstRow = newUsers.FirstOrDefault();
+
+            // if nothing to add then abort here
+            if (firstRow == null)
+            {
+                errors.Add(new ExcelImportError { Message = "Intet at importere!" });
+                return errors;
+            }
+
             // unresolved rows are orgUnits which still needs to be added to the DB.
             var unresolvedRows = new List<UserRow>();
 
@@ -266,7 +276,7 @@ namespace Core.ApplicationServices
             // split the rows into the old org units (already in db)
             // and the new rows that the users has added to the sheet
             var rowIndex = 2;
-            foreach (var row in userTable.AsEnumerable())
+            foreach (var row in newUsers)
             {
                 // a row is new if the first column, the id, is empty
                 var id = StringToId(row.Field<string>(0));
@@ -420,13 +430,13 @@ namespace Core.ApplicationServices
         
         private static long? StringToEan(string s)
         {
-            if (string.IsNullOrEmpty(s)) return null;
+            if (String.IsNullOrEmpty(s)) return null;
 
             // if the ean was properly entered, excel will treat is as a Number,
             // which is bascially a string in double format i.e "12345678.0"
             // so try to parse as double first
             double dbl;
-            if (!double.TryParse(s, out dbl)) return null;
+            if (!Double.TryParse(s, out dbl)) return null;
 
             //then convert to long
             return Convert.ToInt64(dbl);
@@ -479,16 +489,19 @@ namespace Core.ApplicationServices
                     errors.Add(new ExcelImportOrgUnitNoNameError(orgUnitRow.RowIndex));
                 }
                 // ean must be valid
-                if (isNew && orgUnitRow.Ean.HasValue && orgUnitRow.Ean.ToString().Length != 13)
+                if (isNew && !String.IsNullOrWhiteSpace(row.Field<string>(3)))
                 {
-                    var error = new ExcelImportError()
+                    if (!(orgUnitRow.Ean.HasValue && orgUnitRow.Ean.ToString().Length == 13))
                     {
-                        Row = orgUnitRow.RowIndex,
-                        Column = "D",
-                        Message = "EAN værdien er ikke gyldig",
-                        SheetName = "Organisationsenheder"
-                    };
-                    errors.Add(error);
+                        var error = new ExcelImportError()
+                        {
+                            Row = orgUnitRow.RowIndex,
+                            Column = "D",
+                            Message = "EAN værdien er ikke gyldig",
+                            SheetName = "Organisationsenheder"
+                        };
+                        errors.Add(error);
+                    }
                 }
                 // name cannot be duplicate
                 else if (unresolvedRows.Any(x => x.Name == orgUnitRow.Name) || resolvedRows.ContainsKey(orgUnitRow.Name))
