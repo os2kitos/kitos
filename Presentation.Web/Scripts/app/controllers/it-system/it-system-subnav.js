@@ -113,23 +113,15 @@
 
 
                             $scope.validateName = function () {
-
-                                //cope.createForm.itInterfaceId.$setViewValue($scope.createForm.itInterfaceId.$viewValue);
-
                                 $scope.createForm.name.$validate();
                             }
                             $scope.validateItInterfaceId = function () {
-
-                                //$scope.createForm.name.$pristine = false;
-                                //$scope.createForm.itInterfaceId.$setViewValue($scope.createForm.itInterfaceId.$viewValue);
-
                                 $scope.createForm.itInterfaceId.$validate();
                             }
 
                             $scope.uniqueConstraintError = false;
                             
                             $scope.submit = function () {
-                                console.log($scope.formData);
                                 var payload = {
                                     name: $scope.formData.name,
                                     itInterfaceId: $scope.formData.itInterfaceId,
