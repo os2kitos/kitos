@@ -7,8 +7,6 @@ using System.Text.RegularExpressions;
 using Core.ApplicationServices;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
-using DataTable = System.Data.DataTable;
-using Font = DocumentFormat.OpenXml.Spreadsheet.Font;
 
 namespace Infrastructure.OpenXML
 {
@@ -18,13 +16,13 @@ namespace Infrastructure.OpenXML
         {
             var dataSet = new DataSet();
 
-            // Open document
+            // open document
             var spreadsheetDocument = SpreadsheetDocument.Open(stream, true);
 
-            // Open WorkbookPart
+            // open WorkbookPart
             var workbookPart = spreadsheetDocument.WorkbookPart;
 
-            // Open Sheets
+            // open Sheets
             var sheets = workbookPart.Workbook.GetFirstChild<Sheets>().Elements<Sheet>();
 
             foreach (var sheet in sheets)
@@ -44,7 +42,7 @@ namespace Infrastructure.OpenXML
 
                 foreach (var row in rows)
                 {
-                    //skip header row
+                    // skip header row
                     if (row.RowIndex < 2)
                         continue;
 
@@ -129,7 +127,7 @@ namespace Infrastructure.OpenXML
         /// <returns>Column Name (ie. B)</returns>
         private static string GetColumnName(string cellReference)
         {
-            // Match the column name portion of the cell name.
+            // match the column name portion of the cell name.
             var regex = new Regex("[A-Za-z]+");
             var match = regex.Match(cellReference);
 
@@ -183,13 +181,13 @@ namespace Infrastructure.OpenXML
 
         public Stream Export(DataSet data, Stream stream)
         {
-            // Open document
+            // open document
             var spreadsheetDocument = SpreadsheetDocument.Open(stream, true);
 
-            // Open a WorkbookPart
+            // open a WorkbookPart
             var workbookPart = spreadsheetDocument.WorkbookPart;
 
-            // Loop through data
+            // loop through data
             foreach (DataTable table in data.Tables)
             {
                 var id = workbookPart.Workbook.Descendants<Sheet>().First(x => x.Name == table.TableName).Id;
@@ -224,7 +222,7 @@ namespace Infrastructure.OpenXML
                 // we just appended a lock cell style, ergo it must be the last!
                 var cellLockStyleIndex = cellFormats.Count - 1; // the style index starts at 0 so subtract 1
 
-                // Delete all rows except for the header row
+                // delete all rows except for the header row
                 var headerRow = sheetData.Elements<Row>().FirstOrDefault();
                 sheetData.RemoveAllChildren();
                 sheetData.AppendChild(headerRow);
@@ -242,7 +240,7 @@ namespace Infrastructure.OpenXML
                             StyleIndex = cellLockStyleIndex //locked style
                         };
 
-                        //TODO: Altid int?
+                        //TODO: always int?
                         int t;
                         newCell.DataType = int.TryParse(row[column].ToString(), out t) ? CellValues.Number : CellValues.String;
                         newRow.AppendChild(newCell);
