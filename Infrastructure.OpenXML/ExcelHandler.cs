@@ -8,6 +8,7 @@ using Core.ApplicationServices;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
 using DataTable = System.Data.DataTable;
+using Font = DocumentFormat.OpenXml.Spreadsheet.Font;
 
 namespace Infrastructure.OpenXML
 {
@@ -195,32 +196,33 @@ namespace Infrastructure.OpenXML
                 var workSheetPart = (WorksheetPart)workbookPart.GetPartById(id);
                 var sheetData = workSheetPart.Worksheet.GetFirstChild<SheetData>();
 
-                /* disabled until more information on the subject is found... see last comment section
-                 //cell format is a kind of style that can be applied to cells 
-                var unlockedCellFormat = new CellFormat()
+                // append the locked cell format to the stylesheet
+                var stylesPart = workbookPart.GetPartsOfType<WorkbookStylesPart>().FirstOrDefault() ?? workbookPart.AddNewPart<WorkbookStylesPart>();
+                var stylesheet = stylesPart.Stylesheet;
+
+                var fonts = stylesheet.GetFirstChild<Fonts>();
+                fonts.AppendChild(new Font
                 {
-                    ApplyProtection = false,
-                    Protection = new Protection() { Locked = false }
-                };
-                
-                // append the unlocked cell format to the stylesheet
-                var unlockedStyle = workbookPart.AddNewPart<WorkbookStylesPart>();
-                unlockedStyle.Stylesheet.CellFormats.AppendChild<CellFormat>(unlockedCellFormat);
-                unlockedStyle.Stylesheet.Save();
-                 
-                var lockedCellFormat = new CellFormat()
+                    Italic = new Italic(),
+                    Color = new Color() {Rgb = "FF7F7F7F"}
+                });
+                fonts.Count++;
+
+                // we just appended a lock cell style, ergo it must be the last!
+                var fontId = fonts.Count - 1; // the fonts index starts at 0 so subtract 1
+                var lockFormat = new CellFormat
                 {
                     ApplyProtection = true,
-                    Protection = new Protection() { Locked = true }
+                    Protection = new Protection { Locked = true },
+                    FontId = fontId
                 };
 
+                var cellFormats = stylesheet.GetFirstChild<CellFormats>();
+                cellFormats.AppendChild(lockFormat);
+                cellFormats.Count++;
 
-                // append the locked cell format to the stylesheet
-                var workbookStylesPart = workbookPart.GetPartsOfType<WorkbookStylesPart>().FirstOrDefault() ?? workbookPart.AddNewPart<WorkbookStylesPart>();
-                workbookStylesPart.Stylesheet.CellFormats.AppendChild<CellFormat>(lockedCellFormat);
-                workbookStylesPart.Stylesheet.Save();
-                var lockedStyleIndex = UInt32Value.FromUInt32((uint)workbookStylesPart.Stylesheet.CellFormats.Count());
-                 */
+                // we just appended a lock cell style, ergo it must be the last!
+                var cellLockStyleIndex = cellFormats.Count - 1; // the style index starts at 0 so subtract 1
 
                 // Delete all rows except for the header row
                 var headerRow = sheetData.Elements<Row>().FirstOrDefault();
@@ -237,7 +239,7 @@ namespace Infrastructure.OpenXML
                         {
                             CellValue = new CellValue(row[column].ToString()),
                             DataType = CellValues.String,
-                            //StyleIndex = lockedStyleIndex //locked style
+                            StyleIndex = cellLockStyleIndex //locked style
                         };
 
                         //TODO: Altid int?
@@ -247,25 +249,7 @@ namespace Infrastructure.OpenXML
                     }
                     sheetData.AppendChild(newRow);
                 }
-
-                /* disabled until more information on the subject is found - or at least until i can test it properly
-                //this is also necessary to enable protection of cells. 
-                //a strong password is not really necessary for our application..... afterall this is not a security feature,
-                //but more of a UX thing - to avoid that the user accidentally edits stuff he can't
-                var sheetProtection = new SheetProtection();
-                sheetProtection.Password = "password";
-
-                //really, i have no idea what this means.......... see http://stackoverflow.com/questions/20257842/read-only-or-lock-the-particular-cells-or-rows-using-open-xml-sdk
-                sheetProtection.Sheet = true;
-                sheetProtection.Objects = true;
-                sheetProtection.Scenarios = true;         
-
-                workSheetPart.Worksheet.InsertAfter(sheetProtection, sheetData);
-                workSheetPart.Worksheet.Save();
-                 */
             }
-
-            workbookPart.Workbook.Save(); //TODO: Test if nessesary?
             spreadsheetDocument.Close();
 
             return stream;

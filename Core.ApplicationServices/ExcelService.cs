@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Transactions;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
 using Core.DomainServices;
 
 namespace Core.ApplicationServices
@@ -13,16 +14,19 @@ namespace Core.ApplicationServices
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<User> _userRepository;
+        private readonly IGenericRepository<ItContract> _itContractRepository;
         private readonly IGenericRepository<AdminRight> _adminRightRepository;
         private readonly IExcelHandler _excelHandler;
 
         public ExcelService(IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<User> userRepository,
+            IGenericRepository<ItContract> itContractRepository,
             IGenericRepository<AdminRight> adminRightRepository,
             IExcelHandler excelHandler)
         {
             _orgUnitRepository = orgUnitRepository;
             _userRepository = userRepository;
+            _itContractRepository = itContractRepository;
             _adminRightRepository = adminRightRepository;
             _excelHandler = excelHandler;
         }
@@ -66,11 +70,10 @@ namespace Core.ApplicationServices
             using (scope)
             {
                 var errors = new List<ExcelImportError>();
-
                 var set = _excelHandler.Import(stream);
 
                 // importing org units
-                var userTable = set.Tables[5];
+                var userTable = set.Tables[0];
                 errors.AddRange(ImportUsersTransaction(userTable, organizationId, kitosUser));
 
                 // then finally, did we notice any errors?
@@ -78,18 +81,184 @@ namespace Core.ApplicationServices
 
                 // if we got here, we're home frreeeee
                 scope.Complete();
-
             }
+        }
+
+        public void ExportItContracts(Stream stream, int organizationId, User kitosUser)
+        {
+            var contracts = _itContractRepository.Get(x => x.OrganizationId == organizationId);
+
+            var set = new DataSet();
+            set.Tables.Add(GetItContractTable(contracts));
+
+            _excelHandler.Export(set, stream);
+        }
+
+        public void ImportItContracts(Stream stream, int organizationId, User kitosUser)
+        {
+            // read excel stream to DataSet
+            var contractDataSet = _excelHandler.Import(stream);
+            // get contracts table
+            var contractDataTable = contractDataSet.Tables[0];
+            // import contracts
+            var errors = ImportItContractsTransaction(contractDataTable, organizationId, kitosUser).ToList();
+
+            // then finally, did we notice any errors?
+            if (errors.Any()) 
+                throw new ExcelImportException { Errors = errors };
+        }
+
+        private IEnumerable<ExcelImportError> ImportItContractsTransaction(DataTable contractTable, int organizationId, User kitosUser)
+        {
+            var errors = new List<ExcelImportError>();
+            
+            // select only contracts that should be inserted
+            var newContracts = contractTable.Select("[Column1] IS NULL OR [Column1] = ''").AsEnumerable().ToList();
+            var firstRow = newContracts.FirstOrDefault();
+            
+            // if nothing to add then abort here
+            if (firstRow == null)
+            {
+                errors.Add(new ExcelImportError { Message = "Intet at importere!"});
+                return errors;
+            }
+
+            var rowIndex = contractTable.Rows.IndexOf(firstRow) + 2; // adding 2 to get it to lign up with row numbers in excel
+            foreach (var row in newContracts)
+            {
+                var contractRow = new ContractRow
+                {
+                    RowIndex = rowIndex,
+                    Name = row.Field<string>(1),
+                    ItContractId = row.Field<string>(2),
+                    Esdh = row.Field<string>(3),
+                    Folder = row.Field<string>(4),
+                    Note = row.Field<string>(5),
+                    ConcludedText = row.Field<string>(6),
+                    IrrevocableToText = row.Field<string>(7),
+                    ExpirationDateText = row.Field<string>(8),
+                    TerminatedText = row.Field<string>(9),
+                };
+
+                // validate that name exists
+                if (String.IsNullOrEmpty(contractRow.Name) || String.IsNullOrWhiteSpace(contractRow.Name))
+                {
+                    var error = new ExcelImportError
+                    {
+                        Row = contractRow.RowIndex,
+                        Column = "B",
+                        Message = "IT Kontrakt Navn mangler",
+                        SheetName = "IT Kontrakter"
+                    };
+                    errors.Add(error);
+                }
+                    
+                // validate Concluded is a date
+                try
+                {
+                    // is something entered?
+                    if (!String.IsNullOrEmpty(contractRow.ConcludedText) && !String.IsNullOrWhiteSpace(contractRow.ConcludedText))
+                        contractRow.Concluded = DateTime.FromOADate(Double.Parse(contractRow.ConcludedText)).Date;
+                }
+                catch (Exception)
+                {
+                    var error = new ExcelImportError
+                    {
+                        Row = contractRow.RowIndex,
+                        Column = "G",
+                        Message = "Indgået er ikke en gyldig dato",
+                        SheetName = "IT Kontrakter"
+                    };
+                    errors.Add(error);
+                }
+                    
+                // validate IrrevocableTo is a date
+                try
+                {
+                    // is something entered?
+                    if (!String.IsNullOrEmpty(contractRow.IrrevocableToText) && !String.IsNullOrWhiteSpace(contractRow.IrrevocableToText))
+                        contractRow.IrrevocableTo = DateTime.FromOADate(Double.Parse(contractRow.IrrevocableToText)).Date;
+                }
+                catch (Exception)
+                {
+                    var error = new ExcelImportError
+                    {
+                        Row = contractRow.RowIndex,
+                        Column = "H",
+                        Message = "'Uopsigeligt til' er ikke en gyldig dato",
+                        SheetName = "IT Kontrakter"
+                    };
+                    errors.Add(error);
+                }
+
+                // validate ExpirationDate is a date
+                try
+                {
+                    // is something entered?
+                    if (!String.IsNullOrEmpty(contractRow.ExpirationDateText) && !String.IsNullOrWhiteSpace(contractRow.ExpirationDateText))
+                        contractRow.ExpirationDate = DateTime.FromOADate(Double.Parse(contractRow.ExpirationDateText)).Date;
+                }
+                catch (Exception)
+                {
+                    var error = new ExcelImportError
+                    {
+                        Row = contractRow.RowIndex,
+                        Column = "I",
+                        Message = "Udløbsdato er ikke en gyldig dato",
+                        SheetName = "IT Kontrakter"
+                    };
+                    errors.Add(error);
+                }
+
+                // validate Terminated is a date
+                try
+                {
+                    // is something entered?
+                    if (!String.IsNullOrEmpty(contractRow.TerminatedText) && !String.IsNullOrWhiteSpace(contractRow.TerminatedText))
+                        contractRow.Terminated = DateTime.FromOADate(Double.Parse(contractRow.TerminatedText)).Date;
+                }
+                catch (Exception)
+                {
+                    var error = new ExcelImportError
+                    {
+                        Row = contractRow.RowIndex,
+                        Column = "J",
+                        Message = "'Kontrakten opsagt' er ikke en gyldig dato",
+                        SheetName = "IT Kontrakter"
+                    };
+                    errors.Add(error);
+                }
+
+                _itContractRepository.Insert(new ItContract
+                {
+                    Name = contractRow.Name,
+                    ItContractId = contractRow.ItContractId,
+                    Esdh = contractRow.Esdh,
+                    Folder = contractRow.Folder,
+                    Note = contractRow.Note,
+                    Concluded = contractRow.Concluded,
+                    IrrevocableTo = contractRow.IrrevocableTo,
+                    ExpirationDate = contractRow.ExpirationDate,
+                    Terminated = contractRow.Terminated,
+                    OrganizationId = organizationId,
+                    LastChangedByUserId = kitosUser.Id,
+                    LastChanged = DateTime.Now,
+                    ObjectOwnerId = kitosUser.Id
+                });
+
+                rowIndex++;
+            }
+            // no errors found, it's safe to save to DB
+            if (!errors.Any())
+                _itContractRepository.Save();
+            
+            return errors;
         }
 
         private IEnumerable<ExcelImportError> ImportUsersTransaction(DataTable userTable, int organizationId, User kitosUser)
         {
             var errors = new List<ExcelImportError>();
-
-            // resolvedRows are the orgUnits that already has been added to the DB.
-            // the key is the name of the orgUnit;
-            var resolvedRows = new Dictionary<string, UserRow>();
-
+            
             // unresolved rows are orgUnits which still needs to be added to the DB.
             var unresolvedRows = new List<UserRow>();
 
@@ -117,7 +286,7 @@ namespace Core.ApplicationServices
                 rowIndex++;
 
                 // error checking
-                // name cannot be empty
+                // firstname cannot be empty
                 if (String.IsNullOrWhiteSpace(userRow.Name))
                 {
                     var error = new ExcelImportError()
@@ -130,7 +299,8 @@ namespace Core.ApplicationServices
 
                     errors.Add(error);
                 }
-                else if (String.IsNullOrWhiteSpace(userRow.LastName))
+                // lastname cannot be empty
+                if (String.IsNullOrWhiteSpace(userRow.LastName))
                 {
                     var error = new ExcelImportError()
                     {
@@ -143,7 +313,7 @@ namespace Core.ApplicationServices
                     errors.Add(error);
                 }
                 // email cannot be empty
-                else if (String.IsNullOrWhiteSpace(userRow.Email))
+                if (String.IsNullOrWhiteSpace(userRow.Email))
                 {
                     var error = new ExcelImportError()
                     {
@@ -156,16 +326,10 @@ namespace Core.ApplicationServices
                     errors.Add(error);
                 }
 
-                // otherwise we're good - add the row to either resolved or unresolved
-                else if (isNew)
+                if (isNew && !errors.Any())
                 {
                     unresolvedRows.Add(userRow);
                 }
-                else
-                {
-                    resolvedRows.Add(userRow.Name, userRow);
-                }
-
             }
 
             // do the actually passes, trying to resolve parents
@@ -200,7 +364,7 @@ namespace Core.ApplicationServices
                     }
                     else
                     {
-                        // fet user to ensure we're using the correct information
+                        // fetch user to ensure we're using the correct information
                         userEntity = _userRepository.Get(x => x.Email == userEntity.Email).First();
                     }
 
@@ -253,8 +417,7 @@ namespace Core.ApplicationServices
                 scope.Complete();
             }
         }
-
-
+        
         private static long? StringToEan(string s)
         {
             if (string.IsNullOrEmpty(s)) return null;
@@ -297,7 +460,7 @@ namespace Core.ApplicationServices
                 var id = StringToId(row.Field<string>(0));
                 var isNew = (id == null);
 
-                var orgUnitRow = new OrgUnitRow()
+                var orgUnitRow = new OrgUnitRow
                 {
                     RowIndex = rowIndex, // needed for error reporting
                     IsNew = isNew,
@@ -407,8 +570,8 @@ namespace Core.ApplicationServices
             {
                 Row = row;
                 Column = "D";
-                SheetName = "Organisation";
-                Message = "Overordnet enhed må ikke være blank og skal henvise til gyldig enhed.";
+                SheetName = "Organisationsenheder";
+                Message = "Overordnet enhed må ikke være blank og skal henvise til en gyldig enhed.";
             }
         }
 
@@ -418,7 +581,7 @@ namespace Core.ApplicationServices
             {
                 Row = row;
                 Column = "B";
-                SheetName = "Organisation";
+                SheetName = "Organisationsenheder";
                 Message = "Enheden skal have et navn.";
             }
         }
@@ -429,7 +592,7 @@ namespace Core.ApplicationServices
             {
                 Row = row;
                 Column = "B";
-                SheetName = "Organisation";
+                SheetName = "Organisationsenheder";
                 Message = "Der findes allerede en enhed med dette navn.";
             }
         }
@@ -440,7 +603,7 @@ namespace Core.ApplicationServices
             {
                 Row = row;
                 Column = "C";
-                SheetName = "Organisation";
+                SheetName = "Organisationsenheder";
                 Message = "Der findes allerede en enhed i KITOS med dette EAN nummer.";
             }
         }
@@ -467,11 +630,29 @@ namespace Core.ApplicationServices
             public OrganizationUnit Proxy { get; set; }
         }
 
+        private class ContractRow
+        {
+            public int RowIndex { get; set; }
+            public string Name { get; set; }
+            public string ItContractId { get; set; }
+            public string Esdh { get; set; }
+            public string Folder { get; set; }
+            public string Note { get; set; }
+            public DateTime? Concluded { get; set; }
+            public DateTime? IrrevocableTo { get; set; }
+            public DateTime? ExpirationDate { get; set; }
+            public DateTime? Terminated { get; set; }
+            public string ConcludedText { get; set; }
+            public string IrrevocableToText { get; set; }
+            public string ExpirationDateText { get; set; }
+            public string TerminatedText { get; set; }
+        }
+
         #region Table Helpers
 
         private static DataTable GetOrganizationTable(IEnumerable<OrganizationUnit> orgUnits)
         {
-            var table = new DataTable("Organisation");
+            var table = new DataTable("Organisationsenheder");
             table.Columns.Add();
             table.Columns.Add();
             table.Columns.Add();
@@ -491,7 +672,7 @@ namespace Core.ApplicationServices
 
         private static DataTable GetUserTable(IEnumerable<User> users)
         {
-            var table = new DataTable("Bruger");
+            var table = new DataTable("Brugere");
             table.Columns.Add();
             table.Columns.Add();
             table.Columns.Add();
@@ -501,6 +682,26 @@ namespace Core.ApplicationServices
             foreach (var user in users)
                 table.Rows.Add(user.Id, user.Name, user.LastName, user.Email, user.PhoneNumber);
             
+            return table;
+        }
+
+        private static DataTable GetItContractTable(IEnumerable<ItContract> itContracts)
+        {
+            var table = new DataTable("IT Kontrakter");
+            
+            // add columns according to fields added below
+            for (var i = 0; i < 10; i++)
+                table.Columns.Add();
+
+            foreach (var contract in itContracts)
+            {
+                var concluded = contract.Concluded.HasValue ? contract.Concluded.Value.ToShortDateString() : null;
+                var irrevocableTo = contract.IrrevocableTo.HasValue ? contract.IrrevocableTo.Value.ToShortDateString() : null;
+                var expirationDate = contract.ExpirationDate.HasValue ? contract.ExpirationDate.Value.ToShortDateString() : null;
+                var terminated = contract.Terminated.HasValue ? contract.Terminated.Value.ToShortDateString() : null;
+                table.Rows.Add(contract.Id, contract.Name, contract.ItContractId, contract.Esdh, contract.Folder, contract.Note, concluded, irrevocableTo, expirationDate, terminated);
+            }
+
             return table;
         }
 
