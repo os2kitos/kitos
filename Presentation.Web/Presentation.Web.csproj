@@ -840,8 +840,6 @@
     <Content Include="Content\kendo\fonts\DejaVu\DejaVuSerif-Italic.ttf" />
     <Content Include="Content\kendo\fonts\DejaVu\DejaVuSerif.ttf" />
     <Content Include="Content\kendo\fonts\DejaVu\LICENSE" />
-    <Content Include="Content\excel\OS2KITOS Excel Skabelon Organisation.OLD.xlsx" />
-    <Content Include="Content\excel\OS2KITOS Excel Skabelon Brugere.xlsx" />
     <None Include="Properties\PublishProfiles\Kitos - Prodmiljø.pubxml" />
     <None Include="Properties\PublishProfiles\Kitos - Testmiljø.pubxml" />
     <None Include="Properties\Settings.settings">
