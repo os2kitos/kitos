@@ -420,13 +420,13 @@ namespace Core.ApplicationServices
         
         private static long? StringToEan(string s)
         {
-            if (string.IsNullOrEmpty(s)) return null;
+            if (String.IsNullOrEmpty(s)) return null;
 
             // if the ean was properly entered, excel will treat is as a Number,
             // which is bascially a string in double format i.e "12345678.0"
             // so try to parse as double first
             double dbl;
-            if (!double.TryParse(s, out dbl)) return null;
+            if (!Double.TryParse(s, out dbl)) return null;
 
             //then convert to long
             return Convert.ToInt64(dbl);
@@ -479,16 +479,19 @@ namespace Core.ApplicationServices
                     errors.Add(new ExcelImportOrgUnitNoNameError(orgUnitRow.RowIndex));
                 }
                 // ean must be valid
-                if (isNew && orgUnitRow.Ean.HasValue && orgUnitRow.Ean.ToString().Length != 13)
+                if (isNew && !String.IsNullOrWhiteSpace(row.Field<string>(3)))
                 {
-                    var error = new ExcelImportError()
+                    if (!(orgUnitRow.Ean.HasValue && orgUnitRow.Ean.ToString().Length == 13))
                     {
-                        Row = orgUnitRow.RowIndex,
-                        Column = "D",
-                        Message = "EAN værdien er ikke gyldig",
-                        SheetName = "Organisationsenheder"
-                    };
-                    errors.Add(error);
+                        var error = new ExcelImportError()
+                        {
+                            Row = orgUnitRow.RowIndex,
+                            Column = "D",
+                            Message = "EAN værdien er ikke gyldig",
+                            SheetName = "Organisationsenheder"
+                        };
+                        errors.Add(error);
+                    }
                 }
                 // name cannot be duplicate
                 else if (unresolvedRows.Any(x => x.Name == orgUnitRow.Name) || resolvedRows.ContainsKey(orgUnitRow.Name))
