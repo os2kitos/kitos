@@ -213,8 +213,11 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!IsAvailable(dto.Name, dto.OrganizationId))
-                    return Conflict("Name is already taken!");
+                //if (!IsAvailable(dto.Name, dto.OrganizationId))
+                //    return Conflict("Name is already taken!");
+
+                if (!IsItInterfaceIdAndNameUnique(dto.ItInterfaceId, dto.Name, dto.OrganizationId))
+                    return Conflict("ItInterface with same InterfaceId and Name is taken!");
 
                 var item = Map(dto);
 
@@ -278,7 +281,8 @@ namespace Presentation.Web.Controllers.API
 
         private bool IsItInterfaceIdAndNameUnique(string itInterfaceId, string name, int orgId)
         {
-            var system = Repository.Get(x => x.ItInterfaceId == itInterfaceId && x.Name == name && x.OrganizationId == orgId);
+            if (itInterfaceId == "undefined") itInterfaceId = null;
+            var system = Repository.Get(x => x.ItInterfaceId == (itInterfaceId ?? string.Empty) && x.Name == name && x.OrganizationId == orgId);
             return !system.Any();
         }
 

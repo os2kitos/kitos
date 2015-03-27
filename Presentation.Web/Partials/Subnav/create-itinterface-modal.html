@@ -7,13 +7,10 @@
             <label class="control-label" for="name">Navn</label>
             <input type="text" class="form-control" name="name" id="name" data-ng-change="validateItInterfaceId()" placeholder="navn" required data-ng-model="formData.name" data-unique-it-interface-id-name="{{checkAvailbleUrl}}">
             <label class="control-label" for="itInterfaceId">Snitflade Id</label>
-            <input type="text" class="form-control" name="itInterfaceId" data-ng-change="validateName()" id="itInterfaceId" placeholder="Snitflade ID" required data-ng-model="formData.itInterfaceId" data-unique-it-interface-id-name="{{checkAvailbleUrl}}">
+            <input type="text" class="form-control" name="itInterfaceId" data-ng-change="validateName()" id="itInterfaceId" placeholder="Snitflade ID" data-ng-model="formData.itInterfaceId" data-unique-it-interface-id-name="{{checkAvailbleUrl}}">
 
             <span class="help-block" data-ng-show="createForm.name.$error.required">Navn er påkrævet!</span>
-            <span class="help-block" data-ng-show="createForm.name.$error.lookup">Der skete en fejl ved tjek om navnet er ledig!</span>
-            <span class="help-block" data-ng-show="createForm.itInterfaceId.$error.lookup">Der skete en fejl ved tjek om Snitflade ID er ledig!</span>
-            <span class="help-block" data-ng-show="createForm.itInterfaceId.$error.required">Snitflade ID er påkrævet!</span>
-            <span class="help-block" data-ng-show="uniqueConstraintError">Snitflade med samme navn og ID findes allerede.</span>
+            <span class="help-block" data-ng-show="uniqueConstraintError == true">Snitflade med samme navn og ID findes allerede.</span>
         </div>
     </div>
     <div class="modal-footer">
