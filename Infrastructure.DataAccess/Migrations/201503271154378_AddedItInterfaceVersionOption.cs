@@ -3,7 +3,7 @@ namespace Infrastructure.DataAccess.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class AddedVersionOption : DbMigration
+    public partial class AddedItInterfaceVersionOption : DbMigration
     {
         public override void Up()
         {
@@ -28,7 +28,6 @@ namespace Infrastructure.DataAccess.Migrations
             AddForeignKey("VersionOptions", "ObjectOwnerId", "User", "Id");
             AddForeignKey("VersionOptions", "LastChangedByUserId", "User", "Id");
             DropColumn("ItInterface", "Version");
-
         }
         
         public override void Down()

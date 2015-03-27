@@ -37,7 +37,7 @@ namespace Presentation.Web.Models
         public IEnumerable<DataRowDTO> DataRows { get; set; }
         public int? BelongsToId { get; set; }
         public string BelongsToName { get; set; }
-        public int? VersionId { get; set; }
+        public int? VersionOptionId { get; set; }
         public VersionOption VersionOption { get; set; }
 
         /// <summary>

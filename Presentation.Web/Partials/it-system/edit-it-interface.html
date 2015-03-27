@@ -31,9 +31,9 @@
                         <select id="interface-versionOption" class="form-control input-sm"
                                 data-ui-select2="allowClearOption"
                                 data-placeholder="Vælg version"
-                               data-ng-disabled="!hasWriteAccess"
-                                data-ng-model="interface.versionId"
-                                data-autosave="{{ autoSaveUrl }}"
+                                data-ng-disabled="!hasWriteAccess"
+                                data-ng-model="interface.versionOptionId"
+                                data-autosave="{{interface.updateUrl}}"
                                 data-field="versionOptionId">
                             <option value=""></option>
                             <option data-ng-repeat="versionOption in versionOptions" value="{{versionOption.id}}">{{versionOption.name}}</option>
