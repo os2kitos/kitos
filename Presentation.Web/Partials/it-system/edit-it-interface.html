@@ -25,14 +25,19 @@
                                data-ng-model="interface.itInterfaceId" />
                     </div>
 
-                    <!-- Version -->
+                    <!-- VersionOptions -->
                     <div class="form-group">
-                        <label for="interface-version" class="control-label small">Version</label>
-                        <input type="text" id="interface-version" class="form-control input-sm"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-autosave="{{interface.updateUrl}}"
-                               data-field="version"
-                               data-ng-model="interface.version">
+                        <label for="interface-versionOption" class="control-label small">Version</label>
+                        <select id="interface-versionOption" class="form-control input-sm"
+                                data-ui-select2="allowClearOption"
+                                data-placeholder="Vælg version"
+                                data-ng-disabled="!hasWriteAccess"
+                                data-ng-model="interface.versionOptionId"
+                                data-autosave="{{interface.updateUrl}}"
+                                data-field="versionOptionId">
+                            <option value=""></option>
+                            <option data-ng-repeat="versionOption in versionOptions" value="{{versionOption.id}}">{{versionOption.name}}</option>
+                        </select>
                     </div>
                 </div>
             </div>
