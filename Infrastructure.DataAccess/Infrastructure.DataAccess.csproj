@@ -208,6 +208,10 @@
     <Compile Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.Designer.cs">
       <DependentUpon>201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201503240921390_AddedItInterfaceNoteField.cs" />
+    <Compile Include="Migrations\201503240921390_AddedItInterfaceNoteField.Designer.cs">
+      <DependentUpon>201503240921390_AddedItInterfaceNoteField.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\201503262102361_AddedUniqueItInterfaceToNamePerOrg.cs" />
     <Compile Include="Migrations\201503262102361_AddedUniqueItInterfaceToNamePerOrg.Designer.cs">
       <DependentUpon>201503262102361_AddedUniqueItInterfaceToNamePerOrg.cs</DependentUpon>
@@ -282,6 +286,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.resx">
       <DependentUpon>201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503240921390_AddedItInterfaceNoteField.resx">
+      <DependentUpon>201503240921390_AddedItInterfaceNoteField.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201503262102361_AddedUniqueItInterfaceToNamePerOrg.resx">
       <DependentUpon>201503262102361_AddedUniqueItInterfaceToNamePerOrg.cs</DependentUpon>

@@ -1,21 +1,20 @@
-﻿(function(ng, app) {
+﻿(function (ng, app) {
     app.config([
-        '$stateProvider', function($stateProvider) {
-            $stateProvider.state('local-config.import.organization', {
-                url: '/organization',
+        '$stateProvider', function ($stateProvider) {
+            $stateProvider.state('local-config.import.contracts', {
+                url: '/contracts',
                 templateUrl: 'partials/local-config/import-template.html',
-                controller: 'local-config.import.ImportOrgCtrl',
+                controller: 'local-config.import.ImportContractCtrl',
             });
         }
     ]);
 
-    app.controller('local-config.import.ImportOrgCtrl', [
+    app.controller('local-config.import.ImportContractCtrl', [
         '$rootScope', '$scope', '$http', 'notify', 'user',
         function ($rootScope, $scope, $http, notify, user) {
-            $scope.url = 'api/excel?organizationId=' + user.currentOrganizationId + '&exportOrgUnits';
-            $scope.title = 'organisationsenheder';
-
-            //Import OrganizationUnits
+            $scope.url = 'api/excel?organizationId=' + user.currentOrganizationId + '&exportContracts';
+            $scope.title = 'IT Kontrakter';
+            
             $scope.submit = function () {
                 var msg = notify.addInfoMessage("Læser excel ark...", false);
                 var formData = new FormData();
@@ -25,7 +24,8 @@
                 if ($scope.file) {
                     formData.append('file', $scope.file, $scope.file.name);
                 }
-                $http.post('/api/excel?organizationId=' + user.currentOrganizationId + '&importOrgUnits', formData, {
+
+                $http.post('/api/excel?organizationId=' + user.currentOrganizationId + '&importContracts', formData, {
                     // angular.identity, a bit of Angular magic to parse our FormData object
                     transformRequest: angular.identity,
                     // IMPORTANT!!! You might think this should be set to 'multipart/form-data' 

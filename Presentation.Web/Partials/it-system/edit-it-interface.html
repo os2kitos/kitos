@@ -99,6 +99,16 @@
                                data-ng-model="interface.url">
                         <span class="help-block">Skal starte med http://</span>
                     </div>
+
+                    <!-- Note -->
+                    <div class="form-group">
+                        <label for="interface-note" class="control-label small">Note</label>
+                        <textarea id="interface-note" class="form-control input-sm" rows="4"
+                                  data-autosave="{{interface.updateUrl}}"
+                                  data-field="note"
+                                  data-ng-disabled="!hasWriteAccess"
+                                  data-ng-model="interface.note"></textarea>
+                    </div>
                 </div>
             </div>
         </div>

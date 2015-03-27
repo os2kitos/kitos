@@ -54,6 +54,10 @@
     <Reference Include="AutoMapper.Net4">
       <HintPath>..\packages\AutoMapper.3.3.0\lib\net40\AutoMapper.Net4.dll</HintPath>
     </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
     <Reference Include="DotNetOpenAuth.AspNet, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\DotNetOpenAuth.AspNet.4.3.4.13329\lib\net45-full\DotNetOpenAuth.AspNet.dll</HintPath>
@@ -224,6 +228,9 @@
     <Reference Include="WebMatrix.WebData, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.WebData.3.2.2\lib\net45\WebMatrix.WebData.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase">
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -535,8 +542,7 @@
     <Content Include="Partials\it-system\tab-roles.html" />
     <Content Include="Partials\it-system\tab-wishes.html" />
     <Content Include="Partials\it-system\usage-it-system.html" />
-    <Content Include="Partials\local-config\import-organization.html" />
-    <Content Include="Partials\local-config\import-users.html" />
+    <Content Include="Partials\local-config\import-template.html" />
     <Content Include="Partials\local-config\tab-contract.html" />
     <Content Include="Partials\local-config\tab-import.html" />
     <Content Include="Partials\local-config\tab-system.html" />
@@ -656,6 +662,7 @@
     <Content Include="Scripts\app\controllers\it-system\usage\it-system-wishes.js" />
     <Content Include="Scripts\app\controllers\it-system\usage\it-system-interfaces.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-import-org.js" />
+    <Content Include="Scripts\app\controllers\local-config\local-config-import-contracts.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-import-users.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-import.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-system.js" />
@@ -685,14 +692,14 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="Content\excel\OS2KITOS Excel Skabelon Organisation.xlsx" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
-    <Content Include="Content\excel\OS2KITOS Excel Skabelon Organisation.OLD.xlsx" />
-    <Content Include="Content\excel\OS2KITOS Excel Skabelon Brugere.xlsx" />
+    <Content Include="Content\excel\OS2KITOS IT Kontrakter.xlsx" />
+    <Content Include="Content\excel\OS2KITOS Brugere.xlsx" />
+    <Content Include="Content\excel\OS2KITOS Organisationsenheder.xlsx" />
     <None Include="Properties\PublishProfiles\Kitos - Prodmiljø.pubxml" />
     <None Include="Properties\PublishProfiles\Kitos - Testmiljø.pubxml" />
     <None Include="Properties\Settings.settings">
@@ -1593,15 +1600,6 @@
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug %40 Test Mijlø|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Sandbox|AnyCPU'">
     <OutputPath>bin\</OutputPath>
