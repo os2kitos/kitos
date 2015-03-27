@@ -258,7 +258,17 @@ namespace Core.ApplicationServices
         private IEnumerable<ExcelImportError> ImportUsersTransaction(DataTable userTable, int organizationId, User kitosUser)
         {
             var errors = new List<ExcelImportError>();
-            
+
+            var newUsers = userTable.Select("[Column1] IS NULL OR [Column1] = ''").AsEnumerable().ToList();
+            var firstRow = newUsers.FirstOrDefault();
+
+            // if nothing to add then abort here
+            if (firstRow == null)
+            {
+                errors.Add(new ExcelImportError { Message = "Intet at importere!" });
+                return errors;
+            }
+
             // unresolved rows are orgUnits which still needs to be added to the DB.
             var unresolvedRows = new List<UserRow>();
 
@@ -266,7 +276,7 @@ namespace Core.ApplicationServices
             // split the rows into the old org units (already in db)
             // and the new rows that the users has added to the sheet
             var rowIndex = 2;
-            foreach (var row in userTable.AsEnumerable())
+            foreach (var row in newUsers)
             {
                 // a row is new if the first column, the id, is empty
                 var id = StringToId(row.Field<string>(0));
