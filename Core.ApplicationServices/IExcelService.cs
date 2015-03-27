@@ -13,6 +13,8 @@ namespace Core.ApplicationServices
         void ImportUsers(Stream stream, int organizationId, User kitosUser);
         void ExportItContracts(Stream stream, int organizationId, User kitosUser);
         void ImportItContracts(Stream stream, int organizationId, User kitosUser);
+        void ExportItInterfaces(Stream stream, int organizationId, User kitosUser);
+        void ImportItInterfaces(Stream stream, int organizationId, User kitosUser);
     }
 
     public class ExcelImportException : Exception

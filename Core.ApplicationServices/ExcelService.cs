@@ -6,6 +6,7 @@ using System.Linq;
 using System.Transactions;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 
 namespace Core.ApplicationServices
@@ -15,18 +16,24 @@ namespace Core.ApplicationServices
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<User> _userRepository;
         private readonly IGenericRepository<ItContract> _itContractRepository;
+        private readonly IGenericRepository<ItInterface> _itInterfaceRepository;
+        private readonly IGenericRepository<ItSystem> _itSystemRepository;
         private readonly IGenericRepository<AdminRight> _adminRightRepository;
         private readonly IExcelHandler _excelHandler;
 
         public ExcelService(IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<User> userRepository,
             IGenericRepository<ItContract> itContractRepository,
+            IGenericRepository<ItInterface> itInterfaceRepository,
+            IGenericRepository<ItSystem> itSystemRepository,
             IGenericRepository<AdminRight> adminRightRepository,
             IExcelHandler excelHandler)
         {
             _orgUnitRepository = orgUnitRepository;
             _userRepository = userRepository;
             _itContractRepository = itContractRepository;
+            _itInterfaceRepository = itInterfaceRepository;
+            _itSystemRepository = itSystemRepository;
             _adminRightRepository = adminRightRepository;
             _excelHandler = excelHandler;
         }
@@ -108,6 +115,184 @@ namespace Core.ApplicationServices
                 throw new ExcelImportException { Errors = errors };
         }
 
+        public void ExportItInterfaces(Stream stream, int organizationId, User kitosUser)
+        {
+            var itInterfaces = _itInterfaceRepository.Get(
+                s =>
+                    // global admin sees all within the context 
+                    kitosUser.IsGlobalAdmin &&
+                    s.OrganizationId == organizationId ||
+                    // object owner sees his own objects     
+                    s.ObjectOwnerId == kitosUser.Id ||
+                    // it's public everyone can see it
+                    s.AccessModifier == AccessModifier.Public ||
+                    // everyone in the same organization can see normal objects
+                    s.AccessModifier == AccessModifier.Normal &&
+                    s.OrganizationId == organizationId
+                    // it systems doesn't have roles so private doesn't make sense
+                    // only object owners will be albe to see private objects
+                );
+
+            var itSystems = _itSystemRepository.Get(
+                s =>
+                    // it's public everyone can see it
+                    s.AccessModifier == AccessModifier.Public ||
+                    // It's in the right context
+                    s.OrganizationId == organizationId &&
+                    // global admin sees all within the context
+                    (kitosUser.IsGlobalAdmin ||
+                     // object owner sees his own objects within the given context
+                     s.ObjectOwnerId == kitosUser.Id ||
+                     // everyone in the same organization can see normal objects
+                     s.AccessModifier == AccessModifier.Normal)
+                    // it systems doesn't have roles so private doesn't make sense
+                    // only object owners will be albe to see private objects
+                );
+
+            var set = new DataSet();
+            set.Tables.Add(GetItInterfaceTable(itInterfaces));
+            set.Tables.Add(GetItSystemTable(itSystems));
+            
+            _excelHandler.Export(set, stream);
+        }
+
+        public void ImportItInterfaces(Stream stream, int organizationId, User kitosUser)
+        {
+            // read excel stream to DataSet
+            var contractDataSet = _excelHandler.Import(stream);
+            // get contracts table
+            var contractDataTable = contractDataSet.Tables[0];
+            // select only rows that should be inserted
+            var newItInterfaces = contractDataTable.Select("[Column1] IS NULL OR [Column1] = ''").AsEnumerable().ToList();
+
+            var errors = new List<ExcelImportError>();
+            var firstRow = newItInterfaces.FirstOrDefault();
+            // if nothing to add then abort here
+            if (firstRow == null)
+            {
+                errors.Add(new ExcelImportError { Message = "Intet at importere!"});
+            }
+
+            var rowIndex = contractDataTable.Rows.IndexOf(firstRow) + 2; // adding 2 to get it to line up with row numbers in excel
+            foreach (var row in newItInterfaces)
+            {
+                var interfaceRow = new InterfaceRow
+                {
+                    Name = row.Field<string>(1),
+                    ItInterfaceId = row.Field<string>(2),
+                    Note = row.Field<string>(3),
+                    Description = row.Field<string>(4),
+                    Link = row.Field<string>(5),
+                    ExhibitedByText = row.Field<string>(6)
+                };
+                
+                // name is required
+                if (String.IsNullOrEmpty(interfaceRow.Name) || String.IsNullOrWhiteSpace(interfaceRow.Name))
+                {
+                    var error = new ExcelImportError
+                    {
+                        Row = rowIndex,
+                        Column = "B",
+                        Message = "Snitflade Navn mangler",
+                        SheetName = "Snitflader"
+                    };
+                    errors.Add(error);
+                }
+
+                // name and ItInterfaceId combo should be unique within the context
+                if (_itInterfaceRepository.Get(x => x.OrganizationId == organizationId && x.Name == interfaceRow.Name && x.ItInterfaceId == interfaceRow.ItInterfaceId).Any())
+                {
+                    var error = new ExcelImportError
+                    {
+                        Row = rowIndex,
+                        Column = "B og C",
+                        Message = "Der findes allerede en snitflade med det navn og id",
+                        SheetName = "Snitflader"
+                    };
+                    errors.Add(error);
+                }
+
+                // link should be an address, if set
+                if (!String.IsNullOrWhiteSpace(interfaceRow.Link) && !Uri.IsWellFormedUriString(interfaceRow.Link, UriKind.Absolute))
+                {
+                    var error = new ExcelImportError
+                    {
+                        Row = rowIndex,
+                        Column = "F",
+                        Message = "Linket er ikke i korrekt format",
+                        SheetName = "Snitflader"
+                    };
+                    errors.Add(error);
+                }
+
+                var itSystem = _itSystemRepository.Get(s =>
+                    // equals name
+                    s.Name == interfaceRow.ExhibitedByText &&
+                    // it's public everyone can see it
+                    (s.AccessModifier == AccessModifier.Public ||
+                    // It's in the right context
+                    s.OrganizationId == organizationId &&
+                    // global admin sees all within the context
+                    (kitosUser.IsGlobalAdmin ||
+                     // object owner sees his own objects within the given context
+                     s.ObjectOwnerId == kitosUser.Id ||
+                     // everyone in the same organization can see normal objects
+                     s.AccessModifier == AccessModifier.Normal)
+                    // it systems doesn't have roles so private doesn't make sense
+                    // only object owners will be albe to see private objects
+                    )).FirstOrDefault();
+
+                
+                if (itSystem == null)
+                {
+                    var error = new ExcelImportError
+                    {
+                        Row = rowIndex,
+                        Column = "G",
+                        Message = "'Udstillet af' har en ugyldig værdi",
+                        SheetName = "Snitflader"
+                    };
+                    errors.Add(error);
+                }
+                
+                rowIndex++;
+
+                var itInterface = new ItInterface
+                {
+                    Name = interfaceRow.Name,
+                    ItInterfaceId = interfaceRow.ItInterfaceId,
+                    Note = interfaceRow.Note,
+                    Description = interfaceRow.Description,
+                    Url = interfaceRow.Link,
+                    OrganizationId = organizationId,
+                    LastChangedByUserId = kitosUser.Id,
+                    LastChanged = DateTime.Now,
+                    ObjectOwnerId = kitosUser.Id
+                };
+
+                // have to move this "else" part of the above "if (itSystem == null)" down here 
+                if (itSystem != null)
+                {
+                    interfaceRow.ExhibitedBy = new ItInterfaceExhibit
+                    {
+                        ItInterface = itInterface, // to get access to this variable
+                        ItSystemId = itSystem.Id,
+                        LastChangedByUserId = kitosUser.Id,
+                        LastChanged = DateTime.Now,
+                        ObjectOwnerId = kitosUser.Id
+                    };
+                }
+
+                _itInterfaceRepository.Insert(itInterface);
+            }
+
+            if (errors.Any())
+                throw new ExcelImportException { Errors = errors };
+            
+            // no errors found, it's safe to save to DB
+            _itContractRepository.Save();
+        }
+
         private IEnumerable<ExcelImportError> ImportItContractsTransaction(DataTable contractTable, int organizationId, User kitosUser)
         {
             var errors = new List<ExcelImportError>();
@@ -123,7 +308,7 @@ namespace Core.ApplicationServices
                 return errors;
             }
 
-            var rowIndex = contractTable.Rows.IndexOf(firstRow) + 2; // adding 2 to get it to lign up with row numbers in excel
+            var rowIndex = contractTable.Rows.IndexOf(firstRow) + 2; // adding 2 to get it to line up with row numbers in excel
             foreach (var row in newContracts)
             {
                 var contractRow = new ContractRow
@@ -648,6 +833,17 @@ namespace Core.ApplicationServices
             public string TerminatedText { get; set; }
         }
 
+        private class InterfaceRow
+        {
+            public string Name { get; set; }
+            public string ItInterfaceId { get; set; }
+            public string Note { get; set; }
+            public string Description { get; set; }
+            public string Link { get; set; }
+            public string ExhibitedByText { get; set; }
+            public ItInterfaceExhibit ExhibitedBy { get; set; }
+        }
+
         #region Table Helpers
 
         private static DataTable GetOrganizationTable(IEnumerable<OrganizationUnit> orgUnits)
@@ -700,6 +896,46 @@ namespace Core.ApplicationServices
                 var expirationDate = contract.ExpirationDate.HasValue ? contract.ExpirationDate.Value.ToShortDateString() : null;
                 var terminated = contract.Terminated.HasValue ? contract.Terminated.Value.ToShortDateString() : null;
                 table.Rows.Add(contract.Id, contract.Name, contract.ItContractId, contract.Esdh, contract.Folder, contract.Note, concluded, irrevocableTo, expirationDate, terminated);
+            }
+
+            return table;
+        }
+
+        private static DataTable GetItInterfaceTable(IEnumerable<ItInterface> itInterfaces)
+        {
+            var table = new DataTable("Snitflader");
+
+            // add columns according to fields added below
+            for (var i = 0; i < 7; i++)
+                table.Columns.Add();
+
+            foreach (var itInterface in itInterfaces)
+            {
+                string exhibitedBySystemName = null;
+                var exhibitedBy = itInterface.ExhibitedBy;
+                if (exhibitedBy != null)
+                {
+                    exhibitedBySystemName = exhibitedBy.ItSystem.Name;
+                }
+
+                table.Rows.Add(itInterface.Id, itInterface.Name, itInterface.ItInterfaceId, itInterface.Note,
+                    itInterface.Description, itInterface.Url, exhibitedBySystemName);
+            }
+
+            return table;
+        }
+
+        private static DataTable GetItSystemTable(IEnumerable<ItSystem> itSystems)
+        {
+            var table = new DataTable("IT Systemer");
+
+            // add columns according to fields added below
+            for (var i = 0; i < 2; i++)
+                table.Columns.Add();
+
+            foreach (var itSystem in itSystems)
+            {
+                table.Rows.Add(itSystem.Id, itSystem.Name);
             }
 
             return table;

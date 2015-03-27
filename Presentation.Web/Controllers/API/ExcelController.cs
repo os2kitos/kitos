@@ -128,6 +128,41 @@ namespace Presentation.Web.Controllers.API
 
         #endregion
 
+        #region Excel IT Interfaces
+
+        public HttpResponseMessage GetItInterfaces(int organizationId, bool? exportInterfaces)
+        {
+            const string filename = "OS2KITOS Snitflader.xlsx";
+            var stream = new MemoryStream();
+            using (var file = File.OpenRead(_mapPath + filename))
+                file.CopyTo(stream);
+
+            _excelService.ExportItInterfaces(stream, organizationId, KitosUser);
+            return GetResponseMessage(stream, filename);
+        }
+
+        public async Task<HttpResponseMessage> PostItInterfaces(int organizationId, bool? importInterfaces)
+        {
+            // check if the request contains multipart/form-data.
+            if (!Request.Content.IsMimeMultipartContent())
+                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+
+            // read multipart form data
+            var stream = await ReadMultipartRequestAsync();
+
+            try
+            {
+                _excelService.ImportItInterfaces(stream, organizationId, KitosUser);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (ExcelImportException e)
+            {
+                return Request.CreateResponse(HttpStatusCode.Conflict, GetErrorMessages(e));
+            }
+        }
+
+        #endregion
+
         #region Helpers
 
         private static HttpResponseMessage GetResponseMessage(Stream stream, string filename)
