@@ -271,11 +271,11 @@ namespace Core.ApplicationServices
 
             // unresolved rows are orgUnits which still needs to be added to the DB.
             var unresolvedRows = new List<UserRow>();
-
+            
+            var rowIndex = userTable.Rows.IndexOf(firstRow) + 2; // adding 2 to get it to lign up with row numbers in excel
+            
             // preliminary pass and error checking
-            // split the rows into the old org units (already in db)
             // and the new rows that the users has added to the sheet
-            var rowIndex = 2;
             foreach (var row in newUsers)
             {
                 // a row is new if the first column, the id, is empty
@@ -290,56 +290,58 @@ namespace Core.ApplicationServices
                     Name = row.Field<string>(1),
                     LastName = row.Field<string>(2),
                     Email = row.Field<string>(3),
-                    Phone = row.Field<string>(4)
+                    Phone = String.IsNullOrWhiteSpace(row.Field<string>(4)) ? null : row.Field<string>(4)
                 };
 
-                rowIndex++;
+                var foundError = false;
 
                 // error checking
                 // firstname cannot be empty
                 if (String.IsNullOrWhiteSpace(userRow.Name))
                 {
-                    var error = new ExcelImportError()
+                    var error = new ExcelImportError
                     {
                         Row = userRow.RowIndex,
                         Column = "B",
                         Message = "Fornavn mangler",
                         SheetName = "Brugere"
                     };
-
                     errors.Add(error);
+                    foundError = true;
                 }
                 // lastname cannot be empty
                 if (String.IsNullOrWhiteSpace(userRow.LastName))
                 {
-                    var error = new ExcelImportError()
+                    var error = new ExcelImportError
                     {
                         Row = userRow.RowIndex,
                         Column = "C",
                         Message = "Efternavn(e) mangler",
                         SheetName = "Brugere"
                     };
-
                     errors.Add(error);
+                    foundError = true;
                 }
                 // email cannot be empty
                 if (String.IsNullOrWhiteSpace(userRow.Email))
                 {
-                    var error = new ExcelImportError()
+                    var error = new ExcelImportError
                     {
                         Row = userRow.RowIndex,
                         Column = "D",
                         Message = "Email mangler",
                         SheetName = "Brugere"
                     };
-
                     errors.Add(error);
+                    foundError = true;
                 }
 
-                if (isNew && !errors.Any())
+                if (isNew && !foundError)
                 {
                     unresolvedRows.Add(userRow);
                 }
+
+                rowIndex++;
             }
 
             // do the actually passes, trying to resolve parents
