@@ -489,19 +489,16 @@ namespace Core.ApplicationServices
                     errors.Add(new ExcelImportOrgUnitNoNameError(orgUnitRow.RowIndex));
                 }
                 // ean must be valid
-                if (isNew && !String.IsNullOrWhiteSpace(row.Field<string>(3)))
+                else if (isNew && !String.IsNullOrWhiteSpace(row.Field<string>(3)) && !(orgUnitRow.Ean.HasValue && orgUnitRow.Ean.ToString().Length == 13))
                 {
-                    if (!(orgUnitRow.Ean.HasValue && orgUnitRow.Ean.ToString().Length == 13))
+                    var error = new ExcelImportError()
                     {
-                        var error = new ExcelImportError()
-                        {
-                            Row = orgUnitRow.RowIndex,
-                            Column = "D",
-                            Message = "EAN værdien er ikke gyldig",
-                            SheetName = "Organisationsenheder"
-                        };
-                        errors.Add(error);
-                    }
+                        Row = orgUnitRow.RowIndex,
+                        Column = "D",
+                        Message = "EAN værdien er ikke gyldig",
+                        SheetName = "Organisationsenheder"
+                    };
+                    errors.Add(error);
                 }
                 // name cannot be duplicate
                 else if (unresolvedRows.Any(x => x.Name == orgUnitRow.Name) || resolvedRows.ContainsKey(orgUnitRow.Name))
