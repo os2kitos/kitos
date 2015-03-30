@@ -15,11 +15,8 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using Newtonsoft.Json.Linq;
 using Ninject;
-using Ninject.Web.Common;
 using Presentation.Web.Models;
-using WebGrease.Css.Extensions;
 
 namespace Presentation.Web.Controllers.API
 {

@@ -15,13 +15,11 @@ namespace Core.DomainModel
         {
             this.PasswordResetRequests = new List<PasswordResetRequest>();
             this.AdminRights = new List<AdminRight>();
-
             this.Wishes = new List<Wish>();
             this.ItProjectStatuses = new List<ItProjectStatus>();
             this.ResponsibleForRisks = new List<Risk>();
             this.ResponsibleForCommunications = new List<Communication>();
             this.HandoverParticipants = new List<Handover>();
-
             this.SignerForContracts = new Collection<ItContract.ItContract>();
         }
 
