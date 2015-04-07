@@ -256,6 +256,7 @@
     <Compile Include="Controllers\API\ItProjectOrgUnitUsageController.cs" />
     <Compile Include="Controllers\API\VersionOptionController.cs" />
     <Compile Include="Controllers\OData\BaseController.cs" />
+    <Compile Include="Controllers\OData\ItInterfaceExhibitsController.cs" />
     <Compile Include="Controllers\OData\OrganizationsController.cs" />
     <Compile Include="Controllers\OData\InterfacesController.cs" />
     <Compile Include="Controllers\OData\ItInterfacesController.cs" />

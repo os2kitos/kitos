@@ -3,7 +3,17 @@
         <div k-detail-template>
             <div>
                 <div kendo-grid k-options="detailGridOptions(dataItem)"></div>
-</div>
+            </div>
         </div>
     </div>
+</div>
+<div data-kendo-window="modal"
+     data-k-title="'Anvendelse'" data-k-width="800"
+     data-k-visible="false" data-k-modal="true">
+    <div data-kendo-grid="usageGrid" data-k-options="usageDetailsGrid"></div>
+</div>
+<div data-kendo-window="exhibitModal"
+     data-k-title="'Udstilling'" data-k-width="800"
+     data-k-visible="false" data-k-modal="true">
+    <div data-kendo-grid="exhibitGrid" data-k-options="exhibitDetailsGrid"></div>
 </div>

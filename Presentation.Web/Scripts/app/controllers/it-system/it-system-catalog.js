@@ -87,7 +87,7 @@
                 $scope.modal.center().open();
             }
 
-            //usagedetails grid
+            // usagedetails grid
             $scope.usageDetailsGrid = {
                     dataSource: {
                     type: "odata-v4",
@@ -113,7 +113,7 @@
                 dataBound: detailsBound
             };
             
-            //catalog grid (mainGrid)
+            // catalog grid
             $scope.itSystemCatalogueGrid = {
                 dataSource: {
                     type: "odata-v4",

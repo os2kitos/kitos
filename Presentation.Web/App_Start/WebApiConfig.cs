@@ -205,6 +205,7 @@ namespace Presentation.Web
             itInterfaceExihibits.EntityType.HasKey(x => x.Id);
             itInterfaceExihibits.EntityType.Property(x => x.ItSystemId);
             itInterfaceExihibits.EntityType.HasRequired(x => x.ItSystem);
+            itInterfaceExihibits.EntityType.HasOptional(x => x.ItInterface);
 
             var itInterfaceExhibitUsage = builder.EntitySet<ItInterfaceExhibitUsage>("ItInterfaceExhibitUsages");
             itInterfaceExhibitUsage.EntityType.HasKey(x => x.ItContractId)

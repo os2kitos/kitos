@@ -51,21 +51,6 @@
                 $scope.showSystemId = 'localSystemId';
                 $scope.showType = 'itSystem.appType.name';
 
-                $scope.$watchCollection('pagination', function() {
-                    //var url = 'api/itSystemUsage?csv&organizationId=' + user.currentOrganizationId + '&skip=' + $scope.pagination.skip + '&take=' + $scope.pagination.take;
-
-                    //if ($scope.pagination.orderBy) {
-                    //    url += '&orderBy=' + $scope.pagination.orderBy;
-                    //    if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
-                    //}
-
-                    //if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
-                    //else url += "&q=";
-
-                    //$scope.csvUrl = url;
-                    //loadUsages();
-                });
-
                 // clear lists 
                 $scope.activeContracts = [];
                 $scope.inactiveContracts = [];
@@ -114,7 +99,7 @@
                         type: "odata-v4",
                         transport: {
                             read: {
-                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=Parent,AppTypeOption,BusinessType),ItSystem($expand=Usages),Organization,ResponsibleUsage,Overview($expand=ItSystem),MainContract($expand=ItContract),Rights($expand=Role)"
+                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=Parent,AppTypeOption,BusinessType,Usages,ItInterfaceExhibits),Organization,ResponsibleUsage,Overview($expand=ItSystem),MainContract($expand=ItContract)"
                             }
                         },
                         pageSize: 5,
@@ -133,9 +118,6 @@
                         refresh: true,
                         pageSizes: true,
                         buttonCount: 5
-                    },
-                    dataBound: function() {
-                        this.expandRow(this.tbody.find("tr.k-master-row").first());
                     },
                     sortable: true,
                     columnMenu: true,
@@ -163,12 +145,12 @@
                             template: "<span data-ng-bind='dataItem.ItSystem.BusinessType.Name'></span>"
                         },
                         {
-                            field: "ItSystem.Usages", title: "Anvender",
-                            template: "<span data-ng-bind='dataItem.ItSystem.Usages.length || 0'></span>"
+                            field: "ItSystem.Usages", title: "Anvender", width: 95,
+                            template: "<a data-ng-click=\"showUsageDetails(#: data.ItSystem.Id#,'#: data.ItSystem.Name#')\">{{dataItem.ItSystem.Usages.length || 0}}</a>"
                         },
                         {
-                            field: "ItSystem.ItInterfaceExhibits", title: "Udstiller",
-                            template: "<span data-ng-bind='dataItem.ItSystem.ItInterfaceExhibits.length || 0'></span>"
+                            field: "ItSystem.ItInterfaceExhibits", title: "Udstiller", width: 95,
+                            template: "<a data-ng-click=\"showExposureDetails(#: data.ItSystem.Id#,'#: data.ItSystem.Name#')\">{{dataItem.ItSystem.ItInterfaceExhibits.length || 0}}</a>"
                         },
                         {
                             field: "Overview", title: "Overblik",
@@ -180,6 +162,101 @@
                     }
                 };
 
+                // usagedetails grid empty-grid handling
+                function detailsBound(e) {
+                    var grid = e.sender;
+                    if (grid.dataSource.total() == 0) {
+                        var colCount = grid.columns.length;
+                        $(e.sender.wrapper)
+                            .find('tbody')
+                            .append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data text-muted">System anvendens ikke</td></tr>');
+                    }
+                };
+
+                // exposuredetails grid empty-grid handling
+                function exposureDetailsBound(e) {
+                    var grid = e.sender;
+                    if (grid.dataSource.total() == 0) {
+                        var colCount = grid.columns.length;
+                        $(e.sender.wrapper)
+                            .find('tbody')
+                            .append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data text-muted">System udstiller ikke nogle snitflader</td></tr>');
+                    }
+                }
+
+                // show exposureDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
+                $scope.showExposureDetails = function (usageId, systemName) {
+                    // filter by usageId
+                    $scope.exhibitGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
+                    // set title
+                    $scope.exhibitModal.setOptions({ title: "Udstilles af " + systemName });
+                    // open modal
+                    $scope.exhibitModal.center().open();
+                };
+
+                $scope.exhibitDetailsGrid = {
+                    dataSource: {
+                        type: "odata-v4",
+                        transport: {
+                            read: {
+                                url: "/odata/ItInterfaceExhibits?$expand=ItInterface",
+                                dataType: "json",
+                                cache: false
+                            }
+                        },
+                        pageSize: 10,
+                        serverPaging: true,
+                        serverSorting: true,
+                        serverFiltering: true
+                    },
+                    columns: [
+                        {
+                            field: "ItInterface.ItInterfaceId", title: "Snitflade ID"
+                        },
+                        {
+                            field: "ItInterface.Name", title: "Snitflade"
+                        }
+                    ],
+                    dataBound: exposureDetailsBound
+                };
+
+                // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
+                $scope.showUsageDetails = function(systemId, systemName) {
+                    // filter by usageId
+                    $scope.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: systemId });
+                    // set modal title
+                    $scope.modal.setOptions({ title: "Anvendelse af " + systemName });
+                    // open modal
+                    $scope.modal.center().open();
+                };
+
+                // usagedetails grid - shows which organizations has a given itsystem in local usage
+                $scope.usageDetailsGrid = {
+                    dataSource: {
+                        type: "odata-v4",
+                        transport:
+                        {
+                            read: {
+                                url: "/odata/ItSystemUsages?$expand=Organization",
+                                dataType: "json",
+                                cache: false
+                            },
+                        },
+                        pageSize: 10,
+                        serverPaging: true,
+                        serverSorting: true,
+                        serverFiltering: true
+                    },
+                    columns: [
+                        {
+                            field: "Organization.Name",
+                            title: "Organisation"
+                        }
+                    ],
+                    dataBound: detailsBound
+                };
+
+                // shows a detailGrid containg userroles for a given itsystem
                 $scope.detailGridOptions = function (dataItem) {
                     return {
                         dataSource: {
