@@ -189,6 +189,13 @@ namespace Presentation.Web
             itInterfaces.EntityType.HasOptional(x => x.Interface);
             itInterfaces.EntityType.Property(x => x.InterfaceTypeId);
             itInterfaces.EntityType.HasOptional(x => x.InterfaceType);
+            itInterfaces.EntityType.HasRequired(x => x.ObjectOwner);
+            itInterfaces.EntityType.Property(x => x.OrganizationId);
+            itInterfaces.EntityType.HasRequired(x => x.Organization);
+            itInterfaces.EntityType.HasOptional(x => x.Tsa);
+            itInterfaces.EntityType.HasOptional(x => x.Method);
+            itInterfaces.EntityType.HasOptional(x => x.ExhibitedBy);
+            itInterfaces.EntityType.Property(x => x.ItInterfaceId);
 
             var interfaceTypes = builder.EntitySet<InterfaceType>("InterfaceType");
             interfaceTypes.EntityType.HasKey(x => x.Id);
@@ -203,6 +210,14 @@ namespace Presentation.Web
             itInterfaceExhibitUsage.EntityType.HasKey(x => x.ItContractId)
                 .HasKey(x => x.ItInterfaceExhibitId)
                 .HasKey(x => x.ItSystemUsageId);
+
+            var tsas = builder.EntitySet<Tsa>("Tsas");
+            tsas.EntityType.HasKey(x => x.Id);
+            tsas.EntityType.Property(x => x.Name);
+
+            var methods = builder.EntitySet<Method>("Methods");
+            methods.EntityType.HasKey(x => x.Id);
+            methods.EntityType.Property(x => x.Name);
 
             //builder.EntitySet<ItSystemUsage>("ItSystemUsages");
             //builder.EntitySet<ItSystemRight>("ItSystemRights");
