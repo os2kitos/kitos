@@ -6,27 +6,11 @@
                 templateUrl: 'partials/it-system/overview-it-system.html',
                 controller: 'system.OverviewCtrl',
                 resolve: {
-                    businessTypes: [
-                        '$http', function($http) {
-                            return $http.get("api/businesstype");
-                        }
-                    ],
-                    organizations: [
-                        '$http', function($http) {
-                            return $http.get("api/organization");
-                        }
-                    ],
                     user: [
                         'userService', function(userService) {
                             return userService.getUser();
                         }
-                    ],
-                    itSystemRoles: ['$http', function ($http) {
-                        return $http.get("api/itsystemrole/")
-                            .then(function (result) {
-                                return result.data.response;
-                            });
-                    }]
+                    ]
                 }
             });
         }
@@ -34,8 +18,8 @@
 
     app.controller('system.OverviewCtrl',
         [
-            '$rootScope', '$scope', '$http', 'notify', 'businessTypes', 'organizations', 'user', 'itSystemRoles',
-            function($rootScope, $scope, $http, notify, businessTypesHttp, organizationsHttp, user, itSystemRoles) {
+            '$rootScope', '$scope', '$http', 'user',
+            function($rootScope, $scope, $http, user) {
                 $rootScope.page.title = 'IT System - Overblik';
 
                 // overview grid options

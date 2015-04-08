@@ -4,22 +4,15 @@
             $stateProvider.state('it-system.interfaceCatalog', {
                 url: '/interface-catalog',
                 templateUrl: 'partials/it-system/it-interface-catalog.html',
-                controller: 'system.interfaceCatalogCtrl',
-                resolve: {
-                    user: [
-                        'userService', function(userService) {
-                            return userService.getUser();
-                        }
-                    ]
-                }
+                controller: 'system.interfaceCatalogCtrl'
             });
         }
     ]);
 
     app.controller('system.interfaceCatalogCtrl',
     [
-        '$rootScope', '$scope', '$http', 'notify', '$state', 'user',
-        function ($rootScope, $scope, user) {
+        '$rootScope', '$scope',
+        function ($rootScope, $scope) {
             $rootScope.page.title = 'Snitflade - Katalog';
 
             $scope.itInterfaceOptions = {

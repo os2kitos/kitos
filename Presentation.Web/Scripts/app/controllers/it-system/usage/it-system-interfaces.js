@@ -67,11 +67,6 @@
                             return interfaces;
                         });
                     }
-                ],
-                user: [
-                    'userService', function (userService) {
-                        return userService.getUser();
-                    }
                 ]
             }
         });
@@ -80,9 +75,9 @@
     app.controller('system.EditInterfaces',
     [
         '$rootScope', '$scope', '$http', 'notify',
-        'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'frequencies', 'itSystemUsage', 'userService', 'canUseInterfaces', 'exhibits', 'user',
+        'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'frequencies', 'itSystemUsage', 'userService', 'canUseInterfaces', 'exhibits',
         function($rootScope, $scope, $http, notify,
-            tsas, interfaces, interfaceTypes, methods, dataTypes, frequencies, itSystemUsage, userService, canUseInterfaces, exhibits, user) {
+            tsas, interfaces, interfaceTypes, methods, dataTypes, frequencies, itSystemUsage, userService, canUseInterfaces, exhibits) {
 
             $scope.frequencies = frequencies;
 

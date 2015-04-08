@@ -44,11 +44,6 @@
                                 return result.data.response;
                             });
                     }
-                ],
-                user: [
-                    'userService', function (userService) {
-                        return userService.getUser();
-                    }
                 ]
             }
         });

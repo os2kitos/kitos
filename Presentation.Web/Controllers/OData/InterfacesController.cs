@@ -9,6 +9,5 @@ namespace Presentation.Web.Controllers.OData
             : base(repository)
         {
         }
-
     }
 }
