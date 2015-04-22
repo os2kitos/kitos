@@ -1012,10 +1012,6 @@
     <Content Include="Content\kendo\fonts\DejaVu\DejaVuSerif-Italic.ttf" />
     <Content Include="Content\kendo\fonts\DejaVu\DejaVuSerif.ttf" />
     <Content Include="Content\kendo\fonts\DejaVu\LICENSE" />
-    <Content Include="Content\kendo\Black\Thumbs.db" />
-    <Content Include="Content\kendo\BlueOpal\Thumbs.db" />
-    <Content Include="Content\kendo\Bootstrap\Thumbs.db" />
-    <Content Include="Content\kendo\Default\Thumbs.db" />
     <None Include="Properties\PublishProfiles\Kitos - Prodmiljø.pubxml" />
     <None Include="Properties\PublishProfiles\Kitos - Testmiljø.pubxml" />
     <None Include="Properties\Settings.settings">
