@@ -177,7 +177,6 @@ namespace Presentation.Web
             var interfaces = builder.EntitySet<Interface>("Interfaces");
             interfaces.EntityType.HasKey(x => x.Id);
             interfaces.EntityType.Property(x => x.Name);
-            interfaces.EntityType.ComplexProperty(x => x.References);
 
             var itInterfaces = builder.EntitySet<ItInterface>("ItInterfaces");
             itInterfaces.EntityType.HasKey(x => x.Id);
