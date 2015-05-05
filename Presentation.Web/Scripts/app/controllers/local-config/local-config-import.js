@@ -16,6 +16,7 @@
                     $rootScope.page.importsubnav = [
                         { state: 'local-config.import.organization', text: 'Organisation' },
                         { state: 'local-config.import.users', text: 'Brugere' },
+                        { state: 'local-config.import.interfaces', text: 'Snitflader' },
                         { state: 'local-config.import.contracts', text: 'IT Kontrakter' }
                     ];
                 }

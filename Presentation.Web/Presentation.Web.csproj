@@ -662,6 +662,7 @@
     <Content Include="Scripts\app\controllers\it-system\usage\it-system-usage.js" />
     <Content Include="Scripts\app\controllers\it-system\usage\it-system-wishes.js" />
     <Content Include="Scripts\app\controllers\it-system\usage\it-system-interfaces.js" />
+    <Content Include="Scripts\app\controllers\local-config\local-config-import-interfaces.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-import-org.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-import-contracts.js" />
     <Content Include="Scripts\app\controllers\local-config\local-config-import-users.js" />
@@ -701,6 +702,7 @@
     <Content Include="Content\excel\OS2KITOS IT Kontrakter.xlsx" />
     <Content Include="Content\excel\OS2KITOS Brugere.xlsx" />
     <Content Include="Content\excel\OS2KITOS Organisationsenheder.xlsx" />
+    <Content Include="Content\excel\OS2KITOS Snitflader.xlsx" />
     <None Include="Properties\PublishProfiles\Kitos - Prodmiljø.pubxml" />
     <None Include="Properties\PublishProfiles\Kitos - Testmiljø.pubxml" />
     <None Include="Properties\Settings.settings">
