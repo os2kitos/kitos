@@ -258,6 +258,7 @@
     <Compile Include="Controllers\API\OptionExtendController.cs" />
     <Compile Include="Controllers\API\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\API\ItProjectOrgUnitUsageController.cs" />
+    <Compile Include="Controllers\API\VersionOptionController.cs" />
     <Compile Include="Models\UpdateDefaultOrgUnitDto.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Models\HandoverTrialDTO.cs" />
@@ -565,6 +566,7 @@
     <Content Include="Partials\org\user\org-edituser-modal.html" />
     <Content Include="Partials\org\user\org-user.html" />
     <Content Include="Partials\shared\org-tree-item.html" />
+    <Content Include="Partials\subnav\create-itinterface-modal.html" />
     <Content Include="Partials\subnav\create-modal.html" />
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />

@@ -443,15 +443,25 @@ namespace Core.ApplicationServices
         private IEnumerable<ExcelImportError> ImportUsersTransaction(DataTable userTable, int organizationId, User kitosUser)
         {
             var errors = new List<ExcelImportError>();
-            
+
+            var newUsers = userTable.Select("[Column1] IS NULL OR [Column1] = ''").AsEnumerable().ToList();
+            var firstRow = newUsers.FirstOrDefault();
+
+            // if nothing to add then abort here
+            if (firstRow == null)
+            {
+                errors.Add(new ExcelImportError { Message = "Intet at importere!" });
+                return errors;
+            }
+
             // unresolved rows are orgUnits which still needs to be added to the DB.
             var unresolvedRows = new List<UserRow>();
-
+            
+            var rowIndex = userTable.Rows.IndexOf(firstRow) + 2; // adding 2 to get it to lign up with row numbers in excel
+            
             // preliminary pass and error checking
-            // split the rows into the old org units (already in db)
             // and the new rows that the users has added to the sheet
-            var rowIndex = 2;
-            foreach (var row in userTable.AsEnumerable())
+            foreach (var row in newUsers)
             {
                 // a row is new if the first column, the id, is empty
                 var id = StringToId(row.Field<string>(0));
@@ -465,56 +475,58 @@ namespace Core.ApplicationServices
                     Name = row.Field<string>(1),
                     LastName = row.Field<string>(2),
                     Email = row.Field<string>(3),
-                    Phone = row.Field<string>(4)
+                    Phone = String.IsNullOrWhiteSpace(row.Field<string>(4)) ? null : row.Field<string>(4)
                 };
 
-                rowIndex++;
+                var foundError = false;
 
                 // error checking
                 // firstname cannot be empty
                 if (String.IsNullOrWhiteSpace(userRow.Name))
                 {
-                    var error = new ExcelImportError()
+                    var error = new ExcelImportError
                     {
                         Row = userRow.RowIndex,
                         Column = "B",
                         Message = "Fornavn mangler",
                         SheetName = "Brugere"
                     };
-
                     errors.Add(error);
+                    foundError = true;
                 }
                 // lastname cannot be empty
                 if (String.IsNullOrWhiteSpace(userRow.LastName))
                 {
-                    var error = new ExcelImportError()
+                    var error = new ExcelImportError
                     {
                         Row = userRow.RowIndex,
                         Column = "C",
                         Message = "Efternavn(e) mangler",
                         SheetName = "Brugere"
                     };
-
                     errors.Add(error);
+                    foundError = true;
                 }
                 // email cannot be empty
                 if (String.IsNullOrWhiteSpace(userRow.Email))
                 {
-                    var error = new ExcelImportError()
+                    var error = new ExcelImportError
                     {
                         Row = userRow.RowIndex,
                         Column = "D",
                         Message = "Email mangler",
                         SheetName = "Brugere"
                     };
-
                     errors.Add(error);
+                    foundError = true;
                 }
 
-                if (isNew && !errors.Any())
+                if (isNew && !foundError)
                 {
                     unresolvedRows.Add(userRow);
                 }
+
+                rowIndex++;
             }
 
             // do the actually passes, trying to resolve parents
@@ -605,13 +617,13 @@ namespace Core.ApplicationServices
         
         private static long? StringToEan(string s)
         {
-            if (string.IsNullOrEmpty(s)) return null;
+            if (String.IsNullOrEmpty(s)) return null;
 
             // if the ean was properly entered, excel will treat is as a Number,
             // which is bascially a string in double format i.e "12345678.0"
             // so try to parse as double first
             double dbl;
-            if (!double.TryParse(s, out dbl)) return null;
+            if (!Double.TryParse(s, out dbl)) return null;
 
             //then convert to long
             return Convert.ToInt64(dbl);
@@ -650,9 +662,9 @@ namespace Core.ApplicationServices
                     RowIndex = rowIndex, // needed for error reporting
                     IsNew = isNew,
                     Id = id,
-                    Name = row.Field<string>(1),
-                    Ean = StringToEan(row.Field<string>(2)),
-                    Parent = row.Field<string>(3)
+                    Parent = row.Field<string>(1),
+                    Name = row.Field<string>(2),
+                    Ean = StringToEan(row.Field<string>(3))
                 };
 
                 rowIndex++;
@@ -662,6 +674,18 @@ namespace Core.ApplicationServices
                 if (String.IsNullOrWhiteSpace(orgUnitRow.Name))
                 {
                     errors.Add(new ExcelImportOrgUnitNoNameError(orgUnitRow.RowIndex));
+                }
+                // ean must be valid
+                else if (isNew && !String.IsNullOrWhiteSpace(row.Field<string>(3)) && !(orgUnitRow.Ean.HasValue && orgUnitRow.Ean.ToString().Length == 13))
+                {
+                    var error = new ExcelImportError()
+                    {
+                        Row = orgUnitRow.RowIndex,
+                        Column = "D",
+                        Message = "EAN værdien er ikke gyldig",
+                        SheetName = "Organisationsenheder"
+                    };
+                    errors.Add(error);
                 }
                 // name cannot be duplicate
                 else if (unresolvedRows.Any(x => x.Name == orgUnitRow.Name) || resolvedRows.ContainsKey(orgUnitRow.Name))
@@ -754,7 +778,7 @@ namespace Core.ApplicationServices
             public ExcelImportOrgUnitBadParentError(int row)
             {
                 Row = row;
-                Column = "D";
+                Column = "B";
                 SheetName = "Organisationsenheder";
                 Message = "Overordnet enhed må ikke være blank og skal henvise til en gyldig enhed.";
             }
@@ -765,7 +789,7 @@ namespace Core.ApplicationServices
             public ExcelImportOrgUnitNoNameError(int row)
             {
                 Row = row;
-                Column = "B";
+                Column = "C";
                 SheetName = "Organisationsenheder";
                 Message = "Enheden skal have et navn.";
             }
@@ -776,7 +800,7 @@ namespace Core.ApplicationServices
             public ExcelImportOrgUnitDuplicateNameError(int row)
             {
                 Row = row;
-                Column = "B";
+                Column = "C";
                 SheetName = "Organisationsenheder";
                 Message = "Der findes allerede en enhed med dette navn.";
             }
@@ -787,7 +811,7 @@ namespace Core.ApplicationServices
             public ExcelImportOrgUnitDuplicateEanError(int row)
             {
                 Row = row;
-                Column = "C";
+                Column = "D";
                 SheetName = "Organisationsenheder";
                 Message = "Der findes allerede en enhed i KITOS med dette EAN nummer.";
             }
@@ -860,7 +884,7 @@ namespace Core.ApplicationServices
                 if (orgUnit.Parent != null)
                     parent = orgUnit.Parent.Name;
 
-                table.Rows.Add(orgUnit.Id, orgUnit.Name, orgUnit.Ean, parent);
+                table.Rows.Add(orgUnit.Id, parent, orgUnit.Name, orgUnit.Ean);
             }
 
             return table;

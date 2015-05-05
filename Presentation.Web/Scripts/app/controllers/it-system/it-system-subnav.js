@@ -105,17 +105,28 @@
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: 'modal fade in',
-                        templateUrl: 'partials/subnav/create-modal.html',
+                        templateUrl: 'partials/subnav/create-itinterface-modal.html',
                         controller: ['$scope', '$modalInstance', function ($scope, $modalInstance) {
                             $scope.formData = {};
                             $scope.type = 'IT Snitflade';
                             $scope.checkAvailbleUrl = 'api/itInterface/';
 
+
+                            $scope.validateName = function () {
+                                $scope.createForm.name.$validate();
+                            }
+                            $scope.validateItInterfaceId = function () {
+                                $scope.createForm.itInterfaceId.$validate();
+                            }
+
+                            $scope.uniqueConstraintError = false;
+                            
                             $scope.submit = function () {
                                 var payload = {
                                     name: $scope.formData.name,
+                                    itInterfaceId: $scope.formData.itInterfaceId,
                                     belongsToId: user.currentOrganizationId,
-                                    organizationId: user.currentOrganizationId,
+                                    organizationId: user.currentOrganizationId
                                 };
 
                                 var msg = notify.addInfoMessage('Opretter snitflade...', false);

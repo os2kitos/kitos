@@ -15,6 +15,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(100) // http://stackoverflow.com/questions/1827063/mysql-error-key-specification-without-a-key-length
                 .IsRequired()
                 .HasUniqueIndexAnnotation("IX_NamePerOrg", 1);
+            this.Property(x => x.ItInterfaceId)
+                .HasMaxLength(100)
+                .IsRequired()
+                .HasUniqueIndexAnnotation("IX_NamePerOrg", 2);
             
             // Table & Column Mappings
             this.ToTable("ItInterface");
@@ -35,6 +39,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.Method)
                 .WithMany(d => d.References)
                 .HasForeignKey(t => t.MethodId);
+
+            this.HasOptional(t => t.VersionOption)
+                .WithMany(d => d.References)
+                .HasForeignKey(t => t.VersionOptionId);
         }
     }
 }
