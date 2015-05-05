@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.DomainModel;
-using Core.DomainModel.ItSystem;
 
 namespace Presentation.Web.Models
 {
@@ -38,7 +37,7 @@ namespace Presentation.Web.Models
         public int? BelongsToId { get; set; }
         public string BelongsToName { get; set; }
         public int? VersionOptionId { get; set; }
-        public VersionOption VersionOption { get; set; }
+        public OptionDTO VersionOption { get; set; }
 
         /// <summary>
         /// Gets or sets whether this instance has a usage in any organization.
