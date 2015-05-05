@@ -93,6 +93,7 @@ namespace Presentation.Web
             itSystems.EntityType.Property(x => x.Description);
             itSystems.EntityType.Property(x => x.ParentId);
             itSystems.EntityType.HasOptional(x => x.Parent).IsNavigable();
+            itSystems.EntityType.HasMany(x => x.Children).NonContained().IsNavigable();
             itSystems.EntityType.EnumProperty(x => x.AccessModifier);
             itSystems.EntityType.Property(x => x.AppTypeOptionId);
             itSystems.EntityType.HasOptional(x => x.AppTypeOption).IsNavigable();
