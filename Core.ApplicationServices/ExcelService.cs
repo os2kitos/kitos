@@ -159,11 +159,11 @@ namespace Core.ApplicationServices
         public void ImportItInterfaces(Stream stream, int organizationId, User kitosUser)
         {
             // read excel stream to DataSet
-            var contractDataSet = _excelHandler.Import(stream);
+            var interfaceDataSet = _excelHandler.Import(stream);
             // get contracts table
-            var contractDataTable = contractDataSet.Tables[0];
+            var interfaceDataTable = interfaceDataSet.Tables[0];
             // select only rows that should be inserted
-            var newItInterfaces = contractDataTable.Select("[Column1] IS NULL OR [Column1] = ''").AsEnumerable().ToList();
+            var newItInterfaces = interfaceDataTable.Select("[Column1] IS NULL OR [Column1] = ''").AsEnumerable().ToList();
 
             var errors = new List<ExcelImportError>();
             var firstRow = newItInterfaces.FirstOrDefault();
@@ -173,7 +173,7 @@ namespace Core.ApplicationServices
                 errors.Add(new ExcelImportError { Message = "Intet at importere!"});
             }
 
-            var rowIndex = contractDataTable.Rows.IndexOf(firstRow) + 2; // adding 2 to get it to line up with row numbers in excel
+            var rowIndex = interfaceDataTable.Rows.IndexOf(firstRow) + 2; // adding 2 to get it to line up with row numbers in excel
             foreach (var row in newItInterfaces)
             {
                 var interfaceRow = new InterfaceRow
