@@ -7,15 +7,11 @@ namespace Infrastructure.DataAccess.Migrations
     {
         public override void Up()
         {
-            DropForeignKey("VersionOptions", "LastChangedByUserId", "User");
-            DropForeignKey("VersionOptions", "ObjectOwnerId", "User");
             DropForeignKey("ItInterface", "VersionOptionId", "VersionOptions");
-            DropIndex("ItInterface", new[] { "VersionOptionId" });
-            DropIndex("VersionOptions", new[] { "ObjectOwnerId" });
-            DropIndex("VersionOptions", new[] { "LastChangedByUserId" });
-            AddColumn("ItInterface", "Version", c => c.String(maxLength: 20, storeType: "nvarchar"));
+            DropIndex("ItInterface", "IX_VersionOptionId");
             DropColumn("ItInterface", "VersionOptionId");
             DropTable("VersionOptions");
+            AddColumn("ItInterface", "Version", c => c.String(maxLength: 20, storeType: "nvarchar"));
         }
         
         public override void Down()
