@@ -260,7 +260,6 @@
     <Compile Include="Controllers\API\OptionExtendController.cs" />
     <Compile Include="Controllers\API\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\API\ItProjectOrgUnitUsageController.cs" />
-    <Compile Include="Controllers\API\VersionOptionController.cs" />
     <Compile Include="Controllers\OData\BaseController.cs" />
     <Compile Include="Controllers\OData\InterfacesController.cs" />
     <Compile Include="Controllers\OData\ItInterfaceExhibitsController.cs" />

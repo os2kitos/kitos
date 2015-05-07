@@ -147,7 +147,6 @@
     <Compile Include="Mapping\StakeholderMap.cs" />
     <Compile Include="Mapping\TextMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
-    <Compile Include="Mapping\VersionOptionMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
     <Compile Include="Migrations\201410021644216_InitialCreate.cs" />
     <Compile Include="Migrations\201410021644216_InitialCreate.Designer.cs">
@@ -220,6 +219,10 @@
     <Compile Include="Migrations\201503271154378_AddedItInterfaceVersionOption.cs" />
     <Compile Include="Migrations\201503271154378_AddedItInterfaceVersionOption.Designer.cs">
       <DependentUpon>201503271154378_AddedItInterfaceVersionOption.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505071525165_RevertedVersionOptionToString.cs" />
+    <Compile Include="Migrations\201505071525165_RevertedVersionOptionToString.Designer.cs">
+      <DependentUpon>201505071525165_RevertedVersionOptionToString.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\BackupConfiguration.cs" />
     <Compile Include="Migrations\Configuration.cs" />
@@ -300,6 +303,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201503271154378_AddedItInterfaceVersionOption.resx">
       <DependentUpon>201503271154378_AddedItInterfaceVersionOption.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505071525165_RevertedVersionOptionToString.resx">
+      <DependentUpon>201505071525165_RevertedVersionOptionToString.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -7,6 +7,7 @@ namespace Infrastructure.DataAccess.Mapping
         public ItInterfaceMap()
         {
             // Properties
+            this.Property(x => x.Version).HasMaxLength(20);
 
             // BUG there's an issue with indexing http://stackoverflow.com/questions/26055140/ef-migrations-drops-index-when-adding-compsite-index
             this.Property(x => x.OrganizationId)
@@ -39,10 +40,6 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.Method)
                 .WithMany(d => d.References)
                 .HasForeignKey(t => t.MethodId);
-
-            this.HasOptional(t => t.VersionOption)
-                .WithMany(d => d.References)
-                .HasForeignKey(t => t.VersionOptionId);
         }
     }
 }
