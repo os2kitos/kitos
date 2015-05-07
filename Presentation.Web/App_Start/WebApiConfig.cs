@@ -1,10 +1,11 @@
 ﻿using System.Web.Http;
-using System.Web.Http.OData.Builder;
+using System.Web.OData.Builder;
+using System.Web.OData.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
-using Microsoft.Data.Edm;
+using Microsoft.OData.Edm;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
