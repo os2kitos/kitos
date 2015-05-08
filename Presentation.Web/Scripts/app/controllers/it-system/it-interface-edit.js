@@ -95,7 +95,7 @@
             });
             $scope.versionKendoConfig = {
                 dataTextField: "Version",
-                filter: "contains",
+                filter: "startswith",
                 minLength: 1,
                 delay: 500,
                 dataSource: versionDataSource
