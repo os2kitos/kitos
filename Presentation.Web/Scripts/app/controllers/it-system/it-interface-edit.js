@@ -87,15 +87,33 @@
             }
 
             var versionDataSource = new kendo.data.DataSource({
-                type: "odata-v4",
                 serverFiltering: true,
                 transport: {
-                    read: "/odata/ItInterfaces?$select=version"
+                    read: {
+                        url: "/odata/ItInterfaces",
+                        dataType: "json",
+                    },
+                    parameterMap: function (data, type) {
+                        if (type == "read") {
+                            return {
+                                // url param to hit custom action
+                                distinct: true,
+                                // get the value entered into the search box
+                                filter: data.filter.filters[0].value,
+                            }
+                        }
+                        // fallback if type is not read - should never get hit
+                        return kendo.stringify(data);
+                    }
+                },
+                schema: {
+                    data: function (parameters) {
+                        // result is wrapped in an object, just return the array
+                        return parameters.value;
+                    }
                 }
             });
             $scope.versionKendoConfig = {
-                dataTextField: "Version",
-                filter: "startswith",
                 minLength: 1,
                 delay: 500,
                 dataSource: versionDataSource
