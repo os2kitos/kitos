@@ -29,9 +29,8 @@
                     <div class="form-group">
                         <label for="interface-version" class="control-label small">Version</label>
                         <input type="text" id="interface-version" class="form-control input-sm"
-                               data-kendo-auto-complete
+                               data-ng-disabled="!hasWriteAccess"
                                data-ng-model="interface.version"
-                               data-k-options="versionKendoConfig"
                                data-autosave="{{interface.updateUrl}}"
                                data-field="version">
                     </div>
