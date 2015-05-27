@@ -671,3 +671,14 @@ div.searchbox-wrapper {
     background-color: #ddd;
     cursor: not-allowed;
 }
+
+
+/*
+    Fixes kendo problem with bootstrap form-constrol
+    http://docs.telerik.com/kendo-ui/using-kendo-with-twitter-bootstrap#using-the-form-control-bootstrap-css-class-with-kendo-ui-widgets 
+*/
+.form-control.k-widget
+{
+    padding: 0;
+    width: 100%;
+}

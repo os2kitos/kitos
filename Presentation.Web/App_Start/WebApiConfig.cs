@@ -196,6 +196,7 @@ namespace Presentation.Web
             itInterfaces.EntityType.HasOptional(x => x.Method);
             itInterfaces.EntityType.HasOptional(x => x.ExhibitedBy);
             itInterfaces.EntityType.Property(x => x.ItInterfaceId);
+            itInterfaces.EntityType.Property(x => x.Version);
 
             var interfaceTypes = builder.EntitySet<InterfaceType>("InterfaceType");
             interfaceTypes.EntityType.HasKey(x => x.Id);
