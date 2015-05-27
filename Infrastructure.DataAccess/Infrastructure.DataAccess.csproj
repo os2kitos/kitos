@@ -216,13 +216,9 @@
     <Compile Include="Migrations\201503270921214_AddedUniqueItInterfaceToNamePerOrg.Designer.cs">
       <DependentUpon>201503270921214_AddedUniqueItInterfaceToNamePerOrg.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201503271154378_AddedItInterfaceVersionOption.cs" />
-    <Compile Include="Migrations\201503271154378_AddedItInterfaceVersionOption.Designer.cs">
-      <DependentUpon>201503271154378_AddedItInterfaceVersionOption.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201505071525165_RevertedVersionOptionToString.cs" />
-    <Compile Include="Migrations\201505071525165_RevertedVersionOptionToString.Designer.cs">
-      <DependentUpon>201505071525165_RevertedVersionOptionToString.cs</DependentUpon>
+    <Compile Include="Migrations\201505271137151_AddedMaxLengthToItInterfaceVersion.cs" />
+    <Compile Include="Migrations\201505271137151_AddedMaxLengthToItInterfaceVersion.Designer.cs">
+      <DependentUpon>201505271137151_AddedMaxLengthToItInterfaceVersion.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\BackupConfiguration.cs" />
     <Compile Include="Migrations\Configuration.cs" />
@@ -301,11 +297,8 @@
     <EmbeddedResource Include="Migrations\201503270921214_AddedUniqueItInterfaceToNamePerOrg.resx">
       <DependentUpon>201503270921214_AddedUniqueItInterfaceToNamePerOrg.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201503271154378_AddedItInterfaceVersionOption.resx">
-      <DependentUpon>201503271154378_AddedItInterfaceVersionOption.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201505071525165_RevertedVersionOptionToString.resx">
-      <DependentUpon>201505071525165_RevertedVersionOptionToString.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201505271137151_AddedMaxLengthToItInterfaceVersion.resx">
+      <DependentUpon>201505271137151_AddedMaxLengthToItInterfaceVersion.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

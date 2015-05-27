@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.2-31219")]
-    public sealed partial class RevertedVersionOptionToString : IMigrationMetadata
+    public sealed partial class AddedMaxLengthToItInterfaceVersion : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(RevertedVersionOptionToString));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedMaxLengthToItInterfaceVersion));
         
         string IMigrationMetadata.Id
         {
-            get { return "201505071525165_RevertedVersionOptionToString"; }
+            get { return "201505271137151_AddedMaxLengthToItInterfaceVersion"; }
         }
         
         string IMigrationMetadata.Source
