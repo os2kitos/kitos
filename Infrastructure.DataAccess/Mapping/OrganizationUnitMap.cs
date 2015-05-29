@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity.Infrastructure.Annotations;
 using Core.DomainModel;
 
 namespace Infrastructure.DataAccess.Mapping
@@ -30,9 +28,6 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasMany(t => t.Using)
                 .WithRequired(t => t.OrganizationUnit)
                 .HasForeignKey(d => d.OrganizationUnitId);
-
-            this.Property(t => t.Ean)
-                .HasColumnAnnotation(IndexAnnotation.AnnotationName, new IndexAnnotation(new[] { new IndexAttribute("IX_Ean") { IsUnique = true } }));
         }
     }
 }
