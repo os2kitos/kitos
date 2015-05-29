@@ -216,6 +216,10 @@
     <Compile Include="Migrations\201505271137151_AddedMaxLengthToItInterfaceVersion.Designer.cs">
       <DependentUpon>201505271137151_AddedMaxLengthToItInterfaceVersion.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201505291237028_RemovedUniqueIndexOnEAN.cs" />
+    <Compile Include="Migrations\201505291237028_RemovedUniqueIndexOnEAN.Designer.cs">
+      <DependentUpon>201505291237028_RemovedUniqueIndexOnEAN.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\BackupConfiguration.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -294,6 +298,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201505271137151_AddedMaxLengthToItInterfaceVersion.resx">
       <DependentUpon>201505271137151_AddedMaxLengthToItInterfaceVersion.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505291237028_RemovedUniqueIndexOnEAN.resx">
+      <DependentUpon>201505291237028_RemovedUniqueIndexOnEAN.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

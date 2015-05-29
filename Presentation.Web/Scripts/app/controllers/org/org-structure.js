@@ -354,11 +354,7 @@
                                     $modalInstance.close(result.response);
                                 }).error(function(result, status) {
                                     $modalScope.submitting = false;
-                                    if (status === 409) {
-                                        notify.addErrorMessage("Fejl! " + name + " kunne ikke ændres da EAN værdien allerede findes i KITOS!");
-                                    } else {
-                                        notify.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
-                                    }
+                                    notify.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
                                 });
 
                             };
@@ -389,11 +385,7 @@
                                     $modalInstance.close(result.response);
                                 }).error(function (result, status) {
                                     $modalScope.submitting = false;
-                                    if (status === 409) {
-                                        notify.addErrorMessage("Fejl! " + name + " kunne ikke ændres da EAN værdien allerede findes i KITOS!");
-                                    } else {
-                                        notify.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
-                                    }
+                                    notify.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
                                 });
                             };
 
