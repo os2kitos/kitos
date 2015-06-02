@@ -217,7 +217,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public override HttpResponseMessage Delete(int itSystemId, int organizationId)
+        public HttpResponseMessage DeleteByItSystemId(int itSystemId, int organizationId)
         {
             try
             {

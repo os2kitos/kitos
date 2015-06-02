@@ -1,5 +1,5 @@
 ﻿using Core.DomainModel.ItSystem;
-using Core.DomainServices;
+﻿using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData
 {

@@ -27,14 +27,6 @@
                     'userService', function(userService) {
                         return userService.getUser();
                     }
-                ],
-                versionOptions: [
-                    '$http', function ($http) {
-                        return $http.get('api/versionOption/')
-                            .then(function (result) {
-                                return result.data.response;
-                            });
-                    }
                 ]
             }
         });
@@ -42,12 +34,10 @@
 
     app.controller('system.interfaceEditCtrl',
     [
-        '$rootScope', '$scope', '$http', '$state', 'notify', 'itInterface', 'hasWriteAccess', 'autofocus', 'user', 'versionOptions',
-        function ($rootScope, $scope, $http, $state, notify, itInterface, hasWriteAccess, autofocus, user, versionOptions) {
+        '$rootScope', '$scope', '$http', '$state', 'notify', 'itInterface', 'hasWriteAccess', 'autofocus', 'user',
+        function ($rootScope, $scope, $http, $state, notify, itInterface, hasWriteAccess, autofocus, user) {
             $rootScope.page.title = 'Snitflade - Rediger';
             autofocus();
-
-            $scope.versionOptions = versionOptions;
 
             itInterface.belongsTo = (!itInterface.belongsToId) ? null : { id: itInterface.belongsToId, text: itInterface.belongsToName };
             itInterface.updateUrl = 'api/itInterface/' + itInterface.id;

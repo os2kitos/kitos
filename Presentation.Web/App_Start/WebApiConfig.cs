@@ -25,7 +25,7 @@ namespace Presentation.Web
             // To avoid processing unexpected or malicious queries, use the validation settings on QueryableAttribute to validate incoming queries.
             // For more information, visit http://go.microsoft.com/fwlink/?LinkId=279712.
             //config.EnableQuerySupport();
-
+            
             //OData
             config.MapODataServiceRoute(
                 routeName: "odata",
@@ -43,7 +43,7 @@ namespace Presentation.Web
         {
             var builder = new ODataModelBuilder();
 
-            builder.AddEnumType(typeof (AccessModifier));
+            builder.AddEnumType(typeof(AccessModifier));
 
             //builder.EntitySet<AdminRight>("AdminRights");
             //builder.EntitySet<AdminRole>("AdminRoles");
@@ -196,6 +196,7 @@ namespace Presentation.Web
             itInterfaces.EntityType.HasOptional(x => x.Method);
             itInterfaces.EntityType.HasOptional(x => x.ExhibitedBy);
             itInterfaces.EntityType.Property(x => x.ItInterfaceId);
+            itInterfaces.EntityType.Property(x => x.Version);
 
             var interfaceTypes = builder.EntitySet<InterfaceType>("InterfaceType");
             interfaceTypes.EntityType.HasKey(x => x.Id);

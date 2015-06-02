@@ -110,7 +110,7 @@
                 $scope.procurementPlans.push(obj);
 
                 // add 6 months for next iter
-                currentDate.add('months', 6);
+                currentDate.add(6, 'months');
             }
 
             var foundPlan = _.find($scope.procurementPlans, function (plan) {

@@ -213,7 +213,8 @@ namespace Presentation.Web.Controllers.API
 
                 var list = new List<dynamic>();
                 var header = new ExpandoObject() as IDictionary<string, Object>;
-                header.Add("Navn", "Navn");
+                header.Add("Fornavn", "Fornavn");
+                header.Add("Efternavn", "Efternavn");
                 header.Add("Email", "Email");
                 header.Add("Organisationsenhed", "Default org.enhed");
                 header.Add("Advis", "Advis");
@@ -227,7 +228,8 @@ namespace Presentation.Web.Controllers.API
                 foreach (var user in dtos)
                     {
                     var obj = new ExpandoObject() as IDictionary<string, Object>;
-                    obj.Add("Navn", user.Name);
+                    obj.Add("Fornavn", user.Name);
+                    obj.Add("Efternavn", user.LastName);
                     obj.Add("Email", user.Email);
                     obj.Add("Organisationsenhed", user.DefaultOrganizationUnitName);
                     obj.Add("Advis", user.LastAdvisDate.HasValue ? user.LastAdvisDate.Value.ToString("dd-MM-yy") : "Ikke sendt");

@@ -36,9 +36,8 @@ namespace Presentation.Web.Models
         public IEnumerable<DataRowDTO> DataRows { get; set; }
         public int? BelongsToId { get; set; }
         public string BelongsToName { get; set; }
-        public int? VersionOptionId { get; set; }
-        public OptionDTO VersionOption { get; set; }
-
+        public string Version { get; set; }
+        
         /// <summary>
         /// Gets or sets whether this instance has a usage in any organization.
         /// </summary>

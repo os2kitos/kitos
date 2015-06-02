@@ -7,30 +7,13 @@ namespace Presentation.Web
         // For more information on Bundling, visit http://go.microsoft.com/fwlink/?LinkId=254725
         public static void RegisterBundles(BundleCollection bundles)
         {
-            // jQuery and plugins
-            bundles.Add(new ScriptBundle("~/Scripts/jquery").Include(
-                "~/Scripts/jquery-{version}.js",
-                "~/Scripts/jquery-ui-{version}.js",
-                "~/Scripts/holder.js",
-                "~/Scripts/select2.js",
-                "~/Scripts/moment.js",
-                "~/Scripts/jszip.js"));
-
-            /*
-            bundles.Add(new ScriptBundle("~/bundles/jqueryui").Include(
-                        "~/Scripts/jquery-ui-{version}.js"));
-
-            // Use the development version of Modernizr to develop with and learn from. Then, when you're
-            // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.
-            bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
-                        "~/Scripts/modernizr-*"));
-             * 
-             */
-
-            // standalone libraries
+           // standalone libraries
             bundles.Add(new ScriptBundle("~/Scripts/libraries").Include(
                 "~/Scripts/underscore.js",
                 "~/Scripts/lodash.js",
+                "~/Scripts/jquery-{version}.js",
+                "~/Scripts/select2.js",
+                "~/Scripts/moment.js",
                 "~/Scripts/bootstrap.js"));
 
             // angularjs and plugins

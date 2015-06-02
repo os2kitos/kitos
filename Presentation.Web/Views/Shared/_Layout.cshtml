@@ -1,20 +1,17 @@
 ﻿<!DOCTYPE html>
 <html lang="en" data-ng-app="app">
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
-    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+    <meta charset="utf-8">
     <title data-ng-bind="page.title + ' - KITOS'">KITOS</title>
-    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
-    <meta name="viewport" content="width=device-width" />
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <meta name="viewport" content="width=device-width">
     @Styles.Render("~/Content/cssbundle")
-
-    <link href="../../Content/kendo/kendo.common.min.css" rel="stylesheet"/>
-    <link href="../../Content/kendo/kendo.common-bootstrap.min.css" rel="stylesheet" />
-    <link href="../../Content/kendo/kendo.rtl.css" rel="stylesheet" />
-    <link href="../../Content/kendo/kendo.bootstrap.min.css" rel="stylesheet" />
-    <link href="../../Content/kendo/kendo.dataviz.min.css" rel="stylesheet" />
-    <link href="../../Content/kendo/kendo.dataviz.bootstrap.min.css" rel="stylesheet" />
-
+    <link href="/Content/kendo/kendo.common-bootstrap.min.css" rel="stylesheet">
+    <link href="/Content/kendo/kendo.bootstrap.min.css" rel="stylesheet">
+    <link href="/Content/kendo/kendo.dataviz.min.css" rel="stylesheet">
+    <link href="/Content/kendo/kendo.dataviz.bootstrap.min.css" rel="stylesheet">
+    
     @if (ViewBag.Environment != "Prod")
     {
         if (ViewBag.Environment == "Test")
@@ -33,7 +30,6 @@
                 }
             </style>
         }
-
     }
 </head>
 <body data-ng-cloak>
@@ -55,10 +51,10 @@
         </div>
     </div>
 
-    @Scripts.Render("~/Scripts/jquery")
     @Scripts.Render("~/Scripts/libraries")
     @Scripts.Render("~/Scripts/angular")
-
+    
+    <script src="/Scripts/kendo/jszip.min.js"></script>
     <script src="/Scripts/kendo/kendo.all.min.js"></script>
     <script src="/Scripts/kendo/messages/kendo.messages.da-DK.min.js"></script>
 

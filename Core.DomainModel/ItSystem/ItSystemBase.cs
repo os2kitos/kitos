@@ -30,13 +30,5 @@ namespace Core.DomainModel.ItSystem
         /// The organization the it system belongs to.
         /// </value>
         public virtual Organization BelongsTo { get; set; }
-
-        public override bool HasUserWriteAccess(User user, int organizationId)
-        {
-            // Should only be editable within context unless user is GlobalAdmin
-            if (OrganizationId != organizationId && !user.IsGlobalAdmin) return false;
-
-            return base.HasUserWriteAccess(user, organizationId);
-        }
     }
 }
