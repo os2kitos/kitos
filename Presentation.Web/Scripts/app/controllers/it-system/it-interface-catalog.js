@@ -65,10 +65,13 @@
                     mode: "row"
                 },
                 groupable: false,
-                columnMenu: true,
+                columnMenu: {
+                    filterable: false
+                },
                 columns: [
                     {
-                        field: "ItInterfaceId", title: "Snidtflade ID",
+                        field: "ItInterfaceId", title: "Snidtflade ID", width: 150,
+                        locked: true,
                         filterable: {
                             cell: {
                                 delay: 1500,
@@ -78,8 +81,9 @@
                         }
                     },
                     {
-                        field: "Name", title: "Snitflade",
+                        field: "Name", title: "Snitflade", width: 150,
                         template: "<a data-ui-sref='it-system.interface-edit.interface-details({id: #: Id #})'>#: Name #</a>",
+                        locked: true,
                         filterable: {
                             cell: {
                                 delay: 1500,
@@ -90,10 +94,11 @@
                     },
                     {
                         field: "AccessModifier", title: "Tilgængelighed", width: 80,
-                        filterable: false
+                        filterable: false,
+                        sortable: false
                     },
                     {
-                        field: "InterfaceType.Name", title: "Snitfladetype",
+                        field: "InterfaceType.Name", title: "Snitfladetype", width: 150,
                         template: "#: InterfaceType ? InterfaceType.Name : '' #",
                         filterable: {
                             cell: {
@@ -104,7 +109,7 @@
                         }
                     },
                     {
-                        field: "Interface.Name", title: "Grænseflade",
+                        field: "Interface.Name", title: "Grænseflade", width: 150,
                         template: "#: Interface ? Interface.Name : '' #",
                         filterable: {
                             cell: {
@@ -115,7 +120,7 @@
                         }
                     },
                     {
-                        field: "Method", title: "Metode", sortable: false,
+                        field: "Method.Name", title: "Metode", width: 150,
                         template: "#: Method ? Method.Name : '' #",
                         filterable: {
                             cell: {
@@ -123,10 +128,10 @@
                                 operator: "contains",
                                 suggestionOperator: "contains"
                             }
-                        }
+                        },
                     },
                     {
-                        field: "Tsa", title: "TSA", sortable: false,
+                        field: "Tsa.Name", title: "TSA", width: 150,
                         template: "#: Tsa ? Tsa.Name : '' #",
                         filterable: {
                             cell: {
@@ -134,10 +139,10 @@
                                 operator: "contains",
                                 suggestionOperator: "contains"
                             }
-                        }
+                        },
                     },
                     {
-                        field: "ExhibitedBy.ItSystem.Name", title: "Udstillet af", sortable: false,
+                        field: "ExhibitedBy.ItSystem.Name", title: "Udstillet af", width: 150,
                         template: "#: ExhibitedBy ? ExhibitedBy.ItSystem.Name : '' #",
                         filterable: {
                             cell: {
@@ -145,10 +150,10 @@
                                 operator: "contains",
                                 suggestionOperator: "contains"
                             }
-                        }
+                        },
                     },
                     {
-                        field: "BelongsTo.Name", title: "Rettighedshaver",
+                        field: "BelongsTo.Name", title: "Rettighedshaver", width: 150,
                         filterable: {
                             cell: {
                                 delay: 1500,
@@ -158,7 +163,7 @@
                         }
                     },
                     {
-                        field: "Organization.Name", title: "Oprettet i",
+                        field: "Organization.Name", title: "Oprettet i", width: 150,
                         filterable: {
                             cell: {
                                 delay: 1500,
@@ -168,7 +173,7 @@
                         }
                     },
                     {
-                        field: "ObjectOwner.Name", title: "Oprettet af",
+                        field: "ObjectOwner.Name", title: "Oprettet af", width: 150,
                         template: "#: ObjectOwner.Name + ' ' + ObjectOwner.LastName #",
                         filterable: {
                             cell: {
@@ -189,6 +194,8 @@
                 }
             };
 
+            var localStorageKey = "kendo-grid-it-interface-catalog-options";
+
             // saves grid state to localStorage
             function saveGridOptions(e) {
                 if ($scope.mainGrid) {
@@ -198,29 +205,29 @@
                         var options = $scope.mainGrid.getOptions();
                         var pickedOptions = {}; // _.pick(options, 'columns'); BUG disabled for now as saving column data overwrites source changes - FUBAR!
                         pickedOptions.dataSource = _.pick(options.dataSource, ['filter', 'sort', 'page', 'pageSize']);
-                        localStorage["kendo-grid-it-interface-catalog-options"] = kendo.stringify(pickedOptions);
+                        localStorage[localStorageKey] = kendo.stringify(pickedOptions);
                     });
                 }
             }
 
             // loads kendo grid options from localstorage
             function loadOptions() {
-                var options = localStorage["kendo-grid-it-interface-catalog-options"];
+                var options = localStorage[localStorageKey];
                 if (options) {
                     $scope.mainGrid.setOptions(JSON.parse(options));
                 }
-            }
-
-            // clears grid filters by removing the localStorageItem and reloading the page
-            $scope.clearOptions = function () {
-                localStorage.removeItem("kendo-grid-it-interface-catalog-options");
-                itInterfaceCatalogDataSource.read();
             }
 
             // fires when kendo is finished rendering all its goodies
             $scope.$on("kendoRendered", function (e) {
                 loadOptions();
             });
+
+            // clears grid filters by removing the localStorageItem and reloading the page
+            $scope.clearOptions = function () {
+                localStorage.removeItem(localStorageKey);
+                itInterfaceCatalogDataSource.read();
+            }
         }
     ]);
 })(angular, app);

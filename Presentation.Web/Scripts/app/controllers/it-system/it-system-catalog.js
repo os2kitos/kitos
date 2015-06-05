@@ -56,6 +56,8 @@
                 }
             };
 
+            var localStorageKey = "kendo-grid-it-system-catalog-options";
+
             // saves grid state to localStorage
             function saveGridOptions(e) {
                 if ($scope.mainGrid) {
@@ -65,17 +67,28 @@
                         var options = $scope.mainGrid.getOptions();
                         var pickedOptions = {}; // _.pick(options, 'columns'); BUG disabled for now as saving column data overwrites source changes - FUBAR!
                         pickedOptions.dataSource = _.pick(options.dataSource, ['filter', 'sort', 'page', 'pageSize']);
-                        localStorage["kendo-grid-it-system-catalog-options"] = kendo.stringify(pickedOptions);
+                        localStorage[localStorageKey] = kendo.stringify(pickedOptions);
                     });
                 }
             }
 
             // loads kendo grid options from localstorage
             function loadOptions() {
-                var options = localStorage["kendo-grid-it-system-catalog-options"];
+                var options = localStorage[localStorageKey];
                 if (options) {
                     $scope.mainGrid.setOptions(JSON.parse(options));
                 }
+            }
+
+            // fires when kendo is finished rendering all its goodies
+            $scope.$on("kendoRendered", function (e) {
+                loadOptions();
+            });
+
+            // clears grid filters by removing the localStorageItem and reloading the page
+            $scope.clearOptions = function () {
+                localStorage.removeItem(localStorageKey);
+                itSystemCatalogDataSource.read();
             }
 
             // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
@@ -167,11 +180,14 @@
                     mode: "row"
                 },
                 groupable: false,
-                columnMenu: true,
+                columnMenu: {
+                    filterable: false
+                },
                 columns: [
                     {
-                        field: "Name", title: "It System",
+                        field: "Name", title: "It System", width: 150,
                         template: '<a data-ui-sref="it-system.edit.interfaces({id: #: Id #})">#: Name #</a>',
+                        locked: true,
                         filterable: {
                             cell: {
                                 delay: 1500,
@@ -181,10 +197,12 @@
                         }
                     },
                     {
-                        field: "AccessModifier", title: "Tilgængelighed", width: 80, filterable: false
+                        field: "AccessModifier", title: "Tilgængelighed", width: 80,
+                        filterable: false,
+                        sortable: false
                     },
                     {
-                        field: "Parent.Name", title: "Overordnet",
+                        field: "Parent.Name", title: "Overordnet", width: 150,
                         template: "#: Parent ? Parent.Name : '' #",
                         filterable: {
                             cell: {
@@ -195,16 +213,30 @@
                         }
                     },
                     {
-                        field: "AppTypeOption.Name", title: "Applikationstype",
-                        template: "#: AppTypeOption ? AppTypeOption.Name : '' #"
+                        field: "AppTypeOption.Name", title: "Applikationstype", width: 150,
+                        template: "#: AppTypeOption ? AppTypeOption.Name : '' #",
+                        filterable: {
+                            cell: {
+                                delay: 1500,
+                                operator: "contains",
+                                suggestionOperator: "contains"
+                            }
+                        }
                     },
                     {
-                        field: "BusinessType.Name", title: "Forretningtype",
-                        template: "#: BusinessType ? BusinessType.Name : '' #"
+                        field: "BusinessType.Name", title: "Forretningtype", width: 150,
+                        template: "#: BusinessType ? BusinessType.Name : '' #",
+                        filterable: {
+                            cell: {
+                                delay: 1500,
+                                operator: "contains",
+                                suggestionOperator: "contains"
+                            }
+                        }
                     },
                     {
                         // DON'T YOU DARE RENAME!
-                        field: "TaskKey", title: "KLE", width: 100, sortable: false, 
+                        field: "TaskKey", title: "KLE", width: 150,
                         template: "#: TaskRefs.length > 0 ? _.pluck(TaskRefs.slice(0,4), 'TaskKey').join(', ') : '' ##: TaskRefs.length > 5 ? ', ...' : '' #",
                         filterable: {
                             cell: {
@@ -212,30 +244,56 @@
                                 delay: 1500,
                                 operator: "startswith",
                             }
+                        },
+                        sortable: false
+                    },
+                    {
+                        field: "BelongsTo.Name", title: "Rettighedshaver", width: 150,
+                        template: "#: BelongsTo ? BelongsTo.Name : '' #",
+                        filterable: {
+                            cell: {
+                                delay: 1500,
+                                operator: "contains",
+                                suggestionOperator: "contains"
+                            }
                         }
                     },
                     {
-                        field: "BelongsTo.Name", title: "Rettighedshaver",
-                        template: "#: BelongsTo ? BelongsTo.Name : '' #"
+                        field: "Organization.Name", title: "Oprettet i", width: 150,
+                        template: "#: Organization ? Organization.Name : '' #",
+                        filterable: {
+                            cell: {
+                                delay: 1500,
+                                operator: "contains",
+                                suggestionOperator: "contains"
+                            }
+                        }
                     },
                     {
-                        field: "Organization.Name", title: "Oprettet i",
-                        template: "#: Organization ? Organization.Name : '' #"
+                        field: "ObjectOwner.Name", title: "Oprettet af", width: 150,
+                        template: "#: ObjectOwner.Name + ' ' + ObjectOwner.LastName #",
+                        filterable: {
+                            cell: {
+                                delay: 1500,
+                                operator: "contains",
+                                suggestionOperator: "contains"
+                            }
+                        }
                     },
                     {
-                        field: "ObjectOwner.Name", title: "Oprettet af",
-                        template: "#: ObjectOwner.Name + ' ' + ObjectOwner.LastName #"
-                    },
-                    {
-                        field: "Usages.length" || 0, title: "Anvender", width: 95, sortable: false, filterable: false,
-                        template: '<a class="col-md-7 text-center" data-ng-click="showUsageDetails(#: Id #,\'#: Name #\')">#: Usages.length #</a>'
+                        field: "Usages.length" || 0, title: "Anvender", width: 95,
+                        template: '<a class="col-md-7 text-center" data-ng-click="showUsageDetails(#: Id #,\'#: Name #\')">#: Usages.length #</a>',
+                        filterable: false,
+                        sortable: false
                     },
                     {
                         title: "Anvendelse",
-                        width: "110px",
-                        field: "Usages", sortable: false, filterable: false, columnMenu: false,
+                        width: 110,
+                        field: "Usages",
                         template: '<button class="btn btn-success col-md-7" data-ng-click="enableUsage(#: Id #)" data-ng-show="!systemHasUsages(dataItem)">Anvend</button>' +
-                                  '<button class="btn btn-danger  col-md-7" data-ng-click="removeUsage(#: Id #)" data-ng-show="systemHasUsages(dataItem)">Fjern anv.</button>'
+                                  '<button class="btn btn-danger  col-md-7" data-ng-click="removeUsage(#: Id #)" data-ng-show="systemHasUsages(dataItem)">Fjern anv.</button>',
+                        filterable: false,
+                        sortable: false
                     },
                 ],
                 dataBound: saveGridOptions,
@@ -264,17 +322,6 @@
                 if (sure)
                     deleteODataUsage(dataItem);
             }
-
-            // clears grid filters by removing the localStorageItem and reloading the page
-            $scope.clearOptions = function () {
-                localStorage.removeItem("kendo-grid-it-system-catalog-options");
-                itSystemCatalogDataSource.read();
-            }
-
-            // fires when kendo is finished rendering all its goodies
-            $scope.$on("kendoRendered", function (e) {
-                loadOptions();
-            });
         }
     ]);
 })(angular, app);

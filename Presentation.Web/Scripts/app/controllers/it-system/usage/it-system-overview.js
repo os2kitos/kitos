@@ -103,11 +103,51 @@
                     }
                 });
 
+                var localStorageKey = "kendo-grid-it-system-overview-options";
+
+                // saves grid state to localStorage
+                function saveGridOptions(e) {
+                    if ($scope.mainGrid) {
+                        // timeout fixes columnReorder saves before the column is actually reordered 
+                        // http://stackoverflow.com/questions/21270748/kendo-grid-saving-state-in-columnreorder-event
+                        $timeout(function () {
+                            var options = $scope.mainGrid.getOptions();
+                            var pickedOptions = {}; // _.pick(options, 'columns'); BUG disabled for now as saving column data overwrites source changes - FUBAR!
+                            pickedOptions.dataSource = _.pick(options.dataSource, ['filter', 'sort', 'page', 'pageSize']);
+                            localStorage[localStorageKey] = kendo.stringify(pickedOptions);
+                        });
+                    }
+                }
+
+                // loads kendo grid options from localstorage
+                function loadOptions() {
+                    var options = localStorage[localStorageKey];
+                    if (options) {
+                        $scope.mainGrid.setOptions(JSON.parse(options));
+                    }
+                }
+
+                // fires when kendo is finished rendering all its goodies
+                $scope.$on("kendoRendered", function (e) {
+                    loadOptions();
+                });
+
+                // clears grid filters by removing the localStorageItem and reloading the page
+                $scope.clearOptions = function () {
+                    localStorage.removeItem(localStorageKey);
+                    itSystemOverviewDataSource.read();
+                }
+
                 // overview grid options
                 $scope.mainGridOptions = {
                     dataSource: itSystemOverviewDataSource,
                     toolbar: [
                         { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
+                        {
+                            name: "clearFilter",
+                            text: "Nulstil",
+                            template: "<a class='k-button k-button-icontext' data-ng-click='clearOptions()'>#: text #</a>"
+                        }
                     ],
                     excel: {
                         fileName: "IT System Katalog.xlsx",
@@ -133,36 +173,63 @@
                     },
                     columns: [
                         {
-                            field: "ItSystem.Name", title: "IT System", width: 150, lockable: true,
-                            template: "<a data-ui-sref='it-system.usage.interfaces({id: #: Id #})'>#: ItSystem.Name #</a>"
+                            field: "ItSystem.Name", title: "IT System", width: 150,
+                            template: "<a data-ui-sref='it-system.usage.interfaces({id: #: Id #})'>#: ItSystem.Name #</a>",
+                            locked: true,
+                            filterable: {
+                                cell: {
+                                    delay: 1500,
+                                    operator: "contains",
+                                }
+                            }
                         },
                         {
                             field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 150,
-                            template: "#: ResponsibleUsage ? ResponsibleUsage.OrganizationUnit.Name : '' #"
+                            template: "#: ResponsibleUsage ? ResponsibleUsage.OrganizationUnit.Name : '' #",
+                            filterable: {
+                                cell: {
+                                    delay: 1500,
+                                    operator: "contains",
+                                }
+                            }
                         },
                         {
                             field: "LocalSystemId", title: "Lokal system ID", width: 150,
+                            filterable: {
+                                cell: {
+                                    delay: 1500,
+                                    operator: "contains",
+                                }
+                            }
                         },
                         {
-                            field: "ItSystem.BusinessType", title: "Forretningstype", width: 150,
+                            field: "ItSystem.BusinessType.Name", title: "Forretningstype", width: 150,
                             template: "#: ItSystem.BusinessType ? ItSystem.BusinessType.Name : '' #",
+                            filterable: {
+                                cell: {
+                                    delay: 1500,
+                                    operator: "contains",
+                                }
+                            }
                         },
                         {
-                            field: "ItSystem.AppTypeOption", title: "Applikationstype", width: 150,
+                            field: "ItSystem.AppTypeOption.Name", title: "Applikationstype", width: 150,
                             template: "#: ItSystem.AppTypeOption ? ItSystem.AppTypeOption.Name : '' #",
-                            hidden: true
+                            hidden: true,
+                            filterable: {
+                                cell: {
+                                    delay: 1500,
+                                    operator: "contains",
+                                }
+                            }
                         },
                         {
-                            field: "MainContract.ItContract.IsActive", title: "Kontrakt", width: 70,
+                            field: "MainContract.ItContract.IsActive", title: "Kontrakt", width: 80,
                             template: function (dataItem) {
                                 return contractTemplate(dataItem);
                             },
                             filterable: false,
                             sortable: false
-                        },
-                        {
-                            field: "ItSystem.BusinessType", title: "Forretningstype", width: 150,
-                            template: "#: ItSystem.BusinessType ? ItSystem.BusinessType.Name : '' #"
                         },
                         {
                             field: "ItSystem.Usages", title: "Anvender", width: 95,
@@ -177,7 +244,7 @@
                             sortable: false
                         },
                         {
-                            field: "Overview", title: "Overblik", width: 150,
+                            field: "Overview.ItSystem.Name", title: "Overblik", width: 150,
                             template: "#: Overview ? Overview.ItSystem.Name : '' #",
                             hidden: true
                         },
@@ -337,6 +404,11 @@
                             }
                         }
                     ],
+                    dataBound: saveGridOptions,
+                    columnResize: saveGridOptions,
+                    columnHide: saveGridOptions,
+                    columnShow: saveGridOptions,
+                    columnReorder: saveGridOptions,
                     error: function(e) {
                         console.log(e);
                     }
@@ -365,9 +437,9 @@
                     if (dataItem.MainContract)
                         if (dataItem.MainContract.ItContract)
                             if (dataItem.MainContract.ItContract.IsActive)
-                                return '<span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>';
+                                return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span></a>';
                             else
-                                return '<span class="glyphicon glyphicon-file text-muted" aria-hidden="true"></span>';
+                                return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="glyphicon glyphicon-file text-muted" aria-hidden="true"></span></a>';
 
                     return "";
                 }
