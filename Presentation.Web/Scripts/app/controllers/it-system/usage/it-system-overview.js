@@ -79,7 +79,6 @@
                         model: {
                             fields: {
                                 LastChanged: { type: "date" },
-                                "MainContract.ItContract.IsActive": { type: "boolean" }
                             }
                         },
                         parse: function (response) {
