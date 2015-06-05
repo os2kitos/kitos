@@ -126,6 +126,7 @@ namespace Presentation.Web
             organizations.EntityType.Property(x => x.Name);
             organizations.EntityType.HasMany(x => x.ItSystems).IsNavigable();
             organizations.EntityType.HasMany(x => x.ItSystemUsages).IsNavigable();
+            organizations.EntityType.HasMany(x => x.ItInterfaces).IsNavigable();
 
             var orgUnits = builder.EntitySet<OrganizationUnit>("OrganizationUnits");
             orgUnits.EntityType.HasKey(x => x.Id);
@@ -142,6 +143,8 @@ namespace Presentation.Web
             usages.EntityType.Property(x => x.OrganizationId);
             usages.EntityType.HasOptional(x => x.Organization).IsNavigable();
             usages.EntityType.Property(x => x.ItSystemId);
+            usages.EntityType.Property(x => x.LastChanged);
+            usages.EntityType.Property(x => x.LocalSystemId);
             usages.EntityType.HasOptional(x => x.ResponsibleUsage);
             usages.EntityType.HasOptional(x => x.MainContract);
             usages.EntityType.Property(x => x.OverviewId);
@@ -191,7 +194,7 @@ namespace Presentation.Web
             itInterfaces.EntityType.HasOptional(x => x.InterfaceType);
             itInterfaces.EntityType.HasRequired(x => x.ObjectOwner);
             itInterfaces.EntityType.Property(x => x.OrganizationId);
-            itInterfaces.EntityType.HasRequired(x => x.Organization);
+            itInterfaces.EntityType.HasRequired(x => x.Organization).IsNavigable();
             itInterfaces.EntityType.HasOptional(x => x.Tsa);
             itInterfaces.EntityType.HasOptional(x => x.Method);
             itInterfaces.EntityType.HasOptional(x => x.ExhibitedBy);

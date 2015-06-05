@@ -63,8 +63,9 @@
                     // http://stackoverflow.com/questions/21270748/kendo-grid-saving-state-in-columnreorder-event
                     $timeout(function () {
                         var options = $scope.mainGrid.getOptions();
-                        delete options.dataSource.transport; //delete datasource.transport from options before saving state - would remember requestUrl including orgId from last request
-                        localStorage["kendo-grid-it-system-catalog-options"] = kendo.stringify(options);
+                        var pickedOptions = {}; // _.pick(options, 'columns'); BUG disabled for now as saving column data overwrites source changes - FUBAR!
+                        pickedOptions.dataSource = _.pick(options.dataSource, ['filter', 'sort', 'page', 'pageSize']);
+                        localStorage["kendo-grid-it-system-catalog-options"] = kendo.stringify(pickedOptions);
                     });
                 }
             }
@@ -95,8 +96,7 @@
                         {
                             read: {
                                 url: "/odata/ItSystemUsages?$expand=Organization",
-                                dataType: "json",
-                                cache: false
+                                dataType: "json"
                             },
                         },
                     pageSize: 10,
@@ -112,49 +112,45 @@
                 ],
                 dataBound: detailsBound
             };
-            
+
+            var itSystemCatalogDataSource = new kendo.data.DataSource({
+                type: "odata-v4",
+                transport: {
+                    read: {
+                        url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystems?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization)",
+                        dataType: "json"
+                    },
+                    parameterMap: function (options, type) {
+                        var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
+
+                        if (parameterMap.$filter) {
+                            // replaces "startswith(TaskKey,'11')" with "TaskRefs/any(c: startswith(c/TaskKey),'11')"
+                            parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()(TaskKey.*\))/, "TaskRefs/any(c: $1c/$2)");
+                        }
+                        
+                        return parameterMap;
+                    }
+                },
+                pageSize: 10,
+                serverPaging: true,
+                serverSorting: true,
+                serverFiltering: true
+            });
+
             // catalog grid
             $scope.itSystemCatalogueGrid = {
-                dataSource: {
-                    type: "odata-v4",
-                    transport: {
-                        read: {
-                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystems?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization)",
-                            dataType: "json",
-                            cache: false
-                        },
-                        parameterMap: function (options, type) {
-                            //options.foo = "bar"; // do something here
-                            return kendo.data.transports["odata-v4"].parameterMap(options, type);
-                        }
-                    },
-                    schema: {
-                        parse: function(data) {
-                            $.each(data.value, function(i, elem) {
-                                elem.AppTypeOption = elem.AppTypeOption ? elem.AppTypeOption : { Name: "" };
-                                elem.BusinessType = elem.BusinessType ? elem.BusinessType : { Name: "" };
-                                elem.UsagesLength = elem.Usages ? elem.Usages.length : 0;
-                                elem.TaskRefs = elem.TaskRefs ? elem.TaskRefs : [{ TaskKey: "" }];
-                            });
-                            return data;
-                        },
-                    },
-                    pageSize: 10,
-                    serverPaging: true,
-                    serverSorting: true,
-                    serverFiltering: true,
-                },
+                dataSource: itSystemCatalogDataSource,
                 toolbar: [
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",
                         text: "Nulstil",
-                        template: "<a class='k-button k-button-icontext' data-ng-click='clearOptions()'>#: data.text#</a>"
+                        template: "<a class='k-button k-button-icontext' data-ng-click='clearOptions()'>#: text #</a>"
                     }
                 ],
                 excel: {
                     fileName: "IT System Katalog.xlsx",
-                    filterable: false,
+                    filterable: true,
                     allPages: true
                 },
                 pageable: {
@@ -167,51 +163,79 @@
                 },
                 reorderable: true,
                 resizable: true,
-                filterable: true,
+                filterable: {
+                    mode: "row"
+                },
                 groupable: false,
                 columnMenu: true,
                 columns: [
                     {
                         field: "Name", title: "It System",
-                        template: '<a data-ui-sref="it-system.edit.interfaces({id: #:data.Id#})" data-ng-bind="dataItem.Name"></a>',
+                        template: '<a data-ui-sref="it-system.edit.interfaces({id: #: Id #})">#: Name #</a>',
+                        filterable: {
+                            cell: {
+                                delay: 1500,
+                                operator: "contains",
+                                suggestionOperator: "contains"
+                            }
+                        }
                     },
                     {
-                        field: "AccessModifier", title: "(p)", width: 80, filterable: false
+                        field: "AccessModifier", title: "Tilgængelighed", width: 80, filterable: false
+                    },
+                    {
+                        field: "Parent.Name", title: "Overordnet",
+                        template: "#: Parent ? Parent.Name : '' #",
+                        filterable: {
+                            cell: {
+                                delay: 1500,
+                                operator: "contains",
+                                suggestionOperator: "contains"
+                            }
+                        }
                     },
                     {
                         field: "AppTypeOption.Name", title: "Applikationstype",
-                        template: '<span data-ng-bind="dataItem.AppTypeOption.Name"></span>'
+                        template: "#: AppTypeOption ? AppTypeOption.Name : '' #"
                     },
                     {
                         field: "BusinessType.Name", title: "Forretningtype",
-                        template: '<span data-ng-bind="dataItem.BusinessType.Name"></span>'
+                        template: "#: BusinessType ? BusinessType.Name : '' #"
                     },
                     {
-                        field: "TaskRefs", title: "KLE", width: 100, sortable: false, filterable: false,
-                        template: '<span data-ng-bind="dataItem.TaskRefs[0].TaskKey"></span>'
+                        // DON'T YOU DARE RENAME!
+                        field: "TaskKey", title: "KLE", width: 100, sortable: false, 
+                        template: "#: TaskRefs.length > 0 ? _.pluck(TaskRefs.slice(0,4), 'TaskKey').join(', ') : '' ##: TaskRefs.length > 5 ? ', ...' : '' #",
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                delay: 1500,
+                                operator: "startswith",
+                            }
+                        }
                     },
                     {
                         field: "BelongsTo.Name", title: "Rettighedshaver",
-                        template: '<span data-ng-bind="dataItem.BelongsTo.Name"></span>'
+                        template: "#: BelongsTo ? BelongsTo.Name : '' #"
                     },
                     {
                         field: "Organization.Name", title: "Oprettet i",
-                        template: '<span data-ng-bind="dataItem.Organization.Name"></span>'
+                        template: "#: Organization ? Organization.Name : '' #"
                     },
                     {
                         field: "ObjectOwner.Name", title: "Oprettet af",
-                        template: '<span>{{ dataItem.ObjectOwner.Name + " " + dataItem.ObjectOwner.LastName }}</span>'
+                        template: "#: ObjectOwner.Name + ' ' + ObjectOwner.LastName #"
                     },
                     {
                         field: "Usages.length" || 0, title: "Anvender", width: 95, sortable: false, filterable: false,
-                        template: '<a class="col-md-7 text-center" data-ng-click="showUsageDetails(#: data.Id#,\'#: data.Name#\')">#: data.UsagesLength#</a>'
+                        template: '<a class="col-md-7 text-center" data-ng-click="showUsageDetails(#: Id #,\'#: Name #\')">#: Usages.length #</a>'
                     },
                     {
                         title: "Anvendelse",
                         width: "110px",
                         field: "Usages", sortable: false, filterable: false, columnMenu: false,
-                        template: '<button class="btn btn-success col-md-7" data-ng-click="enableUsage(#: data.Id#)" data-ng-show="!systemHasUsages(dataItem)">Anvend</button>' +
-                                  '<button class="btn btn-danger  col-md-7" data-ng-click="removeUsage(#: data.Id#)" data-ng-show="systemHasUsages(dataItem)">Fjern anv.</button>'
+                        template: '<button class="btn btn-success col-md-7" data-ng-click="enableUsage(#: Id #)" data-ng-show="!systemHasUsages(dataItem)">Anvend</button>' +
+                                  '<button class="btn btn-danger  col-md-7" data-ng-click="removeUsage(#: Id #)" data-ng-show="systemHasUsages(dataItem)">Fjern anv.</button>'
                     },
                 ],
                 dataBound: saveGridOptions,
@@ -226,7 +250,7 @@
 
             // returns bool if system is being used by system within current context
             $scope.systemHasUsages = function(system) {
-                return _.find(system.Usages, function (d) { return d.OrganizationId == user.currentOrganizationId });
+                return _.find(system.Usages, function (d) { return d.OrganizationId == user.currentOrganizationId; });
             }
 
             // adds usage at selected system within current context
@@ -237,14 +261,14 @@
             // removes usage at selected system within current context
             $scope.removeUsage = function (dataItem) {
                 var sure = confirm("Er du sikker på at du vil fjerne den lokale anvendelse af systemet? Dette sletter ikke systemet, men vil slette alle lokale detaljer vedrørende anvendelsen.");
-
-                if(sure) deleteODataUsage(dataItem);
+                if (sure)
+                    deleteODataUsage(dataItem);
             }
-          
+
             // clears grid filters by removing the localStorageItem and reloading the page
             $scope.clearOptions = function () {
                 localStorage.removeItem("kendo-grid-it-system-catalog-options");
-                $state.go($state.current, {}, { reload: true });
+                itSystemCatalogDataSource.read();
             }
 
             // fires when kendo is finished rendering all its goodies

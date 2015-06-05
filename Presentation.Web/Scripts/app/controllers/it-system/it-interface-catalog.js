@@ -4,35 +4,51 @@
             $stateProvider.state('it-system.interfaceCatalog', {
                 url: '/interface-catalog',
                 templateUrl: 'partials/it-system/it-interface-catalog.html',
-                controller: 'system.interfaceCatalogCtrl'
+                controller: 'system.interfaceCatalogCtrl',
+                resolve: {
+                    user: [
+                        'userService', function (userService) {
+                            return userService.getUser();
+                        }
+                    ]
+                }
             });
         }
     ]);
 
     app.controller('system.interfaceCatalogCtrl',
     [
-        '$rootScope', '$scope',
-        function ($rootScope, $scope) {
+        '$rootScope', '$scope', '$timeout', 'user',
+        function ($rootScope, $scope, $timeout, user) {
             $rootScope.page.title = 'Snitflade - Katalog';
 
-            $scope.itInterfaceOptions = {
-                dataSource: {
-                    type: "odata-v4",
-                    transport: {
-                        read: {
-                            url: "/odata/ItInterfaces?$expand=Interface,ObjectOwner,BelongsTo,Organization,Tsa,ExhibitedBy($expand=ItSystem),Method"
-                        }
-                    },
-                    pageSize: 5,
-                    serverPaging: true,
-                    serverSorting: true
+            var itInterfaceCatalogDataSource = new kendo.data.DataSource({
+                type: "odata-v4",
+                transport: {
+                    read: {
+                        url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItInterfaces?$expand=Interface,InterfaceType,ObjectOwner,BelongsTo,Organization,Tsa,ExhibitedBy($expand=ItSystem),Method",
+                        dataType: "json"
+                    }
                 },
+                pageSize: 10,
+                serverPaging: true,
+                serverSorting: true,
+                serverFiltering: true,
+            });
+
+            $scope.itInterfaceOptions = {
+                dataSource: itInterfaceCatalogDataSource,
                 toolbar: [
-                { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
+                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
+                    {
+                        name: "clearFilter",
+                        text: "Nulstil",
+                        template: "<a class='k-button k-button-icontext' data-ng-click='clearOptions()'>#: text #</a>"
+                    }
                 ],
                 excel: {
                     fileName: "IT System Katalog.xlsx",
-                    filterable: false,
+                    filterable: true,
                     allPages: true
                 },
                 pageable: {
@@ -40,56 +56,171 @@
                     pageSizes: true,
                     buttonCount: 5
                 },
-                sortable: true,
-                columnMenu: true,
+                sortable: {
+                    mode: "single"
+                },
                 reorderable: true,
                 resizable: true,
+                filterable: {
+                    mode: "row"
+                },
+                groupable: false,
+                columnMenu: true,
                 columns: [
                     {
-                        field: "ItInterfaceId", title: "Snidtflade ID"
+                        field: "ItInterfaceId", title: "Snidtflade ID",
+                        filterable: {
+                            cell: {
+                                delay: 1500,
+                                operator: "contains",
+                                suggestionOperator: "contains"
+                            }
+                        }
                     },
                     {
                         field: "Name", title: "Snitflade",
-                        template: "<a data-ui-sref='it-system.interface-edit.interface-details({id: #: data.Id#})' data-ng-bind='dataItem.Name'></a>"
+                        template: "<a data-ui-sref='it-system.interface-edit.interface-details({id: #: Id #})'>#: Name #</a>",
+                        filterable: {
+                            cell: {
+                                delay: 1500,
+                                operator: "contains",
+                                suggestionOperator: "contains"
+                            }
+                        }
                     },
                     {
-                        field: "AccessModifier", title: "Tilgængelighed", width: 125
+                        field: "AccessModifier", title: "Tilgængelighed", width: 80,
+                        filterable: false
                     },
                     {
                         field: "InterfaceType.Name", title: "Snitfladetype",
-                        template: "<span data-ng-bind='dataItem.InterfaceType.Name'></span>"
+                        template: "#: InterfaceType ? InterfaceType.Name : '' #",
+                        filterable: {
+                            cell: {
+                                delay: 1500,
+                                operator: "contains",
+                                suggestionOperator: "contains"
+                            }
+                        }
                     },
                     {
                         field: "Interface.Name", title: "Grænseflade",
-                        template: "<span data-ng-bind='dataItem.Interface.Name'></span>"
+                        template: "#: Interface ? Interface.Name : '' #",
+                        filterable: {
+                            cell: {
+                                delay: 1500,
+                                operator: "contains",
+                                suggestionOperator: "contains"
+                            }
+                        }
                     },
                     {
                         field: "Method", title: "Metode", sortable: false,
-                        template: "<span data-ng-bind='dataItem.Method.Name'></span>"
+                        template: "#: Method ? Method.Name : '' #",
+                        filterable: {
+                            cell: {
+                                delay: 1500,
+                                operator: "contains",
+                                suggestionOperator: "contains"
+                            }
+                        }
                     },
                     {
-                        field: "TSA", title: "TSA", sortable: false,
-                        template: "<span data-ng-bind='dataItem.Tsa.Name'></span>"
+                        field: "Tsa", title: "TSA", sortable: false,
+                        template: "#: Tsa ? Tsa.Name : '' #",
+                        filterable: {
+                            cell: {
+                                delay: 1500,
+                                operator: "contains",
+                                suggestionOperator: "contains"
+                            }
+                        }
                     },
                     {
-                        field: "ExhibitedBy", title: "Udstillet af", sortable: false,
-                        template: "<span data-ng-bind='dataItem.ExhibitedBy.ItSystem.Name'></span>"
+                        field: "ExhibitedBy.ItSystem.Name", title: "Udstillet af", sortable: false,
+                        template: "#: ExhibitedBy ? ExhibitedBy.ItSystem.Name : '' #",
+                        filterable: {
+                            cell: {
+                                delay: 1500,
+                                operator: "contains",
+                                suggestionOperator: "contains"
+                            }
+                        }
                     },
                     {
-                        field: "BelongsTo.Name", title: "Rettighedshaver"
+                        field: "BelongsTo.Name", title: "Rettighedshaver",
+                        filterable: {
+                            cell: {
+                                delay: 1500,
+                                operator: "contains",
+                                suggestionOperator: "contains"
+                            }
+                        }
                     },
                     {
-                        field: "Organization.Name", title: "Oprettet i"
+                        field: "Organization.Name", title: "Oprettet i",
+                        filterable: {
+                            cell: {
+                                delay: 1500,
+                                operator: "contains",
+                                suggestionOperator: "contains"
+                            }
+                        }
                     },
                     {
                         field: "ObjectOwner.Name", title: "Oprettet af",
-                        template: "<span>{{dataItem.ObjectOwner.Name + ' ' + dataItem.ObjectOwner.LastName}}</span>"
+                        template: "#: ObjectOwner.Name + ' ' + ObjectOwner.LastName #",
+                        filterable: {
+                            cell: {
+                                delay: 1500,
+                                operator: "contains",
+                                suggestionOperator: "contains"
+                            }
+                        }
                     }
                 ],
+                dataBound: saveGridOptions,
+                columnResize: saveGridOptions,
+                columnHide: saveGridOptions,
+                columnShow: saveGridOptions,
+                columnReorder: saveGridOptions,
                 error: function (e) {
                     console.log(e);
                 }
             };
+
+            // saves grid state to localStorage
+            function saveGridOptions(e) {
+                if ($scope.mainGrid) {
+                    // timeout fixes columnReorder saves before the column is actually reordered 
+                    // http://stackoverflow.com/questions/21270748/kendo-grid-saving-state-in-columnreorder-event
+                    $timeout(function () {
+                        var options = $scope.mainGrid.getOptions();
+                        var pickedOptions = {}; // _.pick(options, 'columns'); BUG disabled for now as saving column data overwrites source changes - FUBAR!
+                        pickedOptions.dataSource = _.pick(options.dataSource, ['filter', 'sort', 'page', 'pageSize']);
+                        localStorage["kendo-grid-it-interface-catalog-options"] = kendo.stringify(pickedOptions);
+                    });
+                }
+            }
+
+            // loads kendo grid options from localstorage
+            function loadOptions() {
+                var options = localStorage["kendo-grid-it-interface-catalog-options"];
+                if (options) {
+                    $scope.mainGrid.setOptions(JSON.parse(options));
+                }
+            }
+
+            // clears grid filters by removing the localStorageItem and reloading the page
+            $scope.clearOptions = function () {
+                localStorage.removeItem("kendo-grid-it-interface-catalog-options");
+                itInterfaceCatalogDataSource.read();
+            }
+
+            // fires when kendo is finished rendering all its goodies
+            $scope.$on("kendoRendered", function (e) {
+                loadOptions();
+            });
         }
     ]);
 })(angular, app);

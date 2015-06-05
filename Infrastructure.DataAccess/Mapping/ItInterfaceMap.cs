@@ -40,6 +40,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.Method)
                 .WithMany(d => d.References)
                 .HasForeignKey(t => t.MethodId);
+
+            this.HasRequired(t => t.Organization)
+                .WithMany(d => d.ItInterfaces)
+                .HasForeignKey(t => t.OrganizationId);
         }
     }
 }
