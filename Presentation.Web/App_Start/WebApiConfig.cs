@@ -68,7 +68,6 @@ namespace Presentation.Web
             //builder.EntitySet<HandoverTrial>("HandoverTrials");
             //builder.EntitySet<HandoverTrialType>("HandoverTrialTypes");
             //builder.EntitySet<Interface>("Interfaces");
-            //builder.EntitySet<ItInterfaceUse>("ItInterfaceUses");
             //builder.EntitySet<InterfaceUsage>("InterfaceUsages");
             //builder.EntitySet<ItInterfaceExhibit>("ItInterfaceExhibits");
             //builder.EntitySet<ItInterfaceExhibitUsage>("InterfaceExhibtUsages");
@@ -108,6 +107,7 @@ namespace Presentation.Web
             itSystems.EntityType.HasOptional(x => x.ObjectOwner).IsNavigable();
             itSystems.EntityType.HasMany(x => x.Usages).IsNavigable();
             itSystems.EntityType.HasMany(x => x.ItInterfaceExhibits).IsNavigable();
+            itSystems.EntityType.HasMany(x => x.CanUseInterfaces).IsNavigable();
 
             var itSystemTypeOptions = builder.EntitySet<ItSystemTypeOption>("ItSystemTypeOptions");
             itSystemTypeOptions.EntityType.HasKey(x => x.Id);
@@ -215,6 +215,13 @@ namespace Presentation.Web
             itInterfaceExhibitUsage.EntityType.HasKey(x => x.ItContractId)
                 .HasKey(x => x.ItInterfaceExhibitId)
                 .HasKey(x => x.ItSystemUsageId);
+
+            var itInterfaceUse = builder.EntitySet<ItInterfaceUse>("ItInterfaceUses");
+            itInterfaceUse.EntityType
+                .HasKey(x => x.ItSystemId)
+                .HasKey(x => x.ItInterfaceId);
+            itInterfaceUse.EntityType.HasRequired(x => x.ItInterface);
+            itInterfaceUse.EntityType.HasRequired(x => x.ItSystem);
 
             var tsas = builder.EntitySet<Tsa>("Tsas");
             tsas.EntityType.HasKey(x => x.Id);
