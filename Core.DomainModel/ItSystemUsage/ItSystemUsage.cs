@@ -192,7 +192,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public override bool HasUserWriteAccess(User user, int organizationId)
         {
-            // check that object belongs to the requwested organization context
+            // check that object belongs to the requested organization context
             if (OrganizationId != organizationId)
                 return false;
             return base.HasUserWriteAccess(user, organizationId);
