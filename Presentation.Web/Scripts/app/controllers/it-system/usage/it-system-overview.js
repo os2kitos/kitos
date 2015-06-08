@@ -32,7 +32,7 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,Usages,ItInterfaceExhibits),Organization,ResponsibleUsage,Overview($expand=ItSystem),MainContract($expand=ItContract),Rights($expand=User,Role)",
+                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,CanUseInterfaces,ItInterfaceExhibits),Organization,ResponsibleUsage,Overview($expand=ItSystem),MainContract($expand=ItContract),Rights($expand=User,Role)",
                             dataType: "json"
                         },
                         parameterMap: function (options, type) {
@@ -223,7 +223,7 @@
                             }
                         },
                         {
-                            field: "MainContract.ItContract.IsActive", title: "Kontrakt", width: 80,
+                            field: "MainContract", title: "Kontrakt", width: 80,
                             template: function (dataItem) {
                                 return contractTemplate(dataItem);
                             },
@@ -231,8 +231,8 @@
                             sortable: false
                         },
                         {
-                            field: "ItSystem.Usages", title: "Anvender", width: 95,
-                            template: "<a data-ng-click=\"showUsageDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.Usages.length #</a>",
+                            field: "ItSystem.CanUseInterfaces", title: "Anvender", width: 95,
+                            template: "<a data-ng-click=\"showUsageDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.CanUseInterfaces.length #</a>",
                             filterable: false,
                             sortable: false
                         },
@@ -443,15 +443,42 @@
                     return "";
                 }
 
-                // usagedetails grid empty-grid handling
-                function detailsBound(e) {
-                    var grid = e.sender;
-                    if (grid.dataSource.total() == 0) {
-                        var colCount = grid.columns.length;
-                        $(e.sender.wrapper)
-                            .find('tbody')
-                            .append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data text-muted">System anvendens ikke</td></tr>');
-                    }
+                // show exposureDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
+                $scope.showExposureDetails = function (usageId, systemName) {
+                    // filter by usageId
+                    exhibitDetailDataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
+                    // set title
+                    $scope.exhibitModal.setOptions({ title: systemName + " udstiller følgende snitflader" });
+                    // open modal
+                    $scope.exhibitModal.center().open();
+                };
+
+                var exhibitDetailDataSource = new kendo.data.DataSource({
+                    type: "odata-v4",
+                    transport: {
+                        read: {
+                            url: "/odata/ItInterfaceExhibits?$expand=ItInterface",
+                            dataType: "json"
+                        }
+                    },
+                    pageSize: 10,
+                    serverPaging: true,
+                    serverSorting: true,
+                    serverFiltering: true
+                });
+
+                $scope.exhibitDetailsGrid = {
+                    dataSource: exhibitDetailDataSource,
+                    autoBind: false,
+                    columns: [
+                        {
+                            field: "ItInterface.ItInterfaceId", title: "Snitflade ID"
+                        },
+                        {
+                            field: "ItInterface.Name", title: "Snitflade"
+                        }
+                    ],
+                    dataBound: exposureDetailsBound
                 };
 
                 // exposuredetails grid empty-grid handling
@@ -465,76 +492,55 @@
                     }
                 }
 
-                // show exposureDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
-                $scope.showExposureDetails = function (usageId, systemName) {
-                    // filter by usageId
-                    $scope.exhibitGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
-                    // set title
-                    $scope.exhibitModal.setOptions({ title: systemName + " udstiller følgende snitflader" });
-                    // open modal
-                    $scope.exhibitModal.center().open();
-                };
-
-                $scope.exhibitDetailsGrid = {
-                    dataSource: {
-                        type: "odata-v4",
-                        transport: {
-                            read: {
-                                url: "/odata/ItInterfaceExhibits?$expand=ItInterface",
-                                dataType: "json",
-                                cache: false
-                            }
-                        },
-                        pageSize: 10,
-                        serverPaging: true,
-                        serverSorting: true,
-                        serverFiltering: true
-                    },
-                    columns: [
-                        {
-                            field: "ItInterface.ItInterfaceId", title: "Snitflade ID"
-                        },
-                        {
-                            field: "ItInterface.Name", title: "Snitflade"
-                        }
-                    ],
-                    dataBound: exposureDetailsBound
-                };
-
                 // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
                 $scope.showUsageDetails = function(systemId, systemName) {
-                    // filter by usageId
-                    $scope.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: systemId });
+                    // filter by systemId
+                    usageDetailDataSource.filter({ field: "ItSystemId", operator: "eq", value: systemId });
                     // set modal title
                     $scope.modal.setOptions({ title: "Anvendelse af " + systemName });
                     // open modal
                     $scope.modal.center().open();
                 };
+                
+                var usageDetailDataSource = new kendo.data.DataSource({
+                    type: "odata-v4",
+                    transport:
+                    {
+                        read: {
+                            url: "/odata/ItInterfaceUses/?$expand=ItInterface",
+                            dataType: "json"
+                        },
+                    },
+                    pageSize: 10,
+                    serverPaging: true,
+                    serverSorting: true,
+                    serverFiltering: true
+                });
 
                 // usagedetails grid - shows which organizations has a given itsystem in local usage
                 $scope.usageDetailsGrid = {
-                    dataSource: {
-                        type: "odata-v4",
-                        transport:
-                        {
-                            read: {
-                                url: "/odata/ItSystemUsages?$expand=Organization",
-                                dataType: "json",
-                                cache: false
-                            },
-                        },
-                        pageSize: 10,
-                        serverPaging: true,
-                        serverSorting: true,
-                        serverFiltering: true
-                    },
+                    dataSource: usageDetailDataSource,
+                    autoBind: false,
                     columns: [
                         {
-                            field: "Organization.Name",
-                            title: "Organisation"
+                            field: "ItInterfaceId", title: "Snitflade ID"
+                        },
+                        {
+                            field: "ItInterface.Name", title: "Snitflade"
                         }
                     ],
                     dataBound: detailsBound
+                };
+
+                // usagedetails grid empty-grid handling
+                function detailsBound(e) {
+                    var grid = e.sender;
+                    if (grid.dataSource.total() == 0) {
+                        var colCount = grid.columns.length;
+                        $(e.sender.wrapper)
+                            .find('tbody')
+                            .append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data text-muted">System anvendens ikke</td></tr>');
+                    }
                 };
             }
         ]
