@@ -59,7 +59,7 @@
             var localStorageKey = "kendo-grid-it-system-catalog-options";
 
             // saves grid state to localStorage
-            function saveGridOptions(e) {
+            function saveGridOptions() {
                 if ($scope.mainGrid) {
                     // timeout fixes columnReorder saves before the column is actually reordered 
                     // http://stackoverflow.com/questions/21270748/kendo-grid-saving-state-in-columnreorder-event
@@ -73,50 +73,59 @@
             }
 
             // loads kendo grid options from localstorage
-            function loadOptions() {
+            function loadGridOptions() {
                 var options = localStorage[localStorageKey];
                 if (options) {
                     $scope.mainGrid.setOptions(JSON.parse(options));
                 }
             }
-
+            
             // fires when kendo is finished rendering all its goodies
             $scope.$on("kendoRendered", function (e) {
-                loadOptions();
+                loadGridOptions();
             });
 
             // clears grid filters by removing the localStorageItem and reloading the page
             $scope.clearOptions = function () {
                 localStorage.removeItem(localStorageKey);
-                itSystemCatalogDataSource.read();
+                // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
+                reload();
+            }
+
+            function reload() {
+                $state.go('.', null, { reload: true });
             }
 
             // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
             $scope.showUsageDetails = function (usageId, systemName) {
                 //Filter by usageId
-                $scope.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
+                usageDetailDataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
                 //Set modal title
                 $scope.modal.setOptions({ title: "Anvendelse af " + systemName });
                 //Open modal
                 $scope.modal.center().open();
             }
 
+            
+            var usageDetailDataSource = new kendo.data.DataSource({
+                type: "odata-v4",
+                transport:
+                {
+                    read: {
+                        url: "/odata/ItSystemUsages?$expand=Organization",
+                        dataType: "json"
+                    },
+                },
+                pageSize: 10,
+                serverPaging: true,
+                serverSorting: true,
+                serverFiltering: true
+            });
+
             // usagedetails grid
             $scope.usageDetailsGrid = {
-                    dataSource: {
-                    type: "odata-v4",
-                        transport:
-                        {
-                            read: {
-                                url: "/odata/ItSystemUsages?$expand=Organization",
-                                dataType: "json"
-                            },
-                        },
-                    pageSize: 10,
-                    serverPaging: true,
-                    serverSorting: true,
-                    serverFiltering: true
-                },
+                dataSource: usageDetailDataSource,
+                autoBind: false,
                 columns: [
                     {
                         field: "Organization.Name",
@@ -294,8 +303,7 @@
                         title: "Anvendelse",
                         width: 110,
                         field: "Usages",
-                        template: '<button class="btn btn-success col-md-7" data-ng-click="enableUsage(#: Id #)" data-ng-show="!systemHasUsages(dataItem)">Anvend</button>' +
-                                  '<button class="btn btn-danger  col-md-7" data-ng-click="removeUsage(#: Id #)" data-ng-show="systemHasUsages(dataItem)">Fjern anv.</button>',
+                        template: usageButtonTemplate,
                         filterable: false,
                         sortable: false
                     },
@@ -310,8 +318,15 @@
                 }
             };
 
+            function usageButtonTemplate(dataItem) {
+                if (systemHasUsages(dataItem)) {
+                    return '<button class="btn btn-danger col-md-7" data-ng-click="removeUsage(' + dataItem.Id + ')">Fjern anv.</button>';
+                }
+                return '<button class="btn btn-success col-md-7" data-ng-click="enableUsage(' + dataItem.Id + ')">Anvend</button>';
+            }
+
             // returns bool if system is being used by system within current context
-            $scope.systemHasUsages = function(system) {
+            function systemHasUsages(system) {
                 return _.find(system.Usages, function (d) { return d.OrganizationId == user.currentOrganizationId; });
             }
 
