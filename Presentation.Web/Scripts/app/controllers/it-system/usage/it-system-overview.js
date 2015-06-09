@@ -71,6 +71,10 @@
                             return parameterMap;
                         }
                     },
+                    sort: {
+                        field: "ItSystem.Name",
+                        dir: "asc"
+                    },
                     pageSize: 10,
                     serverPaging: true,
                     serverSorting: true,

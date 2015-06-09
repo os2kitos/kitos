@@ -144,6 +144,10 @@
                         return parameterMap;
                     }
                 },
+                sort: {
+                    field: "Name",
+                    dir: "asc"
+                },
                 pageSize: 10,
                 serverPaging: true,
                 serverSorting: true,
