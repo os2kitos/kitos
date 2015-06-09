@@ -748,7 +748,6 @@
     <Content Include="Partials\it-project\tab-status-project.html" />
     <Content Include="Partials\it-system\edit-it-interface.html" />
     <Content Include="Partials\it-system\it-interface-catalog.html" />
-    <Content Include="Partials\it-system\overview-row.html" />
     <Content Include="Partials\it-system\tab-edit-interface-details.html" />
     <Content Include="Partials\it-system\tab-edit-interfaces.html" />
     <Content Include="Partials\it-system\tab-edit-kle.html" />
@@ -2345,11 +2344,8 @@
     <Content Include="Images\orderedList9.png" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Web.config" />
-    <Content Include="Views\Shared\_TopNavigation.old.cshtml" />
-    <Content Include="Views\Shared\_TopNavigation.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Scripts\kendo\jquery.min.map" />
     <Content Include="Scripts\kendo\kendo.all.min.js.map" />
