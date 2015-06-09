@@ -18,8 +18,8 @@
 
     app.controller('system.interfaceCatalogCtrl',
     [
-        '$rootScope', '$scope', '$timeout', 'user',
-        function ($rootScope, $scope, $timeout, user) {
+        '$rootScope', '$scope', '$timeout', '$state', 'user',
+        function ($rootScope, $scope, $timeout, $state, user) {
             $rootScope.page.title = 'Snitflade - Katalog';
 
             var itInterfaceCatalogDataSource = new kendo.data.DataSource({
@@ -215,7 +215,7 @@
             }
 
             // loads kendo grid options from localstorage
-            function loadOptions() {
+            function loadGridOptions() {
                 var options = localStorage[localStorageKey];
                 if (options) {
                     $scope.mainGrid.setOptions(JSON.parse(options));
@@ -224,13 +224,18 @@
 
             // fires when kendo is finished rendering all its goodies
             $scope.$on("kendoRendered", function (e) {
-                loadOptions();
+                loadGridOptions();
             });
 
             // clears grid filters by removing the localStorageItem and reloading the page
             $scope.clearOptions = function () {
                 localStorage.removeItem(localStorageKey);
-                itInterfaceCatalogDataSource.read();
+                // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
+                reload();
+            }
+
+            function reload() {
+                $state.go('.', null, { reload: true });
             }
         }
     ]);

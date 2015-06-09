@@ -18,8 +18,8 @@
 
     app.controller('system.OverviewCtrl',
         [
-            '$rootScope', '$scope', '$http', 'user',
-            function($rootScope, $scope, $http, user) {
+            '$rootScope', '$scope', '$http', '$state', 'user',
+            function($rootScope, $scope, $http, $state, user) {
                 $rootScope.page.title = 'IT System - Overblik';
 
                 // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(c/User/Name),'foo' and c/RoleId eq {roleId})"
@@ -123,7 +123,7 @@
                 }
 
                 // loads kendo grid options from localstorage
-                function loadOptions() {
+                function loadGridOptions() {
                     var options = localStorage[localStorageKey];
                     if (options) {
                         $scope.mainGrid.setOptions(JSON.parse(options));
@@ -132,13 +132,18 @@
 
                 // fires when kendo is finished rendering all its goodies
                 $scope.$on("kendoRendered", function (e) {
-                    loadOptions();
+                    loadGridOptions();
                 });
 
                 // clears grid filters by removing the localStorageItem and reloading the page
                 $scope.clearOptions = function () {
                     localStorage.removeItem(localStorageKey);
-                    itSystemOverviewDataSource.read();
+                    // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
+                    reload();
+                }
+
+                function reload() {
+                    $state.go('.', null, { reload: true });
                 }
 
                 // overview grid options
