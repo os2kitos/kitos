@@ -127,10 +127,14 @@ namespace Presentation.Web
             organizations.EntityType.HasMany(x => x.ItSystems).IsNavigable();
             organizations.EntityType.HasMany(x => x.ItSystemUsages).IsNavigable();
             organizations.EntityType.HasMany(x => x.ItInterfaces).IsNavigable();
+            organizations.EntityType.HasMany(x => x.OrgUnits).IsNavigable().Name = "OrganizationUnits";
 
             var orgUnits = builder.EntitySet<OrganizationUnit>("OrganizationUnits");
             orgUnits.EntityType.HasKey(x => x.Id);
             orgUnits.EntityType.Property(x => x.Name);
+            orgUnits.EntityType.Property(x => x.ParentId);
+            orgUnits.EntityType.HasOptional(x => x.Parent).IsNavigable();
+            orgUnits.EntityType.HasMany(x => x.Children).IsNavigable();
 
             var users = builder.EntitySet<User>("Users");
             users.EntityType.HasKey(x => x.Id);
