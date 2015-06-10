@@ -9,12 +9,6 @@
                     return userService.getUser();
                 }]
             },
-            onEnter: function () {
-                // remove saved state of grids in this module
-                localStorage.removeItem("kendo-grid-it-system-overview-options");
-                localStorage.removeItem("kendo-grid-it-system-catalog-options");
-                localStorage.removeItem("kendo-grid-it-interface-catalog-options");
-            },
             controller: ['$rootScope', '$http', '$state', '$modal', 'notify', 'user', function ($rootScope, $http, $state, $modal, notify, user) {
                 $rootScope.page.title = 'IT System';
                 $rootScope.page.subnav = [

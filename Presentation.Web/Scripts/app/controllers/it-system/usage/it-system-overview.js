@@ -18,8 +18,8 @@
 
     app.controller('system.OverviewCtrl',
         [
-            '$rootScope', '$scope', '$http', '$state', 'user',
-            function($rootScope, $scope, $http, $state, user) {
+            '$rootScope', '$scope', '$http', '$timeout', '$state', 'user', 'gridStateService',
+            function ($rootScope, $scope, $http, $timeout, $state, user, gridStateService) {
                 $rootScope.page.title = 'IT System - Overblik';
 
                 // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(c/User/Name),'foo' and c/RoleId eq {roleId})"
@@ -106,28 +106,25 @@
                     }
                 });
 
-                var localStorageKey = "kendo-grid-it-system-overview-options";
+                var localStorageKey = "it-system-overview-options";
+                var sessionStorageKey = "it-system-overview-options";
 
                 // saves grid state to localStorage
-                function saveGridOptions(e) {
+                function saveGridOptions() {
                     if ($scope.mainGrid) {
                         // timeout fixes columnReorder saves before the column is actually reordered 
                         // http://stackoverflow.com/questions/21270748/kendo-grid-saving-state-in-columnreorder-event
                         $timeout(function () {
                             var options = $scope.mainGrid.getOptions();
-                            var pickedOptions = {}; // _.pick(options, 'columns'); BUG disabled for now as saving column data overwrites source changes - FUBAR!
-                            pickedOptions.dataSource = _.pick(options.dataSource, ['filter', 'sort', 'page', 'pageSize']);
-                            localStorage[localStorageKey] = kendo.stringify(pickedOptions);
+                            gridStateService.save(localStorageKey, sessionStorageKey, options);
                         });
                     }
                 }
 
                 // loads kendo grid options from localstorage
                 function loadGridOptions() {
-                    var options = localStorage[localStorageKey];
-                    if (options) {
-                        $scope.mainGrid.setOptions(JSON.parse(options));
-                    }
+                    var options = gridStateService.get(localStorageKey, sessionStorageKey);
+                    $scope.mainGrid.setOptions(options);
                 }
 
                 // fires when kendo is finished rendering all its goodies
@@ -137,7 +134,7 @@
 
                 // clears grid filters by removing the localStorageItem and reloading the page
                 $scope.clearOptions = function () {
-                    localStorage.removeItem(localStorageKey);
+                    gridStateService.clear();
                     // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                     reload();
                 }

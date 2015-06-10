@@ -18,8 +18,8 @@
 
     app.controller('system.interfaceCatalogCtrl',
     [
-        '$rootScope', '$scope', '$timeout', '$state', 'user',
-        function ($rootScope, $scope, $timeout, $state, user) {
+        '$rootScope', '$scope', '$timeout', '$state', 'user', 'gridStateService',
+        function ($rootScope, $scope, $timeout, $state, user, gridStateService) {
             $rootScope.page.title = 'Snitflade - Katalog';
 
             var itInterfaceCatalogDataSource = new kendo.data.DataSource({
@@ -75,7 +75,6 @@
                 columns: [
                     {
                         field: "ItInterfaceId", title: "Snidtflade ID", width: 150,
-                        locked: true,
                         filterable: {
                             cell: {
                                 delay: 1500,
@@ -87,7 +86,6 @@
                     {
                         field: "Name", title: "Snitflade", width: 150,
                         template: "<a data-ui-sref='it-system.interface-edit.interface-details({id: #: Id #})'>#: Name #</a>",
-                        locked: true,
                         filterable: {
                             cell: {
                                 delay: 1500,
@@ -198,28 +196,25 @@
                 }
             };
 
-            var localStorageKey = "kendo-grid-it-interface-catalog-options";
+            var localStorageKey = "it-interface-catalog-options";
+            var sessionStorageKey = "it-interface-catalog-options";
 
             // saves grid state to localStorage
-            function saveGridOptions(e) {
+            function saveGridOptions() {
                 if ($scope.mainGrid) {
                     // timeout fixes columnReorder saves before the column is actually reordered 
                     // http://stackoverflow.com/questions/21270748/kendo-grid-saving-state-in-columnreorder-event
                     $timeout(function () {
                         var options = $scope.mainGrid.getOptions();
-                        var pickedOptions = {}; // _.pick(options, 'columns'); BUG disabled for now as saving column data overwrites source changes - FUBAR!
-                        pickedOptions.dataSource = _.pick(options.dataSource, ['filter', 'sort', 'page', 'pageSize']);
-                        localStorage[localStorageKey] = kendo.stringify(pickedOptions);
+                        gridStateService.save(localStorageKey, sessionStorageKey, options);
                     });
                 }
             }
 
             // loads kendo grid options from localstorage
             function loadGridOptions() {
-                var options = localStorage[localStorageKey];
-                if (options) {
-                    $scope.mainGrid.setOptions(JSON.parse(options));
-                }
+                var options = gridStateService.get(localStorageKey, sessionStorageKey);
+                $scope.mainGrid.setOptions(options);
             }
 
             // fires when kendo is finished rendering all its goodies
@@ -229,7 +224,7 @@
 
             // clears grid filters by removing the localStorageItem and reloading the page
             $scope.clearOptions = function () {
-                localStorage.removeItem(localStorageKey);
+                gridStateService.clear();
                 // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                 reload();
             }
