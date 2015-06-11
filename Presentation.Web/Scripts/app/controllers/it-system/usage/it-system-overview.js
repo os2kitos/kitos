@@ -32,7 +32,7 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,CanUseInterfaces,ItInterfaceExhibits),Organization,ResponsibleUsage,Overview($expand=ItSystem),MainContract($expand=ItContract),Rights($expand=User,Role)",
+                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,CanUseInterfaces,ItInterfaceExhibits),Organization,ResponsibleUsage($expand=OrganizationUnit),Overview($expand=ItSystem),MainContract($expand=ItContract),Rights($expand=User,Role)",
                             dataType: "json"
                         },
                         parameterMap: function (options, type) {
@@ -126,7 +126,7 @@
                     var options = gridStateService.get(localStorageKey, sessionStorageKey);
                     $scope.mainGrid.setOptions(options);
                 }
-
+                
                 // fires when kendo is finished rendering all its goodies
                 $scope.$on("kendoRendered", function (e) {
                     loadGridOptions();
@@ -134,7 +134,7 @@
 
                 // clears grid filters by removing the localStorageItem and reloading the page
                 $scope.clearOptions = function () {
-                    gridStateService.clear();
+                    gridStateService.clear(localStorageKey, sessionStorageKey);
                     // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                     reload();
                 }
@@ -161,7 +161,7 @@
                     },
                     pageable: {
                         refresh: true,
-                        pageSizes: true,
+                        pageSizes: [10, 20, 50, 100, 200],
                         buttonCount: 5
                     },
                     sortable: {
@@ -230,9 +230,7 @@
                         },
                         {
                             field: "MainContract", title: "Kontrakt", width: 80,
-                            template: function (dataItem) {
-                                return contractTemplate(dataItem);
-                            },
+                            template: kendoTemplate.contractTemplate,
                             filterable: false,
                             sortable: false
                         },
@@ -260,7 +258,7 @@
                             // DON'T YOU DARE RENAME!
                             field: "SystemOwner", title: "Systemejer",
                             template: function(dataItem) {
-                                return roleTemplate(dataItem, 1);
+                                return kendoTemplate.roleTemplate(dataItem, 1);
                             },
                             width: 150,
                             sortable: false,
@@ -276,7 +274,7 @@
                             // DON'T YOU DARE RENAME!
                             field: "SystemResponsible", title: "Systemansvarlig",
                             template: function (dataItem) {
-                                return roleTemplate(dataItem, 2);
+                                return kendoTemplate.roleTemplate(dataItem, 2);
                             },
                             width: 150,
                             hidden: true,
@@ -293,7 +291,7 @@
                             // DON'T YOU DARE RENAME!
                             field: "BusinessOwner", title: "Forretningsejer",
                             template: function (dataItem) {
-                                return roleTemplate(dataItem, 3);
+                                return kendoTemplate.roleTemplate(dataItem, 3);
                             },
                             width: 150,
                             hidden: true,
@@ -310,7 +308,7 @@
                             // DON'T YOU DARE RENAME!
                             field: "SuperUserResponsible", title: "Superbrugeransvarlig",
                             template: function (dataItem) {
-                                return roleTemplate(dataItem, 4);
+                                return kendoTemplate.roleTemplate(dataItem, 4);
                             },
                             width: 150,
                             hidden: true,
@@ -327,7 +325,7 @@
                             // DON'T YOU DARE RENAME!
                             field: "SuperUser", title: "Superbruger",
                             template: function (dataItem) {
-                                return roleTemplate(dataItem, 5);
+                                return kendoTemplate.roleTemplate(dataItem, 5);
                             },
                             width: 150,
                             hidden: true,
@@ -344,7 +342,7 @@
                             // DON'T YOU DARE RENAME!
                             field: "SecurityResponsible", title: "Sikkerhedsansvarlig",
                             template: function (dataItem) {
-                                return roleTemplate(dataItem, 6);
+                                return kendoTemplate.roleTemplate(dataItem, 6);
                             },
                             width: 150,
                             hidden: true,
@@ -361,7 +359,7 @@
                             // DON'T YOU DARE RENAME!
                             field: "ChangeManager", title: "Changemanager",
                             template: function (dataItem) {
-                                return roleTemplate(dataItem, 7);
+                                return kendoTemplate.roleTemplate(dataItem, 7);
                             },
                             width: 150,
                             hidden: true,
@@ -378,7 +376,7 @@
                             // DON'T YOU DARE RENAME!
                             field: "DataOwner", title: "Dataejer",
                             template: function (dataItem) {
-                                return roleTemplate(dataItem, 8);
+                                return kendoTemplate.roleTemplate(dataItem, 8);
                             },
                             width: 150,
                             hidden: true,
@@ -395,7 +393,7 @@
                             // DON'T YOU DARE RENAME!
                             field: "SystemAdmin", title: "Systemadminstrator",
                             template: function (dataItem) {
-                                return roleTemplate(dataItem, 9);
+                                return kendoTemplate.roleTemplate(dataItem, 9);
                             },
                             width: 150,
                             hidden: true,
@@ -418,36 +416,6 @@
                         console.log(e);
                     }
                 };
-
-                function roleTemplate(dataItem, roleId) {
-                    var roles = "";
-
-                    if (dataItem.roles[roleId] === undefined)
-                        return roles;
-                    
-                    // join the first 5 username together
-                    if (dataItem.roles[roleId].length > 0)
-                        roles = dataItem.roles[roleId].slice(0, 4).join(", ");
-
-                    // if more than 5 then add an elipsis
-                    if (dataItem.roles[roleId].length > 5)
-                        roles += ", ...";
-
-                    var link = "<a data-ui-sref='it-system.usage.roles({id: " + dataItem.Id + "})'>" + roles + "</a>";
-
-                    return link;
-                }
-
-                function contractTemplate(dataItem) {
-                    if (dataItem.MainContract)
-                        if (dataItem.MainContract.ItContract)
-                            if (dataItem.MainContract.ItContract.IsActive)
-                                return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span></a>';
-                            else
-                                return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="glyphicon glyphicon-file text-muted" aria-hidden="true"></span></a>';
-
-                    return "";
-                }
 
                 // show exposureDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
                 $scope.showExposureDetails = function (usageId, systemName) {

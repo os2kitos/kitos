@@ -57,7 +57,7 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: true,
+                    pageSizes: [10, 20, 50, 100, 200],
                     buttonCount: 5
                 },
                 sortable: {
@@ -224,7 +224,7 @@
 
             // clears grid filters by removing the localStorageItem and reloading the page
             $scope.clearOptions = function () {
-                gridStateService.clear();
+                gridStateService.clear(localStorageKey, sessionStorageKey);
                 // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                 reload();
             }
