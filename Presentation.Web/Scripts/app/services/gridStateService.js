@@ -11,33 +11,45 @@
 
         // saves grid state
         function saveGridOptions(localStorageKey, sessionStorageKey, options) {
+            if (!localStorageKey) 
+                throw new Error('Missing parameter: localStorageKey');
+
+            if (!sessionStorageKey)
+                throw new Error('Missing parameter: sessionStorageKey');
+            
             if (options) {
                 var pickedLocalOptions = _.pick(options, 'columns');
                 pickedLocalOptions.dataSource = _.pick(options.dataSource, ['pageSize']);
-
-                localStorage[localStorageKey] = kendo.stringify(pickedLocalOptions);
+                
+                localStorage.setItem(localStorageKey, JSONfn.stringify(pickedLocalOptions));
 
                 var pickedSessionOptions = {};
                 pickedSessionOptions.dataSource = _.pick(options.dataSource, ['filter', 'sort', 'page']);
 
-                sessionStorage[sessionStorageKey] = kendo.stringify(pickedSessionOptions);
+                sessionStorage.setItem(sessionStorageKey, JSONfn.stringify(pickedSessionOptions));
             };
         }
 
         // loads kendo grid options from storages
         function getGridOptions(localStorageKey, sessionStorageKey) {
+            if (!localStorageKey)
+                throw new Error('Missing parameter: localStorageKey');
+
+            if (!sessionStorageKey)
+                throw new Error('Missing parameter: sessionStorageKey');
+
             // load options from session storage
-            var sessionOptions = sessionStorage[sessionStorageKey];
+            var sessionOptions = sessionStorage.getItem(sessionStorageKey);
             if (sessionOptions) {
-                sessionOptions = JSON.parse(sessionOptions);
+                sessionOptions = JSONfn.parse(sessionOptions);
             }
 
             // load options from local storage
-            var localOptions = localStorage[localStorageKey];
+            var localOptions = localStorage.getItem(localStorageKey);
             if (localOptions) {
-                localOptions = JSON.parse(localOptions);
+                localOptions = JSONfn.parse(localOptions);
             }
-
+            
             // merge them
             var options = _.merge({}, sessionOptions, localOptions);
             return options;
@@ -45,6 +57,12 @@
 
         // clears grid filters by removing the StorageItems
         function clearOptions(localStorageKey, sessionStorageKey) {
+            if (!localStorageKey)
+                throw new Error('Missing parameter: localStorageKey');
+
+            if (!sessionStorageKey)
+                throw new Error('Missing parameter: sessionStorageKey');
+
             localStorage.removeItem(localStorageKey);
             sessionStorage.removeItem(sessionStorageKey);
         }
