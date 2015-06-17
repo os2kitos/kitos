@@ -100,3 +100,85 @@ _.mixin({
         return result;
     }
 });
+
+// Usage: 
+// var obj = [{
+//     id: 1, children: [
+//         { id: 2 },
+//         { id: 3 }
+//     ]
+// }]
+// 
+// _.addHierarchyLevel(obj, 0, 'children');
+// Result:
+// var obj = [{
+//     id: 1, $level: 0, children: [
+//         { id: 2, $level: 1 },
+//         { id: 3, $level: 1 }
+//     ]
+// }]
+
+_.mixin({
+    addHierarchyLevelOnNested: function self(objAry, level, childPropertyName) {
+        // default values
+        level = typeof level !== 'undefined' ? level : 0;
+        childPropertyName = typeof childPropertyName !== 'undefined' ? childPropertyName : 'children';
+
+        _.forEach(objAry, function(obj) {
+            // add level attribute
+            obj["$level"] = level;
+
+            // handle children
+            if (obj.hasOwnProperty(childPropertyName) && obj[childPropertyName] !== null) {
+                // child object(s)
+                var children = obj[childPropertyName];
+                if (!_.isArray(children))
+                    children = [children];
+
+                _.forEach(children, function(child) {
+                    self([child], level + 1, childPropertyName);
+                });
+            }
+        });
+    }
+});
+
+// http://stackoverflow.com/questions/30864656/set-depth-level-properity-in-flattened-object-hierarchy
+_.mixin({
+    addHierarchyLevelOnFlatAndSort: function(objAry, idPropertyName, parentIdPropertyName) {
+        // default values
+        idPropertyName = typeof idPropertyName !== 'undefined' ? idPropertyName : 'id';
+        parentIdPropertyName = typeof parentIdPropertyName !== 'undefined' ? parentIdPropertyName : 'parentId';
+
+        // clone to avoid changing source
+        var clone = _.clone(objAry);
+        var sorted = [];
+
+        // TODO rewrite using lodash
+        function setLevel(parentId, level) {
+            var ids = [];
+            clone.filter(function (el) {
+                return el[parentIdPropertyName] === parentId;
+            }).forEach(function (el) {
+                // add depth level to element
+                el.$level = level;
+                // add to "sorted" result array
+                // this is to ensure that children comes directly after their parent,
+                // handy when displaying
+                sorted.push(el);
+                // recursive call to set child levels and also return their ids
+                el.childIds = setLevel(el[idPropertyName], level + 1);
+                // so we can add child ids for easy lookup, as they're needed for OData filtering
+                ids.push(el[idPropertyName]);
+                ids.pushArray(el.childIds);
+            });
+
+            return ids;
+        }
+
+        // starts the recursive call at the parent level
+        setLevel(null, 0);
+
+        return sorted;
+    }
+});
