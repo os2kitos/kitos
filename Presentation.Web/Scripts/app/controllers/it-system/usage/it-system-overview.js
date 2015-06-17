@@ -188,12 +188,94 @@
                             }
                         },
                         {
-                            field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 150,
+                            field: "ResponsibleUsage.OrganizationUnit.Id", title: "Ansv. organisationsenhed", width: 150,
                             template: "#: ResponsibleUsage ? ResponsibleUsage.OrganizationUnit.Name : '' #",
                             filterable: {
                                 cell: {
-                                    delay: 1500,
-                                    operator: "contains",
+                                    showOperators: false,
+                                    template: function orgUnitDropDownList(args) {
+                                        // http://dojo.telerik.com/ODuDe/5
+                                        args.element.removeAttr("data-bind");
+                                        args.element.kendoDropDownList({
+                                            dataSource: {
+                                                type: "odata-v4",
+                                                transport: {
+                                                    read: {
+                                                        url: "/odata/Organizations(" + localStorage.getItem("currentOrgId") + ")/OrganizationUnits",
+                                                        dataType: "json",
+                                                    }
+                                                },
+                                                serverFiltering: true,
+                                                schema: {
+                                                    parse: function (response) {
+                                                        // add hierarchy level to each item
+                                                        response.value = _.addHierarchyLevelOnFlatAndSort(response.value, "Id", "ParentId");
+
+                                                        return response;
+                                                    }
+                                                }
+                                            },
+                                            dataValueField: "Id",
+                                            dataTextField: "Name",
+                                            template: function indent(dataItem) {
+                                                var htmlSpace = "&nbsp;&nbsp;&nbsp;&nbsp;";
+                                                return htmlSpace.repeat(dataItem.$level) + dataItem.Name;
+                                            },
+                                            dataBound: function setDefaultOrgUnit() {
+                                                var kendoElem = this;
+                                                var id = localStorage.getItem("defaultOrgUnitId");
+                                                var index = _.findIndex(kendoElem.dataItems(), function (item) {
+                                                    return item.Id == id;
+                                                });
+                                                kendoElem.select(index);
+
+                                                // WARN exactly the same as below, but because of KENDO BULLSHIT
+                                                // we have to c/p... just great!
+                                                var selectedId = _.parseInt(kendoElem.value());
+                                                var childIds = kendoElem.dataItem().childIds;
+                                                var field = "ResponsibleUsage.OrganizationUnit.Id";
+
+                                                var filters = [{ field: field, operator: "eq", value: selectedId }];
+                                                // add children to filters
+                                                _.forEach(childIds, function (id) {
+                                                    filters.push({ field: field, operator: "eq", value: id });
+                                                });
+
+                                                var filter = {
+                                                    logic: "or",
+                                                    filters: filters
+                                                };
+
+                                                // this doesn't work... susepct we have to do a $apply(), but can't
+                                                // args.dataSource.filter(filter);
+                                                // so resorting to EVAL()... ARE YOU KIDDING ME KENDO?!!
+                                                eval("itSystemOverviewDataSource.filter(filter);"); // this sometimes throws: itSystemOverviewDataSource is not defined
+                                                // but it works... 
+                                            },
+                                            change: function () {
+                                                var kendoElem = this;
+                                                var selectedId = _.parseInt(kendoElem.value());
+                                                var childIds = kendoElem.dataItem().childIds;
+                                                var field = "ResponsibleUsage.OrganizationUnit.Id";
+
+                                                var filters = [{ field: field, operator: "eq", value: selectedId }];
+                                                // add children to filters
+                                                _.forEach(childIds, function (id) {
+                                                    filters.push({ field: field, operator: "eq", value: id });
+                                                });
+
+                                                var filter = {
+                                                    logic: "or",
+                                                    filters: filters
+                                                };
+
+                                                // this doesn't work... susepct we have to do a $apply(), but can't
+                                                // args.dataSource.filter(filter);
+                                                // so resorting to EVAL()... ARE YOU KIDDING ME KENDO?!!
+                                                eval("itSystemOverviewDataSource.filter(filter);");
+                                            }
+                                        });
+                                    }
                                 }
                             }
                         },
