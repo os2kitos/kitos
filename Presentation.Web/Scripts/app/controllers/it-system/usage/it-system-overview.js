@@ -155,7 +155,7 @@
                         }
                     ],
                     excel: {
-                        fileName: "IT System Katalog.xlsx",
+                        fileName: "IT System Overblik.xlsx",
                         filterable: true,
                         allPages: true
                     },
@@ -180,7 +180,6 @@
                         {
                             field: "ItSystem.Name", title: "IT System", width: 150,
                             template: "<a data-ui-sref='it-system.usage.interfaces({id: #: Id #})'>#: ItSystem.Name #</a>",
-                            locked: true,
                             filterable: {
                                 cell: {
                                     delay: 1500,

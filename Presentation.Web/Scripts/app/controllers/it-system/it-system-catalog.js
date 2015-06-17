@@ -171,9 +171,8 @@
                         template: "<a class='k-button k-button-icontext' data-ng-click='clearOptions()'>#: text #</a>"
                     }
                 ],
-                height: 800,
                 excel: {
-                    fileName: "IT System Katalog.xlsx",
+                    fileName: "Snitflade Katalog.xlsx",
                     filterable: true,
                     allPages: true
                 },
@@ -198,7 +197,6 @@
                     {
                         field: "Name", title: "It System", width: 150,
                         template: '<a data-ui-sref="it-system.edit.interfaces({id: #: Id #})">#: Name #</a>',
-                        locked: true,
                         filterable: {
                             cell: {
                                 delay: 1500,
