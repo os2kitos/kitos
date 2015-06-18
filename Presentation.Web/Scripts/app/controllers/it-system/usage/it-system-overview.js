@@ -188,7 +188,7 @@
                             }
                         },
                         {
-                            field: "ResponsibleUsage.OrganizationUnit.Id", title: "Ansv. organisationsenhed", width: 150,
+                            field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 150,
                             template: "#: ResponsibleUsage ? ResponsibleUsage.OrganizationUnit.Name : '' #",
                             filterable: {
                                 cell: {
@@ -215,6 +215,7 @@
                                                     }
                                                 }
                                             },
+                                            optionLabel: "-- Org Enhed --",
                                             dataValueField: "Id",
                                             dataTextField: "Name",
                                             template: function indent(dataItem) {
@@ -257,6 +258,10 @@
                                                 var selectedId = _.parseInt(kendoElem.value());
                                                 var childIds = kendoElem.dataItem().childIds;
                                                 var field = "ResponsibleUsage.OrganizationUnit.Id";
+
+                                                if (selectedId === NaN) {
+                                                    // TODO remove filter(s) on this field only
+                                                }
 
                                                 var filters = [{ field: field, operator: "eq", value: selectedId }];
                                                 // add children to filters
