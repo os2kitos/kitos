@@ -220,7 +220,9 @@
             if (orgsAndDefaultUnits.$values.length == 1) {
                 var firstOrgAndDefaultUnit = orgsAndDefaultUnits.$values[0];
                 setSavedOrgId(firstOrgAndDefaultUnit.organization.id);
-                setSavedDefaultOrgUnitId(firstOrgAndDefaultUnit.defaultOrgUnit.id);
+                if (firstOrgAndDefaultUnit.defaultOrgUnit) {
+                    setSavedDefaultOrgUnitId(firstOrgAndDefaultUnit.defaultOrgUnit.id);
+                }
 
                 deferred.resolve(firstOrgAndDefaultUnit);
                 return deferred.promise;
@@ -274,7 +276,9 @@
 
             modal.result.then(function (selectedOrgAndUnit) {
                 setSavedOrgId(selectedOrgAndUnit.organization.id);
-                setSavedDefaultOrgUnitId(selectedOrgAndUnit.defaultOrgUnit.id);
+                if (selectedOrgAndUnit.defaultOrgUnit) {
+                    setSavedDefaultOrgUnitId(selectedOrgAndUnit.defaultOrgUnit.id);
+                }
                 deferred.resolve(selectedOrgAndUnit);
             }, function () {
                 deferred.reject("Modal dismissed");
@@ -293,7 +297,7 @@
             }
 
             $http.post('api/user?updateDefaultOrgUnit', payload).success(function (result) {
-                setSavedDefaultOrgUnitId(newDefaultOrgUnitId);
+                setSavedDefaultOrgUnitId(_.parseInt(newDefaultOrgUnitId));
                 //now we gotta update the saved user in the userService.
                 //the simplest is just to re-auth the user.
                 getUser().then(function (user) {
