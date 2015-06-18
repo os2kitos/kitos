@@ -156,7 +156,7 @@
                 <span data-ng-if="chosenEco == 2">{{ p.bc }}</span>
             </td>
             <td>
-                <select data-ng-model="p.priority" data-autosave="api/itproject/{{p.id}}" data-field="priority" data-ng-disabled="p.isPriorityLocked" data-ng-if=" chosenpriority= =0">
+                <select data-ng-model="p.priority" data-autosave="api/itproject/{{p.id}}" data-field="priority" data-ng-disabled="p.isPriorityLocked" data-ng-if="chosenpriority == 0">
                     <option value="0">-- Vælg --</option>
                     <option value="3">Høj</option>
                     <option value="2">Mellem</option>
