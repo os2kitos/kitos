@@ -47,9 +47,9 @@ namespace Core.ApplicationServices
 #else
             user.Password = _cryptoService.Encrypt(DateTime.Now + user.Salt);
 #endif
-            // user isn't an EF proxy class so navigation properites aren't set,
-            // so we need to fetch org name ourself
-            user.DefaultOrganizationUnitId = orgId;
+            
+            var defaultOrgUnit = _orgRepository.GetByKey(orgId).OrgUnits.First(x => x.ParentId == null);
+            user.DefaultOrganizationUnitId = defaultOrgUnit.Id;
             user.LastChanged = DateTime.Now;
 
             _userRepository.Insert(user);
