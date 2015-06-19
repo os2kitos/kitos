@@ -123,12 +123,39 @@
 
                 // loads kendo grid options from localstorage
                 function loadGridOptions() {
-                    var options = gridStateService.get(localStorageKey, sessionStorageKey);
-                    $scope.mainGrid.setOptions(options);
+                    var grid = $scope.mainGrid;
+                    var persistedState = gridStateService.get(localStorageKey, sessionStorageKey);
+                    var gridOptions = _.omit(persistedState, "columnState");
+                    var columnState = _.pick(persistedState, "columnState");
+                    
+                    _.forEach(columnState.columnState, function (state, key) {
+                        var columnIndex = _.findIndex(grid.columns, function(column) {
+                            return column.persistId == key;
+                        });
+                        var columnObj = grid.columns[columnIndex];
+                        // reorder column
+                        if (state.index != columnIndex) {
+                            grid.reorderColumn(state.index, columnObj);
+                        }
+                        // show / hide column
+                        if (state.hidden != columnObj.hidden) {
+                            if (state.hidden) {
+                                grid.hideColumn(columnObj);
+                            } else {
+                                grid.showColumn(columnObj);
+                            }
+                        }
+                        // resize column
+                        if (state.width != columnObj.width) {
+                            // TODO
+                        }
+                    });
+
+                    grid.setOptions(gridOptions);
                 }
                 
                 // fires when kendo is finished rendering all its goodies
-                $scope.$on("kendoRendered", function (e) {
+                $scope.$on("kendoRendered", function () {
                     loadGridOptions();
                 });
 
@@ -145,6 +172,7 @@
 
                 // overview grid options
                 $scope.mainGridOptions = {
+                    autoBind: false,
                     dataSource: itSystemOverviewDataSource,
                     toolbar: [
                         { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
@@ -178,7 +206,7 @@
                     },
                     columns: [
                         {
-                            field: "ItSystem.Name", title: "IT System", width: 150,
+                            field: "ItSystem.Name", title: "IT System", width: 150, persistId: "sysname",
                             template: "<a data-ui-sref='it-system.usage.interfaces({id: #: Id #})'>#: ItSystem.Name #</a>",
                             filterable: {
                                 cell: {
@@ -188,104 +216,17 @@
                             }
                         },
                         {
-                            field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 150,
+                            field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 150, persistId: "orgunit",
                             template: "#: ResponsibleUsage ? ResponsibleUsage.OrganizationUnit.Name : '' #",
                             filterable: {
                                 cell: {
                                     showOperators: false,
-                                    template: function orgUnitDropDownList(args) {
-                                        // http://dojo.telerik.com/ODuDe/5
-                                        args.element.removeAttr("data-bind");
-                                        args.element.kendoDropDownList({
-                                            dataSource: {
-                                                type: "odata-v4",
-                                                transport: {
-                                                    read: {
-                                                        url: "/odata/Organizations(" + localStorage.getItem("currentOrgId") + ")/OrganizationUnits",
-                                                        dataType: "json",
-                                                    }
-                                                },
-                                                serverFiltering: true,
-                                                schema: {
-                                                    parse: function (response) {
-                                                        // add hierarchy level to each item
-                                                        response.value = _.addHierarchyLevelOnFlatAndSort(response.value, "Id", "ParentId");
-
-                                                        return response;
-                                                    }
-                                                }
-                                            },
-                                            optionLabel: "-- Org Enhed --",
-                                            dataValueField: "Id",
-                                            dataTextField: "Name",
-                                            template: function indent(dataItem) {
-                                                var htmlSpace = "&nbsp;&nbsp;&nbsp;&nbsp;";
-                                                return htmlSpace.repeat(dataItem.$level) + dataItem.Name;
-                                            },
-                                            dataBound: function setDefaultOrgUnit() {
-                                                var kendoElem = this;
-                                                var id = localStorage.getItem("defaultOrgUnitId");
-                                                var index = _.findIndex(kendoElem.dataItems(), function (item) {
-                                                    return item.Id == id;
-                                                });
-                                                kendoElem.select(index);
-
-                                                // WARN exactly the same as below, but because of KENDO BULLSHIT
-                                                // we have to c/p... just great!
-                                                var selectedId = _.parseInt(kendoElem.value());
-                                                var childIds = kendoElem.dataItem().childIds;
-                                                var field = "ResponsibleUsage.OrganizationUnit.Id";
-
-                                                var filters = [{ field: field, operator: "eq", value: selectedId }];
-                                                // add children to filters
-                                                _.forEach(childIds, function (id) {
-                                                    filters.push({ field: field, operator: "eq", value: id });
-                                                });
-
-                                                var filter = {
-                                                    logic: "or",
-                                                    filters: filters
-                                                };
-
-                                                // this doesn't work... susepct we have to do a $apply(), but can't
-                                                // args.dataSource.filter(filter);
-                                                // so resorting to EVAL()... ARE YOU KIDDING ME KENDO?!!
-                                                eval("itSystemOverviewDataSource.filter(filter);"); // this sometimes throws: itSystemOverviewDataSource is not defined
-                                                // but it works... 
-                                            },
-                                            change: function () {
-                                                var kendoElem = this;
-                                                var selectedId = _.parseInt(kendoElem.value());
-                                                var childIds = kendoElem.dataItem().childIds;
-                                                var field = "ResponsibleUsage.OrganizationUnit.Id";
-
-                                                if (selectedId === NaN) {
-                                                    // TODO remove filter(s) on this field only
-                                                }
-
-                                                var filters = [{ field: field, operator: "eq", value: selectedId }];
-                                                // add children to filters
-                                                _.forEach(childIds, function (id) {
-                                                    filters.push({ field: field, operator: "eq", value: id });
-                                                });
-
-                                                var filter = {
-                                                    logic: "or",
-                                                    filters: filters
-                                                };
-
-                                                // this doesn't work... susepct we have to do a $apply(), but can't
-                                                // args.dataSource.filter(filter);
-                                                // so resorting to EVAL()... ARE YOU KIDDING ME KENDO?!!
-                                                eval("itSystemOverviewDataSource.filter(filter);");
-                                            }
-                                        });
-                                    }
+                                    template: orgUnitDropDownList
                                 }
                             }
                         },
                         {
-                            field: "LocalSystemId", title: "Lokal system ID", width: 150,
+                            field: "LocalSystemId", title: "Lokal system ID", width: 150, persistId: "localid",
                             filterable: {
                                 cell: {
                                     delay: 1500,
@@ -294,7 +235,7 @@
                             }
                         },
                         {
-                            field: "ItSystem.BusinessType.Name", title: "Forretningstype", width: 150,
+                            field: "ItSystem.BusinessType.Name", title: "Forretningstype", width: 150, persistId: "busitype",
                             template: "#: ItSystem.BusinessType ? ItSystem.BusinessType.Name : '' #",
                             filterable: {
                                 cell: {
@@ -304,7 +245,7 @@
                             }
                         },
                         {
-                            field: "ItSystem.AppTypeOption.Name", title: "Applikationstype", width: 150,
+                            field: "ItSystem.AppTypeOption.Name", title: "Applikationstype", width: 150, persistId: "apptype",
                             template: "#: ItSystem.AppTypeOption ? ItSystem.AppTypeOption.Name : '' #",
                             hidden: true,
                             filterable: {
@@ -315,34 +256,34 @@
                             }
                         },
                         {
-                            field: "MainContract", title: "Kontrakt", width: 80,
+                            field: "MainContract", title: "Kontrakt", width: 80, persistId: "contract",
                             template: kendoTemplate.contractTemplate,
                             filterable: false,
                             sortable: false
                         },
                         {
-                            field: "ItSystem.CanUseInterfaces", title: "Anvender", width: 95,
+                            field: "ItSystem.CanUseInterfaces", title: "Anvender", width: 95, persistId: "canuse",
                             template: "<a data-ng-click=\"showUsageDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.CanUseInterfaces.length #</a>",
                             filterable: false,
                             sortable: false
                         },
                         {
-                            field: "ItSystem.ItInterfaceExhibits", title: "Udstiller", width: 95,
+                            field: "ItSystem.ItInterfaceExhibits", title: "Udstiller", width: 95, persistId: "exhibit",
                             template: "<a data-ng-click=\"showExposureDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.ItInterfaceExhibits.length #</a>",
                             filterable: false,
                             sortable: false
                         },
                         {
-                            field: "Overview.ItSystem.Name", title: "Overblik", width: 150,
+                            field: "Overview.ItSystem.Name", title: "Overblik", width: 150, persistId: "overview",
                             template: "#: Overview ? Overview.ItSystem.Name : '' #",
                             hidden: true
                         },
                         {
-                            field: "LastChanged", title: "Opdateret", format: "{0:dd-MM-yyyy}", width: 150,
+                            field: "LastChanged", title: "Opdateret", format: "{0:dd-MM-yyyy}", width: 150, persistId: "changed",
                         },
                         {
                             // DON'T YOU DARE RENAME!
-                            field: "SystemOwner", title: "Systemejer",
+                            field: "SystemOwner", title: "Systemejer", persistId: "sysowner",
                             template: function(dataItem) {
                                 return kendoTemplate.roleTemplate(dataItem, 1);
                             },
@@ -358,7 +299,7 @@
                         },
                         {
                             // DON'T YOU DARE RENAME!
-                            field: "SystemResponsible", title: "Systemansvarlig",
+                            field: "SystemResponsible", title: "Systemansvarlig", persistId: "sysresp",
                             template: function (dataItem) {
                                 return kendoTemplate.roleTemplate(dataItem, 2);
                             },
@@ -375,7 +316,7 @@
                         },
                         {
                             // DON'T YOU DARE RENAME!
-                            field: "BusinessOwner", title: "Forretningsejer",
+                            field: "BusinessOwner", title: "Forretningsejer", persistId: "busiowner",
                             template: function (dataItem) {
                                 return kendoTemplate.roleTemplate(dataItem, 3);
                             },
@@ -392,7 +333,7 @@
                         },
                         {
                             // DON'T YOU DARE RENAME!
-                            field: "SuperUserResponsible", title: "Superbrugeransvarlig",
+                            field: "SuperUserResponsible", title: "Superbrugeransvarlig", persistId: "superuserresp",
                             template: function (dataItem) {
                                 return kendoTemplate.roleTemplate(dataItem, 4);
                             },
@@ -409,7 +350,7 @@
                         },
                         {
                             // DON'T YOU DARE RENAME!
-                            field: "SuperUser", title: "Superbruger",
+                            field: "SuperUser", title: "Superbruger", persistId: "superuser",
                             template: function (dataItem) {
                                 return kendoTemplate.roleTemplate(dataItem, 5);
                             },
@@ -426,7 +367,7 @@
                         },
                         {
                             // DON'T YOU DARE RENAME!
-                            field: "SecurityResponsible", title: "Sikkerhedsansvarlig",
+                            field: "SecurityResponsible", title: "Sikkerhedsansvarlig", persistId: "secresp",
                             template: function (dataItem) {
                                 return kendoTemplate.roleTemplate(dataItem, 6);
                             },
@@ -443,7 +384,7 @@
                         },
                         {
                             // DON'T YOU DARE RENAME!
-                            field: "ChangeManager", title: "Changemanager",
+                            field: "ChangeManager", title: "Changemanager", persistId: "changemanager",
                             template: function (dataItem) {
                                 return kendoTemplate.roleTemplate(dataItem, 7);
                             },
@@ -460,7 +401,7 @@
                         },
                         {
                             // DON'T YOU DARE RENAME!
-                            field: "DataOwner", title: "Dataejer",
+                            field: "DataOwner", title: "Dataejer", persistId: "dataowner",
                             template: function (dataItem) {
                                 return kendoTemplate.roleTemplate(dataItem, 8);
                             },
@@ -477,7 +418,7 @@
                         },
                         {
                             // DON'T YOU DARE RENAME!
-                            field: "SystemAdmin", title: "Systemadminstrator",
+                            field: "SystemAdmin", title: "Systemadminstrator", persistId: "sysadm",
                             template: function (dataItem) {
                                 return kendoTemplate.roleTemplate(dataItem, 9);
                             },
@@ -602,6 +543,83 @@
                             .append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data text-muted">System anvendens ikke</td></tr>');
                     }
                 };
+
+                var orgUnitDataSource = new kendo.data.DataSource({
+                    type: "odata-v4",
+                    transport: {
+                        read: {
+                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/OrganizationUnits",
+                            dataType: "json",
+                        }
+                    },
+                    serverFiltering: true,
+                    schema: {
+                        parse: function(response) {
+                            // add hierarchy level to each item
+                            response.value = _.addHierarchyLevelOnFlatAndSort(response.value, "Id", "ParentId");
+
+                            return response;
+                        }
+                    }
+                });
+
+                function orgUnitDropDownList(args) {
+                    // http://dojo.telerik.com/ODuDe/5
+                    args.element.removeAttr("data-bind");
+                    args.element.kendoDropDownList({
+                        dataSource: orgUnitDataSource,
+                        optionLabel: "Vælg Organisationsenhed",
+                        dataValueField: "Id",
+                        dataTextField: "Name",
+                        template: indent,
+                        dataBound: setDefaultOrgUnit,
+                        change: orgUnitChanged
+                    });
+                }
+
+                function indent(dataItem) {
+                    var htmlSpace = "&nbsp;&nbsp;&nbsp;&nbsp;";
+                    return htmlSpace.repeat(dataItem.$level) + dataItem.Name;
+                }
+
+                function setDefaultOrgUnit() {
+                    var kendoElem = this;
+                    var index = _.findIndex(kendoElem.dataItems(), function (item) {
+                        return item.Id == user.defaultOrganizationUnitId;
+                    });
+                    kendoElem.select(index);
+                    var selectedId = _.parseInt(kendoElem.value());
+                    var childIds = kendoElem.dataItem().childIds;
+                    filterByOrgUnit(selectedId, childIds);
+                }
+
+                function orgUnitChanged() {
+                    var kendoElem = this;
+                    var selectedId = _.parseInt(kendoElem.value());
+                    var childIds = kendoElem.dataItem().childIds;
+                    filterByOrgUnit(selectedId, childIds);
+                }
+
+                function filterByOrgUnit(selectedId, childIds) {
+                    var field = "ResponsibleUsage.OrganizationUnit.Id";
+
+                    if (selectedId === NaN) {
+                        // TODO remove filter(s) on this field only
+                    } else {
+                        var filters = [{ field: field, operator: "eq", value: selectedId }];
+                        // add children to filters
+                        _.forEach(childIds, function (id) {
+                            filters.push({ field: field, operator: "eq", value: id });
+                        });
+
+                        var filter = {
+                            logic: "or",
+                            filters: filters
+                        };
+
+                        itSystemOverviewDataSource.filter(filter);
+                    }
+                }
             }
         ]
     );
