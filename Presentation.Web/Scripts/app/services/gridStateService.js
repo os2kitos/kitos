@@ -18,9 +18,14 @@
                 throw new Error('Missing parameter: sessionStorageKey');
             
             if (options) {
-                var pickedLocalOptions = _.pick(options, 'columns');
+                var pickedLocalOptions = {};
                 pickedLocalOptions.dataSource = _.pick(options.dataSource, ['pageSize']);
                 
+                pickedLocalOptions.columnState = {};
+                for (var i = 0; i < options.columns.length; i++) {
+                    var column = options.columns[i];
+                    pickedLocalOptions.columnState[column.persistId] = { index: i, width: column.width, hidden: column.hidden };
+                }
                 localStorage.setItem(localStorageKey, JSONfn.stringify(pickedLocalOptions));
 
                 var pickedSessionOptions = {};
