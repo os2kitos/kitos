@@ -201,14 +201,6 @@
             localStorage.setItem("currentOrgId", null);
         }
 
-        function setSavedDefaultOrgUnitId(orgUnitId) {
-            localStorage.setItem("defaultOrgUnitId", JSON.stringify(orgUnitId));
-        }
-
-        function clearSavedDefaultOrgUnitId() {
-            localStorage.setItem("defaultOrgUnitId", null);
-        }
-
         //resolve which organization context, the user will be working in.
         //when a user logs in, the user is prompted with a select-organization modal.
         //the organization that is selected here, will be saved in local storage, for the next
@@ -220,10 +212,6 @@
             if (orgsAndDefaultUnits.$values.length == 1) {
                 var firstOrgAndDefaultUnit = orgsAndDefaultUnits.$values[0];
                 setSavedOrgId(firstOrgAndDefaultUnit.organization.id);
-                if (firstOrgAndDefaultUnit.defaultOrgUnit) {
-                    setSavedDefaultOrgUnitId(firstOrgAndDefaultUnit.defaultOrgUnit.id);
-                }
-
                 deferred.resolve(firstOrgAndDefaultUnit);
                 return deferred.promise;
             }
@@ -245,7 +233,6 @@
                 //if we get to this point, the stored org id was useless - i.e. it referred to an organization, that the user no longer is a member of.
                 //so clear it
                 clearSavedOrgId();
-                clearSavedDefaultOrgUnitId();
             }
 
             //if we get to this point, there is more than organization to choose from,
@@ -276,9 +263,6 @@
 
             modal.result.then(function (selectedOrgAndUnit) {
                 setSavedOrgId(selectedOrgAndUnit.organization.id);
-                if (selectedOrgAndUnit.defaultOrgUnit) {
-                    setSavedDefaultOrgUnitId(selectedOrgAndUnit.defaultOrgUnit.id);
-                }
                 deferred.resolve(selectedOrgAndUnit);
             }, function () {
                 deferred.reject("Modal dismissed");
@@ -297,7 +281,6 @@
             }
 
             $http.post('api/user?updateDefaultOrgUnit', payload).success(function (result) {
-                setSavedDefaultOrgUnitId(_.parseInt(newDefaultOrgUnitId));
                 //now we gotta update the saved user in the userService.
                 //the simplest is just to re-auth the user.
                 getUser().then(function (user) {
