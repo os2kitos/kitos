@@ -182,3 +182,25 @@ _.mixin({
         return sorted;
     }
 });
+
+_.mixin({
+    removeFiltersForField: function (filter, field) {
+        // clone to avoid changing source
+        var clone = _.clone(filter);
+
+        var isNested = !clone.filters[0].hasOwnProperty("field");
+        if (isNested) {
+            // iterrate backwards so we can remove items along the way
+            _.remove(clone.filters, function(n) {
+                return n.filters.field === field;
+            });
+            
+        } else {
+            if (clone.filters[0].field === field) {
+                clone = {};
+            }
+        }
+
+        return clone;
+    }
+});
