@@ -21,7 +21,7 @@ namespace Infrastructure.DataAccess.Mapping
            this.HasOptional(t => t.Parent)
                 .WithMany(d => d.Children)
                 .HasForeignKey(t => t.ParentId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(true);
 
            this.HasMany(t => t.UsedByOrgUnits)
                .WithRequired(t => t.ItProject)
@@ -41,12 +41,12 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.JointMunicipalProject)
                 .WithMany(t => t.JointMunicipalProjects)
                 .HasForeignKey(d => d.JointMunicipalProjectId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(true);
 
             this.HasOptional(t => t.CommonPublicProject)
                 .WithMany(t => t.CommonPublicProjects)
                 .HasForeignKey(d => d.CommonPublicProjectId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(true);
 
             this.HasMany(t => t.Risks)
                 .WithRequired(d => d.ItProject)
