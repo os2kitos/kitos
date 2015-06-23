@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Core.DomainModel;
 using Core.DomainModel.ItProject;
 
 namespace Core.DomainServices
@@ -22,7 +21,7 @@ namespace Core.DomainServices
         /// <param name="newOwner"></param>
         /// <param name="newOrgId"></param>
         /// <returns></returns>
-        ItProject CloneProject(ItProject original, User newOwner, int newOrgId);
+        //ItProject CloneProject(ItProject original, User newOwner, int newOrgId);
 
         void DeleteProject(ItProject project);
     }

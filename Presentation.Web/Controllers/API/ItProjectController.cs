@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
@@ -13,7 +14,6 @@ using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
-using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 
@@ -25,7 +25,6 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
         private readonly IGenericRepository<ItProjectRole> _roleRepository;
-        private readonly IGenericRepository<ItProjectPhase> _phaseRepository;
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
 
         //TODO: Man, this constructor smells ...
@@ -35,15 +34,13 @@ namespace Presentation.Web.Controllers.API
             IGenericRepository<OrganizationUnit> orgUnitRepository, 
             IGenericRepository<TaskRef> taskRepository, 
             IGenericRepository<ItSystemUsage> itSystemUsageRepository,
-            IGenericRepository<ItProjectRole> roleRepository,
-            IGenericRepository<ItProjectPhase> phaseRepository)
+            IGenericRepository<ItProjectRole> roleRepository)
             : base(repository)
         {
             _itProjectService = itProjectService;
             _taskRepository = taskRepository;
             _itSystemUsageRepository = itSystemUsageRepository;
             _roleRepository = roleRepository;
-            _phaseRepository = phaseRepository;
             _orgUnitRepository = orgUnitRepository;
         }
 
@@ -178,7 +175,6 @@ namespace Presentation.Web.Controllers.API
                 var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectOverviewDTO>>(projects);
 
                 var roles = _roleRepository.Get().ToList();
-                var phases = _phaseRepository.Get().ToList();
 
                 var list = new List<dynamic>();
                 var header = new ExpandoObject() as IDictionary<string, Object>;
@@ -217,7 +213,29 @@ namespace Presentation.Web.Controllers.API
                     obj.Add("Type", project.ItProjectTypeName);
                     obj.Add("Strategisk", project.IsStrategy);
                     obj.Add("Tværgaaende", project.IsTransversal);
-                    obj.Add("Fase", phases.SingleOrDefault(x => x.Id == project.CurrentPhaseId).IfNotNull(x => x.Name));
+
+                    switch (project.CurrentPhase)
+                    {
+                        case 1:
+                            obj.Add("Fase", project.Phase1.Name);
+                            break;
+                        case 2:
+                            obj.Add("Fase", project.Phase2.Name);
+                            break;
+                        case 3:
+                            obj.Add("Fase", project.Phase3.Name);
+                            break;
+                        case 4:
+                            obj.Add("Fase", project.Phase4.Name);
+                            break;
+                        case 5:
+                            obj.Add("Fase", project.Phase5.Name);
+                            break;
+                        default:
+                            obj.Add("Fase", "Ikke sat");
+                            break;
+                    }
+                    
                     obj.Add("Status", project.StatusProject);
                     obj.Add("Maal", project.GoalStatusStatus);
                     obj.Add("Risiko", project.AverageRisk);
@@ -319,22 +337,23 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage PostCloneProject(int id, bool? clone, [FromBody] ItProjectDTO dto)
-        {
-            try
-            {
-                //make sure we only clone projects that the is accessible from the organization
-                var project = _itProjectService.GetAll(dto.OrganizationId).FirstOrDefault(p => p.Id == id);
+        // TODO cloning has been disabled for now, reviewed at a later date
+        //public HttpResponseMessage PostCloneProject(int id, bool? clone, [FromBody] ItProjectDTO dto)
+        //{
+        //    try
+        //    {
+        //        //make sure we only clone projects that the is accessible from the organization
+        //        var project = _itProjectService.GetAll(dto.OrganizationId).FirstOrDefault(p => p.Id == id);
 
-                var clonedProject = _itProjectService.CloneProject(project, KitosUser, dto.OrganizationId);
+        //        var clonedProject = _itProjectService.CloneProject(project, KitosUser, dto.OrganizationId);
 
-                return Created(Map(clonedProject), new Uri(Request.RequestUri + "/" + clonedProject.Id));
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
+        //        return Created(Map(clonedProject), new Uri(Request.RequestUri + "/" + clonedProject.Id));
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return Error(e);
+        //    }
+        //}
 
         public HttpResponseMessage GetProjectsByType([FromUri] int orgId, [FromUri] int typeId)
         {
@@ -703,6 +722,50 @@ namespace Presentation.Web.Controllers.API
                 return Unauthorized();
             }
             return base.Post(dto);
+        }
+
+        public HttpResponseMessage PostPhaseChange(int id, int organizationId, string phaseNum, JObject phaseObj)
+        {
+            var project = Repository.GetByKey(id);
+
+            if (project == null) return NotFound();
+            if (!HasWriteAccess(project, organizationId)) return Unauthorized();
+            
+            const string propertyName = "Phase";
+            var phaseRef = project.GetType().GetProperty(propertyName + phaseNum);
+            // make sure object has the property we are after
+            if (phaseRef != null)
+            {
+                var phase = phaseRef.GetValue(project);
+
+                foreach (var valuePair in phaseObj)
+                {
+                    var propRef = phase.GetType().GetProperty(valuePair.Key);
+                    var t = propRef.PropertyType;
+                    var jToken = valuePair.Value;
+                    try
+                    {
+                        // get reference to the generic method obj.Value<t>(parameter);
+                        var genericMethod = jToken.GetType().GetMethod("Value").MakeGenericMethod(new Type[] { t });
+                        // use reflection to call obj.Value<t>("keyName");
+                        var value = genericMethod.Invoke(phaseObj, new object[] { valuePair.Key });
+                        // update the entity
+                        propRef.SetValue(phase, value);
+                    }
+                    catch (Exception)
+                    {
+                        // if obj.Value<t>("keyName") cast fails set to fallback value
+                        propRef.SetValue(phase, null); // TODO this is could be dangerous, should probably also be default(t)
+                    }
+                }
+            }
+
+            project.LastChanged = DateTime.Now;
+            project.LastChangedByUser = KitosUser;
+
+            PatchQuery(project);
+
+            return Ok();
         }
 
         public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)

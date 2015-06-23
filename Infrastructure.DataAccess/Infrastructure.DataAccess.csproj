@@ -224,6 +224,10 @@
     <Compile Include="Migrations\201506221042023_EnabledCascadingDeleteOnProject.Designer.cs">
       <DependentUpon>201506221042023_EnabledCascadingDeleteOnProject.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201506221106303_ProjectPhaseToComplexType.cs" />
+    <Compile Include="Migrations\201506221106303_ProjectPhaseToComplexType.Designer.cs">
+      <DependentUpon>201506221106303_ProjectPhaseToComplexType.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\BackupConfiguration.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -308,6 +312,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201506221042023_EnabledCascadingDeleteOnProject.resx">
       <DependentUpon>201506221042023_EnabledCascadingDeleteOnProject.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506221106303_ProjectPhaseToComplexType.resx">
+      <DependentUpon>201506221106303_ProjectPhaseToComplexType.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

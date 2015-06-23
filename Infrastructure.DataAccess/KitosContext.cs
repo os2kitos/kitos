@@ -53,7 +53,6 @@ namespace Infrastructure.DataAccess
         public DbSet<ItContractRight> ItContractRights { get; set; }
         public DbSet<ItContractRole> ItContractRoles { get; set; }
         public DbSet<ItProject> ItProjects { get; set; }
-        public DbSet<ItProjectPhase> ItProjectPhases { get; set; }
         public DbSet<ItProjectStatus> ItProjectStatuses { get; set; }
         public DbSet<ItProjectRight> ItProjectRights { get; set; }
         public DbSet<ItProjectRole> ItProjectRoles { get; set; }
@@ -91,6 +90,8 @@ namespace Infrastructure.DataAccess
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            modelBuilder.ComplexType<ItProjectPhase>();
+
             modelBuilder.Configurations.Add(new AdminRightMap());
             modelBuilder.Configurations.Add(new AdminRoleMap());
             modelBuilder.Configurations.Add(new AdviceMap());
