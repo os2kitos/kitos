@@ -14,15 +14,8 @@ namespace Core.DomainServices
         /// <returns></returns>
         ItProject AddProject(ItProject project);
 
-        /// <summary>
-        /// Clones and saves an IT project.
-        /// </summary>
-        /// <param name="original"></param>
-        /// <param name="newOwner"></param>
-        /// <param name="newOrgId"></param>
-        /// <returns></returns>
         //ItProject CloneProject(ItProject original, User newOwner, int newOrgId);
 
-        void DeleteProject(ItProject project);
+        void DeleteProject(int id);
     }
 }

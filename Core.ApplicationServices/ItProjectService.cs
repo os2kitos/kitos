@@ -121,9 +121,12 @@ namespace Core.ApplicationServices
         //    return clone;
         //}
 
-        public void DeleteProject(ItProject project)
+        public void DeleteProject(int id)
         {
-            _projectRepository.DeleteByKey(project.Id);
+            // http://stackoverflow.com/questions/15226312/entityframewok-how-to-configure-cascade-delete-to-nullify-foreign-keys
+            // when children are loaded into memory the foreign key is correctly set to null on children when deleted
+            var entity = _projectRepository.Get(x => x.Id == id, null, "Children, JointMunicipalProjects, CommonPublicProjects").FirstOrDefault();
+            _projectRepository.Delete(entity);
             _projectRepository.Save();
         }
 

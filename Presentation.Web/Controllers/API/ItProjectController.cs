@@ -708,9 +708,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override void DeleteQuery(int id)
         {
-            var project = Repository.GetByKey(id);
-
-            _itProjectService.DeleteProject(project);
+            _itProjectService.DeleteProject(id);
         }
 
         public override HttpResponseMessage Post(ItProjectDTO dto)
