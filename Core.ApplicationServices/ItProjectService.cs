@@ -40,10 +40,10 @@ namespace Core.ApplicationServices
 
         public ItProject AddProject(ItProject project)
         {
+            CreateDefaultPhases(project);
             _projectRepository.Insert(project);
             _projectRepository.Save();
             
-            CreateDefaultPhases(project);
             AddEconomyYears(project);
 
             project.Handover = new Handover()
