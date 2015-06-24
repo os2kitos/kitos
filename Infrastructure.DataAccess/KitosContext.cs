@@ -5,9 +5,11 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Infrastructure.DataAccess.Mapping;
+using MySql.Data.Entity;
 
 namespace Infrastructure.DataAccess
 {
+    [DbConfigurationType(typeof(MySqlEFConfiguration))]
     public class KitosContext : DbContext
     {
         static KitosContext()
