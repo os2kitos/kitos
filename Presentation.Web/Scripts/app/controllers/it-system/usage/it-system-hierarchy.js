@@ -23,7 +23,8 @@
             // sort by parent to get roots (roots are null) first, then we only need to iterrate once
             // example [1, 1, null, 2] -> [null, 1, 1, 2] (number is parent id)
             var sorted = _.sortBy(flatAry, function (obj) {
-                return obj[parentIdPropetyName];
+                var id = obj[parentIdPropetyName];
+                return id == null ? -1 : id;
             });
 
             function search(nestedAry, id) {
