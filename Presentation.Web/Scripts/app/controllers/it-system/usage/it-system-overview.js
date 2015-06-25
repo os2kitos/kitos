@@ -148,6 +148,18 @@
                         // resize column
                         if (state.width != columnObj.width) {
                             // TODO
+                            // manually set the width on the column option, cause changing the css doesn't
+                            columnObj.width = state.width;
+                            // $timeout is required here, else the jQuery select doesn't work
+                            $timeout(function() {
+                                $(".k-grid-content")
+                                    .find("colgroup col")
+                                    .eq(columnIndex)
+                                    .width(state.width);
+
+                                // NOTE make sure that this id actually matches the id in the view
+                                $("#mainGrid").find("col").eq(columnIndex).width(state.width);
+                            });
                         }
                     });
 
