@@ -20,31 +20,6 @@
         function ($rootScope, $scope, $http, notify, $state, user, $timeout, gridStateService) {
             $rootScope.page.title = 'IT System - Katalog';
             
-            // adds system to usage within the current context
-            function addODataUsage(systemId) {
-                return $http.post('api/itsystemusage', {
-                    itSystemId: systemId,
-                    organizationId: user.currentOrganizationId
-                }).success(function(result) {
-                    notify.addSuccessMessage('Systemet er taget i anvendelse');
-                    itSystemCatalogDataSource.read();
-                }).error(function(result) {
-                    notify.addErrorMessage('Systemet kunne ikke tages i anvendelse!');
-                });
-            }
-
-            // removes system from usage within the current context
-            function deleteODataUsage(systemId) {
-                var url = 'api/itsystemusage?itSystemId=' + systemId + '&organizationId=' + user.currentOrganizationId;
-
-                return $http.delete(url).success(function(result) {
-                    notify.addSuccessMessage('Anvendelse af systemet er fjernet');
-                    itSystemCatalogDataSource.read();
-                }).error(function(result) {
-                    notify.addErrorMessage('Anvendelse af systemet kunne ikke fjernes!');
-                });
-            }
-
             // usagedetails grid empty-grid handling
             function detailsBound(e) {
                 var grid = e.sender;
@@ -58,23 +33,16 @@
 
             var localStorageKey = "it-system-catalog-options";
             var sessionStorageKey = "it-system-catalog-options";
+            var gridState = gridStateService.getService(localStorageKey, sessionStorageKey);
 
             // saves grid state to localStorage
             function saveGridOptions() {
-                if ($scope.mainGrid) {
-                    // timeout fixes columnReorder saves before the column is actually reordered 
-                    // http://stackoverflow.com/questions/21270748/kendo-grid-saving-state-in-columnreorder-event
-                    $timeout(function () {
-                        var options = $scope.mainGrid.getOptions();
-                        gridStateService.save(localStorageKey, sessionStorageKey, options);
-                    });
-                }
+                gridState.saveGridOptions($scope.mainGrid);
             }
 
             // loads kendo grid options from localstorage
             function loadGridOptions() {
-                var options = gridStateService.get(localStorageKey, sessionStorageKey);
-                $scope.mainGrid.setOptions(options);
+                gridState.loadGridOptions($scope.mainGrid);
             }
             
             // fires when kendo is finished rendering all its goodies
@@ -85,7 +53,7 @@
 
             // clears grid filters by removing the localStorageItem and reloading the page
             $scope.clearOptions = function () {
-                gridStateService.clear(localStorageKey, sessionStorageKey);
+                gridState.clearOptions(localStorageKey, sessionStorageKey);
                 // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                 reload();
             }
@@ -196,7 +164,7 @@
                 },
                 columns: [
                     {
-                        field: "Name", title: "It System", width: 150,
+                        field: "Name", title: "It System", width: 150, persistId: "name",
                         template: '<a data-ui-sref="it-system.edit.interfaces({id: #: Id #})">#: Name #</a>',
                         filterable: {
                             cell: {
@@ -207,12 +175,12 @@
                         }
                     },
                     {
-                        field: "AccessModifier", title: "Tilgængelighed", width: 80,
+                        field: "AccessModifier", title: "Tilgængelighed", width: 80, persistId: "accessmod",
                         filterable: false,
                         sortable: false
                     },
                     {
-                        field: "Parent.Name", title: "Overordnet", width: 150,
+                        field: "Parent.Name", title: "Overordnet", width: 150, persistId: "parentname",
                         template: "#: Parent ? Parent.Name : '' #",
                         filterable: {
                             cell: {
@@ -223,7 +191,7 @@
                         }
                     },
                     {
-                        field: "AppTypeOption.Name", title: "Applikationstype", width: 150,
+                        field: "AppTypeOption.Name", title: "Applikationstype", width: 150, persistId: "apptype",
                         template: "#: AppTypeOption ? AppTypeOption.Name : '' #",
                         filterable: {
                             cell: {
@@ -234,7 +202,7 @@
                         }
                     },
                     {
-                        field: "BusinessType.Name", title: "Forretningtype", width: 150,
+                        field: "BusinessType.Name", title: "Forretningtype", width: 150, persistId: "busitype",
                         template: "#: BusinessType ? BusinessType.Name : '' #",
                         filterable: {
                             cell: {
@@ -246,7 +214,7 @@
                     },
                     {
                         // DON'T YOU DARE RENAME!
-                        field: "TaskKey", title: "KLE", width: 150,
+                        field: "TaskKey", title: "KLE", width: 150, persistId: "taskkey",
                         template: "#: TaskRefs.length > 0 ? _.pluck(TaskRefs.slice(0,4), 'TaskKey').join(', ') : '' ##: TaskRefs.length > 5 ? ', ...' : '' #",
                         filterable: {
                             cell: {
@@ -258,7 +226,7 @@
                         sortable: false
                     },
                     {
-                        field: "BelongsTo.Name", title: "Rettighedshaver", width: 150,
+                        field: "BelongsTo.Name", title: "Rettighedshaver", width: 150, persistId: "belongsto",
                         template: "#: BelongsTo ? BelongsTo.Name : '' #",
                         filterable: {
                             cell: {
@@ -269,7 +237,7 @@
                         }
                     },
                     {
-                        field: "Organization.Name", title: "Oprettet i", width: 150,
+                        field: "Organization.Name", title: "Oprettet i", width: 150, persistId: "orgname",
                         template: "#: Organization ? Organization.Name : '' #",
                         filterable: {
                             cell: {
@@ -280,7 +248,7 @@
                         }
                     },
                     {
-                        field: "ObjectOwner.Name", title: "Oprettet af", width: 150,
+                        field: "ObjectOwner.Name", title: "Oprettet af", width: 150, persistId: "ownername",
                         template: "#: ObjectOwner.Name + ' ' + ObjectOwner.LastName #",
                         filterable: {
                             cell: {
@@ -291,16 +259,16 @@
                         }
                     },
                     {
-                        field: "Usages.length" || 0, title: "Anvender", width: 95,
+                        field: "Usages.length", title: "Anvender", width: 95, persistId: "usages",
                         template: '<a class="col-md-7 text-center" data-ng-click="showUsageDetails(#: Id #,\'#: Name #\')">#: Usages.length #</a>',
                         filterable: false,
                         sortable: false
                     },
                     {
-                        title: "Anvendelse",
+                        title: "Anvendelse", persistId: "command",
                         width: 110,
                         field: "Usages",
-                        template: kendoTemplate.usageButtonTemplate,
+                        template: usageButtonTemplate,
                         filterable: false,
                         sortable: false
                     }
@@ -315,16 +283,53 @@
                 }
             };
 
+            function usageButtonTemplate(dataItem) {
+                // true if system is being used by system within current context, else false
+                var systemHasUsages = _.find(dataItem.Usages, function(d) { return d.OrganizationId == user.currentOrganizationId; });
+
+                if (systemHasUsages)
+                    return '<button class="btn btn-danger col-md-7" data-ng-click="removeUsage(' + dataItem.Id + ')">Fjern anv.</button>';
+
+                return '<button class="btn btn-success col-md-7" data-ng-click="enableUsage(' + dataItem.Id + ')">Anvend</button>';
+            }
+
             // adds usage at selected system within current context
             $scope.enableUsage = function (dataItem) {
-                addODataUsage(dataItem);
+                addUsage(dataItem).then(function() {
+                    $scope.mainGrid.dataSource.fetch();
+                });
             }
 
             // removes usage at selected system within current context
             $scope.removeUsage = function (dataItem) {
                 var sure = confirm("Er du sikker på at du vil fjerne den lokale anvendelse af systemet? Dette sletter ikke systemet, men vil slette alle lokale detaljer vedrørende anvendelsen.");
                 if (sure)
-                    deleteODataUsage(dataItem);
+                    deleteUsage(dataItem).then(function() {
+                        $scope.mainGrid.dataSource.fetch();
+                    });
+            }
+
+            // adds system to usage within the current context
+            function addUsage(systemId) {
+                return $http.post('api/itsystemusage', {
+                    itSystemId: systemId,
+                    organizationId: user.currentOrganizationId
+                }).success(function () {
+                    notify.addSuccessMessage('Systemet er taget i anvendelse');
+                }).error(function () {
+                    notify.addErrorMessage('Systemet kunne ikke tages i anvendelse!');
+                });
+            }
+
+            // removes system from usage within the current context
+            function deleteUsage(systemId) {
+                var url = 'api/itsystemusage?itSystemId=' + systemId + '&organizationId=' + user.currentOrganizationId;
+
+                return $http.delete(url).success(function() {
+                    notify.addSuccessMessage('Anvendelse af systemet er fjernet');
+                }).error(function() {
+                    notify.addErrorMessage('Anvendelse af systemet kunne ikke fjernes!');
+                });
             }
         }
     ]);

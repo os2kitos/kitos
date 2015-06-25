@@ -41,6 +41,7 @@
             });
 
             $scope.itInterfaceOptions = {
+                autoBind: false,
                 dataSource: itInterfaceCatalogDataSource,
                 toolbar: [
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
@@ -74,7 +75,7 @@
                 },
                 columns: [
                     {
-                        field: "ItInterfaceId", title: "Snidtflade ID", width: 150,
+                        field: "ItInterfaceId", title: "Snidtflade ID", width: 150, persistId: "infid",
                         filterable: {
                             cell: {
                                 delay: 1500,
@@ -84,7 +85,7 @@
                         }
                     },
                     {
-                        field: "Name", title: "Snitflade", width: 150,
+                        field: "Name", title: "Snitflade", width: 150, persistId: "name",
                         template: "<a data-ui-sref='it-system.interface-edit.interface-details({id: #: Id #})'>#: Name #</a>",
                         filterable: {
                             cell: {
@@ -95,12 +96,12 @@
                         }
                     },
                     {
-                        field: "AccessModifier", title: "Tilgængelighed", width: 80,
+                        field: "AccessModifier", title: "Tilgængelighed", width: 80, persistId: "accessmod",
                         filterable: false,
                         sortable: false
                     },
                     {
-                        field: "InterfaceType.Name", title: "Snitfladetype", width: 150,
+                        field: "InterfaceType.Name", title: "Snitfladetype", width: 150, persistId: "inftype",
                         template: "#: InterfaceType ? InterfaceType.Name : '' #",
                         filterable: {
                             cell: {
@@ -111,7 +112,7 @@
                         }
                     },
                     {
-                        field: "Interface.Name", title: "Grænseflade", width: 150,
+                        field: "Interface.Name", title: "Grænseflade", width: 150, persistId: "infname",
                         template: "#: Interface ? Interface.Name : '' #",
                         filterable: {
                             cell: {
@@ -122,7 +123,7 @@
                         }
                     },
                     {
-                        field: "Method.Name", title: "Metode", width: 150,
+                        field: "Method.Name", title: "Metode", width: 150, persistId: "method",
                         template: "#: Method ? Method.Name : '' #",
                         filterable: {
                             cell: {
@@ -133,7 +134,7 @@
                         },
                     },
                     {
-                        field: "Tsa.Name", title: "TSA", width: 150,
+                        field: "Tsa.Name", title: "TSA", width: 150, persistId: "tsa",
                         template: "#: Tsa ? Tsa.Name : '' #",
                         filterable: {
                             cell: {
@@ -144,7 +145,7 @@
                         },
                     },
                     {
-                        field: "ExhibitedBy.ItSystem.Name", title: "Udstillet af", width: 150,
+                        field: "ExhibitedBy.ItSystem.Name", title: "Udstillet af", width: 150, persistId: "exhibit",
                         template: "#: ExhibitedBy ? ExhibitedBy.ItSystem.Name : '' #",
                         filterable: {
                             cell: {
@@ -155,7 +156,7 @@
                         },
                     },
                     {
-                        field: "BelongsTo.Name", title: "Rettighedshaver", width: 150,
+                        field: "BelongsTo.Name", title: "Rettighedshaver", width: 150, persistId: "belongs",
                         filterable: {
                             cell: {
                                 delay: 1500,
@@ -165,7 +166,7 @@
                         }
                     },
                     {
-                        field: "Organization.Name", title: "Oprettet i", width: 150,
+                        field: "Organization.Name", title: "Oprettet i", width: 150, persistId: "orgname",
                         filterable: {
                             cell: {
                                 delay: 1500,
@@ -175,7 +176,7 @@
                         }
                     },
                     {
-                        field: "ObjectOwner.Name", title: "Oprettet af", width: 150,
+                        field: "ObjectOwner.Name", title: "Oprettet af", width: 150, persistId: "owername",
                         template: "#: ObjectOwner.Name + ' ' + ObjectOwner.LastName #",
                         filterable: {
                             cell: {
@@ -198,33 +199,27 @@
 
             var localStorageKey = "it-interface-catalog-options";
             var sessionStorageKey = "it-interface-catalog-options";
+            var gridState = gridStateService.getService(localStorageKey, sessionStorageKey);
 
             // saves grid state to localStorage
             function saveGridOptions() {
-                if ($scope.mainGrid) {
-                    // timeout fixes columnReorder saves before the column is actually reordered 
-                    // http://stackoverflow.com/questions/21270748/kendo-grid-saving-state-in-columnreorder-event
-                    $timeout(function () {
-                        var options = $scope.mainGrid.getOptions();
-                        gridStateService.save(localStorageKey, sessionStorageKey, options);
-                    });
-                }
+                gridState.saveGridOptions($scope.mainGrid);
             }
 
             // loads kendo grid options from localstorage
             function loadGridOptions() {
-                var options = gridStateService.get(localStorageKey, sessionStorageKey);
-                $scope.mainGrid.setOptions(options);
+                gridState.loadGridOptions($scope.mainGrid);
             }
 
             // fires when kendo is finished rendering all its goodies
             $scope.$on("kendoRendered", function (e) {
                 loadGridOptions();
+                $scope.mainGrid.dataSource.fetch();
             });
 
             // clears grid filters by removing the localStorageItem and reloading the page
             $scope.clearOptions = function () {
-                gridStateService.clear(localStorageKey, sessionStorageKey);
+                gridState.clearOptions(localStorageKey, sessionStorageKey);
                 // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                 reload();
             }

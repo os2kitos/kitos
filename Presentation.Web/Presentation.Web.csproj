@@ -903,6 +903,7 @@
     <Content Include="Scripts\app\directives\utils-directives.js" />
     <Content Include="Scripts\app\kendo-templates\kendo-templates.js" />
     <Content Include="Scripts\app\services\gridStateService.js" />
+    <Content Include="Scripts\app\services\gridOptionsService.js" />
     <Content Include="Scripts\app\services\taskService.js" />
     <Content Include="Scripts\app\services\userServices.js" />
     <Content Include="Scripts\app\utility\underscore.mixin.js" />

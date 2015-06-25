@@ -108,61 +108,27 @@
 
                 var localStorageKey = "it-system-overview-options";
                 var sessionStorageKey = "it-system-overview-options";
+                var gridState = gridStateService.getService(localStorageKey, sessionStorageKey);
 
                 // saves grid state to localStorage
                 function saveGridOptions() {
-                    if ($scope.mainGrid) {
-                        // timeout fixes columnReorder saves before the column is actually reordered 
-                        // http://stackoverflow.com/questions/21270748/kendo-grid-saving-state-in-columnreorder-event
-                        $timeout(function () {
-                            var options = $scope.mainGrid.getOptions();
-                            gridStateService.save(localStorageKey, sessionStorageKey, options);
-                        });
-                    }
+                    gridState.saveGridOptions($scope.mainGrid);
                 }
 
                 // loads kendo grid options from localstorage
                 function loadGridOptions() {
-                    var grid = $scope.mainGrid;
-                    var persistedState = gridStateService.get(localStorageKey, sessionStorageKey);
-                    var gridOptions = _.omit(persistedState, "columnState");
-                    var columnState = _.pick(persistedState, "columnState");
-                    
-                    _.forEach(columnState.columnState, function (state, key) {
-                        var columnIndex = _.findIndex(grid.columns, function(column) {
-                            return column.persistId == key;
-                        });
-                        var columnObj = grid.columns[columnIndex];
-                        // reorder column
-                        if (state.index != columnIndex) {
-                            grid.reorderColumn(state.index, columnObj);
-                        }
-                        // show / hide column
-                        if (state.hidden != columnObj.hidden) {
-                            if (state.hidden) {
-                                grid.hideColumn(columnObj);
-                            } else {
-                                grid.showColumn(columnObj);
-                            }
-                        }
-                        // resize column
-                        if (state.width != columnObj.width) {
-                            // manually set the width on the column option, cause changing the css doesn't
-                            columnObj.width = state.width;
-                            // $timeout is required here, else the jQuery select doesn't work
-                            $timeout(function() {
-                                $(".k-grid-content")
-                                    .find("colgroup col")
-                                    .eq(columnIndex)
-                                    .width(state.width);
+                    gridState.loadGridOptions($scope.mainGrid);
+                }
 
-                                // NOTE make sure that this id actually matches the id in the view
-                                $("#mainGrid").find("col").eq(columnIndex).width(state.width);
-                            });
-                        }
-                    });
+                // clears grid filters by removing the localStorageItem and reloading the page
+                $scope.clearOptions = function () {
+                    gridState.clearOptions(localStorageKey, sessionStorageKey);
+                    // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
+                    reload();
+                }
 
-                    grid.setOptions(gridOptions);
+                function reload() {
+                    $state.go('.', null, { reload: true });
                 }
 
                 var kendoRendered = false;
@@ -171,17 +137,6 @@
                     kendoRendered = true;
                     loadGridOptions();
                 });
-
-                // clears grid filters by removing the localStorageItem and reloading the page
-                $scope.clearOptions = function () {
-                    gridStateService.clear(localStorageKey, sessionStorageKey);
-                    // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
-                    reload();
-                }
-
-                function reload() {
-                    $state.go('.', null, { reload: true });
-                }
 
                 // overview grid options
                 $scope.mainGridOptions = {
@@ -270,7 +225,7 @@
                         },
                         {
                             field: "MainContract", title: "Kontrakt", width: 80, persistId: "contract",
-                            template: kendoTemplate.contractTemplate,
+                            template: contractTemplate,
                             filterable: false,
                             sortable: false
                         },
@@ -298,7 +253,7 @@
                             // DON'T YOU DARE RENAME!
                             field: "SystemOwner", title: "Systemejer", persistId: "sysowner",
                             template: function (dataItem) {
-                                return kendoTemplate.roleTemplate(dataItem, 1);
+                                return roleTemplate(dataItem, 1);
                             },
                             width: 150,
                             sortable: false,
@@ -314,7 +269,7 @@
                             // DON'T YOU DARE RENAME!
                             field: "SystemResponsible", title: "Systemansvarlig", persistId: "sysresp",
                             template: function (dataItem) {
-                                return kendoTemplate.roleTemplate(dataItem, 2);
+                                return roleTemplate(dataItem, 2);
                             },
                             width: 150,
                             hidden: true,
@@ -331,7 +286,7 @@
                             // DON'T YOU DARE RENAME!
                             field: "BusinessOwner", title: "Forretningsejer", persistId: "busiowner",
                             template: function (dataItem) {
-                                return kendoTemplate.roleTemplate(dataItem, 3);
+                                return roleTemplate(dataItem, 3);
                             },
                             width: 150,
                             hidden: true,
@@ -348,7 +303,7 @@
                             // DON'T YOU DARE RENAME!
                             field: "SuperUserResponsible", title: "Superbrugeransvarlig", persistId: "superuserresp",
                             template: function (dataItem) {
-                                return kendoTemplate.roleTemplate(dataItem, 4);
+                                return roleTemplate(dataItem, 4);
                             },
                             width: 150,
                             hidden: true,
@@ -365,7 +320,7 @@
                             // DON'T YOU DARE RENAME!
                             field: "SuperUser", title: "Superbruger", persistId: "superuser",
                             template: function (dataItem) {
-                                return kendoTemplate.roleTemplate(dataItem, 5);
+                                return roleTemplate(dataItem, 5);
                             },
                             width: 150,
                             hidden: true,
@@ -382,7 +337,7 @@
                             // DON'T YOU DARE RENAME!
                             field: "SecurityResponsible", title: "Sikkerhedsansvarlig", persistId: "secresp",
                             template: function (dataItem) {
-                                return kendoTemplate.roleTemplate(dataItem, 6);
+                                return roleTemplate(dataItem, 6);
                             },
                             width: 150,
                             hidden: true,
@@ -399,7 +354,7 @@
                             // DON'T YOU DARE RENAME!
                             field: "ChangeManager", title: "Changemanager", persistId: "changemanager",
                             template: function (dataItem) {
-                                return kendoTemplate.roleTemplate(dataItem, 7);
+                                return roleTemplate(dataItem, 7);
                             },
                             width: 150,
                             hidden: true,
@@ -416,7 +371,7 @@
                             // DON'T YOU DARE RENAME!
                             field: "DataOwner", title: "Dataejer", persistId: "dataowner",
                             template: function (dataItem) {
-                                return kendoTemplate.roleTemplate(dataItem, 8);
+                                return roleTemplate(dataItem, 8);
                             },
                             width: 150,
                             hidden: true,
@@ -433,7 +388,7 @@
                             // DON'T YOU DARE RENAME!
                             field: "SystemAdmin", title: "Systemadminstrator", persistId: "sysadm",
                             template: function (dataItem) {
-                                return kendoTemplate.roleTemplate(dataItem, 9);
+                                return roleTemplate(dataItem, 9);
                             },
                             width: 150,
                             hidden: true,
@@ -456,6 +411,36 @@
                         console.log(e);
                     }
                 };
+
+                function contractTemplate(dataItem) {
+                    if (dataItem.MainContract)
+                        if (dataItem.MainContract.ItContract)
+                            if (dataItem.MainContract.ItContract.IsActive)
+                                return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span></a>';
+                            else
+                                return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="glyphicon glyphicon-file text-muted" aria-hidden="true"></span></a>';
+
+                    return "";
+                }
+
+                function roleTemplate(dataItem, roleId) {
+                    var roles = "";
+
+                    if (dataItem.roles[roleId] === undefined)
+                        return roles;
+
+                    // join the first 5 username together
+                    if (dataItem.roles[roleId].length > 0)
+                        roles = dataItem.roles[roleId].slice(0, 4).join(", ");
+
+                    // if more than 5 then add an elipsis
+                    if (dataItem.roles[roleId].length > 5)
+                        roles += ", ...";
+
+                    var link = "<a data-ui-sref='it-system.usage.roles({id: " + dataItem.Id + "})'>" + roles + "</a>";
+
+                    return link;
+                }
 
                 // show exposureDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
                 $scope.showExposureDetails = function (usageId, systemName) {
