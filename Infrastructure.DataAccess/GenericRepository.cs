@@ -63,6 +63,11 @@ namespace Infrastructure.DataAccess
             return _dbSet.Add(entity);
         }
 
+        public void Delete(T entity)
+        {
+            _dbSet.Remove(entity);
+        }
+
         public void DeleteByKey(params object[] key)
         {
             var entityToDelete = _dbSet.Find(key);
