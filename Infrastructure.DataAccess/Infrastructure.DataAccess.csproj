@@ -220,7 +220,10 @@
     <Compile Include="Migrations\201505291237028_RemovedUniqueIndexOnEAN.Designer.cs">
       <DependentUpon>201505291237028_RemovedUniqueIndexOnEAN.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\BackupConfiguration.cs" />
+    <Compile Include="Migrations\201506221106303_ProjectPhaseToComplexType.cs" />
+    <Compile Include="Migrations\201506221106303_ProjectPhaseToComplexType.Designer.cs">
+      <DependentUpon>201506221106303_ProjectPhaseToComplexType.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -301,6 +304,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201505291237028_RemovedUniqueIndexOnEAN.resx">
       <DependentUpon>201505291237028_RemovedUniqueIndexOnEAN.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506221106303_ProjectPhaseToComplexType.resx">
+      <DependentUpon>201506221106303_ProjectPhaseToComplexType.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

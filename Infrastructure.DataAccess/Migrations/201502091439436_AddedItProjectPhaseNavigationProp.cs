@@ -23,6 +23,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         public override void Down()
         {
+            throw new NotSupportedException("Down method doesn't include SQL regarding migrating data. If you wish to revert this migration you should implment the SQL needed.");
             DropForeignKey("ItProjectPhases", "ItProjectId", "ItProject");
             DropIndex("ItProjectPhases", new[] { "ItProjectId" });
             DropColumn("ItProjectPhases", "ItProjectId");

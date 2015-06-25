@@ -89,11 +89,6 @@
             }
             
             function pushProject(project) {
-                // set current phase
-                var phases = [project.phase1, project.phase2, project.phase3, project.phase4, project.phase5];
-                project.currentPhase = _.find(phases, function (phase) {
-                    return phase.id == project.currentPhaseId;
-                });
                 $scope.projects.push(project);
             }
         }]);

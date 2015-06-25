@@ -14,6 +14,7 @@ namespace Core.DomainServices
             string includeProperties = "");
         TModel GetByKey(params object[] key);
         TModel Insert(TModel entity);
+        void Delete(TModel entity);
         void DeleteByKey(params object[] key);
         void Update(TModel entity);
         void Save();

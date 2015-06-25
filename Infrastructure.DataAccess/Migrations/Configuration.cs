@@ -24,8 +24,9 @@ namespace Infrastructure.DataAccess.Migrations
             SetSqlGenerator("MySql.Data.MySqlClient", new MySql.Data.Entity.MySqlMigrationSqlGenerator());
             CodeGenerator = new MySql.Data.Entity.MySqlMigrationCodeGenerator();
 
-            //Use a smaller key size for our migration history table. See MySqlHistoryContext.cs
-            SetHistoryContextFactory("MySql.Data.MySqlClient", (conn, schema) => new MySqlHistoryContext(conn, schema));
+            // TODO this is apparently not needed anymore - remove when confirmed
+            ////Use a smaller key size for our migration history table. See MySqlHistoryContext.cs
+            //SetHistoryContextFactory("MySql.Data.MySqlClient", (conn, schema) => new MySqlHistoryContext(conn, schema));
         }
 
         /// <summary>

@@ -21,6 +21,11 @@ namespace Core.DomainModel.ItProject
             this.Children = new List<ItProject>();
             this.Clones = new List<ItProject>();
             this.ItProjectStatuses = new List<ItProjectStatus>();
+            this.Phase1 = new ItProjectPhase();
+            this.Phase2 = new ItProjectPhase();
+            this.Phase3 = new ItProjectPhase();
+            this.Phase4 = new ItProjectPhase();
+            this.Phase5 = new ItProjectPhase();
 
             // default value(s) TODO does these have an effect? Aren't they overwritten when mapped
             this.Priority = ItProjectPriority.None;
@@ -167,16 +172,16 @@ namespace Core.DomainModel.ItProject
         public string StatusNote { get; set; }
 
         // The phases of the project
-        public virtual ItProjectPhase Phase1 { get; set; }
-        public virtual ItProjectPhase Phase2 { get; set; }
-        public virtual ItProjectPhase Phase3 { get; set; }
-        public virtual ItProjectPhase Phase4 { get; set; }
-        public virtual ItProjectPhase Phase5 { get; set; }
+        public ItProjectPhase Phase1 { get; set; }
+        public ItProjectPhase Phase2 { get; set; }
+        public ItProjectPhase Phase3 { get; set; }
+        public ItProjectPhase Phase4 { get; set; }
+        public ItProjectPhase Phase5 { get; set; }
         
         /// <summary>
         /// The id of current selected phase
         /// </summary>
-        public int? CurrentPhaseId { get; set; }
+        public int CurrentPhase { get; set; }
 
         /// <summary>
         /// The "milestones and tasks" table. 
@@ -205,7 +210,7 @@ namespace Core.DomainModel.ItProject
         /// <value>
         /// The clones.
         /// </value>
-        public virtual ICollection<ItProject> Clones { get; set; }
+        public virtual ICollection<ItProject> Clones { get; set; } // TODO this isn't used anymore, we should probably remove it
 
         public virtual GoalStatus GoalStatus { get; set; }
 
