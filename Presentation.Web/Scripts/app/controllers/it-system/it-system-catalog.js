@@ -80,6 +80,7 @@
             // fires when kendo is finished rendering all its goodies
             $scope.$on("kendoRendered", function (e) {
                 loadGridOptions();
+                $scope.mainGrid.dataSource.fetch();
             });
 
             // clears grid filters by removing the localStorageItem and reloading the page
@@ -88,7 +89,7 @@
                 // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                 reload();
             }
-
+            
             function reload() {
                 $state.go('.', null, { reload: true });
             }
@@ -102,7 +103,6 @@
                 //Open modal
                 $scope.modal.center().open();
             }
-
             
             var usageDetailDataSource = new kendo.data.DataSource({
                 type: "odata-v4",
@@ -162,6 +162,7 @@
 
             // catalog grid
             $scope.itSystemCatalogueGrid = {
+                autoBind: false,
                 dataSource: itSystemCatalogDataSource,
                 toolbar: [
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
@@ -302,7 +303,7 @@
                         template: kendoTemplate.usageButtonTemplate,
                         filterable: false,
                         sortable: false
-                    },
+                    }
                 ],
                 dataBound: saveGridOptions,
                 columnResize: saveGridOptions,

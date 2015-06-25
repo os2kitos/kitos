@@ -21,7 +21,7 @@
             '$rootScope', '$scope', '$http', '$timeout', '$state', 'user', 'gridStateService',
             function ($rootScope, $scope, $http, $timeout, $state, user, gridStateService) {
                 $rootScope.page.title = 'IT System - Overblik';
-
+                
                 // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(c/User/Name),'foo' and c/RoleId eq {roleId})"
                 function fixRoleFilter(filterUrl, roleName, roleId) {
                     var pattern = new RegExp("(\\w+\\()" + roleName + "(.*?\\))", "i");
@@ -147,7 +147,6 @@
                         }
                         // resize column
                         if (state.width != columnObj.width) {
-                            // TODO
                             // manually set the width on the column option, cause changing the css doesn't
                             columnObj.width = state.width;
                             // $timeout is required here, else the jQuery select doesn't work
@@ -165,9 +164,11 @@
 
                     grid.setOptions(gridOptions);
                 }
-                
+
+                var kendoRendered = false;
                 // fires when kendo is finished rendering all its goodies
                 $scope.$on("kendoRendered", function () {
+                    kendoRendered = true;
                     loadGridOptions();
                 });
 
@@ -184,7 +185,7 @@
 
                 // overview grid options
                 $scope.mainGridOptions = {
-                    autoBind: false,
+                    autoBind: false, // do not set to true, it works because the org unit filter inits the query
                     dataSource: itSystemOverviewDataSource,
                     toolbar: [
                         { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
@@ -296,7 +297,7 @@
                         {
                             // DON'T YOU DARE RENAME!
                             field: "SystemOwner", title: "Systemejer", persistId: "sysowner",
-                            template: function(dataItem) {
+                            template: function (dataItem) {
                                 return kendoTemplate.roleTemplate(dataItem, 1);
                             },
                             width: 150,
@@ -569,24 +570,25 @@
                         parse: function(response) {
                             // add hierarchy level to each item
                             response.value = _.addHierarchyLevelOnFlatAndSort(response.value, "Id", "ParentId");
-
                             return response;
                         }
                     }
                 });
 
                 function orgUnitDropDownList(args) {
-                    // http://dojo.telerik.com/ODuDe/5
-                    args.element.removeAttr("data-bind");
-                    args.element.kendoDropDownList({
-                        dataSource: orgUnitDataSource,
-                        optionLabel: "Vælg Organisationsenhed",
-                        dataValueField: "Id",
-                        dataTextField: "Name",
-                        template: indent,
-                        dataBound: setDefaultOrgUnit,
-                        change: orgUnitChanged
-                    });
+                    if (kendoRendered) {
+                        // http://dojo.telerik.com/ODuDe/5
+                        args.element.removeAttr("data-bind");
+                        args.element.kendoDropDownList({
+                            dataSource: orgUnitDataSource,
+                            optionLabel: "Vælg Organisationsenhed",
+                            dataValueField: "Id",
+                            dataTextField: "Name",
+                            template: indent,
+                            dataBound: setDefaultOrgUnit,
+                            change: orgUnitChanged
+                        });
+                    }
                 }
 
                 function indent(dataItem) {
@@ -596,27 +598,40 @@
 
                 function setDefaultOrgUnit() {
                     var kendoElem = this;
+                    var optionLabelOffset = 1;
+
+                    // find the index of the org unit that matches the users default org unit
                     var index = _.findIndex(kendoElem.dataItems(), function (item) {
                         return item.Id == user.defaultOrganizationUnitId;
                     });
-                    kendoElem.select(index);
-                    var selectedId = _.parseInt(kendoElem.value());
-                    var childIds = kendoElem.dataItem().childIds;
-                    filterByOrgUnit(selectedId, childIds);
+                    
+                    if (index !== -1) {
+                        // select the users default org unit + the optionLabel offset
+                        kendoElem.select(index + optionLabelOffset);
+
+                        var selectedId = _.parseInt(kendoElem.value());
+                        var childIds = kendoElem.dataItem().childIds;
+                        // apply filter
+                        filterByOrgUnit(selectedId, childIds);
+                    }
                 }
 
                 function orgUnitChanged() {
                     var kendoElem = this;
                     var selectedId = _.parseInt(kendoElem.value());
                     var childIds = kendoElem.dataItem().childIds;
+                    // apply filter
                     filterByOrgUnit(selectedId, childIds);
                 }
 
                 function filterByOrgUnit(selectedId, childIds) {
                     var field = "ResponsibleUsage.OrganizationUnit.Id";
+                    var currentFilter = itSystemOverviewDataSource.filter();
+                    var newFilter;
 
-                    if (selectedId === NaN) {
+                    if (isNaN(selectedId)) {
                         // TODO remove filter(s) on this field only
+                        newFilter = _.removeFiltersForField(currentFilter, field);
                     } else {
                         var filters = [{ field: field, operator: "eq", value: selectedId }];
                         // add children to filters
@@ -624,13 +639,15 @@
                             filters.push({ field: field, operator: "eq", value: id });
                         });
 
-                        var filter = {
+                        newFilter = {
                             logic: "or",
                             filters: filters
                         };
-
-                        itSystemOverviewDataSource.filter(filter);
                     }
+                    // can't use datasource object directly,
+                    // if we do then the view doesn't update.
+                    // So have to go through $scope - sadly :(
+                    $scope.mainGrid.dataSource.filter(newFilter);
                 }
             }
         ]
