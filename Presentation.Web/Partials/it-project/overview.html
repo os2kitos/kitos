@@ -83,7 +83,7 @@
                 <span data-ng-if="p.isStrategy">(S)</span>
             </td>
             <!-- Phase -->
-            <td>{{ p.currentPhase.name }}</td>
+            <td>{{ p["phase" + p.currentPhase].name }}</td>
             <!-- Status -->
             <td class="text-center" data-ng-switch="chosenStatus">
                 <span data-square-traffic-light="p.statusProject" data-ng-switch-when="statusProject"></span>

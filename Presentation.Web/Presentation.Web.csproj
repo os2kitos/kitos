@@ -198,7 +198,6 @@
     <Compile Include="Controllers\API\ItInterfaceUseController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageOrgUnitUsageController.cs" />
     <Compile Include="Controllers\API\ItProjectStatusController.cs" />
-    <Compile Include="Controllers\API\ItProjectPhaseController.cs" />
     <Compile Include="Controllers\API\HandoverTrialController.cs" />
     <Compile Include="Controllers\API\HandoverTrialTypeController.cs" />
     <Compile Include="Controllers\API\GenericHierarchyApiController.cs" />

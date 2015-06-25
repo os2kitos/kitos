@@ -34,7 +34,7 @@ namespace Presentation.Web.Models
         public ItProjectPhaseDTO Phase3 { get; set; }
         public ItProjectPhaseDTO Phase4 { get; set; }
         public ItProjectPhaseDTO Phase5 { get; set; }
-        public int? CurrentPhaseId { get; set; }
+        public int CurrentPhase { get; set; }
 
         //7th
         public int StatusProject { get; set; }

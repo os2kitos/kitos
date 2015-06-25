@@ -13,10 +13,8 @@
                             <!-- Phases names -->
                             <div class="col-md-2 small"></div>
                             <div data-ng-repeat="phase in project.phases" class="col-md-2">
-                                <input type="text" class="input-sm form-control" data-ng-show="editPhaseNames" data-ng-model="phase.name"
-                                    data-field="name"
-                                    data-autosave="{{phase.updateUrl}}" data-ng-disabled="!hasWriteAccess" />
-
+                                <input type="text" class="input-sm form-control" data-ng-show="editPhaseNames" data-ng-model="phase.name" data-ng-blur="updatePhaseName(phase, $index + 1)"
+                                       data-ng-disabled="!hasWriteAccess">
                                 <p class="text-center full-width small" data-ng-hide="editPhaseNames">{{phase.name}}</p>
                             </div>
                         </div>
@@ -25,8 +23,8 @@
                             <!-- Phases buttons -->
                             <div class="col-md-2">Aktuel fase</div>
                             <span data-ng-repeat="phase in project.phases" class="col-md-2">
-                                <button class="btn btn-xs full-width text-center" data-ng-click="updateSelectedPhase(phase)" data-ng-disabled="!hasWriteAccess">
-                                    <i class="glyphicon glyphicon-ok text-success" data-ng-class="{'invisible': phase.id != project.currentPhaseId}"></i>
+                                <button class="btn btn-xs full-width text-center" data-ng-click="updateSelectedPhase($index + 1)" data-ng-disabled="!hasWriteAccess">
+                                    <i class="glyphicon glyphicon-ok text-success" data-ng-class="{'invisible': project.currentPhase != $index + 1}"></i>
                                 </button>
                             </span>
                         </div>
@@ -37,12 +35,12 @@
                             <span data-ng-repeat="phase in project.phases" class="col-md-2" data-ng-hide="$first">
                                 <div class="input-group input-group-sm">
                                     <input type="text" class="form-control"
-                                        data-datepicker-popup="dd-MM-yyyy"
-                                        data-is-open="opened['pd' + $index]"
-                                        data-date-to-string
-                                        data-ng-disabled="!hasWriteAccess"
-                                        data-ng-model="phase.startDate"
-                                        data-ng-change="updatePhaseDate(phase)">
+                                           data-datepicker-popup="dd-MM-yyyy"
+                                           data-is-open="opened['pd' + $index]"
+                                           data-date-to-string
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-ng-model="phase.startDate"
+                                           data-ng-change="updatePhaseDate(phase, $index + 1)">
                                     <span class="input-group-btn">
                                         <button type="button" class="btn btn-default" data-ng-click="open($event, 'pd' + $index)" data-ng-disabled="!hasWriteAccess"><i class="glyphicon glyphicon-calendar"></i></button>
                                     </span>

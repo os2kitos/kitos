@@ -85,7 +85,7 @@ namespace Presentation.Web.Models
         /// <summary>
         /// The id of current selected phase
         /// </summary>
-        public int? CurrentPhaseId { get; set; }
+        public int CurrentPhase { get; set; }
 
         #endregion
 
