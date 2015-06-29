@@ -602,29 +602,30 @@
                 }
 
                 function filterByOrgUnit(selectedId, childIds) {
+                    var dataSource = $scope.mainGrid.dataSource;
                     var field = "ResponsibleUsage.OrganizationUnit.Id";
-                    var currentFilter = itSystemOverviewDataSource.filter();
-                    var newFilter;
+                    var currentFilter = dataSource.filter();
+                    // remove old values first
+                    var newFilter = _.removeFiltersForField(currentFilter, field);
 
-                    if (isNaN(selectedId)) {
-                        // TODO remove filter(s) on this field only
-                        newFilter = _.removeFiltersForField(currentFilter, field);
-                    } else {
-                        var filters = [{ field: field, operator: "eq", value: selectedId }];
+                    console.log("current", currentFilter);
+                    console.log("removed", newFilter);
+                    
+                    // is selectedId a number?
+                    if (!isNaN(selectedId)) {
+                        newFilter = _.addFilter(newFilter, field, "eq", selectedId, "or");
                         // add children to filters
                         _.forEach(childIds, function (id) {
-                            filters.push({ field: field, operator: "eq", value: id });
+                            newFilter = _.addFilter(newFilter, field, "eq", id, "or");
                         });
-
-                        newFilter = {
-                            logic: "or",
-                            filters: filters
-                        };
                     }
+
+                    console.log("new", newFilter);
+
                     // can't use datasource object directly,
                     // if we do then the view doesn't update.
                     // So have to go through $scope - sadly :(
-                    $scope.mainGrid.dataSource.filter(newFilter);
+                    dataSource.filter(newFilter);
                 }
             }
         ]

@@ -184,72 +184,87 @@ _.mixin({
 });
 
 _.mixin({
-    removeFiltersforField: function(currentFilter, field) {
-        var clonedFilters = _.clone(currentFilter, true);
+    removeFiltersForField: function (filterObj, field) {
+        var clonedFilterObj = _.clone(filterObj, true);
 
-        if (_.isEmpty(clonedFilters)) { //if empty, nothing to remove.
-            return clonedFilters;
-        } else {
-            if (_.isArray(clonedFilters)) { //if array, just iterate through it.
-                _.forEach(clonedFilters, function(n) {
-                    var filters = n.filters;
-                    for (var i = filters.length - 1; i >= 0; i--) {
-                        if (filters[i].field == field) {
-                            filters.splice(i, 1);
-                        }
+        function searchAndDestory(filters) {
+            // iterate backwards so we don't screw the index when removing elements
+            for (var i = filters.length - 1; i >= 0; i--) {
+                var filter = filters[i];
+
+                // check if we should go deeper
+                if (filter.hasOwnProperty("field")) {
+                    // if field is present then we're at the max depth
+                    if (filter.field == field) {
+                        filters.splice(i, 1);
                     }
+                } else if (filter.hasOwnProperty("filters")) {
+                    // down the rabbit hole
+                    searchAndDestory(filter.filters, field);
 
-                });
-
-                for (var k = clonedFilters.length - 1; k >= 0; k--) { //Checking if any of the logic have no filters
-                    if (_.isEmpty(clonedFilters[k].filters)) {
-
-                        clonedFilters.splice(k, 1);
-                        if (clonedFilters.length == 1)
-                            clonedFilters = clonedFilters[0];
-                    }
-                }
-            } else { //if not array must be a single object.
-                var filters = clonedFilters.filters;
-                for (var p = filters.length - 1; p >= 0; p--) {
-                    if (filters[p].field == field) {
-                        filters.splice(p, 1);
+                    // if recursive call removed all elements in filters
+                    // then we should clean up
+                    if (filter.filters.length === 0) {
+                        filters.splice(i, 1);
                     }
                 }
-                if (_.isEmpty(filters))
-                    clonedFilters = {}
             }
         }
 
-        return clonedFilters;
+        if (filterObj) {
+            // kick off
+            searchAndDestory(clonedFilterObj.filters);
+        } else {
+            return undefined;
+        }
+
+        if (_.isEmpty(clonedFilterObj.filters)) {
+            // if all filters are removed then return empty object
+            return {};
+        }
+
+        return clonedFilterObj;
     }
 });
 
 _.mixin({
-    addFilter: function(currentFilter, field, operator, value, logic) {
-        var clonedFilters = _.clone(currentFilter, true);
+    addFilter: function(filterObj, field, operator, value, logic) {
+        var clonedFilterObj = _.clone(filterObj, true);
 
-        if (_.isEmpty(clonedFilters)) {
-            clonedFilters = { logic: logic, filters: [{ field: field, operator: operator, value: value }] }
-        } else {
-            if (_.isArray(clonedFilters)) {
-                _.forEach(clonedFilters, function(n) {
-                    if (n.logic == logic) {
-                        n.filters.push({ field: field, operator: operator, value: value });
-                    } else {
-                        clonedFilters.push({ filters: [{ field: field, operator: operator, value: value }], logic: logic })
+        function findGroupByField(filters) {
+            for (var i = 0; i < filters.length; i++) {
+                var filter = filters[i];
+
+                if (filter.hasOwnProperty("field")) {
+                    if (filter.field == field) {
+                        return filters;
                     }
-                });
-            } else {
-                if (clonedFilters.logic == logic) {
-                    clonedFilters.filters.push({ field: field, operator: operator, value: value })
+                } else if (filter.hasOwnProperty("filters")) {
+                    // down the rabbit hole
+                    return findGroupByField(filter.filters);
                 } else {
-                    var tmp = _.clone(currentFilter, true);
-                    clonedFilters = [tmp, { logic: logic, filters: [{ field: field, operator: operator, value: value }] }];
+                    throw Error("field or filters property missing, this doesn't look like a filter object!");
                 }
+            }
+            return false;
+        }
+
+        if (_.isEmpty(clonedFilterObj)) {
+            // if filter object is empty, just set the filter
+            clonedFilterObj = { logic: logic, filters: [{ field: field, operator: operator, value: value }] };
+        } else {
+            // else search for a matching filter group
+            var foundGroup = findGroupByField(clonedFilterObj.filters);
+
+            if (foundGroup) {
+                // if a match is found, then add to the existing group
+                foundGroup.push({ field: field, operator: operator, value: value });
+            } else {
+                // else create a new group
+                clonedFilterObj.filters.push({ logic: logic, filters: [{ field: field, operator: operator, value: value }] });
             }
         }
 
-        return clonedFilters;
+        return clonedFilterObj;
     }
 });
