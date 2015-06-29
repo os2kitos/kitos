@@ -184,23 +184,72 @@ _.mixin({
 });
 
 _.mixin({
-    removeFiltersForField: function (filter, field) {
-        // clone to avoid changing source
-        var clone = _.clone(filter);
+    removeFiltersforField: function(currentFilter, field) {
+        var clonedFilters = _.clone(currentFilter, true);
 
-        var isNested = !clone.filters[0].hasOwnProperty("field");
-        if (isNested) {
-            // iterrate backwards so we can remove items along the way
-            _.remove(clone.filters, function(n) {
-                return n.filters.field === field;
-            });
-            
+        if (_.isEmpty(clonedFilters)) { //if empty, nothing to remove.
+            return clonedFilters;
         } else {
-            if (clone.filters[0].field === field) {
-                clone = {};
+            if (_.isArray(clonedFilters)) { //if array, just iterate through it.
+                _.forEach(clonedFilters, function(n) {
+                    var filters = n.filters;
+                    for (var i = filters.length - 1; i >= 0; i--) {
+                        if (filters[i].field == field) {
+                            filters.splice(i, 1);
+                        }
+                    }
+
+                });
+
+                for (var k = clonedFilters.length - 1; k >= 0; k--) { //Checking if any of the logic have no filters
+                    if (_.isEmpty(clonedFilters[k].filters)) {
+
+                        clonedFilters.splice(k, 1);
+                        if (clonedFilters.length == 1)
+                            clonedFilters = clonedFilters[0];
+                    }
+                }
+            } else { //if not array must be a single object.
+                var filters = clonedFilters.filters;
+                for (var p = filters.length - 1; p >= 0; p--) {
+                    if (filters[p].field == field) {
+                        filters.splice(p, 1);
+                    }
+                }
+                if (_.isEmpty(filters))
+                    clonedFilters = {}
             }
         }
 
-        return clone;
+        return clonedFilters;
+    }
+});
+
+_.mixin({
+    addFilter: function(currentFilter, field, operator, value, logic) {
+        var clonedFilters = _.clone(currentFilter, true);
+
+        if (_.isEmpty(clonedFilters)) {
+            clonedFilters = { logic: logic, filters: [{ field: field, operator: operator, value: value }] }
+        } else {
+            if (_.isArray(clonedFilters)) {
+                _.forEach(clonedFilters, function(n) {
+                    if (n.logic == logic) {
+                        n.filters.push({ field: field, operator: operator, value: value });
+                    } else {
+                        clonedFilters.push({ filters: [{ field: field, operator: operator, value: value }], logic: logic })
+                    }
+                });
+            } else {
+                if (clonedFilters.logic == logic) {
+                    clonedFilters.filters.push({ field: field, operator: operator, value: value })
+                } else {
+                    var tmp = _.clone(currentFilter, true);
+                    clonedFilters = [tmp, { logic: logic, filters: [{ field: field, operator: operator, value: value }] }];
+                }
+            }
+        }
+
+        return clonedFilters;
     }
 });
