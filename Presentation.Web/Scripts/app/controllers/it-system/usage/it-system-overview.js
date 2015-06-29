@@ -28,84 +28,6 @@
                     return filterUrl.replace(pattern, "Rights/any(c: $1c/User/Name$2 and c/RoleId eq " + roleId + ")");
                 }
 
-                var itSystemOverviewDataSource = new kendo.data.DataSource({
-                    type: "odata-v4",
-                    transport: {
-                        read: {
-                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,CanUseInterfaces,ItInterfaceExhibits),Organization,ResponsibleUsage($expand=OrganizationUnit),Overview($expand=ItSystem),MainContract($expand=ItContract),Rights($expand=User,Role)",
-                            dataType: "json"
-                        },
-                        parameterMap: function (options, type) {
-                            // get kendo to map parameters to an odata url
-                            var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
-                            
-                            if (parameterMap.$filter) {
-                                // replaces "startswith(SystemOwner,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo' and c/RoleId eq 1)"
-                                parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "SystemOwner", 1);
-
-                                // replaces "startswith(SystemResponsible,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 2"
-                                parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "SystemResponsible", 2);
-
-                                // replaces "startswith(BusinessOwner,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 3"
-                                parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "BusinessOwner", 3);
-
-                                // replaces "startswith(SuperUserResponsible,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 4"
-                                parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "SuperUserResponsible", 4);
-
-                                // replaces "startswith(SuperUser,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 5"
-                                parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "SuperUser", 5);
-
-                                // replaces "startswith(SecurityResponsible,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 6"
-                                parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "SecurityResponsible", 6);
-
-                                // replaces "startswith(ChangeManager,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 7"
-                                parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "ChangeManager", 7);
-
-                                // replaces "startswith(DataOwner,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 8"
-                                parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "DataOwner", 8);
-
-                                // replaces "startswith(SystemAdmin,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 9"
-                                parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "SystemAdmin", 9);
-                            }
-
-                            return parameterMap;
-                        }
-                    },
-                    sort: {
-                        field: "ItSystem.Name",
-                        dir: "asc"
-                    },
-                    pageSize: 10,
-                    serverPaging: true,
-                    serverSorting: true,
-                    serverFiltering: true,
-                    schema: {
-                        model: {
-                            fields: {
-                                LastChanged: { type: "date" },
-                            }
-                        },
-                        parse: function (response) {
-                            // HACK to flattens the Rights on usage so they can be displayed as single columns
-
-                            // iterrate each usage
-                            _.forEach(response.value, function (usage) {
-                                usage.roles = [];
-                                // iterrate each right
-                                _.forEach(usage.Rights, function (right) {
-                                    // init an role array to hold users assigned to this role
-                                    if (!usage.roles[right.RoleId])
-                                        usage.roles[right.RoleId] = [];
-                                    
-                                    // push username to the role array
-                                    usage.roles[right.RoleId].push(right.User.Name + " " + right.User.LastName);
-                                });
-                            });
-                            return response;
-                        }
-                    }
-                });
-
                 var localStorageKey = "it-system-overview-options";
                 var sessionStorageKey = "it-system-overview-options";
                 var gridState = gridStateService.getService(localStorageKey, sessionStorageKey);
@@ -141,7 +63,83 @@
                 // overview grid options
                 $scope.mainGridOptions = {
                     autoBind: false, // do not set to true, it works because the org unit filter inits the query
-                    dataSource: itSystemOverviewDataSource,
+                    dataSource: {
+                        type: "odata-v4",
+                        transport: {
+                            read: {
+                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,CanUseInterfaces,ItInterfaceExhibits),Organization,ResponsibleUsage($expand=OrganizationUnit),Overview($expand=ItSystem),MainContract($expand=ItContract),Rights($expand=User,Role)",
+                                dataType: "json"
+                            },
+                            parameterMap: function (options, type) {
+                                // get kendo to map parameters to an odata url
+                                var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
+
+                                if (parameterMap.$filter) {
+                                    // replaces "startswith(SystemOwner,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo' and c/RoleId eq 1)"
+                                    parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "SystemOwner", 1);
+
+                                    // replaces "startswith(SystemResponsible,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 2"
+                                    parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "SystemResponsible", 2);
+
+                                    // replaces "startswith(BusinessOwner,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 3"
+                                    parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "BusinessOwner", 3);
+
+                                    // replaces "startswith(SuperUserResponsible,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 4"
+                                    parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "SuperUserResponsible", 4);
+
+                                    // replaces "startswith(SuperUser,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 5"
+                                    parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "SuperUser", 5);
+
+                                    // replaces "startswith(SecurityResponsible,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 6"
+                                    parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "SecurityResponsible", 6);
+
+                                    // replaces "startswith(ChangeManager,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 7"
+                                    parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "ChangeManager", 7);
+
+                                    // replaces "startswith(DataOwner,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 8"
+                                    parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "DataOwner", 8);
+
+                                    // replaces "startswith(SystemAdmin,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 9"
+                                    parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "SystemAdmin", 9);
+                                }
+
+                                return parameterMap;
+                            }
+                        },
+                        sort: {
+                            field: "ItSystem.Name",
+                            dir: "asc"
+                        },
+                        pageSize: 10,
+                        serverPaging: true,
+                        serverSorting: true,
+                        serverFiltering: true,
+                        schema: {
+                            model: {
+                                fields: {
+                                    LastChanged: { type: "date" },
+                                }
+                            },
+                            parse: function (response) {
+                                // HACK to flattens the Rights on usage so they can be displayed as single columns
+
+                                // iterrate each usage
+                                _.forEach(response.value, function (usage) {
+                                    usage.roles = [];
+                                    // iterrate each right
+                                    _.forEach(usage.Rights, function (right) {
+                                        // init an role array to hold users assigned to this role
+                                        if (!usage.roles[right.RoleId])
+                                            usage.roles[right.RoleId] = [];
+
+                                        // push username to the role array
+                                        usage.roles[right.RoleId].push(right.User.Name + " " + right.User.LastName);
+                                    });
+                                });
+                                return response;
+                            }
+                        }
+                    },
                     toolbar: [
                         { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                         {
@@ -445,29 +443,27 @@
                 // show exposureDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
                 $scope.showExposureDetails = function (usageId, systemName) {
                     // filter by usageId
-                    exhibitDetailDataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
+                    $scope.exhibitGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
                     // set title
                     $scope.exhibitModal.setOptions({ title: systemName + " udstiller følgende snitflader" });
                     // open modal
                     $scope.exhibitModal.center().open();
                 };
 
-                var exhibitDetailDataSource = new kendo.data.DataSource({
-                    type: "odata-v4",
-                    transport: {
-                        read: {
-                            url: "/odata/ItInterfaceExhibits?$expand=ItInterface",
-                            dataType: "json"
-                        }
-                    },
-                    pageSize: 10,
-                    serverPaging: true,
-                    serverSorting: true,
-                    serverFiltering: true
-                });
-
                 $scope.exhibitDetailsGrid = {
-                    dataSource: exhibitDetailDataSource,
+                    dataSource: {
+                        type: "odata-v4",
+                        transport: {
+                            read: {
+                                url: "/odata/ItInterfaceExhibits?$expand=ItInterface",
+                                dataType: "json"
+                            }
+                        },
+                        pageSize: 10,
+                        serverPaging: true,
+                        serverSorting: true,
+                        serverFiltering: true
+                    },
                     autoBind: false,
                     columns: [
                         {
@@ -494,31 +490,29 @@
                 // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
                 $scope.showUsageDetails = function(systemId, systemName) {
                     // filter by systemId
-                    usageDetailDataSource.filter({ field: "ItSystemId", operator: "eq", value: systemId });
+                    $scope.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: systemId });
                     // set modal title
                     $scope.modal.setOptions({ title: "Anvendelse af " + systemName });
                     // open modal
                     $scope.modal.center().open();
                 };
                 
-                var usageDetailDataSource = new kendo.data.DataSource({
-                    type: "odata-v4",
-                    transport:
-                    {
-                        read: {
-                            url: "/odata/ItInterfaceUses/?$expand=ItInterface",
-                            dataType: "json"
-                        },
-                    },
-                    pageSize: 10,
-                    serverPaging: true,
-                    serverSorting: true,
-                    serverFiltering: true
-                });
-
                 // usagedetails grid - shows which organizations has a given itsystem in local usage
                 $scope.usageDetailsGrid = {
-                    dataSource: usageDetailDataSource,
+                    dataSource: {
+                        type: "odata-v4",
+                        transport:
+                        {
+                            read: {
+                                url: "/odata/ItInterfaceUses/?$expand=ItInterface",
+                                dataType: "json"
+                            },
+                        },
+                        pageSize: 10,
+                        serverPaging: true,
+                        serverSorting: true,
+                        serverFiltering: true
+                    },
                     autoBind: false,
                     columns: [
                         {
@@ -542,30 +536,28 @@
                     }
                 };
 
-                var orgUnitDataSource = new kendo.data.DataSource({
-                    type: "odata-v4",
-                    transport: {
-                        read: {
-                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/OrganizationUnits",
-                            dataType: "json",
-                        }
-                    },
-                    serverFiltering: true,
-                    schema: {
-                        parse: function(response) {
-                            // add hierarchy level to each item
-                            response.value = _.addHierarchyLevelOnFlatAndSort(response.value, "Id", "ParentId");
-                            return response;
-                        }
-                    }
-                });
-
                 function orgUnitDropDownList(args) {
                     if (kendoRendered) {
                         // http://dojo.telerik.com/ODuDe/5
                         args.element.removeAttr("data-bind");
                         args.element.kendoDropDownList({
-                            dataSource: orgUnitDataSource,
+                            dataSource: {
+                                type: "odata-v4",
+                                transport: {
+                                    read: {
+                                        url: "/odata/Organizations(" + user.currentOrganizationId + ")/OrganizationUnits",
+                                        dataType: "json",
+                                    }
+                                },
+                                serverFiltering: true,
+                                schema: {
+                                    parse: function (response) {
+                                        // add hierarchy level to each item
+                                        response.value = _.addHierarchyLevelOnFlatAndSort(response.value, "Id", "ParentId");
+                                        return response;
+                                    }
+                                }
+                            },
                             optionLabel: "Vælg Organisationsenhed",
                             dataValueField: "Id",
                             dataTextField: "Name",
