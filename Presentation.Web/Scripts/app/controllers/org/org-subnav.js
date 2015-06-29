@@ -66,7 +66,12 @@
                                     lastName: $modalScope.lastName,
                                     phoneNumber: $modalScope.phoneNumber
                                 };
-                                var params = sendMail ? { sendMailOnCreation: sendMail, organizationId: user.currentOrganizationId } : null; //set params if sendMail is true
+                                
+                                var params = { organizationId: user.currentOrganizationId };
+                                // set params if sendMail is true
+                                if (sendMail) {
+                                    params.sendMailOnCreation = sendMail;
+                                }
                                 
                                 var msg = notify.addInfoMessage("Opretter bruger", false);
                                 $http.post("api/user", newUser, { handleBusy: true, params: params }).success(function (result, status) {

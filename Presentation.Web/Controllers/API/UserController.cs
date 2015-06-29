@@ -72,6 +72,12 @@ namespace Presentation.Web.Controllers.API
                     }
                 }
 
+                // check if orgId is set, if not return error as we cannot continue without it
+                if (!orgId.HasValue)
+                {
+                    return Error("Organization id is missing!");
+                }
+
                 //check if user already exists and we are not sending a reminder or advis. If so, just return him
                 var existingUser = Repository.Get(u => u.Email == dto.Email).FirstOrDefault();
                 if (existingUser != null && !sendReminder && !sendAdvis)
