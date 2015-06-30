@@ -18,6 +18,11 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasUniqueIndexAnnotation("IX_NamePerOrg", 1);
             this.Property(x => x.ItInterfaceId)
                 .HasMaxLength(100)
+                // this should really be optional but because 
+                // MySql doesn't follow the SQL standard 
+                // when it comes to unique indexs with nulls in them - we can't...
+                // http://bugs.mysql.com/bug.php?id=8173
+                // So instead we set it to an empty string :´(
                 .IsRequired()
                 .HasUniqueIndexAnnotation("IX_NamePerOrg", 2);
             
