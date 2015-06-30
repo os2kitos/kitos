@@ -107,7 +107,7 @@
                         windowClass: 'modal fade in',
                         templateUrl: 'partials/subnav/create-itinterface-modal.html',
                         controller: ['$scope', '$modalInstance', function ($scope, $modalInstance) {
-                            $scope.formData = {};
+                            $scope.formData = { itInterfaceId: "" }; // set itInterfaceId to an empty string
                             $scope.type = 'IT Snitflade';
                             $scope.checkAvailbleUrl = 'api/itInterface/';
 
