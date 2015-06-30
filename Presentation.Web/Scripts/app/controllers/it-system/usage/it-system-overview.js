@@ -607,9 +607,6 @@
                     var currentFilter = dataSource.filter();
                     // remove old values first
                     var newFilter = _.removeFiltersForField(currentFilter, field);
-
-                    console.log("current", currentFilter);
-                    console.log("removed", newFilter);
                     
                     // is selectedId a number?
                     if (!isNaN(selectedId)) {
@@ -619,9 +616,6 @@
                             newFilter = _.addFilter(newFilter, field, "eq", id, "or");
                         });
                     }
-
-                    console.log("new", newFilter);
-
                     // can't use datasource object directly,
                     // if we do then the view doesn't update.
                     // So have to go through $scope - sadly :(
