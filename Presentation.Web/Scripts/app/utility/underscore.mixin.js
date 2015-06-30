@@ -200,7 +200,7 @@ _.mixin({
                     }
                 } else if (filter.hasOwnProperty("filters")) {
                     // down the rabbit hole
-                    searchAndDestory(filter.filters, field);
+                    searchAndDestory(filter.filters);
 
                     // if recursive call removed all elements in filters
                     // then we should clean up
