@@ -213,9 +213,6 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                //if (!IsAvailable(dto.Name, dto.OrganizationId))
-                //    return Conflict("Name is already taken!");
-
                 if (!IsItInterfaceIdAndNameUnique(dto.ItInterfaceId, dto.Name, dto.OrganizationId))
                     return Conflict("ItInterface with same InterfaceId and Name is taken!");
 
