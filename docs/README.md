@@ -1,7 +1,7 @@
  How to doxygen
 =====
  The doxy.conf file have been set to only look in:
- > ../Core.ApplicationServices/ ../Core.DomainModel/ ../Core.DomainServices/ ../Infrastructure.DataAccess/ ../UI.MVC4/
+ > ../Core.ApplicationServices/ ../Core.DomainModel/ ../Core.DomainServices/ ../Infrastructure.DataAccess/ ../Infrastructure.OpenXML/ ../Presentation.Web/
  
  So if anymore are added they should be added to the config as well.
  
