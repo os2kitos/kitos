@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
@@ -14,6 +15,15 @@ namespace Presentation.Web.Controllers.API
         protected GenericHierarchyApiController(IGenericRepository<TModel> repository)
             : base(repository)
         {
+        }
+
+        protected override void DeleteQuery(int id)
+        {
+            // http://stackoverflow.com/questions/15226312/entityframewok-how-to-configure-cascade-delete-to-nullify-foreign-keys
+            // when children are loaded into memory the foreign key is correctly set to null on children when deleted
+            var entity = Repository.Get(x => x.Id == id, null, "Children").FirstOrDefault();
+            Repository.Delete(entity);
+            Repository.Save();
         }
 
         public virtual HttpResponseMessage GetRoots(bool? roots, [FromUri] PagingModel<TModel> paging)

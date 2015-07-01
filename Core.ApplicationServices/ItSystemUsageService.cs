@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Core.DomainModel;
-using Core.DomainModel.ItSystem;
+﻿using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 

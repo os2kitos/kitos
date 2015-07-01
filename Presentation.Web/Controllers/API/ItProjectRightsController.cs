@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Presentation.Web.Models;
