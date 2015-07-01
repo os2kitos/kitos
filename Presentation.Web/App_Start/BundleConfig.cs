@@ -14,8 +14,7 @@ namespace Presentation.Web
                 "~/Scripts/jquery-{version}.js",
                 "~/Scripts/select2.js",
                 "~/Scripts/moment.js",
-                "~/Scripts/bootstrap.js",
-                "~/Scripts/jsonfn.js"));
+                "~/Scripts/bootstrap.js"));
 
             // angularjs and plugins
             bundles.Add(new ScriptBundle("~/Scripts/angular").Include(

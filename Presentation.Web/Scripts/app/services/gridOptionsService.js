@@ -26,12 +26,12 @@
                     var column = options.columns[i];
                     pickedLocalOptions.columnState[column.persistId] = { index: i, width: column.width, hidden: column.hidden };
                 }
-                localStorage.setItem(localStorageKey, JSONfn.stringify(pickedLocalOptions));
+                localStorage.setItem(localStorageKey, JSON.stringify(pickedLocalOptions));
 
                 var pickedSessionOptions = {};
                 pickedSessionOptions.dataSource = _.pick(options.dataSource, ['filter', 'sort', 'page']);
 
-                sessionStorage.setItem(sessionStorageKey, JSONfn.stringify(pickedSessionOptions));
+                sessionStorage.setItem(sessionStorageKey, JSON.stringify(pickedSessionOptions));
             };
         }
 
@@ -46,13 +46,13 @@
             // load options from session storage
             var sessionOptions = sessionStorage.getItem(sessionStorageKey);
             if (sessionOptions) {
-                sessionOptions = JSONfn.parse(sessionOptions);
+                sessionOptions = JSON.parse(sessionOptions);
             }
 
             // load options from local storage
             var localOptions = localStorage.getItem(localStorageKey);
             if (localOptions) {
-                localOptions = JSONfn.parse(localOptions);
+                localOptions = JSON.parse(localOptions);
             }
             
             // merge them
