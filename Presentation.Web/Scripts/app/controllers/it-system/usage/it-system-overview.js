@@ -30,6 +30,7 @@
 
                 var localStorageKey = "it-system-overview-options";
                 var sessionStorageKey = "it-system-overview-options";
+                var orgUnitStorageKey = "it-system-overview-orgunit";
                 var gridState = gridStateService.getService(localStorageKey, sessionStorageKey);
 
                 // saves grid state to localStorage
@@ -44,6 +45,7 @@
 
                 // clears grid filters by removing the localStorageItem and reloading the page
                 $scope.clearOptions = function () {
+                    sessionStorage.removeItem(orgUnitStorageKey);
                     gridState.clearOptions(localStorageKey, sessionStorageKey);
                     // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                     reload();
@@ -577,9 +579,11 @@
                     var kendoElem = this;
                     var optionLabelOffset = 1;
 
+                    var idTofind = sessionStorage.getItem(orgUnitStorageKey) ? sessionStorage.getItem(orgUnitStorageKey) : user.defaultOrganizationUnitId;
+
                     // find the index of the org unit that matches the users default org unit
                     var index = _.findIndex(kendoElem.dataItems(), function (item) {
-                        return item.Id == user.defaultOrganizationUnitId;
+                        return item.Id == idTofind;
                     });
                     
                     if (index !== -1) {
@@ -590,6 +594,9 @@
                         var childIds = kendoElem.dataItem().childIds;
                         // apply filter
                         filterByOrgUnit(selectedId, childIds);
+                    } else {
+                        // no match found, but we still need to trigger a datasource fetch
+                        filterByOrgUnit();
                     }
                 }
 
@@ -597,6 +604,9 @@
                     var kendoElem = this;
                     var selectedId = _.parseInt(kendoElem.value());
                     var childIds = kendoElem.dataItem().childIds;
+
+                    sessionStorage.setItem(orgUnitStorageKey, selectedId);
+
                     // apply filter
                     filterByOrgUnit(selectedId, childIds);
                 }
