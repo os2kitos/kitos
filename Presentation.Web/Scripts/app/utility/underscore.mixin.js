@@ -215,7 +215,8 @@ _.mixin({
             // kick off
             searchAndDestory(clonedFilterObj.filters);
         } else {
-            return undefined;
+            // if filterObj is falsy then just return an empty object
+            return {};
         }
 
         if (_.isEmpty(clonedFilterObj.filters)) {
