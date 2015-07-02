@@ -49,6 +49,16 @@
                         name: "clearFilter",
                         text: "Nulstil",
                         template: "<a class='k-button k-button-icontext' data-ng-click='clearOptions()'>#: text #</a>"
+                    },
+                    {
+                        name: "saveFilter",
+                        text: "Gem filter",
+                        template: "<a class='k-button k-button-icontext' data-ng-click='saveGridProfile()'>#: text #</a>"
+                    },
+                    {
+                        name: "deleteFilter",
+                        text: "Slet filter",
+                        template: "<a class='k-button k-button-icontext' data-ng-click='clearGridProfile()'>#: text #</a>"
                     }
                 ],
                 excel: {
@@ -197,9 +207,8 @@
                 }
             };
 
-            var localStorageKey = "it-interface-catalog-options";
-            var sessionStorageKey = "it-interface-catalog-options";
-            var gridState = gridStateService.getService(localStorageKey, sessionStorageKey);
+            var storageKey = "it-interface-catalog-options";
+            var gridState = gridStateService.getService(storageKey);
 
             // saves grid state to localStorage
             function saveGridOptions() {
@@ -211,6 +220,14 @@
                 gridState.loadGridOptions($scope.mainGrid);
             }
 
+            $scope.saveGridProfile = function () {
+                gridState.saveGridProfile($scope.mainGrid);
+            }
+
+            $scope.clearGridProfile = function () {
+                gridState.clearGridProfile($scope.mainGrid);
+            }
+
             // fires when kendo is finished rendering all its goodies
             $scope.$on("kendoRendered", function (e) {
                 loadGridOptions();
@@ -219,7 +236,7 @@
 
             // clears grid filters by removing the localStorageItem and reloading the page
             $scope.clearOptions = function () {
-                gridState.clearOptions(localStorageKey, sessionStorageKey);
+                gridState.clearOptions();
                 // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                 reload();
             }

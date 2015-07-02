@@ -22,16 +22,15 @@
             function ($rootScope, $scope, $http, $timeout, $state, user, gridStateService) {
                 $rootScope.page.title = 'IT System - Overblik';
                 
-                // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(c/User/Name),'foo' and c/RoleId eq {roleId})"
+                // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(c/User/Name,'foo') and c/RoleId eq {roleId})"
                 function fixRoleFilter(filterUrl, roleName, roleId) {
                     var pattern = new RegExp("(\\w+\\()" + roleName + "(.*?\\))", "i");
                     return filterUrl.replace(pattern, "Rights/any(c: $1c/User/Name$2 and c/RoleId eq " + roleId + ")");
                 }
 
-                var localStorageKey = "it-system-overview-options";
-                var sessionStorageKey = "it-system-overview-options";
+                var storageKey = "it-system-overview-options";
                 var orgUnitStorageKey = "it-system-overview-orgunit";
-                var gridState = gridStateService.getService(localStorageKey, sessionStorageKey);
+                var gridState = gridStateService.getService(storageKey);
 
                 // saves grid state to localStorage
                 function saveGridOptions() {
@@ -43,10 +42,20 @@
                     gridState.loadGridOptions($scope.mainGrid);
                 }
 
+                $scope.saveGridProfile = function() {
+                    localStorage.setItem(orgUnitStorageKey + "-profile", selectedOrgUnit);
+                    gridState.saveGridProfile($scope.mainGrid);
+                }
+
+                $scope.clearGridProfile = function () {
+                    localStorage.removeItem(orgUnitStorageKey + "-profile");
+                    gridState.clearGridProfile($scope.mainGrid);
+                }
+
                 // clears grid filters by removing the localStorageItem and reloading the page
                 $scope.clearOptions = function () {
                     sessionStorage.removeItem(orgUnitStorageKey);
-                    gridState.clearOptions(localStorageKey, sessionStorageKey);
+                    gridState.clearOptions();
                     // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                     reload();
                 }
@@ -148,6 +157,16 @@
                             name: "clearFilter",
                             text: "Nulstil",
                             template: "<a class='k-button k-button-icontext' data-ng-click='clearOptions()'>#: text #</a>"
+                        },
+                        {
+                            name: "saveFilter",
+                            text: "Gem filter",
+                            template: "<a class='k-button k-button-icontext' data-ng-click='saveGridProfile()'>#: text #</a>"
+                        },
+                        {
+                            name: "deleteFilter",
+                            text: "Slet filter",
+                            template: "<a class='k-button k-button-icontext' data-ng-click='clearGridProfile()'>#: text #</a>"
                         }
                     ],
                     excel: {
@@ -179,7 +198,7 @@
                             filterable: {
                                 cell: {
                                     delay: 1500,
-                                    operator: "contains",
+                                    operator: "contains"
                                 }
                             }
                         },
@@ -579,7 +598,23 @@
                     var kendoElem = this;
                     var optionLabelOffset = 1;
 
-                    var idTofind = sessionStorage.getItem(orgUnitStorageKey) ? sessionStorage.getItem(orgUnitStorageKey) : user.defaultOrganizationUnitId;
+                    var idTofind;
+                    var savedIdSession = sessionStorage.getItem(orgUnitStorageKey);
+                    if (savedIdSession) {
+                        // if session is set use that
+                        idTofind = savedIdSession;
+                    } else {
+                        var savedIdProfile = localStorage.getItem(orgUnitStorageKey + "-profile");
+                        if (savedIdProfile) {
+                            // else if profile id is set then use that
+                            idTofind = savedIdProfile;
+                        } else {
+                            // else default to users default org unit
+                            idTofind = user.defaultOrganizationUnitId;
+                        }
+                    }
+
+                    selectedOrgUnit = idTofind;
 
                     // find the index of the org unit that matches the users default org unit
                     var index = _.findIndex(kendoElem.dataItems(), function (item) {
@@ -600,10 +635,14 @@
                     }
                 }
 
+                var selectedOrgUnit;
+
                 function orgUnitChanged() {
                     var kendoElem = this;
                     var selectedId = _.parseInt(kendoElem.value());
                     var childIds = kendoElem.dataItem().childIds;
+
+                    selectedOrgUnit = selectedId;
 
                     sessionStorage.setItem(orgUnitStorageKey, selectedId);
 
