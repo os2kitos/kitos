@@ -163,7 +163,7 @@
                     transport: function(queryParams) {
                         var url = '';
                         if ($scope.newAssociatedInterfaceRelation == 'exhibit')
-                            url = 'api/exhibit?sysId=' + $scope.newAssociatedInterfaceSelectedSystemUsage.itSystemId + '&q=' + queryParams.data.query;
+                            url = 'api/exhibit?sysId=' + $scope.newAssociatedInterfaceSelectedSystemUsage.itSystemId + '&orgId=' + user.currentOrganizationId + '&q=' + queryParams.data.query;
 
                         if ($scope.newAssociatedInterfaceRelation == 'using')
                             url = 'api/itInterfaceUse?sysId=' + $scope.newAssociatedInterfaceSelectedSystemUsage.itSystemId + '&q=' + queryParams.data.query;
