@@ -121,14 +121,14 @@ namespace Presentation.Web.Controllers.API
                 foreach (var system in dtos)
                 {
                     var obj = new ExpandoObject() as IDictionary<string, Object>;
-                    obj.Add("It Kontrakt", system.Name);
+                    obj.Add("It System", system.Name);
                     obj.Add("Public", system.AccessModifier == AccessModifier.Public ? "(P)" : "");
                     obj.Add("AppType", system.AppTypeOptionName);
                     obj.Add("BusiType", system.BusinessTypeName);
                     obj.Add("KLEID", String.Join(",", system.TaskRefs.Select(x => x.TaskKey)));
                     obj.Add("KLENavn", String.Join(",", system.TaskRefs.Select(x => x.Description)));
                     obj.Add("Rettighedshaver", system.BelongsToName);
-                    obj.Add("Oprettet", system.ObjectOwnerName);
+                    obj.Add("Oprettet", system.ObjectOwnerFullName);
                     list.Add(obj);
                 }
                 var csvList = list.ToCsv();
