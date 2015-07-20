@@ -255,7 +255,7 @@ namespace Presentation.Web.Controllers.API
                     {
                         var roleId = role.Id;
                         obj.Add(role.Name,
-                                String.Join(",", contract.Rights.Where(x => x.RoleId == roleId).Select(x => x.UserName)));
+                                String.Join(",", contract.Rights.Where(x => x.RoleId == roleId).Select(x => x.User.FullName)));
                     }
                     obj.Add("Leverandor", contract.SupplierName);
                     obj.Add("Anskaffelse", contract.AcquisitionSum);

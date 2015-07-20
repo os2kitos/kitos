@@ -206,7 +206,7 @@ namespace Presentation.Web.Controllers.API
                     {
                         var roleId = role.Id;
                         obj.Add(role.Name,
-                                String.Join(",", project.Rights.Where(x => x.RoleId == roleId).Select(x => x.UserName)));
+                                String.Join(",", project.Rights.Where(x => x.RoleId == roleId).Select(x => x.User.FullName)));
                     }
                     obj.Add("ID", project.ItProjectId);
                     obj.Add("Type", project.ItProjectTypeName);

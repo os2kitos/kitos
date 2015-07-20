@@ -239,7 +239,7 @@ namespace Presentation.Web.Controllers.API
                     obj.Add("Email", user.Email);
                     obj.Add("Organisationsenhed", user.DefaultOrganizationUnitName);
                     obj.Add("Advis", user.LastAdvisDate.HasValue ? user.LastAdvisDate.Value.ToString("dd-MM-yy") : "Ikke sendt");
-                    obj.Add("Oprettet", user.ObjectOwnerName);
+                    obj.Add("Oprettet", user.ObjectOwnerName + " " + user.ObjectOwnerLastName);
                     obj.Add("OrgRoller", GetOrgRights(orgId, user.Id));
                     obj.Add("ITProjektRoller", GetProjectRights(user.Id));
                     obj.Add("ITSystemRoller", GetSystemRights(user.Id));
