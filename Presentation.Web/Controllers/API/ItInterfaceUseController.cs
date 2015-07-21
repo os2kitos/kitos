@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using AutoMapper;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Presentation.Web.Models;
@@ -21,11 +22,11 @@ namespace Presentation.Web.Controllers.API
             _repository = repository;
         }
 
-        public HttpResponseMessage GetInterfaceBySystem(int sysId, bool? interfaces)
+        public HttpResponseMessage GetInterfaceBySystem(int sysId, int orgId, bool? interfaces)
         {
             try
             {
-                var items = _repository.Get(x => x.ItSystemId == sysId);
+                var items = _repository.Get(x => x.ItSystemId == sysId && x.ItInterface.OrganizationId == orgId || x.ItInterface.AccessModifier == AccessModifier.Public);
                 var intfs = items.Select(x => x.ItInterface);
                 var dtos = Mapper.Map<IEnumerable<ItInterfaceDTO>>(intfs);
 
@@ -37,11 +38,11 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetBySystem(int sysId, string q)
+        public HttpResponseMessage GetBySystem(int sysId, int orgId, string q)
         {
             try
             {
-                var items = _repository.Get(x => x.ItSystemId == sysId && x.ItInterface.Name.Contains(q));
+                var items = _repository.Get(x => x.ItSystemId == sysId && x.ItInterface.OrganizationId == orgId && x.ItInterface.Name.Contains(q));
                 var dtos = Map<IEnumerable<ItInterfaceUse>, IEnumerable<ItInterfaceUseDTO>>(items);
                 return Ok(dtos);
             }

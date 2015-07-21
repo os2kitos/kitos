@@ -48,8 +48,8 @@
                     }
                 ],
                 canUseInterfaces: [
-                    '$http', 'itSystemUsage', function($http, itSystemUsage) {
-                        return $http.get('api/itInterfaceUse/?interfaces&sysid=' + itSystemUsage.itSystem.id).then(function(result) {
+                    '$http', 'itSystemUsage', 'user', function ($http, itSystemUsage, user) {
+                        return $http.get('api/itInterfaceUse/?interfaces&sysId=' + itSystemUsage.itSystem.id + '&orgId=' + user.currentOrganizationId).then(function (result) {
                             var interfaces = result.data.response;
                             return interfaces;
                         });
@@ -57,7 +57,7 @@
                 ],
                 exhibits: [
                     '$http', 'itSystemUsage', 'user', function ($http, itSystemUsage, user) {
-                        return $http.get('api/exhibit/?interfaces&sysid=' + itSystemUsage.itSystem.id + '&orgId=' + user.currentOrganizationId).then(function(result) {
+                        return $http.get('api/exhibit/?interfaces&sysId=' + itSystemUsage.itSystem.id + '&orgId=' + user.currentOrganizationId).then(function(result) {
                             var interfaces = result.data.response;
                             _.each(interfaces, function(data) {
                                 $http.get('api/itInterfaceExhibitUsage/?usageId=' + itSystemUsage.id + '&exhibitId=' + data.exhibitedById).success(function(usageResult) {

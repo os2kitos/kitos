@@ -166,7 +166,7 @@
                             url = 'api/exhibit?sysId=' + $scope.newAssociatedInterfaceSelectedSystemUsage.itSystemId + '&orgId=' + user.currentOrganizationId + '&q=' + queryParams.data.query;
 
                         if ($scope.newAssociatedInterfaceRelation == 'using')
-                            url = 'api/itInterfaceUse?sysId=' + $scope.newAssociatedInterfaceSelectedSystemUsage.itSystemId + '&q=' + queryParams.data.query;
+                            url = 'api/itInterfaceUse?sysId=' + $scope.newAssociatedInterfaceSelectedSystemUsage.itSystemId + '&orgId=' + user.currentOrganizationId + '&q=' + queryParams.data.query;
 
                         var res = $http.get(url).then(queryParams.success);
                         res.abort = function() {
