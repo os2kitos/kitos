@@ -33,24 +33,33 @@
                             <option value=""></option>
                             <option data-ng-repeat="projectType in projectTypes" value="{{projectType.id}}">{{projectType.name}}</option>
                         </select>
+                        <span class="help-block small">&nbsp;</span>
                     </div>
 
                     <!-- cmdb ref -->
                     <div class="form-group">
                         <label for="project-cmdb" class="control-label small">CMDB ref.</label>
-                        <input id="project-cmdb" class="form-control input-sm" type="text" data-ng-model="project.cmdb"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-field="cmdb"
-                               data-autosave="api/itproject/{{project.id}}">
+                        <div class="input-group">
+                            <input id="project-cmdb" class="form-control input-sm" type="text" placeholder="http://" data-ng-model="project.cmdb"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-field="cmdb"
+                                   data-autosave="api/itproject/{{project.id}}">
+                            <span class="input-group-btn">
+                                <button class="btn btn-sm btn-default" type="button">
+                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true" data-href-blank="project.cmdb"></span>
+                                </button>
+                            </span>
+                        </div>
+                        <span class="help-block small">Skal starte med http://</span>
                     </div>
                 </div>
-            
+
                 <!-- 2nd column -->
                 <div class="col-md-6">
                     <!-- Object owner -->
                     <div class="form-group">
                         <label class="control-label small">Oprettet af</label>
-                        <input type="text" value="{{project.objectOwnerFullName}}" class="form-control input-sm" disabled="true" />
+                        <input type="text" value="{{project.objectOwnerFullName}}" class="form-control input-sm" disabled="disabled">
                     </div>
                     <!-- access modifier -->
                     <div class="form-group">
@@ -63,22 +72,38 @@
                     <!-- esdh ref -->
                     <div class="form-group">
                         <label for="project-esdh" class="control-label small">ESDH ref.</label>
-                        <input id="project-esdh" class="form-control input-sm" type="text" data-ng-model="project.esdh"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-field="esdh"
-                               data-autosave="api/itproject/{{project.id}}">
+                        <div class="input-group">
+                            <input id="project-esdh" class="form-control input-sm" type="text" placeholder="http://"  data-ng-model="project.esdh"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-field="esdh"
+                                   data-autosave="api/itproject/{{project.id}}">
+                            <span class="input-group-btn">
+                                <button class="btn btn-sm btn-default" type="button">
+                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true" data-href-blank="project.esdh"></span>
+                                </button>
+                            </span>
+                        </div>
+                        <span class="help-block small">Skal starte med http://</span>
                     </div>
 
                     <!-- link ref -->
                     <div class="form-group">
                         <label for="project-url" class="control-label small">Mappe link</label>
-                        <input id="project-url" class="form-control input-sm" type="text" data-ng-model="project.folder"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-field="folder"
-                               data-autosave="api/itproject/{{project.id}}">
+                        <div class="input-group">
+                            <input id="project-url" class="form-control input-sm" type="text" placeholder="http://" data-ng-model="project.folder"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-field="folder"
+                                   data-autosave="api/itproject/{{project.id}}">
+                            <span class="input-group-btn">
+                                <button class="btn btn-sm btn-default" type="button">
+                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true" data-href-blank="project.folder"></span>
+                                </button>
+                            </span>
+                        </div>
+                        <span class="help-block small">Skal starte med http://</span>
                     </div>
                 </div>
-            
+
                 <!-- full width (left side) -->
                 <div class="col-md-12">
                     <!-- archived -->
@@ -96,14 +121,14 @@
                             Tværgående
                         </label>
                     </div>
-                    
+
                     <!-- strategy -->
                     <div class="checkbox-inline">
                         <label>
-                            <input type="checkbox" 
-                                   data-ng-model="project.isStrategy" 
-                                   data-autosave="{{ autosaveUrl }}" 
-                                   data-field="isStrategy" 
+                            <input type="checkbox"
+                                   data-ng-model="project.isStrategy"
+                                   data-autosave="{{ autosaveUrl }}"
+                                   data-field="isStrategy"
                                    data-ng-disabled="!hasWriteAccess">
                             Strategisk
                         </label>
@@ -122,7 +147,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Right side -->
         <div class="col-md-6">
             <div class="row">
@@ -133,23 +158,21 @@
                         <label for="project-background" class="control-label small">Formål/baggrund</label>
                         <textarea id="project-background" class="form-control input-sm" rows="7"
                                   data-ng-model="project.background"
-                                  data-field="background" 
+                                  data-field="background"
                                   data-autosave="{{autosaveUrl}}"
-                                  data-ng-disabled="!hasWriteAccess">
-                    </textarea>
+                                  data-ng-disabled="!hasWriteAccess"></textarea>
                     </div>
                 </div>
-            
+
                 <div class="col-md-12">
                     <!-- notes -->
                     <div class="form-group">
                         <label for="project-note" class="control-label small">Noter</label>
-                        <textarea id="project-note" class="form-control input-sm" rows="7" 
+                        <textarea id="project-note" class="form-control input-sm" rows="7"
                                   data-ng-model="project.note"
-                                  data-field="note" 
+                                  data-field="note"
                                   data-autosave="{{autosaveUrl}}"
-                                  data-ng-disabled="!hasWriteAccess">
-                    </textarea>
+                                  data-ng-disabled="!hasWriteAccess"></textarea>
                     </div>
                 </div>
             </div>
