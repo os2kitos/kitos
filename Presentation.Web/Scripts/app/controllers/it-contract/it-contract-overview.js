@@ -23,7 +23,7 @@
                 $scope.pagination = {
                     search: '',
                     skip: 0,
-                    take: 1000
+                    take: 20
                 };
 
                 $scope.csvUrl = 'api/itcontract?csv&organizationId=' + user.currentOrganizationId;
