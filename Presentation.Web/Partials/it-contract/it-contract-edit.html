@@ -55,11 +55,19 @@
                     <!-- ESDH -->
                     <div class="form-group">
                         <label for="contract-esdh" class="control-label small">ESDH ref.</label>
-                        <input type="text" id="contract-esdh" class="form-control input-sm" 
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="contract.esdh" 
-                               data-autosave="{{ autoSaveUrl }}" 
-                               data-field="esdh">
+                        <div class="input-group">
+                            <input type="text" id="contract-esdh" class="form-control input-sm"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="contract.esdh"
+                                   data-autosave="{{ autoSaveUrl }}"
+                                   data-field="esdh">
+                            <span class="input-group-btn">
+                                <button class="btn btn-sm btn-default" type="button" data-href-blank="contract.esdh">
+                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                </button>
+                            </span>
+                        </div>
+                        <span class="help-block small">Skal starte med http://</span>
                     </div>
                 </div>
 
@@ -137,11 +145,19 @@
                     <!-- Folder -->
                     <div class="form-group">
                         <label for="contract-folder" class="control-label small">Mappe</label>
-                        <input type="text" id="contract-folder" class="form-control input-sm"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="contract.folder"
-                               data-autosave="{{ autoSaveUrl }}"
-                               data-field="folder">
+                        <div class="input-group">
+                            <input type="text" id="contract-folder" class="form-control input-sm"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="contract.folder"
+                                   data-autosave="{{ autoSaveUrl }}"
+                                   data-field="folder">
+                            <span class="input-group-btn">
+                                <button class="btn btn-sm btn-default" type="button" data-href-blank="contract.folder">
+                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                </button>
+                            </span>
+                        </div>
+                        <span class="help-block small">Skal starte med http://</span>
                     </div>
 
                     <!-- Note -->

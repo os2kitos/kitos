@@ -373,8 +373,6 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
-    <Content Include="Content\bootstrap\bootstrap.css" />
-    <Content Include="Content\bootstrap\bootstrap.min.css" />
     <Content Include="Content\css\select2-spinner.gif" />
     <Content Include="Content\css\select2.css" />
     <Content Include="Content\css\select2.png" />
@@ -812,6 +810,8 @@
     <Content Include="Scripts\angular-scenario.js" />
     <Content Include="Scripts\angular-touch.js" />
     <Content Include="Scripts\angular-touch.min.js" />
+    <Content Include="Scripts\angular-ui-router.js" />
+    <Content Include="Scripts\angular-ui-router.min.js" />
     <Content Include="Scripts\angular-ui-util\ui-utils.js" />
     <Content Include="Scripts\angular-ui-util\ui-utils.min.js" />
     <Content Include="Scripts\angular-ui\ui-bootstrap-tpls.js" />
@@ -820,8 +820,6 @@
     <Content Include="Scripts\angular-ui\ui-bootstrap.min.js" />
     <Content Include="Scripts\angular.js" />
     <Content Include="Scripts\angular.min.js" />
-    <Content Include="Scripts\AngularUI\ui-router.js" />
-    <Content Include="Scripts\AngularUI\ui-router.min.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-admin-global-admins.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-admin-local-admins.js" />
     <Content Include="Scripts\app\controllers\global-admin\global-admin-organization-edit.js" />
@@ -909,7 +907,6 @@
     <Content Include="Scripts\app\services\httpServices.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="Scripts\bootstrap3-wysihtml5.js" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff" />
@@ -2473,8 +2470,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Content\themes\base\images\" />
-    <Folder Include="Content\themes\base\minified\images\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">

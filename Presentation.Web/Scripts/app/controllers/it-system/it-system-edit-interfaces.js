@@ -6,8 +6,8 @@
                 controller: 'system.SystemInterfacesCtrl',
                 resolve: {
                     interfaces: [
-                        '$http', 'itSystem', function($http, itSystem) {
-                            return $http.get('api/itInterfaceUse/?interfaces&sysId=' + itSystem.id).then(function(result) {
+                        '$http', 'itSystem', 'user', function ($http, itSystem, user) {
+                            return $http.get('api/itInterfaceUse/?interfaces&sysId=' + itSystem.id + '&orgId=' + user.currentOrganizationId).then(function(result) {
                                 return result.data.response;
                             });
                         }
