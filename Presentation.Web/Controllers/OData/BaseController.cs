@@ -7,12 +7,12 @@ using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class BaseController<T> : ODataController where T : class
+    public abstract class BaseController<T> : ODataController where T : class
     {
         protected ODataValidationSettings ValidationSettings;
         protected IGenericRepository<T> Repository;
 
-        public BaseController(IGenericRepository<T> repository)
+        protected BaseController(IGenericRepository<T> repository)
         {
             ValidationSettings = new ODataValidationSettings {AllowedQueryOptions = AllowedQueryOptions.All};
             Repository = repository;
