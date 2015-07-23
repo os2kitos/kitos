@@ -22,8 +22,7 @@ namespace Presentation.Web
                 "~/Scripts/i18n/angular-locale_da-dk.js",
                 "~/Scripts/angular-animate.js",
                 "~/Scripts/angular-sanitize.js",
-                "~/Scripts/angular-route.js",
-                "~/Scripts/AngularUI/ui-router.js",
+                "~/Scripts/angular-ui-router.js",
                 "~/Scripts/angular-ui/ui-bootstrap.js",
                 "~/Scripts/angular-ui/ui-bootstrap-tpls.js",
                 "~/Scripts/ui-select2.js",
@@ -36,7 +35,7 @@ namespace Presentation.Web
 
             // css
             bundles.Add(new StyleBundle("~/Content/cssbundle").Include(
-                "~/Content/bootstrap/bootstrap.css",
+                "~/Content/bootstrap.css",
                 "~/Content/notify/notify.css",
                 "~/Content/select2.css",
                 "~/Content/select2-bootstrap.css",
