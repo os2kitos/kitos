@@ -571,10 +571,6 @@ tr.super-sum {
     margin-right: 0;
 }
 
-body, .btn {
-    font-size: 13px !important;
-}
-
 .btn-order-by {
     text-align: left;
     color: inherit;
@@ -681,4 +677,17 @@ div.searchbox-wrapper {
 {
     padding: 0;
     width: 100%;
+}
+
+/* fixes hover color on nav buttons */
+.nav > li > a.btn-success:hover,
+.nav > li > a.btn-success:focus {
+  text-decoration: none;
+  background-color: #449d44;
+}
+
+.nav > li > a.btn-danger:hover,
+.nav > li > a.btn-danger:focus {
+  text-decoration: none;
+  background-color: #c9302c;
 }
