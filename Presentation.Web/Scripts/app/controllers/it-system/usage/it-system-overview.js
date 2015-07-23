@@ -29,7 +29,6 @@
                 }
 
                 var storageKey = "it-system-overview-options";
-                var orgUnitStorageKey = "it-system-overview-orgunit";
                 var gridState = gridStateService.getService(storageKey);
 
                 // saves grid state to localStorage
@@ -43,18 +42,15 @@
                 }
 
                 $scope.saveGridProfile = function() {
-                    localStorage.setItem(orgUnitStorageKey + "-profile", selectedOrgUnit);
                     gridState.saveGridProfile($scope.mainGrid);
                 }
 
                 $scope.clearGridProfile = function () {
-                    localStorage.removeItem(orgUnitStorageKey + "-profile");
                     gridState.clearGridProfile($scope.mainGrid);
                 }
 
                 // clears grid filters by removing the localStorageItem and reloading the page
                 $scope.clearOptions = function () {
-                    sessionStorage.removeItem(orgUnitStorageKey);
                     gridState.clearOptions();
                     // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                     reload();
@@ -558,6 +554,9 @@
                 };
 
                 function orgUnitDropDownList(args) {
+                    // check if the kendoRendered event has been called
+                    // because this function is apparently called multiple 
+                    // times before the grid is actually ready
                     if (kendoRendered) {
                         // http://dojo.telerik.com/ODuDe/5
                         args.element.removeAttr("data-bind");
@@ -579,7 +578,6 @@
                                     }
                                 }
                             },
-                            optionLabel: "Vælg Organisationsenhed",
                             dataValueField: "Id",
                             dataTextField: "Name",
                             template: indent,
@@ -596,55 +594,33 @@
 
                 function setDefaultOrgUnit() {
                     var kendoElem = this;
-                    var optionLabelOffset = 1;
-
-                    var idTofind;
-                    var savedIdSession = sessionStorage.getItem(orgUnitStorageKey);
-                    if (savedIdSession) {
-                        // if session is set use that
-                        idTofind = savedIdSession;
-                    } else {
-                        var savedIdProfile = localStorage.getItem(orgUnitStorageKey + "-profile");
-                        if (savedIdProfile) {
-                            // else if profile id is set then use that
-                            idTofind = savedIdProfile;
-                        } else {
-                            // else default to users default org unit
-                            idTofind = user.defaultOrganizationUnitId;
-                        }
-                    }
-
-                    selectedOrgUnit = idTofind;
-
+                    var idTofind = user.defaultOrganizationUnitId;
+                    
                     // find the index of the org unit that matches the users default org unit
                     var index = _.findIndex(kendoElem.dataItems(), function (item) {
                         return item.Id == idTofind;
                     });
                     
-                    if (index !== -1) {
-                        // select the users default org unit + the optionLabel offset
-                        kendoElem.select(index + optionLabelOffset);
+                    // -1 = no match
+                    //  0 = root org unit, which should display all. So remove org unit filter
+                    if (index > 0) {
+                        // select the users default org unit
+                        kendoElem.select(index);
 
                         var selectedId = _.parseInt(kendoElem.value());
                         var childIds = kendoElem.dataItem().childIds;
                         // apply filter
                         filterByOrgUnit(selectedId, childIds);
                     } else {
-                        // no match found, but we still need to trigger a datasource fetch
+                        // clear org unit filter
                         filterByOrgUnit();
                     }
                 }
-
-                var selectedOrgUnit;
 
                 function orgUnitChanged() {
                     var kendoElem = this;
                     var selectedId = _.parseInt(kendoElem.value());
                     var childIds = kendoElem.dataItem().childIds;
-
-                    selectedOrgUnit = selectedId;
-
-                    sessionStorage.setItem(orgUnitStorageKey, selectedId);
 
                     // apply filter
                     filterByOrgUnit(selectedId, childIds);
