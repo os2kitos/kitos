@@ -35,7 +35,7 @@ namespace Presentation.Web
 
             // css
             bundles.Add(new StyleBundle("~/Content/cssbundle").Include(
-                "~/Content/bootstrap/bootstrap.css",
+                "~/Content/bootstrap.css",
                 "~/Content/notify/notify.css",
                 "~/Content/select2.css",
                 "~/Content/select2-bootstrap.css",
