@@ -269,3 +269,30 @@ _.mixin({
         return clonedFilterObj;
     }
 });
+
+_.mixin({
+    findKeyDeep: function self(obj, keyObj) {
+        var p, key, val, tRet;
+        for (p in keyObj) {
+            if (keyObj.hasOwnProperty(p)) {
+                key = p;
+                val = keyObj[p];
+            }
+        }
+
+        for (p in obj) {
+            if (p == key) {
+                if (obj[p] == val) {
+                    return obj;
+                }
+            } else if (obj[p] instanceof Object) {
+                if (obj.hasOwnProperty(p)) {
+                    tRet = self(obj[p], keyObj);
+                    if (tRet) { return tRet; }
+                }
+            }
+        }
+
+        return false;
+    }
+});
