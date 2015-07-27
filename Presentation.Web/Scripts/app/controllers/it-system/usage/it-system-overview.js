@@ -241,8 +241,13 @@
                         {
                             field: "MainContract", title: "Kontrakt", width: 80, persistId: "contract",
                             template: contractTemplate,
-                            filterable: false,
-                            sortable: false
+                            sortable: false,
+                            filterable: {
+                                cell: {
+                                    showOperators: false,
+                                    template: contractFilterDropDownList
+                                }
+                            },
                         },
                         {
                             field: "ItSystem.CanUseInterfaces", title: "Anvender", width: 95, persistId: "canuse",
@@ -645,6 +650,55 @@
                     // if we do then the view doesn't update.
                     // So have to go through $scope - sadly :(
                     dataSource.filter(newFilter);
+                }
+
+                function contractFilterDropDownList(args) {
+                    // check if the kendoRendered event has been called
+                    // because this function is apparently called multiple 
+                    // times before the grid is actually ready
+                    if (kendoRendered) {
+                        // http://dojo.telerik.com/ODuDe/5
+                        args.element.removeAttr("data-bind");
+                        args.element.kendoDropDownList({
+                            dataSource: ["Har kontrakt", "Ingen kontrakt"],
+                            optionLabel: "Vælg filter...",
+                            dataBound: setContractFilter,
+                            change: filterByContract
+                        });
+                    }
+                }
+
+                function filterByContract() {
+                    var kendoElem = this;
+                    var selectedValue = kendoElem.value();
+                    var dataSource = $scope.mainGrid.dataSource;
+                    var field = "MainContract";
+                    var currentFilter = dataSource.filter();
+                    // remove old value first
+                    var newFilter = _.removeFiltersForField(currentFilter, field);
+
+                    if (selectedValue == "Har kontrakt") {
+                        newFilter = _.addFilter(newFilter, field, "ne", null, "or");
+                    } else if (selectedValue == "Ingen kontrakt") {
+                        newFilter = _.addFilter(newFilter, field, "eq", null, "or");
+                    }
+                    // can't use datasource object directly,
+                    // if we do then the view doesn't update.
+                    // So have to go through $scope - sadly :(
+                    dataSource.filter(newFilter);
+                }
+
+                function setContractFilter() {
+                    var kendoElem = this;
+                    var dataSource = $scope.mainGrid.dataSource;
+                    var currentFilter = dataSource.filter();
+                    var contractFilterObj = _.findKeyDeep(currentFilter, { field: "MainContract" });
+                    
+                    if (contractFilterObj.operator == "neq") {
+                        kendoElem.select(1); // index of "Har kontrakt"
+                    } else if (contractFilterObj.operator == "eq") {
+                        kendoElem.select(2); // index of "Ingen kontrakt"
+                    }
                 }
             }
         ]
