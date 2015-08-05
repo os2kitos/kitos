@@ -26,7 +26,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var items = _repository.Get(x => x.ItSystemId == sysId && x.ItInterface.OrganizationId == orgId || x.ItInterface.AccessModifier == AccessModifier.Public);
+                var items = _repository.Get(x => x.ItSystemId == sysId && (x.ItInterface.OrganizationId == orgId || x.ItInterface.AccessModifier == AccessModifier.Public));
                 var intfs = items.Select(x => x.ItInterface);
                 var dtos = Mapper.Map<IEnumerable<ItInterfaceDTO>>(intfs);
 
@@ -42,7 +42,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var items = _repository.Get(x => x.ItSystemId == sysId && x.ItInterface.OrganizationId == orgId && x.ItInterface.Name.Contains(q));
+                var items = _repository.Get(x => x.ItSystemId == sysId && (x.ItInterface.OrganizationId == orgId || x.ItInterface.AccessModifier == AccessModifier.Public) && x.ItInterface.Name.Contains(q));
                 var dtos = Map<IEnumerable<ItInterfaceUse>, IEnumerable<ItInterfaceUseDTO>>(items);
                 return Ok(dtos);
             }
