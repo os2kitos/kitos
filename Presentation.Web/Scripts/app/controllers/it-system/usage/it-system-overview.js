@@ -611,24 +611,30 @@
                     if (index > 0) {
                         // select the users default org unit
                         kendoElem.select(index);
-
+                        
                         var selectedId = _.parseInt(kendoElem.value());
                         var childIds = kendoElem.dataItem().childIds;
-                        // apply filter
+                        // filter by selected
                         filterByOrgUnit(selectedId, childIds);
                     } else {
-                        // clear org unit filter
+                        // else clear filter because the 0th element should act like a placeholder
                         filterByOrgUnit();
                     }
                 }
 
                 function orgUnitChanged() {
                     var kendoElem = this;
+                    var selectedIndex = kendoElem.select();
                     var selectedId = _.parseInt(kendoElem.value());
                     var childIds = kendoElem.dataItem().childIds;
 
-                    // apply filter
-                    filterByOrgUnit(selectedId, childIds);
+                    if (selectedIndex > 0) {
+                        // filter by selected
+                        filterByOrgUnit(selectedId, childIds);
+                    } else {
+                        // else clear filter because the 0th element should act like a placeholder
+                        filterByOrgUnit();
+                    }
                 }
 
                 function filterByOrgUnit(selectedId, childIds) {
