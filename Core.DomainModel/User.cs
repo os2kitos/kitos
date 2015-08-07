@@ -81,11 +81,12 @@ namespace Core.DomainModel
         /// </summary>
         public virtual ICollection<ItContract.ItContract> SignerForContracts { get; set; }
 
-        public override bool HasUserWriteAccess(User user, int organizationId)
+        public override bool HasUserWriteAccess(User user)
         {
-            if (user.Id == this.Id) return true;
+            if (Id == user.Id) 
+                return true;
 
-            return base.HasUserWriteAccess(user, organizationId);
+            return base.HasUserWriteAccess(user);
         }
     }
 }

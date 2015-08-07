@@ -8,7 +8,7 @@ namespace Core.DomainModel
     /// <summary>
     /// Represents a unit or department within an organization (OIO term: "OrgEnhed").
     /// </summary>
-    public class OrganizationUnit : HasRightsEntity<OrganizationUnit, OrganizationRight, OrganizationRole>, IHierarchy<OrganizationUnit>
+    public class OrganizationUnit : HasRightsEntity<OrganizationUnit, OrganizationRight, OrganizationRole>, IHierarchy<OrganizationUnit>, IContextAware
     {
         public OrganizationUnit()
         {
@@ -94,19 +94,32 @@ namespace Core.DomainModel
         /// </summary>
         public virtual ICollection<EconomyStream> EconomyStreams { get; set; }
 
-        public override bool HasUserWriteAccess(User user, int organizationId)
+        /// <summary>
+        /// Determines whether a user has write access to this instance.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        /// <returns>
+        ///   <c>true</c> if user has write access, otherwise <c>false</c>.
+        /// </returns>
+        public override bool HasUserWriteAccess(User user)
         {
-            //if user has write access to the organisation, 
-            //user has write access to the org unit
-            if (Organization.HasUserWriteAccess(user, organizationId)) return true;
+            // check rights on parent org unit
+            if (Parent != null && Parent.HasUserWriteAccess(user)) 
+                return true;
 
-            //Check rights on this org unit
-            if (base.HasUserWriteAccess(user, organizationId)) return true;
+            return base.HasUserWriteAccess(user);
+        }
 
-            //Check rights on parent org unit
-            if (Parent != null && Parent.HasUserWriteAccess(user, organizationId)) return true;
-
-            return false;
+        /// <summary>
+        /// Determines whether this instance is within a given organizational context.
+        /// </summary>
+        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
+        /// <returns>
+        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
+        /// </returns>
+        public bool IsInContext(int organizationId)
+        {
+            return OrganizationId == organizationId;
         }
     }
 }

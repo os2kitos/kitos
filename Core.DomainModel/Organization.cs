@@ -16,7 +16,7 @@ namespace Core.DomainModel
     /// Holds local configuration and admin roles, as well as collections of
     /// ItSystems, ItProjects, etc that was created in this organization.
     /// </summary>
-    public class Organization : HasRightsEntity<Organization, AdminRight, AdminRole>, IHasAccessModifier
+    public class Organization : HasRightsEntity<Organization, AdminRight, AdminRole>, IHasAccessModifier, IContextAware
     {
         public Organization()
         {
@@ -80,12 +80,16 @@ namespace Core.DomainModel
             return OrgUnits.FirstOrDefault(u => u.Parent == null);
         }
 
-        public override bool HasUserWriteAccess(User user, int organizationId)
+        /// <summary>
+        /// Determines whether this instance is within a given organizational context.
+        /// </summary>
+        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
+        /// <returns>
+        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
+        /// </returns>
+        public bool IsInContext(int organizationId)
         {
-            // check that object belongs to the requwested organization context
-            if (Id != organizationId && !user.IsGlobalAdmin)
-                return false;
-            return base.HasUserWriteAccess(user, organizationId);
+            return Id == organizationId;
         }
     }
 }
