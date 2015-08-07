@@ -6,7 +6,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class WishController : GenericApiController<Wish, WishDTO>
+    public class WishController : GenericContextAwareApiController<Wish, WishDTO>
     {
         public WishController(IGenericRepository<Wish> repository) 
             : base(repository)

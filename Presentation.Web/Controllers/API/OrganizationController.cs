@@ -9,7 +9,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class OrganizationController : GenericApiController<Organization, OrganizationDTO>
+    public class OrganizationController : GenericContextAwareApiController<Organization, OrganizationDTO>
     {
         private readonly IOrganizationService _organizationService;
         private readonly IGenericRepository<User> _useRepository;

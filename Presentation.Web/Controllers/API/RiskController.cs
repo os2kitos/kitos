@@ -6,7 +6,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class RiskController : GenericApiController<Risk, RiskDTO>
+    public class RiskController : GenericContextAwareApiController<Risk, RiskDTO>
     {
         public RiskController(IGenericRepository<Risk> repository) : base(repository)
         {

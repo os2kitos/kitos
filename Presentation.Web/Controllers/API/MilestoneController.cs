@@ -4,7 +4,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class MilestoneController : GenericApiController<Milestone, MilestoneDTO>
+    public class MilestoneController : GenericContextAwareApiController<Milestone, MilestoneDTO>
     {
         public MilestoneController(IGenericRepository<Milestone> repository) 
             : base(repository)
