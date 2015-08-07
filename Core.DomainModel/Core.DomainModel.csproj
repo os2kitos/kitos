@@ -62,6 +62,7 @@
     <Compile Include="Assignment.cs" />
     <Compile Include="AdminRight.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="IContextAware.cs" />
     <Compile Include="IHasAccessModifier.cs" />
     <Compile Include="IHierarchy.cs" />
     <Compile Include="ItContract\HandoverTrial.cs" />
