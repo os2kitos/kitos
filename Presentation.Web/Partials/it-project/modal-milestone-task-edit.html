@@ -32,7 +32,7 @@
                 <select id="phase" class="form-control input-sm"
                         data-ng-disabled="!hasWriteAccess"
                         data-ng-model="activity.associatedPhaseNum"
-                        data-ng-options="phase.name for phase in phases track by phases.indexOf(phase) + 1">
+                        data-ng-options="phases.indexOf(phase) + 1 as phase.name for phase in phases">
                     <option value=""></option>
                 </select>
             </div>
