@@ -3,12 +3,12 @@
 
     app.factory("gridStateService", gridStateService);
 
-    gridStateService.$inject = ["$timeout"];
+    gridStateService.$inject = ["$timeout", "JSONfn"];
 
     // this serivce is not really a service but a trick to avoid 
     // repeating logic in controllers that need to persist 
     // the grid state - which is pretty much all of them
-    function gridStateService($timeout) {
+    function gridStateService($timeout, JSONfn) {
         var factory = {
             getService: getService
         };
@@ -95,19 +95,19 @@
                 // load options from local storage
                 var localOptions = localStorage.getItem(storageKey);
                 if (localOptions) {
-                    localOptions = JSON.parse(localOptions);
+                    localOptions = JSONfn.parse(localOptions, true);
                 }
 
                 // load options profile from local storage
                 var profileOptions = localStorage.getItem(profileStorageKey);
                 if (profileOptions) {
-                    profileOptions = JSON.parse(profileOptions);
+                    profileOptions = JSONfn.parse(profileOptions, true);
                 }
 
                 // load options from session storage
                 var sessionOptions = sessionStorage.getItem(storageKey);
                 if (sessionOptions) {
-                    sessionOptions = JSON.parse(sessionOptions);
+                    sessionOptions = JSONfn.parse(sessionOptions, true);
                 }
 
                 var options;
@@ -128,7 +128,7 @@
                 var pickedOptions = {};
                 // save filter, sort and page
                 pickedOptions.dataSource = _.pick(options.dataSource, ['filter', 'sort', 'page']);
-                sessionStorage.setItem(storageKey, JSON.stringify(pickedOptions));
+                sessionStorage.setItem(storageKey, JSONfn.stringify(pickedOptions));
             }
 
             // save grid options that should be stored in localStorage
@@ -138,14 +138,14 @@
                     // save pageSize
                     pickedOptions.dataSource = _.pick(options.dataSource, ['pageSize']);
 
-                    // save column state - dont use the kendo function for it as it breaks more than if fixes...
+                    // save column state - dont use the kendo function for it as it breaks more than it fixes...
                     pickedOptions.columnState = {};
                     for (var i = 0; i < options.columns.length; i++) {
                         var column = options.columns[i];
                         pickedOptions.columnState[column.persistId] = { index: i, width: column.width, hidden: column.hidden };
                     }
 
-                    localStorage.setItem(storageKey, JSON.stringify(pickedOptions));
+                    localStorage.setItem(storageKey, JSONfn.stringify(pickedOptions));
                 }
             }
 
@@ -155,7 +155,7 @@
                 // save filter and sort
                 pickedOptions.dataSource = _.pick(options.dataSource, ['filter', 'sort']);
 
-                localStorage.setItem(profileStorageKey, JSON.stringify(pickedOptions));
+                localStorage.setItem(profileStorageKey, JSONfn.stringify(pickedOptions));
             }
 
             function clearGridProfile() {
