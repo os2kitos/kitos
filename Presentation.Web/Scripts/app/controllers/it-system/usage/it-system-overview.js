@@ -283,6 +283,12 @@
                         },
                         {
                             field: "LastChanged", title: "Opdateret", format: "{0:dd-MM-yyyy}", width: 150, persistId: "changed",
+                            filterable: {
+                                cell: {
+                                    showOperators: false,
+                                    operator: "gte"
+                                }
+                            }
                         },
                         {
                             // DON'T YOU DARE RENAME!
