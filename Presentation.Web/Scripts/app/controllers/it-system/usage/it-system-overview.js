@@ -74,7 +74,7 @@
                         type: "odata-v4",
                         transport: {
                             read: {
-                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,CanUseInterfaces,ItInterfaceExhibits),Organization,ResponsibleUsage($expand=OrganizationUnit),Overview($expand=ItSystem),MainContract($expand=ItContract),Rights($expand=User,Role)",
+                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,CanUseInterfaces,ItInterfaceExhibits,Parent),Organization,ResponsibleUsage($expand=OrganizationUnit),Overview($expand=ItSystem),MainContract($expand=ItContract),Rights($expand=User,Role)",
                                 dataType: "json"
                             },
                             parameterMap: function (options, type) {
@@ -188,6 +188,16 @@
                         filterable: false
                     },
                     columns: [
+                        {
+                            field: "ItSystem.Parent.Name", title: "Overordnet IT System", width: 150, persistId: "parentsysname",
+                            template: "#: ItSystem.Parent ? ItSystem.Parent.Name : '' #",
+                            filterable: {
+                                cell: {
+                                    delay: 1500,
+                                    operator: "contains"
+                                }
+                            }
+                        },
                         {
                             field: "ItSystem.Name", title: "IT System", width: 150, persistId: "sysname",
                             template: "<a data-ui-sref='it-system.usage.interfaces({id: #: Id #})'>#: ItSystem.Name #</a>",
