@@ -106,7 +106,7 @@
                         }
                     },
                     {
-                        field: "AccessModifier", title: "Tilgængelighed", width: 80, persistId: "accessmod",
+                        field: "AccessModifier", title: "Synlighed", width: 80, persistId: "accessmod",
                         filterable: false,
                         sortable: false
                     },
