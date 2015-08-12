@@ -88,9 +88,9 @@
                         field: "ItInterfaceId", title: "Snidtflade ID", width: 150, persistId: "infid",
                         filterable: {
                             cell: {
-                                delay: 1500,
+                                dataSource: [],
+                                showOperators: false,
                                 operator: "contains",
-                                suggestionOperator: "contains"
                             }
                         }
                     },
@@ -99,9 +99,9 @@
                         template: "<a data-ui-sref='it-system.interface-edit.interface-details({id: #: Id #})'>#: Name #</a>",
                         filterable: {
                             cell: {
-                                delay: 1500,
+                                dataSource: [],
+                                showOperators: false,
                                 operator: "contains",
-                                suggestionOperator: "contains"
                             }
                         }
                     },
@@ -115,9 +115,9 @@
                         template: "#: InterfaceType ? InterfaceType.Name : '' #",
                         filterable: {
                             cell: {
-                                delay: 1500,
+                                dataSource: [],
+                                showOperators: false,
                                 operator: "contains",
-                                suggestionOperator: "contains"
                             }
                         }
                     },
@@ -126,9 +126,9 @@
                         template: "#: Interface ? Interface.Name : '' #",
                         filterable: {
                             cell: {
-                                delay: 1500,
+                                dataSource: [],
+                                showOperators: false,
                                 operator: "contains",
-                                suggestionOperator: "contains"
                             }
                         }
                     },
@@ -137,9 +137,9 @@
                         template: "#: Method ? Method.Name : '' #",
                         filterable: {
                             cell: {
-                                delay: 1500,
+                                dataSource: [],
+                                showOperators: false,
                                 operator: "contains",
-                                suggestionOperator: "contains"
                             }
                         },
                     },
@@ -148,9 +148,9 @@
                         template: "#: Tsa ? Tsa.Name : '' #",
                         filterable: {
                             cell: {
-                                delay: 1500,
+                                dataSource: [],
+                                showOperators: false,
                                 operator: "contains",
-                                suggestionOperator: "contains"
                             }
                         },
                     },
@@ -159,9 +159,9 @@
                         template: "#: ExhibitedBy ? ExhibitedBy.ItSystem.Name : '' #",
                         filterable: {
                             cell: {
-                                delay: 1500,
+                                dataSource: [],
+                                showOperators: false,
                                 operator: "contains",
-                                suggestionOperator: "contains"
                             }
                         },
                     },
@@ -169,9 +169,9 @@
                         field: "BelongsTo.Name", title: "Rettighedshaver", width: 150, persistId: "belongs",
                         filterable: {
                             cell: {
-                                delay: 1500,
+                                dataSource: [],
+                                showOperators: false,
                                 operator: "contains",
-                                suggestionOperator: "contains"
                             }
                         }
                     },
@@ -179,9 +179,9 @@
                         field: "Organization.Name", title: "Oprettet i", width: 150, persistId: "orgname",
                         filterable: {
                             cell: {
-                                delay: 1500,
+                                dataSource: [],
+                                showOperators: false,
                                 operator: "contains",
-                                suggestionOperator: "contains"
                             }
                         }
                     },
@@ -190,9 +190,9 @@
                         template: "#: ObjectOwner.Name + ' ' + ObjectOwner.LastName #",
                         filterable: {
                             cell: {
-                                delay: 1500,
+                                dataSource: [],
+                                showOperators: false,
                                 operator: "contains",
-                                suggestionOperator: "contains"
                             }
                         }
                     }

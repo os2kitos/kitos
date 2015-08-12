@@ -185,9 +185,9 @@
                         template: '<a data-ui-sref="it-system.edit.interfaces({id: #: Id #})">#: Name #</a>',
                         filterable: {
                             cell: {
-                                delay: 1500,
+                                dataSource: [],
+                                showOperators: false,
                                 operator: "contains",
-                                suggestionOperator: "contains"
                             }
                         }
                     },
@@ -201,9 +201,9 @@
                         template: "#: Parent ? Parent.Name : '' #",
                         filterable: {
                             cell: {
-                                delay: 1500,
+                                dataSource: [],
+                                showOperators: false,
                                 operator: "contains",
-                                suggestionOperator: "contains"
                             }
                         }
                     },
@@ -212,9 +212,9 @@
                         template: "#: AppTypeOption ? AppTypeOption.Name : '' #",
                         filterable: {
                             cell: {
-                                delay: 1500,
+                                dataSource: [],
+                                showOperators: false,
                                 operator: "contains",
-                                suggestionOperator: "contains"
                             }
                         }
                     },
@@ -223,9 +223,9 @@
                         template: "#: BusinessType ? BusinessType.Name : '' #",
                         filterable: {
                             cell: {
-                                delay: 1500,
+                                dataSource: [],
+                                showOperators: false,
                                 operator: "contains",
-                                suggestionOperator: "contains"
                             }
                         }
                     },
@@ -236,7 +236,7 @@
                         filterable: {
                             cell: {
                                 dataSource: [],
-                                delay: 1500,
+                                showOperators: false,
                                 operator: "startswith",
                             }
                         },
@@ -247,9 +247,9 @@
                         template: "#: BelongsTo ? BelongsTo.Name : '' #",
                         filterable: {
                             cell: {
-                                delay: 1500,
+                                dataSource: [],
+                                showOperators: false,
                                 operator: "contains",
-                                suggestionOperator: "contains"
                             }
                         }
                     },
@@ -258,9 +258,9 @@
                         template: "#: Organization ? Organization.Name : '' #",
                         filterable: {
                             cell: {
-                                delay: 1500,
+                                dataSource: [],
+                                showOperators: false,
                                 operator: "contains",
-                                suggestionOperator: "contains"
                             }
                         }
                     },
@@ -269,9 +269,9 @@
                         template: "#: ObjectOwner.Name + ' ' + ObjectOwner.LastName #",
                         filterable: {
                             cell: {
-                                delay: 1500,
+                                dataSource: [],
+                                showOperators: false,
                                 operator: "contains",
-                                suggestionOperator: "contains"
                             }
                         }
                     },

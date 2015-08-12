@@ -193,7 +193,8 @@
                             template: "#: ItSystem.Parent ? ItSystem.Parent.Name : '' #",
                             filterable: {
                                 cell: {
-                                    delay: 1500,
+                                    dataSource: [],
+                                    showOperators: false,
                                     operator: "contains"
                                 }
                             }
@@ -203,7 +204,8 @@
                             template: "<a data-ui-sref='it-system.usage.interfaces({id: #: Id #})'>#: ItSystem.Name #</a>",
                             filterable: {
                                 cell: {
-                                    delay: 1500,
+                                    dataSource: [],
+                                    showOperators: false,
                                     operator: "contains"
                                 }
                             }
@@ -222,7 +224,8 @@
                             field: "LocalSystemId", title: "Lokal system ID", width: 150, persistId: "localid",
                             filterable: {
                                 cell: {
-                                    delay: 1500,
+                                    dataSource: [],
+                                    showOperators: false,
                                     operator: "contains",
                                 }
                             }
@@ -232,7 +235,8 @@
                             template: "#: ItSystem.BusinessType ? ItSystem.BusinessType.Name : '' #",
                             filterable: {
                                 cell: {
-                                    delay: 1500,
+                                    dataSource: [],
+                                    showOperators: false,
                                     operator: "contains",
                                 }
                             }
@@ -243,7 +247,8 @@
                             hidden: true,
                             filterable: {
                                 cell: {
-                                    delay: 1500,
+                                    dataSource: [],
+                                    showOperators: false,
                                     operator: "contains",
                                 }
                             }
@@ -290,7 +295,7 @@
                             filterable: {
                                 cell: {
                                     dataSource: [],
-                                    delay: 1500,
+                                    showOperators: false,
                                     operator: "contains",
                                 }
                             }
@@ -307,7 +312,7 @@
                             filterable: {
                                 cell: {
                                     dataSource: [],
-                                    delay: 1500,
+                                    showOperators: false,
                                     operator: "contains",
                                 }
                             }
@@ -324,7 +329,7 @@
                             filterable: {
                                 cell: {
                                     dataSource: [],
-                                    delay: 1500,
+                                    showOperators: false,
                                     operator: "contains",
                                 }
                             }
@@ -341,7 +346,7 @@
                             filterable: {
                                 cell: {
                                     dataSource: [],
-                                    delay: 1500,
+                                    showOperators: false,
                                     operator: "contains",
                                 }
                             }
@@ -358,7 +363,7 @@
                             filterable: {
                                 cell: {
                                     dataSource: [],
-                                    delay: 1500,
+                                    showOperators: false,
                                     operator: "contains",
                                 }
                             }
@@ -375,7 +380,7 @@
                             filterable: {
                                 cell: {
                                     dataSource: [],
-                                    delay: 1500,
+                                    showOperators: false,
                                     operator: "contains",
                                 }
                             }
@@ -392,7 +397,7 @@
                             filterable: {
                                 cell: {
                                     dataSource: [],
-                                    delay: 1500,
+                                    showOperators: false,
                                     operator: "contains",
                                 }
                             }
@@ -409,7 +414,7 @@
                             filterable: {
                                 cell: {
                                     dataSource: [],
-                                    delay: 1500,
+                                    showOperators: false,
                                     operator: "contains",
                                 }
                             }
@@ -426,7 +431,7 @@
                             filterable: {
                                 cell: {
                                     dataSource: [],
-                                    delay: 1500,
+                                    showOperators: false,
                                     operator: "contains",
                                 }
                             }
