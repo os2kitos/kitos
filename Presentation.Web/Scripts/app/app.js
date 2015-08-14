@@ -1,7 +1,9 @@
 ﻿var app = angular.module('app', ['ui.router', 'ui.bootstrap', 'ui.select2', 'ngAnimate', 'notify', 'ui.utils', 'angularjs-dropdown-multiselect', 'ngSanitize', 'kendo.directives']);
 
 app.constant('JSONfn', JSONfn)
-    .constant('moment', moment);
+    .constant('moment', moment)
+    .constant('$', $)
+    .constant('_', _);
 
 app.config([
     '$urlRouterProvider', function($urlRouterProvider) {
