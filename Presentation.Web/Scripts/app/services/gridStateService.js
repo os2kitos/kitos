@@ -70,17 +70,23 @@
                         }
                         // resize column
                         if (state.width != columnObj.width) {
-                            // manually set the width on the column option, cause changing the css doesn't
+                            // manually set the width on the column option, cause changing the css doesn't update it
                             columnObj.width = state.width;
                             // $timeout is required here, else the jQuery select doesn't work
                             $timeout(function() {
-                                $(".k-grid-content")
+                                // HACK make sure that "#mainGrid" actually matches the id in the view
+                                // TODO make "#mainGrid" id into an input parameter
+                                // set width of column header
+                                $("#mainGrid .k-grid-header")
                                     .find("colgroup col")
                                     .eq(columnIndex)
                                     .width(state.width);
 
-                                // NOTE make sure that this id actually matches the id in the view
-                                $("#mainGrid").find("col").eq(columnIndex).width(state.width);
+                                // set width of column
+                                $("#mainGrid .k-grid-content")
+                                    .find("colgroup col")
+                                    .eq(columnIndex)
+                                    .width(state.width);
                             });
                         }
                     }
