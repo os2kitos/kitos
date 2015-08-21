@@ -1596,6 +1596,7 @@
     <Content Include="Scripts\i18n\angular-locale_sv-fi.js" />
     <Content Include="Scripts\i18n\angular-locale_sv-se.js" />
     <Content Include="Scripts\i18n\angular-locale_sv.js" />
+    <Content Include="Scripts\i18n\angular-locale_sw-cd.js" />
     <Content Include="Scripts\i18n\angular-locale_sw-ke.js" />
     <Content Include="Scripts\i18n\angular-locale_sw-tz.js" />
     <Content Include="Scripts\i18n\angular-locale_sw-ug.js" />
