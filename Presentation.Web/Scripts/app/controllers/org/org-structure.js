@@ -6,34 +6,52 @@
                 templateUrl: 'partials/org/org.html',
                 controller: 'org.StructureCtrl',
                 resolve: {
-                    orgRolesHttp: [
-                        '$http', function($http) {
-                            return $http.get('api/organizationRole/?nonsuggestions=');
+                    orgUnits: [
+                        '$http', 'user', function ($http, user) {
+                            return $http.get('api/organizationunit?organization=' + user.currentOrganizationId).then(function (result) {
+                                return result.data.response;
+                            });
                         }
-                    ]
+                    ],
+                    orgRoles: [
+                        '$http', function ($http) {
+                            return $http.get('api/organizationRole/?nonsuggestions').then(function (result) {
+                                return result.data.response;
+                            });
+                        }
+                    ],
+                    user: [
+                        'userService', function (userService) {
+                            return userService.getUser();
+                        }
+                    ],
                 }
             });
         }
     ]);
 
     app.controller('org.StructureCtrl', [
-        '$scope', '$http', '$q', '$filter', '$modal', '$state', 'notify', 'orgRolesHttp', 'user',
-        function($scope, $http, $q, $filter, $modal, $state, notify, orgRolesHttp, user) {
+        '$scope', '$http', '$q', '$filter', '$modal', '$state', 'notify', 'orgUnits', 'orgRoles', 'user',
+        function ($scope, $http, $q, $filter, $modal, $state, notify, orgUnits, orgRoles, user) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
                 take: 50
             };
+            $scope.rightsPagination = {
+                skip: 0,
+                take: 15
+            };
 
             //cache
             var orgs = [];
 
-            //flatten map of all loaded orgUnits
+            //flattened map of all loaded orgUnits
             $scope.orgUnits = {};
 
-            $scope.activeOrgRoles = _.where(orgRolesHttp.data.response, { isActive: true });
+            $scope.activeOrgRoles = _.where(orgRoles, { isActive: true });
             $scope.orgRoles = {};
-            _.each(orgRolesHttp.data.response, function(orgRole) {
+            _.each(orgRoles, function(orgRole) {
                 $scope.orgRoles[orgRole.id] = orgRole;
             });
 
@@ -84,23 +102,11 @@
             }
 
             function loadUnits() {
-                return $http.get('api/organizationunit?organization=' + user.currentOrganizationId).success(function(result) {
-                    var rootNode = result.response;
+                var rootNode = orgUnits;
+                $scope.nodes = [rootNode];
 
-                    $scope.nodes = [rootNode];
-
-                    flattenAndSave(rootNode, false, null);
-
-                    if ($scope.chosenOrgUnit) {
-
-                        var chosenId = $scope.chosenOrgUnit.id;
-                        var newChosen = $scope.orgUnits[chosenId];
-                        $scope.chooseOrgUnit(newChosen);
-                    }
-                });
+                flattenAndSave(rootNode, false, null);
             }
-
-            loadUnits();
 
             $scope.chosenOrgUnit = null;
 
@@ -109,15 +115,11 @@
 
                 //get organization related to the org unit
                 if (!node.organization) {
-
                     //try get from cache
                     if (orgs[node.organizationId]) {
-
                         node.organization = orgs[node.organizationId];
-
                     } else {
                         //else get from server
-
                         $http.get('api/organization/' + node.organizationId).success(function(data) {
                             node.organization = data.response;
 
@@ -127,22 +129,32 @@
                     }
                 }
 
+                // reset pagination
+                $scope.rightsPagination = {
+                    skip: 0,
+                    take: 15
+                };
+
+                loadRights(node);
+                loadTasks();
+            };
+
+            function loadRights(node) {
                 //get org rights on the org unit and subtree
-                $http.get('api/organizationUnitRights/' + node.id).success(function(data) {
+                $http.get('api/organizationUnitRights/' + node.id + '?paged&take=' + $scope.rightsPagination.take + '&skip=' + $scope.rightsPagination.skip).success(function (data, status, headers) {
+                    var paginationHeader = JSON.parse(headers('X-Pagination'));
+                    $scope.totalRightsCount = paginationHeader.TotalCount;
                     node.orgRights = data.response;
 
-                    _.each(node.orgRights, function(right) {
+                    _.each(node.orgRights, function (right) {
                         right.userForSelect = { id: right.user.id, text: right.user.fullName };
                         right.roleForSelect = right.roleId;
                         right.show = true;
                     });
-
                 });
 
                 $scope.chosenOrgUnit = node;
-
-                loadTasks();
-            };
+            }
 
             $scope.$watch("selectedUser", function() {
                 $scope.submitRight();
@@ -244,9 +256,7 @@
 
                         notify.addErrorMessage('Fejl!');
                     });
-
                 }).error(function(deleteResult) {
-
                     // couldn't delete the old entry, just reset select options
                     right.userForSelect = { id: right.user.id, text: right.user.fullName };
                     right.roleForSelect = right.roleId;
@@ -436,6 +446,9 @@
             });
 
             $scope.$watchCollection('pagination', loadTasks);
+            $scope.$watchCollection('rightsPagination', function() {
+                loadRights($scope.chosenOrgUnit);
+            });
 
             // default kle mode
             $scope.showAllTasks = true;
@@ -582,6 +595,9 @@
             function reload() {
                 $state.go('.', null, { reload: true });
             }
+
+            // activate
+            loadUnits();
         }
     ]);
 })(angular, app);

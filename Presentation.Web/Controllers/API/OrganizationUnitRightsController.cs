@@ -23,14 +23,27 @@ namespace Presentation.Web.Controllers.API
         /// Returns all colllecteds rights for an organization unit and all sub units
         /// </summary>
         /// <param name="id">Id of the unit</param>
+        /// <param name="paged"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
         /// <returns>List of rights</returns>
-        public override HttpResponseMessage GetRights(int id)
+        public HttpResponseMessage GetRights(int id, bool? paged, int skip = 0, int take = 50)
         {
             try
             {
                 var theRights = GetOrganizationRights(id);
 
-                var dtos = AutoMapper.Mapper.Map<ICollection<OrganizationRight>, ICollection<RightOutputDTO>>(theRights);
+                var paginationHeader = new
+                {
+                    TotalCount = theRights.Count()
+                };
+                System.Web.HttpContext.Current.Response.Headers.Add("X-Pagination",
+                                                                    Newtonsoft.Json.JsonConvert.SerializeObject(
+                                                                        paginationHeader));
+
+                var pagedRights = theRights.Skip(skip).Take(take).ToList();
+
+                var dtos = AutoMapper.Mapper.Map<ICollection<OrganizationRight>, ICollection<RightOutputDTO>>(pagedRights);
 
                 return Ok(dtos);
             }
