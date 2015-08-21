@@ -15,6 +15,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using Newtonsoft.Json.Linq;
 using Ninject;
 using Presentation.Web.Models;
 
@@ -78,7 +79,13 @@ namespace Presentation.Web.Controllers.API
                     return Error("Organization id is missing!");
                 }
 
-                //check if user already exists and we are not sending a reminder or advis. If so, just return him
+                // only global admin is allowed to set others to global admin
+                if (dto.IsGlobalAdmin && !KitosUser.IsGlobalAdmin)
+                {
+                    return Forbidden();
+                }
+
+                // check if user already exists and we are not sending a reminder or advis. If so, just return him
                 var existingUser = Repository.Get(u => u.Email == dto.Email).FirstOrDefault();
                 if (existingUser != null && !sendReminder && !sendAdvis)
                     return Ok(Map(existingUser));
@@ -109,6 +116,28 @@ namespace Presentation.Web.Controllers.API
             {
                 return Error(e);
             }
+        }
+
+        public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
+        {
+            // get name of mapped property
+            var map = Mapper.FindTypeMapFor<UserDTO, User>().GetPropertyMaps();
+            var nonNullMaps = map.Where(x => x.SourceMember != null).ToList();
+
+            foreach (var valuePair in obj)
+            {
+                var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name.Equals(valuePair.Key, StringComparison.InvariantCultureIgnoreCase));
+                if (mapMember == null)
+                    continue; // abort if no map found
+
+                var destName = mapMember.DestinationProperty.Name;
+
+                if (destName == "IsGlobalAdmin")
+                    if (!KitosUser.IsGlobalAdmin)
+                        return Forbidden(); // don't allow users to elevate to global admin unless done by a global admin
+            }
+
+            return base.Patch(id, organizationId, obj);
         }
 
         public HttpResponseMessage PostTokenRequest(bool? token, int userId)
