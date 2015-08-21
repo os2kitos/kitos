@@ -33,15 +33,15 @@ namespace Presentation.Web.Controllers.API
             _userService = userService;
             _organizationService = organizationService;
 
-            //todo: this is bad crosscutting of concerns. refactor / extract into separate controller
-            _kernel = kernel; //we need this for retrieving userroles when creating a csv file.
+            // TODO: this is bad crosscutting of concerns. refactor / extract into separate controller
+            _kernel = kernel; // we need this for retrieving userroles when creating a csv file.
         }
         
         public override HttpResponseMessage Post(UserDTO dto)
         {
             try
             {
-                //do some string magic to determine parameters, and actions
+                // do some string magic to determine parameters, and actions
                 List<string> parameters = null;
                 var sendMailOnCreation = false;
                 var sendReminder = false;
@@ -89,20 +89,20 @@ namespace Presentation.Web.Controllers.API
                 var existingUser = Repository.Get(u => u.Email == dto.Email).FirstOrDefault();
                 if (existingUser != null && !sendReminder && !sendAdvis)
                     return Ok(Map(existingUser));
-                //if we are sending a reminder:
+                // if we are sending a reminder:
                 if (existingUser != null && sendReminder)
                 {
                     _userService.IssueAdvisMail(existingUser, true, orgId);
                     return Ok(Map(existingUser));
                 }
-                //if we are sending an advis:
+                // if we are sending an advis:
                 if (existingUser != null && sendAdvis)
                 {
                     _userService.IssueAdvisMail(existingUser, false, orgId);
                     return Ok(Map(existingUser));
                 }
 
-                //otherwise we are creating a new user
+                // otherwise we are creating a new user
                 var item = Map(dto);
 
                 item.ObjectOwner = KitosUser;
@@ -163,7 +163,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var users = Repository.Get(u => u.Name.Contains(q) || u.Email.Contains(q));
-                return Ok(AutoMapper.Mapper.Map<IEnumerable<User>, IEnumerable<UserDTO>>(users));
+                return Ok(Mapper.Map<IEnumerable<User>, IEnumerable<UserDTO>>(users));
             }
             catch (Exception e)
             {
@@ -180,7 +180,7 @@ namespace Presentation.Web.Controllers.API
                         u.Name.Contains(q)
                         || u.Email.Contains(q));
 
-                //Get all users inside the organization
+                // Get all users inside the organization
                 pagingModel.Where(u => u.AdminRights.Count(r => r.Role.Name == "Medarbejder" && r.ObjectId == orgId) > 0);
 
                 var users = Page(Repository.AsQueryable(), pagingModel).ToList();
@@ -210,7 +210,7 @@ namespace Presentation.Web.Controllers.API
                         u.Name.Contains(q)
                         || u.Email.Contains(q));
 
-                //Get all users inside the organization
+                // Get all users inside the organization
                 pagingModel.Where(u => u.AdminRights.Count(r => r.Role.Name == "Medarbejder" && r.ObjectId == orgId) > 0);
 
                 var users = Page(Repository.AsQueryable(), pagingModel).ToList();
@@ -295,6 +295,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         #region GetRights
+
         private string GetOrgRights(int orgId, int userId)
         {
             var rightsRepository = _kernel.Get<IGenericRepository<OrganizationRight>>();
@@ -351,6 +352,7 @@ namespace Presentation.Web.Controllers.API
             }
             return builder.ToString();
         }
+
         #endregion
 
         public HttpResponseMessage GetNameIsAvailable(string checkname, int orgId)
@@ -379,7 +381,7 @@ namespace Presentation.Web.Controllers.API
             if (users.Any()) return Ok();
 
             return NotFound();
-    }
+        }
 
         public HttpResponseMessage PostDefaultOrgUnit(bool? updateDefaultOrgUnit, UpdateDefaultOrgUnitDto dto)
         {
