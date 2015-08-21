@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
+using System.Web.Http;
 using System.Web.Security;
 using Core.DomainModel;
 using Core.DomainServices;
@@ -38,6 +39,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         // POST api/Authorize
+        [AllowAnonymous]
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
         {
             try
@@ -76,7 +78,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-
+        [AllowAnonymous]
         public HttpResponseMessage PostResetpassword(bool? resetPassword, ResetPasswordDTO dto)
         {
             try
