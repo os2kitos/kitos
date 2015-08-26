@@ -89,6 +89,11 @@
             }
             
             function pushProject(project) {
+                // Due to https://github.com/angular/angular.js/blob/master/CHANGELOG.md#breaking-changes-8
+                // we have to convert these values to strings
+                project.priority = project.priority.toString();
+                project.priorityPf = project.priorityPf.toString();
+
                 $scope.projects.push(project);
             }
         }]);
