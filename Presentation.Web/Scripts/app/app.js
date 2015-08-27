@@ -17,6 +17,7 @@ app.config([
         notifyProvider.onlyUniqueMessages(false);
 
         // global config for UI Bootstrap
+        datepickerConfig.startingDay = 1; // set starting day of the calendar to monday
         datepickerPopupConfig.datepickerPopup = "dd-MM-yyyy"; // set default date format
     }
 ]);
