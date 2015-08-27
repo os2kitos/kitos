@@ -7,7 +7,7 @@ app.config([
 ]);
 
 app.config([
-    '$httpProvider', 'notifyProvider', function($httpProvider, notifyProvider) {
+    '$httpProvider', 'notifyProvider', 'datepickerConfig', 'datepickerPopupConfig', function ($httpProvider, notifyProvider, datepickerConfig, datepickerPopupConfig) {
         $httpProvider.interceptors.push("httpBusyInterceptor");
         // for some reason templates aren't updated so this is needed
         $httpProvider.defaults.headers.get = {
@@ -15,6 +15,10 @@ app.config([
         };
         notifyProvider.globalTimeToLive(5000);
         notifyProvider.onlyUniqueMessages(false);
+
+        // global config for UI Bootstrap
+        datepickerConfig.startingDay = 1; // set starting day of the calendar to monday
+        datepickerPopupConfig.datepickerPopup = "dd-MM-yyyy"; // set default date format
     }
 ]);
 

@@ -20,7 +20,7 @@ namespace Presentation.Web.Models
         public List<AdminRightDTO> AdminRights { get; set; }
         public string ObjectOwnerName { get; set; }
         public string ObjectOwnerLastName { get; set; }
-        [JsonConverter(typeof(CustomDateTimeConverter))]
+        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? LastAdvisDate { get; set; }
         public DateTime LastChanged { get; set; }
         public int? LastChangedByUserId { get; set; }

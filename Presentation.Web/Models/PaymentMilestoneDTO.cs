@@ -8,9 +8,9 @@ namespace Presentation.Web.Models
     {
         public int Id { get; set; }
         public string Title { get; set; }
-        [JsonConverter(typeof(CustomDateTimeConverter))]
+        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? Expected { get; set; }
-        [JsonConverter(typeof(CustomDateTimeConverter))]
+        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? Approved { get; set; }
         public int ItContractId { get; set; }
     }
