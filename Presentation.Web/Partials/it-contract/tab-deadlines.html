@@ -31,7 +31,6 @@
                                 <input type="text" class="form-control"
                                        data-datepicker-popup
                                        data-is-open="$parent.opened['pe' + $index]"
-                                       data-date-to-string
                                        data-ng-disabled="!hasWriteAccess"
                                        data-ng-model="ht.expected"
                                        data-autosave="api/handovertrial/{{ ht.id }}"
@@ -46,7 +45,6 @@
                                 <input type="text" class="form-control"
                                        data-datepicker-popup
                                        data-is-open="$parent.opened['pa' + $index]"
-                                       data-date-to-string
                                        data-ng-disabled="!hasWriteAccess"
                                        data-ng-model="ht.approved"
                                        data-autosave="api/handovertrial/{{ ht.id }}"
@@ -81,7 +79,6 @@
                                 <input type="text" class="form-control"
                                        data-datepicker-popup
                                        data-is-open="opened.npe"
-                                       data-date-to-string
                                        data-ng-disabled="!hasWriteAccess"
                                        data-ng-model="handoverTrial.expected">
                                 <span class="input-group-btn">
@@ -94,7 +91,6 @@
                                 <input type="text" class="form-control"
                                        data-datepicker-popup
                                        data-is-open="opened.npa"
-                                       data-date-to-string
                                        data-ng-disabled="!hasWriteAccess"
                                        data-ng-model="handoverTrial.approved">
                                 <span class="input-group-btn">
@@ -130,7 +126,6 @@
                                 <input type="text" class="form-control"
                                        data-datepicker-popup
                                        data-is-open="$parent.opened['exp' + $index]"
-                                       data-date-to-string
                                        data-ng-disabled="!hasWriteAccess"
                                        data-ng-model="item.expected"
                                        data-autosave="api/paymentmilestone/{{ item.id }}"
@@ -145,7 +140,6 @@
                                 <input type="text" class="form-control"
                                        data-datepicker-popup
                                        data-is-open="$parent.opened['appr' + $index]"
-                                       data-date-to-string
                                        data-ng-disabled="!hasWriteAccess"
                                        data-ng-model="item.approved"
                                        data-autosave="api/paymentmilestone/{{ item.id }}"
@@ -171,7 +165,6 @@
                                 <input type="text" class="form-control"
                                        data-datepicker-popup
                                        data-is-open="opened.nexp"
-                                       data-date-to-string
                                        data-ng-disabled="!hasWriteAccess"
                                        data-ng-model="paymentMilestone.expected">
                                 <span class="input-group-btn">
@@ -184,7 +177,6 @@
                                 <input type="text" class="form-control"
                                        data-datepicker-popup
                                        data-is-open="opened.nappr"
-                                       data-date-to-string
                                        data-ng-disabled="!hasWriteAccess"
                                        data-ng-model="paymentMilestone.approved">
                                 <span class="input-group-btn">
@@ -214,7 +206,6 @@
                     <input type="text" class="form-control" id="agreement-concluded"
                            data-datepicker-popup
                            data-is-open="opened.conc"
-                           data-date-to-string
                            data-ng-disabled="!hasWriteAccess"
                            data-ng-model="contract.concluded"
                            data-autosave="{{autosaveUrl}}"
@@ -266,7 +257,6 @@
                     <input type="text" class="form-control" id="agreement-irrevocable"
                            data-datepicker-popup
                            data-is-open="opened.irre"
-                           data-date-to-string
                            data-ng-disabled="!hasWriteAccess"
                            data-ng-model="contract.irrevocableTo"
                            data-autosave="{{autosaveUrl}}"
@@ -282,7 +272,6 @@
                     <input type="text" class="form-control" id="agreement-expiration"
                            data-datepicker-popup
                            data-is-open="opened.expi"
-                           data-date-to-string
                            data-ng-disabled="!hasWriteAccess"
                            data-ng-model="contract.expirationDate"
                            data-autosave="{{autosaveUrl}}"
@@ -306,7 +295,6 @@
                     <input type="text" class="form-control" id="agreement-terminated"
                            data-datepicker-popup
                            data-is-open="opened.term"
-                           data-date-to-string
                            data-ng-disabled="!hasWriteAccess"
                            data-ng-model="contract.terminated"
                            data-autosave="{{autosaveUrl}}"

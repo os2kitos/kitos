@@ -38,7 +38,6 @@
                         <input type="text" class="form-control"
                                data-datepicker-popup
                                data-is-open="$parent.opened['dd' + $index]" 
-                               data-date-to-string 
                                data-ng-disabled="!hasWriteAccess" 
                                data-ng-model="c.dueDate"
                                data-autosave="api/communication/{{c.id}}"
@@ -95,7 +94,6 @@
                             <input type="text" name="due" class="form-control" required
                                    data-datepicker-popup
                                    data-is-open="opened['ndd' + $index]" 
-                                   data-date-to-string 
                                    data-ng-disabled="!hasWriteAccess" 
                                    data-ng-model="comm.dueDate">
                             <span class="input-group-btn">
