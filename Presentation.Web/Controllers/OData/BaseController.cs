@@ -1,6 +1,4 @@
-﻿using System;
-using System.Net;
-using System.Web.Http;
+﻿using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Query;
 using Core.DomainServices;
