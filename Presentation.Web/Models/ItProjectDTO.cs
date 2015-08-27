@@ -67,7 +67,7 @@ namespace Presentation.Web.Models
         /// <summary>
         /// Date-for-status-update field
         /// </summary>
-        [JsonConverter(typeof(CustomDateTimeConverter))]
+        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? StatusDate { get; set; }
 
         /// <summary>

@@ -7,9 +7,9 @@ namespace Presentation.Web.Models
     public class ItProjectPhaseDTO
     {
         public string Name { get; set; }
-        [JsonConverter(typeof(CustomDateTimeConverter))]
+        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? StartDate { get; set; }
-        [JsonConverter(typeof(CustomDateTimeConverter))]
+        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? EndDate { get; set; }
     }
 }

@@ -11,9 +11,9 @@ namespace Presentation.Web.Models
         /// </summary>
         public int StatusProcentage { get; set; }
 
-        [JsonConverter(typeof(CustomDateTimeConverter))]
+        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? StartDate { get; set; }
-        [JsonConverter(typeof(CustomDateTimeConverter))]
+        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? EndDate { get; set; }
     }
 }
