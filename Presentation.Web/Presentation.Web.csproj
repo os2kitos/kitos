@@ -286,7 +286,6 @@
     <Compile Include="Controllers\API\StakeholderController.cs" />
     <Compile Include="Controllers\API\MilestoneController.cs" />
     <Compile Include="Models\CommunicationDTO.cs" />
-    <Compile Include="Filters\RFC3339FullDateConverter.cs" />
     <Compile Include="Models\GoalDTO.cs" />
     <Compile Include="Models\GoalStatusDTO.cs" />
     <Compile Include="Models\HandoverDTO.cs" />

@@ -1,7 +1,5 @@
 ﻿using System;
 using Core.DomainModel;
-using Newtonsoft.Json;
-using Presentation.Web.Filters;
 
 namespace Presentation.Web.Models
 {
@@ -40,7 +38,6 @@ namespace Presentation.Web.Models
         /// <summary>
         /// DateTime for audit
         /// </summary>
-        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? AuditDate { get; set; }
 
         public string Note { get; set; }
