@@ -401,7 +401,7 @@ namespace Presentation.Web.Controllers.API
                 
                 project.UsedByOrgUnits.Add(new ItProjectOrgUnitUsage {ItProjectId = id, OrganizationUnitId = organizationUnit});
                 
-                project.LastChanged = DateTime.Now;
+                project.LastChanged = DateTime.UtcNow;
                 project.LastChangedByUser = KitosUser;
 
                 Repository.Save();
@@ -434,7 +434,7 @@ namespace Presentation.Web.Controllers.API
                 if (entity == null) return NotFound();
                 project.UsedByOrgUnits.Remove(entity);
 
-                project.LastChanged = DateTime.Now;
+                project.LastChanged = DateTime.UtcNow;
                 project.LastChangedByUser = KitosUser;
 
                 Repository.Save();
@@ -482,7 +482,7 @@ namespace Presentation.Web.Controllers.API
                 {
                     project.TaskRefs.Add(task);
                 }
-                project.LastChanged = DateTime.Now;
+                project.LastChanged = DateTime.UtcNow;
                 project.LastChangedByUser = KitosUser;
                 Repository.Save();
                 return Ok();
@@ -524,7 +524,7 @@ namespace Presentation.Web.Controllers.API
                 {
                     project.TaskRefs.Remove(task);
                 }
-                project.LastChanged = DateTime.Now;
+                project.LastChanged = DateTime.UtcNow;
                 project.LastChangedByUser = KitosUser;
                 Repository.Save();
                 return Ok();
@@ -615,7 +615,7 @@ namespace Presentation.Web.Controllers.API
                 
                 project.ItSystemUsages.Add(systemUsage);
 
-                project.LastChanged = DateTime.Now;
+                project.LastChanged = DateTime.UtcNow;
                 project.LastChangedByUser = KitosUser;
 
                 Repository.Save();
@@ -643,7 +643,7 @@ namespace Presentation.Web.Controllers.API
                 
                 project.ItSystemUsages.Remove(systemUsage);
 
-                project.LastChanged = DateTime.Now;
+                project.LastChanged = DateTime.UtcNow;
                 project.LastChangedByUser = KitosUser;
 
                 Repository.Save();
@@ -757,7 +757,7 @@ namespace Presentation.Web.Controllers.API
                 }
             }
 
-            project.LastChanged = DateTime.Now;
+            project.LastChanged = DateTime.UtcNow;
             project.LastChangedByUser = KitosUser;
 
             PatchQuery(project);

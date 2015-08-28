@@ -225,7 +225,7 @@ namespace Presentation.Web.Controllers.API
                     }
                 }
                 
-                item.LastChanged = DateTime.Now;
+                item.LastChanged = DateTime.UtcNow;
                 item.LastChangedByUser = KitosUser;
 
                 PatchQuery(item);

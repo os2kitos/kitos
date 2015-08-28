@@ -129,7 +129,7 @@ namespace Presentation.Web.Controllers.API
                 right.ObjectId = organizationId;
                 right.ObjectOwner = KitosUser;
                 right.LastChangedByUser = KitosUser;
-                right.LastChanged = DateTime.Now;
+                right.LastChanged = DateTime.UtcNow;
 
                 RightRepository.Insert(right);
                 RightRepository.Save();

@@ -41,16 +41,16 @@ namespace Core.ApplicationServices
         public User AddUser(User user, bool sendMailOnCreation, int? orgId)
         {
             // hash his salt and default password
-            user.Salt = _cryptoService.Encrypt(DateTime.Now + " spices");
+            user.Salt = _cryptoService.Encrypt(DateTime.UtcNow + " spices");
 #if DEBUG
             user.Password = _cryptoService.Encrypt("arne123" + user.Salt); //TODO: Don't use default password
 #else
-            user.Password = _cryptoService.Encrypt(DateTime.Now + user.Salt);
+            user.Password = _cryptoService.Encrypt(DateTime.UtcNow + user.Salt);
 #endif
             
             var defaultOrgUnit = _orgRepository.GetByKey(orgId).OrgUnits.First(x => x.ParentId == null);
             user.DefaultOrganizationUnitId = defaultOrgUnit.Id;
-            user.LastChanged = DateTime.Now;
+            user.LastChanged = DateTime.UtcNow;
 
             _userRepository.Insert(user);
             _userRepository.Save();
@@ -85,7 +85,7 @@ namespace Core.ApplicationServices
 
             IssuePasswordReset(user, subject, content);
 
-            user.LastAdvisDate = DateTime.Now.Date;
+            user.LastAdvisDate = DateTime.UtcNow.Date;
             _userRepository.Update(user);
             _userRepository.Save();
         }
@@ -125,7 +125,7 @@ namespace Core.ApplicationServices
 
         private PasswordResetRequest GenerateResetRequest(User user)
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             var hash = _cryptoService.Encrypt(now + user.Email);
 
             var request = new PasswordResetRequest { Hash = hash, Time = now, UserId = user.Id, ObjectOwner = user, LastChangedByUser = user };
@@ -142,7 +142,7 @@ namespace Core.ApplicationServices
 
             if (passwordReset == null) return null;
 
-            var timespan = DateTime.Now - passwordReset.Time;
+            var timespan = DateTime.UtcNow - passwordReset.Time;
             if (timespan > _ttl)
             {
                 // the reset request is too old, delete it
