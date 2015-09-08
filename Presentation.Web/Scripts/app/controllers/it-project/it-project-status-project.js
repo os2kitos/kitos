@@ -156,6 +156,12 @@
                         notify.addErrorMessage("Kunne ikke hente projekter!");
                 });
             }
+
+            $scope.getPhaseName = function (num) {
+                if (num)
+                    return $scope.project.phases[num - 1].name;
+                return "";
+            };
         }
     ]);
 })(angular, app);
