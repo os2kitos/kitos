@@ -7,7 +7,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// <summary>
     /// Represents an organisation's usage of an it system.
     /// </summary>
-    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>
+    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, IContextAware
     {
         public ItSystemUsage()
         {
@@ -189,13 +189,17 @@ namespace Core.DomainModel.ItSystemUsage
         /// Associated it projects.
         /// </value>
         public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
-
-        public override bool HasUserWriteAccess(User user, int organizationId)
+        
+        /// <summary>
+        /// Determines whether this instance is within a given organizational context.
+        /// </summary>
+        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
+        /// <returns>
+        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
+        /// </returns>
+        public bool IsInContext(int organizationId)
         {
-            // check that object belongs to the requwested organization context
-            if (OrganizationId != organizationId)
-                return false;
-            return base.HasUserWriteAccess(user, organizationId);
+            return OrganizationId == organizationId;
         }
     }
 }

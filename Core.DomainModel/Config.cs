@@ -1,11 +1,9 @@
-using System.Linq;
-
 namespace Core.DomainModel
 {
     /// <summary>
     /// Configuration of KITOS for an organization
     /// </summary>
-    public class Config : Entity
+    public class Config : Entity, IContextAware
     {
         /* SHOW/HIDE MODULES */
         public bool ShowItProjectModule { get; set; }
@@ -37,16 +35,16 @@ namespace Core.DomainModel
         }
 
         /// <summary>
-        /// Should only be editable by local admin
+        /// Determines whether this instance is within a given organizational context.
         /// </summary>
-        /// <param name="user"></param>
-        /// <param name="organizationId"></param>
-        /// <returns></returns>
-        public override bool HasUserWriteAccess(User user, int organizationId)
+        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
+        /// <returns>
+        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
+        /// </returns>
+        public bool IsInContext(int organizationId)
         {
-            if (Organization != null && user.AdminRights.Any(right => right.ObjectId == Organization.Id)) return true;
-
-            return base.HasUserWriteAccess(user, organizationId);
+            // this is a 1:0-1 relation to Organization so this.Id actually is the OrganizationId
+            return Id == organizationId;
         }
     }
 }

@@ -259,9 +259,13 @@ namespace Presentation.Web.Controllers.API
         /// <param name="user">The user</param>
         /// <param name="organizationId"></param>
         /// <returns>True iff user has write access to obj</returns>
-        protected bool HasWriteAccess(TModel obj, User user, int organizationId)
+        protected virtual bool HasWriteAccess(TModel obj, User user, int organizationId)
         {
-            return obj.HasUserWriteAccess(user, organizationId);
+            // global admin always have write access
+            if (user.IsGlobalAdmin)
+                return true;
+
+            return obj.HasUserWriteAccess(user);
         }
 
         /// <summary>

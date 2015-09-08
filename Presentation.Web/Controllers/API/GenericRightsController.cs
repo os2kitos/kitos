@@ -64,7 +64,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!HasWriteAccess(id, organizationId, KitosUser))
+                if (!HasWriteAccess(id, KitosUser))
                     return Unauthorized();
 
                 var right = AutoMapper.Mapper.Map<RightInputDTO, TRight>(dto);
@@ -101,7 +101,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!HasWriteAccess(id, organizationId, KitosUser))
+                if (!HasWriteAccess(id, KitosUser))
                     return Unauthorized();
 
                 var right = RightRepository.Get(r => r.ObjectId == id && r.RoleId == rId && r.UserId == uId).FirstOrDefault();
@@ -119,11 +119,13 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        private bool HasWriteAccess(int objectId, int organizationId, User user)
+        private bool HasWriteAccess(int objectId, User user)
         {
-            var obj = _objectRepository.GetByKey(objectId);
+            if (user.IsGlobalAdmin)
+                return true;
 
-            return obj.HasUserWriteAccess(user, organizationId);
+            var obj = _objectRepository.GetByKey(objectId);
+            return obj.HasUserWriteAccess(user);
         }
     }
 }

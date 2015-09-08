@@ -9,7 +9,7 @@ namespace Core.DomainModel
     /// </summary>
     /// TODO this really should be a composite key entity
     /// TODO why is this a hierarchy?
-    public class TaskUsage : Entity, IHierarchy<TaskUsage>
+    public class TaskUsage : Entity, IHierarchy<TaskUsage>, IContextAware
     {
         public TaskUsage()
         {
@@ -50,11 +50,31 @@ namespace Core.DomainModel
 
         public string Comment { get; set; }
 
-        public override bool HasUserWriteAccess(User user, int organizationId)
+        /// <summary>
+        /// Determines whether a user has write access to this instance.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        /// <returns>
+        ///   <c>true</c> if user has write access, otherwise <c>false</c>.
+        /// </returns>
+        public override bool HasUserWriteAccess(User user)
         {
-            if (OrgUnit != null && OrgUnit.HasUserWriteAccess(user, organizationId)) return true;
+            if (OrgUnit != null && OrgUnit.HasUserWriteAccess(user)) 
+                return true;
 
-            return base.HasUserWriteAccess(user, organizationId);
+            return base.HasUserWriteAccess(user);
+        }
+
+        /// <summary>
+        /// Determines whether this instance is within a given organizational context.
+        /// </summary>
+        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
+        /// <returns>
+        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
+        /// </returns>
+        public bool IsInContext(int organizationId)
+        {
+            return OrgUnit.IsInContext(organizationId);
         }
     }
 }
