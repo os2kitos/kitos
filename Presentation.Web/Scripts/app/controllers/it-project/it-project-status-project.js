@@ -31,14 +31,14 @@
 
                                         //use the user from the map if possible
                                         var user = users[right.userId] || right.user;
-                                        
+
                                         var roleNames = user.roleNames || [];
                                         roleNames.push(right.roleName);
                                         user.roleNames = roleNames;
-                                        
+
                                         users[right.userId] = user;
                                     });
-                                    
+
                                     return users;
                                 });
                         });
@@ -61,10 +61,10 @@
                 phase.prevPhase = prevPhase;
                 prevPhase = phase;
             });
-            
+
             //All Assignments - both Assignments ("opgaver") and milestones
             $scope.milestonesActivities = [];
-            
+
             function addStatus(activity, skipAdding) {
                 activity.show = true;
 
@@ -123,7 +123,7 @@
                 skip: 0,
                 take: 50
             };
-            
+
             $scope.$watchCollection('pagination', loadStatues);
 
             function loadStatues() {
@@ -139,7 +139,7 @@
 
                 if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
                 else url += "&q=";
-                
+
                 $scope.milestonesActivities = [];
                 $http.get(url).success(function (result, status, headers) {
                     var paginationHeader = JSON.parse(headers('X-Pagination'));
