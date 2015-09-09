@@ -47,7 +47,7 @@ namespace Core.ApplicationServices
 #else
             user.Password = _cryptoService.Encrypt(DateTime.Now + user.Salt);
 #endif
-            
+
             var defaultOrgUnit = _orgRepository.GetByKey(orgId).OrgUnits.First(x => x.ParentId == null);
             user.DefaultOrganizationUnitId = defaultOrgUnit.Id;
             user.LastChanged = DateTime.Now;
@@ -66,7 +66,7 @@ namespace Core.ApplicationServices
         {
             if (user == null || _userRepository.GetByKey(user.Id) == null)
                 throw new ArgumentNullException("user");
-        
+
             var org = _orgRepository.GetByKey(orgId);
 
             var reset = GenerateResetRequest(user);

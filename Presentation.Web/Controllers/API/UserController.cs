@@ -36,7 +36,7 @@ namespace Presentation.Web.Controllers.API
             // TODO: this is bad crosscutting of concerns. refactor / extract into separate controller
             _kernel = kernel; // we need this for retrieving userroles when creating a csv file.
         }
-        
+
         public override HttpResponseMessage Post(UserDTO dto)
         {
             try
@@ -276,7 +276,7 @@ namespace Presentation.Web.Controllers.API
                     obj.Add("ITKontraktRoller", GetContractRights(user.Id));
                     list.Add(obj);
                 }
-                
+
                 var csvList = list.ToCsv();
                 var bytes = Encoding.Unicode.GetBytes(csvList);
                 var stream = new MemoryStream();

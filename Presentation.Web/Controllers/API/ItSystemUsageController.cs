@@ -17,7 +17,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class ItSystemUsageController : GenericContextAwareApiController<ItSystemUsage, ItSystemUsageDTO> 
+    public class ItSystemUsageController : GenericContextAwareApiController<ItSystemUsage, ItSystemUsageDTO>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<TaskRef> _taskRepository;
@@ -25,10 +25,10 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<ItSystemRole> _roleRepository;
 
         public ItSystemUsageController(IGenericRepository<ItSystemUsage> repository,
-            IGenericRepository<OrganizationUnit> orgUnitRepository, 
-            IGenericRepository<TaskRef> taskRepository, 
-            IItSystemUsageService itSystemUsageService, 
-            IGenericRepository<ItSystemRole> roleRepository) 
+            IGenericRepository<OrganizationUnit> orgUnitRepository,
+            IGenericRepository<TaskRef> taskRepository,
+            IItSystemUsageService itSystemUsageService,
+            IGenericRepository<ItSystemRole> roleRepository)
             : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
@@ -45,11 +45,11 @@ namespace Presentation.Web.Controllers.API
                     u =>
                         // filter by system usage name
                         u.ItSystem.Name.Contains(q) &&
-                        // system usage is only within the context 
+                        // system usage is only within the context
                         u.OrganizationId == organizationId &&
-                        // global admin sees all 
+                        // global admin sees all
                         (KitosUser.IsGlobalAdmin ||
-                        // object owner sees his own objects     
+                        // object owner sees his own objects
                         u.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
                         u.ItSystem.AccessModifier == AccessModifier.Public ||
@@ -66,7 +66,7 @@ namespace Presentation.Web.Controllers.API
             catch (Exception e)
             {
                 return Error(e);
-            } 
+            }
         }
 
         public HttpResponseMessage GetByOrganization(int organizationId, [FromUri] PagingModel<ItSystemUsage> pagingModel, [FromUri] string q, bool? overview)
@@ -75,11 +75,11 @@ namespace Presentation.Web.Controllers.API
             {
                 pagingModel.Where(
                     u =>
-                        // system usage is only within the context 
+                        // system usage is only within the context
                         u.OrganizationId == organizationId &&
-                        // global admin sees all 
+                        // global admin sees all
                         (KitosUser.IsGlobalAdmin ||
-                        // object owner sees his own objects     
+                        // object owner sees his own objects
                         u.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
                         u.ItSystem.AccessModifier == AccessModifier.Public ||
@@ -94,7 +94,7 @@ namespace Presentation.Web.Controllers.API
                 if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
 
                 var usages = Page(Repository.AsQueryable(), pagingModel);
-                
+
                 return Ok(Map(usages));
             }
             catch (Exception e)
@@ -109,11 +109,11 @@ namespace Presentation.Web.Controllers.API
             {
                 var usages = Repository.Get(
                     u =>
-                        // system usage is only within the context 
+                        // system usage is only within the context
                         u.OrganizationId == organizationId &&
-                        // global admin sees all 
+                        // global admin sees all
                         (KitosUser.IsGlobalAdmin ||
-                        // object owner sees his own objects     
+                        // object owner sees his own objects
                         u.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
                         u.ItSystem.AccessModifier == AccessModifier.Public ||
@@ -127,7 +127,7 @@ namespace Presentation.Web.Controllers.API
 
                 //if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
                 //var usages = Page(Repository.AsQueryable(), pagingModel);
-                
+
                 // mapping to DTOs for easy lazy loading of needed properties
                 var dtos = Map(usages);
 
@@ -403,7 +403,7 @@ namespace Presentation.Web.Controllers.API
                                   .Where(p => p.Id == id)
                                   .Select(p => p.ItSystem)
                                   .SelectMany(s => s.TaskRefs);
-                    
+
                     taskQuery = taskQuery1.Union(taskQuery2);
                 }
                 else
@@ -417,7 +417,7 @@ namespace Presentation.Web.Controllers.API
                                                   taskRef.Parent.ParentId.Value == taskGroup.Value) &&
                                                  !taskRef.Children.Any() &&
                                                  taskRef.AccessModifier == AccessModifier.Public); // TODO add support for normal
-                else 
+                else
                     pagingModel.Where(taskRef => taskRef.Children.Count == 0);
 
                 var theTasks = Page(taskQuery, pagingModel).ToList();
