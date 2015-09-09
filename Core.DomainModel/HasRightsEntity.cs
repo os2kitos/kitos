@@ -31,7 +31,7 @@ namespace Core.DomainModel
         public override bool HasUserWriteAccess(User user)
         {
             // check if the user has a write role on this instance
-            if (Rights.Any(right => right.UserId == user.Id && right.Role.HasWriteAccess)) 
+            if (Rights.Any(right => right.UserId == user.Id && right.Role.HasWriteAccess))
                 return true;
 
             return base.HasUserWriteAccess(user);

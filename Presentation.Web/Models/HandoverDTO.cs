@@ -9,7 +9,7 @@ namespace Presentation.Web.Models
     {
         public int Id { get; set; }
         public string Description { get; set; }
-        [JsonConverter(typeof(CustomDateTimeConverter))]
+        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? MeetingDate { get; set; }
         public string Summary { get; set; }
         public virtual IEnumerable<UserDTO> Participants { get; set; }

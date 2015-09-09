@@ -10,7 +10,7 @@ namespace Core.DomainModel
         Municipality,
         CommunityOfInterests
     }
-    
+
     /// <summary>
     /// Represents an Organization (such as a municipality, or a company).
     /// Holds local configuration and admin roles, as well as collections of
@@ -65,7 +65,7 @@ namespace Core.DomainModel
         /// Local usages of IT systems within this organization
         /// </summary>
         public virtual ICollection<ItSystemUsage.ItSystemUsage> ItSystemUsages { get; set; }
-        
+
         /// <summary>
         /// Local configuration of KITOS
         /// </summary>
