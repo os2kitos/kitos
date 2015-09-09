@@ -40,13 +40,15 @@
         public virtual ItProject AssociatedItProject { get; set; }
 
         /// <summary>
-        /// Gets or sets the associated phase identifier.
-        /// This id relates to a phase in the <see cref="AssociatedItProject"/>.
+        /// Gets or sets the associated phase.
         /// </summary>
         /// <value>
         /// The associated phase identifier.
         /// </value>
-        public int? AssociatedPhaseId { get; set; }
+        /// <remarks>
+        /// This number relates to a phase in the <see cref="AssociatedItProject"/>.
+        /// </remarks>
+        public int? AssociatedPhaseNum { get; set; }
 
         public override bool HasUserWriteAccess(User user)
         {
