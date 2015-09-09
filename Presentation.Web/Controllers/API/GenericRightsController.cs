@@ -10,7 +10,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     public abstract class GenericRightsController<TObject, TRight, TRole> : BaseApiController
-        where TObject : HasRightsEntity<TObject, TRight, TRole>
+        where TObject : HasRightsEntity<TObject, TRight, TRole>, IContextAware
         where TRight : Entity, IRight<TObject, TRight, TRole>
         where TRole : IRoleEntity<TRight>
     {
@@ -64,7 +64,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!HasWriteAccess(id, KitosUser))
+                if (!HasWriteAccess(id, KitosUser, organizationId))
                     return Unauthorized();
 
                 var right = AutoMapper.Mapper.Map<RightInputDTO, TRight>(dto);
@@ -101,7 +101,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!HasWriteAccess(id, KitosUser))
+                if (!HasWriteAccess(id, KitosUser, organizationId))
                     return Unauthorized();
 
                 var right = RightRepository.Get(r => r.ObjectId == id && r.RoleId == rId && r.UserId == uId).FirstOrDefault();
@@ -119,12 +119,17 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        private bool HasWriteAccess(int objectId, User user)
+        private bool HasWriteAccess(int objectId, User user, int organizationId)
         {
             if (user.IsGlobalAdmin)
                 return true;
 
             var obj = _objectRepository.GetByKey(objectId);
+            // local admin have write access if the obj is in context
+            if (obj.IsInContext(organizationId) &&
+                user.AdminRights.Any(x => x.ObjectId == organizationId && x.Role.HasWriteAccess))
+                return true;
+
             return obj.HasUserWriteAccess(user);
         }
     }
