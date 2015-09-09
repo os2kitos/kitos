@@ -133,8 +133,9 @@ namespace Presentation.Web.Controllers.API
                 var destName = mapMember.DestinationProperty.Name;
 
                 if (destName == "IsGlobalAdmin")
-                    if (!KitosUser.IsGlobalAdmin)
-                        return Forbidden(); // don't allow users to elevate to global admin unless done by a global admin
+                    if (valuePair.Value.Value<bool>()) // check if value is being set to true
+                        if (!KitosUser.IsGlobalAdmin)
+                            return Forbidden(); // don't allow users to elevate to global admin unless done by a global admin
             }
 
             return base.Patch(id, organizationId, obj);
@@ -395,6 +396,15 @@ namespace Presentation.Web.Controllers.API
             {
                 return Error(e);
             }
+        }
+
+        protected override bool HasWriteAccess(User obj, User user, int organizationId)
+        {
+            var isLocalAdmin = KitosUser.AdminRights.Any(x => x.ObjectId == organizationId && x.Role.HasWriteAccess);
+            if (isLocalAdmin)
+                return true;
+
+            return base.HasWriteAccess(obj, user, organizationId);
         }
     }
 }

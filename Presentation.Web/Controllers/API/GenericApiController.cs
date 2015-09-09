@@ -217,10 +217,11 @@ namespace Presentation.Web.Controllers.API
                             // update the entity
                             propRef.SetValue(item, value);
                         }
-                        catch (Exception)
+                        catch
                         {
-                            // if obj.Value<t>("keyName") cast fails set to fallback value
-                            propRef.SetValue(item, null); // TODO this is could be dangerous, should probably also be default(t)
+                            // ignore any errors with setting the value
+                            // this should only happen when trying to set values,
+                            // that aren't ment to be set via the API
                         }
                     }
                 }
