@@ -13,6 +13,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [Authorize]
     public abstract class BaseApiController : ApiController
     {
         [Inject]

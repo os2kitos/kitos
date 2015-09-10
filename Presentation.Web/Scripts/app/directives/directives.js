@@ -441,22 +441,6 @@
         }
     ]);
 
-    app.directive('dateToString', [
-        'dateFilter', function(dateFilter) {
-            return {
-                restrict: 'A',
-                require: 'ngModel',
-                link: function(scope, element, attr, ctrl) {
-                    ctrl.$parsers.push(function(value) {
-                        if (value instanceof Date)
-                            return dateFilter(value, 'yyyy-MM-dd');
-                        return value;
-                    });
-                }
-            };
-        }
-    ]);
-
     app.directive('autosave', [
         '$http', '$timeout', 'notify', 'userService', function ($http, $timeout, notify, userService) {
             return {

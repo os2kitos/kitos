@@ -3,7 +3,7 @@ namespace Core.DomainModel.ItProject
     /// <summary>
     /// Economy for an it project in a specific year.
     /// </summary>
-    public class EconomyYear : Entity
+    public class EconomyYear : Entity, IContextAware
     {
         public int YearNumber { get; set; }
 
@@ -64,20 +64,28 @@ namespace Core.DomainModel.ItProject
 
         public int OtherItSavingsBudget { get; set; }
         public int OtherItSavingsRea { get; set; }
-
+        
         /// <summary>
         /// Determines whether a user has write access to this instance.
         /// </summary>
         /// <param name="user">The user.</param>
-        /// <param name="organizationId"></param>
         /// <returns>
-        ///   <c>true</c> if user has write access; otherwise, <c>false</c>.
+        ///   <c>true</c> if user has write access, otherwise <c>false</c>.
         /// </returns>
-        public override bool HasUserWriteAccess(User user, int organizationId)
+        public override bool HasUserWriteAccess(User user)
         {
-            if (ItProject != null && ItProject.HasUserWriteAccess(user, organizationId)) return true;
+            if (ItProject != null && ItProject.HasUserWriteAccess(user)) 
+                return true;
 
-            return base.HasUserWriteAccess(user, organizationId);
+            return base.HasUserWriteAccess(user);
+        }
+
+        public bool IsInContext(int organizationId)
+        {
+            if (ItProject != null)
+                return ItProject.OrganizationId == organizationId;
+
+            return false;
         }
     }
 }

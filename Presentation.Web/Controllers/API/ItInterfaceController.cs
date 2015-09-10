@@ -17,7 +17,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class ItInterfaceController : GenericApiController<ItInterface, ItInterfaceDTO>
+    public class ItInterfaceController : GenericContextAwareApiController<ItInterface, ItInterfaceDTO>
     {
         public ItInterfaceController(IGenericRepository<ItInterface> repository) 
             : base(repository)

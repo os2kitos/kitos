@@ -6,7 +6,7 @@ namespace Core.DomainModel.ItContract
     /// It contract economy stream.
     /// </summary>
     /// TODO Refactor into a base class and extern & intern derived classes
-    public class EconomyStream : Entity
+    public class EconomyStream : Entity, IContextAware
     {
         /// <summary>
         /// The EconomyStream might be an extern payment for a contract.
@@ -93,21 +93,34 @@ namespace Core.DomainModel.ItContract
         /// The note.
         /// </value>
         public string Note { get; set; }
-
+        
         /// <summary>
         /// Determines whether a user has write access to this instance.
         /// </summary>
         /// <param name="user">The user.</param>
-        /// <param name="organizationId"></param>
         /// <returns>
-        ///   <c>true</c> if user has write access; otherwise, <c>false</c>.
+        ///   <c>true</c> if user has write access, otherwise <c>false</c>.
         /// </returns>
-        public override bool HasUserWriteAccess(User user, int organizationId)
+        public override bool HasUserWriteAccess(User user)
         {
-            if (ExternPaymentFor != null && ExternPaymentFor.HasUserWriteAccess(user, organizationId)) return true;
-            if (InternPaymentFor != null && InternPaymentFor.HasUserWriteAccess(user, organizationId)) return true;
+            if (ExternPaymentFor != null && ExternPaymentFor.HasUserWriteAccess(user)) 
+                return true;
 
-            return base.HasUserWriteAccess(user, organizationId);
+            if (InternPaymentFor != null && InternPaymentFor.HasUserWriteAccess(user)) 
+                return true;
+
+            return base.HasUserWriteAccess(user);
+        }
+
+        public bool IsInContext(int organizationId)
+        {
+            if (ExternPaymentFor != null)
+                return ExternPaymentFor.OrganizationId == organizationId;
+
+            if (InternPaymentFor != null)
+                return InternPaymentFor.OrganizationId == organizationId;
+
+            return false;
         }
     }
 }

@@ -31,70 +31,72 @@ namespace Presentation.Web.Controllers.OData
             return Ok(entity);
         }
 
-        protected IHttpActionResult Put(int key, T entity)
-        {
-            return StatusCode(HttpStatusCode.NotImplemented);
-        }
+        // TODO for now only read actions are allowed, in future write will be enabled - but keep security in mind!
 
-        protected IHttpActionResult Post(T entity)
-        {
-            Validate(entity);
+        //protected IHttpActionResult Put(int key, T entity)
+        //{
+        //    return StatusCode(HttpStatusCode.NotImplemented);
+        //}
 
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+        //protected IHttpActionResult Post(T entity)
+        //{
+        //    Validate(entity);
 
-            try
-            {
-                entity = Repository.Insert(entity);
-                Repository.Save();
-            }
-            catch (Exception e)
-            {
-                return InternalServerError(e);
-            }
+        //    if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            return Created(entity);
-        }
+        //    try
+        //    {
+        //        entity = Repository.Insert(entity);
+        //        Repository.Save();
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return InternalServerError(e);
+        //    }
 
-        protected IHttpActionResult Patch(int key, Delta<T> delta)
-        {
-            Validate(delta.GetEntity());
+        //    return Created(entity);
+        //}
 
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+        //protected IHttpActionResult Patch(int key, Delta<T> delta)
+        //{
+        //    Validate(delta.GetEntity());
 
-            var entity = Repository.GetByKey(key);
-            if(entity == null) 
-                return NotFound();
+        //    if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            try
-            {
-                delta.Patch(entity);
-                Repository.Save();
-            }
-            catch (Exception e)
-            {
-                return InternalServerError(e);
-            }
+        //    var entity = Repository.GetByKey(key);
+        //    if(entity == null) 
+        //        return NotFound();
 
-            return Updated(entity);
-        }
+        //    try
+        //    {
+        //        delta.Patch(entity);
+        //        Repository.Save();
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return InternalServerError(e);
+        //    }
 
-        protected IHttpActionResult Delete(int key)
-        {
-            var entity = Repository.GetByKey(key);
-            if (entity == null)
-                return NotFound();
+        //    return Updated(entity);
+        //}
+
+        //protected IHttpActionResult Delete(int key)
+        //{
+        //    var entity = Repository.GetByKey(key);
+        //    if (entity == null)
+        //        return NotFound();
             
-            try
-            {
-                Repository.DeleteByKey(key);
-                Repository.Save();
-            }
-            catch (Exception e)
-            {
-                return InternalServerError(e);
-            }
+        //    try
+        //    {
+        //        Repository.DeleteByKey(key);
+        //        Repository.Save();
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return InternalServerError(e);
+        //    }
 
-            return StatusCode(HttpStatusCode.NoContent);
-        }
+        //    return StatusCode(HttpStatusCode.NoContent);
+        //}
     }
 }

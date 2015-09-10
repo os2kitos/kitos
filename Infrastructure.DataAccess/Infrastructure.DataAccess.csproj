@@ -224,6 +224,10 @@
     <Compile Include="Migrations\201506221106303_ProjectPhaseToComplexType.Designer.cs">
       <DependentUpon>201506221106303_ProjectPhaseToComplexType.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201508071443388_RenamedAssociatedPhaseId.cs" />
+    <Compile Include="Migrations\201508071443388_RenamedAssociatedPhaseId.Designer.cs">
+      <DependentUpon>201508071443388_RenamedAssociatedPhaseId.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -307,6 +311,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201506221106303_ProjectPhaseToComplexType.resx">
       <DependentUpon>201506221106303_ProjectPhaseToComplexType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508071443388_RenamedAssociatedPhaseId.resx">
+      <DependentUpon>201508071443388_RenamedAssociatedPhaseId.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

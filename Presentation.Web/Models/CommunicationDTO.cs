@@ -11,7 +11,7 @@ namespace Presentation.Web.Models
         public string Purpose { get; set; }
         public string Message { get; set; }
         public string Media { get; set; }
-        [JsonConverter(typeof(CustomDateTimeConverter))]
+        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? DueDate { get; set; }
 
         public int? ResponsibleUserId { get; set; }

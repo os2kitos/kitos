@@ -9,7 +9,7 @@ namespace Presentation.Web.Models
         /// <summary>
         /// Which date, the state should be reached
         /// </summary>
-        [JsonConverter(typeof(CustomDateTimeConverter))]
+        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? Date { get; set; }
 
         /// <summary>

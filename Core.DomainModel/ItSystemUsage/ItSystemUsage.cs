@@ -7,7 +7,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// <summary>
     /// Represents an organisation's usage of an it system.
     /// </summary>
-    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>
+    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, IContextAware
     {
         public ItSystemUsage()
         {
@@ -87,7 +87,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// The responsible organization unit.
         /// </value>
         public virtual ItSystemUsageOrgUnitUsage ResponsibleUsage { get; set; }
-        
+
         public int OrganizationId { get; set; }
         /// <summary>
         /// Gets or sets the organization marked as responsible for this it system usage.
@@ -96,7 +96,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// The responsible organization.
         /// </value>
         public virtual Organization Organization { get; set; }
-        
+
         public int ItSystemId { get; set; }
         /// <summary>
         /// Gets or sets the it system this instance is using.
@@ -172,7 +172,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// </value>
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
         /// <summary>
-        /// The local usages of interfaces. 
+        /// The local usages of interfaces.
         /// </summary>
         public virtual ICollection<InterfaceUsage> InterfaceUsages { get; set; }
         /// <summary>
@@ -190,12 +190,16 @@ namespace Core.DomainModel.ItSystemUsage
         /// </value>
         public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
 
-        public override bool HasUserWriteAccess(User user, int organizationId)
+        /// <summary>
+        /// Determines whether this instance is within a given organizational context.
+        /// </summary>
+        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
+        /// <returns>
+        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
+        /// </returns>
+        public bool IsInContext(int organizationId)
         {
-            // check that object belongs to the requested organization context
-            if (OrganizationId != organizationId)
-                return false;
-            return base.HasUserWriteAccess(user, organizationId);
+            return OrganizationId == organizationId;
         }
     }
 }

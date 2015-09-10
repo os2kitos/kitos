@@ -10,7 +10,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class ExhibitController : GenericApiController<ItInterfaceExhibit, ItInterfaceExhibitDTO>
+    public class ExhibitController : GenericContextAwareApiController<ItInterfaceExhibit, ItInterfaceExhibitDTO>
     {
         private readonly IGenericRepository<ItInterfaceExhibit> _repository;
 
@@ -24,7 +24,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var exhibits = _repository.Get(x => x.ItSystemId == sysId && x.ItInterface.OrganizationId == orgId || x.ItInterface.AccessModifier == AccessModifier.Public);
+                var exhibits = _repository.Get(x => x.ItSystemId == sysId && (x.ItInterface.OrganizationId == orgId || x.ItInterface.AccessModifier == AccessModifier.Public));
                 var intfs = exhibits.Select(x => x.ItInterface);
                 var dtos = Mapper.Map<IEnumerable<ItInterfaceDTO>>(intfs);
                 return Ok(dtos);

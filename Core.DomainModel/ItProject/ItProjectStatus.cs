@@ -4,7 +4,7 @@
     /// Base class of Milestone and Assignment.
     /// Called status for lack of a better word.
     /// </summary>
-    public abstract class ItProjectStatus : Entity
+    public abstract class ItProjectStatus : Entity, IContextAware
     {
         /// <summary>
         /// Human readable ID ("brugervendt noegle" in OIO)
@@ -40,19 +40,31 @@
         public virtual ItProject AssociatedItProject { get; set; }
 
         /// <summary>
-        /// Gets or sets the associated phase identifier.
-        /// This id relates to a phase in the <see cref="AssociatedItProject"/>.
+        /// Gets or sets the associated phase.
         /// </summary>
         /// <value>
         /// The associated phase identifier.
         /// </value>
-        public int? AssociatedPhaseId { get; set; }
+        /// <remarks>
+        /// This number relates to a phase in the <see cref="AssociatedItProject"/>.
+        /// </remarks>
+        public int? AssociatedPhaseNum { get; set; }
 
-        public override bool HasUserWriteAccess(User user, int organizationId)
+        public override bool HasUserWriteAccess(User user)
         {
-            if (AssociatedItProject != null && AssociatedItProject.HasUserWriteAccess(user, organizationId)) return true;
+            if (AssociatedItProject != null && AssociatedItProject.HasUserWriteAccess(user)) 
+                return true;
 
-            return base.HasUserWriteAccess(user, organizationId);
+            return base.HasUserWriteAccess(user);
+        }
+
+        public bool IsInContext(int organizationId)
+        {
+            // delegate to it project
+            if (AssociatedItProject != null)
+                return AssociatedItProject.IsInContext(organizationId);
+
+            return false;
         }
     }
 }

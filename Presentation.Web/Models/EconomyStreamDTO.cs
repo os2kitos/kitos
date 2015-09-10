@@ -40,7 +40,7 @@ namespace Presentation.Web.Models
         /// <summary>
         /// DateTime for audit
         /// </summary>
-        [JsonConverter(typeof(CustomDateTimeConverter))]
+        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? AuditDate { get; set; }
 
         public string Note { get; set; }

@@ -15,6 +15,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using Newtonsoft.Json.Linq;
 using Ninject;
 using Presentation.Web.Models;
 
@@ -32,15 +33,15 @@ namespace Presentation.Web.Controllers.API
             _userService = userService;
             _organizationService = organizationService;
 
-            //todo: this is bad crosscutting of concerns. refactor / extract into separate controller
-            _kernel = kernel; //we need this for retrieving userroles when creating a csv file.
+            // TODO: this is bad crosscutting of concerns. refactor / extract into separate controller
+            _kernel = kernel; // we need this for retrieving userroles when creating a csv file.
         }
-        
+
         public override HttpResponseMessage Post(UserDTO dto)
         {
             try
             {
-                //do some string magic to determine parameters, and actions
+                // do some string magic to determine parameters, and actions
                 List<string> parameters = null;
                 var sendMailOnCreation = false;
                 var sendReminder = false;
@@ -78,24 +79,30 @@ namespace Presentation.Web.Controllers.API
                     return Error("Organization id is missing!");
                 }
 
-                //check if user already exists and we are not sending a reminder or advis. If so, just return him
+                // only global admin is allowed to set others to global admin
+                if (dto.IsGlobalAdmin && !KitosUser.IsGlobalAdmin)
+                {
+                    return Forbidden();
+                }
+
+                // check if user already exists and we are not sending a reminder or advis. If so, just return him
                 var existingUser = Repository.Get(u => u.Email == dto.Email).FirstOrDefault();
                 if (existingUser != null && !sendReminder && !sendAdvis)
                     return Ok(Map(existingUser));
-                //if we are sending a reminder:
+                // if we are sending a reminder:
                 if (existingUser != null && sendReminder)
                 {
                     _userService.IssueAdvisMail(existingUser, true, orgId);
                     return Ok(Map(existingUser));
                 }
-                //if we are sending an advis:
+                // if we are sending an advis:
                 if (existingUser != null && sendAdvis)
                 {
                     _userService.IssueAdvisMail(existingUser, false, orgId);
                     return Ok(Map(existingUser));
                 }
 
-                //otherwise we are creating a new user
+                // otherwise we are creating a new user
                 var item = Map(dto);
 
                 item.ObjectOwner = KitosUser;
@@ -109,6 +116,29 @@ namespace Presentation.Web.Controllers.API
             {
                 return Error(e);
             }
+        }
+
+        public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
+        {
+            // get name of mapped property
+            var map = Mapper.FindTypeMapFor<UserDTO, User>().GetPropertyMaps();
+            var nonNullMaps = map.Where(x => x.SourceMember != null).ToList();
+
+            foreach (var valuePair in obj)
+            {
+                var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name.Equals(valuePair.Key, StringComparison.InvariantCultureIgnoreCase));
+                if (mapMember == null)
+                    continue; // abort if no map found
+
+                var destName = mapMember.DestinationProperty.Name;
+
+                if (destName == "IsGlobalAdmin")
+                    if (valuePair.Value.Value<bool>()) // check if value is being set to true
+                        if (!KitosUser.IsGlobalAdmin)
+                            return Forbidden(); // don't allow users to elevate to global admin unless done by a global admin
+            }
+
+            return base.Patch(id, organizationId, obj);
         }
 
         public HttpResponseMessage PostTokenRequest(bool? token, int userId)
@@ -134,7 +164,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var users = Repository.Get(u => u.Name.Contains(q) || u.Email.Contains(q));
-                return Ok(AutoMapper.Mapper.Map<IEnumerable<User>, IEnumerable<UserDTO>>(users));
+                return Ok(Mapper.Map<IEnumerable<User>, IEnumerable<UserDTO>>(users));
             }
             catch (Exception e)
             {
@@ -151,7 +181,7 @@ namespace Presentation.Web.Controllers.API
                         u.Name.Contains(q)
                         || u.Email.Contains(q));
 
-                //Get all users inside the organization
+                // Get all users inside the organization
                 pagingModel.Where(u => u.AdminRights.Count(r => r.Role.Name == "Medarbejder" && r.ObjectId == orgId) > 0);
 
                 var users = Page(Repository.AsQueryable(), pagingModel).ToList();
@@ -181,7 +211,7 @@ namespace Presentation.Web.Controllers.API
                         u.Name.Contains(q)
                         || u.Email.Contains(q));
 
-                //Get all users inside the organization
+                // Get all users inside the organization
                 pagingModel.Where(u => u.AdminRights.Count(r => r.Role.Name == "Medarbejder" && r.ObjectId == orgId) > 0);
 
                 var users = Page(Repository.AsQueryable(), pagingModel).ToList();
@@ -246,7 +276,7 @@ namespace Presentation.Web.Controllers.API
                     obj.Add("ITKontraktRoller", GetContractRights(user.Id));
                     list.Add(obj);
                 }
-                
+
                 var csvList = list.ToCsv();
                 var bytes = Encoding.Unicode.GetBytes(csvList);
                 var stream = new MemoryStream();
@@ -266,6 +296,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         #region GetRights
+
         private string GetOrgRights(int orgId, int userId)
         {
             var rightsRepository = _kernel.Get<IGenericRepository<OrganizationRight>>();
@@ -322,6 +353,7 @@ namespace Presentation.Web.Controllers.API
             }
             return builder.ToString();
         }
+
         #endregion
 
         public HttpResponseMessage GetNameIsAvailable(string checkname, int orgId)
@@ -350,7 +382,7 @@ namespace Presentation.Web.Controllers.API
             if (users.Any()) return Ok();
 
             return NotFound();
-    }
+        }
 
         public HttpResponseMessage PostDefaultOrgUnit(bool? updateDefaultOrgUnit, UpdateDefaultOrgUnitDto dto)
         {
@@ -364,6 +396,15 @@ namespace Presentation.Web.Controllers.API
             {
                 return Error(e);
             }
+        }
+
+        protected override bool HasWriteAccess(User obj, User user, int organizationId)
+        {
+            var isLocalAdmin = KitosUser.AdminRights.Any(x => x.ObjectId == organizationId && x.Role.HasWriteAccess);
+            if (isLocalAdmin)
+                return true;
+
+            return base.HasWriteAccess(obj, user, organizationId);
         }
     }
 }

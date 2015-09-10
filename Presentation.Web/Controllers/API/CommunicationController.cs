@@ -6,7 +6,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class CommunicationController : GenericApiController<Communication, CommunicationDTO>
+    public class CommunicationController : GenericContextAwareApiController<Communication, CommunicationDTO>
     {
         public CommunicationController(IGenericRepository<Communication> repository) 
             : base(repository)

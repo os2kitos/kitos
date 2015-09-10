@@ -5,7 +5,7 @@ namespace Core.DomainModel.ItProject
     /// <summary>
     /// It project goal.
     /// </summary>
-    public class Goal : Entity
+    public class Goal : Entity, IContextAware
     {
         /// <summary>
         /// Human readable identifier.
@@ -40,20 +40,35 @@ namespace Core.DomainModel.ItProject
         public string SubGoalRea1 { get; set; }
         public string SubGoalRea2 { get; set; }
         public string SubGoalRea3 { get; set; }
-
+        
         /// <summary>
         /// Determines whether a user has write access to this instance.
         /// </summary>
         /// <param name="user">The user.</param>
-        /// <param name="organizationId"></param>
         /// <returns>
-        ///   <c>true</c> if user has write access; otherwise, <c>false</c>.
+        ///   <c>true</c> if user has write access, otherwise <c>false</c>.
         /// </returns>
-        public override bool HasUserWriteAccess(User user, int organizationId)
+        public override bool HasUserWriteAccess(User user)
         {
-            if (GoalStatus != null && GoalStatus.HasUserWriteAccess(user, organizationId)) return true;
+            if (GoalStatus != null && GoalStatus.HasUserWriteAccess(user)) 
+                return true;
 
-            return base.HasUserWriteAccess(user, organizationId);
+            return base.HasUserWriteAccess(user);
+        }
+
+        /// <summary>
+        /// Determines whether this instance is within a given organizational context.
+        /// </summary>
+        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
+        /// <returns>
+        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
+        /// </returns>
+        public bool IsInContext(int organizationId)
+        {
+            if (GoalStatus != null)
+                return GoalStatus.IsInContext(organizationId);
+
+            return false;
         }
     }
 }

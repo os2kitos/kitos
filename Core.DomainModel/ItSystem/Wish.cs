@@ -3,7 +3,7 @@ namespace Core.DomainModel.ItSystem
     /// <summary>
     /// A user generated feature requests for an existing it system.
     /// </summary>
-    public class Wish : Entity
+    public class Wish : Entity, IContextAware
     {
         /// <summary>
         /// Gets or sets a value indicating whether this instance is public.
@@ -39,20 +39,35 @@ namespace Core.DomainModel.ItSystem
         /// It system usage.
         /// </value>
         public virtual ItSystemUsage.ItSystemUsage ItSystemUsage { get; set; }
-
+        
         /// <summary>
         /// Determines whether a user has write access to this instance.
         /// </summary>
         /// <param name="user">The user.</param>
-        /// <param name="organizationId"></param>
         /// <returns>
-        ///   <c>true</c> if user has write access; otherwise, <c>false</c>.
+        ///   <c>true</c> if user has write access, otherwise <c>false</c>.
         /// </returns>
-        public override bool HasUserWriteAccess(User user, int organizationId)
+        public override bool HasUserWriteAccess(User user)
         {
-            if (ItSystemUsage != null && ItSystemUsage.HasUserWriteAccess(user, organizationId)) return true;
+            if (ItSystemUsage != null && ItSystemUsage.HasUserWriteAccess(user)) 
+                return true;
 
-            return base.HasUserWriteAccess(user, organizationId);
+            return base.HasUserWriteAccess(user);
+        }
+
+        /// <summary>
+        /// Determines whether this instance is within a given organizational context.
+        /// </summary>
+        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
+        /// <returns>
+        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
+        /// </returns>
+        public bool IsInContext(int organizationId)
+        {
+            if (ItSystemUsage != null)
+                return ItSystemUsage.IsInContext(organizationId);
+
+            return false;
         }
     }
 }

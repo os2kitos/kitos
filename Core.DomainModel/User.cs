@@ -5,7 +5,7 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
-{    
+{
     /// <summary>
     /// Represents a user with credentials and user roles
     /// </summary>
@@ -31,7 +31,7 @@ namespace Core.DomainModel
         public string Salt { get; set; }
         public bool IsGlobalAdmin { get; set; }
         public Guid? Uuid { get; set; }
-        public DateTime? LastAdvisDate { get; set; }   
+        public DateTime? LastAdvisDate { get; set; }
 
         //TODO REMOVE THIS - replaced by admin rights default org unit
         public int? DefaultOrganizationUnitId { get; set; }
@@ -45,7 +45,7 @@ namespace Core.DomainModel
         /// The admin rights of the user
         /// </summary>
         public virtual ICollection<AdminRight> AdminRights { get; set; }
-        
+
         /// <summary>
         /// Passwords reset request issued for the user
         /// </summary>
@@ -60,7 +60,7 @@ namespace Core.DomainModel
         /// Gets or sets the <see cref="Assignment"/> or <see cref="Milestone"/> associated with this user
         /// </summary>
         public virtual ICollection<ItProjectStatus> ItProjectStatuses { get; set; }
-        
+
         /// <summary>
         /// Risks associated with this user
         /// </summary>
@@ -81,11 +81,12 @@ namespace Core.DomainModel
         /// </summary>
         public virtual ICollection<ItContract.ItContract> SignerForContracts { get; set; }
 
-        public override bool HasUserWriteAccess(User user, int organizationId)
+        public override bool HasUserWriteAccess(User user)
         {
-            if (user.Id == this.Id) return true;
+            if (Id == user.Id)
+                return true;
 
-            return base.HasUserWriteAccess(user, organizationId);
+            return base.HasUserWriteAccess(user);
         }
     }
 }

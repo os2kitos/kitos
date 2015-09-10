@@ -7,7 +7,7 @@ namespace Core.DomainModel
     /// Represents a task (such as KLE), which can be associated
     /// with Systems, Projects or Organization Units.
     /// </summary>
-    public class TaskRef : Entity, IHierarchy<TaskRef>, IHasAccessModifier
+    public class TaskRef : Entity, IHierarchy<TaskRef>, IHasAccessModifier, IContextAware
     {
         public TaskRef()
         {
@@ -78,5 +78,20 @@ namespace Core.DomainModel
         /// ItSystemUsages which have been marked with this task
         /// </summary>
         public virtual ICollection<ItSystemUsage.ItSystemUsage> ItSystemUsages { get; set; }
+
+        /// <summary>
+        /// Determines whether this instance is within a given organizational context.
+        /// </summary>
+        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
+        /// <returns>
+        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
+        /// </returns>
+        public bool IsInContext(int organizationId)
+        {
+            if (OwnedByOrganizationUnit != null)
+                return OwnedByOrganizationUnit.IsInContext(organizationId);
+
+            return false;
+        }
     }
 }

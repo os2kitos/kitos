@@ -7,7 +7,7 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     /// Contains info about an it contract
     /// </summary>
-    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHierarchy<ItContract>
+    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHierarchy<ItContract>, IContextAware
     {
         public ItContract()
         {
@@ -449,19 +449,27 @@ namespace Core.DomainModel.ItContract
         /// Determines whether a user has write access to this instance.
         /// </summary>
         /// <param name="user">The user.</param>
-        /// <param name="organizationId"></param>
         /// <returns>
         ///   <c>true</c> if user has write access; otherwise, <c>false</c>.
         /// </returns>
-        public override bool HasUserWriteAccess(User user, int organizationId)
+        public override bool HasUserWriteAccess(User user)
         {
-            // check that object belongs to the requwested organization context
-            if (OrganizationId != organizationId)
-                return false;
             if (ContractSignerId == user.Id) 
                 return true;
 
-            return base.HasUserWriteAccess(user, organizationId);
+            return base.HasUserWriteAccess(user);
+        }
+
+        /// <summary>
+        /// Determines whether this instance is within a given organizational context.
+        /// </summary>
+        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
+        /// <returns>
+        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
+        /// </returns>
+        public bool IsInContext(int organizationId)
+        {
+            return OrganizationId == organizationId;
         }
 
         /// <summary>
