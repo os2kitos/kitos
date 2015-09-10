@@ -64,7 +64,7 @@ namespace Presentation.Web.Controllers.OData
         //    if (!ModelState.IsValid) return BadRequest(ModelState);
 
         //    var entity = Repository.GetByKey(key);
-        //    if(entity == null) 
+        //    if(entity == null)
         //        return NotFound();
 
         //    try
@@ -85,7 +85,7 @@ namespace Presentation.Web.Controllers.OData
         //    var entity = Repository.GetByKey(key);
         //    if (entity == null)
         //        return NotFound();
-            
+
         //    try
         //    {
         //        Repository.DeleteByKey(key);
