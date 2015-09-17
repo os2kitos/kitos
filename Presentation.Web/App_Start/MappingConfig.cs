@@ -68,7 +68,7 @@ namespace Presentation.Web
 
             Mapper.CreateMap<ItProjectType, OptionDTO>()
                   .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore()); 
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<PurchaseForm, OptionDTO>()
                   .ReverseMap()
@@ -160,11 +160,17 @@ namespace Presentation.Web
                   .ReverseMap();
 
             Mapper.CreateMap<User, UserDTO>()
-                  .ReverseMap();
-            Mapper.CreateMap<User, UserProfileDTO>()
+                  .ForMember(dest => dest.DefaultOrganizationUnitId,
+                      opt => opt.MapFrom(src => src.AdminRights.First().DefaultOrgUnitId)) // TODO using FirstOrDefault here might cause problems
+                  .ForMember(dest => dest.DefaultOrganizationUnitName,
+                      opt => opt.MapFrom(src => src.AdminRights.First().DefaultOrgUnit.Name)) // TODO using FirstOrDefault here might cause problems
                   .ReverseMap();
 
-            Mapper.CreateMap<User, UserOverviewDTO>();
+            Mapper.CreateMap<User, UserOverviewDTO>()
+                .ForMember(dest => dest.DefaultOrganizationUnitId,
+                    opt => opt.MapFrom(src => src.AdminRights.First().DefaultOrgUnitId)) // TODO using FirstOrDefault here might cause problems
+                .ForMember(dest => dest.DefaultOrganizationUnitName,
+                    opt => opt.MapFrom(src => src.AdminRights.First().DefaultOrgUnit.Name)); // TODO using FirstOrDefault here might cause problems
 
             Mapper.CreateMap<Wish, WishDTO>()
                   .ReverseMap()
@@ -301,7 +307,7 @@ namespace Presentation.Web
                   .ReverseMap();
             Mapper.CreateMap<Milestone, MilestoneDTO>()
                   .ReverseMap();
-                
+
             Mapper.CreateMap<GoalStatus, GoalStatusDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.ItProject, opt => opt.Ignore())
@@ -315,7 +321,7 @@ namespace Presentation.Web
             Mapper.CreateMap<Stakeholder, StakeholderDTO>()
                   .ReverseMap();
 
-            
+
 
             Mapper.CreateMap<ItProject, ItProjectDTO>()
                 .ForMember(dest => dest.ChildrenIds,
@@ -364,7 +370,7 @@ namespace Presentation.Web
             Mapper.CreateMap<ItContract, ItContractPlanDTO>();
 
             //Output only - this mapping should not be reversed
-            Mapper.CreateMap<ItContract, ItContractSystemDTO>(); 
+            Mapper.CreateMap<ItContract, ItContractSystemDTO>();
 
             Mapper.CreateMap<PaymentMilestone, PaymentMilestoneDTO>()
                   .ReverseMap();

@@ -89,7 +89,7 @@ namespace Presentation.Web.Controllers.API
                     //TODO: You have to be local or global admin to change parent
 
                     var parentId = jtoken.Value<int>();
-                    
+
                     //if the new parent is actually a descendant of the item, don't update - this would create a loop!
                     if (_orgUnitService.IsAncestorOf(parentId, id))
                     {
@@ -214,6 +214,14 @@ namespace Presentation.Web.Controllers.API
             {
                 return Error(e);
             }
+        }
+
+        protected override void DeleteQuery(OrganizationUnit entity)
+        {
+            // http://stackoverflow.com/questions/15226312/entityframewok-how-to-configure-cascade-delete-to-nullify-foreign-keys
+            // when children are loaded into memory the foreign key is correctly set to null on children when deleted
+            var dummy = entity.DefaultUsers; // users that have this organization unit set as their default
+            base.DeleteQuery(entity);
         }
     }
 }

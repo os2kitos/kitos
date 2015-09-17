@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Diagnostics;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
@@ -19,7 +19,7 @@ namespace Infrastructure.DataAccess.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
-            
+
             // MySQL oddness
             SetSqlGenerator("MySql.Data.MySqlClient", new MySql.Data.Entity.MySqlMigrationSqlGenerator());
             CodeGenerator = new MySql.Data.Entity.MySqlMigrationCodeGenerator();
@@ -76,16 +76,16 @@ namespace Infrastructure.DataAccess.Migrations
 
             AddOptions<DataType, DataRow>(context.DataTypes, globalAdmin, "Person", "Virksomhed", "Sag", "Dokument", "Organisation", "Klassikfikation", "Ejendom", "GIS", "Andet");
 
-            AddOptions<Frequency, DataRowUsage>(context.Frequencies, globalAdmin, "Dagligt", "Ugentligt", "Månedligt", "Årligt", "Kvartal", "Halvårligt"); 
+            AddOptions<Frequency, DataRowUsage>(context.Frequencies, globalAdmin, "Dagligt", "Ugentligt", "Månedligt", "Årligt", "Kvartal", "Halvårligt");
 
             AddOptions<InterfaceType, ItInterface>(context.InterfaceTypes, globalAdmin, "Webservice", "API", "iFrame", "Link", "Link - dybt", "Andet");
-            
+
             AddOptions<Interface, ItInterface>(context.Interfaces, globalAdmin, "CSV", "WS SOAP", "WS REST", "MOX", "OIO REST", "LDAP", "User interface", "ODBC (SQL)", "Andet");
 
             AddOptions<Method, ItInterface>(context.Methods, globalAdmin, "Batch", "Request-Response", "Store and forward", "Publish-subscribe", "App interface", "Andet");
 
             AddOptions<SensitiveDataType, ItSystemUsage>(context.SensitiveDataTypes, globalAdmin, "Ja", "Nej");
-            
+
             AddOptions<Tsa, ItInterface>(context.Tsas, globalAdmin, "Ja", "Nej");
 
             AddOptions<ContractType, ItContract>(context.ContractTypes, globalAdmin, "Hovedkontrakt", "Tillægskontrakt", "Snitflade", "Serviceaftale", "Databehandleraftale");
@@ -95,9 +95,9 @@ namespace Infrastructure.DataAccess.Migrations
             AddOptions<PurchaseForm, ItContract>(context.PurchaseForms, globalAdmin, "SKI", "SKI 02.18", "SKI 02.19", "Udbud", "EU udbud", "Direkte tildeling", "Annoncering");
 
             AddOptions<PaymentModel, ItContract>(context.PaymentModels, globalAdmin, "Licens", "icens - flatrate", "Licens - forbrug", "Licens - indbyggere", "Licens - pr. sag", "Gebyr", "Engangsydelse");
-            
-            AddOptions<AgreementElement, ItContract>(context.AgreementElements, globalAdmin, 
-                "Licens", "Udvikling", "Drift", "Vedligehold", "Support", 
+
+            AddOptions<AgreementElement, ItContract>(context.AgreementElements, globalAdmin,
+                "Licens", "Udvikling", "Drift", "Vedligehold", "Support",
                 "Serverlicenser", "Serverdrift", "Databaselicenser", "Backup", "Overvågning");
 
             AddOptions<OptionExtend, ItContract>(context.OptionExtention, globalAdmin, "2 x 1 år", "1 x 1 år", "1 x ½ år");
@@ -110,12 +110,12 @@ namespace Infrastructure.DataAccess.Migrations
 
             AddOptions<TerminationDeadline, ItContract>(context.TerminationDeadlines, globalAdmin, "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
 
-            AddOptions<HandoverTrialType, HandoverTrial>(context.HandoverTrialTypes, globalAdmin, "Funktionsprøve", "Driftovertagelsesprøve"); 
+            AddOptions<HandoverTrialType, HandoverTrial>(context.HandoverTrialTypes, globalAdmin, "Funktionsprøve", "Driftovertagelsesprøve");
 
             context.SaveChanges();
 
             #endregion
-            
+
             #region ADMIN ROLES
 
             var localAdmin = new AdminRole
@@ -137,7 +137,7 @@ namespace Infrastructure.DataAccess.Migrations
             context.SaveChanges();
 
             #endregion
-            
+
             #region ORG ROLES
 
             var boss = new OrganizationRole()
@@ -381,7 +381,7 @@ namespace Infrastructure.DataAccess.Migrations
             context.SaveChanges();
 
             #endregion
-            
+
             #region SYSTEM ROLES
 
             var systemOwnerRole = new ItSystemRole()
@@ -539,10 +539,10 @@ namespace Infrastructure.DataAccess.Migrations
 
             commonOrganization = context.Organizations.Single(x => x.Name == "Fælles Kommune");
 
-            //SetUserCreatedOrganization(globalAdmin, commonOrganization);
-            //SetUserCreatedOrganization(user1, commonOrganization);
-            //SetUserCreatedOrganization(user2, muni1);
-            //SetUserCreatedOrganization(user3, muni2);
+            //SetUserDefaultOrganizationUnit(globalAdmin, commonOrganization);
+            //SetUserDefaultOrganizationUnit(user1, commonOrganization);
+            //SetUserDefaultOrganizationUnit(user2, muni1);
+            //SetUserDefaultOrganizationUnit(user3, muni2);
 
 
             #endregion
@@ -550,9 +550,9 @@ namespace Infrastructure.DataAccess.Migrations
             #region TEXTS
 
             context.Texts.AddOrUpdate(x => x.Id,
-                                      new Text() { Value = @"KITOS - Kommunernes IT OverbliksSystem er et IT System, som er udviklet i de 3 første kvartaler i 2014 af Roskilde, Sorø, Ringsted, Syddjurs og Ballerup kommune. 
-Et væsentligt formål med projektet er at skabe et ensartet grundlag for hvordan vi som kommuner kan øge vores modenhed og evne til fremadrettet at 1) skabe overblik over 2) dokumentere og 3) analysere på vores samlede IT portefølje m.v. I forlængelse heraf er det en løsning, som skal hjælpe os med at understøtte det vidensbehov, som vi mener at monopolbruddet kræver – herunder kvalificere vores evne til at udnytte rammearkitekturen. 
-KITOS er bygget op omkring flg. moduler: 
+                                      new Text() { Value = @"KITOS - Kommunernes IT OverbliksSystem er et IT System, som er udviklet i de 3 første kvartaler i 2014 af Roskilde, Sorø, Ringsted, Syddjurs og Ballerup kommune.
+Et væsentligt formål med projektet er at skabe et ensartet grundlag for hvordan vi som kommuner kan øge vores modenhed og evne til fremadrettet at 1) skabe overblik over 2) dokumentere og 3) analysere på vores samlede IT portefølje m.v. I forlængelse heraf er det en løsning, som skal hjælpe os med at understøtte det vidensbehov, som vi mener at monopolbruddet kræver – herunder kvalificere vores evne til at udnytte rammearkitekturen.
+KITOS er bygget op omkring flg. moduler:
 1.	IT understøttelse af organisation
 2.	IT Projekter
 3.	IT Systemer
@@ -560,8 +560,8 @@ KITOS er bygget op omkring flg. moduler:
  Løsningen er ’overdraget’ til det digitale fællesskab OS2, som vil sørge for forvaltning af KITOS med hensyn til hosting, vedligeholdelse, videreudvikling, administration etc, så den også i praksis vil være mulig for andre kommuner at bruge.
 De første kommuner tager KITOS i brug i oktober 2014.
 Du kan læse mere om OS2KITOS på os2web.dk > Projekter > KITOS
-Kontakt: info@kitos.dk", 
-                       ObjectOwnerId = globalAdmin.Id, 
+Kontakt: info@kitos.dk",
+                       ObjectOwnerId = globalAdmin.Id,
                        LastChangedByUserId = globalAdmin.Id },
                                       new Text() { Value = "Der er p.t ingen driftsforstyrrelser", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
 
@@ -660,7 +660,7 @@ Kontakt: info@kitos.dk",
         {
             var options = names.Select(name => CreateOption<T, TReference>(name, objectOwner)).ToArray();
             dbSet.AddOrUpdate(x => x.Name, options);
-        } 
+        }
 
         /// <summary>
         /// Creates and returns a User
@@ -705,15 +705,18 @@ Kontakt: info@kitos.dk",
 
             return org;
         }
-        
+
         /// <summary>
         /// Helper function for setting the CreatedIn and DefaultOrganizationUnit properties.
         /// </summary>
         /// <param name="user"></param>
         /// <param name="organization"></param>
-        private static void SetUserCreatedOrganization(User user, Organization organization)
+        private static void SetUserDefaultOrganizationUnit(User user, Organization organization)
         {
-            user.DefaultOrganizationUnit = organization.GetRoot();
+            var rootOrgUnit = organization.GetRoot();
+            var right = organization.Rights.FirstOrDefault(x => x.UserId == user.Id);
+            Debug.Assert(right != null, "right != null");
+            right.DefaultOrgUnitId = rootOrgUnit.Id;
         }
 
         #endregion

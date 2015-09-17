@@ -33,14 +33,6 @@ namespace Core.DomainModel
         public Guid? Uuid { get; set; }
         public DateTime? LastAdvisDate { get; set; }
 
-        //TODO REMOVE THIS - replaced by admin rights default org unit
-        public int? DefaultOrganizationUnitId { get; set; }
-
-        /// <summary>
-        /// The organization unit that the user has selected as his default.
-        /// </summary>
-        public virtual OrganizationUnit DefaultOrganizationUnit { get; set; }
-
         /// <summary>
         /// The admin rights of the user
         /// </summary>

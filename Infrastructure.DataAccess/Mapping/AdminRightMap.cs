@@ -12,6 +12,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasRequired(t => t.User)
                 .WithMany(d => d.AdminRights)
                 .HasForeignKey(t => t.UserId);
+
+            this.HasOptional(t => t.DefaultOrgUnit)
+                .WithMany(d => d.DefaultUsers)
+                .HasForeignKey(t => t.DefaultOrgUnitId);
         }
     }
 }
