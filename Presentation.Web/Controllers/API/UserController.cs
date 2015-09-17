@@ -186,14 +186,6 @@ namespace Presentation.Web.Controllers.API
 
                 var users = Page(Repository.AsQueryable(), pagingModel).ToList();
 
-                foreach (var user in users)
-                {
-                    var right = user.AdminRights.FirstOrDefault(x => x.ObjectId == orgId);
-                    if (right != null)
-                        user.DefaultOrganizationUnit = right.DefaultOrgUnit;
-                    user.DefaultOrganizationUnitId = user.DefaultOrganizationUnit != null ? (int?)user.DefaultOrganizationUnit.Id : null;
-                }
-
                 return Ok(Map(users));
             }
             catch (Exception e)
@@ -219,12 +211,6 @@ namespace Presentation.Web.Controllers.API
 
                 foreach (var user in users)
                 {
-                    var right = user.AdminRights.FirstOrDefault(x => x.ObjectId == orgId);
-                    if (right != null)
-                        user.DefaultOrganizationUnit = right.DefaultOrgUnit;
-
-                    user.DefaultOrganizationUnitId = user.DefaultOrganizationUnit != null ? (int?)user.DefaultOrganizationUnit.Id : null;
-
                     var newDTO = Map<User, UserOverviewDTO>(user);
 
                     newDTO.CanBeEdited = HasWriteAccess(user, KitosUser, orgId);

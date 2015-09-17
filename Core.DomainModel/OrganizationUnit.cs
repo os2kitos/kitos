@@ -15,7 +15,7 @@ namespace Core.DomainModel
             this.TaskUsages = new List<TaskUsage>();
             this.TaskRefs = new List<TaskRef>();
             this.OwnedTasks = new List<TaskRef>();
-            this.DefaultUsers = new List<User>();
+            this.DefaultUsers = new List<AdminRight>();
             this.Using = new List<ItSystemUsageOrgUnitUsage>();
             this.UsingItProjects = new List<ItProjectOrgUnitUsage>();
         }
@@ -41,7 +41,7 @@ namespace Core.DomainModel
         public virtual Organization Organization { get; set; }
 
         /// <summary>
-        /// The usage of task on this Organization Unit. 
+        /// The usage of task on this Organization Unit.
         /// Should be a subset of the TaskUsages of the parent department.
         /// </summary>
         public virtual ICollection<TaskUsage> TaskUsages { get; set; }
@@ -71,9 +71,13 @@ namespace Core.DomainModel
         public virtual ICollection<ItSystemUsage.ItSystemUsage> ItSystemUsages { get; set; }
 
         /// <summary>
-        /// Users which have set this as their default OrganizationUnit
+        /// Users which have set this as their default OrganizationUnit.
         /// </summary>
-        public virtual ICollection<User> DefaultUsers { get; set; }
+        /// <remarks>
+        /// Goes through <seealso cref="AdminRight"/>.
+        /// So to access the user you must call .User on the rights object.
+        /// </remarks>
+        public virtual ICollection<AdminRight> DefaultUsers { get; set; }
 
         /// <summary>
         /// This Organization Unit is using these IT Systems (Via ItSystemUsage)
@@ -105,7 +109,7 @@ namespace Core.DomainModel
         public override bool HasUserWriteAccess(User user)
         {
             // check rights on parent org unit
-            if (Parent != null && Parent.HasUserWriteAccess(user)) 
+            if (Parent != null && Parent.HasUserWriteAccess(user))
                 return true;
 
             return base.HasUserWriteAccess(user);
