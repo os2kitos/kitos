@@ -215,5 +215,13 @@ namespace Presentation.Web.Controllers.API
                 return Error(e);
             }
         }
+
+        protected override void DeleteQuery(OrganizationUnit entity)
+        {
+            // http://stackoverflow.com/questions/15226312/entityframewok-how-to-configure-cascade-delete-to-nullify-foreign-keys
+            // when children are loaded into memory the foreign key is correctly set to null on children when deleted
+            var dummy = entity.DefaultUsers; // users that have this organization unit set as their default
+            base.DeleteQuery(entity);
+        }
     }
 }
