@@ -131,9 +131,9 @@ namespace Presentation.Web.Controllers.API
             return Patch(id, organizationId, obj);
         }
 
-        protected virtual void DeleteQuery(int id)
+        protected virtual void DeleteQuery(TModel entity)
         {
-            Repository.DeleteByKey(id);
+            Repository.DeleteByKey(entity.Id);
             Repository.Save();
         }
 
@@ -145,7 +145,7 @@ namespace Presentation.Web.Controllers.API
                 var item = Repository.GetByKey(id);
                 if (!HasWriteAccess(item, organizationId)) return Unauthorized();
 
-                DeleteQuery(id);
+                DeleteQuery(item);
 
                 return Ok();
             }

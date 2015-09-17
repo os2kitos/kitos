@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
@@ -17,12 +16,13 @@ namespace Presentation.Web.Controllers.API
         {
         }
 
-        protected override void DeleteQuery(int id)
+        protected override void DeleteQuery(TModel entity)
         {
             // http://stackoverflow.com/questions/15226312/entityframewok-how-to-configure-cascade-delete-to-nullify-foreign-keys
             // when children are loaded into memory the foreign key is correctly set to null on children when deleted
-            var entity = Repository.Get(x => x.Id == id, null, "Children").FirstOrDefault();
-            Repository.Delete(entity);
+            //var todo = Repository.Get(x => x.Id == entity.Id, null, "Children").FirstOrDefault();
+            var dummy = entity.Children;
+            Repository.DeleteByKey(entity.Id);
             Repository.Save();
         }
 

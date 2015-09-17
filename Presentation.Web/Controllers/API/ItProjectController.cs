@@ -706,9 +706,9 @@ namespace Presentation.Web.Controllers.API
             return _itProjectService.AddProject(item);
         }
 
-        protected override void DeleteQuery(int id)
+        protected override void DeleteQuery(ItProject entity)
         {
-            _itProjectService.DeleteProject(id);
+            _itProjectService.DeleteProject(entity.Id);
         }
 
         public override HttpResponseMessage Post(ItProjectDTO dto)
