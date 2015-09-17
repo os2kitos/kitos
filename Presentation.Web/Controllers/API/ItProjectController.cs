@@ -29,9 +29,9 @@ namespace Presentation.Web.Controllers.API
         //TODO: Man, this constructor smells ...
         public ItProjectController(
             IGenericRepository<ItProject> repository,
-            IItProjectService itProjectService, 
-            IGenericRepository<OrganizationUnit> orgUnitRepository, 
-            IGenericRepository<TaskRef> taskRepository, 
+            IItProjectService itProjectService,
+            IGenericRepository<OrganizationUnit> orgUnitRepository,
+            IGenericRepository<TaskRef> taskRepository,
             IGenericRepository<ItSystemUsage> itSystemUsageRepository,
             IGenericRepository<ItProjectRole> roleRepository)
             : base(repository)
@@ -54,7 +54,7 @@ namespace Presentation.Web.Controllers.API
                         p.AccessModifier == AccessModifier.Public ||
                         // or limit all to within the context
                         p.OrganizationId == orgId &&
-                        // global admin sees all 
+                        // global admin sees all
                         (KitosUser.IsGlobalAdmin ||
                         // object owner sees his own objects
                         p.ObjectOwnerId == KitosUser.Id ||
@@ -137,7 +137,7 @@ namespace Presentation.Web.Controllers.API
                         // global admin sees all within the context
                         KitosUser.IsGlobalAdmin && p.OrganizationId == orgId ||
                         // object owner sees his own objects within the context
-                        p.ObjectOwnerId == KitosUser.Id && p.OrganizationId == orgId || 
+                        p.ObjectOwnerId == KitosUser.Id && p.OrganizationId == orgId ||
                         // it's public everyone can see it
                         p.AccessModifier == AccessModifier.Public ||
                         // everyone in the same organization can see normal objects
@@ -167,7 +167,7 @@ namespace Presentation.Web.Controllers.API
             {
                 //Get all projects inside the organizaton
                 var projects = Repository.Get(p => p.OrganizationId == orgId);
-                
+
                 //if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
                 //var projects = Page(Repository.AsQueryable(), pagingModel);
 
@@ -201,7 +201,7 @@ namespace Presentation.Web.Controllers.API
                     obj.Add("Arkiveret", project.IsArchived);
                     obj.Add("Name", project.Name);
                     obj.Add("OrgUnit", project.ResponsibleOrgUnitName);
-                    
+
                     foreach (var role in roles)
                     {
                         var roleId = role.Id;
@@ -234,7 +234,7 @@ namespace Presentation.Web.Controllers.API
                             obj.Add("Fase", "Ikke sat");
                             break;
                     }
-                    
+
                     obj.Add("Status", project.StatusProject);
                     obj.Add("Maal", project.GoalStatusStatus);
                     obj.Add("Risiko", project.AverageRisk);
@@ -398,9 +398,9 @@ namespace Presentation.Web.Controllers.API
 
                 var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
                 if (orgUnit == null) return NotFound();
-                
+
                 project.UsedByOrgUnits.Add(new ItProjectOrgUnitUsage {ItProjectId = id, OrganizationUnitId = organizationUnit});
-                
+
                 project.LastChanged = DateTime.Now;
                 project.LastChangedByUser = KitosUser;
 
@@ -446,7 +446,7 @@ namespace Presentation.Web.Controllers.API
                 return Error(e);
             }
         }
-        
+
         public HttpResponseMessage PostTaskToProject(int id, int organizationId, [FromUri] int? taskId)
         {
             try
@@ -566,7 +566,7 @@ namespace Presentation.Web.Controllers.API
                                                   taskRef.Parent.ParentId.Value == taskGroup.Value) &&
                                                  !taskRef.Children.Any() &&
                                                  taskRef.AccessModifier == AccessModifier.Public); // TODO add support for normal
-                else 
+                else
                     pagingModel.Where(taskRef => taskRef.Children.Count == 0);
 
                 var theTasks = Page(taskQuery, pagingModel).ToList();
@@ -589,7 +589,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var project = Repository.GetByKey(id); 
+                var project = Repository.GetByKey(id);
                 if (project == null) return NotFound();
 
                 return Ok(Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageDTO>>(project.ItSystemUsages));
@@ -604,7 +604,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var project = Repository.GetByKey(id); 
+                var project = Repository.GetByKey(id);
                 if (project == null) return NotFound();
 
                 if (!HasWriteAccess(project, organizationId)) return Unauthorized();
@@ -612,7 +612,7 @@ namespace Presentation.Web.Controllers.API
                 //TODO: should also we check for write access to the system usage?
                 var systemUsage = _itSystemUsageRepository.GetByKey(usageId);
                 if (systemUsage == null) return NotFound();
-                
+
                 project.ItSystemUsages.Add(systemUsage);
 
                 project.LastChanged = DateTime.Now;
@@ -632,7 +632,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var project = Repository.GetByKey(id); 
+                var project = Repository.GetByKey(id);
                 if (project == null) return NotFound();
 
                 if (!HasWriteAccess(project, organizationId)) return Unauthorized();
@@ -640,7 +640,7 @@ namespace Presentation.Web.Controllers.API
                 var systemUsage = _itSystemUsageRepository.GetByKey(usageId);
 
                 if (systemUsage == null) return NotFound();
-                
+
                 project.ItSystemUsages.Remove(systemUsage);
 
                 project.LastChanged = DateTime.Now;
@@ -691,7 +691,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var projects = _itProjectService.GetAll(orgId, includePublic: false)
                     .Where(project => project.ItSystemUsages.Any(usage => usage.Id == usageId)).ToList();
-                
+
                 return Ok(Map(projects));
             }
             catch (Exception e)
@@ -699,7 +699,7 @@ namespace Presentation.Web.Controllers.API
                 return Error(e);
             }
         }
-        
+
         protected override ItProject PostQuery(ItProject item)
         {
             //Makes sure to create the necessary properties, like phases
@@ -727,7 +727,7 @@ namespace Presentation.Web.Controllers.API
 
             if (project == null) return NotFound();
             if (!HasWriteAccess(project, organizationId)) return Unauthorized();
-            
+
             const string propertyName = "Phase";
             var phaseRef = project.GetType().GetProperty(propertyName + phaseNum);
             // make sure object has the property we are after

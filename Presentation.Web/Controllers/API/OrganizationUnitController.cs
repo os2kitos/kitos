@@ -89,7 +89,7 @@ namespace Presentation.Web.Controllers.API
                     //TODO: You have to be local or global admin to change parent
 
                     var parentId = jtoken.Value<int>();
-                    
+
                     //if the new parent is actually a descendant of the item, don't update - this would create a loop!
                     if (_orgUnitService.IsAncestorOf(parentId, id))
                     {

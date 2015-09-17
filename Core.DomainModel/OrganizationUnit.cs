@@ -21,7 +21,7 @@ namespace Core.DomainModel
         }
 
         public string Name { get; set; }
-        
+
         /// <summary>
         /// EAN number of the department.
         /// </summary>
@@ -60,6 +60,7 @@ namespace Core.DomainModel
         /// The delegated system usages.
         /// </value>
         public virtual ICollection<ItSystemUsage.ItSystemUsage> DelegatedSystemUsages { get; set; }
+
         /// <summary>
         /// Gets or sets it system usages.
         /// TODO write better summary
@@ -83,7 +84,7 @@ namespace Core.DomainModel
         /// This Organization Unit is using these IT projects
         /// </summary>
         public virtual ICollection<ItProjectOrgUnitUsage> UsingItProjects { get; set; }
-        
+
         /// <summary>
         /// This Organization Unit is responsible for these IT Contracts
         /// </summary>

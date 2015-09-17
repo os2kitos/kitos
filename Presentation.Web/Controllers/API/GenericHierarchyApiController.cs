@@ -66,14 +66,14 @@ namespace Presentation.Web.Controllers.API
         private void CheckForHierarchyLoop(TModel item, int? newParentId)
         {
             if (newParentId == null) return;
-            
+
             // the parent-to-be of item
             var parent = Repository.GetByKey(newParentId);
 
             do
             {
                 // did we find a loop?
-                if (parent.Id == item.Id) 
+                if (parent.Id == item.Id)
                     throw new Exception("Self reference detected");
 
                 // otherwise, check next parent
