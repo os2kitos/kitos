@@ -161,16 +161,16 @@ namespace Presentation.Web
 
             Mapper.CreateMap<User, UserDTO>()
                   .ForMember(dest => dest.DefaultOrganizationUnitId,
-                      opt => opt.MapFrom(src => src.AdminRights.First().DefaultOrgUnitId)) // TODO using FirstOrDefault here might cause problems
+                      opt => opt.MapFrom(src => src.AdminRights.FirstOrDefault() != null ? src.AdminRights.First().DefaultOrgUnitId : null))
                   .ForMember(dest => dest.DefaultOrganizationUnitName,
-                      opt => opt.MapFrom(src => src.AdminRights.First().DefaultOrgUnit.Name)) // TODO using FirstOrDefault here might cause problems
+                      opt => opt.MapFrom(src => src.AdminRights.FirstOrDefault() != null ? src.AdminRights.First().DefaultOrgUnit.Name : null))
                   .ReverseMap();
 
             Mapper.CreateMap<User, UserOverviewDTO>()
                 .ForMember(dest => dest.DefaultOrganizationUnitId,
-                    opt => opt.MapFrom(src => src.AdminRights.First().DefaultOrgUnitId)) // TODO using FirstOrDefault here might cause problems
-                .ForMember(dest => dest.DefaultOrganizationUnitName,
-                    opt => opt.MapFrom(src => src.AdminRights.First().DefaultOrgUnit.Name)); // TODO using FirstOrDefault here might cause problems
+                      opt => opt.MapFrom(src => src.AdminRights.FirstOrDefault() != null ? src.AdminRights.First().DefaultOrgUnitId : null))
+                  .ForMember(dest => dest.DefaultOrganizationUnitName,
+                      opt => opt.MapFrom(src => src.AdminRights.FirstOrDefault() != null ? src.AdminRights.First().DefaultOrgUnit.Name : null));
 
             Mapper.CreateMap<Wish, WishDTO>()
                   .ReverseMap()
