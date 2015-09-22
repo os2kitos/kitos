@@ -27,32 +27,22 @@
                             </div>
                         </td>
                         <td>
-                            <div class="input-group input-group-sm">
-                                <input type="text" class="form-control"
-                                       data-datepicker-popup
-                                       data-is-open="$parent.opened['pe' + $index]"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="ht.expected"
-                                       data-autosave="api/handovertrial/{{ ht.id }}"
-                                       data-field="expected">
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-default" data-ng-click="open($event, 'pe' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
-                                </span>
-                            </div>
+                            <input type="text" class="form-control"
+                                   data-kendo-date-picker
+                                   data-k-options="datepickerOptions"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="ht.expected"
+                                   data-autosave="api/handovertrial/{{ ht.id }}"
+                                   data-field="expected">
                         </td>
                         <td>
-                            <div class="input-group input-group-sm">
-                                <input type="text" class="form-control"
-                                       data-datepicker-popup
-                                       data-is-open="$parent.opened['pa' + $index]"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="ht.approved"
-                                       data-autosave="api/handovertrial/{{ ht.id }}"
-                                       data-field="approved">
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-default" data-ng-click="open($event, 'pa' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
-                                </span>
-                            </div>
+                            <input type="text" class="form-control"
+                                   data-kendo-date-picker
+                                   data-k-options="datepickerOptions"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="ht.approved"
+                                   data-autosave="api/handovertrial/{{ ht.id }}"
+                                   data-field="approved">
                         </td>
                         <td>
                             <button type="button" class="btn btn-danger btn-sm" data-ng-show="hasWriteAccess" data-ng-click="deleteTrial(ht.id)">
@@ -75,28 +65,18 @@
                             </div>
                         </td>
                         <td>
-                            <div class="input-group input-group-sm">
-                                <input type="text" class="form-control"
-                                       data-datepicker-popup
-                                       data-is-open="opened.npe"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="handoverTrial.expected">
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-default" data-ng-click="open($event, 'npe')"><i class="glyphicon glyphicon-calendar"></i></button>
-                                </span>
-                            </div>
+                            <input type="text" class="form-control"
+                                   data-kendo-date-picker
+                                   data-k-options="datepickerOptions"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="handoverTrial.expected">
                         </td>
                         <td>
-                            <div class="input-group input-group-sm">
-                                <input type="text" class="form-control"
-                                       data-datepicker-popup
-                                       data-is-open="opened.npa"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="handoverTrial.approved">
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-default" data-ng-click="open($event, 'npa')"><i class="glyphicon glyphicon-calendar"></i></button>
-                                </span>
-                            </div>
+                            <input type="text" class="form-control"
+                                   data-kendo-date-picker
+                                   data-k-options="datepickerOptions"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="handoverTrial.approved">
                         </td>
                         <td>
                             <button class="btn btn-success btn-sm" data-ng-click="saveTrial(handoverTrial)">Gem</button>
@@ -105,7 +85,7 @@
                 </tfoot>
             </table>
         </form>
-            
+
         <form role="form" name="milestoneForm">
             <table class="table table-condensed small">
                 <thead>
@@ -122,32 +102,22 @@
                             <input type="text" class="form-control input-sm" data-ng-disabled="!hasWriteAccess" data-ng-model="item.title" data-autosave="api/paymentmilestone/{{item.id}}" data-field="title">
                         </td>
                         <td>
-                            <div class="input-group input-group-sm">
-                                <input type="text" class="form-control"
-                                       data-datepicker-popup
-                                       data-is-open="$parent.opened['exp' + $index]"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="item.expected"
-                                       data-autosave="api/paymentmilestone/{{ item.id }}"
-                                       data-field="expected">
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-default" data-ng-click="open($event, 'exp' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
-                                </span>
-                            </div>
+                            <input type="text" class="form-control"
+                                   data-kendo-date-picker
+                                   data-k-options="datepickerOptions"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="item.expected"
+                                   data-autosave="api/paymentmilestone/{{ item.id }}"
+                                   data-field="expected">
                         </td>
                         <td>
-                            <div class="input-group input-group-sm">
-                                <input type="text" class="form-control"
-                                       data-datepicker-popup
-                                       data-is-open="$parent.opened['appr' + $index]"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="item.approved"
-                                       data-autosave="api/paymentmilestone/{{ item.id }}"
-                                       data-field="approved">
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-default" data-ng-click="open($event, 'appr' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
-                                </span>
-                            </div>
+                            <input type="text" class="form-control"
+                                   data-kendo-date-picker
+                                   data-k-options="datepickerOptions"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="item.approved"
+                                   data-autosave="api/paymentmilestone/{{ item.id }}"
+                                   data-field="approved">
                         </td>
                         <td>
                             <button type="button" class="btn btn-danger btn-sm" data-ng-show="hasWriteAccess" data-ng-click="deleteMilestone(item.id)">
@@ -161,28 +131,18 @@
                         <td>
                             <input type="text" class="form-control input-sm" data-ng-model="paymentMilestone.title"></td>
                         <td>
-                            <div class="input-group input-group-sm">
-                                <input type="text" class="form-control"
-                                       data-datepicker-popup
-                                       data-is-open="opened.nexp"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="paymentMilestone.expected">
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-default" data-ng-click="open($event, 'nexp')"><i class="glyphicon glyphicon-calendar"></i></button>
-                                </span>
-                            </div>
+                            <input type="text" class="form-control"
+                                   data-kendo-date-picker
+                                   data-k-options="datepickerOptions"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="paymentMilestone.expected">
                         </td>
                         <td>
-                            <div class="input-group input-group-sm">
-                                <input type="text" class="form-control"
-                                       data-datepicker-popup
-                                       data-is-open="opened.nappr"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="paymentMilestone.approved">
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-default" data-ng-click="open($event, 'nappr')"><i class="glyphicon glyphicon-calendar"></i></button>
-                                </span>
-                            </div>
+                            <input type="text" class="form-control"
+                                   data-kendo-date-picker
+                                   data-k-options="datepickerOptions"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="paymentMilestone.approved">
                         </td>
                         <td>
                             <button class="btn btn-success btn-sm" data-ng-click="saveMilestone(paymentMilestone)">Gem</button>
@@ -202,18 +162,13 @@
                 <label for="agreement-concluded" class="control-label small">
                     Indgået
                 </label>
-                <div class="input-group input-group-sm">
-                    <input type="text" class="form-control" id="agreement-concluded"
-                           data-datepicker-popup
-                           data-is-open="opened.conc"
-                           data-ng-disabled="!hasWriteAccess"
-                           data-ng-model="contract.concluded"
-                           data-autosave="{{autosaveUrl}}"
-                           data-field="concluded">
-                    <span class="input-group-btn">
-                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'conc')"><i class="glyphicon glyphicon-calendar"></i></button>
-                    </span>
-                </div>
+                <input type="text" class="form-control" id="agreement-concluded"
+                       data-kendo-date-picker
+                       data-k-options="datepickerOptions"
+                       data-ng-disabled="!hasWriteAccess"
+                       data-ng-model="contract.concluded"
+                       data-autosave="{{autosaveUrl}}"
+                       data-field="concluded">
             </div>
             <div class="form-group">
                 <label for="agreement-duration" class="control-label small">Varighed</label>
@@ -253,33 +208,23 @@
             </div>
             <div class="form-group">
                 <label for="agreement-irrevocable" class="control-label small">Uopsigelig til</label>
-                <div class="input-group input-group-sm">
-                    <input type="text" class="form-control" id="agreement-irrevocable"
-                           data-datepicker-popup
-                           data-is-open="opened.irre"
-                           data-ng-disabled="!hasWriteAccess"
-                           data-ng-model="contract.irrevocableTo"
-                           data-autosave="{{autosaveUrl}}"
-                           data-field="irrevocableTo">
-                    <span class="input-group-btn">
-                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'irre')"><i class="glyphicon glyphicon-calendar"></i></button>
-                    </span>
-                </div>
+                <input type="text" class="form-control" id="agreement-irrevocable"
+                       data-kendo-date-picker
+                       data-k-options="datepickerOptions"
+                       data-ng-disabled="!hasWriteAccess"
+                       data-ng-model="contract.irrevocableTo"
+                       data-autosave="{{autosaveUrl}}"
+                       data-field="irrevocableTo">
             </div>
             <div class="form-group">
                 <label for="agreement-expiration" class="control-label small">Udløbsdato</label>
-                <div class="input-group input-group-sm">
-                    <input type="text" class="form-control" id="agreement-expiration"
-                           data-datepicker-popup
-                           data-is-open="opened.expi"
-                           data-ng-disabled="!hasWriteAccess"
-                           data-ng-model="contract.expirationDate"
-                           data-autosave="{{autosaveUrl}}"
-                           data-field="expirationDate">
-                    <span class="input-group-btn">
-                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'expi')"><i class="glyphicon glyphicon-calendar"></i></button>
-                    </span>
-                </div>
+                <input type="text" class="form-control" id="agreement-expiration"
+                       data-kendo-date-picker
+                       data-k-options="datepickerOptions"
+                       data-ng-disabled="!hasWriteAccess"
+                       data-ng-model="contract.expirationDate"
+                       data-autosave="{{autosaveUrl}}"
+                       data-field="expirationDate">
             </div>
         </div>
     </div>
@@ -291,20 +236,15 @@
         <div class="panel-body">
             <div class="form-group">
                 <label for="agreement-terminated" class="control-label small">Kontrakten opsagt</label>
-                <div class="input-group input-group-sm">
-                    <input type="text" class="form-control" id="agreement-terminated"
-                           data-datepicker-popup
-                           data-is-open="opened.term"
-                           data-ng-disabled="!hasWriteAccess"
-                           data-ng-model="contract.terminated"
-                           data-autosave="{{autosaveUrl}}"
-                           data-field="terminated">
-                    <span class="input-group-btn">
-                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'term')"><i class="glyphicon glyphicon-calendar"></i></button>
-                    </span>
-                </div>
+                <input type="text" class="form-control" id="agreement-terminated"
+                       data-kendo-date-picker
+                       data-k-options="datepickerOptions"
+                       data-ng-disabled="!hasWriteAccess"
+                       data-ng-model="contract.terminated"
+                       data-autosave="{{autosaveUrl}}"
+                       data-field="terminated">
             </div>
-                
+
             <div class="form-group">
                 <label for="agreement-notice" class="control-label small">Opsigelsesfrist (måneder)</label>
                 <select id="agreement-notice" class="form-control input-sm"

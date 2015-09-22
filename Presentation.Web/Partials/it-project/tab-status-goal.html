@@ -7,9 +7,9 @@
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusGoal">Status mål (samlet):</label>
                     <div class="col-md-7">
-                        <span id="statusGoal" data-select-status2="" data-ng-model="goalStatus.status"  
+                        <span id="statusGoal" data-select-status2="" data-ng-model="goalStatus.status"
                             data-field="status"
-                              data-autosave="{{goalStatus.updateUrl}}" 
+                              data-autosave="{{goalStatus.updateUrl}}"
                             data-can-write="hasWriteAccess">
                             </span>
                     </div>
@@ -19,18 +19,13 @@
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
                     <div class="col-md-4">
-                        <div class="input-group input-group-sm">
-                            <input type="text" class="form-control" id="statusDate"
-                                   data-datepicker-popup
-                                   data-is-open="opened.gsd" 
-                                   data-is-disabled="!hasWriteAccess"
-                                   data-ng-model="goalStatus.statusDate"
-                                   data-autosave="{{goalStatus.updateUrl}}"
-                                   data-field="statusDate">
-                            <span class="input-group-btn">
-                                <button type="button" class="btn btn-default" data-ng-click="open($event, 'gsd')"><i class="glyphicon glyphicon-calendar"></i></button>
-                            </span>
-                        </div>
+                        <input type="text" class="form-control" id="statusDate"
+                               data-kendo-date-picker
+                               data-k-options="datepickerOptions"
+                               data-is-disabled="!hasWriteAccess"
+                               data-ng-model="goalStatus.statusDate"
+                               data-autosave="{{goalStatus.updateUrl}}"
+                               data-field="statusDate">
                     </div>
                 </div>
 
@@ -84,12 +79,12 @@
                         <td>
                             {{ getGoalTypeName(goal.goalTypeId) }}
                         </td>
-                        
+
                         <!-- Human readable ID -->
                         <td>
                             {{goal.humanReadableId}}
                         </td>
-                        
+
                         <!-- Goal name -->
                         <td>
                             <a class="btn btn-link btn-xs" data-ng-click="goal.edit()" data-ng-show="hasWriteAccess">
@@ -99,7 +94,7 @@
                                 {{goal.name}}
                             </span>
                         </td>
-                        
+
                         <!-- Description -->
                         <td>
                             <div data-simple-comment="" data-ng-model="goal.description"></div>
@@ -115,7 +110,7 @@
                             <span data-ng-model="goal.subGoalDate1" data-datereader="">
                             </span>
                         </td>
-                        
+
                         <!-- Subgoal 1 name -->
                         <td>
                             {{goal.subGoal1}}
@@ -130,7 +125,7 @@
                             <span data-ng-model="goal.subGoalDate2" data-datereader="">
                             </span>
                         </td>
-                        
+
                         <!-- Subgoal 2 name -->
                         <td>
                             {{goal.subGoal2}}
@@ -145,7 +140,7 @@
                             <span data-ng-model="goal.subGoalDate3" data-datereader="">
                             </span>
                         </td>
-                        
+
                         <!-- Subgoal 3 name -->
                         <td>
                             {{goal.subGoal3}}
@@ -154,12 +149,12 @@
                         <td>
                             {{goal.subGoalRea3}}
                         </td>
-                        
+
                         <!-- Note -->
                         <td>
                             <div data-simple-comment="" data-ng-model="goal.note"></div>
                         </td>
-                        
+
                         <!-- Status -->
                         <td>
                             <span data-select-status2="" data-ng-model="goal.status"></span>

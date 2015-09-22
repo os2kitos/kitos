@@ -17,18 +17,13 @@
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
                     <div class="col-md-4">
-                        <div class="input-group input-group-sm">
-                            <input type="text" class="form-control" id="statusDate"
-                                   data-datepicker-popup
-                                   data-is-open="opened.psd" 
-                                   data-is-disabled="!hasWriteAccess"
-                                   data-ng-model="project.statusDate"
-                                   data-autosave="{{project.updateUrl}}"
-                                   data-field="statusDate">
-                            <span class="input-group-btn">
-                                <button type="button" class="btn btn-default" data-ng-click="open($event, 'psd')"><i class="glyphicon glyphicon-calendar"></i></button>
-                            </span>
-                        </div>
+                        <input type="text" class="form-control" id="statusDate"
+                               data-kendo-date-picker
+                               data-k-options="datepickerOptions"
+                               data-is-disabled="!hasWriteAccess"
+                               data-ng-model="project.statusDate"
+                               data-autosave="{{project.updateUrl}}"
+                               data-field="statusDate">
                     </div>
                 </div>
             </div>

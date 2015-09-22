@@ -11,18 +11,18 @@
                         <label for="contract-name" class="control-label small">IT kontraktnavn</label>
                         <input type="text" id="contract-name" class="form-control input-sm" autofocus required
                                data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="contract.name" 
-                               data-autosave="{{ autoSaveUrl }}" 
+                               data-ng-model="contract.name"
+                               data-autosave="{{ autoSaveUrl }}"
                                data-field="name">
                     </div>
 
                     <!-- Id -->
                     <div class="form-group">
                         <label for="contract-id" class="control-label small">KontraktID</label>
-                        <input type="text" id="contract-id" class="form-control input-sm" 
+                        <input type="text" id="contract-id" class="form-control input-sm"
                                data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="contract.itContractId" 
-                               data-autosave="{{ autoSaveUrl }}" 
+                               data-ng-model="contract.itContractId"
+                               data-autosave="{{ autoSaveUrl }}"
                                data-field="itContractId">
                     </div>
 
@@ -32,8 +32,8 @@
                         <input type="hidden" id="contract-parent" class="form-control input-sm"
                                data-ui-select2="itContractsSelectOptions"
                                data-ng-model="contract.parent"
-                               data-autosave="{{ autoSaveUrl }}" 
-                               data-field="parentId" 
+                               data-autosave="{{ autoSaveUrl }}"
+                               data-field="parentId"
                                data-ng-disabled="!hasWriteAccess">
                     </div>
 
@@ -182,9 +182,9 @@
                     <div class="form-group">
                         <label for="contract-supplier" class="control-label small">Leverandør</label>
                         <input type="hidden" id="contract-supplier" class="form-control input-sm"
-                               data-ui-select2="suppliersSelectOptions" 
-                               data-ng-model="contract.supplier" 
-                               data-autosave="{{ autoSaveUrl }}" data-field="supplierId" 
+                               data-ui-select2="suppliersSelectOptions"
+                               data-ng-model="contract.supplier"
+                               data-autosave="{{ autoSaveUrl }}" data-field="supplierId"
                                data-ng-disabled="!hasWriteAccess">
                     </div>
                 </div>
@@ -196,21 +196,21 @@
                     <!-- Extern contract signer -->
                     <div class="form-group">
                         <label for="contract-ext-signer" class="control-label small">Leverandørs kontraktunderskriver</label>
-                        <input type="text" id="contract-ext-signer" class="form-control input-sm" 
+                        <input type="text" id="contract-ext-signer" class="form-control input-sm"
                                data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="contract.supplierContractSigner" 
-                               data-autosave="{{ autoSaveUrl }}" 
+                               data-ng-model="contract.supplierContractSigner"
+                               data-autosave="{{ autoSaveUrl }}"
                                data-field="supplierContractSigner">
                     </div>
 
                     <!-- Responsible org unit -->
                     <div class="form-group">
                         <label for="contract-orgunit" class="control-label small">Ansvarlig enhed</label>
-                        <div id="contract-orgunit" 
-                             data-ng-model="contract.responsibleOrganizationUnitId" 
-                             data-ng-disabled="!hasWriteAccess" 
-                             data-select-org-unit="" 
-                             data-autosave="{{ autoSaveUrl }}" 
+                        <div id="contract-orgunit"
+                             data-ng-model="contract.responsibleOrganizationUnitId"
+                             data-ng-disabled="!hasWriteAccess"
+                             data-select-org-unit=""
+                             data-autosave="{{ autoSaveUrl }}"
                              data-field="responsibleOrganizationUnitId">
                         </div>
                     </div>
@@ -218,12 +218,12 @@
                     <!-- Intern contract signer -->
                     <div class="form-group">
                         <label for="contract-int-signer" class="control-label small">Kontraktunderskriver</label>
-                        <input id="contract-int-signer" 
-                               data-select-user="bar" 
-                               data-ng-disabled="!hasWriteAccess" 
+                        <input id="contract-int-signer"
+                               data-select-user="bar"
+                               data-ng-disabled="!hasWriteAccess"
                                data-org-id="{{ contract.organizationId }}"
-                               data-user-model="contractSigner.userForSelect" 
-                               data-allow-clear="true" 
+                               data-user-model="contractSigner.userForSelect"
+                               data-allow-clear="true"
                                data-on-select="contractSigner.update()">
                     </div>
                 </div>
@@ -233,10 +233,10 @@
                     <!-- Extern contract is signed -->
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" 
-                                   data-ng-model="contract.hasSupplierSigned" 
+                            <input type="checkbox"
+                                   data-ng-model="contract.hasSupplierSigned"
                                    data-ng-disabled="!hasWriteAccess"
-                                   data-autosave="{{ autoSaveUrl }}" 
+                                   data-autosave="{{ autoSaveUrl }}"
                                    data-field="hasSupplierSigned">
                             Underskrevet
                         </label>
@@ -245,29 +245,22 @@
                     <!-- Extern contract signed date -->
                     <div class="form-group">
                         <label for="contract-ext-date" class="control-label small">Dato</label>
-                        <div class="input-group input-group-sm">
-                            <input type="text" id="contract-ext-date" class="form-control" 
-                                   data-datepicker-popup
-                                   data-is-open="opened.ext" 
-                                   data-ng-disabled="!hasWriteAccess" 
-                                   data-ng-model="contract.supplierSignedDate" 
-                                   data-autosave="{{ autoSaveUrl }}" 
-                                   data-field="supplierSignedDate" />
-                            <span class="input-group-btn">
-                                <button type="button" class="btn btn-default" data-ng-click="open($event, 'ext')">
-                                    <i class="glyphicon glyphicon-calendar"></i>
-                                </button>
-                            </span>
-                        </div>
+                        <input type="text" id="contract-ext-date" class="form-control"
+                               data-kendo-date-picker
+                               data-k-options="datepickerOptions"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-model="contract.supplierSignedDate"
+                               data-autosave="{{ autoSaveUrl }}"
+                               data-field="supplierSignedDate">
                     </div>
 
                     <!-- Intern contract is signed -->
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" 
-                                   data-ng-model="contract.isSigned" 
+                            <input type="checkbox"
+                                   data-ng-model="contract.isSigned"
                                    data-ng-disabled="!hasWriteAccess"
-                                   data-autosave="{{ autoSaveUrl }}" 
+                                   data-autosave="{{ autoSaveUrl }}"
                                    data-field="isSigned">
                             Underskrevet
                         </label>
@@ -276,20 +269,13 @@
                     <!-- Intern contract signed date -->
                     <div class="form-group">
                         <label for="contract-int-date" class="control-label small">Dato</label>
-                        <div class="input-group input-group-sm">
-                            <input type="text" id="contract-int-date" class="form-control" 
-                                   data-datepicker-popup
-                                   data-is-open="opened.int" 
-                                   data-ng-disabled="!hasWriteAccess" 
-                                   data-ng-model="contract.signedDate" 
-                                   data-autosave="{{ autoSaveUrl }}" 
-                                   data-field="signedDate" />
-                            <span class="input-group-btn">
-                                <button type="button" class="btn btn-default" data-ng-click="open($event, 'int')">
-                                    <i class="glyphicon glyphicon-calendar"></i>
-                                </button>
-                            </span>
-                        </div>
+                        <input type="text" id="contract-int-date" class="form-control"
+                               data-kendo-date-picker
+                               data-k-options="datepickerOptions"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-model="contract.signedDate"
+                               data-autosave="{{ autoSaveUrl }}"
+                               data-field="signedDate">
                     </div>
                 </div>
 
@@ -297,11 +283,11 @@
                     <!-- Agreement elements -->
                     <div class="form-group">
                         <label for="agreement-elements" class="control-label small">IT Kontrakten omfatter flg. aftaleelementer</label>
-                        <select id="agreement-elements" class="form-control" multiple 
-                                data-ui-select2="" 
-                                data-ng-model="selectedAgreementElements" 
-                                data-ng-disabled="!hasWriteAccess" 
-                                data-autosave="{{ autoSaveUrl }}" 
+                        <select id="agreement-elements" class="form-control" multiple
+                                data-ui-select2=""
+                                data-ng-model="selectedAgreementElements"
+                                data-ng-disabled="!hasWriteAccess"
+                                data-autosave="{{ autoSaveUrl }}"
                                 data-field="elemId">
                             <option value="{{ item.id }}" data-ng-repeat="item in agreementElements">{{ item.name }}</option>
                         </select>
