@@ -31,5 +31,10 @@
                 $scope.paymentFrequencies = paymentFrequencies;
                 $scope.paymentModels = paymentModels;
                 $scope.priceRegulations = priceRegulations;
+
+                $scope.datepickerOptions = {
+                    format: "dd-MM-yyyy",
+                    parseFormats: ["yyyy-MM-dd"]
+                };
             }]);
 })(angular, app);

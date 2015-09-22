@@ -81,24 +81,34 @@
     ['$scope', '$http', 'autofocus', 'project', 'usersWithRoles', 'activity', 'notify', 'activityId', 'activityType', 'hasWriteAccess', 'user',
         function ($scope, $http, autofocus, project, usersWithRoles, activity, notify, activityId, activityType, hasWriteAccess, user) {
             var isNewActivity = activity == null;
-            
+
             $scope.hasWriteAccess = isNewActivity ? true : hasWriteAccess;
             $scope.isAssignment = activityType == 'assignment';
             $scope.isMilestone = activityType == 'milestone';
+
+            if (activity) {
+                if (activity.startDate) {
+                    activity.startDate = moment(activity.startDate, "YYYY-MM-DD").format("DD-MM-YYYY");
+                }
+                if (activity.endDate) {
+                    activity.endDate = moment(activity.endDate, "YYYY-MM-DD").format("DD-MM-YYYY");
+                }
+                if (activity.date) {
+                    activity.date = moment(activity.date, "YYYY-MM-DD").format("DD-MM-YYYY");
+                }
+            }
+
             // set to empty object if falsy
             $scope.activity = activity ? activity : {};
             $scope.phases = project.phases;
             $scope.usersWithRoles = _.values(usersWithRoles);
 
-            autofocus();
-
-            $scope.opened = {};
-            $scope.open = function ($event, datepicker) {
-                $event.preventDefault();
-                $event.stopPropagation();
-
-                $scope.opened[datepicker] = true;
+            $scope.datepickerOptions = {
+                format: "dd-MM-yyyy",
+                parseFormats: ["yyyy-MM-dd"]
             };
+
+            autofocus();
 
             $scope.dismiss = function () {
                 $scope.$dismiss();
@@ -107,6 +117,28 @@
             $scope.save = function () {
                 var payload = $scope.activity;
                 payload.associatedItProjectId = project.id;
+
+                var startDate = moment(payload.startDate, "DD-MM-YYYY");
+                if (startDate.isValid()) {
+                    payload.startDate = startDate.format("YYYY-MM-DD");
+                } else {
+                    payload.startDate = null;
+                }
+
+                var endDate = moment(payload.endDate, "DD-MM-YYYY");
+                if (endDate.isValid()) {
+                    payload.endDate = endDate.format("YYYY-MM-DD");
+                } else {
+                    payload.endDate = null;
+                }
+
+                var date = moment(payload.date, "DD-MM-YYYY");
+                if (date.isValid()) {
+                    payload.date = date.format("YYYY-MM-DD");
+                } else {
+                    payload.date = null;
+                }
+
                 delete payload.id;
                 delete payload.objectOwnerId;
                 delete payload.objectOwner;

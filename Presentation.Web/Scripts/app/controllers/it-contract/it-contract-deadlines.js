@@ -34,8 +34,8 @@
         });
     }]);
 
-    app.controller('contract.DeadlinesCtrl', ['$scope', '$http', '$timeout', '$state', '$stateParams', 'notify', 'contract', 'optionExtensions', 'terminationDeadlines', 'paymentMilestones', 'handoverTrialTypes', 'handoverTrials', 'user',
-        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, optionExtensions, terminationDeadlines, paymentMilestones, handoverTrialTypes, handoverTrials, user) {
+    app.controller('contract.DeadlinesCtrl', ['$scope', '$http', '$timeout', '$state', '$stateParams', 'notify', 'contract', 'optionExtensions', 'terminationDeadlines', 'paymentMilestones', 'handoverTrialTypes', 'handoverTrials', 'user', 'moment',
+        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, optionExtensions, terminationDeadlines, paymentMilestones, handoverTrialTypes, handoverTrials, user, moment) {
             $scope.contract = contract;
             $scope.autosaveUrl = 'api/itcontract/' + contract.id;
             $scope.optionExtensions = optionExtensions;
@@ -44,8 +44,28 @@
             $scope.handoverTrialTypes = handoverTrialTypes;
             $scope.handoverTrials = handoverTrials;
 
+            $scope.datepickerOptions = {
+                format: "dd-MM-yyyy",
+                parseFormats: ["yyyy-MM-dd"]
+            };
+
             $scope.saveMilestone = function(paymentMilestone) {
                 paymentMilestone.itContractId = contract.id;
+
+                var approvedDate = moment(paymentMilestone.approved, "DD-MM-YYYY");
+                if (approvedDate.isValid()) {
+                    paymentMilestone.approved = approvedDate.format("YYYY-MM-DD");
+                } else {
+                    paymentMilestone.approved = null;
+                }
+
+                var expectedDate = moment(paymentMilestone.expected, "DD-MM-YYYY");
+                if (expectedDate.isValid()) {
+                    paymentMilestone.expected = expectedDate.format("YYYY-MM-DD");
+                } else {
+                    paymentMilestone.expected = null;
+                }
+
                 var msg = notify.addInfoMessage("Gemmer...", false);
                 $http.post('api/paymentmilestone', paymentMilestone)
                     .success(function(result) {
@@ -74,6 +94,21 @@
 
             $scope.saveTrial = function(handoverTrial) {
                 handoverTrial.itContractId = contract.id;
+
+                var approvedDate = moment(handoverTrial.approved, "DD-MM-YYYY");
+                if (approvedDate.isValid()) {
+                    handoverTrial.approved = approvedDate.format("YYYY-MM-DD");
+                } else {
+                    handoverTrial.approved = null;
+                }
+
+                var expectedDate = moment(handoverTrial.expected, "DD-MM-YYYY");
+                if (expectedDate.isValid()) {
+                    handoverTrial.expected = expectedDate.format("YYYY-MM-DD");
+                } else {
+                    handoverTrial.expected = null;
+                }
+
                 var msg = notify.addInfoMessage("Gemmer...", false);
                 $http.post('api/handoverTrial', handoverTrial)
                     .success(function(result) {
@@ -87,7 +122,7 @@
                         msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                     });
             };
-            
+
             $scope.deleteTrial = function (id) {
                 var msg = notify.addInfoMessage("Sletter...", false);
                 $http.delete('api/handoverTrial/' + id + '?organizationId=' + user.currentOrganizationId)
@@ -99,7 +134,7 @@
                         msg.toErrorMessage("Fejl! Kunne ikke slette!");
                     });
             };
-            
+
             // work around for $state.reload() not updating scope
             // https://github.com/angular-ui/ui-router/issues/582
             function reload() {

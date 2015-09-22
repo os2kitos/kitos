@@ -22,9 +22,14 @@
             $scope.project = project;
             $scope.project.updateUrl = "api/itproject/" + project.id + '?organizationId=' + user.currentOrganizationId;
 
+            $scope.datepickerOptions = {
+                format: "dd-MM-yyyy",
+                parseFormats: ["yyyy-MM-dd"]
+            };
+
             //Setup phases
             $scope.project.phases = [project.phase1, project.phase2, project.phase3, project.phase4, project.phase5];
-            
+
             function patch(url, field, value) {
                 var payload = {};
                 payload[field] = value;
@@ -60,15 +65,22 @@
             };
 
             $scope.updatePhaseDate = function(phase, num) {
+                var dateObject = moment(phase.startDate, "DD-MM-YYYY");
+                var startDate;
+                if (dateObject.isValid()) {
+                    startDate = dateObject.format("YYYY-MM-DD");
+                } else {
+                    startDate = null;
+                }
                 //Update start date of the current phase
                 var firstPayload = {};
-                firstPayload["StartDate"] = phase.startDate;
+                firstPayload["StartDate"] = startDate;
                 $http.post($scope.project.updateUrl + "&phaseNum=" + num, firstPayload)
                     .success(function () {
                         if (num > 1) {
                             var prevPhaseNum = num - 1;
                             var secondPayload = {};
-                            secondPayload["EndDate"] = phase.startDate;
+                            secondPayload["EndDate"] = startDate;
                             //Also update end date of the previous phase
                             $http.post($scope.project.updateUrl + "&phaseNum=" + prevPhaseNum, secondPayload).success(function () {
                                 notify.addSuccessMessage("Feltet er opdateret");

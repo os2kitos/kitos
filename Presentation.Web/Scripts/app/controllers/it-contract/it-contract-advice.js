@@ -24,8 +24,14 @@
         function ($scope, $http, $state, $stateParams, $timeout, notify, contract, advices, itContractRoles, user) {
             $scope.itContractRoles = itContractRoles;
             $scope.advices = advices;
+
+            $scope.datepickerOptions = {
+                format: "dd-MM-yyyy",
+                parseFormats: ["yyyy-MM-dd"]
+            };
+
             var baseUrl = "api/advice";
-            
+
             _.each(advices, pushAdvice);
 
             function pushAdvice(advice) {
@@ -33,7 +39,7 @@
 
                 advice.delete = function () {
                     var msg = notify.addInfoMessage("Sletter rækken...", false);
-                    
+
                     $http.delete(advice.updateUrl + '?organizationId=' + user.currentOrganizationId).success(function (result) {
                         msg.toSuccessMessage("Rækken er slettet!");
                         reload();

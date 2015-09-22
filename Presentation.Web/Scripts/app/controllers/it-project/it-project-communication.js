@@ -13,7 +13,6 @@
                 //returns a map with those users who have a role in this project.
                 //the names of the roles is saved in user.roleNames
                 usersWithRoles: ['$http', '$stateParams', function ($http, $stateParams) {
-
                     //get the rights of the projects
                     return $http.get("api/itprojectrights/" + $stateParams.id)
                         .then(function (rightResult) {
@@ -41,9 +40,7 @@
                                     });
 
                                     return users;
-
                                 });
-
                         });
                 }]
             }
@@ -55,7 +52,11 @@
         function ($scope, $http, $timeout, $state, $stateParams, comms, usersWithRoles, user) {
             $scope.comms = comms;
             $scope.usersWithRoles = _.values(usersWithRoles);
-            
+            $scope.datepickerOptions = {
+                format: "dd-MM-yyyy",
+                parseFormats: ["yyyy-MM-dd"]
+            };
+
             $scope.comm = {
                 itProjectId: $stateParams.id
             };
@@ -65,13 +66,20 @@
 
                 if ($scope.commForm.$invalid) { return; }
 
+                var dueDate = moment($scope.comm.dueDate, "DD-MM-YYYY");
+                if (dueDate.isValid()) {
+                    $scope.comm.dueDate = dueDate.format("YYYY-MM-DD");
+                } else {
+                    $scope.comm.dueDate = null;
+                }
+
                 $http.post('api/communication', $scope.comm).finally(reload);
             };
 
             $scope.delete = function(id) {
                 $http.delete('api/communication/' + id + '?organizationId=' + user.currentOrganizationId).finally(reload);
             }
-            
+
             // work around for $state.reload() not updating scope
             // https://github.com/angular-ui/ui-router/issues/582
             function reload() {
