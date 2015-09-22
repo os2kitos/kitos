@@ -867,7 +867,6 @@
     <Content Include="Scripts\app\controllers\it-system\it-interface-catalog.js" />
     <Content Include="Scripts\app\controllers\it-system\it-interface-edit.js" />
     <Content Include="Scripts\app\controllers\it-system\it-interface-edit-details.js" />
-    <Content Include="Scripts\app\controllers\it-system\it-system-create-modal.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-edit-interfaces.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-edit-kle.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-edit.js" />
