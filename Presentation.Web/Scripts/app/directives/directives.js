@@ -442,7 +442,7 @@
     ]);
 
     app.directive('autosave', [
-        '$http', '$timeout', 'notify', 'userService', function ($http, $timeout, notify, userService) {
+        '$http', '$timeout', 'notify', 'userService', 'moment', function ($http, $timeout, notify, userService, moment) {
             return {
                 restrict: 'A',
                 require: 'ngModel',
@@ -463,11 +463,31 @@
                         if (attrs.pluck)
                             newValue = _.pluck(newValue, attrs.pluck);
 
-                        var payload = {};
-                        payload[attrs.field] = newValue;
+                        if (newValue !== oldValue) {
+                            if (ctrl.$valid) {
+                                var payload = {};
+                                payload[attrs.field] = newValue;
+
+                                save(payload);
+                            }
+                        }
+                    }
+
+                    function saveDate() {
+                        var newValue = ctrl.$modelValue;
+                        if (attrs.pluck)
+                            newValue = _.pluck(newValue, attrs.pluck);
 
                         if (newValue !== oldValue) {
                             if (ctrl.$valid) {
+                                var dateObject = moment(newValue, "DD-MM-YYYY");
+                                var payload = {};
+                                if (dateObject.isValid()) {
+                                    payload[attrs.field] = dateObject.format("YYYY-MM-DD");
+                                } else {
+                                    payload[attrs.field] = null;
+                                }
+
                                 save(payload);
                             }
                         }
@@ -555,6 +575,9 @@
                         } else {
                             element.bind('change', saveSelect2);
                         }
+                    // kendo date picker
+                    } else if (!angular.isUndefined(attrs.kendoDatePicker)) {
+                        element.bind('blur', saveDate);
                     } else if (attrs.type === 'checkbox') {
                         element.bind('change', saveCheckbox);
                     } else {
@@ -684,7 +707,7 @@
 
                         $http.get('api/organizationUnit?organization=' + user.currentOrganizationId, { cache: true }).success(function(result) {
 
-                            //recursive function for added indentation, 
+                            //recursive function for added indentation,
                             //and pushing org units to the list in the right order (depth-first)
                             function visit(orgUnit, indentation) {
                                 var option = {
@@ -792,7 +815,7 @@
 
                     $http.get('api/organizationUnit?organization=' + user.currentOrganizationId, { cache: true }).success(function (result) {
 
-                        //recursive function for added indentation, 
+                        //recursive function for added indentation,
                         //and pushing org units to the list in the right order (depth-first)
                         function visit(orgUnit, indentation) {
                             var option = {
@@ -1223,7 +1246,7 @@
             link: function(scope, element, attrs) {
                 var model = $parse(attrs.fileModel);
                 var modelSetter = model.assign;
-            
+
                 element.bind('change', function(){
                     scope.$apply(function(){
                         modelSetter(scope, element[0].files[0]);
