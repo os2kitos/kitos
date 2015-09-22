@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 namespace Core.DomainModel
 {
@@ -46,19 +45,12 @@ namespace Core.DomainModel
         /// Determines whether a user has write access to this instance.
         /// </summary>
         /// <param name="user">The user.</param>
-        /// <param name="organizationId">OrganizationId (context) the user is accessing from.</param>
         /// <returns>
-        /// <c>true</c> if user has write access; otherwise, <c>false</c>.
+        ///   <c>true</c> if user has write access, otherwise <c>false</c>.
         /// </returns>
-        public virtual bool HasUserWriteAccess(User user, int organizationId)
+        public virtual bool HasUserWriteAccess(User user)
         {
-            return 
-                // object owner has write access
-                ObjectOwnerId == user.Id || 
-                // global admin has write access
-                user.IsGlobalAdmin ||
-                // organizational admins has write access if their role provide it
-                user.AdminRights.Any(x => x.ObjectId == organizationId && x.Role.HasWriteAccess);
+            return ObjectOwnerId == user.Id;
         }
 
         /// <summary>

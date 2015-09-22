@@ -10,7 +10,7 @@ namespace Presentation.Web.Controllers.API
 {
     public class AdminRightsController : GenericRightsController<Organization, AdminRight, AdminRole>
     {
-        public AdminRightsController(IGenericRepository<AdminRight> rightRepository, IGenericRepository<Organization> objectRepository) 
+        public AdminRightsController(IGenericRepository<AdminRight> rightRepository, IGenericRepository<Organization> objectRepository)
             : base(rightRepository, objectRepository)
         {
         }
@@ -44,7 +44,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var theRights = RightRepository.Get(x => x.Role.Name == roleName && x.UserId == userId && x.ObjectId == organizationId);
-                return Ok(theRights.Any());   
+                return Ok(theRights.Any());
             }
             catch (Exception e)
             {
@@ -78,7 +78,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var rId = RightRepository.Get().Where(r => r.ObjectId == orgId && r.UserId == uId);
-                
+
                 if(rId.Any()) RightRepository.DeleteByKey(rId);
 
                 return Ok();
@@ -108,7 +108,7 @@ namespace Presentation.Web.Controllers.API
                 }
 
                 RightRepository.Save();
-                
+
                 return Ok();
             }
             catch (Exception e)
@@ -125,7 +125,7 @@ namespace Presentation.Web.Controllers.API
                 if (!KitosUser.IsGlobalAdmin)
                     if (!RightRepository.Get(r => r.UserId == userId && r.ObjectId == organizationId).Any())
                         return Unauthorized();
-                
+
                 right.ObjectId = organizationId;
                 right.ObjectOwner = KitosUser;
                 right.LastChangedByUser = KitosUser;

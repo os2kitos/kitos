@@ -48,8 +48,6 @@ namespace Core.ApplicationServices
             user.Password = _cryptoService.Encrypt(DateTime.UtcNow + user.Salt);
 #endif
             
-            var defaultOrgUnit = _orgRepository.GetByKey(orgId).OrgUnits.First(x => x.ParentId == null);
-            user.DefaultOrganizationUnitId = defaultOrgUnit.Id;
             user.LastChanged = DateTime.UtcNow;
 
             _userRepository.Insert(user);

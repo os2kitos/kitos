@@ -15,7 +15,7 @@ namespace Presentation.Web.Controllers.API
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
-        
+
 
         public AuthorizeController(IUserRepository userRepository, IUserService userService,  IOrganizationService organizationService)
         {
@@ -25,7 +25,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         public HttpResponseMessage GetLogin()
-        { 
+        {
             try
             {
                 var response = CreateLoginResponse(KitosUser);

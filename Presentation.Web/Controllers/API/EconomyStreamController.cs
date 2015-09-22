@@ -4,7 +4,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class EconomyStreamController : GenericApiController<EconomyStream, EconomyStreamDTO>
+    public class EconomyStreamController : GenericContextAwareApiController<EconomyStream, EconomyStreamDTO>
     {
         public EconomyStreamController(IGenericRepository<EconomyStream> repository) : base(repository)
         {

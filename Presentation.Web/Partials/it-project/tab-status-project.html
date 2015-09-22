@@ -31,8 +31,6 @@
                         </div>
                     </div>
                 </div>
-
-               
             </div>
 
             <!-- Notes to status of project -->
@@ -105,7 +103,7 @@
                         <!-- ID -->
                         <td>{{ activity.humanReadableId }}</td>
                         <!-- Projektfase -->
-                        <td>{{ activity.phase.name }}</td>
+                        <td>{{ getPhaseName(activity.associatedPhaseNum) }}</td>
                         <!-- Start -->
                         <td>
                             <span data-datereader="" data-ng-show="activity.isTask" data-ng-model="activity.startDate"></span>

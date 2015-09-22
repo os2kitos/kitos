@@ -35,11 +35,6 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Table & Column Mappings
             this.ToTable("User");
-
-            // Relationships
-            this.HasOptional(t => t.DefaultOrganizationUnit)
-                .WithMany(t => t.DefaultUsers)
-                .HasForeignKey(d => d.DefaultOrganizationUnitId);
         }
     }
 }

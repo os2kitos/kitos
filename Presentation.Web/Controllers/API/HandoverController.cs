@@ -8,7 +8,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class HandoverController : GenericApiController<Handover, HandoverDTO>
+    public class HandoverController : GenericContextAwareApiController<Handover, HandoverDTO>
     {
         private readonly IGenericRepository<User> _userRepository;
 

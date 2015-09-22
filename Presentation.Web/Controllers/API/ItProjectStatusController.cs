@@ -8,7 +8,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class ItProjectStatusController : GenericApiController<ItProjectStatus, ItProjectStatusDTO>
+    public class ItProjectStatusController : GenericContextAwareApiController<ItProjectStatus, ItProjectStatusDTO>
     {
         public ItProjectStatusController(IGenericRepository<ItProjectStatus> repository) 
             : base(repository)

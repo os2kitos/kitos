@@ -22,7 +22,7 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemService _systemService;
 
-        public ItSystemController(IGenericRepository<ItSystem> repository, IGenericRepository<TaskRef> taskRepository, IItSystemService systemService) 
+        public ItSystemController(IGenericRepository<ItSystem> repository, IGenericRepository<TaskRef> taskRepository, IItSystemService systemService)
             : base(repository)
         {
             _taskRepository = taskRepository;
@@ -39,7 +39,7 @@ namespace Presentation.Web.Controllers.API
                 // check if system has any usages, if it does it's may not be deleted
                 if (item.Usages.Any())
                     return Conflict("Cannot delete a system in use!");
-                
+
                 return base.Delete(id, organizationId);
             }
             catch (Exception e)
@@ -90,7 +90,7 @@ namespace Presentation.Web.Controllers.API
                         .Where(s =>
                             // global admin sees all
                             (KitosUser.IsGlobalAdmin ||
-                            // object owner sees his own objects     
+                            // object owner sees his own objects
                             s.ObjectOwnerId == KitosUser.Id ||
                             // it's public everyone can see it
                             s.AccessModifier == AccessModifier.Public ||
@@ -106,7 +106,7 @@ namespace Presentation.Web.Controllers.API
                 //var query = Page(systems, paging);
 
                 var dtos = Map(systems);
-                
+
                 var list = new List<dynamic>();
                 var header = new ExpandoObject() as IDictionary<string, Object>;
                 header.Add("It System", "It System");
@@ -159,9 +159,9 @@ namespace Presentation.Web.Controllers.API
                         s.Name.Contains(q) &&
                         // exclude system with id
                         s.Id != excludeId &&
-                        // global admin sees all 
+                        // global admin sees all
                         (KitosUser.IsGlobalAdmin ||
-                         // object owner sees his own objects     
+                         // object owner sees his own objects
                          s.ObjectOwnerId == KitosUser.Id ||
                          // it's public everyone can see it
                          s.AccessModifier == AccessModifier.Public ||
@@ -244,7 +244,7 @@ namespace Presentation.Web.Controllers.API
                     var task = _taskRepository.GetByKey(id);
                     item.TaskRefs.Add(task);
                 }
-                
+
                 var savedItem = PostQuery(item);
 
                 return Created(Map(savedItem), new Uri(Request.RequestUri + "/" + savedItem.Id));
@@ -284,7 +284,7 @@ namespace Presentation.Web.Controllers.API
                     tasks = _taskRepository.Get(
                         x =>
                             (x.Id == taskId || x.ParentId == taskId || x.Parent.ParentId == taskId) && !x.Children.Any() &&
-                            x.AccessModifier == AccessModifier.Public && 
+                            x.AccessModifier == AccessModifier.Public &&
                             x.ItSystems.All(y => y.Id != id)).ToList();
                 }
                 else
@@ -388,7 +388,7 @@ namespace Presentation.Web.Controllers.API
                                                   taskRef.Parent.ParentId.Value == taskGroup.Value) &&
                                                  !taskRef.Children.Any() &&
                                                  taskRef.AccessModifier == AccessModifier.Public); // TODO add support for normal
-                else 
+                else
                     pagingModel.Where(taskRef => taskRef.Children.Count == 0);
 
                 var theTasks = Page(taskQuery, pagingModel).ToList();
@@ -406,7 +406,7 @@ namespace Presentation.Web.Controllers.API
                 return Error(e);
             }
         }
-        
+
         public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
         {
             // try get AccessModifier value

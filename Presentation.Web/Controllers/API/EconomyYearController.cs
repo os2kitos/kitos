@@ -4,7 +4,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class EconomyYearController : GenericApiController<EconomyYear, EconomyYearDTO>
+    public class EconomyYearController : GenericContextAwareApiController<EconomyYear, EconomyYearDTO>
     {
         public EconomyYearController(IGenericRepository<EconomyYear> repository) : base(repository)
         {

@@ -24,8 +24,8 @@ namespace Presentation.Web.Controllers.API
         protected virtual IQueryable<TModel> GetAllQuery()
         {
             return Repository.AsQueryable();
-        } 
-        
+        }
+
         public virtual HttpResponseMessage GetAll([FromUri] PagingModel<TModel> paging)
         {
             try
@@ -131,9 +131,9 @@ namespace Presentation.Web.Controllers.API
             return Patch(id, organizationId, obj);
         }
 
-        protected virtual void DeleteQuery(int id)
+        protected virtual void DeleteQuery(TModel entity)
         {
-            Repository.DeleteByKey(id);
+            Repository.DeleteByKey(entity.Id);
             Repository.Save();
         }
 
@@ -145,7 +145,7 @@ namespace Presentation.Web.Controllers.API
                 var item = Repository.GetByKey(id);
                 if (!HasWriteAccess(item, organizationId)) return Unauthorized();
 
-                DeleteQuery(id);
+                DeleteQuery(item);
 
                 return Ok();
             }
@@ -171,7 +171,7 @@ namespace Presentation.Web.Controllers.API
                 var item = Repository.GetByKey(id);
                 if (item == null) return NotFound();
                 if (!HasWriteAccess(item, organizationId)) return Unauthorized();
-                
+
                 var itemType = item.GetType();
                 // get name of mapped property
                 var map = AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>().GetPropertyMaps();
@@ -217,10 +217,11 @@ namespace Presentation.Web.Controllers.API
                             // update the entity
                             propRef.SetValue(item, value);
                         }
-                        catch (Exception)
+                        catch
                         {
-                            // if obj.Value<t>("keyName") cast fails set to fallback value
-                            propRef.SetValue(item, null); // TODO this is could be dangerous, should probably also be default(t)
+                            // ignore any errors with setting the value
+                            // this should only happen when trying to set values,
+                            // that aren't ment to be set via the API
                         }
                     }
                 }
@@ -259,9 +260,13 @@ namespace Presentation.Web.Controllers.API
         /// <param name="user">The user</param>
         /// <param name="organizationId"></param>
         /// <returns>True iff user has write access to obj</returns>
-        protected bool HasWriteAccess(TModel obj, User user, int organizationId)
+        protected virtual bool HasWriteAccess(TModel obj, User user, int organizationId)
         {
-            return obj.HasUserWriteAccess(user, organizationId);
+            // global admin always have write access
+            if (user.IsGlobalAdmin)
+                return true;
+
+            return obj.HasUserWriteAccess(user);
         }
 
         /// <summary>

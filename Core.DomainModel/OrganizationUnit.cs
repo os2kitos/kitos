@@ -8,20 +8,20 @@ namespace Core.DomainModel
     /// <summary>
     /// Represents a unit or department within an organization (OIO term: "OrgEnhed").
     /// </summary>
-    public class OrganizationUnit : HasRightsEntity<OrganizationUnit, OrganizationRight, OrganizationRole>, IHierarchy<OrganizationUnit>
+    public class OrganizationUnit : HasRightsEntity<OrganizationUnit, OrganizationRight, OrganizationRole>, IHierarchy<OrganizationUnit>, IContextAware
     {
         public OrganizationUnit()
         {
             this.TaskUsages = new List<TaskUsage>();
             this.TaskRefs = new List<TaskRef>();
             this.OwnedTasks = new List<TaskRef>();
-            this.DefaultUsers = new List<User>();
+            this.DefaultUsers = new List<AdminRight>();
             this.Using = new List<ItSystemUsageOrgUnitUsage>();
             this.UsingItProjects = new List<ItProjectOrgUnitUsage>();
         }
 
         public string Name { get; set; }
-        
+
         /// <summary>
         /// EAN number of the department.
         /// </summary>
@@ -41,7 +41,7 @@ namespace Core.DomainModel
         public virtual Organization Organization { get; set; }
 
         /// <summary>
-        /// The usage of task on this Organization Unit. 
+        /// The usage of task on this Organization Unit.
         /// Should be a subset of the TaskUsages of the parent department.
         /// </summary>
         public virtual ICollection<TaskUsage> TaskUsages { get; set; }
@@ -60,6 +60,7 @@ namespace Core.DomainModel
         /// The delegated system usages.
         /// </value>
         public virtual ICollection<ItSystemUsage.ItSystemUsage> DelegatedSystemUsages { get; set; }
+
         /// <summary>
         /// Gets or sets it system usages.
         /// TODO write better summary
@@ -70,9 +71,13 @@ namespace Core.DomainModel
         public virtual ICollection<ItSystemUsage.ItSystemUsage> ItSystemUsages { get; set; }
 
         /// <summary>
-        /// Users which have set this as their default OrganizationUnit
+        /// Users which have set this as their default OrganizationUnit.
         /// </summary>
-        public virtual ICollection<User> DefaultUsers { get; set; }
+        /// <remarks>
+        /// Goes through <seealso cref="AdminRight"/>.
+        /// So to access the user you must call .User on the rights object.
+        /// </remarks>
+        public virtual ICollection<AdminRight> DefaultUsers { get; set; }
 
         /// <summary>
         /// This Organization Unit is using these IT Systems (Via ItSystemUsage)
@@ -83,7 +88,7 @@ namespace Core.DomainModel
         /// This Organization Unit is using these IT projects
         /// </summary>
         public virtual ICollection<ItProjectOrgUnitUsage> UsingItProjects { get; set; }
-        
+
         /// <summary>
         /// This Organization Unit is responsible for these IT Contracts
         /// </summary>
@@ -94,19 +99,32 @@ namespace Core.DomainModel
         /// </summary>
         public virtual ICollection<EconomyStream> EconomyStreams { get; set; }
 
-        public override bool HasUserWriteAccess(User user, int organizationId)
+        /// <summary>
+        /// Determines whether a user has write access to this instance.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        /// <returns>
+        ///   <c>true</c> if user has write access, otherwise <c>false</c>.
+        /// </returns>
+        public override bool HasUserWriteAccess(User user)
         {
-            //if user has write access to the organisation, 
-            //user has write access to the org unit
-            if (Organization.HasUserWriteAccess(user, organizationId)) return true;
+            // check rights on parent org unit
+            if (Parent != null && Parent.HasUserWriteAccess(user))
+                return true;
 
-            //Check rights on this org unit
-            if (base.HasUserWriteAccess(user, organizationId)) return true;
+            return base.HasUserWriteAccess(user);
+        }
 
-            //Check rights on parent org unit
-            if (Parent != null && Parent.HasUserWriteAccess(user, organizationId)) return true;
-
-            return false;
+        /// <summary>
+        /// Determines whether this instance is within a given organizational context.
+        /// </summary>
+        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
+        /// <returns>
+        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
+        /// </returns>
+        public bool IsInContext(int organizationId)
+        {
+            return OrganizationId == organizationId;
         }
     }
 }
