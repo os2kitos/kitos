@@ -33,17 +33,12 @@
                             <!-- Phases buttons -->
                             <div class="col-md-3">Forventet faseovergang</div>
                             <span data-ng-repeat="phase in project.phases" class="col-md-2" data-ng-hide="$first">
-                                <div class="input-group input-group-sm">
-                                    <input type="text" class="form-control"
-                                           data-datepicker-popup
-                                           data-is-open="opened['pd' + $index]"
-                                           data-ng-disabled="!hasWriteAccess"
-                                           data-ng-model="phase.startDate"
-                                           data-ng-change="updatePhaseDate(phase, $index + 1)">
-                                    <span class="input-group-btn">
-                                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'pd' + $index)" data-ng-disabled="!hasWriteAccess"><i class="glyphicon glyphicon-calendar"></i></button>
-                                    </span>
-                                </div>
+                                <input type="text" class="form-control"
+                                       data-kendo-date-picker
+                                       data-k-options="datepickerOptions"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       data-ng-model="phase.startDate"
+                                       data-ng-change="updatePhaseDate(phase, $index + 1)">
                             </span>
                         </div>
                     </div>

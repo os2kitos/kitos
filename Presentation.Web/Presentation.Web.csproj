@@ -287,7 +287,6 @@
     <Compile Include="Controllers\API\StakeholderController.cs" />
     <Compile Include="Controllers\API\MilestoneController.cs" />
     <Compile Include="Models\CommunicationDTO.cs" />
-    <Compile Include="Filters\RFC3339FullDateConverter.cs" />
     <Compile Include="Models\GoalDTO.cs" />
     <Compile Include="Models\GoalStatusDTO.cs" />
     <Compile Include="Models\HandoverDTO.cs" />
@@ -868,7 +867,6 @@
     <Content Include="Scripts\app\controllers\it-system\it-interface-catalog.js" />
     <Content Include="Scripts\app\controllers\it-system\it-interface-edit.js" />
     <Content Include="Scripts\app\controllers\it-system\it-interface-edit-details.js" />
-    <Content Include="Scripts\app\controllers\it-system\it-system-create-modal.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-edit-interfaces.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-edit-kle.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-edit.js" />

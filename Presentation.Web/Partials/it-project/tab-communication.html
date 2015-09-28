@@ -34,18 +34,13 @@
                     </div>
                 </td>
                 <td>
-                    <div class="input-group input-group-sm">
-                        <input type="text" class="form-control"
-                               data-datepicker-popup
-                               data-is-open="$parent.opened['dd' + $index]" 
-                               data-ng-disabled="!hasWriteAccess" 
-                               data-ng-model="c.dueDate"
-                               data-autosave="api/communication/{{c.id}}"
-                               data-field="dueDate">
-                        <span class="input-group-btn">
-                            <button type="button" class="btn btn-default" data-ng-click="open($event, 'dd' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
-                        </span>
-                    </div>
+                    <input type="text" class="form-control"
+                           data-kendo-date-picker
+                           data-k-options="datepickerOptions"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-ng-model="c.dueDate"
+                           data-autosave="api/communication/{{c.id}}"
+                           data-field="dueDate">
                 </td>
                 <td>
                     <div class="form-group">
@@ -90,16 +85,11 @@
                 </td>
                 <td>
                     <div class="form-group" data-show-errors>
-                        <div class="input-group input-group-sm">
-                            <input type="text" name="due" class="form-control" required
-                                   data-datepicker-popup
-                                   data-is-open="opened['ndd' + $index]" 
-                                   data-ng-disabled="!hasWriteAccess" 
-                                   data-ng-model="comm.dueDate">
-                            <span class="input-group-btn">
-                                <button type="button" class="btn btn-default" data-ng-click="open($event, 'ndd' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
-                            </span>
-                        </div>
+                        <input type="text" name="due" class="form-control" required
+                               data-kendo-date-picker
+                               data-k-options="datepickerOptions"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-model="comm.dueDate">
                     </div>
                 </td>
                 <td>

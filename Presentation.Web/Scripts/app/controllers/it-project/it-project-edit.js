@@ -1,6 +1,5 @@
 ﻿(function(ng, app) {
     app.config(['$stateProvider', function($stateProvider) {
-
         $stateProvider.state('it-project.edit', {
             url: '/edit/{id:[0-9]+}',
             templateUrl: 'partials/it-project/edit-it-project.html',
@@ -61,7 +60,7 @@
                     buttonDefaultText: 'Faner '
                 };
                 $scope.selectedData = [];
-                if (project.isStatusGoalVisible) 
+                if (project.isStatusGoalVisible)
                     $scope.selectedData.push({ id: 1 });
                 if (project.isStrategyVisible)
                     $scope.selectedData.push({ id: 2 });
@@ -169,7 +168,7 @@
 
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.autosaveUrl = "api/itproject/" + project.id;
-                
+
                 $scope.parentSelectOptions = selectLazyLoading('api/itproject', true, ['overview', 'orgId=' + user.currentOrganizationId]);
 
                 function selectLazyLoading(url, excludeSelf, paramAry) {
@@ -213,13 +212,5 @@
                         }
                     };
                 }
-
-                $scope.opened = {};
-                $scope.open = function ($event, datepicker) {
-                    $event.preventDefault();
-                    $event.stopPropagation();
-
-                    $scope.opened[datepicker] = true;
-                };
             }]);
 })(angular, app);

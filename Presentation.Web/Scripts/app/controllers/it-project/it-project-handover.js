@@ -60,6 +60,11 @@
                 return user.id.toString();
             });
 
+            $scope.datepickerOptions = {
+                format: "dd-MM-yyyy",
+                parseFormats: ["yyyy-MM-dd"]
+            };
+
             $scope.select2Options = {
                 dropdownAutoWidth: true
             };

@@ -242,7 +242,7 @@ namespace Core.ApplicationServices
                     Terminated = contractRow.Terminated,
                     OrganizationId = organizationId,
                     LastChangedByUserId = kitosUser.Id,
-                    LastChanged = DateTime.Now,
+                    LastChanged = DateTime.UtcNow,
                     ObjectOwnerId = kitosUser.Id
                 });
 
@@ -362,7 +362,7 @@ namespace Core.ApplicationServices
                         PhoneNumber = userRow.Phone,
                         ObjectOwnerId = kitosUser.Id,
                         LastChangedByUserId = kitosUser.Id,
-                        LastChanged = DateTime.Now,
+                        LastChanged = DateTime.UtcNow,
                         IsGlobalAdmin = false,
                         Password = "mangler at blive indsat",
                         Salt = "mangler at blive indsat"
@@ -393,7 +393,7 @@ namespace Core.ApplicationServices
                         UserId = userEntity.Id,
                         RoleId = 2,
                         LastChangedByUserId = kitosUser.Id,
-                        LastChanged = DateTime.Now,
+                        LastChanged = DateTime.UtcNow,
                         ObjectOwnerId = kitosUser.Id
                     });
                     _adminRightRepository.Save();
@@ -553,7 +553,7 @@ namespace Core.ApplicationServices
                             ParentId = parent.Id,
                             ObjectOwnerId = kitosUser.Id,
                             LastChangedByUserId = kitosUser.Id,
-                            LastChanged = DateTime.Now,
+                            LastChanged = DateTime.UtcNow,
                             OrganizationId = organizationId
                         });
 

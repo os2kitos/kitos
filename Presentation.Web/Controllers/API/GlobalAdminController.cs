@@ -40,7 +40,7 @@ namespace Presentation.Web.Controllers.API
                 if (user.IsGlobalAdmin) return Conflict(user.Name + " is already global admin");
 
                 user.IsGlobalAdmin = true;
-                user.LastChanged = DateTime.Now;
+                user.LastChanged = DateTime.UtcNow;
                 user.LastChangedByUser = KitosUser;
                 UserRepository.Save();
 

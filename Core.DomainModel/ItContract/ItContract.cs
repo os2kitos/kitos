@@ -479,7 +479,7 @@ namespace Core.DomainModel.ItContract
         {
             get
             {
-                var today = DateTime.Now;
+                var today = DateTime.UtcNow;
                 var startDate = Concluded ?? today;
                 var endDate = ExpirationDate ?? DateTime.MaxValue;
 

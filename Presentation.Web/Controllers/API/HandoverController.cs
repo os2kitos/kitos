@@ -25,7 +25,7 @@ namespace Presentation.Web.Controllers.API
                 var handover = Repository.GetByKey(id);
                 var user = _userRepository.GetByKey(participantId);
                 handover.Participants.Add(user);
-                handover.LastChanged = DateTime.Now;
+                handover.LastChanged = DateTime.UtcNow;
                 handover.LastChangedByUser = KitosUser;
                 Repository.Save();
 
