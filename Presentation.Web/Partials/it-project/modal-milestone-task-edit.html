@@ -45,16 +45,11 @@
                 Start
             </label>
             <div class="col-md-4">
-                <div class="input-group input-group-sm">
-                    <input type="text" class="form-control" id="startDate"
-                           data-datepicker-popup
-                           data-is-open="opened.sd"
-                           data-ng-model="activity.startDate"
-                           data-ng-disabled="!hasWriteAccess" />
-                    <span class="input-group-btn">
-                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'sd')" data-ng-disabled="!hasWriteAccess"><i class="glyphicon glyphicon-calendar"></i></button>
-                    </span>
-                </div>
+                <input type="text" class="form-control" id="startDate"
+                       data-kendo-date-picker
+                       data-k-options="datepickerOptions"
+                       data-ng-model="activity.startDate"
+                       data-ng-disabled="!hasWriteAccess">
             </div>
 
             <!-- End date -->
@@ -62,16 +57,11 @@
                 Slut
             </label>
             <div class="col-md-4">
-                <div class="input-group input-group-sm">
-                    <input type="text" class="form-control" id="endDate"
-                           data-datepicker-popup
-                           data-is-open="opened.ed"
-                           data-ng-model="activity.endDate"
-                           data-ng-disabled="!hasWriteAccess">
-                    <span class="input-group-btn">
-                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'ed')" data-ng-disabled="!hasWriteAccess"><i class="glyphicon glyphicon-calendar"></i></button>
-                    </span>
-                </div>
+                <input type="text" class="form-control" id="endDate"
+                       data-kendo-date-picker
+                       data-k-options="datepickerOptions"
+                       data-ng-model="activity.endDate"
+                       data-ng-disabled="!hasWriteAccess">
             </div>
         </div>
 
@@ -82,16 +72,11 @@
                 Dato
             </label>
             <div class="col-md-4">
-                <div class="input-group input-group-sm">
-                    <input type="text" class="form-control" id="date"
-                           data-datepicker-popup
-                           data-is-open="opened.d"
-                           data-ng-model="activity.date"
-                           data-ng-disabled="!hasWriteAccess">
-                    <span class="input-group-btn">
-                        <button type="button" class="btn btn-default" data-ng-click="open($event, 'd')" data-ng-disabled="!hasWriteAccess"><i class="glyphicon glyphicon-calendar"></i></button>
-                    </span>
-                </div>
+                <input type="text" class="form-control" id="date"
+                       data-kendo-date-picker
+                       data-k-options="datepickerOptions"
+                       data-ng-model="activity.date"
+                       data-ng-disabled="!hasWriteAccess">
             </div>
         </div>
 

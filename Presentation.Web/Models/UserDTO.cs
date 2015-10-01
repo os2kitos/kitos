@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using Presentation.Web.Filters;
 
 namespace Presentation.Web.Models
 {
@@ -14,13 +12,11 @@ namespace Presentation.Web.Models
         public string Email { get; set; }
         public int? DefaultOrganizationUnitId { get; set; }
         public string DefaultOrganizationUnitName { get; set; }
-        public int? DefaultOrganizationUnitOrganizationId { get; set; }
         public bool IsGlobalAdmin { get; set; }
         public Guid? Uuid { get; set; }
         public List<AdminRightDTO> AdminRights { get; set; }
         public string ObjectOwnerName { get; set; }
         public string ObjectOwnerLastName { get; set; }
-        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? LastAdvisDate { get; set; }
         public DateTime LastChanged { get; set; }
         public int? LastChangedByUserId { get; set; }

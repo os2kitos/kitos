@@ -20,37 +20,37 @@
                 <!-- ORG UNIT -->
                 <td>
                     <div data-ng-model="stream.organizationUnitId" data-select-org-unit="" data-extra-options="extraOptions"
-                         data-ng-disabled="!hasWriteAccess" 
+                         data-ng-disabled="!hasWriteAccess"
                          data-ng-change="stream.updateEan()"
                          data-field="organizationUnitId"
                          data-autosave="{{stream.updateUrl}}" data-allow-clear="true"></div>
                 </td>
-                
+
                 <!-- EAN #  -->
                 <td>
                     {{stream.ean}}
                 </td>
-                
+
                 <!-- ACQUISITION "Anskaffelse" -->
                 <td>
                     <input type="number" class="input-sm form-control" data-ng-model="stream.acquisition"
-                           data-ng-disabled="!hasWriteAccess" 
+                           data-ng-disabled="!hasWriteAccess"
                            data-field="acquisition"
                            data-autosave="{{stream.updateUrl}}"/>
                 </td>
-                
+
                 <!-- Operation "drift" -->
                 <td>
                     <input type="number" class="input-sm form-control" data-ng-model="stream.operation"
-                           data-ng-disabled="!hasWriteAccess" 
+                           data-ng-disabled="!hasWriteAccess"
                            data-field="operation"
                            data-autosave="{{stream.updateUrl}}"/>
                 </td>
-                
+
                 <!-- Other -->
                 <td>
                     <input type="number" class="input-sm form-control" data-ng-model="stream.other"
-                           data-ng-disabled="!hasWriteAccess" 
+                           data-ng-disabled="!hasWriteAccess"
                            data-field="other"
                            data-autosave="{{stream.updateUrl}}"/>
                 </td>
@@ -58,42 +58,37 @@
                 <!-- Accounting entry "kontering" -->
                 <td>
                     <input type="text" class="input-sm form-control" data-ng-model="stream.accountingEntry"
-                           data-ng-disabled="!hasWriteAccess" 
+                           data-ng-disabled="!hasWriteAccess"
                            data-field="accountingEntry"
                            data-autosave="{{stream.updateUrl}}"/>
                 </td>
-                
+
                 <!-- Audit trafficlight -->
                 <td>
                     <span data-select-status2="" data-ng-model="stream.auditStatus" data-can-write="hasWriteAccess"
                           data-field="auditStatus"
                           data-autosave="{{stream.updateUrl}}"></span>
                 </td>
-                
+
                 <!-- Audit date -->
                 <td>
-                    <div class="input-group input-group-sm">
-                        <input type="text" class="form-control"
-                               data-datepicker-popup
-                               data-is-open="opened['eaud' + $index]" 
-                               data-ng-disabled="!hasWriteAccess" 
-                               data-ng-model="stream.auditDate"
-                               data-autosave="{{stream.updateUrl}}"
-                               data-field="auditDate">
-                        <span class="input-group-btn">
-                            <button type="button" class="btn btn-default" data-ng-click="open($event, 'eaud' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
-                        </span>
-                    </div>
+                    <input type="text" class="form-control"
+                           data-kendo-date-picker
+                           data-k-options="datepickerOptions"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-ng-model="stream.auditDate"
+                           data-autosave="{{stream.updateUrl}}"
+                           data-field="auditDate">
                 </td>
 
                 <!-- Note -->
                 <td>
                     <input type="text" class="input-sm form-control" data-ng-model="stream.note"
-                           data-ng-disabled="!hasWriteAccess" 
+                           data-ng-disabled="!hasWriteAccess"
                         data-field="note"
                         data-autosave="{{stream.updateUrl}}"/>
                 </td>
-                
+
                 <!-- delete button -->
                 <td>
                     <div class="pull-right" data-ng-hide="!hasWriteAccess">
@@ -142,37 +137,37 @@
                 <!-- ORG UNIT -->
                 <td>
                     <div data-ng-model="stream.organizationUnitId" data-select-org-unit="" data-extra-options="extraOptions"
-                         data-ng-disabled="!hasWriteAccess" 
+                         data-ng-disabled="!hasWriteAccess"
                          data-ng-change="stream.updateEan()"
                          data-field="organizationUnitId"
                          data-autosave="{{stream.updateUrl}}" data-allow-clear="true"></div>
                 </td>
-                
+
                 <!-- EAN #  -->
                 <td>
                     {{stream.ean}}
                 </td>
-                
+
                 <!-- ACQUISITION "Anskaffelse" -->
                 <td>
                     <input type="number" class="input-sm form-control" data-ng-model="stream.acquisition"
-                           data-ng-disabled="!hasWriteAccess" 
+                           data-ng-disabled="!hasWriteAccess"
                            data-field="acquisition"
                            data-autosave="{{stream.updateUrl}}"/>
                 </td>
-                
+
                 <!-- Operation "drift" -->
                 <td>
                     <input type="number" class="input-sm form-control" data-ng-model="stream.operation"
-                           data-ng-disabled="!hasWriteAccess" 
+                           data-ng-disabled="!hasWriteAccess"
                            data-field="operation"
                            data-autosave="{{stream.updateUrl}}"/>
                 </td>
-                
+
                 <!-- Other -->
                 <td>
                     <input type="number" class="input-sm form-control" data-ng-model="stream.other"
-                           data-ng-disabled="!hasWriteAccess" 
+                           data-ng-disabled="!hasWriteAccess"
                            data-field="other"
                            data-autosave="{{stream.updateUrl}}"/>
                 </td>
@@ -180,42 +175,37 @@
                 <!-- Accounting entry "kontering" -->
                 <td>
                     <input type="text" class="input-sm form-control" data-ng-model="stream.accountingEntry"
-                           data-ng-disabled="!hasWriteAccess" 
+                           data-ng-disabled="!hasWriteAccess"
                            data-field="accountingEntry"
                            data-autosave="{{stream.updateUrl}}"/>
                 </td>
-                
+
                 <!-- Audit trafficlight -->
                 <td>
                     <span data-select-status2="" data-ng-model="stream.auditStatus" data-can-write="hasWriteAccess"
                           data-field="auditStatus"
                           data-autosave="{{stream.updateUrl}}"></span>
                 </td>
-                
+
                 <!-- Audit date -->
                 <td>
-                    <div class="input-group input-group-sm">
-                        <input type="text" class="form-control"
-                               data-datepicker-popup
-                               data-is-open="opened['iaud' + $index]" 
-                               data-ng-disabled="!hasWriteAccess" 
-                               data-ng-model="stream.auditDate"
-                               data-autosave="{{stream.updateUrl}}"
-                               data-field="auditDate">
-                        <span class="input-group-btn">
-                            <button type="button" class="btn btn-default" data-ng-click="open($event, 'iaud' + $index)"><i class="glyphicon glyphicon-calendar"></i></button>
-                        </span>
-                    </div>
+                    <input type="text" class="form-control"
+                           data-kendo-date-picker
+                           data-k-options="datepickerOptions"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-ng-model="stream.auditDate"
+                           data-autosave="{{stream.updateUrl}}"
+                           data-field="auditDate">
                 </td>
 
                 <!-- Note -->
                 <td>
                     <input type="text" class="input-sm form-control" data-ng-model="stream.note"
-                           data-ng-disabled="!hasWriteAccess" 
-                        data-field="note"
-                        data-autosave="{{stream.updateUrl}}"/>
+                           data-ng-disabled="!hasWriteAccess"
+                           data-field="note"
+                           data-autosave="{{stream.updateUrl}}">
                 </td>
-                
+
                 <!-- delete button -->
                 <td>
                     <div class="pull-right" data-ng-hide="!hasWriteAccess">

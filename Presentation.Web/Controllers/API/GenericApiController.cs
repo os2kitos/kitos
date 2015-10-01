@@ -60,7 +60,7 @@ namespace Presentation.Web.Controllers.API
 
         /// <summary>
         /// GET api/T/id?hasWriteAccess
-        /// Returns whether the current authenticated user has write access
+        /// Returns whether the current authenticated user has write access 
         /// to the object with the given id
         /// </summary>
         /// <param name="id">The id of the object</param>
@@ -131,9 +131,9 @@ namespace Presentation.Web.Controllers.API
             return Patch(id, organizationId, obj);
         }
 
-        protected virtual void DeleteQuery(int id)
+        protected virtual void DeleteQuery(TModel entity)
         {
-            Repository.DeleteByKey(id);
+            Repository.DeleteByKey(entity.Id);
             Repository.Save();
         }
 
@@ -145,7 +145,7 @@ namespace Presentation.Web.Controllers.API
                 var item = Repository.GetByKey(id);
                 if (!HasWriteAccess(item, organizationId)) return Unauthorized();
 
-                DeleteQuery(id);
+                DeleteQuery(item);
 
                 return Ok();
             }
@@ -225,8 +225,8 @@ namespace Presentation.Web.Controllers.API
                         }
                     }
                 }
-
-                item.LastChanged = DateTime.Now;
+                
+                item.LastChanged = DateTime.UtcNow;
                 item.LastChangedByUser = KitosUser;
 
                 PatchQuery(item);
@@ -239,7 +239,7 @@ namespace Presentation.Web.Controllers.API
                     if (e.InnerException.InnerException != null)
                         if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
                             return Conflict(e.InnerException.InnerException.Message);
-
+                        
                 return Error(e);
             }
         }
@@ -253,7 +253,7 @@ namespace Presentation.Web.Controllers.API
         #region Write Access Checks functions
 
         /// <summary>
-        /// Checks if a given user has write access to a given object.
+        /// Checks if a given user has write access to a given object. 
         /// Override this method as needed.
         /// </summary>
         /// <param name="obj">The object</param>
@@ -270,7 +270,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         /// <summary>
-        /// Checks if the current authenticated user has write access to a given object.
+        /// Checks if the current authenticated user has write access to a given object. 
         /// </summary>
         /// <param name="objId">The id of object</param>
         /// <param name="organizationId"></param>
@@ -281,7 +281,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         /// <summary>
-        /// Checks if a given user has write access to a given object.
+        /// Checks if a given user has write access to a given object. 
         /// </summary>
         /// <param name="objId">The id of object</param>
         /// <param name="user">The user</param>
@@ -294,7 +294,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         /// <summary>
-        /// Checks if the current authenticated user has write access to a given object.
+        /// Checks if the current authenticated user has write access to a given object. 
         /// </summary>
         /// <param name="obj">The object</param>
         /// <param name="organizationId"></param>

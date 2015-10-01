@@ -248,7 +248,7 @@ namespace Presentation.Web.Controllers.API
 
                 usage.UsedBy.Add(new ItSystemUsageOrgUnitUsage { ItSystemUsageId = id, OrganizationUnitId = organizationUnit });
 
-                usage.LastChanged = DateTime.Now;
+                usage.LastChanged = DateTime.UtcNow;
                 usage.LastChangedByUser = KitosUser;
 
                 Repository.Save();
@@ -278,7 +278,7 @@ namespace Presentation.Web.Controllers.API
 
                 usage.UsedBy.Remove(entity);
 
-                usage.LastChanged = DateTime.Now;
+                usage.LastChanged = DateTime.UtcNow;
                 usage.LastChangedByUser = KitosUser;
 
                 Repository.Save();
@@ -326,7 +326,7 @@ namespace Presentation.Web.Controllers.API
                 {
                     usage.TaskRefs.Add(task);
                 }
-                usage.LastChanged = DateTime.Now;
+                usage.LastChanged = DateTime.UtcNow;
                 usage.LastChangedByUser = KitosUser;
                 Repository.Save();
                 return Ok();
@@ -368,7 +368,7 @@ namespace Presentation.Web.Controllers.API
                 {
                     usage.TaskRefs.Remove(task);
                 }
-                usage.LastChanged = DateTime.Now;
+                usage.LastChanged = DateTime.UtcNow;
                 usage.LastChangedByUser = KitosUser;
                 Repository.Save();
                 return Ok();

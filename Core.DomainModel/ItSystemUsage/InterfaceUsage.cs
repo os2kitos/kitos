@@ -6,7 +6,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// <summary>
     /// Represent the local usage of a interface.
     /// When an <see cref="ItSystem"/>, which can use an interface, is taken into local usage,
-    /// a InterfaceUsage is created, to allow for adding local details regarding the usage 
+    /// a InterfaceUsage is created, to allow for adding local details regarding the usage
     /// of the interface.
     /// It is also used for binding an <see cref="ItContract"/> with the usage.
     /// </summary>
@@ -16,7 +16,7 @@ namespace Core.DomainModel.ItSystemUsage
         {
             this.DataRowUsages = new List<DataRowUsage>();
         }
-        
+
         public int ItSystemUsageId { get; set; }
         /// <summary>
         /// The system that is using the interface.
@@ -43,7 +43,7 @@ namespace Core.DomainModel.ItSystemUsage
         public int ItInterfaceId { get; set; }
         public int ItSystemId { get; set; }
         public virtual ItInterfaceUse ItInterfaceUse { get; set; } // careful ItInterfaceUse has a composite key
-        
+
         /// <summary>
         /// Whether local usage of the interface is wanted or not.
         /// </summary>

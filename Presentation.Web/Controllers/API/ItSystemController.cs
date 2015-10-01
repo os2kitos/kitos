@@ -304,7 +304,7 @@ namespace Presentation.Web.Controllers.API
                 {
                     system.TaskRefs.Add(task);
                 }
-                system.LastChanged = DateTime.Now;
+                system.LastChanged = DateTime.UtcNow;
                 system.LastChangedByUser = KitosUser;
                 Repository.Save();
                 return Ok();
@@ -346,7 +346,7 @@ namespace Presentation.Web.Controllers.API
                 {
                     system.TaskRefs.Remove(task);
                 }
-                system.LastChanged = DateTime.Now;
+                system.LastChanged = DateTime.UtcNow;
                 system.LastChangedByUser = KitosUser;
                 Repository.Save();
                 return Ok();

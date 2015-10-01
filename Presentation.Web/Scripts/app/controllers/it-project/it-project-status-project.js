@@ -53,6 +53,11 @@
             $scope.project = project;
             $scope.project.updateUrl = "api/itproject/" + project.id;
 
+            $scope.datepickerOptions = {
+                format: "dd-MM-yyyy",
+                parseFormats: ["yyyy-MM-dd"]
+            };
+
             //Setup phases
             $scope.project.phases = [project.phase1, project.phase2, project.phase3, project.phase4, project.phase5];
             var prevPhase = null;

@@ -1,6 +1,4 @@
 ﻿using System;
-using Newtonsoft.Json;
-using Presentation.Web.Filters;
 
 namespace Presentation.Web.Models
 {
@@ -11,7 +9,6 @@ namespace Presentation.Web.Models
         public string Purpose { get; set; }
         public string Message { get; set; }
         public string Media { get; set; }
-        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? DueDate { get; set; }
 
         public int? ResponsibleUserId { get; set; }

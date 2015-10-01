@@ -1,7 +1,5 @@
 ﻿using System;
 using Core.DomainModel;
-using Newtonsoft.Json;
-using Presentation.Web.Filters;
 
 namespace Presentation.Web.Models
 {
@@ -25,11 +23,8 @@ namespace Presentation.Web.Models
 
         public bool Measurable { get; set; }
         
-        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? SubGoalDate1 { get; set; }
-        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? SubGoalDate2 { get; set; }
-        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? SubGoalDate3 { get; set; }
 
         public string SubGoal1 { get; set; }

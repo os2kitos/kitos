@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using Presentation.Web.Filters;
 
 namespace Presentation.Web.Models
 {
@@ -16,26 +14,16 @@ namespace Presentation.Web.Models
         public string Folder { get; set; }
         public string SupplierContractSigner { get; set; }
         public bool HasSupplierSigned { get; set; }
-        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? SupplierSignedDate { get; set; }
-        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? OperationTestExpected { get; set; }
-        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? OperationTestApproved { get; set; }
-        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? OperationalAcceptanceTestExpected { get; set; }
-        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? OperationalAcceptanceTestApproved { get; set; }
-        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? Concluded { get; set; }
         public int Duration { get; set; }
-        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? IrrevocableTo { get; set; }
-        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? ExpirationDate { get; set; }
-        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? OperationRemunerationBegun { get; set; }
-        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? Terminated { get; set; }
         public int ExtendMultiplier { get; set; }
 
@@ -48,7 +36,6 @@ namespace Presentation.Web.Models
         public UserDTO ContractSigner { get; set; }
 
         public bool IsSigned { get; set; }
-        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? SignedDate { get; set; }
         public int? ResponsibleOrganizationUnitId { get; set; }
         public int? SupplierId { get; set; }

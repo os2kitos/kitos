@@ -33,6 +33,11 @@
             $scope.goalStatus = project.goalStatus;
             $scope.goalStatus.updateUrl = "api/goalStatus/" + project.goalStatus.id;
 
+            $scope.datepickerOptions = {
+                format: "dd-MM-yyyy",
+                parseFormats: ["yyyy-MM-dd"]
+            };
+
             $scope.getGoalTypeName = function(goalTypeId) {
                 var type = _.findWhere(goalTypes, { id: goalTypeId });
 
@@ -74,26 +79,6 @@
             }
 
             _.each($scope.goalStatus.goals, addGoal);
-
-            function patch(url, field, value) {
-                var payload = {};
-                payload[field] = value;
-
-                return $http({
-                    method: 'PATCH',
-                    url: url,
-                    data: payload
-                });
-            }
-
-            $scope.updateStatusDate = function() {
-                patch($scope.goalStatus.updateUrl, "statusDate", $scope.project.statusDate)
-                    .success(function() {
-                        notify.addSuccessMessage("Feltet er opdateret");
-                    }).error(function() {
-                        notify.addErrorMessage("Fejl!");
-                    });
-            };
         }
     ]);
 })(angular, app);

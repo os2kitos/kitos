@@ -289,7 +289,6 @@
     <Compile Include="Controllers\API\StakeholderController.cs" />
     <Compile Include="Controllers\API\MilestoneController.cs" />
     <Compile Include="Models\CommunicationDTO.cs" />
-    <Compile Include="Filters\RFC3339FullDateConverter.cs" />
     <Compile Include="Models\GoalDTO.cs" />
     <Compile Include="Models\GoalStatusDTO.cs" />
     <Compile Include="Models\HandoverDTO.cs" />
@@ -364,7 +363,6 @@
     <Compile Include="Models\UserDTO.cs" />
     <Compile Include="Models\UserOrganizationsDTO.cs" />
     <Compile Include="Models\UserOverviewDTO.cs" />
-    <Compile Include="Models\UserProfileDTO.cs" />
     <Compile Include="Models\WishDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -873,7 +871,6 @@
     <Content Include="Scripts\app\controllers\it-system\it-interface-catalog.js" />
     <Content Include="Scripts\app\controllers\it-system\it-interface-edit.js" />
     <Content Include="Scripts\app\controllers\it-system\it-interface-edit-details.js" />
-    <Content Include="Scripts\app\controllers\it-system\it-system-create-modal.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-edit-interfaces.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-edit-kle.js" />
     <Content Include="Scripts\app\controllers\it-system\it-system-edit.js" />

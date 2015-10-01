@@ -25,7 +25,7 @@ namespace Presentation.Web
             // To avoid processing unexpected or malicious queries, use the validation settings on QueryableAttribute to validate incoming queries.
             // For more information, visit http://go.microsoft.com/fwlink/?LinkId=279712.
             //config.EnableQuerySupport();
-            
+
             //OData
             config.MapODataServiceRoute(
                 routeName: "odata",

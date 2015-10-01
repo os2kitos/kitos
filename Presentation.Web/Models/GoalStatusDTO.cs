@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.DomainModel;
-using Newtonsoft.Json;
-using Presentation.Web.Filters;
 
 namespace Presentation.Web.Models
 {
@@ -19,7 +17,6 @@ namespace Presentation.Web.Models
         /// <summary>
         /// Date-for-status-update field
         /// </summary>
-        [JsonConverter(typeof(Rfc3339FullDateConverter))]
         public DateTime? StatusDate { get; set; }
 
         /// <summary>

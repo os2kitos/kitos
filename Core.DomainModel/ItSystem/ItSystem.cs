@@ -38,7 +38,7 @@ namespace Core.DomainModel.ItSystem
         /// Exhibited interfaces.
         /// </value>
         public virtual ICollection<ItInterfaceExhibit> ItInterfaceExhibits { get; set; }
-        
+
         /// <summary>
         /// Gets or sets interfaces that can use this instance.
         /// </summary>
@@ -46,7 +46,7 @@ namespace Core.DomainModel.ItSystem
         /// Usable interfaces.
         /// </value>
         public virtual ICollection<ItInterfaceUse> CanUseInterfaces { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the sub (child) it systems.
         /// </summary>
@@ -54,7 +54,7 @@ namespace Core.DomainModel.ItSystem
         /// The children.
         /// </value>
         public virtual ICollection<ItSystem> Children { get; set; }
-        
+
         public int? ParentId { get; set; }
         /// <summary>
         /// Gets or sets the parent (master) it system.
@@ -63,7 +63,7 @@ namespace Core.DomainModel.ItSystem
         /// The parent.
         /// </value>
         public virtual ItSystem Parent { get; set; }
-        
+
         public int? BusinessTypeId { get; set; }
         /// <summary>
         /// Gets or sets the type of the business option.

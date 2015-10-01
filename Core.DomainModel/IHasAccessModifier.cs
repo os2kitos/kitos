@@ -5,11 +5,11 @@
         /// <summary>
         /// Only users within the organization this instance was created in have read access.
         /// </summary>
-        Normal, 
+        Normal,
         /// <summary>
         /// Everyone have read access.
         /// </summary>
-        Public, 
+        Public,
         /// <summary>
         /// Only users with a role on the instance have read access.
         /// </summary>

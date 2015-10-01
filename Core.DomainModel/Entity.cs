@@ -11,7 +11,7 @@ namespace Core.DomainModel
         protected Entity()
         {
             // instance creation time
-            LastChanged = DateTime.Now;
+            LastChanged = DateTime.UtcNow;
         }
 
         /// <summary>

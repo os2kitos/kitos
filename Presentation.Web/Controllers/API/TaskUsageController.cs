@@ -102,7 +102,7 @@ namespace Presentation.Web.Controllers.API
                         OrgUnitId = orgUnitId,
                         TaskRefId = task.Id,
                         ObjectOwner = KitosUser,
-                        LastChanged = DateTime.Now,
+                        LastChanged = DateTime.UtcNow,
                         LastChangedByUser = KitosUser
                     });
                 }
