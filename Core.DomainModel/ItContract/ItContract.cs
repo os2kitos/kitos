@@ -454,7 +454,7 @@ namespace Core.DomainModel.ItContract
         /// </returns>
         public override bool HasUserWriteAccess(User user)
         {
-            if (ContractSignerId == user.Id) 
+            if (ContractSignerId == user.Id)
                 return true;
 
             return base.HasUserWriteAccess(user);
@@ -495,7 +495,7 @@ namespace Core.DomainModel.ItContract
                     // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
                     return today >= startDate && today <= terminationDate;
                 }
-                
+
                 // indgået-dato <= dags dato <= udløbs-dato
                 return today >= startDate && today <= endDate;
             }
