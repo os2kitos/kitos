@@ -117,7 +117,7 @@
                             field: "ItSystem.Name",
                             dir: "asc"
                         },
-                        pageSize: 10,
+                        pageSize: 25,
                         serverPaging: true,
                         serverSorting: true,
                         serverFiltering: true,
@@ -172,7 +172,7 @@
                     },
                     pageable: {
                         refresh: true,
-                        pageSizes: [10, 20, 50, 100, 200],
+                        pageSizes: [10, 25, 50, 100, 200],
                         buttonCount: 5
                     },
                     sortable: {
