@@ -85,7 +85,6 @@ namespace Presentation.Web
             //builder.EntitySet<ItSystemUsageOrgUnitUsage>("ItSystemUsageOrgUnitUsages");
             //builder.EntitySet<ItSystem>("ItSystems").EntityType.HasKey(x => x.Id);
 
-
             var itSystems = builder.EntitySet<ItSystem>("ItSystems");
             itSystems.EntityType.HasKey(x => x.Id);
             itSystems.EntityType.Property(x => x.Name);

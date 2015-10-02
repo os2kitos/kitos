@@ -19,7 +19,7 @@
         '$rootScope', '$scope', '$http', 'notify', '$state', 'user', '$timeout', 'gridStateService',
         function ($rootScope, $scope, $http, notify, $state, user, $timeout, gridStateService) {
             $rootScope.page.title = 'IT System - Katalog';
-            
+
             // usagedetails grid empty-grid handling
             function detailsBound(e) {
                 var grid = e.sender;
@@ -43,7 +43,7 @@
             function loadGridOptions() {
                 gridState.loadGridOptions($scope.mainGrid);
             }
-            
+
             $scope.saveGridProfile = function () {
                 gridState.saveGridProfile($scope.mainGrid);
             }
@@ -64,7 +64,7 @@
                 // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                 reload();
             }
-            
+
             function reload() {
                 $state.go('.', null, { reload: true });
             }
@@ -78,7 +78,7 @@
                 //Open modal
                 $scope.modal.center().open();
             }
-            
+
             var usageDetailDataSource = new kendo.data.DataSource({
                 type: "odata-v4",
                 transport:
@@ -121,7 +121,7 @@
                             // replaces "startswith(TaskKey,'11')" with "TaskRefs/any(c: startswith(c/TaskKey),'11')"
                             parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()(TaskKey.*\))/, "TaskRefs/any(c: $1c/$2)");
                         }
-                        
+
                         return parameterMap;
                     }
                 },

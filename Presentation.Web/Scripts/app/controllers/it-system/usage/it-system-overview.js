@@ -21,7 +21,7 @@
             '$rootScope', '$scope', '$http', '$timeout', '$state', 'user', 'gridStateService',
             function ($rootScope, $scope, $http, $timeout, $state, user, gridStateService) {
                 $rootScope.page.title = 'IT System - Overblik';
-                
+
                 // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(c/User/Name,'foo') and c/RoleId eq {roleId})"
                 function fixRoleFilter(filterUrl, roleName, roleId) {
                     var pattern = new RegExp("(\\w+\\()" + roleName + "(.*?\\))", "i");
@@ -539,7 +539,7 @@
                     // open modal
                     $scope.modal.center().open();
                 };
-                
+
                 // usagedetails grid - shows which organizations has a given itsystem in local usage
                 $scope.usageDetailsGrid = {
                     dataSource: {
@@ -581,7 +581,7 @@
 
                 function orgUnitDropDownList(args) {
                     // check if the kendoRendered event has been called
-                    // because this function is apparently called multiple 
+                    // because this function is apparently called multiple
                     // times before the grid is actually ready
                     if (kendoRendered) {
                         // http://dojo.telerik.com/ODuDe/5
@@ -621,18 +621,18 @@
                 function setDefaultOrgUnit() {
                     var kendoElem = this;
                     var idTofind = user.defaultOrganizationUnitId;
-                    
+
                     // find the index of the org unit that matches the users default org unit
                     var index = _.findIndex(kendoElem.dataItems(), function (item) {
                         return item.Id == idTofind;
                     });
-                    
+
                     // -1 = no match
                     //  0 = root org unit, which should display all. So remove org unit filter
                     if (index > 0) {
                         // select the users default org unit
                         kendoElem.select(index);
-                        
+
                         var selectedId = _.parseInt(kendoElem.value());
                         var childIds = kendoElem.dataItem().childIds;
                         // filter by selected
@@ -664,7 +664,7 @@
                     var currentFilter = dataSource.filter();
                     // remove old values first
                     var newFilter = _.removeFiltersForField(currentFilter, field);
-                    
+
                     // is selectedId a number?
                     if (!isNaN(selectedId)) {
                         newFilter = _.addFilter(newFilter, field, "eq", selectedId, "or");
@@ -681,7 +681,7 @@
 
                 function contractFilterDropDownList(args) {
                     // check if the kendoRendered event has been called
-                    // because this function is apparently called multiple 
+                    // because this function is apparently called multiple
                     // times before the grid is actually ready
                     if (kendoRendered) {
                         // http://dojo.telerik.com/ODuDe/5
@@ -720,7 +720,7 @@
                     var dataSource = $scope.mainGrid.dataSource;
                     var currentFilter = dataSource.filter();
                     var contractFilterObj = _.findKeyDeep(currentFilter, { field: "MainContract" });
-                    
+
                     if (contractFilterObj.operator == "neq") {
                         kendoElem.select(1); // index of "Har kontrakt"
                     } else if (contractFilterObj.operator == "eq") {
