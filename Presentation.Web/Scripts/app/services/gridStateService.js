@@ -5,8 +5,8 @@
 
     gridStateService.$inject = ["$timeout", "JSONfn"];
 
-    // this serivce is not really a service but a trick to avoid 
-    // repeating logic in controllers that need to persist 
+    // this serivce is not really a service but a trick to avoid
+    // repeating logic in controllers that need to persist
     // the grid state - which is pretty much all of them
     function gridStateService($timeout, JSONfn) {
         var factory = {
@@ -30,7 +30,7 @@
 
             // saves grid state to localStorage
             function saveGridOptions(grid) {
-                // timeout fixes columnReorder saves before the column is actually reordered 
+                // timeout fixes columnReorder saves before the column is actually reordered
                 // http://stackoverflow.com/questions/21270748/kendo-grid-saving-state-in-columnreorder-event
                 $timeout(function () {
                     var options = grid.getOptions();
