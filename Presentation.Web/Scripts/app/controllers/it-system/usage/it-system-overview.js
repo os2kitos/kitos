@@ -709,9 +709,9 @@
                     var newFilter = _.removeFiltersForField(currentFilter, field);
 
                     if (selectedValue == "Har kontrakt") {
-                        newFilter = _.addFilter(newFilter, field, "ne", null, "or");
+                        newFilter = _.addFilter(newFilter, field, "ne", null, "and");
                     } else if (selectedValue == "Ingen kontrakt") {
-                        newFilter = _.addFilter(newFilter, field, "eq", null, "or");
+                        newFilter = _.addFilter(newFilter, field, "eq", null, "and");
                     }
                     // can't use datasource object directly,
                     // if we do then the view doesn't update.
