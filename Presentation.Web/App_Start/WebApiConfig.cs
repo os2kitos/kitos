@@ -179,6 +179,10 @@ namespace Presentation.Web
 
             var contracts = builder.EntitySet<ItContract>("ItContracts");
             contracts.EntityType.HasKey(x => x.Id);
+
+            // TODO this field is causing issues.
+            // This query fails: /odata/Organizations(1)/ItSystemUsages?$expand=MainContract($expand=ItContract)
+            // if ItContract.Terminated has a value
             contracts.EntityType.Property(x => x.IsActive);
 
             var interfaces = builder.EntitySet<Interface>("Interfaces");

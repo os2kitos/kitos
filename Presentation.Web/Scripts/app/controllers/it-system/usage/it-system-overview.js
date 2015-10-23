@@ -77,7 +77,7 @@
                         type: "odata-v4",
                         transport: {
                             read: {
-                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,CanUseInterfaces,ItInterfaceExhibits,Parent),Organization,ResponsibleUsage($expand=OrganizationUnit),Overview($expand=ItSystem),MainContract($expand=ItContract),Rights($expand=User,Role)",
+                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,CanUseInterfaces,ItInterfaceExhibits,Parent),Organization,ResponsibleUsage($expand=OrganizationUnit),Overview($expand=ItSystem),MainContract,Rights($expand=User,Role)",
                                 dataType: "json"
                             },
                             parameterMap: function (options, type) {
@@ -457,13 +457,17 @@
                 };
 
                 function contractTemplate(dataItem) {
-                    if (dataItem.MainContract)
-                        if (dataItem.MainContract.ItContract)
-                            if (dataItem.MainContract.ItContract.IsActive)
-                                return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="fa fa-file text-success" aria-hidden="true"></span></a>';
-                            else
-                                return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="fa fa-file-o text-muted" aria-hidden="true"></span></a>';
+                    if (dataItem.MainContract) {
+                        return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="fa fa-file-o" aria-hidden="true"></span></a>';
 
+                        // TODO this has been disabled for now because $expand=MainContract($expand=ItContract) fails when ItContract.Terminated has a value
+                        // re-enable when a workaround has been found
+                        //if (dataItem.MainContract.ItContract)
+                        //    if (dataItem.MainContract.ItContract.IsActive)
+                        //        return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="fa fa-file text-success" aria-hidden="true"></span></a>';
+                        //    else
+                        //        return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="fa fa-file-o text-muted" aria-hidden="true"></span></a>';
+                    }
                     return "";
                 }
 
