@@ -10,7 +10,6 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("Stakeholder");
             this.Property(t => t.ItProjectId).HasColumnName("ItProjectId");
-
         }
     }
 }

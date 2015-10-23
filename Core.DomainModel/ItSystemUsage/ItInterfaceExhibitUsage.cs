@@ -5,8 +5,8 @@ namespace Core.DomainModel.ItSystemUsage
     /// <summary>
     /// Represent the local usage of an exhibited interface.
     /// When an <see cref="ItSystem"/>, which exhibits an interface, is taken into local usage,
-    /// a ItInterfaceExhibitUsage is created, to allow for adding local details regarding the exposure 
-    /// of the interface. 
+    /// a ItInterfaceExhibitUsage is created, to allow for adding local details regarding the exposure
+    /// of the interface.
     /// It is also used for binding an <see cref="ItContract"/> with the usage.
     /// </summary>
     public class ItInterfaceExhibitUsage

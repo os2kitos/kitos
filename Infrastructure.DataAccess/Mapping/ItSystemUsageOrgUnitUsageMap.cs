@@ -8,7 +8,7 @@ namespace Infrastructure.DataAccess.Mapping
         public ItSystemUsageOrgUnitUsageMap()
         {
             ToTable("itusageorgusage");
-            
+
             HasKey(x => new
             {
                 x.ItSystemUsageId, x.OrganizationUnitId
