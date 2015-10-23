@@ -132,7 +132,7 @@
                         field: "Name",
                         dir: "asc"
                     },
-                    pageSize: 25,
+                    pageSize: 100,
                     serverPaging: true,
                     serverSorting: true,
                     serverFiltering: true
