@@ -53,7 +53,7 @@
             }
 
             // fires when kendo is finished rendering all its goodies
-            $scope.$on("kendoRendered", function (e) {
+            $scope.$on("kendoRendered", function () {
                 loadGridOptions();
                 $scope.mainGrid.dataSource.fetch();
             });
@@ -107,38 +107,36 @@
                 dataBound: detailsBound
             };
 
-            var itSystemCatalogDataSource = new kendo.data.DataSource({
-                type: "odata-v4",
-                transport: {
-                    read: {
-                        url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystems?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization)",
-                        dataType: "json"
-                    },
-                    parameterMap: function (options, type) {
-                        var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
-
-                        if (parameterMap.$filter) {
-                            // replaces "startswith(TaskKey,'11')" with "TaskRefs/any(c: startswith(c/TaskKey),'11')"
-                            parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()(TaskKey.*\))/, "TaskRefs/any(c: $1c/$2)");
-                        }
-
-                        return parameterMap;
-                    }
-                },
-                sort: {
-                    field: "Name",
-                    dir: "asc"
-                },
-                pageSize: 25,
-                serverPaging: true,
-                serverSorting: true,
-                serverFiltering: true
-            });
-
             // catalog grid
             $scope.itSystemCatalogueGrid = {
                 autoBind: false,
-                dataSource: itSystemCatalogDataSource,
+                dataSource: {
+                    type: "odata-v4",
+                    transport: {
+                        read: {
+                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystems?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization)",
+                            dataType: "json"
+                        },
+                        parameterMap: function (options, type) {
+                            var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
+
+                            if (parameterMap.$filter) {
+                                // replaces "startswith(TaskKey,'11')" with "TaskRefs/any(c: startswith(c/TaskKey),'11')"
+                                parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()(TaskKey.*\))/, "TaskRefs/any(c: $1c/$2)");
+                            }
+
+                            return parameterMap;
+                        }
+                    },
+                    sort: {
+                        field: "Name",
+                        dir: "asc"
+                    },
+                    pageSize: 25,
+                    serverPaging: true,
+                    serverSorting: true,
+                    serverFiltering: true
+                },
                 toolbar: [
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {

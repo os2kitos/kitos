@@ -22,27 +22,25 @@
         function ($rootScope, $scope, $timeout, $state, user, gridStateService) {
             $rootScope.page.title = 'Snitflade - Katalog';
 
-            var itInterfaceCatalogDataSource = new kendo.data.DataSource({
-                type: "odata-v4",
-                transport: {
-                    read: {
-                        url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItInterfaces?$expand=Interface,InterfaceType,ObjectOwner,BelongsTo,Organization,Tsa,ExhibitedBy($expand=ItSystem),Method",
-                        dataType: "json"
-                    }
-                },
-                sort: {
-                    field: "Name",
-                    dir: "asc"
-                },
-                pageSize: 25,
-                serverPaging: true,
-                serverSorting: true,
-                serverFiltering: true,
-            });
-
             $scope.itInterfaceOptions = {
                 autoBind: false,
-                dataSource: itInterfaceCatalogDataSource,
+                dataSource: {
+                    type: "odata-v4",
+                    transport: {
+                        read: {
+                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItInterfaces?$expand=Interface,InterfaceType,ObjectOwner,BelongsTo,Organization,Tsa,ExhibitedBy($expand=ItSystem),Method",
+                            dataType: "json"
+                        }
+                    },
+                    sort: {
+                        field: "Name",
+                        dir: "asc"
+                    },
+                    pageSize: 25,
+                    serverPaging: true,
+                    serverSorting: true,
+                    serverFiltering: true,
+                },
                 toolbar: [
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
@@ -229,7 +227,7 @@
             }
 
             // fires when kendo is finished rendering all its goodies
-            $scope.$on("kendoRendered", function (e) {
+            $scope.$on("kendoRendered", function () {
                 loadGridOptions();
                 $scope.mainGrid.dataSource.fetch();
             });
