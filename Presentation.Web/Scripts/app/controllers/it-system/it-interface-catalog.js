@@ -28,13 +28,20 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItInterfaces?$expand=Interface,InterfaceType,ObjectOwner,BelongsTo,Organization,Tsa,ExhibitedBy($expand=ItSystem),Method",
+                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItInterfaces?$expand=Interface,InterfaceType,ObjectOwner,BelongsTo,Organization,Tsa,ExhibitedBy($expand=ItSystem),Method,LastChangedByUser",
                             dataType: "json"
                         }
                     },
                     sort: {
                         field: "Name",
                         dir: "asc"
+                    },
+                    schema: {
+                        model: {
+                            fields: {
+                                LastChanged: { type: "date" }
+                            }
+                        }
                     },
                     pageSize: 100,
                     serverPaging: true,
@@ -83,7 +90,8 @@
                 },
                 columns: [
                     {
-                        field: "ItInterfaceId", title: "Snidtflade ID", width: 150, persistId: "infid",
+                        field: "ItInterfaceId", title: "Snidtflade ID", width: 150,
+                        persistId: "infid", // DON'T YOU DARE RENAME!
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -93,7 +101,8 @@
                         }
                     },
                     {
-                        field: "Name", title: "Snitflade", width: 150, persistId: "name",
+                        field: "Name", title: "Snitflade", width: 150,
+                        persistId: "name", // DON'T YOU DARE RENAME!
                         template: "<a data-ui-sref='it-system.interface-edit.interface-details({id: #: Id #})'>#: Name #</a>",
                         filterable: {
                             cell: {
@@ -104,12 +113,26 @@
                         }
                     },
                     {
-                        field: "AccessModifier", title: "Synlighed", width: 80, persistId: "accessmod",
+                        field: "Version", title: "Version", width: 150,
+                        persistId: "version", // DON'T YOU DARE RENAME!
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
+                    },
+                    {
+                        field: "AccessModifier", title: "Synlighed", width: 80,
+                        persistId: "accessmod", // DON'T YOU DARE RENAME!
                         filterable: false,
                         sortable: false
                     },
                     {
-                        field: "InterfaceType.Name", title: "Snitfladetype", width: 150, persistId: "inftype",
+                        field: "InterfaceType.Name", title: "Snitfladetype", width: 150,
+                        persistId: "inftype", // DON'T YOU DARE RENAME!
                         template: "#: InterfaceType ? InterfaceType.Name : '' #",
                         filterable: {
                             cell: {
@@ -120,8 +143,8 @@
                         }
                     },
                     {
-                        field: "Interface.Name", title: "Grænseflade", width: 150, persistId: "infname",
-                        template: "#: Interface ? Interface.Name : '' #",
+                        field: "BelongsTo.Name", title: "Rettighedshaver", width: 150,
+                        persistId: "belongs", // DON'T YOU DARE RENAME!
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -131,29 +154,20 @@
                         }
                     },
                     {
-                        field: "Method.Name", title: "Metode", width: 150, persistId: "method",
-                        template: "#: Method ? Method.Name : '' #",
+                        field: "Url", title: "Link til yderligere beskrivelse", width: 100,
+                        persistId: "link", // DON'T YOU DARE RENAME!
+                        template: linkTemplate,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains",
                             }
-                        },
+                        }
                     },
                     {
-                        field: "Tsa.Name", title: "TSA", width: 150, persistId: "tsa",
-                        template: "#: Tsa ? Tsa.Name : '' #",
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains",
-                            }
-                        },
-                    },
-                    {
-                        field: "ExhibitedBy.ItSystem.Name", title: "Udstillet af", width: 150, persistId: "exhibit",
+                        field: "ExhibitedBy.ItSystem.Name", title: "Udstillet af", width: 150,
+                        persistId: "exhibit", // DON'T YOU DARE RENAME!
                         template: "#: ExhibitedBy ? ExhibitedBy.ItSystem.Name : '' #",
                         filterable: {
                             cell: {
@@ -164,7 +178,34 @@
                         },
                     },
                     {
-                        field: "BelongsTo.Name", title: "Rettighedshaver", width: 150, persistId: "belongs",
+                        field: "", title: "Snitflader: Anvendes globalt", width: 150,
+                        persistId: "infglobalusage", // DON'T YOU DARE RENAME!
+                        template: "TODO",
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        },
+                    },
+                    {
+                        field: "Tsa.Name", title: "TSA", width: 150,
+                        persistId: "tsa", // DON'T YOU DARE RENAME!
+                        template: "#: Tsa ? Tsa.Name : '' #",
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        },
+                    },
+                    {
+                        field: "Interface.Name", title: "Grænseflade", width: 150,
+                        persistId: "infname", // DON'T YOU DARE RENAME!
+                        template: "#: Interface ? Interface.Name : '' #",
+                        hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -174,7 +215,33 @@
                         }
                     },
                     {
-                        field: "Organization.Name", title: "Oprettet i", width: 150, persistId: "orgname",
+                        field: "Method.Name", title: "Metode", width: 150,
+                        persistId: "method", // DON'T YOU DARE RENAME!
+                        template: "#: Method ? Method.Name : '' #",
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        },
+                    },
+                    {
+                        field: "", title: "Datatype", width: 150,
+                        persistId: "datatypes", // DON'T YOU DARE RENAME!
+                        template: "TODO",
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        },
+                    },
+                    {
+                        field: "Organization.Name", title: "Oprettet af: Organisation", width: 150,
+                        persistId: "orgname", // DON'T YOU DARE RENAME!
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -184,13 +251,39 @@
                         }
                     },
                     {
-                        field: "ObjectOwner.Name", title: "Oprettet af", width: 150, persistId: "owername",
+                        field: "ObjectOwner.Name", title: "Oprettet af: Bruger", width: 150,
+                        persistId: "ownername", // DON'T YOU DARE RENAME!
                         template: "#: ObjectOwner.Name + ' ' + ObjectOwner.LastName #",
+                        hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains",
+                            }
+                        }
+                    },
+                    {
+                        field: "LastChangedByUser.Name", title: "Sidst redigeret: Bruger", width: 150,
+                        persistId: "lastchangedname", // DON'T YOU DARE RENAME!
+                        template: "#: LastChangedByUser.Name + ' ' + LastChangedByUser.LastName #",
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
+                    },
+                    {
+                        field: "LastChanged", title: "Sidst redigeret: Dato", format: "{0:dd-MM-yyyy HH:mm}", width: 150,
+                        persistId: "lastchangeddate", // DON'T YOU DARE RENAME!
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                showOperators: false,
+                                operator: "gte"
                             }
                         }
                     }
@@ -241,6 +334,12 @@
 
             function reload() {
                 $state.go('.', null, { reload: true });
+            }
+
+            function linkTemplate(dataItem) {
+                if (dataItem.Url)
+                    return '<a href="' + dataItem.Url + '" title="Link til yderligere..."><i class="fa fa-link"></i></a>';
+                return "";
             }
         }
     ]);

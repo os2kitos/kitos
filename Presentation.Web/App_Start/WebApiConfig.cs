@@ -49,7 +49,6 @@ namespace Presentation.Web
             //builder.EntitySet<AdminRole>("AdminRoles");
             //builder.EntitySet<Advice>("Advices");
             //builder.EntitySet<AgreementElement>("AgreementElements");
-            //builder.EntitySet<ArchiveType>("ArchiveTypes");
             //builder.EntitySet<BusinessType>("BusinessTypes");
             //builder.EntitySet<Communication>("Communications");
             //builder.EntitySet<Config>("Configs");
@@ -83,7 +82,10 @@ namespace Presentation.Web
             //builder.EntitySet<ItProjectRole>("ItProjectRoles");
             //builder.EntitySet<ItProjectOrgUnitUsage>("ItProjectOrgUnitUsages");
             //builder.EntitySet<ItSystemUsageOrgUnitUsage>("ItSystemUsageOrgUnitUsages");
-            //builder.EntitySet<ItSystem>("ItSystems").EntityType.HasKey(x => x.Id);
+
+            var archiveOption = builder.EntitySet<ArchiveType>("ArchiveTypes");
+            archiveOption.EntityType.HasKey(x => x.Id);
+            archiveOption.EntityType.Property(x => x.Name);
 
             var itSystems = builder.EntitySet<ItSystem>("ItSystems");
             itSystems.EntityType.HasKey(x => x.Id);
@@ -107,6 +109,9 @@ namespace Presentation.Web
             itSystems.EntityType.HasMany(x => x.Usages).IsNavigable();
             itSystems.EntityType.HasMany(x => x.ItInterfaceExhibits).IsNavigable();
             itSystems.EntityType.HasMany(x => x.CanUseInterfaces).IsNavigable();
+            itSystems.EntityType.Property(x => x.Url);
+            itSystems.EntityType.Property(x => x.LastChanged);
+            itSystems.EntityType.HasRequired(x => x.LastChangedByUser);
 
             var itSystemTypeOptions = builder.EntitySet<ItSystemTypeOption>("ItSystemTypeOptions");
             itSystemTypeOptions.EntityType.HasKey(x => x.Id);
@@ -119,6 +124,7 @@ namespace Presentation.Web
             var taskRefs = builder.EntitySet<TaskRef>("TaskRefs");
             taskRefs.EntityType.HasKey(x => x.Id);
             taskRefs.EntityType.Property(x => x.TaskKey);
+            taskRefs.EntityType.Property(x => x.Description);
 
             var organizations = builder.EntitySet<Organization>("Organizations");
             organizations.EntityType.HasKey(x => x.Id);
@@ -153,6 +159,13 @@ namespace Presentation.Web
             usages.EntityType.Property(x => x.OverviewId);
             usages.EntityType.HasOptional(x => x.Overview);
             usages.EntityType.HasMany(x => x.Rights).IsNavigable();
+            usages.EntityType.Property(x => x.EsdhRef);
+            usages.EntityType.Property(x => x.CmdbRef);
+            usages.EntityType.Property(x => x.DirectoryOrUrlRef);
+            usages.EntityType.HasOptional(x => x.SensitiveDataType);
+            usages.EntityType.HasOptional(x => x.ArchiveType);
+            usages.EntityType.HasRequired(x => x.LastChangedByUser);
+            usages.EntityType.HasRequired(x => x.ObjectOwner);
 
             var itSystemRights = builder.EntitySet<ItSystemRight>("ItSystemRights");
             itSystemRights.EntityType.HasKey(x => x.Id);
@@ -207,6 +220,9 @@ namespace Presentation.Web
             itInterfaces.EntityType.HasOptional(x => x.ExhibitedBy);
             itInterfaces.EntityType.Property(x => x.ItInterfaceId);
             itInterfaces.EntityType.Property(x => x.Version);
+            itInterfaces.EntityType.Property(x => x.Url);
+            itInterfaces.EntityType.Property(x => x.LastChanged);
+            itInterfaces.EntityType.HasRequired(x => x.LastChangedByUser);
 
             var interfaceTypes = builder.EntitySet<InterfaceType>("InterfaceType");
             interfaceTypes.EntityType.HasKey(x => x.Id);
@@ -238,11 +254,11 @@ namespace Presentation.Web
             methods.EntityType.HasKey(x => x.Id);
             methods.EntityType.Property(x => x.Name);
 
-            //builder.EntitySet<ItSystemUsage>("ItSystemUsages");
-            //builder.EntitySet<ItSystemRight>("ItSystemRights");
-            //builder.EntitySet<ItSystemRole>("ItSystemRoles");
+            var sensitiveDataOption = builder.EntitySet<SensitiveDataType>("SensitiveDataTypes");
+            sensitiveDataOption.EntityType.HasKey(x => x.Id);
+            sensitiveDataOption.EntityType.Property(x => x.Name);
+
             //builder.EntitySet<ItSystemTypeOption>("ItSystemTypeOptions");
-            //builder.EntitySet<Method>("Methods");
             //builder.EntitySet<OptionExtend>("OptionExtention");
             //builder.EntitySet<Organization>("Organizations");
             //builder.EntitySet<OrganizationUnit>("OrganizationUnits");
@@ -257,7 +273,6 @@ namespace Presentation.Web
             //builder.EntitySet<ItProjectType>("ProjectTypes");
             //builder.EntitySet<PurchaseForm>("PurchaseForms");
             //builder.EntitySet<Risk>("Risks");
-            //builder.EntitySet<SensitiveDataType>("SensitiveDataTypes");
             //builder.EntitySet<Stakeholder>("Stakeholders");
             //builder.EntitySet<TerminationDeadline>("TerminationDeadlines");
             //builder.EntitySet<TaskRef>("TaskRefs");

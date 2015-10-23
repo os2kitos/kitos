@@ -80,7 +80,7 @@
                         type: "odata-v4",
                         transport: {
                             read: {
-                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,CanUseInterfaces,ItInterfaceExhibits,Parent),Organization,ResponsibleUsage($expand=OrganizationUnit),Overview($expand=ItSystem),MainContract,Rights($expand=User,Role)",
+                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,CanUseInterfaces,ItInterfaceExhibits,Parent,TaskRefs),Organization,ResponsibleUsage($expand=OrganizationUnit),Overview($expand=ItSystem),MainContract,Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser",
                                 dataType: "json"
                             },
                             parameterMap: function (options, type) {
@@ -195,61 +195,8 @@
                     },
                     columns: [
                         {
-                            field: "ItSystem.Parent.Name", title: "Overordnet IT System", width: 150, persistId: "parentsysname",
-                            template: "#: ItSystem.Parent ? ItSystem.Parent.Name : '' #",
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains"
-                                }
-                            }
-                        },
-                        {
-                            field: "ItSystem.Name", title: "IT System", width: 150, persistId: "sysname",
-                            template: "<a data-ui-sref='it-system.usage.interfaces({id: #: Id #})'>#: ItSystem.Name #</a>",
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains"
-                                }
-                            }
-                        },
-                        {
-                            field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 150, persistId: "orgunit",
-                            template: "#: ResponsibleUsage ? ResponsibleUsage.OrganizationUnit.Name : '' #",
-                            filterable: {
-                                cell: {
-                                    showOperators: false,
-                                    template: orgUnitDropDownList
-                                }
-                            }
-                        },
-                        {
-                            field: "LocalSystemId", title: "Lokal system ID", width: 150, persistId: "localid",
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "ItSystem.BusinessType.Name", title: "Forretningstype", width: 150, persistId: "busitype",
-                            template: "#: ItSystem.BusinessType ? ItSystem.BusinessType.Name : '' #",
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "ItSystem.AppTypeOption.Name", title: "Applikationstype", width: 150, persistId: "apptype",
-                            template: "#: ItSystem.AppTypeOption ? ItSystem.AppTypeOption.Name : '' #",
+                            field: "LocalSystemId", title: "Lokal system ID", width: 150,
+                            persistId: "localid", // DON'T YOU DARE RENAME!
                             hidden: true,
                             filterable: {
                                 cell: {
@@ -260,45 +207,68 @@
                             }
                         },
                         {
-                            field: "MainContract", title: "Kontrakt", width: 80, persistId: "contract",
-                            template: contractTemplate,
-                            sortable: false,
+                            field: "ItSystem.Parent.Name", title: "Overordnet IT System", width: 150,
+                            persistId: "parentsysname", // DON'T YOU DARE RENAME!
+                            template: "#: ItSystem.Parent ? ItSystem.Parent.Name : '' #",
+                            hidden: true,
                             filterable: {
                                 cell: {
+                                    dataSource: [],
                                     showOperators: false,
-                                    template: contractFilterDropDownList
-                                }
-                            },
-                        },
-                        {
-                            field: "ItSystem.CanUseInterfaces", title: "Anvender", width: 95, persistId: "canuse",
-                            template: "<a data-ng-click=\"showUsageDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.CanUseInterfaces.length #</a>",
-                            filterable: false,
-                            sortable: false
-                        },
-                        {
-                            field: "ItSystem.ItInterfaceExhibits", title: "Udstiller", width: 95, persistId: "exhibit",
-                            template: "<a data-ng-click=\"showExposureDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.ItInterfaceExhibits.length #</a>",
-                            filterable: false,
-                            sortable: false
-                        },
-                        {
-                            field: "Overview.ItSystem.Name", title: "Overblik", width: 150, persistId: "overview",
-                            template: "#: Overview ? Overview.ItSystem.Name : '' #",
-                            hidden: true
-                        },
-                        {
-                            field: "LastChanged", title: "Opdateret", format: "{0:dd-MM-yyyy}", width: 150, persistId: "changed",
-                            filterable: {
-                                cell: {
-                                    showOperators: false,
-                                    operator: "gte"
+                                    operator: "contains"
                                 }
                             }
                         },
                         {
-                            // DON'T YOU DARE RENAME!
-                            field: "SystemOwner", title: "Systemejer", persistId: "sysowner",
+                            field: "ItSystem.Name", title: "IT System", width: 150,
+                            persistId: "sysname", // DON'T YOU DARE RENAME!
+                            template: "<a data-ui-sref='it-system.usage.interfaces({id: #: Id #})'>#: ItSystem.Name #</a>",
+                            filterable: {
+                                cell: {
+                                    dataSource: [],
+                                    showOperators: false,
+                                    operator: "contains"
+                                }
+                            }
+                        },
+                        {
+                            field: "Version", title: "Version", width: 150,
+                            persistId: "version", // DON'T YOU DARE RENAME!
+                            hidden: true,
+                            filterable: {
+                                cell: {
+                                    dataSource: [],
+                                    showOperators: false,
+                                    operator: "contains",
+                                }
+                            }
+                        },
+                        {
+                            field: "LocalCallName", title: "Lokal kaldenavn", width: 150,
+                            persistId: "localname", // DON'T YOU DARE RENAME!
+                            hidden: true,
+                            filterable: {
+                                cell: {
+                                    dataSource: [],
+                                    showOperators: false,
+                                    operator: "contains",
+                                }
+                            }
+                        },
+                        {
+                            field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 150,
+                            persistId: "orgunit", // DON'T YOU DARE RENAME!
+                            template: "#: ResponsibleUsage ? ResponsibleUsage.OrganizationUnit.Name : '' #",
+                            filterable: {
+                                cell: {
+                                    showOperators: false,
+                                    template: orgUnitDropDownList
+                                }
+                            }
+                        },
+                        {
+                            field: "SystemOwner", title: "Systemejer",
+                            persistId: "sysowner", // DON'T YOU DARE RENAME!
                             template: function (dataItem) {
                                 return roleTemplate(dataItem, 1);
                             },
@@ -313,8 +283,8 @@
                             }
                         },
                         {
-                            // DON'T YOU DARE RENAME!
-                            field: "SystemResponsible", title: "Systemansvarlig", persistId: "sysresp",
+                            field: "SystemResponsible", title: "Systemansvarlig",
+                            persistId: "sysresp", // DON'T YOU DARE RENAME!
                             template: function (dataItem) {
                                 return roleTemplate(dataItem, 2);
                             },
@@ -330,8 +300,8 @@
                             }
                         },
                         {
-                            // DON'T YOU DARE RENAME!
-                            field: "BusinessOwner", title: "Forretningsejer", persistId: "busiowner",
+                            field: "BusinessOwner", title: "Forretningsejer",
+                            persistId: "busiowner", // DON'T YOU DARE RENAME!
                             template: function (dataItem) {
                                 return roleTemplate(dataItem, 3);
                             },
@@ -347,8 +317,8 @@
                             }
                         },
                         {
-                            // DON'T YOU DARE RENAME!
-                            field: "SuperUserResponsible", title: "Superbrugeransvarlig", persistId: "superuserresp",
+                            field: "SuperUserResponsible", title: "Superbrugeransvarlig",
+                            persistId: "superuserresp", // DON'T YOU DARE RENAME!
                             template: function (dataItem) {
                                 return roleTemplate(dataItem, 4);
                             },
@@ -364,8 +334,8 @@
                             }
                         },
                         {
-                            // DON'T YOU DARE RENAME!
-                            field: "SuperUser", title: "Superbruger", persistId: "superuser",
+                            field: "SuperUser", title: "Superbruger",
+                            persistId: "superuser", // DON'T YOU DARE RENAME!
                             template: function (dataItem) {
                                 return roleTemplate(dataItem, 5);
                             },
@@ -381,8 +351,8 @@
                             }
                         },
                         {
-                            // DON'T YOU DARE RENAME!
-                            field: "SecurityResponsible", title: "Sikkerhedsansvarlig", persistId: "secresp",
+                            field: "SecurityResponsible", title: "Sikkerhedsansvarlig",
+                            persistId: "secresp", // DON'T YOU DARE RENAME!
                             template: function (dataItem) {
                                 return roleTemplate(dataItem, 6);
                             },
@@ -398,8 +368,8 @@
                             }
                         },
                         {
-                            // DON'T YOU DARE RENAME!
-                            field: "ChangeManager", title: "Changemanager", persistId: "changemanager",
+                            field: "ChangeManager", title: "Changemanager",
+                            persistId: "changemanager", // DON'T YOU DARE RENAME!
                             template: function (dataItem) {
                                 return roleTemplate(dataItem, 7);
                             },
@@ -415,8 +385,8 @@
                             }
                         },
                         {
-                            // DON'T YOU DARE RENAME!
-                            field: "DataOwner", title: "Dataejer", persistId: "dataowner",
+                            field: "DataOwner", title: "Dataejer",
+                            persistId: "dataowner", // DON'T YOU DARE RENAME!
                             template: function (dataItem) {
                                 return roleTemplate(dataItem, 8);
                             },
@@ -432,8 +402,8 @@
                             }
                         },
                         {
-                            // DON'T YOU DARE RENAME!
-                            field: "SystemAdmin", title: "Systemadminstrator", persistId: "sysadm",
+                            field: "SystemAdmin", title: "Systemadminstrator",
+                            persistId: "sysadm", // DON'T YOU DARE RENAME!
                             template: function (dataItem) {
                                 return roleTemplate(dataItem, 9);
                             },
@@ -445,6 +415,191 @@
                                     dataSource: [],
                                     showOperators: false,
                                     operator: "contains",
+                                }
+                            }
+                        },
+                        {
+                            field: "ItSystem.BusinessType.Name", title: "Forretningstype", width: 150,
+                            persistId: "busitype", // DON'T YOU DARE RENAME!
+                            template: "#: ItSystem.BusinessType ? ItSystem.BusinessType.Name : '' #",
+                            filterable: {
+                                cell: {
+                                    dataSource: [],
+                                    showOperators: false,
+                                    operator: "contains",
+                                }
+                            }
+                        },
+                        {
+                            field: "ItSystem.AppTypeOption.Name", title: "Applikationstype", width: 150,
+                            persistId: "apptype", // DON'T YOU DARE RENAME!
+                            template: "#: ItSystem.AppTypeOption ? ItSystem.AppTypeOption.Name : '' #",
+                            hidden: true,
+                            filterable: {
+                                cell: {
+                                    dataSource: [],
+                                    showOperators: false,
+                                    operator: "contains",
+                                }
+                            }
+                        },
+                        {
+                            field: "ItSystem.TaskKey", title: "KLE ID", width: 150,
+                            persistId: "taskkey", // DON'T YOU DARE RENAME!
+                            template: "#: ItSystem.TaskRefs.length > 0 ? _.pluck(ItSystem.TaskRefs.slice(0,4), 'TaskKey').join(', ') : '' ##: ItSystem.TaskRefs.length > 5 ? ', ...' : '' #",
+                            hidden: true,
+                            filterable: {
+                                cell: {
+                                    dataSource: [],
+                                    showOperators: false,
+                                    operator: "startswith",
+                                }
+                            },
+                            sortable: false
+                        },
+                        {
+                            field: "EsdhRef", title: "ESDH ref", width: 150,
+                            persistId: "esdh", // DON'T YOU DARE RENAME!
+                            hidden: true,
+                            filterable: {
+                                cell: {
+                                    dataSource: [],
+                                    showOperators: false,
+                                    operator: "contains",
+                                }
+                            }
+                        },
+                        {
+                            field: "DirectoryOrUrlRef", title: "Mappe ref", width: 150,
+                            persistId: "folderref", // DON'T YOU DARE RENAME!
+                            hidden: true,
+                            filterable: {
+                                cell: {
+                                    dataSource: [],
+                                    showOperators: false,
+                                    operator: "contains",
+                                }
+                            }
+                        },
+                        {
+                            field: "CmdbRef", title: "CMDB ref", width: 150,
+                            persistId: "cmdb", // DON'T YOU DARE RENAME!
+                            hidden: true,
+                            filterable: {
+                                cell: {
+                                    dataSource: [],
+                                    showOperators: false,
+                                    operator: "contains",
+                                }
+                            }
+                        },
+                        {
+                            field: "ArchiveType.Name", title: "Arkivering", width: 150,
+                            persistId: "archive", // DON'T YOU DARE RENAME!
+                            template: "#: ArchiveType ? ArchiveType.Name : '' #",
+                            hidden: true,
+                            filterable: {
+                                cell: {
+                                    dataSource: [],
+                                    showOperators: false,
+                                    operator: "contains",
+                                }
+                            }
+                        },
+                        {
+                            field: "SensitiveDataType.Name", title: "Personfølsom", width: 150,
+                            persistId: "sensitive", // DON'T YOU DARE RENAME!
+                            template: "#: SensitiveDataType ? SensitiveDataType.Name : '' #",
+                            hidden: true,
+                            filterable: {
+                                cell: {
+                                    dataSource: [],
+                                    showOperators: false,
+                                    operator: "contains",
+                                }
+                            }
+                        },
+                        {
+                            field: "", title: "IT System: Anvendes af", width: 150,
+                            persistId: "sysusage", // DON'T YOU DARE RENAME!
+                            template: "TODO",
+                            filterable: {
+                                cell: {
+                                    dataSource: [],
+                                    showOperators: false,
+                                    operator: "contains",
+                                }
+                            }
+                        },
+                        {
+                            field: "ItSystem.ItInterfaceExhibits", title: "Snitflader: Udstilles ???", width: 95, persistId: "exhibit",
+                            template: "<a data-ng-click=\"showExposureDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.ItInterfaceExhibits.length #</a>",
+                            filterable: false,
+                            sortable: false
+                        },
+                        {
+                            field: "ItSystem.CanUseInterfaces", title: "Snitflader: Anvendes ???", width: 95, persistId: "canuse",
+                            template: "<a data-ng-click=\"showUsageDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.CanUseInterfaces.length #</a>",
+                            filterable: false,
+                            sortable: false
+                        },
+                        {
+                            field: "MainContract", title: "Kontrakt", width: 80,
+                            persistId: "contract", // DON'T YOU DARE RENAME!
+                            template: contractTemplate,
+                            sortable: false,
+                            filterable: {
+                                cell: {
+                                    showOperators: false,
+                                    template: contractFilterDropDownList
+                                }
+                            },
+                        },
+                        {
+                            field: "", title: "IT Projekt", width: 150,
+                            persistId: "sysusage", // DON'T YOU DARE RENAME!
+                            template: "TODO",
+                            filterable: {
+                                cell: {
+                                    dataSource: [],
+                                    showOperators: false,
+                                    operator: "contains",
+                                }
+                            }
+                        },
+                        {
+                            field: "ObjectOwner.Name", title: "Taget i anvendelse af", width: 150,
+                            persistId: "ownername", // DON'T YOU DARE RENAME!
+                            template: "#: ObjectOwner.Name + ' ' + ObjectOwner.LastName #",
+                            filterable: {
+                                cell: {
+                                    dataSource: [],
+                                    showOperators: false,
+                                    operator: "contains",
+                                }
+                            }
+                        },
+                        {
+                            field: "LastChangedByUser.Name", title: "Sidst redigeret: Bruger", width: 150,
+                            persistId: "lastchangedname", // DON'T YOU DARE RENAME!
+                            template: "#: LastChangedByUser.Name + ' ' + LastChangedByUser.LastName #",
+                            hidden: true,
+                            filterable: {
+                                cell: {
+                                    dataSource: [],
+                                    showOperators: false,
+                                    operator: "contains",
+                                }
+                            }
+                        },
+                        {
+                            field: "LastChanged", title: "Sidste redigeret: Dato", format: "{0:dd-MM-yyyy HH:mm}", width: 150,
+                            persistId: "changed", // DON'T YOU DARE RENAME!
+                            hidden: true,
+                            filterable: {
+                                cell: {
+                                    showOperators: false,
+                                    operator: "gte"
                                 }
                             }
                         }

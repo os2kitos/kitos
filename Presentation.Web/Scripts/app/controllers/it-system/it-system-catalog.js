@@ -114,7 +114,7 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystems?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization)",
+                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystems?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser",
                             dataType: "json"
                         },
                         parameterMap: function (options, type) {
@@ -131,6 +131,13 @@
                     sort: {
                         field: "Name",
                         dir: "asc"
+                    },
+                    schema: {
+                        model: {
+                            fields: {
+                                LastChanged: { type: "date" }
+                            }
+                        }
                     },
                     pageSize: 100,
                     serverPaging: true,
@@ -179,7 +186,28 @@
                 },
                 columns: [
                     {
-                        field: "Name", title: "It System", width: 150, persistId: "name",
+                        field: "Usages", title: "Anvend/Fjern anvendelse", width: 110,
+                        persistId: "command", // DON'T YOU DARE RENAME!
+                        template: usageButtonTemplate,
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
+                        field: "Parent.Name", title: "Overordnet IT System", width: 150,
+                        persistId: "parentname", // DON'T YOU DARE RENAME!
+                        template: "#: Parent ? Parent.Name : '' #",
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
+                    },
+                    {
+                        field: "Name", title: "It System", width: 150,
+                        persistId: "name", // DON'T YOU DARE RENAME!
                         template: '<a data-ui-sref="it-system.edit.interfaces({id: #: Id #})">#: Name #</a>',
                         filterable: {
                             cell: {
@@ -190,34 +218,14 @@
                         }
                     },
                     {
-                        field: "AccessModifier", title: "Synlighed", width: 80, persistId: "accessmod",
+                        field: "AccessModifier", title: "Synlighed", width: 80,
+                        persistId: "accessmod", // DON'T YOU DARE RENAME!
                         filterable: false,
                         sortable: false
                     },
                     {
-                        field: "Parent.Name", title: "Overordnet", width: 150, persistId: "parentname",
-                        template: "#: Parent ? Parent.Name : '' #",
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains",
-                            }
-                        }
-                    },
-                    {
-                        field: "AppTypeOption.Name", title: "Applikationstype", width: 150, persistId: "apptype",
-                        template: "#: AppTypeOption ? AppTypeOption.Name : '' #",
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains",
-                            }
-                        }
-                    },
-                    {
-                        field: "BusinessType.Name", title: "Forretningtype", width: 150, persistId: "busitype",
+                        field: "BusinessType.Name", title: "Forretningstype", width: 150,
+                        persistId: "busitype", // DON'T YOU DARE RENAME!
                         template: "#: BusinessType ? BusinessType.Name : '' #",
                         filterable: {
                             cell: {
@@ -228,17 +236,16 @@
                         }
                     },
                     {
-                        // DON'T YOU DARE RENAME!
-                        field: "TaskKey", title: "KLE", width: 150, persistId: "taskkey",
-                        template: "#: TaskRefs.length > 0 ? _.pluck(TaskRefs.slice(0,4), 'TaskKey').join(', ') : '' ##: TaskRefs.length > 5 ? ', ...' : '' #",
+                        field: "AppTypeOption.Name", title: "Applikationstype", width: 150,
+                        persistId: "apptype", // DON'T YOU DARE RENAME!
+                        template: "#: AppTypeOption ? AppTypeOption.Name : '' #",
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "startswith",
+                                operator: "contains",
                             }
-                        },
-                        sortable: false
+                        }
                     },
                     {
                         field: "BelongsTo.Name", title: "Rettighedshaver", width: 150, persistId: "belongsto",
@@ -252,7 +259,70 @@
                         }
                     },
                     {
-                        field: "Organization.Name", title: "Oprettet i", width: 150, persistId: "orgname",
+                        field: "TaskKey", title: "KLE ID", width: 150,
+                        persistId: "taskkey", // DON'T YOU DARE RENAME!
+                        template: "#: TaskRefs.length > 0 ? _.pluck(TaskRefs.slice(0,4), 'TaskKey').join(', ') : '' ##: TaskRefs.length > 5 ? ', ...' : '' #",
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "startswith",
+                            }
+                        },
+                        sortable: false
+                    },
+                    {
+                        field: "TaskName", title: "KLE Navn", width: 150,
+                        persistId: "taskname", // DON'T YOU DARE RENAME!
+                        template: "#: TaskRefs.length > 0 ? _.pluck(TaskRefs.slice(0,4), 'Description').join(', ') : '' ##: TaskRefs.length > 5 ? ', ...' : '' #",
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "startswith",
+                            }
+                        },
+                        sortable: false
+                    },
+                    {
+                        field: "Url", title: "Link til yderligere beskrivelse", width: 100,
+                        persistId: "link", // DON'T YOU DARE RENAME!
+                        template: linkTemplate,
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
+                    },
+                    {
+                        field: "Usages.length", title: "IT System: Anvendes af", width: 95,
+                        persistId: "usages", // DON'T YOU DARE RENAME!
+                        template: '<a class="col-md-7 text-center" data-ng-click="showUsageDetails(#: Id #,\'#: Name #\')">#: Usages.length #</a>',
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
+                        field: "", title: "Snitflader: Udstilles globalt", width: 95,
+                        persistId: "globalexpsure", // DON'T YOU DARE RENAME!
+                        template: "TODO",
+                        hidden: true,
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
+                        field: "", title: "Snitflader: Anvendes globalt", width: 95,
+                        persistId: "globalusage", // DON'T YOU DARE RENAME!
+                        template: "TODO",
+                        hidden: true,
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
+                        field: "Organization.Name", title: "Oprettet af: Organisation", width: 150,
+                        persistId: "orgname", // DON'T YOU DARE RENAME!
                         template: "#: Organization ? Organization.Name : '' #",
                         filterable: {
                             cell: {
@@ -263,7 +333,8 @@
                         }
                     },
                     {
-                        field: "ObjectOwner.Name", title: "Oprettet af", width: 150, persistId: "ownername",
+                        field: "ObjectOwner.Name", title: "Oprettet af: Bruger", width: 150,
+                        persistId: "ownername", // DON'T YOU DARE RENAME!
                         template: "#: ObjectOwner.Name + ' ' + ObjectOwner.LastName #",
                         filterable: {
                             cell: {
@@ -274,18 +345,27 @@
                         }
                     },
                     {
-                        field: "Usages.length", title: "Anvender", width: 95, persistId: "usages",
-                        template: '<a class="col-md-7 text-center" data-ng-click="showUsageDetails(#: Id #,\'#: Name #\')">#: Usages.length #</a>',
-                        filterable: false,
-                        sortable: false
+                        field: "LastChangedByUser.Name", title: "Sidst redigeret: Bruger", width: 150,
+                        persistId: "lastchangedname", // DON'T YOU DARE RENAME!
+                        template: "#: LastChangedByUser.Name + ' ' + LastChangedByUser.LastName #",
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
                     },
                     {
-                        title: "Anvendelse", persistId: "command",
-                        width: 110,
-                        field: "Usages",
-                        template: usageButtonTemplate,
-                        filterable: false,
-                        sortable: false
+                        field: "LastChanged", title: "Sidst redigeret: Dato", format: "{0:dd-MM-yyyy HH:mm}", width: 150,
+                        persistId: "lastchangeddate", // DON'T YOU DARE RENAME!
+                        filterable: {
+                            cell: {
+                                showOperators: false,
+                                operator: "gte"
+                            }
+                        }
                     }
                 ],
                 dataBound: saveGridOptions,
@@ -345,6 +425,12 @@
                 }).error(function() {
                     notify.addErrorMessage('Anvendelse af systemet kunne ikke fjernes!');
                 });
+            }
+
+            function linkTemplate(dataItem) {
+                if (dataItem.Url)
+                    return '<a href="' + dataItem.Url + '" title="Link til yderligere..."><i class="fa fa-link"></i></a>';
+                return "";
             }
         }
     ]);
