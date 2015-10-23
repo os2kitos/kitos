@@ -29,6 +29,7 @@
                 }
 
                 var storageKey = "it-system-overview-options";
+                var orgUnitStorageKey = "it-system-overview-orgunit";
                 var gridState = gridStateService.getService(storageKey);
 
                 // saves grid state to localStorage
@@ -46,11 +47,13 @@
                 }
 
                 $scope.clearGridProfile = function () {
+                    sessionStorage.removeItem(orgUnitStorageKey);
                     gridState.clearGridProfile($scope.mainGrid);
                 }
 
                 // clears grid filters by removing the localStorageItem and reloading the page
                 $scope.clearOptions = function () {
+                    sessionStorage.removeItem(orgUnitStorageKey);
                     gridState.clearOptions();
                     // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                     reload();
@@ -620,7 +623,7 @@
 
                 function setDefaultOrgUnit() {
                     var kendoElem = this;
-                    var idTofind = user.defaultOrganizationUnitId;
+                    var idTofind = sessionStorage.getItem(orgUnitStorageKey) ? sessionStorage.getItem(orgUnitStorageKey) : user.defaultOrganizationUnitId;;
 
                     // find the index of the org unit that matches the users default org unit
                     var index = _.findIndex(kendoElem.dataItems(), function (item) {
@@ -648,6 +651,8 @@
                     var selectedIndex = kendoElem.select();
                     var selectedId = _.parseInt(kendoElem.value());
                     var childIds = kendoElem.dataItem().childIds;
+
+                    sessionStorage.setItem(orgUnitStorageKey, selectedId);
 
                     if (selectedIndex > 0) {
                         // filter by selected
