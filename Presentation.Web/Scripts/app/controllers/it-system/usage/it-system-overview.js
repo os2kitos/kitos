@@ -16,6 +16,8 @@
         }
     ]);
 
+    // Here be dragons! Thou art forewarned.
+    // Or perhaps it's samurais, because it's kendo that's terrible terrible framework that's the cause...
     app.controller('system.OverviewCtrl',
         [
             '$rootScope', '$scope', '$http', '$timeout', '$state', 'user', 'gridStateService',
@@ -68,6 +70,7 @@
                 $scope.$on("kendoRendered", function () {
                     kendoRendered = true;
                     loadGridOptions();
+                    $scope.mainGrid.dataSource.fetch();
                 });
 
                 // overview grid options
@@ -639,14 +642,6 @@
                     if (index > 0) {
                         // select the users default org unit
                         kendoElem.select(index);
-
-                        var selectedId = _.parseInt(kendoElem.value());
-                        var childIds = kendoElem.dataItem().childIds;
-                        // filter by selected
-                        filterByOrgUnit(selectedId, childIds);
-                    } else {
-                        // else clear filter because the 0th element should act like a placeholder
-                        filterByOrgUnit();
                     }
                 }
 
