@@ -53,7 +53,6 @@ _.mixin({
     }
 });
 
-
 // Usage:
 //
 // var arr = [{
@@ -65,7 +64,7 @@ _.mixin({
 //     nested: 'bar'
 //   }
 // }];
-// 
+//
 // _.pluckDeep(arr, 'deeply.nested'); // ['foo', 'bar']
 _.mixin({
     pluckDeep: function(obj, key) {
@@ -73,18 +72,15 @@ _.mixin({
     }
 });
 
-
 _.mixin({
-
     // Return a copy of an object containing all but the blacklisted properties.
     unpick: function (obj) {
         obj || (obj = {});
         return _.pick(obj, _.difference(_.keys(obj), _.flatten(Array.prototype.slice.call(arguments, 1))));
     }
-
 });
 
-_.mixin({   
+_.mixin({
     resursivePluck: function self(obj, key, childPropertyName) {
         // default values
         childPropertyName = typeof childPropertyName !== 'undefined' ? childPropertyName : 'children';
@@ -101,14 +97,14 @@ _.mixin({
     }
 });
 
-// Usage: 
+// Usage:
 // var obj = [{
 //     id: 1, children: [
 //         { id: 2 },
 //         { id: 3 }
 //     ]
 // }]
-// 
+//
 // _.addHierarchyLevel(obj, 0, 'children');
 // Result:
 // var obj = [{
@@ -117,7 +113,6 @@ _.mixin({
 //         { id: 3, $level: 1 }
 //     ]
 // }]
-
 _.mixin({
     addHierarchyLevelOnNested: function self(objAry, level, childPropertyName) {
         // default values

@@ -955,7 +955,7 @@
     <Content Include="Scripts\app\services\gridStateService.js" />
     <Content Include="Scripts\app\services\taskService.js" />
     <Content Include="Scripts\app\services\userServices.js" />
-    <Content Include="Scripts\app\utility\underscore.mixin.js" />
+    <Content Include="Scripts\app\utility\lodash.mixin.js" />
     <Content Include="Scripts\app\utility\utility.js" />
     <Content Include="Scripts\app\services\httpServices.js" />
     <Content Include="Scripts\bootstrap.js" />
