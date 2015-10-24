@@ -80,7 +80,7 @@
                         type: "odata-v4",
                         transport: {
                             read: {
-                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,CanUseInterfaces,ItInterfaceExhibits,Parent,TaskRefs),Organization,ResponsibleUsage($expand=OrganizationUnit),Overview($expand=ItSystem),MainContract,Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser",
+                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,CanUseInterfaces,ItInterfaceExhibits,Parent,TaskRefs),Organization,ResponsibleUsage($expand=OrganizationUnit),Overview($expand=ItSystem),MainContract,Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects",
                                 dataType: "json"
                             },
                             parameterMap: function (options, type) {
@@ -532,13 +532,15 @@
                             }
                         },
                         {
-                            field: "ItSystem.ItInterfaceExhibits", title: "Snitflader: Udstilles ???", width: 95, persistId: "exhibit",
+                            field: "ItSystem.ItInterfaceExhibits", title: "Snitflader: Udstilles ???", width: 95,
+                            persistId: "exhibit", // DON'T YOU DARE RENAME!
                             template: "<a data-ng-click=\"showExposureDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.ItInterfaceExhibits.length #</a>",
                             filterable: false,
                             sortable: false
                         },
                         {
-                            field: "ItSystem.CanUseInterfaces", title: "Snitflader: Anvendes ???", width: 95, persistId: "canuse",
+                            field: "ItSystem.CanUseInterfaces", title: "Snitflader: Anvendes ???", width: 95,
+                            persistId: "canuse", // DON'T YOU DARE RENAME!
                             template: "<a data-ng-click=\"showUsageDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.CanUseInterfaces.length #</a>",
                             filterable: false,
                             sortable: false
@@ -558,7 +560,7 @@
                         {
                             field: "", title: "IT Projekt", width: 150,
                             persistId: "sysusage", // DON'T YOU DARE RENAME!
-                            template: "TODO",
+                            template: "#: ItProjects.length > 0 ? _.first(ItProjects).Name : '' #",
                             filterable: {
                                 cell: {
                                     dataSource: [],

@@ -3,6 +3,7 @@ using System.Web.OData.Builder;
 using System.Web.OData.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Microsoft.OData.Edm;
@@ -54,8 +55,6 @@ namespace Presentation.Web
             //builder.EntitySet<Config>("Configs");
             //builder.EntitySet<ContractTemplate>("ContractTemplates");
             //builder.EntitySet<ContractType>("ContractTypes");
-            //builder.EntitySet<DataType>("DataTypes");
-            //builder.EntitySet<DataRow>("DataRows");
             //builder.EntitySet<DataRowUsage>("DataRowUsages");
             //builder.EntitySet<EconomyYear>("EconomyYears");
             //builder.EntitySet<EconomyStream>("EconomyStrams");
@@ -67,7 +66,6 @@ namespace Presentation.Web
             //builder.EntitySet<HandoverTrial>("HandoverTrials");
             //builder.EntitySet<HandoverTrialType>("HandoverTrialTypes");
             //builder.EntitySet<Interface>("Interfaces");
-            //builder.EntitySet<InterfaceUsage>("InterfaceUsages");
             //builder.EntitySet<ItInterfaceExhibit>("ItInterfaceExhibits");
             //builder.EntitySet<ItInterfaceExhibitUsage>("InterfaceExhibtUsages");
             //builder.EntitySet<InterfaceType>("InterfaceTypes");
@@ -75,13 +73,27 @@ namespace Presentation.Web
             //builder.EntitySet<ItContractItSystemUsage>("ItContractItSystemUsages");
             //builder.EntitySet<ItContractRight>("ItContractRights");
             //builder.EntitySet<ItContractRole>("ItContractRoles");
-            //builder.EntitySet<ItProject>("ItProjects");
             //builder.EntitySet<ItProjectPhase>("ItProjectPhases");
             //builder.EntitySet<ItProjectStatus>("ItProjectStatuses");
             //builder.EntitySet<ItProjectRight>("ItProjectRights");
             //builder.EntitySet<ItProjectRole>("ItProjectRoles");
             //builder.EntitySet<ItProjectOrgUnitUsage>("ItProjectOrgUnitUsages");
             //builder.EntitySet<ItSystemUsageOrgUnitUsage>("ItSystemUsageOrgUnitUsages");
+
+            var itProject = builder.EntitySet<ItProject>("ItProjects");
+            itProject.EntityType.HasKey(x => x.Id);
+            itProject.EntityType.Property(x => x.Name);
+
+            var interfaceUsage = builder.EntitySet<InterfaceUsage>("InterfaceUsages");
+            interfaceUsage.EntityType.HasKey(x => new { x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId });
+
+            var dataOption = builder.EntitySet<DataType>("DataTypes");
+            dataOption.EntityType.HasKey(x => x.Id);
+            dataOption.EntityType.Property(x => x.Name);
+
+            var dataRow = builder.EntitySet<DataRow>("DataRows");
+            dataRow.EntityType.HasKey(x => x.Id);
+            dataRow.EntityType.HasOptional(x => x.DataType);
 
             var archiveOption = builder.EntitySet<ArchiveType>("ArchiveTypes");
             archiveOption.EntityType.HasKey(x => x.Id);
@@ -166,6 +178,8 @@ namespace Presentation.Web
             usages.EntityType.HasOptional(x => x.ArchiveType);
             usages.EntityType.HasRequired(x => x.LastChangedByUser);
             usages.EntityType.HasRequired(x => x.ObjectOwner);
+            usages.EntityType.HasMany(x => x.InterfaceUsages);
+            usages.EntityType.HasMany(x => x.ItProjects);
 
             var itSystemRights = builder.EntitySet<ItSystemRight>("ItSystemRights");
             itSystemRights.EntityType.HasKey(x => x.Id);
@@ -223,6 +237,8 @@ namespace Presentation.Web
             itInterfaces.EntityType.Property(x => x.Url);
             itInterfaces.EntityType.Property(x => x.LastChanged);
             itInterfaces.EntityType.HasRequired(x => x.LastChangedByUser);
+            itInterfaces.EntityType.HasMany(x => x.DataRows);
+            itInterfaces.EntityType.HasMany(x => x.InterfaceLocalUsages);
 
             var interfaceTypes = builder.EntitySet<InterfaceType>("InterfaceType");
             interfaceTypes.EntityType.HasKey(x => x.Id);

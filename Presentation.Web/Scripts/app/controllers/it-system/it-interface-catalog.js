@@ -28,7 +28,7 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItInterfaces?$expand=Interface,InterfaceType,ObjectOwner,BelongsTo,Organization,Tsa,ExhibitedBy($expand=ItSystem),Method,LastChangedByUser",
+                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItInterfaces?$expand=Interface,InterfaceType,ObjectOwner,BelongsTo,Organization,Tsa,ExhibitedBy($expand=ItSystem),Method,LastChangedByUser,DataRows($expand=DataType),InterfaceLocalUsages",
                             dataType: "json"
                         }
                     },
@@ -180,7 +180,7 @@
                     {
                         field: "", title: "Snitflader: Anvendes globalt", width: 150,
                         persistId: "infglobalusage", // DON'T YOU DARE RENAME!
-                        template: "TODO",
+                        template: "#: InterfaceLocalUsages.length #",
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -230,7 +230,7 @@
                     {
                         field: "", title: "Datatype", width: 150,
                         persistId: "datatypes", // DON'T YOU DARE RENAME!
-                        template: "TODO",
+                        template: "#: DataRows.length > 0 ? _.pluck(DataRows.slice(0,4), 'DataType.Name').join(', ') : '' ##: DataRows.length > 5 ? ', ...' : '' #",
                         filterable: {
                             cell: {
                                 dataSource: [],
