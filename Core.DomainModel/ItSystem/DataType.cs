@@ -3,7 +3,7 @@
 namespace Core.DomainModel.ItSystem
 {
     /// <summary>
-    /// Dropdown type for the <see cref="DataRow"/>. Represents the type of 
+    /// Dropdown type for the <see cref="DataRow"/>. Represents the type of
     /// data that is exposed by the DataRow.
     /// </summary>
     public class DataType : Entity, IOptionEntity<DataRow>
