@@ -5,6 +5,7 @@ using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [Authorize]
     public abstract class BaseController<T> : ODataController where T : class
     {
         protected ODataValidationSettings ValidationSettings;
