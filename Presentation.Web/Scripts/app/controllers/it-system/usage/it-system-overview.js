@@ -669,7 +669,6 @@
                                 dataType: "json"
                             }
                         },
-                        pageSize: 10,
                         serverPaging: true,
                         serverSorting: true,
                         serverFiltering: true
@@ -718,7 +717,6 @@
                                 dataType: "json"
                             },
                         },
-                        pageSize: 10,
                         serverPaging: true,
                         serverSorting: true,
                         serverFiltering: true
