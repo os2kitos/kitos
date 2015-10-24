@@ -10,6 +10,13 @@
                         'userService', function(userService) {
                             return userService.getUser();
                         }
+                    ],
+                    systemRoles: [
+                        '$http', function ($http) {
+                            return $http.get("/odata/ItSystemRoles").then(function (result) {
+                                return result.data.value;
+                            });
+                        }
                     ]
                 }
             });
@@ -17,11 +24,11 @@
     ]);
 
     // Here be dragons! Thou art forewarned.
-    // Or perhaps it's samurais, because it's kendo that's terrible terrible framework that's the cause...
+    // Or perhaps it's samurais, because it's kendos terrible terrible framework that's the cause...
     app.controller('system.OverviewCtrl',
         [
-            '$rootScope', '$scope', '$http', '$timeout', '$state', 'user', 'gridStateService',
-            function ($rootScope, $scope, $http, $timeout, $state, user, gridStateService) {
+            '$rootScope', '$scope', '$http', '$timeout', '$state', 'user', 'gridStateService', 'systemRoles',
+            function ($rootScope, $scope, $http, $timeout, $state, user, gridStateService, systemRoles) {
                 $rootScope.page.title = 'IT System - Overblik';
 
                 // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(c/User/Name,'foo') and c/RoleId eq {roleId})"
@@ -74,8 +81,7 @@
                 });
 
                 // overview grid options
-                $scope.mainGridOptions = {
-                    autoBind: false, // do not set to true, it works because the org unit filter inits the query
+                var mainGridOptions = {
                     autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                     dataSource: {
                         type: "odata-v4",
@@ -89,32 +95,9 @@
                                 var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
 
                                 if (parameterMap.$filter) {
-                                    // replaces "startswith(SystemOwner,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo' and c/RoleId eq 1)"
-                                    parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "SystemOwner", 1);
-
-                                    // replaces "startswith(SystemResponsible,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 2"
-                                    parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "SystemResponsible", 2);
-
-                                    // replaces "startswith(BusinessOwner,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 3"
-                                    parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "BusinessOwner", 3);
-
-                                    // replaces "startswith(SuperUserResponsible,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 4"
-                                    parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "SuperUserResponsible", 4);
-
-                                    // replaces "startswith(SuperUser,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 5"
-                                    parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "SuperUser", 5);
-
-                                    // replaces "startswith(SecurityResponsible,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 6"
-                                    parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "SecurityResponsible", 6);
-
-                                    // replaces "startswith(ChangeManager,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 7"
-                                    parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "ChangeManager", 7);
-
-                                    // replaces "startswith(DataOwner,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 8"
-                                    parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "DataOwner", 8);
-
-                                    // replaces "startswith(SystemAdmin,'foo')" with "Rights/any(c: startswith(c/User/Name),'foo') and RoleId eq 9"
-                                    parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "SystemAdmin", 9);
+                                    _.forEach(systemRoles, function (role) {
+                                        parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "role" + role.Id, role.Id);
+                                    });
                                 }
 
                                 return parameterMap;
@@ -264,158 +247,6 @@
                                 cell: {
                                     showOperators: false,
                                     template: orgUnitDropDownList
-                                }
-                            }
-                        },
-                        {
-                            field: "SystemOwner", title: "Systemejer",
-                            persistId: "sysowner", // DON'T YOU DARE RENAME!
-                            template: function (dataItem) {
-                                return roleTemplate(dataItem, 1);
-                            },
-                            width: 150,
-                            sortable: false,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "SystemResponsible", title: "Systemansvarlig",
-                            persistId: "sysresp", // DON'T YOU DARE RENAME!
-                            template: function (dataItem) {
-                                return roleTemplate(dataItem, 2);
-                            },
-                            width: 150,
-                            hidden: true,
-                            sortable: false,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "BusinessOwner", title: "Forretningsejer",
-                            persistId: "busiowner", // DON'T YOU DARE RENAME!
-                            template: function (dataItem) {
-                                return roleTemplate(dataItem, 3);
-                            },
-                            width: 150,
-                            hidden: true,
-                            sortable: false,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "SuperUserResponsible", title: "Superbrugeransvarlig",
-                            persistId: "superuserresp", // DON'T YOU DARE RENAME!
-                            template: function (dataItem) {
-                                return roleTemplate(dataItem, 4);
-                            },
-                            width: 150,
-                            hidden: true,
-                            sortable: false,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "SuperUser", title: "Superbruger",
-                            persistId: "superuser", // DON'T YOU DARE RENAME!
-                            template: function (dataItem) {
-                                return roleTemplate(dataItem, 5);
-                            },
-                            width: 150,
-                            hidden: true,
-                            sortable: false,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "SecurityResponsible", title: "Sikkerhedsansvarlig",
-                            persistId: "secresp", // DON'T YOU DARE RENAME!
-                            template: function (dataItem) {
-                                return roleTemplate(dataItem, 6);
-                            },
-                            width: 150,
-                            hidden: true,
-                            sortable: false,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "ChangeManager", title: "Changemanager",
-                            persistId: "changemanager", // DON'T YOU DARE RENAME!
-                            template: function (dataItem) {
-                                return roleTemplate(dataItem, 7);
-                            },
-                            width: 150,
-                            hidden: true,
-                            sortable: false,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "DataOwner", title: "Dataejer",
-                            persistId: "dataowner", // DON'T YOU DARE RENAME!
-                            template: function (dataItem) {
-                                return roleTemplate(dataItem, 8);
-                            },
-                            width: 150,
-                            hidden: true,
-                            sortable: false,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "SystemAdmin", title: "Systemadminstrator",
-                            persistId: "sysadm", // DON'T YOU DARE RENAME!
-                            template: function (dataItem) {
-                                return roleTemplate(dataItem, 9);
-                            },
-                            width: 150,
-                            hidden: true,
-                            sortable: false,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
                                 }
                             }
                         },
@@ -616,6 +447,41 @@
                         console.log(e);
                     }
                 };
+
+                function activate() {
+                    // find the index of column where the role columns should be inserted
+                    var insertIndex = _.findIndex(mainGridOptions.columns, "persistId", "orgunit") + 1;
+
+                    // add a role column for each of the roles
+                    // note iterating in reverse so we don't have to update the insert index
+                    _.forEachRight(systemRoles, function(role) {
+                        var roleColumn = {
+                            field: "role" + role.Id,
+                            title: role.Name,
+                            persistId: "role" + role.Id,
+                            template: function (dataItem) {
+                                return roleTemplate(dataItem, role.Id);
+                            },
+                            width: 150,
+                            hidden: role.Name == "Systemejer" ? false : true, // hardcoded role name :(
+                            sortable: false,
+                            filterable: {
+                                cell: {
+                                    dataSource: [],
+                                    showOperators: false,
+                                    operator: "contains",
+                                }
+                            }
+                        };
+
+                        // insert the generated column at the correct location
+                        mainGridOptions.columns.splice(insertIndex, 0, roleColumn);
+                    });
+
+                    // assign the generated grid options to the scope value, kendo will do the rest
+                    $scope.mainGridOptions = mainGridOptions;
+                }
+                activate();
 
                 function contractTemplate(dataItem) {
                     if (dataItem.MainContract) {

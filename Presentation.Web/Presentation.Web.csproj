@@ -219,6 +219,7 @@
     <Compile Include="Controllers\OData\ItInterfaceUsesController.cs" />
     <Compile Include="Controllers\OData\ItInterfaceExhibitsController.cs" />
     <Compile Include="Controllers\OData\ItInterfacesController.cs" />
+    <Compile Include="Controllers\OData\ItSystemRolesController.cs" />
     <Compile Include="Controllers\OData\ItSystemRightsController.cs" />
     <Compile Include="Controllers\OData\ItSystemsController.cs" />
     <Compile Include="Controllers\OData\ItSystemUsagesController.cs" />

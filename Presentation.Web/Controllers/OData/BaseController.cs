@@ -18,13 +18,13 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        public IHttpActionResult Get()
+        public virtual IHttpActionResult Get()
         {
             return Ok(Repository.AsQueryable());
         }
 
         [EnableQuery(MaxExpansionDepth = 4)]
-        public IHttpActionResult Get(int key)
+        public virtual IHttpActionResult Get(int key)
         {
             var entity = Repository.GetByKey(key);
             return Ok(entity);
