@@ -12,7 +12,7 @@ app.config([
 ]);
 
 app.config([
-    '$httpProvider', 'notifyProvider', 'datepickerConfig', 'datepickerPopupConfig', function ($httpProvider, notifyProvider, datepickerConfig, datepickerPopupConfig) {
+    '$httpProvider', 'notifyProvider', 'uibDatepickerConfig', 'uibDatepickerPopupConfig', function ($httpProvider, notifyProvider, datepickerConfig, datepickerPopupConfig) {
         $httpProvider.interceptors.push("httpBusyInterceptor");
         // for some reason templates aren't updated so this is needed
         $httpProvider.defaults.headers.get = {
