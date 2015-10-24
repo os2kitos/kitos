@@ -28,6 +28,7 @@ namespace Presentation.Web
                 "~/Scripts/angular-ui/ui-bootstrap-tpls.js",
                 "~/Scripts/ui-select2.js",
                 "~/Scripts/notify/*.js",
+                "~/Scripts/loading-bar.js",
                 "~/Scripts/angular-ui-util/ui-utils.js"));
 
             // angular app files
@@ -41,6 +42,7 @@ namespace Presentation.Web
                 "~/Content/notify/notify.css",
                 "~/Content/select2.css",
                 "~/Content/select2-bootstrap.css",
+                "~/Content/loading-bar.css",
                 "~/Content/kitos.css"));
         }
     }

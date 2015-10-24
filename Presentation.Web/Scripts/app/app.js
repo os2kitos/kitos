@@ -1,4 +1,4 @@
-﻿var app = angular.module('app', ['ui.router', 'ui.bootstrap', 'ui.select2', 'ngAnimate', 'notify', 'ui.utils', 'angularjs-dropdown-multiselect', 'ngSanitize', 'kendo.directives']);
+﻿var app = angular.module('app', ['ui.router', 'ui.bootstrap', 'ui.select2', 'ngAnimate', 'notify', 'ui.utils', 'angularjs-dropdown-multiselect', 'ngSanitize', 'kendo.directives', 'angular-loading-bar']);
 
 app.constant('JSONfn', JSONfn)
     .constant('moment', moment)

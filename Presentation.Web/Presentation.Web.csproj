@@ -719,6 +719,8 @@
     <Content Include="Content\kendo\2015.3.930\Uniform\sprite_2x.png" />
     <Content Include="Content\kendo\2015.3.930\Uniform\sprite_kpi.png" />
     <Content Include="Content\kendo\2015.3.930\Uniform\sprite_kpi_2x.png" />
+    <Content Include="Content\loading-bar.css" />
+    <Content Include="Content\loading-bar.min.css" />
     <Content Include="Content\select2-spinner.gif" />
     <Content Include="Content\select2.png" />
     <Content Include="Content\select2x2.png" />
@@ -2328,6 +2330,8 @@
     <Content Include="Scripts\kendo\2015.3.930\messages\kendo.messages.zh-HK.min.js" />
     <Content Include="Scripts\kendo\2015.3.930\messages\kendo.messages.zh-TW.min.js" />
     <Content Include="Scripts\kendo\2015.3.930\pako_deflate.min.js" />
+    <Content Include="Scripts\loading-bar.js" />
+    <Content Include="Scripts\loading-bar.min.js" />
     <Content Include="Scripts\lodash.js" />
     <Content Include="Scripts\lodash.min.js" />
     <Content Include="Scripts\moment-with-locales.js" />
