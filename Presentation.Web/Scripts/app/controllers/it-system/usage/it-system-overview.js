@@ -70,12 +70,13 @@
                 $scope.$on("kendoRendered", function () {
                     kendoRendered = true;
                     loadGridOptions();
-                    $scope.mainGrid.dataSource.fetch();
+                    $scope.mainGrid.dataSource.read();
                 });
 
                 // overview grid options
                 $scope.mainGridOptions = {
                     autoBind: false, // do not set to true, it works because the org unit filter inits the query
+                    autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                     dataSource: {
                         type: "odata-v4",
                         transport: {

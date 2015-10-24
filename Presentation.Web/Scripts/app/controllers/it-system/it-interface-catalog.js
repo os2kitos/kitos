@@ -23,7 +23,7 @@
             $rootScope.page.title = 'Snitflade - Katalog';
 
             $scope.itInterfaceOptions = {
-                autoBind: false,
+                autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
                     type: "odata-v4",
                     transport: {
@@ -322,7 +322,7 @@
             // fires when kendo is finished rendering all its goodies
             $scope.$on("kendoRendered", function () {
                 loadGridOptions();
-                $scope.mainGrid.dataSource.fetch();
+                $scope.mainGrid.dataSource.read();
             });
 
             // clears grid filters by removing the localStorageItem and reloading the page
