@@ -41,10 +41,13 @@
             }
 
             // loads kendo grid options from localstorage
-            function loadGridOptions(grid) {
-                var persistedState = getOptions();
-                var gridOptions = _.omit(persistedState, "columnState");
-                var columnState = _.pick(persistedState, "columnState");
+            function loadGridOptions(grid, initialFilter) {
+                var gridId = grid.element[0].id;
+                var storedState = getStoredOptions();
+                var columnState = _.pick(storedState, "columnState");
+
+                var gridOptionsWithInitialFitler = _.merge({ dataSource: { filter: initialFilter } }, storedState);
+                var gridOptions = _.omit(gridOptionsWithInitialFitler, "columnState");
 
                 _.forEach(columnState.columnState, function (state, key) {
                     var columnIndex = _.findIndex(grid.columns, function (column) {
@@ -74,16 +77,14 @@
                             columnObj.width = state.width;
                             // $timeout is required here, else the jQuery select doesn't work
                             $timeout(function() {
-                                // HACK make sure that "#mainGrid" actually matches the id in the view
-                                // TODO make "#mainGrid" id into an input parameter
                                 // set width of column header
-                                $("#mainGrid .k-grid-header")
+                                $("#" + gridId + " .k-grid-header")
                                     .find("colgroup col")
                                     .eq(columnIndex)
                                     .width(state.width);
 
                                 // set width of column
-                                $("#mainGrid .k-grid-content")
+                                $("#" + gridId + " .k-grid-content")
                                     .find("colgroup col")
                                     .eq(columnIndex)
                                     .width(state.width);
@@ -97,7 +98,7 @@
 
             // gets all the saved options, both session and local, and merges
             // them together so that the correct options are overwritten
-            function getOptions() {
+            function getStoredOptions() {
                 // load options from local storage
                 var localOptions = localStorage.getItem(storageKey);
                 if (localOptions) {
@@ -119,11 +120,13 @@
                 var options;
                 if (sessionOptions) {
                     // if session options are set then use them
+                    // note the order the options are merged in (below) is important!
                     options = _.merge({}, localOptions, sessionOptions);
                 } else {
                     // else use the profile options
                     // this should only happen the first time the page loads
                     // or when the session optinos are deleted
+                    // note the order the options are merged in (below) is important!
                     options = _.merge({}, localOptions, profileOptions);
                 }
                 return options;

@@ -17,6 +17,13 @@
                                 return result.data.value;
                             });
                         }
+                    ],
+                    orgUnits: [
+                        '$http', 'user', '_', function ($http, user, _) {
+                            return $http.get("/odata/Organizations(" + user.currentOrganizationId + ")/OrganizationUnits").then(function (result) {
+                                return _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId");
+                            });
+                        }
                     ]
                 }
             });
@@ -27,8 +34,8 @@
     // Or perhaps it's samurais, because it's kendos terrible terrible framework that's the cause...
     app.controller('system.OverviewCtrl',
         [
-            '$rootScope', '$scope', '$http', '$timeout', '$state', 'user', 'gridStateService', 'systemRoles',
-            function ($rootScope, $scope, $http, $timeout, $state, user, gridStateService, systemRoles) {
+            '$rootScope', '$scope', '$http', '$timeout', '_', '$state', 'user', 'gridStateService', 'systemRoles', 'orgUnits',
+            function ($rootScope, $scope, $http, $timeout, _, $state, user, gridStateService, systemRoles, orgUnits) {
                 $rootScope.page.title = 'IT System - Overblik';
 
                 // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(c/User/Name,'foo') and c/RoleId eq {roleId})"
@@ -48,7 +55,18 @@
 
                 // loads kendo grid options from localstorage
                 function loadGridOptions() {
-                    gridState.loadGridOptions($scope.mainGrid);
+                    var selectedOrgUnitId = getStoredOrgUnitId();
+                    var selectedOrgUnit = _.find(orgUnits, function (orgUnit) {
+                        return orgUnit.Id == selectedOrgUnitId;
+                    });
+
+                    var filter = undefined;
+                    // if selected is a root then no need to filter as it should display everything anyway
+                    if (selectedOrgUnit.$level != 0) {
+                        filter = getFilterWithOrgUnit({}, selectedOrgUnitId, selectedOrgUnit.childIds);
+                    }
+
+                    gridState.loadGridOptions($scope.mainGrid, filter);
                 }
 
                 $scope.saveGridProfile = function() {
@@ -72,10 +90,8 @@
                     $state.go('.', null, { reload: true });
                 }
 
-                var kendoRendered = false;
                 // fires when kendo is finished rendering all its goodies
                 $scope.$on("kendoRendered", function () {
-                    kendoRendered = true;
                     loadGridOptions();
                     $scope.mainGrid.dataSource.read();
                 });
@@ -611,83 +627,69 @@
                     }
                 };
 
+                function getStoredOrgUnitId() {
+                    return sessionStorage.getItem(orgUnitStorageKey) ? sessionStorage.getItem(orgUnitStorageKey) : user.defaultOrganizationUnitId;
+                }
+
                 function orgUnitDropDownList(args) {
-                    // check if the kendoRendered event has been called
-                    // because this function is apparently called multiple
-                    // times before the grid is actually ready
-                    if (kendoRendered) {
-                        // http://dojo.telerik.com/ODuDe/5
-                        args.element.removeAttr("data-bind");
-                        args.element.kendoDropDownList({
-                            dataSource: {
-                                type: "odata-v4",
-                                transport: {
-                                    read: {
-                                        url: "/odata/Organizations(" + user.currentOrganizationId + ")/OrganizationUnits",
-                                        dataType: "json",
-                                    }
-                                },
-                                serverFiltering: true,
-                                schema: {
-                                    parse: function (response) {
-                                        // add hierarchy level to each item
-                                        response.value = _.addHierarchyLevelOnFlatAndSort(response.value, "Id", "ParentId");
-                                        return response;
-                                    }
-                                }
-                            },
-                            dataValueField: "Id",
-                            dataTextField: "Name",
-                            template: indent,
-                            dataBound: setDefaultOrgUnit,
-                            change: orgUnitChanged
+                    function indent(dataItem) {
+                        var htmlSpace = "&nbsp;&nbsp;&nbsp;&nbsp;";
+                        return htmlSpace.repeat(dataItem.$level) + dataItem.Name;
+                    }
+
+                    function setDefaultOrgUnit() {
+                        var kendoElem = this;
+                        var idTofind = getStoredOrgUnitId();
+
+                        // find the index of the org unit that matches the users default org unit
+                        var index = _.findIndex(kendoElem.dataItems(), function (item) {
+                            return item.Id == idTofind;
                         });
+
+                        // -1 = no match
+                        //  0 = root org unit, which should display all. So remove org unit filter
+                        if (index > 0) {
+                            // select the users default org unit
+                            kendoElem.select(index);
+                        }
                     }
-                }
 
-                function indent(dataItem) {
-                    var htmlSpace = "&nbsp;&nbsp;&nbsp;&nbsp;";
-                    return htmlSpace.repeat(dataItem.$level) + dataItem.Name;
-                }
+                    function orgUnitChanged() {
+                        var kendoElem = this;
+                        // can't use args.dataSource directly,
+                        // if we do then the view doesn't update.
+                        // So have to go through $scope - sadly :(
+                        var dataSource = $scope.mainGrid.dataSource;
+                        var currentFilter = dataSource.filter();
+                        var selectedIndex = kendoElem.select();
+                        var selectedId = _.parseInt(kendoElem.value());
+                        var childIds = kendoElem.dataItem().childIds;
 
-                function setDefaultOrgUnit() {
-                    var kendoElem = this;
-                    var idTofind = sessionStorage.getItem(orgUnitStorageKey) ? sessionStorage.getItem(orgUnitStorageKey) : user.defaultOrganizationUnitId;;
+                        sessionStorage.setItem(orgUnitStorageKey, selectedId);
 
-                    // find the index of the org unit that matches the users default org unit
-                    var index = _.findIndex(kendoElem.dataItems(), function (item) {
-                        return item.Id == idTofind;
+                        if (selectedIndex > 0) {
+                            // filter by selected
+                            dataSource.filter(getFilterWithOrgUnit(currentFilter, selectedId, childIds));
+                        } else {
+                            // else clear filter because the 0th element should act like a placeholder
+                            dataSource.filter(getFilterWithOrgUnit());
+                        }
+                    }
+
+                    // http://dojo.telerik.com/ODuDe/5
+                    args.element.removeAttr("data-bind");
+                    args.element.kendoDropDownList({
+                        dataSource: orgUnits,
+                        dataValueField: "Id",
+                        dataTextField: "Name",
+                        template: indent,
+                        dataBound: setDefaultOrgUnit,
+                        change: orgUnitChanged
                     });
-
-                    // -1 = no match
-                    //  0 = root org unit, which should display all. So remove org unit filter
-                    if (index > 0) {
-                        // select the users default org unit
-                        kendoElem.select(index);
-                    }
                 }
 
-                function orgUnitChanged() {
-                    var kendoElem = this;
-                    var selectedIndex = kendoElem.select();
-                    var selectedId = _.parseInt(kendoElem.value());
-                    var childIds = kendoElem.dataItem().childIds;
-
-                    sessionStorage.setItem(orgUnitStorageKey, selectedId);
-
-                    if (selectedIndex > 0) {
-                        // filter by selected
-                        filterByOrgUnit(selectedId, childIds);
-                    } else {
-                        // else clear filter because the 0th element should act like a placeholder
-                        filterByOrgUnit();
-                    }
-                }
-
-                function filterByOrgUnit(selectedId, childIds) {
-                    var dataSource = $scope.mainGrid.dataSource;
+                function getFilterWithOrgUnit(currentFilter, selectedId, childIds) {
                     var field = "ResponsibleUsage.OrganizationUnit.Id";
-                    var currentFilter = dataSource.filter();
                     // remove old values first
                     var newFilter = _.removeFiltersForField(currentFilter, field);
 
@@ -699,59 +701,53 @@
                             newFilter = _.addFilter(newFilter, field, "eq", id, "or");
                         });
                     }
-                    // can't use datasource object directly,
-                    // if we do then the view doesn't update.
-                    // So have to go through $scope - sadly :(
-                    dataSource.filter(newFilter);
+                    return newFilter;
                 }
 
                 function contractFilterDropDownList(args) {
-                    // check if the kendoRendered event has been called
-                    // because this function is apparently called multiple
-                    // times before the grid is actually ready
-                    if (kendoRendered) {
-                        // http://dojo.telerik.com/ODuDe/5
-                        args.element.removeAttr("data-bind");
-                        args.element.kendoDropDownList({
-                            dataSource: ["Har kontrakt", "Ingen kontrakt"],
-                            optionLabel: "Vælg filter...",
-                            dataBound: setContractFilter,
-                            change: filterByContract
-                        });
+                    var gridDataSource = args.dataSource;
+
+                    function setContractFilter() {
+                        var kendoElem = this;
+                        var currentFilter = gridDataSource.filter();
+                        var contractFilterObj = _.findKeyDeep(currentFilter, { field: "MainContract" });
+
+                        if (contractFilterObj.operator == "neq") {
+                            kendoElem.select(1); // index of "Har kontrakt"
+                        } else if (contractFilterObj.operator == "eq") {
+                            kendoElem.select(2); // index of "Ingen kontrakt"
+                        }
                     }
-                }
 
-                function filterByContract() {
-                    var kendoElem = this;
-                    var selectedValue = kendoElem.value();
-                    var dataSource = $scope.mainGrid.dataSource;
-                    var field = "MainContract";
-                    var currentFilter = dataSource.filter();
-                    // remove old value first
-                    var newFilter = _.removeFiltersForField(currentFilter, field);
+                    function filterByContract() {
+                        var kendoElem = this;
+                        // can't use args.dataSource directly,
+                        // if we do then the view doesn't update.
+                        // So have to go through $scope - sadly :(
+                        var dataSource = $scope.mainGrid.dataSource;
+                        var selectedValue = kendoElem.value();
+                        var field = "MainContract";
+                        var currentFilter = dataSource.filter();
+                        // remove old value first
+                        var newFilter = _.removeFiltersForField(currentFilter, field);
 
-                    if (selectedValue == "Har kontrakt") {
-                        newFilter = _.addFilter(newFilter, field, "ne", null, "and");
-                    } else if (selectedValue == "Ingen kontrakt") {
-                        newFilter = _.addFilter(newFilter, field, "eq", null, "and");
+                        if (selectedValue == "Har kontrakt") {
+                            newFilter = _.addFilter(newFilter, field, "ne", null, "and");
+                        } else if (selectedValue == "Ingen kontrakt") {
+                            newFilter = _.addFilter(newFilter, field, "eq", null, "and");
+                        }
+
+                        dataSource.filter(newFilter);
                     }
-                    // can't use datasource object directly,
-                    // if we do then the view doesn't update.
-                    // So have to go through $scope - sadly :(
-                    dataSource.filter(newFilter);
-                }
 
-                function setContractFilter() {
-                    var kendoElem = this;
-                    var dataSource = $scope.mainGrid.dataSource;
-                    var currentFilter = dataSource.filter();
-                    var contractFilterObj = _.findKeyDeep(currentFilter, { field: "MainContract" });
-
-                    if (contractFilterObj.operator == "neq") {
-                        kendoElem.select(1); // index of "Har kontrakt"
-                    } else if (contractFilterObj.operator == "eq") {
-                        kendoElem.select(2); // index of "Ingen kontrakt"
-                    }
+                    // http://dojo.telerik.com/ODuDe/5
+                    args.element.removeAttr("data-bind");
+                    args.element.kendoDropDownList({
+                        dataSource: ["Har kontrakt", "Ingen kontrakt"],
+                        optionLabel: "Vælg filter...",
+                        dataBound: setContractFilter,
+                        change: filterByContract
+                    });
                 }
             }
         ]
