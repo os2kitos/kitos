@@ -338,7 +338,7 @@
 
             function linkTemplate(dataItem) {
                 if (dataItem.Url)
-                    return '<a href="' + dataItem.Url + '" title="Link til yderligere..."><i class="fa fa-link"></i></a>';
+                    return '<a href="' + dataItem.Url + '" title="Link til yderligere..." target="_blank"><i class="fa fa-link"></i></a>';
                 return "";
             }
         }
