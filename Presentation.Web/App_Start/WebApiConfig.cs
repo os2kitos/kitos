@@ -44,7 +44,11 @@ namespace Presentation.Web
         {
             var builder = new ODataModelBuilder();
 
-            builder.AddEnumType(typeof(AccessModifier));
+            var accessMod = builder.AddEnumType(typeof(AccessModifier));
+            accessMod.Namespace = "Kitos";
+            accessMod.AddMember(AccessModifier.Public).Name = "Public";
+            accessMod.AddMember(AccessModifier.Normal).Name = "Normal";
+            accessMod.AddMember(AccessModifier.Private).Name = "Private";
 
             //builder.EntitySet<AdminRight>("AdminRights");
             //builder.EntitySet<AdminRole>("AdminRoles");

@@ -120,6 +120,8 @@
                             var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
 
                             if (parameterMap.$filter) {
+                                // replaces 'Kitos.AccessModifier0' with Kitos.AccessModifier'0'
+                                parameterMap.$filter = parameterMap.$filter.replace(/('Kitos\.AccessModifier([0-9])')/, "Kitos.AccessModifier'$2'");
                                 // replaces "startswith(TaskKey,'11')" with "TaskRefs/any(c: startswith(c/TaskKey),'11')"
                                 parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()(TaskKey.*\))/, "TaskRefs/any(c: $1c/$2)");
                             }
@@ -219,8 +221,12 @@
                     {
                         field: "AccessModifier", title: "Synlighed", width: 80,
                         persistId: "accessmod", // DON'T YOU DARE RENAME!
-                        filterable: false,
-                        sortable: false
+                        filterable: {
+                            cell: {
+                                showOperators: false,
+                                template: accessModFilter,
+                            }
+                        }
                     },
                     {
                         field: "BusinessType.Name", title: "Forretningstype", width: 150,
@@ -433,6 +439,64 @@
                 if (dataItem.Url)
                     return '<a href="' + dataItem.Url + '" title="Link til yderligere..." target="_blank"><i class="fa fa-link"></i></a>';
                 return "";
+            }
+
+            function accessModFilter(args) {
+                var gridDataSource = args.dataSource;
+
+                function setSelected() {
+                    var kendoElem = this;
+                    var currentFilter = gridDataSource.filter();
+                    var filterObj = _.findKeyDeep(currentFilter, { field: "AccessModifier" });
+
+                    switch (filterObj.value) {
+                        case "Kitos.AccessModifier0":
+                            kendoElem.select(1);
+                            break;
+                        case "Kitos.AccessModifier1":
+                            kendoElem.select(2);
+                            break;
+                        case "Kitos.AccessModifier2":
+                            kendoElem.select(3);
+                            break;
+                        default:
+                            kendoElem.select(0); // select placeholder
+                    }
+                }
+
+                function applyFilter() {
+                    var kendoElem = this;
+                    // can't use args.dataSource directly,
+                    // if we do then the view doesn't update.
+                    // So have to go through $scope - sadly :(
+                    var dataSource = $scope.mainGrid.dataSource;
+                    var selectedValue = kendoElem.value();
+                    var field = "AccessModifier";
+                    var currentFilter = dataSource.filter();
+                    // remove old value first
+                    var newFilter = _.removeFiltersForField(currentFilter, field);
+
+                    if (selectedValue) {
+                        newFilter = _.addFilter(newFilter, field, "eq", selectedValue, "and");
+                    }
+
+                    dataSource.filter(newFilter);
+                }
+
+                // http://dojo.telerik.com/ODuDe/5
+                args.element.removeAttr("data-bind");
+                args.element.kendoDropDownList({
+                    dataSource: [
+                        { value: "Kitos.AccessModifier0", text: "Normal" },
+                        { value: "Kitos.AccessModifier1", text: "Public" },
+                        { value: "Kitos.AccessModifier2", text: "Private" }
+                    ],
+                    dataTextField: "text",
+                    dataValueField: "value",
+                    optionLabel: "Vælg filter...",
+                    dataBound: setSelected,
+                    change: applyFilter
+                });
             }
         }
     ]);
