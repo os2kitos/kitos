@@ -17,7 +17,7 @@
     ]);
 
     app.controller('org.UserCtrl', [
-            '$scope', '$http', '$state', '$modal', '$q', '$stateParams', 'notify', 'user',
+            '$scope', '$http', '$state', '$uibModal', '$q', '$stateParams', 'notify', 'user',
             function ($scope, $http, $state, $modal, $q, $stateParams, notify, user) {
 
                 $scope.rootUnitName = user.currentOrganization.root.name;
@@ -227,7 +227,7 @@
                         windowClass: 'modal fade in',
                         templateUrl: 'partials/org/user/org-edituser-modal.html',
                         controller: [
-                            '$scope', '$modalInstance', 'notify', 'autofocus', function ($modalScope, $modalInstance, modalnotify, autofocus) {
+                            '$scope', '$uibModalInstance', 'notify', 'autofocus', function ($modalScope, $modalInstance, modalnotify, autofocus) {
                                 autofocus();
                                 $modalScope.busy = false;
                                 $modalScope.name = userToEdit.name;

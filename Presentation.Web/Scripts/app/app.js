@@ -24,7 +24,7 @@ app.config([
 ]);
 
 app.run([
-    '$rootScope', '$http', '$state', '$modal', 'notify', 'userService', 'uiSelect2Config',
+    '$rootScope', '$http', '$state', '$uibModal', 'notify', 'userService', 'uiSelect2Config',
     function ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config) {
         //init info
         $rootScope.page = {

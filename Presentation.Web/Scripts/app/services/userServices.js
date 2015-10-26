@@ -1,7 +1,7 @@
 ﻿(function (ng, app) {
     var _user = null;
 
-    app.factory('userService', ['$http', '$q', '$rootScope', '$modal', function ($http, $q, $rootScope, $modal) {
+    app.factory('userService', ['$http', '$q', '$rootScope', '$uibModal', function ($http, $q, $rootScope, $modal) {
         //formats and saves the user
         function saveUser(user, orgAndDefaultUnit) {
             var currOrg = orgAndDefaultUnit.organization;
@@ -17,7 +17,7 @@
             var currentOrgUnitId;
             var currentOrgUnitName;
             var isUsingDefaultOrgUnit;
-            
+
             if (defaultOrgUnitId == null) {
                 currentOrgUnitId = currOrg.root.id;
                 currentOrgUnitName = currOrg.root.name;
@@ -39,29 +39,29 @@
                 email: user.email,
                 phoneNumber: user.phoneNumber,
                 uuid: user.uuid,
-                
+
                 isGlobalAdmin: user.isGlobalAdmin,
                 isLocalAdmin: isLocalAdmin,
-                
+
                 orgAndDefaultUnit: orgAndDefaultUnit,
 
                 currentOrganizationUnitId: currentOrgUnitId,
                 currentOrganizationUnitName: currentOrgUnitName,
                 isUsingDefaultOrgUnit: isUsingDefaultOrgUnit,
-                
+
                 defaultOrganizationUnitId: defaultOrgUnitId,
-                
+
                 currentOrganization: currOrg,
                 currentOrganizationId: currOrg.id,
                 currentOrganizationName: currOrg.name,
                 currentConfig: currOrg.config
             };
-            
+
             $rootScope.user = _user;
 
             return _user;
         }
-        
+
         function patchUser(payload) {
             var deferred = $q.defer();
 
@@ -74,7 +74,7 @@
                     data: payload
                 }).success(function (result) {
                     var newUser = result.response;
-                    
+
                     //updating the user. the organization and default org unit is unchanged
                     saveUser(newUser, _user.orgAndDefaultUnit);
                     loadUserDeferred = null;
@@ -119,7 +119,7 @@
 
 
                 }).error(function (result) {
-                    
+
                     loadUserDeferred.reject(result);
                     loadUserDeferred = null;
                     clearSavedOrgId();
@@ -128,7 +128,7 @@
 
             return loadUserDeferred.promise;
         }
-        
+
         function login(email, password, rememberMe) {
             var deferred = $q.defer();
 
@@ -137,7 +137,7 @@
                 deferred.reject("Email or password cannot be empty");
 
             } else {
-                
+
                  var data = {
                     "email": email,
                     "password": password,
@@ -145,7 +145,7 @@
                  };
 
                 deferred.resolve(loadUser(data));
-                
+
             }
 
             return deferred.promise;
@@ -167,10 +167,10 @@
                 deferred.reject("Could not log out");
 
             });
-            
+
             return deferred.promise;
         }
-        
+
         function auth(adminRoles) {
             return getUser().then(function (user) {
                 if (adminRoles) {
@@ -186,16 +186,16 @@
                 return true;
             });
         }
-        
+
         function getSavedOrgId() {
             var orgId = localStorage.getItem("currentOrgId");
             return orgId != null && JSON.parse(orgId);
         }
-            
+
         function setSavedOrgId(orgId) {
             localStorage.setItem("currentOrgId", JSON.stringify(orgId));
         }
-        
+
         function clearSavedOrgId() {
             localStorage.setItem("currentOrgId", null);
         }
@@ -206,7 +206,7 @@
         //time the user is visiting.
         function resolveOrganization2(orgsAndDefaultUnits) {
             var deferred = $q.defer();
-            
+
             //first, if the user is only member of one organization, just use that
             if (orgsAndDefaultUnits.$values.length == 1) {
                 var firstOrgAndDefaultUnit = orgsAndDefaultUnits.$values[0];
@@ -214,7 +214,7 @@
                 deferred.resolve(firstOrgAndDefaultUnit);
                 return deferred.promise;
             }
-            
+
             //else, try to get previous selected organization id from the local storage
             var storedOrgId = getSavedOrgId();
 
@@ -223,7 +223,7 @@
                 var foundOrgAndDefaultUnit = _.find(orgsAndDefaultUnits.$values, function (orgAndUnit) {
                     return orgAndUnit.organization.id == storedOrgId;
                 });
-                    
+
                 if (foundOrgAndDefaultUnit != null) {
                     deferred.resolve(foundOrgAndDefaultUnit);
                     return deferred.promise;
@@ -233,14 +233,14 @@
                 //so clear it
                     clearSavedOrgId();
             }
-            
+
             //if we get to this point, there is more than organization to choose from,
             //and we couldn't use the stored organization id.
             //last resort we have to prompt the user to select an organization
                         var modal = $modal.open({
                             backdrop: 'static',
                             templateUrl: 'partials/home/choose-organization.html',
-                            controller: ['$scope', '$modalInstance', 'autofocus', function ($modalScope, $modalInstance, autofocus) {
+                            controller: ['$scope', '$uibModalInstance', 'autofocus', function ($modalScope, $modalInstance, autofocus) {
                                 autofocus();
 
                     $modalScope.organizations = _.map(orgsAndDefaultUnits.$values, function (orgAndUnit) {
@@ -250,7 +250,7 @@
                                 $modalScope.orgChooser = {
                         selectedId: null
                                 };
-                                
+
                                 $modalScope.ok = function () {
                         var selectedOrgAndUnit = _.find(orgsAndDefaultUnits.$values, function (orgAndUnit) {
                             return orgAndUnit.organization.id == $modalScope.orgChooser.selectedId;

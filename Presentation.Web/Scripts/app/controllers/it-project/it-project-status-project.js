@@ -48,7 +48,7 @@
     }]);
 
     app.controller('project.EditStatusProjectCtrl',
-    ['$scope', '$http', '$state', 'notify', '$modal', 'project', 'usersWithRoles', 'user',
+    ['$scope', '$http', '$state', 'notify', '$uibModal', 'project', 'usersWithRoles', 'user',
         function ($scope, $http, $state, notify, $modal, project, usersWithRoles, user) {
             $scope.project = project;
             $scope.project.updateUrl = "api/itproject/" + project.id;

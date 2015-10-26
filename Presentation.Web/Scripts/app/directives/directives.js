@@ -141,7 +141,7 @@
     );
 
     app.directive('addUserButton', [
-        '$http', '$modal', function($http, $modal) {
+        '$http', '$uibModal', function ($http, $modal) {
             return {
                 scope: {
                     userResult: '=?addUser',
@@ -163,7 +163,7 @@
                                 ]
                             },
                             controller: [
-                                '$scope', 'notify', '$modalInstance', 'user', 'autofocus', function($scope, notify, $modalInstance, user, autofocus) {
+                                '$scope', 'notify', '$uibModalInstance', 'user', 'autofocus', function ($scope, notify, $modalInstance, user, autofocus) {
                                     autofocus();
                                     $scope.newUser = {};
 

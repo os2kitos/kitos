@@ -19,7 +19,7 @@
     ]);
 
     app.controller('org.OverviewCtrl', [
-        '$rootScope', '$scope', '$http', 'notify', '$modal', 'user',
+        '$rootScope', '$scope', '$http', 'notify', '$uibModal', 'user',
         function($rootScope, $scope, $http, notify, $modal, user) {
             $rootScope.page.title = 'Organisation - Overblik';
 
@@ -207,7 +207,7 @@
                 $modal.open({
                     templateUrl: 'partials/org/overview/comment-modal.html',
                     controller: [
-                        '$scope', '$modalInstance', 'autofocus', function($modalScope, $modalInstance, autofocus) {
+                        '$scope', '$uibModalInstance', 'autofocus', function ($modalScope, $modalInstance, autofocus) {
                             autofocus();
                             $modalScope.usage = usage;
                             $modalScope.hasWriteAccess = usage.hasWriteAccess;

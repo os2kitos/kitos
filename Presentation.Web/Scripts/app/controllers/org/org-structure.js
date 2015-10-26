@@ -31,7 +31,7 @@
     ]);
 
     app.controller('org.StructureCtrl', [
-        '$scope', '$http', '$q', '$filter', '$modal', '$state', 'notify', 'orgUnits', 'orgRoles', 'user',
+        '$scope', '$http', '$q', '$filter', '$uibModal', '$state', 'notify', 'orgUnits', 'orgRoles', 'user',
         function ($scope, $http, $q, $filter, $modal, $state, notify, orgUnits, orgRoles, user) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
@@ -296,7 +296,7 @@
                 var modal = $modal.open({
                     templateUrl: 'partials/org/edit-org-unit-modal.html',
                     controller: [
-                        '$scope', '$modalInstance', 'autofocus', function($modalScope, $modalInstance, autofocus) {
+                        '$scope', '$uibModalInstance', 'autofocus', function ($modalScope, $modalInstance, autofocus) {
                             autofocus();
 
                             // edit or create-new mode

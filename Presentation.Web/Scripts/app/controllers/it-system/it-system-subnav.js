@@ -9,7 +9,7 @@
                     return userService.getUser();
                 }]
             },
-            controller: ['$rootScope', '$http', '$state', '$modal', 'notify', 'user', function ($rootScope, $http, $state, $modal, notify, user) {
+            controller: ['$rootScope', '$http', '$state', '$uibModal', 'notify', 'user', function ($rootScope, $http, $state, $modal, notify, user) {
                 $rootScope.page.title = 'IT System';
                 $rootScope.page.subnav = [
                     { state: 'it-system.overview', text: 'Overblik' },
@@ -33,7 +33,7 @@
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: 'modal fade in',
                         templateUrl: 'partials/subnav/create-modal.html',
-                        controller: ['$scope', '$modalInstance', function ($scope, $modalInstance) {
+                        controller: ['$scope', '$uibModalInstance', function ($scope, $modalInstance) {
                             $scope.formData = {};
                             $scope.type = 'IT System';
                             $scope.checkAvailbleUrl = 'api/itSystem/';
@@ -79,7 +79,7 @@
                         .error(function (data, status) {
                             if (status == 409)
                                 msg.toErrorMessage('Fejl! IT Systemet er i lokal anvendelse!');
-                            else 
+                            else
                                 msg.toErrorMessage('Fejl! Kunne ikke slette IT System!');
                         });
                 }
@@ -106,7 +106,7 @@
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: 'modal fade in',
                         templateUrl: 'partials/subnav/create-itinterface-modal.html',
-                        controller: ['$scope', '$modalInstance', function ($scope, $modalInstance) {
+                        controller: ['$scope', '$uibModalInstance', function ($scope, $modalInstance) {
                             $scope.formData = { itInterfaceId: "" }; // set itInterfaceId to an empty string
                             $scope.type = 'IT Snitflade';
                             $scope.checkAvailbleUrl = 'api/itInterface/';
@@ -120,7 +120,7 @@
                             }
 
                             $scope.uniqueConstraintError = false;
-                            
+
                             $scope.submit = function () {
                                 var payload = {
                                     name: $scope.formData.name,

@@ -16,7 +16,7 @@
                         }
                 ],
             },
-            controller: ['$rootScope', '$modal', '$state', 'user', 'organizationRoles', function ($rootScope, $modal, $state, user, organizationRoles) {
+            controller: ['$rootScope', '$uibModal', '$state', 'user', 'organizationRoles', function ($rootScope, $modal, $state, user, organizationRoles) {
                 $rootScope.page.title = 'Organisation';
 
                 var subnav = [];
@@ -47,7 +47,7 @@
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: 'modal fade in',
                         templateUrl: 'partials/org/user/org-createuser-modal.html',
-                        controller: ['$scope', '$modalInstance', '$http', 'notify', 'autofocus', function ($modalScope, $modalInstance, $http, notify, autofocus) {
+                        controller: ['$scope', '$uibModalInstance', '$http', 'notify', 'autofocus', function ($modalScope, $modalInstance, $http, notify, autofocus) {
                             if (!orgUserRole && !user.currentOrganizationId) {
                                 notify.addErrorMessage("Fejl! Kunne ikke oprette bruger.", true);
                                 return;

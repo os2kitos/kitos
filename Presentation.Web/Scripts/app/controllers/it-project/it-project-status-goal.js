@@ -28,7 +28,7 @@
     ]);
 
     app.controller('project.EditStatusGoalCtrl', [
-        '$scope', '$http', 'notify', '$modal', '$state', 'project', 'goalTypes', 'user',
+        '$scope', '$http', 'notify', '$uibModal', '$state', 'project', 'goalTypes', 'user',
         function ($scope, $http, notify, $modal, $state, project, goalTypes, user) {
             $scope.goalStatus = project.goalStatus;
             $scope.goalStatus.updateUrl = "api/goalStatus/" + project.goalStatus.id;

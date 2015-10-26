@@ -17,7 +17,7 @@
     }]);
 
     app.controller('project.EditPhasesCtrl',
-    ['$scope', '$http', 'notify', '$modal', 'project', 'user',
+    ['$scope', '$http', 'notify', '$uibModal', 'project', 'user',
         function ($scope, $http, notify, $modal, project, user) {
             $scope.project = project;
             $scope.project.updateUrl = "api/itproject/" + project.id + '?organizationId=' + user.currentOrganizationId;
