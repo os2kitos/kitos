@@ -159,6 +159,7 @@
                     {
                         field: "BelongsTo.Name", title: "Rettighedshaver", width: 150,
                         persistId: "belongs", // DON'T YOU DARE RENAME!
+                        hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -246,6 +247,7 @@
                         field: "", title: "Datatype", width: 150,
                         persistId: "datatypes", // DON'T YOU DARE RENAME!
                         template: "#: DataRows.length > 0 ? _.pluck(DataRows.slice(0,4), 'DataType.Name').join(', ') : '' ##: DataRows.length > 5 ? ', ...' : '' #",
+                        hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -257,6 +259,7 @@
                     {
                         field: "Organization.Name", title: "Oprettet af: Organisation", width: 150,
                         persistId: "orgname", // DON'T YOU DARE RENAME!
+                        hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -294,7 +297,6 @@
                     {
                         field: "LastChanged", title: "Sidst redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 150,
                         persistId: "lastchangeddate", // DON'T YOU DARE RENAME!
-                        hidden: true,
                         filterable: {
                             cell: {
                                 showOperators: false,
