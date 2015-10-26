@@ -357,7 +357,7 @@
                         }
                     },
                     {
-                        field: "LastChanged", title: "Sidst redigeret: Dato", format: "{0:dd-MM-yyyy HH:mm}", width: 150,
+                        field: "LastChanged", title: "Sidst redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 150,
                         persistId: "lastchangeddate", // DON'T YOU DARE RENAME!
                         filterable: {
                             cell: {
