@@ -130,7 +130,7 @@
                         schema: {
                             model: {
                                 fields: {
-                                    LastChanged: { type: "date" },
+                                    LastChanged: { type: "date" }
                                 }
                             },
                             parse: function (response) {
@@ -220,7 +220,7 @@
                             }
                         },
                         {
-                            field: "ItSystem.Name", title: "IT System", width: 150,
+                            field: "ItSystem.Name", title: "IT System", width: 250,
                             persistId: "sysname", // DON'T YOU DARE RENAME!
                             template: "<a data-ui-sref='it-system.usage.interfaces({id: #: Id #})'>#: ItSystem.Name #</a>",
                             filterable: {
@@ -368,7 +368,7 @@
                             }
                         },
                         {
-                            field: "", title: "IT System: Anvendes af", width: 150,
+                            field: "", title: "IT System: Anvendes af", width: 100,
                             persistId: "sysusage", // DON'T YOU DARE RENAME!
                             template: "TODO",
                             filterable: {
@@ -408,7 +408,7 @@
                             },
                         },
                         {
-                            field: "MainContract.ItContract.Supplier.Name", title: "Leverandør", width: 80,
+                            field: "MainContract.ItContract.Supplier.Name", title: "Leverandør", width: 150,
                             persistId: "supplier", // DON'T YOU DARE RENAME!
                             template: supplierTemplate,
                             filterable: {
