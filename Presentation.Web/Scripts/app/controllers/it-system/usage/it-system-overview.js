@@ -383,6 +383,7 @@
                             field: "ItSystem.ItInterfaceExhibits", title: "Snitflader: Udstilles ???", width: 95,
                             persistId: "exhibit", // DON'T YOU DARE RENAME!
                             template: "<a data-ng-click=\"showExposureDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.ItInterfaceExhibits.length #</a>",
+                            hidden: true,
                             filterable: false,
                             sortable: false
                         },
@@ -390,6 +391,7 @@
                             field: "ItSystem.CanUseInterfaces", title: "Snitflader: Anvendes ???", width: 95,
                             persistId: "canuse", // DON'T YOU DARE RENAME!
                             template: "<a data-ng-click=\"showUsageDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.CanUseInterfaces.length #</a>",
+                            hidden: true,
                             filterable: false,
                             sortable: false
                         },
@@ -421,6 +423,7 @@
                             field: "", title: "IT Projekt", width: 150,
                             persistId: "sysusage", // DON'T YOU DARE RENAME!
                             template: "#: ItProjects.length > 0 ? _.first(ItProjects).Name : '' #",
+                            hidden: true,
                             filterable: {
                                 cell: {
                                     dataSource: [],
@@ -433,6 +436,7 @@
                             field: "ObjectOwner.Name", title: "Taget i anvendelse af", width: 150,
                             persistId: "ownername", // DON'T YOU DARE RENAME!
                             template: "#: ObjectOwner.Name + ' ' + ObjectOwner.LastName #",
+                            hidden: true,
                             filterable: {
                                 cell: {
                                     dataSource: [],

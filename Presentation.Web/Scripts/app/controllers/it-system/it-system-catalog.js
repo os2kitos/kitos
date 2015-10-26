@@ -238,6 +238,7 @@
                         field: "AppTypeOption.Name", title: "Applikationstype", width: 150,
                         persistId: "apptype", // DON'T YOU DARE RENAME!
                         template: "#: AppTypeOption ? AppTypeOption.Name : '' #",
+                        hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -261,6 +262,7 @@
                         field: "TaskKey", title: "KLE ID", width: 150,
                         persistId: "taskkey", // DON'T YOU DARE RENAME!
                         template: "#: TaskRefs.length > 0 ? _.pluck(TaskRefs.slice(0,4), 'TaskKey').join(', ') : '' ##: TaskRefs.length > 5 ? ', ...' : '' #",
+                        hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -287,7 +289,6 @@
                         field: "Url", title: "Link til yderligere beskrivelse", width: 100,
                         persistId: "link", // DON'T YOU DARE RENAME!
                         template: linkTemplate,
-                        hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -323,6 +324,7 @@
                         field: "Organization.Name", title: "Oprettet af: Organisation", width: 150,
                         persistId: "orgname", // DON'T YOU DARE RENAME!
                         template: "#: Organization ? Organization.Name : '' #",
+                        hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -335,6 +337,7 @@
                         field: "ObjectOwner.Name", title: "Oprettet af: Bruger", width: 150,
                         persistId: "ownername", // DON'T YOU DARE RENAME!
                         template: "#: ObjectOwner.Name + ' ' + ObjectOwner.LastName #",
+                        hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
