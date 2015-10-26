@@ -171,6 +171,7 @@
                         field: "Url", title: "Link til yderligere beskrivelse", width: 100,
                         persistId: "link", // DON'T YOU DARE RENAME!
                         template: linkTemplate,
+                        attributes: { "class": "text-center" },
                         filterable: {
                             cell: {
                                 dataSource: [],
