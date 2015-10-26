@@ -103,7 +103,7 @@
                         type: "odata-v4",
                         transport: {
                             read: {
-                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,CanUseInterfaces,ItInterfaceExhibits,Parent,TaskRefs),Organization,ResponsibleUsage($expand=OrganizationUnit),Overview($expand=ItSystem),MainContract,Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects",
+                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,CanUseInterfaces,ItInterfaceExhibits,Parent,TaskRefs),Organization,ResponsibleUsage($expand=OrganizationUnit),Overview($expand=ItSystem),MainContract($expand=ItContract($expand=Supplier)),Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects",
                                 dataType: "json"
                             },
                             parameterMap: function (options, type) {
@@ -406,6 +406,18 @@
                             },
                         },
                         {
+                            field: "MainContract.ItContract.Supplier.Name", title: "Leverandør", width: 80,
+                            persistId: "supplier", // DON'T YOU DARE RENAME!
+                            template: supplierTemplate,
+                            filterable: {
+                                cell: {
+                                    dataSource: [],
+                                    showOperators: false,
+                                    operator: "contains",
+                                }
+                            }
+                        },
+                        {
                             field: "", title: "IT Projekt", width: 150,
                             persistId: "sysusage", // DON'T YOU DARE RENAME!
                             template: "#: ItProjects.length > 0 ? _.first(ItProjects).Name : '' #",
@@ -510,6 +522,17 @@
                         //        return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="fa fa-file text-success" aria-hidden="true"></span></a>';
                         //    else
                         //        return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="fa fa-file-o text-muted" aria-hidden="true"></span></a>';
+                    }
+                    return "";
+                }
+
+                function supplierTemplate(dataItem) {
+                    if (dataItem.MainContract) {
+                        if (dataItem.MainContract.ItContract) {
+                            if (dataItem.MainContract.ItContract.Supplier) {
+                                return dataItem.MainContract.ItContract.Supplier.Name;
+                            }
+                        }
                     }
                     return "";
                 }

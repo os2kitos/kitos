@@ -69,8 +69,6 @@ namespace Presentation.Web
             //builder.EntitySet<ItInterfaceExhibit>("ItInterfaceExhibits");
             //builder.EntitySet<ItInterfaceExhibitUsage>("InterfaceExhibtUsages");
             //builder.EntitySet<InterfaceType>("InterfaceTypes");
-            //builder.EntitySet<ItContract>("ItContracts");
-            //builder.EntitySet<ItContractItSystemUsage>("ItContractItSystemUsages");
             //builder.EntitySet<ItContractRight>("ItContractRights");
             //builder.EntitySet<ItContractRole>("ItContractRoles");
             //builder.EntitySet<ItProjectPhase>("ItProjectPhases");
@@ -206,11 +204,12 @@ namespace Presentation.Web
 
             var contracts = builder.EntitySet<ItContract>("ItContracts");
             contracts.EntityType.HasKey(x => x.Id);
+            contracts.EntityType.HasOptional(x => x.Supplier);
 
             // TODO this field is causing issues.
             // This query fails: /odata/Organizations(1)/ItSystemUsages?$expand=MainContract($expand=ItContract)
             // if ItContract.Terminated has a value
-            contracts.EntityType.Property(x => x.IsActive);
+            contracts.EntityType.Ignore(x => x.IsActive);
 
             var interfaces = builder.EntitySet<Interface>("Interfaces");
             interfaces.EntityType.HasKey(x => x.Id);
@@ -276,8 +275,6 @@ namespace Presentation.Web
 
             //builder.EntitySet<ItSystemTypeOption>("ItSystemTypeOptions");
             //builder.EntitySet<OptionExtend>("OptionExtention");
-            //builder.EntitySet<Organization>("Organizations");
-            //builder.EntitySet<OrganizationUnit>("OrganizationUnits");
             //builder.EntitySet<OrganizationRight>("OrganizationRights");
             //builder.EntitySet<OrganizationRole>("OrganizationRoles");
             //builder.EntitySet<PasswordResetRequest>("PasswordResetRequests");
