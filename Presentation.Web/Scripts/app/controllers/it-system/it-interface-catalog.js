@@ -98,6 +98,14 @@
                 columnMenu: {
                     filterable: false
                 },
+                dataBound: saveGridOptions,
+                columnResize: saveGridOptions,
+                columnHide: saveGridOptions,
+                columnShow: saveGridOptions,
+                columnReorder: saveGridOptions,
+                error: function (e) {
+                    console.log(e);
+                },
                 columns: [
                     {
                         field: "ItInterfaceId", title: "Snidtflade ID", width: 120,
@@ -304,15 +312,7 @@
                             }
                         }
                     }
-                ],
-                dataBound: saveGridOptions,
-                columnResize: saveGridOptions,
-                columnHide: saveGridOptions,
-                columnShow: saveGridOptions,
-                columnReorder: saveGridOptions,
-                error: function (e) {
-                    console.log(e);
-                }
+                ]
             };
 
             var storageKey = "it-interface-catalog-options";

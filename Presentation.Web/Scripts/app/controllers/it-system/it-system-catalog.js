@@ -185,6 +185,14 @@
                 columnMenu: {
                     filterable: false
                 },
+                dataBound: saveGridOptions,
+                columnResize: saveGridOptions,
+                columnHide: saveGridOptions,
+                columnShow: saveGridOptions,
+                columnReorder: saveGridOptions,
+                error: function(e) {
+                    console.log(e);
+                },
                 columns: [
                     {
                         field: "Usages", title: "Anvend/Fjern anvendelse", width: 110,
@@ -377,15 +385,7 @@
                             }
                         }
                     }
-                ],
-                dataBound: saveGridOptions,
-                columnResize: saveGridOptions,
-                columnHide: saveGridOptions,
-                columnShow: saveGridOptions,
-                columnReorder: saveGridOptions,
-                error: function(e) {
-                    console.log(e);
-                }
+                ]
             };
 
             function usageButtonTemplate(dataItem) {

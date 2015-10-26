@@ -193,6 +193,14 @@
                     columnMenu: {
                         filterable: false
                     },
+                    dataBound: saveGridOptions,
+                    columnResize: saveGridOptions,
+                    columnHide: saveGridOptions,
+                    columnShow: saveGridOptions,
+                    columnReorder: saveGridOptions,
+                    error: function(e) {
+                        console.log(e);
+                    },
                     columns: [
                         {
                             field: "LocalSystemId", title: "Lokal system ID", width: 150,
@@ -469,15 +477,7 @@
                                 }
                             }
                         }
-                    ],
-                    dataBound: saveGridOptions,
-                    columnResize: saveGridOptions,
-                    columnHide: saveGridOptions,
-                    columnShow: saveGridOptions,
-                    columnReorder: saveGridOptions,
-                    error: function(e) {
-                        console.log(e);
-                    }
+                    ]
                 };
 
                 function activate() {
