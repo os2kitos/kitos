@@ -2,7 +2,7 @@
 {
     public class ItContractItSystemUsage
     {
-        public int ItContractId { get; set; } 
+        public int ItContractId { get; set; }
         public virtual ItContract ItContract { get; set; }
 
         public int ItSystemUsageId { get; set; }

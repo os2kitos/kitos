@@ -50,7 +50,7 @@ namespace Core.DomainModel
         public virtual ICollection<ItSystem.ItSystem> BelongingSystems { get; set; }
         //KITOS term - which organization was this system created under in KITOS
         public virtual ICollection<ItSystem.ItSystem> ItSystems { get; set; }
-        
+
         //KITOS term - which organization was this interface created under in KITOS
         public virtual ICollection<ItSystem.ItInterface> ItInterfaces { get; set; }
 
