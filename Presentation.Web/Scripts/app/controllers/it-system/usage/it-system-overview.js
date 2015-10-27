@@ -173,6 +173,9 @@
                             name: "deleteFilter",
                             text: "Slet filter",
                             template: "<a class='k-button k-button-icontext' data-ng-click='clearGridProfile()'>#: text #</a>"
+                        },
+                        {
+                            template: kendo.template($("#role-selector").html())
                         }
                     ],
                     excel: {
@@ -780,6 +783,25 @@
                         change: filterByContract
                     });
                 }
+
+                $scope.roleSelectorOptions = {
+                    autoBind: false,
+                    dataSource: systemRoles,
+                    dataTextField: "Name",
+                    dataValueField: "Id",
+                    optionLabel: "Vælg rolle...",
+                    change: function (e) {
+                        // hide all roles column
+                        _.forEach(systemRoles, function(role) {
+                            $scope.mainGrid.hideColumn("role" + role.Id);
+                        });
+
+                        var selectedId = e.sender.value();
+                        var gridFieldName = "role" + selectedId;
+                        // show only the selected role column
+                        $scope.mainGrid.showColumn(gridFieldName);
+                    }
+                };
             }
         ]
     );
