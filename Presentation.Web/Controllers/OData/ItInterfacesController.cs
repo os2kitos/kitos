@@ -15,6 +15,13 @@ namespace Presentation.Web.Controllers.OData
         {
         }
 
+        [EnableQuery]
+        [ODataRoute("ItInterfaces")]
+        public override IHttpActionResult Get()
+        {
+            return base.Get();
+        }
+
         // GET /Organizations(1)/ItInterfaces
         [EnableQuery]
         [ODataRoute("Organizations({key})/ItInterfaces")]
