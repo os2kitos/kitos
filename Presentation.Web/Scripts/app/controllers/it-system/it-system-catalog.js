@@ -106,6 +106,18 @@
                 dataBound: detailsBound
             };
 
+            var itSystemBaseUrl;
+            if (user.isGlobalAdmin) {
+                // global admin should see all it systems everywhere with all levels of access
+                itSystemBaseUrl = "/odata/ItSystems";
+            } else {
+                // everyone else are limited to within organizationnal context
+                itSystemBaseUrl = "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystems";
+            }
+
+            var itSystemUrl = itSystemBaseUrl + "?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser";
+
+
             // catalog grid
             $scope.itSystemCatalogueGrid = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -113,7 +125,7 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystems?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser",
+                            url: itSystemUrl,
                             dataType: "json"
                         },
                         parameterMap: function (options, type) {

@@ -22,13 +22,25 @@
         function ($rootScope, $scope, $timeout, $state, user, gridStateService) {
             $rootScope.page.title = 'Snitflade - Katalog';
 
+            var itInterfaceBaseUrl;
+            if (user.isGlobalAdmin) {
+                // global admin should see all it systems everywhere with all levels of access
+                itInterfaceBaseUrl = "/odata/ItInterfaces";
+            } else {
+                // everyone else are limited to within organizationnal context
+                itInterfaceBaseUrl = "/odata/Organizations(" + user.currentOrganizationId + ")/ItInterfaces";
+            }
+
+            var itInterfaceUrl = itInterfaceBaseUrl + "?$expand=Interface,InterfaceType,ObjectOwner,BelongsTo,Organization,Tsa,ExhibitedBy($expand=ItSystem),Method,LastChangedByUser,DataRows($expand=DataType),InterfaceLocalUsages";
+
+
             $scope.itInterfaceOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItInterfaces?$expand=Interface,InterfaceType,ObjectOwner,BelongsTo,Organization,Tsa,ExhibitedBy($expand=ItSystem),Method,LastChangedByUser,DataRows($expand=DataType),InterfaceLocalUsages",
+                            url: itInterfaceUrl,
                             dataType: "json"
                         },
                         parameterMap: function (options, type) {
