@@ -90,10 +90,14 @@
                     $state.go('.', null, { reload: true });
                 }
 
-                // fires when kendo is finished rendering all its goodies
-                $scope.$on("kendoRendered", function () {
-                    loadGridOptions();
-                    $scope.mainGrid.dataSource.read();
+                $scope.$on("kendoWidgetCreated", function (event, widget) {
+                    // the event is emitted for every widget; if we have multiple
+                    // widgets in this controller, we need to check that the event
+                    // is for the one we're interested in.
+                    if (widget === $scope.mainGrid) {
+                        loadGridOptions();
+                        $scope.mainGrid.dataSource.read();
+                    }
                 });
 
                 // overview grid options
