@@ -23,6 +23,7 @@
                 saveGridOptions     : saveGridOptions,
                 loadGridOptions     : loadGridOptions,
                 saveGridProfile     : saveGridProfile,
+                doesGridProfileExist: doesGridProfileExist,
                 clearGridProfile    : clearGridProfile,
                 clearOptions        : clearOptions
             };
@@ -168,6 +169,12 @@
                 pickedOptions.dataSource = _.pick(options.dataSource, ['filter', 'sort']);
 
                 localStorage.setItem(profileStorageKey, JSONfn.stringify(pickedOptions));
+            }
+
+            function doesGridProfileExist() {
+                if (localStorage.getItem(profileStorageKey))
+                    return true;
+                return false;
             }
 
             function clearGridProfile() {
