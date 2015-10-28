@@ -170,8 +170,6 @@ namespace Presentation.Web
             usages.EntityType.Property(x => x.LocalSystemId);
             usages.EntityType.HasOptional(x => x.ResponsibleUsage);
             usages.EntityType.HasOptional(x => x.MainContract);
-            usages.EntityType.Property(x => x.OverviewId);
-            usages.EntityType.HasOptional(x => x.Overview);
             usages.EntityType.HasMany(x => x.Rights).IsNavigable();
             usages.EntityType.Property(x => x.EsdhRef);
             usages.EntityType.Property(x => x.CmdbRef);
@@ -277,7 +275,6 @@ namespace Presentation.Web
             sensitiveDataOption.EntityType.HasKey(x => x.Id);
             sensitiveDataOption.EntityType.Property(x => x.Name);
 
-            //builder.EntitySet<ItSystemTypeOption>("ItSystemTypeOptions");
             //builder.EntitySet<OptionExtend>("OptionExtention");
             //builder.EntitySet<OrganizationRight>("OrganizationRights");
             //builder.EntitySet<OrganizationRole>("OrganizationRoles");

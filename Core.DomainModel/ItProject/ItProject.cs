@@ -167,7 +167,7 @@ namespace Core.DomainModel.ItProject
         public DateTime? StatusDate { get; set; }
 
         /// <summary>
-        /// Notes on collected status on project    
+        /// Notes on collected status on project
         /// </summary>
         public string StatusNote { get; set; }
 
@@ -177,14 +177,14 @@ namespace Core.DomainModel.ItProject
         public ItProjectPhase Phase3 { get; set; }
         public ItProjectPhase Phase4 { get; set; }
         public ItProjectPhase Phase5 { get; set; }
-        
+
         /// <summary>
         /// The id of current selected phase
         /// </summary>
         public int CurrentPhase { get; set; }
 
         /// <summary>
-        /// The "milestones and tasks" table. 
+        /// The "milestones and tasks" table.
         /// </summary>
         public virtual ICollection<ItProjectStatus> ItProjectStatuses { get; set; }
 
