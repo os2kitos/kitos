@@ -61,7 +61,10 @@
                         var columnObj = grid.columns[columnIndex];
                         // reorder column
                         if (state.index != columnIndex) {
-                            grid.reorderColumn(state.index, columnObj);
+                            // check if index is out of bounds
+                            if (state.index < grid.columns.length) {
+                                grid.reorderColumn(state.index, columnObj);
+                            }
                         }
                         // show / hide column
                         if (state.hidden != columnObj.hidden) {
