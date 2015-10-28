@@ -114,7 +114,7 @@
                         type: "odata-v4",
                         transport: {
                             read: {
-                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,CanUseInterfaces,ItInterfaceExhibits,Parent,TaskRefs),Organization,ResponsibleUsage($expand=OrganizationUnit),Overview($expand=ItSystem),MainContract($expand=ItContract($expand=Supplier)),Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects",
+                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,Parent,TaskRefs),Organization,ResponsibleUsage($expand=OrganizationUnit),MainContract($expand=ItContract($expand=Supplier)),Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects",
                                 dataType: "json"
                             },
                             parameterMap: function (options, type) {
@@ -393,30 +393,25 @@
                             field: "", title: "IT System: Anvendes af", width: 100,
                             persistId: "sysusage", // DON'T YOU DARE RENAME!
                             template: "TODO",
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "ItSystem.ItInterfaceExhibits", title: "Snitflader: Udstilles ???", width: 95,
-                            persistId: "exhibit", // DON'T YOU DARE RENAME!
-                            template: "<a data-ng-click=\"showExposureDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.ItInterfaceExhibits.length #</a>",
-                            hidden: true,
                             filterable: false,
                             sortable: false
                         },
-                        {
-                            field: "ItSystem.CanUseInterfaces", title: "Snitflader: Anvendes ???", width: 95,
-                            persistId: "canuse", // DON'T YOU DARE RENAME!
-                            template: "<a data-ng-click=\"showUsageDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.CanUseInterfaces.length #</a>",
-                            hidden: true,
-                            filterable: false,
-                            sortable: false
-                        },
+                        //{
+                        //    field: "ItSystem.ItInterfaceExhibits", title: "Snitflader: Udstilles ???", width: 95,
+                        //    persistId: "exhibit", // DON'T YOU DARE RENAME!
+                        //    template: "<a data-ng-click=\"showExposureDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.ItInterfaceExhibits.length #</a>",
+                        //    hidden: true,
+                        //    filterable: false,
+                        //    sortable: false
+                        //},
+                        //{
+                        //    field: "ItSystem.CanUseInterfaces", title: "Snitflader: Anvendes ???", width: 95,
+                        //    persistId: "canuse", // DON'T YOU DARE RENAME!
+                        //    template: "<a data-ng-click=\"showUsageDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.CanUseInterfaces.length #</a>",
+                        //    hidden: true,
+                        //    filterable: false,
+                        //    sortable: false
+                        //},
                         {
                             field: "MainContract", title: "Kontrakt", width: 80,
                             persistId: "contract", // DON'T YOU DARE RENAME!

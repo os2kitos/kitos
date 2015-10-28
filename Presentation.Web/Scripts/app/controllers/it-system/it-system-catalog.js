@@ -353,22 +353,22 @@
                         filterable: false,
                         sortable: false
                     },
-                    {
-                        field: "", title: "Snitflader: Udstilles globalt", width: 95,
-                        persistId: "globalexpsure", // DON'T YOU DARE RENAME!
-                        template: "TODO",
-                        hidden: true,
-                        filterable: false,
-                        sortable: false
-                    },
-                    {
-                        field: "", title: "Snitflader: Anvendes globalt", width: 95,
-                        persistId: "globalusage", // DON'T YOU DARE RENAME!
-                        template: "TODO",
-                        hidden: true,
-                        filterable: false,
-                        sortable: false
-                    },
+                    //{
+                    //    field: "", title: "Snitflader: Udstilles globalt", width: 95,
+                    //    persistId: "globalexpsure", // DON'T YOU DARE RENAME!
+                    //    template: "TODO",
+                    //    hidden: true,
+                    //    filterable: false,
+                    //    sortable: false
+                    //},
+                    //{
+                    //    field: "", title: "Snitflader: Anvendes globalt", width: 95,
+                    //    persistId: "globalusage", // DON'T YOU DARE RENAME!
+                    //    template: "TODO",
+                    //    hidden: true,
+                    //    filterable: false,
+                    //    sortable: false
+                    //},
                     {
                         field: "Organization.Name", title: "Oprettet af: Organisation", width: 150,
                         persistId: "orgname", // DON'T YOU DARE RENAME!

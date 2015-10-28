@@ -212,18 +212,18 @@
                             }
                         },
                     },
-                    {
-                        field: "", title: "Snitflader: Anvendes globalt", width: 115,
-                        persistId: "infglobalusage", // DON'T YOU DARE RENAME!
-                        template: "#: InterfaceLocalUsages.length #",
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains",
-                            }
-                        },
-                    },
+                    //{ TODO
+                    //    field: "", title: "Snitflader: Anvendes globalt", width: 115,
+                    //    persistId: "infglobalusage", // DON'T YOU DARE RENAME!
+                    //    template: "#: InterfaceLocalUsages.length #",
+                    //    filterable: {
+                    //        cell: {
+                    //            dataSource: [],
+                    //            showOperators: false,
+                    //            operator: "contains",
+                    //        }
+                    //    },
+                    //},
                     {
                         field: "Tsa.Name", title: "TSA", width: 90,
                         persistId: "tsa", // DON'T YOU DARE RENAME!
@@ -433,7 +433,7 @@
                     dataSource.filter(newFilter);
                 }
 
-                // http://dojo.telerik.com/ODuDe/5
+                // advice from kendo support http://dojo.telerik.com/ODuDe/5
                 args.element.removeAttr("data-bind");
                 args.element.kendoDropDownList({
                     dataSource: [
