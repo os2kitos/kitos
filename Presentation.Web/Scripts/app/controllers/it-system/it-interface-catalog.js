@@ -18,8 +18,8 @@
 
     app.controller('system.interfaceCatalogCtrl',
     [
-        '$rootScope', '$scope', '$timeout', '$state', 'user', 'gridStateService',
-        function ($rootScope, $scope, $timeout, $state, user, gridStateService) {
+        '$rootScope', '$scope', '$timeout', '$state', 'user', 'gridStateService', 'notify',
+        function ($rootScope, $scope, $timeout, $state, user, gridStateService, notify) {
             $rootScope.page.title = 'Snitflade - Katalog';
 
             var itInterfaceBaseUrl;
@@ -74,17 +74,17 @@
                     {
                         name: "clearFilter",
                         text: "Nulstil",
-                        template: "<a class='k-button k-button-icontext' data-ng-click='clearOptions()'>#: text #</a>"
+                        template: "<button class='k-button k-button-icontext' data-ng-click='clearOptions()' title='Nulstiller tilbage til standard sortering, filter, kolonne vide og kolonne rækkefølge'>#: text #</button>"
                     },
                     {
                         name: "saveFilter",
                         text: "Gem filter",
-                        template: "<a class='k-button k-button-icontext' data-ng-click='saveGridProfile()'>#: text #</a>"
+                        template: "<button class='k-button k-button-icontext' data-ng-click='saveGridProfile()' title='Gemmer sortering og filtre'>#: text #</button>"
                     },
                     {
                         name: "deleteFilter",
                         text: "Slet filter",
-                        template: "<a class='k-button k-button-icontext' data-ng-click='clearGridProfile()'>#: text #</a>"
+                        template: "<button class='k-button k-button-icontext' data-ng-click='clearGridProfile()' data-ng-disabled='!doesGridProfileExist()'>#: text #</button>"
                     }
                 ],
                 excel: {
@@ -341,10 +341,16 @@
 
             $scope.saveGridProfile = function () {
                 gridState.saveGridProfile($scope.mainGrid);
+                notify.addSuccessMessage("Filtre og sortering gemt");
             }
 
             $scope.clearGridProfile = function () {
                 gridState.clearGridProfile($scope.mainGrid);
+                notify.addSuccessMessage("Filtre og sortering slettet");
+            }
+
+            $scope.doesGridProfileExist = function () {
+                return gridState.doesGridProfileExist();
             }
 
             $scope.$on("kendoWidgetCreated", function (event, widget) {
@@ -360,6 +366,7 @@
             // clears grid filters by removing the localStorageItem and reloading the page
             $scope.clearOptions = function () {
                 gridState.clearOptions();
+                notify.addSuccessMessage("Nulstiller tilbage til standard sortering, viste kolonner, kolonne vide og kolonne rækkefølge samt fjerner filtre");
                 // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                 reload();
             }
