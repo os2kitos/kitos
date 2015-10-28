@@ -699,3 +699,11 @@ div.searchbox-wrapper {
 .k-grid  .k-grid-header  .k-header {
     white-space: normal;
 }
+
+/*
+  Make grid content have a minimum height
+  so it shows the spinner when initially loaded
+*/
+.k-grid-content {
+    min-height: 50px!important;
+}
