@@ -242,7 +242,7 @@
                             }
                         },
                         {
-                            field: "ItSystem.Name", title: "IT System", width: 250,
+                            field: "ItSystem.Name", title: "IT System", width: 350,
                             persistId: "sysname", // DON'T YOU DARE RENAME!
                             template: "<a data-ui-sref='it-system.usage.interfaces({id: #: Id #})'>#: ItSystem.Name #</a>",
                             filterable: {
@@ -278,7 +278,7 @@
                             }
                         },
                         {
-                            field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 150,
+                            field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 250,
                             persistId: "orgunit", // DON'T YOU DARE RENAME!
                             template: "#: ResponsibleUsage ? ResponsibleUsage.OrganizationUnit.Name : '' #",
                             filterable: {
@@ -289,7 +289,7 @@
                             }
                         },
                         {
-                            field: "ItSystem.BusinessType.Name", title: "Forretningstype", width: 150,
+                            field: "ItSystem.BusinessType.Name", title: "Forretningstype", width: 200,
                             persistId: "busitype", // DON'T YOU DARE RENAME!
                             template: "#: ItSystem.BusinessType ? ItSystem.BusinessType.Name : '' #",
                             filterable: {
@@ -413,7 +413,7 @@
                         //    sortable: false
                         //},
                         {
-                            field: "MainContract", title: "Kontrakt", width: 80,
+                            field: "MainContract", title: "Kontrakt", width: 120,
                             persistId: "contract", // DON'T YOU DARE RENAME!
                             template: contractTemplate,
                             attributes: { "class": "text-center" },
@@ -426,7 +426,7 @@
                             },
                         },
                         {
-                            field: "MainContract.ItContract.Supplier.Name", title: "Leverandør", width: 150,
+                            field: "MainContract.ItContract.Supplier.Name", title: "Leverandør", width: 180,
                             persistId: "supplier", // DON'T YOU DARE RENAME!
                             template: supplierTemplate,
                             filterable: {

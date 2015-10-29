@@ -130,7 +130,7 @@
                         }
                     },
                     {
-                        field: "Name", title: "Snitflade", width: 225,
+                        field: "Name", title: "Snitflade", width: 350,
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: "<a data-ui-sref='it-system.interface-edit.interface-details({id: #: Id #})'>#: Name #</a>",
                         filterable: {
@@ -154,7 +154,7 @@
                         }
                     },
                     {
-                        field: "AccessModifier", title: "Synlighed", width: 100,
+                        field: "AccessModifier", title: "Synlighed", width: 110,
                         persistId: "accessmod", // DON'T YOU DARE RENAME!
                         filterable: {
                             cell: {
@@ -188,7 +188,7 @@
                         }
                     },
                     {
-                        field: "Url", title: "Link til yderligere beskrivelse", width: 75,
+                        field: "Url", title: "Link til yderligere beskrivelse", width: 100,
                         persistId: "link", // DON'T YOU DARE RENAME!
                         template: linkTemplate,
                         attributes: { "class": "text-center" },
@@ -201,7 +201,7 @@
                         }
                     },
                     {
-                        field: "ExhibitedBy.ItSystem.Name", title: "Udstillet af", width: 150,
+                        field: "ExhibitedBy.ItSystem.Name", title: "Udstillet af", width: 230,
                         persistId: "exhibit", // DON'T YOU DARE RENAME!
                         template: "#: ExhibitedBy ? ExhibitedBy.ItSystem.Name : '' #",
                         filterable: {
@@ -314,7 +314,7 @@
                         }
                     },
                     {
-                        field: "LastChanged", title: "Sidst redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 75,
+                        field: "LastChanged", title: "Sidst redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 100,
                         persistId: "lastchangeddate", // DON'T YOU DARE RENAME!
                         filterable: {
                             cell: {
