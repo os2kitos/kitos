@@ -74,17 +74,17 @@
                     {
                         name: "clearFilter",
                         text: "Nulstil",
-                        template: "<button class='k-button k-button-icontext' data-ng-click='clearOptions()' title='Nulstiller tilbage til standard sortering, filter, kolonne vide og kolonne rækkefølge'>#: text #</button>"
+                        template: "<button type='button' class='k-button k-button-icontext' data-ng-click='clearOptions()' title='Nulstiller tilbage til standard sortering, filter, kolonne vide og kolonne rækkefølge'>#: text #</button>"
                     },
                     {
                         name: "saveFilter",
                         text: "Gem filter",
-                        template: "<button class='k-button k-button-icontext' data-ng-click='saveGridProfile()' title='Gemmer sortering og filtre'>#: text #</button>"
+                        template: "<button type='button' class='k-button k-button-icontext' data-ng-click='saveGridProfile()' title='Gemmer sortering og filtre'>#: text #</button>"
                     },
                     {
                         name: "deleteFilter",
                         text: "Slet filter",
-                        template: "<button class='k-button k-button-icontext' data-ng-click='clearGridProfile()' data-ng-disabled='!doesGridProfileExist()'>#: text #</button>"
+                        template: "<button type='button' class='k-button k-button-icontext' data-ng-click='clearGridProfile()' data-ng-disabled='!doesGridProfileExist()'>#: text #</button>"
                     }
                 ],
                 excel: {

@@ -183,17 +183,17 @@
                     {
                         name: "clearFilter",
                         text: "Nulstil",
-                        template: "<button class='k-button k-button-icontext' data-ng-click='clearOptions()' title='Nulstiller tilbage til standard sortering, filter, kolonne vide og kolonne rækkefølge'>#: text #</button>"
+                        template: "<button type='button' class='k-button k-button-icontext' data-ng-click='clearOptions()' title='Nulstiller tilbage til standard sortering, filter, kolonne vide og kolonne rækkefølge'>#: text #</button>"
                     },
                     {
                         name: "saveFilter",
                         text: "Gem filter",
-                        template: "<button class='k-button k-button-icontext' data-ng-click='saveGridProfile()' title='Gemmer sortering og filtre'>#: text #</button>"
+                        template: "<button type='button' class='k-button k-button-icontext' data-ng-click='saveGridProfile()' title='Gemmer sortering og filtre'>#: text #</button>"
                     },
                     {
                         name: "deleteFilter",
                         text: "Slet filter",
-                        template: "<button class='k-button k-button-icontext' data-ng-click='clearGridProfile()' data-ng-disabled='!doesGridProfileExist()'>#: text #</button>"
+                        template: "<button type='button' class='k-button k-button-icontext' data-ng-click='clearGridProfile()' data-ng-disabled='!doesGridProfileExist()'>#: text #</button>"
                     }
                 ],
                 excel: {
@@ -426,9 +426,9 @@
                 var systemHasUsages = _.find(dataItem.Usages, function(d) { return d.OrganizationId == user.currentOrganizationId; });
 
                 if (systemHasUsages)
-                    return '<button class="btn btn-danger col-md-7" data-ng-click="removeUsage(' + dataItem.Id + ')">Fjern anv.</button>';
+                    return '<button type="button" class="btn btn-danger col-md-7" data-ng-click="removeUsage(' + dataItem.Id + ')">Fjern anv.</button>';
 
-                return '<button class="btn btn-success col-md-7" data-ng-click="enableUsage(' + dataItem.Id + ')">Anvend</button>';
+                return '<button type="button" class="btn btn-success col-md-7" data-ng-click="enableUsage(' + dataItem.Id + ')">Anvend</button>';
             }
 
             // adds usage at selected system within current context
