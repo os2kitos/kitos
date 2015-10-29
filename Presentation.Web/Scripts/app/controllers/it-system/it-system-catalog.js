@@ -412,6 +412,7 @@
                     {
                         field: "LastChanged", title: "Sidst redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 100,
                         persistId: "lastchangeddate", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "text-center" },
                         filterable: {
                             cell: {
                                 showOperators: false,
