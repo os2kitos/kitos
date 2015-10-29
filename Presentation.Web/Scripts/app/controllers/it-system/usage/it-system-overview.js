@@ -389,13 +389,13 @@
                                 }
                             }
                         },
-                        {
-                            field: "", title: "IT System: Anvendes af", width: 100,
-                            persistId: "sysusage", // DON'T YOU DARE RENAME!
-                            template: "TODO",
-                            filterable: false,
-                            sortable: false
-                        },
+                        //{
+                        //    field: "", title: "IT System: Anvendes af", width: 100,
+                        //    persistId: "sysusage", // DON'T YOU DARE RENAME!
+                        //    template: "TODO",
+                        //    filterable: false,
+                        //    sortable: false
+                        //},
                         //{
                         //    field: "ItSystem.ItInterfaceExhibits", title: "Snitflader: Udstilles ???", width: 95,
                         //    persistId: "exhibit", // DON'T YOU DARE RENAME!
