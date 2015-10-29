@@ -278,7 +278,7 @@
                             }
                         },
                         {
-                            field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 250,
+                            field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 245,
                             persistId: "orgunit", // DON'T YOU DARE RENAME!
                             template: "#: ResponsibleUsage ? ResponsibleUsage.OrganizationUnit.Name : '' #",
                             filterable: {
@@ -289,7 +289,7 @@
                             }
                         },
                         {
-                            field: "ItSystem.BusinessType.Name", title: "Forretningstype", width: 200,
+                            field: "ItSystem.BusinessType.Name", title: "Forretningstype", width: 195,
                             persistId: "busitype", // DON'T YOU DARE RENAME!
                             template: "#: ItSystem.BusinessType ? ItSystem.BusinessType.Name : '' #",
                             filterable: {
@@ -504,7 +504,7 @@
                             template: function (dataItem) {
                                 return roleTemplate(dataItem, role.Id);
                             },
-                            width: 150,
+                            width: 160,
                             hidden: role.Name == "Systemejer" ? false : true, // hardcoded role name :(
                             sortable: false,
                             filterable: {

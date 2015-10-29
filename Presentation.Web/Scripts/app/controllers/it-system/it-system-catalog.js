@@ -228,7 +228,7 @@
                 },
                 columns: [
                     {
-                        field: "Usages", title: "Anvend/Fjern anvendelse", width: 110,
+                        field: "Usages", title: "Anvend/Fjern anvendelse", width: 100,
                         persistId: "command", // DON'T YOU DARE RENAME!
                         template: usageButtonTemplate,
                         filterable: false,
@@ -248,7 +248,7 @@
                         }
                     },
                     {
-                        field: "Name", title: "It System", width: 280,
+                        field: "Name", title: "It System", width: 350,
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: '<a data-ui-sref="it-system.edit.interfaces({id: #: Id #})">#: Name #</a>',
                         filterable: {
@@ -262,6 +262,7 @@
                     {
                         field: "AccessModifier", title: "Synlighed", width: 110,
                         persistId: "accessmod", // DON'T YOU DARE RENAME!
+                        hidden: true,
                         filterable: {
                             cell: {
                                 showOperators: false,
@@ -270,7 +271,7 @@
                         }
                     },
                     {
-                        field: "BusinessType.Name", title: "Forretningstype", width: 150,
+                        field: "BusinessType.Name", title: "Forretningstype", width: 195,
                         persistId: "busitype", // DON'T YOU DARE RENAME!
                         template: "#: BusinessType ? BusinessType.Name : '' #",
                         filterable: {
@@ -295,7 +296,7 @@
                         }
                     },
                     {
-                        field: "BelongsTo.Name", title: "Rettighedshaver", width: 150,
+                        field: "BelongsTo.Name", title: "Rettighedshaver", width: 180,
                         persistId: "belongsto", // DON'T YOU DARE RENAME!
                         template: "#: BelongsTo ? BelongsTo.Name : '' #",
                         filterable: {
@@ -334,7 +335,7 @@
                         sortable: false
                     },
                     {
-                        field: "Url", title: "Link til yderligere beskrivelse", width: 100,
+                        field: "Url", title: "Link til beskrivelse", width: 75,
                         persistId: "link", // DON'T YOU DARE RENAME!
                         template: linkTemplate,
                         attributes: { "class": "text-center" },
