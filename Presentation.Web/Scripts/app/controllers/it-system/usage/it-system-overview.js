@@ -416,6 +416,7 @@
                             field: "MainContract", title: "Kontrakt", width: 80,
                             persistId: "contract", // DON'T YOU DARE RENAME!
                             template: contractTemplate,
+                            attributes: { "class": "text-center" },
                             sortable: false,
                             filterable: {
                                 cell: {
