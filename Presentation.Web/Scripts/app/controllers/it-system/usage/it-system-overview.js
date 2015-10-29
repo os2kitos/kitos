@@ -316,7 +316,8 @@
                         {
                             field: "ItSystem.TaskKey", title: "KLE ID", width: 150,
                             persistId: "taskkey", // DON'T YOU DARE RENAME!
-                            template: "#: ItSystem.TaskRefs.length > 0 ? _.pluck(ItSystem.TaskRefs.slice(0,4), 'TaskKey').join(', ') : '' ##: ItSystem.TaskRefs.length > 5 ? ', ...' : '' #",
+                            template: "#: ItSystem.TaskRefs.length > 0 ? _.pluck(ItSystem.TaskRefs, 'TaskKey').join(', ') : '' #",
+                            attributes: { "class": "might-overflow" },
                             hidden: true,
                             filterable: {
                                 cell: {

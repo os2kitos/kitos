@@ -310,7 +310,8 @@
                     {
                         field: "TaskKey", title: "KLE ID", width: 150,
                         persistId: "taskkey", // DON'T YOU DARE RENAME!
-                        template: "#: TaskRefs.length > 0 ? _.pluck(TaskRefs.slice(0,4), 'TaskKey').join(', ') : '' ##: TaskRefs.length > 5 ? ', ...' : '' #",
+                        template: "#: TaskRefs.length > 0 ? _.pluck(TaskRefs, 'TaskKey').join(', ') : '' #",
+                        attributes: { "class": "might-overflow" },
                         hidden: true,
                         filterable: {
                             cell: {
@@ -324,7 +325,8 @@
                     {
                         field: "TaskName", title: "KLE Navn", width: 155,
                         persistId: "taskname", // DON'T YOU DARE RENAME!
-                        template: "#: TaskRefs.length > 0 ? _.pluck(TaskRefs.slice(0,4), 'Description').join(', ') : '' ##: TaskRefs.length > 5 ? ', ...' : '' #",
+                        template: "#: TaskRefs.length > 0 ? _.pluck(TaskRefs, 'Description').join(', ') : '' #",
+                        attributes: { "class": "might-overflow" },
                         filterable: {
                             cell: {
                                 dataSource: [],
