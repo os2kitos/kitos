@@ -1,1 +1,1 @@
-node_modules\.bin\eslint %ESLINT_DIR%/**/*.js
+node_modules\.bin\eslint %ESLINT_DIR%\**\*.js
