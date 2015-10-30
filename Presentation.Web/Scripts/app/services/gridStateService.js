@@ -20,12 +20,14 @@
 
             var profileStorageKey = storageKey + "-profile";
             var service = {
-                saveGridOptions     : saveGridOptions,
-                loadGridOptions     : loadGridOptions,
-                saveGridProfile     : saveGridProfile,
-                doesGridProfileExist: doesGridProfileExist,
-                clearGridProfile    : clearGridProfile,
-                clearOptions        : clearOptions
+                saveGridOptions         : saveGridOptions,
+                loadGridOptions         : loadGridOptions,
+                saveGridProfile         : saveGridProfile,
+                loadGridProfile         : loadGridProfile,
+                doesGridProfileExist    : doesGridProfileExist,
+                removeProfile           : removeProfile,
+                removeLocal             : removeLocal,
+                removeSession           : removeSession
             };
             return service;
 
@@ -41,7 +43,7 @@
                 });
             }
 
-            // loads kendo grid options from localstorage
+            // loads kendo grid options from localStorage
             function loadGridOptions(grid, initialFilter) {
                 var gridId = grid.element[0].id;
                 var storedState = getStoredOptions();
@@ -171,20 +173,29 @@
                 localStorage.setItem(profileStorageKey, JSONfn.stringify(pickedOptions));
             }
 
+            function loadGridProfile(grid) {
+                removeSession();
+                var storedState = getStoredOptions();
+                var gridOptions = _.omit(storedState, "columnState");
+                grid.setOptions(gridOptions);
+            }
+
             function doesGridProfileExist() {
                 if (localStorage.getItem(profileStorageKey))
                     return true;
                 return false;
             }
 
-            function clearGridProfile() {
-                localStorage.removeItem(profileStorageKey);
+            function removeSession() {
+                sessionStorage.removeItem(storageKey);
             }
 
-            // clears grid options
-            function clearOptions() {
+            function removeLocal() {
                 localStorage.removeItem(storageKey);
-                sessionStorage.removeItem(storageKey);
+            }
+
+            function removeProfile() {
+                localStorage.removeItem(profileStorageKey);
             }
         }
     }

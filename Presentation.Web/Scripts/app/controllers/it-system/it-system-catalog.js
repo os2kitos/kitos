@@ -50,7 +50,7 @@
             }
 
             $scope.clearGridProfile = function () {
-                gridState.clearGridProfile($scope.mainGrid);
+                gridState.removeProfile();
                 notify.addSuccessMessage("Filtre og sortering slettet");
             }
 
@@ -80,7 +80,8 @@
 
             // clears grid filters by removing the localStorageItem and reloading the page
             $scope.clearOptions = function () {
-                gridState.clearOptions();
+                gridState.removeLocal();
+                gridState.removeSession();
                 notify.addSuccessMessage("Nulstiller tilbage til standard sortering, viste kolonner, kolonne vide og kolonne rækkefølge samt fjerner filtre");
                 // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                 reload();

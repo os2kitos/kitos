@@ -69,15 +69,38 @@
                     gridState.loadGridOptions($scope.mainGrid, filter);
                 }
 
-                $scope.saveGridProfile = function() {
+                $scope.saveGridProfile = function () {
+                    // the stored org unit id must be the current
+                    var currentOrgUnitId = getStoredOrgUnitId();
+                    localStorage.setItem(orgUnitStorageKey + "-profile", currentOrgUnitId);
+
                     gridState.saveGridProfile($scope.mainGrid);
                     notify.addSuccessMessage("Filtre og sortering gemt");
                 }
 
+                $scope.loadGridProfile = function () {
+                    gridState.loadGridProfile($scope.mainGrid);
+
+                    var orgUnitId = localStorage.getItem(orgUnitStorageKey + "-profile");
+                    // update session
+                    sessionStorage.setItem(orgUnitStorageKey, orgUnitId);
+                    // find the org unit filter row section
+                    var orgUnitFilterRow = $(".k-filter-row [data-field='ResponsibleUsage.OrganizationUnit.Name']");
+                    // find the access modifier kendo widget
+                    var orgUnitFilterWidget = orgUnitFilterRow.find("input").data("kendoDropDownList");
+                    orgUnitFilterWidget.select(function (dataItem) {
+                        return dataItem.Id == orgUnitId;
+                    });
+
+                    $scope.mainGrid.dataSource.read();
+                }
+
                 $scope.clearGridProfile = function () {
                     sessionStorage.removeItem(orgUnitStorageKey);
-                    gridState.clearGridProfile($scope.mainGrid);
+                    gridState.removeProfile();
+                    gridState.removeSession();
                     notify.addSuccessMessage("Filtre og sortering slettet");
+                    reload();
                 }
 
                 $scope.doesGridProfileExist = function() {
@@ -86,8 +109,11 @@
 
                 // clears grid filters by removing the localStorageItem and reloading the page
                 $scope.clearOptions = function () {
+                    localStorage.removeItem(orgUnitStorageKey + "-profile");
                     sessionStorage.removeItem(orgUnitStorageKey);
-                    gridState.clearOptions();
+                    gridState.removeProfile();
+                    gridState.removeLocal();
+                    gridState.removeSession();
                     notify.addSuccessMessage("Nulstiller tilbage til standard sortering, viste kolonner, kolonne vide og kolonne rækkefølge samt fjerner filtre");
                     // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                     reload();
@@ -173,8 +199,7 @@
                         },
                         {
                             name: "saveFilter",
-                            text: "Gem filter",
-                            template: "<button type='button' class='k-button k-button-icontext' data-ng-click='saveGridProfile()' title='Gemmer sortering og filtre'>#: text #</button>"
+                            template: kendo.template($("#save-profile-btn").html())
                         },
                         {
                             name: "deleteFilter",
@@ -710,7 +735,7 @@
                             dataSource.filter(getFilterWithOrgUnit(currentFilter, selectedId, childIds));
                         } else {
                             // else clear filter because the 0th element should act like a placeholder
-                            dataSource.filter(getFilterWithOrgUnit());
+                            dataSource.filter(getFilterWithOrgUnit(currentFilter));
                         }
                     }
 
