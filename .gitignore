@@ -24,6 +24,9 @@ results.xml
 # Coverage report
 coverage/
 
+# npm packages
+node_modules/
+
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*

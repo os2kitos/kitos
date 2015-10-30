@@ -1,0 +1,25 @@
+{
+  "name": "kitos",
+  "version": "1.0.0",
+  "description": "The OS2KITOS was programmed by IT Minds ApS (http://it-minds.dk)\r for OS2 - Offentligt digitaliseringsf�llesskab (http://os2web.dk).",
+  "main": "Presentation.Web\\Scripts\\app\\app.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/os2kitos/kitos.git"
+  },
+  "author": "IT Minds",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/os2kitos/kitos/issues"
+  },
+  "homepage": "https://github.com/os2kitos/kitos#readme",
+  "dependencies": {
+    "eslint": "^1.7.3"
+  }
+}
