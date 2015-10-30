@@ -130,7 +130,7 @@
                         }
                     },
                     {
-                        field: "Name", title: "Snitflade", width: 350,
+                        field: "Name", title: "Snitflade", width: 310,
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: "<a data-ui-sref='it-system.interface-edit.interface-details({id: #: Id #})'>#: Name #</a>",
                         filterable: {
@@ -188,7 +188,7 @@
                         }
                     },
                     {
-                        field: "Url", title: "Link til yderligere beskrivelse", width: 100,
+                        field: "Url", title: "Link til beskrivelse", width: 110,
                         persistId: "link", // DON'T YOU DARE RENAME!
                         template: linkTemplate,
                         attributes: { "class": "text-center" },
@@ -314,8 +314,9 @@
                         }
                     },
                     {
-                        field: "LastChanged", title: "Sidst redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 100,
+                        field: "LastChanged", title: "Sidst redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 130,
                         persistId: "lastchangeddate", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "text-center" },
                         filterable: {
                             cell: {
                                 showOperators: false,

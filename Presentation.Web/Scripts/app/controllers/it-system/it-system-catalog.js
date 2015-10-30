@@ -249,7 +249,7 @@
                         }
                     },
                     {
-                        field: "Name", title: "It System", width: 350,
+                        field: "Name", title: "It System", width: 300,
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: '<a data-ui-sref="it-system.edit.interfaces({id: #: Id #})">#: Name #</a>',
                         filterable: {
@@ -272,9 +272,10 @@
                         }
                     },
                     {
-                        field: "BusinessType.Name", title: "Forretningstype", width: 195,
+                        field: "BusinessType.Name", title: "Forretningstype", width: 150,
                         persistId: "busitype", // DON'T YOU DARE RENAME!
                         template: "#: BusinessType ? BusinessType.Name : '' #",
+                        attributes: { "class": "might-overflow" },
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -297,7 +298,7 @@
                         }
                     },
                     {
-                        field: "BelongsTo.Name", title: "Rettighedshaver", width: 180,
+                        field: "BelongsTo.Name", title: "Rettighedshaver", width: 210,
                         persistId: "belongsto", // DON'T YOU DARE RENAME!
                         template: "#: BelongsTo ? BelongsTo.Name : '' #",
                         filterable: {
@@ -338,7 +339,7 @@
                         sortable: false
                     },
                     {
-                        field: "Url", title: "Link til beskrivelse", width: 75,
+                        field: "Url", title: "Link til beskrivelse", width: 110,
                         persistId: "link", // DON'T YOU DARE RENAME!
                         template: linkTemplate,
                         attributes: { "class": "text-center" },
@@ -413,7 +414,7 @@
                         }
                     },
                     {
-                        field: "LastChanged", title: "Sidst redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 100,
+                        field: "LastChanged", title: "Sidst redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 130,
                         persistId: "lastchangeddate", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
                         filterable: {

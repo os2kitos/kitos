@@ -267,7 +267,7 @@
                             }
                         },
                         {
-                            field: "ItSystem.Name", title: "IT System", width: 350,
+                            field: "ItSystem.Name", title: "IT System", width: 320,
                             persistId: "sysname", // DON'T YOU DARE RENAME!
                             template: "<a data-ui-sref='it-system.usage.interfaces({id: #: Id #})'>#: ItSystem.Name #</a>",
                             filterable: {
@@ -314,9 +314,10 @@
                             }
                         },
                         {
-                            field: "ItSystem.BusinessType.Name", title: "Forretningstype", width: 195,
+                            field: "ItSystem.BusinessType.Name", title: "Forretningstype", width: 150,
                             persistId: "busitype", // DON'T YOU DARE RENAME!
                             template: "#: ItSystem.BusinessType ? ItSystem.BusinessType.Name : '' #",
+                            attributes: { "class": "might-overflow" },
                             filterable: {
                                 cell: {
                                     dataSource: [],
@@ -452,7 +453,7 @@
                             },
                         },
                         {
-                            field: "MainContract.ItContract.Supplier.Name", title: "Leverandør", width: 180,
+                            field: "MainContract.ItContract.Supplier.Name", title: "Leverandør", width: 210,
                             persistId: "supplier", // DON'T YOU DARE RENAME!
                             template: supplierTemplate,
                             filterable: {
@@ -530,7 +531,7 @@
                             template: function (dataItem) {
                                 return roleTemplate(dataItem, role.Id);
                             },
-                            width: 160,
+                            width: 205,
                             hidden: role.Name == "Systemejer" ? false : true, // hardcoded role name :(
                             sortable: false,
                             filterable: {
