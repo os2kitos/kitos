@@ -237,6 +237,7 @@
                     columnHide: saveGridOptions,
                     columnShow: saveGridOptions,
                     columnReorder: saveGridOptions,
+                    excelExport: exportToExcel,
                     error: function(e) {
                         console.log(e);
                     },
@@ -832,6 +833,33 @@
                         $scope.mainGrid.showColumn(gridFieldName);
                     }
                 };
+
+                var exportFlag = false;
+                function exportToExcel(e) {
+                    var columns = e.sender.columns;
+
+                    if (!exportFlag) {
+                        e.preventDefault();
+                        _.forEach(columns, function (column) {
+                            if (column.hidden) {
+                                column.tempVisual = true;
+                                e.sender.showColumn(column);
+                            }
+                        });
+                        $timeout(function () {
+                            exportFlag = true;
+                            e.sender.saveAsExcel();
+                        });
+                    } else {
+                        exportFlag = false;
+                        _.forEach(columns, function (column) {
+                            if (column.tempVisual) {
+                                delete column.tempVisual;
+                                e.sender.hideColumn(column);
+                            }
+                        });
+                    }
+                }
             }
         ]
     );

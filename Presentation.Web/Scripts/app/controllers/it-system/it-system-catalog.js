@@ -146,6 +146,32 @@
 
             var itSystemUrl = itSystemBaseUrl + "?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser";
 
+            var exportFlag = false;
+            function exportToExcel(e) {
+                var columns = e.sender.columns;
+
+                if (!exportFlag) {
+                    e.preventDefault();
+                    _.forEach(columns, function (column) {
+                        if (column.hidden) {
+                            column.tempVisual = true;
+                            e.sender.showColumn(column);
+                        }
+                    });
+                    $timeout(function () {
+                        exportFlag = true;
+                        e.sender.saveAsExcel();
+                    });
+                } else {
+                    exportFlag = false;
+                    _.forEach(columns, function (column) {
+                        if (column.tempVisual) {
+                            delete column.tempVisual;
+                            e.sender.hideColumn(column);
+                        }
+                    });
+                }
+            }
 
             // catalog grid
             $scope.itSystemCatalogueGrid = {
@@ -204,7 +230,7 @@
                     }
                 ],
                 excel: {
-                    fileName: "Snitflade Katalog.xlsx",
+                    fileName: "IT System Katalog.xlsx",
                     filterable: true,
                     allPages: true
                 },
@@ -230,6 +256,7 @@
                 columnHide: saveGridOptions,
                 columnShow: saveGridOptions,
                 columnReorder: saveGridOptions,
+                excelExport: exportToExcel,
                 error: function(e) {
                     console.log(e);
                 },

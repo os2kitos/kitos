@@ -87,7 +87,7 @@
                     }
                 ],
                 excel: {
-                    fileName: "IT System Katalog.xlsx",
+                    fileName: "Snitflade Katalog.xlsx",
                     filterable: true,
                     allPages: true
                 },
@@ -113,6 +113,7 @@
                 columnHide: saveGridOptions,
                 columnShow: saveGridOptions,
                 columnReorder: saveGridOptions,
+                excelExport: exportToExcel,
                 error: function (e) {
                     console.log(e);
                 },
@@ -455,6 +456,33 @@
                     dataBound: setSelected,
                     change: applyFilter
                 });
+            }
+
+            var exportFlag = false;
+            function exportToExcel(e) {
+                var columns = e.sender.columns;
+
+                if (!exportFlag) {
+                    e.preventDefault();
+                    _.forEach(columns, function (column) {
+                        if (column.hidden) {
+                            column.tempVisual = true;
+                            e.sender.showColumn(column);
+                        }
+                    });
+                    $timeout(function () {
+                        exportFlag = true;
+                        e.sender.saveAsExcel();
+                    });
+                } else {
+                    exportFlag = false;
+                    _.forEach(columns, function (column) {
+                        if (column.tempVisual) {
+                            delete column.tempVisual;
+                            e.sender.hideColumn(column);
+                        }
+                    });
+                }
             }
         }
     ]);
