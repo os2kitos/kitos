@@ -69,16 +69,16 @@
                     gridState.loadGridOptions($scope.mainGrid, filter);
                 }
 
-                $scope.saveGridProfile = function () {
+                $scope.saveGridProfile = function() {
                     // the stored org unit id must be the current
                     var currentOrgUnitId = getStoredOrgUnitId();
                     localStorage.setItem(orgUnitStorageKey + "-profile", currentOrgUnitId);
 
                     gridState.saveGridProfile($scope.mainGrid);
                     notify.addSuccessMessage("Filtre og sortering gemt");
-                }
+                };
 
-                $scope.loadGridProfile = function () {
+                $scope.loadGridProfile = function() {
                     gridState.loadGridProfile($scope.mainGrid);
 
                     var orgUnitId = localStorage.getItem(orgUnitStorageKey + "-profile");
@@ -88,27 +88,27 @@
                     var orgUnitFilterRow = $(".k-filter-row [data-field='ResponsibleUsage.OrganizationUnit.Name']");
                     // find the access modifier kendo widget
                     var orgUnitFilterWidget = orgUnitFilterRow.find("input").data("kendoDropDownList");
-                    orgUnitFilterWidget.select(function (dataItem) {
+                    orgUnitFilterWidget.select(function(dataItem) {
                         return dataItem.Id == orgUnitId;
                     });
 
                     $scope.mainGrid.dataSource.read();
-                }
+                };
 
-                $scope.clearGridProfile = function () {
+                $scope.clearGridProfile = function() {
                     sessionStorage.removeItem(orgUnitStorageKey);
                     gridState.removeProfile();
                     gridState.removeSession();
                     notify.addSuccessMessage("Filtre og sortering slettet");
                     reload();
-                }
+                };
 
                 $scope.doesGridProfileExist = function() {
                     return gridState.doesGridProfileExist();
-                }
+                };
 
                 // clears grid filters by removing the localStorageItem and reloading the page
-                $scope.clearOptions = function () {
+                $scope.clearOptions = function() {
                     localStorage.removeItem(orgUnitStorageKey + "-profile");
                     sessionStorage.removeItem(orgUnitStorageKey);
                     gridState.removeProfile();
@@ -117,7 +117,7 @@
                     notify.addSuccessMessage("Nulstiller tilbage til standard sortering, viste kolonner, kolonne vide og kolonne rækkefølge samt fjerner filtre");
                     // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                     reload();
-                }
+                };
 
                 function reload() {
                     $state.go('.', null, { reload: true });

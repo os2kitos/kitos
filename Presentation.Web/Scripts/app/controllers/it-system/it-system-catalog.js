@@ -29,7 +29,7 @@
                         .find('tbody')
                         .append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data text-muted">System anvendens ikke</td></tr>');
                 }
-            };
+            }
 
             var storageKey = "it-system-catalog-options";
             var gridState = gridStateService.getService(storageKey);
@@ -44,19 +44,26 @@
                 gridState.loadGridOptions($scope.mainGrid);
             }
 
-            $scope.saveGridProfile = function () {
+            $scope.saveGridProfile = function() {
                 gridState.saveGridProfile($scope.mainGrid);
                 notify.addSuccessMessage("Filtre og sortering gemt");
-            }
+            };
 
-            $scope.clearGridProfile = function () {
+            $scope.loadGridProfile = function () {
+                gridState.loadGridProfile($scope.mainGrid);
+                $scope.mainGrid.dataSource.read();
+            };
+
+            $scope.clearGridProfile = function() {
                 gridState.removeProfile();
+                gridState.removeSession();
                 notify.addSuccessMessage("Filtre og sortering slettet");
-            }
+                reload();
+            };
 
-            $scope.doesGridProfileExist = function () {
+            $scope.doesGridProfileExist = function() {
                 return gridState.doesGridProfileExist();
-            }
+            };
 
             $scope.$on("kendoWidgetCreated", function (event, widget) {
                 // the event is emitted for every widget; if we have multiple
@@ -79,27 +86,27 @@
             });
 
             // clears grid filters by removing the localStorageItem and reloading the page
-            $scope.clearOptions = function () {
+            $scope.clearOptions = function() {
                 gridState.removeLocal();
                 gridState.removeSession();
                 notify.addSuccessMessage("Nulstiller tilbage til standard sortering, viste kolonner, kolonne vide og kolonne rækkefølge samt fjerner filtre");
                 // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                 reload();
-            }
+            };
 
             function reload() {
                 $state.go('.', null, { reload: true });
             }
 
             // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
-            $scope.showUsageDetails = function (usageId, systemName) {
+            $scope.showUsageDetails = function(usageId, systemName) {
                 //Filter by usageId
                 usageDetailDataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
                 //Set modal title
                 $scope.modal.setOptions({ title: "Anvendelse af " + systemName });
                 //Open modal
                 $scope.modal.center().open();
-            }
+            };
 
             var usageDetailDataSource = new kendo.data.DataSource({
                 type: "odata-v4",
@@ -188,8 +195,7 @@
                     },
                     {
                         name: "saveFilter",
-                        text: "Gem filter",
-                        template: "<button type='button' class='k-button k-button-icontext' data-ng-click='saveGridProfile()' title='Gemmer sortering og filtre'>#: text #</button>"
+                        template: kendo.template($("#save-profile-btn").html())
                     },
                     {
                         name: "deleteFilter",

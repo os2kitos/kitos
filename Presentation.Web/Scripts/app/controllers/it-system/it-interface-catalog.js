@@ -78,8 +78,7 @@
                     },
                     {
                         name: "saveFilter",
-                        text: "Gem filter",
-                        template: "<button type='button' class='k-button k-button-icontext' data-ng-click='saveGridProfile()' title='Gemmer sortering og filtre'>#: text #</button>"
+                        template: kendo.template($("#save-profile-btn").html())
                     },
                     {
                         name: "deleteFilter",
@@ -340,19 +339,26 @@
                 gridState.loadGridOptions($scope.mainGrid);
             }
 
-            $scope.saveGridProfile = function () {
+            $scope.saveGridProfile = function() {
                 gridState.saveGridProfile($scope.mainGrid);
                 notify.addSuccessMessage("Filtre og sortering gemt");
-            }
+            };
 
-            $scope.clearGridProfile = function () {
+            $scope.loadGridProfile = function() {
+                gridState.loadGridProfile($scope.mainGrid);
+                $scope.mainGrid.dataSource.read();
+            };
+
+            $scope.clearGridProfile = function() {
                 gridState.removeProfile();
+                gridState.removeSession();
                 notify.addSuccessMessage("Filtre og sortering slettet");
-            }
+                reload();
+            };
 
-            $scope.doesGridProfileExist = function () {
+            $scope.doesGridProfileExist = function() {
                 return gridState.doesGridProfileExist();
-            }
+            };
 
             $scope.$on("kendoWidgetCreated", function (event, widget) {
                 // the event is emitted for every widget; if we have multiple
