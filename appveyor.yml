@@ -11,7 +11,7 @@ environment:
   ESLINT_DIR: Presentation.Web\Scripts\app
 install:
   - ps: install-Product node
-  - npm: install
+  - npm install
 # before_build:
 # - nuget restore -verbosity quiet
 test_script:
