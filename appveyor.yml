@@ -18,7 +18,7 @@ test_script:
 # - run-coverage.bat
 # - post-coverage.bat
 - run-eslint.bat
-# build:
+build: off
   # project: KITOS.sln
   # verbosity: minimal
 # artifacts:
