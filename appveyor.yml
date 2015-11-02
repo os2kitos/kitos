@@ -15,9 +15,9 @@ install:
 before_build:
 - nuget restore #-verbosity quiet
 cache:
-  - node_modules -> package.json # cache node packages if package.json is the same
-  - packages -> **\packages.config # cache NuGet packages if packages.config is the same
-  - C:\Users\appveyor\ApPData\Local\NuGet\Cache -> **\packages.config # cache NuGet packages if packages.config is the same
+- node_modules #-> package.json # cache node packages if package.json is the same
+- packages #-> **\packages.config # cache NuGet packages if packages.config is the same
+- C:\Users\appveyor\ApPData\Local\NuGet\Cache #-> **\packages.config # cache NuGet packages if packages.config is the same
 test_script:
 - run-coverage.bat
 - post-coverage.bat
