@@ -178,6 +178,7 @@
                     {
                         field: "BelongsTo.Name", title: "Rettighedshaver", width: 150,
                         persistId: "belongs", // DON'T YOU DARE RENAME!
+                        template: "#: BelongsTo ? BelongsTo.Name : '' #",
                         hidden: true,
                         filterable: {
                             cell: {
