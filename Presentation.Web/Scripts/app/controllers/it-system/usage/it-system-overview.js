@@ -62,7 +62,7 @@
 
                     var filter = undefined;
                     // if selected is a root then no need to filter as it should display everything anyway
-                    if (selectedOrgUnit.$level != 0) {
+                    if (selectedOrgUnit && selectedOrgUnit.$level != 0) {
                         filter = getFilterWithOrgUnit({}, selectedOrgUnitId, selectedOrgUnit.childIds);
                     }
 
