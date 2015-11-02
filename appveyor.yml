@@ -1,30 +1,30 @@
 version: 1.0.{build}
 environment:
-  TEST_ASSEMBLIES: Tests.Unit.Presentation.Web\bin\Debug\Tests.Unit.Presentation.Web.dll
-  COVERAGE_FILTER_CORE_APPLICATIONSERVICES: +[Core.ApplicationServices]*
-  COVERAGE_FILTER_CORE_DOMAINMODEL: +[Core.DomainModel]*
-  COVERAGE_FILTER_CORE_DOMAINSERVICES: +[Core.DomainServices]*
-  COVERAGE_FILTER_INFRASTRUCTURE_DATAACCESS: +[Infrastructure.DataAccess]*
-  COVERAGE_FILTER_INFRASTRUCTURE_OPENXML: +[Infrastructure.OpenXML]*
-  COVERAGE_FILTER_PRESENTATION_WEB: +[Presentation.Web]*
-  COVERAGE_EXCL_FILTER_PRESENTATION_WEB: -[Presentation.Web]Presentation.Web.App_Start* -[Presentation.Web]Presentation.Web.AuthConfig -[Presentation.Web]Presentation.Web.BundleConfig -[Presentation.Web]Presentation.Web.DropdownProfile -[Presentation.Web]Presentation.Web.FilterConfig -[Presentation.Web]Presentation.Web.Infrastructure.NinjectDependencyResolver -[Presentation.Web]Presentation.Web.Infrastructure.NinjectDependencyScope -[Presentation.Web]Presentation.Web.Infrastructure.UserRepositoryFactory -[Presentation.Web]Presentation.Web.Infrastructure.ProviderInitializationHttpModule -[Presentation.Web]Presentation.Web.MappingProfile -[Presentation.Web]Presentation.Web.MappingConfig -[Presentation.Web]Presentation.Web.Models* -[Presentation.Web]Presentation.Web.MvcApplication -[Presentation.Web]Presentation.Web.Properties.Settings -[Presentation.Web]Presentation.Web.RouteConfig -[Presentation.Web]Presentation.Web.Startup -[Presentation.Web]Presentation.Web.WebApiConfig
+  # TEST_ASSEMBLIES: Tests.Unit.Presentation.Web\bin\Debug\Tests.Unit.Presentation.Web.dll
+  # COVERAGE_FILTER_CORE_APPLICATIONSERVICES: +[Core.ApplicationServices]*
+  # COVERAGE_FILTER_CORE_DOMAINMODEL: +[Core.DomainModel]*
+  # COVERAGE_FILTER_CORE_DOMAINSERVICES: +[Core.DomainServices]*
+  # COVERAGE_FILTER_INFRASTRUCTURE_DATAACCESS: +[Infrastructure.DataAccess]*
+  # COVERAGE_FILTER_INFRASTRUCTURE_OPENXML: +[Infrastructure.OpenXML]*
+  # COVERAGE_FILTER_PRESENTATION_WEB: +[Presentation.Web]*
+  # COVERAGE_EXCL_FILTER_PRESENTATION_WEB: -[Presentation.Web]Presentation.Web.App_Start* -[Presentation.Web]Presentation.Web.AuthConfig -[Presentation.Web]Presentation.Web.BundleConfig -[Presentation.Web]Presentation.Web.DropdownProfile -[Presentation.Web]Presentation.Web.FilterConfig -[Presentation.Web]Presentation.Web.Infrastructure.NinjectDependencyResolver -[Presentation.Web]Presentation.Web.Infrastructure.NinjectDependencyScope -[Presentation.Web]Presentation.Web.Infrastructure.UserRepositoryFactory -[Presentation.Web]Presentation.Web.Infrastructure.ProviderInitializationHttpModule -[Presentation.Web]Presentation.Web.MappingProfile -[Presentation.Web]Presentation.Web.MappingConfig -[Presentation.Web]Presentation.Web.Models* -[Presentation.Web]Presentation.Web.MvcApplication -[Presentation.Web]Presentation.Web.Properties.Settings -[Presentation.Web]Presentation.Web.RouteConfig -[Presentation.Web]Presentation.Web.Startup -[Presentation.Web]Presentation.Web.WebApiConfig
   ESLINT_DIR: Presentation.Web\Scripts\app
 install:
   - ps: install-Product node
   - npm: install
-before_build:
-- nuget restore -verbosity quiet
+# before_build:
+# - nuget restore -verbosity quiet
 test_script:
-- run-coverage.bat
-- post-coverage.bat
+# - run-coverage.bat
+# - post-coverage.bat
 - run-eslint.bat
-build:
-  project: KITOS.sln
-  verbosity: minimal
+# build:
+  # project: KITOS.sln
+  # verbosity: minimal
 artifacts:
 # Coverage
-- path: coverage
-  name: Coverage Report
-- path: results.xml
-  name: OpenCover results
+# - path: coverage
+  # name: Coverage Report
+# - path: results.xml
+  # name: OpenCover results
   
