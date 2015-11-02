@@ -21,7 +21,7 @@ test_script:
 # build:
   # project: KITOS.sln
   # verbosity: minimal
-artifacts:
+# artifacts:
 # Coverage
 # - path: coverage
   # name: Coverage Report
