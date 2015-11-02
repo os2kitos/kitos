@@ -195,7 +195,7 @@
                         {
                             name: "clearFilter",
                             text: "Nulstil",
-                            template: "<button type='button' class='k-button k-button-icontext' data-ng-click='clearOptions()' title='Nulstiller tilbage til standard sortering, filter, kolonne vide og kolonne rækkefølge'>#: text #</button>"
+                            template: "<button type='button' class='k-button k-button-icontext' data-ng-click='clearOptions()'>#: text #</button>"
                         },
                         {
                             name: "saveFilter",
