@@ -114,7 +114,7 @@
                     gridState.removeProfile();
                     gridState.removeLocal();
                     gridState.removeSession();
-                    notify.addSuccessMessage("Nulstiller tilbage til standard sortering, viste kolonner, kolonne vide og kolonne rækkefølge samt fjerner filtre");
+                    notify.addSuccessMessage("Nulstil filter ’Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge’");
                     // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                     reload();
                 };
