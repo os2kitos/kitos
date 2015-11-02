@@ -9,6 +9,7 @@ environment:
   COVERAGE_FILTER_PRESENTATION_WEB: +[Presentation.Web]*
   COVERAGE_EXCL_FILTER_PRESENTATION_WEB: -[Presentation.Web]Presentation.Web.App_Start* -[Presentation.Web]Presentation.Web.AuthConfig -[Presentation.Web]Presentation.Web.BundleConfig -[Presentation.Web]Presentation.Web.DropdownProfile -[Presentation.Web]Presentation.Web.FilterConfig -[Presentation.Web]Presentation.Web.Infrastructure.NinjectDependencyResolver -[Presentation.Web]Presentation.Web.Infrastructure.NinjectDependencyScope -[Presentation.Web]Presentation.Web.Infrastructure.UserRepositoryFactory -[Presentation.Web]Presentation.Web.Infrastructure.ProviderInitializationHttpModule -[Presentation.Web]Presentation.Web.MappingProfile -[Presentation.Web]Presentation.Web.MappingConfig -[Presentation.Web]Presentation.Web.Models* -[Presentation.Web]Presentation.Web.MvcApplication -[Presentation.Web]Presentation.Web.Properties.Settings -[Presentation.Web]Presentation.Web.RouteConfig -[Presentation.Web]Presentation.Web.Startup -[Presentation.Web]Presentation.Web.WebApiConfig
   ESLINT_DIR: Presentation.Web\Scripts\app
+  TSLINT_DIR: Presentation.Web\Scripts\app
 install:
   - ps: install-Product node
   - npm install
@@ -28,6 +29,7 @@ test_script:
 - run-coverage.bat
 - post-coverage.bat
 - run-eslint.bat
+- run-tslint.bat
 build:
   project: KITOS.sln
   verbosity: minimal

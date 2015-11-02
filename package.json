@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/os2kitos/kitos#readme",
   "dependencies": {
-    "eslint": "^1.7.3"
+    "eslint": "^1.7.3",
+    "tslint": "^2.5.1"
   }
 }
