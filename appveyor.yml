@@ -16,9 +16,9 @@ install:
   - npm config set loglevel warn
   - npm install
 before_build:
-- nuget restore %APPVEYOR_BUILD_FOLDER%\KITOS.sln #-verbosity quiet
+- nuget restore %APPVEYOR_BUILD_FOLDER%\KITOS.sln -verbosity quiet
 cache:
-  - node_modules #-> package.json # cache node packages if package.json is the same
+  - node_modules -> package.json # cache node packages if package.json is the same
   - packages\angularjs.1.4.4 -> **\packages.config
   - packages\AutoMapper.3.3.1 -> **\packages.config
   - packages\coveralls.io.1.3.4 -> **\packages.config
