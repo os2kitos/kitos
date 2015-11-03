@@ -684,6 +684,7 @@
     <Content Include="Global.asax" />
     <Content Include="Images\excel.png" />
     <Content Include="Images\logo.png" />
+    <Content Include="karma.conf.js" />
     <Content Include="Partials\directives\add-user-button.html" />
     <Content Include="Partials\directives\add-user-modal.html" />
     <Content Include="Partials\directives\kle-filter.html" />
@@ -831,6 +832,7 @@
     <Content Include="Scripts\app\controllers\global-admin\global-admin-subnav.js" />
     <Content Include="Scripts\app\controllers\global-config\global-config.js" />
     <Content Include="Scripts\app\controllers\home\edit-user.js" />
+    <Content Include="Scripts\app\controllers\home\home.spec.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-hierarchy.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-deadlines.js" />

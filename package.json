@@ -19,10 +19,13 @@
     "url": "https://github.com/os2kitos/kitos/issues"
   },
   "homepage": "https://github.com/os2kitos/kitos#readme",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "eslint": "^1.7.3",
+    "jasmine-core": "^2.3.4",
+    "karma": "^0.13.14",
+    "karma-chrome-launcher": "^0.2.1",
+    "karma-jasmine": "^0.3.6",
     "tslint": "^2.5.1"
   }
 }
