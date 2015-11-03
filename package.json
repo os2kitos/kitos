@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "cd Presentation.Web && karma start"
+    "test": "cd Presentation.Web && karma start --single-run"
   },
   "repository": {
     "type": "git",
