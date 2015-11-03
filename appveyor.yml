@@ -15,7 +15,6 @@ install:
   - ps: install-Product node $env:NODEJS_VERSION
   - npm config set loglevel warn
   - npm install
-  - gulp lint
 before_build:
 - nuget restore %APPVEYOR_BUILD_FOLDER%\KITOS.sln -verbosity quiet
 cache:
@@ -29,6 +28,7 @@ cache:
   - packages\OpenCover.4.6.166 -> **\packages.config
   - packages\ReportGenerator.2.3.2.0 -> **\packages.config
 test_script:
+  - node_modules\.bin\gulp lint
   - npm test
   - run-coverage.bat
   - post-coverage.bat
