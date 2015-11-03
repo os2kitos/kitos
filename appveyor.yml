@@ -31,7 +31,7 @@ test_script:
   - npm test
   - run-coverage.bat
   - post-coverage.bat
-  - run-eslint.bat
+  # - run-eslint.bat
   - run-tslint.bat
 build:
   project: KITOS.sln
