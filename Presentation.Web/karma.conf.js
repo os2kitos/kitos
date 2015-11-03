@@ -27,7 +27,7 @@
             'Scripts/app/**/*.js'
         ],
 
-        browsers: ['Chrome'], // 'IE', 'Firefox',
+        browsers: ['IE', 'Firefox', 'Chrome'],
 
         // list of files to exclude
         exclude: [
