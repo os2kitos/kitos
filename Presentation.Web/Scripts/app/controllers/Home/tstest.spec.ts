@@ -1,5 +1,5 @@
 ﻿module Tests.Unit.HomeController {
-    describe("A controller", () => {
+    describe('A controller', () => {
         it("ts be true", () => {
             expect(true).toBe(true);
         });

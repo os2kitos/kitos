@@ -15,6 +15,7 @@ install:
   - ps: install-Product node $env:NODEJS_VERSION
   - npm config set loglevel warn
   - npm install
+  - gulp lint
 before_build:
 - nuget restore %APPVEYOR_BUILD_FOLDER%\KITOS.sln -verbosity quiet
 cache:
@@ -31,8 +32,6 @@ test_script:
   - npm test
   - run-coverage.bat
   - post-coverage.bat
-  # - run-eslint.bat
-  - run-tslint.bat
 build:
   project: KITOS.sln
   verbosity: minimal
@@ -42,4 +41,3 @@ artifacts:
   name: Coverage Report
 - path: results.xml
   name: OpenCover results
-  
