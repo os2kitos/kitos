@@ -5,6 +5,6 @@
 
 
     it("should be false", function () {
-        expect(false).toBe(false);
+        expect(false).toBe(true);
     });
 });

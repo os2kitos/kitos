@@ -12,6 +12,7 @@ environment:
   # TSLINT_DIR: Presentation.Web\Scripts\app
   NODEJS_VERSION: "4"
 install:
+  - choco install ie10
   - ps: install-Product node $env:NODEJS_VERSION
   - npm install
 # before_build:

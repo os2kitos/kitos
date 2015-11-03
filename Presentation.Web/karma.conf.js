@@ -5,7 +5,7 @@
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        frameworks: ['jasmine'],
+        frameworks: ['jasmine', 'detectBrowsers'],
 
         // list of files / patterns to load in the browser
         files: [
@@ -39,10 +39,6 @@
 
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch: true,
-
-        // start these browsers
-        // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        browsers: ['Chrome'],
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
