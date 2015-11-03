@@ -1,19 +1,21 @@
 'use strict';
 var gulp = require('gulp'),
-	tslint = require('gulp-tslint'),
-	eslint = require('gulp-eslint'),
-    bundle = require('gulp-bundle-assets'),
-	Config = require('./gulpfile.config');
-var config = new Config()
+    tslint = require('gulp-tslint'),
+    eslint = require('gulp-eslint'),
+    bundle = require('gulp-bundle-assets');
 
-gulp.task('default', function() {
-  // place code for your default task here
-});
+// Files selections
+var source = 'Presentation.Web/Scripts/',
+    sourceApp = source + 'app',
+    allJavaScript = sourceApp + '/**/*.js',
+    allTypeScript = sourceApp + '/**/*.ts';
+
+gulp.task('default', ['lint']);
 
 gulp.task('lint', ['es-lint', 'ts-lint']);
 
 gulp.task('ts-lint', function () {
-    return gulp.src(config.allTypeScript)
+    return gulp.src(allTypeScript)
 		.pipe(tslint())
 		.pipe(tslint.report('prose', {
             emitError: false // Set to true to fail build on errors
@@ -21,7 +23,7 @@ gulp.task('ts-lint', function () {
 });
 
 gulp.task('es-lint', function() {
-	return gulp.src(config.allJavaScript)
+	return gulp.src(allJavaScript)
 		.pipe(eslint())
 		.pipe(eslint.format());
 		// Use this to fail build on errors
@@ -33,4 +35,9 @@ gulp.task('bundle', function () {
       .pipe(bundle())
       .pipe(bundle.results('./public'))
       .pipe(gulp.dest('./public'));
+});
+
+gulp.task('watch', function () {
+    gulp.watch(allTypeScript, ['ts-lint']);
+    gulp.watch(allJavaScript, ['es-lint']);
 });
