@@ -1,11 +1,11 @@
-// Manage paths for all gulp actions
+// ´Paths for gulp tasks
 var source = 'Presentation.Web',
-    sourceApp = source + '\\Scripts\\app',
-    allJavaScript = [sourceApp + '\\**\\*.js'],
-    allJavaScriptNoTests = [sourceApp + '\\**\\!(*.spec).js'],
-    allTypeScript = [sourceApp + '\\**\\*.ts'],
-    bundleDir = '.\\public',
-    // Files to load in the browser before tests run.
+    sourceApp = source + '/Scripts/app',
+    allJavaScript = [sourceApp + '/**/*.js'],
+    allJavaScriptNoTests = [sourceApp + '/**/!(*.spec).js'],
+    allTypeScript = [sourceApp + '/**/*.ts'],
+    bundleDir = './public',
+    // Dependency files of files to cover.
     karmaBrowserLibs = [
         source + '/Scripts/lodash.js',
         source + '/Scripts/jquery-2.1.4.js',
@@ -23,7 +23,7 @@ var source = 'Presentation.Web',
         source + '/Scripts/notify/*.js',
         source + '/Scripts/angular-ui-util/ui-utils.js',
     ],
-    // Test files.
+    // Files to cover.
     karmaAppFiles = [
         source + '/Scripts/app/**/*.js'
     ],

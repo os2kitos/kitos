@@ -22,6 +22,7 @@
     "gulp": "^3.9.0",
     "gulp-bundle-assets": "^2.23.0",
     "gulp-eslint": "^1.0.0",
+    "gulp-open": "^1.0.0",
     "gulp-tslint": "^3.5.0",
     "jasmine-core": "^2.3.4",
     "karma": "^0.13.14",

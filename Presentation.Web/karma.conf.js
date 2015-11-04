@@ -3,6 +3,7 @@
 module.exports = function (config) {
     config.set({
         // base path that will be used to resolve all patterns (eg. files, exclude)
+        // This is to handle karma.conf.js being in a subdirectory to satisfy KarmaTestAdapter for Visual Studio.
         basePath: '../',
 
         // frameworks to use
@@ -12,30 +13,16 @@ module.exports = function (config) {
         // list of files / patterns to load in the browser
         files: paths.karma,
 
-        browsers: ['Chrome'], //'IE', 'Firefox',
+        browsers: ['IE', 'Firefox', 'Chrome'],
 
         // list of files to exclude
         exclude: [
         ],
 
-        // preprocess matching files before serving them to the browser
-        // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-        preprocessors: {
-            // source files, that you wanna generate coverage for
-            // do not include tests or libraries
-            // (these files will be instrumented by Istanbul)
-            'Presentation.Web/Scripts/app/**/!(*.spec).js': ['coverage']
-        },
-
-        coverageReporter: {
-            type : 'lcov',
-            dir : 'karmaCoverage/'
-        },
-
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress', 'coverage'],
+        reporters: ['progress'],
 
         // web server port
         port: 9876,
