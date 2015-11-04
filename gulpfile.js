@@ -1,20 +1,16 @@
 var gulp = require('gulp'),
     tslint = require('gulp-tslint'),
     eslint = require('gulp-eslint'),
-    bundle = require('gulp-bundle-assets');
-
-// Files selections
-var source = 'Presentation.Web/Scripts/',
-    sourceApp = source + 'app',
-    allJavaScript = sourceApp + '/**/*.js',
-    allTypeScript = sourceApp + '/**/*.ts';
+    bundle = require('gulp-bundle-assets'),
+    paths = require('./paths.config.js'),
+    KarmaServer = require('karma').Server;
 
 gulp.task('default', ['lint']);
 
 gulp.task('lint', ['es-lint', 'ts-lint']);
 
 gulp.task('ts-lint', function () {
-    return gulp.src(allTypeScript)
+    return gulp.src(paths.allTypeScript)
 		.pipe(tslint())
 		.pipe(tslint.report('prose', {
             emitError: false // Set to true to fail build on errors
@@ -22,7 +18,7 @@ gulp.task('ts-lint', function () {
 });
 
 gulp.task('es-lint', function() {
-	return gulp.src(allJavaScript)
+    return gulp.src(paths.allJavaScript)
 		.pipe(eslint())
 		.pipe(eslint.format());
 		// Use this to fail build on errors
@@ -32,11 +28,18 @@ gulp.task('es-lint', function() {
 gulp.task('bundle', function () {
     return gulp.src('./bundle.config.js')
       .pipe(bundle())
-      .pipe(bundle.results('./public'))
-      .pipe(gulp.dest('./public'));
+      .pipe(bundle.results(paths.bundleDir))
+      .pipe(gulp.dest((paths.bundleDir)));
 });
 
 gulp.task('watch', function () {
-    gulp.watch(allTypeScript, ['ts-lint']);
-    gulp.watch(allJavaScript, ['es-lint']);
+    gulp.watch(paths.allTypeScript, ['ts-lint']);
+    gulp.watch(paths.allJavaScript, ['es-lint']);
+});
+
+gulp.task('karma', function () {
+    new KarmaServer({
+        configFile: paths.source + '\\karma.conf.js',
+        singleRun: true
+    }).start();
 });
