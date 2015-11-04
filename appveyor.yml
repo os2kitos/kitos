@@ -24,8 +24,8 @@ cache:
   # - node_modules\.bin\gulp lint
 test_script:
   - npm test
-  - run-coverage.bat
-  - post-coverage.bat
+  # - run-coverage.bat
+  # - post-coverage.bat
 build: off
   # project: KITOS.sln
   # verbosity: minimal
