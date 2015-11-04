@@ -23,6 +23,7 @@ results.xml
 
 # Coverage report
 coverage/
+karmaCoverage/
 
 # npm packages
 node_modules/

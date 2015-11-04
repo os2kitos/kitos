@@ -33,7 +33,7 @@ artifacts:
 # Coverage
 - path: coverage
   name: Backend Coverage Report
-- path: jsCoverage
+- path: karmaCoverage
   name: Frontend Coverage Report
 - path: results.xml
   name: OpenCover results
