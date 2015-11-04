@@ -32,6 +32,8 @@ build:
 artifacts:
 # Coverage
 - path: coverage
-  name: Coverage Report
+  name: Backend Coverage Report
+- path: jsCoverage
+  name: Frontend Coverage Report
 - path: results.xml
   name: OpenCover results
