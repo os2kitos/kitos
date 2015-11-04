@@ -6,9 +6,6 @@
   "directories": {
     "doc": "docs"
   },
-  "scripts": {
-    "test": "cd Presentation.Web && karma start --single-run"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/os2kitos/kitos.git"

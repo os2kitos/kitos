@@ -3,14 +3,14 @@
 module.exports = function (config) {
     config.set({
         // base path that will be used to resolve all patterns (eg. files, exclude)
-        basePath: '',
+        basePath: '../',
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
         frameworks: ['jasmine'],
 
         // list of files / patterns to load in the browser
-        files: paths.karmaFiles,
+        files: paths.karma,
 
         browsers: ['Chrome'], //'IE', 'Firefox',
 
@@ -24,18 +24,18 @@ module.exports = function (config) {
             // source files, that you wanna generate coverage for
             // do not include tests or libraries
             // (these files will be instrumented by Istanbul)
-            '../Presentation.Web/Scripts/app/**/!(*.spec).js': ['coverage']
+            'Presentation.Web/Scripts/app/**/!(*.spec).js': ['coverage']
         },
 
         coverageReporter: {
             type : 'lcov',
-            dir : '../jsCoverage/'
+            dir : 'karmaCoverage/'
         },
 
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress', 'coverage', 'coveralls'],
+        reporters: ['progress', 'coverage'],
 
         // web server port
         port: 9876,

@@ -39,7 +39,9 @@ gulp.task('watch', function () {
 
 gulp.task('karma', function () {
     new KarmaServer({
-        configFile: paths.source + '\\karma.conf.js',
-        singleRun: true
+        configFile: __dirname + '/' + paths.source + '/karma.conf.js',
+        singleRun: true,
+        reporters: ['progress', 'coverage', 'coveralls'],
+        autoWatch: false
     }).start();
 });

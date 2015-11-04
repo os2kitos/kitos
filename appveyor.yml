@@ -23,7 +23,7 @@ cache:
 # after_build:
   # - node_modules\.bin\gulp lint
 test_script:
-  - npm test
+  - node_modules\.bin\gulp karma
   # - run-coverage.bat
   # - post-coverage.bat
 build: off
