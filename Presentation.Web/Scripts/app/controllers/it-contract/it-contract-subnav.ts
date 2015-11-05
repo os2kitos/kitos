@@ -20,7 +20,7 @@
                     { func: create, text: 'Opret IT Kontrakt', style: 'btn-success', icon: 'glyphicon-plus' },
                     { func: remove, text: 'Slet IT Kontrakt', style: 'btn-danger', icon: 'glyphicon-minus', showWhen: 'it-contract.edit' }
                 ];
-                
+
                 function create() {
                     var orgId = user.currentOrganizationId;
                     var msg = notify.addInfoMessage("Opretter kontrakt...", false);

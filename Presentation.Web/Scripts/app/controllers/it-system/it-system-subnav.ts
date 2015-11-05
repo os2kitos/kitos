@@ -79,7 +79,7 @@
                         .error(function (data, status) {
                             if (status == 409)
                                 msg.toErrorMessage('Fejl! IT Systemet er i lokal anvendelse!');
-                            else 
+                            else
                                 msg.toErrorMessage('Fejl! Kunne ikke slette IT System!');
                         });
                 }
@@ -120,7 +120,7 @@
                             }
 
                             $scope.uniqueConstraintError = false;
-                            
+
                             $scope.submit = function () {
                                 var payload = {
                                     name: $scope.formData.name,

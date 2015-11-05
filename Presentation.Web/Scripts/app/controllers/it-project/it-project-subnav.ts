@@ -20,7 +20,7 @@
                     { func: create, text: 'Opret IT Projekt', style: 'btn-success', icon: 'glyphicon-plus' },
                     { func: remove, text: 'Slet IT Projekt', style: 'btn-danger', icon: 'glyphicon-minus', showWhen: 'it-project.edit' }
                 ];
-                
+
                 var orgUnitId = user.currentOrganizationUnitId;
 
                 function create() {

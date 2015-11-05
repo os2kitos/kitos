@@ -5,7 +5,7 @@
             templateUrl: 'partials/local-config/tab-system.html',
             controller: 'local-config.EditSystemCtrl',
             resolve: {
-                
+
             }
         });
     }]);

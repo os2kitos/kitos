@@ -5,7 +5,7 @@
             templateUrl: 'partials/local-config/tab-project.html',
             controller: 'local-config.EditProjectCtrl',
             resolve: {
-                
+
             }
         });
     }]);
