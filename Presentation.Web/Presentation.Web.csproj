@@ -372,6 +372,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="protractor.conf.js" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -2324,6 +2325,7 @@
     <Content Include="Scripts\select2.js" />
     <Content Include="Scripts\select2.min.js" />
     <Content Include="Scripts\ui-select2.js" />
+    <Content Include="Tests\home.e2e.spec.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
