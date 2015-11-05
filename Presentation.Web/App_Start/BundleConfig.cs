@@ -9,7 +9,6 @@ namespace Presentation.Web
         {
            // standalone libraries
             bundles.Add(new ScriptBundle("~/Scripts/libraries").Include(
-                "~/Scripts/underscore.js",
                 "~/Scripts/lodash.js",
                 "~/Scripts/jquery-{version}.js",
                 "~/Scripts/select2.js",
