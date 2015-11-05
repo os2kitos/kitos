@@ -15,7 +15,6 @@ namespace Core.ApplicationServices
             _client = new SmtpClient();
         }
 
-
         /// <summary>
         /// Initializes a new instance of the <see cref="MailClient"/> class.
         /// </summary>
@@ -34,7 +33,6 @@ namespace Core.ApplicationServices
         public void Send(MailMessage message)
         {
             _client.Send(message);
-            
         }
     }
 }
