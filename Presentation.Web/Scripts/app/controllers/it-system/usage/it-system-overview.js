@@ -55,7 +55,7 @@
 
                 // loads kendo grid options from localstorage
                 function loadGridOptions() {
-                    var selectedOrgUnitId = getStoredOrgUnitId();
+                    var selectedOrgUnitId = sessionStorage.getItem(orgUnitStorageKey);
                     var selectedOrgUnit = _.find(orgUnits, function (orgUnit) {
                         return orgUnit.Id == selectedOrgUnitId;
                     });
@@ -71,7 +71,7 @@
 
                 $scope.saveGridProfile = function() {
                     // the stored org unit id must be the current
-                    var currentOrgUnitId = getStoredOrgUnitId();
+                    var currentOrgUnitId = sessionStorage.getItem(orgUnitStorageKey);
                     localStorage.setItem(orgUnitStorageKey + "-profile", currentOrgUnitId);
 
                     gridState.saveGridProfile($scope.mainGrid);
@@ -93,6 +93,7 @@
                     });
 
                     $scope.mainGrid.dataSource.read();
+                    notify.addSuccessMessage("Anvender gemte filtre og sortering");
                 };
 
                 $scope.clearGridProfile = function() {
@@ -114,7 +115,7 @@
                     gridState.removeProfile();
                     gridState.removeLocal();
                     gridState.removeSession();
-                    notify.addSuccessMessage("Nulstil filter ’Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge’");
+                    notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge nulstillet");
                     // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                     reload();
                 };
@@ -183,7 +184,7 @@
                                             usage.roles[right.RoleId] = [];
 
                                         // push username to the role array
-                                        usage.roles[right.RoleId].push(right.User.Name + " " + right.User.LastName);
+                                        usage.roles[right.RoleId].push([right.User.Name, right.User.LastName].join(" "));
                                     });
                                 });
                                 return response;
@@ -195,16 +196,22 @@
                         {
                             name: "clearFilter",
                             text: "Nulstil",
-                            template: "<button type='button' class='k-button k-button-icontext' data-ng-click='clearOptions()'>#: text #</button>"
+                            template: "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='clearOptions()'>#: text #</button>"
                         },
                         {
                             name: "saveFilter",
-                            template: kendo.template($("#save-profile-btn").html())
+                            text: "Gem filter",
+                            template: '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="saveGridProfile()">#: text #</button>'
+                        },
+                        {
+                            name: "useFilter",
+                            text: "Anvend filter",
+                            template: '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="loadGridProfile()" data-ng-disabled="!doesGridProfileExist()">#: text #</button>'
                         },
                         {
                             name: "deleteFilter",
                             text: "Slet filter",
-                            template: "<button type='button' class='k-button k-button-icontext' data-ng-click='clearGridProfile()' data-ng-disabled='!doesGridProfileExist()'>#: text #</button>"
+                            template: "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='clearGridProfile()' data-ng-disabled='!doesGridProfileExist()'>#: text #</button>"
                         },
                         {
                             template: kendo.template($("#role-selector").html())
@@ -692,10 +699,6 @@
                     }
                 };
 
-                function getStoredOrgUnitId() {
-                    return sessionStorage.getItem(orgUnitStorageKey) ? sessionStorage.getItem(orgUnitStorageKey) : user.defaultOrganizationUnitId;
-                }
-
                 function orgUnitDropDownList(args) {
                     function indent(dataItem) {
                         var htmlSpace = "&nbsp;&nbsp;&nbsp;&nbsp;";
@@ -704,7 +707,12 @@
 
                     function setDefaultOrgUnit() {
                         var kendoElem = this;
-                        var idTofind = getStoredOrgUnitId();
+                        var idTofind = sessionStorage.getItem(orgUnitStorageKey);
+
+                        if (!idTofind) {
+                            // if no id was found then do nothing
+                            return;
+                        }
 
                         // find the index of the org unit that matches the users default org unit
                         var index = _.findIndex(kendoElem.dataItems(), function (item) {
@@ -820,7 +828,7 @@
                     dataSource: systemRoles,
                     dataTextField: "Name",
                     dataValueField: "Id",
-                    optionLabel: "Vælg rolle...",
+                    optionLabel: "Vælg systemrolle...",
                     change: function (e) {
                         // hide all roles column
                         _.forEach(systemRoles, function(role) {

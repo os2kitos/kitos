@@ -52,6 +52,7 @@
             $scope.loadGridProfile = function () {
                 gridState.loadGridProfile($scope.mainGrid);
                 $scope.mainGrid.dataSource.read();
+                notify.addSuccessMessage("Anvender gemte filtre og sortering");
             };
 
             $scope.clearGridProfile = function() {
@@ -90,7 +91,7 @@
                 gridState.removeProfile();
                 gridState.removeLocal();
                 gridState.removeSession();
-                notify.addSuccessMessage("Nulstil filter ’Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge’");
+                notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge nulstillet");
                 // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
                 reload();
             };
@@ -218,16 +219,22 @@
                     {
                         name: "clearFilter",
                         text: "Nulstil",
-                        template: "<button type='button' class='k-button k-button-icontext' data-ng-click='clearOptions()'>#: text #</button>"
+                        template: "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='clearOptions()'>#: text #</button>"
                     },
                     {
                         name: "saveFilter",
-                        template: kendo.template($("#save-profile-btn").html())
+                        text: "Gem filter",
+                        template: '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="saveGridProfile()">#: text #</button>'
+                    },
+                    {
+                        name: "useFilter",
+                        text: "Anvend filter",
+                        template: '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="loadGridProfile()" data-ng-disabled="!doesGridProfileExist()">#: text #</button>'
                     },
                     {
                         name: "deleteFilter",
                         text: "Slet filter",
-                        template: "<button type='button' class='k-button k-button-icontext' data-ng-click='clearGridProfile()' data-ng-disabled='!doesGridProfileExist()'>#: text #</button>"
+                        template: "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='clearGridProfile()' data-ng-disabled='!doesGridProfileExist()'>#: text #</button>"
                     }
                 ],
                 excel: {
@@ -283,7 +290,7 @@
                         }
                     },
                     {
-                        field: "Name", title: "It System", width: 300,
+                        field: "Name", title: "It System", width: 285,
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: '<a data-ui-sref="it-system.edit.interfaces({id: #: Id #})">#: Name #</a>',
                         filterable: {
@@ -295,7 +302,7 @@
                         }
                     },
                     {
-                        field: "AccessModifier", title: "Synlighed", width: 110,
+                        field: "AccessModifier", title: "Synlighed", width: 120,
                         persistId: "accessmod", // DON'T YOU DARE RENAME!
                         hidden: true,
                         filterable: {
@@ -373,7 +380,7 @@
                         sortable: false
                     },
                     {
-                        field: "Url", title: "Link til beskrivelse", width: 110,
+                        field: "Url", title: "Link til beskrivelse", width: 125,
                         persistId: "link", // DON'T YOU DARE RENAME!
                         template: linkTemplate,
                         attributes: { "class": "text-center" },
