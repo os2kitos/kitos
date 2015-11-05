@@ -13,7 +13,8 @@ module.exports = function (config) {
         // list of files / patterns to load in the browser
         files: paths.karma,
 
-        browsers: ['IE', 'Firefox', 'Chrome'],
+        // run in headless per default
+        browsers: ['PhantomJS'],
 
         // list of files to exclude
         exclude: [

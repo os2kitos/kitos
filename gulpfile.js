@@ -47,6 +47,7 @@ gulp.task('karma', function () {
     new KarmaServer({
         configFile: __dirname + '/' + paths.source + '/karma.conf.js',
         singleRun: true,
+        browsers: ['IE', 'Firefox', 'Chrome'],
         reporters: ['progress', 'coverage', 'coveralls'],
         coverageReporter: {
             type: 'lcov',
@@ -64,7 +65,7 @@ gulp.task('karma', function () {
 
 // Open coverage results.
 gulp.task('localCover', ['localKarma'], function() {
-    gulp.src('karmaCoverage/Chrome*/index.html')
+    gulp.src('karmaCoverage/Phantom*/index.html')
         .pipe(open({
             app: 'chrome'
         }));
@@ -75,7 +76,6 @@ gulp.task('localKarma', function(done) {
     new KarmaServer({
         configFile: __dirname + '/' + paths.source + '/karma.conf.js',
         singleRun: true,
-        browsers: ['Chrome'],
         reporters: ['progress', 'coverage'],
         coverageReporter: {
             type: 'html',
