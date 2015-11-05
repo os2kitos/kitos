@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -24,6 +25,7 @@
     <RestorePackages>true</RestorePackages>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>1ba07016</NuGetPackageImportStamp>
+    <TypeScriptToolsVersion>1.5</TypeScriptToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -790,6 +792,47 @@
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />
     <Content Include="Partials\topnav\topnav.html" />
+    <TypeScriptCompile Include="Scripts\typings\angular-ui-router\angular-ui-router.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-mocks.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-resource.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-route.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-sanitize.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\moment\moment-node.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\moment\moment.d.ts" />
+    <TypeScriptCompile Include="Scripts\app\app.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\global-admin\global-admin-organization-edit.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\global-admin\global-admin-organization-create.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\global-admin\global-admin-organizations.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\global-admin\global-admin-subnav.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\global-config\global-config.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\home\edit-user.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-contract\it-contract-deadlines.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-contract\it-contract-subnav.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-contract\it-contract-paymentmodel.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-phases.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-status-goal-modal.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-description.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-subnav.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-system\usage\it-system-contracts.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-system\it-system-subnav.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-system\usage\it-system-wishes.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\local-config\local-config-import-org.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\local-config\local-config-import-contracts.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\local-config\local-config-import-users.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\local-config\local-config-import.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\local-config\local-config-system.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\local-config\local-config-contract.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\local-config\local-config-project.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\local-config\local-config-org.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\local-config\local-config-subnav.ts" />
+    <TypeScriptCompile Include="Scripts\app\directives\form-directives.ts" />
+    <TypeScriptCompile Include="Scripts\app\services\taskService.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\global-admin\global-admin-global-admins.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\global-admin\global-admin-local-admins.ts" />
     <Content Include="Scripts\angular-animate.js" />
     <Content Include="Scripts\angular-animate.min.js" />
     <Content Include="Scripts\angular-aria.js" />
@@ -823,86 +866,56 @@
     <Content Include="Scripts\angular-ui\ui-bootstrap.min.js" />
     <Content Include="Scripts\angular.js" />
     <Content Include="Scripts\angular.min.js" />
-    <Content Include="Scripts\app\controllers\global-admin\global-admin-global-admins.js" />
-    <Content Include="Scripts\app\controllers\global-admin\global-admin-local-admins.js" />
-    <Content Include="Scripts\app\controllers\global-admin\global-admin-organization-edit.js" />
-    <Content Include="Scripts\app\controllers\global-admin\global-admin-organization-create.js" />
-    <Content Include="Scripts\app\controllers\global-admin\global-admin-organizations.js" />
-    <Content Include="Scripts\app\controllers\global-admin\global-admin-subnav.js" />
-    <Content Include="Scripts\app\controllers\global-config\global-config.js" />
-    <Content Include="Scripts\app\controllers\home\edit-user.js" />
-    <Content Include="Scripts\app\controllers\home\home.js" />
-    <Content Include="Scripts\app\controllers\it-contract\it-contract-hierarchy.js" />
-    <Content Include="Scripts\app\controllers\it-contract\it-contract-deadlines.js" />
-    <Content Include="Scripts\app\controllers\it-contract\it-contract-advice.js" />
-    <Content Include="Scripts\app\controllers\it-contract\it-contract-edit.js" />
-    <Content Include="Scripts\app\controllers\it-contract\it-contract-overview.js" />
-    <Content Include="Scripts\app\controllers\it-contract\it-contract-paymentmodel.js" />
-    <Content Include="Scripts\app\controllers\it-contract\it-contract-plan.js" />
-    <Content Include="Scripts\app\controllers\it-contract\it-contract-roles.js" />
-    <Content Include="Scripts\app\controllers\it-contract\it-contract-subnav.js" />
-    <Content Include="Scripts\app\controllers\it-contract\it-contract-systems.js" />
-    <Content Include="Scripts\app\controllers\it-contract\it-contract-economy.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-communication.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-handover.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-hierarchy.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-phases.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-stakeholders.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-overview.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-status-goal.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-status-goal-modal.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-status-modal.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-status-project.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-catalog.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-description.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-risk.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-roles.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-org.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-economy.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-itsys.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-kle.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-strategy.js" />
+    <TypeScriptCompile Include="Scripts\app\controllers\home\home.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-contract\it-contract-hierarchy.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-contract\it-contract-advice.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-contract\it-contract-edit.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-contract\it-contract-overview.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-contract\it-contract-plan.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-contract\it-contract-roles.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-contract\it-contract-systems.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-contract\it-contract-economy.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-communication.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-handover.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-hierarchy.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-stakeholders.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-overview.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-status-goal.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-status-modal.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-status-project.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-catalog.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-risk.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-roles.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-org.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-economy.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-itsys.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-kle.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-project\it-project-strategy.ts" />
     <Content Include="Scripts\app\controllers\it-project\it-project-edit.js" />
-    <Content Include="Scripts\app\controllers\it-project\it-project-subnav.js" />
-    <Content Include="Scripts\app\controllers\it-system\it-interface-catalog.js" />
-    <Content Include="Scripts\app\controllers\it-system\it-interface-edit.js" />
-    <Content Include="Scripts\app\controllers\it-system\it-interface-edit-details.js" />
-    <Content Include="Scripts\app\controllers\it-system\it-system-edit-interfaces.js" />
-    <Content Include="Scripts\app\controllers\it-system\it-system-edit-kle.js" />
-    <Content Include="Scripts\app\controllers\it-system\it-system-edit.js" />
-    <Content Include="Scripts\app\controllers\it-system\it-system-catalog.js" />
-    <Content Include="Scripts\app\controllers\it-system\usage\it-system-contracts.js" />
-    <Content Include="Scripts\app\controllers\it-system\usage\it-system-overview.js" />
-    <Content Include="Scripts\app\controllers\it-system\usage\it-system-proj.js" />
-    <Content Include="Scripts\app\controllers\it-system\usage\it-system-kle.js" />
-    <Content Include="Scripts\app\controllers\it-system\usage\it-system-org.js" />
-    <Content Include="Scripts\app\controllers\it-system\usage\it-system-hierarchy.js" />
-    <Content Include="Scripts\app\controllers\it-system\usage\it-system-roles.js" />
-    <Content Include="Scripts\app\controllers\it-system\it-system-subnav.js" />
-    <Content Include="Scripts\app\controllers\it-system\usage\it-system-usage.js" />
-    <Content Include="Scripts\app\controllers\it-system\usage\it-system-wishes.js" />
-    <Content Include="Scripts\app\controllers\it-system\usage\it-system-interfaces.js" />
-    <Content Include="Scripts\app\controllers\local-config\local-config-import-org.js" />
-    <Content Include="Scripts\app\controllers\local-config\local-config-import-contracts.js" />
-    <Content Include="Scripts\app\controllers\local-config\local-config-import-users.js" />
-    <Content Include="Scripts\app\controllers\local-config\local-config-import.js" />
-    <Content Include="Scripts\app\controllers\local-config\local-config-system.js" />
-    <Content Include="Scripts\app\controllers\local-config\local-config-contract.js" />
-    <Content Include="Scripts\app\controllers\local-config\local-config-project.js" />
-    <Content Include="Scripts\app\controllers\local-config\local-config-org.js" />
-    <Content Include="Scripts\app\controllers\local-config\local-config-subnav.js" />
-    <Content Include="Scripts\app\controllers\org\org-structure.js" />
-    <Content Include="Scripts\app\controllers\org\org-subnav.js" />
-    <Content Include="Scripts\app\controllers\org\org-overview.js" />
-    <Content Include="Scripts\app\controllers\org\org-user.js" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-system\it-interface-catalog.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-system\it-interface-edit.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-system\it-interface-edit-details.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-system\it-system-edit-interfaces.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-system\it-system-edit-kle.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-system\it-system-edit.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-system\it-system-catalog.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-system\usage\it-system-overview.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-system\usage\it-system-proj.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-system\usage\it-system-kle.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-system\usage\it-system-org.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-system\usage\it-system-hierarchy.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-system\usage\it-system-roles.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-system\usage\it-system-usage.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\it-system\usage\it-system-interfaces.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\org\org-structure.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\org\org-subnav.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\org\org-overview.ts" />
+    <TypeScriptCompile Include="Scripts\app\controllers\org\org-user.ts" />
     <Content Include="Scripts\app\directives\angularjs-dropdown-multiselect.js" />
     <Content Include="Scripts\app\directives\directives.js" />
     <Content Include="Scripts\app\directives\filters.js" />
-    <Content Include="Scripts\app\directives\form-directives.js" />
-    <Content Include="Scripts\app\app.js" />
     <Content Include="Scripts\app\directives\utils-directives.js" />
-    <Content Include="Scripts\app\services\taskService.js" />
-    <Content Include="Scripts\app\services\userServices.js" />
+    <TypeScriptCompile Include="Scripts\app\services\userServices.ts" />
     <Content Include="Scripts\app\utility\underscore.mixin.js" />
     <Content Include="Scripts\app\utility\utility.js" />
     <Content Include="Scripts\app\services\httpServices.js" />
@@ -2472,6 +2485,7 @@
     <None Include="Web.Sandbox.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
+    <TypeScriptCompile Include="Scripts\typings\underscore\underscore.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -2517,6 +2531,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
