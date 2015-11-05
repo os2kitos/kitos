@@ -913,7 +913,7 @@
     <Content Include="Scripts\app\directives\angularjs-dropdown-multiselect.js" />
     <Content Include="Scripts\app\directives\directives.js" />
     <Content Include="Scripts\app\directives\filters.js" />
-    <TypeScriptCompile Include="Scripts\app\directives\utils-directives.ts" />
+    <Content Include="Scripts\app\directives\utils-directives.js" />
     <TypeScriptCompile Include="Scripts\app\services\userServices.ts" />
     <Content Include="Scripts\app\utility\underscore.mixin.js" />
     <Content Include="Scripts\app\utility\utility.js" />
