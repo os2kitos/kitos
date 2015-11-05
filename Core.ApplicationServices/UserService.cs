@@ -47,7 +47,7 @@ namespace Core.ApplicationServices
 #else
             user.Password = _cryptoService.Encrypt(DateTime.UtcNow + user.Salt);
 #endif
-            
+
             user.LastChanged = DateTime.UtcNow;
 
             _userRepository.Insert(user);
@@ -64,7 +64,7 @@ namespace Core.ApplicationServices
         {
             if (user == null || _userRepository.GetByKey(user.Id) == null)
                 throw new ArgumentNullException("user");
-        
+
             var org = _orgRepository.GetByKey(orgId);
 
             var reset = GenerateResetRequest(user);
