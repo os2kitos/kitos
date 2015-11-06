@@ -24,19 +24,29 @@ build:
   project: KITOS.sln
   verbosity: minimal
 after_build:
-  - node_modules\.bin\gulp lint
+  # - node_modules\.bin\gulp lint
 test_script:
   # Use karma for local coverage report and karmaPost for coveralls.io.
   - node_modules\.bin\gulp karmaPost
-  - node_modules\.bin\gulp protractor
-  - run-coverage.bat
+  # - run-coverage.bat
   # Comment out to remove coverage from Coveralls.io
-  - post-coverage.bat
-artifacts:
-# Coverage
-- path: coverage
-  name: Backend Coverage Report
-- path: karmaCoverage
-  name: Frontend Coverage Report
-- path: results.xml
-  name: OpenCover results
+  # - post-coverage.bat
+# artifacts:
+# # Coverage
+# - path: coverage
+  # name: Backend Coverage Report
+# - path: karmaCoverage
+  # name: Frontend Coverage Report
+# - path: results.xml
+  # name: OpenCover results
+deploy:
+  provider: WebDeploy
+  server: htpp://localhost()
+  website: Kitos
+  username: Kitos
+  password:
+  ntlm: false
+  remove_files: true
+  artifact: web-deploy-package
+after_deploy:
+  - node_modules\.bin\gulp protractor
