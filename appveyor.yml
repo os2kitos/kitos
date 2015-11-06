@@ -48,6 +48,6 @@ deploy:
   password:
   ntlm: false
   remove_files: true
-  artifact: web-deploy-package
+  artifact: Presentation.Web.zip
 after_deploy:
   - node_modules\.bin\gulp protractor
