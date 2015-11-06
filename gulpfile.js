@@ -1,6 +1,7 @@
 var gulp = require('gulp'),
     tslint = require('gulp-tslint'),
     eslint = require('gulp-eslint'),
+    protractor = require('gulp-protractor').protractor,
     bundle = require('gulp-bundle-assets'),
     open = require('gulp-open'),
     paths = require('./paths.config.js'),
@@ -43,7 +44,7 @@ gulp.task('watch', function () {
 });
 
 // Run karma tests and coverage. Post coverage to Coveralls.io
-gulp.task('karma', function () {
+gulp.task('karmaPost', function () {
     new KarmaServer({
         configFile: __dirname + '/' + paths.source + '/karma.conf.js',
         singleRun: true,
@@ -51,6 +52,27 @@ gulp.task('karma', function () {
         reporters: ['progress', 'coverage', 'coveralls'],
         coverageReporter: {
             type: 'lcov',
+            dir: 'karmaCoverage/'
+        },
+        preprocessors: {
+            // source files, that you wanna generate coverage for
+            // do not include tests or libraries
+            // (these files will be instrumented by Istanbul)
+            'Presentation.Web/Scripts/app/**/!(*.spec).js': ['coverage']
+        },
+        autoWatch: false
+    }).start();
+});
+
+// Run karma tests and coverage. No publish to Coveralls.io
+gulp.task('karma', function () {
+    new KarmaServer({
+        configFile: __dirname + '/' + paths.source + '/karma.conf.js',
+        singleRun: true,
+        browsers: ['IE', 'Firefox', 'Chrome'],
+        reporters: ['progress', 'coverage'],
+        coverageReporter: {
+            type: 'html',
             dir: 'karmaCoverage/'
         },
         preprocessors: {
@@ -89,4 +111,12 @@ gulp.task('localKarma', function(done) {
         },
         autoWatch: false
     }, done).start();
+});
+
+gulp.task('protractor', function (done) {
+    return gulp.src(['Presentation/**/*.e2e.spec.js'])
+        .pipe(protractor({
+            configFile: paths.source + '/protractor.conf.js',
+        }))
+        .on('done', done);
 });

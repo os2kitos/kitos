@@ -13,22 +13,25 @@ environment:
   NODEJS_VERSION: "4"
 install:
   - ps: install-Product node $env:NODEJS_VERSION
-  - npm config set loglevel warn
   - npm install
-before_build:
-- nuget restore %APPVEYOR_BUILD_FOLDER%\KITOS.sln -verbosity quiet
+  - node_modules\.bin\webdriver-manager update --standalone
 cache:
   - node_modules -> package.json # cache node packages if package.json is the same
   - packages -> **\packages.config
-after_build:
-  - node_modules\.bin\gulp lint
-test_script:
-  - node_modules\.bin\gulp karma
-  - run-coverage.bat
-  - post-coverage.bat
+before_build:
+- nuget restore %APPVEYOR_BUILD_FOLDER%\KITOS.sln -verbosity quiet
 build:
   project: KITOS.sln
   verbosity: minimal
+after_build:
+  - node_modules\.bin\gulp lint
+test_script:
+  # Use karma for local coverage report and karmaPost for coveralls.io.
+  - node_modules\.bin\gulp karmaPost
+  - node_modules\.bin\gulp protractor
+  - run-coverage.bat
+  # Comment out to remove coverage from Coveralls.io
+  - post-coverage.bat
 artifacts:
 # Coverage
 - path: coverage

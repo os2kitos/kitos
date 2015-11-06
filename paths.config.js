@@ -1,11 +1,12 @@
-// ´Paths for gulp tasks
+// paths for gulp tasks
 var source = 'Presentation.Web',
     sourceApp = source + '/Scripts/app',
     allJavaScript = [sourceApp + '/**/*.js'],
     allJavaScriptNoTests = [sourceApp + '/**/!(*.spec).js'],
     allTypeScript = [sourceApp + '/**/*.ts'],
     bundleDir = './public',
-    // Dependency files of files to cover.
+
+    // dependency files of files to cover.
     karmaBrowserLibs = [
         source + '/Scripts/lodash.js',
         source + '/Scripts/jquery-2.1.4.js',
@@ -23,11 +24,16 @@ var source = 'Presentation.Web',
         source + '/Scripts/notify/*.js',
         source + '/Scripts/angular-ui-util/ui-utils.js',
     ],
-    // Files to cover.
+    // files to cover.
     karmaAppFiles = [
         source + '/Scripts/app/**/*.js'
     ],
-    karma = karmaBrowserLibs.concat(karmaAppFiles);
+    karma = karmaBrowserLibs.concat(karmaAppFiles),
+
+    // all e2e tests.
+    e2eFiles = ['Tests/**/*e2e.spec.js'],
+    e2eReport = 'results-protractor.json',
+    seleniumServerJar = '../node_modules/protractor/selenium/selenium-server-standalone-2.47.1.jar';
 
 module.exports = {
     source: source,
@@ -35,5 +41,7 @@ module.exports = {
     allJavaScript: allJavaScript,
     allTypeScript: allTypeScript,
     bundleDir: bundleDir,
-    karma: karma
+    karma: karma,
+    e2eFiles: e2eFiles,
+    e2eReport: e2eReport
 };

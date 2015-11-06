@@ -21,6 +21,9 @@ build/
 # xUnit tests
 results.xml
 
+# Protractor tests
+results-protractor.json
+
 # Coverage report
 coverage/
 karmaCoverage/
