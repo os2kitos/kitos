@@ -1,0 +1,41 @@
+{
+  "name": "kitos",
+  "version": "1.0.0",
+  "description": "The OS2KITOS was programmed by IT Minds ApS (http://it-minds.dk)\r for OS2 - Offentligt digitaliseringsf�llesskab (http://os2web.dk).",
+  "main": "Presentation.Web\\Scripts\\app\\app.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/os2kitos/kitos.git"
+  },
+  "author": "IT Minds",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/os2kitos/kitos/issues"
+  },
+  "homepage": "https://github.com/os2kitos/kitos#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^1.7.3",
+    "gulp": "^3.9.0",
+    "gulp-bundle-assets": "^2.23.0",
+    "gulp-eslint": "^1.0.0",
+    "gulp-open": "^1.0.0",
+    "gulp-protractor": "^1.0.0",
+    "gulp-tslint": "^3.5.0",
+    "jasmine-core": "^2.3.4",
+    "karma": "^0.13.14",
+    "karma-chrome-launcher": "^0.2.1",
+    "karma-coverage": "^0.5.3",
+    "karma-coveralls": "^1.1.2",
+    "karma-firefox-launcher": "^0.1.6",
+    "karma-ie-launcher": "^0.2.0",
+    "karma-jasmine": "^0.3.6",
+    "karma-phantomjs-launcher": "^0.2.1",
+    "phantomjs": "^1.9.18",
+    "protractor": "^2.5.1",
+    "tslint": "^2.5.1"
+  }
+}
