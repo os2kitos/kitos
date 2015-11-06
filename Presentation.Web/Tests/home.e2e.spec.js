@@ -1,7 +1,7 @@
 ﻿describe('home view', function () {
     it('should mark invalid email in field', function () {
         // arrange
-        browser.get('https://localhost:44300/');
+        browser.get('https://localhost/');
         var emailField = element(by.model('email'));
 
         // act
@@ -13,7 +13,7 @@
 
     it('should mark valid email in field', function () {
         // arrange
-        browser.get('https://localhost:44300/');
+        browser.get('https://localhost/');
         var emailField = element(by.model('email'));
 
         // act
