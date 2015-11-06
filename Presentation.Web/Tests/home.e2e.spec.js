@@ -1,17 +1,25 @@
-﻿describe('angularjs homepage todo list', function () {
-    it('should add a todo', function () {
-        browser.get('https://angularjs.org');
+﻿describe('home view', function () {
+    it('should mark invalid email in field', function () {
+        // arrange
+        browser.get('https://localhost:44300/');
+        var emailField = element(by.model('email'));
 
-        element(by.model('todoList.todoText')).sendKeys('write first protractor test');
-        element(by.css('[value="add"]')).click();
+        // act
+        emailField.sendKeys('some invalid email');
 
-        var todoList = element.all(by.repeater('todo in todoList.todos'));
-        expect(todoList.count()).toEqual(3);
-        expect(todoList.get(2).getText()).toEqual('write first protractor test');
+        // assert
+        expect(emailField.getAttribute('class')).toMatch('ng-invalid');
+    });
 
-        // You wrote your first test, cross it off the list
-        todoList.get(2).element(by.css('input')).click();
-        var completedAmount = element.all(by.css('.done-true'));
-        expect(completedAmount.count()).toEqual(2);
+    it('should mark valid email in field', function () {
+        // arrange
+        browser.get('https://localhost:44300/');
+        var emailField = element(by.model('email'));
+
+        // act
+        emailField.sendKeys('some@valid.email');
+
+        // assert
+        expect(emailField.getAttribute('class')).toMatch('ng-valid');
     });
 });
