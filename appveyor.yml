@@ -35,8 +35,7 @@ test_script:
   # - run-coverage.bat
   # Comment out to remove coverage from Coveralls.io
   # - post-coverage.bat
-artifacts:
-
+# artifacts:
 # # Coverage
 # - path: coverage
   # name: Backend Coverage Report
