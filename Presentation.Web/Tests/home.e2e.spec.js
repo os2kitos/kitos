@@ -1,6 +1,6 @@
 ﻿describe('home view', function () {
     beforeEach(function() {
-        browser.get('https://localhost:44300/');
+        browser.get('http://localhost:44300/');
     });
 
     it('should mark invalid email in field', function () {
