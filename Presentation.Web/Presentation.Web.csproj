@@ -687,7 +687,7 @@
     <Content Include="Global.asax" />
     <Content Include="Images\excel.png" />
     <Content Include="Images\logo.png" />
-    <Content Include="karma.conf.js" />
+    <None Include="karma.conf.js" />
     <Content Include="Partials\directives\add-user-button.html" />
     <Content Include="Partials\directives\add-user-modal.html" />
     <Content Include="Partials\directives\kle-filter.html" />
@@ -2476,6 +2476,9 @@
     <Content Include="Scripts\kendo\kendo.window.min.js.map" />
     <Content Include="Scripts\jquery-2.1.4.min.map" />
     <Content Include="Scripts\version.json" />
+    <None Include="Web.AppVeyor.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
     <None Include="Web.Sandbox.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
