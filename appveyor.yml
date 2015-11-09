@@ -44,13 +44,6 @@ test_script:
 # - path: results.xml
   # name: OpenCover results
 deploy:
-  provider: WebDeploy
-  server: http://127.0.0.1/
-  website: Kitos
-  username: Kitos
-  password:
-  ntlm: false
-  remove_files: true
-  artifact: Presentation.Web.zip
+  provider: Local
 after_deploy:
   - node_modules\.bin\gulp protractor
