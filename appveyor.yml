@@ -35,7 +35,8 @@ test_script:
   # - run-coverage.bat
   # Comment out to remove coverage from Coveralls.io
   # - post-coverage.bat
-# artifacts:
+artifacts:
+
 # # Coverage
 # - path: coverage
   # name: Backend Coverage Report
@@ -45,5 +46,6 @@ test_script:
   # name: OpenCover results
 deploy:
 - provider: Local
+  Presentation.Web.Zip.deploy_website: true
 after_deploy:
   - node_modules\.bin\gulp protractor
