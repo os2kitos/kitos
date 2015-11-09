@@ -45,7 +45,7 @@ test_script:
   # name: OpenCover results
 deploy:
   provider: WebDeploy
-  server: http://localhost/
+  server: http://127.0.0.1/
   website: Kitos
   username: Kitos
   password:
