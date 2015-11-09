@@ -48,7 +48,6 @@ deploy:
 - provider: Local
   Presentation.Web.deploy_website: true
   Presentation.Web.hostname: localhost
-  Presentation.Web.ip: 127.0.0.1
   Presentation.Web.port: 44300
 after_deploy:
   - node_modules\.bin\gulp protractor
