@@ -29,9 +29,10 @@ build:
   publish_wap: true
 after_build:
   # - node_modules\.bin\gulp lint
-test_script:
+test: off
+# test_script:
   # Use karma for local coverage report and karmaPost for coveralls.io.
-  - node_modules\.bin\gulp karmaPost
+  # - node_modules\.bin\gulp karmaPost
   # - run-coverage.bat
   # Comment out to remove coverage from Coveralls.io
   # - post-coverage.bat
