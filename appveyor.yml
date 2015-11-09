@@ -46,6 +46,6 @@ test: off
   # name: OpenCover results
 deploy:
 - provider: Local
-  Presentation.Web.Zip.deploy_website: true
+  Presentation.Web.deploy_website: true
 # after_deploy:
   # - node_modules\.bin\gulp protractor
