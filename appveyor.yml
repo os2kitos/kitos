@@ -11,12 +11,12 @@ environment:
   ESLINT_DIR: Presentation.Web\Scripts\app
   TSLINT_DIR: Presentation.Web\Scripts\app
   NODEJS_VERSION: "4"
-install:
-  - ps: install-Product node $env:NODEJS_VERSION
-  - npm install
-  - node_modules\.bin\webdriver-manager update --standalone
+# install:
+  # - ps: install-Product node $env:NODEJS_VERSION
+  # - npm install
+  # - node_modules\.bin\webdriver-manager update --standalone
 cache:
-  - node_modules -> package.json # cache node packages if package.json is the same
+  # - node_modules -> package.json # cache node packages if package.json is the same
   - packages -> **\packages.config
 services:
 - iis
@@ -47,5 +47,5 @@ artifacts:
 deploy:
 - provider: Local
   Presentation.Web.Zip.deploy_website: true
-after_deploy:
-  - node_modules\.bin\gulp protractor
+# after_deploy:
+  # - node_modules\.bin\gulp protractor
