@@ -21,8 +21,6 @@ cache:
 services:
 - iis
 - mysql56
-configuration:
-  - AppVeyor
 before_build:
 - nuget restore %APPVEYOR_BUILD_FOLDER%\KITOS.sln -verbosity quiet
 build:
