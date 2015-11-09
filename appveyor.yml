@@ -19,8 +19,8 @@ cache:
   - node_modules -> package.json # cache node packages if package.json is the same
   - packages -> **\packages.config
 services:
-  - iis
-  - mysql
+- iis
+- mysql56
 before_build:
 - nuget restore %APPVEYOR_BUILD_FOLDER%\KITOS.sln -verbosity quiet
 build:
@@ -44,6 +44,6 @@ test_script:
 # - path: results.xml
   # name: OpenCover results
 deploy:
-  provider: Local
+- provider: Local
 after_deploy:
   - node_modules\.bin\gulp protractor
