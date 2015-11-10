@@ -16,10 +16,6 @@ module.exports = function (config) {
         // run in headless per default
         browsers: ['PhantomJS'],
 
-        // list of files to exclude
-        exclude: [
-        ],
-
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
