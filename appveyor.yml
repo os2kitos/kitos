@@ -29,23 +29,24 @@ build:
   project: KITOS.sln
   verbosity: quiet
   publish_wap: true
-# after_build:
-  # - node_modules\.bin\gulp lint
-test: off
-# test_script:
+after_build:
+  - node_modules\.bin\gulp lint
+test_script:
   # Post frontend coverage to coveralls. Use "karma" for local coverage report.
-  # - node_modules\.bin\gulp karmaPost
-  # - run-coverage.bat
+  - node_modules\.bin\gulp karmaPost
+  - run-coverage.bat
   # Post backend coverage to coveralls.
   # - post-coverage.bat
-# artifacts:
-# # Coverage
-# - path: coverage
-  # name: Backend Coverage Report
-# - path: karmaCoverage
-  # name: Frontend Coverage Report
-# - path: results.xml
-  # name: OpenCover results
+artifacts:
+# Coverage
+- path: coverage
+  name: Backend Coverage Report
+- path: karmaCoverage
+  name: Frontend Coverage Report
+- path: results.xml
+  name: OpenCover results
+- path: results-protractor.json
+  name: Protractor test results
 before_deploy:
   - ps: .\InstallSelfSignedCert.ps1
 deploy:
