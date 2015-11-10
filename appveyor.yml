@@ -50,5 +50,5 @@ deploy:
   Presentation.Web.hostname: localhost
   Presentation.Web.port: 44300
 after_deploy:
-  - ps: .\test-deploy.ps1
+  - ps: $env:APPVEYOR_BUILD_FOLDER\test-deploy.ps1
   # - node_modules\.bin\gulp protractor
