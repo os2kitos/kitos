@@ -57,7 +57,7 @@ deploy:
   Presentation.Web.hostname: localhost
   Presentation.Web.port: 44300
   Presentation.Web.protocol: https
-  Presentation.Web.certificate: localtest.me
+  Presentation.Web.certificate: localhost
   Presentation.Web.remove_files: true
   # - node_modules\.bin\gulp protractor
 on_finish:

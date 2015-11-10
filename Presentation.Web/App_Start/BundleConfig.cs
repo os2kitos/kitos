@@ -31,7 +31,11 @@ namespace Presentation.Web
 
             // angular app files
             bundles.Add(new ScriptBundle("~/Scripts/appbundle").IncludeDirectory(
-                "~/Scripts/app", "*.js", true));
+                "~/Scripts/app", "*.js", true)
+                );
+
+            // Ignore test specs
+            bundles.IgnoreList.Ignore("*.spec.js");
 
             // css
             bundles.Add(new StyleBundle("~/Content/cssbundle").Include(
