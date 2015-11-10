@@ -48,6 +48,8 @@ test: off
   # name: Frontend Coverage Report
 # - path: results.xml
   # name: OpenCover results
+before_deploy:
+  - ps: .\InstallSelfSignedCert.ps1
 deploy:
 - provider: Local
   Presentation.Web.deploy_website: true
