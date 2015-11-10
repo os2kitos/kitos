@@ -50,4 +50,5 @@ deploy:
   Presentation.Web.hostname: localhost
   Presentation.Web.port: 44300
 after_deploy:
-  - node_modules\.bin\gulp protractor
+  - ps: test-deploy.ps1
+  # - node_modules\.bin\gulp protractor
