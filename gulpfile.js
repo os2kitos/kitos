@@ -11,7 +11,7 @@ gulp.task('default', ['lint']);
 
 gulp.task('lint', ['es-lint', 'ts-lint']);
 
-// Run tslint on all typescript files.
+// run tslint on all typescript files.
 gulp.task('ts-lint', function () {
     return gulp.src(paths.allTypeScript)
 		.pipe(tslint())
@@ -20,7 +20,7 @@ gulp.task('ts-lint', function () {
 		}));
 });
 
-// Run eslint on all javascript files
+// run eslint on all javascript files
 gulp.task('es-lint', function() {
     return gulp.src(paths.allJavaScript)
 		.pipe(eslint())
@@ -29,7 +29,7 @@ gulp.task('es-lint', function() {
 		//.pipe(eslint.failAfterError());
 });
 
-// Bundle files for deployment.
+// bundle files for deployment.
 gulp.task('bundle', function () {
     return gulp.src('./bundle.config.js')
       .pipe(bundle())
@@ -37,13 +37,13 @@ gulp.task('bundle', function () {
       .pipe(gulp.dest((paths.bundleDir)));
 });
 
-// Watch for file changes and run linters.
+// watch for file changes and run linters.
 gulp.task('watch', function () {
     gulp.watch(paths.allTypeScript, ['ts-lint']);
     gulp.watch(paths.allJavaScript, ['es-lint']);
 });
 
-// Run karma tests and coverage. Post coverage to Coveralls.io
+// run karma tests and coverage. Post coverage to Coveralls.io
 gulp.task('karmaPost', function () {
     new KarmaServer({
         configFile: __dirname + '/' + paths.source + '/karma.conf.js',
@@ -64,7 +64,7 @@ gulp.task('karmaPost', function () {
     }).start();
 });
 
-// Run karma tests and coverage. No publish to Coveralls.io
+// run karma tests and coverage. No publish to Coveralls.io
 gulp.task('karma', function () {
     new KarmaServer({
         configFile: __dirname + '/' + paths.source + '/karma.conf.js',
@@ -85,7 +85,7 @@ gulp.task('karma', function () {
     }).start();
 });
 
-// Open coverage results.
+// open coverage results.
 gulp.task('localCover', ['localKarma'], function() {
     gulp.src('karmaCoverage/Phantom*/index.html')
         .pipe(open({
@@ -93,7 +93,7 @@ gulp.task('localCover', ['localKarma'], function() {
         }));
 });
 
-// Run karma tests and coverage locally
+// run karma tests and coverage locally
 gulp.task('localKarma', function(done) {
     new KarmaServer({
         configFile: __dirname + '/' + paths.source + '/karma.conf.js',
@@ -113,6 +113,7 @@ gulp.task('localKarma', function(done) {
     }, done).start();
 });
 
+// run protractor tests
 gulp.task('protractor', function (done) {
     return gulp.src(['Presentation/**/*.e2e.spec.js'])
         .pipe(protractor({

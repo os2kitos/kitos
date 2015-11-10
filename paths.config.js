@@ -1,4 +1,3 @@
-// paths for gulp tasks
 var source = 'Presentation.Web',
     sourceApp = source + '/Scripts/app',
     allJavaScript = [sourceApp + '/**/*.js'],

@@ -1,9 +1,7 @@
-﻿using System.Data.Entity;
-using System.Web.Http;
+﻿using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-using Infrastructure.DataAccess;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
