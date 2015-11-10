@@ -9,7 +9,7 @@
         ],
         "linebreak-style": [
             2,
-            "windows"
+            "unix"
         ],
         "semi": [
             2,
