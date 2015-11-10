@@ -55,6 +55,7 @@ deploy:
   Presentation.Web.hostname: localhost
   Presentation.Web.port: 44300
   Presentation.Web.remove_files: true
+  Presentation.Web.write_access: true
 # after_deploy:
   # - node_modules\.bin\gulp protractor
 on_finish:
