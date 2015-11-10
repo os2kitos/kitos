@@ -25,6 +25,8 @@ services:
 - mysql56
 before_build:
 - nuget restore %APPVEYOR_BUILD_FOLDER%\KITOS.sln -verbosity quiet
+configuration:
+  - AppVeyor
 build:
   project: KITOS.sln
   verbosity: minimal
