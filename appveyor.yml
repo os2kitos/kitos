@@ -13,10 +13,10 @@ environment:
   NODEJS_VERSION: "4"
 install:
   - ps: install-Product node $env:NODEJS_VERSION
-  - npm install
-  - node_modules\.bin\webdriver-manager update --standalone
+  # - npm install
+  # - node_modules\.bin\webdriver-manager update --standalone
 cache:
-  - node_modules -> package.json # cache node packages if package.json is the same
+  # - node_modules -> package.json # cache node packages if package.json is the same
   - packages -> **\packages.config
 services:
 - iis
@@ -50,5 +50,5 @@ deploy:
   Presentation.Web.hostname: localhost
   Presentation.Web.port: 44300
 after_deploy:
-  - ps: test-deploy.ps1
+  - ps: .\test-deploy.ps1
   # - node_modules\.bin\gulp protractor
