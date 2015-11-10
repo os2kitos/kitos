@@ -15,10 +15,10 @@ init:
   - ps: iex((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 install:
   - ps: install-Product node $env:NODEJS_VERSION
-  # - npm install
-  # - node_modules\.bin\webdriver-manager update --standalone
+  - npm install
+  - node_modules\.bin\webdriver-manager update --standalone
 cache:
-  # - node_modules -> package.json # cache node packages if package.json is the same
+  - node_modules -> package.json # cache node packages if package.json is the same
   - packages -> **\packages.config
 services:
 - iis
@@ -59,6 +59,6 @@ deploy:
   Presentation.Web.protocol: https
   Presentation.Web.certificate: localhost
   Presentation.Web.remove_files: true
-  # - node_modules\.bin\gulp protractor
+  - node_modules\.bin\gulp protractor
 on_finish:
 - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
