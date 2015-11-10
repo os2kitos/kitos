@@ -49,8 +49,10 @@ test: off
 deploy:
 - provider: Local
   Presentation.Web.deploy_website: true
+  Presentation.Web.site_name: Kitos
   Presentation.Web.hostname: localhost
   Presentation.Web.port: 44300
+  Presentation.Web.remove_files: true
 # after_deploy:
   # - node_modules\.bin\gulp protractor
 on_finish:
