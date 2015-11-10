@@ -1,4 +1,4 @@
-$cert = New-SelfSignedCertificate -FriendlyName "kitosCert" -DnsName ("localtest.me","*.localtest.me") -CertStoreLocation cert:\LocalMachine\My
+$cert = New-SelfSignedCertificate -DnsName ("localtest.me","*.localtest.me") -CertStoreLocation cert:\LocalMachine\My
 $rootStore = Get-Item cert:\LocalMachine\Root
 $rootStore.Open("ReadWrite")
 $rootStore.Add($cert)
