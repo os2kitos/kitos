@@ -59,6 +59,7 @@ deploy:
   Presentation.Web.protocol: https
   Presentation.Web.certificate: localhost
   Presentation.Web.remove_files: true
+after_deploy:
   - node_modules\.bin\gulp protractor
 on_finish:
 - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
