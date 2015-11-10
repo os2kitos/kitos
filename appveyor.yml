@@ -11,8 +11,6 @@ environment:
   ESLINT_DIR: Presentation.Web\Scripts\app
   TSLINT_DIR: Presentation.Web\Scripts\app
   NODEJS_VERSION: "4"
-init:
-  - ps: iex((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 install:
   - ps: install-Product node $env:NODEJS_VERSION
   - npm install --loglevel error
@@ -61,5 +59,3 @@ deploy:
   Presentation.Web.remove_files: true
 after_deploy:
   - node_modules\.bin\gulp protractor
-on_finish:
-- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
