@@ -32,7 +32,7 @@ var source = 'Presentation.Web',
     // all e2e tests.
     e2eFiles = ['Tests/**/*e2e.spec.js'],
     e2eReport = 'results-protractor.json',
-    seleniumServerJar = '../node_modules/protractor/selenium/selenium-server-standalone-2.47.1.jar';
+    seleniumServerJar = '../node_modules/selenium-server-standalone-jar/jar/selenium-server-standalone-2.47.1.jar';
 
 module.exports = {
     source: source,
