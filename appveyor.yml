@@ -49,6 +49,7 @@ deploy:
   Presentation.Web.certificate: localhost
   Presentation.Web.remove_files: true
 after_deploy:
+  - java -version
   - node_modules\.bin\gulp protractor
 artifacts:
 - path: coverage
