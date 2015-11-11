@@ -1,6 +1,6 @@
-﻿<div search-box data-paging="pagination"></div>
+﻿<div search-box data-paging="vm.pagination"></div>
 <div class="searchbox-wrapper">
-    <a class="excel-icon" data-ng-href="{{csvUrl}}">
+    <a class="excel-icon" data-ng-href="{{vm.csvUrl}}">
         <img src="../../Images/excel.png" alt="Hent excelark" width="25">
     </a>
 </div>
@@ -11,7 +11,7 @@
             <!-- Name -->
             <th>
                 IT Projekt
-                <button data-order-by="'name'" data-paging="pagination"></button>
+                <button data-order-by="'name'" data-paging="vm.pagination"></button>
             </th>
             <!-- Responsible -->
             <th>
@@ -19,20 +19,19 @@
             </th>
             <!-- Role -->
             <th>
-                <select data-ng-model="chosenRoleId" data-ng-init="chosenRoleId = 2" data-ng-options="r.id as r.name for r in projectRoles">
-                </select>
+                <select data-ng-model="chosenRoleId" data-ng-init="chosenRoleId = 2" data-ng-options="r.id as r.name for r in vm.projectRoles"></select>
             </th>
             <!-- ID -->
             <th>
                 Projekt ID
-                <button data-order-by="'ItProjectId'" data-paging="pagination"></button>
+                <button data-order-by="'ItProjectId'" data-paging="vm.pagination"></button>
             </th>
             <!-- Type -->
             <th>
                 Type
-                <button data-order-by="'itProjectType.name'" data-paging="pagination"></button>
+                <button data-order-by="'itProjectType.name'" data-paging="vm.pagination"></button>
             </th>
-            
+
             <!-- bool markers -->
             <th class="col-sm-0"></th>
 
@@ -45,7 +44,7 @@
                     <option value="statusProject">Status projekt</option>
                     <option value="goalStatus.status">Status mål</option>
                 </select>
-                <button data-order-by="chosenStatus" data-paging="pagination"></button>
+                <button data-order-by="chosenStatus" data-paging="vm.pagination"></button>
             </th>
             <!-- Risk/ROI/BC -->
             <th class="text-right">
@@ -61,18 +60,18 @@
                     <option value="priority">Prioritet 1</option>
                     <option value="priorityPf">Prioritet 2</option>
                 </select>
-                <button data-order-by="chosenPriority" data-paging="pagination"></button>
+                <button data-order-by="chosenPriority" data-paging="vm.pagination"></button>
             </th>
         </tr>
     </thead>
     <tbody>
-        <tr data-ng-repeat="p in projects | filter:{isArchived: false}">
+        <tr data-ng-repeat="p in vm.projects | filter:{isArchived: false}">
             <!-- Name -->
             <td><a data-ui-sref="it-project.edit.status-project({id: p.id})">{{ p.name ? p.name : 'Unavngiven' }}</a></td>
             <!-- Responsible -->
             <td>{{ p.responsibleOrgUnitName }}</td>
             <!-- Role -->
-            <td>{{ p.rights | filter:{roleId:chosenRoleId}:true | joinBy:', ':'user.fullName' }}</td>
+            <td>{{ p.rights | filter:{roleId:chosenRoleId}:true | joinBy:', ':'vm.user.fullName' }}</td>
             <!-- ID -->
             <td>{{ p.itProjectId }}</td>
             <!-- Type -->
@@ -120,7 +119,7 @@
                 </div>
             </td>
         </tr>
-        
+
         <!-- "click to show inactive projects"-row -->
         <tr>
             <td colspan="10">
@@ -131,13 +130,13 @@
             </td>
         </tr>
 
-        <tr data-ng-repeat="p in projects | filter:{isArchived: true}" data-ng-if="showInactive">
+        <tr data-ng-repeat="p in vm.projects | filter:{isArchived: true}" data-ng-if="showInactive">
             <!-- Name -->
             <td><a data-ui-sref="it-project.edit.status-project({id: p.id})">{{ p.name ? p.name : 'Unavngiven' }}</a></td>
             <!-- Responsible -->
             <td>{{ p.responsibleOrgUnitName }}</td>
             <!-- Role -->
-            <td>{{ p.roles | filter:{roleId:chosenRoleId} | joinBy:', ':'user.name' }}</td>
+            <td>{{ p.roles | filter:{roleId:chosenRoleId} | joinBy:', ':'vm.user.name' }}</td>
             <!-- ID -->
             <td>{{ chosenId == 0 ? p.itProjectId : p.parent.itProjectId }}</td>
             <!-- Type -->
@@ -156,7 +155,7 @@
                 <span data-ng-if="chosenEco == 2">{{ p.bc }}</span>
             </td>
             <td>
-                <select data-ng-model="p.priority" data-autosave="api/itproject/{{p.id}}" data-field="priority" data-ng-disabled="p.isPriorityLocked" data-ng-if="chosenpriority == 0">
+                <select data-ng-model="p.priority" data-autosave="api/itproject/{{p.id}}" data-field="priority" data-ng-disabled="p.isPriorityLocked" data-ng-if="chosenPriority == 0">
                     <option value="0">-- Vælg --</option>
                     <option value="3">Høj</option>
                     <option value="2">Mellem</option>
@@ -178,11 +177,11 @@
                 </select>
             </td>
         </tr>
-    </tbody>    
+    </tbody>
     <tfoot>
         <tr>
             <td colspan="10" class="text-center">
-                <span data-pagination-buttons="pagination" data-pagination-total-count="totalCount"></span>
+                <span data-pagination-buttons="vm.pagination" data-pagination-total-count="vm.totalCount"></span>
             </td>
         </tr>
     </tfoot>

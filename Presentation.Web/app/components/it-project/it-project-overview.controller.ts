@@ -1,100 +1,128 @@
-﻿(function (ng, app) {
-    app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-project.overview', {
-            url: '/overview',
-            templateUrl: 'app/components/it-project/it-project-overview.html',
-            controller: 'project.EditOverviewCtrl',
-            resolve: {
-                projectRoles: ['$http', function ($http) {
-                    return $http.get('api/itprojectrole').then(function (result) {
-                        return result.data.response;
-                    });
-                }],
-                user: ['userService', function (userService) {
-                    return userService.getUser();
-                }]
-            }
-        });
-    }]);
+﻿module Kitos.ItProject.Overview {
+    'use strict';
 
-    app.controller('project.EditOverviewCtrl',
-    ['$scope', '$http', 'notify', 'projectRoles', 'user', '$q',
-        function ($scope, $http, notify, projectRoles, user, $q) {
-            $scope.pagination = {
+    interface IPaginationSettings {
+        search: string;
+        skip: number;
+        take: number;
+        orderBy: string;
+        descending?: boolean;
+    }
+
+    export class OverviewController {
+
+        public pagination: IPaginationSettings
+        public csvUrl: string;
+        public projects: Array<any>
+        public totalCount: number;
+
+        static $inject: Array<string> = [
+            '$scope',
+            '$http',
+            'notify',
+            'projectRoles',
+            'user',
+            '$q'
+        ];
+
+        constructor(
+            private $scope: ng.IScope,
+            private $http: ng.IHttpService,
+            private notify,
+            public projectRoles,
+            public user,
+            private $q) {
+
+            this.pagination = {
                 search: '',
                 skip: 0,
                 take: 25,
                 orderBy: 'Name'
             };
 
-            $scope.csvUrl = 'api/itProject?csv&orgId=' + user.currentOrganizationId;
+            this.csvUrl = 'api/itProject?csv&orgId=' + this.user.currentOrganizationId;
 
-            $scope.projects = [];
-            $scope.projectRoles = projectRoles;
+            this.projects = [];
 
-            $scope.$watchCollection('pagination', function (newVal, oldVal) {
-                loadProjects();
-            });
+            this.$scope.$watchCollection(() => this.pagination, () => this.loadProjects());
+        }
 
-            function loadProjects() {
-                var deferred = $q.defer();
+        private setCanEdit(projectCollection) {
+            return this.$q.all(_.map(projectCollection, (iteratee: { id; canBeEdited; }) => {
+                var deferred = this.$q.defer();
 
-                var url = 'api/itProject?overview&orgId=' + user.currentOrganizationId;
+                setTimeout(() => {
+                    this.$http.get("api/itProject/" + iteratee.id + "?hasWriteAccess" + '&organizationId=' + this.user.currentOrganizationId)
+                        .then(
+                        (result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => {
+                            iteratee.canBeEdited = result.data.response;
+                            deferred.resolve(iteratee);
+                        }, result => {
+                            iteratee.canBeEdited = false;
+                            deferred.reject(result);
+                        });
+                }, 0);
 
-                url += '&skip=' + $scope.pagination.skip;
-                url += '&take=' + $scope.pagination.take;
+                return deferred.promise;
+            }));
+        }
 
-                if ($scope.pagination.orderBy) {
-                    url += '&orderBy=' + $scope.pagination.orderBy;
-                    if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
-                }
+        private pushProject(project) {
+            // Due to https://github.com/angular/angular.js/blob/master/CHANGELOG.md#breaking-changes-8
+            // we have to convert these values to strings
+            project.priority = project.priority.toString();
+            project.priorityPf = project.priorityPf.toString();
 
-                if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
-                else url += "&q=";
+            this.projects.push(project);
+        }
 
-                $scope.projects = [];
-                $http.get(url).success(function (result, status, headers) {
+        private loadProjects() {
+            var deferred = this.$q.defer();
 
+            var url = 'api/itProject?overview&orgId=' + this.user.currentOrganizationId;
+
+            url += '&skip=' + this.pagination.skip;
+            url += '&take=' + this.pagination.take;
+
+            if (this.pagination.orderBy) {
+                url += '&orderBy=' + this.pagination.orderBy;
+                if (this.pagination.descending) url += '&descending=' + this.pagination.descending;
+            }
+
+            if (this.pagination.search) url += '&q=' + this.pagination.search;
+            else url += "&q=";
+
+            this.projects = [];
+            this.$http.get(url)
+                .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => {
+                    var headers = result.headers;
                     var paginationHeader = JSON.parse(headers('X-Pagination'));
-                    $scope.totalCount = paginationHeader.TotalCount;
+                    this.totalCount = paginationHeader.TotalCount;
 
-                    setCanEdit(result.response).then(function(canEditResult) {
-                        _.each(canEditResult, pushProject);
-                    });
+                    this.setCanEdit(result.data.response)
+                        .then(canEditResult => angular.forEach(canEditResult, (project) => this.pushProject(project)));
+                },
+                () => this.notify.addErrorMessage("Kunne ikke hente projekter!"));
+        }
+    }
 
-                }).error(function () {
-                    notify.addErrorMessage("Kunne ikke hente projekter!");
-                });
-            }
-
-            function setCanEdit(projectCollection) {
-                return $q.all(_.map(projectCollection, function(iteratee: { id; canBeEdited; }) {
-                    var deferred = $q.defer();
-
-                    setTimeout(function() {
-                        $http.get("api/itProject/" + iteratee.id + "?hasWriteAccess" + '&organizationId=' + user.currentOrganizationId)
-                            .success(function(result) {
-                                iteratee.canBeEdited = result.response;
-                                deferred.resolve(iteratee);
-                            })
-                            .error(function(result) {
-                                iteratee.canBeEdited = false;
-                                deferred.reject(result);
-                                }
-                            );
-                    }, 0);
-
-                    return deferred.promise;
-                }));
-            }
-
-            function pushProject(project) {
-                // Due to https://github.com/angular/angular.js/blob/master/CHANGELOG.md#breaking-changes-8
-                // we have to convert these values to strings
-                project.priority = project.priority.toString();
-                project.priorityPf = project.priorityPf.toString();
-
-                $scope.projects.push(project);
-            }
+    angular
+        .module('app')
+        .controller('project.EditOverviewCtrl', OverviewController)
+        .config(['$stateProvider', $stateProvider => {
+            $stateProvider.state('it-project.overview', {
+                url: '/overview',
+                templateUrl: 'app/components/it-project/it-project-overview.html',
+                controller: OverviewController,
+                controllerAs: 'vm',
+                resolve: {
+                    projectRoles: [
+                        '$http', $http => $http.get('api/itprojectrole').then(result => result.data.response)
+                    ],
+                    user: [
+                        'userService', userService => userService.getUser()
+                    ]
+                }
+            });
         }]);
-})(angular, app);
+}
