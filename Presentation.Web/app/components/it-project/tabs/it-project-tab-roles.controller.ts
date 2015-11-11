@@ -4,7 +4,7 @@
 
         $stateProvider.state('it-project.edit.roles', {
             url: '/roles',
-            templateUrl: 'partials/it-project/tab-roles.html',
+            templateUrl: 'app/components/it-project/tabs/it-project-tab-roles.html',
             controller: 'project.EditRolesCtrl',
             resolve: {
                 // re-resolve data from parent cause changes here wont cascade to it

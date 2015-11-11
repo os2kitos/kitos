@@ -4,7 +4,7 @@
 
         $stateProvider.state('it-project.edit.stakeholders', {
             url: '/stakeholders',
-            templateUrl: 'partials/it-project/tab-stakeholders.html',
+            templateUrl: 'app/components/it-project/tabs/it-project-tab-stakeholders.html',
             controller: 'project.EditStakeholdersCtrl',
             resolve: {
                 // re-resolve data from parent cause changes here wont cascade to it
@@ -13,7 +13,7 @@
                         .then(function (result) {
                             return result.data.response;
                         });
-                }]             
+                }]
             }
         });
     }]);
@@ -54,7 +54,7 @@
                 $scope.$broadcast('show-errors-check-validity');
 
                 if ($scope.stakeholderForm.$invalid) { return; }
-                
+
                 var row = $scope.new;
 
                 var data = {
@@ -83,4 +83,3 @@
 
 
 })(angular, app);
-    

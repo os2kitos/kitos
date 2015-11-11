@@ -3,7 +3,7 @@
         '$stateProvider', function($stateProvider) {
             $stateProvider.state('it-project.edit.kle', {
                 url: '/kle',
-                templateUrl: 'partials/it-project/tab-kle.html',
+                templateUrl: 'app/components/it-project/tabs/it-project-tab-kle.html',
                 controller: 'project.EditKleCtrl',
                 resolve: {
                     // re-resolve data from parent cause changes here wont cascade to it

@@ -30,7 +30,7 @@ namespace Presentation.Web
 
             // angular app files
             bundles.Add(new ScriptBundle("~/Scripts/appbundle").IncludeDirectory(
-                "~/Scripts/app", "*.js", true));
+                "~/app", "*.js", true));
 
             // css
             bundles.Add(new StyleBundle("~/Content/cssbundle").Include(

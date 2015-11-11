@@ -2,7 +2,7 @@
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-project.edit.communication', {
             url: '/communication',
-            templateUrl: 'partials/it-project/tab-communication.html',
+            templateUrl: 'app/components/it-project/tabs/it-project-tab-communication.html',
             controller: 'project.EditCommunicationCtrl',
             resolve: {
                 comms: ['$http', '$stateParams', function ($http, $stateParams) {

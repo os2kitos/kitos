@@ -2,7 +2,7 @@
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-project.edit.phases', {
             url: '/phases',
-            templateUrl: 'partials/it-project/tab-phases.html',
+            templateUrl: 'app/components/it-project/tabs/it-project-tab-phases.html',
             controller: 'project.EditPhasesCtrl',
             resolve: {
                 // re-resolve data from parent cause changes here wont cascade to it

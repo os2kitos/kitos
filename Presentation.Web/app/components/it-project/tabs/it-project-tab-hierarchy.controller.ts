@@ -2,7 +2,7 @@
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-project.edit.hierarchy', {
             url: '/hierarchy',
-            templateUrl: 'partials/it-project/tab-hierarchy.html',
+            templateUrl: 'app/components/it-project/tabs/it-project-tab-hierarchy.html',
             controller: 'project.EditHierarchyCtrl',
             resolve: {
                 hierarchyFlat: ['$http', '$stateParams', function ($http, $stateParams) {

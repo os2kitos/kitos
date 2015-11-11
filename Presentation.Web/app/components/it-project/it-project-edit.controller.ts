@@ -2,7 +2,7 @@
     app.config(['$stateProvider', function($stateProvider) {
         $stateProvider.state('it-project.edit', {
             url: '/edit/{id:[0-9]+}',
-            templateUrl: 'partials/it-project/edit-it-project.html',
+            templateUrl: 'app/components/it-project/it-project-edit.html',
             controller: 'project.EditCtrl',
             resolve: {
                 project: ['$http', '$stateParams', function($http, $stateParams) {
@@ -38,7 +38,7 @@
                 $scope.project = project;
                 $scope.projectTypes = projectTypes;
 
-                if (!_.find(projectTypes, function(type) { return type.id == project.itProjectTypeId; })) {
+                if (!_.find(projectTypes, function(type: { id }) { return type.id == project.itProjectTypeId; })) {
                     $scope.projectTypes.unshift({ id: project.itProjectTypeId, name: project.itProjectTypeName });
                 }
 
@@ -88,7 +88,25 @@
                 ];
                 // TODO refactor this garbage!
                 $scope.$watch('selectedData', function (newValue, oldValue) {
-                    var payload = {};
+                    var payload: {
+                        isStatusGoalVisible: boolean;
+                        isStrategyVisible: boolean;
+                        isHierarchyVisible: boolean;
+                        isEconomyVisible: boolean;
+                        isStakeholderVisible: boolean;
+                        isRiskVisible: boolean;
+                        isCommunicationVisible: boolean;
+                        isHandoverVisible: boolean;
+                    } = {
+                        isStatusGoalVisible: null,
+                        isStrategyVisible: null,
+                        isHierarchyVisible: null,
+                        isEconomyVisible: null,
+                        isStakeholderVisible: null,
+                        isRiskVisible: null,
+                        isCommunicationVisible: null,
+                        isHandoverVisible: null
+                    };
                     if (newValue.length > oldValue.length) {
                         // something was added
                         var addIds = _.difference(_.pluck(newValue, 'id'), _.pluck(oldValue, 'id'));
@@ -196,7 +214,7 @@
                             results: function (data, page) {
                                 var results = [];
 
-                                _.each(data.data.response, function (obj) {
+                                _.each(data.data.response, function (obj: { id; name; cvr;}) {
                                     if (excludeSelf && obj.id == project.id)
                                         return; // don't add self to result
 
