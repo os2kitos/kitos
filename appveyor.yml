@@ -11,21 +11,20 @@ environment:
   ESLINT_DIR: Presentation.Web\Scripts\app
   TSLINT_DIR: Presentation.Web\Scripts\app
   NODEJS_VERSION: "4"
+services:
+- iis
+- mysql56
+cache:
+  - node_modules -> package.json
+  - packages -> **\packages.config
+configuration:
+  - AppVeyor
 install:
   - ps: install-Product node $env:NODEJS_VERSION
   - npm config set loglevel error
   - npm install
-  - node_modules\.bin\webdriver-manager update --standalone
-cache:
-  - node_modules -> package.json
-  - packages -> **\packages.config
-services:
-- iis
-- mysql56
 before_build:
 - nuget restore %APPVEYOR_BUILD_FOLDER%\KITOS.sln -verbosity quiet
-configuration:
-  - AppVeyor
 build:
   project: KITOS.sln
   verbosity: quiet
@@ -38,17 +37,6 @@ test_script:
   - run-coverage.bat
   # Post backend coverage to coveralls.
   # - post-coverage.bat
-artifacts:
-- path: coverage
-  name: Backend Coverage Report
-- path: karmaCoverage
-  name: Frontend Coverage Report
-- path: results.xml
-  name: OpenCover results
-- path: results-protractor.json
-  name: Protractor test results
-- path: npm-debug.log
-  name: npm error log
 before_deploy:
   - ps: .\InstallSelfSignedCert.ps1
 deploy:
@@ -62,4 +50,15 @@ deploy:
   Presentation.Web.remove_files: true
 after_deploy:
   - node_modules\.bin\gulp protractor
+artifacts:
+- path: coverage
+  name: Backend Coverage Report
+- path: karmaCoverage
+  name: Frontend Coverage Report
+- path: results.xml
+  name: OpenCover results
+- path: results-protractor.json
+  name: Protractor test results
+- path: npm-debug.log
+  name: npm error log
   
