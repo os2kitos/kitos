@@ -1,117 +1,114 @@
-﻿(function(ng, app) {
-    app.config(['$stateProvider', function($stateProvider) {
-        $stateProvider.state('it-project.edit', {
-            url: '/edit/{id:[0-9]+}',
-            templateUrl: 'app/components/it-project/it-project-edit.html',
-            controller: 'project.EditCtrl',
-            resolve: {
-                project: ['$http', '$stateParams', function($http, $stateParams) {
-                    return $http.get("api/itproject/" + $stateParams.id)
-                        .then(function(result) {
-                            return result.data.response;
-                        });
-                }],
-                projectTypes: ['$http', function ($http) {
-                    return $http.get("api/itprojecttype/")
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }],
-                user: ['userService', function (userService) {
-                    return userService.getUser();
-                }],
-                hasWriteAccess: ['$http', '$stateParams', 'user', function ($http, $stateParams, user) {
-                    return $http.get("api/itproject/" + $stateParams.id + "?hasWriteAccess&organizationId=" + user.currentOrganizationId)
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }],
+﻿module Kitos.ItProject.Edit {
+    'use strict';
+
+    export class EditController {
+
+        public parentSelectOptions;
+        public autosaveUrl: string;
+        public dropdownData: Array<IDropdownOption>;
+        public selectedData: Array<IDropdownOption>;
+        public selectTranslation: ISelectTranslation;
+        public selectSettings: ISelectSettings;
+        public allowClearOption: IAllowClearOption;
+
+        static $inject: string[] = [
+            '$scope',
+            '$http',
+            'project',
+            'projectTypes',
+            'user',
+            'hasWriteAccess',
+            'autofocus'
+        ];
+
+        constructor(
+            private $scope: ng.IScope,
+            private $http: ng.IHttpService,
+            public project,
+            public projectTypes,
+            private user,
+            public hasWriteAccess,
+            private autofocus) {
+            autofocus();
+
+            if (!_.find(this.projectTypes, (type: { id }) => type.id == this.project.itProjectTypeId)) {
+                this.projectTypes.unshift({ id: this.project.itProjectTypeId, name: this.project.itProjectTypeName });
             }
-        });
-    }]);
 
-    app.controller('project.EditCtrl', ['$scope', '$http', 'notify',
-            'project', 'projectTypes', 'user', 'hasWriteAccess', 'autofocus',
-            function ($scope, $http, notify, project, projectTypes, user, hasWriteAccess, autofocus) {
-                autofocus();
+            if (this.project.parentId) {
+                this.project.parent = {
+                    id: this.project.parentId,
+                    text: this.project.parentName
+                };
+            }
 
-                $scope.project = project;
-                $scope.projectTypes = projectTypes;
+            this.allowClearOption = {
+                allowClear: true
+            };
 
-                if (!_.find(projectTypes, function(type: { id }) { return type.id == project.itProjectTypeId; })) {
-                    $scope.projectTypes.unshift({ id: project.itProjectTypeId, name: project.itProjectTypeName });
-                }
+            this.selectSettings = {
+                dynamicTitle: false,
+                buttonClasses: 'btn btn-default btn-sm'
+            };
 
-                if ($scope.project.parentId) {
-                    $scope.project.parent = {
-                        id: $scope.project.parentId,
-                        text: $scope.project.parentName
-                    };
-                }
+            this.selectTranslation = {
+                checkAll: 'Vis alle',
+                uncheckAll: 'Skjul alle',
+                buttonDefaultText: 'Faner '
+            };
 
-                $scope.allowClearOption = {
-                    allowClear: true
+            this.selectedData = [];
+
+            if (this.project.isStatusGoalVisible)
+                this.selectedData.push({ id: 1 });
+            if (this.project.isStrategyVisible)
+                this.selectedData.push({ id: 2 });
+            if (this.project.isHierarchyVisible)
+                this.selectedData.push({ id: 3 });
+            if (this.project.isEconomyVisible)
+                this.selectedData.push({ id: 4 });
+            if (this.project.isStakeholderVisible)
+                this.selectedData.push({ id: 5 });
+            if (this.project.isRiskVisible)
+                this.selectedData.push({ id: 6 });
+            if (this.project.isCommunicationVisible)
+                this.selectedData.push({ id: 7 });
+            if (this.project.isHandoverVisible)
+                this.selectedData.push({ id: 8 });
+
+            this.dropdownData = [
+                { id: 1, label: 'Vis Status: Mål' },
+                { id: 2, label: 'Vis Strategi' },
+                { id: 3, label: 'Vis Hierarki' },
+                { id: 4, label: 'Vis Økonomi' },
+                { id: 5, label: 'Vis Interessenter' },
+                { id: 6, label: 'Vis Risiko' },
+                { id: 7, label: 'Vis Kommunikation' },
+                { id: 8, label: 'Vis Overlevering' }
+            ];
+
+            this.autosaveUrl = "api/itproject/" + this.project.id;
+
+            this.parentSelectOptions = this.selectLazyLoading('api/itproject', true, ['overview', 'orgId=' + this.user.currentOrganizationId]);
+
+            // TODO refactor this garbage!
+            this.$scope.$watch(() => this.selectedData, (newValue: Array<IDropdownOption>, oldValue: Array<IDropdownOption>) => {
+                var payload: IPayload = {
+                        isStatusGoalVisible: false,
+                        isStrategyVisible: false,
+                        isHierarchyVisible: false,
+                        isEconomyVisible: false,
+                        isStakeholderVisible: false,
+                        isRiskVisible: false,
+                        isCommunicationVisible: false,
+                        isHandoverVisible: false
                 };
 
-                $scope.selectSettings = { dynamicTitle: false, buttonClasses: 'btn btn-default btn-sm' };
-                $scope.selectTranslation = {
-                    checkAll: 'Vis alle',
-                    uncheckAll: 'Skjul alle',
-                    buttonDefaultText: 'Faner '
-                };
-                $scope.selectedData = [];
-                if (project.isStatusGoalVisible)
-                    $scope.selectedData.push({ id: 1 });
-                if (project.isStrategyVisible)
-                    $scope.selectedData.push({ id: 2 });
-                if (project.isHierarchyVisible)
-                    $scope.selectedData.push({ id: 3 });
-                if (project.isEconomyVisible)
-                    $scope.selectedData.push({ id: 4 });
-                if (project.isStakeholderVisible)
-                    $scope.selectedData.push({ id: 5 });
-                if (project.isRiskVisible)
-                    $scope.selectedData.push({ id: 6 });
-                if (project.isCommunicationVisible)
-                    $scope.selectedData.push({ id: 7 });
-                if (project.isHandoverVisible)
-                    $scope.selectedData.push({ id: 8 });
-                $scope.dropdownData = [
-                    {id: 1, label: 'Vis Status: Mål'},
-                    { id: 2, label: 'Vis Strategi' },
-                    { id: 3, label: 'Vis Hierarki' },
-                    { id: 4, label: 'Vis Økonomi'},
-                    { id: 5, label: 'Vis Interessenter' },
-                    { id: 6, label: 'Vis Risiko' },
-                    { id: 7, label: 'Vis Kommunikation'},
-                    { id: 8, label: 'Vis Overlevering'}
-                ];
-                // TODO refactor this garbage!
-                $scope.$watch('selectedData', function (newValue, oldValue) {
-                    var payload: {
-                        isStatusGoalVisible: boolean;
-                        isStrategyVisible: boolean;
-                        isHierarchyVisible: boolean;
-                        isEconomyVisible: boolean;
-                        isStakeholderVisible: boolean;
-                        isRiskVisible: boolean;
-                        isCommunicationVisible: boolean;
-                        isHandoverVisible: boolean;
-                    } = {
-                        isStatusGoalVisible: null,
-                        isStrategyVisible: null,
-                        isHierarchyVisible: null,
-                        isEconomyVisible: null,
-                        isStakeholderVisible: null,
-                        isRiskVisible: null,
-                        isCommunicationVisible: null,
-                        isHandoverVisible: null
-                    };
-                    if (newValue.length > oldValue.length) {
-                        // something was added
-                        var addIds = _.difference(_.pluck(newValue, 'id'), _.pluck(oldValue, 'id'));
-                        _.each(addIds, function(id) {
-                            switch (id) {
+                if (newValue.length > oldValue.length) {
+                    // something was added
+                    var addIds = _.difference(_.pluck(newValue, 'id'), _.pluck(oldValue, 'id'));
+                    _.each(addIds, id => {
+                        switch (id) {
                             case 1:
                                 payload.isStatusGoalVisible = true;
                                 break;
@@ -136,99 +133,162 @@
                             case 8:
                                 payload.isHandoverVisible = true;
                                 break;
-                            }
-                        });
-                    } else if (newValue.length < oldValue.length) {
-                        // something was removed
-                        var removedIds = _.difference(_.pluck(oldValue, 'id'), _.pluck(newValue, 'id'));
-                        _.each(removedIds, function(id) {
-                            switch (id) {
-                                case 1:
-                                    payload.isStatusGoalVisible = false;
-                                    break;
-                                case 2:
-                                    payload.isStrategyVisible = false;
-                                    break;
-                                case 3:
-                                    payload.isHierarchyVisible = false;
-                                    break;
-                                case 4:
-                                    payload.isEconomyVisible = false;
-                                    break;
-                                case 5:
-                                    payload.isStakeholderVisible = false;
-                                    break;
-                                case 6:
-                                    payload.isRiskVisible = false;
-                                    break;
-                                case 7:
-                                    payload.isCommunicationVisible = false;
-                                    break;
-                                case 8:
-                                    payload.isHandoverVisible = false;
-                                    break;
-                            }
-                        });
-                    }
-                    if (_.size(payload) > 0) {
-                        $http({ method: 'PATCH', url: $scope.autosaveUrl + '?organizationId=' + user.currentOrganizationId, data: payload }).success(function (result) {
-                            $scope.project.isStatusGoalVisible = result.response.isStatusGoalVisible;
-                            $scope.project.isStrategyVisible = result.response.isStrategyVisible;
-                            $scope.project.isHierarchyVisible = result.response.isHierarchyVisible;
-                            $scope.project.isEconomyVisible = result.response.isEconomyVisible;
-                            $scope.project.isStakeholderVisible = result.response.isStakeholderVisible;
-                            $scope.project.isRiskVisible = result.response.isRiskVisible;
-                            $scope.project.isCommunicationVisible = result.response.isCommunicationVisible;
-                            $scope.project.isHandoverVisible = result.response.isHandoverVisible;
-                        });
-                    }
-                }, true);
-
-                $scope.hasWriteAccess = hasWriteAccess;
-                $scope.autosaveUrl = "api/itproject/" + project.id;
-
-                $scope.parentSelectOptions = selectLazyLoading('api/itproject', true, ['overview', 'orgId=' + user.currentOrganizationId]);
-
-                function selectLazyLoading(url, excludeSelf, paramAry) {
-                    return {
-                        minimumInputLength: 1,
-                        allowClear: true,
-                        placeholder: ' ',
-                        initSelection: function (elem, callback) {
-                        },
-                        ajax: {
-                            data: function (term, page) {
-                                return { query: term };
-                            },
-                            quietMillis: 500,
-                            transport: function (queryParams) {
-                                var extraParams = paramAry ? '&' + paramAry.join('&') : '';
-                                var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
-                                res.abort = function () {
-                                    return null;
-                                };
-
-                                return res;
-                            },
-
-                            results: function (data, page) {
-                                var results = [];
-
-                                _.each(data.data.response, function (obj: { id; name; cvr;}) {
-                                    if (excludeSelf && obj.id == project.id)
-                                        return; // don't add self to result
-
-                                    results.push({
-                                        id: obj.id,
-                                        text: obj.name ? obj.name : 'Unavngiven',
-                                        cvr: obj.cvr
-                                    });
-                                });
-
-                                return { results: results };
-                            }
                         }
-                    };
+                    });
+                } else if (newValue.length < oldValue.length) {
+                    // something was removed
+                    var removedIds = _.difference(_.pluck(oldValue, 'id'), _.pluck(newValue, 'id'));
+                    _.each(removedIds, id => {
+                        switch (id) {
+                            case 1:
+                                payload.isStatusGoalVisible = false;
+                                break;
+                            case 2:
+                                payload.isStrategyVisible = false;
+                                break;
+                            case 3:
+                                payload.isHierarchyVisible = false;
+                                break;
+                            case 4:
+                                payload.isEconomyVisible = false;
+                                break;
+                            case 5:
+                                payload.isStakeholderVisible = false;
+                                break;
+                            case 6:
+                                payload.isRiskVisible = false;
+                                break;
+                            case 7:
+                                payload.isCommunicationVisible = false;
+                                break;
+                            case 8:
+                                payload.isHandoverVisible = false;
+                                break;
+                        }
+                    });
                 }
-            }]);
-})(angular, app);
+                if (_.size(payload) > 0) {
+                    this.$http({ method: 'PATCH', url: this.autosaveUrl + '?organizationId=' + this.user.currentOrganizationId, data: payload })
+                        .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<IPayload>>) => {
+                            var data = result.data.response;
+                            this.project.isStatusGoalVisible = data.isStatusGoalVisible;
+                            this.project.isStrategyVisible = data.isStrategyVisible;
+                            this.project.isHierarchyVisible = data.isHierarchyVisible;
+                            this.project.isEconomyVisible = data.isEconomyVisible;
+                            this.project.isStakeholderVisible = data.isStakeholderVisible;
+                            this.project.isRiskVisible = data.isRiskVisible;
+                            this.project.isCommunicationVisible = data.isCommunicationVisible;
+                            this.project.isHandoverVisible = data.isHandoverVisible;
+                    });
+                }
+            }, true);
+        }
+
+        public selectLazyLoading(url: string, excludeSelf: boolean, paramAry: string[]) {
+            return {
+                minimumInputLength: 1,
+                allowClear: true,
+                placeholder: ' ',
+                initSelection: () => {
+                },
+                ajax: {
+                    data: (term) => {
+                        return { query: term };
+                    },
+                    quietMillis: 500,
+                    transport: (queryParams) => {
+                        var extraParams = paramAry ? '&' + paramAry.join('&') : '';
+                        var res = this.$http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
+                        //res.abort = () => null;
+
+                        return res;
+                    },
+
+                    results: (data: {data: IApiResponse<any> }) => {
+                        var results = [];
+
+                        _.each(data.data.response, (obj: { id; name; cvr; }) => {
+                            if (excludeSelf && obj.id == this.project.id)
+                                return; // don't add self to result
+
+                            results.push({
+                                id: obj.id,
+                                text: obj.name ? obj.name : 'Unavngiven',
+                                cvr: obj.cvr
+                            });
+                        });
+
+                        return { results: results };
+                    }
+                }
+            };
+        }
+    }
+
+    angular
+        .module("app")
+        .controller("project.EditCtrl", EditController)
+        .config([
+            '$stateProvider', $stateProvider => {
+                $stateProvider.state('it-project.edit', {
+                    url: '/edit/{id:[0-9]+}',
+                    templateUrl: 'app/components/it-project/it-project-edit.html',
+                    controller: EditController,
+                    controllerAs: 'vm',
+                    resolve: {
+                        project: [
+                            '$http', '$stateParams', ($http: ng.IHttpService, $stateParams) => {
+                                return $http.get("api/itproject/" + $stateParams.id)
+                                    .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.response);
+                            }
+                        ],
+                        projectTypes: [
+                            '$http', $http => {
+                                return $http.get("api/itprojecttype/")
+                                    .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.response);
+                            }
+                        ],
+                        user: [
+                            'userService', userService => userService.getUser()
+                        ],
+                        hasWriteAccess: [
+                            '$http', '$stateParams', 'user', ($http, $stateParams, user) => {
+                                return $http.get("api/itproject/" + $stateParams.id + "?hasWriteAccess&organizationId=" + user.currentOrganizationId)
+                                    .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.response);
+                            }
+                        ]
+                    }
+                });
+            }
+        ]);
+
+    export interface IDropdownOption {
+        id: number;
+        label?: string;
+    }
+    export interface ISelectSettings {
+        dynamicTitle: boolean;
+        buttonClasses: string;
+    }
+    export interface IAllowClearOption {
+        allowClear: boolean;
+    }
+    export interface ISelectTranslation {
+        checkAll: string;
+        uncheckAll: string;
+        buttonDefaultText: string;
+    }
+    export interface IPayload {
+        isStatusGoalVisible: boolean;
+        isStrategyVisible: boolean;
+        isHierarchyVisible: boolean;
+        isEconomyVisible: boolean;
+        isStakeholderVisible: boolean;
+        isRiskVisible: boolean;
+        isCommunicationVisible: boolean;
+        isHandoverVisible: boolean;
+    }
+    export interface IApiResponse<T> {
+        response: T;
+    }
+}
