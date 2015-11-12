@@ -736,7 +736,7 @@
     <Content Include="app\components\it-project\tabs\it-project-tab-hierarchy.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-phases.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-risk.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-roles.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-roles.view.html" />
     <Content Include="app\components\it-project\it-project-edit.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-org.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-economy.html" />
