@@ -1,15 +1,16 @@
 ﻿module Kitos.ItProject.Overview {
     'use strict';
 
-    interface IPaginationSettings {
-        search: string;
-        skip: number;
-        take: number;
-        orderBy: string;
-        descending?: boolean;
+    export interface IOverviewController {
+        pagination: IPaginationSettings;
+        csvUrl: string;
+        projectRoles: any;
+        projects: Array<any>;
+        user: any;
+        totalCount: number;
     }
 
-    export class OverviewController {
+    export class OverviewController implements IOverviewController {
 
         public pagination: IPaginationSettings
         public csvUrl: string;
@@ -112,9 +113,9 @@
         .config(['$stateProvider', $stateProvider => {
             $stateProvider.state('it-project.overview', {
                 url: '/overview',
-                templateUrl: 'app/components/it-project/it-project-overview.html',
+                templateUrl: 'app/components/it-project/it-project-overview.view.html',
                 controller: OverviewController,
-                controllerAs: 'vm',
+                controllerAs: 'projectOverviewVm',
                 resolve: {
                     projectRoles: [
                         '$http', $http => $http.get('api/itprojectrole').then(result => result.data.response)

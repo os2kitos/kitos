@@ -10,33 +10,33 @@
                     <div class="form-group">
                         <label for="project-name" class="control-label small">Projekt</label>
                         <input type="text" id="project-name" class="form-control input-sm" required
-                               data-ng-model="vm.project.name"
+                               data-ng-model="projectEditVm.project.name"
                                data-field="name"
-                               data-autosave="{{vm.autosaveUrl}}"
-                               data-ng-disabled="!vm.hasWriteAccess"
+                               data-autosave="{{projectEditVm.autosaveUrl}}"
+                               data-ng-disabled="!projectEditVm.hasWriteAccess"
                                autofocus>
                     </div>
                     <!-- ID -->
                     <div class="form-group">
                         <label for="project-projectId" class="control-label small">Projekt ID</label>
                         <input type="text" id="project-projectId" class="form-control input-sm"
-                               data-ng-model="vm.project.itProjectId"
+                               data-ng-model="projectEditVm.project.itProjectId"
                                data-field="itProjectId"
-                               data-autosave="{{vm.autosaveUrl}}"
-                               data-ng-disabled="!vm.hasWriteAccess">
+                               data-autosave="{{projectEditVm.autosaveUrl}}"
+                               data-ng-disabled="!projectEditVm.hasWriteAccess">
                     </div>
 
                     <!-- type -->
                     <div class="form-group">
                         <label for="project-type" class="control-label small">Type</label>
                         <select id="project-type" class="form-control input-sm"
-                                data-ui-select2="vm.allowClearOption"
-                                data-ng-model="vm.project.itProjectTypeId"
+                                data-ui-select2="projectEditVm.allowClearOption"
+                                data-ng-model="projectEditVm.project.itProjectTypeId"
                                 data-field="itProjectTypeId"
-                                data-autosave="{{vm.autosaveUrl}}"
-                                data-ng-disabled="!vm.hasWriteAccess">
+                                data-autosave="{{projectEditVm.autosaveUrl}}"
+                                data-ng-disabled="!projectEditVm.hasWriteAccess">
                             <option value=""></option>
-                            <option data-ng-repeat="projectType in vm.projectTypes" value="{{projectType.id}}">{{projectType.name}}</option>
+                            <option data-ng-repeat="projectType in projectEditVm.projectTypes" value="{{projectType.id}}">{{projectType.name}}</option>
                         </select>
                         <span class="help-block small">&nbsp;</span>
                     </div>
@@ -46,12 +46,12 @@
                         <label for="project-cmdb" class="control-label small">CMDB ref.</label>
                         <div class="input-group">
                             <input id="project-cmdb" class="form-control input-sm" type="text" placeholder="http://"
-                                   data-ng-model="vm.project.cmdb"
-                                   data-ng-disabled="!vm.hasWriteAccess"
+                                   data-ng-model="projectEditVm.project.cmdb"
+                                   data-ng-disabled="!projectEditVm.hasWriteAccess"
                                    data-field="cmdb"
-                                   data-autosave="api/itproject/{{vm.project.id}}">
+                                   data-autosave="api/itproject/{{projectEditVm.project.id}}">
                             <span class="input-group-btn">
-                                <button class="btn btn-sm btn-default" type="button" data-href-blank="vm.project.cmdb">
+                                <button class="btn btn-sm btn-default" type="button" data-href-blank="projectEditVm.project.cmdb">
                                     <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
                                 </button>
                             </span>
@@ -65,17 +65,17 @@
                     <!-- Object owner -->
                     <div class="form-group">
                         <label class="control-label small">Oprettet af</label>
-                        <input type="text" value="{{vm.project.objectOwnerFullName}}" class="form-control input-sm" disabled="disabled">
+                        <input type="text" value="{{projectEditVm.project.objectOwnerFullName}}" class="form-control input-sm" disabled="disabled">
                     </div>
                     <!-- access modifier -->
                     <div class="form-group">
                         <label for="project-access" class="control-label small">Public</label>
                         <input id="project-access" class="form-control input-sm"
-                               data-ng-model="vm.project.accessModifier"
+                               data-ng-model="projectEditVm.project.accessModifier"
                                data-select-access-modifier=""
                                data-field="accessModifier"
-                               data-autosave="{{vm.autosaveUrl}}"
-                               data-ng-disabled="!vm.hasWriteAccess">
+                               data-autosave="{{projectEditVm.autosaveUrl}}"
+                               data-ng-disabled="!projectEditVm.hasWriteAccess">
                     </div>
 
                     <!-- esdh ref -->
@@ -83,12 +83,12 @@
                         <label for="project-esdh" class="control-label small">ESDH ref.</label>
                         <div class="input-group">
                             <input id="project-esdh" class="form-control input-sm" type="text" placeholder="http://"
-                                   data-ng-model="vm.project.esdh"
-                                   data-ng-disabled="!vm.hasWriteAccess"
+                                   data-ng-model="projectEditVm.project.esdh"
+                                   data-ng-disabled="!projectEditVm.hasWriteAccess"
                                    data-field="esdh"
-                                   data-autosave="api/itproject/{{vm.project.id}}">
+                                   data-autosave="api/itproject/{{projectEditVm.project.id}}">
                             <span class="input-group-btn">
-                                <button class="btn btn-sm btn-default" type="button" data-href-blank="vm.project.esdh">
+                                <button class="btn btn-sm btn-default" type="button" data-href-blank="projectEditVm.project.esdh">
                                     <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
                                 </button>
                             </span>
@@ -101,12 +101,12 @@
                         <label for="project-url" class="control-label small">Mappe link</label>
                         <div class="input-group">
                             <input id="project-url" class="form-control input-sm" type="text" placeholder="http://"
-                                   data-ng-model="vm.project.folder"
-                                   data-ng-disabled="!vm.hasWriteAccess"
+                                   data-ng-model="projectEditVm.project.folder"
+                                   data-ng-disabled="!projectEditVm.hasWriteAccess"
                                    data-field="folder"
-                                   data-autosave="api/itproject/{{vm.project.id}}">
+                                   data-autosave="api/itproject/{{projectEditVm.project.id}}">
                             <span class="input-group-btn">
-                                <button class="btn btn-sm btn-default" type="button" data-href-blank="vm.project.folder">
+                                <button class="btn btn-sm btn-default" type="button" data-href-blank="projectEditVm.project.folder">
                                     <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
                                 </button>
                             </span>
@@ -121,10 +121,10 @@
                     <div class="checkbox-inline">
                         <label>
                             <input type="checkbox"
-                                   data-ng-model="vm.project.isArchived"
-                                   data-autosave="{{vm.autosaveUrl}}"
+                                   data-ng-model="projectEditVm.project.isArchived"
+                                   data-autosave="{{projectEditVm.autosaveUrl}}"
                                    data-field="isArchived"
-                                   data-ng-disabled="!vm.hasWriteAccess">
+                                   data-ng-disabled="!projectEditVm.hasWriteAccess">
                             Arkiveret
                         </label>
                     </div>
@@ -133,10 +133,10 @@
                     <div class="checkbox-inline">
                         <label>
                             <input type="checkbox"
-                                   data-ng-model="vm.project.isTransversal"
-                                   data-autosave="{{vm.autosaveUrl}}"
+                                   data-ng-model="projectEditVm.project.isTransversal"
+                                   data-autosave="{{projectEditVm.autosaveUrl}}"
                                    data-field="isTransversal"
-                                   data-ng-disabled="!vm.hasWriteAccess">
+                                   data-ng-disabled="!projectEditVm.hasWriteAccess">
                             Tværgående
                         </label>
                     </div>
@@ -145,10 +145,10 @@
                     <div class="checkbox-inline">
                         <label>
                             <input type="checkbox"
-                                   data-ng-model="vm.project.isStrategy"
-                                   data-autosave="{{vm.autosaveUrl}}"
+                                   data-ng-model="projectEditVm.project.isStrategy"
+                                   data-autosave="{{projectEditVm.autosaveUrl}}"
                                    data-field="isStrategy"
-                                   data-ng-disabled="!vm.hasWriteAccess">
+                                   data-ng-disabled="!projectEditVm.hasWriteAccess">
                             Strategisk
                         </label>
                     </div>
@@ -157,11 +157,11 @@
                     <div class="form-group">
                         <label for="project-parent" class="control-label small">Overordnet projekt</label>
                         <input type="hidden" id="project-parent" class="form-control input-sm"
-                               data-ui-select2="vm.parentSelectOptions"
-                               data-ng-model="vm.project.parent"
-                               data-autosave="{{vm.autosaveUrl}}"
+                               data-ui-select2="projectEditVm.parentSelectOptions"
+                               data-ng-model="projectEditVm.project.parent"
+                               data-autosave="{{projectEditVm.autosaveUrl}}"
                                data-field="parentId"
-                               data-ng-disabled="!vm.hasWriteAccess">
+                               data-ng-disabled="!projectEditVm.hasWriteAccess">
                     </div>
                 </div>
             </div>
@@ -176,10 +176,10 @@
                     <div class="form-group">
                         <label for="project-background" class="control-label small">Formål/baggrund</label>
                         <textarea id="project-background" class="form-control input-sm" rows="7"
-                                  data-ng-model="vm.project.background"
+                                  data-ng-model="projectEditVm.project.background"
                                   data-field="background"
-                                  data-autosave="{{vm.autosaveUrl}}"
-                                  data-ng-disabled="!vm.hasWriteAccess"></textarea>
+                                  data-autosave="{{projectEditVm.autosaveUrl}}"
+                                  data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
                     </div>
                 </div>
 
@@ -188,10 +188,10 @@
                     <div class="form-group">
                         <label for="project-note" class="control-label small">Noter</label>
                         <textarea id="project-note" class="form-control input-sm" rows="7"
-                                  data-ng-model="vm.project.note"
+                                  data-ng-model="projectEditVm.project.note"
                                   data-field="note"
-                                  data-autosave="{{vm.autosaveUrl}}"
-                                  data-ng-disabled="!vm.hasWriteAccess"></textarea>
+                                  data-autosave="{{projectEditVm.autosaveUrl}}"
+                                  data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
                     </div>
                 </div>
             </div>
@@ -204,7 +204,7 @@
     <li data-ui-sref-active="active">
         <a data-ui-sref="it-project.edit.status-project">Status: Projekt</a>
     </li>
-    <li data-ui-sref-active="active" data-ng-show="vm.project.isStatusGoalVisible">
+    <li data-ui-sref-active="active" data-ng-show="projectEditVm.project.isStatusGoalVisible">
         <a data-ui-sref="it-project.edit.status-goal">Status: Mål</a>
     </li>
     <li data-ui-sref-active="active">
@@ -213,28 +213,28 @@
     <li data-ui-sref-active="active">
         <a data-ui-sref="it-project.edit.description">Projektbeskrivelse</a>
     </li>
-    <li data-ui-sref-active="active" data-ng-show="vm.project.isStrategyVisible">
+    <li data-ui-sref-active="active" data-ng-show="projectEditVm.project.isStrategyVisible">
         <a data-ui-sref="it-project.edit.strategy">Strategi</a>
     </li>
     <li data-ui-sref-active="active">
         <a data-ui-sref="it-project.edit.roles">Projektroller</a>
     </li>
-    <li data-ui-sref-active="active" data-ng-show="vm.project.isHierarchyVisible">
+    <li data-ui-sref-active="active" data-ng-show="projectEditVm.project.isHierarchyVisible">
         <a data-ui-sref="it-project.edit.hierarchy">Hierarki</a>
     </li>
-    <li data-ui-sref-active="active" data-ng-show="vm.project.isEconomyVisible">
+    <li data-ui-sref-active="active" data-ng-show="projectEditVm.project.isEconomyVisible">
         <a data-ui-sref="it-project.edit.economy">Økonomi</a>
     </li>
-    <li data-ui-sref-active="active" data-ng-show="vm.project.isStakeholderVisible">
+    <li data-ui-sref-active="active" data-ng-show="projectEditVm.project.isStakeholderVisible">
         <a data-ui-sref="it-project.edit.stakeholders">Interessenter</a>
     </li>
-    <li data-ui-sref-active="active" data-ng-show="vm.project.isRiskVisible">
+    <li data-ui-sref-active="active" data-ng-show="projectEditVm.project.isRiskVisible">
         <a data-ui-sref="it-project.edit.risk">Risiko</a>
     </li>
-    <li data-ui-sref-active="active" data-ng-show="vm.project.isCommunicationVisible">
+    <li data-ui-sref-active="active" data-ng-show="projectEditVm.project.isCommunicationVisible">
         <a data-ui-sref="it-project.edit.communication">Kommunikation</a>
     </li>
-    <li data-ui-sref-active="active" data-ng-show="vm.project.isHandoverVisible">
+    <li data-ui-sref-active="active" data-ng-show="projectEditVm.project.isHandoverVisible">
         <a data-ui-sref="it-project.edit.handover">Overlevering</a>
     </li>
     <li data-ui-sref-active="active">
@@ -248,10 +248,10 @@
     </li>
     <li class="pull-right"
         data-ng-dropdown-multiselect=""
-        data-options="vm.dropdownData"
-        data-selected-model="vm.selectedData"
-        data-extra-settings="vm.selectSettings"
-        data-translation-texts="vm.selectTranslation">
+        data-options="projectEditVm.dropdownData"
+        data-selected-model="projectEditVm.selectedData"
+        data-extra-settings="projectEditVm.selectSettings"
+        data-translation-texts="projectEditVm.selectTranslation">
     </li>
 </ul>
 

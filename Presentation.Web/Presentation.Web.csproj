@@ -727,7 +727,7 @@
     <Content Include="Partials\it-contract\tab-systems.html" />
     <Content Include="Partials\it-contract\tab-roles.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-catalog.html" />
-    <Content Include="app\components\it-project\it-project-overview.html" />
+    <Content Include="app\components\it-project\it-project-overview.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-goal-modal.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-modal.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-communication.html" />
@@ -737,7 +737,7 @@
     <Content Include="app\components\it-project\tabs\it-project-tab-phases.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-risk.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-roles.html" />
-    <Content Include="app\components\it-project\it-project-edit.html" />
+    <Content Include="app\components\it-project\it-project-edit.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-org.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-economy.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-itsys.html" />
@@ -745,7 +745,7 @@
     <Content Include="app\components\it-project\tabs\it-project-tab-stakeholders.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-goal.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-strategy.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-status-project.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-status-project.view.html" />
     <Content Include="Partials\it-system\edit-it-interface.html" />
     <Content Include="Partials\it-system\it-interface-catalog.html" />
     <Content Include="Partials\it-system\overview-row.html" />

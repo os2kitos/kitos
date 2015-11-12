@@ -1,17 +1,29 @@
 ﻿module Kitos.ItProject.Edit {
     'use strict';
 
-    export class EditController {
+    export interface IEditController {
+        allowClearOption: IAllowClearOption;
+        autosaveUrl: string;
+        dropdownData: Array<IDropdownOption>;
+        hasWriteAccess: boolean;
+        parentSelectOptions: any;
+        project: any;
+        projectTypes: Array<any>;
+        selectedData: Array<IDropdownOption>;
+        selectSettings: ISelectSettings;
+        selectTranslation: ISelectTranslation;
+    }
 
-        public parentSelectOptions;
+    export class EditController implements IEditController {
+        public allowClearOption: IAllowClearOption;
         public autosaveUrl: string;
         public dropdownData: Array<IDropdownOption>;
+        public parentSelectOptions;
         public selectedData: Array<IDropdownOption>;
         public selectTranslation: ISelectTranslation;
         public selectSettings: ISelectSettings;
-        public allowClearOption: IAllowClearOption;
 
-        static $inject: string[] = [
+        static $inject: Array<string> = [
             '$scope',
             '$http',
             'project',
@@ -91,17 +103,21 @@
 
             this.parentSelectOptions = this.selectLazyLoading('api/itproject', true, ['overview', 'orgId=' + this.user.currentOrganizationId]);
 
+            this.setupSelectedDataWatch();
+        }
+
+        private setupSelectedDataWatch(): void {
             // TODO refactor this garbage!
             this.$scope.$watch(() => this.selectedData, (newValue: Array<IDropdownOption>, oldValue: Array<IDropdownOption>) => {
                 var payload: IPayload = {
-                        isStatusGoalVisible: false,
-                        isStrategyVisible: false,
-                        isHierarchyVisible: false,
-                        isEconomyVisible: false,
-                        isStakeholderVisible: false,
-                        isRiskVisible: false,
-                        isCommunicationVisible: false,
-                        isHandoverVisible: false
+                    isStatusGoalVisible: false,
+                    isStrategyVisible: false,
+                    isHierarchyVisible: false,
+                    isEconomyVisible: false,
+                    isStakeholderVisible: false,
+                    isRiskVisible: false,
+                    isCommunicationVisible: false,
+                    isHandoverVisible: false
                 };
 
                 if (newValue.length > oldValue.length) {
@@ -179,12 +195,12 @@
                             this.project.isRiskVisible = data.isRiskVisible;
                             this.project.isCommunicationVisible = data.isCommunicationVisible;
                             this.project.isHandoverVisible = data.isHandoverVisible;
-                    });
+                        });
                 }
             }, true);
         }
 
-        public selectLazyLoading(url: string, excludeSelf: boolean, paramAry: string[]) {
+        private selectLazyLoading(url: string, excludeSelf: boolean, paramAry: Array<string>) {
             return {
                 minimumInputLength: 1,
                 allowClear: true,
@@ -232,9 +248,9 @@
             '$stateProvider', $stateProvider => {
                 $stateProvider.state('it-project.edit', {
                     url: '/edit/{id:[0-9]+}',
-                    templateUrl: 'app/components/it-project/it-project-edit.html',
+                    templateUrl: 'app/components/it-project/it-project-edit.view.html',
                     controller: EditController,
-                    controllerAs: 'vm',
+                    controllerAs: 'projectEditVm',
                     resolve: {
                         project: [
                             '$http', '$stateParams', ($http: ng.IHttpService, $stateParams) => {

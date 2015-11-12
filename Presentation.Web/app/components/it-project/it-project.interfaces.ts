@@ -33,4 +33,12 @@
     export interface IApiResponse<T> {
         response: T;
     }
+
+    export interface IPaginationSettings {
+        search: string;
+        skip: number;
+        take: number;
+        orderBy?: string;
+        descending?: boolean;
+    }
 }
