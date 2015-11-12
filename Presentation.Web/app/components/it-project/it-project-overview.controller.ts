@@ -11,11 +11,10 @@
     }
 
     export class OverviewController implements IOverviewController {
-
-        public pagination: IPaginationSettings
-        public csvUrl: string;
-        public projects: Array<any>
-        public totalCount: number;
+        pagination: IPaginationSettings;
+        csvUrl: string;
+        projects: Array<any>;
+        totalCount: number;
 
         static $inject: Array<string> = [
             '$scope',
@@ -53,15 +52,17 @@
                 var deferred = this.$q.defer();
 
                 setTimeout(() => {
-                    this.$http.get("api/itProject/" + iteratee.id + "?hasWriteAccess" + '&organizationId=' + this.user.currentOrganizationId)
+                    this.$http.get('api/itProject/' + iteratee.id + '?hasWriteAccess' + '&organizationId=' + this.user.currentOrganizationId)
                         .then(
-                        (result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => {
-                            iteratee.canBeEdited = result.data.response;
-                            deferred.resolve(iteratee);
-                        }, result => {
-                            iteratee.canBeEdited = false;
-                            deferred.reject(result);
-                        });
+                            (result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => {
+                                iteratee.canBeEdited = result.data.response;
+                                deferred.resolve(iteratee);
+                            },
+                            result => {
+                                iteratee.canBeEdited = false;
+                                deferred.reject(result);
+                            }
+                        );
                 }, 0);
 
                 return deferred.promise;
@@ -69,7 +70,7 @@
         }
 
         private pushProject(project) {
-            // Due to https://github.com/angular/angular.js/blob/master/CHANGELOG.md#breaking-changes-8
+            // due to https://github.com/angular/angular.js/blob/master/CHANGELOG.md#breaking-changes-8
             // we have to convert these values to strings
             project.priority = project.priority.toString();
             project.priorityPf = project.priorityPf.toString();
@@ -78,7 +79,8 @@
         }
 
         private loadProjects() {
-            var deferred = this.$q.defer();
+            // apparently not used
+            // var deferred = this.$q.defer();
 
             var url = 'api/itProject?overview&orgId=' + this.user.currentOrganizationId;
 
@@ -87,29 +89,35 @@
 
             if (this.pagination.orderBy) {
                 url += '&orderBy=' + this.pagination.orderBy;
-                if (this.pagination.descending) url += '&descending=' + this.pagination.descending;
+                if (this.pagination.descending) {
+                    url += '&descending=' + this.pagination.descending;
+                }
             }
 
-            if (this.pagination.search) url += '&q=' + this.pagination.search;
-            else url += "&q=";
+            if (this.pagination.search) {
+                url += '&q=' + this.pagination.search;
+            } else {
+                url += '&q=';
+            }
 
             this.projects = [];
             this.$http.get(url)
-                .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => {
-                    var headers = result.headers;
-                    var paginationHeader = JSON.parse(headers('X-Pagination'));
-                    this.totalCount = paginationHeader.TotalCount;
+                .then(
+                    (result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => {
+                        var headers = result.headers;
+                        var paginationHeader = JSON.parse(headers('X-Pagination'));
+                        this.totalCount = paginationHeader.TotalCount;
 
-                    this.setCanEdit(result.data.response)
-                        .then(canEditResult => angular.forEach(canEditResult, (project) => this.pushProject(project)));
-                },
-                () => this.notify.addErrorMessage("Kunne ikke hente projekter!"));
+                        this.setCanEdit(result.data.response)
+                            .then(canEditResult => angular.forEach(canEditResult, (project) => this.pushProject(project)));
+                    },
+                    () => this.notify.addErrorMessage('Kunne ikke hente projekter!')
+                );
         }
     }
 
     angular
         .module('app')
-        .controller('project.EditOverviewCtrl', OverviewController)
         .config(['$stateProvider', $stateProvider => {
             $stateProvider.state('it-project.overview', {
                 url: '/overview',
