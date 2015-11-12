@@ -731,7 +731,7 @@
     <Content Include="app\components\it-project\tabs\it-project-tab-status-goal-modal.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-modal.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-communication.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-description.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-description.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-handover.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-hierarchy.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-phases.view.html" />

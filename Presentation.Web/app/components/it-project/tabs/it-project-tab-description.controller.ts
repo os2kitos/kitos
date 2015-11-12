@@ -1,25 +1,22 @@
-﻿(function (ng, app) {
-    app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-project.edit.description', {
-            url: '/description',
-            templateUrl: 'app/components/it-project/tabs/it-project-tab-description.html',
-            controller: 'project.EditDescriptionCtrl',
-            resolve: {
-                // re-resolve data from parent cause changes here wont cascade to it
-                project: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itproject/" + $stateParams.id)
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }]
-            }
-        });
-    }]);
+﻿module Kitos.ItProject.Edit {
+    interface IDescriptionController {
+        project: any;
+    }
 
-    app.controller('project.EditDescriptionCtrl',
-    ['$scope', 'project',
-        function ($scope, project) {
-            $scope.itProjectId = project.id;
-            $scope.description = project.description;
+    class DescriptionController implements IDescriptionController {
+        static $inject: Array<string> = ['project'];
+        constructor(public project) {
+        }
+    }
+
+    angular
+        .module('app')
+        .config(['$stateProvider', ($stateProvider: ng.ui.IStateProvider) => {
+            $stateProvider.state('it-project.edit.description', {
+                url: '/description',
+                templateUrl: 'app/components/it-project/tabs/it-project-tab-description.view.html',
+                controller: DescriptionController,
+                controllerAs: 'projectDescriptionVm'
+            });
         }]);
-})(angular, app);
+}
