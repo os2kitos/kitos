@@ -14,14 +14,14 @@
         selectTranslation: ISelectTranslation;
     }
 
-    export class EditController implements IEditController {
-        public allowClearOption: IAllowClearOption;
-        public autosaveUrl: string;
-        public dropdownData: Array<IDropdownOption>;
-        public parentSelectOptions;
-        public selectedData: Array<IDropdownOption>;
-        public selectTranslation: ISelectTranslation;
-        public selectSettings: ISelectSettings;
+    class EditController implements IEditController {
+        allowClearOption: IAllowClearOption;
+        autosaveUrl: string;
+        dropdownData: Array<IDropdownOption>;
+        parentSelectOptions;
+        selectedData: Array<IDropdownOption>;
+        selectTranslation: ISelectTranslation;
+        selectSettings: ISelectSettings;
 
         static $inject: Array<string> = [
             '$scope',
@@ -71,22 +71,30 @@
 
             this.selectedData = [];
 
-            if (this.project.isStatusGoalVisible)
+            if (this.project.isStatusGoalVisible) {
                 this.selectedData.push({ id: 1 });
-            if (this.project.isStrategyVisible)
+            }
+            if (this.project.isStrategyVisible) {
                 this.selectedData.push({ id: 2 });
-            if (this.project.isHierarchyVisible)
+            }
+            if (this.project.isHierarchyVisible) {
                 this.selectedData.push({ id: 3 });
-            if (this.project.isEconomyVisible)
+            }
+            if (this.project.isEconomyVisible) {
                 this.selectedData.push({ id: 4 });
-            if (this.project.isStakeholderVisible)
+            }
+            if (this.project.isStakeholderVisible) {
                 this.selectedData.push({ id: 5 });
-            if (this.project.isRiskVisible)
+            }
+            if (this.project.isRiskVisible) {
                 this.selectedData.push({ id: 6 });
-            if (this.project.isCommunicationVisible)
+            }
+            if (this.project.isCommunicationVisible) {
                 this.selectedData.push({ id: 7 });
-            if (this.project.isHandoverVisible)
+            }
+            if (this.project.isHandoverVisible) {
                 this.selectedData.push({ id: 8 });
+            }
 
             this.dropdownData = [
                 { id: 1, label: 'Vis Status: Mål' },
@@ -99,7 +107,7 @@
                 { id: 8, label: 'Vis Overlevering' }
             ];
 
-            this.autosaveUrl = "api/itproject/" + this.project.id;
+            this.autosaveUrl = 'api/itproject/' + this.project.id;
 
             this.parentSelectOptions = this.selectLazyLoading('api/itproject', true, ['overview', 'orgId=' + this.user.currentOrganizationId]);
 
@@ -107,7 +115,7 @@
         }
 
         private setupSelectedDataWatch(): void {
-            // TODO refactor this garbage!
+            // todo refactor this garbage!
             this.$scope.$watch(() => this.selectedData, (newValue: Array<IDropdownOption>, oldValue: Array<IDropdownOption>) => {
                 var payload: IPayload = {
                     isStatusGoalVisible: false,
@@ -123,32 +131,32 @@
                 if (newValue.length > oldValue.length) {
                     // something was added
                     var addIds = _.difference(_.pluck(newValue, 'id'), _.pluck(oldValue, 'id'));
-                    _.each(addIds, id => {
+                    _.each(addIds, (id: number) => {
                         switch (id) {
-                            case 1:
-                                payload.isStatusGoalVisible = true;
-                                break;
-                            case 2:
-                                payload.isStrategyVisible = true;
-                                break;
-                            case 3:
-                                payload.isHierarchyVisible = true;
-                                break;
-                            case 4:
-                                payload.isEconomyVisible = true;
-                                break;
-                            case 5:
-                                payload.isStakeholderVisible = true;
-                                break;
-                            case 6:
-                                payload.isRiskVisible = true;
-                                break;
-                            case 7:
-                                payload.isCommunicationVisible = true;
-                                break;
-                            case 8:
-                                payload.isHandoverVisible = true;
-                                break;
+                        case 1:
+                            payload.isStatusGoalVisible = true;
+                            break;
+                        case 2:
+                            payload.isStrategyVisible = true;
+                            break;
+                        case 3:
+                            payload.isHierarchyVisible = true;
+                            break;
+                        case 4:
+                            payload.isEconomyVisible = true;
+                            break;
+                        case 5:
+                            payload.isStakeholderVisible = true;
+                            break;
+                        case 6:
+                            payload.isRiskVisible = true;
+                            break;
+                        case 7:
+                            payload.isCommunicationVisible = true;
+                            break;
+                        case 8:
+                            payload.isHandoverVisible = true;
+                            break;
                         }
                     });
                 } else if (newValue.length < oldValue.length) {
@@ -156,30 +164,30 @@
                     var removedIds = _.difference(_.pluck(oldValue, 'id'), _.pluck(newValue, 'id'));
                     _.each(removedIds, id => {
                         switch (id) {
-                            case 1:
-                                payload.isStatusGoalVisible = false;
-                                break;
-                            case 2:
-                                payload.isStrategyVisible = false;
-                                break;
-                            case 3:
-                                payload.isHierarchyVisible = false;
-                                break;
-                            case 4:
-                                payload.isEconomyVisible = false;
-                                break;
-                            case 5:
-                                payload.isStakeholderVisible = false;
-                                break;
-                            case 6:
-                                payload.isRiskVisible = false;
-                                break;
-                            case 7:
-                                payload.isCommunicationVisible = false;
-                                break;
-                            case 8:
-                                payload.isHandoverVisible = false;
-                                break;
+                        case 1:
+                            payload.isStatusGoalVisible = false;
+                            break;
+                        case 2:
+                            payload.isStrategyVisible = false;
+                            break;
+                        case 3:
+                            payload.isHierarchyVisible = false;
+                            break;
+                        case 4:
+                            payload.isEconomyVisible = false;
+                            break;
+                        case 5:
+                            payload.isStakeholderVisible = false;
+                            break;
+                        case 6:
+                            payload.isRiskVisible = false;
+                            break;
+                        case 7:
+                            payload.isCommunicationVisible = false;
+                            break;
+                        case 8:
+                            payload.isHandoverVisible = false;
+                            break;
                         }
                     });
                 }
@@ -215,7 +223,7 @@
                     transport: (queryParams) => {
                         var extraParams = paramAry ? '&' + paramAry.join('&') : '';
                         var res = this.$http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
-                        //res.abort = () => null;
+                        // res.abort = () => null;
 
                         return res;
                     },
@@ -242,8 +250,8 @@
     }
 
     angular
-        .module("app")
-        .controller("project.EditCtrl", EditController)
+        .module('app')
+        .controller('project.EditCtrl', EditController)
         .config([
             '$stateProvider', $stateProvider => {
                 $stateProvider.state('it-project.edit', {
@@ -254,13 +262,13 @@
                     resolve: {
                         project: [
                             '$http', '$stateParams', ($http: ng.IHttpService, $stateParams) => {
-                                return $http.get("api/itproject/" + $stateParams.id)
+                                return $http.get('api/itproject/' + $stateParams.id)
                                     .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.response);
                             }
                         ],
                         projectTypes: [
                             '$http', $http => {
-                                return $http.get("api/itprojecttype/")
+                                return $http.get('api/itprojecttype/')
                                     .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.response);
                             }
                         ],
@@ -269,7 +277,7 @@
                         ],
                         hasWriteAccess: [
                             '$http', '$stateParams', 'user', ($http, $stateParams, user) => {
-                                return $http.get("api/itproject/" + $stateParams.id + "?hasWriteAccess&organizationId=" + user.currentOrganizationId)
+                                return $http.get('api/itproject/' + $stateParams.id + '?hasWriteAccess&organizationId=' + user.currentOrganizationId)
                                     .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.response);
                             }
                         ]
