@@ -41,4 +41,21 @@
         orderBy?: string;
         descending?: boolean;
     }
+
+    export interface IPhase {
+        name: string;
+        startDate?: any;
+        endDate?: any;
+    }
+
+    export interface IPhaseData {
+        id;
+        updateUrl;
+        prevPhase;
+    }
+
+    export interface IDatepickerOptions {
+        format: string;
+        parseFormats: Array<string>;
+    }
 }

@@ -45,8 +45,8 @@
 
             //Setup phases
             this.project.phases = [project.phase1, project.phase2, project.phase3, project.phase4, project.phase5];
-            var prevPhase: IPhase = null;
-            _.each(this.project.phases, (phase: IPhase) => {
+            var prevPhase: IPhaseData = null;
+            _.each(this.project.phases, (phase: IPhaseData) => {
                 phase.updateUrl = "api/itProjectPhase/" + phase.id;
                 phase.prevPhase = prevPhase;
                 prevPhase = phase;
@@ -154,17 +154,6 @@
             return activity;
         }
 
-    }
-
-    interface IPhase {
-        id;
-        updateUrl;
-        prevPhase;
-    }
-
-    interface IDatepickerOptions {
-        format: string;
-        parseFormats: Array<string>;
     }
 
     angular
