@@ -16,8 +16,7 @@
             </tr>
         </thead>
         <!-- for each right -->
-        <tbody data-ng-repeat="right in projectRolesVm.rights | filter : { show: true } | orderBy : rightSort : rightSortReverse"><!-- Maybe VM here -->
-
+        <tbody data-ng-repeat="right in projectRolesVm.rights | filter : { show: true } | orderBy : projectRolesVm.rightSort : projectRolesVm.rightSortReverse">
             <!-- show -->
             <tr data-ng-hide="right.edit">
                 <td>{{ right.role.name }}</td>
@@ -48,9 +47,9 @@
                     </select>
                 </td>
                 <td colspan="2" class="relative-position">
-                    <input data-select-user="foo" data-org-id="{{ orgId }}" data-user-model="right.userForSelect" />
+                    <input data-select-user="foo" data-org-id="{{projectRolesVm.orgId}}" data-user-model="right.userForSelect" />
                     <div class="pull-outside-table">
-                        <input type="submit" class="btn btn-success btn-sm" data-ng-click="updateRight(right)" value="Gem" />
+                        <input type="submit" class="btn btn-success btn-sm" data-ng-click="projectRolesVm.updateRight(right)" value="Gem" />
                     </div>
                 </td>
             </tr>

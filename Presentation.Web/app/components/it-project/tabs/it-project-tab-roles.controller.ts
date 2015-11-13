@@ -111,7 +111,7 @@
             // otherwise, we should delete the old entry, then add a new one
             this.$http.delete('api/itprojectrights/' + this.projectId + '?rId=' + rIdOld + '&uId=' + uIdOld + '&organizationId=' + this.user.currentOrganizationId)
                 .then(
-                    deleteResult => {
+                    successResult => {
                         var data = {
                             'roleId': rIdNew,
                             'userId': uIdNew
@@ -139,7 +139,7 @@
                                 }
                             );
                     },
-                    deleteResult => {
+                    errorResult => {
                         // couldn't delete the old entry, just reset select options
                         right.userForSelect = { id: right.user.id, text: right.user.fullName };
                         right.roleForSelect = right.roleId;
