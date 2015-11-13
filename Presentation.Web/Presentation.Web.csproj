@@ -835,8 +835,6 @@
     <Content Include="Scripts\app\controllers\global-admin\global-admin-subnav.js" />
     <Content Include="Scripts\app\controllers\global-config\global-config.js" />
     <Content Include="Scripts\app\controllers\home\edit-user.js" />
-    <TypeScriptCompile Include="Scripts\app\controllers\home\tstest.spec.ts" />
-    <Content Include="Scripts\app\controllers\home\home.spec.js" />
     <Content Include="Scripts\app\controllers\home\home.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-hierarchy.js" />
     <Content Include="Scripts\app\controllers\it-contract\it-contract-deadlines.js" />
@@ -2325,7 +2323,17 @@
     <Content Include="Scripts\select2.js" />
     <Content Include="Scripts\select2.min.js" />
     <Content Include="Scripts\ui-select2.js" />
-    <Content Include="Tests\home.e2e.spec.js" />
+    <TypeScriptCompile Include="Scripts\typings\angular-protractor\angular-protractor.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-mocks.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-resource.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-route.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-sanitize.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\selenium-webdriver\selenium-webdriver.d.ts" />
+    <TypeScriptCompile Include="Tests\home.e2e.spec.ts" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

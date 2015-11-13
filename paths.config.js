@@ -30,7 +30,7 @@ var source = 'Presentation.Web',
     karma = karmaBrowserLibs.concat(karmaAppFiles),
 
     // all e2e tests.
-    e2eFiles = ['Tests/**/*e2e.spec.js'],
+    e2eFiles = ['Tests/**/*pag.spec.js', 'Tests/**/*e2e.spec.js'],
     e2eReport = 'results-protractor.json',
     seleniumServerJar = '../node_modules/protractor/selenium/selenium-server-standalone-2.47.1.jar';
 
