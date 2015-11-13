@@ -32,6 +32,9 @@ namespace Presentation.Web
             bundles.Add(new ScriptBundle("~/Scripts/appbundle").IncludeDirectory(
                 "~/app", "*.js", true));
 
+            // Ignore test specs
+            bundles.IgnoreList.Ignore("*.spec.js");
+
             // css
             bundles.Add(new StyleBundle("~/Content/cssbundle").Include(
                 "~/Content/bootstrap.css",

@@ -1,0 +1,2 @@
+packages\OpenCover.4.6.166\tools\OpenCover.Console.exe -target:run-tests.bat -register:user -log:Error -filter:"%COVERAGE_FILTER_CORE_APPLICATIONSERVICES% %COVERAGE_FILTER_CORE_DOMAINMODEL% %COVERAGE_FILTER_CORE_DOMAINSERVICES% %COVERAGE_FILTER_INFRASTRUCTURE_DATAACCESS% %COVERAGE_FILTER_INFRASTRUCTURE_OPENXML% %COVERAGE_FILTER_PRESENTATION_WEB% %COVERAGE_EXCL_FILTER_PRESENTATION_WEB%"
+packages\ReportGenerator.2.3.2.0\tools\ReportGenerator.exe -reports:results.xml -targetdir:coverage -verbosity:Error

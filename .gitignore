@@ -27,6 +27,19 @@ Presentation.Web/app/**/*.js.map
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
 !packages/*/build/
 
+# xUnit tests
+results.xml
+
+# Protractor tests
+results-protractor.json
+
+# Coverage report
+coverage/
+karmaCoverage/
+
+# npm packages
+node_modules/
+
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
