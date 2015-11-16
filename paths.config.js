@@ -42,5 +42,6 @@ module.exports = {
     bundleDir: bundleDir,
     karma: karma,
     e2eFiles: e2eFiles,
-    e2eReport: e2eReport
+    e2eReport: e2eReport,
+    seleniumServerJar: seleniumServerJar
 };

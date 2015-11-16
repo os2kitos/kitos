@@ -5,7 +5,10 @@ exports.config = {
     seleniumServerJar: paths.seleniumServerJar,
 
     // select all end to end tests
-    specs: paths.e2eFiles,
+    suites: {
+        home: 'Tests/home.e2e.spec.js',
+        itProject: 'Tests/ItProject/**/*.e2e.spec.js'
+    },
 
     // output results to xml
     resultJsonOutputFile: paths.e2eReport,

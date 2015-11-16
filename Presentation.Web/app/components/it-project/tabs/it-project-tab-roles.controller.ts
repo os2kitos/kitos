@@ -164,7 +164,7 @@
                     }
                 );
 
-        };
+        }
 
         submitRight(): void {
             if (!this.selectedUser || !this.newRole) {
