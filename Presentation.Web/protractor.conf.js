@@ -14,5 +14,10 @@ exports.config = {
     resultJsonOutputFile: paths.e2eReport,
 
     // increase timeout to allow AppVeyor to rebuild database on first instantiation.
-    allScriptsTimeout: 30000
+    allScriptsTimeout: 30000,
+    baseUrl: 'https://localhost:44300',
+
+    onPrepare: function () {
+        browser.driver.get('https://localhost:44300');
+    }
 };
