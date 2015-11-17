@@ -20,8 +20,10 @@
     }
 
     describe('home view', () => {
-        var homePage = new KitosHomePage();
+        var homePage;
+
         beforeEach(() => {
+            homePage = new KitosHomePage();
             homePage.get();
         });
 
