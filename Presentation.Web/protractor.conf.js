@@ -18,6 +18,13 @@ exports.config = {
     baseUrl: 'https://localhost:44300',
 
     onPrepare: function () {
-        browser.driver.get('https://localhost:44300');
+        require('protractor-http-mock').config = {
+            rootDirectory: __dirname
+        }
+    },
+
+    mocks: {
+        default: ['authorize'],
+        dir: 'Tests/mocks'
     }
 };

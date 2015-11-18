@@ -24,7 +24,6 @@ namespace Presentation.Web
                 "~/Scripts/angular-ui-router.js",
                 "~/Scripts/angular-ui/ui-bootstrap.js",
                 "~/Scripts/angular-ui/ui-bootstrap-tpls.js",
-                "~/Scripts/angular-mocks.js",
                 "~/Scripts/ui-select2.js",
                 "~/Scripts/notify/*.js",
                 "~/Scripts/angular-ui-util/ui-utils.js"));
