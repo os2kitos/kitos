@@ -2344,6 +2344,7 @@
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-sanitize.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\protractor-http-mock\protractor-http-mock.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\selenium-webdriver\selenium-webdriver.d.ts" />
     <TypeScriptCompile Include="Tests\home.e2e.spec.ts" />
     <Content Include="Web.config">
@@ -2497,6 +2498,9 @@
     <Content Include="Scripts\jquery-2.1.4.min.map" />
     <Content Include="Scripts\version.json" />
     <Content Include="Tests\mocks\authorize.json" />
+    <Content Include="Tests\mocks\itprojectrole.json" />
+    <Content Include="Tests\mocks\itproject.json" />
+    <Content Include="Tests\mocks\itprojecttype.json" />
     <None Include="Web.AppVeyor.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -2504,8 +2508,7 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
     <TypeScriptCompile Include="Scripts\typings\underscore\underscore.d.ts" />
-    <Content Include="Tests\ItProject\Edit\projectEdit1.e2e.spec.js" />
-    <TypeScriptCompile Include="Tests\ItProject\Edit\projectEdit.e2e.spe213c.ts" />
+    <TypeScriptCompile Include="Tests\ItProject\Edit\projectEdit.e2e.spec.ts" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

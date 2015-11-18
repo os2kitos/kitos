@@ -52,7 +52,7 @@
                 var deferred = this.$q.defer();
 
                 setTimeout(() => {
-                    this.$http.get('api/itProject/' + iteratee.id + '?hasWriteAccess' + '&organizationId=' + this.user.currentOrganizationId)
+                    this.$http.get('api/itProject/' + iteratee.id + '?hasWriteAccess=true' + '&organizationId=' + this.user.currentOrganizationId)
                         .then(
                             (result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => {
                                 iteratee.canBeEdited = result.data.response;
@@ -82,7 +82,7 @@
             // apparently not used
             // var deferred = this.$q.defer();
 
-            var url = 'api/itProject?overview&orgId=' + this.user.currentOrganizationId;
+            var url = 'api/itProject?overview=true&orgId=' + this.user.currentOrganizationId;
 
             url += '&skip=' + this.pagination.skip;
             url += '&take=' + this.pagination.take;
