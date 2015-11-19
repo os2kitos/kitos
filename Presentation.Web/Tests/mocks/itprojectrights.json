@@ -1,0 +1,12 @@
+﻿[
+    {
+        "request": {
+            "path": "api/itprojectrights/1",
+            "method": "GET"
+        },
+        "response": {
+            "status": 200,
+            "data": { "msg": "", "response": [ ] }
+        }
+    }
+]

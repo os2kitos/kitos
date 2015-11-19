@@ -1,37 +1,40 @@
 ﻿import mock = require('protractor-http-mock');
+import Helper = require('../../helper');
+import ItProjectEditPo = require('../../../app/components/it-project/it-project-edit.po');
 
 describe('project edit view', () => {
+    var browserHelper: Helper.BrowserHelper;
+    var pageObject: ItProjectEditPo;
+
     beforeEach(() => {
-        mock(['itproject', 'itprojectrole', 'itprojecttype']);
+        mock(['itproject', 'itprojectrole', 'itprojecttype', 'itprojectrights']);
+
+        browserHelper = new Helper.BrowserHelper(browser);
+        pageObject = new ItProjectEditPo();
+        pageObject.getPage();
+
+        browser.driver.manage().window().maximize();
     });
 
     it('should save when name looses focus', () => {
-        browser.driver.manage().window().maximize();
-        browser.get('https://localhost:44300/#/project/edit/1/status-project');
-        //browser.pause();
-        expect(true).toBe(true);
+        // arrange
+        pageObject.nameInput = 'SomeName';
 
-        console.log('\n');
-        mock.requestsMade().then(d => console.log(d));
+        // act
+        pageObject.idElement.click();
+
+        // assert
+        mock.requestsMade()
+            .then((requests: Array<any>) => {
+                var lastRequest = requests[requests.length - 1];
+
+                expect(lastRequest.method).toBe('PATCH');
+                expect(lastRequest.url).toMatch('api/itproject/1');
+            });
     });
 
     afterEach(() => {
-
         mock.teardown();
-
-        // Ouput console errors from browser log
-        browser.manage().logs().get('browser').then(browserLogs => {
-            if (browserLogs && browserLogs.length > 0) {
-                console.log('\n*** Browser console output ***');
-
-                browserLogs.forEach(log => {
-                    if (log.level.value > 900) {
-                        console.log(log.message);
-                    }
-                });
-
-                console.log('\n');
-            }
-        });
+        browserHelper.outputLog();
     });
 });

@@ -32,6 +32,7 @@ results.xml
 
 # Protractor tests
 results-protractor.json
+results-protractor.xml
 
 # Coverage report
 coverage/

@@ -277,7 +277,7 @@
                         ],
                         hasWriteAccess: [
                             '$http', '$stateParams', 'user', ($http, $stateParams, user) => {
-                                return $http.get('api/itproject/' + $stateParams.id + '?hasWriteAccess&organizationId=' + user.currentOrganizationId)
+                                return $http.get('api/itproject/' + $stateParams.id + '?hasWriteAccess=true&organizationId=' + user.currentOrganizationId)
                                     .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.response);
                             }
                         ]

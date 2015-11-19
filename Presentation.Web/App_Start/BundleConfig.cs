@@ -34,6 +34,7 @@ namespace Presentation.Web
 
             // Ignore test specs
             bundles.IgnoreList.Ignore("*.spec.js");
+            bundles.IgnoreList.Ignore("*.po.js");
 
             // css
             bundles.Add(new StyleBundle("~/Content/cssbundle").Include(

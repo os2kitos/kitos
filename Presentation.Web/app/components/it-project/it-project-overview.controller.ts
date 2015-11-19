@@ -52,7 +52,7 @@
                 var deferred = this.$q.defer();
 
                 setTimeout(() => {
-                    this.$http.get('api/itProject/' + iteratee.id + '?hasWriteAccess=true' + '&organizationId=' + this.user.currentOrganizationId)
+                    this.$http.get('api/itproject/' + iteratee.id + '?hasWriteAccess=true' + '&organizationId=' + this.user.currentOrganizationId)
                         .then(
                             (result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => {
                                 iteratee.canBeEdited = result.data.response;

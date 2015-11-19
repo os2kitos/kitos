@@ -1,7 +1,7 @@
 ﻿[
     {
         "request": {
-            "path": "api/itprojecttype",
+            "path": "api/itprojecttype/",
             "method": "GET"
         },
         "response": {
