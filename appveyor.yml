@@ -31,7 +31,8 @@ build:
   publish_wap: true
 after_build:
   - node_modules\.bin\gulp lint
-test_script: off
+test: off
+#test_script:
   # Post frontend coverage to coveralls. Use "karma" for local coverage report.
   # - node_modules\.bin\gulp karmaPost
   # - run-coverage.bat
