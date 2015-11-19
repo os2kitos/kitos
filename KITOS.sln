@@ -40,6 +40,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{42678F6A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Unit.Presentation.Web", "Tests.Unit.Presentation.Web\Tests.Unit.Presentation.Web.csproj", "{73EA6CFE-4B6A-4F83-BA3F-93F83A08E73A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{098F0368-603B-4AF3-80A4-569EAB468147}"
+	ProjectSection(SolutionItems) = preProject
+		.eslintrc = .eslintrc
+		appveyor.yml = appveyor.yml
+		bundle.config.js = bundle.config.js
+		gulpfile.js = gulpfile.js
+		InstallSelfSignedCert.ps1 = InstallSelfSignedCert.ps1
+		package.json = package.json
+		paths.config.js = paths.config.js
+		post-coverage.bat = post-coverage.bat
+		README.md = README.md
+		run-coverage.bat = run-coverage.bat
+		run-local-coverage.bat = run-local-coverage.bat
+		run-tests.bat = run-tests.bat
+		tslint.json = tslint.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		AppVeyor|Any CPU = AppVeyor|Any CPU

@@ -11,9 +11,9 @@ environment:
   ESLINT_DIR: Presentation.Web\Scripts\app
   TSLINT_DIR: Presentation.Web\Scripts\app
   NODEJS_VERSION: "4"
-# services:
-# - iis
-# - mysql56
+services:
+- iis
+- mysql56
 cache:
   - node_modules -> package.json
   - packages -> **\packages.config
@@ -28,29 +28,29 @@ before_build:
 build:
   project: KITOS.sln
   verbosity: quiet
-  # publish_wap: true
+  publish_wap: true
 after_build:
   - node_modules\.bin\gulp lint
-test_script:
+test_script: off
   # Post frontend coverage to coveralls. Use "karma" for local coverage report.
   # - node_modules\.bin\gulp karmaPost
-  - run-coverage.bat
+  # - run-coverage.bat
   # Post backend coverage to coveralls.
   # - post-coverage.bat
-# before_deploy:
-  # - ps: .\InstallSelfSignedCert.ps1
-# deploy:
-# - provider: Local
-  # Presentation.Web.deploy_website: true
-  # Presentation.Web.site_name: Kitos
-  # Presentation.Web.hostname: localhost
-  # Presentation.Web.port: 44300
-  # Presentation.Web.protocol: https
-  # Presentation.Web.certificate: localhost
-  # Presentation.Web.remove_files: true
-# after_deploy:
+before_deploy:
+  - ps: .\InstallSelfSignedCert.ps1
+deploy:
+- provider: Local
+  Presentation.Web.deploy_website: true
+  Presentation.Web.site_name: Kitos
+  Presentation.Web.hostname: localhost
+  Presentation.Web.port: 44300
+  Presentation.Web.protocol: https
+  Presentation.Web.certificate: localhost
+  Presentation.Web.remove_files: true
+after_deploy:
   # Error when running protractor on AppVeyor. OS: http://goo.gl/U3ndK1
-  # - node_modules\.bin\gulp protractor
+  - node_modules\.bin\gulp protractor
 artifacts:
 - path: coverage
   name: Backend Coverage Report
@@ -62,4 +62,3 @@ artifacts:
   name: Protractor test results
 - path: npm-debug.log
   name: npm error log
-  
