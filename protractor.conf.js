@@ -11,7 +11,7 @@ exports.config = {
         'browserstack.key': process.env.BROWSERSTACK_KEY,
 
         // Needed for testing localhost
-        //'browserstack.local': 'true',
+        'browserstack.local': 'true',
 
         // Settings for the browser you want to test
         // (check docs for difference between `browser` and `browserName`
@@ -23,10 +23,7 @@ exports.config = {
     },
 
     // select all end to end tests
-    suites: {
-        home: paths.source + '/Tests/home.e2e.spec.js',
-        itProject: paths.source + '/Tests/ItProject/**/*.e2e.spec.js'
-    },
+    suites: paths.e2eSuites,
 
     // increase timeout to allow AppVeyor to rebuild database on first instantiation.
     allScriptsTimeout: 30000,
@@ -59,6 +56,6 @@ exports.config = {
 
     mocks: {
         default: ['authorize'],
-        dir: 'Tests/mocks'
+        dir: paths.source + '/Tests/mocks'
     }
 };
