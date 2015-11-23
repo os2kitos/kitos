@@ -1,5 +1,6 @@
 ﻿var paths = require('./paths.config.js');
 var jasmineReporters = require('jasmine-reporters');
+console.log(process.env.BROWSERSTACK_USER + ' ' + process.env.BROWSERSTACK_KEY);
 
 exports.config = {
     framework: 'jasmine2',
