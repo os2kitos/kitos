@@ -16,9 +16,6 @@
     "url": "https://github.com/os2kitos/kitos/issues"
   },
   "homepage": "https://github.com/os2kitos/kitos#readme",
-  "scripts": {
-    "postinstall": "start /B BrowserStackLocal %BROWSERSTACK_KEY% localhost,44300,0"
-  },
   "dependencies": {},
   "devDependencies": {
     "eslint": "^1.7.3",
