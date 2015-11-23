@@ -1,6 +1,5 @@
 ﻿var paths = require('./paths.config.js');
 var jasmineReporters = require('jasmine-reporters');
-console.log(process.env.BROWSERSTACK_USER + ' ' + process.env.BROWSERSTACK_KEY);
 
 exports.config = {
     framework: 'jasmine2',
@@ -12,7 +11,7 @@ exports.config = {
         'browserstack.key': process.env.BROWSERSTACK_KEY,
 
         // Needed for testing localhost
-        'browserstack.local': 'true',
+        //'browserstack.local': 'true',
 
         // Settings for the browser you want to test
         // (check docs for difference between `browser` and `browserName`
