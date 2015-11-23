@@ -1,16 +1,31 @@
-﻿var paths = require('../paths.config.js');
+﻿var paths = require('./paths.config.js');
 var jasmineReporters = require('jasmine-reporters');
 
 exports.config = {
     framework: 'jasmine2',
 
-    // path to the selenium server jar. Update version number accordingly!
-    seleniumServerJar: paths.seleniumServerJar,
+    seleniumAddress: 'http://hub.browserstack.com/wd/hub',
+
+    capabilities: {
+        'browserstack.user': process.env.BROWSERSTACK_USER,
+        'browserstack.key': process.env.BROWSERSTACK_KEY,
+
+        // Needed for testing localhost
+        'browserstack.local': 'true',
+
+        // Settings for the browser you want to test
+        // (check docs for difference between `browser` and `browserName`
+        'browserName': 'Chrome',
+        'browser_version': '46.0',
+        'os': 'Windows',
+        'os_version': '7',
+        'resolution': '1280x1024'
+    },
 
     // select all end to end tests
     suites: {
-        home: 'Tests/home.e2e.spec.js',
-        itProject: 'Tests/ItProject/**/*.e2e.spec.js'
+        home: paths.source + '/Tests/home.e2e.spec.js',
+        itProject: paths.source + '/Tests/ItProject/**/*.e2e.spec.js'
     },
 
     // increase timeout to allow AppVeyor to rebuild database on first instantiation.

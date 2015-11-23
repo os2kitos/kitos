@@ -50,9 +50,7 @@ deploy:
   Presentation.Web.certificate: localhost
   Presentation.Web.remove_files: true
 after_deploy:
-  # Error when running protractor on AppVeyor. OS: http://goo.gl/U3ndK1
-  #- node_modules\.bin\gulp protractor
-  - node_modules\.bin\protractor Presentation.Web\protractor.conf.js
+  - node_modules\.bin\gulp protractor
 artifacts:
 - path: coverage
   name: Backend Coverage Report

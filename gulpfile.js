@@ -117,7 +117,7 @@ gulp.task('localKarma', function(done) {
 gulp.task('protractor', function (done) {
     return gulp.src(['Presentation/**/*.e2e.spec.js'])
         .pipe(protractor({
-            configFile: paths.source + '/protractor.conf.js',
+            configFile: 'protractor.conf.js',
         }))
         .on('done', done);
 });

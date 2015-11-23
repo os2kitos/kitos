@@ -16,9 +16,6 @@
     "url": "https://github.com/os2kitos/kitos/issues"
   },
   "homepage": "https://github.com/os2kitos/kitos#readme",
-  "scripts": {
-    "postinstall": "node_modules\\.bin\\webdriver-manager update --standalone"
-  },
   "dependencies": {},
   "devDependencies": {
     "eslint": "^1.7.3",
