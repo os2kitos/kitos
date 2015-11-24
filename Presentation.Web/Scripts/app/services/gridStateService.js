@@ -54,8 +54,10 @@
 
                 _.forEach(columnState.columnState, function (state, key) {
                     var columnIndex = _.findIndex(grid.columns, function (column) {
-                        if (!column.hasOwnProperty("persistId"))
-                            throw new Error("Unable to find persistId property in grid column with field=" + column.field);
+                        if (!column.hasOwnProperty("persistId")) {
+                            console.error("Unable to find persistId property in grid column with field=" + column.field);
+                            return false;
+                        }
 
                         return column.persistId == key;
                     });
