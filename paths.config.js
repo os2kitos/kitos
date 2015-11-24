@@ -29,10 +29,13 @@ var source = 'Presentation.Web',
     ],
     karma = karmaBrowserLibs.concat(karmaAppFiles),
 
-    // all e2e tests.
-    e2eFiles = ['Tests/**/*pag.spec.js', 'Tests/**/*e2e.spec.js'],
-    e2eReport = 'results-protractor',
-    seleniumServerJar = '../node_modules/protractor/selenium/selenium-server-standalone-2.47.1.jar';
+    // e2e
+    e2eFiles = source + '/Tests/**/*.e2e.spec.js',
+    e2eSuites = {
+        home: source + '/Tests/home.e2e.spec.js',
+        itProject: source + '/Tests/ItProject/**/*.e2e.spec.js'
+    },
+    e2eReport = 'results-protractor';
 
 module.exports = {
     source: source,
@@ -42,6 +45,6 @@ module.exports = {
     bundleDir: bundleDir,
     karma: karma,
     e2eFiles: e2eFiles,
+    e2eSuites: e2eSuites,
     e2eReport: e2eReport,
-    seleniumServerJar: seleniumServerJar
 };

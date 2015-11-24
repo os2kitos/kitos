@@ -1,7 +1,6 @@
 var gulp = require('gulp'),
     tslint = require('gulp-tslint'),
     eslint = require('gulp-eslint'),
-    protractor = require('gulp-protractor').protractor,
     bundle = require('gulp-bundle-assets'),
     open = require('gulp-open'),
     paths = require('./paths.config.js'),
@@ -114,10 +113,19 @@ gulp.task('localKarma', function(done) {
 });
 
 // run protractor tests
-gulp.task('protractor', function (done) {
-    return gulp.src(['Presentation/**/*.e2e.spec.js'])
-        .pipe(protractor({
-            configFile: 'protractor.conf.js',
+gulp.task('protractor', function () {
+    var protractor = require('gulp-protractor').protractor;
+    var browserstack = require('gulp-browserstack');
+
+    return gulp.src(paths.e2eFiles)
+        .pipe(browserstack.startTunnel({
+            key: process.env.BROWSERSTACK_KEY
         }))
-        .on('done', done);
+        .pipe(protractor({
+            configFile: 'protractor.conf.js'
+        }))
+        .pipe(browserstack.stopTunnel())
+        .once('end', function() {
+            process.exit();
+        });
 });

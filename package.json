@@ -20,11 +20,13 @@
   "devDependencies": {
     "eslint": "^1.7.3",
     "gulp": "^3.9.0",
+    "gulp-browserstack": "^1.0.2",
     "gulp-bundle-assets": "^2.23.0",
     "gulp-eslint": "^1.0.0",
     "gulp-open": "^1.0.0",
     "gulp-protractor": "^1.0.0",
     "gulp-tslint": "^3.5.0",
+    "gulp-util": "^3.0.7",
     "jasmine-core": "^2.3.4",
     "jasmine-reporters": "^2.0.0",
     "karma": "^0.13.14",

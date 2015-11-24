@@ -35,7 +35,6 @@ results.xml
 # Protractor tests
 results-protractor.json
 results-protractor.xml
-!BrowserStackLocal.exe
 
 # Coverage report
 coverage/
