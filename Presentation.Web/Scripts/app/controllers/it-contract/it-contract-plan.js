@@ -26,8 +26,8 @@
         });
     }]);
 
-    app.controller('contract.PlanCtrl', ['$scope', '$http', '$state', '_', 'moment', 'notify', 'user', 'gridStateService', 'itContractRoles', 'orgUnits',
-            function ($scope, $http, $state, _, moment, notify, user, gridStateService, itContractRoles, orgUnits) {
+    app.controller('contract.PlanCtrl', ['$scope', '$http', '$timeout', '$state', '_', 'moment', 'notify', 'user', 'gridStateService', 'itContractRoles', 'orgUnits',
+            function ($scope, $http, $timeout, $state, _, moment, notify, user, gridStateService, itContractRoles, orgUnits) {
                 var storageKey = "it-contract-plan-options";
                 var orgUnitStorageKey = "it-contract-plan-orgunit";
                 var gridState = gridStateService.getService(storageKey);

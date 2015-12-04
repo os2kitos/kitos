@@ -34,8 +34,8 @@
         });
     }]);
 
-    app.controller('contract.OverviewCtrl', ['$scope', '$http', '$state', '_', 'moment', 'notify', 'user', 'gridStateService', 'itContractRoles', 'orgUnits', 'ecoStreamData',
-            function ($scope, $http, $state, _, moment, notify, user, gridStateService, itContractRoles, orgUnits, ecoStreamData) {
+    app.controller('contract.OverviewCtrl', ['$scope', '$http', '$timeout', '$state', '_', 'moment', 'notify', 'user', 'gridStateService', 'itContractRoles', 'orgUnits', 'ecoStreamData',
+            function ($scope, $http, $timeout, $state, _, moment, notify, user, gridStateService, itContractRoles, orgUnits, ecoStreamData) {
                 var storageKey = "it-contract-overview-options";
                 var orgUnitStorageKey = "it-contract-overview-orgunit";
                 var gridState = gridStateService.getService(storageKey);
