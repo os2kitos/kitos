@@ -7,10 +7,7 @@ namespace Infrastructure.DataAccess.Mapping
     {
         public ItProjectOrgUnitUsageMap()
         {
-            HasKey(x => new
-            {
-                x.ItProjectId, x.OrganizationUnitId
-            });
+            HasKey(x => new {x.ItProjectId, x.OrganizationUnitId});
         }
     }
 }

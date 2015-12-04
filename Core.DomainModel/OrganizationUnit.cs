@@ -90,7 +90,7 @@ namespace Core.DomainModel
         public virtual ICollection<ItProjectOrgUnitUsage> UsingItProjects { get; set; }
 
         /// <summary>
-        /// This Organization Unit is responsible for these IT Contracts
+        /// This Organization Unit is responsible for these IT ItContracts
         /// </summary>
         public virtual ICollection<ItContract.ItContract> ResponsibleForItContracts { get; set; }
 

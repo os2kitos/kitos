@@ -93,7 +93,7 @@ namespace Core.DomainModel.ItContract
         /// The note.
         /// </value>
         public string Note { get; set; }
-        
+
         /// <summary>
         /// Determines whether a user has write access to this instance.
         /// </summary>
@@ -103,10 +103,10 @@ namespace Core.DomainModel.ItContract
         /// </returns>
         public override bool HasUserWriteAccess(User user)
         {
-            if (ExternPaymentFor != null && ExternPaymentFor.HasUserWriteAccess(user)) 
+            if (ExternPaymentFor != null && ExternPaymentFor.HasUserWriteAccess(user))
                 return true;
 
-            if (InternPaymentFor != null && InternPaymentFor.HasUserWriteAccess(user)) 
+            if (InternPaymentFor != null && InternPaymentFor.HasUserWriteAccess(user))
                 return true;
 
             return base.HasUserWriteAccess(user);
