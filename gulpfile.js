@@ -125,7 +125,12 @@ gulp.task('protractor', function () {
             configFile: 'protractor.conf.js'
         }))
         .pipe(browserstack.stopTunnel())
-        .once('end', function() {
+        .once('error', function () {
+            // fix error where gulp is hanging after finish
+            process.exit(1);
+        })
+        .once('end', function () {
+            // fix error where gulp is hanging after finish
             process.exit();
         });
 });

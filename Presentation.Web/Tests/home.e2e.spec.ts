@@ -47,5 +47,15 @@
             // assert
             expect(emailField.getAttribute('class')).toMatch('ng-valid');
         });
+
+        it('shouldfail always for testing', () => {
+            // arrange
+            var emailField = homePage.emailInput;
+            // act
+            homePage.email = 'some@email.test';
+
+            // assert
+            expect(emailField.getAttribute('class')).toMatch('nonexistingclass');
+        });
     });
 }
