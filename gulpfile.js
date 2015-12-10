@@ -10,27 +10,10 @@ gulp.task('watch', function () {
     gulp.watch(paths.allJavaScript, ['es-lint']);
 });
 
-// run protractor tests
-gulp.task('protractor', function () {
-    var protractor = require('gulp-protractor').protractor;
-    var browserstack = require('gulp-browserstack');
+// clean solution
+gulp.task('clean', function() {
+    var clean = require('gulp-clean');
 
-    var taskExitValue = 0;
-
-    return gulp.src(paths.e2eFiles)
-        .pipe(browserstack.startTunnel({
-            key: process.env.BROWSERSTACK_KEY
-        }))
-        .pipe(protractor({
-            configFile: 'protractor.conf.js'
-        }))
-        .on('error', function() {
-            taskExitValue = 1;
-            this.emit('end');
-        })
-        .pipe(browserstack.stopTunnel())
-        .once('end', function () {
-            // fix error where gulp is hanging after finish
-            process.exit(taskExitValue);
-        });
+    return gulp.src(paths.tempFiles, { read: false })
+        .pipe(clean());
 });

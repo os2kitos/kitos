@@ -1,17 +1,17 @@
-﻿var paths = require('../paths.config.js');
+﻿var paths = require('./paths.config.js');
 
 module.exports = function (config) {
     config.set({
         // base path that will be used to resolve all patterns (eg. files, exclude)
         // This is to handle karma.conf.js being in a subdirectory to satisfy KarmaTestAdapter for Visual Studio.
-        basePath: '../',
+        basePath: '',
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
         frameworks: ['jasmine'],
 
         // list of files / patterns to load in the browser
-        files: paths.karma,
+        files: paths.unit,
 
         // run in headless per default
         browsers: ['PhantomJS'],

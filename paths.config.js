@@ -1,12 +1,12 @@
 var source = 'Presentation.Web',
-    sourceApp = source + '/Scripts/app',
+    sourceApp = source + '/app',
     allJavaScript = [sourceApp + '/**/*.js'],
-    allJavaScriptNoTests = [sourceApp + '/**/!(*.spec).js'],
+    allJavaScriptNoTests = [sourceApp + '/**/!(*.spec|*.po).js'],
     allTypeScript = [sourceApp + '/**/*.ts'],
     bundleDir = './public',
 
     // dependency files of files to cover.
-    karmaBrowserLibs = [
+    unitDependencies = [
         source + '/Scripts/lodash.js',
         source + '/Scripts/jquery-2.1.4.js',
         source + '/Scripts/select2.js',
@@ -16,18 +16,22 @@ var source = 'Presentation.Web',
         source + '/Scripts/i18n/angular-locale_da-dk.js',
         source + '/Scripts/angular-animate.js',
         source + '/Scripts/angular-sanitize.js',
+        source + '/Scripts/angular-mocks.js',
         source + '/Scripts/angular-ui-router.js',
         source + '/Scripts/angular-ui/ui-bootstrap.js',
         source + '/Scripts/angular-ui/ui-bootstrap-tpls.js',
         source + '/Scripts/ui-select2.js',
         source + '/Scripts/notify/*.js',
-        source + '/Scripts/angular-ui-util/ui-utils.js',
+        source + '/Scripts/angular-ui-util/ui-utils.js'
     ],
-    // files to cover.
-    karmaAppFiles = [
-        source + '/Scripts/app/**/*.js'
+    // unit
+    karmaConf = __dirname + '/karma.conf.js',
+    unitSource = [
+        sourceApp + '/app.js',
+        sourceApp + '/**/!(*.po|*.spec).js',
+        sourceApp + '/**/*.spec.js'
     ],
-    karma = karmaBrowserLibs.concat(karmaAppFiles),
+    unit = unitDependencies.concat(unitSource),
 
     // e2e
     e2eFiles = source + '/Tests/**/*.e2e.spec.js',
@@ -35,7 +39,12 @@ var source = 'Presentation.Web',
         home: source + '/Tests/home.e2e.spec.js',
         itProject: source + '/Tests/ItProject/**/*.e2e.spec.js'
     },
-    e2eReport = 'results-protractor';
+    e2eReport = 'results-protractor',
+
+    // coverage
+    coverage = 'coverage',
+
+    tempFiles = [ e2eReport + '.json', coverage, bundleDir ];
 
 module.exports = {
     source: source,
@@ -43,8 +52,11 @@ module.exports = {
     allJavaScript: allJavaScript,
     allTypeScript: allTypeScript,
     bundleDir: bundleDir,
-    karma: karma,
+    unit: unit,
     e2eFiles: e2eFiles,
     e2eSuites: e2eSuites,
     e2eReport: e2eReport,
+    karmaConf: karmaConf,
+    coverage: coverage,
+    tempFiles: tempFiles
 };

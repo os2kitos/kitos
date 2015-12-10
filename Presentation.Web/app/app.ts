@@ -7,6 +7,7 @@
     'ui.utils',
     'angularjs-dropdown-multiselect',
     'ngSanitize',
+    'ngMock',
     'kendo.directives']);
 
 app.constant('moment', moment);

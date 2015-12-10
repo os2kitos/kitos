@@ -52,7 +52,7 @@ exports.config = {
         //}));
     },
     // json report
-    //resultJsonOutputFile: paths.e2eReport + '.json',
+    resultJsonOutputFile: paths.e2eReport + '.json',
 
     mocks: {
         default: ['authorize'],
