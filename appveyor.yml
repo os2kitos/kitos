@@ -50,6 +50,8 @@ test_script:
 #  Presentation.Web.remove_files: true
 #after_deploy:
 #  - node_modules\.bin\gulp protractor
+on_success:
+  - node_modules\.bin\gulp codecov
 artifacts:
 - path: coverage
   name: Coverage results

@@ -77,3 +77,11 @@ gulp.task('e2e', function () {
             process.exit(taskExitValue);
         });
 });
+
+// publish coverage to codecov
+gulp.task('codecov', function() {
+    var codecov = require('gulp-codecov.io');
+
+    return gulp.src('./coverage/**/lcov.info')
+        .pipe(codecov());
+});
