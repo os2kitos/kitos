@@ -18,11 +18,11 @@
   "homepage": "https://github.com/os2kitos/kitos#readme",
   "dependencies": {},
   "devDependencies": {
+    "del": "^2.2.0",
     "eslint": "^1.7.3",
     "gulp": "^3.9.0",
     "gulp-browserstack": "^1.0.2",
     "gulp-bundle-assets": "^2.23.0",
-    "gulp-clean": "^0.3.1",
     "gulp-codecov.io": "^1.0.1",
     "gulp-eslint": "^1.0.0",
     "gulp-open": "^1.0.0",
