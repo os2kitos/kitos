@@ -1,17 +1,17 @@
 ﻿(function (ng, app) {
-    app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-system.usage.roles', {
-            url: '/roles',
-            templateUrl: 'partials/it-system/tab-roles.html',
-            controller: 'system.EditRoles',
+    app.config(["$stateProvider", function ($stateProvider) {
+        $stateProvider.state("it-system.usage.roles", {
+            url: "/roles",
+            templateUrl: "partials/it-system/tab-roles.html",
+            controller: "system.EditRoles",
             resolve: {
-                itSystemRoles: ['$http', function ($http) {
+                itSystemRoles: ["$http", function ($http) {
                     return $http.get("api/itsystemrole/?nonsuggestions=")
                         .then(function (result) {
                             return result.data.response;
                         });
                 }],
-                user: ['userService', function (userService) {
+                user: ["userService", function (userService) {
                     return userService.getUser().then(function (user) {
                         return user;
                     });
@@ -20,7 +20,7 @@
         });
     }]);
 
-    app.controller('system.EditRoles', ['$scope', '$http', 'notify', 'itSystemUsage', 'itSystemRoles', 'user', function ($scope, $http, notify, itSystemUsage, itSystemRoles, user) {
+    app.controller("system.EditRoles", ["$scope", "$http", "notify", "itSystemUsage", "itSystemRoles", "user", function ($scope, $http, notify, itSystemUsage, itSystemRoles, user) {
         var usageId = itSystemUsage.id;
 
         $scope.activeItSystemRoles = _.where(itSystemRoles, { isActive: true });
@@ -57,7 +57,7 @@
                 "userId": uId
             };
 
-            $http.post("api/itsystemusagerights/" + usageId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
+            $http.post("api/itsystemusagerights/" + usageId + "?organizationId=" + user.currentOrganizationId, data).success(function (result) {
                 notify.addSuccessMessage(result.response.user.fullName + " er knyttet i rollen");
 
                 $scope.rights.push({
@@ -76,7 +76,7 @@
 
             }).error(function (result) {
 
-                notify.addErrorMessage('Fejl!');
+                notify.addErrorMessage("Fejl!");
             });
         };
 
@@ -85,12 +85,12 @@
             var rId = right.roleId;
             var uId = right.userId;
 
-            $http.delete("api/itsystemusagerights/" + usageId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
+            $http.delete("api/itsystemusagerights/" + usageId + "?rId=" + rId + "&uId=" + uId + "&organizationId=" + user.currentOrganizationId).success(function (deleteResult) {
                 right.show = false;
-                notify.addSuccessMessage('Rollen er slettet!');
+                notify.addSuccessMessage("Rollen er slettet!");
             }).error(function (deleteResult) {
 
-                notify.addErrorMessage('Kunne ikke slette rollen!');
+                notify.addErrorMessage("Kunne ikke slette rollen!");
             });
 
         };
@@ -99,29 +99,29 @@
 
             if (!right.roleForSelect || !right.userForSelect) return;
 
-            //old values
+            // old values
             var rIdOld = right.roleId;
             var uIdOld = right.userId;
 
-            //new values
+            // new values
             var rIdNew = right.roleForSelect;
             var uIdNew = right.userForSelect.id;
 
-            //if nothing was changed, just exit edit-mode
+            // if nothing was changed, just exit edit-mode
             if (rIdOld == rIdNew && uIdOld == uIdNew) {
                 right.edit = false;
             }
 
-            //otherwise, we should delete the old entry, then add a new one
+            // otherwise, we should delete the old entry, then add a new one
 
-            $http.delete("api/itsystemusagerights/" + usageId + "?rId=" + rIdOld + "&uId=" + uIdOld + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
+            $http.delete("api/itsystemusagerights/" + usageId + "?rId=" + rIdOld + "&uId=" + uIdOld + "&organizationId=" + user.currentOrganizationId).success(function (deleteResult) {
 
                 var data = {
                     "roleId": rIdNew,
                     "userId": uIdNew
                 };
 
-                $http.post("api/itsystemusagerights/" + usageId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
+                $http.post("api/itsystemusagerights/" + usageId + "?organizationId=" + user.currentOrganizationId, data).success(function (result) {
 
                     right.roleId = result.response.roleId;
                     right.user = result.response.user;
@@ -135,21 +135,21 @@
 
                 }).error(function (result) {
 
-                    //we successfully deleted the old entry, but didn't add a new one
-                    //fuck
+                    // we successfully deleted the old entry, but didn't add a new one
+                    // fuck
 
                     right.show = false;
 
-                    notify.addErrorMessage('Fejl!');
+                    notify.addErrorMessage("Fejl!");
                 });
 
             }).error(function (deleteResult) {
 
-                //couldn't delete the old entry, just reset select options
+                // couldn't delete the old entry, just reset select options
                 right.userForSelect = { id: right.user.id, text: right.user.fullName };
                 right.roleForSelect = right.roleId;
 
-                notify.addErrorMessage('Fejl!');
+                notify.addErrorMessage("Fejl!");
             });
         };
 

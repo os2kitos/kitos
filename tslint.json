@@ -1,6 +1,6 @@
 {
     "rules": {
-        "quotemark": [ true, "single" ],
+        "quotemark": [ true, "double" ],
         "interface-name": true,
         "no-consecutive-blank-lines": true,
         "no-trailing-comma": true,

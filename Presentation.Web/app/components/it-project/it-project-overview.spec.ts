@@ -1,7 +1,7 @@
 ﻿module Kitos.ItProject.Overview.Tests {
-    'use strict';
+    "use strict";
 
-    describe('project.OverviewCtrl', () => {
+    describe("project.OverviewCtrl", () => {
         // mock object references
         var scopeMock: ng.IScope,
             httpBackendMock: ng.IHttpBackendService,
@@ -13,13 +13,13 @@
             controller: OverviewController;
 
         // setup module
-        beforeEach(() => angular.module('app'));
+        beforeEach(() => angular.module("app"));
 
         // setup mocks
         beforeEach(inject(($injector: angular.auto.IInjectorService) => {
-            scopeMock = $injector.get<ng.IScope>('$rootScope').$new();
+            scopeMock = $injector.get<ng.IScope>("$rootScope").$new();
 
-            httpBackendMock = $injector.get<ng.IHttpBackendService>('$httpBackend');
+            httpBackendMock = $injector.get<ng.IHttpBackendService>("$httpBackend");
             // setup HTTP path responses here
             // http://dotnetspeak.com/2014/03/testing-controllers-in-angular-with-jasmine
 
@@ -28,7 +28,7 @@
             };
         }));
 
-        it('should set default pagination object', () => {
+        it("should set default pagination object", () => {
             controller = new OverviewController(scopeMock, httpMock, notifyMock, projectRolesMock, userMock, $qMock);
 
             expect(controller.pagination).not.toBeNull();

@@ -1,15 +1,14 @@
-﻿import IPageObject = require('../../IPageObject.po');
+﻿import IPageObject = require("../../IPageObject.po");
 
 class ItPojectEditPo implements IPageObject {
-
     getPage(): void {
-        browser.get('https://localhost:44300/#/project/edit/1/status-project');
+        browser.get("https://localhost:44300/#/project/edit/1/status-project");
     }
 
-    nameElement = element(by.id('project-name'));
+    nameElement = element(by.id("project-name"));
     get nameInput(): string {
         var value: string;
-        this.nameElement.getAttribute('value').then(v => value = v);
+        this.nameElement.getAttribute("value").then(v => value = v);
         return value;
     }
 
@@ -17,10 +16,10 @@ class ItPojectEditPo implements IPageObject {
         this.nameElement.sendKeys(value);
     }
 
-    idElement = element(by.id('project-projectId'));
+    idElement = element(by.id("project-projectId"));
     get idInput(): string {
         var value: string;
-        this.idElement.getAttribute('value').then(v => value = v);
+        this.idElement.getAttribute("value").then(v => value = v);
         return value;
     }
 

@@ -1,5 +1,5 @@
 ﻿module Kitos.ItProject.Edit {
-    'use strict';
+    "use strict";
 
     interface IProjectStatusController {
         project: any;
@@ -18,13 +18,13 @@
         public totalCount: number;
 
         static $inject: Array<string> = [
-            '$scope',
-            '$http',
-            '$state',
-            'notify',
-            'project',
-            'usersWithRoles',
-            'user'
+            "$scope",
+            "$http",
+            "$state",
+            "notify",
+            "project",
+            "usersWithRoles",
+            "user"
         ];
 
         constructor(
@@ -43,7 +43,7 @@
                 parseFormats: ["yyyy-MM-dd"]
             };
 
-            //Setup phases
+            // setup phases
             this.project.phases = [project.phase1, project.phase2, project.phase3, project.phase4, project.phase5];
             var prevPhase: IPhaseData = null;
             _.each(this.project.phases, (phase: IPhaseData) => {
@@ -52,7 +52,7 @@
                 prevPhase = phase;
             });
 
-            //All Assignments - both Assignments ("opgaver") and milestones
+            // all Assignments - both Assignments ("opgaver") and milestones
             this.milestonesActivities = [];
 
             _.each(project.itProjectStatuses, (value) => {
@@ -60,7 +60,7 @@
             });
 
             this.pagination = {
-                search: '',
+                search: "",
                 skip: 0,
                 take: 50
             };
@@ -75,43 +75,49 @@
         };
 
         private loadStatues = () => {
-            var url = 'api/itProjectStatus/' + this.project.id + '?project=true';
+            var url = "api/itProjectStatus/" + this.project.id + "?project=true";
 
-            url += '&skip=' + this.pagination.skip;
-            url += '&take=' + this.pagination.take;
+            url += "&skip=" + this.pagination.skip;
+            url += "&take=" + this.pagination.take;
 
             if (this.pagination.orderBy) {
-                url += '&orderBy=' + this.pagination.orderBy;
-                if (this.pagination.descending) url += '&descending=' + this.pagination.descending;
+                url += "&orderBy=" + this.pagination.orderBy;
+                if (this.pagination.descending) url += "&descending=" + this.pagination.descending;
             }
 
-            if (this.pagination.search) url += '&q=' + this.pagination.search;
-            else url += "&q=";
+            if (this.pagination.search) {
+                url += "&q=" + this.pagination.search;
+            } else {
+                url += "&q=";
+            }
 
             this.milestonesActivities = [];
-            this.$http.get(url).success((result, status, headers) => {
-                var paginationHeader = JSON.parse(headers('X-Pagination'));
-                this.totalCount = paginationHeader.TotalCount;
+            this.$http.get(url)
+                .success((result, status, headers) => {
+                    var paginationHeader = JSON.parse(headers("X-Pagination"));
+                    this.totalCount = paginationHeader.TotalCount;
 
-                _.each(result.response, (value) => {
-                    this.addStatus(value, null);
+                    _.each(result.response, (value) => {
+                        this.addStatus(value, null);
+                    });
+
+                })
+                .error((data, status) => {
+                    // only display error when an actual error
+                    // 404 just says that there are no statuses
+                    if (status != 404) {
+                        this.notify.addErrorMessage("Kunne ikke hente projekter!");
+                    }
                 });
-
-            }).error((data, status) => {
-                // only display error when an actual error
-                // 404 just says that there are no statues
-                if (status != 404)
-                    this.notify.addErrorMessage("Kunne ikke hente projekter!");
-            });
         }
 
         private addStatus = (activity, skipAdding) => {
             activity.show = true;
 
-            if (activity.$type.indexOf('Assignment') > -1) {
+            if (activity.$type.indexOf("Assignment") > -1) {
                 activity.isTask = true;
                 activity.updateUrl = "api/Assignment/" + activity.id;
-            } else if (activity.$type.indexOf('Milestone') > -1) {
+            } else if (activity.$type.indexOf("Milestone") > -1) {
                 activity.isMilestone = true;
                 activity.updateUrl = "api/Milestone/" + activity.id;
             }
@@ -132,15 +138,15 @@
 
             activity.edit = () => {
                 if (activity.isTask) {
-                    this.$state.go('.modal', { type: 'assignment', activityId: activity.id });
+                    this.$state.go(".modal", { type: "assignment", activityId: activity.id });
                 } else if (activity.isMilestone) {
-                    this.$state.go('.modal', { type: 'milestone', activityId: activity.id });
+                    this.$state.go(".modal", { type: "milestone", activityId: activity.id });
                 }
             };
 
             activity.delete = () => {
                 var msg = this.notify.addInfoMessage("Sletter...");
-                this.$http.delete(activity.updateUrl + '?organizationId=' + this.user.currentOrganizationId).success(() => {
+                this.$http.delete(activity.updateUrl + "?organizationId=" + this.user.currentOrganizationId).success(() => {
                     activity.show = false;
                     msg.toSuccessMessage("Slettet!");
                 }).error(() => {
@@ -153,23 +159,22 @@
 
             return activity;
         }
-
     }
 
     angular
-        .module('app')
-        .controller('project.EditStatusProjectCtrl', ProjectStatusController)
-        .config(['$stateProvider', $stateProvider => {
-            $stateProvider.state('it-project.edit.status-project', {
-                url: '/status-project',
-                templateUrl: 'app/components/it-project/tabs/it-project-tab-status-project.view.html',
+        .module("app")
+        .controller("project.EditStatusProjectCtrl", ProjectStatusController)
+        .config(["$stateProvider", $stateProvider => {
+            $stateProvider.state("it-project.edit.status-project", {
+                url: "/status-project",
+                templateUrl: "app/components/it-project/tabs/it-project-tab-status-project.view.html",
                 controller: ProjectStatusController,
-                controllerAs: 'projectStatusVm',
+                controllerAs: "projectStatusVm",
                 resolve: {
                     //returns a map with those users who have a role in this project.
                     //the names of the roles is saved in user.roleNames
                     usersWithRoles: [
-                        '$http', '$stateParams',
+                        "$http", "$stateParams",
                         ($http, $stateParams) => $http.get("api/itprojectrights/" + $stateParams.id)
                             .then(rightResult => {
                                 var rights = rightResult.data.response;

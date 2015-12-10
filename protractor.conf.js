@@ -10,11 +10,10 @@ exports.config = {
         'browserstack.user': process.env.BROWSERSTACK_USER,
         'browserstack.key': process.env.BROWSERSTACK_KEY,
 
-        // Needed for testing localhost
+        // needed for testing localhost
         'browserstack.local': 'true',
 
-        // Settings for the browser you want to test
-        // (check docs for difference between `browser` and `browserName`
+        // settings for the browser to test
         'browserName': 'Chrome',
         'browser_version': '46.0',
         'os': 'Windows',
@@ -40,7 +39,7 @@ exports.config = {
         //    filename: paths.e2eReport + '.xml'
         //}));
 
-        // Terminal output
+        // terminal output
         jasmine.getEnv().addReporter(new jasmineReporters.TerminalReporter({
             verbosity: 3,
             color: true,

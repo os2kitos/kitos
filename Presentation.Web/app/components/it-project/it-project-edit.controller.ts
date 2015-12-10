@@ -1,5 +1,5 @@
 ﻿module Kitos.ItProject.Edit {
-    'use strict';
+    "use strict";
 
     export interface IEditController {
         allowClearOption: IAllowClearOption;
@@ -24,13 +24,13 @@
         selectSettings: ISelectSettings;
 
         static $inject: Array<string> = [
-            '$scope',
-            '$http',
-            'project',
-            'projectTypes',
-            'user',
-            'hasWriteAccess',
-            'autofocus'
+            "$scope",
+            "$http",
+            "project",
+            "projectTypes",
+            "user",
+            "hasWriteAccess",
+            "autofocus"
         ];
 
         constructor(
@@ -60,13 +60,13 @@
 
             this.selectSettings = {
                 dynamicTitle: false,
-                buttonClasses: 'btn btn-default btn-sm'
+                buttonClasses: "btn btn-default btn-sm"
             };
 
             this.selectTranslation = {
-                checkAll: 'Vis alle',
-                uncheckAll: 'Skjul alle',
-                buttonDefaultText: 'Faner '
+                checkAll: "Vis alle",
+                uncheckAll: "Skjul alle",
+                buttonDefaultText: "Faner "
             };
 
             this.selectedData = [];
@@ -97,19 +97,19 @@
             }
 
             this.dropdownData = [
-                { id: 1, label: 'Vis Status: Mål' },
-                { id: 2, label: 'Vis Strategi' },
-                { id: 3, label: 'Vis Hierarki' },
-                { id: 4, label: 'Vis Økonomi' },
-                { id: 5, label: 'Vis Interessenter' },
-                { id: 6, label: 'Vis Risiko' },
-                { id: 7, label: 'Vis Kommunikation' },
-                { id: 8, label: 'Vis Overlevering' }
+                { id: 1, label: "Vis Status: Mål" },
+                { id: 2, label: "Vis Strategi" },
+                { id: 3, label: "Vis Hierarki" },
+                { id: 4, label: "Vis Økonomi" },
+                { id: 5, label: "Vis Interessenter" },
+                { id: 6, label: "Vis Risiko" },
+                { id: 7, label: "Vis Kommunikation" },
+                { id: 8, label: "Vis Overlevering" }
             ];
 
-            this.autosaveUrl = 'api/itproject/' + this.project.id;
+            this.autosaveUrl = "api/itproject/" + this.project.id;
 
-            this.parentSelectOptions = this.selectLazyLoading('api/itproject', true, ['overview', 'orgId=' + this.user.currentOrganizationId]);
+            this.parentSelectOptions = this.selectLazyLoading("api/itproject", true, ["overview", "orgId=" + this.user.currentOrganizationId]);
 
             this.setupSelectedDataWatch();
         }
@@ -130,7 +130,7 @@
 
                 if (newValue.length > oldValue.length) {
                     // something was added
-                    var addIds = _.difference(_.pluck(newValue, 'id'), _.pluck(oldValue, 'id'));
+                    var addIds = _.difference(_.pluck(newValue, "id"), _.pluck(oldValue, "id"));
                     _.each(addIds, (id: number) => {
                         switch (id) {
                         case 1:
@@ -161,7 +161,7 @@
                     });
                 } else if (newValue.length < oldValue.length) {
                     // something was removed
-                    var removedIds = _.difference(_.pluck(oldValue, 'id'), _.pluck(newValue, 'id'));
+                    var removedIds = _.difference(_.pluck(oldValue, "id"), _.pluck(newValue, "id"));
                     _.each(removedIds, id => {
                         switch (id) {
                         case 1:
@@ -192,7 +192,7 @@
                     });
                 }
                 if (_.size(payload) > 0) {
-                    this.$http({ method: 'PATCH', url: this.autosaveUrl + '?organizationId=' + this.user.currentOrganizationId, data: payload })
+                    this.$http({ method: "PATCH", url: this.autosaveUrl + "?organizationId=" + this.user.currentOrganizationId, data: payload })
                         .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<IPayload>>) => {
                             var data = result.data.response;
                             this.project.isStatusGoalVisible = data.isStatusGoalVisible;
@@ -212,7 +212,7 @@
             return {
                 minimumInputLength: 1,
                 allowClear: true,
-                placeholder: ' ',
+                placeholder: " ",
                 initSelection: () => {
                 },
                 ajax: {
@@ -221,8 +221,8 @@
                     },
                     quietMillis: 500,
                     transport: (queryParams) => {
-                        var extraParams = paramAry ? '&' + paramAry.join('&') : '';
-                        var res = this.$http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
+                        var extraParams = paramAry ? "&" + paramAry.join("&") : "";
+                        var res = this.$http.get(url + "?q=" + queryParams.data.query + extraParams).then(queryParams.success);
                         // res.abort = () => null;
 
                         return res;
@@ -233,11 +233,11 @@
 
                         _.each(data.data.response, (obj: { id; name; cvr; }) => {
                             if (excludeSelf && obj.id == this.project.id)
-                                return; // don't add self to result
+                                return; // don"t add self to result
 
                             results.push({
                                 id: obj.id,
-                                text: obj.name ? obj.name : 'Unavngiven',
+                                text: obj.name ? obj.name : "Unavngiven",
                                 cvr: obj.cvr
                             });
                         });
@@ -250,34 +250,34 @@
     }
 
     angular
-        .module('app')
-        .controller('project.EditCtrl', EditController)
+        .module("app")
+        .controller("project.EditCtrl", EditController)
         .config([
-            '$stateProvider', $stateProvider => {
-                $stateProvider.state('it-project.edit', {
-                    url: '/edit/{id:[0-9]+}',
-                    templateUrl: 'app/components/it-project/it-project-edit.view.html',
+            "$stateProvider", $stateProvider => {
+                $stateProvider.state("it-project.edit", {
+                    url: "/edit/{id:[0-9]+}",
+                    templateUrl: "app/components/it-project/it-project-edit.view.html",
                     controller: EditController,
-                    controllerAs: 'projectEditVm',
+                    controllerAs: "projectEditVm",
                     resolve: {
                         project: [
-                            '$http', '$stateParams', ($http: ng.IHttpService, $stateParams) => {
-                                return $http.get('api/itproject/' + $stateParams.id)
+                            "$http", "$stateParams", ($http: ng.IHttpService, $stateParams) => {
+                                return $http.get("api/itproject/" + $stateParams.id)
                                     .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.response);
                             }
                         ],
                         projectTypes: [
-                            '$http', $http => {
-                                return $http.get('api/itprojecttype/')
+                            "$http", $http => {
+                                return $http.get("api/itprojecttype/")
                                     .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.response);
                             }
                         ],
                         user: [
-                            'userService', userService => userService.getUser()
+                            "userService", userService => userService.getUser()
                         ],
                         hasWriteAccess: [
-                            '$http', '$stateParams', 'user', ($http, $stateParams, user) => {
-                                return $http.get('api/itproject/' + $stateParams.id + '?hasWriteAccess=true&organizationId=' + user.currentOrganizationId)
+                            "$http", "$stateParams", "user", ($http, $stateParams, user) => {
+                                return $http.get("api/itproject/" + $stateParams.id + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
                                     .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.response);
                             }
                         ]

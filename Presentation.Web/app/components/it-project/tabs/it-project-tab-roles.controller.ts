@@ -163,7 +163,6 @@
                         this.notify.addErrorMessage('Kunne ikke slette rollen!');
                     }
                 );
-
         }
 
         submitRight(): void {
