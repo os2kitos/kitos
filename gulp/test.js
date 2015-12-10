@@ -10,10 +10,9 @@ gulp.task('unit', function () {
         browsers: ['IE', 'Firefox', 'Chrome'],
         reporters: ['progress', 'coverage'],
         coverageReporter: {
-            dir: paths.coverage,
-            reporters: [
-                { type: 'cobertura', subdir: '.', file: 'frontend.xml' }
-            ]
+            type: 'json',
+            subdir: '.',
+            file: paths.tempCoverageReport
         },
         preprocessors: {
             // source files, that you wanna generate coverage for
@@ -25,16 +24,6 @@ gulp.task('unit', function () {
     }).start();
 });
 
-// open coverage results.
-gulp.task('localCover', ['localUnit'], function () {
-    var open = require('gulp-open');
-
-    gulp.src(paths.coverage + '/Phantom*/index.html')
-        .pipe(open({
-            app: 'chrome'
-        }));
-});
-
 // run karma tests and coverage locally
 gulp.task('localUnit', function (done) {
     new karma.Server({
@@ -42,8 +31,9 @@ gulp.task('localUnit', function (done) {
         singleRun: true,
         reporters: ['progress', 'coverage'],
         coverageReporter: {
-            type: 'html',
-            dir: paths.coverage
+            type: 'json',
+            subdir: '.',
+            file: paths.tempCoverageReport
         },
         preprocessors: {
             // source files, that you wanna generate coverage for
@@ -53,6 +43,16 @@ gulp.task('localUnit', function (done) {
         },
         autoWatch: false
     }, done).start();
+});
+
+// open coverage results.
+gulp.task('localCover', function () {
+    var open = require('gulp-open');
+
+    gulp.src(paths.coverage + '/Phantom*/index.html')
+        .pipe(open({
+            app: 'chrome'
+        }));
 });
 
 // run e2e tests with protractor
@@ -84,6 +84,6 @@ gulp.task('e2e', function () {
 gulp.task('codecov', function() {
     var codecov = require('gulp-codecov.io');
 
-    return gulp.src('./coverage/*.xml')
+    return gulp.src('./coverage/*.json')
         .pipe(codecov());
 });

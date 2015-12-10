@@ -51,6 +51,7 @@ test_script:
 #after_deploy:
 #  - node_modules\.bin\gulp protractor
 on_success:
+  - npm test
   - node_modules\.bin\gulp codecov
 artifacts:
 - path: coverage

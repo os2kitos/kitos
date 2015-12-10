@@ -43,6 +43,7 @@ var source = 'Presentation.Web',
 
     // coverage
     coverage = 'coverage',
+    tempCoverageReport = 'temp-coverage.json',
 
     tempFiles = [ e2eReport + '.json', coverage, bundleDir ];
 
@@ -58,5 +59,6 @@ module.exports = {
     e2eReport: e2eReport,
     karmaConf: karmaConf,
     coverage: coverage,
+    tempCoverageReport: tempCoverageReport,
     tempFiles: tempFiles
 };

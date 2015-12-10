@@ -15,6 +15,7 @@
   "bugs": {
     "url": "https://github.com/os2kitos/kitos/issues"
   },
+  "scripts": { "test": "node_modules\\.bin\\remap-istanbul -i coverage/temp-coverage.json -o coverage/frontend.json"},
   "homepage": "https://github.com/os2kitos/kitos#readme",
   "dependencies": {},
   "devDependencies": {
@@ -42,6 +43,7 @@
     "phantomjs": "^1.9.18",
     "protractor": "^2.5.1",
     "protractor-http-mock": "^0.1.18",
+    "remap-istanbul": "^0.5.0",
     "require-dir": "^0.3.0",
     "tslint": "^2.5.1"
   }
