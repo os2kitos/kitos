@@ -10,8 +10,10 @@ gulp.task('unit', function () {
         browsers: ['IE', 'Firefox', 'Chrome'],
         reporters: ['progress', 'coverage'],
         coverageReporter: {
-            type: 'lcovonly',
-            dir: paths.coverage
+            dir: paths.coverage,
+            reporters: [
+                { type: 'cobertura', subdir: '.', file: 'frontend.xml' }
+            ]
         },
         preprocessors: {
             // source files, that you wanna generate coverage for
@@ -82,6 +84,6 @@ gulp.task('e2e', function () {
 gulp.task('codecov', function() {
     var codecov = require('gulp-codecov.io');
 
-    return gulp.src('./coverage/**/lcov.info')
+    return gulp.src('./coverage/*.xml')
         .pipe(codecov());
 });
