@@ -33,7 +33,7 @@ build:
 #test: off
 test_script:
   # Run frontend unit tests and coverage
-  - node_modules\.bin\gulp unit
+  - node_modules\.bin\gulp mapCoverage
   # - run-coverage.bat
   # Post backend coverage to coveralls.
   # - post-coverage.bat
@@ -51,7 +51,6 @@ test_script:
 #after_deploy:
 #  - node_modules\.bin\gulp protractor
 on_success:
-  - npm test
   - node_modules\.bin\gulp codecov
 artifacts:
 - path: coverage

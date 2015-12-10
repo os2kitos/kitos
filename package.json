@@ -15,7 +15,6 @@
   "bugs": {
     "url": "https://github.com/os2kitos/kitos/issues"
   },
-  "scripts": { "test": "node_modules\\.bin\\remap-istanbul -i coverage/temp-coverage.json -o coverage/frontend.json"},
   "homepage": "https://github.com/os2kitos/kitos#readme",
   "dependencies": {},
   "devDependencies": {

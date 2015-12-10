@@ -24,6 +24,7 @@ var source = 'Presentation.Web',
         source + '/Scripts/notify/*.js',
         source + '/Scripts/angular-ui-util/ui-utils.js'
     ],
+
     // unit
     karmaConf = __dirname + '/karma.conf.js',
     unitSource = [
@@ -43,7 +44,8 @@ var source = 'Presentation.Web',
 
     // coverage
     coverage = 'coverage',
-    tempCoverageReport = 'temp-coverage.json',
+    frontendCoverageReport = 'frontend.json',
+    tempFrontendCoverageReport = 'temp-coverage.json',
 
     tempFiles = [ e2eReport + '.json', coverage, bundleDir ];
 
@@ -59,6 +61,7 @@ module.exports = {
     e2eReport: e2eReport,
     karmaConf: karmaConf,
     coverage: coverage,
-    tempCoverageReport: tempCoverageReport,
+    frontendCoverageReport: frontendCoverageReport,
+    tempFrontendCoverageReport: tempFrontendCoverageReport,
     tempFiles: tempFiles
 };

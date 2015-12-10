@@ -3,7 +3,7 @@ var gulp = require('gulp'),
     karma = require('karma');
 
 // run karma tests and coverage
-gulp.task('unit', function () {
+gulp.task('unit', function (done) {
     new karma.Server({
         configFile: paths.karmaConf,
         singleRun: true,
@@ -12,16 +12,13 @@ gulp.task('unit', function () {
         coverageReporter: {
             type: 'json',
             subdir: '.',
-            file: paths.tempCoverageReport
+            file: paths.tempFrontendCoverageReport
         },
         preprocessors: {
-            // source files, that you wanna generate coverage for
-            // do not include tests or libraries
-            // (these files will be instrumented by Istanbul)
             'Presentation.Web/app/**/!(*.spec|*.po).js': ['coverage']
         },
         autoWatch: false
-    }).start();
+    }, done).start();
 });
 
 // run karma tests and coverage locally
@@ -31,14 +28,10 @@ gulp.task('localUnit', function (done) {
         singleRun: true,
         reporters: ['progress', 'coverage'],
         coverageReporter: {
-            type: 'json',
-            subdir: '.',
-            file: paths.tempCoverageReport
+            type: 'html',
+            dir: paths.coverage
         },
         preprocessors: {
-            // source files, that you wanna generate coverage for
-            // do not include tests or libraries
-            // (these files will be instrumented by Istanbul)
             'Presentation.Web/app/**/!(*.spec|*.po).js': ['coverage']
         },
         autoWatch: false
@@ -80,10 +73,23 @@ gulp.task('e2e', function () {
         });
 });
 
+gulp.task('mapCoverage', ['unit'], function (done) {
+    var exec = require('child_process').exec;
+    var del = require('del');
+
+    exec('node_modules\\.bin\\remap-istanbul -i ' + paths.coverage + '/' + paths.tempFrontendCoverageReport + ' -o ' + paths.coverage + '/' + paths.frontendCoverageReport, function(err, stdout, stderr) {
+        console.log(stdout);
+        console.log(stderr);
+
+        del([paths.coverage + '/' + paths.tempFrontendCoverageReport]);
+        done();
+    });
+});
+
 // publish coverage to codecov
-gulp.task('codecov', function() {
+gulp.task('codecov', function () {
     var codecov = require('gulp-codecov.io');
 
-    return gulp.src('./coverage/*.json')
+    return gulp.src(paths.coverage + '/?(*.json|*.xml)')
         .pipe(codecov());
 });
