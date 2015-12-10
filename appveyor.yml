@@ -12,8 +12,8 @@ environment:
   TSLINT_DIR: Presentation.Web\Scripts\app
   NODEJS_VERSION: "4"
 #services:
-#- iis
-#- mysql56
+- iis
+- mysql56
 cache:
   - node_modules -> package.json
   - packages -> **\packages.config
@@ -27,39 +27,32 @@ before_build:
 build:
   project: KITOS.sln
   verbosity: quiet
-#  publish_wap: true
-#after_build:
-#  - node_modules\.bin\gulp lint
-#test: off
+  publish_wap: true
+after_build:
+  - node_modules\.bin\gulp lint
 test_script:
   # Run frontend unit tests and coverage
   - node_modules\.bin\gulp mapCoverage
-  # - run-coverage.bat
-  # Post backend coverage to coveralls.
-  # - post-coverage.bat
-#before_deploy:
-#  - ps: .\InstallSelfSignedCert.ps1
-#deploy:
-#- provider: Local
-#  Presentation.Web.deploy_website: true
-#  Presentation.Web.site_name: Kitos
-#  Presentation.Web.hostname: localhost
-#  Presentation.Web.port: 44300
-#  Presentation.Web.protocol: https
-#  Presentation.Web.certificate: localhost
-#  Presentation.Web.remove_files: true
-#after_deploy:
-#  - node_modules\.bin\gulp protractor
+  - run-coverage.bat
+before_deploy:
+  - ps: .\InstallSelfSignedCert.ps1
+deploy:
+- provider: Local
+  Presentation.Web.deploy_website: true
+  Presentation.Web.site_name: Kitos
+  Presentation.Web.hostname: localhost
+  Presentation.Web.port: 44300
+  Presentation.Web.protocol: https
+  Presentation.Web.certificate: localhost
+  Presentation.Web.remove_files: true
+after_deploy:
+  - node_modules\.bin\gulp protractor
 on_success:
   - node_modules\.bin\gulp codecov
 artifacts:
 - path: coverage
   name: Coverage results
-#- path: karmaCoverage
-#  name: Frontend Coverage Report
-#- path: results.xml
-#  name: OpenCover results
-#- path: results-protractor.json
-#  name: Protractor test results
+- path: results-protractor.json
+  name: Protractor test results
 - path: npm-debug.log
   name: npm error log
