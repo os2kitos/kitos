@@ -2,7 +2,7 @@ var gulp = require('gulp'),
     paths = require('../paths.config.js'),
     karma = require('karma');
 
-// run karma tests and coverage
+// run unit tests with karma
 gulp.task('unit', function (done) {
     new karma.Server({
         configFile: paths.karmaConf,
@@ -19,33 +19,6 @@ gulp.task('unit', function (done) {
         },
         autoWatch: false
     }, done).start();
-});
-
-// run karma tests and coverage locally
-gulp.task('localUnit', function (done) {
-    new karma.Server({
-        configFile: paths.karmaConf,
-        singleRun: true,
-        reporters: ['progress', 'coverage'],
-        coverageReporter: {
-            type: 'html',
-            dir: paths.coverage
-        },
-        preprocessors: {
-            'Presentation.Web/app/**/!(*.spec|*.po).js': ['coverage']
-        },
-        autoWatch: false
-    }, done).start();
-});
-
-// open coverage results.
-gulp.task('localCover', function () {
-    var open = require('gulp-open');
-
-    gulp.src(paths.coverage + '/Phantom*/index.html')
-        .pipe(open({
-            app: 'chrome'
-        }));
 });
 
 // run e2e tests with protractor
@@ -73,7 +46,8 @@ gulp.task('e2e', function () {
         });
 });
 
-gulp.task('mapCoverage', ['unit'], function (done) {
+// map karma coverage results from js to ts source
+gulp.task('mapCoverage', function (done) {
     var exec = require('child_process').exec;
     var del = require('del');
 
@@ -87,9 +61,36 @@ gulp.task('mapCoverage', ['unit'], function (done) {
 });
 
 // publish coverage to codecov
-gulp.task('codecov', function () {
+gulp.task('codecov', ['mapCoverage'], function () {
     var codecov = require('gulp-codecov.io');
 
-    return gulp.src(paths.coverage + '/?(*.json|*.xml)')
+    return gulp.src(paths.coverage + '/?(frontend.json|backend.xml)')
         .pipe(codecov());
+});
+
+// run local unit tests and coverage report generator
+gulp.task('localUnit', function (done) {
+    new karma.Server({
+        configFile: paths.karmaConf,
+        singleRun: true,
+        reporters: ['progress', 'coverage'],
+        coverageReporter: {
+            type: 'html',
+            dir: paths.coverage
+        },
+        preprocessors: {
+            'Presentation.Web/app/**/!(*.spec|*.po).js': ['coverage']
+        },
+        autoWatch: false
+    }, done).start();
+});
+
+// open coverage results.
+gulp.task('localCover', ['localUnit'], function () {
+    var open = require('gulp-open');
+
+    gulp.src(paths.coverage + '/Phantom*/index.html')
+        .pipe(open({
+            app: 'chrome'
+        }));
 });
