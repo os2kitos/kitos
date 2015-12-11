@@ -12,4 +12,4 @@ http://mozilla.org/MPL/2.0/.
 All source code in this and the underlying directories is subject to
 the terms of the Mozilla Public License, v. 2.0. 
 
-[![Build status](https://ci.appveyor.com/api/projects/status/r9lsdrjguc7qrq24/branch/master?svg=true)](https://ci.appveyor.com/project/Crevil/kitos/branch/master) [![codecov.io](https://codecov.io/github/os2kitos/kitos/coverage.svg?branch=master)](https://codecov.io/github/os2kitos/kitos?branch=master)
+[![Build status](https://ci.appveyor.com/api/projects/status/ryacihsuw13o1qcw/branch/master?svg=true)](https://ci.appveyor.com/project/Kitos/kitos/branch/master) [![codecov.io](https://codecov.io/github/os2kitos/kitos/coverage.svg?branch=master)](https://codecov.io/github/os2kitos/kitos?branch=master)

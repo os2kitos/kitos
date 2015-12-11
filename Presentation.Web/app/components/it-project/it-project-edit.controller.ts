@@ -233,7 +233,7 @@
 
                         _.each(data.data.response, (obj: { id; name; cvr; }) => {
                             if (excludeSelf && obj.id == this.project.id)
-                                return; // don"t add self to result
+                                return; // don't add self to result
 
                             results.push({
                                 id: obj.id,
