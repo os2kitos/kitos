@@ -20,9 +20,6 @@
     }
 
     describe('home view', () => {
-        jasmine.DEFAULT_TIMEOUT_INTERVAL = 90000;
-        console.log("jasmine timeout: " + jasmine.DEFAULT_TIMEOUT_INTERVAL);
-
         var homePage;
 
         beforeEach(() => {

@@ -28,6 +28,11 @@ exports.config = {
     allScriptsTimeout: 90000,
     baseUrl: 'https://localhost:44300',
 
+    // jasmine timeout options
+    jasmineNodeOpts: {
+        defaultTimeoutInterval: 90000
+    },
+
     onPrepare: function () {
         require('protractor-http-mock').config = {
             rootDirectory: __dirname
