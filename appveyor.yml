@@ -16,18 +16,18 @@ environment:
 #- mysql56
 cache:
   - node_modules -> package.json
-#  - packages -> **\packages.config
-#configuration:
-#  - AppVeyor
+  - packages -> **\packages.config
+configuration:
+  - AppVeyor
 install:
   - ps: install-Product node $env:NODEJS_VERSION
   - npm install
-#before_build:
-#  - nuget restore %APPVEYOR_BUILD_FOLDER%\KITOS.sln -verbosity quiet
+before_build:
+  - nuget restore %APPVEYOR_BUILD_FOLDER%\KITOS.sln -verbosity quiet
 #  - node_modules\.bin\gulp lint
-build: off
-#  project: KITOS.sln
-#  verbosity: quiet
+build:
+  project: KITOS.sln
+  verbosity: quiet
 #  publish_wap: true
 test_script:
   # Run frontend unit tests and coverage
