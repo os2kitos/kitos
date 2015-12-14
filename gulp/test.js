@@ -17,7 +17,12 @@ gulp.task('unit', function (done) {
         preprocessors: {
             'Presentation.Web/app/**/!(*.spec|*.po).js': ['coverage']
         },
-        autoWatch: false
+        autoWatch: false,
+
+        // to avoid DISCONNECTED messages on CI
+        browserDisconnectTimeout : 10000, // default 2000
+        browserDisconnectTolerance : 1, // default 0
+        browserNoActivityTimeout : 60000 //default 10000
     }, done).start();
 });
 
