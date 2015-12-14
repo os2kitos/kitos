@@ -793,6 +793,8 @@
     <Content Include="Partials\topnav\authorized.html" />
     <Content Include="Partials\topnav\topnav.html" />
     <TypeScriptCompile Include="app\components\it-project\it-project-overview.spec.ts" />
+    <TypeScriptCompile Include="app\Select2Wrapper.ts" />
+    <TypeScriptCompile Include="app\SelectWrapper.ts" />
     <TypeScriptCompile Include="app\IPageObject.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-edit.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project.interfaces.ts" />

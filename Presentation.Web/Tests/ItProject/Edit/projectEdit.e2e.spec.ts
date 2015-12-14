@@ -16,12 +16,17 @@ describe('project edit view', () => {
         browser.driver.manage().window().maximize();
     });
 
+    afterEach(() => {
+        mock.teardown();
+        browserHelper.outputLog();
+    });
+
     it('should save when name looses focus', () => {
         // arrange
         pageObject.nameInput = 'SomeName';
 
         // act
-        pageObject.idElement.click();
+        //pageObject.idElement.click();
 
         // assert
         mock.requestsMade()
@@ -33,8 +38,122 @@ describe('project edit view', () => {
             });
     });
 
-    afterEach(() => {
-        mock.teardown();
-        browserHelper.outputLog();
+    it('should save when type is changed', () => {
+        // arrange
+
+        // act
+        pageObject.typeSelect.selectFirst("lo");
+
+        // assert
+        mock.requestsMade()
+            .then((requests: Array<any>) => {
+                var lastRequest = requests[requests.length - 1];
+                console.log(lastRequest);
+                expect(lastRequest.method).toBe('PATCH');
+                expect(lastRequest.url).toMatch('api/itproject/1');
+            });
     });
+
+    /*
+    it('should save when projectId looses focus', () => {
+        // arrange
+        pageObject.idInput = 'SomeId';
+
+        // act
+        pageObject.nameElement.click();
+
+        // assert
+        mock.requestsMade()
+            .then((requests: Array<any>) => {
+                var lastRequest = requests[requests.length - 1];
+
+                expect(lastRequest.method).toBe('PATCH');
+                expect(lastRequest.url).toMatch('api/itproject/1');
+            });
+    });
+
+    it('should save when cmdb looses focus', () => {
+        // arrange
+        pageObject.cmdbInput = 'SomeCmdb';
+
+        // act
+        pageObject.nameElement.click();
+
+        // assert
+        mock.requestsMade()
+            .then((requests: Array<any>) => {
+                var lastRequest = requests[requests.length - 1];
+
+                expect(lastRequest.method).toBe('PATCH');
+                expect(lastRequest.url).toMatch('api/itproject/1');
+            });
+    });
+
+    it('should save when projectEsdh looses focus', () => {
+        // arrange
+        pageObject.esdhInput = 'SomeEsdh';
+
+        // act
+        pageObject.nameElement.click();
+
+        // assert
+        mock.requestsMade()
+            .then((requests: Array<any>) => {
+                var lastRequest = requests[requests.length - 1];
+
+                expect(lastRequest.method).toBe('PATCH');
+                expect(lastRequest.url).toMatch('api/itproject/1');
+            });
+    });
+
+    it('should save when projectFolder looses focus', () => {
+        // arrange
+        pageObject.folderInput = 'SomeFolder';
+
+        // act
+        pageObject.nameElement.click();
+
+        // assert
+        mock.requestsMade()
+            .then((requests: Array<any>) => {
+                var lastRequest = requests[requests.length - 1];
+
+                expect(lastRequest.method).toBe('PATCH');
+                expect(lastRequest.url).toMatch('api/itproject/1');
+            });
+    });
+
+    it('should save when background looses focus', () => {
+        // arrange
+        pageObject.backgroundInput = 'SomeBackground';
+
+        // act
+        pageObject.nameElement.click();
+
+        // assert
+        mock.requestsMade()
+            .then((requests: Array<any>) => {
+                var lastRequest = requests[requests.length - 1];
+
+                expect(lastRequest.method).toBe('PATCH');
+                expect(lastRequest.url).toMatch('api/itproject/1');
+            });
+    });
+
+    it('should save when note looses focus', () => {
+        // arrange
+        pageObject.noteInput = 'SomeNote';
+
+        // act
+        pageObject.nameElement.click();
+
+        // assert
+        mock.requestsMade()
+            .then((requests: Array<any>) => {
+                var lastRequest = requests[requests.length - 1];
+
+                expect(lastRequest.method).toBe('PATCH');
+                expect(lastRequest.url).toMatch('api/itproject/1');
+            });
+    });*/
 });

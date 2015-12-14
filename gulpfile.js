@@ -1,3 +1,4 @@
+/// <binding Clean='clean' />
 var gulp = require('gulp'),
     paths = require('./paths.config.js');
 
