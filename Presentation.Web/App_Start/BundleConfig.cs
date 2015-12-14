@@ -9,7 +9,6 @@ namespace Presentation.Web
         {
            // standalone libraries
             bundles.Add(new ScriptBundle("~/Scripts/libraries").Include(
-                "~/Scripts/underscore.js",
                 "~/Scripts/lodash.js",
                 "~/Scripts/jquery-{version}.js",
                 "~/Scripts/select2.js",
@@ -31,10 +30,11 @@ namespace Presentation.Web
 
             // angular app files
             bundles.Add(new ScriptBundle("~/Scripts/appbundle").IncludeDirectory(
-                "~/Scripts/app", "*.js", true));
+                "~/app", "*.js", true));
 
             // Ignore test specs
             bundles.IgnoreList.Ignore("*.spec.js");
+            bundles.IgnoreList.Ignore("*.po.js");
 
             // css
             bundles.Add(new StyleBundle("~/Content/cssbundle").Include(
