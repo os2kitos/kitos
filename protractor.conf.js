@@ -25,7 +25,7 @@ exports.config = {
     suites: paths.e2eSuites,
 
     // increase timeout to allow AppVeyor to rebuild database on first instantiation.
-    allScriptsTimeout: 30000,
+    allScriptsTimeout: 45000,
     baseUrl: 'https://localhost:44300',
 
     onPrepare: function () {
