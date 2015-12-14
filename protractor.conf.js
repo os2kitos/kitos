@@ -25,8 +25,13 @@ exports.config = {
     suites: paths.e2eSuites,
 
     // increase timeout to allow AppVeyor to rebuild database on first instantiation.
-    allScriptsTimeout: 30000,
+    allScriptsTimeout: 90000,
     baseUrl: 'https://localhost:44300',
+
+    // jasmine timeout options
+    jasmineNodeOpts: {
+        defaultTimeoutInterval: 90000
+    },
 
     onPrepare: function () {
         require('protractor-http-mock').config = {
