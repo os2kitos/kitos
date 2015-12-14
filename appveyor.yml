@@ -16,7 +16,7 @@ services:
 - mysql56
 cache:
   - node_modules -> package.json
-  - packages -> **\packages.config
+#  - packages -> **\packages.config
 configuration:
   - AppVeyor
 install:
