@@ -109,7 +109,7 @@
 
             this.autosaveUrl = "api/itproject/" + this.project.id;
 
-            this.parentSelectOptions = this.selectLazyLoading("api/itproject", true, ["overview", "orgId=" + this.user.currentOrganizationId]);
+            this.parentSelectOptions = this.selectLazyLoading("api/itproject", true, ["overview=true", "orgId=" + this.user.currentOrganizationId]);
 
             this.setupSelectedDataWatch();
         }

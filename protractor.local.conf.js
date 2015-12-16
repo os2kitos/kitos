@@ -22,25 +22,8 @@ exports.config = {
             rootDirectory: __dirname
         }
 
-        // NUnit xml report
-        //jasmine.getEnv().addReporter(new jasmineReporters.NUnitXmlReporter({
-        //    reportName: 'Protractor results',
-        //    filename: paths.e2eReport + '.xml'
-        //}));
-
-        // terminal output
-        jasmine.getEnv().addReporter(new jasmineReporters.TerminalReporter({
-            verbosity: 3,
-            color: true,
-            showStack: false
-        }));
-        // JUnit xml report
-        //jasmine.getEnv().addReporter(new jasmineReporters.JUnitXmlReporter({
-        //    filePrefix: paths.e2eReport + '.xml'
-        //}));
+        jasmine.getEnv().addReporter(new jasmineReporters.TapReporter());
     },
-    // json report
-    //resultJsonOutputFile: paths.e2eReport + '.json',
 
     mocks: {
         default: ['authorize'],

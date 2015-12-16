@@ -3,22 +3,51 @@ import Helper = require('../../helper');
 import ItProjectEditPo = require('../../../app/components/it-project/it-project-edit.po');
 
 describe('project edit view', () => {
-    var browserHelper: Helper.BrowserHelper;
+    var browserHelper: Helper.Browser;
+    var mockHelper: Helper.Mock;
     var pageObject: ItProjectEditPo;
 
     beforeEach(() => {
         mock(['itproject', 'itprojectrole', 'itprojecttype', 'itprojectrights']);
 
-        browserHelper = new Helper.BrowserHelper(browser);
+        browserHelper = new Helper.Browser(browser);
+        mockHelper = new Helper.Mock();
+
         pageObject = new ItProjectEditPo();
         pageObject.getPage();
 
         browser.driver.manage().window().maximize();
+
+        // clear initial requests
+        mock.clearRequests();
     });
 
     afterEach(() => {
         mock.teardown();
-        browserHelper.outputLog();
+    });
+
+    it('should not delete when delete confirm popup is dismissed', () => {
+        // arrange
+        pageObject.deleteProjectElement.first().click();
+
+        // act
+        browser.switchTo().alert()
+            .then(alert => alert.dismiss());
+
+        // assert
+        expect(mockHelper.findRequest({ method: 'DELETE', url: 'api/itproject/1' })).toBeFalsy();
+    });
+
+    it('should delete when delete confirm popup is accepted', () => {
+        // arrange
+        pageObject.deleteProjectElement.first().click();
+
+        // act
+        browser.switchTo().alert()
+            .then(alert => alert.accept());
+
+        // assert
+        expect(mockHelper.findRequest({ method: 'DELETE', url: 'api/itproject/1' })).toBeTruthy();
     });
 
     it('should save when name looses focus', () => {
@@ -26,16 +55,21 @@ describe('project edit view', () => {
         pageObject.nameInput = 'SomeName';
 
         // act
-        //pageObject.idElement.click();
+        pageObject.idElement.click();
 
         // assert
-        mock.requestsMade()
-            .then((requests: Array<any>) => {
-                var lastRequest = requests[requests.length - 1];
+        expect(mockHelper.lastRequest({ method: 'PATCH', url: 'api/itproject/1' })).toBeTruthy();
+    });
 
-                expect(lastRequest.method).toBe('PATCH');
-                expect(lastRequest.url).toMatch('api/itproject/1');
-            });
+    it('should save when projectId looses focus', () => {
+        // arrange
+        pageObject.idInput = 'SomeId';
+
+        // act
+        pageObject.nameElement.click();
+
+        // assert
+        expect(mockHelper.lastRequest({ method: 'PATCH', url: 'api/itproject/1' })).toBeTruthy();
     });
 
     it('should save when type is changed', () => {
@@ -45,31 +79,7 @@ describe('project edit view', () => {
         pageObject.typeSelect.selectFirst("lo");
 
         // assert
-        mock.requestsMade()
-            .then((requests: Array<any>) => {
-                var lastRequest = requests[requests.length - 1];
-                console.log(lastRequest);
-                expect(lastRequest.method).toBe('PATCH');
-                expect(lastRequest.url).toMatch('api/itproject/1');
-            });
-    });
-
-    /*
-    it('should save when projectId looses focus', () => {
-        // arrange
-        pageObject.idInput = 'SomeId';
-
-        // act
-        pageObject.nameElement.click();
-
-        // assert
-        mock.requestsMade()
-            .then((requests: Array<any>) => {
-                var lastRequest = requests[requests.length - 1];
-
-                expect(lastRequest.method).toBe('PATCH');
-                expect(lastRequest.url).toMatch('api/itproject/1');
-            });
+        expect(mockHelper.lastRequest({ method: 'PATCH', url: 'api/itproject/1' })).toBeTruthy();
     });
 
     it('should save when cmdb looses focus', () => {
@@ -80,13 +90,16 @@ describe('project edit view', () => {
         pageObject.nameElement.click();
 
         // assert
-        mock.requestsMade()
-            .then((requests: Array<any>) => {
-                var lastRequest = requests[requests.length - 1];
+        expect(mockHelper.lastRequest({ method: 'PATCH', url: 'api/itproject/1' })).toBeTruthy();
+    });
+    it('should save when access is changed', () => {
+        // arrange
 
-                expect(lastRequest.method).toBe('PATCH');
-                expect(lastRequest.url).toMatch('api/itproject/1');
-            });
+        // act
+        pageObject.accessSelect.selectFirst("p");
+
+        // assert
+        expect(mockHelper.lastRequest({ method: 'PATCH', url: 'api/itproject/1' })).toBeTruthy();
     });
 
     it('should save when projectEsdh looses focus', () => {
@@ -97,13 +110,7 @@ describe('project edit view', () => {
         pageObject.nameElement.click();
 
         // assert
-        mock.requestsMade()
-            .then((requests: Array<any>) => {
-                var lastRequest = requests[requests.length - 1];
-
-                expect(lastRequest.method).toBe('PATCH');
-                expect(lastRequest.url).toMatch('api/itproject/1');
-            });
+        expect(mockHelper.lastRequest({ method: 'PATCH', url: 'api/itproject/1' })).toBeTruthy();
     });
 
     it('should save when projectFolder looses focus', () => {
@@ -114,13 +121,7 @@ describe('project edit view', () => {
         pageObject.nameElement.click();
 
         // assert
-        mock.requestsMade()
-            .then((requests: Array<any>) => {
-                var lastRequest = requests[requests.length - 1];
-
-                expect(lastRequest.method).toBe('PATCH');
-                expect(lastRequest.url).toMatch('api/itproject/1');
-            });
+        expect(mockHelper.lastRequest({ method: 'PATCH', url: 'api/itproject/1' })).toBeTruthy();
     });
 
     it('should save when background looses focus', () => {
@@ -131,13 +132,7 @@ describe('project edit view', () => {
         pageObject.nameElement.click();
 
         // assert
-        mock.requestsMade()
-            .then((requests: Array<any>) => {
-                var lastRequest = requests[requests.length - 1];
-
-                expect(lastRequest.method).toBe('PATCH');
-                expect(lastRequest.url).toMatch('api/itproject/1');
-            });
+        expect(mockHelper.lastRequest({ method: 'PATCH', url: 'api/itproject/1' })).toBeTruthy();
     });
 
     it('should save when note looses focus', () => {
@@ -148,12 +143,46 @@ describe('project edit view', () => {
         pageObject.nameElement.click();
 
         // assert
-        mock.requestsMade()
-            .then((requests: Array<any>) => {
-                var lastRequest = requests[requests.length - 1];
+        expect(mockHelper.lastRequest({ method: 'PATCH', url: 'api/itproject/1' })).toBeTruthy();
+    });
 
-                expect(lastRequest.method).toBe('PATCH');
-                expect(lastRequest.url).toMatch('api/itproject/1');
-            });
-    });*/
+    it('should save when archive checkbox is selected', () => {
+        // arrange
+
+        // act
+        pageObject.archiveCheckbox.click();
+
+        // assert
+        expect(mockHelper.lastRequest({ method: 'PATCH', url: 'api/itproject/1' })).toBeTruthy();
+    });
+
+    it('should save when transversal checkbox is selected', () => {
+        // arrange
+
+        // act
+        pageObject.transversalCheckbox.click();
+
+        // assert
+        expect(mockHelper.lastRequest({ method: 'PATCH', url: 'api/itproject/1' })).toBeTruthy();
+    });
+
+    it('should save when strategy checkbox is selected', () => {
+        // arrange
+
+        // act
+        pageObject.strategyCheckbox.click();
+
+        // assert
+        expect(mockHelper.lastRequest({ method: 'PATCH', url: 'api/itproject/1' })).toBeTruthy();
+    });
+
+    it('should search for projects when change in field', () => {
+        // arrange
+
+        // act
+        pageObject.projectParentSelect.selectFirst('p');
+
+        // assert
+        expect(mockHelper.findRequest({ method: 'GET', url: 'api/itproject?(.*?)q=p' })).toBeTruthy();
+    });
 });

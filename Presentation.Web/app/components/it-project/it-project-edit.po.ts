@@ -5,8 +5,11 @@ class ItPojectEditPo implements IPageObject {
     controllerVm: string = "projectEditVm";
 
     getPage(): webdriver.promise.Promise<void> {
-        return browser.get("https://localhost:44300/#/project/edit/1/status-project");
+        return browser.get("https://localhost:44300/#/project/edit/1");
     }
+
+    // delete project
+    deleteProjectElement = element.all(by.css("a.btn-danger .glyphicon-minus"));
 
     // name
     nameElement = element(by.model(this.controllerVm + ".project.name"));
@@ -47,6 +50,9 @@ class ItPojectEditPo implements IPageObject {
         this.cmdbElement.sendKeys(value);
     }
 
+    // access
+    accessSelect = new Select2Wrapper("#s2id_project-access");
+
     // esdh
     esdhElement = element(by.model(this.controllerVm + ".project.esdh"));
     get esdhInput(): string {
@@ -71,6 +77,15 @@ class ItPojectEditPo implements IPageObject {
         this.folderElement.sendKeys(value);
     }
 
+    // archive
+    archiveCheckbox = element(by.model(this.controllerVm + ".project.isArchived"));
+
+    // transversal
+    transversalCheckbox = element(by.model(this.controllerVm + ".project.isTransversal"));
+
+    // strategy
+    strategyCheckbox = element(by.model(this.controllerVm + ".project.isStrategy"));
+
     // background
     backgroundElement = element(by.model(this.controllerVm + ".project.background"));
     get backgroundInput(): string {
@@ -94,6 +109,9 @@ class ItPojectEditPo implements IPageObject {
     set noteInput(value: string) {
         this.noteElement.sendKeys(value);
     }
+
+    // project parent
+    projectParentSelect = new Select2Wrapper("#s2id_project-parent");
 }
 
 export = ItPojectEditPo;

@@ -9,20 +9,22 @@ class Select2Wrapper {
         this.options = element.all(by.css(".select2-results-dept-0"));
     }
 
-    selectFirst(query?: string) {
-        browser
-            .driver
-            .executeScript("$(arguments[\"0\"]).mousedown();", (this.selector));
-            
+    /**
+     * Select first element in select2 dropdown.
+     *
+     * @param query An optional search query for the dropdown.
+     */
+    selectFirst(query?: string): webdriver.promise.Promise<void> {
+        browser.driver.executeScript("$(arguments[\"0\"]).mousedown();", (this.selector));
+
         if (query) {
             browser.driver.switchTo().activeElement().sendKeys(query);
-
-            browser
-                .driver
-                .wait(() => browser.driver.executeScript('return $.active === 0;'), 2000);
+            browser.driver.wait(() => browser.driver.executeScript('return $.active === 0;'), 2000);
         }
-        
-        //this.options.first().click();
+
+        browser.driver.wait(() => this.options.count().then(count => count > 0), 2000);
+
+        return this.options.first().click();
     }
 }
 
