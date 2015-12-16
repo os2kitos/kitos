@@ -19,7 +19,7 @@ class Select2Wrapper {
 
         if (query) {
             browser.driver.switchTo().activeElement().sendKeys(query);
-            browser.driver.wait(() => browser.driver.executeScript('return $.active === 0;'), 2000);
+            browser.driver.wait(() => browser.driver.executeScript("return $.active === 0;"), 2000);
         }
 
         browser.driver.wait(() => this.options.count().then(count => count > 0), 2000);
