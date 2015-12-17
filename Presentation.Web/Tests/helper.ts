@@ -40,6 +40,8 @@ export class Mock {
             .then((requests: Array<mock.ReceivedRequest>) => {
                 var lastRequest = requests[requests.length - 1];
 
+                if (!lastRequest) throw Error("protractor-http-mock: No requests matched with mocks.");
+
                 return this.compareRequest(lastRequest, expected);
         });
 
