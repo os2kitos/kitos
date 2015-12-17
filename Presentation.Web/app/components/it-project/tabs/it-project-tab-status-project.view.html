@@ -134,12 +134,12 @@
                                data-ng-hide="projectEditVm.hasWriteAccess">
                                 <i class="glyphicon glyphicon-eye-open"></i>
                             </a>
-                            <a class="btn btn-link btn-xs"
-                               data-ng-click="activity.edit()"
+                            <a class="btn btn-link btn-xs edit-activity"
+                               data-ng-click=" activity.edit()"
                                data-ng-show="projectEditVm.hasWriteAccess">
                                 <i class="glyphicon glyphicon-pencil"></i>
                             </a>
-                            <a class="btn btn-link btn-xs"
+                            <a class="btn btn-link btn-xs delete-activity"
                                data-confirmed-click="activity.delete()"
                                data-confirm-click="Er du sikker på at du vil slette?"
                                data-ng-show="projectEditVm.hasWriteAccess">
@@ -156,8 +156,8 @@
                     </tr>
                     <tr>
                         <td colspan="11" class="text-right">
-                            <button class="btn btn-success btn-sm" data-ui-sref="it-project.edit.status-project.modal({type: 'assignment', activityId: ''})" data-ng-hide="!projectEditVm.hasWriteAccess">Tilføj opgave</button>
-                            <button class="btn btn-primary btn-sm" data-ui-sref="it-project.edit.status-project.modal({type: 'milestone', activityId: ''})" data-ng-hide="!projectEditVm.hasWriteAccess">Tilføj milepæl</button>
+                            <button id="addAssignment" class="btn btn-success btn-sm" data-ui-sref="it-project.edit.status-project.modal({type: 'assignment', activityId: ''})" data-ng-hide="!projectEditVm.hasWriteAccess">Tilføj opgave</button>
+                            <button id="addMilestone" class="btn btn-primary btn-sm" data-ui-sref="it-project.edit.status-project.modal({type: 'milestone', activityId: ''})" data-ng-hide="!projectEditVm.hasWriteAccess">Tilføj milepæl</button>
                         </td>
                     </tr>
                 </tfoot>

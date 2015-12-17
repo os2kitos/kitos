@@ -1,0 +1,18 @@
+﻿[
+    {
+        "request": {
+            "path": "api/Assignment/1",
+            "method": "DELETE",
+            "queryString": {
+                "organizationId":  "1"
+            }
+        },
+        "response": {
+            "status": 200,
+            "data": {
+                "msg": "",
+                "response": { }
+            }
+        }
+    }
+]

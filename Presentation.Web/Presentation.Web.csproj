@@ -793,6 +793,7 @@
     <Content Include="Partials\topnav\authorized.html" />
     <Content Include="Partials\topnav\topnav.html" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project.po.ts" />
+    <TypeScriptCompile Include="app\RepeaterWrapper.ts" />
     <TypeScriptCompile Include="app\SelectStatus2Wrapper.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-ui-router\angular-ui-router.d.ts" />
@@ -2503,6 +2504,8 @@
     <Content Include="Tests\mocks\itproject.json" />
     <Content Include="Tests\mocks\itprojecttype.json" />
     <Content Include="Tests\mocks\itprojectrights.json" />
+    <Content Include="Tests\mocks\itprojectstatus.json" />
+    <Content Include="Tests\mocks\assignment.json" />
     <None Include="Web.AppVeyor.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

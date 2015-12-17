@@ -105,7 +105,7 @@
                 .error((data, status) => {
                     // only display error when an actual error
                     // 404 just says that there are no statuses
-                    if (status != 404) {
+                    if (status !== 404) {
                         this.notify.addErrorMessage("Kunne ikke hente projekter!");
                     }
                 });

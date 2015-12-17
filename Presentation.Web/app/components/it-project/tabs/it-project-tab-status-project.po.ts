@@ -1,5 +1,6 @@
 ﻿import IPageObject = require("../../../IPageObject.po");
 import SelectStatus2Wrapper = require("../../../SelectStatus2Wrapper");
+import RepeaterWrapper = require("../../../RepeaterWrapper");
 
 class ItPojectEditPo implements IPageObject {
     controllerVm: string = "projectStatusVm";
@@ -34,6 +35,15 @@ class ItPojectEditPo implements IPageObject {
     set statusNoteInput(value: string) {
         this.statusNoteElement.sendKeys(value);
     }
+
+    // assignment and milestone repeater
+    assignmentMilestoneRepeater = new RepeaterWrapper("activity in " + this.controllerVm + ".milestonesActivities");
+
+    // add assignment button
+    addAssignmentButton = $("#addAssignment");
+
+    // add milestone button
+    addMilestoneButton = $("#addMilestone");
 }
 
 export = ItPojectEditPo;
