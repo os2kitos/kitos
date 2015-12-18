@@ -40,6 +40,33 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{42678F6A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Unit.Presentation.Web", "Tests.Unit.Presentation.Web\Tests.Unit.Presentation.Web.csproj", "{73EA6CFE-4B6A-4F83-BA3F-93F83A08E73A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{098F0368-603B-4AF3-80A4-569EAB468147}"
+	ProjectSection(SolutionItems) = preProject
+		.eslintrc = .eslintrc
+		.gitignore = .gitignore
+		appveyor.yml = appveyor.yml
+		bundle.config.js = bundle.config.js
+		gulpfile.js = gulpfile.js
+		InstallSelfSignedCert.ps1 = InstallSelfSignedCert.ps1
+		karma.conf.js = karma.conf.js
+		package.json = package.json
+		paths.config.js = paths.config.js
+		post-coverage.bat = post-coverage.bat
+		protractor.conf.js = protractor.conf.js
+		README.md = README.md
+		run-coverage.bat = run-coverage.bat
+		run-local-coverage.bat = run-local-coverage.bat
+		run-tests.bat = run-tests.bat
+		tslint.json = tslint.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gulp", "gulp", "{8E3F47CB-D523-461B-A4EE-10CC6650DE8C}"
+	ProjectSection(SolutionItems) = preProject
+		gulp\deploy.js = gulp\deploy.js
+		gulp\linting.js = gulp\linting.js
+		gulp\test.js = gulp\test.js
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		AppVeyor|Any CPU = AppVeyor|Any CPU
@@ -118,5 +145,6 @@ Global
 		{E75385A3-EA7C-4DFF-B989-BEE64BC506ED} = {D21A2EA9-3046-47BC-BE3D-88E1F3640F04}
 		{5AE358F5-4F11-47FE-94BE-1588F357DCDC} = {500B4C1D-B871-49A0-94E7-BD0623101EF6}
 		{73EA6CFE-4B6A-4F83-BA3F-93F83A08E73A} = {42678F6A-7BFE-40AF-A659-0726A06DCE29}
+		{8E3F47CB-D523-461B-A4EE-10CC6650DE8C} = {098F0368-603B-4AF3-80A4-569EAB468147}
 	EndGlobalSection
 EndGlobal
