@@ -7,14 +7,14 @@ describe("project edit tab status project", () => {
     var pageObject: PageObject;
 
     beforeEach(() => {
-        mock(["itproject", "itprojectrole", "itprojecttype", "itprojectrights", "itprojectstatus", "assignment"]);
-
-        mockHelper = new Helper.Mock();
-
-        pageObject = new PageObject();
-        pageObject.getPage();
+        mock(["itProjectWriteAccess", "itproject", "itprojectrole", "itprojecttype", "itprojectrights", "itprojectstatus", "assignment"]);
 
         browser.driver.manage().window().maximize();
+
+        mockHelper = new Helper.Mock();
+        pageObject = new PageObject();
+
+        pageObject.getPage();
 
         // clear initial requests
         mock.clearRequests();
@@ -24,14 +24,15 @@ describe("project edit tab status project", () => {
         mock.teardown();
     });
 
-    it("should save when project status changes", () => {
+    it("should disable status update date when no write access", () => {
         // arrange
+        mock(["itProjectNoWriteAccess", "itproject", "itprojectrole", "itprojecttype", "itprojectrights", "itprojectstatus", "assignment"]);
+        pageObject.getPage();
 
         // act
-        pageObject.statusTrafficLightSelect.select(1);
 
         // assert
-        expect(mockHelper.lastRequest({ method: "PATCH", url: "api/itproject/1" })).toBeTruthy();
+        expect(pageObject.statusUpdateDateElement).toBeDisabled();
     });
 
     it("should save when status update date looses focus", () => {

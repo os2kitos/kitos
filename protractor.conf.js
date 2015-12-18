@@ -38,6 +38,9 @@ exports.config = {
             rootDirectory: __dirname
         }
 
+        require("jasmine-expect");
+        require("./Presentation.Web/Tests/matchers/custom-matchers.js");
+
         // NUnit xml report
         //jasmine.getEnv().addReporter(new jasmineReporters.NUnitXmlReporter({
         //    reportName: 'Protractor results',

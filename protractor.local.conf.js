@@ -21,6 +21,8 @@ exports.config = {
         require('protractor-http-mock').config = {
             rootDirectory: __dirname
         }
+        require("jasmine-expect");
+        require("./Presentation.Web/Tests/matchers/custom-matchers.js");
 
         jasmine.getEnv().addReporter(new jasmineReporters.TapReporter());
     },

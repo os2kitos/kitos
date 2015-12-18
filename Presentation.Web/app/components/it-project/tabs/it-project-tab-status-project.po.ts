@@ -1,6 +1,6 @@
-﻿import IPageObject = require("../../../IPageObject.po");
-import SelectStatus2Wrapper = require("../../../SelectStatus2Wrapper");
-import RepeaterWrapper = require("../../../RepeaterWrapper");
+﻿import IPageObject = require("../../../../Tests/object-wrappers/IPageObject.po");
+import SelectStatus2Wrapper = require("../../../../Tests/object-wrappers/SelectStatus2Wrapper");
+import RepeaterWrapper = require("../../../../Tests/object-wrappers/RepeaterWrapper");
 
 class ItPojectEditPo implements IPageObject {
     controllerVm: string = "projectStatusVm";

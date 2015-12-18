@@ -8,7 +8,7 @@ describe("project edit view", () => {
     var pageObject: ItProjectEditPo;
 
     beforeEach(() => {
-        mock(["itproject", "itprojectrole", "itprojecttype", "itprojectrights"]);
+        mock(["itProjectWriteAccess", "itproject", "itprojectrole", "itprojecttype", "itprojectrights"]);
 
         browserHelper = new Helper.Browser(browser);
         mockHelper = new Helper.Mock();

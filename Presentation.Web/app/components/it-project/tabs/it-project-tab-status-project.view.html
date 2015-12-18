@@ -23,7 +23,7 @@
                         <input type="text" class="form-control" id="statusDate"
                                data-kendo-date-picker
                                data-k-options="projectStatusVm.datepickerOptions"
-                               data-is-disabled="!projectEditVm.hasWriteAccess"
+                               data-ng-disabled="!projectEditVm.hasWriteAccess"
                                data-ng-model="projectStatusVm.project.statusDate"
                                data-autosave="{{projectStatusVm.project.updateUrl}}"
                                data-field="statusDate">

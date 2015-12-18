@@ -1,5 +1,5 @@
-﻿import IPageObject = require("../../IPageObject.po");
-import Select2Wrapper = require("../../Select2Wrapper");
+﻿import IPageObject = require("../../../Tests/object-wrappers/IPageObject.po");
+import Select2Wrapper = require("../../../Tests/object-wrappers/Select2Wrapper");
 
 class ItPojectEditPo implements IPageObject {
     controllerVm: string = "projectEditVm";

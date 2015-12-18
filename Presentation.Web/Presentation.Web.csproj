@@ -793,8 +793,10 @@
     <Content Include="Partials\topnav\authorized.html" />
     <Content Include="Partials\topnav\topnav.html" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project.po.ts" />
-    <TypeScriptCompile Include="app\RepeaterWrapper.ts" />
-    <TypeScriptCompile Include="app\SelectStatus2Wrapper.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jasmine-expect\jasmine-expect.d.ts" />
+    <TypeScriptCompile Include="Tests\matchers\custom-matchers.ts" />
+    <TypeScriptCompile Include="Tests\object-wrappers\RepeaterWrapper.ts" />
+    <TypeScriptCompile Include="Tests\object-wrappers\SelectStatus2Wrapper.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-ui-router\angular-ui-router.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine\jasmine.d.ts" />
@@ -802,9 +804,9 @@
     <TypeScriptCompile Include="Scripts\typings\moment\moment-node.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\moment\moment.d.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-overview.spec.ts" />
-    <TypeScriptCompile Include="app\Select2Wrapper.ts" />
-    <TypeScriptCompile Include="app\SelectWrapper.ts" />
-    <TypeScriptCompile Include="app\IPageObject.po.ts" />
+    <TypeScriptCompile Include="Tests\object-wrappers\Select2Wrapper.ts" />
+    <TypeScriptCompile Include="Tests\object-wrappers\SelectWrapper.ts" />
+    <TypeScriptCompile Include="Tests\object-wrappers\IPageObject.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-edit.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project.interfaces.ts" />
     <TypeScriptCompile Include="app\app.ts" />
@@ -2506,6 +2508,8 @@
     <Content Include="Tests\mocks\itprojectrights.json" />
     <Content Include="Tests\mocks\itprojectstatus.json" />
     <Content Include="Tests\mocks\assignment.json" />
+    <Content Include="Tests\mocks\itProjectNoWriteAccess.json" />
+    <Content Include="Tests\mocks\itProjectWriteAccess.json" />
     <None Include="Web.AppVeyor.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

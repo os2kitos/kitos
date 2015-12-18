@@ -64,7 +64,7 @@ export class Mock {
 
     outputRequests(): webdriver.promise.Promise<void> {
         var promise = mock.requestsMade().then((requests: Array<mock.ReceivedRequest>) => {
-            console.log("\nprotractor-http-mock matched requests");
+            console.log("\n*** protractor-http-mock matched requests ***\n");
 
             for (var i = 0; i < requests.length; i++) {
                 console.log(requests[i]);
