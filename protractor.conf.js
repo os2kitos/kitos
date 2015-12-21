@@ -5,20 +5,83 @@ exports.config = {
 
     seleniumAddress: 'http://hub.browserstack.com/wd/hub',
 
-    capabilities: {
-        'browserstack.user': process.env.BROWSERSTACK_USER,
-        'browserstack.key': process.env.BROWSERSTACK_KEY,
+    multiCapabilities: [
+        {
+            // Chrome 47
+            'browserstack.user': process.env.BROWSERSTACK_USER,
+            'browserstack.key': process.env.BROWSERSTACK_KEY,
 
-        // needed for testing localhost
-        'browserstack.local': 'true',
+            // needed for testing localhost
+            'browserstack.local': 'true',
 
-        // settings for the browser to test
-        'browserName': 'Chrome',
-        'browser_version': '46.0',
-        'os': 'Windows',
-        'os_version': '7',
-        'resolution': '1280x1024'
-    },
+            // settings for the browser to test
+            'browserName': 'Chrome',
+            'browser_version': '47.0',
+            'os': 'Windows',
+            'os_version': '7',
+            'resolution': '1280x1024'
+        },
+        {
+            // IE 10
+            'browserstack.user': process.env.BROWSERSTACK_USER,
+            'browserstack.key': process.env.BROWSERSTACK_KEY,
+
+            // needed for testing localhost
+            'browserstack.local': 'true',
+
+            // settings for the browser to test
+            'browserName': 'IE',
+            'browser_version': '10.0',
+            'os': 'Windows',
+            'os_version': '7',
+            'resolution': '1280x1024'
+        },
+        {
+            // IE 11
+            'browserstack.user': process.env.BROWSERSTACK_USER,
+            'browserstack.key': process.env.BROWSERSTACK_KEY,
+
+            // needed for testing localhost
+            'browserstack.local': 'true',
+
+            // settings for the browser to test
+            'browserName': 'IE',
+            'browser_version': '11.0',
+            'os': 'Windows',
+            'os_version': '7',
+            'resolution': '1280x1024'
+        },
+        {
+            // Edge 12
+            'browserstack.user': process.env.BROWSERSTACK_USER,
+            'browserstack.key': process.env.BROWSERSTACK_KEY,
+
+            // needed for testing localhost
+            'browserstack.local': 'true',
+
+            // settings for the browser to test
+            'browserName': 'Edge',
+            'browser_version': '12.0',
+            'os': 'Windows',
+            'os_version': '10',
+            'resolution': '1280x1024'
+        },
+        {
+            // Firefox 42
+            'browserstack.user': process.env.BROWSERSTACK_USER,
+            'browserstack.key': process.env.BROWSERSTACK_KEY,
+
+            // needed for testing localhost
+            'browserstack.local': 'true',
+
+            // settings for the browser to test
+            'browserName': 'Firefox',
+            'browser_version': '42.0',
+            'os': 'Windows',
+            'os_version': '7',
+            'resolution': '1280x1024'
+        }
+    ],
 
     // select all end to end tests
     suites: paths.e2eSuites,
