@@ -808,7 +808,6 @@
     <TypeScriptCompile Include="Scripts\typings\moment\moment.d.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-overview.spec.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\Select2Wrapper.ts" />
-    <TypeScriptCompile Include="Tests\object-wrappers\SelectWrapper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\IPageObject.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-edit.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project.interfaces.ts" />

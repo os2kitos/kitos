@@ -98,7 +98,7 @@ exports.config = {
     onPrepare: function () {
         require('protractor-http-mock').config = {
             rootDirectory: __dirname
-        }
+        };
 
         require("jasmine-expect");
         require("require-dir")("./Presentation.Web/Tests/matchers");

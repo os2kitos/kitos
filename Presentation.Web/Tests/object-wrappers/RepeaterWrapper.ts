@@ -10,7 +10,6 @@ class RepeaterWrapper {
      */
     constructor(locator: string) {
         this.locator = locator;
-
         this.repeater = element.all(by.repeater(this.locator));
     }
 

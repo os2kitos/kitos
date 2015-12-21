@@ -73,7 +73,9 @@ describe("project edit tab status project", () => {
 
             // clear initial requests
             mock.clearRequests();
-        }); it("should save when status traffic light changes", () => {
+        });
+
+        it("should save when status traffic light changes", () => {
             // arrange
 
             // act
