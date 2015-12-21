@@ -11,6 +11,7 @@ class SelectStatus2Wrapper {
      */
     constructor(cssLocator: string) {
         this.cssSelector = cssLocator;
+
         this.dropdownElement = $(this.cssSelector + " a.select-status");
         this.options = element.all(by.css(cssLocator + " .traffic-light li a"));
     }
@@ -19,7 +20,9 @@ class SelectStatus2Wrapper {
      * select first element.
      */
     selectFirst(): webdriver.promise.Promise<void> {
-        this.dropdownElement.click();
+        this.dropdownElement.click().then(null, () => {
+            throw Error("No active selectStatus2 directive found with selector '" + this.cssSelector + "'");
+        });
 
         browser.driver.wait(() => this.options.count().then(count => count > 0), 2000)
             .then(null, err => this.createError("No options found.\n  " + err));
@@ -35,7 +38,9 @@ class SelectStatus2Wrapper {
     select(index: number): webdriver.promise.Promise<void> {
         if (index < 0) this.createError("Index must be positive: " + index);
 
-        this.dropdownElement.click();
+        this.dropdownElement.click().then(null, () => {
+            throw Error("No active selectStatus2 directive found with selector '" + this.cssSelector + "'");
+        });
 
         browser.driver.wait(() => this.options.count().then(count => count > 0), 2000)
             .then(() => this.options.count(), err => this.createError("No options found.\n  " + err))
@@ -46,6 +51,15 @@ class SelectStatus2Wrapper {
             });
 
         return this.options.get(index).click();
+    }
+
+    /**
+     * is directive present
+     *
+     * @return A promise that resolves to a boolean indicating if the element is present.
+     */
+    isPresent(): webdriver.promise.Promise<boolean> {
+        return this.dropdownElement.isPresent();
     }
 
     /**

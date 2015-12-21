@@ -1,5 +1,4 @@
 ﻿var paths = require('./paths.config.js');
-var jasmineReporters = require('jasmine-reporters');
 
 exports.config = {
     framework: 'jasmine2',
@@ -22,9 +21,17 @@ exports.config = {
             rootDirectory: __dirname
         }
         require("jasmine-expect");
-        require("./Presentation.Web/Tests/matchers/custom-matchers.js");
+        require("require-dir")("./Presentation.Web/Tests/matchers");
 
-        jasmine.getEnv().addReporter(new jasmineReporters.TapReporter());
+        var SpecReporter = require("jasmine-spec-reporter");
+        jasmine.getEnv().addReporter(new SpecReporter({
+            displayStacktrace: "summary",
+            displaySuccessfulSpec: false
+        }));
+    },
+
+    jasmineNodeOpts: {
+        print: function() {}
     },
 
     mocks: {

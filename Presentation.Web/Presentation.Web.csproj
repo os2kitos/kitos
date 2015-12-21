@@ -794,7 +794,10 @@
     <Content Include="Partials\topnav\topnav.html" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project.po.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine-expect\jasmine-expect.d.ts" />
-    <TypeScriptCompile Include="Tests\matchers\custom-matchers.ts" />
+    <TypeScriptCompile Include="Tests\matchers\select2ToBeDisabled.ts" />
+    <TypeScriptCompile Include="Tests\matchers\toBeDisabled.ts" />
+    <TypeScriptCompile Include="Tests\matchers\toMatchInRequests.ts" />
+    <TypeScriptCompile Include="Tests\matchers\toMatchRequest.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\RepeaterWrapper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\SelectStatus2Wrapper.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />

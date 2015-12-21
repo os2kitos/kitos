@@ -1,5 +1,4 @@
 ﻿var paths = require('./paths.config.js');
-var jasmineReporters = require('jasmine-reporters');
 
 exports.config = {
     framework: 'jasmine2',
@@ -39,24 +38,7 @@ exports.config = {
         }
 
         require("jasmine-expect");
-        require("./Presentation.Web/Tests/matchers/custom-matchers.js");
-
-        // NUnit xml report
-        //jasmine.getEnv().addReporter(new jasmineReporters.NUnitXmlReporter({
-        //    reportName: 'Protractor results',
-        //    filename: paths.e2eReport + '.xml'
-        //}));
-
-        // terminal output
-        jasmine.getEnv().addReporter(new jasmineReporters.TerminalReporter({
-            verbosity: 3,
-            color: true,
-            showStack: false
-        }));
-        // JUnit xml report
-        //jasmine.getEnv().addReporter(new jasmineReporters.JUnitXmlReporter({
-        //    filePrefix: paths.e2eReport + '.xml'
-        //}));
+        require("require-dir")("./Presentation.Web/Tests/matchers");
     },
     // json report
     resultJsonOutputFile: paths.e2eReport + '.json',

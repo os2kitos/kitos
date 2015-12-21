@@ -31,37 +31,25 @@ export class Browser {
 export class Mock {
     constructor() { }
 
-    private compareRequest(actual: mock.ReceivedRequest, expected: mock.ReceivedRequest): boolean {
-        return actual.method === expected.method && actual.url.search(expected.url) !== -1;
-    }
-
-    lastRequest(expected: mock.ReceivedRequest): webdriver.promise.Promise<boolean> {
+    /**
+     * return last matched request
+     */
+    lastRequest(): webdriver.promise.Promise<mock.ReceivedRequest> {
         var promise = mock.requestsMade()
             .then((requests: Array<mock.ReceivedRequest>) => {
                 var lastRequest = requests[requests.length - 1];
 
                 if (!lastRequest) throw Error("protractor-http-mock: No requests matched with mocks.");
 
-                return this.compareRequest(lastRequest, expected);
+            return lastRequest;
         });
 
         return promise;
     }
 
-    findRequest(expected: mock.ReceivedRequest): webdriver.promise.Promise<boolean> {
-        var promise = mock.requestsMade().then((requests: Array<mock.ReceivedRequest>) => {
-            for (var i = 0; i < requests.length; i++) {
-                if (this.compareRequest(requests[i], expected)) {
-                    return true;
-                }
-            }
-
-            return false;
-        });
-
-        return promise;
-    }
-
+    /**
+     * output all matched requests to console
+     */
     outputRequests(): webdriver.promise.Promise<void> {
         var promise = mock.requestsMade().then((requests: Array<mock.ReceivedRequest>) => {
             console.log("\n*** protractor-http-mock matched requests ***\n");

@@ -5,129 +5,178 @@ import PageObject = require("../../../../app/components/it-project/tabs/it-proje
 describe("project edit tab status project", () => {
     var mockHelper: Helper.Mock;
     var pageObject: PageObject;
+    var mockDependencies: Array<string> = ["itproject", "itprojectrole", "itprojecttype", "itprojectrights", "itprojectstatus", "assignment"];
 
     beforeEach(() => {
-        mock(["itProjectWriteAccess", "itproject", "itprojectrole", "itprojecttype", "itprojectrights", "itprojectstatus", "assignment"]);
-
         browser.driver.manage().window().maximize();
 
         mockHelper = new Helper.Mock();
         pageObject = new PageObject();
-
-        pageObject.getPage();
-
-        // clear initial requests
-        mock.clearRequests();
     });
 
     afterEach(() => {
         mock.teardown();
     });
 
-    it("should disable status update date when no write access", () => {
-        // arrange
-        mock(["itProjectNoWriteAccess", "itproject", "itprojectrole", "itprojecttype", "itprojectrights", "itprojectstatus", "assignment"]);
-        pageObject.getPage();
+    describe("with no write access", () => {
+        beforeEach(() => {
+            mock(["itProjectNoWriteAccess"].concat(mockDependencies));
+            pageObject.getPage();
 
-        // act
+            // clear initial requests
+            mock.clearRequests();
+        });
 
-        // assert
-        expect(pageObject.statusUpdateDateElement).toBeDisabled();
+        it("should disable trafic light", () => {
+            // arrange
+
+            // act
+
+            // assert
+            expect(pageObject.statusTrafficLightSelect.isPresent()).toBeFalse();
+        });
+
+        it("should disable status update date", () => {
+            // arrange
+
+            // act
+
+            // assert
+            expect(pageObject.statusUpdateDateElement).toBeDisabled();
+        });
+
+        it("should disable status note", () => {
+            // arrange
+
+            // act
+
+            // assert
+            expect(pageObject.statusNoteElement).toBeDisabled();
+        });
+
+        // TODO: Modal closes unexpectedly right after click
+        //it("should show view activity", () => {
+        //    // arrange
+        //
+        //    // act
+        //    pageObject.assignmentMilestoneRepeater.selectFirst("a.view-activity").first().click();
+        //
+        //    // assert
+        //    expect(browser.driver.getCurrentUrl()).toMatch("modal/assignment/");
+        //});
     });
 
-    it("should save when status update date looses focus", () => {
-        // arrange
-        pageObject.statusUpdateInput = "01-01-2015";
+    describe("with write access", () => {
+        beforeEach(() => {
+            mock(["itProjectWriteAccess"].concat(mockDependencies));
+            pageObject.getPage();
 
-        // act
-        pageObject.statusNoteElement.click();
+            // clear initial requests
+            mock.clearRequests();
+        }); it("should save when status traffic light changes", () => {
+            // arrange
 
-        // assert
-        expect(mockHelper.lastRequest({ method: "PATCH", url: "api/itproject/1" })).toBeTruthy();
-    });
+            // act
+            pageObject.statusTrafficLightSelect.select(1);
 
-    it("should save when status note looses focus", () => {
-        // arrange
-        pageObject.statusNoteInput = "SomeNote";
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itproject/1" });
+        });
 
-        // act
-        pageObject.statusUpdateDateElement.click();
+        it("should save when status update date looses focus", () => {
+            // arrange
+            pageObject.statusUpdateInput = "01-01-2015";
 
-        // assert
-        expect(mockHelper.lastRequest({ method: "PATCH", url: "api/itproject/1" })).toBeTruthy();
-    });
+            // act
+            pageObject.statusNoteElement.click();
 
-    it("should present assignments and milestones in table on load", () => {
-        // arrange
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itproject/1" });
+        });
 
-        // act
+        it("should save when status note looses focus", () => {
+            // arrange
+            pageObject.statusNoteInput = "SomeNote";
 
-        // assert
-        expect(pageObject.assignmentMilestoneRepeater.repeater.count()).toBe(2);
-    });
+            // act
+            pageObject.statusUpdateDateElement.click();
 
-    // TODO: Some issue with the modal closing after initiation
-    //it("should open edit modal when item name is clicked", () => {
-    //    // arrange
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itproject/1" });
+        });
 
-    //    // act
-    //    pageObject.assignmentMilestoneRepeater.selectFirst("a.edit-activity").first().click();
+        it("should present assignments and milestones in table on load", () => {
+            // arrange
 
-    //    // assert
-    //    expect(browser.driver.getCurrentUrl()).toMatch("modal/assignment/2311");
-    //});
+            // act
 
-    it("should delete activity when delete confirm popup is accepted", () => {
-        // arrange
-        pageObject.assignmentMilestoneRepeater.selectFirst("a.delete-activity").first().click();
+            // assert
+            expect(pageObject.assignmentMilestoneRepeater.repeater.count()).toBe(2);
+        });
 
-        // act
-        browser.switchTo().alert()
-            .then(alert => alert.accept());
+        // TODO: Modal closes unexpectedly right after click
+        //it("should open edit modal when item name is clicked", () => {
+        //    // arrange
 
-        // assert
-        expect(mockHelper.findRequest({ method: "DELETE", url: "api/Assignment/1" })).toBeTruthy("DELETE HTTP request not detected");
-    });
+        //    // act
+        //    pageObject.assignmentMilestoneRepeater.selectFirst("a.edit-activity").first().click();
 
-    it("should not delete activity when delete confirm popup is dismissed", () => {
-        // arrange
-        pageObject.assignmentMilestoneRepeater.selectFirst("a.delete-activity").first().click();
+        //    // assert
+        //    expect(browser.driver.getCurrentUrl()).toMatch("modal/assignment/2311");
+        //});
 
-        // act
-        browser.switchTo().alert()
-            .then(alert => alert.dismiss());
+        it("should delete activity when delete confirm popup is accepted", () => {
+            // arrange
+            pageObject.assignmentMilestoneRepeater.selectFirst("a.delete-activity").first().click();
 
-        // assert
-        expect(mockHelper.findRequest({ method: "DELETE", url: "api/Assignment/1" })).toBeFalsy("DELETE HTTP request detected");
-    });
+            // act
+            browser.switchTo().alert()
+                .then(alert => alert.accept());
 
-    it("should open assignment modal when add assignment is clicked", () => {
-        // arrange
+            // assert
+            expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/Assignment/1" });
+        });
 
-        // act
-        pageObject.addAssignmentButton.click();
+        it("should not delete activity when delete confirm popup is dismissed", () => {
+            // arrange
+            pageObject.assignmentMilestoneRepeater.selectFirst("a.delete-activity").first().click();
 
-        // assert
-        expect(browser.driver.getCurrentUrl()).toMatch("modal/assignment/");
-    });
+            // act
+            browser.switchTo().alert()
+                .then(alert => alert.dismiss());
 
-    it("should open assignment modal when add assignment is clicked", () => {
-        // arrange
+            // assert
+            expect(mock.requestsMade()).not.toMatchInRequests({ method: "DELETE", url: "api/Assignment/1" });
+        });
 
-        // act
-        pageObject.addAssignmentButton.click();
+        it("should open assignment modal when add assignment is clicked", () => {
+            // arrange
 
-        // assert
-        expect(browser.driver.getCurrentUrl()).toMatch("modal/assignment/");
-    });
+            // act
+            pageObject.addAssignmentButton.click();
 
-    it("should open milestone modal when add milestone is clicked", () => {
-        // arrange
+            // assert
+            expect(browser.driver.getCurrentUrl()).toMatch("modal/assignment/");
+        });
 
-        // act
-        pageObject.addMilestoneButton.click();
+        it("should open assignment modal when add assignment is clicked", () => {
+            // arrange
 
-        // assert
-        expect(browser.driver.getCurrentUrl()).toMatch("modal/milestone/");
+            // act
+            pageObject.addAssignmentButton.click();
+
+            // assert
+            expect(browser.driver.getCurrentUrl()).toMatch("modal/assignment/");
+        });
+
+        it("should open milestone modal when add milestone is clicked", () => {
+            // arrange
+
+            // act
+            pageObject.addMilestoneButton.click();
+
+            // assert
+            expect(browser.driver.getCurrentUrl()).toMatch("modal/milestone/");
+        });
     });
 });
