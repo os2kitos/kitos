@@ -210,7 +210,7 @@
     <Compile Include="Controllers\API\AdminRightsController.cs" />
     <Compile Include="Controllers\API\DataRowController.cs" />
     <Compile Include="Controllers\API\ItContractRightsController.cs" />
-    <Compile Include="Controllers\API\ItProjectRightsController.cs" />
+    <Compile Include="Controllers\API\ItProjectRightController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageRightsController.cs" />
     <Compile Include="Controllers\API\OptionExtendController.cs" />
     <Compile Include="Controllers\API\OrganizationUnitRightsController.cs" />
@@ -222,9 +222,12 @@
     <Compile Include="Controllers\OData\ItInterfaceExhibitsController.cs" />
     <Compile Include="Controllers\OData\ItInterfacesController.cs" />
     <Compile Include="Controllers\OData\ItContractRolesController.cs" />
+    <Compile Include="Controllers\OData\ItProjectRolesController.cs" />
+    <Compile Include="Controllers\OData\ItProjectRightsController.cs" />
     <Compile Include="Controllers\OData\ItSystemRolesController.cs" />
     <Compile Include="Controllers\OData\ItSystemRightsController.cs" />
     <Compile Include="Controllers\OData\ItContractsController.cs" />
+    <Compile Include="Controllers\OData\ItProjectsController.cs" />
     <Compile Include="Controllers\OData\ItSystemsController.cs" />
     <Compile Include="Controllers\OData\ItSystemUsagesController.cs" />
     <Compile Include="Controllers\OData\OrganizationUnitsController.cs" />

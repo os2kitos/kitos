@@ -193,6 +193,8 @@
                                 parameterMap.$filter = parameterMap.$filter.replace(/('Kitos\.AccessModifier([0-9])')/, "Kitos.AccessModifier'$2'");
                                 // replaces "startswith(TaskKey,'11')" with "TaskRefs/any(c: startswith(c/TaskKey),'11')"
                                 parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()(TaskKey.*\))/, "TaskRefs/any(c: $1c/$2)");
+                                // replaces "startswith(TaskName,'11')" with "TaskRefs/any(c: startswith(c/Description),'11')"
+                                parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()TaskName(.*\))/, "TaskRefs/any(c: $1c/Description$2)");
                             }
 
                             return parameterMap;

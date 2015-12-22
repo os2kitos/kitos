@@ -7,9 +7,9 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class ItProjectRightsController : GenericRightsController<ItProject, ItProjectRight, ItProjectRole>
+    public class ItProjectRightController : GenericRightsController<ItProject, ItProjectRight, ItProjectRole>
     {
-        public ItProjectRightsController(IGenericRepository<ItProjectRight> rightRepository, IGenericRepository<ItProject> objectRepository) : base(rightRepository, objectRepository)
+        public ItProjectRightController(IGenericRepository<ItProjectRight> rightRepository, IGenericRepository<ItProject> objectRepository) : base(rightRepository, objectRepository)
         {
         }
 

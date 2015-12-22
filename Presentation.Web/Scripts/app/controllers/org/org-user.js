@@ -193,7 +193,7 @@
                                     break;
                                 //ITProjects selected
                                 case '2':
-                                    httpUrl += 'itprojectrights?';
+                                    httpUrl += 'itprojectright?';
                                     break;
                                 //ITSystems selected
                                 case '3':
@@ -272,11 +272,11 @@
                 $scope.sendAdvis = function (userToAdvis, reminder) {
                     var params = {};
                     var type;
-                    
+
                     if (reminder) {
                         params.sendReminder = true;
                         type = "påmindelse";
-                        
+
                     } else {
                         params.sendAdvis = true;
                         type = "advis";
@@ -294,7 +294,7 @@
                         })
                         .then(function () { });
                 }
-                
+
                 $scope.currentUser = user;
 
                 $scope.pagination = {
@@ -311,11 +311,11 @@
                     $scope.chosenModule = $stateParams.lastModule;
                 else
                     $scope.chosenModule = '0';
-                
+
                 $scope.$watchCollection('pagination', function (newVal, oldVal) {
                     loadUsers().then(function() {
                         $scope.getRightsForModule($scope.chosenModule).then(function() {
-                            
+
                         });
                     });
                 });

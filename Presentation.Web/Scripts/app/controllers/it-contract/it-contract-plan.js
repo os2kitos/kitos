@@ -134,7 +134,7 @@
                         type: "odata-v4",
                         transport: {
                             read: {
-                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItContracts?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,Advices",
+                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItContracts?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,Advices,ContractSigner",
                                 dataType: "json"
                             },
                             parameterMap: function (options, type) {
@@ -292,7 +292,7 @@
                             }
                         },
                         {
-                            field: "Name", title: "IT Kontrakt", width: 190,
+                            field: "Name", title: "IT Kontrakt", width: 265,
                             persistId: "name", // DON'T YOU DARE RENAME!
                             template: "<a data-ui-sref='it-contract.edit.systems({id: #: Id #})'>#: Name #</a>",
                             filterable: {
@@ -329,7 +329,7 @@
                         //    }
                         //},
                         {
-                            field: "Supplier.Name", title: "Leverandør", width: 140,
+                            field: "Supplier.Name", title: "Leverandør", width: 200,
                             persistId: "suppliername", // DON'T YOU DARE RENAME!
                             template: "#: Supplier ? Supplier.Name : '' #",
                             filterable: {
@@ -343,6 +343,8 @@
                         {
                             field: "Esdh", title: "ESDH ref", width: 150,
                             persistId: "esdh", // DON'T YOU DARE RENAME!
+                            template: "#= Esdh ? '<a target=\"_blank\" href=\"' + Esdh + '\"><i class=\"fa fa-link\"></a>' : '' #",
+                            attributes: { "class": "text-center" },
                             hidden: true,
                             filterable: {
                                 cell: {
@@ -355,7 +357,7 @@
                         {
                             field: "Folder", title: "Mappe ref", width: 150,
                             persistId: "folderref", // DON'T YOU DARE RENAME!
-                            template: folderTemplate,
+                            template: "#= Folder ? '<a target=\"_blank\" href=\"' + Folder + '\"><i class=\"fa fa-link\"></i></a>' : '' #",
                             attributes: { "class": "text-center" },
                             hidden: true,
                             filterable: {
@@ -379,10 +381,9 @@
                             }
                         },
                         {
-                            field: "ContractTemplate.Name", title: "Kontraktskabelon", width: 150,
+                            field: "ContractTemplate.Name", title: "Kontraktskabelon", width: 145,
                             persistId: "contracttmpl", // DON'T YOU DARE RENAME!
                             template: "#: ContractTemplate ? ContractTemplate.Name : '' #",
-                            hidden: true,
                             filterable: {
                                 cell: {
                                     dataSource: [],
@@ -392,7 +393,7 @@
                             }
                         },
                         {
-                            field: "PurchaseForm.Name", title: "Indkøbsform", width: 120,
+                            field: "PurchaseForm.Name", title: "Indkøbsform", width: 115,
                             persistId: "purchaseform", // DON'T YOU DARE RENAME!
                             template: "#: PurchaseForm ? PurchaseForm.Name : '' #",
                             filterable: {
@@ -414,9 +415,10 @@
                             }
                         },
                         {
-                            field: "Duration", title: "Varighed", width: 95,
+                            field: "Duration", title: "Varighed", width: 115,
                             persistId: "duration", // DON'T YOU DARE RENAME!
                             template: "#: Duration ? Duration + ' md' : '' #",
+                            hidden: true,
                             filterable: {
                                 cell: {
                                     dataSource: [],
@@ -426,8 +428,7 @@
                             }
                         },
                         {
-                            field: "ExpirationDate", title: "Udløbsdato", format: "{0:dd-MM-yyyy}", width: 90,
-                            headerTemplate: '<div style="word-wrap: break-word;">Udløbsdato</div>',
+                            field: "ExpirationDate", title: "Udløbs dato", format: "{0:dd-MM-yyyy}", width: 90,
                             persistId: "expirationDate", // DON'T YOU DARE RENAME!
                             filterable: {
                                 cell: {
@@ -453,6 +454,7 @@
                             field: "TerminationDeadline.Name", title: "Opsigelse", width: 100,
                             persistId: "terminationDeadline", // DON'T YOU DARE RENAME!
                             template: "#: TerminationDeadline ? TerminationDeadline.Name + ' md' : '' #",
+                            hidden: true,
                             filterable: {
                                 cell: {
                                     showOperators: false,
@@ -497,8 +499,7 @@
                             }
                         },
                         {
-                            field: "ProcurementPlanYear", title: "Udbudsplan", width: 90,
-                            headerTemplate: '<div style="word-wrap: break-word;">Udbudsplan</div>',
+                            field: "ProcurementPlanYear", title: "Udbuds plan", width: 90,
                             persistId: "procurementPlan", // DON'T YOU DARE RENAME!
                             template: "#: ProcurementPlanHalf && ProcurementPlanYear ? ProcurementPlanYear + ' | ' + ProcurementPlanHalf : ''#",
                             filterable: {
@@ -510,10 +511,9 @@
                             }
                         },
                         {
-                            field: "Advices.AlarmDate", title: "Dato for næste advis", width: 150,
+                            field: "Advices.AlarmDate", title: "Dato for næste advis", width: 90,
                             persistId: "nextadvis", // DON'T YOU DARE RENAME!
                             template: nextAdviceTemplate,
-                            hidden: true,
                             sortable: false,
                             filterable: false,
                         },
@@ -523,6 +523,25 @@
                 function activate() {
                     // find the index of column where the role columns should be inserted
                     var insertIndex = _.findIndex(mainGridOptions.columns, "persistId", "orgunit") + 1;
+
+                    // add special contract signer role
+                    var signerRole = {
+                        field: "ContractSigner.Name",
+                        title: "Kontraktunderskriver",
+                        persistId: "roleSigner",
+                        template: "#: ContractSigner ? ContractSigner.Name + ' ' + ContractSigner.LastName : '' #",
+                        width: 130,
+                        hidden: true,
+                        sortable: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
+                    };
+                    mainGridOptions.columns.splice(insertIndex, 0, signerRole);
 
                     // add a role column for each of the roles
                     // note iterating in reverse so we don't have to update the insert index
@@ -534,8 +553,8 @@
                             template: function (dataItem) {
                                 return roleTemplate(dataItem, role.Id);
                             },
-                            width: 170,
-                            hidden: role.Name == "Kontraktejer" ? false : true, // hardcoded role name :(
+                            width: 130,
+                            hidden: true,
                             sortable: false,
                             filterable: {
                                 cell: {
@@ -599,12 +618,6 @@
                     var link = "<a data-ui-sref='it-contract.edit.roles({id: " + dataItem.Id + "})'>" + roles + "</a>";
 
                     return link;
-                }
-
-                function folderTemplate(dataItem) {
-                    if (dataItem.Folder)
-                        return '<a href="' + dataItem.Folder + '" target="_blank"><i class="fa fa-link"></i></a>';
-                    return "";
                 }
 
                 function nextAdviceTemplate(dataItem) {
@@ -717,22 +730,28 @@
                     return newFilter;
                 }
 
+                var roleSelectorDataSource = _.clone(itContractRoles);
+                _.forEach(roleSelectorDataSource, function(n) {
+                    n.Id = "role" + n.Id;
+                });
+                roleSelectorDataSource.push({ Id: "ContractSigner.Name", Name: "Kontraktunderskriver" });
                 $scope.roleSelectorOptions = {
                     autoBind: false,
-                    dataSource: itContractRoles,
+                    dataSource: roleSelectorDataSource,
                     dataTextField: "Name",
                     dataValueField: "Id",
                     optionLabel: "Vælg kontraktrolle...",
                     change: function (e) {
                         // hide all roles column
+                        $scope.mainGrid.hideColumn("ContractSigner.Name");
                         _.forEach(itContractRoles, function (role) {
-                            $scope.mainGrid.hideColumn("role" + role.Id);
+                            $scope.mainGrid.hideColumn(role.Id);
                         });
 
                         var selectedId = e.sender.value();
-                        var gridFieldName = "role" + selectedId;
+                        //var gridFieldName = "role" + selectedId;
                         // show only the selected role column
-                        $scope.mainGrid.showColumn(gridFieldName);
+                        $scope.mainGrid.showColumn(selectedId);
                     }
                 };
             }]);

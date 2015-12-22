@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Core.DomainModel.ItSystemUsage;
 
 namespace Core.DomainModel.ItProject
 {
@@ -12,7 +11,6 @@ namespace Core.DomainModel.ItProject
             this.TaskRefs = new List<TaskRef>();
             this.Risks = new List<Risk>();
             this.Stakeholders = new List<Stakeholder>();
-            this.ItSystemUsages = new List<ItSystemUsage.ItSystemUsage>();
             this.UsedByOrgUnits = new List<ItProjectOrgUnitUsage>();
             this.ItSystemUsages = new List<ItSystemUsage.ItSystemUsage>();
             this.EconomyYears = new List<EconomyYear>();
@@ -158,7 +156,7 @@ namespace Core.DomainModel.ItProject
         #region Status project tab
 
         /// <summary>
-        /// Traffic-light dropdown for overall status
+        /// Traffic-light dropdown for overall statusr
         /// </summary>
         public TrafficLight StatusProject { get; set; }
         /// <summary>

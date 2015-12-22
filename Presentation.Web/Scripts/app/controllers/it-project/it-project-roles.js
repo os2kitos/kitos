@@ -15,7 +15,7 @@
                         });
                 }],
                 itProjectRights: ['$http', '$stateParams', function($http, $stateParams) {
-                    return $http.get("api/itprojectrights/" + $stateParams.id)
+                    return $http.get("api/itprojectright/" + $stateParams.id)
                         .then(function(result) {
                             return result.data.response;
                         });
@@ -74,7 +74,7 @@
                     "userId": uId
                 };
 
-                $http.post("api/itprojectrights/" + oId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
+                $http.post("api/itprojectright/" + oId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
                     notify.addSuccessMessage(result.response.user.fullName + " er knyttet i rollen");
 
                     $scope.rights.push({
@@ -102,7 +102,7 @@
                 var rId = right.roleId;
                 var uId = right.userId;
 
-                $http.delete("api/itprojectrights/" + projectId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
+                $http.delete("api/itprojectright/" + projectId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
                     right.show = false;
                     notify.addSuccessMessage('Rollen er slettet!');
                 }).error(function (deleteResult) {
@@ -131,14 +131,14 @@
 
                 //otherwise, we should delete the old entry, then add a new one
 
-                $http.delete("api/itprojectrights/" + projectId + "?rId=" + rIdOld + "&uId=" + uIdOld + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
+                $http.delete("api/itprojectright/" + projectId + "?rId=" + rIdOld + "&uId=" + uIdOld + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
 
                     var data = {
                         "roleId": rIdNew,
                         "userId": uIdNew
                     };
 
-                    $http.post("api/itprojectrights/" + projectId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
+                    $http.post("api/itprojectright/" + projectId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
 
                         right.roleId = result.response.roleId;
                         right.user = result.response.user;

@@ -138,7 +138,7 @@
                         type: "odata-v4",
                         transport: {
                             read: {
-                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItContracts?$expand=Parent,ResponsibleOrganizationUnit,PaymentModel,PaymentFreqency,Rights($expand=User,Role),Supplier,AssociatedSystemUsages($expand=ItSystemUsage($expand=ItSystem)),TerminationDeadline",
+                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItContracts?$expand=Parent,ResponsibleOrganizationUnit,PaymentModel,PaymentFreqency,Rights($expand=User,Role),Supplier,AssociatedSystemUsages($expand=ItSystemUsage($expand=ItSystem)),TerminationDeadline,ContractSigner",
                                 dataType: "json"
                             },
                             parameterMap: function(options, type) {
@@ -361,6 +361,8 @@
                         {
                             field: "Esdh", title: "ESDH ref", width: 150,
                             persistId: "esdh", // DON'T YOU DARE RENAME!
+                            template: "#= Esdh ? '<a target=\"_blank\" href=\"' + Esdh + '\"><i class=\"fa fa-link\"></a>' : '' #",
+                            attributes: { "class": "text-center" },
                             hidden: true,
                             filterable: {
                                 cell: {
@@ -373,7 +375,7 @@
                         {
                             field: "Folder", title: "Mappe ref", width: 150,
                             persistId: "folderref", // DON'T YOU DARE RENAME!
-                            template: folderTemplate,
+                            template: "#= Folder ? '<a target=\"_blank\" href=\"' + Folder + '\"><i class=\"fa fa-link\"></i></a>' : '' #",
                             attributes: { "class": "text-center" },
                             hidden: true,
                             filterable: {
@@ -467,6 +469,25 @@
                     // find the index of column where the role columns should be inserted
                     var insertIndex = _.findIndex(mainGridOptions.columns, "persistId", "orgunit") + 1;
 
+                    // add special contract signer role
+                    var signerRole = {
+                        field: "ContractSigner.Name",
+                        title: "Kontraktunderskriver",
+                        persistId: "roleSigner",
+                        template: "#: ContractSigner ? ContractSigner.Name + ' ' + ContractSigner.LastName : '' #",
+                        width: 200,
+                        hidden: true,
+                        sortable: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
+                    };
+                    mainGridOptions.columns.splice(insertIndex, 0, signerRole);
+
                     // add a role column for each of the roles
                     // note iterating in reverse so we don't have to update the insert index
                     _.forEachRight(itContractRoles, function (role) {
@@ -542,12 +563,6 @@
                     var link = "<a data-ui-sref='it-contract.edit.roles({id: " + dataItem.Id + "})'>" + roles + "</a>";
 
                     return link;
-                }
-
-                function folderTemplate(dataItem) {
-                    if (dataItem.Folder)
-                        return '<a href="' + dataItem.Folder + '" target="_blank"><i class="fa fa-link"></i></a>';
-                    return "";
                 }
 
                 function nextAdviceTemplate(dataItem) {
@@ -668,22 +683,28 @@
                     return newFilter;
                 }
 
+                var roleSelectorDataSource = _.clone(itContractRoles);
+                _.forEach(roleSelectorDataSource, function (n) {
+                    n.Id = "role" + n.Id;
+                });
+                roleSelectorDataSource.push({ Id: "ContractSigner.Name", Name: "Kontraktunderskriver" });
                 $scope.roleSelectorOptions = {
                     autoBind: false,
-                    dataSource: itContractRoles,
+                    dataSource: roleSelectorDataSource,
                     dataTextField: "Name",
                     dataValueField: "Id",
                     optionLabel: "Vælg kontraktrolle...",
                     change: function (e) {
                         // hide all roles column
+                        $scope.mainGrid.hideColumn("ContractSigner.Name");
                         _.forEach(itContractRoles, function (role) {
-                            $scope.mainGrid.hideColumn("role" + role.Id);
+                            $scope.mainGrid.hideColumn(role.Id);
                         });
 
                         var selectedId = e.sender.value();
-                        var gridFieldName = "role" + selectedId;
+                        //var gridFieldName = "role" + selectedId;
                         // show only the selected role column
-                        $scope.mainGrid.showColumn(gridFieldName);
+                        $scope.mainGrid.showColumn(selectedId);
                     }
                 };
             }]);

@@ -721,3 +721,7 @@ div.searchbox-wrapper {
     white-space: normal;
     word-break: break-all;
 }
+
+.k-header {
+   vertical-align: middle!important;
+}

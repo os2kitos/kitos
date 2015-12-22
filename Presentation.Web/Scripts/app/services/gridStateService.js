@@ -52,6 +52,7 @@
                 var gridOptionsWithInitialFitler = _.merge({ dataSource: { filter: initialFilter } }, storedState);
                 var gridOptions = _.omit(gridOptionsWithInitialFitler, "columnState");
 
+                var visableColumnIndex = 0;
                 _.forEach(columnState.columnState, function (state, key) {
                     var columnIndex = _.findIndex(grid.columns, function (column) {
                         if (!column.hasOwnProperty("persistId")) {
@@ -71,6 +72,7 @@
                                 grid.reorderColumn(state.index, columnObj);
                             }
                         }
+
                         // show / hide column
                         if (state.hidden != columnObj.hidden) {
                             if (state.hidden) {
@@ -79,22 +81,27 @@
                                 grid.showColumn(columnObj);
                             }
                         }
+
+                        if (!columnObj.hidden) {
+                            visableColumnIndex++;
+                        }
+
                         // resize column
                         if (state.width != columnObj.width) {
-                            // manually set the width on the column option, cause changing the css doesn't update it
+                            // manually set the width on the column, cause changing the css doesn't update it
                             columnObj.width = state.width;
                             // $timeout is required here, else the jQuery select doesn't work
                             $timeout(function() {
                                 // set width of column header
                                 $("#" + gridId + " .k-grid-header")
                                     .find("colgroup col")
-                                    .eq(columnIndex)
+                                    .eq(visableColumnIndex)
                                     .width(state.width);
 
                                 // set width of column
                                 $("#" + gridId + " .k-grid-content")
                                     .find("colgroup col")
-                                    .eq(columnIndex)
+                                    .eq(visableColumnIndex)
                                     .width(state.width);
                             });
                         }

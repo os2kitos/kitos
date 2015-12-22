@@ -417,24 +417,27 @@
             return {
                 template: '<progressbar class="status-bar" data-value="value" data-type="{{type}}"></progressbar>',
                 scope: {
-                    status: '=squareTrafficLight'
+                    status: '@squareTrafficLight'
                 },
                 link: function(scope) {
-                    switch (scope.status) {
-                    case 1:
-                        scope.type = 'danger';
-                        scope.value = 100;
-                        break;
-                    case 2:
-                        scope.type = 'warning';
-                        scope.value = 100;
-                        break;
-                    case 3:
-                        scope.type = 'success';
-                        scope.value = 100;
-                        break;
-                    default:
-                        scope.value = 0;
+                    switch (scope.status.toLowerCase()) {
+                        case "red":
+                        case 1:
+                            scope.type = 'danger';
+                            scope.value = 100;
+                            break;
+                        case "yellow":
+                        case 2:
+                            scope.type = 'warning';
+                            scope.value = 100;
+                            break;
+                        case "green":
+                        case 3:
+                            scope.type = 'success';
+                            scope.value = 100;
+                            break;
+                        default:
+                            scope.value = 0;
                     }
                 }
             };
@@ -651,9 +654,13 @@
                 link: function(scope, element, attrs, ctrl) {
                     //this is called when the user selects something from select2
                     element.bind('change', function() {
-                        $timeout(function() {
+                        $timeout(function () {
                             //update the view value
-                            ctrl.$setViewValue(scope.select.selected);
+                            if (scope.select.selected === "") {
+                                ctrl.$setViewValue(null);
+                            } else {
+                                ctrl.$setViewValue(scope.select.selected);
+                            }
 
                             //this triggers the autosave directive
                             element.triggerHandler("blur");
@@ -687,7 +694,9 @@
 
                             if (option) {
                                 return option.selectedText;
-                            } else return null;
+                            } else {
+                                return null;
+                            }
                         }
                     };
 
@@ -704,7 +713,6 @@
 
                     //loads the org unit roots
                     userService.getUser().then(function(user) {
-
                         $http.get('api/organizationUnit?organization=' + user.currentOrganizationId, { cache: true }).success(function(result) {
 
                             //recursive function for added indentation,
@@ -738,7 +746,6 @@
                         selected: null
                     };
                 }
-
             };
         }
     ]);

@@ -365,6 +365,8 @@
                         {
                             field: "EsdhRef", title: "ESDH ref", width: 150,
                             persistId: "esdh", // DON'T YOU DARE RENAME!
+                            template: "#= EsdhRef ? '<a target=\"_blank\" href=\"' + EsdhRef + '\"><i class=\"fa fa-link\"></a>' : '' #",
+                            attributes: { "class": "text-center" },
                             hidden: true,
                             filterable: {
                                 cell: {
@@ -377,6 +379,8 @@
                         {
                             field: "DirectoryOrUrlRef", title: "Mappe ref", width: 150,
                             persistId: "folderref", // DON'T YOU DARE RENAME!
+                            template: "#= DirectoryOrUrlRef ? '<a target=\"_blank\" href=\"' + DirectoryOrUrlRef + '\"><i class=\"fa fa-link\"></i></a>' : '' #",
+                            attributes: { "class": "text-center" },
                             hidden: true,
                             filterable: {
                                 cell: {
@@ -389,6 +393,8 @@
                         {
                             field: "CmdbRef", title: "CMDB ref", width: 150,
                             persistId: "cmdb", // DON'T YOU DARE RENAME!
+                            template: "#= CmdbRef ? '<a target=\"_blank\" href=\"' + CmdbRef + '\"><i class=\"fa fa-link\"></i></a>' : '' #",
+                            attributes: { "class": "text-center" },
                             hidden: true,
                             filterable: {
                                 cell: {
@@ -562,17 +568,31 @@
 
                 function contractTemplate(dataItem) {
                     if (dataItem.MainContract) {
-                        return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="fa fa-file-o" aria-hidden="true"></span></a>';
-
-                        // TODO this has been disabled for now because $expand=MainContract($expand=ItContract) fails when ItContract.Terminated has a value
-                        // re-enable when a workaround has been found
-                        //if (dataItem.MainContract.ItContract)
-                        //    if (dataItem.MainContract.ItContract.IsActive)
-                        //        return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="fa fa-file text-success" aria-hidden="true"></span></a>';
-                        //    else
-                        //        return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="fa fa-file-o text-muted" aria-hidden="true"></span></a>';
+                        if (dataItem.MainContract.ItContract)
+                            if (isContractActive(dataItem.MainContract.ItContract))
+                                return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="fa fa-file text-success" aria-hidden="true"></span></a>';
+                            else
+                                return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="fa fa-file-o text-muted" aria-hidden="true"></span></a>';
                     }
                     return "";
+                }
+
+                function isContractActive(dataItem) {
+                    var today = moment();
+                    var startDate = dataItem.Concluded ? moment(dataItem.Concluded) : today;
+                    var endDate = dataItem.ExpirationDate ? moment(dataItem.ExpirationDate) : moment("9999-12-30");
+
+                    if (dataItem.Terminated) {
+                        var terminationDate = moment(dataItem.Terminated);
+                        if (dataItem.TerminationDeadline) {
+                            terminationDate.add(dataItem.TerminationDeadline.Name, "months");
+                        }
+                        // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
+                        return today >= startDate && today <= terminationDate;
+                    }
+
+                    // indgået-dato <= dags dato <= udløbs-dato
+                    return today >= startDate && today <= endDate;
                 }
 
                 function supplierTemplate(dataItem) {
