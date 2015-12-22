@@ -38,6 +38,7 @@ class ItPojectEditPo implements IPageObject {
 
     // assignment and milestone repeater
     assignmentMilestoneRepeater = new RepeaterWrapper("activity in " + this.controllerVm + ".milestonesActivities");
+    assigmentLocator = by.css("a.delete-activity");
 
     // add assignment button
     addAssignmentButton = $("#addAssignment");

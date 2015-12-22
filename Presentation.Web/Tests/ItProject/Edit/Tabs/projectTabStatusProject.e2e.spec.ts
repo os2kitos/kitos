@@ -129,7 +129,7 @@ describe("project edit tab status project", () => {
 
         it("should delete activity when delete confirm popup is accepted", () => {
             // arrange
-            pageObject.assignmentMilestoneRepeater.selectFirst("a.delete-activity").first().click();
+            pageObject.assignmentMilestoneRepeater.selectFirst(pageObject.assigmentLocator).first().click();
 
             // act
             browser.switchTo().alert()
@@ -141,7 +141,7 @@ describe("project edit tab status project", () => {
 
         it("should not delete activity when delete confirm popup is dismissed", () => {
             // arrange
-            pageObject.assignmentMilestoneRepeater.selectFirst("a.delete-activity").first().click();
+            pageObject.assignmentMilestoneRepeater.selectFirst(pageObject.assigmentLocator).first().click();
 
             // act
             browser.switchTo().alert()

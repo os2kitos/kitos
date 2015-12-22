@@ -25,7 +25,8 @@
     <RestorePackages>true</RestorePackages>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>1ba07016</NuGetPackageImportStamp>
-    <TypeScriptToolsVersion>1.5</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>1.7</TypeScriptToolsVersion>
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -792,9 +793,12 @@
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />
     <Content Include="Partials\topnav\topnav.html" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-phases.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project.po.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine-expect\jasmine-expect.d.ts" />
+    <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabPhases.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\matchers\select2ToBeDisabled.ts" />
+    <TypeScriptCompile Include="Tests\matchers\toBeVisible.ts" />
     <TypeScriptCompile Include="Tests\matchers\toBeDisabled.ts" />
     <TypeScriptCompile Include="Tests\matchers\toMatchInRequests.ts" />
     <TypeScriptCompile Include="Tests\matchers\toMatchRequest.ts" />

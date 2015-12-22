@@ -1,5 +1,5 @@
 ﻿interface IPageObject {
-    getPage(): void;
+    getPage(): webdriver.promise.Promise<void>;
 }
 
 export = IPageObject;

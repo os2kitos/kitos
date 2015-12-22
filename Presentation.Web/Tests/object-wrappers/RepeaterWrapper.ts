@@ -6,18 +6,31 @@ class RepeaterWrapper {
     /**
      * instantiate repeater directive wrapper.
      *
-     * @param locator repeater locator like "post in posts"
+     * @param {string} [locator] repeater locator like "post in posts"
      */
     constructor(locator: string) {
         this.locator = locator;
+
         this.repeater = element.all(by.repeater(this.locator));
     }
 
     /**
      * select elements in first repeated item.
+     *
+     * @param {webdriver.Locator} [locator] locator for elements to select in first repeated item
      */
-    selectFirst(cssLocator: string): protractor.ElementArrayFinder {
-        return this.repeater.first().all(by.css(cssLocator));
+    selectFirst(locator: webdriver.Locator): protractor.ElementArrayFinder {
+         return this.repeater.first().all(locator);
+    }
+
+    /**
+     * select elements in repeated item.
+     *
+     * @param {number} [index] index of repeated item to select
+     * @param {webdriver.Locator} [locator] locator for elements to select in first repeated item
+     */
+    select(index: number, locator: webdriver.Locator): protractor.ElementArrayFinder {
+        return this.repeater.get(index).all(locator);
     }
 }
 
