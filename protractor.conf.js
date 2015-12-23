@@ -10,12 +10,13 @@ exports.config = {
             // Chrome 47
             'browserstack.user': process.env.BROWSERSTACK_USER,
             'browserstack.key': process.env.BROWSERSTACK_KEY,
-
-            // needed for testing localhost
             'browserstack.local': 'true',
 
+            'project': process.env.APPVEYOR_PROJECT_NAME || 'kitos local',
+            'build': process.env.APPVEYOR_BUILD_NUMBER || 'local build',
+
             // settings for the browser to test
-            'browserName': 'Chrome',
+            'browserName': 'chrome',
             'browser_version': '47.0',
             'os': 'Windows',
             'os_version': '7',
@@ -25,9 +26,10 @@ exports.config = {
             // IE 10
             'browserstack.user': process.env.BROWSERSTACK_USER,
             'browserstack.key': process.env.BROWSERSTACK_KEY,
-
-            // needed for testing localhost
             'browserstack.local': 'true',
+
+            'project': process.env.APPVEYOR_PROJECT_NAME || 'kitos local',
+            'build': process.env.APPVEYOR_BUILD_NUMBER || 'local build',
 
             // settings for the browser to test
             'browserName': 'IE',
@@ -40,9 +42,10 @@ exports.config = {
             // IE 11
             'browserstack.user': process.env.BROWSERSTACK_USER,
             'browserstack.key': process.env.BROWSERSTACK_KEY,
-
-            // needed for testing localhost
             'browserstack.local': 'true',
+
+            'project': process.env.APPVEYOR_PROJECT_NAME || 'kitos local',
+            'build': process.env.APPVEYOR_BUILD_NUMBER || 'local build',
 
             // settings for the browser to test
             'browserName': 'IE',
@@ -55,9 +58,10 @@ exports.config = {
             // Edge 12
             'browserstack.user': process.env.BROWSERSTACK_USER,
             'browserstack.key': process.env.BROWSERSTACK_KEY,
-
-            // needed for testing localhost
             'browserstack.local': 'true',
+
+            'project': process.env.APPVEYOR_PROJECT_NAME || 'kitos local',
+            'build': process.env.APPVEYOR_BUILD_NUMBER || 'local build',
 
             // settings for the browser to test
             'browserName': 'Edge',
@@ -70,9 +74,10 @@ exports.config = {
             // Firefox 42
             'browserstack.user': process.env.BROWSERSTACK_USER,
             'browserstack.key': process.env.BROWSERSTACK_KEY,
-
-            // needed for testing localhost
             'browserstack.local': 'true',
+
+            'project': process.env.APPVEYOR_PROJECT_NAME || 'kitos local',
+            'build': process.env.APPVEYOR_BUILD_NUMBER || 'local build',
 
             // settings for the browser to test
             'browserName': 'Firefox',
