@@ -1,5 +1,4 @@
 ﻿import IPageObject = require("../../../../Tests/object-wrappers/IPageObject.po");
-import SelectStatus2Wrapper = require("../../../../Tests/object-wrappers/SelectStatus2Wrapper");
 import RepeaterWrapper = require("../../../../Tests/object-wrappers/RepeaterWrapper");
 
 class PageObject implements IPageObject {
