@@ -38,7 +38,7 @@ var source = 'Presentation.Web',
     e2eFiles = source + '/Tests/**/*.e2e.spec.js',
     e2eSuites = {
         home: source + '/Tests/home.e2e.spec.js',
-        itProject: source + '/Tests/ItProject/Edit/Tabs/**/*Phases.e2e.spec.js'
+        itProject: source + '/Tests/ItProject/**/*e2e.spec.js'
     },
     e2eReport = 'results-protractor',
 

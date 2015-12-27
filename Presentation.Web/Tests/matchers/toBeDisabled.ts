@@ -1,48 +1,60 @@
 ﻿beforeEach(() => {
     jasmine.addMatchers({
         "toBeDisabled": (util: jasmine.MatchersUtil): jasmine.CustomMatcher => {
-            // create error message from id, name, data-ng-model or use the full HTML element if others are abcent
-            var createErrorMessage = (actual, result) => {
-                actual.getAttribute("id")
-                    .then(id => {
-                        if (!id) throw Error();
-                        result.message = util.buildFailureMessage("toBeDisabled", false, "#" + id.toString());
-                    })
-                    .then(null, () => {
-                        actual.getAttribute("name")
-                            .then(name => {
-                                if (!name) throw Error();
-                                result.message = util.buildFailureMessage("toBeDisabled", false, name.toString());
-                            })
-                            .then(null, () => {
-                                actual.getAttribute("data-ng-model")
-                                    .then(model => {
-                                        if (!model) throw Error();
-                                        result.message = util.buildFailureMessage("toBeDisabled", false, "ngModel " + model.toString());
-                                    })
-                                    .then(null, () => {
-                                        actual.getOuterHtml()
-                                            .then(html => {
-                                                result.message = util.buildFailureMessage("toBeDisabled", false, html.toString());
-                                            });
-                                    });
-                            });
-                    });
-            };
-
             var compare = (actual) => {
-
                 var result = {
                     pass: null,
                     message: null
                 };
 
+                // get element identifier from id, name, data-ng-model or use the full HTML element if others are abcent
+                var getElementIdentifier = (): webdriver.promise.Promise<string> => {
+                    return actual.getAttribute("id")
+                        .then(id => {
+                            if (!id) throw Error();
+                            return "#" + id.toString();
+                        })
+                        .thenCatch(() => {
+                            return actual.getAttribute("name")
+                                .then(name => {
+                                    if (!name) throw Error();
+                                    return name.toString();
+                                });
+                        })
+                        .thenCatch(() => {
+                            return actual.getAttribute("data-ng-model")
+                                .then(model => {
+                                    if (!model) throw Error();
+                                    return model.toString();
+                                });
+                        })
+                        .thenCatch(() => {
+                            return actual.getOuterHtml()
+                                .then(html => {
+                                    return html.toString();
+                                });
+                        });
+                };
+
+                var setErrorMessage = (negated: boolean = false) => {
+                    getElementIdentifier()
+                        .then(value => result.message = util.buildFailureMessage("toBeDisabled", negated, value));
+                };
+
+                if (!actual.getAttribute) {
+                    getElementIdentifier().then(v => {
+                        throw Error("Can't determine if '" + v + "' is disabled. Method getAttribute() is not defined.");
+                    });
+                }
+
+                // protractor always returns true if disabled attribute is pressent
+                // otherwise it rejects the promise
                 result.pass = browser.wait(() => actual.getAttribute("disabled"), 2000)
-                    .then(value => {
-                        createErrorMessage(actual, result);
-                        return util.equals(value, "true");
+                    .then(() => {
+                        setErrorMessage(true); // used when .not is used on matcher
+                        return true;
                     }, () => {
-                        createErrorMessage(actual, result);
+                        setErrorMessage();
                         return false;
                     });
 

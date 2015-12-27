@@ -4,7 +4,7 @@
             // output a single request
             var outputRequest = (request: mock.ReceivedRequest) => {
                 return "METHOD: " + request.method + " URL: " + request.url;
-            }
+            };
 
             // output all requests
             var outputRequests = (requests: Array<mock.ReceivedRequest>) => {
@@ -20,12 +20,12 @@
                 }
 
                 return output;
-            }
+            };
 
             // compare two requests
             var compareRequest = (actual: mock.ReceivedRequest, expected: mock.ReceivedRequest) => {
                 return actual.method === expected.method && actual.url.search(expected.url) !== -1;
-            }
+            };
 
             var compare = (actual, expected) => {
                 var result = {
@@ -33,14 +33,14 @@
                     message: null
                 };
 
-                result.message = util.buildFailureMessage("toMatchRequest", false, outputRequests(actual), "\n  " + outputRequest(expected));
-
                 for (var i = 0; i < actual.length; i++) {
                     if (compareRequest(actual[i], expected)) {
                         result.pass = true;
                         break;
                     }
                 }
+
+                result.message = util.buildFailureMessage("toMatchInRequests", result.pass, outputRequests(actual), "\n  " + outputRequest(expected));
 
                 return result;
             };

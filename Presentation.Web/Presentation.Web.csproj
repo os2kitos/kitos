@@ -797,7 +797,7 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project.po.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine-expect\jasmine-expect.d.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabPhases.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\matchers\select2ToBeDisabled.ts" />
+    <TypeScriptCompile Include="Tests\matchers\toBeSelect2Disabled.ts" />
     <TypeScriptCompile Include="Tests\matchers\toBeVisible.ts" />
     <TypeScriptCompile Include="Tests\matchers\toBeDisabled.ts" />
     <TypeScriptCompile Include="Tests\matchers\toMatchInRequests.ts" />

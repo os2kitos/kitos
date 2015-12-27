@@ -27,7 +27,7 @@ exports.config = {
         var SpecReporter = require("jasmine-spec-reporter");
         jasmine.getEnv().addReporter(new SpecReporter({
             displayStacktrace: "summary",
-            displaySuccessfulSpec: false
+            displaySuccessfulSpec: true
         }));
     },
 

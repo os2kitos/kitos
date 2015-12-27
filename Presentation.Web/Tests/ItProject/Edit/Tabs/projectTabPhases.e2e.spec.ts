@@ -20,10 +20,12 @@ describe("project edit tab phases", () => {
 
     describe("with no write access", () => {
         beforeEach(() => {
-            mock(["itProjectWriteAccess"].concat(mockDependencies));
+            mock(["itProjectNoWriteAccess"].concat(mockDependencies));
             pageObject.getPage();
 
             // clear initial requests
+            // necessary hack to let protractor-http-mock clear all requests after page load
+            browser.sleep(300);
             mock.clearRequests();
         });
 
@@ -35,14 +37,37 @@ describe("project edit tab phases", () => {
             // assert
             expect(pageObject.editPhaseNamesElement).not.toBeVisible();
         });
+
+        it("should disable phase buttons", () => {
+            // arrange
+            var buttons = pageObject.buttonRepeater.select(1, pageObject.buttonLocator);
+
+            // act
+
+            // assert
+            buttons.each((element, index) => expect(element).toBeDisabled());
+        });
+
+        it("should disable phase cross date", () => {
+            // arrange
+            // select index 1 as the first element in the repeater is hidden
+            var elements = pageObject.crossDateRepeater.select(1, pageObject.crossDateLocator);
+
+            // act
+
+            // assert
+            elements.each((element, index) => expect(element).toBeDisabled());
+        });
     });
 
-    xdescribe("with write access", () => {
+    describe("with write access", () => {
         beforeEach(() => {
             mock(["itProjectWriteAccess"].concat(mockDependencies));
             pageObject.getPage();
 
             // clear initial requests
+            // necessary hack to let protractor-http-mock clear all requests after page load
+            browser.sleep(300);
             mock.clearRequests();
         });
 
@@ -50,10 +75,10 @@ describe("project edit tab phases", () => {
             // arrange
 
             // act
-            pageObject.editPhaseNamesElement.click();
-
-            // assert
-            expect(pageObject.nameRepeater.selectFirst(pageObject.nameLocator).count()).toBe(1);
+            pageObject.editPhaseNamesElement.click().then(() => {
+                // assert
+                expect(pageObject.nameRepeater.selectFirst(pageObject.nameLocator).count()).toBe(1);
+            });
         });
 
         it("should hide input fields when edit phase names is clicked twice", () => {
@@ -70,13 +95,13 @@ describe("project edit tab phases", () => {
         it("should save when phase name looses focus", () => {
             // arrange
             pageObject.editPhaseNamesElement.click();
-            pageObject.nameRepeater.selectFirst(pageObject.buttonLocator).sendKeys("SomeText");
+            pageObject.nameRepeater.selectFirst(pageObject.nameLocator).first().sendKeys("SomeText");
 
             // act
             pageObject.editPhaseNamesElement.click();
 
             // assert
-            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itproject/1" });
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "POST", url: "api/itproject/1" });
         });
 
         it("should save when phase button is clicked", () => {
@@ -95,10 +120,12 @@ describe("project edit tab phases", () => {
             var element = pageObject.crossDateRepeater.select(1, pageObject.crossDateLocator).first();
 
             // act
-            element.sendKeys("01-01-2015");
-
-            // assert
-            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itproject/1" });
+            element.sendKeys("1")
+                .then(() => {
+                    // assert
+                    expect(mock.requestsMade()).toMatchInRequests({ method: "POST", url: "api/itproject/1?(.*?)phaseNum=1" });
+                    expect(mock.requestsMade()).toMatchInRequests({ method: "POST", url: "api/itproject/1?(.*?)phaseNum=2" });
+                });
         });
     });
 });

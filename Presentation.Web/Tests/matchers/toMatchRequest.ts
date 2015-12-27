@@ -3,7 +3,7 @@
         "toMatchRequest": (util: jasmine.MatchersUtil): jasmine.CustomMatcher => {
             var outputRequest = (request: mock.ReceivedRequest): string => {
                 return "METHOD: " + request.method + " URL: " + request.url;
-            }
+            };
 
             var compare = (actual, expected) => {
                 var result = {
@@ -11,8 +11,9 @@
                     message: null
                 };
 
-                result.message = util.buildFailureMessage("toMatchRequest", false, outputRequest(actual), outputRequest(expected));
                 result.pass = actual.method === expected.method && actual.url.search(expected.url) !== -1;
+
+                result.message = util.buildFailureMessage("toMatchRequest", result.pass, outputRequest(actual), outputRequest(expected));
 
                 return result;
             };

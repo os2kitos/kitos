@@ -3,13 +3,11 @@ import Helper = require("../../helper");
 import ItProjectEditPo = require("../../../app/components/it-project/it-project-edit.po");
 
 describe("project edit view", () => {
-    var browserHelper: Helper.Browser;
     var mockHelper: Helper.Mock;
     var pageObject: ItProjectEditPo;
     var mockDependencies: Array<string> = ["itproject", "itprojectrole", "itprojecttype", "itprojectrights"];
 
     beforeEach(() => {
-        browserHelper = new Helper.Browser(browser);
         mockHelper = new Helper.Mock();
 
         pageObject = new ItProjectEditPo();
@@ -36,7 +34,7 @@ describe("project edit view", () => {
             // act
 
             // assert
-            expect(pageObject.nameElement).not.toBeDisabled();
+            expect(pageObject.nameElement).toBeDisabled();
         });
 
         it("should disable projectId", () => {
@@ -48,7 +46,7 @@ describe("project edit view", () => {
             expect(pageObject.idElement).toBeDisabled();
         });
 
-        it("should disable type when", () => {
+        it("should disable type", () => {
             // arrange
 
             // act
@@ -57,7 +55,7 @@ describe("project edit view", () => {
             expect(pageObject.typeSelect.isDisabled()).toBeTrue();
         });
 
-        it("should disable cmdb when", () => {
+        it("should disable cmdb", () => {
             // arrange
 
             // act
@@ -66,7 +64,7 @@ describe("project edit view", () => {
             expect(pageObject.cmdbElement).toBeDisabled();
         });
 
-        it("should disable access when no write access", () => {
+        it("should disable access", () => {
             // arrange
 
             // act
@@ -75,7 +73,7 @@ describe("project edit view", () => {
             expect(pageObject.accessSelect.isDisabled()).toBeTrue();
         });
 
-        it("should disable esdh when no write access", () => {
+        it("should disable esdh", () => {
             // arrange
 
             // act
@@ -84,7 +82,7 @@ describe("project edit view", () => {
             expect(pageObject.esdhElement).toBeDisabled();
         });
 
-        it("should disable folder when no write access", () => {
+        it("should disable folder", () => {
             // arrange
 
             // act
@@ -93,7 +91,7 @@ describe("project edit view", () => {
             expect(pageObject.folderElement).toBeDisabled();
         });
 
-        it("should disable background when no write access", () => {
+        it("should disable background", () => {
             // arrange
 
             // act
@@ -102,7 +100,7 @@ describe("project edit view", () => {
             expect(pageObject.backgroundElement).toBeDisabled();
         });
 
-        it("should disable note when no write access", () => {
+        it("should disable note", () => {
             // arrange
 
             // act
@@ -111,7 +109,7 @@ describe("project edit view", () => {
             expect(pageObject.noteElement).toBeDisabled();
         });
 
-        it("should disable archive checkbox when no write access", () => {
+        it("should disable archive checkbox", () => {
             // arrange
 
             // act
@@ -120,7 +118,7 @@ describe("project edit view", () => {
             expect(pageObject.archiveCheckbox).toBeDisabled();
         });
 
-        it("should disable transversal checkbox when no write access", () => {
+        it("should disable transversal checkbox", () => {
             // arrange
 
             // act
@@ -129,7 +127,7 @@ describe("project edit view", () => {
             expect(pageObject.transversalCheckbox).toBeDisabled();
         });
 
-        it("should disable strategy checkbox when no write access", () => {
+        it("should disable strategy checkbox", () => {
             // arrange
 
             // act
@@ -138,13 +136,13 @@ describe("project edit view", () => {
             expect(pageObject.strategyCheckbox).toBeDisabled();
         });
 
-        it("should disable project parent when no write access", () => {
+        it("should disable project parent", () => {
             // arrange
 
             // act
 
             // assert
-            expect(pageObject.projectParentSelect.element).select2ToBeDisabled();
+            expect(pageObject.projectParentSelect.element).toBeSelect2Disabled();
         });
     });
 

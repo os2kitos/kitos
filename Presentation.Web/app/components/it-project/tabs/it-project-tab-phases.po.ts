@@ -18,7 +18,7 @@ class PageObject implements IPageObject {
 
     // phase select buttons repeater
     buttonRepeater = new RepeaterWrapper("phaseButton in " + this.controllerVm + ".project.phases");
-    buttonLocator = by.css("input");
+    buttonLocator = by.css("button");
 
     // phase cross date repeater
     crossDateRepeater = new RepeaterWrapper("phaseCrossDate in " + this.controllerVm + ".project.phases");
