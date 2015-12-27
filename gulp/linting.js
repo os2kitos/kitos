@@ -7,8 +7,7 @@ gulp.task('lint', ['es-lint', 'ts-lint']);
 gulp.task('ts-lint', function () {
     var tslint = require('gulp-tslint');
 
-    //return gulp.src(paths.allTypeScript)
-    return gulp.src(['Presentation.Web/Tests/**/*.ts'])
+    return gulp.src(paths.allTypeScript)
 		.pipe(tslint())
 		.pipe(tslint.report('prose', {
 		    emitError: false // Set to true to fail build on errors

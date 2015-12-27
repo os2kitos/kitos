@@ -107,6 +107,9 @@ exports.config = {
 
         require("jasmine-expect");
         require("require-dir")("./Presentation.Web/Tests/matchers");
+
+        var reporters = require("jasmine-reporters");
+        jasmine.getEnv().addReporter(new reporters.AppVeyorReporter());
     },
     // json report
     resultJsonOutputFile: paths.e2eReport + '.json',

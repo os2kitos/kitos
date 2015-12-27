@@ -24,15 +24,16 @@ exports.config = {
         require("jasmine-expect");
         require("require-dir")("./Presentation.Web/Tests/matchers");
 
-        var SpecReporter = require("jasmine-spec-reporter");
-        jasmine.getEnv().addReporter(new SpecReporter({
-            displayStacktrace: "summary",
-            displaySuccessfulSpec: true
+        var reporters = require("jasmine-reporters");
+        jasmine.getEnv().addReporter(new reporters.TerminalReporter({
+            verbosity: 3,
+            color: true,
+            showStack: true
         }));
     },
 
     jasmineNodeOpts: {
-        print: function() {}
+        print: function () { }
     },
 
     mocks: {
