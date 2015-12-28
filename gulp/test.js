@@ -58,9 +58,11 @@ gulp.task('webdriver', require('gulp-protractor').webdriver_standalone);
 // run e2e tests with protractor locally
 gulp.task('locale2e', function () {
     var taskExitValue = 0;
-    var args = process.argv || {};
-    if (args.length > 3) {
+    var args = process.argv;
+    if (args && args.length > 3) {
         args = args.slice(3, args.length);
+    } else {
+        args = null;
     }
 
     return gulp.src(paths.e2eFiles)
