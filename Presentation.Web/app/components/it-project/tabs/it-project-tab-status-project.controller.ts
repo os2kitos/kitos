@@ -109,7 +109,7 @@
                         this.notify.addErrorMessage("Kunne ikke hente projekter!");
                     }
                 });
-        }
+        };
 
         private addStatus = (activity, skipAdding) => {
             activity.show = true;
@@ -158,7 +158,7 @@
                 this.milestonesActivities.push(activity);
 
             return activity;
-        }
+        };
     }
 
     angular

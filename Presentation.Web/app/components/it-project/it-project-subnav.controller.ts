@@ -28,7 +28,7 @@
                         name: "Unavngivet projekt",
                         itProjectTypeId: 1,
                         responsibleOrgUnitId: orgUnitId,
-                        organizationId: user.currentOrganizationId,
+                        organizationId: user.currentOrganizationId
                     };
 
                     var msg = notify.addInfoMessage("Opretter projekt...", false);

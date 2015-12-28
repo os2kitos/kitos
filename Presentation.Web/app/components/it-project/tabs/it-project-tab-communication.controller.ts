@@ -1,18 +1,18 @@
 ﻿(function (ng, app) {
-    app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-project.edit.communication', {
-            url: '/communication',
-            templateUrl: 'app/components/it-project/tabs/it-project-tab-communication.html',
-            controller: 'project.EditCommunicationCtrl',
+    app.config(["$stateProvider", function ($stateProvider) {
+        $stateProvider.state("it-project.edit.communication", {
+            url: "/communication",
+            templateUrl: "app/components/it-project/tabs/it-project-tab-communication.html",
+            controller: "project.EditCommunicationCtrl",
             resolve: {
-                comms: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get('api/communication/' + $stateParams.id + '?project=true').then(function (result) {
+                comms: ["$http", "$stateParams", function ($http, $stateParams) {
+                    return $http.get("api/communication/" + $stateParams.id + "?project=true").then(function (result) {
                         return result.data.response;
                     });
                 }],
                 //returns a map with those users who have a role in this project.
                 //the names of the roles is saved in user.roleNames
-                usersWithRoles: ['$http', '$stateParams', function ($http, $stateParams) {
+                usersWithRoles: ["$http", "$stateParams", function ($http, $stateParams) {
                     //get the rights of the projects
                     return $http.get("api/itprojectrights/" + $stateParams.id)
                         .then(function (rightResult) {
@@ -47,8 +47,8 @@
         });
     }]);
 
-    app.controller('project.EditCommunicationCtrl',
-    ['$scope', '$http', '$timeout', '$state', '$stateParams', 'comms', 'usersWithRoles', 'user',
+    app.controller("project.EditCommunicationCtrl",
+    ["$scope", "$http", "$timeout", "$state", "$stateParams", "comms", "usersWithRoles", "user",
         function ($scope, $http, $timeout, $state, $stateParams, comms, usersWithRoles, user) {
             $scope.comms = comms;
             $scope.usersWithRoles = _.values(usersWithRoles);
@@ -62,7 +62,7 @@
             };
 
             $scope.save = function () {
-                $scope.$broadcast('show-errors-check-validity');
+                $scope.$broadcast("show-errors-check-validity");
 
                 if ($scope.commForm.$invalid) { return; }
 
@@ -73,12 +73,12 @@
                     $scope.comm.dueDate = null;
                 }
 
-                $http.post('api/communication', $scope.comm).finally(reload);
+                $http.post("api/communication", $scope.comm).finally(reload);
             };
 
-            $scope.delete = function(id) {
-                $http.delete('api/communication/' + id + '?organizationId=' + user.currentOrganizationId).finally(reload);
-            }
+            $scope.delete = function (id) {
+                $http.delete("api/communication/" + id + "?organizationId=" + user.currentOrganizationId).finally(reload);
+            };
 
             // work around for $state.reload() not updating scope
             // https://github.com/angular-ui/ui-router/issues/582

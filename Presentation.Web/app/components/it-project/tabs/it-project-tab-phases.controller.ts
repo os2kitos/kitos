@@ -1,5 +1,5 @@
 ﻿module Kitos.ItProject.Edit {
-    'use strict';
+    "use strict";
 
     export interface IPhasesController {
         project: any;
@@ -14,11 +14,11 @@
         datepickerOptions: IDatepickerOptions;
 
         static $inject: Array<string> = [
-            '$scope',
-            '$http',
-            'notify',
-            'project',
-            'user'
+            "$scope",
+            "$http",
+            "notify",
+            "project",
+            "user"
         ];
 
         constructor(
@@ -28,11 +28,11 @@
             public project,
             private user) {
 
-            this.project.updateUrl = 'api/itproject/' + this.project.id + '?organizationId=' + this.user.currentOrganizationId;
+            this.project.updateUrl = "api/itproject/" + this.project.id + "?organizationId=" + this.user.currentOrganizationId;
 
             this.datepickerOptions = {
-                format: 'dd-MM-yyyy',
-                parseFormats: ['yyyy-MM-dd']
+                format: "dd-MM-yyyy",
+                parseFormats: ["yyyy-MM-dd"]
             };
 
             // setup phases
@@ -41,52 +41,52 @@
 
         updatePhaseName(phase: IPhase, num: number): void {
             var payload = {};
-            payload['Name'] = phase.name;
-            this.$http.post(this.project.updateUrl + '&phaseNum=' + num, payload)
+            payload["Name"] = phase.name;
+            this.$http.post(this.project.updateUrl + "&phaseNum=" + num, payload)
                 .then(
-                    () => this.notify.addSuccessMessage('Feltet er opdateret'),
-                    () => this.notify.addErrorMessage('Fejl!')
+                    () => this.notify.addSuccessMessage("Feltet er opdateret"),
+                    () => this.notify.addErrorMessage("Fejl!")
                 );
         }
 
         updateSelectedPhase(phaseNum: number): void {
-            this.patch(this.project.updateUrl, 'currentPhase', phaseNum)
+            this.patch(this.project.updateUrl, "currentPhase", phaseNum)
                 .then(
                     result => {
                         // todo: No evaluation on result. Might be 404 or 500 ?
-                        this.notify.addSuccessMessage('Feltet er opdateret');
+                        this.notify.addSuccessMessage("Feltet er opdateret");
                         this.project.currentPhase = phaseNum;
                     },
-                    () => this.notify.addErrorMessage('Fejl!')
+                    () => this.notify.addErrorMessage("Fejl!")
                 );
         }
 
         updatePhaseDate(phase: IPhase, num: number): void {
-            var dateObject = moment(phase.startDate, 'DD-MM-YYYY');
+            var dateObject = moment(phase.startDate, "DD-MM-YYYY");
             var startDate;
             if (dateObject.isValid()) {
-                startDate = dateObject.format('YYYY-MM-DD');
+                startDate = dateObject.format("YYYY-MM-DD");
             } else {
                 startDate = null;
             }
             // update start date of the current phase
             var firstPayload = {};
-            firstPayload['StartDate'] = startDate;
-            this.$http.post(this.project.updateUrl + '&phaseNum=' + num, firstPayload)
+            firstPayload["StartDate"] = startDate;
+            this.$http.post(this.project.updateUrl + "&phaseNum=" + num, firstPayload)
                 .then(
                     () => {
                         if (num > 1) {
                             var prevPhaseNum = num - 1;
                             var secondPayload = {};
-                            secondPayload['EndDate'] = startDate;
+                            secondPayload["EndDate"] = startDate;
                             // also update end date of the previous phase
-                            this.$http.post(this.project.updateUrl + '&phaseNum=' + prevPhaseNum, secondPayload)
+                            this.$http.post(this.project.updateUrl + "&phaseNum=" + prevPhaseNum, secondPayload)
                                 .then(
-                                    () => this.notify.addSuccessMessage('Feltet er opdateret'),
-                                    () => this.notify.addErrorMessage('Fejl!'));
+                                    () => this.notify.addSuccessMessage("Feltet er opdateret"),
+                                    () => this.notify.addErrorMessage("Fejl!"));
                         }
                     },
-                    () => this.notify.addErrorMessage('Fejl!')
+                    () => this.notify.addErrorMessage("Fejl!")
                 );
         }
 
@@ -95,7 +95,7 @@
             payload[field] = value;
 
             return this.$http({
-                method: 'PATCH',
+                method: "PATCH",
                 url: url,
                 data: payload
             });
@@ -103,13 +103,13 @@
     }
 
     angular
-        .module('app')
-        .config(['$stateProvider', $stateProvider => {
-            $stateProvider.state('it-project.edit.phases', {
-                url: '/phases',
-                templateUrl: 'app/components/it-project/tabs/it-project-tab-phases.view.html',
+        .module("app")
+        .config(["$stateProvider", $stateProvider => {
+            $stateProvider.state("it-project.edit.phases", {
+                url: "/phases",
+                templateUrl: "app/components/it-project/tabs/it-project-tab-phases.view.html",
                 controller: PhasesController,
-                controllerAs: 'projectPhasesVm'
+                controllerAs: "projectPhasesVm"
         });
     }]);
 }

@@ -1,12 +1,12 @@
 ﻿(function (ng, app) {
-    app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-project.edit.hierarchy', {
-            url: '/hierarchy',
-            templateUrl: 'app/components/it-project/tabs/it-project-tab-hierarchy.html',
-            controller: 'project.EditHierarchyCtrl',
+    app.config(["$stateProvider", function ($stateProvider) {
+        $stateProvider.state("it-project.edit.hierarchy", {
+            url: "/hierarchy",
+            templateUrl: "app/components/it-project/tabs/it-project-tab-hierarchy.html",
+            controller: "project.EditHierarchyCtrl",
             resolve: {
-                hierarchyFlat: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get('api/itproject/' + $stateParams.id + '?hierarchy').then(function (result) {
+                hierarchyFlat: ["$http", "$stateParams", function ($http, $stateParams) {
+                    return $http.get("api/itproject/" + $stateParams.id + "?hierarchy").then(function (result) {
                         return result.data.response;
                     });
                 }]
@@ -14,22 +14,22 @@
         });
     }]);
 
-    app.controller('project.EditHierarchyCtrl',
-    ['$scope', 'hierarchyFlat',
+    app.controller("project.EditHierarchyCtrl",
+    ["$scope", "hierarchyFlat",
         function ($scope, hierarchyFlat) {
-            $scope.hierarchy = toHierarchy(hierarchyFlat, 'id', 'parentId', null, null);
+            $scope.hierarchy = toHierarchy(hierarchyFlat, "id", "parentId", null, null);
 
             // TODO WUFF!
             function toHierarchy(flatAry, idPropertyName, parentIdPropetyName, parentPropetyName, childPropertyName) {
                 // default values
-                parentPropetyName = typeof parentPropetyName !== 'undefined' ? parentPropetyName : 'parent';
-                childPropertyName = typeof childPropertyName !== 'undefined' ? childPropertyName : 'children';
+                parentPropetyName = typeof parentPropetyName !== "undefined" ? parentPropetyName : "parent";
+                childPropertyName = typeof childPropertyName !== "undefined" ? childPropertyName : "children";
 
                 // sort by parent to get roots (roots are null) first, then we only need to iterrate once
                 // example [1, 1, null, 2] -> [null, 1, 1, 2] (number is parent id)
                 var sorted = _.sortBy(flatAry, function (obj) {
                     var id = obj[parentIdPropetyName];
-                    return id == null ? -1 : id;
+                    return id === null ? -1 : id;
                 });
 
                 function search(nestedAry, id) {
@@ -51,8 +51,8 @@
                 _.each(sorted, function (obj: { isAllChildren; setChildrenShown; setParentShown; setState; setChildrenState; setParentState; level; }) {
                     // define functions
                     obj.isAllChildren = function (isChecked) {
-                        if (typeof isChecked !== 'boolean')
-                            throw new Error('Argument must be a boolean');
+                        if (typeof isChecked !== "boolean")
+                            throw new Error("Argument must be a boolean");
 
                         return _.every(this.children, function (child: { selected; indeterminate; }) {
                             if (isChecked === true) {
@@ -63,8 +63,8 @@
                         });
                     };
                     obj.setChildrenShown = function (isShown) {
-                        if (typeof isShown !== 'boolean')
-                            throw new Error('Argument must be a boolean');
+                        if (typeof isShown !== "boolean")
+                            throw new Error("Argument must be a boolean");
 
                         var children = this.children;
                         if (!children) return;
@@ -94,8 +94,8 @@
                         }
                     };
                     obj.setChildrenState = function (isChecked) {
-                        if (typeof isChecked !== 'boolean')
-                            throw new Error('Argument must be a boolean');
+                        if (typeof isChecked !== "boolean")
+                            throw new Error("Argument must be a boolean");
 
                         var children = this.children;
                         if (!children) return;
