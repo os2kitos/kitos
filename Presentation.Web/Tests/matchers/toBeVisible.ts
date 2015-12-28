@@ -9,6 +9,10 @@
 
                 // create error message from id, name, data-ng-model or use the full HTML element if others are abcent
                 var getElementIdentifier = (): webdriver.promise.Promise<string> => {
+                    if (!actual.getAttribute) {
+                        throw Error("Can't determine identifier for element. Method getAttribute() is undefined.");
+                    }
+
                     return actual.getAttribute("id")
                         .then(id => {
                             if (!id) throw Error();
@@ -43,7 +47,7 @@
 
                 if (!actual.isDisplayed) {
                     getElementIdentifier().then(v => {
-                        throw Error("Can't determine visibility of '" + v + "'. Method isDisplayed() is not defined.");
+                        throw Error("Can't determine visibility of '" + v + "'. Method isDisplayed() is undefined.");
                     });
                 }
 

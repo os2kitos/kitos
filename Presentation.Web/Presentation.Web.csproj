@@ -793,9 +793,11 @@
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />
     <Content Include="Partials\topnav\topnav.html" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-roles.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-phases.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project.po.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine-expect\jasmine-expect.d.ts" />
+    <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabRoles.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabPhases.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\matchers\toBeSelect2Disabled.ts" />
     <TypeScriptCompile Include="Tests\matchers\toBeVisible.ts" />
@@ -2516,6 +2518,7 @@
     <Content Include="Tests\mocks\assignment.json" />
     <Content Include="Tests\mocks\itProjectNoWriteAccess.json" />
     <Content Include="Tests\mocks\itProjectWriteAccess.json" />
+    <Content Include="Tests\mocks\organization.json" />
     <None Include="Web.AppVeyor.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

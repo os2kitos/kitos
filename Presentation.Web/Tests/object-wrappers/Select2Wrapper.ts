@@ -20,6 +20,8 @@ class Select2Wrapper {
      * @param query An optional search query for the dropdown.
      */
     selectFirst(query?: string): webdriver.promise.Promise<void> {
+        this.isPresent();
+
         browser.driver.executeScript("$(arguments[\"0\"]).mousedown();", (this.elementSelector));
 
         if (query) {
@@ -27,7 +29,10 @@ class Select2Wrapper {
             browser.driver.wait(() => browser.driver.executeScript("return $.active === 0;"), 2000);
         }
 
-        browser.driver.wait(() => this.options.count().then(count => count > 0), 2000);
+        browser.driver.wait(() => this.options.count().then(count => count > 0), 2000)
+            .thenCatch(err => {
+                throw new Error("No options found for select2 selector '" + this.cssSelector + "'");
+            });
 
         return this.options.first().click();
     }
@@ -38,7 +43,29 @@ class Select2Wrapper {
      * @return Promise that resovles to a boolean indicating if the dropdown is disabled or not.
      */
     isDisabled(): webdriver.promise.Promise<boolean> {
+        this.isPresent();
         return $(this.cssSelector + ".select2-container-disabled").isPresent();
+    }
+
+    /**
+     * detect if element is present in the DOM
+     *
+     * @throws error is not present.
+     */
+    isPresent(): webdriver.promise.Promise<boolean> {
+        return this.element.isPresent()
+            .then(present => {
+                if (!present) {
+                    throw Error("select2 element not found using selector '" + this.cssSelector + "'");
+                }
+            })
+            .then(() => $(this.elementSelector).isPresent())
+            .then(present => {
+                if (!present) {
+                    throw Error("select2 element not found using selector '" + this.cssSelector + "'. Is the element select2 initialized?");
+                }
+            })
+            .then(() => true);
     }
 }
 
