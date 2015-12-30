@@ -39,6 +39,16 @@
                 return filterUrl.replace(pattern, "Rights/any(c: $1c/User/Name$2 and c/RoleId eq " + roleId + ")");
             }
 
+            function fixKleIdFilter(filterUrl, column) {
+                var pattern = new RegExp("(\\w+\\()" + column + "(.*?\\))", "i");
+                return filterUrl.replace(pattern, "TaskRefs/any(c: $1c/TaskKey$2)");
+            }
+
+            function fixKleDescFilter(filterUrl, column) {
+                var pattern = new RegExp("(\\w+\\()" + column + "(.*?\\))", "i");
+                return filterUrl.replace(pattern, "TaskRefs/any(c: $1c/Description$2)");
+            }
+
             // saves grid state to localStorage
             function saveGridOptions() {
                 gridState.saveGridOptions($scope.mainGrid);
@@ -141,6 +151,9 @@
                             if (parameterMap.$filter) {
                                 _.forEach(projectRoles, function(role) {
                                     parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "role" + role.Id, role.Id);
+
+                                    parameterMap.$filter = fixKleIdFilter(parameterMap.$filter, "TaskRefs/TaskKey");
+                                    parameterMap.$filter = fixKleDescFilter(parameterMap.$filter, "TaskRefs/Description");
                                 });
                             }
 
@@ -403,23 +416,9 @@
                         }
                     },
                     {
-                        field: "TaskRefs.TaskKey", title: "Opgave id'er", width: 150,
+                        field: "TaskRefs.TaskKey", title: "Opgave id", width: 150,
                         persistId: "kleid", // DON'T YOU DARE RENAME!
                         template: "#: TaskRefs.length > 0 ? _.pluck(TaskRefs, 'TaskKey').join(', ') : '' #",
-                        attributes: { "class": "might-overflow" },
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "startswith",
-                            }
-                        },
-                        sortable: false
-                    },
-                    {
-                        field: "TaskRefs.Description", title: "Opgave navne", width: 150,
-                        persistId: "klename", // DON'T YOU DARE RENAME!
-                        template: "#: TaskRefs.length > 0 ? _.pluck(TaskRefs, 'Description').join(', ') : '' #",
                         attributes: { "class": "might-overflow" },
                         hidden: true,
                         filterable: {
@@ -432,9 +431,24 @@
                         sortable: false
                     },
                     {
+                        field: "TaskRefs.Description", title: "Opgave navn", width: 150,
+                        persistId: "klename", // DON'T YOU DARE RENAME!
+                        template: "#: TaskRefs.length > 0 ? _.pluck(TaskRefs, 'Description').join(', ') : '' #",
+                        attributes: { "class": "might-overflow" },
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        },
+                        sortable: false
+                    },
+                    {
                         field: "GoalStatus.Status", title: "Status Mål", width: 150,
                         persistId: "goalstatus", // DON'T YOU DARE RENAME!
                         template: '<span data-square-traffic-light="#: GoalStatus.Status #"></span>',
+                        hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -452,21 +466,25 @@
                     {
                         field: "IsTransversal", title: "Tværgående", width: 150,
                         persistId: "trans", // DON'T YOU DARE RENAME!
+                        hidden: true,
                         template: "#= IsTransversal ? '<i class=\"text-success fa fa-check\"></i>' : '<i class=\"text-danger fa fa-times\"></i>' #",
                     },
                     {
                         field: "IsStrategy", title: "Strategisk", width: 150,
                         persistId: "strat", // DON'T YOU DARE RENAME!
+                        hidden: true,
                         template: "#= IsStrategy ? '<i class=\"text-success fa fa-check\"></i>' : '<i class=\"text-danger fa fa-times\"></i>' #",
                     },
                     {
                         field: "EconomyYears", title: "Økonomi", width: 150,
                         persistId: "eco", // DON'T YOU DARE RENAME!
+                        hidden: true,
                         template: "TODO",
                     },
                     {
                         field: "Risks", title: "Risiko", width: 150,
                         persistId: "risks", // DON'T YOU DARE RENAME!
+                        hidden: true,
                         template: "TODO",
                     },
                     {

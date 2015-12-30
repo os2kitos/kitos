@@ -44,6 +44,16 @@
                     return filterUrl.replace(pattern, "Rights/any(c: $1c/User/Name$2 and c/RoleId eq " + roleId + ")");
                 }
 
+                function fixKleIdFilter(filterUrl, column) {
+                    var pattern = new RegExp("(\\w+\\()" + column + "(.*?\\))", "i");
+                    return filterUrl.replace(pattern, "ItSystem/TaskRefs/any(c: $1c/TaskKey$2)");
+                }
+
+                function fixKleDescFilter(filterUrl, column) {
+                    var pattern = new RegExp("(\\w+\\()" + column + "(.*?\\))", "i");
+                    return filterUrl.replace(pattern, "ItSystem/TaskRefs/any(c: $1c/Description$2)");
+                }
+
                 var storageKey = "it-system-overview-options";
                 var orgUnitStorageKey = "it-system-overview-orgunit";
                 var gridState = gridStateService.getService(storageKey);
@@ -152,6 +162,9 @@
                                     _.forEach(systemRoles, function (role) {
                                         parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "role" + role.Id, role.Id);
                                     });
+
+                                    parameterMap.$filter = fixKleIdFilter(parameterMap.$filter, "ItSystem/TaskRefs/TaskKey");
+                                    parameterMap.$filter = fixKleDescFilter(parameterMap.$filter, "ItSystem/TaskRefs/Description");
                                 }
 
                                 return parameterMap;
@@ -348,7 +361,7 @@
                             }
                         },
                         {
-                            field: "ItSystem.TaskKey", title: "KLE ID", width: 150,
+                            field: "ItSystem.TaskRefs.TaskKey", title: "KLE ID", width: 150,
                             persistId: "taskkey", // DON'T YOU DARE RENAME!
                             template: "#: ItSystem.TaskRefs.length > 0 ? _.pluck(ItSystem.TaskRefs, 'TaskKey').join(', ') : '' #",
                             attributes: { "class": "might-overflow" },
@@ -358,6 +371,20 @@
                                     dataSource: [],
                                     showOperators: false,
                                     operator: "startswith",
+                                }
+                            },
+                            sortable: false
+                        },
+                        {
+                            field: "ItSystem.TaskRefs.Description", title: "KLE navn", width: 150,
+                            persistId: "klename", // DON'T YOU DARE RENAME!
+                            template: "#: ItSystem.TaskRefs.length > 0 ? _.pluck(ItSystem.TaskRefs, 'Description').join(', ') : '' #",
+                            attributes: { "class": "might-overflow" },
+                            filterable: {
+                                cell: {
+                                    dataSource: [],
+                                    showOperators: false,
+                                    operator: "contains",
                                 }
                             },
                             sortable: false

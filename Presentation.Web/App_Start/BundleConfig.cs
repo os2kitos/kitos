@@ -23,12 +23,14 @@ namespace Presentation.Web
                 "~/Scripts/angular-animate.js",
                 "~/Scripts/angular-sanitize.js",
                 "~/Scripts/angular-ui-router.js",
-                "~/Scripts/angular-ui/ui-bootstrap.js",
                 "~/Scripts/angular-ui/ui-bootstrap-tpls.js",
                 "~/Scripts/ui-select2.js",
                 "~/Scripts/notify/*.js",
                 "~/Scripts/loading-bar.js",
                 "~/Scripts/angular-ui-util/ui-utils.js"));
+
+            // bootstrap.js was causing issues. Use ui-bootstrap instead.
+            bundles.IgnoreList.Ignore("bootstrap.js");
 
             // angular app files
             bundles.Add(new ScriptBundle("~/Scripts/appbundle").IncludeDirectory(
