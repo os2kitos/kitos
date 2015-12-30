@@ -7,10 +7,12 @@
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusGoal">Status mål (samlet):</label>
                     <div class="col-md-7">
-                        <span id="statusGoal" data-select-status2="" data-ng-model="goalStatus.status"
-                            data-field="status"
+                        <span id="statusGoal"
+                              data-select-status2=""
+                              data-ng-model="goalStatus.status"
+                              data-field="status"
                               data-autosave="{{goalStatus.updateUrl}}"
-                            data-can-write="hasWriteAccess">
+                              data-can-write="projectEditVm.hasWriteAccess"
                             </span>
                     </div>
                 </div>
@@ -22,7 +24,7 @@
                         <input type="text" class="form-control" id="statusDate"
                                data-kendo-date-picker
                                data-k-options="datepickerOptions"
-                               data-is-disabled="!hasWriteAccess"
+                               data-ng-disabled="!projectEditVm.hasWriteAccess"
                                data-ng-model="goalStatus.statusDate"
                                data-autosave="{{goalStatus.updateUrl}}"
                                data-field="statusDate">
@@ -39,7 +41,7 @@
                         <textarea id="note" class="form-control input-sm" rows="4" data-ng-model="goalStatus.statusNote"
                             data-field="statusNote"
                             data-autosave="{{goalStatus.updateUrl}}"
-                            data-ng-disabled="!hasWriteAccess"></textarea>
+                            data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
                     </div>
                 </div>
             </div>
@@ -87,10 +89,10 @@
 
                         <!-- Goal name -->
                         <td>
-                            <a class="btn btn-link btn-xs" data-ng-click="goal.edit()" data-ng-show="hasWriteAccess">
+                            <a class="btn btn-link btn-xs" data-ng-click="goal.edit()" data-ng-show="projectEditVm.hasWriteAccess">
                                 {{goal.name}}
                             </a>
-                            <span data-ng-hide="hasWriteAccess">
+                            <span data-ng-hide="projectEditVm.hasWriteAccess">
                                 {{goal.name}}
                             </span>
                         </td>
@@ -160,11 +162,11 @@
                             <span data-select-status2="" data-ng-model="goal.status"></span>
                         </td>
                         <td>
-                            <div class="pull-right" data-ng-hide="!hasWriteAccess">
-                                <a class="btn btn-link btn-xs" data-ng-click="goal.edit()">
+                            <div class="pull-right" data-ng-hide="!projectEditVm.hasWriteAccess">
+                                <a class="btn btn-link btn-xs edit-goal" data-ng-click="goal.edit()">
                                     <i class="glyphicon glyphicon-pencil"></i>
                                 </a>
-                                <a class="btn btn-link btn-xs"
+                                <a class="btn btn-link btn-xs delete-goal"
                                    data-confirmed-click="goal.delete()"
                                    data-confirm-click="Er du sikker på at du vil slette?">
                                     <i class="glyphicon glyphicon-trash"></i>
@@ -177,8 +179,8 @@
                 <tfoot>
                     <tr>
                         <td colspan="17">
-                            <div class="pull-right" data-ng-hide="!hasWriteAccess">
-                                <button class="btn btn-success btn-sm" data-ui-sref="it-project.edit.status-goal.modal({goalId: ''})">Tilføj mål</button>
+                            <div class="pull-right" data-ng-hide="!projectEditVm.hasWriteAccess">
+                                <button id="add-goal" class="btn btn-success btn-sm" data-ui-sref="it-project.edit.status-goal.modal({goalId: ''})">Tilføj mål</button>
                             </div>
                         </td>
                     </tr>
