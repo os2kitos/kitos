@@ -118,14 +118,14 @@
             // todo refactor this garbage!
             this.$scope.$watch(() => this.selectedData, (newValue: Array<IDropdownOption>, oldValue: Array<IDropdownOption>) => {
                 var payload: IPayload = {
-                    isStatusGoalVisible: false,
-                    isStrategyVisible: false,
-                    isHierarchyVisible: false,
-                    isEconomyVisible: false,
-                    isStakeholderVisible: false,
-                    isRiskVisible: false,
-                    isCommunicationVisible: false,
-                    isHandoverVisible: false
+                    isStatusGoalVisible: null,
+                    isStrategyVisible: null,
+                    isHierarchyVisible: null,
+                    isEconomyVisible: null,
+                    isStakeholderVisible: null,
+                    isRiskVisible: null,
+                    isCommunicationVisible: null,
+                    isHandoverVisible: null
                 };
 
                 if (newValue.length > oldValue.length) {
