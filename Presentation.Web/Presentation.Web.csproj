@@ -745,7 +745,7 @@
     <Content Include="app\components\it-project\tabs\it-project-tab-kle.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-stakeholders.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-goal.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-strategy.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-strategy.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-project.view.html" />
     <Content Include="Partials\it-system\edit-it-interface.html" />
     <Content Include="Partials\it-system\it-interface-catalog.html" />
@@ -798,8 +798,10 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-roles.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-phases.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-goal.po.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-strategy.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project.po.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine-expect\jasmine-expect.d.ts" />
+    <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabStrategy.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabDescription.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabRoles.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabPhases.e2e.spec.ts" />
@@ -910,7 +912,7 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-economy.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-itsys.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-kle.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-strategy.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-strategy.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-edit.controller.ts" />
     <TypeScriptCompile Include="app\controllers\it-system\it-interface-catalog.ts" />
     <TypeScriptCompile Include="app\controllers\it-system\it-interface-edit.ts" />
