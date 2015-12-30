@@ -27,7 +27,7 @@
             <tr data-ng-repeat="task in tasklist">
                 <!-- selected -->
                 <td>
-                    <input type="checkbox" id="{{task.taskRef.id}}" data-ng-checked="task.isSelected" data-ng-click="save(task)" data-ng-disabled="!hasWriteAccess" />
+                    <input type="checkbox" id="{{task.taskRef.id}}" data-ng-checked="task.isSelected" data-ng-click="save(task)" data-ng-disabled="!projectEditVm.hasWriteAccess" />
                 </td>
                 <td>
                     <label for="{{task.taskRef.id}}">{{task.taskRef.taskKey}}</label>
@@ -42,16 +42,16 @@
                 <td colspan="3" class="text-center">
                     <span data-pagination-buttons="pagination" data-pagination-total-count="totalCount"></span>
                     <span>
-                        <button class="btn btn-success btn-sm" data-confirmed-click="selectTaskGroup()" data-confirm-click="Er du sikker?" data-ng-if="hasWriteAccess">
+                        <button class="btn btn-success btn-sm" data-confirmed-click="selectTaskGroup()" data-confirm-click="Er du sikker?" data-ng-if="projectEditVm.hasWriteAccess">
                             Vælg alle sider
                         </button>
-                        <button class="btn btn-success btn-sm" data-ng-click="selectAllTasks()" data-ng-if="hasWriteAccess">
+                        <button class="btn btn-success btn-sm" data-ng-click="selectAllTasks()" data-ng-if="projectEditVm.hasWriteAccess">
                             Vælg alle
                         </button>
-                        <button class="btn btn-danger btn-sm" data-confirmed-click="removeAllTasks()" data-confirm-click="Er du sikker?" data-ng-if="hasWriteAccess">
+                        <button class="btn btn-danger btn-sm" data-confirmed-click="removeAllTasks()" data-confirm-click="Er du sikker?" data-ng-if="projectEditVm.hasWriteAccess">
                             Fjern alle
                         </button>
-                        <button class="btn btn-danger btn-sm" data-confirmed-click="removeTaskGroup()" data-confirm-click="Er du sikker?" data-ng-if="hasWriteAccess">
+                        <button class="btn btn-danger btn-sm" data-confirmed-click="removeTaskGroup()" data-confirm-click="Er du sikker?" data-ng-if="projectEditVm.hasWriteAccess">
                             Fjern alle sider
                         </button>
                     </span>

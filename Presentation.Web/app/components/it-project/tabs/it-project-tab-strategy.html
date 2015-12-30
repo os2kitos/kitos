@@ -12,7 +12,7 @@
                         data-ng-model="jointMunicipalProjectId"
                         data-autosave="{{ autosaveUrl }}"
                         data-field="jointMunicipalProjectId"
-                        data-ng-disabled="!hasWriteAccess">
+                        data-ng-disabled="!projectEditVm.hasWriteAccess">
                     <option value=""></option>
                     <option data-ng-repeat="jointMunicipalProject in jointMunicipalProjects" value="{{jointMunicipalProject.id}}">{{jointMunicipalProject.name}}</option>
                 </select>
@@ -25,7 +25,7 @@
                         data-ng-model="commonPublicProjectId"
                         data-autosave="{{ autosaveUrl }}"
                         data-field="commonPublicProjectId"
-                        data-ng-disabled="!hasWriteAccess">
+                        data-ng-disabled="!projectEditVm.hasWriteAccess">
                     <option value=""></option>
                     <option data-ng-repeat="commonPublicProject in commonPublicProjects" value="{{commonPublicProject.id}}">{{commonPublicProject.name}}</option>
                 </select>

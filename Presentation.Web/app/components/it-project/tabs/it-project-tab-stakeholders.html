@@ -26,49 +26,49 @@
         <tbody>
             <tr data-ng-repeat="stakeholder in stakeholders | filter:{show:true}">
                 <td>
-                    <input type="text" class="form-control input-sm" 
-                           data-autosave="{{stakeholder.updateUrl}}" 
+                    <input type="text" class="form-control input-sm"
+                           data-autosave="{{stakeholder.updateUrl}}"
                            data-field="name"
-                           data-ng-model="stakeholder.name" 
-                           data-ng-disabled="!hasWriteAccess"/>
+                           data-ng-model="stakeholder.name"
+                           data-ng-disabled="!projectEditVm.hasWriteAccess"/>
                 </td>
                 <td>
-                    <input type="text" class="form-control input-sm" 
-                           data-autosave="{{stakeholder.updateUrl}}" 
+                    <input type="text" class="form-control input-sm"
+                           data-autosave="{{stakeholder.updateUrl}}"
                            data-field="role"
-                           data-ng-model="stakeholder.role" 
-                           data-ng-disabled="!hasWriteAccess"/>
+                           data-ng-model="stakeholder.role"
+                           data-ng-disabled="!projectEditVm.hasWriteAccess"/>
                 </td>
                 <td>
-                    <input type="text" class="form-control input-sm" 
-                           data-autosave="{{stakeholder.updateUrl}}" 
+                    <input type="text" class="form-control input-sm"
+                           data-autosave="{{stakeholder.updateUrl}}"
                            data-field="downsides"
-                           data-ng-model="stakeholder.downsides" 
-                           data-ng-disabled="!hasWriteAccess"/>
+                           data-ng-model="stakeholder.downsides"
+                           data-ng-disabled="!projectEditVm.hasWriteAccess"/>
                 </td>
                 <td>
-                    <input type="text" class="form-control input-sm" 
-                           data-autosave="{{stakeholder.updateUrl}}" 
+                    <input type="text" class="form-control input-sm"
+                           data-autosave="{{stakeholder.updateUrl}}"
                            data-field="benefits"
-                           data-ng-model="stakeholder.benefits" 
-                           data-ng-disabled="!hasWriteAccess"/>
+                           data-ng-model="stakeholder.benefits"
+                           data-ng-disabled="!projectEditVm.hasWriteAccess"/>
                 </td>
                 <td>
-                    <input type="number" min="1" max="5" step="1" class="form-control input-sm" 
-                           data-autosave="{{stakeholder.updateUrl}}" 
+                    <input type="number" min="1" max="5" step="1" class="form-control input-sm"
+                           data-autosave="{{stakeholder.updateUrl}}"
                            data-field="significance"
-                           data-ng-model="stakeholder.significance" 
-                           data-ng-disabled="!hasWriteAccess"/>
+                           data-ng-model="stakeholder.significance"
+                           data-ng-disabled="!projectEditVm.hasWriteAccess"/>
                 </td>
                 <td>
-                    <input type="text" class="form-control input-sm" 
-                           data-autosave="{{stakeholder.updateUrl}}" 
+                    <input type="text" class="form-control input-sm"
+                           data-autosave="{{stakeholder.updateUrl}}"
                            data-field="howToHandle"
-                           data-ng-model="stakeholder.howToHandle" 
-                           data-ng-disabled="!hasWriteAccess"/>
+                           data-ng-model="stakeholder.howToHandle"
+                           data-ng-disabled="!projectEditVm.hasWriteAccess"/>
                 </td>
                 <td>
-                    <div class="pull-right" data-ng-hide="!hasWriteAccess">
+                    <div class="pull-right" data-ng-hide="!projectEditVm.hasWriteAccess">
                         <a class="btn btn-danger btn-sm"
                            data-confirmed-click="stakeholder.delete()"
                            data-confirm-click="Er du sikker på at du vil slette?">
@@ -80,7 +80,7 @@
         </tbody>
         <tfoot>
             <!-- new row -->
-            <tr data-ng-if="hasWriteAccess">
+            <tr data-ng-if="projectEditVm.hasWriteAccess">
                 <td>
                     <div class="form-group" data-show-errors>
                         <input type="text" name="name" class="form-control input-sm" required

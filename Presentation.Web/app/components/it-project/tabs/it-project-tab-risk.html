@@ -16,39 +16,39 @@
             <tbody>
                 <tr data-ng-repeat="risk in risks | filter : { show: true }">
                     <td>
-                        <input type="text" class="form-control input-sm" 
-                               data-ng-model="risk.name" 
+                        <input type="text" class="form-control input-sm"
+                               data-ng-model="risk.name"
                                data-field="name"
-                               data-autosave="{{risk.updateUrl}}" 
-                               data-ng-disabled="!hasWriteAccess">
+                               data-autosave="{{risk.updateUrl}}"
+                               data-ng-disabled="!projectEditVm.hasWriteAccess">
                     </td>
                     <td>
-                        <input type="number" class="form-control input-sm" min="1" max="5" 
+                        <input type="number" class="form-control input-sm" min="1" max="5"
                                data-ng-model="risk.consequence"
                                data-field="consequence"
-                               data-autosave="{{risk.updateUrl}}" 
-                               data-ng-disabled="!hasWriteAccess">
+                               data-autosave="{{risk.updateUrl}}"
+                               data-ng-disabled="!projectEditVm.hasWriteAccess">
                     </td>
                     <td>
-                        <input type="number" class="form-control input-sm" min="1" max="5" 
+                        <input type="number" class="form-control input-sm" min="1" max="5"
                                data-ng-model="risk.probability"
                                data-field="probability"
-                               data-autosave="{{risk.updateUrl}}" 
-                               data-ng-disabled="!hasWriteAccess">
+                               data-autosave="{{risk.updateUrl}}"
+                               data-ng-disabled="!projectEditVm.hasWriteAccess">
                     </td>
                     <td>
                         <span class="form-control-static input-sm">{{ product(risk) }}</span>
                     </td>
                     <td>
-                        <textarea class="form-control input-sm" 
-                                  data-ng-model="risk.action" 
+                        <textarea class="form-control input-sm"
+                                  data-ng-model="risk.action"
                                   data-field="action"
-                                  data-autosave="{{risk.updateUrl}}" 
-                                  data-ng-disabled="!hasWriteAccess">
+                                  data-autosave="{{risk.updateUrl}}"
+                                  data-ng-disabled="!projectEditVm.hasWriteAccess">
                     </textarea>
                     </td>
                     <td>
-                        <select class="form-control input-sm" 
+                        <select class="form-control input-sm"
                                 data-ui-select2=""
                                 data-field="responsibleUserId"
                                 data-autosave="{{risk.updateUrl}}"
@@ -58,14 +58,14 @@
                         </select>
                     </td>
                     <td>
-                        <button class="btn btn-danger btn-sm" 
-                                data-ng-click="delete(risk)" 
-                                data-ng-disabled="!hasWriteAccess">
+                        <button class="btn btn-danger btn-sm"
+                                data-ng-click="delete(risk)"
+                                data-ng-disabled="!projectEditVm.hasWriteAccess">
                             <span class="glyphicon glyphicon-trash small"></span>
                         </button>
                     </td>
-                </tr>                     
-                <tr class="active" data-ng-hide="!hasWriteAccess">
+                </tr>
+                <tr class="active" data-ng-hide="!projectEditVm.hasWriteAccess">
                     <td>
                         <div class="form-group" data-show-errors>
                             <input type="text" name="name" class="form-control input-sm" required data-ng-model="newRisk.name">
@@ -104,7 +104,7 @@
                             Gem
                         </button>
                     </td>
-                </tr>  
+                </tr>
                 <tr>
                     <td></td>
                     <td></td>

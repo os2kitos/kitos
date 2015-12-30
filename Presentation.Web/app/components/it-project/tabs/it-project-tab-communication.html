@@ -37,7 +37,7 @@
                     <input type="text" class="form-control"
                            data-kendo-date-picker
                            data-k-options="datepickerOptions"
-                           data-ng-disabled="!hasWriteAccess"
+                           data-ng-disabled="!projectEditVm.hasWriteAccess"
                            data-ng-model="c.dueDate"
                            data-autosave="api/communication/{{c.id}}"
                            data-field="dueDate">
@@ -55,7 +55,7 @@
                     </div>
                 </td>
                 <td>
-                    <a class="btn btn-link btn-xs" data-ng-click="delete(c.id)" data-ng-hide="!hasWriteAccess">
+                    <a class="btn btn-link btn-xs" data-ng-click="delete(c.id)" data-ng-hide="!projectEditVm.hasWriteAccess">
                         <i class="glyphicon glyphicon-trash"></i>
                     </a>
                 </td>
@@ -88,7 +88,7 @@
                         <input type="text" name="due" class="form-control" required
                                data-kendo-date-picker
                                data-k-options="datepickerOptions"
-                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-disabled="!projectEditVm.hasWriteAccess"
                                data-ng-model="comm.dueDate">
                     </div>
                 </td>

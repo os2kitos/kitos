@@ -4,12 +4,12 @@
             <th rowspan="2" style="width: 20%">
                 <!-- empty corner -->
             </th>
-            
+
             <!-- year cols -->
             <th data-ng-repeat="col in columns" colspan="2" class="text-center">
                 År {{$index}}
             </th>
-            
+
             <!-- total col -->
             <th colspan="2" class="text-center">
                 Total
@@ -23,7 +23,7 @@
             <th data-ng-repeat-end="">
                 Rea
             </th>
-            
+
             <!-- total col -->
             <th>
                 Budget
@@ -43,7 +43,7 @@
             <td data-ng-if="!row.titlerow">
                 <small>{{row.label}}</small>
             </td>
-            
+
             <!-- years cols -->
             <td data-ng-repeat-start="column in row.columns" class="td-very-condensed border-left">
                 <!-- if not-readonly -->
@@ -53,10 +53,10 @@
                        data-ng-model="column.budget"
                        data-ng-change="row.update()"
                        data-ng-if="!row.readonly"
-                       data-ng-disabled="!hasWriteAccess">
-                
+                       data-ng-disabled="!projectEditVm.hasWriteAccess">
+
                 <!-- if readonly -->
-                <input type="number" class="form-control input-sm input-cell" 
+                <input type="number" class="form-control input-sm input-cell"
                        data-ng-model="column.budget" readonly="readonly" data-ng-if="row.readonly" />
 
             </td>
@@ -68,13 +68,13 @@
                        data-ng-model="column.rea"
                        data-ng-change="row.update()"
                        data-ng-if="!row.readonly"
-                       data-ng-disabled="!hasWriteAccess" />
+                       data-ng-disabled="!projectEditVm.hasWriteAccess" />
 
                 <!-- if readonly -->
                 <input type="number" class="form-control input-sm input-cell"
                        data-ng-model="column.rea" readonly="readonly" data-ng-if="row.readonly" />
             </td>
-            
+
             <!-- total col -->
             <td class="td-very-condensed border-left" data-ng-if="!row.titlerow">
                 <input type="number" class="form-control input-sm input-cell" data-ng-model="row.total.budget" readonly="readonly" />

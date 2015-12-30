@@ -7,7 +7,7 @@
                 <select class="form-control input-sm"
                         data-ui-select2="allowClearOption"
                         data-placeholder="Vælg ansvarlig organisationsenhed"
-                        data-ng-disabled="!hasWriteAccess"
+                        data-ng-disabled="!projectEditVm.hasWriteAccess"
                         data-ng-model="responsibleOrgUnitId"
                         data-ng-change="saveResponsible()">
                     <option value=""></option>
