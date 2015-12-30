@@ -793,12 +793,14 @@
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />
     <Content Include="Partials\topnav\topnav.html" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-description.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-org.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-roles.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-phases.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-goal.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project.po.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine-expect\jasmine-expect.d.ts" />
+    <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabDescription.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabRoles.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabPhases.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabOrg.e2e.spec.ts" />

@@ -1,6 +1,6 @@
 ﻿import IPageObject = require("../../../../Tests/object-wrappers/IPageObject.po");
 
-class PageObject implements IPageObject {
+class ItProjectEditTabDescription implements IPageObject {
     controllerVm: string = "projectDescriptionVm";
 
     getPage(): webdriver.promise.Promise<void> {
@@ -20,4 +20,4 @@ class PageObject implements IPageObject {
     }
 }
 
-export = PageObject;
+export = ItProjectEditTabDescription;
