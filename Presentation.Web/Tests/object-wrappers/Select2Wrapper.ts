@@ -43,7 +43,6 @@ class Select2Wrapper {
      * @return Promise that resovles to a boolean indicating if the dropdown is disabled or not.
      */
     isDisabled(): webdriver.promise.Promise<boolean> {
-        this.isPresent();
         return $(this.cssSelector + ".select2-container-disabled").isPresent();
     }
 
