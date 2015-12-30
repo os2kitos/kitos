@@ -739,7 +739,7 @@
     <Content Include="app\components\it-project\tabs\it-project-tab-risk.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-roles.view.html" />
     <Content Include="app\components\it-project\it-project-edit.view.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-org.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-org.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-economy.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-itsys.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-kle.html" />
@@ -793,6 +793,7 @@
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />
     <Content Include="Partials\topnav\topnav.html" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-org.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-roles.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-phases.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-goal.po.ts" />
@@ -800,6 +801,7 @@
     <TypeScriptCompile Include="Scripts\typings\jasmine-expect\jasmine-expect.d.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabRoles.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabPhases.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabOrg.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabStatusGoal.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\matchers\toBeSelect2Disabled.ts" />
     <TypeScriptCompile Include="Tests\matchers\toBeVisible.ts" />
@@ -2524,6 +2526,8 @@
     <Content Include="Tests\mocks\goalType.json" />
     <Content Include="Tests\mocks\goalStatus.json" />
     <Content Include="Tests\mocks\goal.json" />
+    <Content Include="Tests\mocks\itProjectOrgUnitUsage.json" />
+    <Content Include="Tests\mocks\organizationunit.json" />
     <None Include="Web.AppVeyor.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -55,7 +55,12 @@ export class Mock {
             console.log("\n*** protractor-http-mock matched requests ***\n");
 
             for (var i = 0; i < requests.length; i++) {
-                console.log(requests[i]);
+                console.log((i + 1) + "\n" +
+                            "  METHOD: " + requests[i].method + "\n" +
+                            "  URL   : " + requests[i].url);
+                if (requests[i].data) {
+                    console.log("  DATA  : ", requests[i].data);
+                }
             }
 
             console.log("\n");

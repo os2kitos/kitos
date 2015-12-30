@@ -2,7 +2,7 @@
     app.config(["$stateProvider", function ($stateProvider) {
         $stateProvider.state("it-project.edit.org", {
             url: "/org",
-            templateUrl: "app/components/it-project/tabs/it-project-tab-org.html",
+            templateUrl: "app/components/it-project/tabs/it-project-tab-org.view.html",
             controller: "project.EditOrgCtrl",
             resolve: {
                 // re-resolve data from parent cause changes here wont cascade to it
@@ -18,13 +18,13 @@
                 selectedOrgUnits: ["$http", "$stateParams", function ($http, $stateParams) {
                     var projectId = $stateParams.id;
                     return $http.get("api/itProjectOrgUnitUsage/" + projectId)
-                        .then(function(result) {
+                        .then(function (result) {
                             return result.data.response;
                         });
                 }],
                 responsibleOrgUnitId: ["$http", "$stateParams", function ($http, $stateParams) {
                     var projectId = $stateParams.id;
-                    return $http.get("api/itProjectOrgUnitUsage/" + projectId + "?responsible")
+                    return $http.get("api/itProjectOrgUnitUsage/" + projectId + "?responsible=true")
                         .then(function (result) {
                             if (result.data.response)
                                 return result.data.response.id;

@@ -65,6 +65,7 @@ declare module mock {
     interface ReceivedRequest {
         url: string;
         method: string;
+        data?: Object;
     }
 
     module requests {

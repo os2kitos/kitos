@@ -22,7 +22,7 @@ class Select2Wrapper {
     selectFirst(query?: string): webdriver.promise.Promise<void> {
         this.isPresent();
 
-        browser.driver.executeScript("$(arguments[\"0\"]).mousedown();", (this.elementSelector));
+        this.click();
 
         if (query) {
             browser.driver.switchTo().activeElement().sendKeys(query);
@@ -40,7 +40,7 @@ class Select2Wrapper {
     /**
      * Detect if select2 dropdown is disabled
      *
-     * @return Promise that resovles to a boolean indicating if the dropdown is disabled or not.
+     * @return Promise that resolves to a boolean indicating if the dropdown is disabled or not.
      */
     isDisabled(): webdriver.promise.Promise<boolean> {
         return $(this.cssSelector + ".select2-container-disabled").isPresent();
@@ -65,6 +65,15 @@ class Select2Wrapper {
                 }
             })
             .then(() => true);
+    }
+
+    /**
+     * click select2 dropdown
+     *
+     * @return Promise that resolves when element is clicked.
+     */
+    click(): webdriver.promise.Promise<void> {
+        return browser.driver.executeScript<void>("$(arguments[\"0\"]).mousedown();", (this.elementSelector));
     }
 }
 

@@ -8058,41 +8058,15 @@
             "data": {
                 "msg": "",
                 "response": {
-                    "id": 1,
-                    "objectOwnerName": "Global",
-                    "objectOwnerLastName": "admin",
-                    "objectOwnerFullName": "Global admin",
-                    "itProjectId": null,
-                    "background": null,
-                    "isTransversal": false,
-                    "isStrategy": false,
-                    "note": null,
-                    "name": "Projekt 1",
-                    "description": null,
                     "accessModifier": 0,
-                    "priority": 0,
-                    "isPriorityLocked": false,
-                    "priorityPf": 0,
-                    "isArchived": false,
-                    "esdh": null,
-                    "cmdb": null,
-                    "folder": null,
-                    "commonPublicProjectId": null,
-                    "jointMunicipalProjectId": null,
-                    "isStatusGoalVisible": false,
-                    "isStrategyVisible": false,
-                    "isRiskVisible": false,
-                    "isHierarchyVisible": false,
-                    "isEconomyVisible": false,
-                    "isStakeholderVisible": false,
-                    "isCommunicationVisible": false,
-                    "isHandoverVisible": false,
-                    "parentId": null,
-                    "parentName": null,
+                    "averageRisk": 0.0,
+                    "background": null,
+                    "bc": 0,
                     "childrenIds": [ ],
-                    "itProjectTypeId": 1,
-                    "itProjectTypeName": "Fællesoffentlig",
-                    "organizationId": 1,
+                    "cmdb": null,
+                    "commonPublicProjectId": null,
+                    "currentPhase": 1,
+                    "description": null,
                     "economyYears": [
                         {
                             "id": 1,
@@ -8311,12 +8285,68 @@
                             "totalBudget": 0
                         }
                     ],
-                    "taskRefs": [ ],
-                    "risks": [ ],
-                    "stakeholders": [ ],
-                    "statusProject": 0,
-                    "statusDate": null,
-                    "statusNote": null,
+                    "esdh": null,
+                    "folder": null,
+                    "goalStatus": {
+                        "goals": [
+                            {
+                                "description": null,
+                                "goalStatusId": 2,
+                                "goalTypeId": 2,
+                                "goalTypeName": "Effektivitet",
+                                "humanReadableId": null,
+                                "id": 1,
+                                "measurable": false,
+                                "name": "Mål 1",
+                                "note": null,
+                                "status": 0,
+                                "subGoal1": null,
+                                "subGoal2": null,
+                                "subGoal3": null,
+                                "subGoalDate1": null,
+                                "subGoalDate2": null,
+                                "subGoalDate3": null,
+                                "subGoalRea1": null,
+                                "subGoalRea2": null,
+                                "subGoalRea3": null
+                            }
+                        ],
+                        "id": 1,
+                        "itProjectId": 1,
+                        "status": 0,
+                        "statusDate": null,
+                        "statusNote": null
+                    },
+                    "id": 1,
+                    "isArchived": false,
+                    "isCommunicationVisible": false,
+                    "isEconomyVisible": false,
+                    "isHandoverVisible": false,
+                    "isHierarchyVisible": false,
+                    "isPriorityLocked": false,
+                    "isRiskVisible": false,
+                    "isStakeholderVisible": false,
+                    "isStatusGoalVisible": false,
+                    "isStrategy": false,
+                    "isStrategyVisible": false,
+                    "isTransversal": false,
+                    "itProjectId": null,
+                    "itProjectTypeId": 1,
+                    "itProjectTypeName": "Fællesoffentlig",
+                    "jointMunicipalProjectId": null,
+                    "lastChanged": "2015-11-18T15:59:58Z",
+                    "lastChangedByUserId": 1,
+                    "name": "Projekt 1",
+                    "note": null,
+                    "objectOwnerFullName": "Global admin",
+                    "objectOwnerLastName": "admin",
+                    "objectOwnerName": "Global",
+                    "organizationId": 1,
+                    "original": null,
+                    "originalId": null,
+                    "originalItProjectId": null,
+                    "parentId": null,
+                    "parentName": null,
                     "phase1": {
                         "name": "Afventer",
                         "startDate": null,
@@ -8342,45 +8372,15 @@
                         "startDate": null,
                         "endDate": null
                     },
-                    "currentPhase": 1,
-                    "originalId": null,
-                    "original": null,
-                    "originalItProjectId": null,
-                    "lastChanged": "2015-11-18T15:59:58Z",
-                    "lastChangedByUserId": 1,
-                    "goalStatus": {
-                        "id": 1,
-                        "itProjectId": 1,
-                        "status": 0,
-                        "statusDate": null,
-                        "statusNote": null,
-                        "goals": [
-                            {
-                                "description": null,
-                                "goalStatusId": 2,
-                                "goalTypeId": 2,
-                                "goalTypeName": "Effektivitet",
-                                "humanReadableId": null,
-                                "id": 1,
-                                "measurable": false,
-                                "name": "Mål 1",
-                                "note": null,
-                                "status": 0,
-                                "subGoal1": null,
-                                "subGoal2": null,
-                                "subGoal3": null,
-                                "subGoalDate1": null,
-                                "subGoalDate2": null,
-                                "subGoalDate3": null,
-                                "subGoalRea1": null,
-                                "subGoalRea2": null,
-                                "subGoalRea3": null
-                            }
-                        ]
-                    },
+                    "priority": 0,
+                    "priorityPf": 0,
+                    "risks": [ ],
                     "roi": 0,
-                    "bc": 0,
-                    "averageRisk": 0.0
+                    "stakeholders": [ ],
+                    "statusDate": null,
+                    "statusNote": null,
+                    "statusProject": 0,
+                    "taskRefs": [ ]
                 }
             }
         }
@@ -8738,6 +8738,52 @@
             "data": {
                 "msg": "",
                 "response": { }
+            }
+        }
+    },
+    {
+        "request": {
+            "method": "DELETE",
+            "path": "api/itproject/1",
+            "queryString": {
+                "organizationId": "1",
+                "organizationunit": "1"
+            }
+        },
+        "response": {
+            "status": 200,
+            "data": {
+                "msg": "",
+                "response": { }
+            }
+        }
+    },
+    {
+        "request": {
+            "method": "POST",
+            "path": "api/itproject/1",
+            "queryString": {
+                "organizationId": "1",
+                "organizationunit": "1"
+            }
+        },
+        "response": {
+            "status": 201,
+            "data": {
+                "msg": "",
+                "response": {
+                    "id": 1,
+                    "name": "Fælles Kommune",
+                    "organizationId": 1,
+                    "parentId": null,
+                    "children": [ ],
+                    "ean": null,
+                    "objectOwnerName": "Global",
+                    "objectOwnerLastName": "admin",
+                    "objectOwnerFullName": "Global admin",
+                    "lastChanged": "2015-12-16T11:55:37Z",
+                    "lastChangedByUserId": 1
+                }
             }
         }
     },
