@@ -415,7 +415,7 @@
     app.directive("squareTrafficLight", [
         function() {
             return {
-                template: "<progressbar class="status-bar" data-value="value" data-type="{{type}}"></progressbar>",
+                template: "<progressbar class='status-bar' data-value='value' data-type='{{type}}'></progressbar>",
                 scope: {
                     status: "=squareTrafficLight"
                 },
