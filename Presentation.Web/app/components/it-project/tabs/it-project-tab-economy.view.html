@@ -45,7 +45,7 @@
             </td>
 
             <!-- years cols -->
-            <td data-ng-repeat-start="column in row.columns" class="td-very-condensed border-left">
+            <td data-ng-repeat-start="column in row.columns" class="td-very-condensed border-left year-budget-col">
                 <!-- if not-readonly -->
                 <input type="number" step="1" data-ng-pattern="/^\d*$/" class="form-control input-sm input-cell"
                        data-autosave="{{column.updateUrl}}"
@@ -60,7 +60,7 @@
                        data-ng-model="column.budget" readonly="readonly" data-ng-if="row.readonly" />
 
             </td>
-            <td data-ng-repeat-end="" class="td-very-condensed">
+            <td data-ng-repeat-end="" class="td-very-condensed year-rea-col">
                 <!-- if not-readonly -->
                 <input type="number" step="1" data-ng-pattern="/^\d*$/" class="form-control input-sm input-cell"
                        data-autosave="{{column.updateUrl}}"
@@ -77,10 +77,10 @@
 
             <!-- total col -->
             <td class="td-very-condensed border-left" data-ng-if="!row.titlerow">
-                <input type="number" class="form-control input-sm input-cell" data-ng-model="row.total.budget" readonly="readonly" />
+                <input type="number" class="form-control input-sm input-cell budget-sum" data-ng-model="row.total.budget" readonly="readonly" />
             </td>
             <td class="td-very-condensed" data-ng-if="!row.titlerow">
-                <input type="number" class="form-control input-sm input-cell" data-ng-model="row.total.rea" readonly="readonly" />
+                <input type="number" class="form-control input-sm input-cell rea-sum" data-ng-model="row.total.rea" readonly="readonly" />
             </td>
         </tr>
     </tbody>
