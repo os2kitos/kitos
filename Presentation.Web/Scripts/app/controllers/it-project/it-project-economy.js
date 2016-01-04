@@ -13,7 +13,7 @@
                         .then(function (result) {
                             return result.data.response;
                         });
-                }]             
+                }]
             }
         });
     }]);
@@ -27,24 +27,24 @@
 
             var businessExpenses = [];
             var businessExpensesSumRow = createReadonlyRow("Forretningsmæssige omkostninger", "sub-sum");
-            
+
             var itExpenses = [];
             var itExpensesSumRow = createReadonlyRow("IT omkostninger", "sub-sum");
 
             var expensesSumRow = createReadonlyRow("OMKOSTNINGER TOTAL", "sum");
 
             var savingsTitleRow = createTitleRow("BESPARELSER");
-            
+
             var businessSavings = [];
             var businessSavingsSumRow = createReadonlyRow("Forretningsmæssige besparelser", "sub-sum");
 
             var itSavings = [];
             var itSavingsSumRow = createReadonlyRow("IT besparelser", "sub-sum");
-            
+
             var savingsSumRow = createReadonlyRow("BESPARELSER TOTAL", "sum");
 
             var diffRow = createReadonlyRow("Finansieringsbehov / besparelse", "super-sum");
-            
+
             function createTitleRow(label) {
                 return {
                     label: label,
@@ -71,7 +71,7 @@
                     classes: classes
                 };
             }
-            
+
             function addRow(field, label, array, update) {
                 var budgetName = field + "Budget",
                     reaName = field + "Rea";
@@ -101,7 +101,7 @@
                 array.push(row);
                 row.update();
             }
-            
+
             function addBusinessExpenses(field, label) {
                 return addRow(field, label, businessExpenses, function (row) {
                     calcTotalColumn(row);
@@ -168,20 +168,20 @@
 
             //calculates the last column "total" for a given row
             function calcTotalColumn(row) {
-                
+
                 var sums = _.reduce(row.columns, function (memo, column) {
                     return {
                         budget: memo.budget + parseInt(column.budget),
                         rea: memo.rea + parseInt(column.rea)
                     };
                 }, { budget: 0, rea: 0 });
-                
+
                 row.total = sums;
             }
-            
+
             //sums the rows and stores the result in sumRow
             function sumRows(rows, resultRow) {
-                
+
                 //sum each of the year columns
                 _.each(resultRow.columns, function(column, index) {
                     var sums = _.reduce(rows, function(memo, row) {
@@ -203,7 +203,7 @@
                     };
                 }, { budget: 0, rea: 0 });
             }
-            
+
             function subtractRows(rowA, rowB, resultRow) {
                 //subtract each of the year columns
                 _.each(resultRow.columns, function(column, index) {
@@ -217,10 +217,9 @@
                     rea: rowA.total.rea - rowB.total.rea
                 };
             }
-            
-            
+
+
         }]);
 
 
 })(angular, app);
-    

@@ -27,7 +27,6 @@
             get { return ConsultantBudget + EducationBudget + OtherBusinessExpensesBudget + IncreasedBusinessExpensesBudget; }
         }
 
-
         //IT expenses
         public int HardwareBudget { get; set; }
         public int HardwareRea { get; set; }
@@ -53,9 +52,9 @@
         public int OtherBusinessSavingsBudget { get; set; }
         public int OtherBusinessSavingsRea { get; set; }
 
-        public int BusinessSavingsTotal 
+        public int BusinessSavingsTotal
         {
-            get { return SalaryBudget + OtherBusinessSavingsBudget; } 
+            get { return SalaryBudget + OtherBusinessSavingsBudget; }
         }
 
         //IT savings
