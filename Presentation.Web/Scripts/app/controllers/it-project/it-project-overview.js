@@ -196,6 +196,10 @@
 
                                 var phase = "Phase" + project.CurrentPhase;
                                 project.CurrentPhaseObj = project[phase];
+
+                                if (user.isGlobalAdmin || user.isLocalAdmin || _.find(project.Rights, { 'userId': user.id })) {
+                                    project.hasWriteAccess = true;
+                                }
                             });
 
                             return response;
@@ -265,7 +269,12 @@
                 },
                 columns: [
                     {
-                        field: "ItProjectId", title: "ProjektID", width: 150,
+                        field: "IsArchived", title: "Arkiveret", width: 111,
+                        persistId: "archived", // DON'T YOU DARE RENAME!
+                        template: "#= IsArchived ? '<i class=\"text-success fa fa-check\"></i>' : '<i class=\"text-danger fa fa-times\"></i>' #",
+                    },
+                    {
+                        field: "ItProjectId", title: "ProjektID", width: 115,
                         persistId: "projid", // DON'T YOU DARE RENAME!
                         filterable: {
                             cell: {
@@ -354,7 +363,7 @@
                         }
                     },
                     {
-                        field: "ItProjectType.Name", title: "Projekttype", width: 150,
+                        field: "ItProjectType.Name", title: "Projekttype", width: 125,
                         persistId: "projtype", // DON'T YOU DARE RENAME!
                         template: "#: ItProjectType ? ItProjectType.Name : '' #",
                         filterable: {
@@ -366,28 +375,28 @@
                         }
                     },
                     {
-                        field: "", title: "Fase", width: 150,
+                        field: "", title: "Fase", width: 100,
                         persistId: "phasename", // DON'T YOU DARE RENAME!
                         template: "#: CurrentPhaseObj ? CurrentPhaseObj.Name : '' #",
                         sortable: false,
                         filterable: false,
                     },
                     {
-                        field: "", title: "Fase: Startdato", format: "{0:dd-MM-yyyy}", width: 150,
+                        field: "", title: "Fase: Startdato", format: "{0:dd-MM-yyyy}", width: 85,
                         persistId: "phasestartdate", // DON'T YOU DARE RENAME!
                         template: phaseStartDateTemplate,
                         sortable: false,
                         filterable: false,
                     },
                     {
-                        field: "", title: "Fase: Slutdato", format: "{0:dd-MM-yyyy}", width: 150,
+                        field: "", title: "Fase: Slutdato", format: "{0:dd-MM-yyyy}", width: 85,
                         persistId: "phaseenddate", // DON'T YOU DARE RENAME!
                         template: phaseEndDateTemplate,
                         sortable: false,
                         filterable: false,
                     },
                     {
-                        field: "StatusProject", title: "Status projekt", width: 150,
+                        field: "StatusProject", title: "Status projekt", width: 140,
                         persistId: "statusproj", // DON'T YOU DARE RENAME!
                         template: '<span data-square-traffic-light="#: StatusProject #"></span>',
                         filterable: {
@@ -405,7 +414,7 @@
                         ]
                     },
                     {
-                        field: "StatusDate", title: "Status projekt: Dato", format: "{0:dd-MM-yyyy}", width: 150,
+                        field: "StatusDate", title: "Status projekt: Dato", format: "{0:dd-MM-yyyy}", width: 130,
                         persistId: "statusdateproj", // DON'T YOU DARE RENAME!
                         filterable: {
                             cell: {
@@ -488,9 +497,9 @@
                         template: "TODO",
                     },
                     {
-                        field: "Priority", title: "Prioritet: Projekt", width: 150,
+                        field: "Priority", title: "Prioritet: Projekt", width: 155,
                         persistId: "priority", // DON'T YOU DARE RENAME!
-                        template: '<select data-ng-model="dataItem.Priority" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priority" data-ng-disabled="dataItem.IsPriorityLocked">' +
+                        template: '<select data-ng-model="dataItem.Priority" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priority" data-ng-disabled="dataItem.IsPriorityLocked || !dataItem.hasWriteAccess">' +
                             '<option value="None">-- Vælg --</option>' +
                             '<option value="High">Høj</option>' +
                             '<option value="Mid">Mellem</option>' +
@@ -514,7 +523,7 @@
                         field: "PriorityPf", title: "Prioritet: Portefølje", width: 150,
                         persistId: "prioritypf", // DON'T YOU DARE RENAME!
                         template: '<div class="btn-group btn-group-sm" data-toggle="buttons">' +
-                            '<label class="btn btn-star" data-ng-class="{ \'unstarred\': !dataItem.IsPriorityLocked }" data-ng-click="dataItem.IsPriorityLocked = !dataItem.IsPriorityLocked">' +
+                            '<label class="btn btn-star" data-ng-class="{ \'unstarred\': !dataItem.IsPriorityLocked }" data-ng-disabled="!dataItem.hasWriteAccess" data-ng-click="dataItem.IsPriorityLocked = !dataItem.IsPriorityLocked">' +
                                 '<input type="checkbox" data-ng-model="dataItem.IsPriorityLocked" data-autosave="api/itproject/{{dataItem.Id}}" data-field="IsPriorityLocked">' +
                                 '<i class="glyphicon glyphicon-lock"></i>' +
                             "</label>" +
@@ -539,12 +548,6 @@
                             { text: "Mellem", value: 2 },
                             { text: "Høj", value: 3 }
                         ]
-                    },
-                    {
-                        field: "IsArchived", title: "Arkiveret", width: 150,
-                        persistId: "archived", // DON'T YOU DARE RENAME!
-                        template: "#= IsArchived ? '<i class=\"text-success fa fa-check\"></i>' : '<i class=\"text-danger fa fa-times\"></i>' #",
-                        hidden: true,
                     },
                 ]
             };
