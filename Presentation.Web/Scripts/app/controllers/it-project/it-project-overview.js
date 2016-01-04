@@ -25,8 +25,8 @@
     }]);
 
     app.controller('project.EditOverviewCtrl',
-    ['$rootScope', '$scope', '$http', '$timeout', '_', 'moment', '$state', 'notify', 'projectRoles', 'user', 'gridStateService', 'orgUnits', '$q',
-        function ($rootScope, $scope, $http, $timeout, _, moment, $state, notify, projectRoles, user, gridStateService, orgUnits, $q) {
+    ['$rootScope', '$scope', '$http', '$timeout', '_', 'moment', '$state', 'notify', 'projectRoles', 'user', 'gridStateService', 'orgUnits', '$q', 'economyCalc',
+        function ($rootScope, $scope, $http, $timeout, _, moment, $state, notify, projectRoles, user, gridStateService, orgUnits, $q, economyCalc) {
             $rootScope.page.title = "IT Projekt - Overblik";
 
             var storageKey = "it-project-overview-options";
@@ -141,7 +141,7 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItProjects?$expand=ItProjectStatuses,Parent,ItProjectType,Rights($expand=User,Role),ResponsibleUsage($expand=OrganizationUnit),GoalStatus,TaskRefs",
+                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItProjects?$expand=ItProjectStatuses,Parent,ItProjectType,Rights($expand=User,Role),ResponsibleUsage($expand=OrganizationUnit),GoalStatus,EconomyYears",
                             dataType: "json"
                         },
                         parameterMap: function(options, type) {
@@ -160,6 +160,7 @@
                             return parameterMap;
                         }
                     },
+                    filter: { field: "IsArchived", operator: "eq", value: false }, // default filter
                     sort: {
                         field: "Name",
                         dir: "asc"
@@ -230,6 +231,9 @@
                     },
                     {
                         template: kendo.template($("#role-selector").html())
+                    },
+                    {
+                        template: kendo.template($("#archive-selector").html())
                     }
                 ],
                 excel: {
@@ -268,11 +272,6 @@
                     console.log(e);
                 },
                 columns: [
-                    {
-                        field: "IsArchived", title: "Arkiveret", width: 111,
-                        persistId: "archived", // DON'T YOU DARE RENAME!
-                        template: "#= IsArchived ? '<i class=\"text-success fa fa-check\"></i>' : '<i class=\"text-danger fa fa-times\"></i>' #",
-                    },
                     {
                         field: "ItProjectId", title: "ProjektID", width: 115,
                         persistId: "projid", // DON'T YOU DARE RENAME!
@@ -377,7 +376,7 @@
                     {
                         field: "", title: "Fase", width: 100,
                         persistId: "phasename", // DON'T YOU DARE RENAME!
-                        template: "#: CurrentPhaseObj ? CurrentPhaseObj.Name : '' #",
+                        template: "#= CurrentPhaseObj ? '<a data-ui-sref=\"it-project.edit.phases({id:' + Id + '})\">' + CurrentPhaseObj.Name + '</a>'  : '' #",
                         sortable: false,
                         filterable: false,
                     },
@@ -425,32 +424,10 @@
                         }
                     },
                     {
-                        field: "TaskRefs.TaskKey", title: "Opgave id", width: 150,
-                        persistId: "kleid", // DON'T YOU DARE RENAME!
-                        template: "#: TaskRefs.length > 0 ? _.pluck(TaskRefs, 'TaskKey').join(', ') : '' #",
-                        attributes: { "class": "might-overflow" },
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "startswith",
-                            }
-                        },
-                        sortable: false
-                    },
-                    {
-                        field: "TaskRefs.Description", title: "Opgave navn", width: 150,
-                        persistId: "klename", // DON'T YOU DARE RENAME!
-                        template: "#: TaskRefs.length > 0 ? _.pluck(TaskRefs, 'Description').join(', ') : '' #",
-                        attributes: { "class": "might-overflow" },
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains",
-                            }
-                        },
+                        field: "", title: "Opgaver", width: 150,
+                        persistId: "assignments", // DON'T YOU DARE RENAME!
+                        template: assigmentTemplate,
+                        filterable: false,
                         sortable: false
                     },
                     {
@@ -488,13 +465,7 @@
                         field: "EconomyYears", title: "Økonomi", width: 150,
                         persistId: "eco", // DON'T YOU DARE RENAME!
                         hidden: true,
-                        template: "TODO",
-                    },
-                    {
-                        field: "Risks", title: "Risiko", width: 150,
-                        persistId: "risks", // DON'T YOU DARE RENAME!
-                        hidden: true,
-                        template: "TODO",
+                        template: economyTemplate,
                     },
                     {
                         field: "Priority", title: "Prioritet: Projekt", width: 155,
@@ -549,6 +520,12 @@
                             { text: "Høj", value: 3 }
                         ]
                     },
+                    {
+                        field: "IsArchived", title: "Arkiveret", width: 111,
+                        persistId: "archived", // DON'T YOU DARE RENAME!
+                        hidden: true,
+                        template: "#= IsArchived ? '<i class=\"text-success fa fa-check\"></i>' : '<i class=\"text-danger fa fa-times\"></i>' #",
+                    },
                 ]
             };
 
@@ -587,6 +564,14 @@
             }
             activate();
 
+            function economyTemplate(dataItem) {
+                var total = 0;
+                _.each(dataItem.EconomyYears, function (eco) {
+                    total += economyCalc.getTotalBudget(eco);
+                });
+                return -total;
+            }
+
             function roleTemplate(dataItem, roleId) {
                 var roles = "";
 
@@ -624,6 +609,14 @@
                 }
 
                 return "";
+            }
+
+            function assigmentTemplate(dataItem) {
+                var res = _.filter(dataItem.ItProjectStatuses, function (n) {
+                    return _.contains(n["@odata.type"], "Assignment");
+                });
+
+                return res.length;
             }
 
             function orgUnitDropDownList(args) {
@@ -720,6 +713,34 @@
                     var gridFieldName = "role" + selectedId;
                     // show only the selected role column
                     $scope.mainGrid.showColumn(gridFieldName);
+                }
+            };
+
+            $scope.archiveFilterSelectorOptions = {
+                autoBind: false,
+                dataSource: ["Vis kun aktive", "Vis kun arkiverede"],
+                optionLabel: "Vælg arkiveret filter...",
+                change: function (e) {
+                    var selectedText = e.sender.value();
+
+                    var showArchived;
+                    if (selectedText === "Vis kun aktive") {
+                        showArchived = false;
+                    } else if (selectedText === "Vis kun arkiverede") {
+                        showArchived = true;
+                    } else {
+                        return;
+                    }
+
+                    var field = "IsArchived";
+                    var dataSource = $scope.mainGrid.dataSource;
+                    var currentFilter = dataSource.filter();
+                    // remove old values first
+                    var newFilter = _.removeFiltersForField(currentFilter, field);
+                    // add new filter
+                    newFilter = _.addFilter(newFilter, field, "eq", showArchived, "or");
+                    // set it on the data source
+                    dataSource.filter(newFilter);
                 }
             };
 
