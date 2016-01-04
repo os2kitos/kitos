@@ -10742,7 +10742,18 @@
                     "priorityPf": 0,
                     "risks": [ ],
                     "roi": 0,
-                    "stakeholders": [ ],
+                    "stakeholders": [
+                        {
+                            "id": 1,
+                            "itProjectId": 1,
+                            "name": "SomeName",
+                            "role": "SomeRole",
+                            "downsides": "SomeDownside",
+                            "benefits": "SomeBenifit",
+                            "significance": 1,
+                            "howToHandle": "SomeHandling"
+                        }
+                    ],
                     "statusDate": null,
                     "statusNote": null,
                     "statusProject": 0,

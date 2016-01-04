@@ -743,7 +743,7 @@
     <Content Include="app\components\it-project\tabs\it-project-tab-economy.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-itsys.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-kle.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-stakeholders.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-stakeholders.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-goal.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-strategy.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-project.view.html" />
@@ -796,12 +796,14 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-description.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-economy.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-org.po.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-stakeholders.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-roles.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-phases.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-goal.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-strategy.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project.po.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine-expect\jasmine-expect.d.ts" />
+    <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabStakeholders.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabEconomy.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabStrategy.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabDescription.e2e.spec.ts" />
@@ -810,6 +812,7 @@
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabOrg.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabStatusGoal.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\matchers\toBeSelect2Disabled.ts" />
+    <TypeScriptCompile Include="Tests\matchers\toHaveClass.ts" />
     <TypeScriptCompile Include="Tests\matchers\toBeVisible.ts" />
     <TypeScriptCompile Include="Tests\matchers\toBeDisabled.ts" />
     <TypeScriptCompile Include="Tests\matchers\toMatchInRequests.ts" />
@@ -2535,6 +2538,7 @@
     <Content Include="Tests\mocks\itProjectOrgUnitUsage.json" />
     <Content Include="Tests\mocks\organizationunit.json" />
     <Content Include="Tests\mocks\economyYear.json" />
+    <Content Include="Tests\mocks\stakeholder.json" />
     <None Include="Web.AppVeyor.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -69,7 +69,7 @@
                 </td>
                 <td>
                     <div class="pull-right" data-ng-hide="!projectEditVm.hasWriteAccess">
-                        <a class="btn btn-danger btn-sm"
+                        <a class="btn btn-danger btn-sm delete-stakeholder"
                            data-confirmed-click="stakeholder.delete()"
                            data-confirm-click="Er du sikker på at du vil slette?">
                             <i class="glyphicon glyphicon-trash"></i>
@@ -121,7 +121,7 @@
                 </td>
                 <td>
                     <div class="pull-right">
-                        <button class="btn btn-success btn-sm" data-ng-click="saveNewStakeholder()">
+                        <button id="save-stakeholder" class="btn btn-success btn-sm" data-ng-click="saveNewStakeholder()">
                             Gem
                         </button>
                     </div>

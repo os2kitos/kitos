@@ -4,7 +4,7 @@
 
         $stateProvider.state("it-project.edit.stakeholders", {
             url: "/stakeholders",
-            templateUrl: "app/components/it-project/tabs/it-project-tab-stakeholders.html",
+            templateUrl: "app/components/it-project/tabs/it-project-tab-stakeholders.view.html",
             controller: "project.EditStakeholdersCtrl",
             resolve: {
                 // re-resolve data from parent cause changes here wont cascade to it
