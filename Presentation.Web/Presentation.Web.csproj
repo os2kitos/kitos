@@ -902,6 +902,7 @@
     <Content Include="Scripts\app\controllers\it-project\it-project-communication.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-handover.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-hierarchy.js" />
+    <Content Include="Scripts\app\controllers\it-project\it-project-overview-inactive.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-phases.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-stakeholders.js" />
     <Content Include="Scripts\app\controllers\it-project\it-project-overview.js" />

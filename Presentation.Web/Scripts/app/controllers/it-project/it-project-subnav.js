@@ -12,7 +12,8 @@
             controller: ['$rootScope', '$http', '$state', 'notify', 'user', function($rootScope, $http, $state, notify, user) {
                 $rootScope.page.title = 'IT Projekt';
                 $rootScope.page.subnav = [
-                    { state: 'it-project.overview', text: 'Overblik' },
+                    { state: 'it-project.overview', text: 'Overblik: Aktiv' },
+                    { state: 'it-project.overview-inactive', text: 'Overblik: Inaktiv' },
                     //{ state: 'it-project.catalog', text: 'IT Projekt katalog' },
                     { state: 'it-project.edit', text: 'IT Projekt', showWhen: 'it-project.edit' },
                 ];
@@ -20,7 +21,7 @@
                     { func: create, text: 'Opret IT Projekt', style: 'btn-success', icon: 'glyphicon-plus' },
                     { func: remove, text: 'Slet IT Projekt', style: 'btn-danger', icon: 'glyphicon-minus', showWhen: 'it-project.edit' }
                 ];
-                
+
                 var orgUnitId = user.currentOrganizationUnitId;
 
                 function create() {

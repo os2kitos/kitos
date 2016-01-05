@@ -1,9 +1,9 @@
 ﻿(function (ng, app) {
     app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-project.overview', {
-            url: '/overview',
+        $stateProvider.state('it-project.overview-inactive', {
+            url: '/overview-inactive',
             templateUrl: 'partials/it-project/overview.html',
-            controller: 'project.EditOverviewCtrl',
+            controller: 'project.EditOverviewInactiveCtrl',
             resolve: {
                 projectRoles: ['$http', function ($http) {
                     return $http.get('/odata/ItProjectRoles').then(function(result) {
@@ -24,13 +24,13 @@
         });
     }]);
 
-    app.controller('project.EditOverviewCtrl',
+    app.controller('project.EditOverviewInactiveCtrl',
     ['$rootScope', '$scope', '$http', '$timeout', '_', 'moment', '$state', 'notify', 'projectRoles', 'user', 'gridStateService', 'orgUnits', '$q', 'economyCalc',
         function ($rootScope, $scope, $http, $timeout, _, moment, $state, notify, projectRoles, user, gridStateService, orgUnits, $q, economyCalc) {
             $rootScope.page.title = "IT Projekt - Overblik";
 
-            var storageKey = "it-project-overview-options";
-            var orgUnitStorageKey = "it-project-overview-orgunit";
+            var storageKey = "it-project-overview-inactive-options";
+            var orgUnitStorageKey = "it-project-overview-inactive-orgunit";
             var gridState = gridStateService.getService(storageKey);
 
             // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(c/User/Name,'foo') and c/RoleId eq {roleId})"
@@ -147,7 +147,7 @@
                             return parameterMap;
                         }
                     },
-                    filter: { field: "IsArchived", operator: "eq", value: false }, // default filter
+                    filter: { field: "IsArchived", operator: "eq", value: true }, // default filter
                     sort: {
                         field: "Name",
                         dir: "asc"
@@ -381,24 +381,6 @@
                         filterable: false,
                     },
                     {
-                        field: "StatusProject", title: "Status projekt", width: 100,
-                        persistId: "statusproj", // DON'T YOU DARE RENAME!
-                        template: '<span data-square-traffic-light="#: StatusProject #"></span>',
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "eq",
-                            }
-                        },
-                        values: [
-                            { text: "Hvid", value: 0 },
-                            { text: "Rød", value: 1 },
-                            { text: "Gul", value: 2 },
-                            { text: "Grøn", value: 3 }
-                        ]
-                    },
-                    {
                         field: "StatusDate", title: "Status projekt: Dato", format: "{0:dd-MM-yyyy}", width: 130,
                         persistId: "statusdateproj", // DON'T YOU DARE RENAME!
                         hidden: true,
@@ -455,59 +437,6 @@
                         hidden: true,
                         template: economyTemplate,
                     },
-                    {
-                        field: "Priority", title: "Prioritet: Projekt", width: 120,
-                        persistId: "priority", // DON'T YOU DARE RENAME!
-                        template: '<select data-ng-model="dataItem.Priority" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priority" data-ng-disabled="dataItem.IsPriorityLocked || !dataItem.hasWriteAccess">' +
-                            '<option value="None">-- Vælg --</option>' +
-                            '<option value="High">Høj</option>' +
-                            '<option value="Mid">Mellem</option>' +
-                            '<option value="Low">Lav</option>' +
-                            "</select>",
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "eq",
-                            }
-                        },
-                        values: [
-                            { text: "Ingen", value: 0 },
-                            { text: "Lav", value: 1 },
-                            { text: "Mellem", value: 2 },
-                            { text: "Høj", value: 3 }
-                        ]
-                    },
-                    {
-                        field: "PriorityPf", title: "Prioritet: Portefølje", width: 150,
-                        persistId: "prioritypf", // DON'T YOU DARE RENAME!
-                        template: '<div class="btn-group btn-group-sm" data-toggle="buttons">' +
-                            '<label class="btn btn-star" data-ng-class="{ \'unstarred\': !dataItem.IsPriorityLocked }" data-ng-disabled="!dataItem.hasWriteAccess" data-ng-click="dataItem.IsPriorityLocked = !dataItem.IsPriorityLocked">' +
-                                '<input type="checkbox" data-ng-model="dataItem.IsPriorityLocked" data-autosave="api/itproject/{{dataItem.Id}}" data-field="IsPriorityLocked">' +
-                                '<i class="glyphicon glyphicon-lock"></i>' +
-                            "</label>" +
-                        "</div>" +
-                        '<select data-ng-model="dataItem.PriorityPf" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priorityPf">' +
-                            '<option value="None">-- Vælg --</option>' +
-                            '<option value="High">Høj</option>' +
-                            '<option value="Mid">Mellem</option>' +
-                            '<option value="Low">Lav</option>' +
-                            "</select>",
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "eq",
-                            }
-                        },
-                        values: [
-                            { text: "Ingen", value: 0 },
-                            { text: "Lav", value: 1 },
-                            { text: "Mellem", value: 2 },
-                            { text: "Høj", value: 3 }
-                        ]
-                    }
                 ]
             };
 
