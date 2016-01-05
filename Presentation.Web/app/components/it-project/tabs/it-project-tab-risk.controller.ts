@@ -2,7 +2,7 @@
     app.config(["$stateProvider", function ($stateProvider) {
         $stateProvider.state("it-project.edit.risk", {
             url: "/risk",
-            templateUrl: "app/components/it-project/tabs/it-project-tab-risk.html",
+            templateUrl: "app/components/it-project/tabs/it-project-tab-risk.view.html",
             controller: "project.EditRiskCtrl",
             resolve: {
                 // re-resolve data from parent cause changes here wont cascade to it

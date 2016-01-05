@@ -58,8 +58,9 @@
                         </select>
                     </td>
                     <td>
-                        <button class="btn btn-danger btn-sm"
-                                data-ng-click="delete(risk)"
+                        <button class="btn btn-danger btn-sm delete-risk"
+                                data-confirmed-click="delete(risk)"
+                                data-confirm-click="Er du sikker på at du vil slette?"
                                 data-ng-disabled="!projectEditVm.hasWriteAccess">
                             <span class="glyphicon glyphicon-trash small"></span>
                         </button>
