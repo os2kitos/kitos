@@ -12,7 +12,7 @@
             controller: ['$rootScope', '$http', '$state', '$uibModal', 'notify', 'user', function ($rootScope, $http, $state, $modal, notify, user) {
                 $rootScope.page.title = 'IT System';
                 $rootScope.page.subnav = [
-                    { state: 'it-system.overview', text: 'Overblik' },
+                    { state: 'it-system.overview', text: "IT systemer" },
                     { state: 'it-system.catalog', text: 'IT System katalog' },
                     { state: 'it-system.interfaceCatalog', text: 'Snitflade katalog' },
                     { state: 'it-system.edit', text: 'IT System', showWhen: 'it-system.edit' },

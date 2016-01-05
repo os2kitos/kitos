@@ -368,6 +368,7 @@
                     {
                         field: "", title: "Fase: Startdato", format: "{0:dd-MM-yyyy}", width: 85,
                         persistId: "phasestartdate", // DON'T YOU DARE RENAME!
+                        hidden: true,
                         template: phaseStartDateTemplate,
                         sortable: false,
                         filterable: false,
@@ -375,7 +376,6 @@
                     {
                         field: "", title: "Fase: Slutdato", format: "{0:dd-MM-yyyy}", width: 85,
                         persistId: "phaseenddate", // DON'T YOU DARE RENAME!
-                        hidden: true,
                         template: phaseEndDateTemplate,
                         sortable: false,
                         filterable: false,

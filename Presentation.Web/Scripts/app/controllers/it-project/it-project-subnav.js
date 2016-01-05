@@ -12,8 +12,8 @@
             controller: ['$rootScope', '$http', '$state', 'notify', 'user', function($rootScope, $http, $state, notify, user) {
                 $rootScope.page.title = 'IT Projekt';
                 $rootScope.page.subnav = [
-                    { state: 'it-project.overview', text: 'Overblik: Aktiv' },
-                    { state: 'it-project.overview-inactive', text: 'Overblik: Inaktiv' },
+                    { state: 'it-project.overview', text: "IT projekter" },
+                    { state: 'it-project.overview-inactive', text: "Inaktive IT projekter" },
                     //{ state: 'it-project.catalog', text: 'IT Projekt katalog' },
                     { state: 'it-project.edit', text: 'IT Projekt', showWhen: 'it-project.edit' },
                 ];

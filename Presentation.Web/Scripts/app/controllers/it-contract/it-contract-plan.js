@@ -501,6 +501,7 @@
                         {
                             field: "ProcurementPlanYear", title: "Udbuds plan", width: 90,
                             persistId: "procurementPlan", // DON'T YOU DARE RENAME!
+                            attributes: { "class": "text-center" },
                             template: "#: ProcurementPlanHalf && ProcurementPlanYear ? ProcurementPlanYear + ' | ' + ProcurementPlanHalf : ''#",
                             filterable: {
                                 cell: {

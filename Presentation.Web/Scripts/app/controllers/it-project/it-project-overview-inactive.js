@@ -282,7 +282,7 @@
                         }
                     },
                     {
-                        field: "Name", title: "IT Projekt", width: 415,
+                        field: "Name", title: "IT Projekt", width: 370,
                         persistId: "projname", // DON'T YOU DARE RENAME!
                         template: '<a data-ui-sref="it-project.edit.status-project({id: #: Id #})">#: Name #</a>',
                         filterable: {
@@ -294,7 +294,7 @@
                         }
                     },
                     {
-                        field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 300,
+                        field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 245,
                         persistId: "orgunit", // DON'T YOU DARE RENAME!
                         template: "#: ResponsibleUsage ? ResponsibleUsage.OrganizationUnit.Name : '' #",
                         filterable: {
@@ -379,6 +379,24 @@
                         template: phaseEndDateTemplate,
                         sortable: false,
                         filterable: false,
+                    },
+                    {
+                        field: "StatusProject", title: "Status projekt", width: 100,
+                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        template: '<span data-square-traffic-light="#: StatusProject #"></span>',
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "eq",
+                            }
+                        },
+                        values: [
+                            { text: "Hvid", value: 0 },
+                            { text: "Rød", value: 1 },
+                            { text: "Gul", value: 2 },
+                            { text: "Grøn", value: 3 }
+                        ]
                     },
                     {
                         field: "StatusDate", title: "Status projekt: Dato", format: "{0:dd-MM-yyyy}", width: 130,

@@ -171,6 +171,9 @@
                                     ExpirationDate: { type: "date" },
                                     IrrevocableTo: { type: "date" },
                                     Terminated: { type: "date" },
+                                    Acquisition: { type: "number" },
+                                    Operation: { type: "number" },
+                                    Other: { type: "number" },
                                 }
                             },
                             parse: function(response) {
@@ -276,7 +279,7 @@
                     },
                     columns: [
                         {
-                            field: "", title: "Aktiv", width: 45,
+                            field: "", title: "Aktiv", width: 50,
                             persistId: "active", // DON'T YOU DARE RENAME!
                             template: activeStatusTemplate,
                             attributes: { "class": "text-center" },
@@ -310,7 +313,7 @@
                             }
                         },
                         {
-                            field: "Name", title: "IT Kontrakt", width: 265,
+                            field: "Name", title: "IT Kontrakt", width: 260,
                             persistId: "name", // DON'T YOU DARE RENAME!
                             template: "<a data-ui-sref='it-contract.edit.systems({id: #: Id #})'>#: Name #</a>",
                             filterable: {
@@ -389,18 +392,24 @@
                         {
                             field: "Acquisition", title: "Anskaffelse", width: 90,
                             persistId: "acquisition", // DON'T YOU DARE RENAME!
+                            attributes: { "class": "text-right" },
+                            format: "{0:n0}",
                             sortable: false,
                             filterable: false,
                         },
                         {
                             field: "Operation", title: "Drift/År", width: 75,
                             persistId: "operation", // DON'T YOU DARE RENAME!
+                            attributes: { "class": "text-right" },
+                            format: "{0:n0}",
                             sortable: false,
                             filterable: false,
                         },
                         {
                             field: "Other", title: "Andet", width: 150,
                             persistId: "other", // DON'T YOU DARE RENAME!
+                            attributes: { "class": "text-right" },
+                            format: "{0:n0}",
                             hidden: true,
                             sortable: false,
                             filterable: false,

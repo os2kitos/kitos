@@ -12,15 +12,15 @@
             controller: ['$rootScope', '$http', '$state', 'notify', 'user', function ($rootScope, $http, $state, notify, user) {
                 $rootScope.page.title = 'IT Kontrakt';
                 $rootScope.page.subnav = [
-                    { state: 'it-contract.overview', text: 'Overblik: økonomi' },
-                    { state: 'it-contract.plan', text: 'Overblik: tid' },
+                    { state: 'it-contract.overview', text: "IT kontrakter: økonomi" },
+                    { state: 'it-contract.plan', text: "IT kontrakter: tid" },
                     { state: 'it-contract.edit', text: 'IT Kontrakt', showWhen: 'it-contract.edit' },
                 ];
                 $rootScope.page.subnav.buttons = [
                     { func: create, text: 'Opret IT Kontrakt', style: 'btn-success', icon: 'glyphicon-plus' },
                     { func: remove, text: 'Slet IT Kontrakt', style: 'btn-danger', icon: 'glyphicon-minus', showWhen: 'it-contract.edit' }
                 ];
-                
+
                 function create() {
                     var orgId = user.currentOrganizationId;
                     var msg = notify.addInfoMessage("Opretter kontrakt...", false);
