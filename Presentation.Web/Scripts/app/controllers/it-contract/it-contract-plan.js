@@ -141,12 +141,12 @@
                                 // get kendo to map parameters to an odata url
                                 var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
 
-                                if (parameterMap.$orderBy) {
-                                    if (parameterMap.$orderBy === "ProcurementPlanYear") {
-                                        parameterMap.$orderBy = "ProcurementPlanYear,ProcurementPlanHalf";
+                                if (parameterMap.$orderby) {
+                                    if (parameterMap.$orderby === "ProcurementPlanYear") {
+                                        parameterMap.$orderby = "ProcurementPlanYear,ProcurementPlanHalf";
                                     }
-                                    if (parameterMap.$orderBy === "ProcurementPlanYear desc") {
-                                        parameterMap.$orderBy = "ProcurementPlanYear desc,ProcurementPlanHalf desc";
+                                    if (parameterMap.$orderby === "ProcurementPlanYear desc") {
+                                        parameterMap.$orderby = "ProcurementPlanYear desc,ProcurementPlanHalf desc";
                                     }
                                 }
 
