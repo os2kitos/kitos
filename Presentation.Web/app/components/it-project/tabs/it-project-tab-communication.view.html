@@ -15,22 +15,38 @@
             <tr data-ng-repeat="c in comms">
                 <td>
                     <div class="form-group">
-                        <textarea class="form-control input-sm" data-ng-model="c.targetAudiance" data-autosave="api/communication/{{c.id}}" data-field="targetAudiance"></textarea>
+                        <textarea class="form-control input-sm"
+                                  data-ng-model="c.targetAudiance"
+                                  data-autosave="api/communication/{{c.id}}"
+                                  data-field="targetAudiance"
+                                  data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
                     </div>
                 </td>
                 <td>
                     <div class="form-group">
-                        <textarea class="form-control input-sm" data-ng-model="c.purpose" data-autosave="api/communication/{{c.id}}" data-field="purpose"></textarea>
+                        <textarea class="form-control input-sm"
+                                  data-ng-model="c.purpose"
+                                  data-autosave="api/communication/{{c.id}}"
+                                  data-field="purpose"
+                                  data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
                     </div>
                 </td>
                 <td>
                     <div class="form-group">
-                        <textarea class="form-control input-sm" data-ng-model="c.message" data-autosave="api/communication/{{c.id}}" data-field="message"></textarea>
+                        <textarea class="form-control input-sm"
+                                  data-ng-model="c.message"
+                                  data-autosave="api/communication/{{c.id}}"
+                                  data-field="message"
+                                  data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
                     </div>
                 </td>
                 <td>
                     <div class="form-group">
-                        <textarea class="form-control input-sm" data-ng-model="c.media" data-autosave="api/communication/{{c.id}}" data-field="media"></textarea>
+                        <textarea class="form-control input-sm"
+                                  data-ng-model="c.media"
+                                  data-autosave="api/communication/{{c.id}}"
+                                  data-field="media"
+                                  data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
                     </div>
                 </td>
                 <td>
@@ -44,24 +60,28 @@
                 </td>
                 <td>
                     <div class="form-group">
-                        <select class="form-control input-sm"
+                        <select class="form-control input-sm responsible"
                                 data-ui-select2=""
                                 data-field="responsibleUserId"
                                 data-autosave="api/communication/{{c.id}}"
-                                data-ng-model="c.responsibleUserId">
+                                data-ng-model="c.responsibleUserId"
+                                data-ng-disabled="!projectEditVm.hasWriteAccess">
                             <option value=""></option>
                             <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.name}}</option>
                         </select>
                     </div>
                 </td>
                 <td>
-                    <a class="btn btn-link btn-xs" data-ng-click="delete(c.id)" data-ng-hide="!projectEditVm.hasWriteAccess">
-                        <i class="glyphicon glyphicon-trash"></i>
-                    </a>
+                    <button class="btn btn-danger btn-sm delete-comm"
+                            data-confirmed-click="delete(c.id)"
+                            data-confirm-click="Er du sikker på at du vil slette?"
+                            data-ng-disabled="!projectEditVm.hasWriteAccess">
+                        <span class="glyphicon glyphicon-trash small"></span>
+                    </button>
                 </td>
             </tr>
         </tbody>
-        <tfoot>
+        <tfoot data-ng-hide="!projectEditVm.hasWriteAccess">
             <tr>
                 <td>
                     <div class="form-group" data-show-errors>
@@ -85,7 +105,10 @@
                 </td>
                 <td>
                     <div class="form-group" data-show-errors>
-                        <input type="text" name="due" class="form-control" required
+                        <input type="text"
+                               name="due"
+                               class="form-control"
+                               required
                                data-kendo-date-picker
                                data-k-options="datepickerOptions"
                                data-ng-disabled="!projectEditVm.hasWriteAccess"
@@ -94,7 +117,10 @@
                 </td>
                 <td>
                     <div class="form-group" data-show-errors>
-                        <select name="responsible" class="form-control input-sm" required
+                        <select id="responsible"
+                                name="responsible"
+                                class="form-control input-sm"
+                                required
                                 data-ui-select2=""
                                 data-ng-model="comm.responsibleUserId">
                             <option value=""></option>
@@ -103,7 +129,7 @@
                     </div>
                 </td>
                 <td>
-                    <button class="btn btn-success btn-sm" data-ng-click="save()">Gem</button>
+                    <button id="save-comm" class="btn btn-success btn-sm" data-ng-click="save()">Gem</button>
                 </td>
             </tr>
         </tfoot>
