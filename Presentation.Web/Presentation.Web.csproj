@@ -736,7 +736,7 @@
     <Content Include="app\components\it-project\tabs\it-project-tab-handover.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-hierarchy.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-phases.view.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-risk.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-risk.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-roles.view.html" />
     <Content Include="app\components\it-project\it-project-edit.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-org.view.html" />
@@ -796,6 +796,7 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-description.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-economy.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-org.po.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-risk.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-stakeholders.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-roles.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-phases.po.ts" />
@@ -803,6 +804,7 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-strategy.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project.po.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine-expect\jasmine-expect.d.ts" />
+    <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabRisk.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabStakeholders.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabEconomy.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabStrategy.e2e.spec.ts" />
@@ -2539,6 +2541,7 @@
     <Content Include="Tests\mocks\organizationunit.json" />
     <Content Include="Tests\mocks\economyYear.json" />
     <Content Include="Tests\mocks\stakeholder.json" />
+    <Content Include="Tests\mocks\risk.json" />
     <None Include="Web.AppVeyor.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

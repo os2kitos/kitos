@@ -37,7 +37,7 @@
                                data-ng-disabled="!projectEditVm.hasWriteAccess">
                     </td>
                     <td>
-                        <span class="form-control-static input-sm">{{ product(risk) }}</span>
+                        <span class="form-control-static input-sm product">{{ product(risk) }}</span>
                     </td>
                     <td>
                         <textarea class="form-control input-sm"
@@ -48,10 +48,11 @@
                     </textarea>
                     </td>
                     <td>
-                        <select class="form-control input-sm"
+                        <select class="form-control input-sm responsible"
                                 data-ui-select2=""
                                 data-field="responsibleUserId"
                                 data-autosave="{{risk.updateUrl}}"
+                                data-ng-disabled="!projectEditVm.hasWriteAccess"
                                 data-ng-model="risk.responsibleUserId">
                             <option value=""></option>
                             <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.name}}</option>
@@ -83,7 +84,7 @@
                         </div>
                     </td>
                     <td>
-                        <span class="form-control-static input-sm">{{ product(newRisk) }}</span>
+                        <span id="product" class="form-control-static input-sm">{{ product(newRisk) }}</span>
                     </td>
                     <td>
                         <div class="form-group" data-show-errors>
@@ -92,8 +93,12 @@
                     </td>
                     <td>
                         <div class="form-group" data-show-errors>
-                            <select name="responsbile" class="form-control input-sm" required
+                            <select id="responsible"
+                                    name="responsbile"
+                                    class="form-control input-sm"
+                                    required
                                     data-ui-select2=""
+                                    data-ng-disabled="!projectEditVm.hasWriteAccess"
                                     data-ng-model="newRisk.responsibleUserId">
                                 <option value=""></option>
                                 <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.name}}</option>
@@ -101,7 +106,7 @@
                         </div>
                     </td>
                     <td class="text-right">
-                        <button class="btn btn-success btn-sm" data-ng-click="saveNewRisk()">
+                        <button id="save-risk" class="btn btn-success btn-sm" data-ng-click="saveNewRisk()">
                             Gem
                         </button>
                     </td>
@@ -113,7 +118,7 @@
                         <span class="form-control-static input-sm text-right">Gennemsnit:</span>
                     </td>
                     <td>
-                        <span class="form-control-static input-sm">{{ averageProduct() }}</span>
+                        <span id="average-product" class="form-control-static input-sm">{{ averageProduct() }}</span>
                     </td>
                     <td></td>
                     <td></td>

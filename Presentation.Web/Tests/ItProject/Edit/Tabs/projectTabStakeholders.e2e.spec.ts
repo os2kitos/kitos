@@ -18,7 +18,7 @@ describe("project edit tab description", () => {
         mock.teardown();
     });
 
-    xdescribe("with no write access", () => {
+    describe("with no write access", () => {
         beforeEach(() => {
             mock(["itProjectNoWriteAccess"].concat(mockDependencies));
             pageObject.getPage();

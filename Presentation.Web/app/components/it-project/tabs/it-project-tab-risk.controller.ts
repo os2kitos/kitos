@@ -13,7 +13,7 @@
                         });
                 }],
                 risks: ["$http", "project", function ($http, project) {
-                        return $http.get("api/risk/?getByProject&projectId=" + project.id)
+                        return $http.get("api/risk/?getByProject=true&projectId=" + project.id)
                             .then(function (result) {
                                 return result.data.response;
                             });

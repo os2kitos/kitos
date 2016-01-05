@@ -11,7 +11,7 @@
                 "response": [
                     {
                         "objectId": 2,
-                        "objectName": "Projekt 2das",
+                        "objectName": "Projekt 2",
                         "roleId": 1,
                         "roleName": "Projektejer",
                         "roleHasWriteAccess": true,
@@ -24,6 +24,46 @@
                             "lastName": "User",
                             "phoneNumber": "12345678",
                             "email": "test@user.dk",
+                            "defaultOrganizationUnitId": null,
+                            "defaultOrganizationUnitName": null,
+                            "isGlobalAdmin": false,
+                            "uuid": null,
+                            "adminRights": [
+                                {
+                                    "organizationId": 1,
+                                    "roleName": "Medarbejder",
+                                    "roleId": 2,
+                                    "objectOwnerName": "Global",
+                                    "objectOwnerLastName": "admin",
+                                    "objectOwnerFullName": "Global admin",
+                                    "defaultOrgUnitName": null
+                                }
+                            ],
+                            "objectOwnerName": "Global",
+                            "objectOwnerLastName": "admin",
+                            "lastAdvisDate": null,
+                            "lastChanged": "2015-12-28T10:27:02Z",
+                            "lastChangedByUserId": 1,
+                            "fullName": "Test User"
+                        },
+                        "lastChanged": "2015-12-28T12:48:24Z",
+                        "lastChangedByUserId": 1
+                    },
+                    {
+                        "objectId": 2,
+                        "objectName": "Projekt 2",
+                        "roleId": 1,
+                        "roleName": "Projektejer",
+                        "roleHasWriteAccess": true,
+                        "userId": 9,
+                        "userName": "Test2",
+                        "userEmail": "test2@user.dk",
+                        "user": {
+                            "id": 9,
+                            "name": "Test2",
+                            "lastName": "User",
+                            "phoneNumber": "12345678",
+                            "email": "test2@user.dk",
                             "defaultOrganizationUnitId": null,
                             "defaultOrganizationUnitName": null,
                             "isGlobalAdmin": false,
