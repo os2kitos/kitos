@@ -20,6 +20,11 @@ div#page-body {
     padding: 10px 5px 20px 5px;
 }
 
+.footer {
+    background-color: white;
+    padding: 5px 5px 5px 0px;
+}
+
 /************ NAVIGATION BAR TOP **************/
 .navbar-nav {
     width: 70%;
@@ -350,7 +355,7 @@ div.task-usage-row {
         padding: 5px;
         margin: 5px;
     }
-    
+
     .dropdown-menu.traffic-light a:hover {
         border-color: black;
     }
@@ -671,7 +676,7 @@ div.searchbox-wrapper {
 
 /*
     Fixes kendo problem with bootstrap form-constrol
-    http://docs.telerik.com/kendo-ui/using-kendo-with-twitter-bootstrap#using-the-form-control-bootstrap-css-class-with-kendo-ui-widgets 
+    http://docs.telerik.com/kendo-ui/using-kendo-with-twitter-bootstrap#using-the-form-control-bootstrap-css-class-with-kendo-ui-widgets
 */
 .form-control.k-widget
 {

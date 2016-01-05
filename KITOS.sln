@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{2AC4CFA8-D99E-4DF2-9E2D-202E3A7BD29E}"
 EndProject
@@ -66,6 +66,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gulp", "gulp", "{8E3F47CB-D
 		gulp\deploy.js = gulp\deploy.js
 		gulp\linting.js = gulp\linting.js
 		gulp\test.js = gulp\test.js
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assets", "Assets", "{F9AC0D85-511A-4B8A-A7B0-02763A1BC618}"
+	ProjectSection(SolutionItems) = preProject
+		Assets\BrowserStack.svg = Assets\BrowserStack.svg
 	EndProjectSection
 EndProject
 Global
@@ -147,5 +152,6 @@ Global
 		{5AE358F5-4F11-47FE-94BE-1588F357DCDC} = {500B4C1D-B871-49A0-94E7-BD0623101EF6}
 		{73EA6CFE-4B6A-4F83-BA3F-93F83A08E73A} = {42678F6A-7BFE-40AF-A659-0726A06DCE29}
 		{8E3F47CB-D523-461B-A4EE-10CC6650DE8C} = {098F0368-603B-4AF3-80A4-569EAB468147}
+		{F9AC0D85-511A-4B8A-A7B0-02763A1BC618} = {098F0368-603B-4AF3-80A4-569EAB468147}
 	EndGlobalSection
 EndGlobal

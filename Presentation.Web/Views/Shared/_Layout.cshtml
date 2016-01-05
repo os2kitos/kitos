@@ -11,7 +11,7 @@
     <link href="/Content/kendo/kendo.bootstrap.min.css" rel="stylesheet">
     <link href="/Content/kendo/kendo.dataviz.min.css" rel="stylesheet">
     <link href="/Content/kendo/kendo.dataviz.bootstrap.min.css" rel="stylesheet">
-    
+
     @if (ViewBag.Environment != "Prod")
     {
         if (ViewBag.Environment == "Test")
@@ -49,11 +49,14 @@
             @{/* this doesn't really do anything, but it's necessary to shut up the interpreter */}
             @RenderBody()
         </div>
+        <footer class="footer text-info text-right">
+            <small>Siden anvender <a href="https://www.browserstack.com/" title="BrowserStack">BrowserStack</a>.</small>
+        </footer>
     </div>
 
     @Scripts.Render("~/Scripts/libraries")
     @Scripts.Render("~/Scripts/angular")
-    
+
     <script src="/Scripts/kendo/jszip.min.js"></script>
     <script src="/Scripts/kendo/kendo.all.min.js"></script>
     <script src="/Scripts/kendo/messages/kendo.messages.da-DK.min.js"></script>
