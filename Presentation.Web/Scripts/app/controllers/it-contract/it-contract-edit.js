@@ -109,7 +109,7 @@
             $scope.procurementPlans = [];
             var currentDate = moment();
             for (var i = 0; i < 20; i++) {
-                var half = Math.ceil(currentDate.month() / 6); // calcs 1 for the first 6 months, 2 for the rest
+                var half = currentDate.quarter() <= 2 ? 1 : 2; // calcs 1 for the first 6 months, 2 for the rest
                 var year = currentDate.year();
                 var obj = { id: i, half: half, year: year };
                 $scope.procurementPlans.push(obj);
