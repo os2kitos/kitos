@@ -91,7 +91,7 @@ describe("project edit tab communication", () => {
                 .then(() => {
 
                     // assert
-                    expect(mock.requestsMade()).toMatchInRequests({ method: "POST", url: "api/communication/" });
+                    expect(mock.requestsMade()).toMatchInRequests({ method: "POST", url: "api/communication" });
                 });
         });
 

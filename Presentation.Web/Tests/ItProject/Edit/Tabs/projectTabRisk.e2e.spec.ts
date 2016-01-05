@@ -70,7 +70,6 @@ describe("project edit tab risk", () => {
 
         it("should mark inputs required on save when nothing is entered", () => {
             // arrange
-            browserHelper.outputLog();
 
             // act
             pageObject.saveRiskElement.click()
