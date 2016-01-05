@@ -282,7 +282,7 @@
                         }
                     },
                     {
-                        field: "Name", title: "IT Projekt", width: 340,
+                        field: "Name", title: "IT Projekt", width: 415,
                         persistId: "projname", // DON'T YOU DARE RENAME!
                         template: '<a data-ui-sref="it-project.edit.status-project({id: #: Id #})">#: Name #</a>',
                         filterable: {
@@ -294,7 +294,7 @@
                         }
                     },
                     {
-                        field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 245,
+                        field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 300,
                         persistId: "orgunit", // DON'T YOU DARE RENAME!
                         template: "#: ResponsibleUsage ? ResponsibleUsage.OrganizationUnit.Name : '' #",
                         filterable: {
@@ -347,7 +347,7 @@
                         }
                     },
                     {
-                        field: "ItProjectType.Name", title: "Projekttype", width: 125,
+                        field: "ItProjectType.Name", title: "Projekttype", width: 135,
                         persistId: "projtype", // DON'T YOU DARE RENAME!
                         template: "#: ItProjectType ? ItProjectType.Name : '' #",
                         filterable: {
@@ -454,7 +454,7 @@
                         template: function (dataItem) {
                             return roleTemplate(dataItem, role.Id);
                         },
-                        width: 135,
+                        width: 215,
                         hidden: role.Name == "Projektleder" ? false : true, // hardcoded role name :(
                         sortable: false,
                         filterable: {
@@ -680,105 +680,6 @@
                         }
                     });
                 }
-            }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            $scope.pagination = {
-                search: '',
-                skip: 0,
-                take: 25,
-                orderBy: 'Name'
-            };
-
-            $scope.csvUrl = 'api/itProject?csv&orgId=' + user.currentOrganizationId;
-
-            $scope.projects = [];
-            $scope.projectRoles = projectRoles;
-
-            $scope.$watchCollection('pagination', function (newVal, oldVal) {
-                loadProjects();
-            });
-
-            function loadProjects() {
-                var deferred = $q.defer();
-
-                var url = 'api/itProject?overview&orgId=' + user.currentOrganizationId;
-
-                url += '&skip=' + $scope.pagination.skip;
-                url += '&take=' + $scope.pagination.take;
-
-                if ($scope.pagination.orderBy) {
-                    url += '&orderBy=' + $scope.pagination.orderBy;
-                    if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
-                }
-
-                if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
-                else url += "&q=";
-
-                $scope.projects = [];
-                $http.get(url).success(function (result, status, headers) {
-
-                    var paginationHeader = JSON.parse(headers('X-Pagination'));
-                    $scope.totalCount = paginationHeader.TotalCount;
-
-                    setCanEdit(result.response).then(function(canEditResult) {
-                        _.each(canEditResult, pushProject);
-                    });
-
-                }).error(function () {
-                    notify.addErrorMessage("Kunne ikke hente projekter!");
-                });
-            }
-
-            function setCanEdit(projectCollection) {
-                return $q.all(_.map(projectCollection, function(iteratee) {
-                    var deferred = $q.defer();
-
-                    setTimeout(function() {
-                        $http.get("api/itProject/" + iteratee.id + "?hasWriteAccess" + '&organizationId=' + user.currentOrganizationId)
-                            .success(function(result) {
-                                iteratee.canBeEdited = result.response;
-                                deferred.resolve(iteratee);
-                            })
-                            .error(function(result) {
-                                iteratee.canBeEdited = false;
-                                deferred.reject(result);
-                                }
-                            );
-                    }, 0);
-
-                    return deferred.promise;
-                }));
-            }
-
-            function pushProject(project) {
-                // Due to https://github.com/angular/angular.js/blob/master/CHANGELOG.md#breaking-changes-8
-                // we have to convert these values to strings
-                project.priority = project.priority.toString();
-                project.priorityPf = project.priorityPf.toString();
-
-                $scope.projects.push(project);
             }
         }]);
 })(angular, app);
