@@ -733,7 +733,7 @@
     <Content Include="app\components\it-project\tabs\it-project-tab-status-modal.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-communication.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-description.view.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-handover.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-handover.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-hierarchy.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-phases.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-risk.view.html" />
@@ -794,6 +794,7 @@
     <Content Include="Partials\topnav\authorized.html" />
     <Content Include="Partials\topnav\topnav.html" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-description.po.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-handover.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-economy.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-org.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-communication.po.ts" />
@@ -806,6 +807,7 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project.po.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine-expect\jasmine-expect.d.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabCommunication.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabHandover.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabRisk.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabStakeholders.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabEconomy.e2e.spec.ts" />
@@ -822,6 +824,7 @@
     <TypeScriptCompile Include="Tests\matchers\toMatchInRequests.ts" />
     <TypeScriptCompile Include="Tests\matchers\toMatchRequest.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\RepeaterWrapper.ts" />
+    <TypeScriptCompile Include="Tests\object-wrappers\Select2TagWrapper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\SelectStatus2Wrapper.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-ui-router\angular-ui-router.d.ts" />
@@ -2545,6 +2548,7 @@
     <Content Include="Tests\mocks\stakeholder.json" />
     <Content Include="Tests\mocks\risk.json" />
     <Content Include="Tests\mocks\communication.json" />
+    <Content Include="Tests\mocks\handover.json" />
     <None Include="Web.AppVeyor.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

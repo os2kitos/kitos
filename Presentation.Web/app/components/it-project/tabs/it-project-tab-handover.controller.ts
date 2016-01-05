@@ -2,7 +2,7 @@
     app.config(["$stateProvider", function ($stateProvider) {
         $stateProvider.state("it-project.edit.handover", {
             url: "/handover",
-            templateUrl: "app/components/it-project/tabs/it-project-tab-handover.html",
+            templateUrl: "app/components/it-project/tabs/it-project-tab-handover.view.html",
             controller: "project.EditHandoverCtrl",
             resolve: {
                 handover: ["$http", "$stateParams", function ($http, $stateParams) {

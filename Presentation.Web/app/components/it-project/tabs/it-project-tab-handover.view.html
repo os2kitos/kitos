@@ -1,7 +1,12 @@
 ﻿<form role="form">
     <div class="form-group">
         <label for="description">Beskriv hvordan/hvad der gælder ifm. overlevering af dette projekt</label>
-        <textarea id="description" class="form-control input-sm" data-ng-disabled="!projectEditVm.hasWriteAccess"  data-ng-model="handover.description" data-autosave="{{autosaveUrl}}" data-field="description"></textarea>
+        <textarea id="description"
+                  class="form-control input-sm"
+                  data-ng-disabled="!projectEditVm.hasWriteAccess"
+                  data-ng-model="handover.description"
+                  data-autosave="{{autosaveUrl}}"
+                  data-field="description"></textarea>
     </div>
 
     <div class="form-group">
@@ -17,7 +22,13 @@
 
     <div class="form-group">
         <label for="participants">Deltagere</label>
-        <select id="participants" class="form-control input-sm" multiple="multiple" data-ng-disabled="!projectEditVm.hasWriteAccess" data-ui-select2="select2Options" data-ng-model="participants" data-placeholder="Vælg deltagere">
+        <select id="participants"
+                class="form-control input-sm"
+                multiple="multiple"
+                data-ng-disabled="!projectEditVm.hasWriteAccess"
+                data-ui-select2="select2Options"
+                data-ng-model="participants"
+                data-placeholder="Vælg deltagere">
             <option value=""></option>
             <option value="{{ user.id }}" data-ng-repeat="user in usersWithRoles">{{user.name}}</option>
         </select>
@@ -25,6 +36,10 @@
 
     <div class="form-group">
         <label for="summary">Resume af hvad der er aftalt ifm. overleveringsmødet</label>
-        <textarea id="summary" class="form-control input-sm" data-ng-model="handover.summary" data-ng-disabled="!projectEditVm.hasWriteAccess" data-autosave="{{autosaveUrl}}" data-field="summary"></textarea>
+        <textarea id="summary"
+                  class="form-control input-sm"
+                  data-ng-model="handover.summary"
+                  data-ng-disabled="!projectEditVm.hasWriteAccess"
+                  data-autosave="{{autosaveUrl}}" data-field="summary"></textarea>
     </div>
 </form>
