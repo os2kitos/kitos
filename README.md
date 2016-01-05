@@ -1,7 +1,7 @@
 The OS2KITOS was programmed by IT Minds ApS (http://it-minds.dk)
-for OS2 - Offentligt digitaliseringsfællesskab (http://os2web.dk).
+for OS2 - Offentligt digitaliseringsfÃ¦llesskab (http://os2web.dk).
 
-Copyright (c) 2014, OS2 - Offentligt digitaliseringsfællesskab.
+Copyright (c) 2014, OS2 - Offentligt digitaliseringsfÃ¦llesskab.
 
 The OS2KITOS is free software; you may use, study, modify and
 distribute it under the terms of version 2.0 of the Mozilla Public
@@ -16,4 +16,4 @@ the terms of the Mozilla Public License, v. 2.0.
 
 This website uses [BrowserStack](https://www.browserstack.com/) for testing.
 
-![BrowserStackLogo](Assets/BrowserStack.svg)
+![BrowserStackLogo](https://cdn.rawgit.com/os2kitos/kitos/e2e/project-edit/Assets/BrowserStack.svg)
