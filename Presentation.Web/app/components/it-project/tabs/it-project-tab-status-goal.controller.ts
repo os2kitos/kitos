@@ -3,7 +3,7 @@
         '$stateProvider', function($stateProvider) {
             $stateProvider.state('it-project.edit.status-goal', {
                 url: '/status-goal',
-                templateUrl: 'partials/it-project/tab-status-goal.html',
+                templateUrl: 'app/components/it-project/tabs/it-project-tab-status-goal.html',
                 controller: 'project.EditStatusGoalCtrl',
                 resolve: {
                     // re-resolve data from parent cause changes here wont cascade to it
@@ -28,8 +28,8 @@
     ]);
 
     app.controller('project.EditStatusGoalCtrl', [
-        '$scope', '$http', 'notify', '$uibModal', '$state', 'project', 'goalTypes', 'user',
-        function ($scope, $http, notify, $modal, $state, project, goalTypes, user) {
+        '$scope', '$http', 'notify', '$modal', '$state', 'project', 'goalTypes', 'user',
+        function ($scope, $http, notify, $modal, $state, project, goalTypes: { name }[], user) {
             $scope.goalStatus = project.goalStatus;
             $scope.goalStatus.updateUrl = "api/goalStatus/" + project.goalStatus.id;
 

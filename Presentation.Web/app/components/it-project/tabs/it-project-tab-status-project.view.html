@@ -6,9 +6,11 @@
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusProject">Status projekt (økonomi, tid og kvalitet):</label>
                     <div class="col-md-7">
-                        <span id="statusProject" data-select-status2="" data-ng-model="project.statusProject" data-can-write="hasWriteAccess"
+                        <span id="statusProject" data-select-status2=""
+                              data-ng-model="projectStatusVm.project.statusProject"
+                              data-can-write="projectEditVm.hasWriteAccess"
                               data-field="statusProject"
-                              data-autosave="{{project.updateUrl}}">
+                              data-autosave="{{projectStatusVm.project.updateUrl}}">
                         </span>
                     </div>
                 </div>
@@ -19,10 +21,10 @@
                     <div class="col-md-4">
                         <input type="text" class="form-control" id="statusDate"
                                data-kendo-date-picker
-                               data-k-options="datepickerOptions"
-                               data-is-disabled="!hasWriteAccess"
-                               data-ng-model="project.statusDate"
-                               data-autosave="{{project.updateUrl}}"
+                               data-k-options="projectStatusVm.datepickerOptions"
+                               data-is-disabled="!projectEditVm.hasWriteAccess"
+                               data-ng-model="projectStatusVm.project.statusDate"
+                               data-autosave="{{projectStatusVm.project.updateUrl}}"
                                data-field="statusDate">
                     </div>
                 </div>
@@ -33,9 +35,11 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label small" for="note">Bemærkning til samlet status på projekt:</label>
                     <div class="col-md-10">
-                        <textarea id="note" class="form-control input-sm" rows="4" data-ng-model="project.statusNote"
+                        <textarea id="note" class="form-control input-sm" rows="4"
+                                  data-ng-model="projectStatusVm.project.statusNote"
                                   data-field="statusNote"
-                                  data-autosave="{{project.updateUrl}}" data-ng-disabled="!hasWriteAccess"></textarea>
+                                  data-autosave="{{projectStatusVm.project.updateUrl}}"
+                                  data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
                     </div>
                 </div>
             </div>
@@ -52,16 +56,16 @@
                         </th>
                         <th>
                             Navn
-                            <button data-order-by="'name'" data-paging="pagination"></button>
+                            <button data-order-by="'name'" data-paging="projectStatusVm.pagination"></button>
                         </th>
                         <th>Note</th>
                         <th>
                             ID
-                            <button data-order-by="'humanReadableId'" data-paging="pagination"></button>
+                            <button data-order-by="'humanReadableId'" data-paging="projectStatusVm.pagination"></button>
                         </th>
                         <th>
                             Projektfase
-                            <button data-order-by="'associatedPhaseId'" data-paging="pagination"></button>
+                            <button data-order-by="'associatedPhaseId'" data-paging="projectStatusVm.pagination"></button>
                         </th>
                         <th>
                             Start
@@ -72,14 +76,14 @@
                         <th>Status</th>
                         <th>
                             Ansvarlig: Navn
-                            <button data-order-by="'associatedUser.fullName'" data-paging="pagination"></button>
+                            <button data-order-by="'associatedUser.fullName'" data-paging="projectStatusVm.pagination"></button>
                         </th>
                         <th>Ansvarlig: Projektrolle</th>
                         <th class="text-right">Rediger/slet</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-ng-repeat="activity in milestonesActivities | filter:{show:true}" class="small">
+                    <tr data-ng-repeat="activity in projectStatusVm.milestonesActivities | filter:{show:true}" class="small">
                         <!-- Type -->
                         <td>
                             <span data-ng-show="activity.isTask">Opgave</span>
@@ -87,7 +91,7 @@
                         </td>
                         <!-- Navn -->
                         <td>
-                            <a data-ng-click="activity.edit()">{{ activity.name }}</a>
+                            <a data-ng-click="activity.edit()">{{activity.name}}</a>
                         </td>
                         <!-- Note -->
                         <td>
@@ -96,9 +100,9 @@
                             </a>
                         </td>
                         <!-- ID -->
-                        <td>{{ activity.humanReadableId }}</td>
+                        <td>{{activity.humanReadableId}}</td>
                         <!-- Projektfase -->
-                        <td>{{ getPhaseName(activity.associatedPhaseNum) }}</td>
+                        <td>{{projectStatusVm.getPhaseName(activity.associatedPhaseNum)}}</td>
                         <!-- Start -->
                         <td>
                             <span data-datereader="" data-ng-show="activity.isTask" data-ng-model="activity.startDate"></span>
@@ -112,27 +116,32 @@
                         <!-- Status -->
                         <td>
                             <span data-ng-show="activity.isTask">
-                                {{ activity.statusProcentage }}%
+                                {{activity.statusProcentage}}%
                             </span>
                             <span data-ng-show="activity.isMilestone">
                                 <span data-select-status2="" data-ng-model="activity.status"></span>
                             </span>
                         </td>
                         <!-- Ansvarlig: Navn -->
-                        <td>{{ activity.associatedUser.fullName }}</td>
+                        <td>{{activity.associatedUser.fullName}}</td>
                         <!-- Ansvarlig: Projektrolle -->
-                        <td>{{ activity.associatedUser.roleNames | joinBy:', ' }}</td>
+                        <td>{{activity.associatedUser.roleNames | joinBy:', '}}</td>
                         <!-- Control -->
                         <td class="text-right">
-                            <a class="btn btn-link btn-xs" data-ng-click="activity.edit()" data-ng-hide="hasWriteAccess">
+                            <a class="btn btn-link btn-xs"
+                               data-ng-click="activity.edit()"
+                               data-ng-hide="projectEditVm.hasWriteAccess">
                                 <i class="glyphicon glyphicon-eye-open"></i>
                             </a>
-                            <a class="btn btn-link btn-xs" data-ng-click="activity.edit()" data-ng-show="hasWriteAccess">
+                            <a class="btn btn-link btn-xs"
+                               data-ng-click="activity.edit()"
+                               data-ng-show="projectEditVm.hasWriteAccess">
                                 <i class="glyphicon glyphicon-pencil"></i>
                             </a>
                             <a class="btn btn-link btn-xs"
                                data-confirmed-click="activity.delete()"
-                               data-confirm-click="Er du sikker på at du vil slette?" data-ng-show="hasWriteAccess">
+                               data-confirm-click="Er du sikker på at du vil slette?"
+                               data-ng-show="projectEditVm.hasWriteAccess">
                                 <i class="glyphicon glyphicon-trash"></i>
                             </a>
                         </td>
@@ -141,13 +150,13 @@
                 <tfoot>
                     <tr>
                         <td colspan="11" class="text-center">
-                            <span data-pagination-buttons="pagination" data-pagination-total-count="totalCount"></span>
+                            <span data-pagination-buttons="projectStatusVm.pagination" data-pagination-total-count="projectStatusVm.totalCount"></span>
                         </td>
                     </tr>
                     <tr>
                         <td colspan="11" class="text-right">
-                            <button class="btn btn-success btn-sm" data-ui-sref="it-project.edit.status-project.modal({type: 'assignment', activityId: ''})" data-ng-hide="!hasWriteAccess">Tilføj opgave</button>
-                            <button class="btn btn-primary btn-sm" data-ui-sref="it-project.edit.status-project.modal({type: 'milestone', activityId: ''})" data-ng-hide="!hasWriteAccess">Tilføj milepæl</button>
+                            <button class="btn btn-success btn-sm" data-ui-sref="it-project.edit.status-project.modal({type: 'assignment', activityId: ''})" data-ng-hide="!projectEditVm.hasWriteAccess">Tilføj opgave</button>
+                            <button class="btn btn-primary btn-sm" data-ui-sref="it-project.edit.status-project.modal({type: 'milestone', activityId: ''})" data-ng-hide="!projectEditVm.hasWriteAccess">Tilføj milepæl</button>
                         </td>
                     </tr>
                 </tfoot>

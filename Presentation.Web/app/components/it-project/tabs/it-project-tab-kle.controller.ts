@@ -3,7 +3,7 @@
         '$stateProvider', function($stateProvider) {
             $stateProvider.state('it-project.edit.kle', {
                 url: '/kle',
-                templateUrl: 'partials/it-project/tab-kle.html',
+                templateUrl: 'app/components/it-project/tabs/it-project-tab-kle.html',
                 controller: 'project.EditKleCtrl',
                 resolve: {
                     // re-resolve data from parent cause changes here wont cascade to it
@@ -102,7 +102,7 @@
             };
 
             $scope.selectAllTasks = function() {
-                _.each($scope.tasklist, function(task) {
+                _.each($scope.tasklist, function(task: { isSelected }) {
                     if (!task.isSelected) {
                         add(task);
                     }
@@ -110,7 +110,7 @@
             };
 
             $scope.removeAllTasks = function() {
-                _.each($scope.tasklist, function(task) {
+                _.each($scope.tasklist, function(task: { isSelected }) {
                     if (task.isSelected) {
                         remove(task);
                     }

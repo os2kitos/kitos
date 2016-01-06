@@ -2,7 +2,7 @@
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-project.edit.risk', {
             url: '/risk',
-            templateUrl: 'partials/it-project/tab-risk.html',
+            templateUrl: 'app/components/it-project/tabs/it-project-tab-risk.html',
             controller: 'project.EditRiskCtrl',
             resolve: {
                 // re-resolve data from parent cause changes here wont cascade to it
@@ -29,11 +29,11 @@
                             //get the role names
                             return $http.get("api/itprojectrole/")
                                 .then(function (roleResult) {
-                                    var roles = roleResult.data.response;
+                                    var roles: { name }[] = roleResult.data.response;
 
                                     //the resulting map
                                     var users = {};
-                                    _.each(rights, function (right) {
+                                    _.each(rights, function (right: { userId; user; roleId; }) {
 
                                         //use the user from the map if possible
                                         var user = users[right.userId] || right.user;
@@ -62,7 +62,7 @@
 
             $scope.risks = [];
             $scope.usersWithRoles = _.values(usersWithRoles);
-            
+
             function pushRisk(risk) {
                 risk.show = true;
 
@@ -92,7 +92,7 @@
 
                 if ($scope.risks.length == 0) return 0;
 
-                var sum = _.reduce($scope.risks, function(memo, risk) {
+                var sum = _.reduce($scope.risks, function(memo, risk: { product }) {
                     return memo + risk.product;
                 }, 0);
 
@@ -112,12 +112,12 @@
                 $scope.$broadcast('show-errors-check-validity');
 
                 if ($scope.riskForm.$invalid) { return; }
-                
+
                 var risk = $scope.newRisk;
 
                 //name, action or user shouldn't be null or empty
                 if (!risk.name || !risk.action || !risk.responsibleUserId) return;
-                
+
                 var data = {
                     itProjectId: projectId,
                     name: risk.name,

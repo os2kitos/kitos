@@ -5,7 +5,7 @@
             onEnter: ['$state', '$stateParams', '$uibModal', 'project', 'usersWithRoles', 'user',
                 function ($state, $stateParams, $modal, project, usersWithRoles, user) {
                     $modal.open({
-                        templateUrl: 'partials/it-project/modal-milestone-task-edit.html',
+                        templateUrl: 'app/components/it-project/tabs/it-project-tab-status-modal.html',
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: 'modal fade in',

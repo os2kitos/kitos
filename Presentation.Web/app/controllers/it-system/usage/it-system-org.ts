@@ -78,8 +78,8 @@
                             msg.toSuccessMessage("Gemt!");
 
                             var indexOf;
-                            // find the index of the orgunit 
-                            var found = _.filter($scope.selectedOrgUnits, function(element, index) {
+                            // find the index of the orgunit
+                            var found = _.filter($scope.selectedOrgUnits, function(element: { id }, index) {
                                 var equal = element.id == obj.id;
                                 // set outer scope indexOf, to be used later
                                 if (equal) indexOf = index;

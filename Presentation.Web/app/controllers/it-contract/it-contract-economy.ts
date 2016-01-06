@@ -17,7 +17,7 @@
     }]);
 
     app.controller('contract.EditEconomyCtrl', ['$scope', '$http', '$timeout', '$state', '$stateParams', 'notify', 'contract', 'orgUnits', 'user',
-        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits, user) {
+        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: { ean; }[], user) {
             $scope.datepickerOptions = {
                 format: "dd-MM-yyyy",
                 parseFormats: ["yyyy-MM-dd"]
@@ -58,7 +58,7 @@
                     stream.ean = " - ";
 
                     if (stream.organizationUnitId) {
-                        var orgUnit = _.findWhere(orgUnits, { id: parseInt(stream.organizationUnitId) });
+                        var orgUnit: { ean } = _.findWhere(orgUnits, { id: parseInt(stream.organizationUnitId) });
 
                         if (orgUnit && orgUnit.ean) stream.ean = orgUnit.ean;
                     }

@@ -78,7 +78,7 @@
                 //Goes through a collection of users, and for each user sets canBeEdited flag
                 //Returns a flattened promise, that resolves when all users in the collection has been resolved
                 function setCanEdit(userCollection) {
-                    return $q.all(_.map(userCollection, function (iteratee) {
+                    return $q.all(_.map(userCollection, function (iteratee: { adminRights; canBeEdited; id; }) {
                         var deferred = $q.defer();
 
                         iteratee.adminRights = _.findWhere(iteratee.adminRights, { roleName: "Medarbejder", organizationId: user.currentOrganizationId });
@@ -144,7 +144,7 @@
                 $scope.toggleStatus = function (userToToggle) {
                     userToToggle.isLocked = !userToToggle.isLocked;
                     var success = userToToggle.isLocked ? userToToggle.name + " er låst" : userToToggle.name + " er låst op";
-                    updateUser(userToToggle, success).then( //success
+                    updateUser(userToToggle, success, null).then( //success
                         function (successMessage) {
                             notify.addSuccessMessage(successMessage);
                         },
@@ -176,7 +176,7 @@
 
                 $scope.getRightsForModule = function (chosenModule) {
                     //return a flat promise, that fullfills when all rights have been retrieved
-                    return $q.all(_.map($scope.users, function (iteratee) {
+                    return $q.all(_.map($scope.users, function (iteratee: { id; rights; }) {
                         var deferred = $q.defer();
 
                         setTimeout(function () {
@@ -270,7 +270,7 @@
                 }
 
                 $scope.sendAdvis = function (userToAdvis, reminder) {
-                    var params = {};
+                    var params: { sendReminder; sendAdvis; organizationId; } = { sendReminder: null, sendAdvis: null, organizationId: null};
                     var type;
 
                     if (reminder) {

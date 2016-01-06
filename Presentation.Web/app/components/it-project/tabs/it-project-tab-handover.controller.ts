@@ -2,7 +2,7 @@
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-project.edit.handover', {
             url: '/handover',
-            templateUrl: 'partials/it-project/tab-handover.html',
+            templateUrl: 'app/components/it-project/tabs/it-project-tab-handover.html',
             controller: 'project.EditHandoverCtrl',
             resolve: {
                 handover: ['$http', '$stateParams', function ($http, $stateParams) {
@@ -24,11 +24,11 @@
                             //get the role names
                             return $http.get('api/itprojectrole/')
                                 .then(function(roleResult) {
-                                    var roles = roleResult.data.response;
+                                    var roles: { name }[] = roleResult.data.response;
 
                                     //the resulting map
                                     var users = {};
-                                    _.each(rights, function(right) {
+                                    _.each(rights, function(right: { userId; user; roleId; }) {
 
                                         //use the user from the map if possible
                                         var user = users[right.userId] || right.user;
@@ -56,7 +56,7 @@
             $scope.handover = handover;
             $scope.usersWithRoles = usersWithRoles;
             $scope.autosaveUrl = 'api/handover/' + $stateParams.id;
-            $scope.participants = _.map(handover.participants, function(user) {
+            $scope.participants = _.map(handover.participants, function(user: { id }) {
                 return user.id.toString();
             });
 

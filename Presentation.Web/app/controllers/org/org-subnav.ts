@@ -16,7 +16,7 @@
                         }
                 ],
             },
-            controller: ['$rootScope', '$uibModal', '$state', 'user', 'organizationRoles', function ($rootScope, $modal, $state, user, organizationRoles) {
+            controller: ['$rootScope', '$modal', '$state', 'user', 'organizationRoles', function ($rootScope, $modal, $state, user, organizationRoles: { id; name; }[]) {
                 $rootScope.page.title = 'Organisation';
 
                 var subnav = [];
@@ -67,7 +67,7 @@
                                     phoneNumber: $modalScope.phoneNumber
                                 };
                                 
-                                var params = { organizationId: user.currentOrganizationId };
+                                var params: { organizationId; sendMailOnCreation; } = { organizationId: user.currentOrganizationId, sendMailOnCreation: null };
                                 // set params if sendMail is true
                                 if (sendMail) {
                                     params.sendMailOnCreation = sendMail;

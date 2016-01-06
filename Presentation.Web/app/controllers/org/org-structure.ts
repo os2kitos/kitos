@@ -51,7 +51,7 @@
 
             $scope.activeOrgRoles = _.where(orgRoles, { isActive: true });
             $scope.orgRoles = {};
-            _.each(orgRoles, function(orgRole) {
+            _.each(orgRoles, function(orgRole: { id }) {
                 $scope.orgRoles[orgRole.id] = orgRole;
             });
 
@@ -146,7 +146,7 @@
                     $scope.totalRightsCount = paginationHeader.TotalCount;
                     node.orgRights = data.response;
 
-                    _.each(node.orgRights, function (right) {
+                    _.each(node.orgRights, function (right: { userForSelect; roleForSelect; user; roleId; show; }) {
                         right.userForSelect = { id: right.user.id, text: right.user.fullName };
                         right.roleForSelect = right.roleId;
                         right.show = true;
@@ -524,7 +524,7 @@
 
             function decorateTasks() {
 
-                _.each($scope.taskRefUsageList, function(refUsage) {
+                _.each($scope.taskRefUsageList, function(refUsage: { toggleUsage; usage; toggleStar; }) {
                     refUsage.toggleUsage = function() {
                         if (refUsage.usage) {
                             removeUsage(refUsage, true);
@@ -553,7 +553,7 @@
             }
 
             $scope.selectAllTasks = function() {
-                _.each($scope.taskRefUsageList, function(refUsage) {
+                _.each($scope.taskRefUsageList, function(refUsage: { usage }) {
                     if (!refUsage.usage) {
                         addUsage(refUsage, false);
                     }
@@ -561,7 +561,7 @@
             };
 
             $scope.removeAllTasks = function() {
-                _.each($scope.taskRefUsageList, function(refUsage) {
+                _.each($scope.taskRefUsageList, function(refUsage: { usage }) {
                     if (refUsage.usage) {
                         removeUsage(refUsage, false);
                     }
@@ -570,7 +570,7 @@
 
             $scope.selectTaskGroup = function() {
                 var url = 'api/taskusage?orgUnitId=' + $scope.chosenOrgUnit.id + '&taskId=' + $scope.selectedTaskGroup;
-                
+
                 var msg = notify.addInfoMessage("Opretter tilknytning...", false);
                 $http.post(url).success(function() {
                     msg.toSuccessMessage("Tilknytningen er oprettet");

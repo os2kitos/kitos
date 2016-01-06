@@ -6,7 +6,7 @@
                 templateUrl: 'partials/it-system/tab-kle.html',
                 controller: 'system.EditKle',
                 resolve: {
-            
+
                 }
             });
         }
@@ -96,7 +96,7 @@
             };
 
             $scope.selectAllTasks = function() {
-                _.each($scope.tasklist, function(task) {
+                _.each($scope.tasklist, function(task: { isSelected; isLocked; }) {
                     if (!task.isSelected && !task.isLocked) {
                         add(task);
                     }
@@ -104,7 +104,7 @@
             };
 
             $scope.removeAllTasks = function() {
-                _.each($scope.tasklist, function(task) {
+                _.each($scope.tasklist, function(task: { isSelected; isLocked; }) {
                     if (task.isSelected && !task.isLocked) {
                         remove(task);
                     }

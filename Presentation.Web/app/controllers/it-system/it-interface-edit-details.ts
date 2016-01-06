@@ -67,7 +67,7 @@
             $scope.methods = methods;
             $scope.dataTypes = dataTypes;
             $scope.exposedByObj = !itInterface.exhibitedByItSystemId ? null : { id: itInterface.exhibitedByItSystemId, text: itInterface.exhibitedByItSystemName };
-            
+
             itInterface.updateUrl = 'api/itInterface/' + itInterface.id;
             $scope.system = itInterface;
 
@@ -133,7 +133,7 @@
                         results: function(data, page) {
                             var results = [];
 
-                            _.each(data.data.response, function(obj) {
+                            _.each(data.data.response, function(obj: { id; name; }) {
                                 results.push({
                                     id: obj.id,
                                     text: obj.name
@@ -167,16 +167,16 @@
                     }
                     // TODO need previous value to prompt when value is changed (not cleared)
                 }
-                
+
                 var msg = notify.addInfoMessage("Gemmer...", false);
                 if ($scope.exposedByObj) {
                     if (itInterface.exhibitedByItSystemId) {
                         // PATCH
-                        var payload = {
+                        var patchPayload = {
                             itSystemId: $scope.exposedByObj.id
                         };
                         var url = 'api/exhibit/' + itInterface.id + '?organizationId=' + user.currentOrganizationId;
-                        $http({ method: 'PATCH', url: url, data: payload })
+                        $http({ method: 'PATCH', url: url, data: patchPayload })
                             .success(function() {
                                 msg.toSuccessMessage("Feltet er opdateret.");
                                 reload();
@@ -186,11 +186,11 @@
                             });
                     } else {
                         // POST
-                        var payload = {
+                        var postPayload = {
                             id: itInterface.id,
                             itSystemId: $scope.exposedByObj.id
                         };
-                        $http.post('api/exhibit', payload).success(function() {
+                        $http.post('api/exhibit', postPayload).success(function() {
                             msg.toSuccessMessage("Feltet er opdateret.");
                             reload();
                         }).error(function() {

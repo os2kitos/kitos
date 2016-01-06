@@ -11,9 +11,9 @@
         var curItSystemId = $scope.$parent.usage.itSystemId;
         $http.get('api/itsystem/' + curItSystemId + '?hierarchy=true')
             .then(function(result) {
-                $scope.systems = toHierarchy(result.data.response, 'id', 'parentId');
+                $scope.systems = toHierarchy(result.data.response, 'id', 'parentId', null, null);
             });
-        
+
         // TODO WUFF!
         function toHierarchy(flatAry, idPropertyName, parentIdPropetyName, parentPropetyName, childPropertyName) {
             // default values
@@ -43,13 +43,13 @@
             }
 
             var hierarchy = [];
-            _.each(sorted, function (obj) {
+            _.each(sorted, function (obj: { isAllChildren; setChildrenShown; setParentShown; setState; setChildrenState; setParentState; level; }) {
                 // define functions
                 obj.isAllChildren = function (isChecked) {
                     if (typeof isChecked !== 'boolean')
                         throw new Error('Argument must be a boolean');
 
-                    return _.every(this.children, function (child) {
+                    return _.every(this.children, function (child: { selected; indeterminate; }) {
                         if (isChecked === true) {
                             return child.selected === true;
                         } else {
@@ -64,7 +64,7 @@
                     var children = this.children;
                     if (!children) return;
 
-                    _.each(children, function (child) {
+                    _.each(children, function (child: { show; canWrite; setChildrenShown; }) {
                         child.show = isShown;
                         child.canWrite = isShown;
                         child.setChildrenShown(isShown);
@@ -95,7 +95,7 @@
                     var children = this.children;
                     if (!children) return;
 
-                    _.each(children, function (child) {
+                    _.each(children, function (child: { setState; setChildrenState; }) {
                         child.setState(isChecked);
                         child.setChildrenState(isChecked);
                     });
@@ -109,9 +109,9 @@
                     } else if (parent.isAllChildren(false)) {
                         parent.setState(false);
                     } else {
-                        // if all children is neither true or false 
+                        // if all children is neither true or false
                         // then it must be a mix
-                        // so we need to set the parent as not selected 
+                        // so we need to set the parent as not selected
                         // and show the indeterminate state
                         parent.setState(null);
                     }

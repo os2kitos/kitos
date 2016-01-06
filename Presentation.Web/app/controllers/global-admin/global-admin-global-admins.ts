@@ -39,7 +39,7 @@
 
                 var user = $scope.newUser;
                 var uId = user.id;
-                
+
                 if (!uId) return;
 
                 var data = {

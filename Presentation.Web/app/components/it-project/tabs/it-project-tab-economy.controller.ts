@@ -4,7 +4,7 @@
 
         $stateProvider.state('it-project.edit.economy', {
             url: '/economy',
-            templateUrl: 'partials/it-project/tab-economy.html',
+            templateUrl: 'app/components/it-project/tabs/it-project-tab-economy.html',
             controller: 'project.EditEconomyCtrl',
             resolve: {
                 // re-resolve data from parent cause changes here wont cascade to it
@@ -76,7 +76,7 @@
                 var budgetName = field + "Budget",
                     reaName = field + "Rea";
 
-                var columns = _.map(project.economyYears, function(year) {
+                var columns = _.map(project.economyYears, function(year: { id }) {
                     return {
                         updateUrl: "api/economyYear/" + year.id,
                         budget: year[budgetName],
@@ -84,7 +84,7 @@
                     };
                 });
 
-                var row = {
+                var row: { update } = {
                     budgetName: budgetName,
                     reaName: reaName,
                     label: label,
@@ -92,7 +92,8 @@
                     total: {
                         budget: 0,
                         rea: 0
-                    }
+                    },
+                    update: null
                 };
 
                 row.update = function() {
@@ -169,7 +170,7 @@
             //calculates the last column "total" for a given row
             function calcTotalColumn(row) {
 
-                var sums = _.reduce(row.columns, function (memo, column) {
+                var sums = _.reduce(row.columns, function (memo, column: { budget; rea; }) {
                     return {
                         budget: memo.budget + parseInt(column.budget),
                         rea: memo.rea + parseInt(column.rea)
@@ -183,8 +184,8 @@
             function sumRows(rows, resultRow) {
 
                 //sum each of the year columns
-                _.each(resultRow.columns, function(column, index) {
-                    var sums = _.reduce(rows, function(memo, row) {
+                _.each(resultRow.columns, function(column: { budget; rea; }, index) {
+                    var sums = _.reduce(rows, function(memo, row: { columns }) {
                         return {
                             budget: memo.budget + parseInt(row.columns[index].budget),
                             rea: memo.rea + parseInt(row.columns[index].rea)
@@ -196,7 +197,7 @@
                 });
 
                 //sum the total column
-                resultRow.total = _.reduce(rows, function(memo, row) {
+                resultRow.total = _.reduce(rows, function(memo, row: { total }) {
                     return {
                         budget: memo.budget + row.total.budget,
                         rea: memo.rea + row.total.rea
@@ -206,7 +207,7 @@
 
             function subtractRows(rowA, rowB, resultRow) {
                 //subtract each of the year columns
-                _.each(resultRow.columns, function(column, index) {
+                _.each(resultRow.columns, function(column: { budget; rea; }, index) {
                     column.budget = rowA.columns[index].budget - rowB.columns[index].budget;
                     column.rea = rowA.columns[index].rea - rowB.columns[index].rea;
                 });
@@ -217,9 +218,5 @@
                     rea: rowA.total.rea - rowB.total.rea
                 };
             }
-
-
         }]);
-
-
 })(angular, app);

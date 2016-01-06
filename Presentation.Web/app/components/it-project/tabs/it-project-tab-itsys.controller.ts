@@ -2,7 +2,7 @@
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-project.edit.itsys', {
             url: '/itsys',
-            templateUrl: 'partials/it-project/tab-itsys.html',
+            templateUrl: 'app/components/it-project/tabs/it-project-tab-itsys.html',
             controller: 'project.EditItsysCtrl',
             resolve: {
                 user: ['userService', function (userService) {
@@ -73,7 +73,7 @@
                         var results = [];
 
                         //for each system usages
-                        _.each(data.data.response, function (usage) {
+                        _.each(data.data.response, function (usage: { id; itSystem; }) {
 
                             results.push({
                                 //the id of the system usage is the id, that is selected

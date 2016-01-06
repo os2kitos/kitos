@@ -66,3 +66,4 @@
         $scope.orgId = user.currentOrganizationId;
     }]);
 })(angular, app);
+

@@ -14,9 +14,34 @@ x64/
 build/
 [Bb]in/
 [Oo]bj/
+Presentation.Web/app/**/*.js
+Presentation.Web/app/**/*.js.map
+!Presentation.Web/app/directives/angularjs-dropdown-multiselect.js
+!Presentation.Web/app/directives/directives.js
+!Presentation.Web/app/directives/filters.js
+!Presentation.Web/app/directives/utils-directives.js
+!Presentation.Web/app/services/httpServices.js
+!Presentation.Web/app/utility/underscore.mixin.js
+!Presentation.Web/app/utility/utility.js
+Presentation.Web/Tests/**/*.js
+Presentation.Web/Tests/**/*.js.map
 
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
 !packages/*/build/
+
+# xUnit tests
+results.xml
+
+# Protractor tests
+results-protractor.json
+results-protractor.xml
+
+# Coverage report
+coverage/
+karmaCoverage/
+
+# npm packages
+node_modules/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/

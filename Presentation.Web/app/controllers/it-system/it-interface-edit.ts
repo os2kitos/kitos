@@ -46,7 +46,7 @@
             $scope.select2AllowClearOpt = {
                 allowClear: true
             };
-            
+
             $scope.organizationSelectOptions = selectLazyLoading('api/organization', true, ['orgId=' + user.currentOrganizationId]);
 
             function selectLazyLoading(url, allowClear, paramAry) {
@@ -73,7 +73,7 @@
                         results: function (data, page) {
                             var results = [];
 
-                            _.each(data.data.response, function (obj) {
+                            _.each(data.data.response, function (obj: { id; name; }) {
                                 results.push({
                                     id: obj.id,
                                     text: obj.name

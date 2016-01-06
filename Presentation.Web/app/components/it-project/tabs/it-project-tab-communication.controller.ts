@@ -2,7 +2,7 @@
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-project.edit.communication', {
             url: '/communication',
-            templateUrl: 'partials/it-project/tab-communication.html',
+            templateUrl: 'app/components/it-project/tabs/it-project-tab-communication.html',
             controller: 'project.EditCommunicationCtrl',
             resolve: {
                 comms: ['$http', '$stateParams', function ($http, $stateParams) {
@@ -21,16 +21,16 @@
                             //get the role names
                             return $http.get("api/itprojectrole/")
                                 .then(function (roleResult) {
-                                    var roles = roleResult.data.response;
+                                    var roles: { name }[] = roleResult.data.response;
 
                                     //the resulting map
                                     var users = {};
-                                    _.each(rights, function (right) {
+                                    _.each(rights, function (right: { userId; user; roleId; }) {
 
                                         //use the user from the map if possible
                                         var user = users[right.userId] || right.user;
 
-                                        var role = _.findWhere(roles, { id: right.roleId });
+                                        var role: { name } = _.findWhere(roles, { id: right.roleId });
 
                                         var roleNames = user.roleNames || [];
                                         roleNames.push(role.name);

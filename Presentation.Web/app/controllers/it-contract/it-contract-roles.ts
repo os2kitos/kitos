@@ -37,7 +37,7 @@
             $scope.newRole = itContractRoles.length > 0 ? 1 : 0;
 
             $scope.rights = [];
-            _.each(itContractRights, function (right) {
+            _.each(itContractRights, function (right: { role; roleId; show; userForSelect; roleForSelect; user; }) {
                 right.role = _.findWhere(itContractRoles, { id: right.roleId });
                 right.show = true;
 

@@ -81,7 +81,7 @@
                         if (parent) usage.hasWriteAccess = parent.hasWriteAccess;
 
                         /* if this task hasn't been delegated, it's a leaf. A leaf can select and update the statuses
-                         * at which point we need to update the parents statuses as well 
+                         * at which point we need to update the parents statuses as well
                         */
                         if (!usage.hasDelegations) {
                             $scope.$watch(function() { return usage.technologyStatus; }, function(newVal, oldVal) {
@@ -99,7 +99,7 @@
                     }
 
                     /* each of these are root usages */
-                    _.each($scope.taskUsages, function(usage) {
+                    _.each($scope.taskUsages, function(usage: { isRoot }) {
                         usage.isRoot = true;
 
                         visit(usage, null, 0);

@@ -26,7 +26,7 @@
         '$scope', '$http', 'notify', 'itSystem', 'userService', 'interfaces', 'user',
         function ($scope, $http, notify, itSystem, userService, interfaces, user) {
             $scope.new = {};
-            
+
             $scope.canUseInterfaces = [];
             _.each(interfaces, pushInterface);
 
@@ -91,7 +91,7 @@
                         results: function(data, page) {
                             var results = [];
 
-                            _.each(data.data.response, function(obj) {
+                            _.each(data.data.response, function(obj: { id; name; organizationName; }) {
                                 results.push({
                                     id: obj.id,
                                     text: obj.name,

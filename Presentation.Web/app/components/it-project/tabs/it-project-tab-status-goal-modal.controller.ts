@@ -6,7 +6,7 @@
                 function ($state, $stateParams, $modal, goalTypes, project, user) {
                     $modal.open({
                         size: 'lg',
-                        templateUrl: 'partials/it-project/modal-goal-edit.html',
+                        templateUrl: 'app/components/it-project/tabs/it-project-tab-status-goal-modal.html',
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: 'modal fade in',

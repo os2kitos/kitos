@@ -84,7 +84,7 @@
                         results: function(data, page) {
                             var results = [];
 
-                            _.each(data.data.response, function(obj) {
+                            _.each(data.data.response, function(obj: { id; name; }) {
 
                                 results.push({
                                     id: obj.id,

@@ -109,7 +109,7 @@
             $scope.procurementPlans = [];
             var currentDate = moment();
             for (var i = 0; i < 20; i++) {
-                var half = currentDate.quarter() <= 2 ? 1 : 2; // calcs 1 for the first 6 months, 2 for the rest
+                var half = currentDate.quarter() <= 2 ? 1 : 2; // 1 for the first 6 months, 2 for the rest
                 var year = currentDate.year();
                 var obj = { id: i, half: half, year: year };
                 $scope.procurementPlans.push(obj);
@@ -118,7 +118,7 @@
                 currentDate.add(6, 'months');
             }
 
-            var foundPlan = _.find($scope.procurementPlans, function (plan) {
+            var foundPlan: { id } = _.find($scope.procurementPlans, function (plan: {half; year; id; }) {
                 return plan.half == contract.procurementPlanHalf && plan.year == contract.procurementPlanYear;
             });
             if (foundPlan) {
@@ -225,7 +225,7 @@
                         results: function (data, page) {
                             var results = [];
 
-                            _.each(data.data.response, function (obj) {
+                            _.each(data.data.response, function (obj: { id; name; cvr; }) {
                                 if (excludeSelf && obj.id == contract.id)
                                     return; // don't add self to result
 

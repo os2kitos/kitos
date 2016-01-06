@@ -783,24 +783,25 @@
     <Content Include="Partials\it-contract\tab-paymentmodel.html" />
     <Content Include="Partials\it-contract\tab-systems.html" />
     <Content Include="Partials\it-contract\tab-roles.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-catalog.html" />
     <Content Include="app\components\it-project\it-project-overview.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-goal-modal.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-modal.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-communication.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-communication.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-description.view.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-handover.view.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-hierarchy.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-handover.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-hierarchy.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-phases.view.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-risk.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-risk.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-roles.view.html" />
     <Content Include="app\components\it-project\it-project-edit.view.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-org.view.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-economy.view.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-itsys.view.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-kle.view.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-stakeholders.view.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-status-goal.view.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-strategy.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-org.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-economy.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-itsys.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-kle.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-stakeholders.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-status-goal.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-strategy.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-project.view.html" />
     <Content Include="Partials\it-system\edit-it-interface.html" />
     <Content Include="Partials\it-system\it-interface-catalog.html" />
@@ -847,6 +848,56 @@
     <Content Include="Partials\subnav\subnav.html" />
     <Content Include="Partials\topnav\authorized.html" />
     <Content Include="Partials\topnav\topnav.html" />
+    <TypeScriptCompile Include="app\components\it-project\it-project-overview.spec.ts" />
+    <TypeScriptCompile Include="app\IPageObject.po.ts" />
+    <TypeScriptCompile Include="app\components\it-project\it-project-edit.po.ts" />
+    <TypeScriptCompile Include="app\components\it-project\it-project.interfaces.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angular-ui-router\angular-ui-router.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-mocks.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-resource.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-route.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-sanitize.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\kendo\2015.3.1111\kendo.all.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\kendo\2015.3.1111\kendo.dataviz.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\kendo\2015.3.1111\kendo.mobile.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\kendo\2015.3.1111\kendo.web.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\lodash\lodash.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\moment\moment-node.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\moment\moment.d.ts" />
+    <TypeScriptCompile Include="app\app.ts" />
+    <TypeScriptCompile Include="app\controllers\global-admin\global-admin-organization-edit.ts" />
+    <TypeScriptCompile Include="app\controllers\global-admin\global-admin-organization-create.ts" />
+    <TypeScriptCompile Include="app\controllers\global-admin\global-admin-organizations.ts" />
+    <TypeScriptCompile Include="app\controllers\global-admin\global-admin-subnav.ts" />
+    <TypeScriptCompile Include="app\controllers\global-config\global-config.ts" />
+    <TypeScriptCompile Include="app\controllers\home\edit-user.ts" />
+    <TypeScriptCompile Include="app\controllers\it-contract\it-contract-deadlines.ts" />
+    <TypeScriptCompile Include="app\controllers\it-contract\it-contract-subnav.ts" />
+    <TypeScriptCompile Include="app\controllers\it-contract\it-contract-paymentmodel.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-phases.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-goal-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-description.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\it-project-subnav.controller.ts" />
+    <TypeScriptCompile Include="app\controllers\it-system\usage\it-system-contracts.ts" />
+    <TypeScriptCompile Include="app\controllers\it-system\it-system-subnav.ts" />
+    <TypeScriptCompile Include="app\controllers\it-system\usage\it-system-wishes.ts" />
+    <TypeScriptCompile Include="app\controllers\local-config\local-config-import-org.ts" />
+    <TypeScriptCompile Include="app\controllers\local-config\local-config-import-contracts.ts" />
+    <TypeScriptCompile Include="app\controllers\local-config\local-config-import-users.ts" />
+    <TypeScriptCompile Include="app\controllers\local-config\local-config-import.ts" />
+    <TypeScriptCompile Include="app\controllers\local-config\local-config-system.ts" />
+    <TypeScriptCompile Include="app\controllers\local-config\local-config-contract.ts" />
+    <TypeScriptCompile Include="app\controllers\local-config\local-config-project.ts" />
+    <TypeScriptCompile Include="app\controllers\local-config\local-config-org.ts" />
+    <TypeScriptCompile Include="app\controllers\local-config\local-config-subnav.ts" />
+    <TypeScriptCompile Include="app\directives\form-directives.ts" />
+    <TypeScriptCompile Include="app\services\taskService.ts" />
+    <TypeScriptCompile Include="app\controllers\global-admin\global-admin-global-admins.ts" />
+    <TypeScriptCompile Include="app\controllers\global-admin\global-admin-local-admins.ts" />
     <Content Include="Scripts\angular-animate.js" />
     <Content Include="Scripts\angular-animate.min.js" />
     <Content Include="Scripts\angular-aria.js" />
@@ -880,47 +931,32 @@
     <Content Include="Scripts\angular-ui\ui-bootstrap.min.js" />
     <Content Include="Scripts\angular.js" />
     <Content Include="Scripts\angular.min.js" />
-    <TypeScriptCompile Include="app\controllers\global-admin\global-admin-global-admins.ts" />
-    <TypeScriptCompile Include="app\controllers\global-admin\global-admin-local-admins.ts" />
-    <TypeScriptCompile Include="app\controllers\global-admin\global-admin-organization-edit.ts" />
-    <TypeScriptCompile Include="app\controllers\global-admin\global-admin-organization-create.ts" />
-    <TypeScriptCompile Include="app\controllers\global-admin\global-admin-organizations.ts" />
-    <TypeScriptCompile Include="app\controllers\global-admin\global-admin-subnav.ts" />
-    <TypeScriptCompile Include="app\controllers\global-config\global-config.ts" />
-    <TypeScriptCompile Include="app\controllers\home\edit-user.ts" />
     <TypeScriptCompile Include="app\controllers\home\home.ts" />
     <TypeScriptCompile Include="app\controllers\it-contract\it-contract-hierarchy.ts" />
-    <TypeScriptCompile Include="app\controllers\it-contract\it-contract-deadlines.ts" />
     <TypeScriptCompile Include="app\controllers\it-contract\it-contract-advice.ts" />
     <TypeScriptCompile Include="app\controllers\it-contract\it-contract-edit.ts" />
     <TypeScriptCompile Include="app\controllers\it-contract\it-contract-overview.ts" />
-    <TypeScriptCompile Include="app\controllers\it-contract\it-contract-paymentmodel.ts" />
     <TypeScriptCompile Include="app\controllers\it-contract\it-contract-plan.ts" />
     <TypeScriptCompile Include="app\controllers\it-contract\it-contract-roles.ts" />
-    <TypeScriptCompile Include="app\controllers\it-contract\it-contract-subnav.ts" />
     <TypeScriptCompile Include="app\controllers\it-contract\it-contract-systems.ts" />
     <TypeScriptCompile Include="app\controllers\it-contract\it-contract-economy.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-communication.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-handover.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-hierarchy.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-project\it-project-overview-inactive.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-phases.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-stakeholders.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-goal.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-goal-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-description.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-catalog.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-risk.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-roles.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-org.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-economy.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-itsys.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-kle.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-strategy.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-strategy.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-edit.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-project\it-project-subnav.controller.ts" />
     <TypeScriptCompile Include="app\controllers\it-system\it-interface-catalog.ts" />
     <TypeScriptCompile Include="app\controllers\it-system\it-interface-edit.ts" />
     <TypeScriptCompile Include="app\controllers\it-system\it-interface-edit-details.ts" />
@@ -928,41 +964,24 @@
     <TypeScriptCompile Include="app\controllers\it-system\it-system-edit-kle.ts" />
     <TypeScriptCompile Include="app\controllers\it-system\it-system-edit.ts" />
     <TypeScriptCompile Include="app\controllers\it-system\it-system-catalog.ts" />
-    <TypeScriptCompile Include="app\controllers\it-system\usage\it-system-contracts.ts" />
     <TypeScriptCompile Include="app\controllers\it-system\usage\it-system-overview.ts" />
     <TypeScriptCompile Include="app\controllers\it-system\usage\it-system-proj.ts" />
     <TypeScriptCompile Include="app\controllers\it-system\usage\it-system-kle.ts" />
     <TypeScriptCompile Include="app\controllers\it-system\usage\it-system-org.ts" />
     <TypeScriptCompile Include="app\controllers\it-system\usage\it-system-hierarchy.ts" />
     <TypeScriptCompile Include="app\controllers\it-system\usage\it-system-roles.ts" />
-    <TypeScriptCompile Include="app\controllers\it-system\it-system-subnav.ts" />
     <TypeScriptCompile Include="app\controllers\it-system\usage\it-system-usage.ts" />
-    <TypeScriptCompile Include="app\controllers\it-system\usage\it-system-wishes.ts" />
     <TypeScriptCompile Include="app\controllers\it-system\usage\it-system-interfaces.ts" />
-    <TypeScriptCompile Include="app\controllers\local-config\local-config-import-org.ts" />
-    <TypeScriptCompile Include="app\controllers\local-config\local-config-import-contracts.ts" />
-    <TypeScriptCompile Include="app\controllers\local-config\local-config-import-users.ts" />
-    <TypeScriptCompile Include="app\controllers\local-config\local-config-import.ts" />
-    <TypeScriptCompile Include="app\controllers\local-config\local-config-system.ts" />
-    <TypeScriptCompile Include="app\controllers\local-config\local-config-contract.ts" />
-    <TypeScriptCompile Include="app\controllers\local-config\local-config-project.ts" />
-    <TypeScriptCompile Include="app\controllers\local-config\local-config-org.ts" />
-    <TypeScriptCompile Include="app\controllers\local-config\local-config-subnav.ts" />
     <TypeScriptCompile Include="app\controllers\org\org-structure.ts" />
     <TypeScriptCompile Include="app\controllers\org\org-subnav.ts" />
     <TypeScriptCompile Include="app\controllers\org\org-overview.ts" />
     <TypeScriptCompile Include="app\controllers\org\org-user.ts" />
     <Content Include="app\directives\angularjs-dropdown-multiselect.js" />
-    <TypeScriptCompile Include="app\directives\directives.ts" />
-    <TypeScriptCompile Include="app\directives\filters.ts" />
-    <TypeScriptCompile Include="app\directives\form-directives.ts" />
-    <TypeScriptCompile Include="app\app.ts" />
+    <Content Include="app\directives\directives.js" />
+    <Content Include="app\directives\filters.js" />
     <Content Include="app\directives\utils-directives.js" />
-    <TypeScriptCompile Include="app\services\economyCalc.ts" />
-    <TypeScriptCompile Include="app\services\gridStateService.ts" />
-    <TypeScriptCompile Include="app\services\taskService.ts" />
     <TypeScriptCompile Include="app\services\userServices.ts" />
-    <Content Include="app\utility\lodash.mixin.js" />
+    <Content Include="app\utility\underscore.mixin.js" />
     <Content Include="app\utility\utility.js" />
     <Content Include="app\services\httpServices.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -2398,6 +2417,19 @@
     <Content Include="Scripts\select2.js" />
     <Content Include="Scripts\select2.min.js" />
     <Content Include="Scripts\ui-select2.js" />
+    <TypeScriptCompile Include="Scripts\typings\angular-protractor\angular-protractor.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-mocks.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-resource.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-route.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-sanitize.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\protractor-http-mock\protractor-http-mock.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\selenium-webdriver\selenium-webdriver.d.ts" />
+    <TypeScriptCompile Include="Tests\helper.ts" />
+    <TypeScriptCompile Include="Tests\home.e2e.spec.ts" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -2551,6 +2583,8 @@
     <None Include="Web.Sandbox.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
+    <TypeScriptCompile Include="Scripts\typings\underscore\underscore.d.ts" />
+    <TypeScriptCompile Include="Tests\ItProject\Edit\projectEdit.e2e.spec.ts" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Partials\it-project\" />
@@ -2583,6 +2617,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="Scripts\typings\jasmine\jasmine.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <PropertyGroup>
@@ -2598,7 +2638,30 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AppVeyor|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptModuleKind>commonjs</TypeScriptModuleKind>
+    <TypeScriptSourceMap>True</TypeScriptSourceMap>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'AppVeyor'">
+    <TypeScriptModuleKind>commonjs</TypeScriptModuleKind>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TypeScriptModuleKind>commonjs</TypeScriptModuleKind>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Sandbox'">
+    <TypeScriptModuleKind>commonjs</TypeScriptModuleKind>
+  </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />

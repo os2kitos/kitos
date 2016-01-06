@@ -97,7 +97,7 @@
                 });
             };
 
-            $scope.organizationSelectOptions = selectLazyLoading('api/organization', formatOrganization);
+            $scope.organizationSelectOptions = selectLazyLoading('api/organization', formatOrganization, null);
 
             function formatOrganization(org) {
                 var result = '<div>' + org.text + '</div>';
@@ -131,7 +131,7 @@
                         results: function(data, page) {
                             var results = [];
 
-                            _.each(data.data.response, function(obj) {
+                            _.each(data.data.response, function(obj: {id: any; name: any; cvr: any}) {
                                 results.push({
                                     id: obj.id,
                                     text: obj.name ? obj.name : 'Unavngiven',

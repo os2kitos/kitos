@@ -52,7 +52,7 @@
                     notify.addErrorMessage("Kunne ikke hente organisationer!");
                 });
             }
-            
+
             $scope.delete = function (orgId) {
                 $http.delete('api/organization/' + orgId + '?organizationId=' + user.currentOrganizationId)
                     .success(function() {

@@ -87,7 +87,7 @@
                 }
 
                 //for each row of associated system
-                _.each(associatedSystemUsages, function(systemUsage) {
+                _.each(associatedSystemUsages, function(systemUsage: { show; delete; }) {
 
                     systemUsage.show = true;
 
@@ -180,7 +180,7 @@
                         var results = [];
 
                         // for each interface usages
-                        _.each(data.data.response, function(usage) {
+                        _.each(data.data.response, function(usage: { itInterfaceId; itSystemId; id; itInterfaceName; }) {
                             results.push({
                                 // use the id of the interface usage
                                 id: $scope.newAssociatedInterfaceRelation == 'using' ? { intfId: usage.itInterfaceId, sysId: usage.itSystemId } : usage.id,
@@ -217,7 +217,7 @@
                         var results = [];
 
                         // for each system usages
-                        _.each(data.data.response, function(usage) {
+                        _.each(data.data.response, function(usage: { id; itSystem; }) {
                             results.push({
                                 // the id of the system usage id, that is selected
                                 id: usage.id,

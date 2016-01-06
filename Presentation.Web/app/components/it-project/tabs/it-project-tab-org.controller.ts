@@ -2,7 +2,7 @@
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-project.edit.org', {
             url: '/org',
-            templateUrl: 'partials/it-project/tab-org.html',
+            templateUrl: 'app/components/it-project/tabs/it-project-tab-org.html',
             controller: 'project.EditOrgCtrl',
             resolve: {
                 // re-resolve data from parent cause changes here wont cascade to it
@@ -26,7 +26,7 @@
                     var projectId = $stateParams.id;
                     return $http.get('api/itProjectOrgUnitUsage/' + projectId + '?responsible')
                         .then(function (result) {
-                            if (result.data.response) 
+                            if (result.data.response)
                                 return result.data.response.id;
                             return null;
                         }
@@ -91,8 +91,8 @@
                                 msg.toSuccessMessage("Gemt!");
 
                                 var indexOf;
-                                // find the index of the orgunit 
-                                var found = _.filter($scope.selectedOrgUnits, function(element, index) {
+                                // find the index of the orgunit
+                                var found = _.filter($scope.selectedOrgUnits, function(element: { id }, index) {
                                     var equal = element.id == obj.id;
                                     // set outer scope indexOf, to be used later
                                     if (equal) indexOf = index;

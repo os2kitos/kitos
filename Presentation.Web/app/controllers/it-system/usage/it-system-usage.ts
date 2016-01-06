@@ -76,7 +76,7 @@
             }
 
             $scope.orgUnits = itSystemUsage.usedBy;
-            
+
             $scope.itSytemUsagesSelectOptions = selectLazyLoading('api/itsystemusage', false, ['organizationId=' + itSystemUsage.organizationId]);
 
             function selectLazyLoading(url, excludeSelf, paramAry) {
@@ -104,7 +104,7 @@
                         results: function (data, page) {
                             var results = [];
 
-                            _.each(data.data.response, function (obj) {
+                            _.each(data.data.response, function (obj: { id; itSystem; cvr; }) {
                                 if (excludeSelf && obj.id == $scope.usageId)
                                     return; // don't add self to result
 
