@@ -1,32 +1,6 @@
 ﻿beforeEach(() => {
     jasmine.addMatchers({
         "toMatchInRequests": (util: jasmine.MatchersUtil): jasmine.CustomMatcher => {
-            // output a single request
-            var outputRequest = (request: mock.ReceivedRequest) => {
-                return "METHOD: " + request.method + " URL: " + request.url;
-            };
-
-            // output all requests
-            var outputRequests = (requests: Array<mock.ReceivedRequest>) => {
-                var output = "Actual requests: " + requests.length;
-                if (requests.length > 0) {
-                    output += "\n";
-                    for (var i = 0; i < requests.length; i++) {
-                        output += "  " + outputRequest(requests[i]);
-                        if (i < requests.length - 1)
-                            output += "\n";
-                    }
-                    output += "\n";
-                }
-
-                return output;
-            };
-
-            // compare two requests
-            var compareRequest = (actual: mock.ReceivedRequest, expected: mock.ReceivedRequest) => {
-                return actual.method === expected.method && actual.url.search(expected.url) !== -1;
-            };
-
             var compare = (actual, expected) => {
                 var result = {
                     pass: false,
@@ -43,6 +17,32 @@
                 result.message = util.buildFailureMessage("toMatchInRequests", result.pass, outputRequests(actual), "\n  " + outputRequest(expected));
 
                 return result;
+            };
+
+            // output a single request
+            function outputRequest(request: mock.ReceivedRequest) {
+                return "METHOD: " + request.method + " URL: " + request.url;
+            };
+
+            // output all requests
+            function outputRequests(requests: Array<mock.ReceivedRequest>) {
+                var output = "Actual requests: " + requests.length;
+                if (requests.length > 0) {
+                    output += "\n";
+                    for (var i = 0; i < requests.length; i++) {
+                        output += "  " + outputRequest(requests[i]);
+                        if (i < requests.length - 1)
+                            output += "\n";
+                    }
+                    output += "\n";
+                }
+
+                return output;
+            };
+
+            // compare two requests
+            function compareRequest(actual: mock.ReceivedRequest, expected: mock.ReceivedRequest) {
+                return actual.method === expected.method && actual.url.search(expected.url) !== -1;
             };
 
             return {

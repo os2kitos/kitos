@@ -20,7 +20,7 @@ class RepeaterWrapper {
      * @param {webdriver.Locator} [locator] locator for elements to select in first repeated item
      */
     selectFirst(locator: webdriver.Locator): protractor.ElementArrayFinder {
-         return this.repeater.first().all(locator);
+        return this.repeater.first().all(locator);
     }
 
     /**
@@ -31,6 +31,24 @@ class RepeaterWrapper {
      */
     select(index: number, locator: webdriver.Locator): protractor.ElementArrayFinder {
         return this.repeater.get(index).all(locator);
+    }
+
+    /**
+     * get count of repetitions in repeater
+     *
+     * @returns Promise that resolves to the number of repetitions in repeater
+     */
+    count(): webdriver.promise.Promise<number> {
+        return this.repeater.count();
+    }
+
+    /**
+     * calls the input function on each repeated item in repeater.
+     *
+     * @param {function(ElementFinder)} [fn] Input function
+     */
+    each(fn: (element: protractor.ElementFinder, index: number) => void): void {
+        return this.repeater.each(fn);
     }
 }
 

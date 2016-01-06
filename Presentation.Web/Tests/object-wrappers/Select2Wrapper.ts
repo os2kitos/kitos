@@ -5,10 +5,12 @@ class Select2Wrapper {
     elementSelector: string;
     element: protractor.ElementFinder;
     options: protractor.ElementArrayFinder;
+    closeSelector: string;
 
     constructor(cssLocator: string) {
         this.cssSelector = cssLocator;
         this.elementSelector = cssLocator + " a.select2-choice";
+        this.closeSelector = cssLocator + " .select2-search-choice-close";
 
         this.element = $(this.cssSelector);
         this.options = element.all(by.css(".select2-results-dept-0"));
@@ -35,6 +37,19 @@ class Select2Wrapper {
             });
 
         return this.options.first().click();
+    }
+
+    /**
+     * Deselect element in select2 dropdown
+     *
+     * @return Promise that resolves when close link is clicked
+     */
+    deselect(): webdriver.promise.Promise<void> {
+        return $(this.closeSelector)
+            .click()
+            .then(() => { return; }, err => {
+                throw new Error("Can't deselect. Nothing is selected for select2 selector '" + this.cssSelector + "'");
+            });
     }
 
     /**

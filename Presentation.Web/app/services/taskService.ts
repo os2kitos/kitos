@@ -8,7 +8,7 @@
 
                 userService.getUser().then(function(user) {
 
-                    var url = baseUrl + '?roots&orgId=' + user.currentOrganizationId + "&take=200";
+                    var url = baseUrl + '?roots=true&orgId=' + user.currentOrganizationId + "&take=200";
 
                     $http.get(url).success(function(result) {
 
@@ -33,7 +33,7 @@
 
                 userService.getUser().then(function(user) {
 
-                    var url = baseUrl + id + '?children&orgId=' + user.currentOrganizationId;
+                    var url = baseUrl + id + '?children=true&orgId=' + user.currentOrganizationId;
 
                     $http.get(url).success(function(result) {
 

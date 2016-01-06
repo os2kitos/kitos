@@ -3,7 +3,7 @@
         "$stateProvider", function($stateProvider) {
             $stateProvider.state("it-project.edit.kle", {
                 url: "/kle",
-                templateUrl: "app/components/it-project/tabs/it-project-tab-kle.html",
+                templateUrl: "app/components/it-project/tabs/it-project-tab-kle.view.html",
                 controller: "project.EditKleCtrl",
                 resolve: {
                     // re-resolve data from parent cause changes here wont cascade to it
@@ -49,7 +49,7 @@
 
             function loadTasks() {
 
-                var url = baseUrl + "?tasks";
+                var url = baseUrl + "?tasks=true";
                 url += "&onlySelected=" + !$scope.showAllTasks;
                 url += "&taskGroup=" + $scope.selectedTaskGroup;
                 url += "&skip=" + $scope.pagination.skip + "&take=" + $scope.pagination.take;
