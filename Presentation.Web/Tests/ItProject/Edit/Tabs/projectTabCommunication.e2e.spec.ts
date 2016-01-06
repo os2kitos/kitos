@@ -101,8 +101,7 @@ describe("project edit tab communication", () => {
             // act
 
             // assert
-            var repeatedItems = pageObject.commRepeater.repeater.count();
-            expect(repeatedItems).not.toBe(0);
+            expect(pageObject.commRepeater.count()).toBeGreaterThan(0);
         });
 
         it("should delete comm when delete is confirmed", () => {

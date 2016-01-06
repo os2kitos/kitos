@@ -133,7 +133,7 @@ describe("project edit tab status goal", () => {
             // act
 
             // assert
-            expect(pageObject.goalRepeater.repeater.count()).toBe(1);
+            expect(pageObject.goalRepeater.count()).toBeGreaterThan(0);
         });
 
         //// TODO: model closes right after click. Using ui-sref on link fixes issue.

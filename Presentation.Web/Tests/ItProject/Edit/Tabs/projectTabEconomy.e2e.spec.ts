@@ -89,7 +89,7 @@ describe("project edit tab economy", () => {
                 var expectedValue = rows.last - rows.first + 1;
 
                 // act
-                pageObject.rowRepeater.repeater.each((element, index) => {
+                pageObject.rowRepeater.each((element, index) => {
                     if (index >= rows.first && index <= rows.last) {
                         element.all(pageObject.budgetLocator).first().sendKeys("1", protractor.Key.TAB);
                     }
@@ -112,7 +112,7 @@ describe("project edit tab economy", () => {
                 var expectedValue = rows.last - rows.first + 1;
 
                 // act
-                pageObject.rowRepeater.repeater.each((element, index) => {
+                pageObject.rowRepeater.each((element, index) => {
                     if (index >= rows.first && index <= rows.last) {
                         element.all(pageObject.budgetLocator).first().sendKeys("1", protractor.Key.TAB);
                     }
@@ -135,7 +135,7 @@ describe("project edit tab economy", () => {
                 var expectedValue = rows.last - rows.first + 1;
 
                 // act
-                pageObject.rowRepeater.repeater.each((element, index) => {
+                pageObject.rowRepeater.each((element, index) => {
                     if (index >= rows.first && index <= rows.last) {
                         element.all(pageObject.budgetLocator).first().sendKeys("1", protractor.Key.TAB);
                     }
@@ -158,7 +158,7 @@ describe("project edit tab economy", () => {
                 var expectedValue = rows.last - rows.first + 1;
 
                 // act
-                pageObject.rowRepeater.repeater.each((element, index) => {
+                pageObject.rowRepeater.each((element, index) => {
                     if (index >= rows.first && index <= rows.last) {
                         element.all(pageObject.budgetLocator).first().sendKeys("1", protractor.Key.TAB);
                     }
@@ -182,7 +182,7 @@ describe("project edit tab economy", () => {
 
                 // act
                 rows.forEach((row, index) => {
-                    pageObject.rowRepeater.repeater.each((element, index) => {
+                    pageObject.rowRepeater.each((element, index) => {
                         if (index >= row.first && index <= row.last) {
                             element.all(pageObject.budgetLocator).first().sendKeys("1", protractor.Key.TAB);
                         }
@@ -207,7 +207,7 @@ describe("project edit tab economy", () => {
 
                 // act
                 rows.forEach((row, index) => {
-                    pageObject.rowRepeater.repeater.each((element, index) => {
+                    pageObject.rowRepeater.each((element, index) => {
                         if (index >= row.first && index <= row.last) {
                             element.all(pageObject.budgetLocator).first().sendKeys("1", protractor.Key.TAB);
                         }
@@ -232,7 +232,7 @@ describe("project edit tab economy", () => {
 
                 // act
                 rows.forEach((row, index) => {
-                    pageObject.rowRepeater.repeater.each((element, index) => {
+                    pageObject.rowRepeater.each((element, index) => {
                         if (index >= row.first && index <= row.last) {
                             element.all(pageObject.budgetLocator).first().sendKeys("1", protractor.Key.TAB);
                         }
@@ -288,7 +288,7 @@ describe("project edit tab economy", () => {
                 var expectedValue = rows.last - rows.first + 1;
 
                 // act
-                pageObject.rowRepeater.repeater.each((element, index) => {
+                pageObject.rowRepeater.each((element, index) => {
                     if (index >= rows.first && index <= rows.last) {
                         element.all(pageObject.reaLocator).first().sendKeys("1", protractor.Key.TAB);
                     }
@@ -311,7 +311,7 @@ describe("project edit tab economy", () => {
                 var expectedValue = rows.last - rows.first + 1;
 
                 // act
-                pageObject.rowRepeater.repeater.each((element, index) => {
+                pageObject.rowRepeater.each((element, index) => {
                     if (index >= rows.first && index <= rows.last) {
                         element.all(pageObject.reaLocator).first().sendKeys("1", protractor.Key.TAB);
                     }
@@ -334,7 +334,7 @@ describe("project edit tab economy", () => {
                 var expectedValue = rows.last - rows.first + 1;
 
                 // act
-                pageObject.rowRepeater.repeater.each((element, index) => {
+                pageObject.rowRepeater.each((element, index) => {
                     if (index >= rows.first && index <= rows.last) {
                         element.all(pageObject.reaLocator).first().sendKeys("1", protractor.Key.TAB);
                     }
@@ -357,7 +357,7 @@ describe("project edit tab economy", () => {
                 var expectedValue = rows.last - rows.first + 1;
 
                 // act
-                pageObject.rowRepeater.repeater.each((element, index) => {
+                pageObject.rowRepeater.each((element, index) => {
                     if (index >= rows.first && index <= rows.last) {
                         element.all(pageObject.reaLocator).first().sendKeys("1", protractor.Key.TAB);
                     }
@@ -381,7 +381,7 @@ describe("project edit tab economy", () => {
 
                 // act
                 rows.forEach((row, index) => {
-                    pageObject.rowRepeater.repeater.each((element, index) => {
+                    pageObject.rowRepeater.each((element, index) => {
                         if (index >= row.first && index <= row.last) {
                             element.all(pageObject.reaLocator).first().sendKeys("1", protractor.Key.TAB);
                         }
@@ -406,7 +406,7 @@ describe("project edit tab economy", () => {
 
                 // act
                 rows.forEach((row, index) => {
-                    pageObject.rowRepeater.repeater.each((element, index) => {
+                    pageObject.rowRepeater.each((element, index) => {
                         if (index >= row.first && index <= row.last) {
                             element.all(pageObject.reaLocator).first().sendKeys("1", protractor.Key.TAB);
                         }
@@ -431,7 +431,7 @@ describe("project edit tab economy", () => {
 
                 // act
                 rows.forEach((row, index) => {
-                    pageObject.rowRepeater.repeater.each((element, index) => {
+                    pageObject.rowRepeater.each((element, index) => {
                         if (index >= row.first && index <= row.last) {
                             element.all(pageObject.reaLocator).first().sendKeys("1", protractor.Key.TAB);
                         }

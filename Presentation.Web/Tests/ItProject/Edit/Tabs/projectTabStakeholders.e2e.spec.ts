@@ -109,8 +109,7 @@ describe("project edit tab description", () => {
             // act
 
             // assert
-            var repeatedItems = pageObject.stakeholderRepeater.repeater.count();
-            expect(repeatedItems).toBe(1);
+            expect(pageObject.stakeholderRepeater.count()).toBeGreaterThan(0);
         });
 
         it("should delete stakeholder when delete is confirmed", () => {

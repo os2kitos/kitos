@@ -113,7 +113,7 @@ describe("project edit tab status project", () => {
             // act
 
             // assert
-            expect(pageObject.assignmentMilestoneRepeater.repeater.count()).toBe(2);
+            expect(pageObject.assignmentMilestoneRepeater.count()).toBe(2);
         });
 
         // TODO: Modal closes unexpectedly right after click
