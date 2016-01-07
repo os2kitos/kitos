@@ -116,8 +116,7 @@ describe("project edit tab risk", () => {
                 .first().click();
 
             // act
-            browser.switchTo().alert()
-                .then(alert => alert.accept());
+            browserHelper.acceptAlert();
 
             // assert
             expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/risk" });
@@ -130,8 +129,7 @@ describe("project edit tab risk", () => {
                 .first().click();
 
             // act
-            browser.switchTo().alert()
-                .then(alert => alert.dismiss());
+            browserHelper.dismissAlert();
 
             // assert
             expect(mock.requestsMade()).not.toMatchInRequests({ method: "DELETE", url: "api/risk" });

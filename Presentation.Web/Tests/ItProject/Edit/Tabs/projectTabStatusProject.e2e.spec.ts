@@ -4,6 +4,7 @@ import PageObject = require("../../../../app/components/it-project/tabs/it-proje
 
 describe("project edit tab status project", () => {
     var mockHelper: Helper.Mock;
+    var browserHelper: Helper.Browser;
     var pageObject: PageObject;
     var mockDependencies: Array<string> = ["itproject", "itprojectrole", "itprojecttype", "itprojectrights", "itprojectstatus", "assignment"];
 
@@ -11,6 +12,7 @@ describe("project edit tab status project", () => {
         browser.driver.manage().window().maximize();
 
         mockHelper = new Helper.Mock();
+        browserHelper = new Helper.Browser(browser);
         pageObject = new PageObject();
     });
 
@@ -132,8 +134,7 @@ describe("project edit tab status project", () => {
             pageObject.assignmentMilestoneRepeater.selectFirst(pageObject.assigmentLocator).first().click();
 
             // act
-            browser.switchTo().alert()
-                .then(alert => alert.accept());
+            browserHelper.acceptAlert();
 
             // assert
             expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/Assignment/1" });
@@ -144,8 +145,7 @@ describe("project edit tab status project", () => {
             pageObject.assignmentMilestoneRepeater.selectFirst(pageObject.assigmentLocator).first().click();
 
             // act
-            browser.switchTo().alert()
-                .then(alert => alert.dismiss());
+            browserHelper.dismissAlert();
 
             // assert
             expect(mock.requestsMade()).not.toMatchInRequests({ method: "DELETE", url: "api/Assignment/1" });

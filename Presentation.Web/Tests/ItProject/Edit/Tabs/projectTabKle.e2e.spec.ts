@@ -134,8 +134,7 @@ describe("project edit tab kle", () => {
             pageObject.selectAllPagesElement.click();
 
             // act
-            browser.switchTo().alert()
-                .then(alert => alert.accept());
+            browserHelper.acceptAlert();
 
             // assert
             // match api url with query string 'taskID=' only and ignoring any other query parameters
@@ -147,8 +146,7 @@ describe("project edit tab kle", () => {
             pageObject.selectAllPagesElement.click();
 
             // act
-            browser.switchTo().alert()
-                .then(alert => alert.dismiss());
+            browserHelper.dismissAlert();
 
             // assert
             // match api url with query string 'taskID=' only and ignoring any other query parameters
@@ -160,8 +158,7 @@ describe("project edit tab kle", () => {
             pageObject.selectAllElement.click();
 
             // act
-            browser.switchTo().alert()
-                .then(alert => alert.accept());
+            browserHelper.acceptAlert();
 
             // assert
             pageObject.taskRepeater.each((elem, index) => {
@@ -181,8 +178,7 @@ describe("project edit tab kle", () => {
             pageObject.selectAllElement.click();
 
             // act
-            browser.switchTo().alert()
-                .then(alert => alert.dismiss());
+            browserHelper.dismissAlert();
 
             // assert
             pageObject.taskRepeater.each((elem, index) => {
@@ -200,14 +196,12 @@ describe("project edit tab kle", () => {
         it("should uncheck all tasks on page on confirmed deselect all click", () => {
             // arrange
             pageObject.selectAllElement.click();
-            browser.switchTo().alert()
-                .then(alert => alert.accept());
+            browserHelper.acceptAlert();
             mock.clearRequests();
             pageObject.deselectAllElement.click();
 
             // act
-            browser.switchTo().alert()
-                .then(alert => alert.accept());
+            browserHelper.acceptAlert();
 
             // assert
             pageObject.taskRepeater.each((elem, index) => {
@@ -225,14 +219,12 @@ describe("project edit tab kle", () => {
         it("should not uncheck all tasks on page on dismissed deselect all click", () => {
             // arrange
             pageObject.selectAllElement.click();
-            browser.switchTo().alert()
-                .then(alert => alert.accept());
+            browserHelper.acceptAlert();
             mock.clearRequests();
             pageObject.deselectAllElement.click();
 
             // act
-            browser.switchTo().alert()
-                .then(alert => alert.dismiss());
+            browserHelper.dismissAlert();
 
             // assert
             pageObject.taskRepeater.each((elem, index) => {
@@ -250,14 +242,12 @@ describe("project edit tab kle", () => {
         it("should uncheck all tasks on confirmed deselect all pages click", () => {
             // arrange
             pageObject.selectAllElement.click();
-            browser.switchTo().alert()
-                .then(alert => alert.accept());
+            browserHelper.acceptAlert();
             mock.clearRequests();
             pageObject.deselectAllPages.click();
 
             // act
-            browser.switchTo().alert()
-                .then(alert => alert.accept());
+            browserHelper.acceptAlert();
 
             // assert
             // match api url with query string 'taskID=' only and ignoring any other query parameters
@@ -267,14 +257,12 @@ describe("project edit tab kle", () => {
         it("should not uncheck all tasks on dismissed deselect all pages click", () => {
             // arrange
             pageObject.selectAllElement.click();
-            browser.switchTo().alert()
-                .then(alert => alert.accept());
+            browserHelper.acceptAlert();
             mock.clearRequests();
             pageObject.deselectAllPages.click();
 
             // act
-            browser.switchTo().alert()
-                .then(alert => alert.dismiss());
+            browserHelper.dismissAlert();
 
             // assert
             // match api url with query string 'taskID=' only and ignoring any other query parameters

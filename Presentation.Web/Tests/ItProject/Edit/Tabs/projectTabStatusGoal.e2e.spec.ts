@@ -4,6 +4,7 @@ import PageObject = require("../../../../app/components/it-project/tabs/it-proje
 
 describe("project edit tab status goal", () => {
     var mockHelper: Helper.Mock;
+    var browserHelper: Helper.Browser;
     var pageObject: PageObject;
     var mockDependencies: Array<string> = ["itproject", "itprojecttype", "goalType", "goalStatus", "goal"];
 
@@ -11,6 +12,7 @@ describe("project edit tab status goal", () => {
         browser.driver.manage().window().maximize();
 
         mockHelper = new Helper.Mock();
+        browserHelper = new Helper.Browser(browser);
         pageObject = new PageObject();
     });
 
@@ -152,8 +154,7 @@ describe("project edit tab status goal", () => {
             pageObject.goalRepeater.selectFirst(pageObject.deleteGoalLocator).first().click();
 
             // act
-            browser.switchTo().alert()
-                .then(alert => alert.accept());
+            browserHelper.acceptAlert();
 
             // assert
             expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/goal" });
@@ -164,8 +165,7 @@ describe("project edit tab status goal", () => {
             pageObject.goalRepeater.selectFirst(pageObject.deleteGoalLocator).first().click();
 
             // act
-            browser.switchTo().alert()
-                .then(alert => alert.dismiss());
+            browserHelper.dismissAlert();
 
             // assert
             expect(mock.requestsMade()).not.toMatchInRequests({ method: "DELETE", url: "api/goal" });

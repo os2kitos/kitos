@@ -4,11 +4,13 @@ import ItProjectEditPo = require("../../../app/components/it-project/it-project-
 
 describe("project edit view", () => {
     var mockHelper: Helper.Mock;
+    var browserHelper: Helper.Browser;
     var pageObject: ItProjectEditPo;
     var mockDependencies: Array<string> = ["itproject", "itprojectrole", "itprojecttype", "itprojectrights"];
 
     beforeEach(() => {
         mockHelper = new Helper.Mock();
+        browserHelper = new Helper.Browser(browser);
 
         pageObject = new ItProjectEditPo();
 
@@ -160,8 +162,7 @@ describe("project edit view", () => {
             pageObject.deleteProjectElement.first().click();
 
             // act
-            browser.switchTo().alert()
-                .then(alert => alert.dismiss());
+            browserHelper.dismissAlert();
 
             // assert
             expect(mock.requestsMade()).not.toMatchInRequests({ method: "DELETE", url: "api/itproject/1" });
@@ -172,8 +173,7 @@ describe("project edit view", () => {
             pageObject.deleteProjectElement.first().click();
 
             // act
-            browser.switchTo().alert()
-                .then(alert => alert.accept());
+            browserHelper.acceptAlert();
 
             // assert
             expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/itproject/1" });
