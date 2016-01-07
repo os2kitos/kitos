@@ -2,15 +2,16 @@
     app.config(["$stateProvider", function ($stateProvider) {
         $stateProvider.state("it-project.edit.itsys", {
             url: "/itsys",
-            templateUrl: "app/components/it-project/tabs/it-project-tab-itsys.html",
+            templateUrl: "app/components/it-project/tabs/it-project-tab-itsys.view.html",
             controller: "project.EditItsysCtrl",
             resolve: {
                 user: ["userService", function (userService) {
                     return userService.getUser();
                 }],
                 usages: ["$http", "$stateParams", function ($http, $stateParams) {
-                    return $http.get("api/itproject/" + $stateParams.id + "?usages")
-                        .then(function(result) {
+                    return $http.get("api/itproject/" + $stateParams.id + "?usages=true")
+                        .then(function (result) {
+                            console.log(result.data.response);
                             return result.data.response;
                         });
                 }]

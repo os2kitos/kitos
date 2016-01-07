@@ -7,6 +7,9 @@ export class Browser {
         this.browser = browser;
     }
 
+    /**
+     * output browser error log
+     */
     outputLog() {
         this.browser
             .manage()
@@ -26,6 +29,22 @@ export class Browser {
                 }
             });
     }
+
+    /**
+     * dismiss open alert box
+     */
+    dismissAlert(): webdriver.promise.Promise<void> {
+        return browser.switchTo().alert()
+            .then(alert => alert.dismiss());
+    }
+
+    /**
+     * accept open alert box
+     */
+    acceptAlert(): webdriver.promise.Promise<void> {
+        return browser.switchTo().alert()
+            .then(alert => alert.accept());
+    }
 }
 
 export class Mock {
@@ -41,8 +60,8 @@ export class Mock {
 
                 if (!lastRequest) throw Error("protractor-http-mock: No requests matched with mocks.");
 
-            return lastRequest;
-        });
+                return lastRequest;
+            });
 
         return promise;
     }

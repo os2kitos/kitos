@@ -741,7 +741,7 @@
     <Content Include="app\components\it-project\it-project-edit.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-org.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-economy.view.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-itsys.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-itsys.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-kle.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-stakeholders.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-goal.html" />
@@ -796,6 +796,7 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-description.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-handover.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-economy.po.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-itsys.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-kle.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-org.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-communication.po.ts" />
@@ -808,6 +809,7 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project.po.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine-expect\jasmine-expect.d.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabCommunication.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabItsys.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabHandover.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabKle.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabRisk.e2e.spec.ts" />
@@ -2553,6 +2555,7 @@
     <Content Include="Tests\mocks\communication.json" />
     <Content Include="Tests\mocks\handover.json" />
     <Content Include="Tests\mocks\taskref.json" />
+    <Content Include="Tests\mocks\itSystemUsage.json" />
     <None Include="Web.AppVeyor.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

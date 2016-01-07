@@ -17,32 +17,68 @@ class Select2Wrapper {
     }
 
     /**
-     * Select first element in select2 dropdown.
+     * select first element in dropdown
      *
      * @param query An optional search query for the dropdown.
+     *
+     * @throws error if no options are found
      */
     selectFirst(query?: string): webdriver.promise.Promise<void> {
         this.isPresent();
 
-        this.click();
-
         if (query) {
-            browser.driver.switchTo().activeElement().sendKeys(query);
-            browser.driver.wait(() => browser.driver.executeScript("return $.active === 0;"), 2000);
+            this.writeQuery(query);
+        } else {
+            this.click();
         }
 
-        browser.driver.wait(() => this.options.count().then(count => count > 0), 2000)
-            .thenCatch(err => {
-                throw new Error("No options found for select2 selector '" + this.cssSelector + "'");
-            });
+        this.waitForOptions();
 
         return this.options.first().click();
     }
 
     /**
-     * Deselect element in select2 dropdown
+     * write query to search input
      *
-     * @return Promise that resolves when close link is clicked
+     * @param query Search query to input
+     *
+     * @throws error if no options are found
+     *
+     * @return promise that resolves when options are found
+     */
+    writeQuery(query: string): webdriver.promise.Promise<void> {
+        return this.click()
+            .then(() => browser.driver
+                .switchTo()
+                .activeElement()
+                .sendKeys(query)
+                .then(() =>
+                    browser.driver.wait(() => browser.driver.executeScript<boolean>("return $.active === 0;"), 2000)))
+            .then(() => this.waitForOptions());
+    }
+
+    /**
+     * wait for dropdown options
+     *
+     * @throws error if no options are found before timeout
+     *
+     * @return promise that resolves when options are found
+     */
+    waitForOptions(): webdriver.promise.Promise<void> {
+        return browser.driver.wait(() => this.options.count().then(count => count > 0), 2000)
+            .then(() => {
+                return;
+            }, err => {
+                throw new Error("No options found for select2 selector '" + this.cssSelector + "'");
+            });
+    }
+
+    /**
+     * deselect dropdown
+     *
+     * @throws error if nothing is selected
+     *
+     * @return promise that resolves when close link is clicked
      */
     deselect(): webdriver.promise.Promise<void> {
         return $(this.closeSelector)
@@ -53,18 +89,18 @@ class Select2Wrapper {
     }
 
     /**
-     * Detect if select2 dropdown is disabled
+     * detect if dropdown is disabled
      *
-     * @return Promise that resolves to a boolean indicating if the dropdown is disabled or not.
+     * @return promise that resolves to a boolean indicating whether the dropdown is disabled
      */
     isDisabled(): webdriver.promise.Promise<boolean> {
         return $(this.cssSelector + ".select2-container-disabled").isPresent();
     }
 
     /**
-     * detect if element is present in the DOM
+     * detect if selector is present in the DOM
      *
-     * @throws error is not present.
+     * @throws error if not present
      */
     isPresent(): webdriver.promise.Promise<boolean> {
         return this.element.isPresent()
@@ -83,9 +119,9 @@ class Select2Wrapper {
     }
 
     /**
-     * click select2 dropdown
+     * click dropdown
      *
-     * @return Promise that resolves when element is clicked.
+     * @return promise that resolves when element is clicked
      */
     click(): webdriver.promise.Promise<void> {
         return browser.driver.executeScript<void>("$(arguments[\"0\"]).mousedown();", (this.elementSelector));

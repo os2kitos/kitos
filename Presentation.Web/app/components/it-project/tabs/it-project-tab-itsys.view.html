@@ -13,7 +13,11 @@
                 <td><a data-ui-sref="it-system.usage.interfaces({ id: usage.id })">{{ usage.itSystem.name }}</a></td>
                 <td>{{ usage.itSystem.appTypeName }}</td>
                 <td class="text-right">
-                    <button type="button" class="btn btn-danger btn-xs" data-confirmed-click="delete({{ usage.id }})" data-confirm-click="Er du sikker på at du vil slette tilknytningen?" data-ng-show="projectEditVm.hasWriteAccess">
+                    <button type="button"
+                            class="btn btn-danger btn-xs delete-usage"
+                            data-confirmed-click="delete({{ usage.id }})"
+                            data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
+                            data-ng-show="projectEditVm.hasWriteAccess">
                         <i class="glyphicon glyphicon-trash"></i>
                     </button>
                 </td>
@@ -22,8 +26,12 @@
         <tfoot data-ng-show="projectEditVm.hasWriteAccess">
             <tr>
                 <td colspan="3">
-                    <input type="hidden" data-ui-select2="itSystemUsagesSelectOptions"
-                           data-ng-model="selectedSystemUsage" class="form-control input-sm" data-ng-change="save()"
+                    <input id="select-usage"
+                           type="hidden"
+                           class="form-control input-sm"
+                           data-ui-select2="itSystemUsagesSelectOptions"
+                           data-ng-model="selectedSystemUsage"
+                           data-ng-change="save()"
                            data-placeholder="Vælg IT system" />
                 </td>
             </tr>
