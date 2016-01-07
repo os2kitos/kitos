@@ -11,7 +11,6 @@
                 usages: ["$http", "$stateParams", function ($http, $stateParams) {
                     return $http.get("api/itproject/" + $stateParams.id + "?usages=true")
                         .then(function (result) {
-                            console.log(result.data.response);
                             return result.data.response;
                         });
                 }]
