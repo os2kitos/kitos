@@ -56,10 +56,19 @@ class SelectStatus2Wrapper {
     /**
      * is directive present
      *
-     * @return A promise that resolves to a boolean indicating if the element is present.
+     * @return Promise that resolves to a boolean indicating if the element is present.
      */
     isPresent(): webdriver.promise.Promise<boolean> {
         return this.dropdownElement.isPresent();
+    }
+
+    /**
+     * is directive disabled
+     *
+     * @return Promise that resolves to a boolean indicating if the element is disabled
+     */
+    isDisabled(): webdriver.promise.Promise<boolean> {
+        return $(this.cssSelector + " span").isPresent();
     }
 
     /**

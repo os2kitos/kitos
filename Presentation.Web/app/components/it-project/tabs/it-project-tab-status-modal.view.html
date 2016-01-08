@@ -57,7 +57,9 @@
                 Slut
             </label>
             <div class="col-md-4">
-                <input type="text" class="form-control" id="endDate"
+                <input id="endDate"
+                       type="text"
+                       class="form-control"
                        data-kendo-date-picker
                        data-k-options="datepickerOptions"
                        data-ng-model="activity.endDate"
@@ -72,7 +74,9 @@
                 Dato
             </label>
             <div class="col-md-4">
-                <input type="text" class="form-control" id="date"
+                <input id="date"
+                       type="text"
+                       class="form-control"
                        data-kendo-date-picker
                        data-k-options="datepickerOptions"
                        data-ng-model="activity.date"
@@ -109,17 +113,17 @@
                 </select>
             </div>
             <div class="col-md-4" data-ng-if="isMilestone">
-                <span id="status"
+                <span id="milestone-status"
                       data-select-status2=""
                       data-ng-model="activity.status"
                       data-can-write="true"
-                      data-ng-show="hasWriteAccess">
+                      data-ng-if="!hasWriteAccess">
                 </span>
-                <span id="status"
+                <span id="milestone-status"
                       data-select-status2=""
                       data-ng-model="activity.status"
                       data-can-write="false"
-                      data-ng-hide="hasWriteAccess">
+                      data-ng-if="hasWriteAccess">
                 </span>
             </div>
         </div>
@@ -131,18 +135,26 @@
                 Beskrivelse
             </label>
             <div class="col-md-10">
-                <textarea id="description" class="form-control input-sm" data-ng-model="activity.description" rows="4" data-ng-disabled="!hasWriteAccess"></textarea>
+                <textarea id="description"
+                          class="form-control input-sm"
+                          rows="4"
+                          data-ng-model="activity.description"
+                          data-ng-disabled="!hasWriteAccess"></textarea>
             </div>
         </div>
 
         <div class="form-group">
 
             <!-- Note -->
-            <label for="note" class="col-md-2 control-label small">
+            <label for="assignment-note" class="col-md-2 control-label small">
                 Note
             </label>
             <div class="col-md-10">
-                <textarea id="note" class="form-control input-sm" data-ng-model="activity.note" rows="4" data-ng-disabled="!hasWriteAccess"></textarea>
+                <textarea id="assignment-note"
+                          class="form-control input-sm"
+                          rows="4"
+                          data-ng-model="activity.note"
+                          data-ng-disabled="!hasWriteAccess"></textarea>
             </div>
         </div>
 
@@ -152,7 +164,8 @@
                 Ansvarlig
             </label>
             <div class="col-md-10">
-                <select id="associatedUserId" class="form-control input-sm"
+                <select id="associatedUserId"
+                        class="form-control input-sm"
                         data-ng-disabled="!hasWriteAccess"
                         data-ng-model="activity.associatedUserId"
                         data-ng-options="user.id as user.name for user in usersWithRoles">
@@ -169,10 +182,21 @@
 
     </div>
     <div class="modal-footer" data-ng-show="hasWriteAccess">
-        <button type="submit" class="btn btn-success" data-disabled-on-busy="" data-ng-disabled="!hasWriteAccess">Gem</button>
-        <button type="button" class="btn btn-warning" data-ng-click="dismiss()" data-disabled-on-busy="">Annuller</button>
+        <button id="save"
+                type="submit"
+                class="btn btn-success"
+                data-disabled-on-busy=""
+                data-ng-disabled="!hasWriteAccess">Gem</button>
+        <button id="cancel"
+                type="button"
+                class="btn btn-warning"
+                data-ng-click="dismiss()"
+                data-disabled-on-busy="">Annuller</button>
     </div>
     <div class="modal-footer" data-ng-hide="hasWriteAccess">
-        <button type="button" class="btn btn-success" data-ng-click="dismiss()">Luk</button>
+        <button id="close"
+                type="button"
+                class="btn btn-success"
+                data-ng-click="dismiss()">Luk</button>
     </div>
 </form>

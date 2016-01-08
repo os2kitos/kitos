@@ -5,7 +5,7 @@
             onEnter: ["$state", "$stateParams", "$modal", "project", "usersWithRoles", "user",
                 function ($state, $stateParams, $modal, project, usersWithRoles, user) {
                     $modal.open({
-                        templateUrl: "app/components/it-project/tabs/it-project-tab-status-modal.html",
+                        templateUrl: "app/components/it-project/tabs/it-project-tab-status-modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: "modal fade in",
@@ -48,12 +48,12 @@
                                 var id = $stateParams.activityId;
                                 if (id) {
                                     if ($stateParams.type == "assignment") {
-                                        return $http.get("api/assignment/" + $stateParams.activityId + "?hasWriteAccess&organizationId=" + user.currentOrganizationId)
+                                        return $http.get("api/assignment/" + $stateParams.activityId + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
                                             .then(function(result) {
                                                 return result.data.response;
                                             });
                                     } else if ($stateParams.type == "milestone") {
-                                        return $http.get("api/milestone/" + $stateParams.activityId + "?hasWriteAccess&organizationId=" + user.currentOrganizationId)
+                                        return $http.get("api/milestone/" + $stateParams.activityId + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
                                             .then(function (result) {
                                                 return result.data.response;
                                             });

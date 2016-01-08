@@ -1,7 +1,7 @@
 ﻿[
     {
         "request": {
-            "path": "api/assignment/1",
+            "path": "api/milestone/1",
             "method": "GET"
         },
         "response": {
@@ -9,61 +9,44 @@
             "data": {
                 "msg": "",
                 "response": {
-                    "associatedItProjectId": 1,
-                    "associatedPhaseNum": null,
-                    "associatedUser": null,
-                    "associatedUserId": null,
-                    "description": null,
-                    "endDate": null,
+                    "date": null,
+                    "status": 0,
+                    "id": 2,
                     "humanReadableId": null,
-                    "id": 1,
-                    "name": "NyOpgave",
+                    "name": "Milestone 1",
+                    "description": null,
                     "note": null,
+                    "timeEstimate": 0,
+                    "objectOwnerId": 1,
                     "objectOwner": {
-                        "adminRights": [ ],
+                        "id": 1,
+                        "name": "Global",
+                        "lastName": "admin",
+                        "phoneNumber": null,
+                        "email": "support@kitos.dk",
                         "defaultOrganizationUnitId": null,
                         "defaultOrganizationUnitName": null,
-                        "email": "support@kitos.dk",
-                        "fullName": "Global admin",
-                        "id": 1,
                         "isGlobalAdmin": true,
+                        "uuid": null,
+                        "adminRights": [ ],
+                        "objectOwnerName": null,
+                        "objectOwnerLastName": null,
                         "lastAdvisDate": null,
                         "lastChanged": "2016-01-07T09:42:55Z",
                         "lastChangedByUserId": null,
-                        "lastName": "admin",
-                        "name": "Global",
-                        "objectOwnerLastName": null,
-                        "objectOwnerName": null,
-                        "phoneNumber": null,
-                        "uuid": null
+                        "fullName": "Global admin"
                     },
-                    "objectOwnerId": 1,
-                    "startDate": null,
-                    "statusProcentage": 0,
-                    "timeEstimate": 0
+                    "associatedPhaseNum": null,
+                    "associatedItProjectId": 1,
+                    "associatedUserId": null,
+                    "associatedUser": null
                 }
             }
         }
     },
     {
         "request": {
-            "path": "api/Assignment/1",
-            "method": "DELETE",
-            "queryString": {
-                "organizationId": "1"
-            }
-        },
-        "response": {
-            "status": 200,
-            "data": {
-                "msg": "",
-                "response": { }
-            }
-        }
-    },
-    {
-        "request": {
-            "path": "api/assignment/1",
+            "path": "api/milestone/1",
             "method": "PATCH",
             "queryString": {
                 "organizationId": "1"
@@ -74,12 +57,11 @@
             "data": {
                 "msg": "",
                 "response": {
-                    "statusProcentage": 0,
-                    "startDate": null,
-                    "endDate": null,
-                    "id": 1,
+                    "date": null,
+                    "status": 0,
+                    "id": 2,
                     "humanReadableId": null,
-                    "name": "NyOpgave",
+                    "name": "Milestone 1",
                     "description": null,
                     "note": null,
                     "timeEstimate": 0,

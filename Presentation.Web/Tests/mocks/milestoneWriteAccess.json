@@ -1,0 +1,19 @@
+﻿[
+    {
+        "request": {
+            "path": "api/milestone/1",
+            "method": "GET",
+            "queryString": {
+                "hasWriteAccess": "true",
+                "organizationId": "1"
+            }
+        },
+        "response": {
+            "status": 200,
+            "data": {
+                "msg": "",
+                "response": true
+            }
+        }
+    }
+]

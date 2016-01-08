@@ -730,7 +730,7 @@
     <Content Include="app\components\it-project\tabs\it-project-tab-catalog.html" />
     <Content Include="app\components\it-project\it-project-overview.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-goal-modal.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-status-modal.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-status-modal.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-communication.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-description.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-handover.view.html" />
@@ -805,6 +805,7 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-roles.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-phases.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-goal.po.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-modal.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-strategy.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project.po.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine-expect\jasmine-expect.d.ts" />
@@ -815,6 +816,7 @@
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabRisk.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabStakeholders.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabEconomy.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabStatusModal.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabStrategy.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabDescription.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabRoles.e2e.spec.ts" />
@@ -2540,7 +2542,7 @@
     <Content Include="Tests\mocks\itprojecttype.json" />
     <Content Include="Tests\mocks\itprojectrights.json" />
     <Content Include="Tests\mocks\itprojectstatus.json" />
-    <Content Include="Tests\mocks\assignment.json" />
+    <Content Include="Tests\mocks\milestone.json" />
     <Content Include="Tests\mocks\itProjectNoWriteAccess.json" />
     <Content Include="Tests\mocks\itProjectWriteAccess.json" />
     <Content Include="Tests\mocks\organization.json" />
@@ -2556,6 +2558,11 @@
     <Content Include="Tests\mocks\handover.json" />
     <Content Include="Tests\mocks\taskref.json" />
     <Content Include="Tests\mocks\itSystemUsage.json" />
+    <Content Include="Tests\mocks\assignmentNoWriteAccess.json" />
+    <Content Include="Tests\mocks\assignmentWriteAccess.json" />
+    <Content Include="Tests\mocks\assignment.json" />
+    <Content Include="Tests\mocks\milestoneNoWriteAccess.json" />
+    <Content Include="Tests\mocks\milestoneWriteAccess.json" />
     <None Include="Web.AppVeyor.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
