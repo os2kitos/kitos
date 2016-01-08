@@ -84,7 +84,7 @@
                     };
                 });
 
-                var row: { update } = {
+                var row = {
                     budgetName: budgetName,
                     reaName: reaName,
                     label: label,

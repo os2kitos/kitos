@@ -38,7 +38,7 @@
                 $scope.project = project;
                 $scope.projectTypes = projectTypes;
 
-                if (!_.find(projectTypes, function(type) { return type.id == project.itProjectTypeId; })) {
+                if (!_.find(projectTypes, function(type: any) { return type.id == project.itProjectTypeId; })) {
                     $scope.projectTypes.unshift({ id: project.itProjectTypeId, name: project.itProjectTypeName });
                 }
 
@@ -88,7 +88,7 @@
                 ];
                 // TODO refactor this garbage!
                 $scope.$watch('selectedData', function (newValue, oldValue) {
-                    var payload = {};
+                    var payload: any = {};
                     if (newValue.length > oldValue.length) {
                         // something was added
                         var addIds = _.difference(_.pluck(newValue, 'id'), _.pluck(oldValue, 'id'));

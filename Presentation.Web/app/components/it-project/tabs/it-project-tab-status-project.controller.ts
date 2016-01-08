@@ -70,7 +70,7 @@
             //All Assignments - both Assignments ("opgaver") and milestones
             $scope.milestonesActivities = [];
 
-            function addStatus(activity, skipAdding) {
+            function addStatus(activity, skipAdding?) {
                 activity.show = true;
 
                 if (activity.$type.indexOf('Assignment') > -1 ) {
