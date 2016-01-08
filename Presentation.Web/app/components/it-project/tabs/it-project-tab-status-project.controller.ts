@@ -1,172 +1,210 @@
-﻿(function (ng, app) {
-    app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-project.edit.status-project', {
-            url: '/status-project',
-            templateUrl: 'partials/it-project/tab-status-project.html',
-            controller: 'project.EditStatusProjectCtrl',
-            resolve: {
-                // re-resolve data from parent cause changes here wont cascade to it
-                project: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itproject/" + $stateParams.id)
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }],
-                //returns a map with those users who have a role in this project.
-                //the names of the roles is saved in user.roleNames
-                usersWithRoles: ['$http', '$stateParams', function ($http, $stateParams) {
-                    //get the rights of the projects
-                    return $http.get("api/itprojectright/" + $stateParams.id)
-                        .then(function (rightResult) {
-                            var rights = rightResult.data.response;
+﻿module Kitos.ItProject.Edit {
+    "use strict";
 
-                            //get the role names
-                            return $http.get("api/itprojectrole/")
-                                .then(function (roleResult) {
-                                    var roles = roleResult.data.response;
+    interface IProjectStatusController {
+        project: any;
+        datepickerOptions: IDatepickerOptions;
+        pagination: IPaginationSettings;
+        milestonesActivities: Array<any>;
+        totalCount: number;
 
-                                    //the resulting map
-                                    var users = {};
-                                    _.each(rights, function (right) {
+        getPhaseName(phaseNumber: number): string;
+    }
 
-                                        //use the user from the map if possible
-                                        var user = users[right.userId] || right.user;
+    export class ProjectStatusController implements IProjectStatusController {
+        public datepickerOptions: IDatepickerOptions;
+        public milestonesActivities: Array<any>;
+        public pagination: IPaginationSettings;
+        public totalCount: number;
 
-                                        var roleNames = user.roleNames || [];
-                                        roleNames.push(right.roleName);
-                                        user.roleNames = roleNames;
+        static $inject: Array<string> = [
+            "$scope",
+            "$http",
+            "$state",
+            "notify",
+            "project",
+            "usersWithRoles",
+            "user"
+        ];
 
-                                        users[right.userId] = user;
-                                    });
+        constructor(
+            private $scope: ng.IScope,
+            private $http,
+            private $state,
+            private notify,
+            public project,
+            private usersWithRoles,
+            private user) {
 
-                                    return users;
-                                });
-                        });
-                }]
-            }
-        });
-    }]);
+            this.project.updateUrl = `api/itproject/${project.id}`;
 
-    app.controller('project.EditStatusProjectCtrl',
-    ['$scope', '$http', '$state', 'notify', '$uibModal', 'project', 'usersWithRoles', 'user',
-        function ($scope, $http, $state, notify, $modal, project, usersWithRoles, user) {
-            $scope.project = project;
-            $scope.project.updateUrl = "api/itproject/" + project.id;
-
-            $scope.datepickerOptions = {
+            this.datepickerOptions = {
                 format: "dd-MM-yyyy",
                 parseFormats: ["yyyy-MM-dd"]
             };
 
-            //Setup phases
-            $scope.project.phases = [project.phase1, project.phase2, project.phase3, project.phase4, project.phase5];
-            var prevPhase = null;
-            _.each($scope.project.phases, function (phase) {
-                phase.updateUrl = "api/itProjectPhase/" + phase.id;
+            // setup phases
+            this.project.phases = [project.phase1, project.phase2, project.phase3, project.phase4, project.phase5];
+            var prevPhase: IPhaseData = null;
+            _.each(this.project.phases, (phase: IPhaseData) => {
+                phase.updateUrl = `api/itProjectPhase/${phase.id}`;
                 phase.prevPhase = prevPhase;
                 prevPhase = phase;
             });
 
-            //All Assignments - both Assignments ("opgaver") and milestones
-            $scope.milestonesActivities = [];
+            // all Assignments - both Assignments ("opgaver") and milestones
+            this.milestonesActivities = [];
 
-            function addStatus(activity, skipAdding?) {
-                activity.show = true;
-
-                if (activity.$type.indexOf('Assignment') > -1 ) {
-                    activity.isTask = true;
-                    activity.updateUrl = "api/Assignment/" + activity.id;
-                } else if (activity.$type.indexOf('Milestone') > -1) {
-                    activity.isMilestone = true;
-                    activity.updateUrl = "api/Milestone/" + activity.id;
-                }
-
-                activity.updatePhase = function() {
-                    activity.phase = _.findWhere($scope.project.phases, { id: activity.associatedPhaseId });
-                };
-
-                activity.updatePhase();
-
-                activity.updateUser = function() {
-                    if (activity.associatedUserId) {
-                        activity.associatedUser = _.findWhere(usersWithRoles, { id: activity.associatedUserId });
-                    }
-                };
-
-                activity.updateUser();
-
-                activity.edit = function () {
-                    if (activity.isTask) {
-                        $state.go('.modal', { type: 'assignment', activityId: activity.id });
-                    } else if (activity.isMilestone) {
-                        $state.go('.modal', { type: 'milestone', activityId: activity.id });
-                    }
-                };
-
-                activity.delete = function() {
-                    var msg = notify.addInfoMessage("Sletter...");
-                    $http.delete(activity.updateUrl + '?organizationId=' + user.currentOrganizationId).success(function () {
-                        activity.show = false;
-                        msg.toSuccessMessage("Slettet!");
-                    }).error(function() {
-                        msg.toErrorMessage("Fejl! Kunne ikke slette!");
-                    });
-                };
-
-                if (!skipAdding)
-                    $scope.milestonesActivities.push(activity);
-
-                return activity;
-            }
-
-            _.each(project.itProjectStatuses, function(value) {
-                addStatus(value);
+            _.each(project.itProjectStatuses, (value) => {
+                this.addStatus(value, null);
             });
 
-            $scope.pagination = {
-                search: '',
+            this.pagination = {
+                search: "",
                 skip: 0,
                 take: 50
             };
 
-            $scope.$watchCollection('pagination', loadStatues);
+            this.$scope.$watchCollection(() => this.pagination, this.loadStatues);
+        }
 
-            function loadStatues() {
-                var url = 'api/itProjectStatus/' + project.id + '?project=true';
+        getPhaseName = (num: number): string => {
+            if (num)
+                return this.project.phases[num - 1].name;
+            return "";
+        };
 
-                url += '&skip=' + $scope.pagination.skip;
-                url += '&take=' + $scope.pagination.take;
+        private loadStatues = () => {
+            var url = `api/itProjectStatus/${this.project.id}?project=true`;
 
-                if ($scope.pagination.orderBy) {
-                    url += '&orderBy=' + $scope.pagination.orderBy;
-                    if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
-                }
+            url += `&skip=${this.pagination.skip}`;
+            url += `&take=${this.pagination.take}`;
 
-                if ($scope.pagination.search) url += '&q=' + $scope.pagination.search;
-                else url += "&q=";
-
-                $scope.milestonesActivities = [];
-                $http.get(url).success(function (result, status, headers) {
-                    var paginationHeader = JSON.parse(headers('X-Pagination'));
-                    $scope.totalCount = paginationHeader.TotalCount;
-
-                    _.each(result.response, function (value) {
-                        addStatus(value);
-                    });
-
-                }).error(function (data, status) {
-                    // only display error when an actual error
-                    // 404 just says that there are no statues
-                    if (status != 404)
-                        notify.addErrorMessage("Kunne ikke hente projekter!");
-                });
+            if (this.pagination.orderBy) {
+                url += `&orderBy=${this.pagination.orderBy}`;
+                if (this.pagination.descending) url += `&descending=${this.pagination.descending}`;
             }
 
-            $scope.getPhaseName = function (num) {
-                if (num)
-                    return $scope.project.phases[num - 1].name;
-                return "";
-            };
+            if (this.pagination.search) {
+                url += `&q=${this.pagination.search}`;
+            } else {
+                url += "&q=";
+            }
+
+            this.milestonesActivities = [];
+            this.$http.get(url)
+                .success((result, status, headers) => {
+                    var paginationHeader = JSON.parse(headers("X-Pagination"));
+                    this.totalCount = paginationHeader.TotalCount;
+
+                    _.each(result.response, (value) => {
+                        this.addStatus(value, null);
+                    });
+
+                })
+                .error((data, status) => {
+                    // only display error when an actual error
+                    // 404 just says that there are no statuses
+                    if (status != 404) {
+                        this.notify.addErrorMessage("Kunne ikke hente projekter!");
+                    }
+                });
         }
-    ]);
-})(angular, app);
+
+        private addStatus = (activity, skipAdding) => {
+            activity.show = true;
+
+            if (activity.$type.indexOf("Assignment") > -1) {
+                activity.isTask = true;
+                activity.updateUrl = `api/Assignment/${activity.id}`;
+            } else if (activity.$type.indexOf("Milestone") > -1) {
+                activity.isMilestone = true;
+                activity.updateUrl = `api/Milestone/${activity.id}`;
+            }
+
+            activity.updatePhase = () => {
+                activity.phase = _.findWhere(this.project.phases, { id: activity.associatedPhaseId });
+            };
+
+            activity.updatePhase();
+
+            activity.updateUser = () => {
+                if (activity.associatedUserId) {
+                    activity.associatedUser = _.findWhere(this.usersWithRoles, { id: activity.associatedUserId });
+                }
+            };
+
+            activity.updateUser();
+
+            activity.edit = () => {
+                if (activity.isTask) {
+                    this.$state.go(".modal", { type: "assignment", activityId: activity.id });
+                } else if (activity.isMilestone) {
+                    this.$state.go(".modal", { type: "milestone", activityId: activity.id });
+                }
+            };
+
+            activity.delete = () => {
+                var msg = this.notify.addInfoMessage("Sletter...");
+                this.$http.delete(activity.updateUrl + "?organizationId=" + this.user.currentOrganizationId).success(() => {
+                    activity.show = false;
+                    msg.toSuccessMessage("Slettet!");
+                }).error(() => {
+                    msg.toErrorMessage("Fejl! Kunne ikke slette!");
+                });
+            };
+
+            if (!skipAdding)
+                this.milestonesActivities.push(activity);
+
+            return activity;
+        }
+    }
+
+    angular
+        .module("app")
+        .controller("project.EditStatusProjectCtrl", ProjectStatusController)
+        .config([
+            "$stateProvider", $stateProvider => {
+                $stateProvider.state("it-project.edit.status-project", {
+                    url: "/status-project",
+                    templateUrl: "app/components/it-project/tabs/it-project-tab-status-project.view.html",
+                    controller: ProjectStatusController,
+                    controllerAs: "projectStatusVm",
+                    resolve: {
+                        //returns a map with those users who have a role in this project.
+                        //the names of the roles is saved in user.roleNames
+                        usersWithRoles: [
+                            "$http", "$stateParams",
+                            ($http, $stateParams) => $http.get(`api/itprojectright/${$stateParams.id}`)
+                            .then(rightResult => {
+                                var rights = rightResult.data.response;
+
+                                //get the role names
+                                return $http.get("api/itprojectrole/")
+                                    .then(roleResult => {
+                                        var roles = roleResult.data.response;
+
+                                        //the resulting map
+                                        var users = {};
+                                        _.each(rights, (right: { userId; user; roleName; }) => {
+
+                                            //use the user from the map if possible
+                                            var user = users[right.userId] || right.user;
+
+                                            var roleNames = user.roleNames || [];
+                                            roleNames.push(right.roleName);
+                                            user.roleNames = roleNames;
+
+                                            users[right.userId] = user;
+                                        });
+
+                                        return users;
+                                    });
+                            })
+                        ]
+                    }
+                });
+            }
+        ]);
+}

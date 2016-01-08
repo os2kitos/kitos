@@ -1,97 +1,117 @@
-﻿(function (ng, app) {
-    app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-project.edit.phases', {
-            url: '/phases',
-            templateUrl: 'partials/it-project/tab-phases.html',
-            controller: 'project.EditPhasesCtrl',
-            resolve: {
-                // re-resolve data from parent cause changes here wont cascade to it
-                project: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itproject/" + $stateParams.id)
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }]
-            }
-        });
-    }]);
+﻿module Kitos.ItProject.Edit {
+    "use strict";
 
-    app.controller('project.EditPhasesCtrl',
-    ['$scope', '$http', 'notify', '$uibModal', 'project', 'user',
-        function ($scope, $http, notify, $modal, project, user) {
-            $scope.project = project;
-            $scope.project.updateUrl = "api/itproject/" + project.id + '?organizationId=' + user.currentOrganizationId;
+    export interface IPhasesController {
+        project: any;
+        datepickerOptions: IDatepickerOptions;
 
-            $scope.datepickerOptions = {
+        updatePhaseDate(phase: IPhase, index: number): void;
+        updatePhaseName(phase: IPhase, index: number): void;
+        updateSelectedPhase(index: number): void;
+    }
+
+    class PhasesController implements IPhasesController {
+        datepickerOptions: IDatepickerOptions;
+
+        static $inject: Array<string> = [
+            "$scope",
+            "$http",
+            "notify",
+            "project",
+            "user"
+        ];
+
+        constructor(
+            private $scope: ng.IScope,
+            private $http: ng.IHttpService,
+            private notify,
+            public project,
+            private user) {
+
+            this.project.updateUrl = `api/itproject/${this.project.id}?organizationId=${this.user.currentOrganizationId}`;
+
+            this.datepickerOptions = {
                 format: "dd-MM-yyyy",
                 parseFormats: ["yyyy-MM-dd"]
             };
 
-            //Setup phases
-            $scope.project.phases = [project.phase1, project.phase2, project.phase3, project.phase4, project.phase5];
+            // setup phases
+            this.project.phases = [this.project.phase1, this.project.phase2, this.project.phase3, this.project.phase4, this.project.phase5];
+        }
 
-            function patch(url, field, value) {
-                var payload = {};
-                payload[field] = value;
+        updatePhaseName(phase: IPhase, num: number): void {
+            var payload = {};
+            payload["Name"] = phase.name;
+            this.$http.post(this.project.updateUrl + "&phaseNum=" + num, payload)
+                .then(
+                    () => this.notify.addSuccessMessage("Feltet er opdateret"),
+                    () => this.notify.addErrorMessage("Fejl!")
+                );
+        }
 
-                return $http({
-                    method: 'PATCH',
-                    url: url,
-                    data: payload
-                });
+        updateSelectedPhase(phaseNum: number): void {
+            this.patch(this.project.updateUrl, "currentPhase", phaseNum)
+                .then(
+                    result => {
+                        // todo: No evaluation on result. Might be 404 or 500 ?
+                        this.notify.addSuccessMessage("Feltet er opdateret");
+                        this.project.currentPhase = phaseNum;
+                    },
+                    () => this.notify.addErrorMessage("Fejl!")
+                );
+        }
+
+        updatePhaseDate(phase: IPhase, num: number): void {
+            var dateObject = moment(phase.startDate, "DD-MM-YYYY");
+            var startDate;
+            if (dateObject.isValid()) {
+                startDate = dateObject.format("YYYY-MM-DD");
+            } else {
+                startDate = null;
             }
-
-            $scope.updatePhaseName = function(phase, num) {
-                var payload = {};
-                payload["Name"] = phase.name;
-                $http.post($scope.project.updateUrl + "&phaseNum=" + num, payload)
-                .success(function() {
-                    notify.addSuccessMessage("Feltet er opdateret");
-                    })
-                .error(function () {
-                    notify.addErrorMessage("Fejl!");
-                });
-            }
-
-            $scope.updateSelectedPhase = function (phaseNum) {
-                patch($scope.project.updateUrl, "currentPhase", phaseNum)
-                    .success(function (result) {
-                        notify.addSuccessMessage("Feltet er opdateret");
-                        $scope.project.currentPhase = phaseNum;
-                    })
-                    .error(function () {
-                        notify.addErrorMessage("Fejl!");
-                    });
-            };
-
-            $scope.updatePhaseDate = function(phase, num) {
-                var dateObject = moment(phase.startDate, "DD-MM-YYYY");
-                var startDate;
-                if (dateObject.isValid()) {
-                    startDate = dateObject.format("YYYY-MM-DD");
-                } else {
-                    startDate = null;
-                }
-                //Update start date of the current phase
-                var firstPayload = {};
-                firstPayload["StartDate"] = startDate;
-                $http.post($scope.project.updateUrl + "&phaseNum=" + num, firstPayload)
-                    .success(function () {
+            // update start date of the current phase
+            var firstPayload = {};
+            firstPayload["StartDate"] = startDate;
+            this.$http.post(this.project.updateUrl + "&phaseNum=" + num, firstPayload)
+                .then(
+                    () => {
                         if (num > 1) {
                             var prevPhaseNum = num - 1;
                             var secondPayload = {};
                             secondPayload["EndDate"] = startDate;
-                            //Also update end date of the previous phase
-                            $http.post($scope.project.updateUrl + "&phaseNum=" + prevPhaseNum, secondPayload).success(function () {
-                                notify.addSuccessMessage("Feltet er opdateret");
-                            }).error(function() {
-                                notify.addErrorMessage("Fejl!");
-                            });
+                            // also update end date of the previous phase
+                            this.$http.post(this.project.updateUrl + "&phaseNum=" + prevPhaseNum, secondPayload)
+                                .then(
+                                    () => this.notify.addSuccessMessage("Feltet er opdateret"),
+                                    () => this.notify.addErrorMessage("Fejl!"));
                         }
-                    }).error(function() {
-                        notify.addErrorMessage("Fejl!");
-                    });
-            };
+                    },
+                    () => this.notify.addErrorMessage("Fejl!")
+                );
         }
-    ]);
-})(angular, app);
+
+        private patch(url: string, field: string, value: any) {
+            var payload = {};
+            payload[field] = value;
+
+            return this.$http({
+                method: "PATCH",
+                url: url,
+                data: payload
+            });
+        }
+    }
+
+    angular
+        .module("app")
+        .config([
+            "$stateProvider", $stateProvider => {
+                $stateProvider.state("it-project.edit.phases", {
+                    url: "/phases",
+                    templateUrl: "app/components/it-project/tabs/it-project-tab-phases.view.html",
+                    controller: PhasesController,
+                    controllerAs: "projectPhasesVm"
+                });
+            }
+        ]);
+}
