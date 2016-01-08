@@ -861,9 +861,6 @@
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-sanitize.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\kendo\2015.3.1111\kendo.all.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\kendo\2015.3.1111\kendo.dataviz.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\kendo\2015.3.1111\kendo.mobile.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\kendo\2015.3.1111\kendo.web.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\lodash\lodash.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\moment\moment-node.d.ts" />
@@ -981,7 +978,6 @@
     <Content Include="app\directives\filters.js" />
     <Content Include="app\directives\utils-directives.js" />
     <TypeScriptCompile Include="app\services\userServices.ts" />
-    <Content Include="app\utility\underscore.mixin.js" />
     <TypeScriptCompile Include="app\utility\utility.ts" />
     <Content Include="app\services\httpServices.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -2583,7 +2579,6 @@
     <None Include="Web.Sandbox.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
-    <TypeScriptCompile Include="Scripts\typings\underscore\underscore.d.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\projectEdit.e2e.spec.ts" />
   </ItemGroup>
   <ItemGroup>
