@@ -610,7 +610,7 @@
         }
 
         private assigmentTemplate = (dataItem) => {
-            var res = this._.filter(dataItem.ItProjectStatuses, n => _.contains(n["@odata.type"], "Assignment"));
+            var res = this._.filter(dataItem.ItProjectStatuses, n => this._.contains(n["@odata.type"], "Assignment"));
 
             return res.length;
         }
@@ -691,22 +691,24 @@
             return newFilter;
         }
 
-        public roleSelectorOptions = {
-            autoBind: false,
-            dataSource: this.projectRoles,
-            dataTextField: "Name",
-            dataValueField: "Id",
-            optionLabel: "Vælg projektrolle...",
-            change: e => {
-                // hide all roles column
-                this._.forEach(this.projectRoles, role => {
-                    this.mainGrid.hideColumn(`role${role.Id}`);
-                });
+        public roleSelectorOptions = () => {
+            return {
+                autoBind: false,
+                dataSource: this.projectRoles,
+                dataTextField: "Name",
+                dataValueField: "Id",
+                optionLabel: "Vælg projektrolle...",
+                change: e => {
+                    // hide all roles column
+                    this._.forEach(this.projectRoles, role => {
+                        this.mainGrid.hideColumn(`role${role.Id}`);
+                    });
 
-                var selectedId = e.sender.value();
-                var gridFieldName = `role${selectedId}`;
-                // show only the selected role column
-                this.mainGrid.showColumn(gridFieldName);
+                    var selectedId = e.sender.value();
+                    var gridFieldName = `role${selectedId}`;
+                    // show only the selected role column
+                    this.mainGrid.showColumn(gridFieldName);
+                }
             }
         };
 
