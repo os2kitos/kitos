@@ -22,9 +22,7 @@
     <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
     <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
     <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>1ba07016</NuGetPackageImportStamp>
     <UseGlobalApplicationHostFile />
     <TypeScriptToolsVersion>1.7</TypeScriptToolsVersion>
   </PropertyGroup>
@@ -2683,7 +2681,6 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Import Project="..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets" Condition="Exists('..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
