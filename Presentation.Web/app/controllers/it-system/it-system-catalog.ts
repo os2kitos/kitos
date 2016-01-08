@@ -1,182 +1,88 @@
-﻿(function (ng, app) {
-    app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-system.catalog', {
-            url: '/catalog',
-            templateUrl: 'partials/it-system/it-system-catalog.html',
-            controller: 'system.CatalogCtrl',
-            resolve: {
-                user: [
-                    'userService', function (userService) {
-                        return userService.getUser();
-                    }
-                ]
-            }
-        });
-    }]);
+﻿module Kitos.ItSystem.Catalog {
+    "use strict";
 
-    app.controller('system.CatalogCtrl',
-    [
-        '$rootScope', '$scope', '$http', 'notify', '$state', 'user', '$timeout', 'gridStateService',
-        function ($rootScope, $scope, $http, notify, $state, user, $timeout, gridStateService) {
-            $rootScope.page.title = 'IT System - Katalog';
+    export interface ICatalogController {
+        mainGrid: Kitos.IKendoGrid;
+        mainGridOptions: kendo.ui.GridOptions;
+        usageGrid: kendo.ui.Grid;
+        usageDetailsGrid: kendo.ui.GridOptions;
+        modal: kendo.ui.Window;
 
-            // usagedetails grid empty-grid handling
-            function detailsBound(e) {
-                var grid = e.sender;
-                if (grid.dataSource.total() == 0) {
-                    var colCount = grid.columns.length;
-                    $(e.sender.wrapper)
-                        .find('tbody')
-                        .append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data text-muted">System anvendens ikke</td></tr>');
-                }
-            }
+        saveGridProfile(): void;
+        loadGridProfile(): void;
+        clearGridProfile(): void;
+        doesGridProfileExist(): boolean;
+        clearOptions(): void;
+        enableUsage(dataItem): void;
+        removeUsage(dataItem): void;
+    }
 
-            var storageKey = "it-system-catalog-options";
-            var gridState = gridStateService.getService(storageKey);
+    export class CatalogController implements ICatalogController {
+        private storageKey = "it-system-catalog-options";
+        private gridState = this.gridStateService.getService(this.storageKey);
+        public mainGrid: Kitos.IKendoGrid;
+        public mainGridOptions: Kitos.IKendoGridOptions;
+        public usageGrid: kendo.ui.Grid;
+        public modal: kendo.ui.Window;
 
-            // saves grid state to localStorage
-            function saveGridOptions() {
-                gridState.saveGridOptions($scope.mainGrid);
-            }
+        private $inject: Array<string> = [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$timeout",
+            "$state",
+            "$",
+            "_",
+            "notify",
+            "user",
+            "gridStateService"
+        ];
 
-            // loads kendo grid options from localstorage
-            function loadGridOptions() {
-                gridState.loadGridOptions($scope.mainGrid);
-            }
+        constructor(
+            private $rootScope: Kitos.IRootScope,
+            private $scope: ng.IScope,
+            private $http: ng.IHttpService,
+            private $timeout: ng.ITimeoutService,
+            private $state: ng.ui.IStateService,
+            private $: JQueryStatic,
+            private _: Kitos.ILodashWithMixins,
+            private notify,
+            private user,
+            private gridStateService: Kitos.Services.IGridStateFactory) {
+            $rootScope.page.title = "IT System - Katalog";
 
-            $scope.saveGridProfile = function() {
-                gridState.saveGridProfile($scope.mainGrid);
-                notify.addSuccessMessage("Filtre og sortering gemt");
-            };
-
-            $scope.loadGridProfile = function () {
-                gridState.loadGridProfile($scope.mainGrid);
-                $scope.mainGrid.dataSource.read();
-                notify.addSuccessMessage("Anvender gemte filtre og sortering");
-            };
-
-            $scope.clearGridProfile = function() {
-                gridState.removeProfile();
-                gridState.removeSession();
-                notify.addSuccessMessage("Filtre og sortering slettet");
-                reload();
-            };
-
-            $scope.doesGridProfileExist = function() {
-                return gridState.doesGridProfileExist();
-            };
-
-            $scope.$on("kendoWidgetCreated", function (event, widget) {
+            $scope.$on("kendoWidgetCreated", (event, widget) => {
                 // the event is emitted for every widget; if we have multiple
                 // widgets in this controller, we need to check that the event
                 // is for the one we're interested in.
-                if (widget === $scope.mainGrid) {
-                    loadGridOptions();
-                    $scope.mainGrid.dataSource.read();
+                if (widget === this.mainGrid) {
+                    this.loadGridOptions();
+                    this.mainGrid.dataSource.read();
 
                     // find the access modifier filter row section
-                    var accessModifierFilterRow = $(".k-filter-row [data-field='AccessModifier']");
+                    var accessModifierFilterRow = this.$(".k-filter-row [data-field='AccessModifier']");
                     // find the access modifier kendo widget
                     var accessModifierFilterWidget = accessModifierFilterRow.find("input").data("kendoDropDownList");
                     // attach a click event to the X (remove filter) button
-                    accessModifierFilterRow.find("button").on("click", function () {
+                    accessModifierFilterRow.find("button").on("click", () => {
                         // set the selected filter to none, because clicking the button removes the filter
                         accessModifierFilterWidget.select(0);
                     });
                 }
             });
 
-            // clears grid filters by removing the localStorageItem and reloading the page
-            $scope.clearOptions = function() {
-                gridState.removeProfile();
-                gridState.removeLocal();
-                gridState.removeSession();
-                notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge nulstillet");
-                // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
-                reload();
-            };
-
-            function reload() {
-                $state.go('.', null, { reload: true });
-            }
-
-            // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
-            $scope.showUsageDetails = function(usageId, systemName) {
-                //Filter by usageId
-                usageDetailDataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
-                //Set modal title
-                $scope.modal.setOptions({ title: "Anvendelse af " + systemName });
-                //Open modal
-                $scope.modal.center().open();
-            };
-
-            var usageDetailDataSource = new kendo.data.DataSource({
-                type: "odata-v4",
-                transport:
-                {
-                    read: {
-                        url: "/odata/ItSystemUsages?$expand=Organization",
-                        dataType: "json"
-                    },
-                },
-                serverPaging: true,
-                serverSorting: true,
-                serverFiltering: true
-            });
-
-            // usagedetails grid
-            $scope.usageDetailsGrid = {
-                dataSource: usageDetailDataSource,
-                autoBind: false,
-                columns: [
-                    {
-                        field: "Organization.Name",
-                        title: "Organisation"
-                    }
-                ],
-                dataBound: detailsBound
-            };
-
-            var itSystemBaseUrl;
+            var itSystemBaseUrl: string;
             if (user.isGlobalAdmin) {
                 // global admin should see all it systems everywhere with all levels of access
                 itSystemBaseUrl = "/odata/ItSystems";
             } else {
                 // everyone else are limited to within organizationnal context
-                itSystemBaseUrl = "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystems";
+                itSystemBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystems`;
             }
-
             var itSystemUrl = itSystemBaseUrl + "?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser";
 
-            var exportFlag = false;
-            function exportToExcel(e) {
-                var columns = e.sender.columns;
-
-                if (!exportFlag) {
-                    e.preventDefault();
-                    _.forEach(columns, function (column) {
-                        if (column.hidden) {
-                            column.tempVisual = true;
-                            e.sender.showColumn(column);
-                        }
-                    });
-                    $timeout(function () {
-                        exportFlag = true;
-                        e.sender.saveAsExcel();
-                    });
-                } else {
-                    exportFlag = false;
-                    _.forEach(columns, function (column) {
-                        if (column.tempVisual) {
-                            delete column.tempVisual;
-                            e.sender.hideColumn(column);
-                        }
-                    });
-                }
-            }
-
             // catalog grid
-            $scope.itSystemCatalogueGrid = {
+            this.mainGridOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
                     type: "odata-v4",
@@ -185,7 +91,7 @@
                             url: itSystemUrl,
                             dataType: "json"
                         },
-                        parameterMap: function (options, type) {
+                        parameterMap: (options, type) => {
                             var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
 
                             if (parameterMap.$filter) {
@@ -221,22 +127,22 @@
                     {
                         name: "clearFilter",
                         text: "Nulstil",
-                        template: "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='clearOptions()'>#: text #</button>"
+                        template: "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='systemCatalogVm.clearOptions()'>#: text #</button>"
                     },
                     {
                         name: "saveFilter",
                         text: "Gem filter",
-                        template: '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="saveGridProfile()">#: text #</button>'
+                        template: '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="systemCatalogVm.saveGridProfile()">#: text #</button>'
                     },
                     {
                         name: "useFilter",
                         text: "Anvend filter",
-                        template: '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="loadGridProfile()" data-ng-disabled="!doesGridProfileExist()">#: text #</button>'
+                        template: '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="systemCatalogVm.loadGridProfile()" data-ng-disabled="!systemCatalogVm.doesGridProfileExist()">#: text #</button>'
                     },
                     {
                         name: "deleteFilter",
                         text: "Slet filter",
-                        template: "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='clearGridProfile()' data-ng-disabled='!doesGridProfileExist()'>#: text #</button>"
+                        template: "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='systemCatalogVm.clearGridProfile()' data-ng-disabled='!systemCatalogVm.doesGridProfileExist()'>#: text #</button>"
                     }
                 ],
                 excel: {
@@ -261,20 +167,17 @@
                 columnMenu: {
                     filterable: false
                 },
-                dataBound: saveGridOptions,
-                columnResize: saveGridOptions,
-                columnHide: saveGridOptions,
-                columnShow: saveGridOptions,
-                columnReorder: saveGridOptions,
-                excelExport: exportToExcel,
-                error: function(e) {
-                    console.log(e);
-                },
+                dataBound: this.saveGridOptions,
+                columnResize: this.saveGridOptions,
+                columnHide: this.saveGridOptions,
+                columnShow: this.saveGridOptions,
+                columnReorder: this.saveGridOptions,
+                excelExport: this.exportToExcel,
                 columns: [
                     {
                         field: "Usages", title: "Anvend/Fjern anvendelse", width: 100,
                         persistId: "command", // DON'T YOU DARE RENAME!
-                        template: usageButtonTemplate,
+                        template: this.usageButtonTemplate,
                         filterable: false,
                         sortable: false
                     },
@@ -310,7 +213,7 @@
                         filterable: {
                             cell: {
                                 showOperators: false,
-                                template: accessModFilter,
+                                template: this.accessModFilter,
                             }
                         }
                     },
@@ -384,7 +287,7 @@
                     {
                         field: "Url", title: "Link til beskrivelse", width: 125,
                         persistId: "link", // DON'T YOU DARE RENAME!
-                        template: linkTemplate,
+                        template: this.linkTemplate,
                         attributes: { "class": "text-center" },
                         filterable: {
                             cell: {
@@ -397,7 +300,7 @@
                     {
                         field: "Usages.length", title: "IT System: Anvendes af", width: 95,
                         persistId: "usages", // DON'T YOU DARE RENAME!
-                        template: '<a class="col-md-7 text-center" data-ng-click="showUsageDetails(#: Id #,\'#: Name #\')">#: Usages.length #</a>',
+                        template: '<a class="col-md-7 text-center" data-ng-click="systemCatalogVm.showUsageDetails(#: Id #,\'#: Name #\')">#: Usages.length #</a>',
                         filterable: false,
                         sortable: false
                     },
@@ -469,119 +372,249 @@
                     }
                 ]
             };
+        }
 
-            function usageButtonTemplate(dataItem) {
-                // true if system is being used by system within current context, else false
-                var systemHasUsages = _.find(dataItem.Usages, function(d) { return d.OrganizationId == user.currentOrganizationId; });
-
-                if (systemHasUsages)
-                    return '<button type="button" class="btn btn-danger col-md-7" data-ng-click="removeUsage(' + dataItem.Id + ')">Fjern anv.</button>';
-
-                return '<button type="button" class="btn btn-success col-md-7" data-ng-click="enableUsage(' + dataItem.Id + ')">Anvend</button>';
+        // usagedetails grid empty-grid handling
+        private detailsBound(e) {
+            var grid = e.sender;
+            if (grid.dataSource.total() == 0) {
+                var colCount = grid.columns.length;
+                this.$(e.sender.wrapper)
+                    .find("tbody")
+                    .append(`<tr class="kendo-data-row"><td colspan="${colCount}" class="no-data text-muted">System anvendens ikke</td></tr>`);
             }
+        }
 
-            // adds usage at selected system within current context
-            $scope.enableUsage = function (dataItem) {
-                addUsage(dataItem).then(function() {
-                    $scope.mainGrid.dataSource.fetch();
-                });
-            }
+        // saves grid state to localStorage
+        private saveGridOptions = () => {
+            this.gridState.saveGridOptions(this.mainGrid);
+        }
 
-            // removes usage at selected system within current context
-            $scope.removeUsage = function (dataItem) {
-                var sure = confirm("Er du sikker på at du vil fjerne den lokale anvendelse af systemet? Dette sletter ikke systemet, men vil slette alle lokale detaljer vedrørende anvendelsen.");
-                if (sure)
-                    deleteUsage(dataItem).then(function() {
-                        $scope.mainGrid.dataSource.fetch();
-                    });
-            }
+        // loads kendo grid options from localstorage
+        private loadGridOptions() {
+            this.gridState.loadGridOptions(this.mainGrid);
+        }
 
-            // adds system to usage within the current context
-            function addUsage(systemId) {
-                return $http.post('api/itsystemusage', {
-                    itSystemId: systemId,
-                    organizationId: user.currentOrganizationId
-                }).success(function () {
-                    notify.addSuccessMessage('Systemet er taget i anvendelse');
-                }).error(function () {
-                    notify.addErrorMessage('Systemet kunne ikke tages i anvendelse!');
-                });
-            }
+        public saveGridProfile = () => {
+            this.gridState.saveGridProfile(this.mainGrid);
+            this.notify.addSuccessMessage("Filtre og sortering gemt");
+        }
 
-            // removes system from usage within the current context
-            function deleteUsage(systemId) {
-                var url = 'api/itsystemusage?itSystemId=' + systemId + '&organizationId=' + user.currentOrganizationId;
+        public loadGridProfile() {
+            this.gridState.loadGridProfile(this.mainGrid);
+            this.mainGrid.dataSource.read();
+            this.notify.addSuccessMessage("Anvender gemte filtre og sortering");
+        }
 
-                return $http.delete(url).success(function() {
-                    notify.addSuccessMessage('Anvendelse af systemet er fjernet');
-                }).error(function() {
-                    notify.addErrorMessage('Anvendelse af systemet kunne ikke fjernes!');
-                });
-            }
+        public clearGridProfile() {
+            this.gridState.removeProfile();
+            this.gridState.removeSession();
+            this.notify.addSuccessMessage("Filtre og sortering slettet");
+            this.reload();
+        };
 
-            function linkTemplate(dataItem) {
-                if (dataItem.Url)
-                    return '<a href="' + dataItem.Url + '" title="Link til yderligere..." target="_blank"><i class="fa fa-link"></i></a>';
-                return "";
-            }
+        public doesGridProfileExist = () => {
+            return this.gridState.doesGridProfileExist();
+        };
 
-            function accessModFilter(args) {
-                var gridDataSource = args.dataSource;
+        // clears grid filters by removing the localStorageItem and reloading the page
+        public clearOptions() {
+            this.gridState.removeProfile();
+            this.gridState.removeLocal();
+            this.gridState.removeSession();
+            this.notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge nulstillet");
+            // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
+            this.reload();
+        };
 
-                function setSelected() {
-                    var kendoElem = this;
-                    var currentFilter = gridDataSource.filter();
-                    var filterObj = _.findKeyDeep(currentFilter, { field: "AccessModifier" });
+        private reload() {
+            this.$state.go(".", null, { reload: true });
+        }
 
-                    switch (filterObj.value) {
-                        case "Kitos.AccessModifier0":
-                            kendoElem.select(1);
-                            break;
-                        case "Kitos.AccessModifier1":
-                            kendoElem.select(2);
-                            break;
-                        case "Kitos.AccessModifier2":
-                            kendoElem.select(3);
-                            break;
-                        default:
-                            kendoElem.select(0); // select placeholder
-                    }
+        // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
+        public showUsageDetails = (usageId, systemName) => {
+            //Filter by usageId
+            this.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
+            //Set modal title
+            this.modal.setOptions({ title: `Anvendelse af ${systemName}` });
+            //Open modal
+            this.modal.center().open();
+        }
+
+        // usagedetails grid
+        public usageDetailsGrid: kendo.ui.GridOptions = {
+            dataSource: {
+                type: "odata-v4",
+                transport:
+                {
+                    read: {
+                        url: "/odata/ItSystemUsages?$expand=Organization",
+                        dataType: "json"
+                    },
+                },
+                serverPaging: true,
+                serverSorting: true,
+                serverFiltering: true
+            },
+            autoBind: false,
+            columns: [
+                {
+                    field: "Organization.Name",
+                    title: "Organisation"
                 }
+            ],
+            dataBound: this.detailsBound
+        };
 
-                function applyFilter() {
-                    var kendoElem = this;
-                    // can't use args.dataSource directly,
-                    // if we do then the view doesn't update.
-                    // So have to go through $scope - sadly :(
-                    var dataSource = $scope.mainGrid.dataSource;
-                    var selectedValue = kendoElem.value();
-                    var field = "AccessModifier";
-                    var currentFilter = dataSource.filter();
-                    // remove old value first
-                    var newFilter = _.removeFiltersForField(currentFilter, field);
+        private exportFlag = false;
+        private exportToExcel = (e) => {
+            var columns = e.sender.columns;
 
-                    if (selectedValue) {
-                        newFilter = _.addFilter(newFilter, field, "eq", selectedValue, "and");
+            if (!this.exportFlag) {
+                e.preventDefault();
+                this._.forEach(columns, column => {
+                    if (column.hidden) {
+                        column.tempVisual = true;
+                        e.sender.showColumn(column);
                     }
-
-                    dataSource.filter(newFilter);
-                }
-
-                // http://dojo.telerik.com/ODuDe/5
-                args.element.removeAttr("data-bind");
-                args.element.kendoDropDownList({
-                    dataSource: [
-                        { value: "Kitos.AccessModifier0", text: "Normal" },
-                        { value: "Kitos.AccessModifier1", text: "Public" },
-                        { value: "Kitos.AccessModifier2", text: "Private" }
-                    ],
-                    dataTextField: "text",
-                    dataValueField: "value",
-                    optionLabel: "Vælg filter...",
-                    dataBound: setSelected,
-                    change: applyFilter
+                });
+                this.$timeout(() => {
+                    this.exportFlag = true;
+                    e.sender.saveAsExcel();
+                });
+            } else {
+                this.exportFlag = false;
+                this._.forEach(columns, column => {
+                    if (column.tempVisual) {
+                        delete column.tempVisual;
+                        e.sender.hideColumn(column);
+                    }
                 });
             }
         }
-    ]);
-})(angular, app);
+
+        private usageButtonTemplate = (dataItem) => {
+            // true if system is being used by system within current context, else false
+            var systemHasUsages = this._.find(dataItem.Usages, (d: any) => (d.OrganizationId == this.user.currentOrganizationId));
+
+            if (systemHasUsages)
+                return `<button type="button" class="btn btn-danger col-md-7" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})">Fjern anv.</button>`;
+
+            return `<button type="button" class="btn btn-success col-md-7" data-ng-click="systemCatalogVm.enableUsage(${dataItem.Id})">Anvend</button>`;
+        }
+
+        // adds usage at selected system within current context
+        public enableUsage(dataItem) {
+            this.addUsage(dataItem).then(() => this.mainGrid.dataSource.fetch());
+        }
+
+        // removes usage at selected system within current context
+        public removeUsage(dataItem) {
+            var sure = confirm("Er du sikker på at du vil fjerne den lokale anvendelse af systemet? Dette sletter ikke systemet, men vil slette alle lokale detaljer vedrørende anvendelsen.");
+            if (sure)
+                this.deleteUsage(dataItem).then(() => this.mainGrid.dataSource.fetch());
+        }
+
+        // adds system to usage within the current context
+        private addUsage(systemId) {
+            return this.$http.post("api/itsystemusage", {
+                itSystemId: systemId,
+                organizationId: this.user.currentOrganizationId
+                })
+                .success(() => this.notify.addSuccessMessage("Systemet er taget i anvendelse"))
+                .error(() => this.notify.addErrorMessage("Systemet kunne ikke tages i anvendelse!"));
+        }
+
+        // removes system from usage within the current context
+        private deleteUsage(systemId) {
+            var url = `api/itsystemusage?itSystemId=${systemId}&organizationId=${this.user.currentOrganizationId}`;
+
+            return this.$http.delete(url)
+                .success(() => this.notify.addSuccessMessage("Anvendelse af systemet er fjernet"))
+                .error(() => this.notify.addErrorMessage("Anvendelse af systemet kunne ikke fjernes!"));
+        }
+
+        private linkTemplate(dataItem) {
+            if (dataItem.Url)
+                return `<a href="${dataItem.Url}" title="Link til yderligere..." target="_blank"><i class="fa fa-link"></i></a>`;
+            return "";
+        }
+
+        private accessModFilter = (args) => {
+            var self = this;
+            var gridDataSource = args.dataSource;
+
+            function setSelected() {
+                var kendoElem = this;
+                var currentFilter = gridDataSource.filter();
+                var filterObj = self._.findKeyDeep(currentFilter, { field: "AccessModifier" });
+
+                switch (filterObj.value) {
+                    case "Kitos.AccessModifier0":
+                        kendoElem.select(1);
+                        break;
+                    case "Kitos.AccessModifier1":
+                        kendoElem.select(2);
+                        break;
+                    case "Kitos.AccessModifier2":
+                        kendoElem.select(3);
+                        break;
+                    default:
+                        kendoElem.select(0); // select placeholder
+                }
+            }
+
+            function applyFilter() {
+                var kendoElem = this;
+                // can't use args.dataSource directly,
+                // if we do then the view doesn't update.
+                // So have to go through $scope - sadly :(
+                var dataSource = self.mainGrid.dataSource;
+                var selectedValue = kendoElem.value();
+                var field = "AccessModifier";
+                var currentFilter = dataSource.filter();
+                // remove old value first
+                var newFilter = self._.removeFiltersForField(currentFilter, field);
+
+                if (selectedValue) {
+                    newFilter = self._.addFilter(newFilter, field, "eq", selectedValue, "and");
+                }
+
+                dataSource.filter(newFilter);
+            }
+
+            // http://dojo.telerik.com/ODuDe/5
+            args.element.removeAttr("data-bind");
+            args.element.kendoDropDownList({
+                dataSource: [
+                    { value: "Kitos.AccessModifier0", text: "Normal" },
+                    { value: "Kitos.AccessModifier1", text: "Public" },
+                    { value: "Kitos.AccessModifier2", text: "Private" }
+                ],
+                dataTextField: "text",
+                dataValueField: "value",
+                optionLabel: "Vælg filter...",
+                dataBound: setSelected,
+                change: applyFilter
+            });
+        }
+    }
+
+    angular
+        .module("app")
+        .config([
+            "$stateProvider", $stateProvider => {
+                $stateProvider.state("it-system.catalog", {
+                    url: "/catalog",
+                    templateUrl: "partials/it-system/it-system-catalog.html",
+                    controller: CatalogController,
+                    controllerAs: "systemCatalogVm",
+                    resolve: {
+                        user: [
+                            "userService", userService => userService.getUser()
+                        ]
+                    }
+                });
+            }
+        ]);
+}

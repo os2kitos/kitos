@@ -1,921 +1,959 @@
-﻿(function (ng, app) {
-    app.config([
-        '$stateProvider', '$urlRouterProvider', function($stateProvider) {
-            $stateProvider.state('it-system.overview', {
-                url: '/overview',
-                templateUrl: 'partials/it-system/overview-it-system.html',
-                controller: 'system.OverviewCtrl',
-                resolve: {
-                    user: [
-                        'userService', function(userService) {
-                            return userService.getUser();
-                        }
-                    ],
-                    systemRoles: [
-                        '$http', function ($http) {
-                            return $http.get("/odata/ItSystemRoles").then(function (result) {
-                                return result.data.value;
-                            });
-                        }
-                    ],
-                    orgUnits: [
-                        '$http', 'user', '_', function ($http, user, _) {
-                            return $http.get("/odata/Organizations(" + user.currentOrganizationId + ")/OrganizationUnits").then(function (result) {
-                                return _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId");
-                            });
-                        }
-                    ]
-                }
-            });
-        }
-    ]);
+﻿module Kitos.ItSystem.Overview {
+    "use strict";
+
+    export interface IOverviewController {
+        mainGrid: Kitos.IKendoGrid;
+        mainGridOptions: kendo.ui.GridOptions;
+        roleSelectorOptions: kendo.ui.DropDownListOptions;
+        //modal: kendo.ui.Window;
+        //usageGrid: kendo.ui.Grid;
+        //usageDetailsGrid: kendo.ui.GridOptions;
+        //exhibitModal: kendo.ui.Window;
+        //exhibitGrid: kendo.ui.Grid;
+        //exhibitDetailsGrid: kendo.ui.GridOptions;
+    }
 
     // Here be dragons! Thou art forewarned.
     // Or perhaps it's samurais, because it's kendos terrible terrible framework that's the cause...
-    app.controller('system.OverviewCtrl',
-        [
-            '$rootScope', '$scope', '$http', '$timeout', '_', '$state', 'user', 'gridStateService', 'systemRoles', 'orgUnits', 'notify',
-            function ($rootScope, $scope, $http, $timeout, _, $state, user, gridStateService, systemRoles, orgUnits, notify) {
-                $rootScope.page.title = 'IT System - Overblik';
+    export class OverviewController implements IOverviewController {
+        private storageKey = "it-system-overview-options";
+        private orgUnitStorageKey = "it-system-overview-orgunit";
+        private gridState = this.gridStateService.getService(this.storageKey);
+        public mainGrid: Kitos.IKendoGrid;
+        public mainGridOptions: kendo.ui.GridOptions;
 
-                // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(c/User/Name,'foo') and c/RoleId eq {roleId})"
-                function fixRoleFilter(filterUrl, roleName, roleId) {
-                    var pattern = new RegExp("(\\w+\\()" + roleName + "(.*?\\))", "i");
-                    return filterUrl.replace(pattern, "Rights/any(c: $1c/User/Name$2 and c/RoleId eq " + roleId + ")");
+        public usageGrid: kendo.ui.Grid;
+        public modal: kendo.ui.Window;
+
+        public exhibitGrid: kendo.ui.Grid;
+        public exhibitModal: kendo.ui.Window;
+
+        private static $inject: Array<string> = [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$timeout",
+            "$window",
+            "$state",
+            "$",
+            "_",
+            "moment",
+            "notify",
+            "systemRoles",
+            "user",
+            "gridStateService",
+            "orgUnits"
+        ];
+
+        constructor(
+            private $rootScope: Kitos.IRootScope,
+            private $scope: ng.IScope,
+            private $http: ng.IHttpService,
+            private $timeout: ng.ITimeoutService,
+            private $window: ng.IWindowService,
+            private $state: ng.ui.IStateService,
+            private $: JQueryStatic,
+            private _: Kitos.ILodashWithMixins,
+            private moment: moment.MomentStatic,
+            private notify,
+            private systemRoles: Array<any>,
+            private user,
+            private gridStateService: Kitos.Services.IGridStateFactory,
+            private orgUnits: Array<any>) {
+            $rootScope.page.title = "IT System - Overblik";
+
+            $scope.$on("kendoWidgetCreated", (event, widget) => {
+                // the event is emitted for every widget; if we have multiple
+                // widgets in this controller, we need to check that the event
+                // is for the one we're interested in.
+                if (widget === this.mainGrid) {
+                    this.loadGridOptions();
+                    this.mainGrid.dataSource.read();
                 }
+            });
 
-                function fixKleIdFilter(filterUrl, column) {
-                    var pattern = new RegExp("(\\w+\\()" + column + "(.*?\\))", "i");
-                    return filterUrl.replace(pattern, "ItSystem/TaskRefs/any(c: $1c/TaskKey$2)");
-                }
+            this.activate();
+        }
 
-                function fixKleDescFilter(filterUrl, column) {
-                    var pattern = new RegExp("(\\w+\\()" + column + "(.*?\\))", "i");
-                    return filterUrl.replace(pattern, "ItSystem/TaskRefs/any(c: $1c/Description$2)");
-                }
+        // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(c/User/Name,'foo') and c/RoleId eq {roleId})"
+        private fixRoleFilter(filterUrl, roleName, roleId) {
+            var pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
+            return filterUrl.replace(pattern, `Rights/any(c: $1c/User/Name$2 and c/RoleId eq ${roleId})`);
+        }
 
-                var storageKey = "it-system-overview-options";
-                var orgUnitStorageKey = "it-system-overview-orgunit";
-                var gridState = gridStateService.getService(storageKey);
+        private fixKleIdFilter(filterUrl, column) {
+            var pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+            return filterUrl.replace(pattern, "ItSystem/TaskRefs/any(c: $1c/TaskKey$2)");
+        }
 
-                // saves grid state to localStorage
-                function saveGridOptions() {
-                    gridState.saveGridOptions($scope.mainGrid);
-                }
+        private fixKleDescFilter(filterUrl, column) {
+            var pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+            return filterUrl.replace(pattern, "ItSystem/TaskRefs/any(c: $1c/Description$2)");
+        }
 
-                // loads kendo grid options from localstorage
-                function loadGridOptions() {
-                    var selectedOrgUnitId = sessionStorage.getItem(orgUnitStorageKey);
-                    var selectedOrgUnit = _.find(orgUnits, function (orgUnit) {
-                        return orgUnit.Id == selectedOrgUnitId;
-                    });
+        // saves grid state to localStorage
+        private saveGridOptions = () => {
+            this.gridState.saveGridOptions(this.mainGrid);
+        }
 
-                    var filter = undefined;
-                    // if selected is a root then no need to filter as it should display everything anyway
-                    if (selectedOrgUnit && selectedOrgUnit.$level != 0) {
-                        filter = getFilterWithOrgUnit({}, selectedOrgUnitId, selectedOrgUnit.childIds);
-                    }
+        // loads kendo grid options from localstorage
+        private loadGridOptions() {
+            var selectedOrgUnitId = <number> this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
+            var selectedOrgUnit = this._.find(this.orgUnits, (orgUnit: any) => (orgUnit.Id == selectedOrgUnitId));
 
-                    gridState.loadGridOptions($scope.mainGrid, filter);
-                }
+            var filter = undefined;
+            // if selected is a root then no need to filter as it should display everything anyway
+            if (selectedOrgUnit && selectedOrgUnit.$level != 0) {
+                filter = this.getFilterWithOrgUnit({}, selectedOrgUnitId, selectedOrgUnit.childIds);
+            }
 
-                $scope.saveGridProfile = function() {
-                    // the stored org unit id must be the current
-                    var currentOrgUnitId = sessionStorage.getItem(orgUnitStorageKey);
-                    localStorage.setItem(orgUnitStorageKey + "-profile", currentOrgUnitId);
+            this.gridState.loadGridOptions(this.mainGrid, filter);
+        }
 
-                    gridState.saveGridProfile($scope.mainGrid);
-                    notify.addSuccessMessage("Filtre og sortering gemt");
-                };
+        public saveGridProfile() {
+            // the stored org unit id must be the current
+            var currentOrgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
+            this.$window.localStorage.setItem(this.orgUnitStorageKey + "-profile", currentOrgUnitId);
 
-                $scope.loadGridProfile = function() {
-                    gridState.loadGridProfile($scope.mainGrid);
+            this.gridState.saveGridProfile(this.mainGrid);
+            this.notify.addSuccessMessage("Filtre og sortering gemt");
+        }
 
-                    var orgUnitId = localStorage.getItem(orgUnitStorageKey + "-profile");
-                    // update session
-                    sessionStorage.setItem(orgUnitStorageKey, orgUnitId);
-                    // find the org unit filter row section
-                    var orgUnitFilterRow = $(".k-filter-row [data-field='ResponsibleUsage.OrganizationUnit.Name']");
-                    // find the access modifier kendo widget
-                    var orgUnitFilterWidget = orgUnitFilterRow.find("input").data("kendoDropDownList");
-                    orgUnitFilterWidget.select(function(dataItem) {
-                        return dataItem.Id == orgUnitId;
-                    });
+        public loadGridProfile() {
+            this.gridState.loadGridProfile(this.mainGrid);
 
-                    $scope.mainGrid.dataSource.read();
-                    notify.addSuccessMessage("Anvender gemte filtre og sortering");
-                };
+            var orgUnitId = this.$window.localStorage.getItem(this.orgUnitStorageKey + "-profile");
+            // update session
+            this.$window.sessionStorage.setItem(this.orgUnitStorageKey, orgUnitId);
+            // find the org unit filter row section
+            var orgUnitFilterRow = this.$(".k-filter-row [data-field='ResponsibleUsage.OrganizationUnit.Name']");
+            // find the access modifier kendo widget
+            var orgUnitFilterWidget = orgUnitFilterRow.find("input").data("kendoDropDownList");
+            orgUnitFilterWidget.select(dataItem => dataItem.Id == orgUnitId);
 
-                $scope.clearGridProfile = function() {
-                    sessionStorage.removeItem(orgUnitStorageKey);
-                    gridState.removeProfile();
-                    gridState.removeSession();
-                    notify.addSuccessMessage("Filtre og sortering slettet");
-                    reload();
-                };
+            this.mainGrid.dataSource.read();
+            this.notify.addSuccessMessage("Anvender gemte filtre og sortering");
+        }
 
-                $scope.doesGridProfileExist = function() {
-                    return gridState.doesGridProfileExist();
-                };
+        public clearGridProfile() {
+            this.$window.sessionStorage.removeItem(this.orgUnitStorageKey);
+            this.gridState.removeProfile();
+            this.gridState.removeSession();
+            this.notify.addSuccessMessage("Filtre og sortering slettet");
+            this.reload();
+        }
 
-                // clears grid filters by removing the localStorageItem and reloading the page
-                $scope.clearOptions = function() {
-                    localStorage.removeItem(orgUnitStorageKey + "-profile");
-                    sessionStorage.removeItem(orgUnitStorageKey);
-                    gridState.removeProfile();
-                    gridState.removeLocal();
-                    gridState.removeSession();
-                    notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge nulstillet");
-                    // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
-                    reload();
-                };
+        public doesGridProfileExist() {
+            return this.gridState.doesGridProfileExist();
+        }
 
-                function reload() {
-                    $state.go('.', null, { reload: true });
-                }
+        // clears grid filters by removing the localStorageItem and reloading the page
+        public clearOptions() {
+            this.$window.localStorage.removeItem(this.orgUnitStorageKey + "-profile");
+            this.$window.sessionStorage.removeItem(this.orgUnitStorageKey);
+            this.gridState.removeProfile();
+            this.gridState.removeLocal();
+            this.gridState.removeSession();
+            this.notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge nulstillet");
+            // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
+            this.reload();
+        };
 
-                $scope.$on("kendoWidgetCreated", function (event, widget) {
-                    // the event is emitted for every widget; if we have multiple
-                    // widgets in this controller, we need to check that the event
-                    // is for the one we're interested in.
-                    if (widget === $scope.mainGrid) {
-                        loadGridOptions();
-                        $scope.mainGrid.dataSource.read();
-                    }
-                });
+        private reload() {
+            this.$state.go(".", null, { reload: true });
+        }
 
-                // overview grid options
-                var mainGridOptions = {
-                    autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
-                    dataSource: {
-                        type: "odata-v4",
-                        transport: {
-                            read: {
-                                url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,Parent,TaskRefs),Organization,ResponsibleUsage($expand=OrganizationUnit),MainContract($expand=ItContract($expand=Supplier)),Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects",
-                                dataType: "json"
-                            },
-                            parameterMap: function (options, type) {
-                                // get kendo to map parameters to an odata url
-                                var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
-
-                                if (parameterMap.$filter) {
-                                    _.forEach(systemRoles, function (role) {
-                                        parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "role" + role.Id, role.Id);
-                                    });
-
-                                    parameterMap.$filter = fixKleIdFilter(parameterMap.$filter, "ItSystem/TaskRefs/TaskKey");
-                                    parameterMap.$filter = fixKleDescFilter(parameterMap.$filter, "ItSystem/TaskRefs/Description");
-                                }
-
-                                return parameterMap;
-                            }
+        private activate() {
+            // overview grid options
+            var mainGridOptions: Kitos.IKendoGridOptions = {
+                autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
+                dataSource: {
+                    type: "odata-v4",
+                    transport: {
+                        read: {
+                            url: `/odata/Organizations(${this.user.currentOrganizationId})/ItSystemUsages?$expand=ItSystem($expand=AppTypeOption,BusinessType,Parent,TaskRefs),Organization,ResponsibleUsage($expand=OrganizationUnit),MainContract($expand=ItContract($expand=Supplier)),Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects`,
+                            dataType: "json"
                         },
-                        sort: {
-                            field: "ItSystem.Name",
-                            dir: "asc"
-                        },
-                        pageSize: 100,
-                        serverPaging: true,
-                        serverSorting: true,
-                        serverFiltering: true,
-                        schema: {
-                            model: {
-                                fields: {
-                                    LastChanged: { type: "date" }
-                                }
-                            },
-                            parse: function (response) {
-                                // HACK to flattens the Rights on usage so they can be displayed as single columns
+                        parameterMap: (options, type) => {
+                            // get kendo to map parameters to an odata url
+                            var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
 
-                                // iterrate each usage
-                                _.forEach(response.value, function (usage) {
-                                    usage.roles = [];
-                                    // iterrate each right
-                                    _.forEach(usage.Rights, function (right) {
-                                        // init an role array to hold users assigned to this role
-                                        if (!usage.roles[right.RoleId])
-                                            usage.roles[right.RoleId] = [];
-
-                                        // push username to the role array
-                                        usage.roles[right.RoleId].push([right.User.Name, right.User.LastName].join(" "));
-                                    });
+                            if (parameterMap.$filter) {
+                                this._.forEach(this.systemRoles, role => {
+                                    parameterMap.$filter = this.fixRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id);
                                 });
-                                return response;
+
+                                parameterMap.$filter = this.fixKleIdFilter(parameterMap.$filter, "ItSystem/TaskRefs/TaskKey");
+                                parameterMap.$filter = this.fixKleDescFilter(parameterMap.$filter, "ItSystem/TaskRefs/Description");
+                            }
+
+                            return parameterMap;
+                        }
+                    },
+                    sort: {
+                        field: "ItSystem.Name",
+                        dir: "asc"
+                    },
+                    pageSize: 100,
+                    serverPaging: true,
+                    serverSorting: true,
+                    serverFiltering: true,
+                    schema: {
+                        model: {
+                            fields: {
+                                LastChanged: { type: "date" }
+                            }
+                        },
+                        parse: response => {
+                            // HACK to flattens the Rights on usage so they can be displayed as single columns
+
+                            // iterrate each usage
+                            this._.forEach(response.value, usage => {
+                                usage.roles = [];
+                                // iterrate each right
+                                this._.forEach(usage.Rights, right => {
+                                    // init an role array to hold users assigned to this role
+                                    if (!usage.roles[right.RoleId])
+                                        usage.roles[right.RoleId] = [];
+
+                                    // push username to the role array
+                                    usage.roles[right.RoleId].push([right.User.Name, right.User.LastName].join(" "));
+                                });
+                            });
+                            return response;
+                        }
+                    }
+                },
+                toolbar: [
+                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
+                    {
+                        name: "clearFilter",
+                        text: "Nulstil",
+                        template: "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='systemOverviewVm.clearOptions()'>#: text #</button>"
+                    },
+                    {
+                        name: "saveFilter",
+                        text: "Gem filter",
+                        template: '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="systemOverviewVm.saveGridProfile()">#: text #</button>'
+                    },
+                    {
+                        name: "useFilter",
+                        text: "Anvend filter",
+                        template: '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="systemOverviewVm.loadGridProfile()" data-ng-disabled="!systemOverviewVm.doesGridProfileExist()">#: text #</button>'
+                    },
+                    {
+                        name: "deleteFilter",
+                        text: "Slet filter",
+                        template: "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='systemOverviewVm.clearGridProfile()' data-ng-disabled='!systemOverviewVm.doesGridProfileExist()'>#: text #</button>"
+                    },
+                    {
+                        template: kendo.template(this.$("#role-selector").html())
+                    }
+                ],
+                excel: {
+                    fileName: "IT System Overblik.xlsx",
+                    filterable: true,
+                    allPages: true
+                },
+                pageable: {
+                    refresh: true,
+                    pageSizes: [10, 25, 50, 100, 200],
+                    buttonCount: 5
+                },
+                sortable: {
+                    mode: "single"
+                },
+                reorderable: true,
+                resizable: true,
+                filterable: {
+                    mode: "row"
+                },
+                groupable: false,
+                columnMenu: {
+                    filterable: false
+                },
+                dataBound: this.saveGridOptions,
+                columnResize: this.saveGridOptions,
+                columnHide: this.saveGridOptions,
+                columnShow: this.saveGridOptions,
+                columnReorder: this.saveGridOptions,
+                excelExport: this.exportToExcel,
+                columns: [
+                    {
+                        field: "LocalSystemId", title: "Lokal system ID", width: 150,
+                        persistId: "localid", // DON'T YOU DARE RENAME!
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
                             }
                         }
                     },
-                    toolbar: [
-                        { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
-                        {
-                            name: "clearFilter",
-                            text: "Nulstil",
-                            template: "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='clearOptions()'>#: text #</button>"
-                        },
-                        {
-                            name: "saveFilter",
-                            text: "Gem filter",
-                            template: '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="saveGridProfile()">#: text #</button>'
-                        },
-                        {
-                            name: "useFilter",
-                            text: "Anvend filter",
-                            template: '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="loadGridProfile()" data-ng-disabled="!doesGridProfileExist()">#: text #</button>'
-                        },
-                        {
-                            name: "deleteFilter",
-                            text: "Slet filter",
-                            template: "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='clearGridProfile()' data-ng-disabled='!doesGridProfileExist()'>#: text #</button>"
-                        },
-                        {
-                            template: kendo.template($("#role-selector").html())
+                    {
+                        field: "ItSystem.Parent.Name", title: "Overordnet IT System", width: 150,
+                        persistId: "parentsysname", // DON'T YOU DARE RENAME!
+                        template: "#: ItSystem.Parent ? ItSystem.Parent.Name : '' #",
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
                         }
-                    ],
-                    excel: {
-                        fileName: "IT System Overblik.xlsx",
-                        filterable: true,
-                        allPages: true
                     },
-                    pageable: {
-                        refresh: true,
-                        pageSizes: [10, 25, 50, 100, 200],
-                        buttonCount: 5
+                    {
+                        field: "ItSystem.Name", title: "IT System", width: 320,
+                        persistId: "sysname", // DON'T YOU DARE RENAME!
+                        template: "<a data-ui-sref='it-system.usage.interfaces({id: #: Id #})'>#: ItSystem.Name #</a>",
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
                     },
-                    sortable: {
-                        mode: "single"
+                    {
+                        field: "Version", title: "Version", width: 150,
+                        persistId: "version", // DON'T YOU DARE RENAME!
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
                     },
-                    reorderable: true,
-                    resizable: true,
+                    {
+                        field: "LocalCallName", title: "Lokal kaldenavn", width: 150,
+                        persistId: "localname", // DON'T YOU DARE RENAME!
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
+                    },
+                    {
+                        field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 190,
+                        persistId: "orgunit", // DON'T YOU DARE RENAME!
+                        template: "#: ResponsibleUsage ? ResponsibleUsage.OrganizationUnit.Name : '' #",
+                        filterable: {
+                            cell: {
+                                showOperators: false,
+                                template: this.orgUnitDropDownList
+                            }
+                        }
+                    },
+                    {
+                        field: "ItSystem.BusinessType.Name", title: "Forretningstype", width: 150,
+                        persistId: "busitype", // DON'T YOU DARE RENAME!
+                        template: "#: ItSystem.BusinessType ? ItSystem.BusinessType.Name : '' #",
+                        attributes: { "class": "might-overflow" },
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
+                    },
+                    {
+                        field: "ItSystem.AppTypeOption.Name", title: "Applikationstype", width: 150,
+                        persistId: "apptype", // DON'T YOU DARE RENAME!
+                        template: "#: ItSystem.AppTypeOption ? ItSystem.AppTypeOption.Name : '' #",
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
+                    },
+                    {
+                        field: "ItSystem.TaskRefs.TaskKey", title: "KLE ID", width: 150,
+                        persistId: "taskkey", // DON'T YOU DARE RENAME!
+                        template: "#: ItSystem.TaskRefs.length > 0 ? _.pluck(ItSystem.TaskRefs, 'TaskKey').join(', ') : '' #",
+                        attributes: { "class": "might-overflow" },
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "startswith",
+                            }
+                        },
+                        sortable: false
+                    },
+                    {
+                        field: "ItSystem.TaskRefs.Description", title: "KLE navn", width: 150,
+                        persistId: "klename", // DON'T YOU DARE RENAME!
+                        template: "#: ItSystem.TaskRefs.length > 0 ? _.pluck(ItSystem.TaskRefs, 'Description').join(', ') : '' #",
+                        attributes: { "class": "might-overflow" },
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        },
+                        sortable: false
+                    },
+                    {
+                        field: "EsdhRef", title: "ESDH ref", width: 150,
+                        persistId: "esdh", // DON'T YOU DARE RENAME!
+                        template: "#= EsdhRef ? '<a target=\"_blank\" href=\"' + EsdhRef + '\"><i class=\"fa fa-link\"></a>' : '' #",
+                        attributes: { "class": "text-center" },
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
+                    },
+                    {
+                        field: "DirectoryOrUrlRef", title: "Mappe ref", width: 150,
+                        persistId: "folderref", // DON'T YOU DARE RENAME!
+                        template: "#= DirectoryOrUrlRef ? '<a target=\"_blank\" href=\"' + DirectoryOrUrlRef + '\"><i class=\"fa fa-link\"></i></a>' : '' #",
+                        attributes: { "class": "text-center" },
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
+                    },
+                    {
+                        field: "CmdbRef", title: "CMDB ref", width: 150,
+                        persistId: "cmdb", // DON'T YOU DARE RENAME!
+                        template: "#= CmdbRef ? '<a target=\"_blank\" href=\"' + CmdbRef + '\"><i class=\"fa fa-link\"></i></a>' : '' #",
+                        attributes: { "class": "text-center" },
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
+                    },
+                    {
+                        field: "ArchiveType.Name", title: "Arkivering", width: 150,
+                        persistId: "archive", // DON'T YOU DARE RENAME!
+                        template: "#: ArchiveType ? ArchiveType.Name : '' #",
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
+                    },
+                    {
+                        field: "SensitiveDataType.Name", title: "Personfølsom", width: 150,
+                        persistId: "sensitive", // DON'T YOU DARE RENAME!
+                        template: "#: SensitiveDataType ? SensitiveDataType.Name : '' #",
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
+                    },
+                    //{
+                    //    field: "", title: "IT System: Anvendes af", width: 100,
+                    //    persistId: "sysusage", // DON'T YOU DARE RENAME!
+                    //    template: "TODO",
+                    //    filterable: false,
+                    //    sortable: false
+                    //},
+                    //{
+                    //    field: "ItSystem.ItInterfaceExhibits", title: "Snitflader: Udstilles ???", width: 95,
+                    //    persistId: "exhibit", // DON'T YOU DARE RENAME!
+                    //    template: "<a data-ng-click=\"systemOverviewVm.showExposureDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.ItInterfaceExhibits.length #</a>",
+                    //    hidden: true,
+                    //    filterable: false,
+                    //    sortable: false
+                    //},
+                    //{
+                    //    field: "ItSystem.CanUseInterfaces", title: "Snitflader: Anvendes ???", width: 95,
+                    //    persistId: "canuse", // DON'T YOU DARE RENAME!
+                    //    template: "<a data-ng-click=\"systemOverviewVm.showUsageDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.CanUseInterfaces.length #</a>",
+                    //    hidden: true,
+                    //    filterable: false,
+                    //    sortable: false
+                    //},
+                    {
+                        field: "MainContract", title: "Kontrakt", width: 120,
+                        persistId: "contract", // DON'T YOU DARE RENAME!
+                        template: this.contractTemplate,
+                        attributes: { "class": "text-center" },
+                        sortable: false,
+                        filterable: {
+                            cell: {
+                                showOperators: false,
+                                template: this.contractFilterDropDownList
+                            }
+                        },
+                    },
+                    {
+                        field: "MainContract.ItContract.Supplier.Name", title: "Leverandør", width: 175,
+                        persistId: "supplier", // DON'T YOU DARE RENAME!
+                        template: this.supplierTemplate,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
+                    },
+                    {
+                        field: "", title: "IT Projekt", width: 150,
+                        persistId: "sysusage", // DON'T YOU DARE RENAME!
+                        template: "#: ItProjects.length > 0 ? _.first(ItProjects).Name : '' #",
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
+                    },
+                    {
+                        field: "ObjectOwner.Name", title: "Taget i anvendelse af", width: 150,
+                        persistId: "ownername", // DON'T YOU DARE RENAME!
+                        template: "#: ObjectOwner.Name + ' ' + ObjectOwner.LastName #",
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
+                    },
+                    {
+                        field: "LastChangedByUser.Name", title: "Sidst redigeret: Bruger", width: 150,
+                        persistId: "lastchangedname", // DON'T YOU DARE RENAME!
+                        template: "#: LastChangedByUser.Name + ' ' + LastChangedByUser.LastName #",
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains",
+                            }
+                        }
+                    },
+                    {
+                        field: "LastChanged", title: "Sidste redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 150,
+                        persistId: "changed", // DON'T YOU DARE RENAME!
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                showOperators: false,
+                                operator: "gte"
+                            }
+                        }
+                    }
+                ]
+            };
+
+            // find the index of column where the role columns should be inserted
+            var insertIndex = this._.findIndex(mainGridOptions.columns, "persistId", "orgunit") + 1;
+
+            // add a role column for each of the roles
+            // note iterating in reverse so we don't have to update the insert index
+            this._.forEachRight(this.systemRoles, role => {
+                var roleColumn = {
+                    field: `role${role.Id}`,
+                    title: role.Name,
+                    persistId: `role${role.Id}`,
+                    template: dataItem => this.roleTemplate(dataItem, role.Id),
+                    width: 145,
+                    hidden: role.Name == "Systemejer" ? false : true, // hardcoded role name :(
+                    sortable: false,
                     filterable: {
-                        mode: "row"
-                    },
-                    groupable: false,
-                    columnMenu: {
-                        filterable: false
-                    },
-                    dataBound: saveGridOptions,
-                    columnResize: saveGridOptions,
-                    columnHide: saveGridOptions,
-                    columnShow: saveGridOptions,
-                    columnReorder: saveGridOptions,
-                    excelExport: exportToExcel,
-                    error: function(e) {
-                        console.log(e);
-                    },
-                    columns: [
-                        {
-                            field: "LocalSystemId", title: "Lokal system ID", width: 150,
-                            persistId: "localid", // DON'T YOU DARE RENAME!
-                            hidden: true,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "ItSystem.Parent.Name", title: "Overordnet IT System", width: 150,
-                            persistId: "parentsysname", // DON'T YOU DARE RENAME!
-                            template: "#: ItSystem.Parent ? ItSystem.Parent.Name : '' #",
-                            hidden: true,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains"
-                                }
-                            }
-                        },
-                        {
-                            field: "ItSystem.Name", title: "IT System", width: 320,
-                            persistId: "sysname", // DON'T YOU DARE RENAME!
-                            template: "<a data-ui-sref='it-system.usage.interfaces({id: #: Id #})'>#: ItSystem.Name #</a>",
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains"
-                                }
-                            }
-                        },
-                        {
-                            field: "Version", title: "Version", width: 150,
-                            persistId: "version", // DON'T YOU DARE RENAME!
-                            hidden: true,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "LocalCallName", title: "Lokal kaldenavn", width: 150,
-                            persistId: "localname", // DON'T YOU DARE RENAME!
-                            hidden: true,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 190,
-                            persistId: "orgunit", // DON'T YOU DARE RENAME!
-                            template: "#: ResponsibleUsage ? ResponsibleUsage.OrganizationUnit.Name : '' #",
-                            filterable: {
-                                cell: {
-                                    showOperators: false,
-                                    template: orgUnitDropDownList
-                                }
-                            }
-                        },
-                        {
-                            field: "ItSystem.BusinessType.Name", title: "Forretningstype", width: 150,
-                            persistId: "busitype", // DON'T YOU DARE RENAME!
-                            template: "#: ItSystem.BusinessType ? ItSystem.BusinessType.Name : '' #",
-                            attributes: { "class": "might-overflow" },
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "ItSystem.AppTypeOption.Name", title: "Applikationstype", width: 150,
-                            persistId: "apptype", // DON'T YOU DARE RENAME!
-                            template: "#: ItSystem.AppTypeOption ? ItSystem.AppTypeOption.Name : '' #",
-                            hidden: true,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "ItSystem.TaskRefs.TaskKey", title: "KLE ID", width: 150,
-                            persistId: "taskkey", // DON'T YOU DARE RENAME!
-                            template: "#: ItSystem.TaskRefs.length > 0 ? _.pluck(ItSystem.TaskRefs, 'TaskKey').join(', ') : '' #",
-                            attributes: { "class": "might-overflow" },
-                            hidden: true,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "startswith",
-                                }
-                            },
-                            sortable: false
-                        },
-                        {
-                            field: "ItSystem.TaskRefs.Description", title: "KLE navn", width: 150,
-                            persistId: "klename", // DON'T YOU DARE RENAME!
-                            template: "#: ItSystem.TaskRefs.length > 0 ? _.pluck(ItSystem.TaskRefs, 'Description').join(', ') : '' #",
-                            attributes: { "class": "might-overflow" },
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            },
-                            sortable: false
-                        },
-                        {
-                            field: "EsdhRef", title: "ESDH ref", width: 150,
-                            persistId: "esdh", // DON'T YOU DARE RENAME!
-                            template: "#= EsdhRef ? '<a target=\"_blank\" href=\"' + EsdhRef + '\"><i class=\"fa fa-link\"></a>' : '' #",
-                            attributes: { "class": "text-center" },
-                            hidden: true,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "DirectoryOrUrlRef", title: "Mappe ref", width: 150,
-                            persistId: "folderref", // DON'T YOU DARE RENAME!
-                            template: "#= DirectoryOrUrlRef ? '<a target=\"_blank\" href=\"' + DirectoryOrUrlRef + '\"><i class=\"fa fa-link\"></i></a>' : '' #",
-                            attributes: { "class": "text-center" },
-                            hidden: true,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "CmdbRef", title: "CMDB ref", width: 150,
-                            persistId: "cmdb", // DON'T YOU DARE RENAME!
-                            template: "#= CmdbRef ? '<a target=\"_blank\" href=\"' + CmdbRef + '\"><i class=\"fa fa-link\"></i></a>' : '' #",
-                            attributes: { "class": "text-center" },
-                            hidden: true,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "ArchiveType.Name", title: "Arkivering", width: 150,
-                            persistId: "archive", // DON'T YOU DARE RENAME!
-                            template: "#: ArchiveType ? ArchiveType.Name : '' #",
-                            hidden: true,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "SensitiveDataType.Name", title: "Personfølsom", width: 150,
-                            persistId: "sensitive", // DON'T YOU DARE RENAME!
-                            template: "#: SensitiveDataType ? SensitiveDataType.Name : '' #",
-                            hidden: true,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        //{
-                        //    field: "", title: "IT System: Anvendes af", width: 100,
-                        //    persistId: "sysusage", // DON'T YOU DARE RENAME!
-                        //    template: "TODO",
-                        //    filterable: false,
-                        //    sortable: false
-                        //},
-                        //{
-                        //    field: "ItSystem.ItInterfaceExhibits", title: "Snitflader: Udstilles ???", width: 95,
-                        //    persistId: "exhibit", // DON'T YOU DARE RENAME!
-                        //    template: "<a data-ng-click=\"showExposureDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.ItInterfaceExhibits.length #</a>",
-                        //    hidden: true,
-                        //    filterable: false,
-                        //    sortable: false
-                        //},
-                        //{
-                        //    field: "ItSystem.CanUseInterfaces", title: "Snitflader: Anvendes ???", width: 95,
-                        //    persistId: "canuse", // DON'T YOU DARE RENAME!
-                        //    template: "<a data-ng-click=\"showUsageDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.CanUseInterfaces.length #</a>",
-                        //    hidden: true,
-                        //    filterable: false,
-                        //    sortable: false
-                        //},
-                        {
-                            field: "MainContract", title: "Kontrakt", width: 120,
-                            persistId: "contract", // DON'T YOU DARE RENAME!
-                            template: contractTemplate,
-                            attributes: { "class": "text-center" },
-                            sortable: false,
-                            filterable: {
-                                cell: {
-                                    showOperators: false,
-                                    template: contractFilterDropDownList
-                                }
-                            },
-                        },
-                        {
-                            field: "MainContract.ItContract.Supplier.Name", title: "Leverandør", width: 175,
-                            persistId: "supplier", // DON'T YOU DARE RENAME!
-                            template: supplierTemplate,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "", title: "IT Projekt", width: 150,
-                            persistId: "sysusage", // DON'T YOU DARE RENAME!
-                            template: "#: ItProjects.length > 0 ? _.first(ItProjects).Name : '' #",
-                            hidden: true,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "ObjectOwner.Name", title: "Taget i anvendelse af", width: 150,
-                            persistId: "ownername", // DON'T YOU DARE RENAME!
-                            template: "#: ObjectOwner.Name + ' ' + ObjectOwner.LastName #",
-                            hidden: true,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "LastChangedByUser.Name", title: "Sidst redigeret: Bruger", width: 150,
-                            persistId: "lastchangedname", // DON'T YOU DARE RENAME!
-                            template: "#: LastChangedByUser.Name + ' ' + LastChangedByUser.LastName #",
-                            hidden: true,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        },
-                        {
-                            field: "LastChanged", title: "Sidste redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 150,
-                            persistId: "changed", // DON'T YOU DARE RENAME!
-                            hidden: true,
-                            filterable: {
-                                cell: {
-                                    showOperators: false,
-                                    operator: "gte"
-                                }
-                            }
+                        cell: {
+                            dataSource: [],
+                            showOperators: false,
+                            operator: "contains"
                         }
-                    ]
-                };
-
-                function activate() {
-                    // find the index of column where the role columns should be inserted
-                    var insertIndex = _.findIndex(mainGridOptions.columns, "persistId", "orgunit") + 1;
-
-                    // add a role column for each of the roles
-                    // note iterating in reverse so we don't have to update the insert index
-                    _.forEachRight(systemRoles, function(role) {
-                        var roleColumn = {
-                            field: "role" + role.Id,
-                            title: role.Name,
-                            persistId: "role" + role.Id,
-                            template: function (dataItem) {
-                                return roleTemplate(dataItem, role.Id);
-                            },
-                            width: 145,
-                            hidden: role.Name == "Systemejer" ? false : true, // hardcoded role name :(
-                            sortable: false,
-                            filterable: {
-                                cell: {
-                                    dataSource: [],
-                                    showOperators: false,
-                                    operator: "contains",
-                                }
-                            }
-                        };
-
-                        // insert the generated column at the correct location
-                        mainGridOptions.columns.splice(insertIndex, 0, roleColumn);
-                    });
-
-                    // assign the generated grid options to the scope value, kendo will do the rest
-                    $scope.mainGridOptions = mainGridOptions;
-                }
-                activate();
-
-                function contractTemplate(dataItem) {
-                    if (dataItem.MainContract) {
-                        if (dataItem.MainContract.ItContract)
-                            if (isContractActive(dataItem.MainContract.ItContract))
-                                return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="fa fa-file text-success" aria-hidden="true"></span></a>';
-                            else
-                                return '<a data-ui-sref="it-system.usage.contracts({id: ' + dataItem.Id + '})"><span class="fa fa-file-o text-muted" aria-hidden="true"></span></a>';
-                    }
-                    return "";
-                }
-
-                function isContractActive(dataItem) {
-                    var today = moment();
-                    var startDate = dataItem.Concluded ? moment(dataItem.Concluded) : today;
-                    var endDate = dataItem.ExpirationDate ? moment(dataItem.ExpirationDate) : moment("9999-12-30");
-
-                    if (dataItem.Terminated) {
-                        var terminationDate = moment(dataItem.Terminated);
-                        if (dataItem.TerminationDeadline) {
-                            terminationDate.add(dataItem.TerminationDeadline.Name, "months");
-                        }
-                        // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
-                        return today >= startDate && today <= terminationDate;
-                    }
-
-                    // indgået-dato <= dags dato <= udløbs-dato
-                    return today >= startDate && today <= endDate;
-                }
-
-                function supplierTemplate(dataItem) {
-                    if (dataItem.MainContract) {
-                        if (dataItem.MainContract.ItContract) {
-                            if (dataItem.MainContract.ItContract.Supplier) {
-                                return dataItem.MainContract.ItContract.Supplier.Name;
-                            }
-                        }
-                    }
-                    return "";
-                }
-
-                function roleTemplate(dataItem, roleId) {
-                    var roles = "";
-
-                    if (dataItem.roles[roleId] === undefined)
-                        return roles;
-
-                    // join the first 5 username together
-                    if (dataItem.roles[roleId].length > 0)
-                        roles = dataItem.roles[roleId].slice(0, 4).join(", ");
-
-                    // if more than 5 then add an elipsis
-                    if (dataItem.roles[roleId].length > 5)
-                        roles += ", ...";
-
-                    var link = "<a data-ui-sref='it-system.usage.roles({id: " + dataItem.Id + "})'>" + roles + "</a>";
-
-                    return link;
-                }
-
-                // show exposureDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
-                $scope.showExposureDetails = function (usageId, systemName) {
-                    // filter by usageId
-                    $scope.exhibitGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
-                    // set title
-                    $scope.exhibitModal.setOptions({ title: systemName + " udstiller følgende snitflader" });
-                    // open modal
-                    $scope.exhibitModal.center().open();
-                };
-
-                $scope.exhibitDetailsGrid = {
-                    dataSource: {
-                        type: "odata-v4",
-                        transport: {
-                            read: {
-                                url: "/odata/ItInterfaceExhibits?$expand=ItInterface",
-                                dataType: "json"
-                            }
-                        },
-                        serverPaging: true,
-                        serverSorting: true,
-                        serverFiltering: true
-                    },
-                    autoBind: false,
-                    columns: [
-                        {
-                            field: "ItInterface.ItInterfaceId", title: "Snitflade ID"
-                        },
-                        {
-                            field: "ItInterface.Name", title: "Snitflade"
-                        }
-                    ],
-                    dataBound: exposureDetailsBound
-                };
-
-                // exposuredetails grid empty-grid handling
-                function exposureDetailsBound(e) {
-                    var grid = e.sender;
-                    if (grid.dataSource.total() == 0) {
-                        var colCount = grid.columns.length;
-                        $(e.sender.wrapper)
-                            .find('tbody')
-                            .append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data text-muted">System udstiller ikke nogle snitflader</td></tr>');
-                    }
-                }
-
-                // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
-                $scope.showUsageDetails = function(systemId, systemName) {
-                    // filter by systemId
-                    $scope.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: systemId });
-                    // set modal title
-                    $scope.modal.setOptions({ title: "Anvendelse af " + systemName });
-                    // open modal
-                    $scope.modal.center().open();
-                };
-
-                // usagedetails grid - shows which organizations has a given itsystem in local usage
-                $scope.usageDetailsGrid = {
-                    dataSource: {
-                        type: "odata-v4",
-                        transport:
-                        {
-                            read: {
-                                url: "/odata/ItInterfaceUses/?$expand=ItInterface",
-                                dataType: "json"
-                            },
-                        },
-                        serverPaging: true,
-                        serverSorting: true,
-                        serverFiltering: true
-                    },
-                    autoBind: false,
-                    columns: [
-                        {
-                            field: "ItInterfaceId", title: "Snitflade ID"
-                        },
-                        {
-                            field: "ItInterface.Name", title: "Snitflade"
-                        }
-                    ],
-                    dataBound: detailsBound
-                };
-
-                // usagedetails grid empty-grid handling
-                function detailsBound(e) {
-                    var grid = e.sender;
-                    if (grid.dataSource.total() == 0) {
-                        var colCount = grid.columns.length;
-                        $(e.sender.wrapper)
-                            .find('tbody')
-                            .append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data text-muted">System anvendens ikke</td></tr>');
                     }
                 };
 
-                function orgUnitDropDownList(args) {
-                    function indent(dataItem) {
-                        var htmlSpace = "&nbsp;&nbsp;&nbsp;&nbsp;";
-                        return htmlSpace.repeat(dataItem.$level) + dataItem.Name;
-                    }
+                // insert the generated column at the correct location
+                mainGridOptions.columns.splice(insertIndex, 0, roleColumn);
+            });
 
-                    function setDefaultOrgUnit() {
-                        var kendoElem = this;
-                        var idTofind = sessionStorage.getItem(orgUnitStorageKey);
+            // assign the generated grid options to the scope value, kendo will do the rest
+            this.mainGridOptions = mainGridOptions;
+        }
 
-                        if (!idTofind) {
-                            // if no id was found then do nothing
-                            return;
-                        }
+        private contractTemplate = (dataItem) => {
+            if (dataItem.MainContract) {
+                if (dataItem.MainContract.ItContract)
+                    if (this.isContractActive(dataItem.MainContract.ItContract))
+                        return `<a data-ui-sref="it-system.usage.contracts({id: ${dataItem.Id}})"><span class="fa fa-file text-success" aria-hidden="true"></span></a>`;
+                    else
+                        return `<a data-ui-sref="it-system.usage.contracts({id: ${dataItem.Id}})"><span class="fa fa-file-o text-muted" aria-hidden="true"></span></a>`;
+            }
+            return "";
+        }
 
-                        // find the index of the org unit that matches the users default org unit
-                        var index = _.findIndex(kendoElem.dataItems(), function (item) {
-                            return item.Id == idTofind;
-                        });
+        private isContractActive(dataItem) {
+            var today = this.moment();
+            var startDate = dataItem.Concluded ? moment(dataItem.Concluded) : today;
+            var endDate = dataItem.ExpirationDate ? moment(dataItem.ExpirationDate) : this.moment("9999-12-30");
 
-                        // -1 = no match
-                        //  0 = root org unit, which should display all. So remove org unit filter
-                        if (index > 0) {
-                            // select the users default org unit
-                            kendoElem.select(index);
-                        }
-                    }
-
-                    function orgUnitChanged() {
-                        var kendoElem = this;
-                        // can't use args.dataSource directly,
-                        // if we do then the view doesn't update.
-                        // So have to go through $scope - sadly :(
-                        var dataSource = $scope.mainGrid.dataSource;
-                        var currentFilter = dataSource.filter();
-                        var selectedIndex = kendoElem.select();
-                        var selectedId = _.parseInt(kendoElem.value());
-                        var childIds = kendoElem.dataItem().childIds;
-
-                        sessionStorage.setItem(orgUnitStorageKey, selectedId);
-
-                        if (selectedIndex > 0) {
-                            // filter by selected
-                            dataSource.filter(getFilterWithOrgUnit(currentFilter, selectedId, childIds));
-                        } else {
-                            // else clear filter because the 0th element should act like a placeholder
-                            dataSource.filter(getFilterWithOrgUnit(currentFilter));
-                        }
-                    }
-
-                    // http://dojo.telerik.com/ODuDe/5
-                    args.element.removeAttr("data-bind");
-                    args.element.kendoDropDownList({
-                        dataSource: orgUnits,
-                        dataValueField: "Id",
-                        dataTextField: "Name",
-                        template: indent,
-                        dataBound: setDefaultOrgUnit,
-                        change: orgUnitChanged
-                    });
+            if (dataItem.Terminated) {
+                var terminationDate = moment(dataItem.Terminated);
+                if (dataItem.TerminationDeadline) {
+                    terminationDate.add(dataItem.TerminationDeadline.Name, "months");
                 }
+                // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
+                return today >= startDate && today <= terminationDate;
+            }
 
-                function getFilterWithOrgUnit(currentFilter, selectedId, childIds) {
-                    var field = "ResponsibleUsage.OrganizationUnit.Id";
-                    // remove old values first
-                    var newFilter = _.removeFiltersForField(currentFilter, field);
+            // indgået-dato <= dags dato <= udløbs-dato
+            return today >= startDate && today <= endDate;
+        }
 
-                    // is selectedId a number?
-                    if (!isNaN(selectedId)) {
-                        newFilter = _.addFilter(newFilter, field, "eq", selectedId, "or");
-                        // add children to filters
-                        _.forEach(childIds, function (id) {
-                            newFilter = _.addFilter(newFilter, field, "eq", id, "or");
-                        });
-                    }
-                    return newFilter;
-                }
-
-                function contractFilterDropDownList(args) {
-                    var gridDataSource = args.dataSource;
-
-                    function setContractFilter() {
-                        var kendoElem = this;
-                        var currentFilter = gridDataSource.filter();
-                        var contractFilterObj = _.findKeyDeep(currentFilter, { field: "MainContract" });
-
-                        if (contractFilterObj.operator == "neq") {
-                            kendoElem.select(1); // index of "Har kontrakt"
-                        } else if (contractFilterObj.operator == "eq") {
-                            kendoElem.select(2); // index of "Ingen kontrakt"
-                        }
-                    }
-
-                    function filterByContract() {
-                        var kendoElem = this;
-                        // can't use args.dataSource directly,
-                        // if we do then the view doesn't update.
-                        // So have to go through $scope - sadly :(
-                        var dataSource = $scope.mainGrid.dataSource;
-                        var selectedValue = kendoElem.value();
-                        var field = "MainContract";
-                        var currentFilter = dataSource.filter();
-                        // remove old value first
-                        var newFilter = _.removeFiltersForField(currentFilter, field);
-
-                        if (selectedValue == "Har kontrakt") {
-                            newFilter = _.addFilter(newFilter, field, "ne", null, "and");
-                        } else if (selectedValue == "Ingen kontrakt") {
-                            newFilter = _.addFilter(newFilter, field, "eq", null, "and");
-                        }
-
-                        dataSource.filter(newFilter);
-                    }
-
-                    // http://dojo.telerik.com/ODuDe/5
-                    args.element.removeAttr("data-bind");
-                    args.element.kendoDropDownList({
-                        dataSource: ["Har kontrakt", "Ingen kontrakt"],
-                        optionLabel: "Vælg filter...",
-                        dataBound: setContractFilter,
-                        change: filterByContract
-                    });
-                }
-
-                $scope.roleSelectorOptions = {
-                    autoBind: false,
-                    dataSource: systemRoles,
-                    dataTextField: "Name",
-                    dataValueField: "Id",
-                    optionLabel: "Vælg systemrolle...",
-                    change: function (e) {
-                        // hide all roles column
-                        _.forEach(systemRoles, function(role) {
-                            $scope.mainGrid.hideColumn("role" + role.Id);
-                        });
-
-                        var selectedId = e.sender.value();
-                        var gridFieldName = "role" + selectedId;
-                        // show only the selected role column
-                        $scope.mainGrid.showColumn(gridFieldName);
-                    }
-                };
-
-                var exportFlag = false;
-                function exportToExcel(e) {
-                    var columns = e.sender.columns;
-
-                    if (!exportFlag) {
-                        e.preventDefault();
-                        _.forEach(columns, function (column) {
-                            if (column.hidden) {
-                                column.tempVisual = true;
-                                e.sender.showColumn(column);
-                            }
-                        });
-                        $timeout(function () {
-                            exportFlag = true;
-                            e.sender.saveAsExcel();
-                        });
-                    } else {
-                        exportFlag = false;
-                        _.forEach(columns, function (column) {
-                            if (column.tempVisual) {
-                                delete column.tempVisual;
-                                e.sender.hideColumn(column);
-                            }
-                        });
+        private supplierTemplate(dataItem) {
+            if (dataItem.MainContract) {
+                if (dataItem.MainContract.ItContract) {
+                    if (dataItem.MainContract.ItContract.Supplier) {
+                        return dataItem.MainContract.ItContract.Supplier.Name;
                     }
                 }
             }
-        ]
-    );
-})(angular, app);
+            return "";
+        }
+
+        private roleTemplate(dataItem, roleId) {
+            var roles = "";
+
+            if (dataItem.roles[roleId] === undefined)
+                return roles;
+
+            // join the first 5 username together
+            if (dataItem.roles[roleId].length > 0)
+                roles = dataItem.roles[roleId].slice(0, 4).join(", ");
+
+            // if more than 5 then add an elipsis
+            if (dataItem.roles[roleId].length > 5)
+                roles += ", ...";
+
+            var link = `<a data-ui-sref='it-system.usage.roles({id: ${dataItem.Id}})'>${roles}</a>`;
+
+            return link;
+        }
+
+        //// show exposureDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
+        //public showExposureDetails(usageId, systemName) {
+        //    // filter by usageId
+        //    this.exhibitGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
+        //    // set title
+        //    this.exhibitModal.setOptions({ title: systemName + " udstiller følgende snitflader" });
+        //    // open modal
+        //    this.exhibitModal.center().open();
+        //}
+
+        //public exhibitDetailsGrid = {
+        //    dataSource: {
+        //        type: "odata-v4",
+        //        transport: {
+        //            read: {
+        //                url: "/odata/ItInterfaceExhibits?$expand=ItInterface",
+        //                dataType: "json"
+        //            }
+        //        },
+        //        serverPaging: true,
+        //        serverSorting: true,
+        //        serverFiltering: true
+        //    },
+        //    autoBind: false,
+        //    columns: [
+        //        {
+        //            field: "ItInterface.ItInterfaceId", title: "Snitflade ID"
+        //        },
+        //        {
+        //            field: "ItInterface.Name", title: "Snitflade"
+        //        }
+        //    ],
+        //    dataBound: this.exposureDetailsBound
+        //};
+
+        //// exposuredetails grid empty-grid handling
+        //private exposureDetailsBound(e) {
+        //    var grid = e.sender;
+        //    if (grid.dataSource.total() == 0) {
+        //        var colCount = grid.columns.length;
+        //        this.$(e.sender.wrapper)
+        //            .find("tbody")
+        //            .append(`<tr class="kendo-data-row"><td colspan="${colCount}" class="no-data text-muted">System udstiller ikke nogle snitflader</td></tr>`);
+        //    }
+        //}
+
+        //// show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
+        //private showUsageDetails(systemId, systemName) {
+        //    // filter by systemId
+        //    this.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: systemId });
+        //    // set modal title
+        //    this.modal.setOptions({ title: `Anvendelse af ${systemName}` });
+        //    // open modal
+        //    this.modal.center().open();
+        //}
+
+        //// usagedetails grid - shows which organizations has a given itsystem in local usage
+        //public usageDetailsGrid = {
+        //    dataSource: {
+        //        type: "odata-v4",
+        //        transport:
+        //        {
+        //            read: {
+        //                url: "/odata/ItInterfaceUses/?$expand=ItInterface",
+        //                dataType: "json"
+        //            },
+        //        },
+        //        serverPaging: true,
+        //        serverSorting: true,
+        //        serverFiltering: true
+        //    },
+        //    autoBind: false,
+        //    columns: [
+        //        {
+        //            field: "ItInterfaceId", title: "Snitflade ID"
+        //        },
+        //        {
+        //            field: "ItInterface.Name", title: "Snitflade"
+        //        }
+        //    ],
+        //    dataBound: this.detailsBound
+        //};
+
+        //// usagedetails grid empty-grid handling
+        //private detailsBound(e) {
+        //    var grid = e.sender;
+        //    if (grid.dataSource.total() == 0) {
+        //        var colCount = grid.columns.length;
+        //        this.$(e.sender.wrapper)
+        //            .find("tbody")
+        //            .append(`<tr class="kendo-data-row"><td colspan="${colCount}" class="no-data text-muted">System anvendens ikke</td></tr>`);
+        //    }
+        //};
+
+        private orgUnitDropDownList = (args) => {
+            var self = this;
+
+            function indent(dataItem: any) {
+                var htmlSpace = "&nbsp;&nbsp;&nbsp;&nbsp;";
+                return htmlSpace.repeat(dataItem.$level) + dataItem.Name;
+            }
+
+            function setDefaultOrgUnit() {
+                var kendoElem = this;
+                var idTofind = self.$window.sessionStorage.getItem(self.orgUnitStorageKey);
+
+                if (!idTofind) {
+                    // if no id was found then do nothing
+                    return;
+                }
+
+                // find the index of the org unit that matches the users default org unit
+                var index = self._.findIndex(kendoElem.dataItems(), (item: any) => (item.Id == idTofind));
+
+                // -1 = no match
+                //  0 = root org unit, which should display all. So remove org unit filter
+                if (index > 0) {
+                    // select the users default org unit
+                    kendoElem.select(index);
+                }
+            }
+
+            function orgUnitChanged() {
+                var kendoElem = this;
+                // can't use args.dataSource directly,
+                // if we do then the view doesn't update.
+                // So have to go through $scope - sadly :(
+                var dataSource = self.mainGrid.dataSource;
+                var currentFilter = dataSource.filter();
+                var selectedIndex = kendoElem.select();
+                var selectedId = self._.parseInt(kendoElem.value());
+                var childIds = kendoElem.dataItem().childIds;
+
+                self.$window.sessionStorage.setItem(self.orgUnitStorageKey, selectedId.toString());
+
+                if (selectedIndex > 0) {
+                    // filter by selected
+                    dataSource.filter(self.getFilterWithOrgUnit(currentFilter, selectedId, childIds));
+                } else {
+                    // else clear filter because the 0th element should act like a placeholder
+                    dataSource.filter(self.getFilterWithOrgUnit(currentFilter));
+                }
+            }
+
+            // http://dojo.telerik.com/ODuDe/5
+            args.element.removeAttr("data-bind");
+            args.element.kendoDropDownList({
+                dataSource: this.orgUnits,
+                dataValueField: "Id",
+                dataTextField: "Name",
+                template: indent,
+                dataBound: setDefaultOrgUnit,
+                change: orgUnitChanged
+            });
+        }
+
+        private getFilterWithOrgUnit(currentFilter: kendo.data.DataSourceFilters, selectedId?: number, childIds?: number[]): kendo.data.DataSourceFilters {
+            var field = "ResponsibleUsage.OrganizationUnit.Id";
+            // remove old values first
+            var newFilter = this._.removeFiltersForField(currentFilter, field);
+
+            // is selectedId a number?
+            if (!isNaN(selectedId)) {
+                newFilter = this._.addFilter(newFilter, field, "eq", selectedId, "or");
+                // add children to filters
+                this._.forEach(childIds, id => newFilter = this._.addFilter(newFilter, field, "eq", id, "or"));
+            }
+            return newFilter;
+        }
+
+        private contractFilterDropDownList = (args) => {
+            var self = this;
+            var gridDataSource = args.dataSource;
+
+            function setContractFilter() {
+                var kendoElem = this;
+                var currentFilter = gridDataSource.filter();
+                var contractFilterObj = self._.findKeyDeep(currentFilter, { field: "MainContract" });
+
+                if (contractFilterObj.operator == "neq") {
+                    kendoElem.select(1); // index of "Har kontrakt"
+                } else if (contractFilterObj.operator == "eq") {
+                    kendoElem.select(2); // index of "Ingen kontrakt"
+                }
+            }
+
+            function filterByContract() {
+                var kendoElem = this;
+                // can't use args.dataSource directly,
+                // if we do then the view doesn't update.
+                // So have to go through $scope - sadly :(
+                var dataSource = self.mainGrid.dataSource;
+                var selectedValue = kendoElem.value();
+                var field = "MainContract";
+                var currentFilter = dataSource.filter();
+                // remove old value first
+                var newFilter = self._.removeFiltersForField(currentFilter, field);
+
+                if (selectedValue === "Har kontrakt") {
+                    newFilter = self._.addFilter(newFilter, field, "ne", null, "and");
+                } else if (selectedValue === "Ingen kontrakt") {
+                    newFilter = self._.addFilter(newFilter, field, "eq", null, "and");
+                }
+
+                dataSource.filter(newFilter);
+            }
+
+            // http://dojo.telerik.com/ODuDe/5
+            args.element.removeAttr("data-bind");
+            args.element.kendoDropDownList({
+                dataSource: ["Har kontrakt", "Ingen kontrakt"],
+                optionLabel: "Vælg filter...",
+                dataBound: setContractFilter,
+                change: filterByContract
+            });
+        }
+
+        public roleSelectorOptions = () => {
+            return {
+                autoBind: false,
+                dataSource: this.systemRoles,
+                dataTextField: "Name",
+                dataValueField: "Id",
+                optionLabel: "Vælg systemrolle...",
+                change: e => {
+                    // hide all roles column
+                    this._.forEach(this.systemRoles, role => {
+                        this.mainGrid.hideColumn(`role${role.Id}`);
+                    });
+
+                    var selectedId = e.sender.value();
+                    var gridFieldName = `role${selectedId}`;
+                    // show only the selected role column
+                    this.mainGrid.showColumn(gridFieldName);
+                }
+            }
+        };
+
+        private exportFlag = false;
+        private exportToExcel = (e) => {
+            var columns = e.sender.columns;
+
+            if (!this.exportFlag) {
+                e.preventDefault();
+                this._.forEach(columns, column => {
+                    if (column.hidden) {
+                        column.tempVisual = true;
+                        e.sender.showColumn(column);
+                    }
+                });
+                this.$timeout(() => {
+                    this.exportFlag = true;
+                    e.sender.saveAsExcel();
+                });
+            } else {
+                this.exportFlag = false;
+                this._.forEach(columns, column => {
+                    if (column.tempVisual) {
+                        delete column.tempVisual;
+                        e.sender.hideColumn(column);
+                    }
+                });
+            }
+        }
+    }
+
+    angular
+        .module("app")
+        .config([
+            "$stateProvider", $stateProvider => {
+                $stateProvider.state("it-system.overview", {
+                    url: "/overview",
+                    templateUrl: "partials/it-system/overview-it-system.html",
+                    controller: OverviewController,
+                    controllerAs: "systemOverviewVm",
+                    resolve: {
+                        systemRoles: [
+                            "$http", $http => $http.get("odata/ItSystemRoles").then(result => result.data.value)
+                        ],
+                        user: [
+                            "userService", userService => userService.getUser()
+                        ],
+                        orgUnits: [
+                            "$http", "user", "_",
+                            ($http, user, _) => $http.get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`)
+                            .then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
+                        ]
+                    }
+                });
+            }
+        ]);
+}

@@ -1,146 +1,169 @@
-﻿(function (ng, app) {
-    app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-project.overview-inactive', {
-            url: '/overview-inactive',
-            templateUrl: 'partials/it-project/overview.html',
-            controller: 'project.EditOverviewInactiveCtrl',
-            resolve: {
-                projectRoles: ['$http', function ($http) {
-                    return $http.get('/odata/ItProjectRoles').then(function(result) {
-                        return result.data.value;
-                    });
-                }],
-                user: ['userService', function (userService) {
-                    return userService.getUser();
-                }],
-                orgUnits: [
-                    '$http', 'user', '_', function ($http, user, _) {
-                        return $http.get("/odata/Organizations(" + user.currentOrganizationId + ")/OrganizationUnits").then(function (result) {
-                            return _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId");
-                        });
-                    }
-                ]
-            }
-        });
-    }]);
+﻿module Kitos.ItProject.OverviewInactive {
+    "use strict";
 
-    app.controller('project.EditOverviewInactiveCtrl',
-    ['$rootScope', '$scope', '$http', '$timeout', '_', 'moment', '$state', 'notify', 'projectRoles', 'user', 'gridStateService', 'orgUnits', '$q', 'economyCalc',
-        function ($rootScope, $scope, $http, $timeout, _, moment, $state, notify, projectRoles, user, gridStateService, orgUnits, $q, economyCalc) {
-            $rootScope.page.title = "IT Projekt - Overblik";
+    export interface IOverviewInactiveController {
+        mainGrid: Kitos.IKendoGrid;
+        mainGridOptions: kendo.ui.GridOptions;
+        roleSelectorOptions: kendo.ui.DropDownListOptions;
 
-            var storageKey = "it-project-overview-inactive-options";
-            var orgUnitStorageKey = "it-project-overview-inactive-orgunit";
-            var gridState = gridStateService.getService(storageKey);
+        saveGridProfile(): void;
+        loadGridProfile(): void;
+        clearGridProfile(): void;
+        doesGridProfileExist(): void;
+        clearOptions(): void;
+    }
 
-            // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(c/User/Name,'foo') and c/RoleId eq {roleId})"
-            function fixRoleFilter(filterUrl, roleName, roleId) {
-                var pattern = new RegExp("(\\w+\\()" + roleName + "(.*?\\))", "i");
-                return filterUrl.replace(pattern, "Rights/any(c: $1c/User/Name$2 and c/RoleId eq " + roleId + ")");
-            }
+    export class OverviewInactiveController implements IOverviewInactiveController {
+        private storageKey = "it-project-overview-inactive-options";
+        private orgUnitStorageKey = "it-project-overview-inactive-orgunit";
+        private gridState = this.gridStateService.getService(this.storageKey);
+        public mainGrid: Kitos.IKendoGrid;
+        public mainGridOptions: kendo.ui.GridOptions;
 
-            // saves grid state to localStorage
-            function saveGridOptions() {
-                gridState.saveGridOptions($scope.mainGrid);
-            }
+        private static $inject: Array<string> = [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$timeout",
+            "$window",
+            "$state",
+            "$",
+            "_",
+            "moment",
+            "notify",
+            "projectRoles",
+            "user",
+            "gridStateService",
+            "orgUnits",
+            "economyCalc"
+        ];
 
-            // loads kendo grid options from localstorage
-            function loadGridOptions() {
-                var selectedOrgUnitId = sessionStorage.getItem(orgUnitStorageKey);
-                var selectedOrgUnit = _.find(orgUnits, function (orgUnit) {
-                    return orgUnit.Id == selectedOrgUnitId;
-                });
+        constructor(
+            private $rootScope: Kitos.IRootScope,
+            private $scope: ng.IScope,
+            private $http: ng.IHttpService,
+            private $timeout: ng.ITimeoutService,
+            private $window: ng.IWindowService,
+            private $state: ng.ui.IStateService,
+            private $: JQueryStatic,
+            private _: Kitos.ILodashWithMixins,
+            private moment: moment.MomentStatic,
+            private notify,
+            private projectRoles,
+            private user,
+            private gridStateService: Kitos.Services.IGridStateFactory,
+            private orgUnits: any,
+            private economyCalc) {
+            this.$rootScope.page.title = "IT Projekt - Overblik";
 
-                var filter = undefined;
-                // if selected is a root then no need to filter as it should display everything anyway
-                if (selectedOrgUnit && selectedOrgUnit.$level != 0) {
-                    filter = getFilterWithOrgUnit({}, selectedOrgUnitId, selectedOrgUnit.childIds);
-                }
-
-                gridState.loadGridOptions($scope.mainGrid, filter);
-            }
-
-            $scope.saveGridProfile = function () {
-                // the stored org unit id must be the current
-                var currentOrgUnitId = sessionStorage.getItem(orgUnitStorageKey);
-                localStorage.setItem(orgUnitStorageKey + "-profile", currentOrgUnitId);
-
-                gridState.saveGridProfile($scope.mainGrid);
-                notify.addSuccessMessage("Filtre og sortering gemt");
-            };
-
-            $scope.loadGridProfile = function () {
-                gridState.loadGridProfile($scope.mainGrid);
-
-                var orgUnitId = localStorage.getItem(orgUnitStorageKey + "-profile");
-                // update session
-                sessionStorage.setItem(orgUnitStorageKey, orgUnitId);
-                // find the org unit filter row section
-                var orgUnitFilterRow = $(".k-filter-row [data-field='ResponsibleUsage.OrganizationUnit.Name']");
-                // find the access modifier kendo widget
-                var orgUnitFilterWidget = orgUnitFilterRow.find("input").data("kendoDropDownList");
-                orgUnitFilterWidget.select(function (dataItem) {
-                    return dataItem.Id == orgUnitId;
-                });
-
-                $scope.mainGrid.dataSource.read();
-                notify.addSuccessMessage("Anvender gemte filtre og sortering");
-            };
-
-            $scope.clearGridProfile = function () {
-                sessionStorage.removeItem(orgUnitStorageKey);
-                gridState.removeProfile();
-                gridState.removeSession();
-                notify.addSuccessMessage("Filtre og sortering slettet");
-                reload();
-            };
-
-            $scope.doesGridProfileExist = function () {
-                return gridState.doesGridProfileExist();
-            };
-
-            // clears grid filters by removing the localStorageItem and reloading the page
-            $scope.clearOptions = function () {
-                localStorage.removeItem(orgUnitStorageKey + "-profile");
-                sessionStorage.removeItem(orgUnitStorageKey);
-                gridState.removeProfile();
-                gridState.removeLocal();
-                gridState.removeSession();
-                notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge nulstillet");
-                // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
-                reload();
-            };
-
-            function reload() {
-                $state.go('.', null, { reload: true });
-            }
-
-            $scope.$on("kendoWidgetCreated", function (event, widget) {
+            this.$scope.$on("kendoWidgetCreated", (event, widget) => {
                 // the event is emitted for every widget; if we have multiple
                 // widgets in this controller, we need to check that the event
                 // is for the one we're interested in.
-                if (widget === $scope.mainGrid) {
-                    loadGridOptions();
-                    $scope.mainGrid.dataSource.read();
+                if (widget === this.mainGrid) {
+                    this.loadGridOptions();
+                    this.mainGrid.dataSource.read();
                 }
             });
 
-            var mainGridOptions = {
+            this.activate();
+        }
+
+        // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(c/User/Name,'foo') and c/RoleId eq {roleId})"
+        private fixRoleFilter(filterUrl, roleName, roleId) {
+            var pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
+            return filterUrl.replace(pattern, `Rights/any(c: $1c/User/Name$2 and c/RoleId eq ${roleId})`);
+        }
+
+        // saves grid state to localStorage
+        private saveGridOptions = () => {
+            this.gridState.saveGridOptions(this.mainGrid);
+        }
+
+        // loads kendo grid options from localstorage
+        private loadGridOptions() {
+            var selectedOrgUnitId = <number> this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
+            var selectedOrgUnit = this._.find(this.orgUnits, (orgUnit: any) => (orgUnit.Id == selectedOrgUnitId));
+
+            var filter = undefined;
+            // if selected is a root then no need to filter as it should display everything anyway
+            if (selectedOrgUnit && selectedOrgUnit.$level != 0) {
+                filter = this.getFilterWithOrgUnit({}, selectedOrgUnitId, selectedOrgUnit.childIds);
+            }
+
+            this.gridState.loadGridOptions(this.mainGrid, filter);
+        }
+
+        public saveGridProfile() {
+            // the stored org unit id must be the current
+            var currentOrgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
+            this.$window.localStorage.setItem(this.orgUnitStorageKey + "-profile", currentOrgUnitId);
+
+            this.gridState.saveGridProfile(this.mainGrid);
+            this.notify.addSuccessMessage("Filtre og sortering gemt");
+        }
+
+        public loadGridProfile() {
+            this.gridState.loadGridProfile(this.mainGrid);
+
+            var orgUnitId = this.$window.localStorage.getItem(this.orgUnitStorageKey + "-profile");
+            // update session
+            this.$window.sessionStorage.setItem(this.orgUnitStorageKey, orgUnitId);
+            // find the org unit filter row section
+            var orgUnitFilterRow = this.$(".k-filter-row [data-field='ResponsibleUsage.OrganizationUnit.Name']");
+            // find the access modifier kendo widget
+            var orgUnitFilterWidget = orgUnitFilterRow.find("input").data("kendoDropDownList");
+            orgUnitFilterWidget.select(dataItem => (dataItem.Id == orgUnitId));
+
+            this.mainGrid.dataSource.read();
+            this.notify.addSuccessMessage("Anvender gemte filtre og sortering");
+        }
+
+        public clearGridProfile() {
+            this.$window.sessionStorage.removeItem(this.orgUnitStorageKey);
+            this.gridState.removeProfile();
+            this.gridState.removeSession();
+            this.notify.addSuccessMessage("Filtre og sortering slettet");
+            this.reload();
+        }
+
+        public doesGridProfileExist() {
+            return this.gridState.doesGridProfileExist();
+        }
+
+        // clears grid filters by removing the localStorageItem and reloading the page
+        public clearOptions() {
+            this.$window.localStorage.removeItem(this.orgUnitStorageKey + "-profile");
+            this.$window.sessionStorage.removeItem(this.orgUnitStorageKey);
+            this.gridState.removeProfile();
+            this.gridState.removeLocal();
+            this.gridState.removeSession();
+            this.notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge nulstillet");
+            // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
+            this.reload();
+        }
+
+        private reload() {
+            this.$state.go(".", null, { reload: true });
+        }
+
+        private activate() {
+            var mainGridOptions: Kitos.IKendoGridOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: "/odata/Organizations(" + user.currentOrganizationId + ")/ItProjects?$expand=ItProjectStatuses,Parent,ItProjectType,Rights($expand=User,Role),ResponsibleUsage($expand=OrganizationUnit),GoalStatus,EconomyYears",
+                            url: `/odata/Organizations(${this.user.currentOrganizationId})/ItProjects?$expand=ItProjectStatuses,Parent,ItProjectType,Rights($expand=User,Role),ResponsibleUsage($expand=OrganizationUnit),GoalStatus,EconomyYears`,
                             dataType: "json"
                         },
-                        parameterMap: function(options, type) {
+                        parameterMap: (options, type) => {
                             // get kendo to map parameters to an odata url
                             var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
 
                             if (parameterMap.$filter) {
-                                _.forEach(projectRoles, function(role) {
-                                    parameterMap.$filter = fixRoleFilter(parameterMap.$filter, "role" + role.Id, role.Id);
+                                this._.forEach(this.projectRoles, role => {
+                                    parameterMap.$filter = this.fixRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id);
                                 });
                             }
 
@@ -166,14 +189,14 @@
                                 IsArchived: { type: "boolean" },
                             }
                         },
-                        parse: function(response) {
+                        parse: response => {
                             // HACK to flatten the Rights on usage so they can be displayed as single columns
 
                             // iterrate each project
-                            _.forEach(response.value, function(project) {
+                            this._.forEach(response.value, project => {
                                 project.roles = [];
                                 // iterrate each right
-                                _.forEach(project.Rights, function(right) {
+                                this._.forEach(project.Rights, right => {
                                     // init an role array to hold users assigned to this role
                                     if (!project.roles[right.RoleId])
                                         project.roles[right.RoleId] = [];
@@ -182,10 +205,10 @@
                                     project.roles[right.RoleId].push([right.User.Name, right.User.LastName].join(" "));
                                 });
 
-                                var phase = "Phase" + project.CurrentPhase;
+                                var phase = `Phase${project.CurrentPhase}`;
                                 project.CurrentPhaseObj = project[phase];
 
-                                if (user.isGlobalAdmin || user.isLocalAdmin || _.find(project.Rights, { 'userId': user.id })) {
+                                if (this.user.isGlobalAdmin || this.user.isLocalAdmin || this._.find(project.Rights, { 'userId': this.user.id })) {
                                     project.hasWriteAccess = true;
                                 }
                             });
@@ -199,25 +222,25 @@
                     {
                         name: "clearFilter",
                         text: "Nulstil",
-                        template: "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='clearOptions()'>#: text #</button>"
+                        template: "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='projectOverviewVm.clearOptions()'>#: text #</button>"
                     },
                     {
                         name: "saveFilter",
                         text: "Gem filter",
-                        template: '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="saveGridProfile()">#: text #</button>'
+                        template: '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="projectOverviewVm.saveGridProfile()">#: text #</button>'
                     },
                     {
                         name: "useFilter",
                         text: "Anvend filter",
-                        template: '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="loadGridProfile()" data-ng-disabled="!doesGridProfileExist()">#: text #</button>'
+                        template: '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="projectOverviewVm.loadGridProfile()" data-ng-disabled="!projectOverviewVm.doesGridProfileExist()">#: text #</button>'
                     },
                     {
                         name: "deleteFilter",
                         text: "Slet filter",
-                        template: "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='clearGridProfile()' data-ng-disabled='!doesGridProfileExist()'>#: text #</button>"
+                        template: "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='projectOverviewVm.clearGridProfile()' data-ng-disabled='!projectOverviewVm.doesGridProfileExist()'>#: text #</button>"
                     },
                     {
-                        template: kendo.template($("#role-selector").html())
+                        template: kendo.template(this.$("#role-selector").html())
                     }
                 ],
                 excel: {
@@ -246,15 +269,12 @@
                 columnMenu: {
                     filterable: false
                 },
-                dataBound: saveGridOptions,
-                columnResize: saveGridOptions,
-                columnHide: saveGridOptions,
-                columnShow: saveGridOptions,
-                columnReorder: saveGridOptions,
-                excelExport: exportToExcel,
-                error: function(e) {
-                    console.log(e);
-                },
+                dataBound: this.saveGridOptions,
+                columnResize: this.saveGridOptions,
+                columnHide: this.saveGridOptions,
+                columnShow: this.saveGridOptions,
+                columnReorder: this.saveGridOptions,
+                excelExport: this.exportToExcel,
                 columns: [
                     {
                         field: "ItProjectId", title: "ProjektID", width: 115,
@@ -300,7 +320,7 @@
                         filterable: {
                             cell: {
                                 showOperators: false,
-                                template: orgUnitDropDownList
+                                template: this.orgUnitDropDownList
                             }
                         }
                     },
@@ -368,7 +388,7 @@
                     {
                         field: "", title: "Fase: Startdato", format: "{0:dd-MM-yyyy}", width: 85,
                         persistId: "phasestartdate", // DON'T YOU DARE RENAME!
-                        template: phaseStartDateTemplate,
+                        template: this.phaseStartDateTemplate,
                         sortable: false,
                         filterable: false,
                     },
@@ -376,7 +396,7 @@
                         field: "", title: "Fase: Slutdato", format: "{0:dd-MM-yyyy}", width: 85,
                         persistId: "phaseenddate", // DON'T YOU DARE RENAME!
                         hidden: true,
-                        template: phaseEndDateTemplate,
+                        template: this.phaseEndDateTemplate,
                         sortable: false,
                         filterable: false,
                     },
@@ -414,7 +434,7 @@
                         field: "", title: "Opgaver", width: 150,
                         persistId: "assignments", // DON'T YOU DARE RENAME!
                         hidden: true,
-                        template: assigmentTemplate,
+                        template: this.assigmentTemplate,
                         filterable: false,
                         sortable: false
                     },
@@ -453,251 +473,244 @@
                         field: "EconomyYears", title: "Økonomi", width: 150,
                         persistId: "eco", // DON'T YOU DARE RENAME!
                         hidden: true,
-                        template: economyTemplate,
-                    },
+                        template: this.economyTemplate,
+                        filterable: false,
+                        sortable: false
+                    }
                 ]
             };
 
-            function activate() {
-                // find the index of column where the role columns should be inserted
-                var insertIndex = _.findIndex(mainGridOptions.columns, "persistId", "orgunit") + 1;
+            // find the index of column where the role columns should be inserted
+            var insertIndex = this._.findIndex(mainGridOptions.columns, "persistId", "orgunit") + 1;
 
-                // add a role column for each of the roles
-                // note iterating in reverse so we don't have to update the insert index
-                _.forEachRight(projectRoles, function (role) {
-                    var roleColumn = {
-                        field: "role" + role.Id,
-                        title: role.Name,
-                        persistId: "role" + role.Id,
-                        template: function (dataItem) {
-                            return roleTemplate(dataItem, role.Id);
-                        },
-                        width: 215,
-                        hidden: role.Name == "Projektleder" ? false : true, // hardcoded role name :(
-                        sortable: false,
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains",
-                            }
+            // add a role column for each of the roles
+            // note iterating in reverse so we don't have to update the insert index
+            this._.forEachRight(this.projectRoles, role => {
+                var roleColumn = {
+                    field: `role${role.Id}`,
+                    title: role.Name,
+                    persistId: `role${role.Id}`,
+                    template: dataItem => this.roleTemplate(dataItem, role.Id),
+                    width: 215,
+                    hidden: role.Name === "Projektleder" ? false : true, // hardcoded role name :(
+                    sortable: false,
+                    filterable: {
+                        cell: {
+                            dataSource: [],
+                            showOperators: false,
+                            operator: "contains"
                         }
-                    };
-
-                    // insert the generated column at the correct location
-                    mainGridOptions.columns.splice(insertIndex, 0, roleColumn);
-                });
-
-                // assign the generated grid options to the scope value, kendo will do the rest
-                $scope.mainGridOptions = mainGridOptions;
-            }
-            activate();
-
-            function economyTemplate(dataItem) {
-                var total = 0;
-                _.each(dataItem.EconomyYears, function (eco) {
-                    total += economyCalc.getTotalBudget(eco);
-                });
-                return -total;
-            }
-
-            function roleTemplate(dataItem, roleId) {
-                var roles = "";
-
-                if (dataItem.roles[roleId] === undefined)
-                    return roles;
-
-                // join the first 5 username together
-                if (dataItem.roles[roleId].length > 0)
-                    roles = dataItem.roles[roleId].slice(0, 4).join(", ");
-
-                // if more than 5 then add an elipsis
-                if (dataItem.roles[roleId].length > 5)
-                    roles += ", ...";
-
-                var link = "<a data-ui-sref='it-system.usage.roles({id: " + dataItem.Id + "})'>" + roles + "</a>";
-
-                return link;
-            }
-
-            function phaseStartDateTemplate(dataItem) {
-                if (dataItem.CurrentPhaseObj) {
-                    if (dataItem.CurrentPhaseObj.StartDate) {
-                        return moment(dataItem.CurrentPhaseObj.StartDate).format("DD-MM-YYYY");
                     }
-                }
+                };
 
-                return "";
+                // insert the generated column at the correct location
+                mainGridOptions.columns.splice(insertIndex, 0, roleColumn);
+            });
+
+            // assign the generated grid options to the scope value, kendo will do the rest
+            this.mainGridOptions = mainGridOptions;
+        }
+
+        private economyTemplate = (dataItem) => {
+            var total = 0;
+            this._.forEach(dataItem.EconomyYears, eco => {
+                total += this.economyCalc.getTotalBudget(eco);
+            });
+            return -total;
+        }
+
+        private roleTemplate(dataItem, roleId) {
+            var roles = "";
+
+            if (dataItem.roles[roleId] === undefined)
+                return roles;
+
+            // join the first 5 username together
+            if (dataItem.roles[roleId].length > 0)
+                roles = dataItem.roles[roleId].slice(0, 4).join(", ");
+
+            // if more than 5 then add an elipsis
+            if (dataItem.roles[roleId].length > 5)
+                roles += ", ...";
+
+            var link = `<a data-ui-sref='it-system.usage.roles({id: ${dataItem.Id}})'>${roles}</a>`;
+
+            return link;
+        }
+
+        private phaseStartDateTemplate = (dataItem) => {
+            if (dataItem.CurrentPhaseObj) {
+                if (dataItem.CurrentPhaseObj.StartDate) {
+                    return this.moment(dataItem.CurrentPhaseObj.StartDate).format("DD-MM-YYYY");
+                }
             }
 
-            function phaseEndDateTemplate(dataItem) {
-                if (dataItem.CurrentPhaseObj) {
-                    if (dataItem.CurrentPhaseObj.EndDate) {
-                        return moment(dataItem.CurrentPhaseObj.EndDate).format("DD-MM-YYYY");
-                    }
-                }
+            return "";
+        }
 
-                return "";
+        private phaseEndDateTemplate = (dataItem) => {
+            if (dataItem.CurrentPhaseObj) {
+                if (dataItem.CurrentPhaseObj.EndDate) {
+                    return this.moment(dataItem.CurrentPhaseObj.EndDate).format("DD-MM-YYYY");
+                }
             }
 
-            function assigmentTemplate(dataItem) {
-                var res = _.filter(dataItem.ItProjectStatuses, function (n) {
-                    return _.contains(n["@odata.type"], "Assignment");
-                });
+            return "";
+        }
 
-                return res.length;
+        private assigmentTemplate = (dataItem) => {
+            var res = this._.filter(dataItem.ItProjectStatuses, n => this._.contains(n["@odata.type"], "Assignment"));
+
+            return res.length;
+        }
+
+        private orgUnitDropDownList = (args) => {
+            var self = this;
+
+            function indent(dataItem: any) {
+                var htmlSpace = "&nbsp;&nbsp;&nbsp;&nbsp;";
+                return htmlSpace.repeat(dataItem.$level) + dataItem.Name;
             }
 
-            function orgUnitDropDownList(args) {
-                function indent(dataItem) {
-                    var htmlSpace = "&nbsp;&nbsp;&nbsp;&nbsp;";
-                    return htmlSpace.repeat(dataItem.$level) + dataItem.Name;
+            function setDefaultOrgUnit() {
+                var kendoElem = this;
+                var idTofind = self.$window.sessionStorage.getItem(self.orgUnitStorageKey);
+
+                if (!idTofind) {
+                    // if no id was found then do nothing
+                    return;
                 }
 
-                function setDefaultOrgUnit() {
-                    var kendoElem = this;
-                    var idTofind = sessionStorage.getItem(orgUnitStorageKey);
+                // find the index of the org unit that matches the users default org unit
+                var index = self._.findIndex(kendoElem.dataItems(), (item: any) => (item.Id == idTofind));
 
-                    if (!idTofind) {
-                        // if no id was found then do nothing
-                        return;
-                    }
-
-                    // find the index of the org unit that matches the users default org unit
-                    var index = _.findIndex(kendoElem.dataItems(), function (item) {
-                        return item.Id == idTofind;
-                    });
-
-                    // -1 = no match
-                    //  0 = root org unit, which should display all. So remove org unit filter
-                    if (index > 0) {
-                        // select the users default org unit
-                        kendoElem.select(index);
-                    }
+                // -1 = no match
+                //  0 = root org unit, which should display all. So remove org unit filter
+                if (index > 0) {
+                    // select the users default org unit
+                    kendoElem.select(index);
                 }
-
-                function orgUnitChanged() {
-                    var kendoElem = this;
-                    // can't use args.dataSource directly,
-                    // if we do then the view doesn't update.
-                    // So have to go through $scope - sadly :(
-                    var dataSource = $scope.mainGrid.dataSource;
-                    var currentFilter = dataSource.filter();
-                    var selectedIndex = kendoElem.select();
-                    var selectedId = _.parseInt(kendoElem.value());
-                    var childIds = kendoElem.dataItem().childIds;
-
-                    sessionStorage.setItem(orgUnitStorageKey, selectedId);
-
-                    if (selectedIndex > 0) {
-                        // filter by selected
-                        dataSource.filter(getFilterWithOrgUnit(currentFilter, selectedId, childIds));
-                    } else {
-                        // else clear filter because the 0th element should act like a placeholder
-                        dataSource.filter(getFilterWithOrgUnit(currentFilter));
-                    }
-                }
-
-                // http://dojo.telerik.com/ODuDe/5
-                args.element.removeAttr("data-bind");
-                args.element.kendoDropDownList({
-                    dataSource: orgUnits,
-                    dataValueField: "Id",
-                    dataTextField: "Name",
-                    template: indent,
-                    dataBound: setDefaultOrgUnit,
-                    change: orgUnitChanged
-                });
             }
 
-            function getFilterWithOrgUnit(currentFilter, selectedId, childIds) {
-                var field = "ResponsibleUsage.OrganizationUnit.Id";
-                // remove old values first
-                var newFilter = _.removeFiltersForField(currentFilter, field);
+            function orgUnitChanged() {
+                var kendoElem = this;
+                // can't use args.dataSource directly,
+                // if we do then the view doesn't update.
+                // So have to go through $scope - sadly :(
+                var dataSource = self.mainGrid.dataSource;
+                var currentFilter = dataSource.filter();
+                var selectedIndex = kendoElem.select();
+                var selectedId = self._.parseInt(kendoElem.value());
+                var childIds = kendoElem.dataItem().childIds;
 
-                // is selectedId a number?
-                if (!isNaN(selectedId)) {
-                    newFilter = _.addFilter(newFilter, field, "eq", selectedId, "or");
-                    // add children to filters
-                    _.forEach(childIds, function (id) {
-                        newFilter = _.addFilter(newFilter, field, "eq", id, "or");
-                    });
+                self.$window.sessionStorage.setItem(self.orgUnitStorageKey, selectedId.toString());
+
+                if (selectedIndex > 0) {
+                    // filter by selected
+                    dataSource.filter(self.getFilterWithOrgUnit(currentFilter, selectedId, childIds));
+                } else {
+                    // else clear filter because the 0th element should act like a placeholder
+                    dataSource.filter(self.getFilterWithOrgUnit(currentFilter));
                 }
-                return newFilter;
             }
 
-            $scope.roleSelectorOptions = {
+            // http://dojo.telerik.com/ODuDe/5
+            args.element.removeAttr("data-bind");
+            args.element.kendoDropDownList({
+                dataSource: this.orgUnits,
+                dataValueField: "Id",
+                dataTextField: "Name",
+                template: indent,
+                dataBound: setDefaultOrgUnit,
+                change: orgUnitChanged
+            });
+        }
+
+        private getFilterWithOrgUnit(currentFilter: kendo.data.DataSourceFilters, selectedId?: number, childIds?: number[]): kendo.data.DataSourceFilters {
+            var field = "ResponsibleUsage.OrganizationUnit.Id";
+            // remove old values first
+            var newFilter = this._.removeFiltersForField(currentFilter, field);
+
+            // is selectedId a number?
+            if (!isNaN(selectedId)) {
+                newFilter = this._.addFilter(newFilter, field, "eq", selectedId, "or");
+                // add children to filters
+                this._.forEach(childIds, id => newFilter = this._.addFilter(newFilter, field, "eq", id, "or"));
+            }
+            return newFilter;
+        }
+
+        public roleSelectorOptions = () => {
+            return {
                 autoBind: false,
-                dataSource: projectRoles,
+                dataSource: this.projectRoles,
                 dataTextField: "Name",
                 dataValueField: "Id",
                 optionLabel: "Vælg projektrolle...",
-                change: function (e) {
+                change: e => {
                     // hide all roles column
-                    _.forEach(projectRoles, function (role) {
-                        $scope.mainGrid.hideColumn("role" + role.Id);
+                    this._.forEach(this.projectRoles, role => {
+                        this.mainGrid.hideColumn(`role${role.Id}`);
                     });
 
                     var selectedId = e.sender.value();
-                    var gridFieldName = "role" + selectedId;
+                    var gridFieldName = `role${selectedId}`;
                     // show only the selected role column
-                    $scope.mainGrid.showColumn(gridFieldName);
-                }
-            };
-
-            $scope.archiveFilterSelectorOptions = {
-                autoBind: false,
-                dataSource: ["Vis kun aktive", "Vis kun arkiverede"],
-                optionLabel: "Vælg arkiveret filter...",
-                change: function (e) {
-                    var selectedText = e.sender.value();
-
-                    var showArchived;
-                    if (selectedText === "Vis kun aktive") {
-                        showArchived = false;
-                    } else if (selectedText === "Vis kun arkiverede") {
-                        showArchived = true;
-                    } else {
-                        return;
-                    }
-
-                    var field = "IsArchived";
-                    var dataSource = $scope.mainGrid.dataSource;
-                    var currentFilter = dataSource.filter();
-                    // remove old values first
-                    var newFilter = _.removeFiltersForField(currentFilter, field);
-                    // add new filter
-                    newFilter = _.addFilter(newFilter, field, "eq", showArchived, "or");
-                    // set it on the data source
-                    dataSource.filter(newFilter);
-                }
-            };
-
-            var exportFlag = false;
-            function exportToExcel(e) {
-                var columns = e.sender.columns;
-
-                if (!exportFlag) {
-                    e.preventDefault();
-                    _.forEach(columns, function (column) {
-                        if (column.hidden) {
-                            column.tempVisual = true;
-                            e.sender.showColumn(column);
-                        }
-                    });
-                    $timeout(function () {
-                        exportFlag = true;
-                        e.sender.saveAsExcel();
-                    });
-                } else {
-                    exportFlag = false;
-                    _.forEach(columns, function (column) {
-                        if (column.tempVisual) {
-                            delete column.tempVisual;
-                            e.sender.hideColumn(column);
-                        }
-                    });
+                    this.mainGrid.showColumn(gridFieldName);
                 }
             }
-        }]);
-})(angular, app);
+        };
+
+        private exportFlag = false;
+        private exportToExcel = (e) => {
+            var columns = e.sender.columns;
+
+            if (!this.exportFlag) {
+                e.preventDefault();
+                this._.forEach(columns, column => {
+                    if (column.hidden) {
+                        column.tempVisual = true;
+                        e.sender.showColumn(column);
+                    }
+                });
+                this.$timeout(() => {
+                    this.exportFlag = true;
+                    e.sender.saveAsExcel();
+                });
+            } else {
+                this.exportFlag = false;
+                this._.forEach(columns, column => {
+                    if (column.tempVisual) {
+                        delete column.tempVisual;
+                        e.sender.hideColumn(column);
+                    }
+                });
+            }
+        }
+    }
+
+    angular
+        .module("app")
+        .config([
+            "$stateProvider", $stateProvider => {
+                $stateProvider.state("it-project.overview-inactive", {
+                    url: "/overview-inactive",
+                    templateUrl: "app/components/it-project/it-project-overview.view.html",
+                    controller: OverviewInactiveController,
+                    controllerAs: "projectOverviewVm",
+                    resolve: {
+                        projectRoles: [
+                            "$http", $http => $http.get("odata/ItProjectRoles").then(result => result.data.value)
+                        ],
+                        user: [
+                            "userService", userService => userService.getUser()
+                        ],
+                        orgUnits: [
+                            "$http", "user", "_", ($http, user, _) => $http.get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`)
+                                .then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
+                        ]
+                    }
+                });
+            }
+        ]);
+}
