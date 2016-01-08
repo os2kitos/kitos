@@ -982,7 +982,7 @@
     <Content Include="app\directives\utils-directives.js" />
     <TypeScriptCompile Include="app\services\userServices.ts" />
     <Content Include="app\utility\underscore.mixin.js" />
-    <Content Include="app\utility\utility.js" />
+    <TypeScriptCompile Include="app\utility\utility.ts" />
     <Content Include="app\services\httpServices.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
