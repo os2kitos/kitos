@@ -2,7 +2,7 @@
 import Select2Wrapper = require("../../../Tests/object-wrappers/Select2Wrapper");
 
 class ItPojectEditPo implements IPageObject {
-    controllerVm: string = "projectEditVm";
+    controllerVm = "projectEditVm";
 
     getPage(): webdriver.promise.Promise<void> {
         return browser.get("https://localhost:44300/#/project/edit/1");
@@ -13,25 +13,13 @@ class ItPojectEditPo implements IPageObject {
 
     // name
     nameElement = element(by.model(this.controllerVm + ".project.name"));
-    get nameInput(): string {
-        var value: string;
-        this.nameElement.getAttribute("value").then(v => value = v);
-        return value;
-    }
-
-    set nameInput(value: string) {
+    nameInput(value: string) {
         this.nameElement.sendKeys(value);
     }
 
     // id
     idElement = element(by.model(this.controllerVm + ".project.itProjectId"));
-    get idInput(): string {
-        var value: string;
-        this.idElement.getAttribute("value").then(v => value = v);
-        return value;
-    }
-
-    set idInput(value: string) {
+    idInput(value: string) {
         this.idElement.sendKeys(value);
     }
 
@@ -40,13 +28,7 @@ class ItPojectEditPo implements IPageObject {
 
     // cmdb
     cmdbElement = element(by.model(this.controllerVm + ".project.cmdb"));
-    get cmdbInput(): string {
-        var value: string;
-        this.cmdbElement.getAttribute("value").then(v => value = v);
-        return value;
-    }
-
-    set cmdbInput(value: string) {
+    cmdbInput(value: string) {
         this.cmdbElement.sendKeys(value);
     }
 
@@ -55,25 +37,13 @@ class ItPojectEditPo implements IPageObject {
 
     // esdh
     esdhElement = element(by.model(this.controllerVm + ".project.esdh"));
-    get esdhInput(): string {
-        var value: string;
-        this.esdhElement.getAttribute("value").then(v => value = v);
-        return value;
-    }
-
-    set esdhInput(value: string) {
+    esdhInput(value: string) {
         this.esdhElement.sendKeys(value);
     }
 
     // folder
     folderElement = element(by.model(this.controllerVm + ".project.folder"));
-    get folderInput(): string {
-        var value: string;
-        this.folderElement.getAttribute("value").then(v => value = v);
-        return value;
-    }
-
-    set folderInput(value: string) {
+    folderInput(value: string) {
         this.folderElement.sendKeys(value);
     }
 
@@ -88,25 +58,13 @@ class ItPojectEditPo implements IPageObject {
 
     // background
     backgroundElement = element(by.model(this.controllerVm + ".project.background"));
-    get backgroundInput(): string {
-        var value: string;
-        this.backgroundElement.getAttribute("value").then(v => value = v);
-        return value;
-    }
-
-    set backgroundInput(value: string) {
+    backgroundInput(value: string) {
         this.backgroundElement.sendKeys(value);
     }
 
     // note
     noteElement = element(by.model(this.controllerVm + ".project.note"));
-    get noteInput(): string {
-        var value: string;
-        this.noteElement.getAttribute("value").then(v => value = v);
-        return value;
-    }
-
-    set noteInput(value: string) {
+    noteInput(value: string) {
         this.noteElement.sendKeys(value);
     }
 

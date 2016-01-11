@@ -2,7 +2,7 @@
     app.config(["$stateProvider", function ($stateProvider) {
         $stateProvider.state("it-project.edit.hierarchy", {
             url: "/hierarchy",
-            templateUrl: "app/components/it-project/tabs/it-project-tab-hierarchy.html",
+            templateUrl: "app/components/it-project/tabs/it-project-tab-hierarchy.view.html",
             controller: "project.EditHierarchyCtrl",
             resolve: {
                 hierarchyFlat: ["$http", "$stateParams", function ($http, $stateParams) {
@@ -29,7 +29,7 @@
                 // example [1, 1, null, 2] -> [null, 1, 1, 2] (number is parent id)
                 var sorted = _.sortBy(flatAry, function (obj) {
                     var id = obj[parentIdPropetyName];
-                    return id === null ? -1 : id;
+                    return id == null ? -1 : id;
                 });
 
                 function search(nestedAry, id) {

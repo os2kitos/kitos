@@ -3,14 +3,14 @@ import RepeaterWrapper = require("../../../../Tests/object-wrappers/RepeaterWrap
 import Select2Wrapper = require("../../../../Tests/object-wrappers/Select2Wrapper");
 
 class ItProjectEditTabRisk implements IPageObject {
-    controllerVm: string = "";
+    controllerVm = "";
 
     getPage(): webdriver.promise.Promise<void> {
         return browser.get("https://localhost:44300/#/project/edit/1/risk");
     }
 
     // risk repeater
-    riskRepeater = new RepeaterWrapper("risk in " + this.controllerVm + "risks");
+    riskRepeater = new RepeaterWrapper(`risk in ${this.controllerVm}risks`);
     nameLocator = by.model("risk.name");
     consequenceLocator = by.model("risk.consequence");
     probabilityLocator = by.model("risk.probability");
@@ -26,43 +26,25 @@ class ItProjectEditTabRisk implements IPageObject {
             .first()
             .getAttribute("id")
             .then(v => {
-                return new Select2Wrapper("#" + v);
+                return new Select2Wrapper(`#${v}`);
             });
     }
 
     // new risk name
     nameElement = element(by.model(this.controllerVm + "newRisk.name"));
-    get nameInput(): string {
-        var value: string;
-        this.nameElement.getAttribute("value").then(v => value = v);
-        return value;
-    }
-
-    set nameInput(value: string) {
+    nameInput(value: string) {
         this.nameElement.sendKeys(value);
     }
 
     // new risk consequence
     consequenceElement = element(by.model(this.controllerVm + "newRisk.consequence"));
-    get consequenceInput(): number {
-        var value: string;
-        this.consequenceElement.getAttribute("value").then(v => value = v);
-        return parseInt(value);
-    }
-
-    set consequenceInput(value: number) {
+    consequenceInput(value: number) {
         this.consequenceElement.sendKeys(protractor.Key.CONTROL, "a", protractor.Key.NULL, value.toString()); // CTRL + a to clear old value
     }
 
     // new risk probability
     probabilityElement = element(by.model(this.controllerVm + "newRisk.probability"));
-    get probabilityInput(): number {
-        var value: string;
-        this.probabilityElement.getAttribute("value").then(v => value = v);
-        return parseInt(value);
-    }
-
-    set probabilityInput(value: number) {
+    probabilityInput(value: number) {
         this.probabilityElement.sendKeys(protractor.Key.CONTROL, "a", protractor.Key.NULL, value.toString()); // CTRL + a to clear old value
     }
 
@@ -73,13 +55,7 @@ class ItProjectEditTabRisk implements IPageObject {
 
     // new risk action
     actionElement = element(by.model(this.controllerVm + "newRisk.action"));
-    get actionInput(): string {
-        var value: string;
-        this.actionElement.getAttribute("value").then(v => value = v);
-        return value;
-    }
-
-    set actionInput(value: string) {
+    actionInput(value: string) {
         this.actionElement.sendKeys(value);
     }
 

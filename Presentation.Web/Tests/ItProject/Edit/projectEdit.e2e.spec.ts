@@ -30,120 +30,24 @@ describe("project edit view", () => {
             mock.clearRequests();
         });
 
-        it("should disable name", () => {
+        it("should disable inputs", () => {
             // arrange
 
             // act
 
             // assert
             expect(pageObject.nameElement).toBeDisabled();
-        });
-
-        it("should disable projectId", () => {
-            // arrange
-
-            // act
-
-            // assert
             expect(pageObject.idElement).toBeDisabled();
-        });
-
-        it("should disable type", () => {
-            // arrange
-
-            // act
-
-            // assert
-            expect(pageObject.typeSelect.isDisabled()).toBeTrue();
-        });
-
-        it("should disable cmdb", () => {
-            // arrange
-
-            // act
-
-            // assert
+            expect(pageObject.typeSelect).toBeSelect2Disabled();
             expect(pageObject.cmdbElement).toBeDisabled();
-        });
-
-        it("should disable access", () => {
-            // arrange
-
-            // act
-
-            // assert
-            expect(pageObject.accessSelect.isDisabled()).toBeTrue();
-        });
-
-        it("should disable esdh", () => {
-            // arrange
-
-            // act
-
-            // assert
+            expect(pageObject.accessSelect).toBeSelect2Disabled();
             expect(pageObject.esdhElement).toBeDisabled();
-        });
-
-        it("should disable folder", () => {
-            // arrange
-
-            // act
-
-            // assert
             expect(pageObject.folderElement).toBeDisabled();
-        });
-
-        it("should disable background", () => {
-            // arrange
-
-            // act
-
-            // assert
             expect(pageObject.backgroundElement).toBeDisabled();
-        });
-
-        it("should disable note", () => {
-            // arrange
-
-            // act
-
-            // assert
             expect(pageObject.noteElement).toBeDisabled();
-        });
-
-        it("should disable archive checkbox", () => {
-            // arrange
-
-            // act
-
-            // assert
             expect(pageObject.archiveCheckbox).toBeDisabled();
-        });
-
-        it("should disable transversal checkbox", () => {
-            // arrange
-
-            // act
-
-            // assert
             expect(pageObject.transversalCheckbox).toBeDisabled();
-        });
-
-        it("should disable strategy checkbox", () => {
-            // arrange
-
-            // act
-
-            // assert
             expect(pageObject.strategyCheckbox).toBeDisabled();
-        });
-
-        it("should disable project parent", () => {
-            // arrange
-
-            // act
-
-            // assert
             expect(pageObject.projectParentSelect.element).toBeSelect2Disabled();
         });
     });
@@ -181,7 +85,7 @@ describe("project edit view", () => {
 
         it("should save when name looses focus", () => {
             // arrange
-            pageObject.nameInput = "SomeName";
+            pageObject.nameInput("SomeName");
 
             // act
             pageObject.idElement.click();
@@ -192,7 +96,7 @@ describe("project edit view", () => {
 
         it("should save when projectId looses focus", () => {
             // arrange
-            pageObject.idInput = "SomeId";
+            pageObject.idInput("SomeId");
 
             // act
             pageObject.nameElement.click();
@@ -213,7 +117,7 @@ describe("project edit view", () => {
 
         it("should save when cmdb looses focus", () => {
             // arrange
-            pageObject.cmdbInput = "SomeCmdb";
+            pageObject.cmdbInput("SomeCmdb");
 
             // act
             pageObject.nameElement.click();
@@ -234,7 +138,7 @@ describe("project edit view", () => {
 
         it("should save when esdh looses focus", () => {
             // arrange
-            pageObject.esdhInput = "SomeEsdh";
+            pageObject.esdhInput("SomeEsdh");
 
             // act
             pageObject.nameElement.click();
@@ -245,7 +149,7 @@ describe("project edit view", () => {
 
         it("should save when folder looses focus", () => {
             // arrange
-            pageObject.folderInput = "SomeFolder";
+            pageObject.folderInput("SomeFolder");
 
             // act
             pageObject.nameElement.click();
@@ -256,7 +160,7 @@ describe("project edit view", () => {
 
         it("should save when background looses focus", () => {
             // arrange
-            pageObject.backgroundInput = "SomeBackground";
+            pageObject.backgroundInput("SomeBackground");
 
             // act
             pageObject.nameElement.click();
@@ -267,7 +171,7 @@ describe("project edit view", () => {
 
         it("should save when note looses focus", () => {
             // arrange
-            pageObject.noteInput = "SomeNote";
+            pageObject.noteInput("SomeNote");
 
             // act
             pageObject.nameElement.click();

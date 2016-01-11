@@ -35,7 +35,7 @@ describe("project edit tab kle", () => {
             // act
 
             // assert
-            pageObject.taskRepeater.each((elem, index) => {
+            pageObject.taskRepeater.each(elem => {
                 var checkbox = elem.element(pageObject.checkboxLocator);
 
                 expect(checkbox).toBeDisabled();
@@ -45,7 +45,7 @@ describe("project edit tab kle", () => {
 
     describe("with write access", () => {
         beforeEach(() => {
-            // TODO: itproject/1/taskId=* is hardcoded in mock JSON for IDs 19-68. Refactor to object base mock generation.
+            // TODO: itproject/1/taskId=* is hardcoded in mock JSON for IDs 19-68. Refactor to object based mock generation.
             mock(["itProjectWriteAccess"].concat(mockDependencies));
             pageObject.getPage();
 
@@ -81,7 +81,7 @@ describe("project edit tab kle", () => {
 
             // act
             // catch error to ignore nothing selected error
-            pageObject.mainGroupSelect.deselect().thenCatch(err => null);
+            pageObject.mainGroupSelect.deselect().thenCatch(() => null);
 
             // assert
             expect(pageObject.groupSelect.element).toBeSelect2Disabled();
@@ -161,13 +161,13 @@ describe("project edit tab kle", () => {
             browserHelper.acceptAlert();
 
             // assert
-            pageObject.taskRepeater.each((elem, index) => {
+            pageObject.taskRepeater.each(elem => {
                 var checkbox = elem.element(pageObject.checkboxLocator);
 
                 // match api url with query string 'taskID=ID' only and ignoring any other query parameters
                 checkbox.getAttribute("id")
                     .then(id =>
-                        expect(mock.requestsMade()).toMatchInRequests({ method: "POST", url: "api/itProject/1?(.[^ ])*taskId=" + id }));
+                        expect(mock.requestsMade()).toMatchInRequests({ method: "POST", url: `api/itProject/1?(.[^ ])*taskId=${id}` }));
 
                 expect(checkbox).toBeChecked();
             });
@@ -181,13 +181,13 @@ describe("project edit tab kle", () => {
             browserHelper.dismissAlert();
 
             // assert
-            pageObject.taskRepeater.each((elem, index) => {
+            pageObject.taskRepeater.each(elem => {
                 var checkbox = elem.element(pageObject.checkboxLocator);
 
                 // match api url with query string 'taskID=ID' only and ignoring any other query parameters
                 checkbox.getAttribute("id")
                     .then(id =>
-                        expect(mock.requestsMade()).not.toMatchInRequests({ method: "POST", url: "api/itProject/1?(.[^ ])*taskId=" + id }));
+                        expect(mock.requestsMade()).not.toMatchInRequests({ method: "POST", url: `api/itProject/1?(.[^ ])*taskId=${id}` }));
 
                 expect(checkbox).not.toBeChecked();
             });
@@ -204,13 +204,13 @@ describe("project edit tab kle", () => {
             browserHelper.acceptAlert();
 
             // assert
-            pageObject.taskRepeater.each((elem, index) => {
+            pageObject.taskRepeater.each(elem => {
                 var checkbox = elem.element(pageObject.checkboxLocator);
 
                 // match api url with query string 'taskID=ID' only and ignoring any other query parameters
                 checkbox.getAttribute("id")
                     .then(id =>
-                        expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/itProject/1?(.[^ ])*taskId=" + id }));
+                        expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: `api/itProject/1?(.[^ ])*taskId=${id}` }));
 
                 expect(checkbox).not.toBeChecked();
             });
@@ -227,13 +227,13 @@ describe("project edit tab kle", () => {
             browserHelper.dismissAlert();
 
             // assert
-            pageObject.taskRepeater.each((elem, index) => {
+            pageObject.taskRepeater.each(elem => {
                 var checkbox = elem.element(pageObject.checkboxLocator);
 
                 // match api url with query string 'taskID=ID' only and ignoring any other query parameters
                 checkbox.getAttribute("id")
                     .then(id =>
-                        expect(mock.requestsMade()).not.toMatchInRequests({ method: "DELETE", url: "api/itProject/1?(.[^ ])*taskId=" + id }));
+                        expect(mock.requestsMade()).not.toMatchInRequests({ method: "DELETE", url: `api/itProject/1?(.[^ ])*taskId=${id}` }));
 
                 expect(checkbox).toBeChecked();
             });

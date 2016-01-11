@@ -6,7 +6,14 @@ describe("project edit tab status project", () => {
     var mockHelper: Helper.Mock;
     var browserHelper: Helper.Browser;
     var pageObject: PageObject;
-    var mockDependencies: Array<string> = ["itproject", "itprojectrole", "itprojecttype", "itprojectrights", "itprojectstatus", "assignment"];
+    var mockDependencies: Array<string> = [
+        "itproject",
+        "itprojectrole",
+        "itprojecttype",
+        "itprojectrights",
+        "itprojectstatus",
+        "assignment"
+    ];
 
     beforeEach(() => {
         browser.driver.manage().window().maximize();
@@ -29,30 +36,14 @@ describe("project edit tab status project", () => {
             mock.clearRequests();
         });
 
-        it("should disable trafic light", () => {
+        it("should disable inputs", () => {
             // arrange
 
             // act
 
             // assert
             expect(pageObject.statusTrafficLightSelect.isPresent()).toBeFalse();
-        });
-
-        it("should disable status update date", () => {
-            // arrange
-
-            // act
-
-            // assert
             expect(pageObject.statusUpdateDateElement).toBeDisabled();
-        });
-
-        it("should disable status note", () => {
-            // arrange
-
-            // act
-
-            // assert
             expect(pageObject.statusNoteElement).toBeDisabled();
         });
 
@@ -89,7 +80,7 @@ describe("project edit tab status project", () => {
 
         it("should save when status update date looses focus", () => {
             // arrange
-            pageObject.statusUpdateInput = "01-01-2015";
+            pageObject.statusUpdateInput("01-01-2015");
 
             // act
             pageObject.statusNoteElement.click();
@@ -100,7 +91,7 @@ describe("project edit tab status project", () => {
 
         it("should save when status note looses focus", () => {
             // arrange
-            pageObject.statusNoteInput = "SomeNote";
+            pageObject.statusNoteInput("SomeNote");
 
             // act
             pageObject.statusUpdateDateElement.click();
@@ -131,7 +122,10 @@ describe("project edit tab status project", () => {
 
         it("should delete activity when delete confirm popup is accepted", () => {
             // arrange
-            pageObject.assignmentMilestoneRepeater.selectFirst(pageObject.assigmentLocator).first().click();
+            pageObject.assignmentMilestoneRepeater
+                .selectFirst(pageObject.assigmentLocator)
+                .first()
+                .click();
 
             // act
             browserHelper.acceptAlert();
@@ -142,7 +136,10 @@ describe("project edit tab status project", () => {
 
         it("should not delete activity when delete confirm popup is dismissed", () => {
             // arrange
-            pageObject.assignmentMilestoneRepeater.selectFirst(pageObject.assigmentLocator).first().click();
+            pageObject.assignmentMilestoneRepeater
+                .selectFirst(pageObject.assigmentLocator)
+                .first()
+                .click();
 
             // act
             browserHelper.dismissAlert();

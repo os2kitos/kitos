@@ -50,7 +50,7 @@ describe("project edit tab description", () => {
 
         it("should save when description looses focus", () => {
             // arrange
-            pageObject.descriptionInput = "SomeDescription";
+            pageObject.descriptionInput("SomeDescription");
 
             // act
             pageObject.descriptionElement.sendKeys(protractor.Key.TAB);

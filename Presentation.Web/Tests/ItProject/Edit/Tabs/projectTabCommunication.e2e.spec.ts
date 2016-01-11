@@ -6,7 +6,14 @@ describe("project edit tab communication", () => {
     var mockHelper: Helper.Mock;
     var browserHelper: Helper.Browser;
     var pageObject: PageObject;
-    var mockDependencies: Array<string> = ["itproject", "itprojecttype", "itprojectrights", "itprojectrole", "itprojectstatus", "communication"];
+    var mockDependencies: Array<string> = [
+        "itproject",
+        "itprojecttype",
+        "itprojectrights",
+        "itprojectrole",
+        "itprojectstatus",
+        "communication"
+    ];
 
     beforeEach(() => {
         browser.driver.manage().window().maximize();
@@ -110,7 +117,8 @@ describe("project edit tab communication", () => {
             // arrange
             pageObject.commRepeater
                 .selectFirst(pageObject.deleteCommLocator)
-                .first().click();
+                .first()
+                .click();
 
             // act
             browserHelper.acceptAlert();
@@ -123,7 +131,8 @@ describe("project edit tab communication", () => {
             // arrange
             pageObject.commRepeater
                 .selectFirst(pageObject.deleteCommLocator)
-                .first().click();
+                .first()
+                .click();
 
             // act
             browserHelper.dismissAlert();

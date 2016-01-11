@@ -2,7 +2,7 @@
 import SelectStatus2Wrapper = require("../../../../Tests/object-wrappers/SelectStatus2Wrapper");
 
 class ItProjectEditTabStrategy implements IPageObject {
-    controllerVm: string = "projectStatusVm";
+    controllerVm = "projectStatusVm";
 
     getPage(): webdriver.promise.Promise<void> {
         throw Error("This PO covers two modal pages. Use getAssignmentPage() or getMilestonePage()");

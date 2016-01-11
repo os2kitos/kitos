@@ -7,7 +7,7 @@ class SelectStatus2Wrapper {
     /**
      * instantiate selectStatus2 directive wrapper.
      *
-     * @param cssLocator CSS locator for directive element.
+     * @param {string} [cssLocator] CSS locator for directive element.
      */
     constructor(cssLocator: string) {
         this.cssSelector = cssLocator;
@@ -21,11 +21,11 @@ class SelectStatus2Wrapper {
      */
     selectFirst(): webdriver.promise.Promise<void> {
         this.dropdownElement.click().then(null, () => {
-            throw Error("No active selectStatus2 directive found with selector '" + this.cssSelector + "'");
+            throw Error(`No active selectStatus2 directive found with selector '${this.cssSelector}'`);
         });
 
         browser.driver.wait(() => this.options.count().then(count => count > 0), 2000)
-            .then(null, err => this.createError("No options found.\n  " + err));
+            .then(null, err => this.createError(`No options found.\n  ${err}`));
 
         return this.options.first().click();
     }
@@ -33,20 +33,25 @@ class SelectStatus2Wrapper {
     /**
      * select element by index.
      *
-     * @param index Options index on dropdown starting on 0.
+     * @param {number} [index] Options index on dropdown starting on 0.
      */
     select(index: number): webdriver.promise.Promise<void> {
-        if (index < 0) this.createError("Index must be positive: " + index);
+        if (index < 0) {
+            this.createError(`Index must be positive: ${index}`);
+        }
 
         this.dropdownElement.click().then(null, () => {
-            throw Error("No active selectStatus2 directive found with selector '" + this.cssSelector + "'");
+            throw Error(`No active selectStatus2 directive found with selector '${this.cssSelector}'`);
         });
 
         browser.driver.wait(() => this.options.count().then(count => count > 0), 2000)
-            .then(() => this.options.count(), err => this.createError("No options found.\n  " + err))
+            .then(() =>
+                this.options.count(),
+            err =>
+                this.createError(`No options found.\n  ${err}`))
             .then(count => {
                 if (index >= count) {
-                    this.createError("Index out of range: " + index + " Range: [0 - " + count + "]");
+                    this.createError(`Index out of range: ${index} Range: [0 - ${count}]`);
                 }
             });
 
@@ -75,7 +80,7 @@ class SelectStatus2Wrapper {
      * throw error message
      */
     private createError(message: string) {
-        throw Error("selectStatus2 selector: " + this.cssSelector + "\n  " + message + "\n");
+        throw Error(`selectStatus2 selector: ${this.cssSelector}\n  ${message}\n`);
     }
 }
 

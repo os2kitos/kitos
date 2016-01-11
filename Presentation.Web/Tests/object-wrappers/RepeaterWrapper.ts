@@ -1,6 +1,5 @@
 ﻿// handle repeater directives
 class RepeaterWrapper {
-    locator: string;
     repeater: protractor.ElementArrayFinder;
 
     /**
@@ -8,8 +7,7 @@ class RepeaterWrapper {
      *
      * @param {string} [locator] repeater locator like "post in posts"
      */
-    constructor(locator: string) {
-        this.locator = locator;
+    constructor(public locator: string) {
 
         this.repeater = element.all(by.repeater(this.locator));
     }

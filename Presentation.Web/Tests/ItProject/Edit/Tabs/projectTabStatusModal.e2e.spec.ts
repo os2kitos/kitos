@@ -4,15 +4,19 @@ import PageObject = require("../../../../app/components/it-project/tabs/it-proje
 
 describe("project edit tab staus modal", () => {
     var mockHelper: Helper.Mock;
-    var browserHelper: Helper.Browser;
     var pageObject: PageObject;
-    var mockDependencies: Array<string> = ["itproject", "itprojecttype", "itprojectrights", "itprojectrole", "itprojectstatus"];
+    var mockDependencies: Array<string> = [
+        "itproject",
+        "itprojecttype",
+        "itprojectrights",
+        "itprojectrole",
+        "itprojectstatus"
+    ];
 
     beforeEach(() => {
         browser.driver.manage().window().maximize();
 
         mockHelper = new Helper.Mock();
-        browserHelper = new Helper.Browser(browser);
         pageObject = new PageObject();
     });
 

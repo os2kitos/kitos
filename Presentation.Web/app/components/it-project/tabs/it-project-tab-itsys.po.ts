@@ -3,14 +3,14 @@ import Select2Wrapper = require("../../../../Tests/object-wrappers/Select2Wrappe
 import RepeaterWrapper = require("../../../../Tests/object-wrappers/RepeaterWrapper");
 
 class ItProjectEditTabItsys implements IPageObject {
-    controllerVm: string = "";
+    controllerVm = "";
 
     getPage(): webdriver.promise.Promise<void> {
         return browser.get("https://localhost:44300/#/project/edit/1/itsys");
     }
 
     // usage repeater
-    usageRepeater = new RepeaterWrapper("usage in " + this.controllerVm + "systemUsages");
+    usageRepeater = new RepeaterWrapper(`usage in ${this.controllerVm}systemUsages`);
     deleteLocator = by.css(".delete-usage");
 
     // usage selector

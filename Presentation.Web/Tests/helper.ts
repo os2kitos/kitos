@@ -1,11 +1,7 @@
 ﻿import mock = require("protractor-http-mock");
 
 export class Browser {
-    browser: protractor.IBrowser;
-
-    constructor(browser: protractor.IBrowser) {
-        this.browser = browser;
-    }
+    constructor(private browser: protractor.IBrowser) { }
 
     /**
      * output browser error log
@@ -48,8 +44,6 @@ export class Browser {
 }
 
 export class Mock {
-    constructor() { }
-
     /**
      * return last matched request
      */
@@ -58,7 +52,9 @@ export class Mock {
             .then((requests: Array<mock.ReceivedRequest>) => {
                 var lastRequest = requests[requests.length - 1];
 
-                if (!lastRequest) throw Error("protractor-http-mock: No requests matched with mocks.");
+                if (!lastRequest) {
+                    throw Error("protractor-http-mock: No requests matched with mocks.");
+                }
 
                 return lastRequest;
             });
@@ -74,9 +70,8 @@ export class Mock {
             console.log("\n*** protractor-http-mock matched requests ***\n");
 
             for (var i = 0; i < requests.length; i++) {
-                console.log((i + 1) + "\n" +
-                            "  METHOD: " + requests[i].method + "\n" +
-                            "  URL   : " + requests[i].url);
+                console.log(`${i + 1}\n  METHOD: ${requests[i].method}\n  URL   : ${requests[i].url}`);
+
                 if (requests[i].data) {
                     console.log("  DATA  : ", requests[i].data);
                 }

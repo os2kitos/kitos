@@ -43,7 +43,7 @@
             private autofocus) {
             autofocus();
 
-            if (!_.find(this.projectTypes, (type: { id }) => type.id === this.project.itProjectTypeId)) {
+            if (!_.find(this.projectTypes, (type: { id }) => type.id == this.project.itProjectTypeId)) {
                 this.projectTypes.unshift({ id: this.project.itProjectTypeId, name: this.project.itProjectTypeName });
             }
 
@@ -232,7 +232,7 @@
                         var results = [];
 
                         _.each(data.data.response, (obj: { id; name; cvr; }) => {
-                            if (excludeSelf && obj.id === this.project.id)
+                            if (excludeSelf && obj.id == this.project.id)
                                 return; // don't add self to result
 
                             results.push({

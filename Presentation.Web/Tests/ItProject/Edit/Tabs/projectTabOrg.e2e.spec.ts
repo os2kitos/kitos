@@ -5,7 +5,12 @@ import PageObject = require("../../../../app/components/it-project/tabs/it-proje
 describe("project edit tab org", () => {
     var mockHelper: Helper.Mock;
     var pageObject: PageObject;
-    var mockDependencies: Array<string> = ["itproject", "itprojecttype", "itProjectOrgUnitUsage", "organizationunit"];
+    var mockDependencies: Array<string> = [
+        "itproject",
+        "itprojecttype",
+        "itProjectOrgUnitUsage",
+        "organizationunit"
+    ];
 
     beforeEach(() => {
         browser.driver.manage().window().maximize();

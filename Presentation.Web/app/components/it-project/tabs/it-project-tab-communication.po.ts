@@ -3,14 +3,14 @@ import RepeaterWrapper = require("../../../../Tests/object-wrappers/RepeaterWrap
 import Select2Wrapper = require("../../../../Tests/object-wrappers/Select2Wrapper");
 
 class ItProjectEditTabCommunication implements IPageObject {
-    controllerVm: string = "";
+    controllerVm = "";
 
     getPage(): webdriver.promise.Promise<void> {
         return browser.get("https://localhost:44300/#/project/edit/1/communication");
     }
 
     // comm repeater
-    commRepeater = new RepeaterWrapper("c in " + this.controllerVm + "comms");
+    commRepeater = new RepeaterWrapper(`c in ${this.controllerVm}comms`);
     targetLocator = by.model("c.targetAudiance");
     purposeLocator = by.model("c.purpose");
     messageLocator = by.model("c.message");
@@ -26,7 +26,7 @@ class ItProjectEditTabCommunication implements IPageObject {
             .first()
             .getAttribute("id")
             .then(v => {
-                return new Select2Wrapper("#" + v);
+                return new Select2Wrapper(`#${v}`);
             });
     }
 

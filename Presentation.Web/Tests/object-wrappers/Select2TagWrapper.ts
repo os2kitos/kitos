@@ -31,7 +31,7 @@ class Select2TagWrapper {
 
         browser.driver.wait(() => this.options.count().then(count => count > 0), 2000)
             .thenCatch(err => {
-                throw new Error("No options found for select2 selector '" + this.cssSelector + "'");
+                throw new Error(`No options found for select2 selector '${this.cssSelector}'`);
             });
 
         return this.options.first().click();
@@ -55,7 +55,7 @@ class Select2TagWrapper {
         return this.element.isPresent()
             .then(present => {
                 if (!present) {
-                    throw Error("select2 element not found using selector '" + this.cssSelector + "'");
+                    throw Error(`select2 element not found using selector '${this.cssSelector}'`);
                 }
             })
             .then(() => true);

@@ -6,7 +6,14 @@ describe("project edit tab risk", () => {
     var mockHelper: Helper.Mock;
     var browserHelper: Helper.Browser;
     var pageObject: PageObject;
-    var mockDependencies: Array<string> = ["itproject", "itprojecttype", "itprojectrights", "itprojectrole", "itprojectstatus", "risk"];
+    var mockDependencies: Array<string> = [
+        "itproject",
+        "itprojecttype",
+        "itprojectrights",
+        "itprojectrole",
+        "itprojectstatus",
+        "risk"
+    ];
 
     beforeEach(() => {
         browser.driver.manage().window().maximize();
@@ -85,10 +92,10 @@ describe("project edit tab risk", () => {
         it("should save when save is clicked", () => {
             // arrange
             // below is dummy. Hardcoded values are returned from mock response
-            pageObject.nameInput = "SomeName";
-            pageObject.consequenceInput = 2;
-            pageObject.probabilityInput = 2;
-            pageObject.actionInput = "SomeAction";
+            pageObject.nameInput("SomeName");
+            pageObject.consequenceInput(2);
+            pageObject.probabilityInput(2);
+            pageObject.actionInput("SomeAction");
             pageObject.responsibleSelect.selectFirst();
 
             // act
@@ -113,7 +120,8 @@ describe("project edit tab risk", () => {
             // arrange
             pageObject.riskRepeater
                 .selectFirst(pageObject.deleteRiskLocator)
-                .first().click();
+                .first()
+                .click();
 
             // act
             browserHelper.acceptAlert();
@@ -126,7 +134,8 @@ describe("project edit tab risk", () => {
             // arrange
             pageObject.riskRepeater
                 .selectFirst(pageObject.deleteRiskLocator)
-                .first().click();
+                .first()
+                .click();
 
             // act
             browserHelper.dismissAlert();
@@ -198,8 +207,8 @@ describe("project edit tab risk", () => {
             // arrange
 
             // act
-            pageObject.consequenceInput = 2;
-            pageObject.probabilityInput = 2;
+            pageObject.consequenceInput(2);
+            pageObject.probabilityInput(2);
             pageObject.riskRepeater
                 .selectFirst(pageObject.consequenceLocator)
                 .sendKeys(protractor.Key.CONTROL, "a", protractor.Key.NULL, "2", protractor.Key.TAB); // CTRL + a to clear input
@@ -219,8 +228,8 @@ describe("project edit tab risk", () => {
             // arrange
 
             // act
-            pageObject.consequenceInput = 2;
-            pageObject.probabilityInput = 2;
+            pageObject.consequenceInput(2);
+            pageObject.probabilityInput(2);
 
             // assert
             expect(pageObject.productValue()).toBe("4");
@@ -230,10 +239,10 @@ describe("project edit tab risk", () => {
             // arrange
             // excisting risk has consequence and probability of 1
             // below is dummy. Hardcoded values are returned from mock response
-            pageObject.nameInput = "SomeName";
-            pageObject.consequenceInput = 2;
-            pageObject.probabilityInput = 2;
-            pageObject.actionInput = "SomeAction";
+            pageObject.nameInput("SomeName");
+            pageObject.consequenceInput(2);
+            pageObject.probabilityInput(2);
+            pageObject.actionInput("SomeAction");
             pageObject.responsibleSelect.selectFirst();
             var expectedAverage = (2 * 2 + 1 * 1) / 2;
 

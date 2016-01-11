@@ -14,23 +14,23 @@
                     }
                 }
 
-                result.message = util.buildFailureMessage("toMatchInRequests", result.pass, outputRequests(actual), "\n  " + outputRequest(expected));
+                result.message = util.buildFailureMessage("toMatchInRequests", result.pass, outputRequests(actual), `\n  ${outputRequest(expected)}`);
 
                 return result;
             };
 
             // output a single request
             function outputRequest(request: mock.ReceivedRequest) {
-                return "METHOD: " + request.method + " URL: " + request.url;
+                return `METHOD: ${request.method} URL: ${request.url}`;
             };
 
             // output all requests
             function outputRequests(requests: Array<mock.ReceivedRequest>) {
-                var output = "Actual requests: " + requests.length;
+                var output = `Actual requests: ${requests.length}`;
                 if (requests.length > 0) {
                     output += "\n";
                     for (var i = 0; i < requests.length; i++) {
-                        output += "  " + outputRequest(requests[i]);
+                        output += `  ${outputRequest(requests[i])}`;
                         if (i < requests.length - 1)
                             output += "\n";
                     }

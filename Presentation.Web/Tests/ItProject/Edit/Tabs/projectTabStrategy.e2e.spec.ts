@@ -27,21 +27,13 @@ describe("project edit tab strategy", () => {
             mock.clearRequests();
         });
 
-        it("should disable joint municipal strategy", () => {
+        it("should disable inputs", () => {
             // arrange
 
             // act
 
             // assert
             expect(pageObject.jointMunicipalSelector.element).toBeSelect2Disabled();
-        });
-
-        it("should disable common public strategy", () => {
-            // arrange
-
-            // act
-
-            // assert
             expect(pageObject.commonPublicSelector.element).toBeSelect2Disabled();
         });
     });

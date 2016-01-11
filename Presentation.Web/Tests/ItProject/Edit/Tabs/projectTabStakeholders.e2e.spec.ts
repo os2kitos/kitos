@@ -89,12 +89,12 @@ describe("project edit tab description", () => {
 
         it("should save when save is clicked", () => {
             // arrange
-            pageObject.nameInput = "SomeName";
-            pageObject.roleInput = "SomeRole";
-            pageObject.downsidesInput = "SomeDownside";
-            pageObject.benefitsInput = "SomeBenifit";
-            pageObject.significanceInput = 1;
-            pageObject.howToHandleInput = "SomeHandling";
+            pageObject.nameInput("SomeName");
+            pageObject.roleInput("SomeRole");
+            pageObject.downsidesInput("SomeDownside");
+            pageObject.benefitsInput("SomeBenifit");
+            pageObject.significanceInput(1);
+            pageObject.howToHandleInput("SomeHandling");
 
             // act
             pageObject.saveStakeholderElement.click()
@@ -118,7 +118,8 @@ describe("project edit tab description", () => {
             // arrange
             pageObject.stakeholderRepeater
                 .selectFirst(pageObject.deleteStakeholderLocator)
-                .first().click();
+                .first()
+                .click();
 
             // act
             browserHelper.acceptAlert();
@@ -131,7 +132,8 @@ describe("project edit tab description", () => {
             // arrange
             pageObject.stakeholderRepeater
                 .selectFirst(pageObject.deleteStakeholderLocator)
-                .first().click();
+                .first()
+                .click();
 
             // act
             browserHelper.dismissAlert();

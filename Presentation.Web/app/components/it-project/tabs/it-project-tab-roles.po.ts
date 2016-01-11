@@ -3,14 +3,14 @@ import RepeaterWrapper = require("../../../../Tests/object-wrappers/RepeaterWrap
 import Select2Wrapper = require("../../../../Tests/object-wrappers/Select2Wrapper");
 
 class PageObject implements IPageObject {
-    controllerVm: string = "projectRolesVm";
+    controllerVm = "projectRolesVm";
 
     getPage(): webdriver.promise.Promise<void> {
         return browser.get("https://localhost:44300/#/project/edit/1/roles");
     }
 
     // phase name repeater
-    rightsRepeater = new RepeaterWrapper("right in " + this.controllerVm + ".right");
+    rightsRepeater = new RepeaterWrapper(`right in ${this.controllerVm}.right`);
     rightRowLocator = by.css("tr");
     rightEditButtonLocator = by.css("tr a.edit-right");
     rightEditDeleteLocator = by.css("tr a.delete-right");

@@ -2,7 +2,7 @@
     app.config(["$stateProvider", function ($stateProvider) {
         $stateProvider.state("it-project.catalog", {
             url: "/catalog",
-            templateUrl: "app/components/it-project/tabs/it-project-tab-catalog.html",
+            templateUrl: "app/components/it-project/tabs/it-project-tab-catalog.view.html",
             controller: "project.CatalogCtrl",
             resolve: {
                 user: ["userService", function(userService) {

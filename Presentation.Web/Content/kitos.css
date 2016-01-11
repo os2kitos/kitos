@@ -675,7 +675,7 @@ div.searchbox-wrapper {
 
 
 /*
-    Fixes kendo problem with bootstrap form-constrol
+    Fixes kendo problem with bootstrap form-control
     http://docs.telerik.com/kendo-ui/using-kendo-with-twitter-bootstrap#using-the-form-control-bootstrap-css-class-with-kendo-ui-widgets
 */
 .form-control.k-widget

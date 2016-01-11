@@ -26,6 +26,7 @@ Presentation.Web/app/**/*.js.map
 !Presentation.Web/app/utility/utility.js
 Presentation.Web/Tests/**/*.js
 Presentation.Web/Tests/**/*.js.map
+public/
 
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
 !packages/*/build/

@@ -3,7 +3,7 @@ import Select2Wrapper = require("../../../../Tests/object-wrappers/Select2Wrappe
 import RepeaterWrapper = require("../../../../Tests/object-wrappers/RepeaterWrapper");
 
 class ItProjectEditTabKle implements IPageObject {
-    controllerVm: string = "";
+    controllerVm = "";
 
     getPage(): webdriver.promise.Promise<void> {
         return browser.get("https://localhost:44300/#/project/edit/1/kle");
@@ -19,7 +19,7 @@ class ItProjectEditTabKle implements IPageObject {
     changeTaskViewElement = element(by.css("#change-task-view"));
 
     // task repeater
-    taskRepeater = new RepeaterWrapper("task in " + this.controllerVm + "tasklist");
+    taskRepeater = new RepeaterWrapper(`task in ${this.controllerVm}tasklist`);
     checkboxLocator = by.css("input[type=checkbox]");
 
     // select buttons

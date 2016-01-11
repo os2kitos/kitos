@@ -727,14 +727,14 @@
     <Content Include="Partials\it-contract\tab-paymentmodel.html" />
     <Content Include="Partials\it-contract\tab-systems.html" />
     <Content Include="Partials\it-contract\tab-roles.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-catalog.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-catalog.view.html" />
     <Content Include="app\components\it-project\it-project-overview.view.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-status-goal-modal.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-status-goal-modal.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-modal.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-communication.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-description.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-handover.view.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-hierarchy.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-hierarchy.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-phases.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-risk.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-roles.view.html" />
@@ -744,7 +744,7 @@
     <Content Include="app\components\it-project\tabs\it-project-tab-itsys.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-kle.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-stakeholders.view.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-status-goal.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-status-goal.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-strategy.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-project.view.html" />
     <Content Include="Partials\it-system\edit-it-interface.html" />

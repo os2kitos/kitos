@@ -5,7 +5,13 @@ import PageObject = require("../../../../app/components/it-project/tabs/it-proje
 describe("project edit tab handover", () => {
     var mockHelper: Helper.Mock;
     var pageObject: PageObject;
-    var mockDependencies: Array<string> = ["itproject", "itprojecttype", "itprojectrole", "itprojectrights", "handover"];
+    var mockDependencies: Array<string> = [
+        "itproject",
+        "itprojecttype",
+        "itprojectrole",
+        "itprojectrights",
+        "handover"
+    ];
 
     beforeEach(() => {
         browser.driver.manage().window().maximize();

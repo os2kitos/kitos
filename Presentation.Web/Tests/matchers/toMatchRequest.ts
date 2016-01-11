@@ -2,7 +2,7 @@
     jasmine.addMatchers({
         "toMatchRequest": (util: jasmine.MatchersUtil): jasmine.CustomMatcher => {
             var outputRequest = (request: mock.ReceivedRequest): string => {
-                return "METHOD: " + request.method + " URL: " + request.url;
+                return `METHOD: ${request.method} URL: ${request.url}`;
             };
 
             var compare = (actual, expected) => {

@@ -29,59 +29,24 @@ describe("project edit tab status goal", () => {
             mock.clearRequests();
         });
 
-        it("should disable trafic light", () => {
+        it("should disable inputs", () => {
             // arrange
 
             // act
 
             // assert
             expect(pageObject.trafficLightSelect.isPresent()).toBeFalse();
-        });
-
-        it("should disable status update date", () => {
-            // arrange
-
-            // act
-
-            // assert
             expect(pageObject.updateDateElement).toBeDisabled();
-        });
-
-        it("should disable status note", () => {
-            // arrange
-
-            // act
-
-            // assert
             expect(pageObject.noteElement).toBeDisabled();
         });
 
-        it("should hide edit goal link", () => {
+        it("should hide goal links", () => {
             // arrange
-            var editLink = element(pageObject.editGoalLocator);
-
             // act
 
             // assert
-            expect(editLink).not.toBeVisible();
-        });
-
-        it("should hide delete goal link", () => {
-            // arrange
-            var deleteLink = element(pageObject.deleteGoalLocator);
-
-            // act
-
-            // assert
-            expect(deleteLink).not.toBeVisible();
-        });
-
-        it("should hide add goal link", () => {
-            // arrange
-
-            // act
-
-            // assert
+            expect(element(pageObject.editGoalLocator)).not.toBeVisible();
+            expect(element(pageObject.deleteGoalLocator)).not.toBeVisible();
             expect(pageObject.addGoalButton).not.toBeVisible();
         });
     });
@@ -109,7 +74,7 @@ describe("project edit tab status goal", () => {
 
         it("should save when update date looses focus", () => {
             // arrange
-            pageObject.updateInput = "01-01-2015";
+            pageObject.updateInput("01-01-2015");
 
             // act
             pageObject.updateDateElement.sendKeys(protractor.Key.TAB);
@@ -120,7 +85,7 @@ describe("project edit tab status goal", () => {
 
         it("should save when note looses focus", () => {
             // arrange
-            pageObject.noteInput = "SomeNote";
+            pageObject.noteInput("SomeNote");
 
             // act
             pageObject.noteElement.sendKeys(protractor.Key.TAB);
@@ -151,7 +116,10 @@ describe("project edit tab status goal", () => {
 
         it("should delete goal when delete confirm popup is accepted", () => {
             // arrange
-            pageObject.goalRepeater.selectFirst(pageObject.deleteGoalLocator).first().click();
+            pageObject.goalRepeater
+                .selectFirst(pageObject.deleteGoalLocator)
+                .first()
+                .click();
 
             // act
             browserHelper.acceptAlert();
@@ -162,7 +130,10 @@ describe("project edit tab status goal", () => {
 
         it("should not delete goal when delete confirm popup is dismissed", () => {
             // arrange
-            pageObject.goalRepeater.selectFirst(pageObject.deleteGoalLocator).first().click();
+            pageObject.goalRepeater
+                .selectFirst(pageObject.deleteGoalLocator)
+                .first()
+                .click();
 
             // act
             browserHelper.dismissAlert();

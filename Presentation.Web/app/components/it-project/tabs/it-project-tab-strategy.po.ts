@@ -2,7 +2,7 @@
 import Select2Wrapper = require("../../../../Tests/object-wrappers/Select2Wrapper");
 
 class ItProjectEditTabStrategy implements IPageObject {
-    controllerVm: string = "projectStatusVm";
+    controllerVm = "projectStatusVm";
 
     getPage(): webdriver.promise.Promise<void> {
         return browser.get("https://localhost:44300/#/project/edit/1/strategy");

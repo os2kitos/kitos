@@ -7,8 +7,8 @@
                     message: null
                 };
 
-                if (!actual.getAttribute) {
-                    throw Error("Can't determine if element is cheked. Method getAttribute() is not defined. Are you expecting on a 'protractor.ElementArrayFinder'?");
+                if (!actual.isSelected) {
+                    throw Error("Can't determine if element is cheked. Method isSelected() is not defined. Are you expecting on a 'protractor.ElementArrayFinder'?");
                 }
 
                 result.pass = actual.isSelected().then(v => {
@@ -20,10 +20,14 @@
 
                 // get element identifier from id, name, data-ng-model or use the full HTML element if others are abcent
                 function getElementIdentifier(): webdriver.promise.Promise<string> {
+                    if (!actual.getAttribute) {
+                        throw Error("Can't determine identifier for element. Method getAttribute() is undefined.");
+                    }
+
                     return actual.getAttribute("id")
                         .then(id => {
                             if (!id) throw Error();
-                            return "#" + id.toString();
+                            return `#${id.toString()}`;
                         })
                         .thenCatch(() => {
                             return actual.getAttribute("name")

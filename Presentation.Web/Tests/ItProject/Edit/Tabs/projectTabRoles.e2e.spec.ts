@@ -6,7 +6,15 @@ describe("project edit tab roles", () => {
     var mockHelper: Helper.Mock;
     var browserHelper: Helper.Browser;
     var pageObject: PageObject;
-    var mockDependencies: Array<string> = ["itproject", "itprojectrole", "itprojecttype", "itprojectrights", "itprojectstatus", "assignment", "organization"];
+    var mockDependencies: Array<string> = [
+        "itproject",
+        "itprojectrole",
+        "itprojecttype",
+        "itprojectrights",
+        "itprojectstatus",
+        "assignment",
+        "organization"
+    ];
 
     beforeEach(() => {
         browser.driver.manage().window().maximize();
@@ -43,8 +51,12 @@ describe("project edit tab roles", () => {
 
         it("should hide edit and delete buttons on rights", () => {
             // arrange
-            var editButton = pageObject.rightsRepeater.selectFirst(pageObject.rightEditButtonLocator).first();
-            var deleteButton = pageObject.rightsRepeater.selectFirst(pageObject.rightEditDeleteLocator).first();
+            var editButton = pageObject.rightsRepeater
+                .selectFirst(pageObject.rightEditButtonLocator)
+                .first();
+            var deleteButton = pageObject.rightsRepeater
+                .selectFirst(pageObject.rightEditDeleteLocator)
+                .first();
 
             // act
 
@@ -107,7 +119,8 @@ describe("project edit tab roles", () => {
 
             // assert
             // two rows are created per right, one for display one for edit
-            expect(pageObject.rightsRepeater.selectFirst(pageObject.rightRowLocator).count()).toBe(2);
+            var count = pageObject.rightsRepeater.selectFirst(pageObject.rightRowLocator).count();
+            expect(count).toBe(2);
         });
 
         it("should display edit field for rights when edit is clicked", () => {
@@ -116,21 +129,28 @@ describe("project edit tab roles", () => {
             element.selectFirst("t");
 
             // act
-            pageObject.rightsRepeater.selectFirst(pageObject.rightEditButtonLocator).click();
+            pageObject.rightsRepeater
+                .selectFirst(pageObject.rightEditButtonLocator)
+                .click();
 
             // assert
-            expect(pageObject.rightsRepeater.selectFirst(pageObject.rightEditRoleInputLocator).count()).toBe(1);
+            var count = pageObject.rightsRepeater.selectFirst(pageObject.rightEditRoleInputLocator).count();
+            expect(count).toBe(1);
         });
 
         it("should save edited field for rights when save is clicked", () => {
             // arrange
             var element = pageObject.addRightUserSelector;
             element.selectFirst("t");
-            pageObject.rightsRepeater.selectFirst(pageObject.rightEditButtonLocator).click();
+            pageObject.rightsRepeater
+                .selectFirst(pageObject.rightEditButtonLocator)
+                .click();
             mock.clearRequests();
 
             // act
-            pageObject.rightsRepeater.selectFirst(pageObject.rightEditSaveButtonLocator).click();
+            pageObject.rightsRepeater
+                .selectFirst(pageObject.rightEditSaveButtonLocator)
+                .click();
 
             // assert
             expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/itprojectrights" });
@@ -142,7 +162,9 @@ describe("project edit tab roles", () => {
             var element = pageObject.addRightUserSelector;
             element.selectFirst("t");
             mock.clearRequests();
-            pageObject.rightsRepeater.selectFirst(pageObject.rightEditDeleteLocator).click();
+            pageObject.rightsRepeater
+                .selectFirst(pageObject.rightEditDeleteLocator)
+                .click();
 
             // act
             browserHelper.acceptAlert();
@@ -156,7 +178,9 @@ describe("project edit tab roles", () => {
             var element = pageObject.addRightUserSelector;
             element.selectFirst("t");
             mock.clearRequests();
-            pageObject.rightsRepeater.selectFirst(pageObject.rightEditDeleteLocator).click();
+            pageObject.rightsRepeater
+                .selectFirst(pageObject.rightEditDeleteLocator)
+                .click();
 
             // act
             browserHelper.dismissAlert();

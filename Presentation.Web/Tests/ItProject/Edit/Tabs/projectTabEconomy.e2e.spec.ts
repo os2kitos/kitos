@@ -34,7 +34,7 @@ describe("project edit tab economy", () => {
             // act
 
             // assert
-            inputs.each((element, index) => {
+            inputs.each(element => {
                 expect(element).toBeDisabled();
             });
         });
@@ -46,7 +46,7 @@ describe("project edit tab economy", () => {
             // act
 
             // assert
-            inputs.each((element, index) => {
+            inputs.each(element => {
                 expect(element).toBeDisabled();
             });
         });
@@ -91,7 +91,9 @@ describe("project edit tab economy", () => {
                 // act
                 pageObject.rowRepeater.each((element, index) => {
                     if (index >= rows.first && index <= rows.last) {
-                        element.all(pageObject.budgetLocator).first().sendKeys("1", protractor.Key.TAB);
+                        element.all(pageObject.budgetLocator)
+                            .first()
+                            .sendKeys("1", protractor.Key.TAB);
                     }
                 });
 
@@ -114,7 +116,9 @@ describe("project edit tab economy", () => {
                 // act
                 pageObject.rowRepeater.each((element, index) => {
                     if (index >= rows.first && index <= rows.last) {
-                        element.all(pageObject.budgetLocator).first().sendKeys("1", protractor.Key.TAB);
+                        element.all(pageObject.budgetLocator)
+                            .first()
+                            .sendKeys("1", protractor.Key.TAB);
                     }
                 });
 
@@ -137,7 +141,9 @@ describe("project edit tab economy", () => {
                 // act
                 pageObject.rowRepeater.each((element, index) => {
                     if (index >= rows.first && index <= rows.last) {
-                        element.all(pageObject.budgetLocator).first().sendKeys("1", protractor.Key.TAB);
+                        element.all(pageObject.budgetLocator)
+                            .first()
+                            .sendKeys("1", protractor.Key.TAB);
                     }
                 });
 
@@ -160,7 +166,9 @@ describe("project edit tab economy", () => {
                 // act
                 pageObject.rowRepeater.each((element, index) => {
                     if (index >= rows.first && index <= rows.last) {
-                        element.all(pageObject.budgetLocator).first().sendKeys("1", protractor.Key.TAB);
+                        element.all(pageObject.budgetLocator)
+                            .first()
+                            .sendKeys("1", protractor.Key.TAB);
                     }
                 });
 
@@ -178,13 +186,15 @@ describe("project edit tab economy", () => {
                 // arrange
                 var rows = [{ first: 1, last: 4 }, { first: 6, last: 9 }];
                 var sumRowIndex = 11;
-                var expectedValue: number = 8;
+                var expectedValue = 8;
 
                 // act
-                rows.forEach((row, index) => {
+                rows.forEach(row => {
                     pageObject.rowRepeater.each((element, index) => {
                         if (index >= row.first && index <= row.last) {
-                            element.all(pageObject.budgetLocator).first().sendKeys("1", protractor.Key.TAB);
+                            element.all(pageObject.budgetLocator)
+                                .first()
+                                .sendKeys("1", protractor.Key.TAB);
                         }
                     });
                 });
@@ -203,13 +213,15 @@ describe("project edit tab economy", () => {
                 // arrange
                 var rows = [{ first: 13, last: 14 }, { first: 16, last: 18 }];
                 var sumRowIndex = 20;
-                var expectedValue: number = 5;
+                var expectedValue = 5;
 
                 // act
-                rows.forEach((row, index) => {
+                rows.forEach(row => {
                     pageObject.rowRepeater.each((element, index) => {
                         if (index >= row.first && index <= row.last) {
-                            element.all(pageObject.budgetLocator).first().sendKeys("1", protractor.Key.TAB);
+                            element.all(pageObject.budgetLocator)
+                                .first()
+                                .sendKeys("1", protractor.Key.TAB);
                         }
                     });
                 });
@@ -228,13 +240,15 @@ describe("project edit tab economy", () => {
                 // arrange
                 var rows = [{ first: 1, last: 4 }, { first: 6, last: 9 }, { first: 13, last: 14 }, { first: 16, last: 18 }];
                 var sumRowIndex = 21;
-                var expectedValue: number = -3;
+                var expectedValue = -3;
 
                 // act
-                rows.forEach((row, index) => {
+                rows.forEach(row => {
                     pageObject.rowRepeater.each((element, index) => {
                         if (index >= row.first && index <= row.last) {
-                            element.all(pageObject.budgetLocator).first().sendKeys("1", protractor.Key.TAB);
+                            element.all(pageObject.budgetLocator)
+                                .first()
+                                .sendKeys("1", protractor.Key.TAB);
                         }
                     });
                 });
@@ -290,7 +304,9 @@ describe("project edit tab economy", () => {
                 // act
                 pageObject.rowRepeater.each((element, index) => {
                     if (index >= rows.first && index <= rows.last) {
-                        element.all(pageObject.reaLocator).first().sendKeys("1", protractor.Key.TAB);
+                        element.all(pageObject.reaLocator)
+                            .first()
+                            .sendKeys("1", protractor.Key.TAB);
                     }
                 });
 
@@ -313,7 +329,9 @@ describe("project edit tab economy", () => {
                 // act
                 pageObject.rowRepeater.each((element, index) => {
                     if (index >= rows.first && index <= rows.last) {
-                        element.all(pageObject.reaLocator).first().sendKeys("1", protractor.Key.TAB);
+                        element.all(pageObject.reaLocator)
+                            .first()
+                            .sendKeys("1", protractor.Key.TAB);
                     }
                 });
 
@@ -336,7 +354,9 @@ describe("project edit tab economy", () => {
                 // act
                 pageObject.rowRepeater.each((element, index) => {
                     if (index >= rows.first && index <= rows.last) {
-                        element.all(pageObject.reaLocator).first().sendKeys("1", protractor.Key.TAB);
+                        element.all(pageObject.reaLocator)
+                            .first()
+                            .sendKeys("1", protractor.Key.TAB);
                     }
                 });
 
@@ -359,7 +379,9 @@ describe("project edit tab economy", () => {
                 // act
                 pageObject.rowRepeater.each((element, index) => {
                     if (index >= rows.first && index <= rows.last) {
-                        element.all(pageObject.reaLocator).first().sendKeys("1", protractor.Key.TAB);
+                        element.all(pageObject.reaLocator)
+                            .first()
+                            .sendKeys("1", protractor.Key.TAB);
                     }
                 });
 
@@ -377,13 +399,15 @@ describe("project edit tab economy", () => {
                 // arrange
                 var rows = [{ first: 1, last: 4 }, { first: 6, last: 9 }];
                 var sumRowIndex = 11;
-                var expectedValue: number = 8;
+                var expectedValue = 8;
 
                 // act
-                rows.forEach((row, index) => {
+                rows.forEach(row => {
                     pageObject.rowRepeater.each((element, index) => {
                         if (index >= row.first && index <= row.last) {
-                            element.all(pageObject.reaLocator).first().sendKeys("1", protractor.Key.TAB);
+                            element.all(pageObject.reaLocator)
+                                .first()
+                                .sendKeys("1", protractor.Key.TAB);
                         }
                     });
                 });
@@ -402,13 +426,15 @@ describe("project edit tab economy", () => {
                 // arrange
                 var rows = [{ first: 13, last: 14 }, { first: 16, last: 18 }];
                 var sumRowIndex = 20;
-                var expectedValue: number = 5;
+                var expectedValue = 5;
 
                 // act
-                rows.forEach((row, index) => {
+                rows.forEach(row => {
                     pageObject.rowRepeater.each((element, index) => {
                         if (index >= row.first && index <= row.last) {
-                            element.all(pageObject.reaLocator).first().sendKeys("1", protractor.Key.TAB);
+                            element.all(pageObject.reaLocator)
+                                .first()
+                                .sendKeys("1", protractor.Key.TAB);
                         }
                     });
                 });
@@ -427,13 +453,15 @@ describe("project edit tab economy", () => {
                 // arrange
                 var rows = [{ first: 1, last: 4 }, { first: 6, last: 9 }, { first: 13, last: 14 }, { first: 16, last: 18 }];
                 var sumRowIndex = 21;
-                var expectedValue: number = -3;
+                var expectedValue = -3;
 
                 // act
-                rows.forEach((row, index) => {
+                rows.forEach(row => {
                     pageObject.rowRepeater.each((element, index) => {
                         if (index >= row.first && index <= row.last) {
-                            element.all(pageObject.reaLocator).first().sendKeys("1", protractor.Key.TAB);
+                            element.all(pageObject.reaLocator)
+                                .first()
+                                .sendKeys("1", protractor.Key.TAB);
                         }
                     });
                 });

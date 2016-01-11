@@ -5,7 +5,14 @@ import PageObject = require("../../../../app/components/it-project/tabs/it-proje
 describe("project edit tab phases", () => {
     var mockHelper: Helper.Mock;
     var pageObject: PageObject;
-    var mockDependencies: Array<string> = ["itproject", "itprojectrole", "itprojecttype", "itprojectrights", "itprojectstatus", "assignment"];
+    var mockDependencies: Array<string> = [
+        "itproject",
+        "itprojectrole",
+        "itprojecttype",
+        "itprojectrights",
+        "itprojectstatus",
+        "assignment"
+    ];
 
     beforeEach(() => {
         browser.driver.manage().window().maximize();
@@ -45,7 +52,7 @@ describe("project edit tab phases", () => {
             // act
 
             // assert
-            buttons.each((element, index) => expect(element).toBeDisabled());
+            buttons.each(element => expect(element).toBeDisabled());
         });
 
         it("should disable phase cross date", () => {
@@ -56,7 +63,7 @@ describe("project edit tab phases", () => {
             // act
 
             // assert
-            elements.each((element, index) => expect(element).toBeDisabled());
+            elements.each(element => expect(element).toBeDisabled());
         });
     });
 
@@ -75,10 +82,13 @@ describe("project edit tab phases", () => {
             // arrange
 
             // act
-            pageObject.editPhaseNamesElement.click().then(() => {
-                // assert
-                expect(pageObject.nameRepeater.selectFirst(pageObject.nameLocator).count()).toBe(1);
-            });
+            pageObject.editPhaseNamesElement.click()
+                .then(() => {
+
+                    // assert
+                    var count = pageObject.nameRepeater.selectFirst(pageObject.nameLocator).count();
+                    expect(count).toBeGreaterThan(0);
+                });
         });
 
         it("should hide input fields when edit phase names is clicked twice", () => {
@@ -89,13 +99,17 @@ describe("project edit tab phases", () => {
             pageObject.editPhaseNamesElement.click();
 
             // assert
-            expect(pageObject.nameRepeater.selectFirst(pageObject.nameLocator).count()).toBe(0);
+            var count = pageObject.nameRepeater.selectFirst(pageObject.nameLocator).count();
+            expect(count).toBe(0);
         });
 
         it("should save when phase name looses focus", () => {
             // arrange
             pageObject.editPhaseNamesElement.click();
-            pageObject.nameRepeater.selectFirst(pageObject.nameLocator).first().sendKeys("SomeText");
+            pageObject.nameRepeater
+                .selectFirst(pageObject.nameLocator)
+                .first()
+                .sendKeys("SomeText");
 
             // act
             pageObject.editPhaseNamesElement.click();

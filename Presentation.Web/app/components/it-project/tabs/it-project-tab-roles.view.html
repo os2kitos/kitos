@@ -48,8 +48,11 @@
                             name="selectRole"
                             data-ui-select2=""
                             data-ng-model="right.roleForSelect">
-                        <option data-ng-show="right.role.isActive == false" disabled="disabled" value="{{right.role.id}}">{{right.role.name}} {{ right.role.isActive == true ? "" : "(Inaktiv rolle)"}}</option>
-                        <option data-ng-repeat="projectRole in projectRolesVm.activeItProjectRoles" value="{{projectRole.id}}">
+                        <option data-ng-show="right.role.isActive == false"
+                                disabled="disabled"
+                                value="{{right.role.id}}">{{right.role.name}} {{ right.role.isActive == true ? "" : "(Inaktiv rolle)"}}</option>
+                        <option data-ng-repeat="projectRole in projectRolesVm.activeItProjectRoles"
+                                value="{{projectRole.id}}">
                             {{projectRole.name}} ({{projectRole.hasWriteAccess && "skriv" || "læs" }})
                         </option>
                     </select>

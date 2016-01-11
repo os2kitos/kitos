@@ -3,7 +3,7 @@ import Select2Wrapper = require("../../../../Tests/object-wrappers/Select2Wrappe
 import RepeaterWrapper = require("../../../../Tests/object-wrappers/RepeaterWrapper");
 
 class ItProjectEditTabOrg implements IPageObject {
-    controllerVm: string = "";
+    controllerVm = "";
 
     getPage(): webdriver.promise.Promise<void> {
         return browser.get("https://localhost:44300/#/project/edit/1/org");
@@ -13,7 +13,7 @@ class ItProjectEditTabOrg implements IPageObject {
     responsibleOrgSelector = new Select2Wrapper("#s2id_responsibleOrg");
 
     // phase name repeater
-    orgUnitsTreeRepeater = new RepeaterWrapper("orgUnit in " + this.controllerVm + "orgUnitsTree");
+    orgUnitsTreeRepeater = new RepeaterWrapper(`orgUnit in ${this.controllerVm}orgUnitsTree`);
     orgUnitLocator = by.model("orgUnit.selected");
 
 }

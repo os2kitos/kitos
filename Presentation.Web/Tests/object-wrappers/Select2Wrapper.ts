@@ -19,7 +19,7 @@ class Select2Wrapper {
     /**
      * select first element in dropdown
      *
-     * @param query An optional search query for the dropdown.
+     * @param {string} [query] An optional search query for the dropdown.
      *
      * @throws error if no options are found
      */
@@ -40,7 +40,7 @@ class Select2Wrapper {
     /**
      * write query to search input
      *
-     * @param query Search query to input
+     * @param {string} [query] Search query to input
      *
      * @throws error if no options are found
      *
@@ -69,7 +69,7 @@ class Select2Wrapper {
             .then(() => {
                 return;
             }, err => {
-                throw new Error("No options found for select2 selector '" + this.cssSelector + "'");
+                throw new Error(`No options found for select2 selector '${this.cssSelector}'`);
             });
     }
 
@@ -84,7 +84,7 @@ class Select2Wrapper {
         return $(this.closeSelector)
             .click()
             .then(() => { return; }, err => {
-                throw new Error("Can't deselect. Nothing is selected for select2 selector '" + this.cssSelector + "'");
+                throw new Error(`Can't deselect. Nothing is selected for select2 selector '${this.cssSelector}'`);
             });
     }
 
@@ -106,13 +106,13 @@ class Select2Wrapper {
         return this.element.isPresent()
             .then(present => {
                 if (!present) {
-                    throw Error("select2 element not found using selector '" + this.cssSelector + "'");
+                    throw Error(`select2 element not found using selector '${this.cssSelector}'`);
                 }
             })
             .then(() => $(this.elementSelector).isPresent())
             .then(present => {
                 if (!present) {
-                    throw Error("select2 element not found using selector '" + this.cssSelector + "'. Is the element select2 initialized?");
+                    throw Error(`select2 element not found using selector '${this.cssSelector}'. Is the element select2 initialized?`);
                 }
             })
             .then(() => true);

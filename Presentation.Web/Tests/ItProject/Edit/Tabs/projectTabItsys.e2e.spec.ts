@@ -6,7 +6,11 @@ describe("project edit tab it system", () => {
     var mockHelper: Helper.Mock;
     var browserHelper: Helper.Browser;
     var pageObject: PageObject;
-    var mockDependencies: Array<string> = ["itproject", "itprojecttype", "itSystemUsage"];
+    var mockDependencies: Array<string> = [
+        "itproject",
+        "itprojecttype",
+        "itSystemUsage"
+    ];
 
     beforeEach(() => {
         browser.driver.manage().window().maximize();
