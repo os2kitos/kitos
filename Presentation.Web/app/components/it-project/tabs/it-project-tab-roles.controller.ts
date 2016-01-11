@@ -109,7 +109,7 @@
             }
 
             // otherwise, we should delete the old entry, then add a new one
-            this.$http.delete("api/itprojectrights/" + this.projectId + "?rId=" + rIdOld + "&uId=" + uIdOld + "&organizationId=" + this.user.currentOrganizationId)
+            this.$http.delete(`api/itprojectright/${this.projectId}?rId=${rIdOld}&uId=${uIdOld}&organizationId=${this.user.currentOrganizationId}`)
                 .then(
                     successResult => {
                         var data = {
@@ -117,7 +117,7 @@
                             "userId": uIdNew
                         };
 
-                        this.$http.post("api/itprojectrights/" + this.projectId + "?organizationId=" + this.user.currentOrganizationId, data)
+                        this.$http.post(`api/itprojectright/${this.projectId}?organizationId=${this.user.currentOrganizationId}`, data)
                             .then(
                                 (result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => {
                                     right.roleId = result.data.response.roleId;
@@ -153,7 +153,7 @@
             var rId = right.roleId;
             var uId = right.userId;
 
-            this.$http.delete("api/itprojectrights/" + this.projectId + "?rId=" + rId + "&uId=" + uId + "&organizationId=" + this.user.currentOrganizationId)
+            this.$http.delete(`api/itprojectright/${this.projectId}?rId=${rId}&uId=${uId}&organizationId=${this.user.currentOrganizationId}`)
                 .then(
                     deleteResult => {
                         right.show = false;
@@ -183,7 +183,7 @@
                 "userId": uId
             };
 
-            this.$http.post("api/itprojectrights/" + oId + "?organizationId=" + this.user.currentOrganizationId, data)
+            this.$http.post(`api/itprojectright/${oId}?organizationId=${this.user.currentOrganizationId}`, data)
                 .then(
                     (result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => {
                         this.notify.addSuccessMessage(result.data.response.user.fullName + " er knyttet i rollen");
@@ -209,32 +209,37 @@
 
     angular
         .module("app")
-        .config(["$stateProvider", ($stateProvider) => {
-            $stateProvider.state("it-project.edit.roles", {
-                url: "/roles",
-                templateUrl: "app/components/it-project/tabs/it-project-tab-roles.view.html",
+        .config([
+            "$stateProvider", ($stateProvider) => {
+                $stateProvider.state("it-project.edit.roles", {
+                    url: "/roles",
+                    templateUrl: "app/components/it-project/tabs/it-project-tab-roles.view.html",
                 controller: RolesController,
-                controllerAs: "projectRolesVm",
+                    controllerAs: "projectRolesVm",
                 resolve: {
                     // re-resolve data from parent cause changes here wont cascade to it
-                    project: ["$http", "$stateParams",
-                        ($http, $stateParams) => $http.get("api/itproject/" + $stateParams.id)
+                        project: [
+                            "$http", "$stateParams",
+                            ($http, $stateParams) => $http.get(`api/itproject/${$stateParams.id}`)
                             .then(result => result.data.response)
                     ],
-                    itProjectRights: ["$http", "$stateParams",
-                        ($http, $stateParams) => $http.get("api/itprojectrights/" + $stateParams.id)
+                        itProjectRights: [
+                            "$http", "$stateParams",
+                            ($http, $stateParams) => $http.get(`api/itprojectright/${$stateParams.id}`)
                             .then(result => result.data.response)
                     ],
-                    itProjectRoles: ["$http",
-                        $http => $http.get("api/itprojectrole/?nonsuggestions=")
+                        itProjectRoles: [
+                            "$http",
+                            $http => $http.get("api/itprojectrole/?nonsuggestions=")
                             .then(result => result.data.response)
                     ],
-                    user: ["userService",
+                        user: [
+                            "userService",
                         userService => userService.getUser()
                             .then(user => user)
                     ]
                 }
             });
-        }]);
+            }
+        ]);
 }
-

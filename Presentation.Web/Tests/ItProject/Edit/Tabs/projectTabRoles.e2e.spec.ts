@@ -10,7 +10,7 @@ describe("project edit tab roles", () => {
         "itproject",
         "itprojectrole",
         "itprojecttype",
-        "itprojectrights",
+        "itprojectright",
         "itprojectstatus",
         "assignment",
         "organization"
@@ -107,13 +107,11 @@ describe("project edit tab roles", () => {
             element.selectFirst("t");
 
             // assert
-            expect(mock.requestsMade()).toMatchInRequests({ method: "POST", url: "api/itprojectrights" });
+            expect(mock.requestsMade()).toMatchInRequests({ method: "POST", url: "api/itprojectright" });
         });
 
         it("should repeat rights", () => {
             // arrange
-            var element = pageObject.addRightUserSelector;
-            element.selectFirst("t");
 
             // act
 
@@ -125,8 +123,6 @@ describe("project edit tab roles", () => {
 
         it("should display edit field for rights when edit is clicked", () => {
             // arrange
-            var element = pageObject.addRightUserSelector;
-            element.selectFirst("t");
 
             // act
             pageObject.rightsRepeater
@@ -140,8 +136,6 @@ describe("project edit tab roles", () => {
 
         it("should save edited field for rights when save is clicked", () => {
             // arrange
-            var element = pageObject.addRightUserSelector;
-            element.selectFirst("t");
             pageObject.rightsRepeater
                 .selectFirst(pageObject.rightEditButtonLocator)
                 .click();
@@ -153,14 +147,12 @@ describe("project edit tab roles", () => {
                 .click();
 
             // assert
-            expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/itprojectrights" });
-            expect(mock.requestsMade()).toMatchInRequests({ method: "POST", url: "api/itprojectrights" });
+            expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/itprojectright" });
+            expect(mock.requestsMade()).toMatchInRequests({ method: "POST", url: "api/itprojectright" });
         });
 
         it("should delete right when delete confirmed", () => {
             // arrange
-            var element = pageObject.addRightUserSelector;
-            element.selectFirst("t");
             mock.clearRequests();
             pageObject.rightsRepeater
                 .selectFirst(pageObject.rightEditDeleteLocator)
@@ -170,14 +162,11 @@ describe("project edit tab roles", () => {
             browserHelper.acceptAlert();
 
             // assert
-            expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/itprojectrights" });
+            expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/itprojectright" });
         });
 
         it("should not delete right when delete dismissed", () => {
             // arrange
-            var element = pageObject.addRightUserSelector;
-            element.selectFirst("t");
-            mock.clearRequests();
             pageObject.rightsRepeater
                 .selectFirst(pageObject.rightEditDeleteLocator)
                 .click();
@@ -186,7 +175,7 @@ describe("project edit tab roles", () => {
             browserHelper.dismissAlert();
 
             // assert
-            expect(mock.requestsMade()).not.toMatchInRequests({ method: "DELETE", url: "api/itprojectrights" });
+            expect(mock.requestsMade()).not.toMatchInRequests({ method: "DELETE", url: "api/itprojectright" });
         });
     });
 });

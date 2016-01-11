@@ -220,6 +220,7 @@ namespace Presentation.Web.Controllers.API
 
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
+                item.ItInterfaceId = item.ItInterfaceId ?? "";
 
                 foreach (var dataRow in item.DataRows)
                 {

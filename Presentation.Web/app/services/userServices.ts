@@ -1,7 +1,7 @@
 ﻿(function (ng, app) {
     var _user = null;
 
-    app.factory("userService", ["$http", "$q", "$rootScope", "$modal", function ($http, $q, $rootScope, $modal) {
+    app.factory('userService', ['$http', '$q', '$rootScope', '$uibModal', function ($http, $q, $rootScope, $modal) {
         // formats and saves the user
         function saveUser(user, orgAndDefaultUnit) {
             var currOrg = orgAndDefaultUnit.organization;
@@ -24,7 +24,7 @@
 
                 isUsingDefaultOrgUnit = false;
             } else {
-                currentOrgUnitId = defaultOrgUnit.id;
+                currentOrgUnitId = defaultOrgUnitId;
                 currentOrgUnitName = defaultOrgUnit.name;
 
                 isUsingDefaultOrgUnit = true;
@@ -167,7 +167,6 @@
 
         function auth(adminRoles) {
             return getUser().then(function (user) {
-
                 if (adminRoles) {
                     var hasRequiredRole = _.some(adminRoles, function (role) {
                         //if the state role is global admin, and the user is global admin, it's cool
@@ -179,7 +178,6 @@
                 }
 
                 return true;
-
             });
         }
 
@@ -201,14 +199,12 @@
         // the organization that is selected here, will be saved in local storage, for the next
         // time the user is visiting.
         function resolveOrganization2(orgsAndDefaultUnits) {
-
             var deferred = $q.defer();
 
             // first, if the user is only member of one organization, just use that
             if (orgsAndDefaultUnits.$values.length == 1) {
                 var firstOrgAndDefaultUnit = orgsAndDefaultUnits.$values[0];
                 setSavedOrgId(firstOrgAndDefaultUnit.organization.id);
-
                 deferred.resolve(firstOrgAndDefaultUnit);
                 return deferred.promise;
             }
@@ -240,7 +236,7 @@
             var modal = $modal.open({
                 backdrop: "static",
                 templateUrl: "partials/home/choose-organization.html",
-                controller: ["$scope", "$modalInstance", "autofocus", function ($modalScope, $modalInstance, autofocus) {
+                controller: ["$scope", "$uibModalInstance", "autofocus", function ($modalScope, $modalInstance, autofocus) {
                     autofocus();
 
                     $modalScope.organizations = _.map(orgsAndDefaultUnits.$values, function (orgAndUnit: { organization }) {
@@ -255,7 +251,6 @@
                         var selectedOrgAndUnit = _.find(orgsAndDefaultUnits.$values, function (orgAndUnit: { organization }) {
                             return orgAndUnit.organization.id == $modalScope.orgChooser.selectedId;
                         });
-
                         $modalInstance.close(selectedOrgAndUnit);
                     };
                 }]
@@ -305,5 +300,4 @@
         };
 
     }]);
-
 })(angular, app);

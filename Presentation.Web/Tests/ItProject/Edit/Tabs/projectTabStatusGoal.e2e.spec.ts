@@ -35,7 +35,7 @@ describe("project edit tab status goal", () => {
             // act
 
             // assert
-            expect(pageObject.trafficLightSelect.isPresent()).toBeFalse();
+            expect(pageObject.trafficLightSelect.isDisabled()).toBeTruthy("traffic light is active");
             expect(pageObject.updateDateElement).toBeDisabled();
             expect(pageObject.noteElement).toBeDisabled();
         });

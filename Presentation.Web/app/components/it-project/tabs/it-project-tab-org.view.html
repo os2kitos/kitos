@@ -11,7 +11,6 @@
                         data-ng-disabled="!projectEditVm.hasWriteAccess"
                         data-ng-model="responsibleOrgUnitId"
                         data-ng-change="saveResponsible()">
-                    <option value=""></option>
                     <option data-ng-repeat="orgUnit in selectedOrgUnits" value="{{orgUnit.id}}">{{orgUnit.name}}</option>
                 </select>
             </div>

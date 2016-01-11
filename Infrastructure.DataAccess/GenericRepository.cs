@@ -39,7 +39,7 @@ namespace Infrastructure.DataAccess
             {
                 query = query.Include(includeProperty);
             }
-            
+
             return orderBy != null ? orderBy(query).ToList() : query.ToList();
         }
 
@@ -89,7 +89,7 @@ namespace Infrastructure.DataAccess
             {
                 if (propertyInfo.Name == "Id")
                     continue; // skip primary key
-                
+
                 if (propertyInfo.GetValue(entity) != null)
                     entry.Property(propertyInfo.Name).IsModified = true;
             }

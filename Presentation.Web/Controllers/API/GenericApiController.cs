@@ -60,7 +60,7 @@ namespace Presentation.Web.Controllers.API
 
         /// <summary>
         /// GET api/T/id?hasWriteAccess
-        /// Returns whether the current authenticated user has write access 
+        /// Returns whether the current authenticated user has write access
         /// to the object with the given id
         /// </summary>
         /// <param name="id">The id of the object</param>
@@ -195,15 +195,16 @@ namespace Presentation.Web.Controllers.API
                     // we have to handle enums separately
                     if (t.IsEnum)
                     {
-                        var value = valuePair.Value.Value<int>();
-                        propRef.SetValue(item, value);
+                        var value = valuePair.Value.Value<string>();
+                        var enumValue = Enum.Parse(t, value, true);
+                        propRef.SetValue(item, enumValue);
                     }
                     // BUG JSON.NET throws on Guid
                     // Bugreport https://json.codeplex.com/workitem/25599
                     else if (t.IsEquivalentTo(typeof(Guid)))
                     {
                         Guid guid;
-                        Guid.TryParse(valuePair.Value.Value<String>(), out guid);
+                        Guid.TryParse(valuePair.Value.Value<string>(), out guid);
                         propRef.SetValue(item, guid);
                     }
                     else
@@ -225,7 +226,7 @@ namespace Presentation.Web.Controllers.API
                         }
                     }
                 }
-                
+
                 item.LastChanged = DateTime.UtcNow;
                 item.LastChangedByUser = KitosUser;
 
@@ -239,7 +240,7 @@ namespace Presentation.Web.Controllers.API
                     if (e.InnerException.InnerException != null)
                         if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
                             return Conflict(e.InnerException.InnerException.Message);
-                        
+
                 return Error(e);
             }
         }
@@ -253,7 +254,7 @@ namespace Presentation.Web.Controllers.API
         #region Write Access Checks functions
 
         /// <summary>
-        /// Checks if a given user has write access to a given object. 
+        /// Checks if a given user has write access to a given object.
         /// Override this method as needed.
         /// </summary>
         /// <param name="obj">The object</param>
@@ -270,7 +271,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         /// <summary>
-        /// Checks if the current authenticated user has write access to a given object. 
+        /// Checks if the current authenticated user has write access to a given object.
         /// </summary>
         /// <param name="objId">The id of object</param>
         /// <param name="organizationId"></param>
@@ -281,7 +282,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         /// <summary>
-        /// Checks if a given user has write access to a given object. 
+        /// Checks if a given user has write access to a given object.
         /// </summary>
         /// <param name="objId">The id of object</param>
         /// <param name="user">The user</param>
@@ -294,7 +295,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         /// <summary>
-        /// Checks if the current authenticated user has write access to a given object. 
+        /// Checks if the current authenticated user has write access to a given object.
         /// </summary>
         /// <param name="obj">The object</param>
         /// <param name="organizationId"></param>

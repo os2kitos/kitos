@@ -25,10 +25,10 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<ItSystemUsage> _usageRepository;
 
         public ItContractController(IGenericRepository<ItContract> repository,
-            IGenericRepository<ItSystemUsage> usageRepository, 
-            IGenericRepository<AgreementElement> agreementElementRepository, 
+            IGenericRepository<ItSystemUsage> usageRepository,
+            IGenericRepository<AgreementElement> agreementElementRepository,
             IGenericRepository<ItContractRole> roleRepository,
-            IGenericRepository<ItContractItSystemUsage> itContractItSystemUsageRepository) 
+            IGenericRepository<ItContractItSystemUsage> itContractItSystemUsageRepository)
             : base(repository)
         {
             _usageRepository = usageRepository;
@@ -124,13 +124,13 @@ namespace Presentation.Web.Controllers.API
 
                 if (_itContractItSystemUsageRepository.GetByKey(new object[] {id, systemUsageId}) != null)
                     return Conflict("The IT system usage is already associated with the contract");
-                
+
                 contract.AssociatedSystemUsages.Add(new ItContractItSystemUsage {ItContractId = id, ItSystemUsageId = systemUsageId});
                 contract.LastChanged = DateTime.UtcNow;
                 contract.LastChangedByUser = KitosUser;
 
                 Repository.Save();
-                
+
                 return Ok(MapSystemUsages(contract));
             }
             catch (Exception e)
@@ -162,7 +162,7 @@ namespace Presentation.Web.Controllers.API
                 contract.LastChangedByUser = KitosUser;
 
                 Repository.Save();
-                
+
                 return Ok(MapSystemUsages(contract));
             }
             catch (Exception e)
@@ -170,7 +170,7 @@ namespace Presentation.Web.Controllers.API
                 return Error(e);
             }
         }
-        
+
         public HttpResponseMessage GetHierarchy(int id, [FromUri] bool? hierarchy)
         {
             try

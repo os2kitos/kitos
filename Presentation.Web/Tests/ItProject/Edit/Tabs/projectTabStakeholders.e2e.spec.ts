@@ -2,7 +2,7 @@
 import Helper = require("../../../helper");
 import PageObject = require("../../../../app/components/it-project/tabs/it-project-tab-stakeholders.po");
 
-describe("project edit tab description", () => {
+describe("project edit tab stakeholders", () => {
     var mockHelper: Helper.Mock;
     var browserHelper: Helper.Browser;
     var pageObject: PageObject;

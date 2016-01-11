@@ -77,7 +77,6 @@
                             data-ng-model="projectRolesVm.newRole"
                             data-placeholder="Vælg en projektrolle"
                             data-ng-change="projectRolesVm.submitRight()">
-                        <option value=""></option>
                         <option data-ng-repeat="projectRole in projectRolesVm.activeItProjectRoles" value="{{projectRole.id}}">
                             {{projectRole.name}} ({{projectRole.hasWriteAccess && "skriv" || "læs" }})
                         </option>

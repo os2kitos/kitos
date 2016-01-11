@@ -15,12 +15,28 @@ namespace Presentation.Web.Controllers.OData
         {
         }
 
+        [EnableQuery]
+        [ODataRoute("ItSystems")]
+        public override IHttpActionResult Get()
+        {
+            return base.Get();
+        }
+
         // GET /Organizations(1)/ItSystems
         [EnableQuery]
         [ODataRoute("Organizations({key})/ItSystems")]
         public IHttpActionResult GetItSystems(int key)
         {
             var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
+            return Ok(result);
+        }
+
+        // GET /Organizations(1)/ItSystems(1)
+        [EnableQuery]
+        [ODataRoute("Organizations({orgKey})/ItSystems({sysKey})")]
+        public IHttpActionResult GetItSystems(int orgKey, int sysKey)
+        {
+            var result = Repository.AsQueryable().Where(m => m.Id == sysKey && (m.OrganizationId == orgKey || m.AccessModifier == AccessModifier.Public));
             return Ok(result);
         }
     }

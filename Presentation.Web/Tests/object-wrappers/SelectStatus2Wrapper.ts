@@ -12,7 +12,7 @@ class SelectStatus2Wrapper {
     constructor(cssLocator: string) {
         this.cssSelector = cssLocator;
 
-        this.dropdownElement = $(this.cssSelector + " a.select-status");
+        this.dropdownElement = $(this.cssSelector + " a.dropdown-toggle");
         this.options = element.all(by.css(cssLocator + " .traffic-light li a"));
     }
 
@@ -59,21 +59,12 @@ class SelectStatus2Wrapper {
     }
 
     /**
-     * is directive present
-     *
-     * @return Promise that resolves to a boolean indicating if the element is present.
-     */
-    isPresent(): webdriver.promise.Promise<boolean> {
-        return this.dropdownElement.isPresent();
-    }
-
-    /**
      * is directive disabled
      *
      * @return Promise that resolves to a boolean indicating if the element is disabled
      */
     isDisabled(): webdriver.promise.Promise<boolean> {
-        return $(this.cssSelector + " span").isPresent();
+        return $(this.cssSelector + " div:not(.dropdown)").isDisplayed();
     }
 
     /**

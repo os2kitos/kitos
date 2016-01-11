@@ -7,9 +7,13 @@
     'ui.utils',
     'angularjs-dropdown-multiselect',
     'ngSanitize',
-    'kendo.directives']);
+    'kendo.directives',
+    'angular-loading-bar']);
 
-app.constant('moment', moment);
+app.constant('JSONfn', JSONfn)
+    .constant('moment', moment)
+    .constant('$', $)
+    .constant('_', _);
 
 app.config([
     '$urlRouterProvider', ($urlRouterProvider: angular.ui.IUrlRouterProvider) => {
@@ -20,9 +24,7 @@ app.config([
 app.config([
     '$httpProvider',
     'notifyProvider',
-    'datepickerConfig',
-    'datepickerPopupConfig',
-    function ($httpProvider, notifyProvider, datepickerConfig, datepickerPopupConfig) {
+    function ($httpProvider, notifyProvider) {
         $httpProvider.interceptors.push('httpBusyInterceptor');
         // for some reason templates aren't updated so this is needed
         $httpProvider.defaults.headers.get = {
@@ -30,15 +32,11 @@ app.config([
         };
         notifyProvider.globalTimeToLive(5000);
         notifyProvider.onlyUniqueMessages(false);
-
-        // global config for UI Bootstrap
-        datepickerConfig.startingDay = 1; // set starting day of the calendar to monday
-        datepickerPopupConfig.datepickerPopup = 'dd-MM-yyyy'; // set default date format
     }
 ]);
 
 app.run([
-    '$rootScope', '$http', '$state', '$modal', 'notify', 'userService', 'uiSelect2Config',
+    '$rootScope', '$http', '$state', '$uibModal', 'notify', 'userService', 'uiSelect2Config',
     function ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config) {
         // init info
         $rootScope.page = {

@@ -140,8 +140,8 @@
     ]
     );
 
-    app.directive("addUserButton", [
-        "$http", "$modal", function($http, $modal) {
+    app.directive('addUserButton', [
+        '$http', '$uibModal', function ($http, $modal) {
             return {
                 scope: {
                     userResult: "=?addUser",
@@ -163,7 +163,7 @@
                                 ]
                             },
                             controller: [
-                                "$scope", "notify", "$modalInstance", "user", "autofocus", function($scope, notify, $modalInstance, user, autofocus) {
+                                '$scope', 'notify', '$uibModalInstance', 'user', 'autofocus', function ($scope, notify, $modalInstance, user, autofocus) {
                                     autofocus();
                                     $scope.newUser = {};
 
@@ -349,11 +349,9 @@
                 scope: {
                     canWrite: "=",
                 },
-                require: "ngModel",
-                templateUrl: "partials/directives/select-status2.html",
-
+                require: 'ngModel',
+                templateUrl: 'partials/directives/select-status2.html',
                 link: function (scope, element, attr, ngModel) {
-
                     scope.setModel = function(n) {
                         //only update on change
                         if (scope.model == n) return;
@@ -417,18 +415,21 @@
             return {
                 template: "<progressbar class='status-bar' data-value='value' data-type='{{type}}'></progressbar>",
                 scope: {
-                    status: "=squareTrafficLight"
+                    status: '@squareTrafficLight'
                 },
                 link: function(scope) {
-                    switch (scope.status) {
+                    switch (scope.status.toLowerCase()) {
+                        case "red":
                     case 1:
                         scope.type = "danger";
                         scope.value = 100;
                         break;
+                        case "yellow":
                     case 2:
                         scope.type = "warning";
                         scope.value = 100;
                         break;
+                        case "green":
                     case 3:
                         scope.type = "success";
                         scope.value = 100;
@@ -650,10 +651,14 @@
                 templateUrl: "partials/directives/select-org-unit.html",
                 link: function(scope, element, attrs, ctrl) {
                     //this is called when the user selects something from select2
-                    element.bind("change", function() {
-                        $timeout(function() {
+                    element.bind('change', function() {
+                        $timeout(function () {
                             //update the view value
+                            if (scope.select.selected === "") {
+                                ctrl.$setViewValue(null);
+                            } else {
                             ctrl.$setViewValue(scope.select.selected);
+                            }
 
                             //this triggers the autosave directive
                             element.triggerHandler("blur");
@@ -687,7 +692,9 @@
 
                             if (option) {
                                 return option.selectedText;
-                            } else return null;
+                            } else {
+                                return null;
+                            }
                         }
                     };
 
@@ -738,7 +745,6 @@
                         selected: null
                     };
                 }
-
             };
         }
     ]);

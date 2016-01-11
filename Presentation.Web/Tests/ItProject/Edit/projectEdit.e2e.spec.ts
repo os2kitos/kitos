@@ -6,7 +6,7 @@ describe("project edit view", () => {
     var mockHelper: Helper.Mock;
     var browserHelper: Helper.Browser;
     var pageObject: ItProjectEditPo;
-    var mockDependencies: Array<string> = ["itproject", "itprojectrole", "itprojecttype", "itprojectrights"];
+    var mockDependencies: Array<string> = ["itproject", "itprojectrole", "itprojecttype", "itprojectright"];
 
     beforeEach(() => {
         mockHelper = new Helper.Mock();
@@ -38,9 +38,9 @@ describe("project edit view", () => {
             // assert
             expect(pageObject.nameElement).toBeDisabled();
             expect(pageObject.idElement).toBeDisabled();
-            expect(pageObject.typeSelect).toBeSelect2Disabled();
+            expect(pageObject.typeSelect.element).toBeSelect2Disabled();
             expect(pageObject.cmdbElement).toBeDisabled();
-            expect(pageObject.accessSelect).toBeSelect2Disabled();
+            expect(pageObject.accessSelect.element).toBeSelect2Disabled();
             expect(pageObject.esdhElement).toBeDisabled();
             expect(pageObject.folderElement).toBeDisabled();
             expect(pageObject.backgroundElement).toBeDisabled();

@@ -36,7 +36,7 @@
             private usersWithRoles,
             private user) {
 
-            this.project.updateUrl = "api/itproject/" + project.id;
+            this.project.updateUrl = `api/itproject/${project.id}`;
 
             this.datepickerOptions = {
                 format: "dd-MM-yyyy",
@@ -47,7 +47,7 @@
             this.project.phases = [project.phase1, project.phase2, project.phase3, project.phase4, project.phase5];
             var prevPhase: IPhaseData = null;
             _.each(this.project.phases, (phase: IPhaseData) => {
-                phase.updateUrl = "api/itProjectPhase/" + phase.id;
+                phase.updateUrl = `api/itProjectPhase/${phase.id}`;
                 phase.prevPhase = prevPhase;
                 prevPhase = phase;
             });
@@ -75,18 +75,18 @@
         };
 
         private loadStatues = () => {
-            var url = "api/itProjectStatus/" + this.project.id + "?project=true";
+            var url = `api/itProjectStatus/${this.project.id}?project=true`;
 
-            url += "&skip=" + this.pagination.skip;
-            url += "&take=" + this.pagination.take;
+            url += `&skip=${this.pagination.skip}`;
+            url += `&take=${this.pagination.take}`;
 
             if (this.pagination.orderBy) {
-                url += "&orderBy=" + this.pagination.orderBy;
-                if (this.pagination.descending) url += "&descending=" + this.pagination.descending;
+                url += `&orderBy=${this.pagination.orderBy}`;
+                if (this.pagination.descending) url += `&descending=${this.pagination.descending}`;
             }
 
             if (this.pagination.search) {
-                url += "&q=" + this.pagination.search;
+                url += `&q=${this.pagination.search}`;
             } else {
                 url += "&q=";
             }
@@ -116,10 +116,10 @@
 
             if (activity.$type.indexOf("Assignment") > -1) {
                 activity.isTask = true;
-                activity.updateUrl = "api/Assignment/" + activity.id;
+                activity.updateUrl = `api/Assignment/${activity.id}`;
             } else if (activity.$type.indexOf("Milestone") > -1) {
                 activity.isMilestone = true;
-                activity.updateUrl = "api/Milestone/" + activity.id;
+                activity.updateUrl = `api/Milestone/${activity.id}`;
             }
 
             activity.updatePhase = () => {
@@ -164,18 +164,19 @@
     angular
         .module("app")
         .controller("project.EditStatusProjectCtrl", ProjectStatusController)
-        .config(["$stateProvider", $stateProvider => {
-            $stateProvider.state("it-project.edit.status-project", {
-                url: "/status-project",
-                templateUrl: "app/components/it-project/tabs/it-project-tab-status-project.view.html",
-                controller: ProjectStatusController,
-                controllerAs: "projectStatusVm",
-                resolve: {
-                    //returns a map with those users who have a role in this project.
-                    //the names of the roles is saved in user.roleNames
-                    usersWithRoles: [
-                        "$http", "$stateParams",
-                        ($http, $stateParams) => $http.get("api/itprojectrights/" + $stateParams.id)
+        .config([
+            "$stateProvider", $stateProvider => {
+                $stateProvider.state("it-project.edit.status-project", {
+                    url: "/status-project",
+                    templateUrl: "app/components/it-project/tabs/it-project-tab-status-project.view.html",
+                    controller: ProjectStatusController,
+                    controllerAs: "projectStatusVm",
+                    resolve: {
+                        //returns a map with those users who have a role in this project.
+                        //the names of the roles is saved in user.roleNames
+                        usersWithRoles: [
+                            "$http", "$stateParams",
+                            ($http, $stateParams) => $http.get(`api/itprojectright/${$stateParams.id}`)
                             .then(rightResult => {
                                 var rights = rightResult.data.response;
 
@@ -198,11 +199,12 @@
                                             users[right.userId] = user;
                                         });
 
-                                    return users;
-                                });
+                                        return users;
+                                    });
                             })
-                    ]
-                }
-            });
-        }]);
+                        ]
+                    }
+                });
+            }
+        ]);
 }

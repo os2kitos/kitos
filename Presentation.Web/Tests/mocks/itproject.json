@@ -10902,7 +10902,8 @@
     {
         "request": {
             "method": "GET",
-            "path": "api/itproject/1"
+            "path": "api/itproject/1",
+            "queryString": { }
         },
         "response": {
             "status": 200,

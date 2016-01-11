@@ -28,7 +28,7 @@
             public project,
             private user) {
 
-            this.project.updateUrl = "api/itproject/" + this.project.id + "?organizationId=" + this.user.currentOrganizationId;
+            this.project.updateUrl = `api/itproject/${this.project.id}?organizationId=${this.user.currentOrganizationId}`;
 
             this.datepickerOptions = {
                 format: "dd-MM-yyyy",
@@ -104,12 +104,14 @@
 
     angular
         .module("app")
-        .config(["$stateProvider", $stateProvider => {
-            $stateProvider.state("it-project.edit.phases", {
-                url: "/phases",
-                templateUrl: "app/components/it-project/tabs/it-project-tab-phases.view.html",
+        .config([
+            "$stateProvider", $stateProvider => {
+                $stateProvider.state("it-project.edit.phases", {
+                    url: "/phases",
+                    templateUrl: "app/components/it-project/tabs/it-project-tab-phases.view.html",
                 controller: PhasesController,
-                controllerAs: "projectPhasesVm"
+                    controllerAs: "projectPhasesVm"
         });
-    }]);
+            }
+        ]);
 }

@@ -9,7 +9,7 @@ describe("project edit tab phases", () => {
         "itproject",
         "itprojectrole",
         "itprojecttype",
-        "itprojectrights",
+        "itprojectright",
         "itprojectstatus",
         "assignment"
     ];

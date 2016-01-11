@@ -116,14 +116,7 @@
                 <span id="milestone-status"
                       data-select-status2=""
                       data-ng-model="activity.status"
-                      data-can-write="true"
-                      data-ng-if="!hasWriteAccess">
-                </span>
-                <span id="milestone-status"
-                      data-select-status2=""
-                      data-ng-model="activity.status"
-                      data-can-write="false"
-                      data-ng-if="hasWriteAccess">
+                      data-can-write="hasWriteAccess">
                 </span>
             </div>
         </div>

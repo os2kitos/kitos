@@ -9,7 +9,7 @@ describe("project edit tab risk", () => {
     var mockDependencies: Array<string> = [
         "itproject",
         "itprojecttype",
-        "itprojectrights",
+        "itprojectright",
         "itprojectrole",
         "itprojectstatus",
         "risk"

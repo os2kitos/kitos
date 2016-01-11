@@ -1,55 +1,17 @@
-﻿<div search-box data-paging="pagination"></div>
-<div class="searchbox-wrapper">
-    <a class="excel-icon" data-ng-href="{{csvUrl}}">
-        <img src="../../Images/excel.png" alt="Hent excelark" width="25">
-    </a>
+﻿<div id="mainGrid" data-kendo-grid="systemOverviewVm.mainGrid" data-k-options="systemOverviewVm.mainGridOptions"></div>
+
+<!--<div data-kendo-window="systemOverviewVm.modal"
+     data-k-title="'Anvendelse'" data-k-width="800"
+     data-k-visible="false" data-k-modal="true">
+    <div data-kendo-grid="systemOverviewVm.usageGrid" data-k-options="systemOverviewVm.usageDetailsGrid"></div>
 </div>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>
-                IT System 
-                <button data-order-by="'itSystem.name'" data-paging="pagination"></button>
-            </th>
-            <th>
-                Ansv. organisationsenhed
-            </th>
-            <th>
-                <select data-ng-model="chosenRoleId" data-ng-init="chosenRoleId = 1" data-ng-options="r.id as r.name for r in itSystemRoles">
-                    <option value="">-- Vælg rolle --</option>
-                </select>
-            </th>
-            <th>
-                <select data-ng-model="showType" data-ng-init="showType = 'businessType'">
-                    <option value="appType">Applikationstype</option>
-                    <option value="businessType">Forretningstype</option>
-                </select>
-            </th>
-            <th>Anvender</th>
-            <th>Udstiller</th>
-            <th>
-                Overblik
-                <button data-order-by="'overviewItSystem.name'" data-paging="pagination"></button>
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- for each itsystem -->
-        <tr data-ng-repeat="usage in itSystemUsage"
-            data-ng-include="'partials/it-system/overview-row.html'"></tr>
-        
-        <!-- when there are no itsystems to show -->
-        <tr data-ng-if="itSystemUsage.length == 0">
-            <td colspan="8" class="text-center">
-                <i>Ingen systemer taget i anvendelse</i>
-            </td>
-        </tr>
-    </tbody>
-    <tfoot>
-        <tr>
-            <td colspan="8" class="text-center">
-                <span data-pagination-buttons="pagination" data-pagination-total-count="totalCount"></span>
-            </td>
-        </tr>
-    </tfoot>
-</table>
+
+<div data-kendo-window="systemOverviewVm.exhibitModal"
+     data-k-title="'Udstilling'" data-k-width="800"
+     data-k-visible="false" data-k-modal="true">
+    <div data-kendo-grid="systemOverviewVm.exhibitGrid" data-k-options="systemOverviewVm.exhibitDetailsGrid"></div>
+</div>-->
+
+<script type="text/x-kendo-template" id="role-selector">
+    <select kendo-drop-down-list="systemOverviewVm.roleSelectorDropDownList" k-options="systemOverviewVm.roleSelectorOptions()"></select>
+</script>

@@ -1,8 +1,8 @@
 ﻿(function (ng, app) {
-    app.config(["$stateProvider", function ($stateProvider) {
-        $stateProvider.state("it-project.edit.status-project.modal", {
-            url: "/modal/:type/:activityId",
-            onEnter: ["$state", "$stateParams", "$modal", "project", "usersWithRoles", "user",
+    app.config(['$stateProvider', function ($stateProvider) {
+        $stateProvider.state('it-project.edit.status-project.modal', {
+            url: '/modal/:type/:activityId',
+            onEnter: ['$state', '$stateParams', '$uibModal', 'project', 'usersWithRoles', 'user',
                 function ($state, $stateParams, $modal, project, usersWithRoles, user) {
                     $modal.open({
                         templateUrl: "app/components/it-project/tabs/it-project-tab-status-modal.view.html",

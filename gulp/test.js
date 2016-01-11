@@ -10,7 +10,7 @@ gulp.task('unit', function (done) {
         configFile: paths.karmaConf,
         singleRun: true,
         browsers: ['IE', 'Firefox', 'Chrome'],
-        reporters: ['progress', 'coverage'],
+        reporters: ['progress', 'coverage', 'appveyor'],
         coverageReporter: {
             type: 'json',
             subdir: '.',

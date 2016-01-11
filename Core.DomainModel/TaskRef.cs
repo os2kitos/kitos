@@ -16,7 +16,7 @@ namespace Core.DomainModel
             this.ItSystemUsages = new List<ItSystemUsage.ItSystemUsage>();
             this.ItProjects = new List<ItProject.ItProject>();
         }
-        
+
         /// <summary>
         /// Gets or sets the access modifier.
         /// </summary>
@@ -47,7 +47,7 @@ namespace Core.DomainModel
 
         public DateTime? ActiveFrom { get; set; }
         public DateTime? ActiveTo { get; set; }
-        
+
         public int? ParentId { get; set; }
 
         public int OwnedByOrganizationUnitId { get; set; }
@@ -73,7 +73,7 @@ namespace Core.DomainModel
         /// ItSystems which have been marked with this task
         /// </summary>
         public virtual ICollection<ItSystem.ItSystem> ItSystems { get; set; }
-        
+
         /// <summary>
         /// ItSystemUsages which have been marked with this task
         /// </summary>

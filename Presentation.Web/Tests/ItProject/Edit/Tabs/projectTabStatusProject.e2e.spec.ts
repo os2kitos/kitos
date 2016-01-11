@@ -10,7 +10,7 @@ describe("project edit tab status project", () => {
         "itproject",
         "itprojectrole",
         "itprojecttype",
-        "itprojectrights",
+        "itprojectright",
         "itprojectstatus",
         "assignment"
     ];
@@ -42,7 +42,7 @@ describe("project edit tab status project", () => {
             // act
 
             // assert
-            expect(pageObject.statusTrafficLightSelect.isPresent()).toBeFalse();
+            expect(pageObject.statusTrafficLightSelect.isDisabled()).toBeTruthy("traffic light is active");
             expect(pageObject.statusUpdateDateElement).toBeDisabled();
             expect(pageObject.statusNoteElement).toBeDisabled();
         });

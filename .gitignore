@@ -22,8 +22,6 @@ Presentation.Web/app/**/*.js.map
 !Presentation.Web/app/directives/filters.js
 !Presentation.Web/app/directives/utils-directives.js
 !Presentation.Web/app/services/httpServices.js
-!Presentation.Web/app/utility/underscore.mixin.js
-!Presentation.Web/app/utility/utility.js
 Presentation.Web/Tests/**/*.js
 Presentation.Web/Tests/**/*.js.map
 public/
@@ -144,6 +142,7 @@ ClientBin/
 *.[Pp]ublish.xml
 *.pfx
 *.publishsettings
+.vs/
 
 # RIA/Silverlight projects
 Generated_Code/

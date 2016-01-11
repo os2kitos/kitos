@@ -12,8 +12,8 @@
             controller: ['$rootScope', '$http', '$state', 'notify', 'user', function ($rootScope, $http, $state, notify, user) {
                 $rootScope.page.title = 'IT Kontrakt';
                 $rootScope.page.subnav = [
-                    { state: 'it-contract.overview', text: 'Overblik: økonomi' },
-                    { state: 'it-contract.plan', text: 'Overblik: tid' },
+                    { state: 'it-contract.overview', text: "IT kontrakter: økonomi" },
+                    { state: 'it-contract.plan', text: "IT kontrakter: tid" },
                     { state: 'it-contract.edit', text: 'IT Kontrakt', showWhen: 'it-contract.edit' },
                 ];
                 $rootScope.page.subnav.buttons = [

@@ -8,7 +8,7 @@ describe("project edit tab staus modal", () => {
     var mockDependencies: Array<string> = [
         "itproject",
         "itprojecttype",
-        "itprojectrights",
+        "itprojectright",
         "itprojectrole",
         "itprojectstatus"
     ];

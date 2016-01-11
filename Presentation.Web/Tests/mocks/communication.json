@@ -75,19 +75,19 @@
             "path": "api/communication"
         },
         "response": {
-            "status": 200,
+            "status": 201,
             "data": {
                 "msg": "",
                 "response": {
-                    "id": 2,
-                    "targetAudiance": null,
-                    "purpose": null,
-                    "message": null,
-                    "media": null,
                     "dueDate": "2016-01-05T00:00:00Z",
+                    "id": 2,
+                    "itProjectId": 1,
+                    "media": null,
+                    "message": null,
+                    "purpose": null,
                     "responsibleUserId": 8,
                     "responsibleUserName": null,
-                    "itProjectId": 1
+                    "targetAudiance": null
                 }
             }
         }

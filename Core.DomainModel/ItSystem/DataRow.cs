@@ -31,7 +31,7 @@ namespace Core.DomainModel.ItSystem
         /// Description/name of the data
         /// </summary>
         public string Data { get; set; }
-        
+
         /// <summary>
         /// Local usages of this exposition
         /// </summary>

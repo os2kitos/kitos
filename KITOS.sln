@@ -22,13 +22,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Presentation.Web", "Present
 		{5AE358F5-4F11-47FE-94BE-1588F357DCDC} = {5AE358F5-4F11-47FE-94BE-1588F357DCDC}
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{57E0F1AF-B1AD-4D8A-9D25-789E4ED417D5}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.OpenXML", "Infrastructure.OpenXML\Infrastructure.OpenXML.csproj", "{5AE358F5-4F11-47FE-94BE-1588F357DCDC}"
 	ProjectSection(ProjectDependencies) = postProject
 		{ADCACC1D-F538-464C-9102-F4C1D6FA35D3} = {ADCACC1D-F538-464C-9102-F4C1D6FA35D3}

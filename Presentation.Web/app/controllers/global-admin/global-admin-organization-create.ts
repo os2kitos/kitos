@@ -4,7 +4,7 @@
             $stateProvider.state('global-admin.organizations.create', {
                 url: '/create',
                 authRoles: ['GlobalAdmin'],
-                onEnter: ['$state', '$stateParams', '$modal',
+                onEnter: ['$state', '$stateParams', '$uibModal',
                     function ($state, $stateParams, $modal) {
                         $modal.open({
                             templateUrl: 'partials/global-admin/organization-modal.html',

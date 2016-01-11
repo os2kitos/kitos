@@ -11,12 +11,14 @@
 
     angular
         .module("app")
-        .config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
-            $stateProvider.state("it-project.edit.description", {
-                url: "/description",
-                templateUrl: "app/components/it-project/tabs/it-project-tab-description.view.html",
+        .config([
+            "$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
+                $stateProvider.state("it-project.edit.description", {
+                    url: "/description",
+                    templateUrl: "app/components/it-project/tabs/it-project-tab-description.view.html",
                 controller: DescriptionController,
-                controllerAs: "projectDescriptionVm"
+                    controllerAs: "projectDescriptionVm"
             });
-        }]);
+            }
+        ]);
 }

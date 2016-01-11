@@ -5,25 +5,26 @@ using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class BaseController<T> : ODataController where T : class
+    [Authorize]
+    public abstract class BaseController<T> : ODataController where T : class
     {
         protected ODataValidationSettings ValidationSettings;
         protected IGenericRepository<T> Repository;
 
-        public BaseController(IGenericRepository<T> repository)
+        protected BaseController(IGenericRepository<T> repository)
         {
             ValidationSettings = new ODataValidationSettings {AllowedQueryOptions = AllowedQueryOptions.All};
             Repository = repository;
         }
 
         [EnableQuery]
-        public IHttpActionResult Get()
+        public virtual IHttpActionResult Get()
         {
             return Ok(Repository.AsQueryable());
         }
 
         [EnableQuery(MaxExpansionDepth = 4)]
-        public IHttpActionResult Get(int key)
+        public virtual IHttpActionResult Get(int key)
         {
             var entity = Repository.GetByKey(key);
             return Ok(entity);
@@ -62,7 +63,7 @@ namespace Presentation.Web.Controllers.OData
         //    if (!ModelState.IsValid) return BadRequest(ModelState);
 
         //    var entity = Repository.GetByKey(key);
-        //    if(entity == null) 
+        //    if(entity == null)
         //        return NotFound();
 
         //    try
@@ -83,7 +84,7 @@ namespace Presentation.Web.Controllers.OData
         //    var entity = Repository.GetByKey(key);
         //    if (entity == null)
         //        return NotFound();
-            
+
         //    try
         //    {
         //        Repository.DeleteByKey(key);

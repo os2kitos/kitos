@@ -9,7 +9,7 @@ describe("project edit tab handover", () => {
         "itproject",
         "itprojecttype",
         "itprojectrole",
-        "itprojectrights",
+        "itprojectright",
         "handover"
     ];
 
