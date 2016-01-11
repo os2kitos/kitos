@@ -84,7 +84,7 @@
                     };
                 });
 
-                var row: { update } = {
+                var row = {
                     budgetName: budgetName,
                     reaName: reaName,
                     label: label,
@@ -218,9 +218,5 @@
                     rea: rowA.total.rea - rowB.total.rea
                 };
             }
-
-
         }]);
-
-
 })(angular, app);

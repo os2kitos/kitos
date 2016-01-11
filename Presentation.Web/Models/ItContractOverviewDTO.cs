@@ -44,7 +44,7 @@ namespace Presentation.Web.Models
         /// Whether the contract is active or not
         /// </summary>
         public bool IsActive { get; set; }
-        
+
         /// <summary>
         /// The sum of the acquisition column of extern economy streams.
         /// </summary>
@@ -55,14 +55,14 @@ namespace Presentation.Web.Models
                 if (!ExternEconomyStreams.Any()) return null;
 
                 return ExternEconomyStreams.Sum(stream => stream.Acquisition);
-            } 
+            }
         }
 
         /// <summary>
         /// The sum of the operation column of extern economy streams.
         /// </summary>
-        public int? OperationSum 
-        { 
+        public int? OperationSum
+        {
             get
             {
                 if (!ExternEconomyStreams.Any()) return null;
@@ -90,8 +90,8 @@ namespace Presentation.Web.Models
         /// <summary>
         /// The number of extern economy streams, that have red status
         /// </summary>
-        public int TotalRedStatuses 
-        { 
+        public int TotalRedStatuses
+        {
             get { return ExternEconomyStreams.Count(stream => stream.AuditStatus == TrafficLight.Red); }
         }
 

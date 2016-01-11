@@ -54,7 +54,7 @@ namespace Presentation.Web.Controllers.API
                 return Request.CreateResponse(HttpStatusCode.Conflict, GetErrorMessages(e));
             }
         }
-        
+
         #endregion
 
         #region Excel OrganizationUnits
@@ -101,7 +101,7 @@ namespace Presentation.Web.Controllers.API
             var stream = new MemoryStream();
             using (var file = File.OpenRead(_mapPath + filename))
                 file.CopyTo(stream);
-            
+
             _excelService.ExportItContracts(stream, organizationId, KitosUser);
             return GetResponseMessage(stream, filename);
         }

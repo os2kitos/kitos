@@ -16,7 +16,7 @@ namespace Presentation.Web.Models
 
         //2nd column
         public string ResponsibleOrgUnitName { get; set; }
-        
+
         //3rd column
         public IEnumerable<RightOutputDTO> Rights { get; set; }
 

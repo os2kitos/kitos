@@ -1,6 +1,5 @@
 ﻿(function(ng, app) {
-    app.config([
-        '$stateProvider', function($stateProvider) {
+    app.config(['$stateProvider', function($stateProvider) {
             $stateProvider.state('it-system.edit.interfaces', {
                 url: '/interfaces',
                 templateUrl: 'partials/it-system/tab-edit-interfaces.html',

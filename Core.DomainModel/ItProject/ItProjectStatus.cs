@@ -29,7 +29,7 @@
         /// User which is somehow associated with this state
         /// </summary>
         public virtual User AssociatedUser { get; set; }
-        
+
         public int? AssociatedItProjectId { get; set; }
         /// <summary>
         /// Gets or sets the associated it project.
@@ -52,7 +52,7 @@
 
         public override bool HasUserWriteAccess(User user)
         {
-            if (AssociatedItProject != null && AssociatedItProject.HasUserWriteAccess(user)) 
+            if (AssociatedItProject != null && AssociatedItProject.HasUserWriteAccess(user))
                 return true;
 
             return base.HasUserWriteAccess(user);

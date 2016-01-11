@@ -350,7 +350,7 @@ div.task-usage-row {
         padding: 5px;
         margin: 5px;
     }
-    
+
     .dropdown-menu.traffic-light a:hover {
         border-color: black;
     }
@@ -671,7 +671,7 @@ div.searchbox-wrapper {
 
 /*
     Fixes kendo problem with bootstrap form-constrol
-    http://docs.telerik.com/kendo-ui/using-kendo-with-twitter-bootstrap#using-the-form-control-bootstrap-css-class-with-kendo-ui-widgets 
+    http://docs.telerik.com/kendo-ui/using-kendo-with-twitter-bootstrap#using-the-form-control-bootstrap-css-class-with-kendo-ui-widgets
 */
 .form-control.k-widget
 {
@@ -690,4 +690,38 @@ div.searchbox-wrapper {
 .nav > li > a.btn-danger:focus {
   text-decoration: none;
   background-color: #c9302c;
+}
+
+/* Make grid header titles wrap text  */
+.k-grid  .k-grid-header  .k-header  .k-link {
+    height: auto;
+}
+.k-grid  .k-grid-header  .k-header {
+    white-space: normal;
+}
+
+/*
+  Make grid content have a minimum height
+  so it shows the spinner when initially loaded
+*/
+.k-grid-content {
+    min-height: 50px!important;
+}
+
+/* show an ellipsis (...) when content overflow */
+.might-overflow {
+    text-overflow: ellipsis;
+    overflow : hidden;
+    white-space: nowrap;
+}
+
+/* expand content to its full length on mouseover */
+.might-overflow:hover {
+    text-overflow: clip;
+    white-space: normal;
+    word-break: break-all;
+}
+
+.k-header {
+   vertical-align: middle!important;
 }

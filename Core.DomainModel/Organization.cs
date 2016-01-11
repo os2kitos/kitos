@@ -24,7 +24,7 @@ namespace Core.DomainModel
             this.ItSystems = new List<ItSystem.ItSystem>();
             this.Supplier = new List<ItContract.ItContract>();
             this.ItSystemUsages = new List<ItSystemUsage.ItSystemUsage>();
-            this.Contracts = new List<ItContract.ItContract>();
+            this.ItContracts = new List<ItContract.ItContract>();
             this.OrgUnits = new List<OrganizationUnit>();
         }
 
@@ -51,15 +51,18 @@ namespace Core.DomainModel
         //KITOS term - which organization was this system created under in KITOS
         public virtual ICollection<ItSystem.ItSystem> ItSystems { get; set; }
 
+        //KITOS term - which organization was this interface created under in KITOS
+        public virtual ICollection<ItSystem.ItInterface> ItInterfaces { get; set; }
+
         /// <summary>
         /// Organization is marked as supplier in these contracts
         /// </summary>
         public virtual ICollection<ItContract.ItContract> Supplier { get; set; }
 
         /// <summary>
-        /// Contracts created inside the organization
+        /// ItContracts created inside the organization
         /// </summary>
-        public virtual ICollection<ItContract.ItContract> Contracts { get; set; }
+        public virtual ICollection<ItContract.ItContract> ItContracts { get; set; }
 
         /// <summary>
         /// Local usages of IT systems within this organization

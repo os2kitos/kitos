@@ -62,7 +62,7 @@ namespace Presentation.Web.Controllers.API
         {
             return CreateResponse(HttpStatusCode.OK, response);
         }
-        
+
         protected virtual HttpResponseMessage Error<T>(T response)
         {
             if (response is SecurityException) return Unauthorized();

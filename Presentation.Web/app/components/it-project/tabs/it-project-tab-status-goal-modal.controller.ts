@@ -2,7 +2,7 @@
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-project.edit.status-goal.modal', {
             url: '/modal/:goalId',
-            onEnter: ['$state', '$stateParams', '$modal', 'goalTypes', 'project', 'user',
+            onEnter: ['$state', '$stateParams', '$uibModal', 'goalTypes', 'project', 'user',
                 function ($state, $stateParams, $modal, goalTypes, project, user) {
                     $modal.open({
                         size: 'lg',

@@ -6,7 +6,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// Helper object for the local usage of a <see cref="DataRow"/>.
     /// When an interface with some DataRows is taken into local usage,
     /// a DataRowUsage is created for each DataRow. This allows for adding details
-    /// regarding the usage. 
+    /// regarding the usage.
     /// </summary>
     /// TODO the db schema for this is wrong, it needs to be deleted when a contract relation to a InterfaceUsage is removed so it needs to somehow attach itself to the relation between ItContract and InterfaceUsage
     public class DataRowUsage
@@ -36,12 +36,12 @@ namespace Core.DomainModel.ItSystemUsage
         /// How much the data of the DataRow is used
         /// </summary>
         public int? Amount { get; set; }
-        
+
         /// <summary>
         /// Details regarding total economy of the usage of DataRow
         /// </summary>
         public int? Economy { get; set; }
-        
+
         /// <summary>
         /// Details regarding the price of this DataRow
         /// </summary>

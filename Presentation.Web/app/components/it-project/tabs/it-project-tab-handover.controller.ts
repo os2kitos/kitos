@@ -17,7 +17,7 @@
                 usersWithRoles: ['$http', '$stateParams', function ($http, $stateParams) {
 
                     //get the rights of the projects
-                    return $http.get('api/itprojectrights/' + $stateParams.id)
+                    return $http.get('api/itprojectright/' + $stateParams.id)
                         .then(function(rightResult) {
                             var rights = rightResult.data.response;
 

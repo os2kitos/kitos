@@ -64,7 +64,7 @@ namespace Core.DomainModel.ItProject
 
         public int OtherItSavingsBudget { get; set; }
         public int OtherItSavingsRea { get; set; }
-        
+
         /// <summary>
         /// Determines whether a user has write access to this instance.
         /// </summary>
@@ -74,7 +74,7 @@ namespace Core.DomainModel.ItProject
         /// </returns>
         public override bool HasUserWriteAccess(User user)
         {
-            if (ItProject != null && ItProject.HasUserWriteAccess(user)) 
+            if (ItProject != null && ItProject.HasUserWriteAccess(user))
                 return true;
 
             return base.HasUserWriteAccess(user);

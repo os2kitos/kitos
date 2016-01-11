@@ -1,6 +1,5 @@
 ﻿(function (ng, app) {
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
-
         $stateProvider.state('it-system.edit', {
             url: '/edit/{id:[0-9]+}',
             templateUrl: 'partials/it-system/edit-it-system.html',

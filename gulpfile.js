@@ -1,3 +1,4 @@
+/// <binding BeforeBuild='es-lint, ts-lint' Clean='clean' />
 var gulp = require('gulp'),
     paths = require('./paths.config.js');
 

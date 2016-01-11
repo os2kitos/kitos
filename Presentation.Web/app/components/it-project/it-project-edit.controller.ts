@@ -191,7 +191,7 @@
                         }
                     });
                 }
-                if (_.size(payload) > 0) {
+                if (_.size(<any>payload) > 0) {
                     this.$http({ method: "PATCH", url: this.autosaveUrl + "?organizationId=" + this.user.currentOrganizationId, data: payload })
                         .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<IPayload>>) => {
                             var data = result.data.response;

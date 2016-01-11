@@ -1,6 +1,1 @@
-﻿<textarea rows="6"
-          class="form-control"
-          data-ng-model="projectDescriptionVm.project.description"
-          data-autosave="api/itproject/{{projectDescriptionVm.project.id}}"
-          data-field="description"
-          data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
+﻿<textarea rows="6" class="form-control" data-ng-model="description" data-autosave="api/itproject/{{ itProjectId }}" data-field="description" data-ng-disabled="!hasWriteAccess"></textarea>

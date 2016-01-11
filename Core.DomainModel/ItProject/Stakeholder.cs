@@ -33,7 +33,7 @@ namespace Core.DomainModel.ItProject
         /// </returns>
         public override bool HasUserWriteAccess(User user)
         {
-            if (ItProject != null && ItProject.HasUserWriteAccess(user)) 
+            if (ItProject != null && ItProject.HasUserWriteAccess(user))
                 return true;
 
             return base.HasUserWriteAccess(user);

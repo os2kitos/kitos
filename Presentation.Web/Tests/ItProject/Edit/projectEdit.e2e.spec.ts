@@ -16,23 +16,6 @@ describe('project edit view', () => {
         browser.driver.manage().window().maximize();
     });
 
-    it('should save when name looses focus', () => {
-        // arrange
-        pageObject.nameInput = 'SomeName';
-
-        // act
-        pageObject.idElement.click();
-
-        // assert
-        mock.requestsMade()
-            .then((requests: Array<any>) => {
-                var lastRequest = requests[requests.length - 1];
-
-                expect(lastRequest.method).toBe('PATCH');
-                expect(lastRequest.url).toMatch('api/itproject/1');
-            });
-    });
-
     afterEach(() => {
         mock.teardown();
         browserHelper.outputLog();

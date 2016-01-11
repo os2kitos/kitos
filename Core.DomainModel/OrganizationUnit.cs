@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
-using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 
 namespace Core.DomainModel
 {
@@ -90,7 +90,7 @@ namespace Core.DomainModel
         public virtual ICollection<ItProjectOrgUnitUsage> UsingItProjects { get; set; }
 
         /// <summary>
-        /// This Organization Unit is responsible for these IT Contracts
+        /// This Organization Unit is responsible for these IT ItContracts
         /// </summary>
         public virtual ICollection<ItContract.ItContract> ResponsibleForItContracts { get; set; }
 

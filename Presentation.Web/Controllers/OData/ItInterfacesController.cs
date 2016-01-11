@@ -1,7 +1,10 @@
 ﻿using System.Linq;
 using System.Web.Http;
+using System.Web.OData;
+using System.Web.OData.Routing;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
-using Core.DomainServices;
+﻿using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -12,11 +15,20 @@ namespace Presentation.Web.Controllers.OData
         {
         }
 
-        // HACK to enable DISTINCT query
-        // When OData support it this should be removed!
-        public IHttpActionResult Get(string filter, bool distinct)
+        [EnableQuery]
+        [ODataRoute("ItInterfaces")]
+        public override IHttpActionResult Get()
         {
-            return Ok(Repository.AsQueryable().GroupBy(x => x.Version).Select(grp => grp.Key).Where(x => x.StartsWith(filter)));
+            return base.Get();
+        }
+
+        // GET /Organizations(1)/ItInterfaces
+        [EnableQuery]
+        [ODataRoute("Organizations({key})/ItInterfaces")]
+        public IHttpActionResult GetItInterfaces(int key)
+        {
+            var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
+            return Ok(result);
         }
     }
 }

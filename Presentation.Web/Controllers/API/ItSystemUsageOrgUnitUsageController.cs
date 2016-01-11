@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using AutoMapper;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Presentation.Web.Models;
@@ -42,9 +41,9 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var systemUsage = _systemUsageRepository.GetByKey(id);
-                
+
                 if (systemUsage.ResponsibleUsage == null) return Ok(); // TODO should be NotFound but ui router resolve redirects to mainpage on 404
-                
+
                 var organizationUnit = systemUsage.ResponsibleUsage.OrganizationUnit;
                 var dtos = Mapper.Map<SimpleOrgUnitDTO>(organizationUnit);
                 return Ok(dtos);
@@ -82,7 +81,7 @@ namespace Presentation.Web.Controllers.API
                 // WARNING: force loading so setting it to null will be tracked
                 var forceLoad = systemUsage.ResponsibleUsage;
                 systemUsage.ResponsibleUsage = null;
-                
+
                 _systemUsageRepository.Save();
 
                 return Ok();
