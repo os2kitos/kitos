@@ -5,7 +5,7 @@ var source = 'Presentation.Web',
     allTypeScript = [sourceApp + '/**/*.ts'],
     bundleDir = './public',
 
-    // dependency files of files to cover.
+    // dependency files of files to unit test
     unitDependencies = [
         source + '/Scripts/lodash.js',
         source + '/Scripts/jquery-2.1.4.js',
