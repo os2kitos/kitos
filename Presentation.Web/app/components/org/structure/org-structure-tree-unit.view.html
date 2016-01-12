@@ -1,0 +1,15 @@
+﻿<div class="org-node" data-ng-class="{'selected': node == chosenOrgUnit, 'hasWriteAccess': node.hasWriteAccess}">
+    <span class="org-node-info">
+        <span data-ng-show="node.children.length > 0">
+            <a data-ng-click="node.isOpen = !node.isOpen" class="small">
+                <i class="glyphicon" data-ng-class="{'glyphicon-chevron-down': node.isOpen, 'glyphicon-chevron-right': !node.isOpen}"></i>
+            </a>
+        </span>
+        <a data-ng-click="chooseOrgUnit(node)">{{node.name}}</a>
+    </span>
+    <ul data-ng-show="node.isOpen">
+        <li data-ng-repeat="node in node.children">
+            <div data-ng-include="'app/components/org/structure/org-structure-tree-unit.view.html'"></div>
+        </li>
+    </ul>
+</div>

@@ -235,7 +235,7 @@
 
             var modal = $modal.open({
                 backdrop: "static",
-                templateUrl: "partials/home/choose-organization.html",
+                templateUrl: "app/components/home/choose-organization.html",
                 controller: ["$scope", "$uibModalInstance", "autofocus", function ($modalScope, $modalInstance, autofocus) {
                     autofocus();
 
