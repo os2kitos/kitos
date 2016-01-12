@@ -532,19 +532,17 @@
                         if (e.added) {
                             id = e.added.id;
                             $http.post(attrs.autosave + "?organizationId=" + user.currentOrganizationId + "&" + attrs.field + "=" + id)
-                                .success(function() {
+                                .then(function() {
                                     msg.toSuccessMessage("Feltet er opdateret.");
-                                })
-                                .error(function() {
+                                }, function() {
                                     msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                                 });
                         } else if (e.removed) {
                             id = e.removed.id;
                             $http.delete(attrs.autosave + "?organizationId=" + user.currentOrganizationId + "&" + attrs.field + "=" + id)
-                                .success(function() {
+                                .then(function() {
                                     msg.toSuccessMessage("Feltet er opdateret.");
-                                })
-                                .error(function() {
+                                }, function() {
                                     msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                                 });
                         }
@@ -555,12 +553,11 @@
                         if (!attrs.appendurl)
                             attrs.appendurl = "";
 
-                        $http({ method: "PATCH", url: attrs.autosave + "?organizationId=" + user.currentOrganizationId + attrs.appendurl, data: payload })
-                            .success(function() {
+                        $http({ method: "PATCH", url: attrs.autosave + "?organizationId=" + user.currentOrganizationId + attrs.appendurl, data: payload, ignoreLoadingBar: true })
+                            .then(function() {
                                 msg.toSuccessMessage("Feltet er opdateret.");
                                 oldValue = ctrl.$modelValue;
-                            })
-                            .error(function(result, status) {
+                            }, function(result, status) {
                                 if (status === 409) {
                                     msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
                                 } else {
