@@ -26,8 +26,8 @@ namespace Presentation.Web
                 "~/Scripts/angular-ui/ui-bootstrap-tpls.js",
                 "~/Scripts/ui-select2.js",
                 "~/Scripts/notify/*.js",
-                "~/Scripts/angular-ui-util/ui-utils.js",
-                "~/Scripts/loading-bar.js"));
+                "~/Scripts/loading-bar.js",
+                "~/Scripts/angular-ui-util/ui-utils.js"));
 
             // bootstrap.js was causing issues. Use ui-bootstrap instead.
             bundles.IgnoreList.Ignore("bootstrap.js");
