@@ -1,30 +1,30 @@
 ﻿(function (ng, app) {
-    app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-project.edit.org', {
-            url: '/org',
-            templateUrl: 'app/components/it-project/tabs/it-project-tab-org.html',
-            controller: 'project.EditOrgCtrl',
+    app.config(["$stateProvider", function ($stateProvider) {
+        $stateProvider.state("it-project.edit.org", {
+            url: "/org",
+            templateUrl: "app/components/it-project/tabs/it-project-tab-org.view.html",
+            controller: "project.EditOrgCtrl",
             resolve: {
                 // re-resolve data from parent cause changes here wont cascade to it
-                project: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get('api/itproject/' + $stateParams.id)
+                project: ["$http", "$stateParams", function ($http, $stateParams) {
+                    return $http.get("api/itproject/" + $stateParams.id)
                         .then(function (result) {
                             return result.data.response;
                         });
                 }],
-                isTransversal: ['project', function (project) {
+                isTransversal: ["project", function (project) {
                     return project.isTransversal;
                 }],
-                selectedOrgUnits: ['$http', '$stateParams', function ($http, $stateParams) {
+                selectedOrgUnits: ["$http", "$stateParams", function ($http, $stateParams) {
                     var projectId = $stateParams.id;
-                    return $http.get('api/itProjectOrgUnitUsage/' + projectId)
-                        .then(function(result) {
+                    return $http.get("api/itProjectOrgUnitUsage/" + projectId)
+                        .then(function (result) {
                             return result.data.response;
                         });
                 }],
-                responsibleOrgUnitId: ['$http', '$stateParams', function ($http, $stateParams) {
+                responsibleOrgUnitId: ["$http", "$stateParams", function ($http, $stateParams) {
                     var projectId = $stateParams.id;
-                    return $http.get('api/itProjectOrgUnitUsage/' + projectId + '?responsible')
+                    return $http.get("api/itProjectOrgUnitUsage/" + projectId + "?responsible=true")
                         .then(function (result) {
                             if (result.data.response)
                                 return result.data.response.id;
@@ -32,8 +32,8 @@
                         }
                     );
                 }],
-                orgUnitsTree: ['$http', 'project', function ($http, project) {
-                    return $http.get('api/organizationunit/?organization=' + project.organizationId)
+                orgUnitsTree: ["$http", "project", function ($http, project) {
+                    return $http.get("api/organizationunit/?organization=" + project.organizationId)
                         .then(function (result) {
                             return [result.data.response]; // to array for ngRepeat to work
                         });
@@ -42,42 +42,42 @@
         });
     }]);
 
-    app.controller('project.EditOrgCtrl',
-        ['$scope', '$http', '$stateParams', 'notify', 'isTransversal', 'orgUnitsTree', 'selectedOrgUnits', 'responsibleOrgUnitId', 'user',
+    app.controller("project.EditOrgCtrl",
+        ["$scope", "$http", "$stateParams", "notify", "isTransversal", "orgUnitsTree", "selectedOrgUnits", "responsibleOrgUnitId", "user",
             function ($scope, $http, $stateParams, notify, isTransversal, orgUnitsTree, selectedOrgUnits, responsibleOrgUnitId, user) {
                 $scope.orgUnitsTree = orgUnitsTree;
                 $scope.isTransversal = isTransversal;
                 $scope.selectedOrgUnits = selectedOrgUnits;
                 $scope.responsibleOrgUnitId = responsibleOrgUnitId;
                 var projectId = $stateParams.id;
-                $scope.patchUrl = 'api/itproject/' + projectId;
+                $scope.patchUrl = "api/itproject/" + projectId;
 
-                $scope.saveResponsible = function() {
+                $scope.saveResponsible = function () {
                     var orgUnitId = $scope.responsibleOrgUnitId;
                     var msg = notify.addInfoMessage("Gemmer... ");
                     if ($scope.responsibleOrgUnitId) {
-                        $http.post('api/itProjectOrgUnitUsage/?projectId=' + projectId + '&orgUnitId=' + orgUnitId + '&responsible')
-                            .success(function() {
+                        $http.post("api/itProjectOrgUnitUsage/?projectId=" + projectId + "&orgUnitId=" + orgUnitId + "&responsible")
+                            .success(function () {
                                 msg.toSuccessMessage("Gemt!");
                             })
-                            .error(function() {
+                            .error(function () {
                                 msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                             });
                     } else {
-                        $http.delete('api/itProjectOrgUnitUsage/?projectId=' + projectId + '&responsible')
-                            .success(function() {
+                        $http.delete("api/itProjectOrgUnitUsage/?projectId=" + projectId + "&responsible")
+                            .success(function () {
                                 msg.toSuccessMessage("Gemt!");
                             })
-                            .error(function() {
+                            .error(function () {
                                 msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                             });
                     }
-                }
+                };
 
                 $scope.save = function(obj) {
                     var msg = notify.addInfoMessage("Gemmer... ");
                     if (obj.selected) {
-                        $http.post('api/itproject/' + projectId + '?organizationunit=' + obj.id + '&organizationId=' + user.currentOrganizationId)
+                        $http.post("api/itproject/" + projectId + "?organizationunit=" + obj.id + "&organizationId=" + user.currentOrganizationId)
                             .success(function() {
                                 msg.toSuccessMessage("Gemt!");
                                 $scope.selectedOrgUnits.push(obj);
@@ -86,7 +86,7 @@
                                 msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                             });
                     } else {
-                        $http.delete('api/itproject/' + projectId + '?organizationunit=' + obj.id + '&organizationId=' + user.currentOrganizationId)
+                        $http.delete("api/itproject/" + projectId + "?organizationunit=" + obj.id + "&organizationId=" + user.currentOrganizationId)
                             .success(function() {
                                 msg.toSuccessMessage("Gemt!");
 
@@ -103,7 +103,7 @@
 
                                 // if responsible is the orgunit being removed unselect it from the dropdown
                                 if (obj.id == $scope.responsibleOrgUnitId)
-                                    $scope.responsibleOrgUnitId = '';
+                                    $scope.responsibleOrgUnitId = "";
                             })
                             .error(function() {
                                 msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
@@ -124,7 +124,7 @@
                     return null;
                 }
 
-                var selectedOrgUnitIds = _.pluck(selectedOrgUnits, 'id');
+                var selectedOrgUnitIds = _.pluck(selectedOrgUnits, "id");
                 _.each(selectedOrgUnitIds, function(id) {
                     var found = searchTree(orgUnitsTree[0], id);
                     if (found) {

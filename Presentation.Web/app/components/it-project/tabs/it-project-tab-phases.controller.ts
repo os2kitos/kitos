@@ -109,9 +109,9 @@
                 $stateProvider.state("it-project.edit.phases", {
                     url: "/phases",
                     templateUrl: "app/components/it-project/tabs/it-project-tab-phases.view.html",
-                    controller: PhasesController,
+                controller: PhasesController,
                     controllerAs: "projectPhasesVm"
-                });
+        });
             }
         ]);
 }

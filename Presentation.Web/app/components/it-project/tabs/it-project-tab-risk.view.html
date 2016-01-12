@@ -1,0 +1,129 @@
+﻿<!-- System Roles -->
+<div class="panel panel-default">
+    <form name="riskForm" role="form">
+        <table class="table table-condensed table-striped small">
+            <thead>
+                <tr>
+                    <th>Risiko</th>
+                    <th class="col-sm-1">Konsekvens (1-5)</th>
+                    <th class="col-sm-1">Sandsynlighed (1-5)</th>
+                    <th class="col-sm-0">Produkt</th>
+                    <th>Handling</th>
+                    <th class="col-sm-2">Ansvarlig</th>
+                    <th class="col-sm-0"><!-- control --></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="risk in risks | filter : { show: true }">
+                    <td>
+                        <input type="text" class="form-control input-sm"
+                               data-ng-model="risk.name"
+                               data-field="name"
+                               data-autosave="{{risk.updateUrl}}"
+                               data-ng-disabled="!projectEditVm.hasWriteAccess">
+                    </td>
+                    <td>
+                        <input type="number" class="form-control input-sm" min="1" max="5"
+                               data-ng-model="risk.consequence"
+                               data-field="consequence"
+                               data-autosave="{{risk.updateUrl}}"
+                               data-ng-disabled="!projectEditVm.hasWriteAccess">
+                    </td>
+                    <td>
+                        <input type="number" class="form-control input-sm" min="1" max="5"
+                               data-ng-model="risk.probability"
+                               data-field="probability"
+                               data-autosave="{{risk.updateUrl}}"
+                               data-ng-disabled="!projectEditVm.hasWriteAccess">
+                    </td>
+                    <td>
+                        <span class="form-control-static input-sm product">{{ product(risk) }}</span>
+                    </td>
+                    <td>
+                        <textarea class="form-control input-sm"
+                                  data-ng-model="risk.action"
+                                  data-field="action"
+                                  data-autosave="{{risk.updateUrl}}"
+                                  data-ng-disabled="!projectEditVm.hasWriteAccess">
+                    </textarea>
+                    </td>
+                    <td>
+                        <select class="form-control input-sm responsible"
+                                data-ui-select2=""
+                                data-field="responsibleUserId"
+                                data-autosave="{{risk.updateUrl}}"
+                                data-ng-disabled="!projectEditVm.hasWriteAccess"
+                                data-ng-model="risk.responsibleUserId">
+                            <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.name}}</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger btn-sm delete-risk"
+                                data-confirmed-click="delete(risk)"
+                                data-confirm-click="Er du sikker på at du vil slette?"
+                                data-ng-disabled="!projectEditVm.hasWriteAccess">
+                            <span class="glyphicon glyphicon-trash small"></span>
+                        </button>
+                    </td>
+                </tr>
+                <tr class="active" data-ng-hide="!projectEditVm.hasWriteAccess">
+                    <td>
+                        <div class="form-group" data-show-errors>
+                            <input type="text" name="name" class="form-control input-sm" required data-ng-model="newRisk.name">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group" data-show-errors>
+                            <input type="number" name="consequence" class="form-control input-sm" min="1" max="5" required data-ng-model="newRisk.consequence">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group" data-show-errors>
+                            <input type="number" name="probability" class="form-control input-sm" min="1" max="5" required data-ng-model="newRisk.probability">
+                        </div>
+                    </td>
+                    <td>
+                        <span id="product" class="form-control-static input-sm">{{ product(newRisk) }}</span>
+                    </td>
+                    <td>
+                        <div class="form-group" data-show-errors>
+                            <textarea name="action" class="form-control input-sm" required data-ng-model="newRisk.action"></textarea>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group" data-show-errors>
+                            <select id="responsible"
+                                    name="responsbile"
+                                    class="form-control input-sm"
+                                    required
+                                    data-ui-select2=""
+                                    data-ng-disabled="!projectEditVm.hasWriteAccess"
+                                    data-ng-model="newRisk.responsibleUserId">
+                                <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.name}}</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td class="text-right">
+                        <button id="save-risk" class="btn btn-success btn-sm" data-ng-click="saveNewRisk()">
+                            Gem
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td class="text-right">
+                        <span class="form-control-static input-sm text-right">Gennemsnit:</span>
+                    </td>
+                    <td>
+                        <span id="average-product" class="form-control-static input-sm">{{ averageProduct() }}</span>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</div>

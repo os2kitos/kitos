@@ -113,8 +113,8 @@
                 .then(
                     successResult => {
                         var data = {
-                            'roleId': rIdNew,
-                            'userId': uIdNew
+                            "roleId": rIdNew,
+                            "userId": uIdNew
                         };
 
                         this.$http.post(`api/itprojectright/${this.projectId}?organizationId=${this.user.currentOrganizationId}`, data)
@@ -179,8 +179,8 @@
             }
 
             var data = {
-                'roleId': rId,
-                'userId': uId
+                "roleId": rId,
+                "userId": uId
             };
 
             this.$http.post(`api/itprojectright/${oId}?organizationId=${this.user.currentOrganizationId}`, data)
@@ -214,32 +214,32 @@
                 $stateProvider.state("it-project.edit.roles", {
                     url: "/roles",
                     templateUrl: "app/components/it-project/tabs/it-project-tab-roles.view.html",
-                    controller: RolesController,
+                controller: RolesController,
                     controllerAs: "projectRolesVm",
-                    resolve: {
-                        // re-resolve data from parent cause changes here wont cascade to it
+                resolve: {
+                    // re-resolve data from parent cause changes here wont cascade to it
                         project: [
                             "$http", "$stateParams",
                             ($http, $stateParams) => $http.get(`api/itproject/${$stateParams.id}`)
                             .then(result => result.data.response)
-                        ],
+                    ],
                         itProjectRights: [
                             "$http", "$stateParams",
                             ($http, $stateParams) => $http.get(`api/itprojectright/${$stateParams.id}`)
                             .then(result => result.data.response)
-                        ],
+                    ],
                         itProjectRoles: [
                             "$http",
                             $http => $http.get("api/itprojectrole/?nonsuggestions=")
                             .then(result => result.data.response)
-                        ],
+                    ],
                         user: [
                             "userService",
-                            userService => userService.getUser()
+                        userService => userService.getUser()
                             .then(user => user)
-                        ]
-                    }
-                });
+                    ]
+                }
+            });
             }
         ]);
 }

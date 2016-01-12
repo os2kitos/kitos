@@ -1,0 +1,35 @@
+﻿<div class="panel-default">
+    <div class="panel-heading">
+        <div class="panel-title">Projektet knytter an til</div>
+    </div>
+    <div class="panel-body">
+        <form role="form">
+            <div class="form-group">
+                <label for="jointDrop" class="control-label">Fælleskommunel digitaliseringsstrategi</label>
+                <select class="form-control input-sm" id="jointDrop"
+                        data-ui-select2="allowClearOption"
+                        data-placeholder="Vælg fælleskommunel projekt"
+                        data-ng-model="jointMunicipalProjectId"
+                        data-autosave="{{ autosaveUrl }}"
+                        data-field="jointMunicipalProjectId"
+                        data-ng-disabled="!projectEditVm.hasWriteAccess">
+                    <option value=""></option>
+                    <option data-ng-repeat="jointMunicipalProject in jointMunicipalProjects" value="{{jointMunicipalProject.id}}">{{jointMunicipalProject.name}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="commonDrop" class="control-label">Fællesoffentlig digitaliseringsstrategi</label>
+                <select class="form-control input-sm" id="commonDrop"
+                        data-ui-select2="allowClearOption"
+                        data-placeholder="Vælg fællesoffentlig projekt"
+                        data-ng-model="commonPublicProjectId"
+                        data-autosave="{{ autosaveUrl }}"
+                        data-field="commonPublicProjectId"
+                        data-ng-disabled="!projectEditVm.hasWriteAccess">
+                    <option value=""></option>
+                    <option data-ng-repeat="commonPublicProject in commonPublicProjects" value="{{commonPublicProject.id}}">{{commonPublicProject.name}}</option>
+                </select>
+            </div>
+        </form>
+    </div>
+</div>

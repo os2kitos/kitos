@@ -1,0 +1,40 @@
+﻿<div class="panel panel-default">
+    <div class="panel-heading">Projektet vedrører følgende IT systemer</div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>IT System</th>
+                <th>Applikationstype</th>
+                <th><!-- edit ctrl --></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="usage in systemUsages">
+                <td><a data-ui-sref="it-system.usage.interfaces({ id: usage.id })">{{ usage.itSystem.name }}</a></td>
+                <td>{{ usage.itSystem.appTypeName }}</td>
+                <td class="text-right">
+                    <button type="button"
+                            class="btn btn-danger btn-xs delete-usage"
+                            data-confirmed-click="delete({{ usage.id }})"
+                            data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
+                            data-ng-show="projectEditVm.hasWriteAccess">
+                        <i class="glyphicon glyphicon-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot data-ng-show="projectEditVm.hasWriteAccess">
+            <tr>
+                <td colspan="3">
+                    <input id="select-usage"
+                           type="hidden"
+                           class="form-control input-sm"
+                           data-ui-select2="itSystemUsagesSelectOptions"
+                           data-ng-model="selectedSystemUsage"
+                           data-ng-change="save()"
+                           data-placeholder="Vælg IT system" />
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

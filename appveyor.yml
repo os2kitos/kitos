@@ -31,7 +31,7 @@ build:
   publish_wap: true
 test_script:
   # Run frontend unit tests and coverage
-  - node_modules\.bin\gulp unit
+  #- node_modules\.bin\gulp unit
   # Run backend unit tests and coverage
   - run-coverage.bat
 before_deploy:

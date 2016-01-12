@@ -1,26 +1,26 @@
 ﻿(function (ng, app) {
-    app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-project.edit.risk', {
-            url: '/risk',
-            templateUrl: 'app/components/it-project/tabs/it-project-tab-risk.html',
-            controller: 'project.EditRiskCtrl',
+    app.config(["$stateProvider", function ($stateProvider) {
+        $stateProvider.state("it-project.edit.risk", {
+            url: "/risk",
+            templateUrl: "app/components/it-project/tabs/it-project-tab-risk.view.html",
+            controller: "project.EditRiskCtrl",
             resolve: {
                 // re-resolve data from parent cause changes here wont cascade to it
-                project: ['$http', '$stateParams', function ($http, $stateParams) {
+                project: ["$http", "$stateParams", function ($http, $stateParams) {
                     return $http.get("api/itproject/" + $stateParams.id)
                         .then(function (result) {
                             return result.data.response;
                         });
                 }],
-                risks: ['$http', 'project', function ($http, project) {
-                        return $http.get('api/risk/?getByProject&projectId=' + project.id)
+                risks: ["$http", "project", function ($http, project) {
+                        return $http.get("api/risk/?getByProject=true&projectId=" + project.id)
                             .then(function (result) {
                                 return result.data.response;
                             });
                 }],
                 //returns a map with those users who have a role in this project.
                 //the names of the roles is saved in user.roleNames
-                usersWithRoles: ['$http', '$stateParams', function ($http, $stateParams) {
+                usersWithRoles: ["$http", "$stateParams", function ($http, $stateParams) {
                     //get the rights of the projects
                     return $http.get("api/itprojectright/" + $stateParams.id)
                         .then(function (rightResult) {
@@ -55,7 +55,7 @@
         });
     }]);
 
-    app.controller('project.EditRiskCtrl', ['$scope', '$http', '$stateParams', 'notify', 'risks', 'usersWithRoles', 'user',
+    app.controller("project.EditRiskCtrl", ["$scope", "$http", "$stateParams", "notify", "risks", "usersWithRoles", "user",
         function($scope, $http, $stateParams, notify, risks, usersWithRoles, user) {
 
             var projectId = $stateParams.id;
@@ -78,7 +78,7 @@
             };
 
             $scope.delete = function(risk) {
-                $http.delete(risk.updateUrl + '?organizationId=' + user.currentOrganizationId).success(function (result) {
+                $http.delete(risk.updateUrl + "?organizationId=" + user.currentOrganizationId).success(function (result) {
                     risk.show = false;
 
                     notify.addSuccessMessage("Rækken er slettet");
@@ -109,7 +109,7 @@
             resetNewRisk();
 
             $scope.saveNewRisk = function () {
-                $scope.$broadcast('show-errors-check-validity');
+                $scope.$broadcast("show-errors-check-validity");
 
                 if ($scope.riskForm.$invalid) { return; }
 

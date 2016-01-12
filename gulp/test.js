@@ -1,5 +1,7 @@
 var gulp = require('gulp'),
     paths = require('../paths.config.js'),
+    gutil = require('gulp-util'),
+    protractor = require('gulp-protractor').protractor,
     karma = require('karma');
 
 // run unit tests with karma
@@ -28,7 +30,6 @@ gulp.task('unit', function (done) {
 
 // run e2e tests with protractor
 gulp.task('e2e', function () {
-    var protractor = require('gulp-protractor').protractor;
     var browserstack = require('gulp-browserstack');
 
     var taskExitValue = 0;
@@ -51,14 +52,38 @@ gulp.task('e2e', function () {
         });
 });
 
+// start standalone selenium webdriver
+gulp.task('webdriver', require('gulp-protractor').webdriver_standalone);
+
+// run e2e tests with protractor locally
+gulp.task('locale2e', function () {
+    var taskExitValue = 0;
+    var args = process.argv;
+    if (args && args.length > 3) {
+        args = args.slice(3, args.length);
+    } else {
+        args = null;
+    }
+
+    return gulp.src(paths.e2eFiles)
+        .pipe(protractor({
+            configFile: 'protractor.local.conf.js',
+            args: args
+        }))
+        .on('error', function (err) {
+            gutil.log(gutil.colors.red("An error occurred in protractor. Did you start the webdriver?"));
+            gutil.log(gutil.colors.red("Run cmd 'start gulp webdriver'."));
+        });
+});
+
 // map karma coverage results from js to ts source
 gulp.task('mapCoverage', function (done) {
     var exec = require('child_process').exec;
     var del = require('del');
 
     exec('node_modules\\.bin\\remap-istanbul -i ' + paths.coverage + '/' + paths.tempFrontendCoverageReport + ' -o ' + paths.coverage + '/' + paths.frontendCoverageReport, function(err, stdout, stderr) {
-        console.log(stdout);
-        console.log(stderr);
+        gutil.log(stdout);
+        gutil.log(gutil.colors.red(stderr));
 
         del([paths.coverage + '/' + paths.tempFrontendCoverageReport]);
         done();

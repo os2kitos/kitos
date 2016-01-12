@@ -16,9 +16,9 @@
                 $stateProvider.state("it-project.edit.description", {
                     url: "/description",
                     templateUrl: "app/components/it-project/tabs/it-project-tab-description.view.html",
-                    controller: DescriptionController,
+                controller: DescriptionController,
                     controllerAs: "projectDescriptionVm"
-                });
+            });
             }
         ]);
 }

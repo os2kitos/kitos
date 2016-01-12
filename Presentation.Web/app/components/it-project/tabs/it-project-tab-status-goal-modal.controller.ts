@@ -5,11 +5,11 @@
             onEnter: ['$state', '$stateParams', '$uibModal', 'goalTypes', 'project', 'user',
                 function ($state, $stateParams, $modal, goalTypes, project, user) {
                     $modal.open({
-                        size: 'lg',
-                        templateUrl: 'app/components/it-project/tabs/it-project-tab-status-goal-modal.html',
+                        size: "lg",
+                        templateUrl: "app/components/it-project/tabs/it-project-tab-status-goal-modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
-                        windowClass: 'modal fade in',
+                        windowClass: "modal fade in",
                         resolve: {
                             goalId: function() {
                                 return $stateParams.goalId;
@@ -25,10 +25,10 @@
                             project: function () {
                                 return project;
                             },
-                            goal: ['$http', function($http) {
+                            goal: ["$http", function($http) {
                                 var id = $stateParams.goalId;
                                 if (id) {
-                                    return $http.get('api/goal/' + id)
+                                    return $http.get("api/goal/" + id)
                                         .then(function(result) {
                                             return result.data.response;
                                         });
@@ -36,23 +36,23 @@
                                 return null;
                             }]
                         },
-                        controller: 'project.statusGoalModalCtrl'
+                        controller: "project.statusGoalModalCtrl"
                     }).result.then(function () {
                         // OK
                         // GOTO parent state and reload
-                        $state.go('^', null, { reload: true });
+                        $state.go("^", null, { reload: true });
                     }, function () {
                         // Cancel
                         // GOTO parent state
-                        $state.go('^');
+                        $state.go("^");
                     });
                 }
             ]
         });
     }]);
 
-    app.controller('project.statusGoalModalCtrl',
-    ['$scope', '$http', 'autofocus', 'goal', 'notify', 'goalId', 'goalTypes', 'project', 'user', 'moment',
+    app.controller("project.statusGoalModalCtrl",
+    ["$scope", "$http", "autofocus", "goal", "notify", "goalId", "goalTypes", "project", "user", "moment",
         function ($scope, $http, autofocus, goal, notify, goalId, goalTypes, project, user, moment) {
             var isNewGoal = goal == null;
 
@@ -114,8 +114,8 @@
 
                 var msg = notify.addInfoMessage("Gemmer ændringer...", false);
                 $http({
-                    method: isNewGoal ? 'POST' : 'PATCH',
-                    url: 'api/goal/' + goalId + '?organizationId=' + user.currentOrganizationId,
+                    method: isNewGoal ? "POST" : "PATCH",
+                    url: "api/goal/" + goalId + "?organizationId=" + user.currentOrganizationId,
                     data: payload
                 }).success(function () {
                     msg.toSuccessMessage("Ændringerne er gemt!");

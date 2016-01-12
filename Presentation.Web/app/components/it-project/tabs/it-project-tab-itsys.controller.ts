@@ -1,16 +1,16 @@
 ﻿(function (ng, app) {
-    app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-project.edit.itsys', {
-            url: '/itsys',
-            templateUrl: 'app/components/it-project/tabs/it-project-tab-itsys.html',
-            controller: 'project.EditItsysCtrl',
+    app.config(["$stateProvider", function ($stateProvider) {
+        $stateProvider.state("it-project.edit.itsys", {
+            url: "/itsys",
+            templateUrl: "app/components/it-project/tabs/it-project-tab-itsys.view.html",
+            controller: "project.EditItsysCtrl",
             resolve: {
-                user: ['userService', function (userService) {
+                user: ["userService", function (userService) {
                     return userService.getUser();
                 }],
-                usages: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get('api/itproject/' + $stateParams.id + '?usages')
-                        .then(function(result) {
+                usages: ["$http", "$stateParams", function ($http, $stateParams) {
+                    return $http.get("api/itproject/" + $stateParams.id + "?usages=true")
+                        .then(function (result) {
                             return result.data.response;
                         });
                 }]
@@ -18,14 +18,14 @@
         });
     }]);
 
-    app.controller('project.EditItsysCtrl',
-    ['$scope', '$http', '$timeout', '$state', '$stateParams', 'user', 'notify', 'usages',
+    app.controller("project.EditItsysCtrl",
+    ["$scope", "$http", "$timeout", "$state", "$stateParams", "user", "notify", "usages",
         function ($scope, $http, $timeout, $state, $stateParams, user, notify, usages) {
             var projectId = $stateParams.id;
             $scope.systemUsages = usages;
 
             $scope.save = function () {
-                $http.post('api/itproject/' + projectId + '?usageId=' + $scope.selectedSystemUsage.id + '&organizationId=' + user.currentOrganizationId)
+                $http.post("api/itproject/" + projectId + "?usageId=" + $scope.selectedSystemUsage.id + "&organizationId=" + user.currentOrganizationId)
                     .success(function () {
                         notify.addSuccessMessage("Systemet er tilknyttet.");
                         reload();
@@ -36,7 +36,7 @@
             };
 
             $scope.delete = function(usageId) {
-                $http.delete('api/itproject/' + projectId + '?usageId=' + usageId + '&organizationId=' + user.currentOrganizationId)
+                $http.delete("api/itproject/" + projectId + "?usageId=" + usageId + "&organizationId=" + user.currentOrganizationId)
                     .success(function() {
                         notify.addSuccessMessage("Systemets tilknyttning er fjernet.");
                         reload();
@@ -47,7 +47,7 @@
             };
 
             function reload() {
-                $state.go('.', null, { reload: true });
+                $state.go(".", null, { reload: true });
             };
 
             //select2 options for looking up it system usages
@@ -61,7 +61,7 @@
                     },
                     quietMillis: 500,
                     transport: function (queryParams) {
-                        var res = $http.get('api/itSystemUsage?organizationId=' + user.currentOrganizationId + '&q=' + queryParams.data.query).then(queryParams.success);
+                        var res = $http.get("api/itSystemUsage?organizationId=" + user.currentOrganizationId + "&q=" + queryParams.data.query).then(queryParams.success);
                         res.abort = function () {
                             return null;
                         };

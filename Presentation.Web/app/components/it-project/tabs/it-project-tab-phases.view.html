@@ -5,27 +5,27 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         Faseplan
-                        <a class="btn btn-sm btn-link pull-right" data-ng-click="editPhaseNames = !editPhaseNames" data-ng-hide="!projectEditVm.hasWriteAccess">{{ editPhaseNames && "Afslut redigering" || "Rediger fasenavne" }}
+                        <a id="edit-phase-names" class="btn btn-sm btn-link pull-right" data-ng-click="editPhaseNames = !editPhaseNames" data-ng-hide="!projectEditVm.hasWriteAccess">{{ editPhaseNames && "Afslut redigering" || "Rediger fasenavne" }}
                         </a>
                     </div>
                     <div class="panel-body">
                         <div class="row">
                             <!-- Phases names -->
                             <div class="col-md-2 small"></div>
-                            <div data-ng-repeat="phase in projectPhasesVm.project.phases" class="col-md-2">
+                            <div data-ng-repeat="phaseName in projectPhasesVm.project.phases" class="col-md-2">
                                 <input type="text" class="input-sm form-control"
                                        data-ng-show="editPhaseNames"
-                                       data-ng-model="phase.name"
-                                       data-ng-blur="projectPhasesVm.updatePhaseName(phase, $index + 1)"
+                                       data-ng-model="phaseName.name"
+                                       data-ng-blur="projectPhasesVm.updatePhaseName(phaseName, $index + 1)"
                                        data-ng-disabled="!projectEditVm.hasWriteAccess">
-                                <p class="text-center full-width small" data-ng-hide="editPhaseNames">{{phase.name}}</p>
+                                <p class="text-center full-width small" data-ng-hide="editPhaseNames">{{phaseName.name}}</p>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <!-- Phases buttons -->
                             <div class="col-md-2">Aktuel fase</div>
-                            <span data-ng-repeat="phase in projectPhasesVm.project.phases" class="col-md-2">
+                            <span data-ng-repeat="phaseButton in projectPhasesVm.project.phases" class="col-md-2">
                                 <button class="btn btn-xs full-width text-center"
                                         data-ng-click="projectPhasesVm.updateSelectedPhase($index + 1)"
                                         data-ng-disabled="!projectEditVm.hasWriteAccess">
@@ -37,13 +37,13 @@
                         <div class="form-group">
                             <!-- Phases buttons -->
                             <div class="col-md-3">Forventet faseovergang</div>
-                            <span class="col-md-2" data-ng-repeat="phase in projectPhasesVm.project.phases" data-ng-hide="$first">
+                            <span class="col-md-2" data-ng-repeat="phaseCrossDate in projectPhasesVm.project.phases" data-ng-hide="$first">
                                 <input type="text" class="form-control"
                                        data-kendo-date-picker
                                        data-k-options="projectPhasesVm.datepickerOptions"
                                        data-ng-disabled="!projectEditVm.hasWriteAccess"
-                                       data-ng-model="phase.startDate"
-                                       data-ng-change="projectPhasesVm.updatePhaseDate(phase, $index + 1)">
+                                       data-ng-model="phaseCrossDate.startDate"
+                                       data-ng-change="projectPhasesVm.updatePhaseDate(phaseCrossDate, $index + 1)">
                             </span>
                         </div>
                     </div>

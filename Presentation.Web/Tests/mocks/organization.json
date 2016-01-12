@@ -1,0 +1,48 @@
+﻿[
+    {
+        "request": {
+            "path": "api/organization/1",
+            "method": "GET",
+            "queryString": {
+                "users": "true",
+                "q": "t"
+            }
+        },
+        "response": {
+            "status": 200,
+            "data": {
+                "msg": "",
+                "response": [
+                    {
+                        "id": 8,
+                        "name": "Test",
+                        "lastName": "User",
+                        "phoneNumber": "12345678",
+                        "email": "test@user.dk",
+                        "defaultOrganizationUnitId": null,
+                        "defaultOrganizationUnitName": null,
+                        "isGlobalAdmin": false,
+                        "uuid": null,
+                        "adminRights": [
+                            {
+                                "organizationId": 1,
+                                "roleName": "Medarbejder",
+                                "roleId": 2,
+                                "objectOwnerName": "Global",
+                                "objectOwnerLastName": "admin",
+                                "objectOwnerFullName": "Global admin",
+                                "defaultOrgUnitName": null
+                            }
+                        ],
+                        "objectOwnerName": "Global",
+                        "objectOwnerLastName": "admin",
+                        "lastAdvisDate": null,
+                        "lastChanged": "2015-12-28T10:27:02Z",
+                        "lastChangedByUserId": 1,
+                        "fullName": "Test User"
+                    }
+                ]
+            }
+        }
+    }
+]

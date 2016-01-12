@@ -1,0 +1,30 @@
+﻿[
+    {
+        "request": {
+            "path": "api/organizationunit/",
+            "method": "GET",
+            "queryString": {
+                "organization": "1"
+            }
+        },
+        "response": {
+            "status": 200,
+            "data": {
+                "msg": "",
+                "response": {
+                    "id": 1,
+                    "name": "Fælles Kommune",
+                    "organizationId": 1,
+                    "parentId": null,
+                    "children": [ ],
+                    "ean": null,
+                    "objectOwnerName": "Global",
+                    "objectOwnerLastName": "admin",
+                    "objectOwnerFullName": "Global admin",
+                    "lastChanged": "2015-12-16T11:55:37Z",
+                    "lastChangedByUserId": 1
+                }
+            }
+        }
+    }
+]
