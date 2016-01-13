@@ -51,7 +51,7 @@
                             $timeout($scope.onSelect);
                         };
 
-                        var userSrc = typeof $scope.orgId !== 'undefined' ? 'api/organization/' + $scope.orgId + '?users&q=' : 'api/user?q=';
+                        var userSrc = typeof $scope.orgId !== 'undefined' ? 'api/organization/' + $scope.orgId + '?users=true&q=' : 'api/user?q=';
 
                         $scope.selectUserOptions = {
                             //don't escape markup, otherwise formatResult will be bugged
@@ -70,7 +70,7 @@
                                 },
                                 quietMillis: 500,
                                 transport: function(queryParams) {
-                                    var res = $http.get(userSrc + queryParams.data.query).then(queryParams.success);
+                                    var res = $http.get(userSrc + queryParams.data.query, { ignoreLoadingBar: true }).then(queryParams.success);
                                     res.abort = function() {
                                         return null;
                                     };
