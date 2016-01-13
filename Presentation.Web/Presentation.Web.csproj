@@ -187,9 +187,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Data\App_Start\AuthConfig.cs" />
-    <Compile Include="App_Data\App_Start\BundleConfig.cs" />
-    <Compile Include="App_Data\App_Start\NinjectWebCommon.cs" />
+    <Compile Include="App_Start\AuthConfig.cs" />
+    <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="Controllers\API\ExcelController.cs" />
     <Compile Include="Controllers\API\GenericContextAwareApiController.cs" />
     <Compile Include="Controllers\API\ItSystemTypeOptionController.cs" />
@@ -258,13 +258,13 @@
     <Compile Include="Controllers\API\ItContractController.cs" />
     <Compile Include="Controllers\API\ProcurementStrategyController.cs" />
     <Compile Include="Models\AdviceDTO.cs" />
-    <Compile Include="App_Data\App_Start\FilterConfig.cs" />
-    <Compile Include="App_Data\App_Start\MappingConfig.cs" />
+    <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\MappingConfig.cs" />
     <Compile Include="Models\Exceptions\ConflictException.cs" />
     <Compile Include="Models\ItContractDTO.cs" />
     <Compile Include="Models\ItSystemUsageSimpleDTO.cs" />
-    <Compile Include="App_Data\App_Start\RouteConfig.cs" />
-    <Compile Include="App_Data\App_Start\WebApiConfig.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\API\AssignmentController.cs" />
     <Compile Include="Controllers\API\AdminRoleController.cs" />
     <Compile Include="Controllers\API\AgreementElementController.cs" />
