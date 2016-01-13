@@ -32,7 +32,7 @@
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: 'modal fade in',
-                        templateUrl: 'partials/subnav/create-modal.html',
+                        templateUrl: 'app/components/it-system/it-system-modal-create.view.html',
                         controller: ['$scope', '$uibModalInstance', function ($scope, $modalInstance) {
                             $scope.formData = {};
                             $scope.type = 'IT System';
@@ -105,7 +105,7 @@
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: 'modal fade in',
-                        templateUrl: 'partials/subnav/create-itinterface-modal.html',
+                        templateUrl: 'app/components/it-system/it-interface/it-interface-modal-create.view.html',
                         controller: ['$scope', '$uibModalInstance', function ($scope, $modalInstance) {
                             $scope.formData = { itInterfaceId: "" }; // set itInterfaceId to an empty string
                             $scope.type = 'IT Snitflade';

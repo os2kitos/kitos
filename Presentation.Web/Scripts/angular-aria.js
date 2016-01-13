@@ -1,5 +1,5 @@
 /**
- * @license AngularJS v1.4.8
+ * @license AngularJS v1.4.7
  * (c) 2010-2015 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -240,8 +240,7 @@ ngAriaModule.directive('ngShow', ['$aria', function($aria) {
           }
         },
         post: function(scope, elem, attr, ngModel) {
-          var needsTabIndex = shouldAttachAttr('tabindex', 'tabindex', elem)
-                                && !isNodeOneOf(elem, nodeBlackList);
+          var needsTabIndex = shouldAttachAttr('tabindex', 'tabindex', elem);
 
           function ngAriaWatchModelValue() {
             return ngModel.$modelValue;

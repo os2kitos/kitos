@@ -51,9 +51,7 @@ var source = 'Presentation.Web',
     tempFiles = [
         e2eReport + '.json',
         coverage,
-        bundleDir,
-        sourceApp + '/components/**/*.js',
-        sourceApp + '/components/**/*.js.map'];
+        bundleDir];
 
 module.exports = {
     source: source,
