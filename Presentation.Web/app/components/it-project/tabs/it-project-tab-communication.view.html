@@ -1,0 +1,135 @@
+﻿<form role="form" name="commForm">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Målgruppe</th>
+                <th>Formål</th>
+                <th>Budskab</th>
+                <th>Medie</th>
+                <th class="col-md-2">Hvornår</th>
+                <th>Ansvarlig</th>
+                <th><!-- control --></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="c in comms">
+                <td>
+                    <div class="form-group">
+                        <textarea class="form-control input-sm"
+                                  data-ng-model="c.targetAudiance"
+                                  data-autosave="api/communication/{{c.id}}"
+                                  data-field="targetAudiance"
+                                  data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <textarea class="form-control input-sm"
+                                  data-ng-model="c.purpose"
+                                  data-autosave="api/communication/{{c.id}}"
+                                  data-field="purpose"
+                                  data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <textarea class="form-control input-sm"
+                                  data-ng-model="c.message"
+                                  data-autosave="api/communication/{{c.id}}"
+                                  data-field="message"
+                                  data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <textarea class="form-control input-sm"
+                                  data-ng-model="c.media"
+                                  data-autosave="api/communication/{{c.id}}"
+                                  data-field="media"
+                                  data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
+                    </div>
+                </td>
+                <td>
+                    <input type="text" class="form-control"
+                           data-kendo-date-picker
+                           data-k-options="datepickerOptions"
+                           data-ng-disabled="!projectEditVm.hasWriteAccess"
+                           data-ng-model="c.dueDate"
+                           data-autosave="api/communication/{{c.id}}"
+                           data-field="dueDate">
+                </td>
+                <td>
+                    <div class="form-group">
+                        <select class="form-control input-sm responsible"
+                                data-ui-select2=""
+                                data-field="responsibleUserId"
+                                data-autosave="api/communication/{{c.id}}"
+                                data-ng-model="c.responsibleUserId"
+                                data-ng-disabled="!projectEditVm.hasWriteAccess">
+                            <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.name}}</option>
+                        </select>
+                    </div>
+                </td>
+                <td>
+                    <button class="btn btn-danger btn-sm delete-comm"
+                            data-confirmed-click="delete(c.id)"
+                            data-confirm-click="Er du sikker på at du vil slette?"
+                            data-ng-disabled="!projectEditVm.hasWriteAccess">
+                        <span class="glyphicon glyphicon-trash small"></span>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot data-ng-hide="!projectEditVm.hasWriteAccess">
+            <tr>
+                <td>
+                    <div class="form-group" data-show-errors>
+                        <textarea name="target" class="form-control input-sm" data-ng-model="comm.targetAudiance"></textarea>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group" data-show-errors>
+                        <textarea name="purpose" class="form-control input-sm" data-ng-model="comm.purpose"></textarea>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group" data-show-errors>
+                        <textarea name="mesasge" class="form-control input-sm" data-ng-model="comm.message"></textarea>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group" data-show-errors>
+                        <textarea name="media" class="form-control input-sm" data-ng-model="comm.media"></textarea>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group" data-show-errors>
+                        <input type="text"
+                               name="due"
+                               class="form-control"
+                               required
+                               data-kendo-date-picker
+                               data-k-options="datepickerOptions"
+                               data-ng-disabled="!projectEditVm.hasWriteAccess"
+                               data-ng-model="comm.dueDate">
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group" data-show-errors>
+                        <select id="responsible"
+                                name="responsible"
+                                class="form-control input-sm"
+                                required
+                                data-ui-select2=""
+                                data-ng-model="comm.responsibleUserId">
+                            <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.name}}</option>
+                        </select>
+                    </div>
+                </td>
+                <td>
+                    <button id="save-comm" class="btn btn-success btn-sm" data-ng-click="save()">Gem</button>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</form>

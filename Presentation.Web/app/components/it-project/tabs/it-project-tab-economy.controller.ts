@@ -1,14 +1,14 @@
 ﻿(function(ng, app) {
 
-    app.config(['$stateProvider', function($stateProvider) {
+    app.config(["$stateProvider", function($stateProvider) {
 
-        $stateProvider.state('it-project.edit.economy', {
-            url: '/economy',
-            templateUrl: 'app/components/it-project/tabs/it-project-tab-economy.html',
-            controller: 'project.EditEconomyCtrl',
+        $stateProvider.state("it-project.edit.economy", {
+            url: "/economy",
+            templateUrl: "app/components/it-project/tabs/it-project-tab-economy.view.html",
+            controller: "project.EditEconomyCtrl",
             resolve: {
                 // re-resolve data from parent cause changes here wont cascade to it
-                project: ['$http', '$stateParams', function ($http, $stateParams) {
+                project: ["$http", "$stateParams", function ($http, $stateParams) {
                     return $http.get("api/itproject/" + $stateParams.id)
                         .then(function (result) {
                             return result.data.response;
@@ -18,8 +18,8 @@
         });
     }]);
 
-    app.controller('project.EditEconomyCtrl',
-    ['$rootScope', '$scope', 'project',
+    app.controller("project.EditEconomyCtrl",
+    ["$rootScope", "$scope", "project",
         function ($rootScope, $scope, project) {
             $scope.columns = _.range(6);
 
@@ -84,7 +84,7 @@
                     };
                 });
 
-                var row = {
+                var row: { budgetName; reaName; label; columns; total; update; } = {
                     budgetName: budgetName,
                     reaName: reaName,
                     label: label,

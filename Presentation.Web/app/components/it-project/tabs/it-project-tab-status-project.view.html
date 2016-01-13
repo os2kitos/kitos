@@ -6,7 +6,8 @@
                 <div class="form-group">
                     <label class="col-md-5 control-label small" for="statusProject">Status projekt (økonomi, tid og kvalitet):</label>
                     <div class="col-md-7">
-                        <span id="statusProject" data-select-status2=""
+                        <span id="statusProject"
+                              data-select-status2=""
                               data-ng-model="projectStatusVm.project.statusProject"
                               data-can-write="projectEditVm.hasWriteAccess"
                               data-field="statusProject"
@@ -22,7 +23,7 @@
                         <input type="text" class="form-control" id="statusDate"
                                data-kendo-date-picker
                                data-k-options="projectStatusVm.datepickerOptions"
-                               data-is-disabled="!projectEditVm.hasWriteAccess"
+                               data-ng-disabled="!projectEditVm.hasWriteAccess"
                                data-ng-model="projectStatusVm.project.statusDate"
                                data-autosave="{{projectStatusVm.project.updateUrl}}"
                                data-field="statusDate">
@@ -128,17 +129,17 @@
                         <td>{{activity.associatedUser.roleNames | joinBy:', '}}</td>
                         <!-- Control -->
                         <td class="text-right">
-                            <a class="btn btn-link btn-xs"
+                            <a class="btn btn-link btn-xs view-activity"
                                data-ng-click="activity.edit()"
                                data-ng-hide="projectEditVm.hasWriteAccess">
                                 <i class="glyphicon glyphicon-eye-open"></i>
                             </a>
-                            <a class="btn btn-link btn-xs"
-                               data-ng-click="activity.edit()"
+                            <a class="btn btn-link btn-xs edit-activity"
+                               data-ng-click=" activity.edit()"
                                data-ng-show="projectEditVm.hasWriteAccess">
                                 <i class="glyphicon glyphicon-pencil"></i>
                             </a>
-                            <a class="btn btn-link btn-xs"
+                            <a class="btn btn-link btn-xs delete-activity"
                                data-confirmed-click="activity.delete()"
                                data-confirm-click="Er du sikker på at du vil slette?"
                                data-ng-show="projectEditVm.hasWriteAccess">
@@ -155,8 +156,8 @@
                     </tr>
                     <tr>
                         <td colspan="11" class="text-right">
-                            <button class="btn btn-success btn-sm" data-ui-sref="it-project.edit.status-project.modal({type: 'assignment', activityId: ''})" data-ng-hide="!projectEditVm.hasWriteAccess">Tilføj opgave</button>
-                            <button class="btn btn-primary btn-sm" data-ui-sref="it-project.edit.status-project.modal({type: 'milestone', activityId: ''})" data-ng-hide="!projectEditVm.hasWriteAccess">Tilføj milepæl</button>
+                            <button id="addAssignment" class="btn btn-success btn-sm" data-ui-sref="it-project.edit.status-project.modal({type: 'assignment', activityId: ''})" data-ng-hide="!projectEditVm.hasWriteAccess">Tilføj opgave</button>
+                            <button id="addMilestone" class="btn btn-primary btn-sm" data-ui-sref="it-project.edit.status-project.modal({type: 'milestone', activityId: ''})" data-ng-hide="!projectEditVm.hasWriteAccess">Tilføj milepæl</button>
                         </td>
                     </tr>
                 </tfoot>

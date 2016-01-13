@@ -5,10 +5,10 @@
             onEnter: ['$state', '$stateParams', '$uibModal', 'project', 'usersWithRoles', 'user',
                 function ($state, $stateParams, $modal, project, usersWithRoles, user) {
                     $modal.open({
-                        templateUrl: 'app/components/it-project/tabs/it-project-tab-status-modal.html',
+                        templateUrl: "app/components/it-project/tabs/it-project-tab-status-modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
-                        windowClass: 'modal fade in',
+                        windowClass: "modal fade in",
                         resolve: {
                             activityId: function() {
                                 return $stateParams.activityId;
@@ -27,16 +27,16 @@
                             usersWithRoles: function() {
                                 return usersWithRoles;
                             },
-                            activity: ['$http', function($http) {
+                            activity: ["$http", function($http) {
                                 var id = $stateParams.activityId;
                                 if (id) {
-                                    if ($stateParams.type == 'assignment') {
-                                        return $http.get('api/assignment/' + id)
+                                    if ($stateParams.type == "assignment") {
+                                        return $http.get("api/assignment/" + id)
                                             .then(function (result) {
                                                 return result.data.response;
                                             });
-                                    } else if ($stateParams.type == 'milestone') {
-                                        return $http.get('api/milestone/' + id)
+                                    } else if ($stateParams.type == "milestone") {
+                                        return $http.get("api/milestone/" + id)
                                             .then(function(result) {
                                                 return result.data.response;
                                             });
@@ -44,16 +44,16 @@
                                 }
                                 return null;
                             }],
-                            hasWriteAccess: ['$http', function ($http) {
+                            hasWriteAccess: ["$http", function ($http) {
                                 var id = $stateParams.activityId;
                                 if (id) {
-                                    if ($stateParams.type == 'assignment') {
-                                        return $http.get("api/assignment/" + $stateParams.activityId + "?hasWriteAccess&organizationId=" + user.currentOrganizationId)
+                                    if ($stateParams.type == "assignment") {
+                                        return $http.get("api/assignment/" + $stateParams.activityId + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
                                             .then(function(result) {
                                                 return result.data.response;
                                             });
-                                    } else if ($stateParams.type == 'milestone') {
-                                        return $http.get("api/milestone/" + $stateParams.activityId + "?hasWriteAccess&organizationId=" + user.currentOrganizationId)
+                                    } else if ($stateParams.type == "milestone") {
+                                        return $http.get("api/milestone/" + $stateParams.activityId + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
                                             .then(function (result) {
                                                 return result.data.response;
                                             });
@@ -62,29 +62,29 @@
                                 return false;
                             }]
                         },
-                        controller: 'project.statusModalCtrl'
+                        controller: "project.statusModalCtrl"
                     }).result.then(function () {
                         // OK
                         // GOTO parent state and reload
-                        $state.go('^', null, { reload: true });
+                        $state.go("^", null, { reload: true });
                     }, function () {
                         // Cancel
                         // GOTO parent state
-                        $state.go('^');
+                        $state.go("^");
                     });
                 }
             ]
         });
     }]);
 
-    app.controller('project.statusModalCtrl',
-    ['$scope', '$http', 'autofocus', 'project', 'usersWithRoles', 'activity', 'notify', 'activityId', 'activityType', 'hasWriteAccess', 'user',
+    app.controller("project.statusModalCtrl",
+    ["$scope", "$http", "autofocus", "project", "usersWithRoles", "activity", "notify", "activityId", "activityType", "hasWriteAccess", "user",
         function ($scope, $http, autofocus, project, usersWithRoles, activity, notify, activityId, activityType, hasWriteAccess, user) {
             var isNewActivity = activity == null;
 
             $scope.hasWriteAccess = isNewActivity ? true : hasWriteAccess;
-            $scope.isAssignment = activityType == 'assignment';
-            $scope.isMilestone = activityType == 'milestone';
+            $scope.isAssignment = activityType == "assignment";
+            $scope.isMilestone = activityType == "milestone";
 
             if (activity) {
                 if (activity.startDate) {
@@ -146,8 +146,8 @@
 
                 var msg = notify.addInfoMessage("Gemmer ændringer...", false);
                 $http({
-                    method: isNewActivity ? 'POST' : 'PATCH',
-                    url: 'api/' + activityType + '/' + activityId + '?organizationId=' + user.currentOrganizationId,
+                    method: isNewActivity ? "POST" : "PATCH",
+                    url: "api/" + activityType + "/" + activityId + "?organizationId=" + user.currentOrganizationId,
                     data: payload
                 }).success(function () {
                     msg.toSuccessMessage("Ændringerne er gemt!");

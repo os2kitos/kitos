@@ -158,7 +158,7 @@
                            data-appendurl="{{usage.urlParams}}"
                            data-autosave="{{usage.updateUrl}}">
                 </td>
-                
+
                 <!-- exposed by -->
                 <td rowspan="{{usage.numRows}}">
                     <a data-ui-sref="it-system.edit.interfaces({ id: usage.exhibitedByItSystemId })">{{usage.exhibitedByItSystemName}}</a>
@@ -170,14 +170,14 @@
                         {{usage.dataRows[0].data}}
                     </span>
                 </td>
-                
+
                 <!-- datatype -->
                 <td>
                     <span data-ng-if="usage.numRows > 0">
                         {{usage.dataRows[0].dataType.name}}
                     </span>
                 </td>
-                
+
                 <!-- frequency -->
                 <td>
                     <span data-ng-if="usage.numRows > 0">

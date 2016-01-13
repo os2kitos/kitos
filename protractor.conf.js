@@ -1,25 +1,93 @@
 ﻿var paths = require('./paths.config.js');
-var jasmineReporters = require('jasmine-reporters');
 
 exports.config = {
     framework: 'jasmine2',
 
     seleniumAddress: 'http://hub.browserstack.com/wd/hub',
 
-    capabilities: {
-        'browserstack.user': process.env.BROWSERSTACK_USER,
-        'browserstack.key': process.env.BROWSERSTACK_KEY,
+    multiCapabilities: [
+        {
+            // Chrome 47
+            'browserstack.user': process.env.BROWSERSTACK_USER,
+            'browserstack.key': process.env.BROWSERSTACK_KEY,
+            'browserstack.local': 'true',
 
-        // needed for testing localhost
-        'browserstack.local': 'true',
+            'project': process.env.APPVEYOR_PROJECT_NAME || 'kitos local',
+            'build': process.env.APPVEYOR_BUILD_NUMBER || 'local build',
 
-        // settings for the browser to test
-        'browserName': 'Chrome',
-        'browser_version': '46.0',
-        'os': 'Windows',
-        'os_version': '7',
-        'resolution': '1280x1024'
-    },
+            // settings for the browser to test
+            'browserName': 'chrome',
+            'browser_version': '47.0',
+            'os': 'Windows',
+            'os_version': '7',
+            'resolution': '1280x1024'
+        }
+        //,
+        //{
+        //    // IE 10
+        //    'browserstack.user': process.env.BROWSERSTACK_USER,
+        //    'browserstack.key': process.env.BROWSERSTACK_KEY,
+        //    'browserstack.local': 'true',
+
+        //    'project': process.env.APPVEYOR_PROJECT_NAME || 'kitos local',
+        //    'build': process.env.APPVEYOR_BUILD_NUMBER || 'local build',
+
+        //    // settings for the browser to test
+        //    'browserName': 'IE',
+        //    'browser_version': '10.0',
+        //    'os': 'Windows',
+        //    'os_version': '7',
+        //    'resolution': '1280x1024'
+        //},
+        //{
+        //    // IE 11
+        //    'browserstack.user': process.env.BROWSERSTACK_USER,
+        //    'browserstack.key': process.env.BROWSERSTACK_KEY,
+        //    'browserstack.local': 'true',
+
+        //    'project': process.env.APPVEYOR_PROJECT_NAME || 'kitos local',
+        //    'build': process.env.APPVEYOR_BUILD_NUMBER || 'local build',
+
+        //    // settings for the browser to test
+        //    'browserName': 'IE',
+        //    'browser_version': '11.0',
+        //    'os': 'Windows',
+        //    'os_version': '7',
+        //    'resolution': '1280x1024'
+        //},
+        //{
+        //    // Edge 12
+        //    'browserstack.user': process.env.BROWSERSTACK_USER,
+        //    'browserstack.key': process.env.BROWSERSTACK_KEY,
+        //    'browserstack.local': 'true',
+
+        //    'project': process.env.APPVEYOR_PROJECT_NAME || 'kitos local',
+        //    'build': process.env.APPVEYOR_BUILD_NUMBER || 'local build',
+
+        //    // settings for the browser to test
+        //    'browserName': 'Edge',
+        //    'browser_version': '12.0',
+        //    'os': 'Windows',
+        //    'os_version': '10',
+        //    'resolution': '1280x1024'
+        //},
+        //{
+        //    // Firefox 42
+        //    'browserstack.user': process.env.BROWSERSTACK_USER,
+        //    'browserstack.key': process.env.BROWSERSTACK_KEY,
+        //    'browserstack.local': 'true',
+
+        //    'project': process.env.APPVEYOR_PROJECT_NAME || 'kitos local',
+        //    'build': process.env.APPVEYOR_BUILD_NUMBER || 'local build',
+
+        //    // settings for the browser to test
+        //    'browserName': 'Firefox',
+        //    'browser_version': '42.0',
+        //    'os': 'Windows',
+        //    'os_version': '7',
+        //    'resolution': '1280x1024'
+        //}
+    ],
 
     // select all end to end tests
     suites: paths.e2eSuites,
@@ -28,32 +96,21 @@ exports.config = {
     allScriptsTimeout: 90000,
     baseUrl: 'https://localhost:44300',
 
-    // jasmine timeout options
     jasmineNodeOpts: {
-        defaultTimeoutInterval: 90000
+        defaultTimeoutInterval: 90000,
+        print: function () { }
     },
 
     onPrepare: function () {
         require('protractor-http-mock').config = {
             rootDirectory: __dirname
-        }
+        };
 
-        // NUnit xml report
-        //jasmine.getEnv().addReporter(new jasmineReporters.NUnitXmlReporter({
-        //    reportName: 'Protractor results',
-        //    filename: paths.e2eReport + '.xml'
-        //}));
+        require("jasmine-expect");
+        require("require-dir")("./Presentation.Web/Tests/matchers");
 
-        // terminal output
-        jasmine.getEnv().addReporter(new jasmineReporters.TerminalReporter({
-            verbosity: 3,
-            color: true,
-            showStack: false
-        }));
-        // JUnit xml report
-        //jasmine.getEnv().addReporter(new jasmineReporters.JUnitXmlReporter({
-        //    filePrefix: paths.e2eReport + '.xml'
-        //}));
+        var reporters = require("jasmine-reporters");
+        jasmine.getEnv().addReporter(new reporters.AppVeyorReporter());
     },
     // json report
     resultJsonOutputFile: paths.e2eReport + '.json',

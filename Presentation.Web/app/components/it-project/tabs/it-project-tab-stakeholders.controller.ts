@@ -1,14 +1,14 @@
 ﻿(function(ng, app) {
 
-    app.config(['$stateProvider', function($stateProvider) {
+    app.config(["$stateProvider", function($stateProvider) {
 
-        $stateProvider.state('it-project.edit.stakeholders', {
-            url: '/stakeholders',
-            templateUrl: 'app/components/it-project/tabs/it-project-tab-stakeholders.html',
-            controller: 'project.EditStakeholdersCtrl',
+        $stateProvider.state("it-project.edit.stakeholders", {
+            url: "/stakeholders",
+            templateUrl: "app/components/it-project/tabs/it-project-tab-stakeholders.view.html",
+            controller: "project.EditStakeholdersCtrl",
             resolve: {
                 // re-resolve data from parent cause changes here wont cascade to it
-                project: ['$http', '$stateParams', function ($http, $stateParams) {
+                project: ["$http", "$stateParams", function ($http, $stateParams) {
                     return $http.get("api/itproject/" + $stateParams.id)
                         .then(function (result) {
                             return result.data.response;
@@ -18,8 +18,8 @@
         });
     }]);
 
-    app.controller('project.EditStakeholdersCtrl',
-    ['$rootScope', '$scope', '$http', 'notify', 'project', 'user',
+    app.controller("project.EditStakeholdersCtrl",
+    ["$rootScope", "$scope", "$http", "notify", "project", "user",
         function($rootScope, $scope, $http, notify, project, user) {
 
             $scope.stakeholders = [];
@@ -31,7 +31,7 @@
 
                 stakeholder.delete = function() {
                     var msg = notify.addInfoMessage("Sletter...");
-                    $http.delete(stakeholder.updateUrl + '?organizationId=' + user.currentOrganizationId).success(function () {
+                    $http.delete(stakeholder.updateUrl + "?organizationId=" + user.currentOrganizationId).success(function () {
                         stakeholder.show = false;
                         msg.toSuccessMessage("Rækken er slettet");
                     }).error(function() {
@@ -51,7 +51,7 @@
             resetNew();
 
             $scope.saveNewStakeholder = function() {
-                $scope.$broadcast('show-errors-check-validity');
+                $scope.$broadcast("show-errors-check-validity");
 
                 if ($scope.stakeholderForm.$invalid) { return; }
 
@@ -75,11 +75,6 @@
                 }).error(function() {
                     msg.toErrorMessage("Fejl! Kunne ikke gemme!");
                 });
-
             };
-
-
         }]);
-
-
 })(angular, app);
