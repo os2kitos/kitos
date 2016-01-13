@@ -48,7 +48,10 @@ var source = "Presentation.Web",
     frontendCoverageReport = "frontend.json",
     tempFrontendCoverageReport = "temp-coverage.json",
 
-    tempFiles = [ e2eReport + ".json", coverage, bundleDir, source + "/Tests/**/*.js" ];
+    tempFiles = [
+        e2eReport + '.json',
+        coverage,
+        bundleDir];
 
 module.exports = {
     source: source,

@@ -8,7 +8,7 @@ namespace Presentation.Web.Controllers.API
 {
     public class TaskRefController : GenericHierarchyApiController<TaskRef, TaskRefDTO>
     {
-        public TaskRefController(IGenericRepository<TaskRef> repository) 
+        public TaskRefController(IGenericRepository<TaskRef> repository)
             : base(repository)
         {
         }
