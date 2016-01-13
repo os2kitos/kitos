@@ -16,4 +16,4 @@ the terms of the Mozilla Public License, v. 2.0.
 
 This website uses [BrowserStack](https://www.browserstack.com/) for testing.
 
-![BrowserStackLogo](https://cdn.rawgit.com/os2kitos/kitos/e2e/project-edit/Assets/BrowserStack.svg)
+![BrowserStackLogo](https://cdn.rawgit.com/os2kitos/kitos/master/Assets/BrowserStack.svg)
