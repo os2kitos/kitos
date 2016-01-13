@@ -23,6 +23,7 @@ Presentation.Web/app/**/*.js.map
 !Presentation.Web/app/services/httpServices.js
 Presentation.Web/Tests/**/*.js
 Presentation.Web/Tests/**/*.js.map
+!*directive.js
 public/
 
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
