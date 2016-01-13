@@ -46,19 +46,7 @@ namespace Presentation.Web.Controllers.API
                         // filter by system usage name
                         u.ItSystem.Name.Contains(q) &&
                         // system usage is only within the context
-                        u.OrganizationId == organizationId &&
-                        // global admin sees all
-                        (KitosUser.IsGlobalAdmin ||
-                        // object owner sees his own objects
-                        u.ObjectOwnerId == KitosUser.Id ||
-                        // it's public everyone can see it
-                        u.ItSystem.AccessModifier == AccessModifier.Public ||
-                        // everyone in the same organization can see normal objects
-                        u.ItSystem.AccessModifier == AccessModifier.Normal &&
-                        u.ItSystem.OrganizationId == organizationId ||
-                        // only users with a role on the object can see private objects
-                        u.ItSystem.AccessModifier == AccessModifier.Private &&
-                        u.Rights.Any(x => x.UserId == KitosUser.Id))
+                        u.OrganizationId == organizationId
                     );
 
                 return Ok(Map(usages));
@@ -76,19 +64,7 @@ namespace Presentation.Web.Controllers.API
                 pagingModel.Where(
                     u =>
                         // system usage is only within the context
-                        u.OrganizationId == organizationId &&
-                        // global admin sees all
-                        (KitosUser.IsGlobalAdmin ||
-                        // object owner sees his own objects
-                        u.ObjectOwnerId == KitosUser.Id ||
-                        // it's public everyone can see it
-                        u.ItSystem.AccessModifier == AccessModifier.Public ||
-                        // everyone in the same organization can see normal objects
-                        u.ItSystem.AccessModifier == AccessModifier.Normal &&
-                        u.ItSystem.OrganizationId == organizationId ||
-                        // only users with a role on the object can see private objects
-                        u.ItSystem.AccessModifier == AccessModifier.Private &&
-                        u.Rights.Any(x => x.UserId == KitosUser.Id))
+                        u.OrganizationId == organizationId
                     );
 
                 if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
@@ -110,19 +86,7 @@ namespace Presentation.Web.Controllers.API
                 var usages = Repository.Get(
                     u =>
                         // system usage is only within the context
-                        u.OrganizationId == organizationId &&
-                        // global admin sees all
-                        (KitosUser.IsGlobalAdmin ||
-                        // object owner sees his own objects
-                        u.ObjectOwnerId == KitosUser.Id ||
-                        // it's public everyone can see it
-                        u.ItSystem.AccessModifier == AccessModifier.Public ||
-                        // everyone in the same organization can see normal objects
-                        u.ItSystem.AccessModifier == AccessModifier.Normal &&
-                        u.ItSystem.OrganizationId == organizationId ||
-                        // only users with a role on the object can see private objects
-                        u.ItSystem.AccessModifier == AccessModifier.Private &&
-                        u.Rights.Any(x => x.UserId == KitosUser.Id))
+                        u.OrganizationId == organizationId
                     );
 
                 //if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
