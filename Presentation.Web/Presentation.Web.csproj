@@ -385,6 +385,9 @@
     <Content Include="Content\css\select2.css" />
     <Content Include="Content\css\select2.png" />
     <Content Include="Content\css\select2x2.png" />
+    <Content Include="Content\dist\css\app.css" />
+    <Content Include="Content\dist\css\app.min.css" />
+    <Content Include="Content\dist\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\font-awesome.min.css" />
     <Content Include="Content\kendo\2015.3.1111\Black\editor.png" />
@@ -934,6 +937,7 @@
     <Content Include="Scripts\angular-animate.min.js" />
     <Content Include="Scripts\angular-aria.js" />
     <Content Include="Scripts\angular-aria.min.js" />
+    <Content Include="Scripts\angular-bundle.min.js" />
     <Content Include="Scripts\angular-cookies.js" />
     <Content Include="Scripts\angular-cookies.min.js" />
     <Content Include="Scripts\angular-csp.css" />
@@ -1049,14 +1053,20 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
+    <Content Include="Content\dist\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Content\dist\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="Content\dist\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="Content\dist\fonts\glyphicons-halflings-regular.woff2" />
     <None Include="Properties\PublishProfiles\Kitos - Prodmiljø.pubxml" />
     <None Include="Properties\PublishProfiles\Kitos - Testmiljø.pubxml" />
+    <None Include="Properties\PublishProfiles\Local.pubxml" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <Content Include="Scripts\angular.js" />
     <Content Include="Scripts\angular.min.js" />
+    <Content Include="Scripts\app-bundle.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\errors.json" />
@@ -2391,6 +2401,7 @@
     <Content Include="Scripts\kendo\2015.3.1111\messages\kendo.messages.zh-HK.min.js" />
     <Content Include="Scripts\kendo\2015.3.1111\messages\kendo.messages.zh-TW.min.js" />
     <Content Include="Scripts\kendo\2015.3.1111\pako_deflate.min.js" />
+    <Content Include="Scripts\library-bundle.min.js" />
     <Content Include="Scripts\loading-bar.js" />
     <Content Include="Scripts\loading-bar.min.js" />
     <Content Include="Scripts\lodash.js" />
@@ -2641,6 +2652,7 @@
     <Content Include="Tests\mocks\assignment.json" />
     <Content Include="Tests\mocks\milestoneNoWriteAccess.json" />
     <Content Include="Tests\mocks\milestoneWriteAccess.json" />
+    <Content Include="Scripts\maps\app-bundle.min.js.map" />
     <None Include="Web.AppVeyor.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

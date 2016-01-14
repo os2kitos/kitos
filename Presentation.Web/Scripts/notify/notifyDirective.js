@@ -15,7 +15,7 @@ angular.module("notify").directive("notify", ["$rootScope", function ($rootScope
 			var onlyUnique = notify.onlyUnique();
 
 			$scope.messages = [];
-		    
+
             function addMessage(message) {
 			    message.closed = false;
 

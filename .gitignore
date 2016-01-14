@@ -39,8 +39,10 @@ results-protractor.xml
 coverage/
 karmaCoverage/
 
-# npm packages
+# Packages
 node_modules/
+bower_components/
+packages/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -118,10 +120,6 @@ publish/
 
 # Publish Web Output
 *.Publish.xml
-
-# NuGet Packages Directory
-## TODO: If you have NuGet Package Restore enabled, uncomment the next line
-packages/
 
 # Windows Azure Build Output
 csx
