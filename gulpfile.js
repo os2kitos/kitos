@@ -12,7 +12,7 @@ gulp.task('watch', function () {
 });
 
 // clean solution
-gulp.task('clean', function() {
+gulp.task('clean', ["clean-styles", "clean-scripts"], function() {
     var del = require('del');
 
     return del(paths.tempFiles);

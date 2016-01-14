@@ -16,7 +16,7 @@ services:
 - mysql56
 cache:
   - node_modules -> package.json
-#  - packages -> **\packages.config
+  - bower_components -> bower.json
 configuration:
   - AppVeyor
 install:
@@ -24,7 +24,6 @@ install:
   - npm install
 before_build:
   - nuget restore %APPVEYOR_BUILD_FOLDER%\KITOS.sln -verbosity quiet
-#  - node_modules\.bin\gulp lint
 build:
   project: KITOS.sln
   verbosity: quiet
@@ -36,6 +35,7 @@ test_script:
   - run-coverage.bat
 before_deploy:
   - ps: .\InstallSelfSignedCert.ps1
+  - node_modules\.bin\gulp deploy
 deploy:
 - provider: Local
   Presentation.Web.deploy_website: true

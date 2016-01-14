@@ -4,7 +4,6 @@ var source = "Presentation.Web",
     allJavaScript = [sourceApp + "/app.js", sourceApp + "/**/*.js"],
     allJavaScriptNoTests = [sourceApp + "/**/!(*.spec|*.po).js"],
     allTypeScript = [sourceApp + "/**/*.ts"],
-    bundleDir = "./public",
     bowerComponents = "bower_components",
 
     // dependency files of files to unit test
@@ -50,7 +49,7 @@ var source = "Presentation.Web",
     frontendCoverageReport = "frontend.json",
     tempFrontendCoverageReport = "temp-coverage.json",
 
-    tempFiles = [ e2eReport + ".json", coverage, bundleDir, source + "/Tests/**/*.js" ];
+    tempFiles = [ e2eReport + ".json", coverage ];
 
 module.exports = {
     source: source,
@@ -59,7 +58,6 @@ module.exports = {
     allJavaScript: allJavaScript,
     allTypeScript: allTypeScript,
     allJavaScriptNoTests: allJavaScriptNoTests,
-    bundleDir: bundleDir,
     bowerComponents: bowerComponents,
     unit: unit,
     e2eFiles: e2eFiles,

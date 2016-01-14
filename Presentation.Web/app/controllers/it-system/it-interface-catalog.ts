@@ -18,7 +18,7 @@
         public mainGrid: Kitos.IKendoGrid;
         public mainGridOptions: Kitos.IKendoGridOptions;
 
-        private $inject: Array<string> = [
+        static $inject: Array<string> = [
             "$rootScope",
             "$scope",
             "$timeout",
