@@ -1,4 +1,4 @@
-/// <binding AfterBuild='deploy' Clean='clean' />
+/// <binding BeforeBuild='deploy' Clean='clean' />
 var gulp = require('gulp'),
     paths = require('./paths.config.js');
 

@@ -52,6 +52,7 @@ gulp.task("kendo-css", function () {
 });
 
 // create app bundled file
+// ASP.NET bundler used instead og this.
 gulp.task("app-bundle", ["clean-scripts"], function () {
     return gulp.src(config.appSrc)
      .pipe(sourcemaps.init())
@@ -104,7 +105,7 @@ gulp.task("bower-restore", function () {
 gulp.task("styles", ["css", "kendo-css", "assets", "fonts"]);
 
 // run bundle tasks
-gulp.task("scripts", ["library-bundle", "kendo-bundle", "angular-bundle", "app-bundle"]);
+gulp.task("scripts", ["library-bundle", "kendo-bundle", "angular-bundle"]);
 
 // bundle and deploy scripts and styles
 gulp.task("deploy", ["scripts", "styles"]);
