@@ -60,13 +60,19 @@
                     this.mainGrid.dataSource.read();
 
                     // find the access modifier filter row section
-                    var accessModifierFilterRow = this.$(".k-filter-row [data-field='AccessModifier']");
+                    var accessModifierFilterRow = $(".k-filter-row [data-field='AccessModifier']");
                     // find the access modifier kendo widget
                     var accessModifierFilterWidget = accessModifierFilterRow.find("input").data("kendoDropDownList");
                     // attach a click event to the X (remove filter) button
                     accessModifierFilterRow.find("button").on("click", () => {
                         // set the selected filter to none, because clicking the button removes the filter
                         accessModifierFilterWidget.select(0);
+                    });
+
+                    // show loadingbar when export to excel is clicked
+                    // hidden again in method exportToExcel callback
+                    $(".k-grid-excel").click(() => {
+                        kendo.ui.progress(this.mainGrid.element, true);
                     });
                 }
             });
@@ -490,6 +496,9 @@
                         e.sender.hideColumn(column);
                     }
                 });
+
+                // hide loadingbar when export is finished
+                kendo.ui.progress(this.mainGrid.element, false);
             }
         }
 
