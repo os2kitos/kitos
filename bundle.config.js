@@ -18,7 +18,7 @@ module.exports = {
         bower("/bootstrap/dist/css/bootstrap.min.css"),
         bower("/font-awesome/css/font-awesome.min.css"),
         bower("/select2/select2.css"),
-        bower("/select2/select2-bootstrap.css"),
+        bower("/select2-bootstrap-css/select2-bootstrap.min.css"),
         bower("/angular-loading-bar/build/loading-bar.min.css")
     ],
 
