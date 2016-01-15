@@ -1,4 +1,4 @@
-/// <binding Clean='clean' />
+/// <binding BeforeBuild='deploy' Clean='clean' />
 var gulp = require('gulp'),
     paths = require('./paths.config.js');
 
@@ -12,7 +12,7 @@ gulp.task('watch', function () {
 });
 
 // clean solution
-gulp.task('clean', function() {
+gulp.task('clean', ["clean-styles", "clean-scripts"], function() {
     var del = require('del');
 
     return del(paths.tempFiles);

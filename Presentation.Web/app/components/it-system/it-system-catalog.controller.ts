@@ -25,7 +25,7 @@
         public usageGrid: kendo.ui.Grid;
         public modal: kendo.ui.Window;
 
-        private $inject: Array<string> = [
+        static $inject: Array<string> = [
             "$rootScope",
             "$scope",
             "$http",

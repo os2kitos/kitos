@@ -16,15 +16,15 @@ build/
 [Oo]bj/
 Presentation.Web/app/**/*.js
 Presentation.Web/app/**/*.js.map
-!Presentation.Web/app/directives/angularjs-dropdown-multiselect.js
-!Presentation.Web/app/directives/directives.js
-!Presentation.Web/app/directives/filters.js
-!Presentation.Web/app/directives/utils-directives.js
-!Presentation.Web/app/services/httpServices.js
+!Presentation.Web/app/**/*directive.js
+Presentation.Web/Content/css/
+Presentation.Web/Content/fonts/
+Presentation.Web/Content/kendo/**/*-bundle*.css
+Presentation.Web/Scripts/*-bundle.min.js
+Presentation.Web/Scripts/maps/
 Presentation.Web/Tests/**/*.js
 Presentation.Web/Tests/**/*.js.map
-!*directive.js
-public/
+
 
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
 !packages/*/build/
@@ -40,8 +40,10 @@ results-protractor.xml
 coverage/
 karmaCoverage/
 
-# npm packages
+# Packages
 node_modules/
+bower_components/
+packages/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -119,10 +121,6 @@ publish/
 
 # Publish Web Output
 *.Publish.xml
-
-# NuGet Packages Directory
-## TODO: If you have NuGet Package Restore enabled, uncomment the next line
-packages/
 
 # Windows Azure Build Output
 csx

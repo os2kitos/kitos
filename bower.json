@@ -1,0 +1,36 @@
+{
+  "name": "kitos",
+  "description": "The OS2KITOS was programmed by IT Minds ApS (http://it-minds.dk)\r for OS2 - Offentligt digitaliseringsf�llesskab (http://os2web.dk).",
+  "author": [
+    "IT Minds"
+  ],
+  "license": "MPL-2.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/os2kitos/kitos.git"
+  },
+  "homepage": "https://github.com/os2kitos/kitos#readme",
+  "dependencies": {
+    "angular": "1.4.7",
+    "angular-animate": "1.4.7",
+    "angular-bootstrap": "angular-ui-bootstrap-bower#0.14.3",
+    "angular-i18n": "1.4.7",
+    "angular-loading-bar": "~0.8.0",
+    "angular-sanitize": "1.4.7",
+    "angular-ui-router": "~0.2.15",
+    "angular-ui-select2": "~0.0.5",
+    "bootstrap": "~3.3.6",
+    "font-awesome": "~4.5.0",
+    "jquery": "~2.2.0",
+    "jsonfn-bower": "~0.6.2",
+    "lodash": "3.10.1",
+    "moment": "~2.11.1",
+    "select2": "3.4.8",
+    "select2-bootstrap-css": "~1.4.6"
+  }
+}

@@ -6,11 +6,9 @@
     <title data-ng-bind="page.title + ' - KITOS'">KITOS</title>
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon">
     <meta name="viewport" content="width=device-width">
-    @Styles.Render("~/Content/cssbundle")
-    <link href="/Content/kendo/2015.3.1111/kendo.common-bootstrap.min.css" rel="stylesheet">
-    <link href="/Content/kendo/2015.3.1111/kendo.bootstrap.min.css" rel="stylesheet">
-    <link href="/Content/kendo/2015.3.1111/kendo.dataviz.min.css" rel="stylesheet">
-    <link href="/Content/kendo/2015.3.1111/kendo.dataviz.bootstrap.min.css" rel="stylesheet">
+
+    <link href="/Content/css/app.min.css" rel="stylesheet"/>
+    <link href="/Content/kendo/2015.3.1111/kendo-bundle.min.css" rel="stylesheet" />
 
     @if (ViewBag.Environment != "Prod")
     {
@@ -54,18 +52,15 @@
         </footer>
     </div>
 
-    @Scripts.Render("~/Scripts/libraries")
-    @Scripts.Render("~/Scripts/angular")
+    <script src="/Scripts/library-bundle.min.js"></script>
+    <script src="/Scripts/angular-bundle.min.js"></script>
+    <script src="/Scripts/kendo-bundle.min.js"></script>
 
-    <script src="/Scripts/kendo/2015.3.1111/jszip.min.js"></script>
-    <script src="/Scripts/kendo/2015.3.1111/kendo.all.min.js"></script>
-    <script src="/Scripts/kendo/2015.3.1111/messages/kendo.messages.da-DK.min.js"></script>
-    <script src="/Scripts/kendo/2015.3.1111/cultures/kendo.culture.da-DK.min.js"></script>
     <script>
         // set current culture to "da-DK"
         kendo.culture("da-DK");
     </script>
 
-    @Scripts.Render("~/Scripts/appbundle")
+    @Scripts.Render("~/Scripts/app")
 </body>
 </html>
