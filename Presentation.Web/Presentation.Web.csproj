@@ -854,6 +854,8 @@
     <Content Include="app\shared\navigation\navigation-sub.view.html" />
     <Content Include="app\shared\navigation\navigation-authorized.view.html" />
     <Content Include="app\shared\navigation\navigation-top.view.html" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-global-admins.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-local-admins.controller.ts" />
     <TypeScriptCompile Include="app\components\global-config\global-config-project.controller.ts" />
     <TypeScriptCompile Include="app\components\global-config\global-config-system.controller.ts" />
     <TypeScriptCompile Include="app\components\global-config\global-config-contract.controller.ts" />
@@ -949,8 +951,6 @@
     <TypeScriptCompile Include="app\components\local-config\local-config-subnav.controller.ts" />
     <TypeScriptCompile Include="app\services\taskService.ts" />
     <Content Include="Scripts\angular-bundle.min.js" />
-    <Content Include="Scripts\angular-ui-util\ui-utils.js" />
-    <Content Include="Scripts\angular-ui-util\ui-utils.min.js" />
     <TypeScriptCompile Include="app\components\home\home.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-hierarchy.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.controller.ts" />
@@ -1038,7 +1038,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Content Include="Scripts\form.control.js" />
     <Content Include="Scripts\kendo-bundle.min.js" />
     <Content Include="Scripts\kendo\2015.3.1111\angular.min.js" />
     <Content Include="Scripts\kendo\2015.3.1111\cultures\kendo.culture.af-ZA.min.js" />
@@ -1613,7 +1612,6 @@
     <Content Include="Scripts\notify\notify.js" />
     <Content Include="Scripts\notify\notifyDirective.js" />
     <Content Include="Scripts\notify\notifyFactory.js" />
-    <Content Include="Scripts\ui-select2.js" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-mocks.d.ts" />
