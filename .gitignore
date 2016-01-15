@@ -16,6 +16,7 @@ build/
 [Oo]bj/
 Presentation.Web/app/**/*.js
 Presentation.Web/app/**/*.js.map
+!Presentation.Web/app/**/*directive.js
 Presentation.Web/Content/css/
 Presentation.Web/Content/fonts/
 Presentation.Web/Content/kendo/**/*-bundle*.css

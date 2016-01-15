@@ -11,10 +11,11 @@
                         data-ng-disabled="!projectEditVm.hasWriteAccess"
                         data-ng-model="responsibleOrgUnitId"
                         data-ng-change="saveResponsible()">
+                    <option value=""></option>
                     <option data-ng-repeat="orgUnit in selectedOrgUnits" value="{{orgUnit.id}}">{{orgUnit.name}}</option>
                 </select>
             </div>
         </div>
-        <div data-ng-repeat="orgUnit in orgUnitsTree" data-ng-include="'/partials/shared/org-tree-item.html'"></div>
+        <div data-ng-repeat="orgUnit in orgUnitsTree" data-ng-include="'app/shared/organization-tree-item.html'"></div>
     </div>
 </div>

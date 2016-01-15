@@ -1,0 +1,109 @@
+﻿(function(ng, app) {
+    app.config(['$stateProvider', function($stateProvider) {
+            $stateProvider.state('it-system.edit.interfaces', {
+                url: '/interfaces',
+                templateUrl: 'app/components/it-system/edit/tabs/it-system-edit-tab-interfaces.view.html',
+                controller: 'system.SystemInterfacesCtrl',
+                resolve: {
+                    interfaces: [
+                        '$http', 'itSystem', 'user', function ($http, itSystem, user) {
+                            return $http.get('api/itInterfaceUse/?interfaces&sysId=' + itSystem.id + '&orgId=' + user.currentOrganizationId).then(function(result) {
+                                return result.data.response;
+                            });
+                        }
+                    ],
+                    user: [
+                        'userService', function(userService) {
+                            return userService.getUser();
+                        }
+                    ]
+                }
+            });
+        }
+    ]);
+
+    app.controller('system.SystemInterfacesCtrl', [
+        '$scope', '$http', 'notify', 'itSystem', 'userService', 'interfaces', 'user',
+        function ($scope, $http, notify, itSystem, userService, interfaces, user) {
+            $scope.new = {};
+
+            $scope.canUseInterfaces = [];
+            _.each(interfaces, pushInterface);
+
+            function pushInterface(theInterface) {
+                if (!theInterface.deleted) theInterface.show = true;
+
+                //method for removing the interface
+                theInterface.delete = function() {
+                    var msg = notify.addInfoMessage("Fjerner opmærkning...", false);
+                    $http.delete('api/itInterfaceUse/?sysId=' + itSystem.id + '&interfaceId=' + theInterface.id).success(function() {
+                        theInterface.show = false;
+                        theInterface.deleted = true;
+                        msg.toSuccessMessage("IT systemet er ikke længere opmærket med kan-anvende denne snitflade.");
+                    }).error(function() {
+                        msg.toErrorMessage("Fejl! Kunne ikke fjerne opmærkning!");
+                    });
+                };
+                $scope.canUseInterfaces.push(theInterface);
+            }
+
+            $scope.addNewInterface = function() {
+                if (!$scope.new.interface) return;
+
+                var msg = notify.addInfoMessage("Gemmer opmærkning...", false);
+                $http.post('api/itInterfaceUse/?sysId=' + itSystem.id + '&interfaceId=' + $scope.new.interface.id).success(function() {
+                    pushInterface({ id: $scope.new.interface.id, name: $scope.new.interface.text });
+
+                    msg.toSuccessMessage("IT systemet er opmærket med kan-anvende snitfladen");
+                    $scope.new.interface = null;
+
+                }).error(function() {
+                    msg.toErrorMessage("Fejl! Kunne ikke gemme opmærkning!");
+                });
+            };
+
+            $scope.interfacesSelectOptions = selectLazyLoading('api/itInterface', false, ['sysId=' + itSystem.id, 'orgId=' + user.currentOrganizationId]);
+
+            function formatInterface(inf) {
+                return '<div>' + inf.text + '</div>' + '<div class="small">' + inf.organizationName + '</div>';
+            }
+
+            function selectLazyLoading(url, allowClear, paramAry) {
+                return {
+                    minimumInputLength: 1,
+                    allowClear: allowClear,
+                    formatResult: formatInterface,
+                    ajax: {
+                        data: function(term, page) {
+                            return { query: term };
+                        },
+                        quietMillis: 500,
+                        transport: function(queryParams) {
+                            var extraParams = paramAry ? '&' + paramAry.join('&') : '';
+                            var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
+                            res.abort = function() {
+                                return null;
+                            };
+
+                            return res;
+                        },
+
+                        results: function(data, page) {
+                            var results = [];
+
+                            _.each(data.data.response, function(obj: { id; name; organizationName; }) {
+                                results.push({
+                                    id: obj.id,
+                                    text: obj.name,
+                                    organizationName: obj.organizationName
+                                });
+                            });
+
+                            return { results: results };
+                        }
+                    }
+                };
+            }
+        }
+    ]);
+})(angular, app);

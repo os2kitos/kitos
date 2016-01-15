@@ -23,7 +23,7 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<TaskRef> _taskRepository;
 
-        public TaskUsageController(IGenericRepository<TaskUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository) 
+        public TaskUsageController(IGenericRepository<TaskUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository)
             : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
@@ -55,7 +55,7 @@ namespace Presentation.Web.Controllers.API
                     dto.Projects = AssociatedProjects(taskUsage);
                     dtos.Add(dto);
                 }
-                
+
                 return Ok(dtos);
             }
             catch (Exception e)
@@ -91,7 +91,7 @@ namespace Presentation.Web.Controllers.API
                             x.AccessModifier == AccessModifier.Public &&
                             x.Usages.All(y => y.OrgUnitId != orgUnitId)).ToList();
                 }
-                
+
                 if (!tasks.Any())
                     return NotFound();
 
@@ -178,7 +178,7 @@ namespace Presentation.Web.Controllers.API
                 header.Add("System", "IT System");
                 list.Add(header);
 
-                // Adding via recursive method so that children are 
+                // Adding via recursive method so that children are
                 // placed directly after their parent in the output
                 Action<TaskUsageNestedDTO> addUsageToList = null;
                 addUsageToList = elem =>
@@ -233,7 +233,7 @@ namespace Presentation.Web.Controllers.API
 
             return base.PostQuery(item);
         }
-        
+
         public override HttpResponseMessage Put(int id, int organizationId, JObject jObject)
         {
             return NotAllowed();
@@ -258,6 +258,6 @@ namespace Presentation.Web.Controllers.API
         {
             var theProjects = taskUsage.TaskRef.ItProjects.Where(p => p.OrganizationId == taskUsage.OrgUnit.OrganizationId);
             return Map<IEnumerable<ItProject>, IEnumerable<ItProjectSimpleDTO>>(theProjects);
-        } 
+        }
     }
 }
