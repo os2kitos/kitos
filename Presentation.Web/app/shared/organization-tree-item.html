@@ -5,7 +5,7 @@
                    value="{{ orgUnit.id }}"
                    data-ng-model="orgUnit.selected"
                    data-ng-change="save(orgUnit)"
-                   data-ng-disabled="!projectEditVm.hasWriteAccess" />
+                   data-ng-disabled="!(projectEditVm.hasWriteAccess || hasWriteAccess)" />
             {{ orgUnit.name }}
         </label>
     </span>
