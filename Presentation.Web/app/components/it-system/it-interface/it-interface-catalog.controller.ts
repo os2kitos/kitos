@@ -59,6 +59,12 @@
                         // set the selected filter to none, because clicking the button removes the filter
                         accessModifierFilterWidget.select(0);
                     });
+
+                    // show loadingbar when export to excel is clicked
+                    // hidden again in method exportToExcel callback
+                    $(".k-grid-excel").click(() => {
+                        kendo.ui.progress(this.mainGrid.element, true);
+                    });
                 }
             });
 
@@ -507,6 +513,9 @@
                         e.sender.hideColumn(column);
                     }
                 });
+
+                // hide loadingbar when export is finished
+                kendo.ui.progress(this.mainGrid.element, false);
             }
         }
     }
