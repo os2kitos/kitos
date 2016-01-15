@@ -4,7 +4,6 @@
     'ui.select2',
     'ngAnimate',
     'notify',
-    'ui.utils',
     'angularjs-dropdown-multiselect',
     'ngSanitize',
     'kendo.directives',

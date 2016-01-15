@@ -21,7 +21,7 @@
         public mainGrid: Kitos.IKendoGrid;
         public mainGridOptions: kendo.ui.GridOptions;
 
-        private static $inject: Array<string> = [
+        static $inject: Array<string> = [
             "$rootScope",
             "$scope",
             "$http",

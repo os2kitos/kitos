@@ -28,7 +28,7 @@
         public exhibitGrid: kendo.ui.Grid;
         public exhibitModal: kendo.ui.Window;
 
-        private static $inject: Array<string> = [
+        static $inject: Array<string> = [
             "$rootScope",
             "$scope",
             "$http",
