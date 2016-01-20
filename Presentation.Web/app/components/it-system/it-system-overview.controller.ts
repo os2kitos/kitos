@@ -73,6 +73,12 @@
                 if (widget === this.mainGrid) {
                     this.loadGridOptions();
                     this.mainGrid.dataSource.read();
+
+                    // show loadingbar when export to excel is clicked
+                    // hidden again in method exportToExcel callback
+                    $(".k-grid-excel").click(() => {
+                        kendo.ui.progress(this.mainGrid.element, true);
+                    });
                 }
             });
 
@@ -523,7 +529,7 @@
                             }
                         },
                         excelTemplate: dataItem =>
-                            dataItem.MainContract && dataItem.MainContract.ItContract ? this.isContractActive(dataItem.MainContract.ItContract).toString()  : "",
+                            dataItem.MainContract && dataItem.MainContract.ItContract ? this.isContractActive(dataItem.MainContract.ItContract).toString() : "",
                         attributes: { "class": "text-center" },
                         sortable: false,
                         filterable: {
@@ -992,6 +998,9 @@
                         cell.value = template(dataItem);
                     }
                 }
+
+                // hide loadingbar when export is finished
+                kendo.ui.progress(this.mainGrid.element, false);
             }
         }
     }

@@ -68,6 +68,12 @@
                 if (widget === this.mainGrid) {
                     this.loadGridOptions();
                     this.mainGrid.dataSource.read();
+
+                    // show loadingbar when export to excel is clicked
+                    // hidden again in method exportToExcel callback
+                    $(".k-grid-excel").click(() => {
+                        kendo.ui.progress(this.mainGrid.element, true);
+                    });
                 }
             });
 
@@ -785,6 +791,9 @@
                         cell.value = template(dataItem);
                     }
                 }
+
+                // hide loadingbar when export is finished
+                kendo.ui.progress(this.mainGrid.element, false);
             }
         }
 
