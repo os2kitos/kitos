@@ -27,8 +27,8 @@ namespace Core.DomainModel.ItContract
         /// Gets or sets the advice alarm date.
         /// </summary>
         /// <remarks>
-        /// Once the alarm expires an email should be sent to all users assigned to 
-        /// the <see cref="ItContract"/> with the role defined in <see cref="Receiver"/> 
+        /// Once the alarm expires an email should be sent to all users assigned to
+        /// the <see cref="ItContract"/> with the role defined in <see cref="Receiver"/>
         /// and <see cref="CarbonCopyReceiver"/>.
         /// </remarks>
         /// <value>
@@ -108,7 +108,7 @@ namespace Core.DomainModel.ItContract
         /// It contract.
         /// </value>
         public virtual ItContract ItContract { get; set; }
-        
+
         /// <summary>
         /// Determines whether a user has write access to this instance.
         /// </summary>
@@ -118,7 +118,7 @@ namespace Core.DomainModel.ItContract
         /// </returns>
         public override bool HasUserWriteAccess(User user)
         {
-            if (ItContract != null && ItContract.HasUserWriteAccess(user)) 
+            if (ItContract != null && ItContract.HasUserWriteAccess(user))
                 return true;
 
             return base.HasUserWriteAccess(user);

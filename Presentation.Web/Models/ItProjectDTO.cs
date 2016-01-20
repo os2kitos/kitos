@@ -68,7 +68,7 @@ namespace Presentation.Web.Models
         public DateTime? StatusDate { get; set; }
 
         /// <summary>
-        /// Notes on collected status on project    
+        /// Notes on collected status on project
         /// </summary>
         public string StatusNote { get; set; }
 
@@ -77,7 +77,7 @@ namespace Presentation.Web.Models
         public ItProjectPhaseDTO Phase2 { get; set; }
         public ItProjectPhaseDTO Phase3 { get; set; }
         public ItProjectPhaseDTO Phase4 { get; set; }
-        public ItProjectPhaseDTO Phase5 { get; set; } 
+        public ItProjectPhaseDTO Phase5 { get; set; }
 
         /// <summary>
         /// The id of current selected phase
