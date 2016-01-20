@@ -11,10 +11,10 @@
     }
 
     export interface IGridStateService {
-        saveGridOptions: (grid: Kitos.IKendoGrid) => void;
-        loadGridOptions: (grid: Kitos.IKendoGrid, initialFilter?) => void;
-        saveGridProfile: (grid: Kitos.IKendoGrid) => void;
-        loadGridProfile: (grid: Kitos.IKendoGrid) => void;
+        saveGridOptions: (grid: Kitos.IKendoGrid<any>) => void;
+        loadGridOptions: (grid: Kitos.IKendoGrid<any>, initialFilter?) => void;
+        saveGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
+        loadGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
         doesGridProfileExist: () => boolean;
         removeProfile: () => void;
         removeLocal: () => void;
@@ -61,7 +61,7 @@
             return service;
 
             // saves grid state to localStorage
-            function saveGridOptions(grid: Kitos.IKendoGrid) {
+            function saveGridOptions(grid: Kitos.IKendoGrid<any>) {
                 // timeout fixes columnReorder saves before the column is actually reordered
                 // http://stackoverflow.com/questions/21270748/kendo-grid-saving-state-in-columnreorder-event
                 $timeout(() => {
@@ -73,7 +73,7 @@
             }
 
             // loads kendo grid options from localStorage
-            function loadGridOptions(grid: Kitos.IKendoGrid, initialFilter?: kendo.data.DataSourceFilters): void {
+            function loadGridOptions(grid: Kitos.IKendoGrid<any>, initialFilter?: kendo.data.DataSourceFilters): void {
                 var gridId = grid.element[0].id;
                 var storedState = getStoredOptions();
                 var columnState = <IGridSavedState> _.pick(storedState, "columnState");
@@ -178,7 +178,7 @@
             }
 
             // save grid options that should be stored in sessionStorage
-            function saveGridStateForSession(options: Kitos.IKendoGridOptions): void {
+            function saveGridStateForSession(options: Kitos.IKendoGridOptions<any>): void {
                 var pickedOptions: IGridSavedState = {};
                 // save filter, sort and page
                 pickedOptions.dataSource = <kendo.data.DataSourceOptions> _.pick(options.dataSource, ["filter", "sort", "page"]);
@@ -186,7 +186,7 @@
             }
 
             // save grid options that should be stored in localStorage
-            function saveGridStateForever(options: Kitos.IKendoGridOptions): void {
+            function saveGridStateForever(options: Kitos.IKendoGridOptions<any>): void {
                 if (options) {
                     var pickedOptions: IGridSavedState = {};
                     // save pageSize
@@ -203,7 +203,7 @@
                 }
             }
 
-            function saveGridProfile(grid: Kitos.IKendoGrid): void {
+            function saveGridProfile(grid: Kitos.IKendoGrid<any>): void {
                 var options = grid.getOptions();
                 var pickedOptions: IGridSavedState = {};
                 // save filter and sort
@@ -212,7 +212,7 @@
                 $window.localStorage.setItem(profileStorageKey, JSONfn.stringify(pickedOptions));
             }
 
-            function loadGridProfile(grid: Kitos.IKendoGrid): void {
+            function loadGridProfile(grid: Kitos.IKendoGrid<any>): void {
                 removeSession();
                 var storedState = getStoredOptions();
                 var gridOptions = _.omit(storedState, "columnState");

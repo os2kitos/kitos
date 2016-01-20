@@ -2,8 +2,8 @@
     "use strict";
 
     export interface ICatalogController {
-        mainGrid: Kitos.IKendoGrid;
-        mainGridOptions: Kitos.IKendoGridOptions;
+        mainGrid: IKendoGrid<Models.ItSystem.IItInterface>;
+        mainGridOptions: IKendoGridOptions<Models.ItSystem.IItInterface>;
 
         saveGridProfile(): void;
         loadGridProfile(): void;
@@ -15,8 +15,8 @@
     export class CatalogController implements ICatalogController {
         private storageKey = "it-interface-catalog-options";
         private gridState = this.gridStateService.getService(this.storageKey);
-        public mainGrid: Kitos.IKendoGrid;
-        public mainGridOptions: Kitos.IKendoGridOptions;
+        public mainGrid: IKendoGrid<Models.ItSystem.IItInterface>;
+        public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItInterface>;
 
         private $inject: Array<string> = [
             "$rootScope",
@@ -25,21 +25,23 @@
             "$state",
             "$",
             "_",
+            "moment",
             "notify",
             "user",
             "gridStateService"
         ];
 
         constructor(
-            private $rootScope: Kitos.IRootScope,
+            private $rootScope: IRootScope,
             private $scope: ng.IScope,
             private $timeout: ng.ITimeoutService,
             private $state: ng.ui.IStateService,
             private $: JQueryStatic,
-            private _: Kitos.ILodashWithMixins,
+            private _: ILodashWithMixins,
+            private moment: moment.MomentStatic,
             private notify,
             private user,
-            private gridStateService: Kitos.Services.IGridStateFactory) {
+            private gridStateService: Services.IGridStateFactory) {
             $rootScope.page.title = "Snitflade - Katalog";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -107,7 +109,7 @@
                     pageSize: 100,
                     serverPaging: true,
                     serverSorting: true,
-                    serverFiltering: true,
+                    serverFiltering: true
                 },
                 toolbar: [
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
@@ -162,99 +164,110 @@
                 excelExport: this.exportToExcel,
                 columns: [
                     {
-                        field: "ItInterfaceId", title: "Snidtflade ID", width: 120,
+                        field: "ItInterfaceId", title: "Snitflade ID", width: 120,
                         persistId: "infid", // DON'T YOU DARE RENAME!
+                        excelTemplate: dataItem => dataItem.ItInterfaceId,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "Name", title: "Snitflade", width: 285,
                         persistId: "name", // DON'T YOU DARE RENAME!
-                        template: "<a data-ui-sref='it-system.interface-edit.interface-details({id: #: Id #})'>#: Name #</a>",
+                        template: dataItem => `<a data-ui-sref='it-system.interface-edit.interface-details({id: ${dataItem.Id}})'>${dataItem.Name}</a>`,
+                        excelTemplate: dataItem => dataItem.Name,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "Version", title: "Version", width: 150,
                         persistId: "version", // DON'T YOU DARE RENAME!
+                        excelTemplate: dataItem => dataItem.Version,
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "AccessModifier", title: "Synlighed", width: 120,
                         persistId: "accessmod", // DON'T YOU DARE RENAME!
+                        excelTemplate: dataItem => dataItem.AccessModifier.toString(),
                         filterable: {
                             cell: {
                                 showOperators: false,
-                                template: this.accessModFilter,
+                                template: this.accessModFilter
                             }
                         }
                     },
                     {
                         field: "InterfaceType.Name", title: "Snitfladetype", width: 150,
                         persistId: "inftype", // DON'T YOU DARE RENAME!
-                        template: "#: InterfaceType ? InterfaceType.Name : '' #",
+                        template: dataItem => dataItem.InterfaceType ? dataItem.InterfaceType.Name : "",
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "BelongsTo.Name", title: "Rettighedshaver", width: 150,
                         persistId: "belongs", // DON'T YOU DARE RENAME!
-                        template: "#: BelongsTo ? BelongsTo.Name : '' #",
+                        template: dataItem => dataItem.BelongsTo ? dataItem.BelongsTo.Name : "",
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "Url", title: "Link til beskrivelse", width: 125,
                         persistId: "link", // DON'T YOU DARE RENAME!
-                        template: this.linkTemplate,
+                        template: dataItem => {
+                            if (!dataItem.Url) {
+                                return "";
+                            }
+
+                            return `<a href="${dataItem.Url}" title="Link til yderligere..." target="_blank"><i class="fa fa-link"></i></a>`;
+                        },
+                        excelTemplate: dataItem => dataItem.Url,
                         attributes: { "class": "text-center" },
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "ExhibitedBy.ItSystem.Name", title: "Udstillet af", width: 230,
                         persistId: "exhibit", // DON'T YOU DARE RENAME!
-                        template: "#: ExhibitedBy ? ExhibitedBy.ItSystem.Name : '' #",
+                        template: dataItem => dataItem.ExhibitedBy ? dataItem.ExhibitedBy.ItSystem.Name : "",
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
-                        },
+                        }
                     },
                     //{ TODO
                     //    field: "", title: "Snitflader: Anvendes globalt", width: 115,
@@ -271,95 +284,120 @@
                     {
                         field: "Tsa.Name", title: "TSA", width: 90,
                         persistId: "tsa", // DON'T YOU DARE RENAME!
-                        template: "#: Tsa ? Tsa.Name : '' #",
+                        template: dataItem => dataItem.Tsa ? dataItem.Tsa.Name : "",
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
-                        },
+                        }
                     },
                     {
                         field: "Interface.Name", title: "Grænseflade", width: 150,
                         persistId: "infname", // DON'T YOU DARE RENAME!
-                        template: "#: Interface ? Interface.Name : '' #",
+                        template: dataItem => dataItem.Interface ? dataItem.Interface.Name : "",
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "Method.Name", title: "Metode", width: 150,
                         persistId: "method", // DON'T YOU DARE RENAME!
-                        template: "#: Method ? Method.Name : '' #",
+                        template: dataItem => dataItem.Method ? dataItem.Method.Name : "",
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
-                        },
+                        }
                     },
                     {
-                        field: "", title: "Datatype", width: 150,
+                        field: "DataType", title: "Datatype", width: 150,
                         persistId: "datatypes", // DON'T YOU DARE RENAME!
-                        template: "#: DataRows.length > 0 ? _.pluck(DataRows.slice(0,4), 'DataType.Name').join(', ') : '' ##: DataRows.length > 5 ? ', ...' : '' #",
+                        template: dataItem => {
+                            var value = "";
+                            if (dataItem.DataRows.length > 0) {
+                                value = this._.pluck(dataItem.DataRows.slice(0, 4), "DataType.Name").join(", ");
+                            }
+                            if (dataItem.DataRows.length > 5) {
+                                value += ", ...";
+                            }
+                            return value;
+                        },
+                        excelTemplate: dataItem => {
+                            var value = "";
+                            if (dataItem.DataRows.length > 0) {
+                                value = this._.pluck(dataItem.DataRows, "DataType.Name").join(", ");
+                            }
+                            return value;
+                        },
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
-                        },
+                        }
                     },
                     {
                         field: "Organization.Name", title: "Oprettet af: Organisation", width: 150,
-                        persistId: "orgname", // DON'T YOU DARE RENAME!
+                        persistId: "orgname", // DON'T YOU DARE RENAME!,
+                        excelTemplate: dataItem => dataItem.Organization.Name,
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "ObjectOwner.Name", title: "Oprettet af: Bruger", width: 150,
                         persistId: "ownername", // DON'T YOU DARE RENAME!
-                        template: "#: ObjectOwner.Name + ' ' + ObjectOwner.LastName #",
+                        template: dataItem => `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}`,
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "LastChangedByUser.Name", title: "Sidst redigeret: Bruger", width: 150,
                         persistId: "lastchangedname", // DON'T YOU DARE RENAME!
-                        template: "#: LastChangedByUser.Name + ' ' + LastChangedByUser.LastName #",
+                        template: dataItem => dataItem.LastChangedByUser && `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}` || "",
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "LastChanged", title: "Sidst redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 130,
                         persistId: "lastchangeddate", // DON'T YOU DARE RENAME!
+                        excelTemplate: dataItem => {
+                            // handles null cases
+                            if (!dataItem.LastChanged) {
+                                return "";
+                            }
+
+                            return this.moment(dataItem.LastChanged).format("DD-MM-YYYY");
+                        },
                         attributes: { "class": "text-center" },
                         filterable: {
                             cell: {
@@ -416,12 +454,6 @@
 
         private reload() {
             this.$state.go(".", null, { reload: true });
-        }
-
-        private linkTemplate(dataItem) {
-            if (dataItem.Url)
-                return `<a href="${dataItem.Url}" title="Link til yderligere..." target="_blank"><i class="fa fa-link"></i></a>`;
-            return "";
         }
 
         private accessModFilter = (args) => {
@@ -501,13 +533,51 @@
                 });
             } else {
                 this.exportFlag = false;
+
+                // hide coloumns on visual grid
                 this._.forEach(columns, column => {
                     if (column.tempVisual) {
                         delete column.tempVisual;
                         e.sender.hideColumn(column);
                     }
                 });
+
+                // render templates
+                var sheet = e.workbook.sheets[0];
+
+                // skip header row
+                for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
+                    var row = sheet.rows[rowIndex];
+
+                    // -1 as sheet has header and dataSource hasn't
+                    var dataItem = <IKendoDataObservableObject>this.mainGrid.dataSource.at(rowIndex - 1);
+
+                    for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
+                        if (columns[columnIndex].field === "") continue;
+                        var cell = row.cells[columnIndex];
+
+                        var template = this.getTemplateMethod(columns[columnIndex]);
+
+                        cell.value = template(dataItem);
+                    }
+                }
             }
+        }
+
+        private getTemplateMethod(column) {
+            var template: Function;
+
+            if (column.excelTemplate) {
+                template = column.excelTemplate;
+            } else if (typeof column.template === "function") {
+                template = <Function>column.template;
+            } else if (typeof column.template === "string") {
+                template = kendo.template(<string>column.template);
+            } else {
+                template = t => t;
+            }
+
+            return template;
         }
     }
 

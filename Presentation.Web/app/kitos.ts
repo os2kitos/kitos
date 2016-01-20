@@ -3,22 +3,29 @@
         page: { title: string};
     }
 
-    export interface IKendoGridColumn extends kendo.ui.GridColumn {
+    export interface IKendoGridColumn<TDataSource> extends kendo.ui.GridColumn {
         persistId: string;
+        tempVisual?: boolean;
+        excelTemplate?(dataItem: TDataSource): string;
+        template?: ((dataItem: TDataSource) => string)|string;
     }
 
     export interface IKendoGridToolbarItem extends kendo.ui.GridToolbarItem {
         className?: string;
     }
 
-    export interface IKendoGridOptions extends kendo.ui.GridOptions {
+    export interface IKendoGridOptions<TDataSource> extends kendo.ui.GridOptions {
         toolbar?: IKendoGridToolbarItem[];
-        columns?: IKendoGridColumn[];
+        columns?: IKendoGridColumn<TDataSource>[];
     }
 
-    export interface IKendoGrid extends kendo.ui.Grid {
-        getOptions(): IKendoGridOptions;
-        columns: IKendoGridColumn[];
+    export interface IKendoGrid<TDataSource> extends kendo.ui.Grid {
+        getOptions(): IKendoGridOptions<TDataSource>;
+        columns: IKendoGridColumn<TDataSource>[];
+    }
+
+    export interface IKendoDataObservableObject extends kendo.data.ObservableObject {
+        id: number;
     }
 
     export interface ILodashWithMixins extends _.LoDashStatic {

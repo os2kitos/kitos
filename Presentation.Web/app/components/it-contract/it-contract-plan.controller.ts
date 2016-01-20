@@ -2,7 +2,7 @@
     "use strict";
 
     export interface IOverviewPlanController {
-        mainGrid: Kitos.IKendoGrid;
+        mainGrid: Kitos.IKendoGrid<IItContractPlan>;
         mainGridOptions: kendo.ui.GridOptions;
         roleSelectorOptions: kendo.ui.DropDownListOptions;
 
@@ -13,12 +13,16 @@
         clearOptions(): void;
     }
 
+    export interface IItContractPlan extends Models.ItContract.IItContract {
+        roles: Array<any>;
+    }
+
     export class OverviewPlanController implements IOverviewPlanController {
         private storageKey = "it-contract-plan-options";
         private orgUnitStorageKey = "it-contract-plan-orgunit";
         private gridState = this.gridStateService.getService(this.storageKey);
         private roleSelectorDataSource;
-        public mainGrid: Kitos.IKendoGrid;
+        public mainGrid: Kitos.IKendoGrid<IItContractPlan>;
         public mainGridOptions: kendo.ui.GridOptions;
 
         static $inject: Array<string> = [
@@ -85,7 +89,7 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            var selectedOrgUnitId = <number> this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
+            var selectedOrgUnitId = <number>this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
             var selectedOrgUnit: any = this._.find(this.orgUnits, (orgUnit: any) => orgUnit.Id == selectedOrgUnitId);
 
             var filter = undefined;
@@ -156,7 +160,7 @@
             clonedItContractRoles.push({ Id: "ContractSigner.Name", Name: "Kontraktunderskriver" });
             this.roleSelectorDataSource = clonedItContractRoles;
 
-            var mainGridOptions: Kitos.IKendoGridOptions = {
+            var mainGridOptions: Kitos.IKendoGridOptions<IItContractPlan> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
                     type: "odata-v4",
@@ -284,9 +288,20 @@
                 excelExport: this.exportToExcel,
                 columns: [
                     {
-                        field: "", title: "Aktiv", width: 45,
+                        field: "Active", title: "Aktiv", width: 45,
                         persistId: "active", // DON'T YOU DARE RENAME!
-                        template: this.activeStatusTemplate,
+                        template: dataItem => {
+                            var isActive = this.isContractActive(dataItem);
+
+                            if (isActive) {
+                                return '<span class="fa fa-file text-success" aria-hidden="true"></span>';
+                            }
+                            return '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>';
+                        },
+                        excelTemplate: dataItem => {
+                            var isActive = this.isContractActive(dataItem);
+                            return isActive.toString();
+                        },
                         attributes: { "class": "text-center" },
                         sortable: false,
                         filterable: false,
@@ -294,6 +309,7 @@
                     {
                         field: "ItContractId", title: "KontraktID", width: 150,
                         persistId: "contractid", // DON'T YOU DARE RENAME!
+                        excelTemplate: dataItem => dataItem && dataItem.ItContractId,
                         hidden: true,
                         filterable: {
                             cell: {
@@ -306,7 +322,8 @@
                     {
                         field: "Parent.Name", title: "Overordnet kontrakt", width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
-                        template: "#= Parent ? '<a data-ui-sref=\"it-contract.edit.systems({id:' + Parent.Id + '})\">' + Parent.Name + '</a>' : '' #",
+                        template: dataItem => dataItem.Parent ? `<a data-ui-sref=\"it-contract.edit.systems({id:${dataItem.Parent.Id}})\">${dataItem.Parent.Name}</a>` : "",
+                        excelTemplate: dataItem => dataItem && dataItem.Parent && dataItem.Parent.Name || "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -319,7 +336,8 @@
                     {
                         field: "Name", title: "IT Kontrakt", width: 265,
                         persistId: "name", // DON'T YOU DARE RENAME!
-                        template: "<a data-ui-sref='it-contract.edit.systems({id: #: Id #})'>#: Name #</a>",
+                        template: dataItem => `<a data-ui-sref='it-contract.edit.systems({id: ${dataItem.Id}})'>${dataItem.Name}</a>`,
+                        excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -331,7 +349,7 @@
                     {
                         field: "ResponsibleOrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 245,
                         persistId: "orgunit", // DON'T YOU DARE RENAME!
-                        template: "#: ResponsibleOrganizationUnit ? ResponsibleOrganizationUnit.Name : '' #",
+                        template: dataItem => dataItem.ResponsibleOrganizationUnit ? dataItem.ResponsibleOrganizationUnit.Name : "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -343,8 +361,17 @@
                     //{
                     //    field: "AssociatedSystemUsages", title: "IT System", width: 150,
                     //    persistId: "itsys", // DON'T YOU DARE RENAME!
-                    //    template: "#: AssociatedSystemUsages.length > 0 ? _.first(AssociatedSystemUsages).ItSystemUsage.ItSystem.Name : '' #" +
-                    //        "#= AssociatedSystemUsages.length > 1 ? ' (' + AssociatedSystemUsages.length + ')' : '' #",
+                    //    template: dataItem => {
+                    //        var value = "";
+                    //        if (dataItem.AssociatedSystemUsages.length > 0)
+                    //            value += this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name;
+
+                    //        if (dataItem.AssociatedSystemUsages.length > 1) {
+                    //            value += ` (${dataItem.AssociatedSystemUsages.length})`;
+                    //        }
+
+                    //        return value;
+                    //    },
                     //    filterable: {
                     //        cell: {
                     //            dataSource: [],
@@ -356,7 +383,7 @@
                     {
                         field: "Supplier.Name", title: "Leverandør", width: 200,
                         persistId: "suppliername", // DON'T YOU DARE RENAME!
-                        template: "#: Supplier ? Supplier.Name : '' #",
+                        template: dataItem => dataItem.Supplier ? dataItem.Supplier.Name : "",
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -368,7 +395,8 @@
                     {
                         field: "Esdh", title: "ESDH ref", width: 150,
                         persistId: "esdh", // DON'T YOU DARE RENAME!
-                        template: "#= Esdh ? '<a target=\"_blank\" href=\"' + Esdh + '\"><i class=\"fa fa-link\"></a>' : '' #",
+                        template: dataItem => dataItem.Esdh ? `<a target=\"_blank\" href=\"${dataItem.Esdh}\"><i class=\"fa fa-link\"></a>` : "",
+                        excelTemplate: dataItem => dataItem && dataItem.Esdh || "",
                         attributes: { "class": "text-center" },
                         hidden: true,
                         filterable: {
@@ -382,7 +410,8 @@
                     {
                         field: "Folder", title: "Mappe ref", width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
-                        template: "#= Folder ? '<a target=\"_blank\" href=\"' + Folder + '\"><i class=\"fa fa-link\"></i></a>' : '' #",
+                        template: dataItem => dataItem.Folder ? `<a target=\"_blank\" href=\"${dataItem.Folder}\"><i class=\"fa fa-link\"></i></a>` : "",
+                        excelTemplate: dataItem => dataItem && dataItem.Folder || "",
                         attributes: { "class": "text-center" },
                         hidden: true,
                         filterable: {
@@ -408,7 +437,7 @@
                     {
                         field: "ContractTemplate.Name", title: "Kontraktskabelon", width: 145,
                         persistId: "contracttmpl", // DON'T YOU DARE RENAME!
-                        template: "#: ContractTemplate ? ContractTemplate.Name : '' #",
+                        template: dataItem => dataItem.ContractTemplate ? dataItem.ContractTemplate.Name : "",
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -420,7 +449,7 @@
                     {
                         field: "PurchaseForm.Name", title: "Indkøbsform", width: 115,
                         persistId: "purchaseform", // DON'T YOU DARE RENAME!
-                        template: "#: PurchaseForm ? PurchaseForm.Name : '' #",
+                        template: dataItem => dataItem.PurchaseForm ? dataItem.PurchaseForm.Name : "",
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -432,6 +461,13 @@
                     {
                         field: "Concluded", title: "Indgået", format: "{0:dd-MM-yyyy}", width: 90,
                         persistId: "concluded", // DON'T YOU DARE RENAME!
+                        excelTemplate: dataItem => {
+                            if (!dataItem.Concluded) {
+                                return "";
+                            }
+
+                            return this.moment(dataItem.Concluded).format("DD-MM-YYYY");
+                        },
                         filterable: {
                             cell: {
                                 showOperators: false,
@@ -442,7 +478,7 @@
                     {
                         field: "Duration", title: "Varighed", width: 115,
                         persistId: "duration", // DON'T YOU DARE RENAME!
-                        template: "#: Duration ? Duration + ' md' : '' #",
+                        template: dataItem => dataItem.Duration ? `${dataItem.Duration} md` : "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -455,6 +491,13 @@
                     {
                         field: "ExpirationDate", title: "Udløbs dato", format: "{0:dd-MM-yyyy}", width: 90,
                         persistId: "expirationDate", // DON'T YOU DARE RENAME!
+                        excelTemplate: dataItem => {
+                            if (!dataItem.ExpirationDate) {
+                                return "";
+                            }
+
+                            return this.moment(dataItem.ExpirationDate).format("DD-MM-YYYY");
+                        },
                         filterable: {
                             cell: {
                                 showOperators: false,
@@ -466,7 +509,19 @@
                         field: "OptionExtend", title: "Option", width: 150,
                         persistId: "option", // DON'T YOU DARE RENAME!
                         hidden: true,
-                        template: "#: OptionExtend ? OptionExtend.Name : '' # #: OptionExtend ? '(' + ExtendMultiplier + ')' : '' #",
+                        template: dataItem => {
+                            var value = "";
+
+                            if (dataItem.OptionExtend) {
+                                value += dataItem.OptionExtend.Name;
+                            }
+
+                            if (dataItem.OptionExtend) {
+                                value += ` (${dataItem.ExtendMultiplier})`;
+                            }
+
+                            return value;
+                        },
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -478,7 +533,7 @@
                     {
                         field: "TerminationDeadline.Name", title: "Opsigelse", width: 100,
                         persistId: "terminationDeadline", // DON'T YOU DARE RENAME!
-                        template: "#: TerminationDeadline ? TerminationDeadline.Name + ' md' : '' #",
+                        template: dataItem => dataItem.TerminationDeadline ? `${dataItem.TerminationDeadline.Name} md` : "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -491,6 +546,13 @@
                         field: "IrrevocableTo", title: "Uopsigelig til", format: "{0:dd-MM-yyyy}", width: 150,
                         headerTemplate: '<div style="word-wrap: break-word;">Uopsigelig til</div>',
                         persistId: "irrevocableTo", // DON'T YOU DARE RENAME!
+                        excelTemplate: dataItem => {
+                            if (!dataItem.IrrevocableTo) {
+                                return "";
+                            }
+
+                            return this.moment(dataItem.IrrevocableTo).format("DD-MM-YYYY");
+                        },
                         hidden: true,
                         filterable: {
                             cell: {
@@ -502,6 +564,13 @@
                     {
                         field: "Terminated", title: "Opsagt", format: "{0:dd-MM-yyyy}", width: 150,
                         persistId: "terminated", // DON'T YOU DARE RENAME!
+                        excelTemplate: dataItem => {
+                            if (!dataItem.Terminated) {
+                                return "";
+                            }
+
+                            return this.moment(dataItem.Terminated).format("DD-MM-YYYY");
+                        },
                         hidden: true,
                         filterable: {
                             cell: {
@@ -514,7 +583,7 @@
                         field: "ProcurementStrategy", title: "Udbudsstrategi", width: 150,
                         persistId: "procurementStrategy", // DON'T YOU DARE RENAME!
                         hidden: true,
-                        template: "#: ProcurementStrategy ? ProcurementStrategy.Name : '' #",
+                        template: dataItem => dataItem.ProcurementStrategy ? dataItem.ProcurementStrategy.Name : "",
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -527,7 +596,8 @@
                         field: "ProcurementPlanYear", title: "Udbuds plan", width: 90,
                         persistId: "procurementPlan", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: "#: ProcurementPlanHalf && ProcurementPlanYear ? ProcurementPlanYear + ' | ' + ProcurementPlanHalf : ''#",
+                        template: dataItem =>
+                            dataItem.ProcurementPlanHalf && dataItem.ProcurementPlanYear ? `${dataItem.ProcurementPlanYear} | ${dataItem.ProcurementPlanHalf}` : "",
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -539,7 +609,13 @@
                     {
                         field: "Advices.AlarmDate", title: "Dato for næste advis", width: 90,
                         persistId: "nextadvis", // DON'T YOU DARE RENAME!
-                        template: this.nextAdviceTemplate,
+                        template: dataItem => {
+                            if (dataItem.Advices.length <= 0) {
+                                return "";
+                            }
+                            var date = this._.first(this._.sortBy(dataItem.Advices, ["AlarmDate"])).AlarmDate;
+                            return this.moment(date).format("DD-MM-YYYY");
+                        },
                         sortable: false,
                         filterable: false
                     }
@@ -554,7 +630,7 @@
                 field: "ContractSigner.Name",
                 title: "Kontraktunderskriver",
                 persistId: "roleSigner",
-                template: "#: ContractSigner ? ContractSigner.Name + ' ' + ContractSigner.LastName : '' #",
+                template: dataItem => dataItem.ContractSigner ? `${dataItem.ContractSigner.Name} ${dataItem.ContractSigner.LastName}` : "",
                 width: 130,
                 hidden: true,
                 sortable: true,
@@ -571,11 +647,30 @@
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
             this._.forEachRight(this.itContractRoles, role => {
-                var roleColumn = {
+                var roleColumn: Kitos.IKendoGridColumn<IItContractPlan> = {
                     field: `role${role.Id}`,
                     title: role.Name,
                     persistId: `role${role.Id}`,
-                    template: dataItem => this.roleTemplate(dataItem, role.Id),
+                    template: dataItem => {
+                        var roles = "";
+
+                        if (dataItem.roles[role.Id] === undefined)
+                            return roles;
+
+                        roles = this.concatRoles(dataItem.roles[role.Id]);
+
+                        var link = `<a data-ui-sref='it-contract.edit.roles({id: ${dataItem.Id}})'>${roles}</a>`;
+
+                        return link;
+                    },
+                    excelTemplate: dataItem => {
+                        var roles = "";
+
+                        if (dataItem.roles[role.Id] === undefined)
+                            return roles;
+
+                        return this.concatRoles(dataItem.roles[role.Id]);
+                    },
                     width: 130,
                     hidden: true,
                     sortable: false,
@@ -614,46 +709,67 @@
                 });
             } else {
                 this.exportFlag = false;
+
+                // hide coloumns on visual grid
                 this._.forEach(columns, column => {
                     if (column.tempVisual) {
                         delete column.tempVisual;
                         e.sender.hideColumn(column);
                     }
                 });
+
+                // render templates
+                var sheet = e.workbook.sheets[0];
+
+                // skip header row
+                for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
+                    var row = sheet.rows[rowIndex];
+
+                    // -1 as sheet has header and dataSource hasn't
+                    var dataItem = <IKendoDataObservableObject>this.mainGrid.dataSource.at(rowIndex - 1);
+
+                    for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
+                        if (columns[columnIndex].field === "") continue;
+                        var cell = row.cells[columnIndex];
+
+                        var template = this.getTemplateMethod(columns[columnIndex]);
+
+                        cell.value = template(dataItem);
+                    }
+                }
             }
         }
 
-        private roleTemplate(dataItem, roleId) {
-            var roles = "";
+        private getTemplateMethod(column) {
+            var template: Function;
 
-            if (dataItem.roles[roleId] === undefined)
-                return roles;
+            if (column.excelTemplate) {
+                template = column.excelTemplate;
+            } else if (typeof column.template === "function") {
+                template = <Function>column.template;
+            } else if (typeof column.template === "string") {
+                template = kendo.template(<string>column.template);
+            } else {
+                template = t => t;
+            }
+
+            return template;
+        }
+
+        private concatRoles(roles: Array<any>): string {
+            var concatRoles = "";
 
             // join the first 5 username together
-            if (dataItem.roles[roleId].length > 0)
-                roles = dataItem.roles[roleId].slice(0, 4).join(", ");
+            if (roles.length > 0) {
+                concatRoles = roles.slice(0, 4).join(", ");
+            }
 
             // if more than 5 then add an elipsis
-            if (dataItem.roles[roleId].length > 5)
-                roles += ", ...";
+            if (roles.length > 5) {
+                concatRoles += ", ...";
+            }
 
-            var link = `<a data-ui-sref='it-contract.edit.roles({id: ${dataItem.Id}})'>${roles}</a>`;
-
-            return link;
-        }
-
-        private nextAdviceTemplate = (dataItem) => {
-            if (dataItem.Advices.length > 0)
-                return this.moment(this._.first<any>(this._.sortBy(dataItem.Advices, ["AlarmDate"])).AlarmDate).format("DD-MM-YYYY");
-            return "";
-        }
-
-        private  activeStatusTemplate = (dataItem) => {
-            var isActive = this.isContractActive(dataItem);
-
-            if (isActive)
-                return '<span class="fa fa-file text-success" aria-hidden="true"></span>';
-            return '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>';
+            return concatRoles;
         }
 
         private isContractActive(dataItem) {
@@ -749,7 +865,6 @@
             }
             return newFilter;
         }
-
 
         public roleSelectorOptions = (): kendo.ui.DropDownListOptions => {
             return {

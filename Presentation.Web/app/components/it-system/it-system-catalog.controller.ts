@@ -1,8 +1,10 @@
 ﻿module Kitos.ItSystem.Catalog {
     "use strict";
 
+    import IItSystem = Models.ItSystem.IItSystem;
+
     export interface ICatalogController {
-        mainGrid: Kitos.IKendoGrid;
+        mainGrid: IKendoGrid<IItSystem>;
         mainGridOptions: kendo.ui.GridOptions;
         usageGrid: kendo.ui.Grid;
         usageDetailsGrid: kendo.ui.GridOptions;
@@ -20,8 +22,8 @@
     export class CatalogController implements ICatalogController {
         private storageKey = "it-system-catalog-options";
         private gridState = this.gridStateService.getService(this.storageKey);
-        public mainGrid: Kitos.IKendoGrid;
-        public mainGridOptions: Kitos.IKendoGridOptions;
+        public mainGrid: IKendoGrid<IItSystem>;
+        public mainGridOptions: IKendoGridOptions<IItSystem>;
         public usageGrid: kendo.ui.Grid;
         public modal: kendo.ui.Window;
 
@@ -33,22 +35,24 @@
             "$state",
             "$",
             "_",
+            "moment",
             "notify",
             "user",
             "gridStateService"
         ];
 
         constructor(
-            private $rootScope: Kitos.IRootScope,
+            private $rootScope: IRootScope,
             private $scope: ng.IScope,
             private $http: ng.IHttpService,
             private $timeout: ng.ITimeoutService,
             private $state: ng.ui.IStateService,
             private $: JQueryStatic,
-            private _: Kitos.ILodashWithMixins,
+            private _: ILodashWithMixins,
+            private moment: moment.MomentStatic,
             private notify,
             private user,
-            private gridStateService: Kitos.Services.IGridStateFactory) {
+            private gridStateService: Services.IGridStateFactory) {
             $rootScope.page.title = "IT System - Katalog";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -177,95 +181,110 @@
                     {
                         field: "Usages", title: "Anvend/Fjern anvendelse", width: 100,
                         persistId: "command", // DON'T YOU DARE RENAME!
-                        template: this.usageButtonTemplate,
+                        template: dataItem => {
+                            // true if system is being used by system within current context, else false
+                            var systemHasUsages = this._.find(dataItem.Usages, (d: any) => (d.OrganizationId == this.user.currentOrganizationId));
+
+                            if (systemHasUsages)
+                                return `<button type="button" class="btn btn-danger col-md-7" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})">Fjern anv.</button>`;
+
+                            return `<button type="button" class="btn btn-success col-md-7" data-ng-click="systemCatalogVm.enableUsage(${dataItem.Id})">Anvend</button>`;
+                        },
+                        excelTemplate: dataItem => {
+                            // true if system is being used by system within current context, else false
+                            var systemHasUsages = this._.find(dataItem.Usages, (d: any) => (d.OrganizationId == this.user.currentOrganizationId));
+                            return systemHasUsages ? "Anvendt" : "Ikke anvendt";
+                        },
                         filterable: false,
                         sortable: false
                     },
                     {
                         field: "Parent.Name", title: "Overordnet IT System", width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
-                        template: "#: Parent ? Parent.Name : '' #",
+                        template: dataItem => dataItem.Parent ? dataItem.Parent.Name : "",
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "Name", title: "It System", width: 285,
                         persistId: "name", // DON'T YOU DARE RENAME!
-                        template: '<a data-ui-sref="it-system.edit.interfaces({id: #: Id #})">#: Name #</a>',
+                        template: dataItem => `<a data-ui-sref="it-system.edit.interfaces({id: ${dataItem.Id}})">${dataItem.Name}</a>`,
+                        excelTemplate: dataItem => dataItem.Name,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "AccessModifier", title: "Synlighed", width: 120,
-                        persistId: "accessmod", // DON'T YOU DARE RENAME!
+                        persistId: "accessmod", // DON'T YOU DARE RENAME!,
+                        excelTemplate: dataItem => dataItem.AccessModifier.toString(),
                         hidden: true,
                         filterable: {
                             cell: {
                                 showOperators: false,
-                                template: this.accessModFilter,
+                                template: this.accessModFilter
                             }
                         }
                     },
                     {
                         field: "BusinessType.Name", title: "Forretningstype", width: 150,
                         persistId: "busitype", // DON'T YOU DARE RENAME!
-                        template: "#: BusinessType ? BusinessType.Name : '' #",
+                        template: dataItem => dataItem.BusinessType ? dataItem.BusinessType.Name : "",
                         attributes: { "class": "might-overflow" },
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "AppTypeOption.Name", title: "Applikationstype", width: 150,
                         persistId: "apptype", // DON'T YOU DARE RENAME!
-                        template: "#: AppTypeOption ? AppTypeOption.Name : '' #",
+                        template: dataItem => dataItem.AppTypeOption ? dataItem.AppTypeOption.Name : "",
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "BelongsTo.Name", title: "Rettighedshaver", width: 210,
                         persistId: "belongsto", // DON'T YOU DARE RENAME!
-                        template: "#: BelongsTo ? BelongsTo.Name : '' #",
+                        template: dataItem => dataItem.BelongsTo ? dataItem.BelongsTo.Name : "",
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "TaskKey", title: "KLE ID", width: 150,
                         persistId: "taskkey", // DON'T YOU DARE RENAME!
-                        template: "#: TaskRefs.length > 0 ? _.pluck(TaskRefs, 'TaskKey').join(', ') : '' #",
+                        template: dataItem => dataItem.TaskRefs.length > 0 ? this._.pluck(dataItem.TaskRefs, "TaskKey").join(", ") : "",
                         attributes: { "class": "might-overflow" },
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "startswith",
+                                operator: "startswith"
                             }
                         },
                         sortable: false
@@ -273,13 +292,13 @@
                     {
                         field: "TaskName", title: "KLE Navn", width: 155,
                         persistId: "taskname", // DON'T YOU DARE RENAME!
-                        template: "#: TaskRefs.length > 0 ? _.pluck(TaskRefs, 'Description').join(', ') : '' #",
+                        template: dataItem => dataItem.TaskRefs.length > 0 ? this._.pluck(dataItem.TaskRefs, "Description").join(", ") : "",
                         attributes: { "class": "might-overflow" },
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "startswith",
+                                operator: "startswith"
                             }
                         },
                         sortable: false
@@ -287,20 +306,28 @@
                     {
                         field: "Url", title: "Link til beskrivelse", width: 125,
                         persistId: "link", // DON'T YOU DARE RENAME!
-                        template: this.linkTemplate,
+                        template: dataItem => {
+                            if (!dataItem.Url) {
+                                return "";
+                            }
+                            return `<a href="${dataItem.Url}" title="Link til yderligere..." target="_blank"><i class="fa fa-link"></i></a>`;
+                        },
+                        excelTemplate: dataItem => dataItem.Url || "",
                         attributes: { "class": "text-center" },
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "Usages.length", title: "IT System: Anvendes af", width: 95,
                         persistId: "usages", // DON'T YOU DARE RENAME!
-                        template: '<a class="col-md-7 text-center" data-ng-click="systemCatalogVm.showUsageDetails(#: Id #,\'#: Name #\')">#: Usages.length #</a>',
+                        template: dataItem =>
+                            `<a class="col-md-7 text-center" data-ng-click="systemCatalogVm.showUsageDetails(${dataItem.Id},\'${dataItem.Name}\')">${dataItem.Usages.length}</a>`,
+                        excelTemplate: dataItem => dataItem && dataItem.Usages && dataItem.Usages.length.toString(),
                         filterable: false,
                         sortable: false
                     },
@@ -323,45 +350,53 @@
                     {
                         field: "Organization.Name", title: "Oprettet af: Organisation", width: 150,
                         persistId: "orgname", // DON'T YOU DARE RENAME!
-                        template: "#: Organization ? Organization.Name : '' #",
+                        template: dataItem => dataItem.Organization ? dataItem.Organization.Name : "",
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "ObjectOwner.Name", title: "Oprettet af: Bruger", width: 150,
                         persistId: "ownername", // DON'T YOU DARE RENAME!
-                        template: "#: ObjectOwner.Name + ' ' + ObjectOwner.LastName #",
+                        template: dataItem => `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}`,
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "LastChangedByUser.Name", title: "Sidst redigeret: Bruger", width: 150,
                         persistId: "lastchangedname", // DON'T YOU DARE RENAME!
-                        template: "#: LastChangedByUser.Name + ' ' + LastChangedByUser.LastName #",
+                        template: dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`,
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "LastChanged", title: "Sidst redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 130,
                         persistId: "lastchangeddate", // DON'T YOU DARE RENAME!
+                        excelTemplate: dataItem => {
+                            // handles null cases
+                            if (!dataItem.LastChanged) {
+                                return "";
+                            }
+
+                            return this.moment(dataItem.LastChanged).format("DD-MM-YYYY");
+                        },
                         attributes: { "class": "text-center" },
                         filterable: {
                             cell: {
@@ -450,7 +485,7 @@
                     read: {
                         url: "/odata/ItSystemUsages?$expand=Organization",
                         dataType: "json"
-                    },
+                    }
                 },
                 serverPaging: true,
                 serverSorting: true,
@@ -484,23 +519,51 @@
                 });
             } else {
                 this.exportFlag = false;
+
+                // hide coloumns on visual grid
                 this._.forEach(columns, column => {
                     if (column.tempVisual) {
                         delete column.tempVisual;
                         e.sender.hideColumn(column);
                     }
                 });
+
+                // render templates
+                var sheet = e.workbook.sheets[0];
+
+                // skip header row
+                for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
+                    var row = sheet.rows[rowIndex];
+
+                    // -1 as sheet has header and dataSource hasn't
+                    var dataItem = <IKendoDataObservableObject>this.mainGrid.dataSource.at(rowIndex - 1);
+
+                    for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
+                        if (columns[columnIndex].field === "") continue;
+                        var cell = row.cells[columnIndex];
+
+                        var template = this.getTemplateMethod(columns[columnIndex]);
+
+                        cell.value = template(dataItem);
+                    }
+                }
             }
         }
 
-        private usageButtonTemplate = (dataItem) => {
-            // true if system is being used by system within current context, else false
-            var systemHasUsages = this._.find(dataItem.Usages, (d: any) => (d.OrganizationId == this.user.currentOrganizationId));
+        private getTemplateMethod(column) {
+            var template: Function;
 
-            if (systemHasUsages)
-                return `<button type="button" class="btn btn-danger col-md-7" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})">Fjern anv.</button>`;
+            if (column.excelTemplate) {
+                template = column.excelTemplate;
+            } else if (typeof column.template === "function") {
+                template = <Function>column.template;
+            } else if (typeof column.template === "string") {
+                template = kendo.template(<string>column.template);
+            } else {
+                template = t => t;
+            }
 
-            return `<button type="button" class="btn btn-success col-md-7" data-ng-click="systemCatalogVm.enableUsage(${dataItem.Id})">Anvend</button>`;
+            return template;
         }
 
         // adds usage at selected system within current context
@@ -520,7 +583,7 @@
             return this.$http.post("api/itsystemusage", {
                 itSystemId: systemId,
                 organizationId: this.user.currentOrganizationId
-                })
+            })
                 .success(() => this.notify.addSuccessMessage("Systemet er taget i anvendelse"))
                 .error(() => this.notify.addErrorMessage("Systemet kunne ikke tages i anvendelse!"));
         }
@@ -532,12 +595,6 @@
             return this.$http.delete(url)
                 .success(() => this.notify.addSuccessMessage("Anvendelse af systemet er fjernet"))
                 .error(() => this.notify.addErrorMessage("Anvendelse af systemet kunne ikke fjernes!"));
-        }
-
-        private linkTemplate(dataItem) {
-            if (dataItem.Url)
-                return `<a href="${dataItem.Url}" title="Link til yderligere..." target="_blank"><i class="fa fa-link"></i></a>`;
-            return "";
         }
 
         private accessModFilter = (args) => {
