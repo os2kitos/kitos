@@ -1,6 +1,6 @@
-﻿(function(ng, app) {
+﻿(function (ng, app) {
     app.config([
-        "$stateProvider", function($stateProvider) {
+        "$stateProvider", function ($stateProvider) {
             $stateProvider.state("it-project.edit.kle", {
                 url: "/kle",
                 templateUrl: "app/components/it-project/tabs/it-project-tab-kle.view.html",
@@ -8,9 +8,9 @@
                 resolve: {
                     // re-resolve data from parent cause changes here wont cascade to it
                     project: [
-                        "$http", "$stateParams", function($http, $stateParams) {
+                        "$http", "$stateParams", function ($http, $stateParams) {
                             return $http.get("api/itproject/" + $stateParams.id)
-                                .then(function(result) {
+                                .then(function (result) {
                                     return result.data.response;
                                 });
                         }
@@ -21,129 +21,136 @@
     ]);
 
     app.controller("project.EditKleCtrl",
-    [
-        "$scope", "$http", "$state", "$stateParams", "notify", "user",
-        function($scope, $http, $state, $stateParams, notify, user) {
-            var projectId = $stateParams.id;
-            var baseUrl = "api/itProject/" + projectId;
+        [
+            "$scope", "$http", "$state", "$stateParams", "notify", "user",
+            function ($scope, $http, $state, $stateParams, notify, user) {
+                var projectId = $stateParams.id;
+                var baseUrl = "api/itProject/" + projectId;
 
-            $scope.pagination = {
-                skip: 0,
-                take: 50
-            };
+                $scope.pagination = {
+                    skip: 0,
+                    take: 50
+                };
 
-            $scope.showAllTasks = true;
+                $scope.showAllTasks = true;
 
-            $scope.$watch("selectedTaskGroup", function(newVal, oldVal) {
-                $scope.pagination.skip = 0;
-                loadTasks();
-            });
-            $scope.$watchCollection("pagination", loadTasks);
+                $scope.$watch("selectedTaskGroup", function (newVal, oldVal) {
+                    $scope.pagination.skip = 0;
+                    loadTasks();
+                });
+                $scope.$watchCollection("pagination", loadTasks);
 
-            //change between show all tasks and only show active tasks
-            $scope.changeTaskView = function() {
-                $scope.showAllTasks = !$scope.showAllTasks;
-                $scope.pagination.skip = 0;
-                loadTasks();
-            };
+                //change between show all tasks and only show active tasks
+                $scope.changeTaskView = function () {
+                    $scope.showAllTasks = !$scope.showAllTasks;
+                    $scope.pagination.skip = 0;
+                    loadTasks();
+                };
 
-            function loadTasks() {
+                function loadTasks() {
 
-                var url = baseUrl + "?tasks=true";
-                url += "&onlySelected=" + !$scope.showAllTasks;
-                url += "&taskGroup=" + $scope.selectedTaskGroup;
-                url += "&skip=" + $scope.pagination.skip + "&take=" + $scope.pagination.take;
+                    var url = baseUrl + "?tasks=true";
+                    url += "&onlySelected=" + !$scope.showAllTasks;
+                    url += "&taskGroup=" + $scope.selectedTaskGroup;
+                    url += "&skip=" + $scope.pagination.skip + "&take=" + $scope.pagination.take;
 
-                if ($scope.pagination.orderBy) {
-                    url += "&orderBy=" + $scope.pagination.orderBy;
-                    if ($scope.pagination.descending) url += "&descending=" + $scope.pagination.descending;
+                    if ($scope.pagination.orderBy) {
+                        url += "&orderBy=" + $scope.pagination.orderBy;
+                        if ($scope.pagination.descending) url += "&descending=" + $scope.pagination.descending;
+                    }
+
+                    $http.get(url)
+                        .then((result, status, headers) => {
+                            $scope.tasklist = result.response;
+
+                            var paginationHeader = JSON.parse(headers("X-Pagination"));
+                            $scope.totalCount = paginationHeader.TotalCount;
+
+                        }, () => {
+                            notify.addErrorMessage("Kunne ikke hente opgaver!");
+                        });
+
                 }
 
-                $http.get(url).success(function(result, status, headers) {
-                    $scope.tasklist = result.response;
-
-                    var paginationHeader = JSON.parse(headers("X-Pagination"));
-                    $scope.totalCount = paginationHeader.TotalCount;
-
-                }).error(function() {
-                    notify.addErrorMessage("Kunne ikke hente opgaver!");
-                });
-
-            }
-
-            function add(task) {
-                return $http.post(baseUrl + "?taskId=" + task.taskRef.id + "&organizationId=" + user.currentOrganizationId).success(function (result) {
-                    task.isSelected = true;
-                });
-            }
-
-            function remove(task) {
-                return $http.delete(baseUrl + "?taskId=" + task.taskRef.id + "&organizationId=" + user.currentOrganizationId).success(function (result) {
-                    task.isSelected = false;
-                });
-            }
-
-            $scope.save = function(task) {
-                var msg = notify.addInfoMessage("Opdaterer ...", false);
-
-                if (!task.isSelected) {
-                    add(task).success(function() {
-                        msg.toSuccessMessage("Feltet er opdateret!");
-                    }).error(function() {
-                        msg.toErrorMessage("Fejl!");
-                    });
-                } else {
-                    remove(task).success(function() {
-                        msg.toSuccessMessage("Feltet er opdateret!");
-                    }).error(function() {
-                        msg.toErrorMessage("Fejl!");
-                    });
+                function add(task) {
+                    return $http.post(baseUrl + "?taskId=" + task.taskRef.id + "&organizationId=" + user.currentOrganizationId, { ignoreLoadingBar: true })
+                        .then(result => {
+                            task.isSelected = true;
+                        });
                 }
-            };
 
-            $scope.selectAllTasks = function() {
-                _.each($scope.tasklist, function(task: { isSelected }) {
+                function remove(task) {
+                    return $http.delete(baseUrl + "?taskId=" + task.taskRef.id + "&organizationId=" + user.currentOrganizationId, { ignoreLoadingBar: true })
+                        .then(result => {
+                            task.isSelected = false;
+                        });
+                }
+
+                $scope.save = function (task) {
+                    var msg = notify.addInfoMessage("Opdaterer ...", false);
+
                     if (!task.isSelected) {
-                        add(task);
+                        add(task)
+                            .then(() => {
+                                msg.toSuccessMessage("Feltet er opdateret!");
+                            }, () => {
+                                msg.toErrorMessage("Fejl!");
+                            });
+                    } else {
+                        remove(task)
+                            .then(() => {
+                                msg.toSuccessMessage("Feltet er opdateret!");
+                            }, () => {
+                                msg.toErrorMessage("Fejl!");
+                            });
                     }
-                });
-            };
+                };
 
-            $scope.removeAllTasks = function() {
-                _.each($scope.tasklist, function(task: { isSelected }) {
-                    if (task.isSelected) {
-                        remove(task);
-                    }
-                });
-            };
+                $scope.selectAllTasks = function () {
+                    _.each($scope.tasklist, function (task: { isSelected }) {
+                        if (!task.isSelected) {
+                            add(task);
+                        }
+                    });
+                };
 
-            $scope.selectTaskGroup = function() {
-                var url = baseUrl + "?taskId=" + $scope.selectedTaskGroup + "&organizationId=" + user.currentOrganizationId;
+                $scope.removeAllTasks = function () {
+                    _.each($scope.tasklist, function (task: { isSelected }) {
+                        if (task.isSelected) {
+                            remove(task);
+                        }
+                    });
+                };
 
-                var msg = notify.addInfoMessage("Opretter tilknytning...", false);
-                $http.post(url).success(function() {
-                    msg.toSuccessMessage("Tilknytningen er oprettet");
-                    reload();
-                }).error(function() {
-                    msg.toErrorMessage("Fejl! Kunne ikke oprette tilknytningen!");
-                });
-            };
+                $scope.selectTaskGroup = function () {
+                    var url = baseUrl + "?taskId=" + $scope.selectedTaskGroup + "&organizationId=" + user.currentOrganizationId;
 
-            $scope.removeTaskGroup = function () {
-                var url = baseUrl + "?taskId=" + $scope.selectedTaskGroup + "&organizationId=" + user.currentOrganizationId;
+                    var msg = notify.addInfoMessage("Opretter tilknytning...", false);
+                    $http.post(url)
+                        .then(() => {
+                            msg.toSuccessMessage("Tilknytningen er oprettet");
+                            reload();
+                        }, () => {
+                            msg.toErrorMessage("Fejl! Kunne ikke oprette tilknytningen!");
+                        });
+                };
 
-                var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
-                $http.delete(url).success(function () {
-                    msg.toSuccessMessage("Tilknytningen er fjernet");
-                    reload();
-                }).error(function () {
-                    msg.toErrorMessage("Fejl! Kunne ikke fjerne tilknytningen!");
-                });
-            };
+                $scope.removeTaskGroup = function () {
+                    var url = baseUrl + "?taskId=" + $scope.selectedTaskGroup + "&organizationId=" + user.currentOrganizationId;
 
-            function reload() {
-                $state.go(".", null, { reload: true });
+                    var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
+                    $http.delete(url)
+                        .then(() => {
+                            msg.toSuccessMessage("Tilknytningen er fjernet");
+                            reload();
+                        }, () => {
+                            msg.toErrorMessage("Fejl! Kunne ikke fjerne tilknytningen!");
+                        });
+                };
+
+                function reload() {
+                    $state.go(".", null, { reload: true });
+                }
             }
-        }
-    ]);
+        ]);
 })(angular, app);
