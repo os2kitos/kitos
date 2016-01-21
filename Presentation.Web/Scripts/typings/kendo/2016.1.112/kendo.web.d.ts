@@ -1364,6 +1364,17 @@ declare module kendo.ui {
     interface GridColumn {
         editor?(container: JQuery, options: GridColumnEditorOptions): void;
     }
+
+    interface TreeListEditorOptions {
+        field?: string;
+        format?: string;
+        model?: kendo.data.Model;
+        values?: any[];
+    }
+
+    interface TreeListColumn {
+        editor?(container: JQuery, options: TreeListEditorOptions): void;
+    }
 }
 
 declare module kendo.geometry {
@@ -1662,6 +1673,7 @@ declare module kendo.drawing {
     interface ArcOptions {
         name?: string;
         clip?: kendo.drawing.Path;
+        cursor?: string;
         fill?: kendo.drawing.FillOptions;
         opacity?: number;
         stroke?: kendo.drawing.StrokeOptions;
@@ -1704,6 +1716,7 @@ declare module kendo.drawing {
     interface CircleOptions {
         name?: string;
         clip?: kendo.drawing.Path;
+        cursor?: string;
         fill?: kendo.drawing.FillOptions;
         opacity?: number;
         stroke?: kendo.drawing.StrokeOptions;
@@ -1742,6 +1755,7 @@ declare module kendo.drawing {
     interface ElementOptions {
         name?: string;
         clip?: kendo.drawing.Path;
+        cursor?: string;
         opacity?: number;
         transform?: kendo.geometry.Transformation;
         visible?: boolean;
@@ -1757,8 +1771,8 @@ declare module kendo.drawing {
 
 
 
-        color: string;
-        opacity: number;
+        color?: string;
+        opacity?: number;
 
 
 
@@ -1846,6 +1860,7 @@ declare module kendo.drawing {
     interface GroupOptions {
         name?: string;
         clip?: kendo.drawing.Path;
+        cursor?: string;
         opacity?: number;
         pdf?: kendo.drawing.PDFOptions;
         transform?: kendo.geometry.Transformation;
@@ -1887,6 +1902,7 @@ declare module kendo.drawing {
     interface ImageOptions {
         name?: string;
         clip?: kendo.drawing.Path;
+        cursor?: string;
         opacity?: number;
         transform?: kendo.geometry.Transformation;
         visible?: boolean;
@@ -2005,6 +2021,7 @@ declare module kendo.drawing {
     interface MultiPathOptions {
         name?: string;
         clip?: kendo.drawing.Path;
+        cursor?: string;
         fill?: kendo.drawing.FillOptions;
         opacity?: number;
         stroke?: kendo.drawing.StrokeOptions;
@@ -2047,14 +2064,14 @@ declare module kendo.drawing {
 
 
 
-        creator: string;
-        date: Date;
-        keywords: string;
-        landscape: boolean;
-        margin: any;
-        paperSize: any;
-        subject: string;
-        title: string;
+        creator?: string;
+        date?: Date;
+        keywords?: string;
+        landscape?: boolean;
+        margin?: any;
+        paperSize?: any;
+        subject?: string;
+        title?: string;
 
 
 
@@ -2109,6 +2126,7 @@ declare module kendo.drawing {
     interface PathOptions {
         name?: string;
         clip?: kendo.drawing.Path;
+        cursor?: string;
         fill?: kendo.drawing.FillOptions;
         opacity?: number;
         stroke?: kendo.drawing.StrokeOptions;
@@ -2184,6 +2202,7 @@ declare module kendo.drawing {
     interface RectOptions {
         name?: string;
         clip?: kendo.drawing.Path;
+        cursor?: string;
         fill?: kendo.drawing.FillOptions;
         opacity?: number;
         stroke?: kendo.drawing.StrokeOptions;
@@ -2229,12 +2248,12 @@ declare module kendo.drawing {
 
 
 
-        color: string;
-        dashType: string;
-        lineCap: string;
-        lineJoin: string;
-        opacity: number;
-        width: number;
+        color?: string;
+        dashType?: string;
+        lineCap?: string;
+        lineJoin?: string;
+        opacity?: number;
+        width?: number;
 
 
 
@@ -2323,6 +2342,7 @@ declare module kendo.drawing {
     interface TextOptions {
         name?: string;
         clip?: kendo.drawing.Path;
+        cursor?: string;
         fill?: kendo.drawing.FillOptions;
         font?: string;
         opacity?: number;
@@ -2534,6 +2554,7 @@ declare module kendo.ui {
         culture?: string;
         dates?: any;
         depth?: string;
+        disableDates?: any|Function;
         footer?: string|Function;
         format?: string;
         max?: Date;
@@ -2812,27 +2833,15 @@ declare module kendo.ui {
         enable(element: string, enable: boolean): kendo.ui.ContextMenu;
         enable(element: Element, enable: boolean): kendo.ui.ContextMenu;
         enable(element: JQuery, enable: boolean): kendo.ui.ContextMenu;
-        insertAfter(item: string, referenceItem: string): kendo.ui.ContextMenu;
-        insertAfter(item: string, referenceItem: Element): kendo.ui.ContextMenu;
-        insertAfter(item: string, referenceItem: JQuery): kendo.ui.ContextMenu;
-        insertAfter(item: Element, referenceItem: string): kendo.ui.ContextMenu;
-        insertAfter(item: Element, referenceItem: Element): kendo.ui.ContextMenu;
-        insertAfter(item: Element, referenceItem: JQuery): kendo.ui.ContextMenu;
-        insertAfter(item: JQuery, referenceItem: string): kendo.ui.ContextMenu;
-        insertAfter(item: JQuery, referenceItem: Element): kendo.ui.ContextMenu;
-        insertAfter(item: JQuery, referenceItem: JQuery): kendo.ui.ContextMenu;
-        insertBefore(item: string, referenceItem: string): kendo.ui.ContextMenu;
-        insertBefore(item: string, referenceItem: Element): kendo.ui.ContextMenu;
-        insertBefore(item: string, referenceItem: JQuery): kendo.ui.ContextMenu;
-        insertBefore(item: Element, referenceItem: string): kendo.ui.ContextMenu;
-        insertBefore(item: Element, referenceItem: Element): kendo.ui.ContextMenu;
-        insertBefore(item: Element, referenceItem: JQuery): kendo.ui.ContextMenu;
-        insertBefore(item: JQuery, referenceItem: string): kendo.ui.ContextMenu;
-        insertBefore(item: JQuery, referenceItem: Element): kendo.ui.ContextMenu;
-        insertBefore(item: JQuery, referenceItem: JQuery): kendo.ui.ContextMenu;
-        open(x: number, y: number): kendo.ui.ContextMenu;
-        open(x: Element, y: number): kendo.ui.ContextMenu;
-        open(x: JQuery, y: number): kendo.ui.ContextMenu;
+        insertAfter(item: any, referenceItem: string): kendo.ui.ContextMenu;
+        insertAfter(item: any, referenceItem: Element): kendo.ui.ContextMenu;
+        insertAfter(item: any, referenceItem: JQuery): kendo.ui.ContextMenu;
+        insertBefore(item: any, referenceItem: string): kendo.ui.ContextMenu;
+        insertBefore(item: any, referenceItem: Element): kendo.ui.ContextMenu;
+        insertBefore(item: any, referenceItem: JQuery): kendo.ui.ContextMenu;
+        open(x: number, y?: number): kendo.ui.ContextMenu;
+        open(x: Element, y?: number): kendo.ui.ContextMenu;
+        open(x: JQuery, y?: number): kendo.ui.ContextMenu;
         remove(element: string): kendo.ui.ContextMenu;
         remove(element: Element): kendo.ui.ContextMenu;
         remove(element: JQuery): kendo.ui.ContextMenu;
@@ -2972,6 +2981,7 @@ declare module kendo.ui {
         culture?: string;
         dates?: any;
         depth?: string;
+        disableDates?: any|Function;
         footer?: string|Function;
         format?: string;
         max?: Date;
@@ -3061,6 +3071,7 @@ declare module kendo.ui {
         culture?: string;
         dates?: any;
         depth?: string;
+        disableDates?: any|Function;
         footer?: string;
         format?: string;
         interval?: number;
@@ -3114,6 +3125,7 @@ declare module kendo.ui {
 
 
         close(): void;
+        dataItem(index?: JQuery): any;
         dataItem(index?: number): any;
         destroy(): void;
         focus(): void;
@@ -4072,6 +4084,8 @@ declare module kendo.ui {
         dataSource?: any|any|kendo.data.DataSource;
         checkAll?: boolean;
         itemTemplate?: Function;
+        search?: boolean;
+        ignoreCase?: boolean;
         ui?: string|Function;
     }
 
@@ -4144,6 +4158,8 @@ declare module kendo.ui {
     interface GridFilterableOperatorsDate {
         eq?: string;
         neq?: string;
+        isnull?: string;
+        isnotnull?: string;
         gte?: string;
         gt?: string;
         lte?: string;
@@ -4153,11 +4169,15 @@ declare module kendo.ui {
     interface GridFilterableOperatorsEnums {
         eq?: string;
         neq?: string;
+        isnull?: string;
+        isnotnull?: string;
     }
 
     interface GridFilterableOperatorsNumber {
         eq?: string;
         neq?: string;
+        isnull?: string;
+        isnotnull?: string;
         gte?: string;
         gt?: string;
         lte?: string;
@@ -4167,6 +4187,10 @@ declare module kendo.ui {
     interface GridFilterableOperatorsString {
         eq?: string;
         neq?: string;
+        isnull?: string;
+        isnotnull?: string;
+        isempty?: string;
+        isnotempty?: string;
         startswith?: string;
         contains?: string;
         doesnotcontain?: string;
@@ -4593,24 +4617,12 @@ declare module kendo.ui {
         enable(element: string, enable: boolean): kendo.ui.Menu;
         enable(element: Element, enable: boolean): kendo.ui.Menu;
         enable(element: JQuery, enable: boolean): kendo.ui.Menu;
-        insertAfter(item: string, referenceItem: string): kendo.ui.Menu;
-        insertAfter(item: string, referenceItem: Element): kendo.ui.Menu;
-        insertAfter(item: string, referenceItem: JQuery): kendo.ui.Menu;
-        insertAfter(item: Element, referenceItem: string): kendo.ui.Menu;
-        insertAfter(item: Element, referenceItem: Element): kendo.ui.Menu;
-        insertAfter(item: Element, referenceItem: JQuery): kendo.ui.Menu;
-        insertAfter(item: JQuery, referenceItem: string): kendo.ui.Menu;
-        insertAfter(item: JQuery, referenceItem: Element): kendo.ui.Menu;
-        insertAfter(item: JQuery, referenceItem: JQuery): kendo.ui.Menu;
-        insertBefore(item: string, referenceItem: string): kendo.ui.Menu;
-        insertBefore(item: string, referenceItem: Element): kendo.ui.Menu;
-        insertBefore(item: string, referenceItem: JQuery): kendo.ui.Menu;
-        insertBefore(item: Element, referenceItem: string): kendo.ui.Menu;
-        insertBefore(item: Element, referenceItem: Element): kendo.ui.Menu;
-        insertBefore(item: Element, referenceItem: JQuery): kendo.ui.Menu;
-        insertBefore(item: JQuery, referenceItem: string): kendo.ui.Menu;
-        insertBefore(item: JQuery, referenceItem: Element): kendo.ui.Menu;
-        insertBefore(item: JQuery, referenceItem: JQuery): kendo.ui.Menu;
+        insertAfter(item: any, referenceItem: string): kendo.ui.Menu;
+        insertAfter(item: any, referenceItem: Element): kendo.ui.Menu;
+        insertAfter(item: any, referenceItem: JQuery): kendo.ui.Menu;
+        insertBefore(item: any, referenceItem: string): kendo.ui.Menu;
+        insertBefore(item: any, referenceItem: Element): kendo.ui.Menu;
+        insertBefore(item: any, referenceItem: JQuery): kendo.ui.Menu;
         open(element: string): kendo.ui.Menu;
         open(element: Element): kendo.ui.Menu;
         open(element: JQuery): kendo.ui.Menu;
@@ -5538,11 +5550,11 @@ declare module kendo.ui {
     }
 
     interface RangeSliderChangeEvent extends RangeSliderEvent {
-        value?: number;
+        value?: any;
     }
 
     interface RangeSliderSlideEvent extends RangeSliderEvent {
-        value?: number;
+        value?: any;
     }
 
 
@@ -6270,7 +6282,10 @@ declare module kendo.ui {
         activeSheet(): kendo.spreadsheet.Sheet;
         activeSheet(sheet?: kendo.spreadsheet.Sheet): void;
         sheets(): any;
+        fromFile(blob: Blob): JQueryPromise<any>;
+        fromFile(blob: File): JQueryPromise<any>;
         saveAsExcel(): void;
+        saveAsPDF(): JQueryPromise<any>;
         sheetByName(name: string): kendo.spreadsheet.Sheet;
         sheetIndex(sheet: kendo.spreadsheet.Sheet): number;
         sheetByIndex(index: number): kendo.spreadsheet.Sheet;
@@ -6279,7 +6294,7 @@ declare module kendo.ui {
         removeSheet(sheet: kendo.spreadsheet.Sheet): void;
         renameSheet(sheet: kendo.spreadsheet.Sheet, newSheetName: string): kendo.spreadsheet.Sheet;
         toJSON(): any;
-        fromJSON(options: any): void;
+        fromJSON(data: any): void;
 
     }
 
@@ -6287,6 +6302,34 @@ declare module kendo.ui {
         fileName?: string;
         forceProxy?: boolean;
         proxyURL?: string;
+    }
+
+    interface SpreadsheetPdfMargin {
+        bottom?: number|string;
+        left?: number|string;
+        right?: number|string;
+        top?: number|string;
+    }
+
+    interface SpreadsheetPdf {
+        area?: string;
+        author?: string;
+        creator?: string;
+        date?: Date;
+        fileName?: string;
+        fitWidth?: boolean;
+        forceProxy?: boolean;
+        guidelines?: boolean;
+        hCenter?: boolean;
+        keywords?: string;
+        landscape?: boolean;
+        margin?: SpreadsheetPdfMargin;
+        paperSize?: string|any;
+        proxyURL?: string;
+        proxyTarget?: string;
+        subject?: string;
+        title?: string;
+        vCenter?: boolean;
     }
 
     interface SpreadsheetSheetColumn {
@@ -6335,11 +6378,12 @@ declare module kendo.ui {
     }
 
     interface SpreadsheetSheetRowCellValidation {
+        type?: string;
         comparerType?: string;
         dataType?: string;
         from?: string;
         to?: string;
-        allowNulls?: string;
+        allowNulls?: boolean;
         messageTemplate?: string;
         titleTemplate?: string;
     }
@@ -6355,6 +6399,7 @@ declare module kendo.ui {
         fontSize?: number;
         italic?: boolean;
         bold?: boolean;
+        enable?: boolean;
         format?: string;
         formula?: string;
         index?: number;
@@ -6404,6 +6449,7 @@ declare module kendo.ui {
         headerHeight?: number;
         headerWidth?: number;
         dataSource?: kendo.data.DataSource;
+        data?: any;
     }
 
     interface SpreadsheetOptions {
@@ -6414,12 +6460,16 @@ declare module kendo.ui {
         headerHeight?: number;
         headerWidth?: number;
         excel?: SpreadsheetExcel;
+        pdf?: SpreadsheetPdf;
         rowHeight?: number;
         rows?: number;
         sheets?: SpreadsheetSheet[];
+        sheetsbar?: boolean;
         toolbar?: boolean;
         render?(e: SpreadsheetRenderEvent): void;
         excelExport?(e: SpreadsheetExcelExportEvent): void;
+        excelImport?(e: SpreadsheetExcelImportEvent): void;
+        pdfExport?(e: SpreadsheetPdfExportEvent): void;
     }
     interface SpreadsheetEvent {
         sender: Spreadsheet;
@@ -6435,6 +6485,15 @@ declare module kendo.ui {
         workbook?: kendo.ooxml.Workbook;
     }
 
+    interface SpreadsheetExcelImportEvent extends SpreadsheetEvent {
+        file?: Blob|File;
+        progress?: JQueryPromise<any>;
+    }
+
+    interface SpreadsheetPdfExportEvent extends SpreadsheetEvent {
+        promise?: JQueryPromise<any>;
+    }
+
 
     class TabStrip extends kendo.ui.Widget {
 
@@ -6442,6 +6501,7 @@ declare module kendo.ui {
 
         options: TabStripOptions;
 
+        dataSource: kendo.data.DataSource;
         tabGroup: JQuery;
 
         element: JQuery;
@@ -6488,12 +6548,14 @@ declare module kendo.ui {
         reload(element: JQuery): kendo.ui.TabStrip;
         remove(element: string): kendo.ui.TabStrip;
         remove(element: number): kendo.ui.TabStrip;
+        remove(element: JQuery): kendo.ui.TabStrip;
         select(): JQuery;
         select(element: string): void;
         select(element: Element): void;
         select(element: JQuery): void;
         select(element: number): void;
-        setDataSource(): void;
+        setDataSource(dataSource: any): void;
+        setDataSource(dataSource: kendo.data.DataSource): void;
 
     }
 
@@ -6524,6 +6586,7 @@ declare module kendo.ui {
         dataContentField?: string;
         dataContentUrlField?: string;
         dataImageUrlField?: string;
+        dataSource?: any|any|kendo.data.DataSource;
         dataSpriteCssClass?: string;
         dataTextField?: string;
         dataUrlField?: string;
@@ -7535,6 +7598,7 @@ declare module kendo.ui {
     }
 
     interface ValidatorValidateEvent extends ValidatorEvent {
+        valid?: boolean;
     }
 
 
@@ -7725,6 +7789,8 @@ declare module kendo {
         function parseFloat(value: string, culture?: string): number;
         function parseInt(value: string, culture?: string): number;
         function parseColor(color: string, noerror: boolean): kendo.Color;
+        function proxyModelSetters(): void;
+        function proxyModelSetters(data: kendo.data.Model): void;
         function resize(element: string, force: boolean): void;
         function resize(element: JQuery, force: boolean): void;
         function resize(element: Element, force: boolean): void;
@@ -7794,6 +7860,10 @@ declare module kendo.spreadsheet {
 
 
 
+        background(): string;
+        background(value?: string): void;
+        bold(): boolean;
+        bold(value?: boolean): void;
         borderBottom(): any;
         borderBottom(value?: any): void;
         borderLeft(): any;
@@ -7802,11 +7872,21 @@ declare module kendo.spreadsheet {
         borderRight(value?: any): void;
         borderTop(): any;
         borderTop(value?: any): void;
+        color(): string;
+        color(value?: string): void;
         clear(options?: any): void;
         clearFilter(indices: any): void;
         clearFilter(indices: number): void;
+        enable(): boolean;
+        enable(value?: boolean): void;
+        fillFrom(srcRange: Range, direction?: number): void;
+        fillFrom(srcRange: string, direction?: number): void;
         filter(filter: boolean): void;
         filter(filter: any): void;
+        fontFamily(): string;
+        fontFamily(value?: string): void;
+        fontSize(): number;
+        fontSize(value?: number): void;
         format(): string;
         format(format?: string): void;
         formula(): string;
@@ -7818,10 +7898,14 @@ declare module kendo.spreadsheet {
         input(value?: Date): void;
         isSortable(): boolean;
         isFilterable(): boolean;
+        italic(): boolean;
+        italic(value?: boolean): void;
         merge(): void;
         select(): void;
         sort(sort: number): void;
         sort(sort: any): void;
+        textAlign(): string;
+        textAlign(value?: string): void;
         unmerge(): void;
         values(values: any): void;
         validation(): any;
@@ -7830,6 +7914,8 @@ declare module kendo.spreadsheet {
         value(value?: string): void;
         value(value?: number): void;
         value(value?: Date): void;
+        verticalAlign(): string;
+        verticalAlign(value?: string): void;
         wrap(): boolean;
         wrap(value?: boolean): void;
 
@@ -7967,8 +8053,32 @@ declare module kendo.ooxml {
         rowSplit?: number;
     }
 
+    interface WorkbookSheetRowCellBorderBottom {
+        color?: string;
+        size?: string;
+    }
+
+    interface WorkbookSheetRowCellBorderLeft {
+        color?: string;
+        size?: string;
+    }
+
+    interface WorkbookSheetRowCellBorderRight {
+        color?: string;
+        size?: string;
+    }
+
+    interface WorkbookSheetRowCellBorderTop {
+        color?: string;
+        size?: string;
+    }
+
     interface WorkbookSheetRowCell {
         background?: string;
+        borderBottom?: WorkbookSheetRowCellBorderBottom;
+        borderLeft?: WorkbookSheetRowCellBorderLeft;
+        borderTop?: WorkbookSheetRowCellBorderTop;
+        borderRight?: WorkbookSheetRowCellBorderRight;
         bold?: boolean;
         color?: string;
         colSpan?: number;
@@ -8316,6 +8426,7 @@ declare module kendo.dataviz.drawing {
     interface ArcOptions {
         name?: string;
         clip?: kendo.drawing.Path;
+        cursor?: string;
         fill?: kendo.drawing.FillOptions;
         opacity?: number;
         stroke?: kendo.drawing.StrokeOptions;
@@ -8358,6 +8469,7 @@ declare module kendo.dataviz.drawing {
     interface CircleOptions {
         name?: string;
         clip?: kendo.drawing.Path;
+        cursor?: string;
         fill?: kendo.drawing.FillOptions;
         opacity?: number;
         stroke?: kendo.drawing.StrokeOptions;
@@ -8396,6 +8508,7 @@ declare module kendo.dataviz.drawing {
     interface ElementOptions {
         name?: string;
         clip?: kendo.drawing.Path;
+        cursor?: string;
         opacity?: number;
         transform?: kendo.geometry.Transformation;
         visible?: boolean;
@@ -8411,8 +8524,8 @@ declare module kendo.dataviz.drawing {
 
 
 
-        color: string;
-        opacity: number;
+        color?: string;
+        opacity?: number;
 
 
 
@@ -8500,6 +8613,7 @@ declare module kendo.dataviz.drawing {
     interface GroupOptions {
         name?: string;
         clip?: kendo.drawing.Path;
+        cursor?: string;
         opacity?: number;
         pdf?: kendo.drawing.PDFOptions;
         transform?: kendo.geometry.Transformation;
@@ -8541,6 +8655,7 @@ declare module kendo.dataviz.drawing {
     interface ImageOptions {
         name?: string;
         clip?: kendo.drawing.Path;
+        cursor?: string;
         opacity?: number;
         transform?: kendo.geometry.Transformation;
         visible?: boolean;
@@ -8659,6 +8774,7 @@ declare module kendo.dataviz.drawing {
     interface MultiPathOptions {
         name?: string;
         clip?: kendo.drawing.Path;
+        cursor?: string;
         fill?: kendo.drawing.FillOptions;
         opacity?: number;
         stroke?: kendo.drawing.StrokeOptions;
@@ -8701,14 +8817,14 @@ declare module kendo.dataviz.drawing {
 
 
 
-        creator: string;
-        date: Date;
-        keywords: string;
-        landscape: boolean;
-        margin: any;
-        paperSize: any;
-        subject: string;
-        title: string;
+        creator?: string;
+        date?: Date;
+        keywords?: string;
+        landscape?: boolean;
+        margin?: any;
+        paperSize?: any;
+        subject?: string;
+        title?: string;
 
 
 
@@ -8763,6 +8879,7 @@ declare module kendo.dataviz.drawing {
     interface PathOptions {
         name?: string;
         clip?: kendo.drawing.Path;
+        cursor?: string;
         fill?: kendo.drawing.FillOptions;
         opacity?: number;
         stroke?: kendo.drawing.StrokeOptions;
@@ -8838,6 +8955,7 @@ declare module kendo.dataviz.drawing {
     interface RectOptions {
         name?: string;
         clip?: kendo.drawing.Path;
+        cursor?: string;
         fill?: kendo.drawing.FillOptions;
         opacity?: number;
         stroke?: kendo.drawing.StrokeOptions;
@@ -8883,12 +9001,12 @@ declare module kendo.dataviz.drawing {
 
 
 
-        color: string;
-        dashType: string;
-        lineCap: string;
-        lineJoin: string;
-        opacity: number;
-        width: number;
+        color?: string;
+        dashType?: string;
+        lineCap?: string;
+        lineJoin?: string;
+        opacity?: number;
+        width?: number;
 
 
 
@@ -8977,6 +9095,7 @@ declare module kendo.dataviz.drawing {
     interface TextOptions {
         name?: string;
         clip?: kendo.drawing.Path;
+        cursor?: string;
         fill?: kendo.drawing.FillOptions;
         font?: string;
         opacity?: number;

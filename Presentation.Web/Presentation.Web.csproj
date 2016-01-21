@@ -550,6 +550,7 @@
     <TypeScriptCompile Include="Scripts\typings\angular-protractor\angular-protractor.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine-expect\jasmine-expect.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine\jasmine.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\kendo\2016.1.112\kendo.web.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\moment\moment-node.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\moment\moment.d.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabCommunication.e2e.spec.ts" />
@@ -583,7 +584,6 @@
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\JSONfn\jsonfn.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\kendo\2015.3.1111\kendo.web.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\lodash\lodash.d.ts" />
     <TypeScriptCompile Include="app\app.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-organization-modal-edit.controller.ts" />
