@@ -862,7 +862,7 @@
     <TypeScriptCompile Include="app\components\global-config\global-config-org.controller.ts" />
     <TypeScriptCompile Include="app\components\home\home-forgot-password.controller.ts" />
     <TypeScriptCompile Include="app\components\home\home-reset-password.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-contract\economy-stream.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\economy-stream.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-overview-inactive.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-overview.spec.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-strategy.controller.ts" />
