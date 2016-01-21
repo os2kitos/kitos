@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-ng-app="app">
+<html lang="da">
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=EDGE">
     <meta charset="utf-8">
@@ -7,8 +7,18 @@
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon">
     <meta name="viewport" content="width=device-width">
 
+    <link href="//kendo.cdn.telerik.com/2016.1.112/styles/kendo.common-bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="//kendo.cdn.telerik.com/2016.1.112/styles/kendo.bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="/Content/css/app.min.css" rel="stylesheet"/>
-    <link href="/Content/kendo/2015.3.1111/kendo-bundle.min.css" rel="stylesheet" />
+
+    <script src="/Scripts/library-bundle.min.js"></script>
+    <script src="/Scripts/angular-bundle.min.js"></script>
+    <script src="//kendo.cdn.telerik.com/2016.1.112/js/jszip.min.js"></script>
+    <script src="//kendo.cdn.telerik.com/2016.1.112/js/kendo.all.min.js"></script>
+    <!-- Kendo localization -->
+    <script src="//kendo.cdn.telerik.com/2016.1.112/js/messages/kendo.messages.da-DK.min.js"></script>
+    <!-- Kendo globalization -->
+    <script src="//kendo.cdn.telerik.com/2016.1.112/js/cultures/kendo.culture.da-DK.min.js"></script>
 
     @if (ViewBag.Environment != "Prod")
     {
@@ -30,31 +40,8 @@
         }
     }
 </head>
-<body data-ng-cloak>
-    <div data-notify></div>
-    <div id="page-wrapper" class="container-fluid">
-        <!-- NAVBAR
-            ================================================== -->
-        <div data-ng-include="'app/shared/navigation/navigation-top.view.html'"></div>
-
-        <div id="page-content" role="main">
-
-            <div id="subnav" data-ng-include="'app/shared/navigation/navigation-sub.view.html'"></div>
-
-            <div id="page-body" data-ui-view="" data-autoscroll="false" data-ng-cloak>
-            </div>
-
-            @{/* this doesn't really do anything, but it's necessary to shut up the interpreter */}
-            @RenderBody()
-        </div>
-        <footer class="footer text-info text-right">
-            <small>Siden anvender <a href="https://www.browserstack.com/" title="BrowserStack">BrowserStack</a>.</small>
-        </footer>
-    </div>
-
-    <script src="/Scripts/library-bundle.min.js"></script>
-    <script src="/Scripts/angular-bundle.min.js"></script>
-    <script src="/Scripts/kendo-bundle.min.js"></script>
+<body data-ng-app="app" data-ng-cloak>
+    @RenderBody()
 
     <script>
         // set current culture to "da-DK"
