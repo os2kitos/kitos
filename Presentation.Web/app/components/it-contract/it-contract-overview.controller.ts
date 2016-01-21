@@ -102,6 +102,11 @@
             return filterUrl.replace(pattern, `Rights/any(c: $1c/User/Name$2 and c/RoleId eq ${roleId})`);
         }
 
+        private fixSystemFilter(filterUrl, column) {
+            var pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+            return filterUrl.replace(pattern, "AssociatedSystemUsages/any(c: $1c/ItSystemUsage/ItSystem/Name$2)");
+        }
+
         // loads kendo grid options from localstorage
         private loadGridOptions() {
             var selectedOrgUnitId = <number>this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
@@ -190,6 +195,8 @@
 
                             if (parameterMap.$filter) {
                                 this._.forEach(this.itContractRoles, role => parameterMap.$filter = this.fixRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id));
+
+                                parameterMap.$filter = this.fixSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
                             }
 
                             return parameterMap;
