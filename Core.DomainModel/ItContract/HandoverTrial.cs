@@ -8,7 +8,7 @@ namespace Core.DomainModel.ItContract
         public DateTime? Approved { get; set; }
         public int ItContractId { get; set; }
         public virtual ItContract ItContract { get; set; }
-        
+
         public int? HandoverTrialTypeId { get; set; }
         public virtual HandoverTrialType HandoverTrialType { get; set; }
 

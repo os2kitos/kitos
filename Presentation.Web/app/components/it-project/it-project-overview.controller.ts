@@ -2,7 +2,7 @@
     "use strict";
 
     export interface IOverviewController {
-        mainGrid: Kitos.IKendoGrid;
+        mainGrid: IKendoGrid<IItProjectOverview>;
         mainGridOptions: kendo.ui.GridOptions;
         roleSelectorOptions: kendo.ui.DropDownListOptions;
 
@@ -13,11 +13,16 @@
         clearOptions(): void;
     }
 
+    export interface IItProjectOverview extends Models.ItProject.IItProject {
+        CurrentPhaseObj: Models.ItProject.IItProjectPhase;
+        roles: Array<any>;
+    }
+
     export class OverviewController implements IOverviewController {
         private storageKey = "it-project-overview-options";
         private orgUnitStorageKey = "it-project-overview-orgunit";
         private gridState = this.gridStateService.getService(this.storageKey);
-        public mainGrid: Kitos.IKendoGrid;
+        public mainGrid: IKendoGrid<IItProjectOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
 
         private static $inject: Array<string> = [
@@ -39,19 +44,19 @@
         ];
 
         constructor(
-            private $rootScope: Kitos.IRootScope,
+            private $rootScope: IRootScope,
             private $scope: ng.IScope,
             private $http: ng.IHttpService,
             private $timeout: ng.ITimeoutService,
             private $window: ng.IWindowService,
             private $state: ng.ui.IStateService,
             private $: JQueryStatic,
-            private _: Kitos.ILodashWithMixins,
+            private _: ILoDashWithMixins,
             private moment: moment.MomentStatic,
             private notify,
             private projectRoles,
             private user,
-            private gridStateService: Kitos.Services.IGridStateFactory,
+            private gridStateService: Services.IGridStateFactory,
             private orgUnits: any,
             private economyCalc) {
             this.$rootScope.page.title = "IT Projekt - Overblik";
@@ -88,7 +93,7 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            var selectedOrgUnitId = <number> this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
+            var selectedOrgUnitId = <number>this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
             var selectedOrgUnit = this._.find(this.orgUnits, (orgUnit: any) => (orgUnit.Id == selectedOrgUnitId));
 
             var filter = undefined;
@@ -154,7 +159,7 @@
         }
 
         private activate() {
-            var mainGridOptions: Kitos.IKendoGridOptions = {
+            var mainGridOptions: IKendoGridOptions<IItProjectOverview> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
                     type: "odata-v4",
@@ -192,7 +197,7 @@
                                 LastChanged: { type: "date" },
                                 IsTransversal: { type: "boolean" },
                                 IsStrategy: { type: "boolean" },
-                                IsArchived: { type: "boolean" },
+                                IsArchived: { type: "boolean" }
                             }
                         },
                         parse: response => {
@@ -285,19 +290,21 @@
                     {
                         field: "ItProjectId", title: "ProjektID", width: 115,
                         persistId: "projid", // DON'T YOU DARE RENAME!
+                        excelTemplate: dataItem => dataItem && dataItem.ItProjectId ? dataItem.ItProjectId : "",
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "Parent.Name", title: "Overordnet IT Projekt", width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
-                        template: "#= Parent ? '<a data-ui-sref=\"it-project.edit.status-project({id:' + Parent.Id + '})\">' + Parent.Name + '</a>' : '' #",
+                        template: dataItem => dataItem.Parent ? `<a data-ui-sref="it-project.edit.status-project({id:${dataItem.Parent.Id}})">${dataItem.Parent.Name}</a>` : "",
+                        excelTemplate: dataItem => dataItem && dataItem.Parent ? dataItem.Parent.Name : "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -310,19 +317,20 @@
                     {
                         field: "Name", title: "IT Projekt", width: 340,
                         persistId: "projname", // DON'T YOU DARE RENAME!
-                        template: '<a data-ui-sref="it-project.edit.status-project({id: #: Id #})">#: Name #</a>',
+                        template: dataItem => `<a data-ui-sref="it-project.edit.status-project({id: ${dataItem.Id}})">${dataItem.Name}</a>`,
+                        excelTemplate: dataItem => dataItem && dataItem.Name ? dataItem.Name : "",
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 245,
                         persistId: "orgunit", // DON'T YOU DARE RENAME!
-                        template: "#: ResponsibleUsage ? ResponsibleUsage.OrganizationUnit.Name : '' #",
+                        template: dataItem => dataItem.ResponsibleUsage && dataItem.ResponsibleUsage.OrganizationUnit.Name || "",
                         filterable: {
                             cell: {
                                 showOperators: false,
@@ -347,74 +355,107 @@
                     {
                         field: "Esdh", title: "ESDH ref", width: 150,
                         persistId: "esdh", // DON'T YOU DARE RENAME!
-                        template: "#= Esdh ? '<a target=\"_blank\" href=\"' + Esdh + '\"><i class=\"fa fa-link\"></a>' : '' #",
+                        template: dataItem => dataItem.Esdh ? `<a target="_blank" href="${dataItem.Esdh}"><i class="fa fa-link"></a>` : "",
+                        excelTemplate: dataItem => dataItem && dataItem.Esdh || "",
                         attributes: { "class": "text-center" },
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "Folder", title: "Mappe ref", width: 150,
                         persistId: "folder", // DON'T YOU DARE RENAME!
-                        template: "#= Folder ? '<a target=\"_blank\" href=\"' + Folder + '\"><i class=\"fa fa-link\"></i></a>' : '' #",
+                        template: dataItem => dataItem.Folder ? `<a target="_blank" href="${dataItem.Folder}"><i class="fa fa-link"></i></a>` : "",
+                        excelTemplate: dataItem => dataItem && dataItem.Folder || "",
                         attributes: { "class": "text-center" },
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
                         field: "ItProjectType.Name", title: "Projekttype", width: 125,
                         persistId: "projtype", // DON'T YOU DARE RENAME!
-                        template: "#: ItProjectType ? ItProjectType.Name : '' #",
+                        template: dataItem => dataItem.ItProjectType ? dataItem.ItProjectType.Name : "",
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
-                        field: "", title: "Fase", width: 100,
+                        field: "CurrentPhaseObj.Name", title: "Fase", width: 100,
                         persistId: "phasename", // DON'T YOU DARE RENAME!
-                        template: "#= CurrentPhaseObj ? '<a data-ui-sref=\"it-project.edit.phases({id:' + Id + '})\">' + CurrentPhaseObj.Name + '</a>'  : '' #",
+                        template: dataItem =>
+                            dataItem.CurrentPhaseObj ? `<a data-ui-sref="it-project.edit.phases({id:${dataItem.Id}})">${dataItem.CurrentPhaseObj.Name}</a>` : "",
+                        excelTemplate: dataItem => dataItem && dataItem.CurrentPhaseObj && dataItem.CurrentPhaseObj.Name || "",
                         sortable: false,
-                        filterable: false,
+                        filterable: false
                     },
                     {
-                        field: "", title: "Fase: Startdato", format: "{0:dd-MM-yyyy}", width: 85,
+                        field: "CurrentPhaseObj.StartDate", title: "Fase: Startdato", format: "{0:dd-MM-yyyy}", width: 85,
                         persistId: "phasestartdate", // DON'T YOU DARE RENAME!
                         hidden: true,
-                        template: this.phaseStartDateTemplate,
+                        template: dataItem => {
+                            // handles null cases
+                            if (!dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.StartDate) {
+                                return "";
+                            }
+
+                            return this.moment(dataItem.CurrentPhaseObj.StartDate).format("DD-MM-YYYY");
+                        },
+                        excelTemplate: dataItem => {
+                            if (!dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.StartDate) {
+                                return "";
+                            }
+
+                            return this.moment(dataItem.CurrentPhaseObj.StartDate).format("DD-MM-YYYY");
+                        },
                         sortable: false,
-                        filterable: false,
+                        filterable: false
                     },
                     {
-                        field: "", title: "Fase: Slutdato", format: "{0:dd-MM-yyyy}", width: 85,
+                        field: "CurrentPhaseobj.EndDate", title: "Fase: Slutdato", format: "{0:dd-MM-yyyy}", width: 85,
                         persistId: "phaseenddate", // DON'T YOU DARE RENAME!
-                        template: this.phaseEndDateTemplate,
+                        template: dataItem => {
+                            // handles null cases
+                            if (!dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.EndDate) {
+                                return "";
+                            }
+
+                            return this.moment(dataItem.CurrentPhaseObj.EndDate).format("DD-MM-YYYY");
+                        },
+                        excelTemplate: dataItem => {
+                            if (!dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.EndDate) {
+                                return "";
+                            }
+
+                            return this.moment(dataItem.CurrentPhaseObj.EndDate).format("DD-MM-YYYY");
+                        },
                         sortable: false,
-                        filterable: false,
+                        filterable: false
                     },
                     {
                         field: "StatusProject", title: "Status projekt", width: 100,
                         persistId: "statusproj", // DON'T YOU DARE RENAME!
-                        template: '<span data-square-traffic-light="#: StatusProject #"></span>',
+                        template: dataItem => `<span data-square-traffic-light="${dataItem.StatusProject}"></span>`,
+                        excelTemplate: dataItem => dataItem.StatusProject.toString(),
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "eq",
+                                operator: "eq"
                             }
                         },
                         values: [
@@ -427,33 +468,41 @@
                     {
                         field: "StatusDate", title: "Status projekt: Dato", format: "{0:dd-MM-yyyy}", width: 130,
                         persistId: "statusdateproj", // DON'T YOU DARE RENAME!
+                        excelTemplate: dataItem => {
+                            if (!dataItem.StatusDate) {
+                                return "";
+                            }
+
+                            return this.moment(dataItem.StatusDate).format("DD-MM-YYYY");
+                        },
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains",
+                                operator: "contains"
                             }
                         }
                     },
                     {
-                        field: "", title: "Opgaver", width: 150,
+                        field: "Assignments", title: "Opgaver", width: 150,
                         persistId: "assignments", // DON'T YOU DARE RENAME!
                         hidden: true,
-                        template: this.assigmentTemplate,
+                        template: dataItem => this._.filter(dataItem.ItProjectStatuses, n => this._.contains(n["@odata.type"], "Assignment")).length.toString(),
                         filterable: false,
                         sortable: false
                     },
                     {
                         field: "GoalStatus.Status", title: "Status Mål", width: 150,
                         persistId: "goalstatus", // DON'T YOU DARE RENAME!
-                        template: '<span data-square-traffic-light="#: GoalStatus.Status #"></span>',
+                        template: dataItem => `<span data-square-traffic-light="${dataItem.GoalStatus.Status}"></span>`,
+                        excelTemplate: dataItem => dataItem && dataItem.GoalStatus && dataItem.GoalStatus.Status.toString() || "",
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "eq",
+                                operator: "eq"
                             }
                         },
                         values: [
@@ -467,34 +516,45 @@
                         field: "IsTransversal", title: "Tværgående", width: 150,
                         persistId: "trans", // DON'T YOU DARE RENAME!
                         hidden: true,
-                        template: "#= IsTransversal ? '<i class=\"text-success fa fa-check\"></i>' : '<i class=\"text-danger fa fa-times\"></i>' #",
+                        template: dataItem => dataItem.IsTransversal ? `<i class="text-success fa fa-check"></i>` : `<i class="text-danger fa fa-times"></i>`,
+                        excelTemplate: dataItem => dataItem.IsTransversal.toString()
                     },
                     {
                         field: "IsStrategy", title: "Strategisk", width: 150,
                         persistId: "strat", // DON'T YOU DARE RENAME!
                         hidden: true,
-                        template: "#= IsStrategy ? '<i class=\"text-success fa fa-check\"></i>' : '<i class=\"text-danger fa fa-times\"></i>' #",
+                        template: dataItem => dataItem.IsStrategy ? `<i class="text-success fa fa-check"></i>` : `<i class="text-danger fa fa-times"></i>`,
+                        excelTemplate: dataItem => dataItem.IsStrategy.toString()
                     },
                     {
                         field: "EconomyYears", title: "Økonomi", width: 150,
                         persistId: "eco", // DON'T YOU DARE RENAME!
                         hidden: true,
-                        template: this.economyTemplate,
+                        template: dataItem => {
+                            var total = 0;
+                            this._.forEach(dataItem.EconomyYears, eco => {
+                                total += this.economyCalc.getTotalBudget(eco);
+                            });
+                            return (-total).toString();
+                        },
+                        filterable: false,
+                        sortable: false
                     },
                     {
                         field: "Priority", title: "Prioritet: Projekt", width: 120,
                         persistId: "priority", // DON'T YOU DARE RENAME!
-                        template: '<select data-ng-model="dataItem.Priority" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priority" data-ng-disabled="dataItem.IsPriorityLocked || !dataItem.hasWriteAccess">' +
-                        '<option value="None">-- Vælg --</option>' +
-                        '<option value="High">Høj</option>' +
-                        '<option value="Mid">Mellem</option>' +
-                        '<option value="Low">Lav</option>' +
-                        "</select>",
+                        template: () => `<select data-ng-model="dataItem.Priority" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priority" data-ng-disabled="dataItem.IsPriorityLocked || !dataItem.hasWriteAccess">
+                                                    <option value="None">-- Vælg --</option>
+                                                    <option value="High">Høj</option>
+                                                    <option value="Mid">Mellem</option>
+                                                    <option value="Low">Lav</option>
+                                                </select>`,
+                        excelTemplate: dataItem => dataItem.Priority.toString(),
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "eq",
+                                operator: "eq"
                             }
                         },
                         values: [
@@ -507,24 +567,25 @@
                     {
                         field: "PriorityPf", title: "Prioritet: Portefølje", width: 150,
                         persistId: "prioritypf", // DON'T YOU DARE RENAME!
-                        template: '<div class="btn-group btn-group-sm" data-toggle="buttons">' +
-                        '<label class="btn btn-star" data-ng-class="{ \'unstarred\': !dataItem.IsPriorityLocked }" data-ng-disabled="!dataItem.hasWriteAccess" data-ng-click="dataItem.IsPriorityLocked = !dataItem.IsPriorityLocked">' +
-                        '<input type="checkbox" data-ng-model="dataItem.IsPriorityLocked" data-autosave="api/itproject/{{dataItem.Id}}" data-field="IsPriorityLocked">' +
-                        '<i class="glyphicon glyphicon-lock"></i>' +
-                        "</label>" +
-                        "</div>" +
-                        '<select data-ng-model="dataItem.PriorityPf" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priorityPf">' +
-                        '<option value="None">-- Vælg --</option>' +
-                        '<option value="High">Høj</option>' +
-                        '<option value="Mid">Mellem</option>' +
-                        '<option value="Low">Lav</option>' +
-                        "</select>",
+                        template: () => `<div class="btn-group btn-group-sm" data-toggle="buttons">
+                                                    <label class="btn btn-star" data-ng-class="{ 'unstarred': !dataItem.IsPriorityLocked }" data-ng-disabled="!dataItem.hasWriteAccess" data-ng-click="dataItem.IsPriorityLocked = !dataItem.IsPriorityLocked">
+                                                        <input type="checkbox" data-ng-model="dataItem.IsPriorityLocked" data-autosave="api/itproject/{{dataItem.Id}}" data-field="IsPriorityLocked">
+                                                        <i class="glyphicon glyphicon-lock"></i>
+                                                    </label>
+                                                </div>
+                                                <select data-ng-model="dataItem.PriorityPf" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priorityPf">
+                                                    <option value="None">-- Vælg --</option>
+                                                    <option value="High">Høj</option>
+                                                    <option value="Mid">Mellem</option>
+                                                    <option value="Low">Lav</option>
+                                                </select>`,
+                        excelTemplate: dataItem => dataItem.PriorityPf.toString(),
                         hidden: true,
                         filterable: {
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "eq",
+                                operator: "eq"
                             }
                         },
                         values: [
@@ -543,19 +604,38 @@
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
             this._.forEachRight(this.projectRoles, role => {
-                var roleColumn = {
+                var roleColumn: IKendoGridColumn<IItProjectOverview> = {
                     field: `role${role.Id}`,
                     title: role.Name,
                     persistId: `role${role.Id}`,
-                    template: dataItem => this.roleTemplate(dataItem, role.Id),
+                    template: dataItem => {
+                        var roles = "";
+
+                        if (dataItem.roles[role.Id] === undefined)
+                            return roles;
+
+                        roles = this.concatRoles(dataItem.roles[role.Id]);
+
+                        var link = `<a data-ui-sref='it-system.usage.roles({id: ${dataItem.Id}})'>${roles}</a>`;
+
+                        return link;
+                    },
+                    excelTemplate: dataItem => {
+                        var roles = "";
+
+                        if (dataItem.roles[role.Id] === undefined)
+                            return roles;
+
+                        return this.concatRoles(dataItem.roles[role.Id]);
+                    },
                     width: 135,
-                    hidden: role.Name === "Projektleder" ? false : true, // hardcoded role name :(
+                    hidden: !(role.Name === "Projektleder"), // hardcoded role name :(
                     sortable: false,
                     filterable: {
                         cell: {
                             dataSource: [],
                             showOperators: false,
-                            operator: "contains",
+                            operator: "contains"
                         }
                     }
                 };
@@ -568,60 +648,7 @@
             this.mainGridOptions = mainGridOptions;
         }
 
-        private economyTemplate = (dataItem) => {
-            var total = 0;
-            this._.forEach(dataItem.EconomyYears, eco => {
-                total += this.economyCalc.getTotalBudget(eco);
-            });
-            return -total;
-        }
-
-        private roleTemplate(dataItem, roleId) {
-            var roles = "";
-
-            if (dataItem.roles[roleId] === undefined)
-                return roles;
-
-            // join the first 5 username together
-            if (dataItem.roles[roleId].length > 0)
-                roles = dataItem.roles[roleId].slice(0, 4).join(", ");
-
-            // if more than 5 then add an elipsis
-            if (dataItem.roles[roleId].length > 5)
-                roles += ", ...";
-
-            var link = `<a data-ui-sref='it-system.usage.roles({id: ${dataItem.Id}})'>${roles}</a>`;
-
-            return link;
-        }
-
-        private phaseStartDateTemplate = (dataItem) => {
-            if (dataItem.CurrentPhaseObj) {
-                if (dataItem.CurrentPhaseObj.StartDate) {
-                    return this.moment(dataItem.CurrentPhaseObj.StartDate).format("DD-MM-YYYY");
-                }
-            }
-
-            return "";
-        }
-
-        private phaseEndDateTemplate = (dataItem) => {
-            if (dataItem.CurrentPhaseObj) {
-                if (dataItem.CurrentPhaseObj.EndDate) {
-                    return this.moment(dataItem.CurrentPhaseObj.EndDate).format("DD-MM-YYYY");
-                }
-            }
-
-            return "";
-        }
-
-        private assigmentTemplate = (dataItem) => {
-            var res = this._.filter(dataItem.ItProjectStatuses, n => this._.contains(n["@odata.type"], "Assignment"));
-
-            return res.length;
-        }
-
-        private orgUnitDropDownList = (args) => {
+        private orgUnitDropDownList = args => {
             var self = this;
 
             function indent(dataItem: any) {
@@ -719,8 +746,8 @@
         };
 
         private exportFlag = false;
-        private exportToExcel = (e) => {
-            var columns = e.sender.columns;
+        private exportToExcel = (e: kendo.ui.GridExcelExportEvent) => {
+            var columns = <Array<IKendoGridColumn<Models.ItProject.IItProject>>>e.sender.columns;
 
             if (!this.exportFlag) {
                 e.preventDefault();
@@ -736,6 +763,8 @@
                 });
             } else {
                 this.exportFlag = false;
+
+                // hide coloumns on visual grid
                 this._.forEach(columns, column => {
                     if (column.tempVisual) {
                         delete column.tempVisual;
@@ -743,9 +772,61 @@
                     }
                 });
 
+                // render templates
+                var sheet = e.workbook.sheets[0];
+
+                // skip header row
+                for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
+                    var row = sheet.rows[rowIndex];
+
+                    // -1 as sheet has header and dataSource doesn't
+                    var dataItem = <IKendoDataObservableObject>this.mainGrid.dataSource.at(rowIndex - 1);
+
+                    for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
+                        if (columns[columnIndex].field === "") continue;
+                        var cell = row.cells[columnIndex];
+
+                        var template = this.getTemplateMethod(columns[columnIndex]);
+
+                        cell.value = template(dataItem);
+                    }
+                }
+
                 // hide loadingbar when export is finished
                 kendo.ui.progress(this.mainGrid.element, false);
             }
+        }
+
+        private concatRoles(roles: Array<any>): string {
+            var concatRoles = "";
+
+            // join the first 5 username together
+            if (roles.length > 0) {
+                concatRoles = roles.slice(0, 4).join(", ");
+            }
+
+            // if more than 5 then add an elipsis
+            if (roles.length > 5) {
+                concatRoles += ", ...";
+            }
+
+            return concatRoles;
+        }
+
+        private getTemplateMethod(column) {
+            var template: Function;
+
+            if (column.excelTemplate) {
+                template = column.excelTemplate;
+            } else if (typeof column.template === "function") {
+                template = <Function>column.template;
+            } else if (typeof column.template === "string") {
+                template = kendo.template(<string>column.template);
+            } else {
+                template = t => t;
+            }
+
+            return template;
         }
     }
 
@@ -767,7 +848,7 @@
                         ],
                         orgUnits: [
                             "$http", "user", "_", ($http, user, _) => $http.get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`)
-                            .then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
+                                .then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
                         ]
                     }
                 });
