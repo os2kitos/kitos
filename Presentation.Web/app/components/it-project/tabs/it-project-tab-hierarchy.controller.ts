@@ -17,10 +17,10 @@
     app.controller("project.EditHierarchyCtrl",
     ["$scope", "hierarchyFlat",
         function ($scope, hierarchyFlat) {
-            $scope.hierarchy = toHierarchy(hierarchyFlat, "id", "parentId", null, null);
+            $scope.hierarchy = toHierarchy(hierarchyFlat, "id", "parentId");
 
             // TODO WUFF!
-            function toHierarchy(flatAry, idPropertyName, parentIdPropetyName, parentPropetyName, childPropertyName) {
+            function toHierarchy(flatAry, idPropertyName, parentIdPropetyName, parentPropetyName?, childPropertyName?) {
                 // default values
                 parentPropetyName = typeof parentPropetyName !== "undefined" ? parentPropetyName : "parent";
                 childPropertyName = typeof childPropertyName !== "undefined" ? childPropertyName : "children";
