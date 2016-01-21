@@ -51,7 +51,7 @@
             private $window: ng.IWindowService,
             private $state: ng.ui.IStateService,
             private $: JQueryStatic,
-            private _: ILodashWithMixins,
+            private _: ILoDashWithMixins,
             private moment: moment.MomentStatic,
             private notify,
             private projectRoles,
@@ -303,7 +303,7 @@
                     {
                         field: "Parent.Name", title: "Overordnet IT Projekt", width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Parent ? `<a data-ui-sref=\"it-project.edit.status-project({id:${dataItem.Parent.Id}})\">${dataItem.Parent.Name}</a>` : "",
+                        template: dataItem => dataItem.Parent ? `<a data-ui-sref="it-project.edit.status-project({id:${dataItem.Parent.Id}})">${dataItem.Parent.Name}</a>` : "",
                         excelTemplate: dataItem => dataItem && dataItem.Parent ? dataItem.Parent.Name : "",
                         hidden: true,
                         filterable: {
@@ -355,7 +355,7 @@
                     {
                         field: "Esdh", title: "ESDH ref", width: 150,
                         persistId: "esdh", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Esdh ? `<a target=\"_blank\" href=\"${dataItem.Esdh}\"><i class=\"fa fa-link\"></a>` : "",
+                        template: dataItem => dataItem.Esdh ? `<a target="_blank" href="${dataItem.Esdh}"><i class="fa fa-link"></a>` : "",
                         excelTemplate: dataItem => dataItem && dataItem.Esdh || "",
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -370,7 +370,7 @@
                     {
                         field: "Folder", title: "Mappe ref", width: 150,
                         persistId: "folder", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Folder ? `<a target=\"_blank\" href=\"${dataItem.Folder}\"><i class=\"fa fa-link\"></i></a>` : "",
+                        template: dataItem => dataItem.Folder ? `<a target="_blank" href="${dataItem.Folder}"><i class="fa fa-link"></i></a>` : "",
                         excelTemplate: dataItem => dataItem && dataItem.Folder || "",
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -398,7 +398,7 @@
                         field: "CurrentPhaseObj.Name", title: "Fase", width: 100,
                         persistId: "phasename", // DON'T YOU DARE RENAME!
                         template: dataItem =>
-                            dataItem.CurrentPhaseObj ? `<a data-ui-sref=\"it-project.edit.phases({id:${dataItem.Id}})\">${dataItem.CurrentPhaseObj.Name}</a>` : "",
+                            dataItem.CurrentPhaseObj ? `<a data-ui-sref="it-project.edit.phases({id:${dataItem.Id}})">${dataItem.CurrentPhaseObj.Name}</a>` : "",
                         excelTemplate: dataItem => dataItem && dataItem.CurrentPhaseObj && dataItem.CurrentPhaseObj.Name || "",
                         sortable: false,
                         filterable: false
@@ -516,14 +516,14 @@
                         field: "IsTransversal", title: "Tværgående", width: 150,
                         persistId: "trans", // DON'T YOU DARE RENAME!
                         hidden: true,
-                        template: dataItem => dataItem.IsTransversal ? "<i class=\"text-success fa fa-check\"></i>" : "<i class=\"text-danger fa fa-times\"></i>",
+                        template: dataItem => dataItem.IsTransversal ? `<i class="text-success fa fa-check"></i>` : `<i class="text-danger fa fa-times"></i>`,
                         excelTemplate: dataItem => dataItem.IsTransversal.toString()
                     },
                     {
                         field: "IsStrategy", title: "Strategisk", width: 150,
                         persistId: "strat", // DON'T YOU DARE RENAME!
                         hidden: true,
-                        template: dataItem => dataItem.IsStrategy ? "<i class=\"text-success fa fa-check\"></i>" : "<i class=\"text-danger fa fa-times\"></i>",
+                        template: dataItem => dataItem.IsStrategy ? `<i class="text-success fa fa-check"></i>` : `<i class="text-danger fa fa-times"></i>`,
                         excelTemplate: dataItem => dataItem.IsStrategy.toString()
                     },
                     {
@@ -568,7 +568,7 @@
                         field: "PriorityPf", title: "Prioritet: Portefølje", width: 150,
                         persistId: "prioritypf", // DON'T YOU DARE RENAME!
                         template: () => `<div class="btn-group btn-group-sm" data-toggle="buttons">
-                                                    <label class="btn btn-star" data-ng-class="{ \'unstarred\': !dataItem.IsPriorityLocked }" data-ng-disabled="!dataItem.hasWriteAccess" data-ng-click="dataItem.IsPriorityLocked = !dataItem.IsPriorityLocked">
+                                                    <label class="btn btn-star" data-ng-class="{ 'unstarred': !dataItem.IsPriorityLocked }" data-ng-disabled="!dataItem.hasWriteAccess" data-ng-click="dataItem.IsPriorityLocked = !dataItem.IsPriorityLocked">
                                                         <input type="checkbox" data-ng-model="dataItem.IsPriorityLocked" data-autosave="api/itproject/{{dataItem.Id}}" data-field="IsPriorityLocked">
                                                         <i class="glyphicon glyphicon-lock"></i>
                                                     </label>
@@ -779,7 +779,7 @@
                 for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
                     var row = sheet.rows[rowIndex];
 
-                    // -1 as sheet has header and dataSource hasn't
+                    // -1 as sheet has header and dataSource doesn't
                     var dataItem = <IKendoDataObservableObject>this.mainGrid.dataSource.at(rowIndex - 1);
 
                     for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {

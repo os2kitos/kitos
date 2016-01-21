@@ -28,7 +28,7 @@
         id: number;
     }
 
-    export interface ILodashWithMixins extends _.LoDashStatic {
+    export interface ILoDashWithMixins extends _.LoDashStatic {
         deep(obj, key, value?);
         pluckDeep(obj, key);
         unpick(obj);

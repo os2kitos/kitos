@@ -48,7 +48,7 @@
             private $timeout: ng.ITimeoutService,
             private $state: ng.ui.IStateService,
             private $: JQueryStatic,
-            private _: ILodashWithMixins,
+            private _: ILoDashWithMixins,
             private moment: moment.MomentStatic,
             private notify,
             private user,
@@ -232,7 +232,7 @@
                     },
                     {
                         field: "AccessModifier", title: "Synlighed", width: 120,
-                        persistId: "accessmod", // DON'T YOU DARE RENAME!,
+                        persistId: "accessmod", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => dataItem.AccessModifier.toString(),
                         hidden: true,
                         filterable: {
@@ -332,7 +332,7 @@
                         field: "Usages.length", title: "IT System: Anvendes af", width: 95,
                         persistId: "usages", // DON'T YOU DARE RENAME!
                         template: dataItem =>
-                            `<a class="col-md-7 text-center" data-ng-click="systemCatalogVm.showUsageDetails(${dataItem.Id},\'${dataItem.Name}\')">${dataItem.Usages.length}</a>`,
+                            `<a class="col-md-7 text-center" data-ng-click="systemCatalogVm.showUsageDetails(${dataItem.Id},'${dataItem.Name}')">${dataItem.Usages.length}</a>`,
                         excelTemplate: dataItem => dataItem && dataItem.Usages && dataItem.Usages.length.toString(),
                         filterable: false,
                         sortable: false
@@ -541,7 +541,7 @@
                 for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
                     var row = sheet.rows[rowIndex];
 
-                    // -1 as sheet has header and dataSource hasn't
+                    // -1 as sheet has header and dataSource doesn't
                     var dataItem = <IKendoDataObservableObject>this.mainGrid.dataSource.at(rowIndex - 1);
 
                     for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {

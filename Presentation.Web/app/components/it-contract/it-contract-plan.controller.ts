@@ -50,7 +50,7 @@
             private $window: ng.IWindowService,
             private $state: ng.ui.IStateService,
             private $: JQueryStatic,
-            private _: Kitos.ILodashWithMixins,
+            private _: Kitos.ILoDashWithMixins,
             private moment: moment.MomentStatic,
             private notify,
             private user,
@@ -328,7 +328,7 @@
                     {
                         field: "Parent.Name", title: "Overordnet kontrakt", width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Parent ? `<a data-ui-sref=\"it-contract.edit.systems({id:${dataItem.Parent.Id}})\">${dataItem.Parent.Name}</a>` : "",
+                        template: dataItem => dataItem.Parent ? `<a data-ui-sref="it-contract.edit.systems({id:${dataItem.Parent.Id}})">${dataItem.Parent.Name}</a>` : "",
                         excelTemplate: dataItem => dataItem && dataItem.Parent && dataItem.Parent.Name || "",
                         hidden: true,
                         filterable: {
@@ -401,7 +401,7 @@
                     {
                         field: "Esdh", title: "ESDH ref", width: 150,
                         persistId: "esdh", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Esdh ? `<a target=\"_blank\" href=\"${dataItem.Esdh}\"><i class=\"fa fa-link\"></a>` : "",
+                        template: dataItem => dataItem.Esdh ? `<a target="_blank" href="${dataItem.Esdh}"><i class="fa fa-link"></a>` : "",
                         excelTemplate: dataItem => dataItem && dataItem.Esdh || "",
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -416,7 +416,7 @@
                     {
                         field: "Folder", title: "Mappe ref", width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Folder ? `<a target=\"_blank\" href=\"${dataItem.Folder}\"><i class=\"fa fa-link\"></i></a>` : "",
+                        template: dataItem => dataItem.Folder ? `<a target="_blank" href="${dataItem.Folder}"><i class="fa fa-link"></i></a>` : "",
                         excelTemplate: dataItem => dataItem && dataItem.Folder || "",
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -731,7 +731,7 @@
                 for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
                     var row = sheet.rows[rowIndex];
 
-                    // -1 as sheet has header and dataSource hasn't
+                    // -1 as sheet has header and dataSource doesn't
                     var dataItem = <IKendoDataObservableObject>this.mainGrid.dataSource.at(rowIndex - 1);
 
                     for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {

@@ -62,7 +62,7 @@
             private $window: ng.IWindowService,
             private $state: ng.ui.IStateService,
             private $: JQueryStatic,
-            private _: ILodashWithMixins,
+            private _: ILoDashWithMixins,
             private moment: moment.MomentStatic,
             private notify,
             private user,
@@ -335,7 +335,7 @@
                     },
                     {
                         field: "ItContractId", title: "KontraktID", width: 150,
-                        persistId: "contractid", // DON'T YOU DARE RENAME!,
+                        persistId: "contractid", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => dataItem && dataItem.ItContractId,
                         hidden: true,
                         filterable: {
@@ -349,7 +349,7 @@
                     {
                         field: "Parent.Name", title: "Overordnet kontrakt", width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Parent ? `<a data-ui-sref=\"it-contract.edit.systems({id:${dataItem.Parent.Id}})\">${dataItem.Parent.Name}</a>` : "",
+                        template: dataItem => dataItem.Parent ? `<a data-ui-sref="it-contract.edit.systems({id:${dataItem.Parent.Id}})">${dataItem.Parent.Name}</a>` : "",
                         excelTemplate: dataItem => dataItem && dataItem.Parent && dataItem.Parent.Name || "",
                         hidden: true,
                         filterable: {
@@ -387,10 +387,11 @@
                     {
                         field: "AssociatedSystemUsages", title: "IT System", width: 150,
                         persistId: "itsys", // DON'T YOU DARE RENAME!
-                        template: (dataItem: IItContractOverview) => {
+                        template: dataItem => {
                             var value = "";
-                            if (dataItem.AssociatedSystemUsages.length > 0)
-                                value += this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name;
+                            if (dataItem.AssociatedSystemUsages.length > 0) {
+                                value = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name;
+                            }
 
                             if (dataItem.AssociatedSystemUsages.length > 1) {
                                 value += ` (${dataItem.AssociatedSystemUsages.length})`;
@@ -422,7 +423,7 @@
                     {
                         field: "Esdh", title: "ESDH ref", width: 150,
                         persistId: "esdh", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Esdh ? `<a target=\"_blank\" href=\"${dataItem.Esdh}\"><i class=\"fa fa-link\"></a>` : "",
+                        template: dataItem => dataItem.Esdh ? `<a target="_blank" href="${dataItem.Esdh}"><i class="fa fa-link"></a>` : "",
                         excelTemplate: dataItem => dataItem && dataItem.Esdh || "",
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -437,7 +438,7 @@
                     {
                         field: "Folder", title: "Mappe ref", width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Folder ? `<a target=\"_blank\" href=\"${dataItem.Folder}\"><i class=\"fa fa-link\"></i></a>` : "",
+                        template: dataItem => dataItem.Folder ? `<a target="_blank" href="${dataItem.Folder}"><i class="fa fa-link"></i></a>` : "",
                         excelTemplate: dataItem => dataItem && dataItem.Folder || "",
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -451,7 +452,7 @@
                     },
                     {
                         field: "Acquisition", title: "Anskaffelse", width: 90,
-                        persistId: "acquisition", // DON'T YOU DARE RENAME!,
+                        persistId: "acquisition", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => dataItem.Acquisition.toString(),
                         attributes: { "class": "text-right" },
                         format: "{0:n0}",
@@ -686,7 +687,7 @@
                 for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
                     var row = sheet.rows[rowIndex];
 
-                    // -1 as sheet has header and dataSource hasn't
+                    // -1 as sheet has header and dataSource doesn't
                     var dataItem = <IKendoDataObservableObject>this.mainGrid.dataSource.at(rowIndex - 1);
 
                     for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {

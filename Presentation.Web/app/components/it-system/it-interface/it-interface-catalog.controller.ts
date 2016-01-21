@@ -37,7 +37,7 @@
             private $timeout: ng.ITimeoutService,
             private $state: ng.ui.IStateService,
             private $: JQueryStatic,
-            private _: ILodashWithMixins,
+            private _: ILoDashWithMixins,
             private moment: moment.MomentStatic,
             private notify,
             private user,
@@ -356,7 +356,7 @@
                     },
                     {
                         field: "Organization.Name", title: "Oprettet af: Organisation", width: 150,
-                        persistId: "orgname", // DON'T YOU DARE RENAME!,
+                        persistId: "orgname", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => dataItem.Organization.Name,
                         hidden: true,
                         filterable: {
@@ -555,7 +555,7 @@
                 for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
                     var row = sheet.rows[rowIndex];
 
-                    // -1 as sheet has header and dataSource hasn't
+                    // -1 as sheet has header and dataSource doesn't
                     var dataItem = <IKendoDataObservableObject>this.mainGrid.dataSource.at(rowIndex - 1);
 
                     for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {

@@ -57,7 +57,7 @@
             private $window: ng.IWindowService,
             private $state: ng.ui.IStateService,
             private $: JQueryStatic,
-            private _: ILodashWithMixins,
+            private _: ILoDashWithMixins,
             private moment: moment.MomentStatic,
             private notify,
             private systemRoles: Array<any>,
@@ -423,7 +423,7 @@
                     {
                         field: "EsdhRef", title: "ESDH ref", width: 150,
                         persistId: "esdh", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.EsdhRef ? `<a target=\"_blank\" href=\"${dataItem.EsdhRef}\"><i class=\"fa fa-link\"></a>` : "",
+                        template: dataItem => dataItem.EsdhRef ? `<a target="_blank" href="${dataItem.EsdhRef}"><i class="fa fa-link"></a>` : "",
                         excelTemplate: dataItem => dataItem.EsdhRef || "",
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -438,7 +438,7 @@
                     {
                         field: "DirectoryOrUrlRef", title: "Mappe ref", width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.DirectoryOrUrlRef ? `<a target=\"_blank\" href=\"${dataItem.DirectoryOrUrlRef}\"><i class=\"fa fa-link\"></i></a>` : "",
+                        template: dataItem => dataItem.DirectoryOrUrlRef ? `<a target="_blank" href="${dataItem.DirectoryOrUrlRef}"><i class="fa fa-link"></i></a>` : "",
                         excelTemplate: dataItem => dataItem.DirectoryOrUrlRef || "",
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -453,7 +453,7 @@
                     {
                         field: "CmdbRef", title: "CMDB ref", width: 150,
                         persistId: "cmdb", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.CmdbRef ? `<a target=\"_blank\" href=\"${dataItem.CmdbRef}\"><i class=\"fa fa-link\"></i></a>` : "",
+                        template: dataItem => dataItem.CmdbRef ? `<a target="_blank" href="${dataItem.CmdbRef}"><i class="fa fa-link"></i></a>` : "",
                         excelTemplate: dataItem => dataItem.CmdbRef || "",
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -986,7 +986,7 @@
                 for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
                     var row = sheet.rows[rowIndex];
 
-                    // -1 as sheet has header and dataSource hasn't
+                    // -1 as sheet has header and dataSource doesn't
                     var dataItem = <IKendoDataObservableObject>this.mainGrid.dataSource.at(rowIndex - 1);
 
                     for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
