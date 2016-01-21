@@ -11,11 +11,11 @@
         var curItSystemId = $scope.$parent.usage.itSystemId;
         $http.get('api/itsystem/' + curItSystemId + '?hierarchy=true')
             .then(function(result) {
-                $scope.systems = toHierarchy(result.data.response, 'id', 'parentId', null, null);
+                $scope.systems = toHierarchy(result.data.response, 'id', 'parentId');
             });
 
         // TODO WUFF!
-        function toHierarchy(flatAry, idPropertyName, parentIdPropetyName, parentPropetyName, childPropertyName) {
+        function toHierarchy(flatAry, idPropertyName, parentIdPropetyName, parentPropetyName?, childPropertyName?) {
             // default values
             parentPropetyName = typeof parentPropetyName !== 'undefined' ? parentPropetyName : 'parent';
             childPropertyName = typeof childPropertyName !== 'undefined' ? childPropertyName : 'children';
