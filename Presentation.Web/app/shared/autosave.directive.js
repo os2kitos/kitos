@@ -114,7 +114,7 @@
                         if (!attrs.appendurl)
                             attrs.appendurl = '';
 
-                        $http({ method: 'PATCH', url: attrs.autosave + '?organizationId=' + user.currentOrganizationId + attrs.appendurl, data: payload })
+                        $http({ method: 'PATCH', url: attrs.autosave + '?organizationId=' + user.currentOrganizationId + attrs.appendurl, data: payload, ignoreLoadingBar: true})
                             .success(function() {
                                 msg.toSuccessMessage("Feltet er opdateret.");
                                 oldValue = ctrl.$modelValue;

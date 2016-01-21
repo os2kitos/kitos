@@ -153,8 +153,7 @@ describe("project edit tab economy", () => {
                     .first()
                     .getAttribute("value")
                     .then(v => parseInt(v));
-
-
+                
                 expect(subsum).toBe(expectedValue);
             });
 
