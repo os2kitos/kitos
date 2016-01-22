@@ -13,7 +13,6 @@ gulp.task("clean-scripts", function () {
     return del([
         config.script(config.libraryBundle),
         config.script(config.angularBundle),
-        config.script(config.kendoBundle),
         config.script(config.appBundle),
         config.script(config.maps)
     ]);
@@ -35,22 +34,6 @@ gulp.task("angular-bundle", ["clean-scripts", "bower-restore"], function () {
      .pipe(gulp.dest(paths.sourceScript));
 });
 
-// create angular library bundled file
-gulp.task("kendo-bundle", ["clean-scripts", "bower-restore"], function () {
-    return gulp.src(config.kendoSrc)
-     .pipe(concat(config.kendoBundle))
-     .pipe(gulp.dest(paths.sourceScript));
-});
-
-gulp.task("kendo-css", function () {
-    return gulp.src(config.kendoStylesSrc)
-        .pipe(concat(config.kendoCss))
-        .pipe(gulp.dest(config.kendo("")))
-        .pipe(minifyCSS())
-        .pipe(concat(config.kendoCssMin))
-        .pipe(gulp.dest(config.kendo("")));
-});
-
 // create app bundled file
 // ASP.NET bundler used instead og this.
 gulp.task("app-bundle", ["clean-scripts"], function () {
@@ -66,9 +49,7 @@ gulp.task("app-bundle", ["clean-scripts"], function () {
 gulp.task("clean-styles", function () {
     return del([
         config.fontDest,
-        config.cssDest,
-        config.kendo(config.kendoCss),
-        config.kendo(config.kendoCssMin)
+        config.cssDest
     ]);
 });
 
@@ -102,10 +83,10 @@ gulp.task("bower-restore", function () {
 });
 
 // bundle, minify and copy styles, fonts and assets
-gulp.task("styles", ["css", "kendo-css", "assets", "fonts"]);
+gulp.task("styles", ["css", "assets", "fonts"]);
 
 // run bundle tasks
-gulp.task("scripts", ["library-bundle", "kendo-bundle", "angular-bundle"]);
+gulp.task("scripts", ["library-bundle", "angular-bundle"]);
 
 // bundle and deploy scripts and styles
 gulp.task("deploy", ["scripts", "styles"]);

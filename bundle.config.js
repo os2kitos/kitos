@@ -37,24 +37,6 @@ module.exports = {
     ],
     angularBundle: "angular-bundle.min.js",
 
-    // kendo bundle
-    kendoSrc: [
-        script("/kendo/2015.3.1111/jszip.min.js"),
-        script("/kendo/2015.3.1111/kendo.all.min.js"),
-        script("/kendo/2015.3.1111/messages/kendo.messages.da-DK.min.js"),
-        script("/kendo/2015.3.1111/cultures/kendo.culture.da-DK.min.js")
-    ],
-    kendoBundle: "kendo-bundle.min.js",
-
-    kendoStylesSrc: [
-        kendo("/kendo.common-bootstrap.min.css"),
-        kendo("/kendo.bootstrap.min.css"),
-        kendo("/kendo.dataviz.min.css"),
-        kendo("/kendo.dataviz.bootstrap.min.css")
-    ],
-    kendoCss: "/kendo-bundle.css",
-    kendoCssMin: "/kendo-bundle.min.css",
-
     // app script bundle
     appSrc: paths.allJavaScriptNoTests,
     appBundle: "app-bundle.min.js",
@@ -85,7 +67,6 @@ module.exports = {
 
     script: script,
     content: content,
-    kendo: kendo,
     bower: bower
 };
 
@@ -96,10 +77,6 @@ function script(file) {
 
 function content(file) {
     return paths.source + "/Content" + file;
-}
-
-function kendo(file) {
-    return content("/kendo/2015.3.1111" + file);
 }
 
 function bower(file) {
