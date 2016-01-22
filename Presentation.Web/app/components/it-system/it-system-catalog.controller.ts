@@ -33,6 +33,7 @@
             "$http",
             "$timeout",
             "$state",
+            "$sce",
             "$",
             "_",
             "moment",
@@ -47,6 +48,7 @@
             private $http: ng.IHttpService,
             private $timeout: ng.ITimeoutService,
             private $state: ng.ui.IStateService,
+            private $sce: ng.ISCEService,
             private $: JQueryStatic,
             private _: ILoDashWithMixins,
             private moment: moment.MomentStatic,
@@ -332,7 +334,7 @@
                         field: "Usages.length", title: "IT System: Anvendes af", width: 95,
                         persistId: "usages", // DON'T YOU DARE RENAME!
                         template: dataItem =>
-                            `<a class="col-md-7 text-center" data-ng-click="systemCatalogVm.showUsageDetails(${dataItem.Id},'${dataItem.Name}')">${dataItem.Usages.length}</a>`,
+                            `<a class="col-md-7 text-center" data-ng-click="systemCatalogVm.showUsageDetails(${dataItem.Id},'${this.$sce.getTrustedHtml(dataItem.Name)}')">${dataItem.Usages.length}</a>`,
                         excelTemplate: dataItem => dataItem && dataItem.Usages && dataItem.Usages.length.toString(),
                         filterable: false,
                         sortable: false
