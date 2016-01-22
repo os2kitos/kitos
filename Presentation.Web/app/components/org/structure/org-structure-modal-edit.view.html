@@ -6,31 +6,31 @@
         <h4>Rediger info</h4>
         <form name="editForm" novalidate="novalidate" class="form-horizontal">
             <div class="form-group">
-                      <label for="parent" class="col-md-3 control-label">
-                          Overordnet enhed
-                      </label>
-                      <div class="col-md-8">
-                          <select type="text" data-ui-select2="" name="parent" data-ng-model="orgUnit.newParent" class="form-control" data-placeholder="Vælg overordnet" data-ng-required="true" data-ng-disabled="!canChangeParent" tabindex="1">
-                              <option></option>
-                              <option data-ng-repeat="unit in orgUnits" value="{{unit.id}}">{{unit.name}}</option>
-                          </select>
-                      </div>
-                      <div class="col-md-8 col-md-offset-3">
-                          <p class="help-block" data-ng-show="canChangeParent">
-                              Der kan kun vælges blandt de organisationsenheder som er indenfor samme organisation, og som ikke er en underenhed til {{orgUnit.oldName}}.
-                          </p>
-                          <p class="help-block" data-ng-hide="canChangeParent">
-                              Du kan ikke ændre {{ orgUnit.oldName + 's' }} overordnet organisationsenhed.  
-                              <span data-ng-show="!isAdmin">Kontakt en lokal administrator.</span>
-                          </p>
-                      </div>
-                  </div>
+                <label for="parent" class="col-md-3 control-label">
+                    Overordnet enhed
+                </label>
+                <div class="col-md-8">
+                    <select type="text" data-ui-select2="" name="parent" data-ng-model="orgUnit.newParent" class="form-control" data-placeholder="Vælg overordnet" data-ng-required="true" data-ng-disabled="!canChangeParent" tabindex="1">
+                        <option></option>
+                        <option data-ng-repeat="unit in orgUnits" value="{{unit.id}}">{{unit.name}}</option>
+                    </select>
+                </div>
+                <div class="col-md-8 col-md-offset-3">
+                    <p class="help-block" data-ng-show="canChangeParent">
+                        Der kan kun vælges blandt de organisationsenheder som er indenfor samme organisation, og som ikke er en underenhed til {{orgUnit.oldName}}.
+                    </p>
+                    <p class="help-block" data-ng-hide="canChangeParent">
+                        Du kan ikke ændre {{ orgUnit.oldName + 's' }} overordnet organisationsenhed.
+                        <span data-ng-show="!isAdmin">Kontakt en lokal administrator.</span>
+                    </p>
+                </div>
+            </div>
             <div class="form-group">
                 <label for="name" class="col-md-3 control-label">
                     Enhedens navn
                 </label>
                 <div class="col-md-8">
-                    <input type="text" name="name" data-ng-model="orgUnit.newName" class="form-control" data-ng-required="true" tabindex="2" data-autofocus=""/>
+                    <input type="text" name="name" data-ng-model="orgUnit.newName" class="form-control" data-ng-required="true" tabindex="2" data-autofocus="" />
                 </div>
             </div>
             <div class="form-group">
@@ -38,21 +38,20 @@
                     EAN nummer
                 </label>
                 <div class="col-md-8">
-                    <input type="number" name="ean" data-ng-model="orgUnit.newEan" class="form-control" tabindex="3"/>
+                    <input type="number" name="ean" data-ng-model="orgUnit.newEan" class="form-control" tabindex="3" />
                 </div>
             </div>
-            
         </form>
 
         <button class="btn btn-primary btn-sm pull-left" data-ng-click="new()" data-ng-disabled="submitting" tabindex="5">
-            <i class="glyphicon glyphicon-plus"></i> 
+            <i class="glyphicon glyphicon-plus"></i>
             Opret ny underenhed
         </button>
         <button class="btn btn-danger btn-sm pull-right"
-                data-ng-disabled="submitting" 
+                data-ng-disabled="submitting"
                 data-confirmed-click="delete()"
                 data-confirm-click="Er du sikker på at du vil slette denne enhed? Dette vil også slette alle underenheder!" data-ng-hide="orgUnit.isRoot" tabindex="6">
-            <i class="glyphicon glyphicon-trash"></i> 
+            <i class="glyphicon glyphicon-trash"></i>
             Slet enhed
         </button>
     </div>
@@ -76,7 +75,7 @@
                     Overordnet enhed
                 </label>
                 <div class="col-md-8">
-                    <input type="text" value="{{orgUnit.oldName}}" class="form-control" disabled="disabled"/>
+                    <input type="text" value="{{orgUnit.oldName}}" class="form-control" disabled="disabled" />
                 </div>
             </div>
             <div class="form-group">
@@ -84,7 +83,7 @@
                     Enhedens navn
                 </label>
                 <div class="col-md-8">
-                    <input type="text" name="name" data-ng-model="newOrgUnit.name" class="form-control" data-ng-required="true" tabindex="1" data-autofocus=""/>
+                    <input type="text" name="name" data-ng-model="newOrgUnit.name" class="form-control" data-ng-required="true" tabindex="1" data-autofocus="" />
                 </div>
             </div>
             <div class="form-group">
@@ -92,7 +91,7 @@
                     EAN nummer
                 </label>
                 <div class="col-md-8">
-                    <input type="number" name="ean" data-ng-model="newOrgUnit.ean" class="form-control" tabindex="2"/>
+                    <input type="number" name="ean" data-ng-model="newOrgUnit.ean" class="form-control" tabindex="2" />
                 </div>
             </div>
         </form>

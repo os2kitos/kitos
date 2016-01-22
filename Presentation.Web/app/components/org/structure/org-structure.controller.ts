@@ -435,7 +435,8 @@
                     ]
                 });
 
-                modal.result.then(function(returnedUnit) {
+                modal.result.then(function (returnedUnit) {
+                    $state.go($state.current, {}, { reload: true });
                     loadUnits();
                 });
             };
