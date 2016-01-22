@@ -110,7 +110,7 @@ exports.config = {
         require("require-dir")("./Presentation.Web/Tests/matchers");
 
         var reporters = require("jasmine-reporters");
-        jasmine.getEnv().addReporter(new reporters.AppVeyorReporter());
+        jasmine.getEnv().addReporter(new reporters.AppVeyorReporter({ batchSize: 1 }));
     },
     // json report
     resultJsonOutputFile: paths.e2eReport + '.json',
