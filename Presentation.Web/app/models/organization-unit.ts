@@ -2,7 +2,7 @@
     import IItSystemUsage = Models.ItSystemUsage.IItSystemUsage;
     import IItSystemUsageOrgUnitUsage = Models.ItSystemUsage.IItSystemUsageOrgUnitUsage;
 
-    export interface IOrganizationUnit {
+    export interface IOrganizationUnit extends IEntity {
         Name: string;
         /** EAN number of the department. */
         Ean: number;

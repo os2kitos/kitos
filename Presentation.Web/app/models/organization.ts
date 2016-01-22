@@ -1,6 +1,6 @@
 ﻿module Kitos.Models {
     /** Represents an Organization (such as a municipality, or a company).Holds local configuration and admin roles, as well as collections ofItSystems, ItProjects, etc that was created in this organization. */
-    export interface IOrganization {
+    export interface IOrganization extends IEntity {
         Name: string;
         Type: OrganizationType;
         /** Cvr number */
