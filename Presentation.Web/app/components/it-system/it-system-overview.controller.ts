@@ -318,7 +318,7 @@
                     {
                         field: "ItSystem.Name", title: "IT System", width: 320,
                         persistId: "sysname", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<a data-ui-sref='it-system.usage.interfaces({id: ${dataItem.ItSystem.Id}})'>${dataItem.ItSystem.Name}</a>`,
+                        template: dataItem => `<a data-ui-sref='it-system.usage.interfaces({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name}</a>`,
                         excelTemplate: dataItem => dataItem.ItSystem.Name,
                         filterable: {
                             cell: {
