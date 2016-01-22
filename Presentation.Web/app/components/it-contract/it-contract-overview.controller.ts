@@ -412,7 +412,8 @@
                                 showOperators: false,
                                 operator: "contains"
                             }
-                        }
+                        },
+                        sortable: false
                     },
                     {
                         field: "Supplier.Name", title: "Leverandør", width: 150,
