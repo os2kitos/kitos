@@ -18,7 +18,7 @@
         public mainGrid: IKendoGrid<Models.ItSystem.IItInterface>;
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItInterface>;
 
-        private $inject: Array<string> = [
+        public static $inject: Array<string> = [
             "$rootScope",
             "$scope",
             "$timeout",
