@@ -11,13 +11,13 @@
         getPhaseName(phaseNumber: number): string;
     }
 
-    export class ProjectStatusController implements IProjectStatusController {
+    class ProjectStatusController implements IProjectStatusController {
         public datepickerOptions: IDatepickerOptions;
         public milestonesActivities: Array<any>;
         public pagination: IPaginationSettings;
         public totalCount: number;
 
-        static $inject: Array<string> = [
+        public static $inject: Array<string> = [
             "$scope",
             "$http",
             "$state",

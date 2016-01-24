@@ -15,17 +15,18 @@
     }
 
     class EditController implements IEditController {
-        allowClearOption: IAllowClearOption;
-        autosaveUrl: string;
-        dropdownData: Array<IDropdownOption>;
-        parentSelectOptions;
-        selectedData: Array<IDropdownOption>;
-        selectTranslation: ISelectTranslation;
-        selectSettings: ISelectSettings;
+        public allowClearOption: IAllowClearOption;
+        public autosaveUrl: string;
+        public dropdownData: Array<IDropdownOption>;
+        public parentSelectOptions;
+        public selectedData: Array<IDropdownOption>;
+        public selectTranslation: ISelectTranslation;
+        public selectSettings: ISelectSettings;
 
-        static $inject: Array<string> = [
+        public static $inject: Array<string> = [
             "$scope",
             "$http",
+            "_",
             "project",
             "projectTypes",
             "user",
@@ -36,6 +37,7 @@
         constructor(
             private $scope: ng.IScope,
             private $http: ng.IHttpService,
+            private _: ILoDashWithMixins,
             public project,
             public projectTypes,
             private user,
@@ -107,9 +109,9 @@
                 { id: 8, label: "Vis Overlevering" }
             ];
 
-            this.autosaveUrl = "api/itproject/" + this.project.id;
+            this.autosaveUrl = `api/itproject/${this.project.id}`;
 
-            this.parentSelectOptions = this.selectLazyLoading("api/itproject", true, ["overview=true", "orgId=" + this.user.currentOrganizationId]);
+            this.parentSelectOptions = this.selectLazyLoading("api/itproject", true, ["overview=true", `orgId=${this.user.currentOrganizationId}`]);
 
             this.setupSelectedDataWatch();
         }
@@ -130,8 +132,8 @@
 
                 if (newValue.length > oldValue.length) {
                     // something was added
-                    var addIds = _.difference(_.pluck(newValue, "id"), _.pluck(oldValue, "id"));
-                    _.each(addIds, (id: number) => {
+                    var addIds = this._.difference(this._.pluck(newValue, "id"), this._.pluck(oldValue, "id"));
+                    this._.each(addIds, (id: number) => {
                         switch (id) {
                         case 1:
                             payload.isStatusGoalVisible = true;
@@ -161,8 +163,8 @@
                     });
                 } else if (newValue.length < oldValue.length) {
                     // something was removed
-                    var removedIds = _.difference(_.pluck(oldValue, "id"), _.pluck(newValue, "id"));
-                    _.each(removedIds, id => {
+                    var removedIds = _.difference(this._.pluck(oldValue, "id"), this._.pluck(newValue, "id"));
+                    this._.each(removedIds, id => {
                         switch (id) {
                         case 1:
                             payload.isStatusGoalVisible = false;
@@ -191,7 +193,7 @@
                         }
                     });
                 }
-                if (_.size(<any>payload) > 0) {
+                if (this._.size(<any>payload) > 0) {
                     this.$http({ method: "PATCH", url: this.autosaveUrl + "?organizationId=" + this.user.currentOrganizationId, data: payload })
                         .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<IPayload>>) => {
                             var data = result.data.response;

@@ -4,7 +4,8 @@
     }
 
     class DescriptionController implements IDescriptionController {
-        static $inject: Array<string> = ["project"];
+        public static $inject: Array<string> = ["project"];
+
         constructor(public project) {
         }
     }

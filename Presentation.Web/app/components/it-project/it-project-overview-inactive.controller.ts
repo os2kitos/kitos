@@ -16,7 +16,6 @@
     export interface IItProjectInactiveOverview extends Models.ItProject.IItProject {
         roles: Array<any>;
         CurrentPhaseObj: Models.ItProject.IItProjectPhase;
-
     }
 
     export class OverviewInactiveController implements IOverviewInactiveController {
@@ -26,7 +25,7 @@
         public mainGrid: IKendoGrid<IItProjectInactiveOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
 
-        private static $inject: Array<string> = [
+        public static $inject: Array<string> = [
             "$rootScope",
             "$scope",
             "$http",

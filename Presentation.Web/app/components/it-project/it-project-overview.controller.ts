@@ -25,7 +25,7 @@
         public mainGrid: IKendoGrid<IItProjectOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
 
-        private static $inject: Array<string> = [
+        public static $inject: Array<string> = [
             "$rootScope",
             "$scope",
             "$http",

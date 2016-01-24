@@ -13,20 +13,21 @@
     }
 
     class RolesController implements IRolesController {
-        rights: Array<any>;
-        activeItProjectRoles: Array<any>;
-        newRole: string;
-        selectedUser: any;
-        orgId: number;
-        rightSortBy: string;
-        rightSortReverse: boolean;
+        public rights: Array<any>;
+        public activeItProjectRoles: Array<any>;
+        public newRole: string;
+        public selectedUser: any;
+        public orgId: number;
+        public rightSortBy: string;
+        public rightSortReverse: boolean;
 
-        projectId: number;
+        public projectId: number;
 
-        static $inject: Array<string> = [
+        public static $inject: Array<string> = [
             "$rootScope",
             "$scope",
             "$http",
+            "_",
             "notify",
             "project",
             "itProjectRights",
@@ -38,6 +39,7 @@
             $rootScope: ng.IScope,
             $scope: ng.IScope,
             private $http: ng.IHttpService,
+            private _: ILoDashWithMixins,
             private notify,
             project,
             itProjectRights,
@@ -67,7 +69,7 @@
             this.rightSortReverse = false;
         }
 
-        rightSortChange(val): void {
+        public rightSortChange(val): void {
             if (this.rightSortBy === val) {
                 this.rightSortReverse = !this.rightSortReverse;
             } else {
@@ -77,7 +79,7 @@
             this.rightSortBy = val;
         }
 
-        rightSort(right): string {
+        public rightSort(right): string {
             switch (this.rightSortBy) {
                 case "roleName":
                     return right.role.name;
@@ -90,7 +92,7 @@
             }
         }
 
-        updateRight(right): void {
+        public updateRight(right): void {
             if (!right.roleForSelect || !right.userForSelect) {
                 return;
             }
@@ -149,7 +151,7 @@
                 );
         }
 
-        deleteRight(right): void {
+        public deleteRight(right): void {
             var rId = right.roleId;
             var uId = right.userId;
 
@@ -165,7 +167,7 @@
                 );
         }
 
-        submitRight(): void {
+        public submitRight(): void {
             if (!this.selectedUser || !this.newRole) {
                 return;
             }
@@ -195,7 +197,7 @@
                             user: result.data.response.user,
                             userForSelect: { id: result.data.response.userId, text: result.data.response.user.fullName },
                             roleForSelect: result.data.response.roleId,
-                            role: _.findWhere(this.itProjectRoles, { id: result.data.response.roleId }),
+                            role: this._.findWhere(this.itProjectRoles, { id: result.data.response.roleId }),
                             show: true
                         });
 

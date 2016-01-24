@@ -11,9 +11,9 @@
     }
 
     class PhasesController implements IPhasesController {
-        datepickerOptions: IDatepickerOptions;
+        public datepickerOptions: IDatepickerOptions;
 
-        static $inject: Array<string> = [
+        public static $inject: Array<string> = [
             "$scope",
             "$http",
             "notify",
