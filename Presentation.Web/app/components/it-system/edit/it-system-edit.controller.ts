@@ -12,7 +12,7 @@
                         });
                 }],
                 hasWriteAccess: ['$http', '$stateParams', 'user', function ($http, $stateParams, user) {
-                    return $http.get("api/itsystem/" + $stateParams.id + "?hasWriteAccess&organizationId=" + user.currentOrganizationId)
+                    return $http.get("api/itsystem/" + $stateParams.id + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
                         .then(function (result) {
                             return result.data.response;
                         });
@@ -45,7 +45,7 @@
             $rootScope.page.title = 'IT System - Rediger system';
             autofocus();
 
-            itSystem.updateUrl = 'api/itSystem/' + itSystem.id;
+            itSystem.updateUrl = 'api/itsystem/' + itSystem.id;
             itSystem.belongsTo = (!itSystem.belongsToId) ? null : { id: itSystem.belongsToId, text: itSystem.belongsToName };
             itSystem.parent = (!itSystem.parentId) ? null : { id: itSystem.parentId, text: itSystem.parentName };
 
