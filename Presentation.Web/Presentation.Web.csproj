@@ -407,8 +407,6 @@
     <Content Include="app\components\org\uniqueOrgUser.directive.js" />
     <Content Include="app\shared\autofocus.directive.js" />
     <Content Include="app\utility\lodash.mixin.js" />
-    <Content Include="Content\css\app.css" />
-    <Content Include="Content\css\app.min.css" />
     <Content Include="Content\css\select2-spinner.gif" />
     <Content Include="Content\css\select2.png" />
     <Content Include="Content\css\select2x2.png" />
@@ -680,7 +678,6 @@
     <TypeScriptCompile Include="app\components\local-config\local-config-org.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-subnav.controller.ts" />
     <TypeScriptCompile Include="app\services\taskService.ts" />
-    <Content Include="Scripts\angular-bundle.min.js" />
     <TypeScriptCompile Include="app\components\home\home.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-hierarchy.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.controller.ts" />
@@ -751,10 +748,9 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Content Include="Scripts\library-bundle.min.js" />
-    <Content Include="Scripts\notify\notify.js" />
-    <Content Include="Scripts\notify\notifyDirective.js" />
-    <Content Include="Scripts\notify\notifyFactory.js" />
+    <TypeScriptCompile Include="app\shared\notify\notify.module.ts" />
+    <TypeScriptCompile Include="app\shared\notify\notify.directive.ts" />
+    <TypeScriptCompile Include="app\shared\notify\notify.factory.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-mocks.d.ts" />

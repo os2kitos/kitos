@@ -4,7 +4,7 @@ var source = "Presentation.Web",
     allJavaScript = [sourceApp + "/app.js", sourceApp + "/**/*.js"],
     allJavaScriptNoTests = [sourceApp + "/**/!(*.spec|*.po).js"],
     allTypeScript = [sourceApp + "/**/*.ts"],
-    bowerComponents = "bower_components",
+    bowerComponents = source + "/bower_components",
 
     // dependency files of files to unit test
     unitDependencies = [
