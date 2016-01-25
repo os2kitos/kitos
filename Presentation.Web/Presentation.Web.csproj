@@ -615,6 +615,9 @@
     <TypeScriptCompile Include="app\models\user.ts" />
     <TypeScriptCompile Include="app\services\economyCalc.ts" />
     <TypeScriptCompile Include="app\services\gridStateService.ts" />
+    <TypeScriptCompile Include="app\shared\notify\notify.directive.ts" />
+    <TypeScriptCompile Include="app\shared\notify\notify.factory.ts" />
+    <TypeScriptCompile Include="app\shared\notify\notify.module.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-protractor\angular-protractor.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine-expect\jasmine-expect.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine\jasmine.d.ts" />
@@ -744,6 +747,7 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff2" />
     <TypeScriptCompile Include="app\models\it-project\it-project-phase.ts" />
+    <Content Include="Content\css\maps\app.min.css.map" />
     <None Include="Properties\PublishProfiles\Kitos - Prodmiljø.pubxml" />
     <None Include="Properties\PublishProfiles\Kitos - Testmiljø.pubxml" />
     <None Include="Properties\PublishProfiles\Local.pubxml" />
@@ -752,9 +756,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <Content Include="Scripts\library-bundle.min.js" />
-    <Content Include="Scripts\notify\notify.js" />
-    <Content Include="Scripts\notify\notifyDirective.js" />
-    <Content Include="Scripts\notify\notifyFactory.js" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-mocks.d.ts" />
@@ -821,6 +822,8 @@
     <Content Include="Tests\mocks\assignment.json" />
     <Content Include="Tests\mocks\milestoneNoWriteAccess.json" />
     <Content Include="Tests\mocks\milestoneWriteAccess.json" />
+    <Content Include="Scripts\maps\angular-bundle.min.js.map" />
+    <Content Include="Scripts\maps\library-bundle.min.js.map" />
     <None Include="Web.AppVeyor.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

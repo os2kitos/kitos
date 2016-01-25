@@ -32,8 +32,7 @@ module.exports = {
         bower("/angular-ui-router/release/angular-ui-router.min.js"),
         bower("/angular-bootstrap/ui-bootstrap-tpls.min.js"),
         bower("/angular-ui-select2/src/select2.js"),
-        bower("/angular-loading-bar/build/loading-bar.min.js"),
-        script("/notify/*.js"),
+        bower("/angular-loading-bar/build/loading-bar.min.js")
     ],
     angularBundle: "angular-bundle.min.js",
 
