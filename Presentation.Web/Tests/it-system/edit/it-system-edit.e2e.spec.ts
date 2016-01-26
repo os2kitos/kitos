@@ -38,7 +38,7 @@ describe("system edit view", () => {
 
         it("should disable inputs", () => {
             // arrange
-            browserHelper.outputLog();
+
             // act
 
             // assert

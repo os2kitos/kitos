@@ -2,9 +2,9 @@
     {
         "request": {
             "method": "GET",
-            "path": "api/itInterfaceUse/",
+            "path": "api/itInterface",
             "queryString": {
-                "interfaces": "true",
+                "q": "i",
                 "sysId": "1",
                 "orgId": "1"
             }
@@ -15,13 +15,13 @@
                 "msg": "",
                 "response": [
                     {
-                        "id": 1,
+                        "id": 2,
                         "uuid": "00000000-0000-0000-0000-000000000000",
-                        "name": "ItInterface1",
+                        "name": "ItInterface2",
                         "url": null,
                         "description": null,
                         "note": null,
-                        "itInterfaceId": "1",
+                        "itInterfaceId": "2",
                         "organizationId": 1,
                         "organizationName": "Fælles Kommune",
                         "objectOwnerName": "Global",
@@ -42,44 +42,10 @@
                         "dataRows": [ ],
                         "belongsToId": 1,
                         "belongsToName": "Fælles Kommune",
-                        "version": "1.0",
+                        "version": null,
                         "isUsed": false
                     }
                 ]
-            }
-        }
-    },
-    {
-        "request": {
-            "method": "DELETE",
-            "path": "api/itInterfaceUse/",
-            "queryString": {
-                "sysId": "1",
-                "interfaceId": "1"
-            }
-        },
-        "response": {
-            "status": 200,
-            "data": {
-                "msg": "",
-                "response": { }
-            }
-        }
-    },
-    {
-        "request": {
-            "method": "POST",
-            "path": "api/itInterfaceUse/",
-            "queryString": {
-                "sysId": "1",
-                "interfaceId": "2"
-            }
-        },
-        "response": {
-            "status": 200,
-            "data": {
-                "msg": "",
-                "response": { }
             }
         }
     }

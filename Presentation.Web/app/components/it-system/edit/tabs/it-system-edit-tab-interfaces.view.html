@@ -13,19 +13,26 @@
                     <a data-ui-sref="it-system.interface-edit.interface-details({ id: interface.id })">{{ interface.name }}</a>
                 </td>
                 <td>
-                    <button data-ng-if="hasWriteAccess" class="btn btn-danger btn-xs" data-tooltip="Fjern kan-anvende" data-confirmed-click="interface.delete()"
+                    <button class="btn btn-danger btn-xs delete-interface"
+                            data-ng-if="hasWriteAccess"
+                            data-tooltip="Fjern kan-anvende"
+                            data-confirmed-click="interface.delete()"
                             data-confirm-click="{{ system.isUsed && 'Der er IT Systemer, som er i Lokal anvendelse som har denne snitfladerelation tilknyttet. Er du sikker på at du vil fjerne relationen?' || 'Er du sikker på at du vil fjerne opmærkingen? Dette sletter ikke snitfladen.' }}">
                         <i class="glyphicon glyphicon-trash"></i>
                     </button>
                 </td>
             </tr>
         </tbody>
-        <tfoot data-ng-if="hasWriteAccess">
+        <tfoot data-ng-show="hasWriteAccess">
             <tr>
                 <td colspan="2">
-                    <input type="hidden" data-ui-select2="interfacesSelectOptions"
-                           data-placeholder="Vælg snitflade" data-ng-model="new.interface" 
-                           class="form-control input-sm" data-ng-change="addNewInterface()">
+                    <input id="select-interface"
+                           class="form-control input-sm"
+                           type="hidden"
+                           data-ui-select2="interfacesSelectOptions"
+                           data-placeholder="Vælg snitflade"
+                           data-ng-model="new.interface"
+                           data-ng-change="addNewInterface()">
                 </td>
             </tr>
         </tfoot>
