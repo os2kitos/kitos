@@ -21,7 +21,9 @@ gulp.task("clean-scripts", function () {
 // create external library bundled file
 gulp.task("library-bundle", ["clean-scripts", "bower-restore"], function () {
     return gulp.src(config.librarySrc)
+     .pipe(sourcemaps.init())
      .pipe(concat(config.libraryBundle))
+     .pipe(sourcemaps.write(config.maps))
      .pipe(gulp.dest(paths.sourceScript));
 });
 
@@ -49,7 +51,8 @@ gulp.task("app-bundle", ["clean-scripts"], function () {
 gulp.task("clean-styles", function () {
     return del([
         config.fontDest,
-        config.cssDest
+        config.cssDest,
+        config.cssDest + "/" + config.maps
     ]);
 });
 
@@ -61,12 +64,13 @@ gulp.task("assets", ["clean-styles", "bower-restore"], function () {
 
 // create css bundled file
 gulp.task("css", ["clean-styles", "bower-restore"], function () {
-    return gulp.src(config.libraryStylesSrc
-            .concat(config.customCssSrc))
+    return gulp.src(config.libraryStylesSrc.concat(config.customCssSrc))
+        .pipe(sourcemaps.init())
         .pipe(concat(config.cssBundle))
         .pipe(gulp.dest(config.cssDest))
         .pipe(minifyCSS())
         .pipe(concat(config.cssBundleMin))
+        .pipe(sourcemaps.write(config.maps))
         .pipe(gulp.dest(config.cssDest));
 });
 
@@ -78,8 +82,7 @@ gulp.task("fonts", ["clean-styles", "bower-restore"], function () {
 
 // restore all bower packages
 gulp.task("bower-restore", function () {
-    return bower()
-        .pipe(gulp.dest(paths.bowerComponents));
+    return bower(paths.bowerComponents);
 });
 
 // bundle, minify and copy styles, fonts and assets
