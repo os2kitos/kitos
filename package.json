@@ -22,7 +22,7 @@
     "del": "^2.2.0",
     "eslint": "^1.7.3",
     "gulp": "^3.9.0",
-    "gulp-bower": "0.0.11",
+    "gulp-bower": "0.0.13",
     "gulp-browserstack": "^1.0.3",
     "gulp-codecov.io": "^1.0.1",
     "gulp-concat": "^2.6.0",

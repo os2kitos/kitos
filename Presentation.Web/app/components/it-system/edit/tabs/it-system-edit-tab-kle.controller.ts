@@ -39,7 +39,7 @@
             };
 
             function loadTasks() {
-                var url = baseUrl + "?tasks";
+                var url = baseUrl + "?tasks=true";
                 url += '&onlySelected=' + !$scope.showAllTasks;
                 url += '&taskGroup=' + $scope.selectedTaskGroup;
                 url += '&skip=' + $scope.pagination.skip + '&take=' + $scope.pagination.take;
@@ -106,7 +106,7 @@
             };
 
             $scope.selectTaskGroup = function () {
-                var url = baseUrl + '?taskId=' + $scope.selectedTaskGroup + '&organizationId=' + user.currentOrganizationId;
+                var url = baseUrl + '?taskId=' + ($scope.selectedTaskGroup || '') + '&organizationId=' + user.currentOrganizationId;
 
                 var msg = notify.addInfoMessage("Opretter tilknytning...", false);
                 $http.post(url).success(function () {
@@ -118,7 +118,7 @@
             };
 
             $scope.removeTaskGroup = function () {
-                var url = baseUrl + '?taskId=' + $scope.selectedTaskGroupc + '&organizationId=' + user.currentOrganizationId;
+                var url = baseUrl + '?taskId=' + ($scope.selectedTaskGroupc || '') + '&organizationId=' + user.currentOrganizationId;
 
                 var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
                 $http.delete(url).success(function () {
