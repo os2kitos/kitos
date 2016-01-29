@@ -1,46 +1,46 @@
 ﻿(function (ng, app) {
-    app.config(['$stateProvider', function($stateProvider) {
+    app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-system.usage', {
             url: '/usage/{id:[0-9]+}',
             templateUrl: 'app/components/it-system/usage/it-system-usage.view.html',
             controller: 'system.UsageCtrl',
             resolve: {
                 businessTypes: [
-                    '$http', function($http) {
+                    '$http', function ($http) {
                         return $http.get('api/businesstype')
-                            .then(function(result) {
+                            .then(function (result) {
                                 return result.data.response;
                             });
                     }
                 ],
                 archiveTypes: [
-                    '$http', function($http) {
+                    '$http', function ($http) {
                         return $http.get('api/archivetype')
-                            .then(function(result) {
+                            .then(function (result) {
                                 return result.data.response;
                             });
                     }
                 ],
                 sensitiveDataTypes: [
-                    '$http', function($http) {
+                    '$http', function ($http) {
                         return $http.get('api/sensitivedatatype')
-                            .then(function(result) {
+                            .then(function (result) {
                                 return result.data.response;
                             });
                     }
                 ],
                 itSystemUsage: [
-                    '$http', '$stateParams', function($http, $stateParams) {
-                        return $http.get('api/itsystemusage/' + $stateParams.id)
-                            .then(function(result) {
+                    '$http', '$stateParams', function ($http, $stateParams) {
+                        return $http.get('api/itSystemUsage/' + $stateParams.id)
+                            .then(function (result) {
                                 return result.data.response;
                             });
                     }
                 ],
                 hasWriteAccess: [
-                    '$http', '$stateParams', 'user', function($http, $stateParams, user) {
-                        return $http.get('api/itsystemusage/' + $stateParams.id + "?hasWriteAccess&organizationId=" + user.currentOrganizationId)
-                            .then(function(result) {
+                    '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
+                        return $http.get('api/itSystemUsage/' + $stateParams.id + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
+                            .then(function (result) {
                                 return result.data.response;
                             });
                     }
@@ -77,7 +77,7 @@
 
             $scope.orgUnits = itSystemUsage.usedBy;
 
-            $scope.itSytemUsagesSelectOptions = selectLazyLoading('api/itsystemusage', false, ['organizationId=' + itSystemUsage.organizationId]);
+            $scope.itSytemUsagesSelectOptions = selectLazyLoading('api/itSystemUsage', false, ['organizationId=' + itSystemUsage.organizationId]);
 
             function selectLazyLoading(url, excludeSelf, paramAry) {
                 return {

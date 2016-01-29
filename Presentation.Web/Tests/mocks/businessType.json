@@ -136,6 +136,9 @@
                         "note": "..."
                     }
                 ]
+            },
+            "headers": {
+                "X-Pagination": "{ \"TotalCount\": 18 }"
             }
         }
     }

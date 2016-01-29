@@ -64,7 +64,7 @@
             $scope.save = function(obj) {
                 var msg = notify.addInfoMessage("Gemmer... ");
                 if (obj.selected) {
-                    $http.post('api/itsystemusage/' + usageId + '?organizationunit=' + obj.id + '&organizationId=' + user.currentOrganizationId)
+                    $http.post('api/itSystemUsage/' + usageId + '?organizationunit=' + obj.id + '&organizationId=' + user.currentOrganizationId)
                         .success(function() {
                             msg.toSuccessMessage("Gemt!");
                             $scope.selectedOrgUnits.push(obj);
@@ -73,7 +73,7 @@
                             msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                         });
                 } else {
-                    $http.delete('api/itsystemusage/' + usageId + '?organizationunit=' + obj.id + '&organizationId=' + user.currentOrganizationId)
+                    $http.delete('api/itSystemUsage/' + usageId + '?organizationunit=' + obj.id + '&organizationId=' + user.currentOrganizationId)
                         .success(function() {
                             msg.toSuccessMessage("Gemt!");
 

@@ -25,8 +25,6 @@
                         <label for="system-parent" class="control-label small">Overordnet system</label>
                         <input type="text" id="system-parent" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystemParentName">
                     </div>
-
-
                 </div>
 
                 <!-- 2st column -->
@@ -40,7 +38,7 @@
                     <!-- Object owner -->
                     <div class="form-group">
                         <label class="control-label small">Oprettet af</label>
-                        <input class="form-control input-sm" disabled="true" type="text" value="{{usage.itSystem.objectOwnerFullName}}"/>
+                        <input class="form-control input-sm" disabled="disabled" type="text" value="{{usage.itSystem.objectOwnerFullName}}" />
                     </div>
                     <!--Access modifier -->
                     <div class="form-group">
@@ -48,7 +46,7 @@
                         <input id="system-access" class="form-control input-sm" disabled data-select-access-modifier="" data-ng-model="usage.itSystem.accessModifier">
                     </div>
                 </div>
-                
+
 
                 <!-- full width -->
                 <div class="col-md-12">
@@ -163,7 +161,7 @@
                     <!-- Object owner -->
                     <div class="form-group">
                         <label for="usage-owner" class="control-label small">Taget i anvendelse af</label>
-                        <input type="text" id="usage-owner" class="form-control input-sm" 
+                        <input type="text" id="usage-owner" class="form-control input-sm"
                                data-ng-disabled="true"
                                value="{{usage.objectOwnerFullName}}">
                     </div>
@@ -259,4 +257,4 @@
 </ul>
 
 <!-- sub tabs view -->
-<ui-view autoscroll="false" class="subtabs"/>
+<ui-view autoscroll="false" class="subtabs" />

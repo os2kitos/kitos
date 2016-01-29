@@ -1,0 +1,20 @@
+﻿[
+    {
+        "request": {
+            "method": "GET",
+            "path": "api/exhibit/",
+            "queryString": {
+                "interfaces": "true",
+                "sysId": "1",
+                "orgId": "1"
+            }
+        },
+        "response": {
+            "status": 200,
+            "data": {
+                "msg": "",
+                "response": [ ]
+            }
+        }
+    }
+]
