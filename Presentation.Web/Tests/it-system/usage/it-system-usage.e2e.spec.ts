@@ -36,12 +36,11 @@ describe("system usage view", () => {
     });
 
     describe("with no write access", () => {
-        beforeEach(() => {
+        beforeEach(done => {
             mock(["itSystemUsageNoWriteAccess"].concat(mockDependencies));
-            pageObject.getPage();
-
-            // clear initial requests
-            mock.clearRequests();
+            pageObject.getPage()
+                .then(() => mock.clearRequests())
+                .then(() => done());
         });
 
         it("should disable inputs", () => {
@@ -67,10 +66,8 @@ describe("system usage view", () => {
     describe("with write access", () => {
         beforeEach(done => {
             mock(["itSystemUsageWriteAccess"].concat(mockDependencies));
-            pageObject.getPage();
-
-            // clear initial requests
-            mock.clearRequests()
+            pageObject.getPage()
+                .then(() => mock.clearRequests())
                 .then(() => done());
         });
 

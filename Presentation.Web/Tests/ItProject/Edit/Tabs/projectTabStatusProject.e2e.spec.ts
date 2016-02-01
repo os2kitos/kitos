@@ -28,12 +28,11 @@ describe("project edit tab status project", () => {
     });
 
     describe("with no write access", () => {
-        beforeEach(() => {
+        beforeEach(done => {
             mock(["itProjectNoWriteAccess"].concat(mockDependencies));
-            pageObject.getPage();
-
-            // clear initial requests
-            mock.clearRequests();
+            pageObject.getPage()
+                .then(() => mock.clearRequests())
+                .then(() => done());
         });
 
         it("should disable inputs", () => {
@@ -60,12 +59,11 @@ describe("project edit tab status project", () => {
     });
 
     describe("with write access", () => {
-        beforeEach(() => {
+        beforeEach(done => {
             mock(["itProjectWriteAccess"].concat(mockDependencies));
-            pageObject.getPage();
-
-            // clear initial requests
-            mock.clearRequests();
+            pageObject.getPage()
+                .then(() => mock.clearRequests())
+                .then(() => done());
         });
 
         it("should save when status traffic light changes", () => {

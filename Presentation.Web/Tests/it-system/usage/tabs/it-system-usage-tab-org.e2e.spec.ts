@@ -28,10 +28,8 @@ describe("system usage tab org", () => {
     describe("with no write access", () => {
         beforeEach(done => {
             mock(["itSystemUsageNoWriteAccess"].concat(mockDependencies));
-            pageObject.getPage();
-
-            // clear initial requests
-            mock.clearRequests()
+            pageObject.getPage()
+                .then(() => mock.clearRequests())
                 .then(() => done());
         });
 
@@ -60,10 +58,8 @@ describe("system usage tab org", () => {
     describe("with write access", () => {
         beforeEach(done => {
             mock(["itSystemUsageWriteAccess"].concat(mockDependencies));
-            pageObject.getPage();
-
-            // clear initial requests
-            mock.clearRequests()
+            pageObject.getPage()
+                .then(() => mock.clearRequests())
                 .then(() => done());
         });
 

@@ -871,6 +871,7 @@
     <Content Include="Tests\mocks\wish.json" />
     <Content Include="Tests\mocks\itSystemUsageOrgUnitUsage.json" />
     <Content Include="Tests\mocks\itSystemUsageKle.json" />
+    <Content Include="Tests\mocks\itSystemKle.json" />
     <None Include="Web.AppVeyor.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

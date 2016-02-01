@@ -21,12 +21,11 @@ describe("project edit tab kle", () => {
     });
 
     describe("with no write access", () => {
-        beforeEach(() => {
+        beforeEach(done => {
             mock(["itProjectNoWriteAccess"].concat(mockDependencies));
-            pageObject.getPage();
-
-            // clear initial requests
-            mock.clearRequests();
+            pageObject.getPage()
+                .then(() => mock.clearRequests())
+                .then(() => done());
         });
 
         it("should disable all checkboxes", () => {
@@ -44,15 +43,12 @@ describe("project edit tab kle", () => {
     });
 
     describe("with write access", () => {
-        beforeEach(() => {
+        beforeEach(done => {
             // TODO: itproject/1/taskId=* is hardcoded in mock JSON for IDs 19-68. Refactor to object based mock generation.
             mock(["itProjectWriteAccess"].concat(mockDependencies));
-            pageObject.getPage();
-
-            // clear initial requests
-            // necessary hack to let protractor-http-mock clear all requests after page load
-            browser.sleep(300);
-            mock.clearRequests();
+            pageObject.getPage()
+                .then(() => mock.clearRequests())
+                .then(() => done());
         });
 
         it("should save when task is checked", () => {
