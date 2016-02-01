@@ -3,30 +3,30 @@ import Select2Wrapper = require("../../../../../Tests/object-wrappers/Select2Wra
 import RepeaterWrapper = require("../../../../../Tests/object-wrappers/RepeaterWrapper");
 
 class ItSystemEditTabKle implements IPageObject {
-    controllerVm = "";
+    public controllerVm = "";
 
-    getPage(): webdriver.promise.Promise<void> {
+    public getPage(): webdriver.promise.Promise<void> {
         return browser.get("https://localhost:44300/#/system/edit/1/kle");
     }
 
     // main group
-    mainGroupSelect = new Select2Wrapper("#s2id_maingroup");
+    public mainGroupSelect = new Select2Wrapper("#s2id_maingroup");
 
     // group
-    groupSelect = new Select2Wrapper("#s2id_group");
+    public groupSelect = new Select2Wrapper("#s2id_group");
 
     // change task view
-    changeTaskViewElement = element(by.css("#change-task-view"));
+    public changeTaskViewElement = element(by.css("#change-task-view"));
 
     // task repeater
-    taskRepeater = new RepeaterWrapper(`task in ${this.controllerVm}tasklist`);
-    checkboxLocator = by.css("input[type=checkbox]");
+    public taskRepeater = new RepeaterWrapper(`task in ${this.controllerVm}tasklist`);
+    public checkboxLocator = by.css("input[type=checkbox]");
 
     // select buttons
-    selectAllPagesElement = element(by.css("#select-all-pages"));
-    selectAllElement = element(by.css("#select-all"));
-    deselectAllElement = element(by.css("#deselect-all"));
-    deselectAllPages = element(by.css("#deselect-all-pages"));
+    public selectAllPagesElement = element(by.css("#select-all-pages"));
+    public selectAllElement = element(by.css("#select-all"));
+    public deselectAllElement = element(by.css("#deselect-all"));
+    public deselectAllPages = element(by.css("#deselect-all-pages"));
 }
 
 export = ItSystemEditTabKle;

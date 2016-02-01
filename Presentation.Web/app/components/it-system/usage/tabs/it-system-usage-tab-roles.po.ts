@@ -7,19 +7,19 @@ class ItSystemUsageTabRolesPo implements IPageObject {
         return browser.get("https://localhost:44300/#/system/usage/1/roles");
     }
 
-    // phase name repeater
-    rightsRepeater = new RepeaterWrapper("right in rights");
-    rightRowLocator = by.css("tr");
-    rightEditButtonLocator = by.css("tr a.edit-right");
-    rightEditDeleteLocator = by.css("tr a.delete-right");
-    rightEditRoleInputLocator = by.css("tr select");
-    rightEditSaveButtonLocator = by.css("tr input[type=submit]");
+    // rights repeater
+    public rightsRepeater = new RepeaterWrapper("right in rights");
+    public rightRowLocator = by.css("tr");
+    public rightEditButtonLocator = by.css("tr a.edit-right");
+    public rightEditDeleteLocator = by.css("tr a.delete-right");
+    public rightEditRoleInputLocator = by.css("tr select");
+    public rightEditSaveButtonLocator = by.css("tr input[type=submit]");
 
     // add right role selector
-    addRightRoleSelector = new Select2Wrapper("#s2id_add-right-role");
+    public addRightRoleSelector = new Select2Wrapper("#s2id_add-right-role");
 
     // add right user selector
-    addRightUserSelector = new Select2Wrapper("#add-right-user .select2-container");
+    public addRightUserSelector = new Select2Wrapper("#add-right-user .select2-container");
 }
 
 export = ItSystemUsageTabRolesPo;
