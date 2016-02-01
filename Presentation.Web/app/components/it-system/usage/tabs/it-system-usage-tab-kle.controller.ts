@@ -40,7 +40,7 @@
 
             function loadTasks() {
 
-                var url = baseUrl + "?tasks";
+                var url = baseUrl + "?tasks=true";
 
                 url += '&onlySelected=' + !$scope.showAllTasks;
 

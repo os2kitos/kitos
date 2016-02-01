@@ -528,6 +528,7 @@
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-interfaces.po.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-kle.po.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\it-system-usage.po.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-kle.po.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-org.po.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-wishes.po.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-roles.po.ts" />
@@ -637,6 +638,7 @@
     <TypeScriptCompile Include="Tests\it-system\edit\tabs\it-system-edit-tab-interfaces.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-system\edit\tabs\it-system-edit-tab-kle.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-system\usage\it-system-usage.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\it-system\usage\tabs\it-system-usage-tab-kle.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-system\usage\tabs\it-system-usage-tab-contracts.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-system\usage\tabs\it-system-usage-tab-interfaces.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-system\usage\tabs\it-system-usage-tab-wishes.e2e.spec.ts" />
@@ -866,6 +868,7 @@
     <Content Include="Tests\mocks\itSystemUsageRights.json" />
     <Content Include="Tests\mocks\wish.json" />
     <Content Include="Tests\mocks\itSystemUsageOrgUnitUsage.json" />
+    <Content Include="Tests\mocks\itSystemUsageKle.json" />
     <None Include="Web.AppVeyor.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
