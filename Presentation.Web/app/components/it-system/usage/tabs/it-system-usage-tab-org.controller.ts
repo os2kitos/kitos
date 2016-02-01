@@ -14,7 +14,7 @@
                 }],
                 responsibleOrgUnitId: ['$http', '$stateParams', function ($http, $stateParams) {
                     var systemUsageId = $stateParams.id;
-                    return $http.get('api/itSystemUsageOrgUnitUsage/' + systemUsageId + '?responsible')
+                    return $http.get('api/itSystemUsageOrgUnitUsage/' + systemUsageId + '?responsible=true')
                         .then(function (result) {
                             if (result.data.response)
                                 return result.data.response.id;
@@ -43,7 +43,7 @@
                 var orgUnitId = $scope.responsibleOrgUnitId;
                 var msg = notify.addInfoMessage("Gemmer... ");
                 if ($scope.responsibleOrgUnitId) {
-                    $http.post('api/itSystemUsageOrgUnitUsage/?usageId=' + usageId + '&orgUnitId=' + orgUnitId + '&responsible')
+                    $http.post('api/itSystemUsageOrgUnitUsage/?usageId=' + usageId + '&orgUnitId=' + orgUnitId + '&responsible=true')
                         .success(function () {
                             msg.toSuccessMessage("Gemt!");
                         })
@@ -51,7 +51,7 @@
                             msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                         });
                 } else {
-                    $http.delete('api/itSystemUsageOrgUnitUsage/?usageId=' + usageId + '&responsible')
+                    $http.delete('api/itSystemUsageOrgUnitUsage/?usageId=' + usageId + '&responsible=true')
                         .success(function () {
                             msg.toSuccessMessage("Gemt!");
                         })

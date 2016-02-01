@@ -13,7 +13,8 @@ describe("system usage tab roles", () => {
         "sensitivedatatype",
         "itSystemRole",
         "organization",
-        "itSystemUsageRights"
+        "itSystemUsageRights",
+        "organizationunit"
     ];
 
     beforeEach(() => {

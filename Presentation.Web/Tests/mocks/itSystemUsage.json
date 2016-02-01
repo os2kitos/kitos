@@ -487,5 +487,51 @@
                 }
             }
         }
+    },
+    {
+        "request": {
+            "path": "api/itSystemUsage/1",
+            "method": "POST",
+            "queryString": {
+                "organizationunit": "1",
+                "organizationId": "1"
+            }
+        },
+        "response": {
+            "status": 201,
+            "data": {
+                "msg": "",
+                "response": {
+                    "id": 1,
+                    "name": "Fælles Kommune",
+                    "organizationId": 1,
+                    "parentId": null,
+                    "children": [ ],
+                    "ean": null,
+                    "objectOwnerName": "Global",
+                    "objectOwnerLastName": "admin",
+                    "objectOwnerFullName": "Global admin",
+                    "lastChanged": "2016-01-25T13:09:18Z",
+                    "lastChangedByUserId": 1
+                }
+            }
+        }
+    },
+    {
+        "request": {
+            "path": "api/itSystemUsage/1",
+            "method": "DELETE",
+            "queryString": {
+                "organizationunit": "1",
+                "organizationId": "1"
+            }
+        },
+        "response": {
+            "status": 200,
+            "data": {
+                "msg": "",
+                "response": { }
+            }
+        }
     }
 ]
