@@ -527,6 +527,7 @@
     <TypeScriptCompile Include="app\components\it-system\edit\it-system-edit.po.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-interfaces.po.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-kle.po.ts" />
+    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit.po.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\it-system-usage.po.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-kle.po.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-proj.po.ts" />
@@ -638,6 +639,7 @@
     <TypeScriptCompile Include="Tests\it-system\edit\it-system-edit.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-system\edit\tabs\it-system-edit-tab-interfaces.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-system\edit\tabs\it-system-edit-tab-kle.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\it-system\it-interface\it-interface-edit.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-system\usage\it-system-usage.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-system\usage\tabs\it-system-usage-tab-proj.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-system\usage\tabs\it-system-usage-tab-kle.e2e.spec.ts" />
@@ -872,6 +874,9 @@
     <Content Include="Tests\mocks\itSystemUsageOrgUnitUsage.json" />
     <Content Include="Tests\mocks\itSystemUsageKle.json" />
     <Content Include="Tests\mocks\itSystemKle.json" />
+    <Content Include="Tests\mocks\datarow.json" />
+    <Content Include="Tests\mocks\itInterfaceNoWriteAccess.json" />
+    <Content Include="Tests\mocks\itInterfaceWriteAccess.json" />
     <None Include="Web.AppVeyor.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

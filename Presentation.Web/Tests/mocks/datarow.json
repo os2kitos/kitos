@@ -1,0 +1,18 @@
+﻿[
+    {
+        "request": {
+            "method": "GET",
+            "path": "api/datarow/",
+            "queryString": {
+                "interfaceid": "1"
+            }
+        },
+        "response": {
+            "status": 200,
+            "data": {
+                "msg": "",
+                "response": [ ]
+            }
+        }
+    }
+]
