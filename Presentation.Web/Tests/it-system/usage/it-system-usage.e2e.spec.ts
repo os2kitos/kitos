@@ -2,7 +2,7 @@
 import Helper = require("../../helper");
 import ItSystemUsagePo = require("../../../app/components/it-system/usage/it-system-usage.po");
 
-describe("system edit view", () => {
+describe("system usage view", () => {
     var mockHelper: Helper.Mock;
     var browserHelper: Helper.Browser;
     var pageObject: ItSystemUsagePo;
@@ -41,15 +41,14 @@ describe("system edit view", () => {
             pageObject.getPage();
 
             // clear initial requests
-            //mock.clearRequests();
+            mock.clearRequests();
         });
 
         it("should disable inputs", () => {
             // arrange
-            browserHelper.outputLog();
-            mockHelper.outputRequests();
+
             // act
-            browser.sleep(3000);
+
             // assert
             expect(pageObject.localSystemIdElement).toBeDisabled();
             expect(pageObject.localCallNameElement).toBeDisabled();
@@ -66,115 +65,135 @@ describe("system edit view", () => {
     });
 
     describe("with write access", () => {
-        beforeEach(() => {
+        beforeEach(done => {
             mock(["itSystemUsageWriteAccess"].concat(mockDependencies));
             pageObject.getPage();
 
             // clear initial requests
-            browser.sleep(300);
-            mock.clearRequests();
+            mock.clearRequests()
+                .then(() => done());
         });
 
-        //it("should not delete when delete confirm popup is dismissed", () => {
-        //    // arrange
-        //    pageObject.deleteSystemElement.first().click();
+        it("should not delete when delete confirm popup is dismissed", () => {
+            // arrange
+            pageObject.deleteUsageElement.first().click();
 
-        //    // act
-        //    browserHelper.dismissAlert();
+            // act
+            browserHelper.dismissAlert();
 
-        //    // assert
-        //    expect(mock.requestsMade()).not.toMatchInRequests({ method: "DELETE", url: "api/itsystem/1" });
-        //});
+            // assert
+            expect(mock.requestsMade()).not.toMatchInRequests({ method: "DELETE", url: "api/itSystemUsage/1" });
+        });
 
-        //it("should delete when delete confirm popup is accepted", () => {
-        //    // arrange
-        //    pageObject.deleteSystemElement.first().click();
+        it("should delete when delete confirm popup is accepted", () => {
+            // arrange
+            pageObject.deleteUsageElement.first().click();
 
-        //    // act
-        //    browserHelper.acceptAlert();
+            // act
+            browserHelper.acceptAlert();
 
-        //    // assert
-        //    expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/itsystem/1" });
-        //});
+            // assert
+            expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/itSystemUsage/1" });
+        });
 
-        //it("should save when appType changes", () => {
-        //    // arrange
+        it("should save when local system id looses focus", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.appTypeSelect.selectFirst("i");
+            // act
+            pageObject.localSystemIdInput(`2${protractor.Key.TAB}`);
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itsystem/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itSystemUsage/1" });
+        });
 
-        //it("should save when name looses focus", () => {
-        //    // arrange
+        it("should save when local name looses focus", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.nameInput("SomeName");
+            // act
+            pageObject.localCallNameInput(`SomeName${protractor.Key.TAB}`);
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itsystem/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itSystemUsage/1" });
+        });
 
-        //it("should save when system parent is changed", () => {
-        //    // arrange
+        it("should save when sensitive data selector is changed", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.systemParentSelect.selectFirst("i");
+            // act
+            pageObject.sensitiveSelector.selectFirst("n");
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itsystem/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itSystemUsage/1" });
+        });
 
-        //it("should save when belongs to is changed", () => {
-        //    // arrange
+        it("should save when esdh looses focus", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.belongsToSelect.selectFirst("i");
+            // act
+            pageObject.esdhInput(`SomeEsdh${protractor.Key.TAB}`);
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itsystem/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itSystemUsage/1" });
+        });
 
-        //it("should save when access modifier is changed", () => {
-        //    // arrange
+        it("should save when link looses focus", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.accessModifierSelect.selectFirst("p");
+            // act
+            pageObject.linkInput(`SomeLink${protractor.Key.TAB}`);
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itsystem/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itSystemUsage/1" });
+        });
 
-        //it("should save when usage type is changed", () => {
-        //    // arrange
+        it("should save when version looses focus", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.usageTypeSelector.selectFirst("p");
+            // act
+            pageObject.versionInput(`2.0${protractor.Key.TAB}`);
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itsystem/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itSystemUsage/1" });
+        });
 
-        //it("should save when description looses focus", () => {
-        //    // arrange
+        it("should save when overview selector is changed", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.descriptionInput("SomeDescription");
+            // act
+            pageObject.overviewSelector.selectFirst("i");
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itsystem/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itSystemUsage/1" });
+        });
 
-        //it("should save when further description looses focus", () => {
-        //    // arrange
+        it("should save when archive selector changes", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.furtherDescriptionInput("SomeFurtherDescription");
+            // act
+            pageObject.archiveSelector.selectFirst("g");
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itsystem/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itSystemUsage/1" });
+        });
+
+        it("should save when cmdb looses focus", () => {
+            // arrange
+
+            // act
+            pageObject.cmdbInput(`SomeCmdb${protractor.Key.TAB}`);
+
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itSystemUsage/1" });
+        });
+
+        it("should save when note looses focus", () => {
+            // arrange
+
+            // act
+            pageObject.noteInput(`SomeNote${protractor.Key.TAB}`);
+
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itSystemUsage/1" });
+        });
     });
 });
