@@ -45,7 +45,7 @@
 
             $scope.delete = function(id) {
                 var msg = notify.addInfoMessage("Gemmer... ");
-                $http.delete('api/wish/' + id + '&organizationId=' + user.currentOrganizationId).success(function () {
+                $http.delete('api/wish/' + id + '?organizationId=' + user.currentOrganizationId).success(function () {
                     msg.toSuccessMessage("Ønsket er slettet!");
                     // reload current state to reflect changes
                     $state.go('.', null, { reload: true });
