@@ -72,7 +72,7 @@
                            data-ng-disabled="!hasWriteAccess"
                            data-ng-change="save()"
                            data-ng-model="exposedByObj">
-                        
+
                 </div>
             </div>
         </div>
@@ -105,7 +105,7 @@
                             </select>
                         </td>
                         <td class="text-right">
-                            <button class="btn btn-danger btn-xs" data-tooltip="Slet rækken" data-ng-click="dataRow.delete()" data-ng-if="hasWriteAccess">
+                            <button class="btn btn-danger btn-xs" data-ng-click="dataRow.delete()" data-ng-if="hasWriteAccess">
                                 <i class="glyphicon glyphicon-trash"></i>
                             </button>
                         </td>
@@ -114,7 +114,7 @@
                 <tfoot>
                     <tr data-ng-if="hasWriteAccess">
                         <td colspan="3" class="text-right">
-                            <button class="btn btn-success btn-xs" data-tooltip="Ny række" data-ng-click="newDataRow()">
+                            <button class="btn btn-success btn-xs" data-ng-click="newDataRow()">
                                 <i class="glyphicon glyphicon-plus"></i> Ny række
                             </button>
                         </td>
