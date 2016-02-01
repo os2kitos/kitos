@@ -97,7 +97,21 @@
                     "interfaceExposures": null,
                     "itProjects": [ ],
                     "mainContractId": null,
-                    "contracts": [ ],
+                    "contracts": [
+                        {
+                            "id": 1,
+                            "name": "Contract1",
+                            "itContractId": null,
+                            "contractTypeName": null,
+                            "supplierName": null,
+                            "concluded": null,
+                            "expirationDate": null,
+                            "terminated": null,
+                            "isActive": true,
+                            "agreementElements": [ ],
+                            "hasOperationElement": false
+                        }
+                    ],
                     "objectOwnerName": "Global",
                     "objectOwnerLastName": "admin",
                     "objectOwnerFullName": "Global admin"
