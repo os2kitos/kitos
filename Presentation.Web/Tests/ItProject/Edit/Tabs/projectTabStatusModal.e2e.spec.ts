@@ -26,12 +26,11 @@ describe("project edit tab staus modal", () => {
 
     describe("assignment", () => {
         describe("with no write access", () => {
-            beforeEach(() => {
+            beforeEach(done => {
                 mock(["assignment", "itProjectNoWriteAccess", "assignmentNoWriteAccess"].concat(mockDependencies));
-                pageObject.getAssignmentPage();
-
-                // clear initial requests
-                mock.clearRequests();
+                pageObject.getAssignmentPage()
+                    .then(() => mock.clearRequests())
+                    .then(() => done());
             });
 
             it("should disable inputs", () => {
@@ -64,14 +63,11 @@ describe("project edit tab staus modal", () => {
         });
 
         describe("with write access", () => {
-            beforeEach(() => {
+            beforeEach(done => {
                 mock(["assignment", "itProjectWriteAccess", "assignmentWriteAccess"].concat(mockDependencies));
-                pageObject.getAssignmentPage();
-
-                // clear initial requests
-                // necessary hack to let protractor-http-mock clear all requests after page load
-                browser.sleep(300);
-                mock.clearRequests();
+                pageObject.getAssignmentPage()
+                    .then(() => mock.clearRequests())
+                    .then(() => done());
             });
 
             it("should save on save click", () => {
