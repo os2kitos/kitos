@@ -10,47 +10,33 @@
             "data": {
                 "msg": "",
                 "response": {
-                    "id": 1,
-                    "isStatusActive": false,
-                    "note": "note",
-                    "localSystemId": "1",
-                    "version": "1",
-                    "esdhRef": "esdh",
-                    "cmdbRef": "cmdb",
-                    "directoryOrUrlRef": "folder",
-                    "localCallName": "LocalName",
-                    "sensitiveDataTypeId": null,
+                    "activeInterfaceUseCount": 0,
                     "archiveTypeId": null,
-                    "responsibleOrgUnitName": null,
-                    "organizationId": 1,
-                    "organization": {
-                        "id": 1,
-                        "name": "Fælles Kommune",
-                        "cvr": null,
-                        "type": 1,
-                        "accessModifier": 0,
-                        "config": {
+                    "cmdbRef": "cmdb",
+                    "contracts": [
+                        {
                             "id": 1,
-                            "showItProjectModule": true,
-                            "showItSystemModule": true,
-                            "showItContractModule": true,
-                            "showTabOverview": true,
-                            "showColumnTechnology": true,
-                            "showColumnUsage": true
-                        },
-                        "root": {
-                            "id": 1,
-                            "name": "Fælles Kommune",
-                            "organizationId": 1,
-                            "organizationName": "Fælles Kommune",
-                            "qualifiedName": "Fælles Kommune, Fælles Kommune"
-                        },
-                        "lastChanged": "2016-01-25T13:09:18Z",
-                        "lastChangedByUserId": 1,
-                        "uuid": null
-                    },
-                    "mainContractIsActive": false,
-                    "itSystemId": 4,
+                            "name": "Contract1",
+                            "itContractId": null,
+                            "contractTypeName": null,
+                            "supplierName": null,
+                            "concluded": null,
+                            "expirationDate": null,
+                            "terminated": null,
+                            "isActive": true,
+                            "agreementElements": [ ],
+                            "hasOperationElement": false
+                        }
+                    ],
+                    "directoryOrUrlRef": "folder",
+                    "esdhRef": "esdh",
+                    "id": 1,
+                    "interfaceExhibitCount": 0,
+                    "interfaceExposures": null,
+                    "interfaceUsages": [ ],
+                    "interfaceUseCount": 1,
+                    "isStatusActive": false,
+                    "itProjects": [ ],
                     "itSystem": {
                         "id": 1,
                         "uuid": "00000000-0000-0000-0000-000000000000",
@@ -85,36 +71,91 @@
                         "lastChangedByUserId": 1,
                         "isUsed": false
                     },
+                    "itSystemId": 4,
                     "itSystemParentName": null,
+                    "localCallName": "LocalName",
+                    "localSystemId": "1",
+                    "mainContractId": null,
+                    "mainContractIsActive": false,
+                    "note": "note",
+                    "objectOwnerFullName": "Global admin",
+                    "objectOwnerLastName": "admin",
+                    "objectOwnerName": "Global",
+                    "organization": {
+                        "id": 1,
+                        "name": "Fælles Kommune",
+                        "cvr": null,
+                        "type": 1,
+                        "accessModifier": 0,
+                        "config": {
+                            "id": 1,
+                            "showItProjectModule": true,
+                            "showItSystemModule": true,
+                            "showItContractModule": true,
+                            "showTabOverview": true,
+                            "showColumnTechnology": true,
+                            "showColumnUsage": true
+                        },
+                        "root": {
+                            "id": 1,
+                            "name": "Fælles Kommune",
+                            "organizationId": 1,
+                            "organizationName": "Fælles Kommune",
+                            "qualifiedName": "Fælles Kommune, Fælles Kommune"
+                        },
+                        "lastChanged": "2016-01-25T13:09:18Z",
+                        "lastChangedByUserId": 1,
+                        "uuid": null
+                    },
+                    "organizationId": 1,
                     "overviewId": null,
                     "overviewItSystemName": null,
-                    "rights": [ ],
-                    "taskRefs": [ ],
-                    "interfaceExhibitCount": 0,
-                    "interfaceUseCount": 1,
-                    "activeInterfaceUseCount": 0,
-                    "interfaceUsages": [ ],
-                    "interfaceExposures": null,
-                    "itProjects": [ ],
-                    "mainContractId": null,
-                    "contracts": [
+                    "responsibleOrgUnitName": null,
+                    "rights": [
                         {
-                            "id": 1,
-                            "name": "Contract1",
-                            "itContractId": null,
-                            "contractTypeName": null,
-                            "supplierName": null,
-                            "concluded": null,
-                            "expirationDate": null,
-                            "terminated": null,
-                            "isActive": true,
-                            "agreementElements": [ ],
-                            "hasOperationElement": false
+                            "objectId": 2,
+                            "objectName": "ItSystem1",
+                            "roleId": 1,
+                            "roleName": "Systemejer",
+                            "roleHasWriteAccess": true,
+                            "userId": 1,
+                            "userName": "Global",
+                            "userEmail": "support@kitos.dk",
+                            "user": {
+                                "id": 1,
+                                "name": "Global",
+                                "lastName": "admin",
+                                "phoneNumber": null,
+                                "email": "support@kitos.dk",
+                                "defaultOrganizationUnitId": null,
+                                "defaultOrganizationUnitName": null,
+                                "isGlobalAdmin": true,
+                                "uuid": null,
+                                "adminRights": [
+                                    {
+                                        "organizationId": 1,
+                                        "roleName": "LocalAdmin",
+                                        "roleId": 1,
+                                        "objectOwnerName": "Global",
+                                        "objectOwnerLastName": "admin",
+                                        "objectOwnerFullName": "Global admin",
+                                        "defaultOrgUnitName": null
+                                    }
+                                ],
+                                "objectOwnerName": null,
+                                "objectOwnerLastName": null,
+                                "lastAdvisDate": null,
+                                "lastChanged": "2016-02-01T08:55:41Z",
+                                "lastChangedByUserId": 1,
+                                "fullName": "Global admin"
+                            },
+                            "lastChanged": "2016-02-01T09:35:19Z",
+                            "lastChangedByUserId": 1
                         }
                     ],
-                    "objectOwnerName": "Global",
-                    "objectOwnerLastName": "admin",
-                    "objectOwnerFullName": "Global admin"
+                    "sensitiveDataTypeId": null,
+                    "taskRefs": [ ],
+                    "version": "1"
                 }
             }
         }

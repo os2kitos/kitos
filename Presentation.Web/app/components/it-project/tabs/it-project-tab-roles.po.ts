@@ -22,7 +22,6 @@ class PageObject implements IPageObject {
 
     // add right user selector
     addRightUserSelector = new Select2Wrapper("#add-right-user .select2-container");
-
 }
 
 export = PageObject;
