@@ -13,7 +13,8 @@ describe("system interface edit", () => {
         "interfaceType",
         "method",
         "datatype",
-        "datarow"
+        "datarow",
+        "organization"
     ];
 
     beforeEach(() => {
@@ -88,7 +89,7 @@ describe("system interface edit", () => {
             pageObject.nameInput(`SomeName${protractor.Key.TAB}`);
 
             // assert
-            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itinterface/1" });
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itInterface/1" });
         });
 
         it("should save when id looses focus", () => {
@@ -98,7 +99,7 @@ describe("system interface edit", () => {
             pageObject.idInput(`SomeId${protractor.Key.TAB}`);
 
             // assert
-            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itinterface/1" });
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itInterface/1" });
         });
 
         it("should save when version looses focus", () => {
@@ -108,17 +109,17 @@ describe("system interface edit", () => {
             pageObject.versionInput(`SomeVersion${protractor.Key.TAB}`);
 
             // assert
-            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itinterface/1" });
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itInterface/1" });
         });
 
         it("should save when belongs to is changed", () => {
             // arrange
 
             // act
-            pageObject.belongsToSelect.selectFirst("f");
+            pageObject.belongsToSelect.selectFirst("i");
 
             // assert
-            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itinterface/1" });
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itInterface/1" });
         });
 
         it("should save when access modifier is changed", () => {
@@ -128,7 +129,7 @@ describe("system interface edit", () => {
             pageObject.accessModifierSelect.selectFirst("p");
 
             // assert
-            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itinterface/1" });
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itInterface/1" });
         });
 
         it("should save when description looses focus", () => {
@@ -138,7 +139,7 @@ describe("system interface edit", () => {
             pageObject.descriptionInput(`SomeDescription${protractor.Key.TAB}`);
 
             // assert
-            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itinterface/1" });
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itInterface/1" });
         });
 
         it("should save when url looses focus", () => {
@@ -148,7 +149,7 @@ describe("system interface edit", () => {
             pageObject.urlInput(`SomeUrl${protractor.Key.TAB}`);
 
             // assert
-            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itinterface/1" });
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itInterface/1" });
         });
 
         it("should save when note looses focus", () => {
@@ -158,7 +159,7 @@ describe("system interface edit", () => {
             pageObject.versionInput(`SomeNote${protractor.Key.TAB}`);
 
             // assert
-            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itinterface/1" });
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itInterface/1" });
         });
     });
 });
