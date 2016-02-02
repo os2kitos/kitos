@@ -51,7 +51,7 @@ describe("system usage tab kle", () => {
 
     describe("with write access", () => {
         beforeEach(done => {
-            // TODO: itsystem/1/taskId=* is hardcoded in mock JSON for IDs 19-68. Refactor to object based mock generation.
+            // TODO: itsystemusage/1/taskId=* is hardcoded in mock JSON for IDs 19-68. Refactor to object based mock generation.
             mock(["itSystemUsageWriteAccess"].concat(mockDependencies));
             pageObject.getPage()
                 .then(() => mock.clearRequests())
