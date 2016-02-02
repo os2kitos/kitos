@@ -12,7 +12,7 @@ class ItSystemUsageTabWishesPo implements IPageObject {
 
     // text input
     public textElement = element(by.css("#wish-text"));
-    public textInput = (value: string) => {
+    public textInput(value: string) {
         this.textElement.sendKeys(value);
     }
 

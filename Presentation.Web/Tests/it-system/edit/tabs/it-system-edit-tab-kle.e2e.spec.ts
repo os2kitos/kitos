@@ -223,7 +223,7 @@ describe("system edit tab kle", () => {
 
         it("should not uncheck all tasks on page on dismissed deselect all click", () => {
             // arrange
-            pageObject.selectAllElement.click()
+            pageObject.selectAllElement.click();
             browserHelper.acceptAlert();
             mock.clearRequests();
             pageObject.deselectAllElement.click();
@@ -246,7 +246,7 @@ describe("system edit tab kle", () => {
 
         it("should uncheck all tasks on confirmed deselect all pages click", () => {
             // arrange
-            pageObject.selectAllElement.click()
+            pageObject.selectAllElement.click();
             browserHelper.acceptAlert();
             mock.clearRequests();
             pageObject.deselectAllPages.click();
@@ -268,7 +268,6 @@ describe("system edit tab kle", () => {
 
             // act
             browserHelper.dismissAlert();
-
 
             // assert
             // match api url with query string 'taskID=' only and ignoring any other query parameters

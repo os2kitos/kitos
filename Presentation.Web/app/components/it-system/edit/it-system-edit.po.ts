@@ -34,13 +34,13 @@ class ItSystemEditPo implements IPageObject {
 
     // description input
     public descriptionElement = element(by.css("#system-description"));
-    public descriptionInput = (value: string) => {
+    public descriptionInput(value: string) {
         this.descriptionElement.sendKeys(value, protractor.Key.TAB);
     }
 
     // furtherDescription input
     public furtherDescriptionElement = element(by.css("#system-url"));
-    public furtherDescriptionInput = (value: string) => {
+    public furtherDescriptionInput(value: string) {
         this.furtherDescriptionElement.sendKeys(value, protractor.Key.TAB);
     }
 }

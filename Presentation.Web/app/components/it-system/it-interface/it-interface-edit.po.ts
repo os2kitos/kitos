@@ -11,19 +11,19 @@ class ItInterfaceEditPo implements IPageObject {
 
     // name input
     public nameElement = element(by.css("#interface-name"));
-    public nameInput = (value: string) => {
+    public nameInput(value: string) {
         this.nameElement.sendKeys(value);
     }
 
     // id input
     public idElement = element(by.css("#interface-itInterfaceId"));
-    public idInput = (value: string) => {
+    public idInput(value: string) {
         this.idElement.sendKeys(value);
     }
 
     // version input
     public versionElement = element(by.css("#interface-version"));
-    public versionInput = (value: string) => {
+    public versionInput(value: string) {
         this.versionElement.sendKeys(value);
     }
 
@@ -35,19 +35,19 @@ class ItInterfaceEditPo implements IPageObject {
 
     // description input
     public descriptionElement = element(by.css("#interface-description"));
-    public descriptionInput = (value: string) => {
+    public descriptionInput(value: string) {
         this.descriptionElement.sendKeys(value);
     }
 
     // url input
     public urlElement = element(by.css("#interface-url"));
-    public urlInput = (value: string) => {
+    public urlInput(value: string) {
         this.urlElement.sendKeys(value);
     }
 
     // note input
     public noteElement = element(by.css("#interface-note"));
-    public noteInput = (value: string) => {
+    public noteInput(value: string) {
         this.noteElement.sendKeys(value);
     }
 }

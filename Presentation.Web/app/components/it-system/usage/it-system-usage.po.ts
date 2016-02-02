@@ -13,13 +13,13 @@ class ItSystemUsagePo implements IPageObject {
 
     // localSystemId input
     public localSystemIdElement = element(by.css("#sysId"));
-    public localSystemIdInput = (value: string) => {
+    public localSystemIdInput(value: string) {
         this.localSystemIdElement.sendKeys(value);
     }
 
     // localCallName input
     public localCallNameElement = element(by.css("#localcallname"));
-    public localCallNameInput = (value: string) => {
+    public localCallNameInput(value: string) {
         this.localCallNameElement.sendKeys(value);
     }
 
@@ -28,25 +28,25 @@ class ItSystemUsagePo implements IPageObject {
 
     // esdh input
     public esdhElement = element(by.css("#esdh"));
-    public esdhInput = (value: string) => {
+    public esdhInput(value: string) {
         this.esdhElement.sendKeys(value);
     }
 
     // link input
     public linkElement = element(by.css("#url"));
-    public linkInput = (value: string) => {
+    public linkInput(value: string) {
         this.linkElement.sendKeys(value);
     }
 
     // version input
     public versionElement = element(by.css("#version"));
-    public versionInput = (value: string) => {
+    public versionInput(value: string) {
         this.versionElement.sendKeys(value);
     }
 
     // usageOwner input
     public usageOwnerElement = element(by.css("#usage-owner"));
-    public usageOwnerInput = (value: string) => {
+    public usageOwnerInput(value: string) {
         this.usageOwnerElement.sendKeys(value);
     }
 
@@ -58,13 +58,13 @@ class ItSystemUsagePo implements IPageObject {
 
     // cmdb input
     public cmdbElement = element(by.css("#cmdb"));
-    public cmdbInput = (value: string) => {
+    public cmdbInput(value: string) {
         this.cmdbElement.sendKeys(value);
     }
 
     // note input
     public noteElement = element(by.css("#note"));
-    public noteInput = (value: string) => {
+    public noteInput(value: string) {
         this.noteElement.sendKeys(value);
     }
 }

@@ -267,7 +267,6 @@ describe("system usage tab kle", () => {
             // act
             browserHelper.dismissAlert();
 
-
             // assert
             // match api url with query string 'taskID=' only and ignoring any other query parameters
             expect(mock.requestsMade()).not.toMatchInRequests({ method: "DELETE", url: "api/itSystemUsage/1?(.[^ ])*taskId=[^0-9]" });

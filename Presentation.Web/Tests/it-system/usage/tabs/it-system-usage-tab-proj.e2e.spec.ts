@@ -82,7 +82,6 @@ describe("system usage tab proj", () => {
             expect(pageObject.projectRepeater.count()).toBeGreaterThan(0, "Selected projects are not repeated");
         });
 
-
         it("should not delete when delete confirm popup is dismissed", () => {
             // arrange
             pageObject.projectRepeater.selectFirst(pageObject.deleteLocator).first().click();
