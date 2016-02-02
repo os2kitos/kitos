@@ -16,5 +16,49 @@
                 "response": [ ]
             }
         }
+    },
+    {
+        "request": {
+            "method": "GET",
+            "path": "api/exhibit/1",
+            "queryString": {
+                "organizationId": "1"
+            }
+        },
+        "response": {
+            "status": 200,
+            "data": {
+                "msg": "",
+                "response": {
+                    "id": 1,
+                    "itSystemId": 1,
+                    "itSystemName": "ItSystem1",
+                    "itInterfaceName": "ItInterface1",
+                    "itInterfaceId": 1
+                }
+            }
+        }
+    },
+    {
+        "request": {
+            "method": "POST",
+            "path": "api/exhibit",
+            "queryString": {
+                "organizationId": "1"
+            }
+        },
+        "response": {
+            "status": 201,
+            "data": {
+                "msg": "",
+                "response": {
+                    "id": 1,
+                    "itSystemId": 1,
+                    "itSystemName": null,
+                    "itInterfaceName": null,
+                    "itInterfaceId": 0
+                }
+            }
+        }
     }
 ]

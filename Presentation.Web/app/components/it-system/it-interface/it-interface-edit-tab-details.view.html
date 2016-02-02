@@ -66,7 +66,7 @@
                 <!-- Exhibited by -->
                 <label for="interface-exposed-by" class="control-label col-md-2 small">Udstillet af</label>
                 <div class="col-md-4">
-                    <input type="text" id="interface-exposed-by" class="form-control input-sm"
+                    <input type="hidden" id="interface-exposed-by" class="form-control input-sm"
                            data-ui-select2="itSystemsSelectOptions"
                            data-placeholder="Vælg IT System"
                            data-ng-disabled="!hasWriteAccess"
@@ -89,10 +89,14 @@
                 <tbody>
                     <tr data-ng-repeat="dataRow in dataRows | filter:{show:true}">
                         <td>
-                            <input type="text" class="form-control input-sm" data-ng-model="dataRow.data" data-ng-disabled="!hasWriteAccess"
-                                   data-autosave="{{dataRow.updateUrl}}" data-field="data">
+                            <input type="text"
+                                   class="form-control input-sm"
+                                   data-ng-model="dataRow.data"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-autosave="{{dataRow.updateUrl}}"
+                                   data-field="data">
                         </td>
-                        <td>
+                        <td class="data-type-selector">
                             <select class="form-control input-sm"
                                     data-ui-select2=""
                                     data-placeholder="Vælg datatype"
@@ -105,16 +109,20 @@
                             </select>
                         </td>
                         <td class="text-right">
-                            <button class="btn btn-danger btn-xs" data-ng-click="dataRow.delete()" data-ng-if="hasWriteAccess">
+                            <button class="btn btn-danger btn-xs delete-data-row"
+                                    data-ng-click="dataRow.delete()"
+                                    data-ng-show="hasWriteAccess">
                                 <i class="glyphicon glyphicon-trash"></i>
                             </button>
                         </td>
                     </tr>
                 </tbody>
                 <tfoot>
-                    <tr data-ng-if="hasWriteAccess">
+                    <tr data-ng-show="hasWriteAccess">
                         <td colspan="3" class="text-right">
-                            <button class="btn btn-success btn-xs" data-ng-click="newDataRow()">
+                            <button id="add-data-row"
+                                    class="btn btn-success btn-xs"
+                                    data-ng-click="newDataRow()">
                                 <i class="glyphicon glyphicon-plus"></i> Ny række
                             </button>
                         </td>
@@ -123,5 +131,4 @@
             </table>
         </div>
     </div>
-
 </div>

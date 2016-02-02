@@ -55,6 +55,58 @@
   {
     "request": {
       "method": "GET",
+      "path": "api/itsystem",
+      "queryString": {
+        "q": "i",
+        "organizationId": "1"
+      }
+    },
+    "response": {
+      "status": 200,
+      "data": {
+        "msg": "",
+        "response": [
+          {
+            "id": 1,
+            "uuid": "00000000-0000-0000-0000-000000000000",
+            "parentId": null,
+            "parentName": null,
+            "exposedInterfaceIds": null,
+            "belongsToId": 1,
+            "belongsToName": "Fælles Kommune",
+            "organizationId": 1,
+            "organizationName": "Fælles Kommune",
+            "name": "ItSystem1",
+            "itSystemId": null,
+            "objectOwnerId": 1,
+            "objectOwnerName": "Global",
+            "objectOwnerLastName": "admin",
+            "objectOwnerFullName": "Global admin",
+            "accessModifier": 0,
+            "description": null,
+            "url": null,
+            "taskRefIds": [ ],
+            "taskRefs": [ ],
+            "appTypeOptionId": null,
+            "appTypeOptionName": null,
+            "businessTypeId": null,
+            "businessTypeName": null,
+            "interfaceId": null,
+            "interfaceTypeId": null,
+            "tsaId": null,
+            "methodId": null,
+            "dataRows": null,
+            "lastChanged": "2016-01-29T12:54:53Z",
+            "lastChangedByUserId": 1,
+            "isUsed": false
+          }
+        ]
+      }
+    }
+  },
+  {
+    "request": {
+      "method": "GET",
       "path": "api/itsystem/1",
       "queryString": { }
     },

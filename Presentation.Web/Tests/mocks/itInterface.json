@@ -34,7 +34,15 @@
                     "interfaceTypeName": null,
                     "methodId": null,
                     "methodName": null,
-                    "dataRows": [ ],
+                    "dataRows": [
+                        {
+                            "id": 1,
+                            "itSystemId": 0,
+                            "data": "ExctistingData",
+                            "dataTypeId": 7,
+                            "itInterfaceId": 1
+                        }
+                    ],
                     "belongsToId": null,
                     "belongsToName": null,
                     "version": "1.0",
