@@ -1,0 +1,18 @@
+﻿[
+    {
+        "request": {
+            "path": "api/InterfaceUsage/",
+            "method": "GET",
+            "queryString": {
+                "contractId": "1"
+            }
+        },
+        "response": {
+            "status": 200,
+            "data": {
+                "msg": "",
+                "response": [ ]
+            }
+        }
+    }
+]

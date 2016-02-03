@@ -64,7 +64,7 @@
                     ],
                     hasWriteAccess: [
                         '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
-                            return $http.get("api/itcontract/" + $stateParams.id + "?hasWriteAccess&organizationId=" + user.currentOrganizationId)
+                            return $http.get("api/itcontract/" + $stateParams.id + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
                                 .then(function (result) {
                                     return result.data.response;
                                 });

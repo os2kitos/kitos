@@ -524,6 +524,7 @@
     <TypeScriptCompile Include="app\components\global-config\global-config-org.controller.ts" />
     <TypeScriptCompile Include="app\components\home\home-forgot-password.controller.ts" />
     <TypeScriptCompile Include="app\components\home\home-reset-password.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\it-contract-edit.po.ts" />
     <TypeScriptCompile Include="app\models\it-contract\economy-stream.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-overview-inactive.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-overview.spec.ts" />
@@ -624,6 +625,7 @@
     <TypeScriptCompile Include="Scripts\typings\kendo\2016.1.112\kendo.web.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\moment\moment-node.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\moment\moment.d.ts" />
+    <TypeScriptCompile Include="Tests\it-contract\edit\it-contract-edit.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabCommunication.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabItsys.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabHandover.e2e.spec.ts" />
@@ -824,6 +826,16 @@
     <Content Include="Tests\mocks\milestoneWriteAccess.json" />
     <Content Include="Scripts\maps\angular-bundle.min.js.map" />
     <Content Include="Scripts\maps\library-bundle.min.js.map" />
+    <Content Include="Tests\mocks\itContract.json" />
+    <Content Include="Tests\mocks\contractType.json" />
+    <Content Include="Tests\mocks\contractTemplate.json" />
+    <Content Include="Tests\mocks\purchaseForm.json" />
+    <Content Include="Tests\mocks\procurementStrategy.json" />
+    <Content Include="Tests\mocks\agreementElement.json" />
+    <Content Include="Tests\mocks\itContractNoWriteAccess.json" />
+    <Content Include="Tests\mocks\itContractWriteAccess.json" />
+    <Content Include="Tests\mocks\itInterfaceExhibitUsage.json" />
+    <Content Include="Tests\mocks\interfaceUsage.json" />
     <None Include="Web.AppVeyor.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

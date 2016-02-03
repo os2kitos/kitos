@@ -234,7 +234,7 @@
                     <!-- Extern contract is signed -->
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox"
+                            <input type="checkbox" id="contract-ext-signed"
                                    data-ng-model="contract.hasSupplierSigned"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-autosave="{{ autoSaveUrl }}"
@@ -258,7 +258,7 @@
                     <!-- Intern contract is signed -->
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox"
+                            <input type="checkbox" id="contract-int-signed"
                                    data-ng-model="contract.isSigned"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-autosave="{{ autoSaveUrl }}"
