@@ -200,7 +200,7 @@
                         },
                         excelTemplate: dataItem => {
                             // true if system is being used by system within current context, else false
-                            var systemHasUsages = this._.find(dataItem.Usages, (d: any) => (d.OrganizationId == this.user.currentOrganizationId));
+                            var systemHasUsages = dataItem ? this._.find(dataItem.Usages, (d: any) => (d.OrganizationId == this.user.currentOrganizationId)) : false;
                             return systemHasUsages ? "Anvendt" : "Ikke anvendt";
                         },
                         filterable: false,
@@ -223,7 +223,7 @@
                         field: "Name", title: "It System", width: 285,
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: dataItem => `<a data-ui-sref="it-system.edit.interfaces({id: ${dataItem.Id}})">${dataItem.Name}</a>`,
-                        excelTemplate: dataItem => dataItem.Name,
+                        excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -235,7 +235,7 @@
                     {
                         field: "AccessModifier", title: "Synlighed", width: 120,
                         persistId: "accessmod", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => dataItem.AccessModifier.toString(),
+                        excelTemplate: dataItem => dataItem && dataItem.AccessModifier.toString() || "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -320,7 +320,7 @@
                             }
                             return `<a href="${dataItem.Url}" title="Link til yderligere..." target="_blank"><i class="fa fa-link"></i></a>`;
                         },
-                        excelTemplate: dataItem => dataItem.Url || "",
+                        excelTemplate: dataItem => dataItem && dataItem.Url || "",
                         attributes: { "class": "text-center" },
                         filterable: {
                             cell: {
@@ -335,7 +335,7 @@
                         persistId: "usages", // DON'T YOU DARE RENAME!
                         template: dataItem =>
                             `<a class="col-md-7 text-center" data-ng-click="systemCatalogVm.showUsageDetails(${dataItem.Id},'${this.$sce.getTrustedHtml(dataItem.Name)}')">${dataItem.Usages.length}</a>`,
-                        excelTemplate: dataItem => dataItem && dataItem.Usages && dataItem.Usages.length.toString(),
+                        excelTemplate: dataItem => dataItem && dataItem.Usages && dataItem.Usages.length.toString() || "",
                         filterable: false,
                         sortable: false
                     },
@@ -399,7 +399,7 @@
                         persistId: "lastchangeddate", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => {
                             // handles null cases
-                            if (!dataItem.LastChanged) {
+                            if (!dataItem || !dataItem.LastChanged) {
                                 return "";
                             }
 

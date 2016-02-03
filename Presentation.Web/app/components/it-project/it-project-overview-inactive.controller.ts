@@ -450,7 +450,7 @@
                         field: "StatusProject", title: "Status projekt", width: 100,
                         persistId: "statusproj", // DON'T YOU DARE RENAME!
                         template: dataItem => `<span data-square-traffic-light="${dataItem.StatusProject}"></span>`,
-                        excelTemplate: dataItem => dataItem.StatusProject.toString(),
+                        excelTemplate: dataItem => dataItem && dataItem.StatusProject.toString() || "",
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -469,7 +469,7 @@
                         field: "StatusDate", title: "Status projekt: Dato", format: "{0:dd-MM-yyyy}", width: 130,
                         persistId: "statusdateproj", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => {
-                            if (!dataItem.StatusDate) {
+                            if (!dataItem || !dataItem.StatusDate) {
                                 return "";
                             }
 
@@ -517,14 +517,14 @@
                         persistId: "trans", // DON'T YOU DARE RENAME!
                         hidden: true,
                         template: dataItem => dataItem.IsTransversal ? `<i class="text-success fa fa-check"></i>` : `<i class="text-danger fa fa-times"></i>`,
-                        excelTemplate: dataItem => dataItem.IsTransversal.toString()
+                        excelTemplate: dataItem => dataItem && dataItem.IsTransversal.toString() || ""
                     },
                     {
                         field: "IsStrategy", title: "Strategisk", width: 150,
                         persistId: "strat", // DON'T YOU DARE RENAME!
                         hidden: true,
                         template: dataItem => dataItem.IsStrategy ? `<i class="text-success fa fa-check"></i>` : `<i class="text-danger fa fa-times"></i>`,
-                        excelTemplate: dataItem => dataItem.IsStrategy.toString()
+                        excelTemplate: dataItem => dataItem && dataItem.IsStrategy.toString() || ""
                     },
                     {
                         field: "EconomyYears", title: "Økonomi", width: 150,
@@ -568,7 +568,7 @@
                     excelTemplate: dataItem => {
                         var roles = "";
 
-                        if (dataItem.roles[role.Id] === undefined)
+                        if (!dataItem || dataItem.roles[role.Id] === undefined)
                             return roles;
 
                         return this.concatRoles(dataItem.roles[role.Id]);

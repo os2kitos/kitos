@@ -290,7 +290,7 @@
                     {
                         field: "ItProjectId", title: "ProjektID", width: 115,
                         persistId: "projid", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => dataItem && dataItem.ItProjectId ? dataItem.ItProjectId : "",
+                        excelTemplate: dataItem => dataItem && dataItem.ItProjectId || "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -304,7 +304,7 @@
                         field: "Parent.Name", title: "Overordnet IT Projekt", width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Parent ? `<a data-ui-sref="it-project.edit.status-project({id:${dataItem.Parent.Id}})">${dataItem.Parent.Name}</a>` : "",
-                        excelTemplate: dataItem => dataItem && dataItem.Parent ? dataItem.Parent.Name : "",
+                        excelTemplate: dataItem => dataItem && dataItem.Parent && dataItem.Parent.Name || "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -318,7 +318,7 @@
                         field: "Name", title: "IT Projekt", width: 340,
                         persistId: "projname", // DON'T YOU DARE RENAME!
                         template: dataItem => `<a data-ui-sref="it-project.edit.status-project({id: ${dataItem.Id}})">${dataItem.Name}</a>`,
-                        excelTemplate: dataItem => dataItem && dataItem.Name ? dataItem.Name : "",
+                        excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -416,7 +416,7 @@
                             return this.moment(dataItem.CurrentPhaseObj.StartDate).format("DD-MM-YYYY");
                         },
                         excelTemplate: dataItem => {
-                            if (!dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.StartDate) {
+                            if (!dataItem || !dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.StartDate) {
                                 return "";
                             }
 
@@ -437,7 +437,7 @@
                             return this.moment(dataItem.CurrentPhaseObj.EndDate).format("DD-MM-YYYY");
                         },
                         excelTemplate: dataItem => {
-                            if (!dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.EndDate) {
+                            if (!dataItem || !dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.EndDate) {
                                 return "";
                             }
 
@@ -450,7 +450,7 @@
                         field: "StatusProject", title: "Status projekt", width: 100,
                         persistId: "statusproj", // DON'T YOU DARE RENAME!
                         template: dataItem => `<span data-square-traffic-light="${dataItem.StatusProject}"></span>`,
-                        excelTemplate: dataItem => dataItem.StatusProject.toString(),
+                        excelTemplate: dataItem => dataItem && dataItem.StatusProject.toString() || "",
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -469,7 +469,7 @@
                         field: "StatusDate", title: "Status projekt: Dato", format: "{0:dd-MM-yyyy}", width: 130,
                         persistId: "statusdateproj", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => {
-                            if (!dataItem.StatusDate) {
+                            if (!dataItem || !dataItem.StatusDate) {
                                 return "";
                             }
 
@@ -517,14 +517,14 @@
                         persistId: "trans", // DON'T YOU DARE RENAME!
                         hidden: true,
                         template: dataItem => dataItem.IsTransversal ? `<i class="text-success fa fa-check"></i>` : `<i class="text-danger fa fa-times"></i>`,
-                        excelTemplate: dataItem => dataItem.IsTransversal.toString()
+                        excelTemplate: dataItem => dataItem && dataItem.IsTransversal.toString() || ""
                     },
                     {
                         field: "IsStrategy", title: "Strategisk", width: 150,
                         persistId: "strat", // DON'T YOU DARE RENAME!
                         hidden: true,
                         template: dataItem => dataItem.IsStrategy ? `<i class="text-success fa fa-check"></i>` : `<i class="text-danger fa fa-times"></i>`,
-                        excelTemplate: dataItem => dataItem.IsStrategy.toString()
+                        excelTemplate: dataItem => dataItem && dataItem.IsStrategy.toString() || ""
                     },
                     {
                         field: "EconomyYears", title: "Økonomi", width: 150,
@@ -549,7 +549,7 @@
                                                     <option value="Mid">Mellem</option>
                                                     <option value="Low">Lav</option>
                                                 </select>`,
-                        excelTemplate: dataItem => dataItem.Priority.toString(),
+                        excelTemplate: dataItem => dataItem && dataItem.Priority.toString() || "",
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -579,7 +579,7 @@
                                                     <option value="Mid">Mellem</option>
                                                     <option value="Low">Lav</option>
                                                 </select>`,
-                        excelTemplate: dataItem => dataItem.PriorityPf.toString(),
+                        excelTemplate: dataItem => dataItem && dataItem.PriorityPf.toString() || "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -623,7 +623,7 @@
                     excelTemplate: dataItem => {
                         var roles = "";
 
-                        if (dataItem.roles[role.Id] === undefined)
+                        if (!dataItem || dataItem.roles[role.Id] === undefined)
                             return roles;
 
                         return this.concatRoles(dataItem.roles[role.Id]);
