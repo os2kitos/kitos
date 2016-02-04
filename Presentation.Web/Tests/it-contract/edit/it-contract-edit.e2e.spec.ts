@@ -15,7 +15,8 @@ describe("contract edit view", () => {
         "agreementElement",
         "organizationunit",
         "itInterfaceExhibitUsage",
-        "interfaceUsage"
+        "interfaceUsage",
+        "organization"
     ];
 
     beforeEach(() => {
@@ -45,7 +46,6 @@ describe("contract edit view", () => {
             // act
 
             // assert
-            browser.sleep(3000);
             expect(pageObject.nameElement).toBeDisabled();
             expect(pageObject.idElement).toBeDisabled();
             expect(pageObject.parentSelector.element).toBeSelect2Disabled();
@@ -70,169 +70,232 @@ describe("contract edit view", () => {
 
     describe("with write access", () => {
         beforeEach(done => {
-            mock(["itContractNoWriteAccess"].concat(mockDependencies));
+            mock(["itContractWriteAccess"].concat(mockDependencies));
             pageObject.getPage()
                 .then(() => mock.clearRequests())
                 .then(() => done());
         });
 
-        //it("should not delete when delete confirm popup is dismissed", () => {
-        //    // arrange
-        //    pageObject.deleteContractButton.first().click();
+        it("should not delete when delete confirm popup is dismissed", () => {
+            // arrange
+            pageObject.deleteContractButton.first().click();
 
-        //    // act
-        //    browserHelper.dismissAlert();
+            // act
+            browserHelper.dismissAlert();
 
-        //    // assert
-        //    expect(mock.requestsMade()).not.toMatchInRequests({ method: "DELETE", url: "api/itcontract/1" });
-        //});
+            // assert
+            expect(mock.requestsMade()).not.toMatchInRequests({ method: "DELETE", url: "api/itcontract/1" });
+        });
 
-        //it("should delete when delete confirm popup is accepted", () => {
-        //    // arrange
-        //    pageObject.deleteContractButton.first().click();
+        it("should delete when delete confirm popup is accepted", () => {
+            // arrange
+            pageObject.deleteContractButton.first().click();
 
-        //    // act
-        //    browserHelper.acceptAlert();
+            // act
+            browserHelper.acceptAlert();
 
-        //    // assert
-        //    expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/itcontract/1" });
-        //});
+            // assert
+            expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/itcontract/1" });
+        });
 
-        //it("should save when name looses focus", () => {
-        //    // arrange
-        //    pageObject.nameInput("SomeName");
+        it("should save when name looses focus", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.idElement.click();
+            // act
+            pageObject.nameInput(`SomeInput${protractor.Key.TAB}`);
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
+        });
 
-        //it("should save when projectId looses focus", () => {
-        //    // arrange
-        //    pageObject.idInput("SomeId");
+        it("should save when id looses focus", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.nameElement.click();
+            // act
+            pageObject.idInput(`SomeInput${protractor.Key.TAB}`);
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
+        });
 
-        //it("should save when type is changed", () => {
-        //    // arrange
+        it("should save when parent is changed", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.typeSelect.selectFirst("lo");
+            // act
+            pageObject.parentSelector.selectFirst("c");
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
+        });
 
-        //it("should save when cmdb looses focus", () => {
-        //    // arrange
-        //    pageObject.cmdbInput("SomeCmdb");
+        it("should save when type is changed", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.nameElement.click();
+            // act
+            pageObject.typeSelector.selectFirst();
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
+        });
 
-        //it("should save when access is changed", () => {
-        //    // arrange
+        it("should save when esdh looses focus", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.accessSelect.selectFirst("p");
+            // act
+            pageObject.esdhInput(`SomeInput${protractor.Key.TAB}`);
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
+        });
 
-        //it("should save when esdh looses focus", () => {
-        //    // arrange
-        //    pageObject.esdhInput("SomeEsdh");
+        it("should save when folder looses focus", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.nameElement.click();
+            // act
+            pageObject.folderInput(`SomeInput${protractor.Key.TAB}`);
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
+        });
 
-        //it("should save when folder looses focus", () => {
-        //    // arrange
-        //    pageObject.folderInput("SomeFolder");
+        it("should save when note looses focus", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.nameElement.click();
+            // act
+            pageObject.noteInput(`SomeInput${protractor.Key.TAB}`);
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
+        });
 
-        //it("should save when background looses focus", () => {
-        //    // arrange
-        //    pageObject.backgroundInput("SomeBackground");
+        it("should save when purchaseform is changed", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.nameElement.click();
+            // act
+            pageObject.purchaseformSelector.selectFirst();
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
+        });
 
-        //it("should save when note looses focus", () => {
-        //    // arrange
-        //    pageObject.noteInput("SomeNote");
+        it("should save when strategy is changed", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.nameElement.click();
+            // act
+            pageObject.strategySelector.selectFirst();
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toBeTruthy({ method: "PATCH", url: "api/itcontract/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
+        });
 
-        //it("should save when archive checkbox is selected", () => {
-        //    // arrange
+        it("should save when plan is changed", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.archiveCheckbox.click();
+            // act
+            pageObject.planSelector.selectFirst();
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
+        });
 
-        //it("should save when transversal checkbox is selected", () => {
-        //    // arrange
+        it("should save when template is changed", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.transversalCheckbox.click();
+            // act
+            pageObject.templateSelector.selectFirst();
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
+        });
 
-        //it("should save when strategy checkbox is selected", () => {
-        //    // arrange
+        it("should save when supplier is changed", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.strategyCheckbox.click();
+            // act
+            pageObject.supplierSelector.selectFirst("f");
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
+        });
 
-        //it("should search for projects when change in field", () => {
-        //    // arrange
+        it("should save when externSigner looses focus", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.projectParentSelect.selectFirst("p");
+            // act
+            pageObject.externSignerInput(`SomeInput${protractor.Key.TAB}`);
 
-        //    // assert
-        //    expect(mock.requestsMade()).toMatchInRequests({ method: "GET", url: "api/itcontract?(.*?)q=p" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
+        });
+
+        it("should save when orgUnit is changed", () => {
+            // arrange
+
+            // act
+            pageObject.orgUnitSelector.selectFirst();
+
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
+        });
+
+        it("should save when internSigner is changed", () => {
+            // arrange
+
+            // act
+            pageObject.internSignerSelector.selectFirst("t");
+
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
+        });
+
+        it("should save when externSign checkbox is changed", () => {
+            // arrange
+
+            // act
+            pageObject.externSignCheckbox.click();
+
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
+        });
+
+        it("should save when externSignDate looses focus", () => {
+            // arrange
+
+            // act
+            pageObject.externSignDateInput(`01-01-2016${protractor.Key.TAB}`);
+
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
+        });
+
+        it("should save when internSign checkbox is changed", () => {
+            // arrange
+
+            // act
+            pageObject.internSignCheckbox.click();
+
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
+        });
+
+        it("should save when internSignDate looses focus", () => {
+            // arrange
+
+            // act
+            pageObject.internSignDateInput(`01-01-2016${protractor.Key.TAB}`);
+
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "PATCH", url: "api/itcontract/1" });
+        });
+
+        it("should save when agreementElements is changed", () => {
+            // arrange
+
+            // act
+            pageObject.agreementElementsSelector.selectFirst("l");
+
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "POST", url: "api/itcontract/1(.)+elemId=[0-9]+" });
+        });
     });
 });

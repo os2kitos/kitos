@@ -1,5 +1,6 @@
 ﻿import IPageObject = require("../../../Tests/object-wrappers/IPageObject.po");
 import Select2Wrapper = require("../../../Tests/object-wrappers/Select2Wrapper");
+import Select2TagWrapper = require("../../../Tests/object-wrappers/Select2TagWrapper");
 
 class ItContractEditPo implements IPageObject {
     public getPage(): webdriver.promise.Promise<void> {
@@ -97,7 +98,7 @@ class ItContractEditPo implements IPageObject {
     }
 
     // agreementElements selector
-    public agreementElementsSelector = new Select2Wrapper("#s2id_agreement-elements");
+    public agreementElementsSelector = new Select2TagWrapper("#s2id_agreement-elements");
 }
 
 export = ItContractEditPo;
