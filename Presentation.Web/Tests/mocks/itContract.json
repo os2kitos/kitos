@@ -201,8 +201,67 @@
                             "itSystemAppTypeName": null
                         }
                     ],
-                    "associatedInterfaceUsages": [ ],
-                    "associatedInterfaceExposures": [ ],
+                    "associatedInterfaceUsages": [
+                        {
+                            "id": 0,
+                            "itSystemUsageId": 2,
+                            "itSystemUsage": {
+                                "id": 2,
+                                "itSystemName": "ItSystem1",
+                                "itSystemAppTypeName": null
+                            },
+                            "interface": null,
+                            "dataRowUsages": [ ],
+                            "itContractId": 1,
+                            "itContract": {
+                                "id": 1,
+                                "name": "Contract1",
+                                "itContractId": null,
+                                "contractTypeName": null,
+                                "supplierName": null,
+                                "concluded": null,
+                                "expirationDate": null,
+                                "terminated": null,
+                                "isActive": true,
+                                "agreementElements": [ ],
+                                "hasOperationElement": false
+                            },
+                            "infrastructureId": null,
+                            "infrastructureItSystemName": null,
+                            "isWishedFor": true,
+                            "itInterfaceId": 1,
+                            "itSystemId": 4,
+                            "itInterfaceUseItSystemName": "ItSystem1",
+                            "itInterfaceUseItInterfaceName": "ItInterface1"
+                        }
+                    ],
+                    "associatedInterfaceExposures": [
+                        {
+                            "id": 0,
+                            "itSystemUsageId": 2,
+                            "itSystemUsage": {
+                                "id": 2,
+                                "itSystemName": "ItSystem1",
+                                "itSystemAppTypeName": null
+                            },
+                            "interface": null,
+                            "itContractId": 1,
+                            "itContract": {
+                                "id": 1,
+                                "name": "Contract1",
+                                "itContractId": null,
+                                "contractTypeName": null,
+                                "supplierName": null,
+                                "concluded": null,
+                                "expirationDate": null,
+                                "terminated": null,
+                                "isActive": true,
+                                "agreementElements": [ ],
+                                "hasOperationElement": false
+                            },
+                            "isWishedFor": false
+                        }
+                    ],
                     "internEconomyStreams": [ ],
                     "externEconomyStreams": [ ],
                     "advices": [ ],
@@ -276,8 +335,67 @@
                                 "itSystemAppTypeName": null
                             }
                         ],
-                        "associatedInterfaceUsages": [ ],
-                        "associatedInterfaceExposures": [ ],
+                        "associatedInterfaceUsages": [
+                            {
+                                "id": 0,
+                                "itSystemUsageId": 2,
+                                "itSystemUsage": {
+                                    "id": 2,
+                                    "itSystemName": "ItSystem1",
+                                    "itSystemAppTypeName": null
+                                },
+                                "interface": null,
+                                "dataRowUsages": [ ],
+                                "itContractId": 1,
+                                "itContract": {
+                                    "id": 1,
+                                    "name": "Contract1",
+                                    "itContractId": null,
+                                    "contractTypeName": null,
+                                    "supplierName": null,
+                                    "concluded": null,
+                                    "expirationDate": null,
+                                    "terminated": null,
+                                    "isActive": true,
+                                    "agreementElements": [ ],
+                                    "hasOperationElement": false
+                                },
+                                "infrastructureId": null,
+                                "infrastructureItSystemName": null,
+                                "isWishedFor": true,
+                                "itInterfaceId": 1,
+                                "itSystemId": 4,
+                                "itInterfaceUseItSystemName": "ItSystem1",
+                                "itInterfaceUseItInterfaceName": "ItInterface1"
+                            }
+                        ],
+                        "associatedInterfaceExposures": [
+                            {
+                                "id": 0,
+                                "itSystemUsageId": 2,
+                                "itSystemUsage": {
+                                    "id": 2,
+                                    "itSystemName": "ItSystem1",
+                                    "itSystemAppTypeName": null
+                                },
+                                "interface": null,
+                                "itContractId": 1,
+                                "itContract": {
+                                    "id": 1,
+                                    "name": "Contract1",
+                                    "itContractId": null,
+                                    "contractTypeName": null,
+                                    "supplierName": null,
+                                    "concluded": null,
+                                    "expirationDate": null,
+                                    "terminated": null,
+                                    "isActive": true,
+                                    "agreementElements": [ ],
+                                    "hasOperationElement": false
+                                },
+                                "isWishedFor": false
+                            }
+                        ],
                         "internEconomyStreams": [ ],
                         "externEconomyStreams": [ ],
                         "advices": [ ],
@@ -439,6 +557,34 @@
             "data": {
                 "msg": "",
                 "response": { }
+            }
+        }
+    },
+    {
+        "request": {
+            "path": "api/itcontract/1",
+            "method": "POST",
+            "queryString": {
+                "organizationId": "1",
+                "systemUsageId": "2"
+            }
+        },
+        "response": {
+            "status": 200,
+            "data": {
+                "msg": "",
+                "response": [
+                    {
+                        "id": 1,
+                        "itSystemName": "ItSystem1",
+                        "itSystemAppTypeName": null
+                    },
+                    {
+                        "id": 2,
+                        "itSystemName": "ItSystem2",
+                        "itSystemAppTypeName": null
+                    }
+                ]
             }
         }
     },

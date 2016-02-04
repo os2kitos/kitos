@@ -1,0 +1,28 @@
+﻿[
+    {
+        "request": {
+            "path": "api/exhibit",
+            "method": "GET",
+            "queryString": {
+                "sysId": "2",
+                "orgId": "1",
+                "q": "i"
+            }
+        },
+        "response": {
+            "status": 200,
+            "data": {
+                "msg": "",
+                "response": [
+                    {
+                        "id": 1,
+                        "itSystemId": 4,
+                        "itSystemName": "ItSystem1",
+                        "itInterfaceName": "ItInterface1",
+                        "itInterfaceId": 1
+                    }
+                ]
+            }
+        }
+    }
+]
