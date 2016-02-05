@@ -14,7 +14,7 @@ class ItContractEditTabSystemsPo implements IPageObject {
     public systemUsageRepeater = new RepeaterWrapper("associatedSystemUsage in associatedSystemUsages");
 
     // deleteUsage locator
-    public deleteUsageLocator = by.css(".delete-system-usage");
+    public deleteSystemUsageLocator = by.css(".delete-system-usage");
 
     // newInterfaceSystemUsage selector
     public newInterfaceSystemUsageSelector = new Select2Wrapper("#s2id_new-interface-system-usage");

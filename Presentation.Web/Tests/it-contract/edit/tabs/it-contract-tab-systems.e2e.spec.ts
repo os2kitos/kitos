@@ -34,45 +34,45 @@ describe("contract edit tab systems", () => {
         mock.teardown();
     });
 
-    //describe("with no write access", () => {
-    //    beforeEach(done => {
-    //        mock(["itContractNoWriteAccess"].concat(mockDependencies));
-    //        pageObject.getPage()
-    //            .then(() => mock.clearRequests())
-    //            .then(() => done());
-    //    });
+    describe("with no write access", () => {
+        beforeEach(done => {
+            mock(["itContractNoWriteAccess"].concat(mockDependencies));
+            pageObject.getPage()
+                .then(() => mock.clearRequests())
+                .then(() => done());
+        });
 
-    //    it("should hide inputs", () => {
-    //        // arrange
+        it("should hide inputs", () => {
+            // arrange
 
-    //        // act
+            // act
 
-    //        // assert
-    //        expect(pageObject.systemUsageSelector.element).not.toBeVisible();
-    //        expect(pageObject.newInterfaceInterfaceUsageSelector.element).not.toBeVisible();
-    //        expect(pageObject.newInterfaceUsageTypeSelector.element).not.toBeVisible();
-    //        expect(pageObject.newInterfaceInterfaceUsageSelector.element).not.toBeVisible();
-    //    });
+            // assert
+            expect(pageObject.systemUsageSelector.element).not.toBeVisible();
+            expect(pageObject.newInterfaceInterfaceUsageSelector.element).not.toBeVisible();
+            expect(pageObject.newInterfaceUsageTypeSelector.element).not.toBeVisible();
+            expect(pageObject.newInterfaceInterfaceUsageSelector.element).not.toBeVisible();
+        });
 
-    //    it("should hide delete buttons", () => {
-    //        // arrange
+        it("should hide delete buttons", () => {
+            // arrange
 
-    //        // act
+            // act
 
-    //        // assert
-    //        pageObject.systemUsageRepeater.each(row => {
-    //            expect(row.element(pageObject.deleteUsageLocator)).not.toBeVisible();
-    //        });
+            // assert
+            pageObject.systemUsageRepeater.each(row => {
+                expect(row.element(pageObject.deleteSystemUsageLocator)).not.toBeVisible();
+            });
 
-    //        pageObject.interfaceExhibitRepeater.each(row => {
-    //            expect(row.element(pageObject.deleteInterfaceExhibitLocator)).not.toBeVisible();
-    //        });
+            pageObject.interfaceExhibitRepeater.each(row => {
+                expect(row.element(pageObject.deleteInterfaceExhibitLocator)).not.toBeVisible();
+            });
 
-    //        pageObject.interfaceRepeater.each(row => {
-    //            expect(row.element(pageObject.deleteInterfaceUsageLocator)).not.toBeVisible();
-    //        });
-    //    });
-    //});
+            pageObject.interfaceRepeater.each(row => {
+                expect(row.element(pageObject.deleteInterfaceUsageLocator)).not.toBeVisible();
+            });
+        });
+    });
 
     describe("with write access", () => {
         beforeEach(done => {
@@ -82,15 +82,15 @@ describe("contract edit tab systems", () => {
                 .then(() => done());
         });
 
-        //it("should save when systemUsage is changed", () => {
-        //    // arrange
+        it("should save when systemUsage is changed", () => {
+            // arrange
 
-        //    // act
-        //    pageObject.systemUsageSelector.selectFirst("i");
+            // act
+            pageObject.systemUsageSelector.selectFirst("i");
 
-        //    // assert
-        //    expect(mockHelper.lastRequest()).toMatchRequest({ method: "POST", url: "api/itcontract/1" });
-        //});
+            // assert
+            expect(mockHelper.lastRequest()).toMatchRequest({ method: "POST", url: "api/itcontract/1" });
+        });
 
         it("should save when interface relation is completed", () => {
             // arrange
@@ -99,9 +99,64 @@ describe("contract edit tab systems", () => {
             pageObject.newInterfaceSystemUsageSelector.selectFirst("i");
             pageObject.newInterfaceUsageTypeSelector.selectFirst();
             pageObject.newInterfaceInterfaceUsageSelector.selectFirst("i");
-
             // assert
             expect(mock.requestsMade()).toMatchInRequests({ method: "PATCH", url: "api/itInterfaceExhibitUsage" });
+        });
+
+        it("should not delete system when delete confirm popup is dismissed", () => {
+            // arrange
+            pageObject.systemUsageRepeater
+                .selectFirst(pageObject.deleteSystemUsageLocator)
+                .first()
+                .click();
+
+            // act
+            browserHelper.dismissAlert();
+
+            // assert
+              expect(mock.requestsMade()).not.toMatchInRequests({ method: "DELETE", url: "api/itcontract/1(.)+systemUsageId" });
+        });
+
+        it("should delete system when delete confirm popup is accepted", () => {
+            // arrange
+            pageObject.systemUsageRepeater
+                .selectFirst(pageObject.deleteSystemUsageLocator)
+                .first()
+                .click();
+
+            // act
+            browserHelper.acceptAlert();
+
+            // assert
+            expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/itcontract/1(.)+systemUsageId" });
+        });
+
+        it("should not delete interface exhibit usage when delete confirm popup is dismissed", () => {
+            // arrange
+            pageObject.interfaceExhibitRepeater
+                .selectFirst(pageObject.deleteInterfaceExhibitLocator)
+                .first()
+                .click();
+
+            // act
+            browserHelper.dismissAlert();
+
+            // assert
+            expect(mock.requestsMade()).not.toMatchInRequests({ method: "PATCH", url: "api/itInterfaceExhibitUsage/(.)+exhibitId" });
+        });
+
+        it("should delete interface exhibit usage when delete confirm popup is accepted", () => {
+            // arrange
+            pageObject.interfaceExhibitRepeater
+                .selectFirst(pageObject.deleteInterfaceExhibitLocator)
+                .first()
+                .click();
+
+            // act
+            browserHelper.acceptAlert();
+
+            // assert
+            expect(mock.requestsMade()).toMatchInRequests({ method: "PATCH", url: "api/itInterfaceExhibitUsage/(.)+exhibitId" });
         });
     });
 });

@@ -600,5 +600,28 @@
                 "response": { }
             }
         }
+    },
+    {
+        "request": {
+            "path": "api/itcontract/1",
+            "method": "DELETE",
+            "queryString": {
+                "systemUsageId": "1",
+                "organizationId": "1"
+            }
+        },
+        "response": {
+            "status": 200,
+            "data": {
+                "msg": "",
+                "response": [
+                    {
+                        "id": 2,
+                        "itSystemName": "ItSystem1",
+                        "itSystemAppTypeName": null
+                    }
+                ]
+            }
+        }
     }
 ]
