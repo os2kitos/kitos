@@ -525,6 +525,7 @@
     <TypeScriptCompile Include="app\components\home\home-forgot-password.controller.ts" />
     <TypeScriptCompile Include="app\components\home\home-reset-password.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-edit.po.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-paymentmodel.po.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-deadlines.po.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-systems.po.ts" />
     <TypeScriptCompile Include="app\models\it-contract\economy-stream.ts" />
