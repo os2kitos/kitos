@@ -15,11 +15,12 @@
                     <tr data-ng-repeat="ht in handoverTrials">
                         <td>
                             <div class="form-group">
-                                <select class="form-control input-sm"
+                                <select class="form-control input-sm handover-trial"
                                         data-ui-select2="allowClearOption"
                                         data-placeholder="Vælg overtagelsesprøve"
                                         data-ng-model="ht.handoverTrialTypeId"
-                                        data-autosave="api/handovertrial/{{ ht.id }}"
+                                        data-autosave="api/handoverTrial/{{ ht.id }}"
+                                        data-ng-disabled="!hasWriteAccess"
                                         data-field="handoverTrialTypeId">
                                     <option value=""></option>
                                     <option data-ng-repeat="handoverTrialType in handoverTrialTypes" value="{{handoverTrialType.id}}">{{handoverTrialType.name}}</option>
@@ -27,25 +28,30 @@
                             </div>
                         </td>
                         <td>
-                            <input type="text" class="form-control"
+                            <input type="text"
+                                   class="form-control handover-trial-expected-date"
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="ht.expected"
-                                   data-autosave="api/handovertrial/{{ ht.id }}"
+                                   data-autosave="api/handoverTrial/{{ ht.id }}"
                                    data-field="expected">
                         </td>
                         <td>
-                            <input type="text" class="form-control"
+                            <input type="text"
+                                   class="form-control handover-trial-approved-date"
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="ht.approved"
-                                   data-autosave="api/handovertrial/{{ ht.id }}"
+                                   data-autosave="api/handoverTrial/{{ ht.id }}"
                                    data-field="approved">
                         </td>
                         <td>
-                            <button type="button" class="btn btn-danger btn-sm" data-ng-show="hasWriteAccess" data-ng-click="deleteTrial(ht.id)">
+                            <button type="button"
+                                    class="btn btn-danger btn-sm handover-trial-delete"
+                                    data-ng-show="hasWriteAccess"
+                                    data-ng-click="deleteTrial(ht.id)">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </button>
                         </td>
@@ -55,7 +61,8 @@
                     <tr>
                         <td>
                             <div class="form-group">
-                                <select class="form-control input-sm"
+                                <select id="handover-trial"
+                                        class="form-control input-sm"
                                         data-ui-select2="allowClearOption"
                                         data-placeholder="Vælg overtagelsesprøve"
                                         data-ng-model="handoverTrial.handoverTrialTypeId">
@@ -65,21 +72,29 @@
                             </div>
                         </td>
                         <td>
-                            <input type="text" class="form-control"
+                            <input id="handover-trial-expected-date"
+                                   type="text"
+                                   class="form-control"
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="handoverTrial.expected">
                         </td>
                         <td>
-                            <input type="text" class="form-control"
+                            <input id="handover-trial-approved-date"
+                                   type="text"
+                                   class="form-control"
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="handoverTrial.approved">
                         </td>
                         <td>
-                            <button class="btn btn-success btn-sm" data-ng-click="saveTrial(handoverTrial)">Gem</button>
+                            <button id="handover-trial-add"
+                                    class="btn btn-success btn-sm"
+                                    data-ng-click="saveTrial(handoverTrial)">
+                                Gem
+                            </button>
                         </td>
                     </tr>
                 </tfoot>
@@ -99,28 +114,38 @@
                 <tbody>
                     <tr data-ng-repeat="item in paymentMilestones">
                         <td>
-                            <input type="text" class="form-control input-sm" data-ng-disabled="!hasWriteAccess" data-ng-model="item.title" data-autosave="api/paymentmilestone/{{item.id}}" data-field="title">
+                            <input type="text"
+                                   class="form-control input-sm payment-milestone"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="item.title"
+                                   data-autosave="api/paymentMilestone/{{item.id}}"
+                                   data-field="title">
                         </td>
                         <td>
-                            <input type="text" class="form-control"
+                            <input type="text"
+                                   class="form-control payment-milestone-expected-date"
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="item.expected"
-                                   data-autosave="api/paymentmilestone/{{ item.id }}"
+                                   data-autosave="api/paymentMilestone/{{ item.id }}"
                                    data-field="expected">
                         </td>
                         <td>
-                            <input type="text" class="form-control"
+                            <input type="text"
+                                   class="form-control payment-milestone-approved-date"
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="item.approved"
-                                   data-autosave="api/paymentmilestone/{{ item.id }}"
+                                   data-autosave="api/paymentMilestone/{{ item.id }}"
                                    data-field="approved">
                         </td>
                         <td>
-                            <button type="button" class="btn btn-danger btn-sm" data-ng-show="hasWriteAccess" data-ng-click="deleteMilestone(item.id)">
+                            <button type="button"
+                                    class="btn btn-danger btn-sm payment-milestone-delete"
+                                    data-ng-show="hasWriteAccess"
+                                    data-ng-click="deleteMilestone(item.id)">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </button>
                         </td>
@@ -129,23 +154,35 @@
                 <tfoot data-ng-show="hasWriteAccess">
                     <tr>
                         <td>
-                            <input type="text" class="form-control input-sm" data-ng-model="paymentMilestone.title"></td>
+                            <input id="payment-milestone"
+                                   type="text"
+                                   class="form-control input-sm"
+                                   data-ng-model="paymentMilestone.title">
+                        </td>
                         <td>
-                            <input type="text" class="form-control"
+                            <input id="payment-milestone-expected-date"
+                                   type="text"
+                                   class="form-control"
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="paymentMilestone.expected">
                         </td>
                         <td>
-                            <input type="text" class="form-control"
+                            <input id="payment-milestone-approved-date"
+                                   type="text"
+                                   class="form-control"
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="paymentMilestone.approved">
                         </td>
                         <td>
-                            <button class="btn btn-success btn-sm" data-ng-click="saveMilestone(paymentMilestone)">Gem</button>
+                            <button id="payment-milestone-add"
+                                    class="btn btn-success btn-sm"
+                                    data-ng-click="saveMilestone(paymentMilestone)">
+                                Gem
+                            </button>
                         </td>
                     </tr>
                 </tfoot>
@@ -162,7 +199,9 @@
                 <label for="agreement-concluded" class="control-label small">
                     Indgået
                 </label>
-                <input type="text" class="form-control" id="agreement-concluded"
+                <input id="agreement-concluded"
+                       type="text"
+                       class="form-control"
                        data-kendo-date-picker
                        data-k-options="datepickerOptions"
                        data-ng-disabled="!hasWriteAccess"
@@ -172,7 +211,8 @@
             </div>
             <div class="form-group">
                 <label for="agreement-duration" class="control-label small">Varighed</label>
-                <select id="agreement-duration" class="form-control input-sm"
+                <select id="agreement-duration"
+                        class="form-control input-sm"
                         data-ui-select2="allowClearOption"
                         data-placeholder="Vælg varighed"
                         data-ng-disabled="!hasWriteAccess"
@@ -204,7 +244,15 @@
                     <option value=""></option>
                     <option data-ng-repeat="optionExtension in optionExtensions" value="{{optionExtension.id}}">{{optionExtension.name}}</option>
                 </select>
-                <input type="number" min="0" max="3" class="form-control input-sm" data-ng-disabled="!hasWriteAccess" data-ng-model="contract.extendMultiplier" data-autosave="{{autosaveUrl}}" data-field="extendMultiplier">
+                <input id="agreement-option-extend-multiplier"
+                       type="number"
+                       min="0"
+                       max="3"
+                       class="form-control input-sm"
+                       data-ng-disabled="!hasWriteAccess"
+                       data-ng-model="contract.extendMultiplier"
+                       data-autosave="{{autosaveUrl}}"
+                       data-field="extendMultiplier">
             </div>
             <div class="form-group">
                 <label for="agreement-irrevocable" class="control-label small">Uopsigelig til</label>
