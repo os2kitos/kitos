@@ -629,6 +629,7 @@
     <TypeScriptCompile Include="Scripts\typings\moment\moment-node.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\moment\moment.d.ts" />
     <TypeScriptCompile Include="Tests\it-contract\edit\it-contract-edit.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\it-contract\edit\tabs\it-contract-tab-payment-model.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-contract\edit\tabs\it-contract-tab-deadlines.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-contract\edit\tabs\it-contract-tab-systems.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabCommunication.e2e.spec.ts" />
@@ -847,6 +848,9 @@
     <Content Include="Tests\mocks\paymentMilestone.json" />
     <Content Include="Tests\mocks\handoverTrialType.json" />
     <Content Include="Tests\mocks\handoverTrial.json" />
+    <Content Include="Tests\mocks\paymentFrequency.json" />
+    <Content Include="Tests\mocks\paymentModel.json" />
+    <Content Include="Tests\mocks\priceRegulation.json" />
     <None Include="Web.AppVeyor.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
