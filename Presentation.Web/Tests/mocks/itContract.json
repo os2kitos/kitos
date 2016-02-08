@@ -262,8 +262,38 @@
                             "isWishedFor": false
                         }
                     ],
-                    "internEconomyStreams": [ ],
-                    "externEconomyStreams": [ ],
+                    "internEconomyStreams": [
+                        {
+                            "id": 2,
+                            "externPaymentForId": null,
+                            "internPaymentForId": 1,
+                            "organizationUnitId": null,
+                            "organizationUnitName": null,
+                            "acquisition": 0,
+                            "operation": 0,
+                            "other": 0,
+                            "accountingEntry": null,
+                            "auditStatus": 3,
+                            "auditDate": null,
+                            "note": null
+                        }
+                    ],
+                    "externEconomyStreams": [
+                        {
+                            "id": 1,
+                            "externPaymentForId": 1,
+                            "internPaymentForId": null,
+                            "organizationUnitId": null,
+                            "organizationUnitName": null,
+                            "acquisition": 0,
+                            "operation": 0,
+                            "other": 0,
+                            "accountingEntry": "",
+                            "auditStatus": 3,
+                            "auditDate": null,
+                            "note": null
+                        }
+                    ],
                     "advices": [ ],
                     "lastChanged": "2016-02-03T10:22:44Z",
                     "lastChangedByUserId": 1,

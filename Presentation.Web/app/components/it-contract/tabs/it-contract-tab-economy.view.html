@@ -19,11 +19,15 @@
             <tr data-ng-repeat="stream in externEconomyStreams | filter:{'show':true}">
                 <!-- ORG UNIT -->
                 <td>
-                    <div data-ng-model="stream.organizationUnitId" data-select-org-unit="" data-extra-options="extraOptions"
+                    <div class="extern-org-unit"
+                         data-ng-model="stream.organizationUnitId"
+                         data-select-org-unit=""
+                         data-extra-options="extraOptions"
                          data-ng-disabled="!hasWriteAccess"
                          data-ng-change="stream.updateEan()"
                          data-field="organizationUnitId"
-                         data-autosave="{{stream.updateUrl}}" data-allow-clear="true"></div>
+                         data-autosave="{{stream.updateUrl}}"
+                         data-allow-clear="true"></div>
                 </td>
 
                 <!-- EAN #  -->
@@ -33,7 +37,9 @@
 
                 <!-- ACQUISITION "Anskaffelse" -->
                 <td>
-                    <input type="number" class="input-sm form-control" data-ng-model="stream.acquisition"
+                    <input type="number"
+                           class="input-sm form-control extern-acquisition"
+                           data-ng-model="stream.acquisition"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="acquisition"
                            data-autosave="{{stream.updateUrl}}"/>
@@ -41,7 +47,9 @@
 
                 <!-- Operation "drift" -->
                 <td>
-                    <input type="number" class="input-sm form-control" data-ng-model="stream.operation"
+                    <input type="number"
+                           class="extern-operation"
+                           data-ng-model="stream.operation"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="operation"
                            data-autosave="{{stream.updateUrl}}"/>
@@ -49,7 +57,9 @@
 
                 <!-- Other -->
                 <td>
-                    <input type="number" class="input-sm form-control" data-ng-model="stream.other"
+                    <input type="number"
+                           class="input-sm form-control extern-other"
+                           data-ng-model="stream.other"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="other"
                            data-autosave="{{stream.updateUrl}}"/>
@@ -57,7 +67,9 @@
 
                 <!-- Accounting entry "kontering" -->
                 <td>
-                    <input type="text" class="input-sm form-control" data-ng-model="stream.accountingEntry"
+                    <input type="text"
+                           class="input-sm form-control extern-accounting-entry"
+                           data-ng-model="stream.accountingEntry"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="accountingEntry"
                            data-autosave="{{stream.updateUrl}}"/>
@@ -65,14 +77,18 @@
 
                 <!-- Audit trafficlight -->
                 <td>
-                    <span data-select-status2="" data-ng-model="stream.auditStatus" data-can-write="hasWriteAccess"
+                    <span class="extern-audit-status"
+                          data-select-status2=""
+                          data-ng-model="stream.auditStatus"
+                          data-can-write="hasWriteAccess"
                           data-field="auditStatus"
                           data-autosave="{{stream.updateUrl}}"></span>
                 </td>
 
                 <!-- Audit date -->
                 <td>
-                    <input type="text" class="form-control"
+                    <input type="text"
+                           class="form-control extern-audit-date"
                            data-kendo-date-picker
                            data-k-options="datepickerOptions"
                            data-ng-disabled="!hasWriteAccess"
@@ -83,7 +99,9 @@
 
                 <!-- Note -->
                 <td>
-                    <input type="text" class="input-sm form-control" data-ng-model="stream.note"
+                    <input type="text"
+                           class="input-sm form-control extern-note"
+                           data-ng-model="stream.note"
                            data-ng-disabled="!hasWriteAccess"
                         data-field="note"
                         data-autosave="{{stream.updateUrl}}"/>
@@ -92,7 +110,7 @@
                 <!-- delete button -->
                 <td>
                     <div class="pull-right" data-ng-hide="!hasWriteAccess">
-                        <a class="btn btn-link btn-xs"
+                        <a class="btn btn-link btn-xs extern-delete"
                            data-confirmed-click="stream.delete()"
                            data-confirm-click="Er du sikker på at du vil slette?">
                             <i class="glyphicon glyphicon-trash"></i>
@@ -101,11 +119,11 @@
                 </td>
             </tr>
         </tbody>
-        <tfoot data-ng-if="hasWriteAccess">
+        <tfoot data-ng-show="hasWriteAccess">
             <tr>
                 <td colspan="10">
                     <div class="pull-right">
-                        <button class="btn btn-success btn-sm" data-ng-click="newExtern()">
+                        <button class="btn btn-success btn-sm new-extern" data-ng-click="newExtern()">
                             <i class="glyphicon glyphicon-plus small"></i> Ny
                         </button>
                     </div>
@@ -136,7 +154,10 @@
             <tr data-ng-repeat="stream in internEconomyStreams | filter:{'show':true}">
                 <!-- ORG UNIT -->
                 <td>
-                    <div data-ng-model="stream.organizationUnitId" data-select-org-unit="" data-extra-options="extraOptions"
+                    <div class="intern-org-unit"
+                         data-ng-model="stream.organizationUnitId"
+                         data-select-org-unit=""
+                         data-extra-options="extraOptions"
                          data-ng-disabled="!hasWriteAccess"
                          data-ng-change="stream.updateEan()"
                          data-field="organizationUnitId"
@@ -150,7 +171,9 @@
 
                 <!-- ACQUISITION "Anskaffelse" -->
                 <td>
-                    <input type="number" class="input-sm form-control" data-ng-model="stream.acquisition"
+                    <input type="number"
+                           class="input-sm form-control intern-acquisition"
+                           data-ng-model="stream.acquisition"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="acquisition"
                            data-autosave="{{stream.updateUrl}}"/>
@@ -158,7 +181,9 @@
 
                 <!-- Operation "drift" -->
                 <td>
-                    <input type="number" class="input-sm form-control" data-ng-model="stream.operation"
+                    <input type="number"
+                           class="input-sm form-control intern-operation"
+                           data-ng-model="stream.operation"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="operation"
                            data-autosave="{{stream.updateUrl}}"/>
@@ -166,7 +191,9 @@
 
                 <!-- Other -->
                 <td>
-                    <input type="number" class="input-sm form-control" data-ng-model="stream.other"
+                    <input type="number"
+                           class="input-sm form-control intern-other"
+                           data-ng-model="stream.other"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="other"
                            data-autosave="{{stream.updateUrl}}"/>
@@ -174,7 +201,9 @@
 
                 <!-- Accounting entry "kontering" -->
                 <td>
-                    <input type="text" class="input-sm form-control" data-ng-model="stream.accountingEntry"
+                    <input type="text"
+                           class="input-sm form-control intern-accounting-entry"
+                           data-ng-model="stream.accountingEntry"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="accountingEntry"
                            data-autosave="{{stream.updateUrl}}"/>
@@ -182,14 +211,18 @@
 
                 <!-- Audit trafficlight -->
                 <td>
-                    <span data-select-status2="" data-ng-model="stream.auditStatus" data-can-write="hasWriteAccess"
+                    <span class="intern-audit-status"
+                          data-select-status2=""
+                          data-ng-model="stream.auditStatus"
+                          data-can-write="hasWriteAccess"
                           data-field="auditStatus"
                           data-autosave="{{stream.updateUrl}}"></span>
                 </td>
 
                 <!-- Audit date -->
                 <td>
-                    <input type="text" class="form-control"
+                    <input type="text"
+                           class="form-control intern-audit-date"
                            data-kendo-date-picker
                            data-k-options="datepickerOptions"
                            data-ng-disabled="!hasWriteAccess"
@@ -200,7 +233,9 @@
 
                 <!-- Note -->
                 <td>
-                    <input type="text" class="input-sm form-control" data-ng-model="stream.note"
+                    <input type="text"
+                           class="input-sm form-control intern-note"
+                           data-ng-model="stream.note"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="note"
                            data-autosave="{{stream.updateUrl}}">
@@ -209,7 +244,7 @@
                 <!-- delete button -->
                 <td>
                     <div class="pull-right" data-ng-hide="!hasWriteAccess">
-                        <a class="btn btn-link btn-xs"
+                        <a class="btn btn-link btn-xs intern-delete"
                            data-confirmed-click="stream.delete()"
                            data-confirm-click="Er du sikker på at du vil slette?">
                             <i class="glyphicon glyphicon-trash"></i>
@@ -218,11 +253,11 @@
                 </td>
             </tr>
         </tbody>
-        <tfoot data-ng-if="hasWriteAccess">
+        <tfoot data-ng-show="hasWriteAccess">
             <tr>
                 <td colspan="10">
                     <div class="pull-right">
-                        <button class="btn btn-success btn-sm" data-ng-click="newIntern()">
+                        <button class="btn btn-success btn-sm new-intern" data-ng-click="newIntern()">
                             <i class="glyphicon glyphicon-plus small"></i> Ny
                         </button>
                     </div>
