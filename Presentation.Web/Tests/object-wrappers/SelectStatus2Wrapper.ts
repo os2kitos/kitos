@@ -1,8 +1,8 @@
 ﻿// handle selectStatus2 directive dropdowns
 class SelectStatus2Wrapper {
-    cssSelector: string;
-    dropdownElement: protractor.ElementFinder;
-    options: protractor.ElementArrayFinder;
+    public cssSelector: string;
+    public dropdownElement: protractor.ElementFinder;
+    public options: protractor.ElementArrayFinder;
 
     /**
      * instantiate selectStatus2 directive wrapper.
@@ -19,7 +19,7 @@ class SelectStatus2Wrapper {
     /**
      * select first element.
      */
-    selectFirst(): webdriver.promise.Promise<void> {
+    public selectFirst(): webdriver.promise.Promise<void> {
         this.dropdownElement.click().then(null, () => {
             throw Error(`No active selectStatus2 directive found with selector '${this.cssSelector}'`);
         });
@@ -35,7 +35,7 @@ class SelectStatus2Wrapper {
      *
      * @param {number} [index] Options index on dropdown starting on 0.
      */
-    select(index: number): webdriver.promise.Promise<void> {
+    public select(index: number): webdriver.promise.Promise<void> {
         if (index < 0) {
             this.createError(`Index must be positive: ${index}`);
         }
@@ -63,7 +63,7 @@ class SelectStatus2Wrapper {
      *
      * @return Promise that resolves to a boolean indicating if the element is disabled
      */
-    isDisabled(): webdriver.promise.Promise<boolean> {
+    public isDisabled(): webdriver.promise.Promise<boolean> {
         return $(this.cssSelector + " div:not(.dropdown)").isDisplayed();
     }
 

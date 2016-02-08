@@ -1,11 +1,11 @@
 ﻿// handle select2 wrapping for protractor
 // http://stackoverflow.com/questions/26504623/protractor-how-to-test-select2?answertab=votes#tab-top
 class Select2Wrapper {
-    cssSelector: string;
-    elementSelector: string;
-    element: protractor.ElementFinder;
-    options: protractor.ElementArrayFinder;
-    closeSelector: string;
+    public cssSelector: string;
+    public elementSelector: string;
+    public element: protractor.ElementFinder;
+    public options: protractor.ElementArrayFinder;
+    public closeSelector: string;
 
     constructor(cssLocator: string) {
         this.cssSelector = cssLocator;
@@ -23,7 +23,7 @@ class Select2Wrapper {
      *
      * @throws error if no options are found
      */
-    selectFirst(query?: string): webdriver.promise.Promise<void> {
+    public selectFirst(query?: string): webdriver.promise.Promise<void> {
         this.isPresent();
 
         if (query) {
@@ -46,7 +46,7 @@ class Select2Wrapper {
      *
      * @return promise that resolves when options are found
      */
-    writeQuery(query: string): webdriver.promise.Promise<void> {
+    public writeQuery(query: string): webdriver.promise.Promise<void> {
         return this.click()
             .then(() => browser.driver
                 .switchTo()
@@ -64,7 +64,7 @@ class Select2Wrapper {
      *
      * @return promise that resolves when options are found
      */
-    waitForOptions(): webdriver.promise.Promise<void> {
+    public waitForOptions(): webdriver.promise.Promise<void> {
         return browser.driver.wait(() => this.options.count().then(count => count > 0), 2000)
             .then(() => {
                 return;
@@ -80,7 +80,7 @@ class Select2Wrapper {
      *
      * @return promise that resolves when close link is clicked
      */
-    deselect(): webdriver.promise.Promise<void> {
+    public deselect(): webdriver.promise.Promise<void> {
         return $(this.closeSelector)
             .click()
             .then(() => { return; }, err => {
@@ -93,7 +93,7 @@ class Select2Wrapper {
      *
      * @return promise that resolves to a boolean indicating whether the dropdown is disabled
      */
-    isDisabled(): webdriver.promise.Promise<boolean> {
+    public isDisabled(): webdriver.promise.Promise<boolean> {
         return $(this.cssSelector + ".select2-container-disabled").isPresent();
     }
 
@@ -102,7 +102,7 @@ class Select2Wrapper {
      *
      * @throws error if not present
      */
-    isPresent(): webdriver.promise.Promise<boolean> {
+    public isPresent(): webdriver.promise.Promise<boolean> {
         return this.element.isPresent()
             .then(present => {
                 if (!present) {
@@ -123,7 +123,7 @@ class Select2Wrapper {
      *
      * @return promise that resolves when element is clicked
      */
-    click(): webdriver.promise.Promise<void> {
+    public click(): webdriver.promise.Promise<void> {
         return browser.driver.executeScript<void>("$(arguments[\"0\"]).mousedown();", (this.elementSelector));
     }
 }

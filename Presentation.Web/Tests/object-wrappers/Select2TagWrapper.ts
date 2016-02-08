@@ -1,10 +1,10 @@
 ﻿// handle select2 wrapping for protractor
 // http://stackoverflow.com/questions/26504623/protractor-how-to-test-select2?answertab=votes#tab-top
 class Select2TagWrapper {
-    cssSelector: string;
-    element: protractor.ElementFinder;
-    options: protractor.ElementArrayFinder;
-    selectedOptionsSelector: string;
+    public cssSelector: string;
+    public element: protractor.ElementFinder;
+    public options: protractor.ElementArrayFinder;
+    public selectedOptionsSelector: string;
 
     constructor(cssLocator: string) {
         this.cssSelector = cssLocator;
@@ -19,7 +19,7 @@ class Select2TagWrapper {
      *
      * @param query An optional search query for the dropdown.
      */
-    selectFirst(query?: string): webdriver.promise.Promise<void> {
+    public selectFirst(query?: string): webdriver.promise.Promise<void> {
         this.isPresent();
 
         this.click();
@@ -42,7 +42,7 @@ class Select2TagWrapper {
      *
      * @return Promise that resolves to a boolean indicating if the dropdown is disabled or not.
      */
-    isDisabled(): webdriver.promise.Promise<boolean> {
+    public isDisabled(): webdriver.promise.Promise<boolean> {
         return $(this.cssSelector + ".select2-container-disabled").isPresent();
     }
 
@@ -51,7 +51,7 @@ class Select2TagWrapper {
      *
      * @throws error is not present.
      */
-    isPresent(): webdriver.promise.Promise<boolean> {
+    public isPresent(): webdriver.promise.Promise<boolean> {
         return this.element.isPresent()
             .then(present => {
                 if (!present) {
@@ -66,7 +66,7 @@ class Select2TagWrapper {
      *
      * @return Promise that resolves when element is clicked.
      */
-    click(): webdriver.promise.Promise<void> {
+    public click(): webdriver.promise.Promise<void> {
         return this.element.click();
     }
 
@@ -75,7 +75,7 @@ class Select2TagWrapper {
      *
      * @return ElementArrayFinder with selected options
      */
-    selectedOptions(): protractor.ElementArrayFinder {
+    public selectedOptions(): protractor.ElementArrayFinder {
         return element.all(by.css(this.selectedOptionsSelector));
     }
 }
