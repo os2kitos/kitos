@@ -294,7 +294,19 @@
                             "note": null
                         }
                     ],
-                    "advices": [ ],
+                    "advices": [
+                        {
+                            "id": 1,
+                            "isActive": true,
+                            "name": "Advis1",
+                            "alarmDate": null,
+                            "receiverId": null,
+                            "carbonCopyReceiverId": null,
+                            "subject": null,
+                            "itContractId": 1,
+                            "sentDate": null
+                        }
+                    ],
                     "lastChanged": "2016-02-03T10:22:44Z",
                     "lastChangedByUserId": 1,
                     "objectOwnerName": "Global",
