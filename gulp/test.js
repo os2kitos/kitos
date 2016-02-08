@@ -30,26 +30,10 @@ gulp.task('unit', function (done) {
 
 // run e2e tests with protractor
 gulp.task('e2e', function () {
-    var browserstack = require('gulp-browserstack');
-
-    var taskExitValue = 0;
-
     return gulp.src(paths.e2eFiles)
-        .pipe(browserstack.startTunnel({
-            key: process.env.BROWSERSTACK_KEY
-        }))
         .pipe(protractor({
             configFile: 'protractor.conf.js'
-        }))
-        .on('error', function () {
-            taskExitValue = 1;
-            this.emit('end');
-        })
-        .pipe(browserstack.stopTunnel())
-        .once('end', function () {
-            // fix error where gulp is hanging after finish
-            process.exit(taskExitValue);
-        });
+        }));
 });
 
 // start standalone selenium webdriver
