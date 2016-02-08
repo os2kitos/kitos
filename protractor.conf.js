@@ -20,7 +20,9 @@ exports.config = {
             'browser_version': '47.0',
             'os': 'Windows',
             'os_version': '7',
-            'resolution': '1280x1024'
+            'resolution': '1280x1024',
+
+            'acceptSslCerts': 'true'
         }
         //,
         //{

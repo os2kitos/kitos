@@ -36,14 +36,7 @@ gulp.task('e2e', function () {
 
     return gulp.src(paths.e2eFiles)
         .pipe(browserstack.startTunnel({
-            key: process.env.BROWSERSTACK_KEY,
-            hosts: [
-                {
-                    name: "localhost",
-                    port: 44300,
-                    sslFlag: 1
-                }
-            ]
+            key: process.env.BROWSERSTACK_KEY
         }))
         .pipe(protractor({
             configFile: 'protractor.conf.js'
