@@ -3,7 +3,8 @@
 exports.config = {
     framework: 'jasmine2',
 
-    seleniumAddress: 'http://hub.browserstack.com/wd/hub',
+    browserstackUser: process.env.BROWSERSTACK_USER,
+    browserstackKey: process.env.BROWSERSTACK_KEY,
 
     multiCapabilities: [
         {
