@@ -3,13 +3,12 @@
 exports.config = {
     framework: 'jasmine2',
 
-    seleniumAddress: 'http://hub.browserstack.com/wd/hub',
+    browserstackUser: process.env.BROWSERSTACK_USER,
+    browserstackKey: process.env.BROWSERSTACK_KEY,
 
     multiCapabilities: [
         {
             // Chrome 47
-            'browserstack.user': process.env.BROWSERSTACK_USER,
-            'browserstack.key': process.env.BROWSERSTACK_KEY,
             'browserstack.local': 'true',
 
             'project': process.env.APPVEYOR_PROJECT_NAME || 'kitos local',
@@ -20,13 +19,13 @@ exports.config = {
             'browser_version': '47.0',
             'os': 'Windows',
             'os_version': '7',
-            'resolution': '1280x1024'
+            'resolution': '1280x1024',
+
+            'acceptSslCerts': 'true'
         }
-        //,
+        ,
         //{
         //    // IE 10
-        //    'browserstack.user': process.env.BROWSERSTACK_USER,
-        //    'browserstack.key': process.env.BROWSERSTACK_KEY,
         //    'browserstack.local': 'true',
 
         //    'project': process.env.APPVEYOR_PROJECT_NAME || 'kitos local',
@@ -37,12 +36,12 @@ exports.config = {
         //    'browser_version': '10.0',
         //    'os': 'Windows',
         //    'os_version': '7',
-        //    'resolution': '1280x1024'
+        //    'resolution': '1280x1024',
+
+        //    'acceptSslCerts': 'true'
         //},
         //{
         //    // IE 11
-        //    'browserstack.user': process.env.BROWSERSTACK_USER,
-        //    'browserstack.key': process.env.BROWSERSTACK_KEY,
         //    'browserstack.local': 'true',
 
         //    'project': process.env.APPVEYOR_PROJECT_NAME || 'kitos local',
@@ -53,12 +52,12 @@ exports.config = {
         //    'browser_version': '11.0',
         //    'os': 'Windows',
         //    'os_version': '7',
-        //    'resolution': '1280x1024'
+        //    'resolution': '1280x1024',
+
+        //    'acceptSslCerts': 'true'
         //},
         //{
         //    // Edge 12
-        //    'browserstack.user': process.env.BROWSERSTACK_USER,
-        //    'browserstack.key': process.env.BROWSERSTACK_KEY,
         //    'browserstack.local': 'true',
 
         //    'project': process.env.APPVEYOR_PROJECT_NAME || 'kitos local',
@@ -69,24 +68,26 @@ exports.config = {
         //    'browser_version': '12.0',
         //    'os': 'Windows',
         //    'os_version': '10',
-        //    'resolution': '1280x1024'
+        //    'resolution': '1280x1024',
+
+        //    'acceptSslCerts': 'true'
         //},
-        //{
-        //    // Firefox 42
-        //    'browserstack.user': process.env.BROWSERSTACK_USER,
-        //    'browserstack.key': process.env.BROWSERSTACK_KEY,
-        //    'browserstack.local': 'true',
+        {
+            // Firefox 42
+            'browserstack.local': 'true',
 
-        //    'project': process.env.APPVEYOR_PROJECT_NAME || 'kitos local',
-        //    'build': process.env.APPVEYOR_BUILD_NUMBER || 'local build',
+            'project': process.env.APPVEYOR_PROJECT_NAME || 'kitos local',
+            'build': process.env.APPVEYOR_BUILD_NUMBER || 'local build',
 
-        //    // settings for the browser to test
-        //    'browserName': 'Firefox',
-        //    'browser_version': '42.0',
-        //    'os': 'Windows',
-        //    'os_version': '7',
-        //    'resolution': '1280x1024'
-        //}
+            // settings for the browser to test
+            'browserName': 'Firefox',
+            'browser_version': '42.0',
+            'os': 'Windows',
+            'os_version': '7',
+            'resolution': '1280x1024',
+
+            'acceptSslCerts': 'true'
+        }
     ],
 
     // select all end to end tests

@@ -22,41 +22,43 @@ gulp.task('unit', function (done) {
         autoWatch: false,
 
         // to avoid DISCONNECTED messages on CI
-        browserDisconnectTimeout : 10000, // default 2000
-        browserDisconnectTolerance : 1, // default 0
-        browserNoActivityTimeout : 60000 //default 10000
+        browserDisconnectTimeout: 10000, // default 2000
+        browserDisconnectTolerance: 1, // default 0
+        browserNoActivityTimeout: 60000 //default 10000
     }, done).start();
 });
 
 // run e2e tests with protractor
-gulp.task('e2e', function () {
-    var browserstack = require('gulp-browserstack');
+gulp.task('e2e', function (done) {
+    var BrowserStackTunnel = require('browserstacktunnel-wrapper');
 
-    var taskExitValue = 0;
+    var browserStackTunnel = new BrowserStackTunnel({
+        key: process.env.BROWSERSTACK_KEY
+    });
 
-    return gulp.src(paths.e2eFiles)
-        .pipe(browserstack.startTunnel({
-            key: process.env.BROWSERSTACK_KEY,
-            hosts: [
-                {
-                    name: "localhost",
-                    port: 44300,
-                    sslFlag: 1
-                }
-            ]
-        }))
-        .pipe(protractor({
-            configFile: 'protractor.conf.js'
-        }))
-        .on('error', function () {
-            taskExitValue = 1;
-            this.emit('end');
-        })
-        .pipe(browserstack.stopTunnel())
-        .once('end', function () {
-            // fix error where gulp is hanging after finish
-            process.exit(taskExitValue);
-        });
+    browserStackTunnel.start(function (error) {
+        if (error) {
+            gutil.log(gutil.colors.red(error));
+        } else {
+            tunnelRunning();
+        }
+    });
+
+    function tunnelRunning() {
+        gulp.src(paths.e2eFiles)
+            .pipe(protractor({
+                configFile: 'protractor.conf.js'
+            }))
+            .on('end', function () {
+                browserStackTunnel.stop(function (error) {
+                    if (error) {
+                        gutil.log(gutil.colors.red(error));
+                    } else {
+                        done();
+                    }
+                });
+            });
+    }
 });
 
 // start standalone selenium webdriver
@@ -88,7 +90,7 @@ gulp.task('mapCoverage', function (done) {
     var exec = require('child_process').exec;
     var del = require('del');
 
-    exec('node_modules\\.bin\\remap-istanbul -i ' + paths.coverage + '/' + paths.tempFrontendCoverageReport + ' -o ' + paths.coverage + '/' + paths.frontendCoverageReport, function(err, stdout, stderr) {
+    exec('node_modules\\.bin\\remap-istanbul -i ' + paths.coverage + '/' + paths.tempFrontendCoverageReport + ' -o ' + paths.coverage + '/' + paths.frontendCoverageReport, function (err, stdout, stderr) {
         gutil.log(stdout);
         gutil.log(gutil.colors.red(stderr));
 
