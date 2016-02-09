@@ -882,7 +882,6 @@
     <Content Include="Tests\mocks\itSystemUsageWriteAccess.json" />
     <Content Include="Tests\mocks\itSystemUsageNoWriteAccess.json" />
     <Content Include="Tests\mocks\exhibit.json" />
-    <Content Include="Tests\mocks\interfaceUsage.json" />
     <Content Include="Tests\mocks\itContractItSystemUsage.json" />
     <Content Include="Tests\mocks\itSystemRole.json" />
     <Content Include="Tests\mocks\itSystemUsageRights.json" />
@@ -902,7 +901,6 @@
     <Content Include="Tests\mocks\itContractNoWriteAccess.json" />
     <Content Include="Tests\mocks\itContractWriteAccess.json" />
     <Content Include="Tests\mocks\itInterfaceExhibitUsage.json" />
-    <Content Include="Tests\mocks\interfaceUsage.json" />
     <Content Include="Tests\mocks\exhibit.json" />
     <Content Include="Tests\mocks\optionExtend.json" />
     <Content Include="Tests\mocks\terminationDeadline.json" />
@@ -916,6 +914,7 @@
     <Content Include="Tests\mocks\itContractRights.json" />
     <Content Include="Tests\mocks\itContractRole.json" />
     <Content Include="Tests\mocks\advice.json" />
+    <Content Include="Tests\mocks\interfaceUsage.json" />
     <None Include="Web.AppVeyor.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
