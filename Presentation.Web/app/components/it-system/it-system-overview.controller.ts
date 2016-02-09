@@ -292,7 +292,7 @@
                     {
                         field: "LocalSystemId", title: "Lokal system ID", width: 150,
                         persistId: "localid", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => dataItem.LocalSystemId || "",
+                        excelTemplate: dataItem => dataItem && dataItem.LocalSystemId || "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -319,7 +319,7 @@
                         field: "ItSystem.Name", title: "IT System", width: 320,
                         persistId: "sysname", // DON'T YOU DARE RENAME!
                         template: dataItem => `<a data-ui-sref='it-system.usage.interfaces({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name}</a>`,
-                        excelTemplate: dataItem => dataItem.ItSystem.Name,
+                        excelTemplate: dataItem => dataItem && dataItem.ItSystem && dataItem.ItSystem.Name || "",
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -331,7 +331,7 @@
                     {
                         field: "Version", title: "Version", width: 150,
                         persistId: "version", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => dataItem.Version || "",
+                        excelTemplate: dataItem => dataItem && dataItem.Version || "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -344,7 +344,7 @@
                     {
                         field: "LocalCallName", title: "Lokal kaldenavn", width: 150,
                         persistId: "localname", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => dataItem.LocalCallName || "",
+                        excelTemplate: dataItem => dataItem && dataItem.LocalCallName || "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -424,7 +424,7 @@
                         field: "EsdhRef", title: "ESDH ref", width: 150,
                         persistId: "esdh", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.EsdhRef ? `<a target="_blank" href="${dataItem.EsdhRef}"><i class="fa fa-link"></a>` : "",
-                        excelTemplate: dataItem => dataItem.EsdhRef || "",
+                        excelTemplate: dataItem => dataItem && dataItem.EsdhRef || "",
                         attributes: { "class": "text-center" },
                         hidden: true,
                         filterable: {
@@ -439,7 +439,7 @@
                         field: "DirectoryOrUrlRef", title: "Mappe ref", width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.DirectoryOrUrlRef ? `<a target="_blank" href="${dataItem.DirectoryOrUrlRef}"><i class="fa fa-link"></i></a>` : "",
-                        excelTemplate: dataItem => dataItem.DirectoryOrUrlRef || "",
+                        excelTemplate: dataItem => dataItem && dataItem.DirectoryOrUrlRef || "",
                         attributes: { "class": "text-center" },
                         hidden: true,
                         filterable: {
@@ -454,7 +454,7 @@
                         field: "CmdbRef", title: "CMDB ref", width: 150,
                         persistId: "cmdb", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.CmdbRef ? `<a target="_blank" href="${dataItem.CmdbRef}"><i class="fa fa-link"></i></a>` : "",
-                        excelTemplate: dataItem => dataItem.CmdbRef || "",
+                        excelTemplate: dataItem => dataItem && dataItem.CmdbRef || "",
                         attributes: { "class": "text-center" },
                         hidden: true,
                         filterable: {
@@ -529,7 +529,7 @@
                             }
                         },
                         excelTemplate: dataItem =>
-                            dataItem.MainContract && dataItem.MainContract.ItContract ? this.isContractActive(dataItem.MainContract.ItContract).toString() : "",
+                            dataItem && dataItem.MainContract && dataItem.MainContract.ItContract ? this.isContractActive(dataItem.MainContract.ItContract).toString() : "",
                         attributes: { "class": "text-center" },
                         sortable: false,
                         filterable: {
@@ -598,7 +598,7 @@
                         field: "LastChanged", title: "Sidste redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 150,
                         persistId: "changed", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => {
-                            if (!dataItem.LastChanged) {
+                            if (!dataItem || !dataItem.LastChanged) {
                                 return "";
                             }
 
@@ -638,7 +638,7 @@
                         return link;
                     },
                     excelTemplate: dataItem => {
-                        if (dataItem.roles[role.Id] === undefined) {
+                        if (!dataItem || dataItem.roles[role.Id] === undefined) {
                             return "";
                         }
 

@@ -333,7 +333,10 @@
                             return '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>';
                         },
                         excelTemplate: dataItem => {
-                            var isActive = this.isContractActive(dataItem);
+                            var isActive = false;
+                            if (dataItem) {
+                                isActive = this.isContractActive(dataItem);
+                            }
                             return isActive.toString();
                         },
                         attributes: { "class": "text-center" },
@@ -343,7 +346,7 @@
                     {
                         field: "ItContractId", title: "KontraktID", width: 150,
                         persistId: "contractid", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => dataItem && dataItem.ItContractId,
+                        excelTemplate: dataItem => dataItem && dataItem.ItContractId || "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -461,7 +464,7 @@
                     {
                         field: "Acquisition", title: "Anskaffelse", width: 90,
                         persistId: "acquisition", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => dataItem.Acquisition.toString(),
+                        excelTemplate: dataItem => dataItem && dataItem.Acquisition.toString() || "",
                         attributes: { "class": "text-right" },
                         format: "{0:n0}",
                         sortable: false,
@@ -470,7 +473,7 @@
                     {
                         field: "Operation", title: "Drift/År", width: 75,
                         persistId: "operation", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => dataItem.Operation.toString(),
+                        excelTemplate: dataItem => dataItem && dataItem.Operation.toString() || "",
                         attributes: { "class": "text-right" },
                         format: "{0:n0}",
                         sortable: false,
@@ -479,7 +482,7 @@
                     {
                         field: "Other", title: "Andet", width: 150,
                         persistId: "other", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => dataItem.Other.toString(),
+                        excelTemplate: dataItem => dataItem && dataItem.Other.toString() || "",
                         attributes: { "class": "text-right" },
                         format: "{0:n0}",
                         hidden: true,
@@ -490,7 +493,7 @@
                         field: "OperationRemunerationBegun", title: "Driftsvederlag påbegyndt", format: "{0:dd-MM-yyyy}", width: 150,
                         persistId: "opremun", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => {
-                            if (!dataItem.OperationRemunerationBegun) {
+                            if (!dataItem || !dataItem.OperationRemunerationBegun) {
                                 return "";
                             }
 
@@ -612,7 +615,7 @@
                     excelTemplate: dataItem => {
                         var roles = "";
 
-                        if (dataItem.roles[role.Id] === undefined)
+                        if (! dataItem || dataItem.roles[role.Id] === undefined)
                             return roles;
 
                         return this.concatRoles(dataItem.roles[role.Id]);

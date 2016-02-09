@@ -172,7 +172,7 @@
                     {
                         field: "ItInterfaceId", title: "Snitflade ID", width: 120,
                         persistId: "infid", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => dataItem.ItInterfaceId,
+                        excelTemplate: dataItem => dataItem && dataItem.ItInterfaceId || "",
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -185,7 +185,7 @@
                         field: "Name", title: "Snitflade", width: 285,
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: dataItem => `<a data-ui-sref='it-system.interface-edit.interface-details({id: ${dataItem.Id}})'>${dataItem.Name}</a>`,
-                        excelTemplate: dataItem => dataItem.Name,
+                        excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -197,7 +197,7 @@
                     {
                         field: "Version", title: "Version", width: 150,
                         persistId: "version", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => dataItem.Version,
+                        excelTemplate: dataItem => dataItem && dataItem.Version || "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -210,7 +210,7 @@
                     {
                         field: "AccessModifier", title: "Synlighed", width: 120,
                         persistId: "accessmod", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => dataItem.AccessModifier.toString(),
+                        excelTemplate: dataItem => dataItem && dataItem.AccessModifier.toString() || "",
                         filterable: {
                             cell: {
                                 showOperators: false,
@@ -253,7 +253,7 @@
 
                             return `<a href="${dataItem.Url}" title="Link til yderligere..." target="_blank"><i class="fa fa-link"></i></a>`;
                         },
-                        excelTemplate: dataItem => dataItem.Url,
+                        excelTemplate: dataItem => dataItem && dataItem.Url || "",
                         attributes: { "class": "text-center" },
                         filterable: {
                             cell: {
@@ -266,7 +266,7 @@
                     {
                         field: "ExhibitedBy.ItSystem.Name", title: "Udstillet af", width: 230,
                         persistId: "exhibit", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.ExhibitedBy ? dataItem.ExhibitedBy.ItSystem.Name : "",
+                        template: dataItem => dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem.Name || "",
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -340,7 +340,7 @@
                         },
                         excelTemplate: dataItem => {
                             var value = "";
-                            if (dataItem.DataRows.length > 0) {
+                            if (dataItem && dataItem.DataRows.length > 0) {
                                 value = this._.pluck(dataItem.DataRows, "DataType.Name").join(", ");
                             }
                             return value;
@@ -357,7 +357,7 @@
                     {
                         field: "Organization.Name", title: "Oprettet af: Organisation", width: 150,
                         persistId: "orgname", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => dataItem.Organization.Name,
+                        excelTemplate: dataItem => dataItem && dataItem.Organization && dataItem.Organization.Name || "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -398,7 +398,7 @@
                         persistId: "lastchangeddate", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => {
                             // handles null cases
-                            if (!dataItem.LastChanged) {
+                            if (!dataItem || !dataItem.LastChanged) {
                                 return "";
                             }
 
