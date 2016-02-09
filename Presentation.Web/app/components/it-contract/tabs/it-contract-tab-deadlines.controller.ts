@@ -16,7 +16,7 @@
                     });
                 }],
                 paymentMilestones: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get('api/paymentMilestone/' + $stateParams.id + '?contract').then(function (result) {
+                    return $http.get('api/paymentMilestone/' + $stateParams.id + '?contract=true').then(function (result) {
                         return result.data.response;
                     });
                 }],
@@ -26,7 +26,7 @@
                     });
                 }],
                 handoverTrials: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get('api/handoverTrial/' + $stateParams.id + '?byContract').then(function (result) {
+                    return $http.get('api/handoverTrial/' + $stateParams.id + '?byContract=true').then(function (result) {
                         return result.data.response;
                     });
                 }]
@@ -67,7 +67,7 @@
                 }
 
                 var msg = notify.addInfoMessage("Gemmer...", false);
-                $http.post('api/paymentmilestone', paymentMilestone)
+                $http.post('api/paymentMilestone', paymentMilestone)
                     .success(function(result) {
                         msg.toSuccessMessage("Gemt");
                         var obj = result.response;
@@ -82,7 +82,7 @@
 
             $scope.deleteMilestone = function(id) {
                 var msg = notify.addInfoMessage("Sletter...", false);
-                $http.delete('api/paymentmilestone/' + id + '?organizationId=' + user.currentOrganizationId)
+                $http.delete('api/paymentMilestone/' + id + '?organizationId=' + user.currentOrganizationId)
                     .success(function() {
                         msg.toSuccessMessage("Slettet");
                         reload();

@@ -20,7 +20,8 @@
                 <tr data-ng-repeat="advice in advices">
                     <!-- active -->
                     <td>
-                        <input type="checkbox" class="checkbox"
+                        <input type="checkbox"
+                               class="checkbox advice-active"
                                data-ng-model="advice.isActive"
                                data-ng-disabled="!hasWriteAccess"
                                data-autosave="{{advice.updateUrl}}"
@@ -34,7 +35,9 @@
 
                     <!-- name -->
                     <td>
-                        <input type="text" data-ng-model="advice.name" class="form-control input-sm"
+                        <input type="text"
+                               class="form-control input-sm advice-name"
+                               data-ng-model="advice.name"
                                data-ng-disabled="!hasWriteAccess"
                                data-autosave="{{advice.updateUrl}}"
                                data-field="name">
@@ -42,7 +45,8 @@
 
                     <!-- date -->
                     <td>
-                        <input type="text" class="form-control"
+                        <input type="text"
+                               class="form-control advice-date"
                                data-kendo-date-picker
                                data-k-options="datepickerOptions"
                                data-ng-disabled="!hasWriteAccess"
@@ -53,7 +57,7 @@
 
                     <!-- receiver -->
                     <td>
-                        <select class="form-control input-sm"
+                        <select class="form-control input-sm advice-receiver"
                                 data-ui-select2="allowClearOption"
                                 data-placeholder="Vælg modtager rolle"
                                 data-ng-model="advice.receiverId"
@@ -67,7 +71,7 @@
 
                     <!-- cc -->
                     <td>
-                        <select class="form-control input-sm"
+                        <select class="form-control input-sm advice-role"
                                 data-ui-select2="allowClearOption"
                                 data-placeholder="Vælg cc rolle"
                                 data-ng-model="advice.carbonCopyReceiverId"
@@ -81,7 +85,9 @@
 
                     <!-- subject -->
                     <td>
-                        <input type="text" data-ng-model="advice.subject" class="form-control input-sm"
+                        <input type="text"
+                               class="form-control input-sm advice-subject"
+                               data-ng-model="advice.subject"
                                data-ng-disabled="!hasWriteAccess"
                                data-autosave="{{advice.updateUrl}}"
                                data-field="subject">
@@ -90,7 +96,7 @@
                     <!-- delete button -->
                     <td>
                         <div class="pull-right" data-ng-hide="!hasWriteAccess">
-                            <a class="btn btn-link btn-xs"
+                            <a class="btn btn-link btn-xs delete-advice"
                                data-confirmed-click="advice.delete()"
                                data-confirm-click="Er du sikker på at du vil slette?">
                                 <i class="glyphicon glyphicon-trash"></i>
@@ -99,11 +105,11 @@
                     </td>
                 </tr>
             </tbody>
-            <tfoot data-ng-if="hasWriteAccess">
+            <tfoot data-ng-show="hasWriteAccess">
                 <tr>
                     <td colspan="7">
                         <div class="pull-right">
-                            <button class="btn btn-success btn-sm" data-ng-click="newAdvice()">
+                            <button id="add-advice" class="btn btn-success btn-sm" data-ng-click="newAdvice()">
                                 <i class="glyphicon glyphicon-plus small"></i> Ny
                             </button>
                         </div>

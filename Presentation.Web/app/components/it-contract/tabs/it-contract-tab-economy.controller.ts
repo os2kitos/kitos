@@ -7,7 +7,7 @@
             resolve: {
                 orgUnits: ['$http', 'userService', function ($http, userService) {
                     return userService.getUser().then(function (user) {
-                        return $http.get('api/organizationunit?organizationId=' + user.currentOrganizationId).then(function (result) {
+                        return $http.get('api/organizationunit/?organizationid=' + user.currentOrganizationId).then(function (result) {
                             return result.data.response;
                         });
                     });

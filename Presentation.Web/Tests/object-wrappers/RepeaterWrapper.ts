@@ -1,6 +1,6 @@
 ﻿// handle repeater directives
 class RepeaterWrapper {
-    repeater: protractor.ElementArrayFinder;
+    public repeater: protractor.ElementArrayFinder;
 
     /**
      * instantiate repeater directive wrapper.
@@ -17,7 +17,7 @@ class RepeaterWrapper {
      *
      * @param {webdriver.Locator} [locator] locator for elements to select in first repeated item
      */
-    selectFirst(locator: webdriver.Locator): protractor.ElementArrayFinder {
+    public selectFirst(locator: webdriver.Locator): protractor.ElementArrayFinder {
         return this.repeater.first().all(locator);
     }
 
@@ -27,7 +27,7 @@ class RepeaterWrapper {
      * @param {number} [index] index of repeated item to select
      * @param {webdriver.Locator} [locator] locator for elements to select in first repeated item
      */
-    select(index: number, locator: webdriver.Locator): protractor.ElementArrayFinder {
+    public select(index: number, locator: webdriver.Locator): protractor.ElementArrayFinder {
         return this.repeater.get(index).all(locator);
     }
 
@@ -36,7 +36,7 @@ class RepeaterWrapper {
      *
      * @returns Promise that resolves to the number of repetitions in repeater
      */
-    count(): webdriver.promise.Promise<number> {
+    public count(): webdriver.promise.Promise<number> {
         return this.repeater.count();
     }
 
@@ -45,7 +45,7 @@ class RepeaterWrapper {
      *
      * @param {function(ElementFinder)} [fn] Input function
      */
-    each(fn: (element: protractor.ElementFinder, index: number) => void): void {
+    public each(fn: (element: protractor.ElementFinder, index: number) => void): void {
         return this.repeater.each(fn);
     }
 }

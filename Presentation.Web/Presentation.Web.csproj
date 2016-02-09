@@ -537,6 +537,13 @@
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-roles.po.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-contracts.po.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-interfaces.po.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\it-contract-edit.po.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-economy.po.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-paymentmodel.po.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-deadlines.po.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.po.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-roles.po.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-systems.po.ts" />
     <TypeScriptCompile Include="app\models\it-contract\economy-stream.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-overview-inactive.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-overview.spec.ts" />
@@ -650,6 +657,13 @@
     <TypeScriptCompile Include="Tests\it-system\usage\tabs\it-system-usage-tab-wishes.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-system\usage\tabs\it-system-usage-tab-roles.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-system\usage\tabs\it-system-usage-tab-org.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\it-contract\edit\it-contract-edit.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\it-contract\edit\tabs\it-contract-tab-economy.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\it-contract\edit\tabs\it-contract-tab-advice.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\it-contract\edit\tabs\it-contract-tab-roles.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\it-contract\edit\tabs\it-contract-tab-payment-model.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\it-contract\edit\tabs\it-contract-tab-deadlines.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\it-contract\edit\tabs\it-contract-tab-systems.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabCommunication.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabItsys.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabHandover.e2e.spec.ts" />
@@ -868,7 +882,6 @@
     <Content Include="Tests\mocks\itSystemUsageWriteAccess.json" />
     <Content Include="Tests\mocks\itSystemUsageNoWriteAccess.json" />
     <Content Include="Tests\mocks\exhibit.json" />
-    <Content Include="Tests\mocks\interfaceUsage.json" />
     <Content Include="Tests\mocks\itContractItSystemUsage.json" />
     <Content Include="Tests\mocks\itSystemRole.json" />
     <Content Include="Tests\mocks\itSystemUsageRights.json" />
@@ -879,6 +892,29 @@
     <Content Include="Tests\mocks\datarow.json" />
     <Content Include="Tests\mocks\itInterfaceNoWriteAccess.json" />
     <Content Include="Tests\mocks\itInterfaceWriteAccess.json" />
+    <Content Include="Tests\mocks\itContract.json" />
+    <Content Include="Tests\mocks\contractType.json" />
+    <Content Include="Tests\mocks\contractTemplate.json" />
+    <Content Include="Tests\mocks\purchaseForm.json" />
+    <Content Include="Tests\mocks\procurementStrategy.json" />
+    <Content Include="Tests\mocks\agreementElement.json" />
+    <Content Include="Tests\mocks\itContractNoWriteAccess.json" />
+    <Content Include="Tests\mocks\itContractWriteAccess.json" />
+    <Content Include="Tests\mocks\itInterfaceExhibitUsage.json" />
+    <Content Include="Tests\mocks\exhibit.json" />
+    <Content Include="Tests\mocks\optionExtend.json" />
+    <Content Include="Tests\mocks\terminationDeadline.json" />
+    <Content Include="Tests\mocks\paymentMilestone.json" />
+    <Content Include="Tests\mocks\handoverTrialType.json" />
+    <Content Include="Tests\mocks\handoverTrial.json" />
+    <Content Include="Tests\mocks\paymentFrequency.json" />
+    <Content Include="Tests\mocks\paymentModel.json" />
+    <Content Include="Tests\mocks\priceRegulation.json" />
+    <Content Include="Tests\mocks\economyStream.json" />
+    <Content Include="Tests\mocks\itContractRights.json" />
+    <Content Include="Tests\mocks\itContractRole.json" />
+    <Content Include="Tests\mocks\advice.json" />
+    <Content Include="Tests\mocks\interfaceUsage.json" />
     <None Include="Web.AppVeyor.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

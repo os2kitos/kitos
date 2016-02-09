@@ -64,7 +64,7 @@
                     ],
                     hasWriteAccess: [
                         '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
-                            return $http.get("api/itcontract/" + $stateParams.id + "?hasWriteAccess&organizationId=" + user.currentOrganizationId)
+                            return $http.get("api/itcontract/" + $stateParams.id + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
                                 .then(function (result) {
                                     return result.data.response;
                                 });
@@ -189,7 +189,7 @@
                 };
             }
 
-            $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, formatSupplier, ['public', 'orgId=' + user.currentOrganizationId]);
+            $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, formatSupplier, ['public=true', 'orgId=' + user.currentOrganizationId]);
 
             function formatSupplier(supplier) {
                 var result = '<div>' + supplier.text + '</div>';
@@ -265,7 +265,7 @@
 
                         $http({
                             method: 'PATCH',
-                            url: 'api/itContract/' + contract.id + '?organizationId=' + user.currentOrganizationId,
+                            url: 'api/itcontract/' + contract.id + '?organizationId=' + user.currentOrganizationId,
                             data: {
                                 contractSignerId: signerId
                             }
