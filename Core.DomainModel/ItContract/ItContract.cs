@@ -318,7 +318,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         /// The duration.
         /// </value>
-        public int Duration { get; set; }
+        public int? Duration { get; set; }
         /// <summary>
         /// Gets or sets the irrevocable to. (uopsigelig til)
         /// </summary>
