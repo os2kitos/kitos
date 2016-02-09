@@ -122,7 +122,7 @@
                         quietMillis: 500,
                         transport: function(queryParams) {
                             var extraParams = paramAry ? '&' + paramAry.join('&') : '';
-                            var res = $http.get(url + '&q=' + queryParams.data.query + extraParams).then(queryParams.success);
+                            var res = $http.get(url + 'q=' + queryParams.data.query + extraParams).then(queryParams.success);
                             res.abort = function() {
                                 return null;
                             };

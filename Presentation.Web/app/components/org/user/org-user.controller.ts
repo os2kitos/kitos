@@ -197,7 +197,7 @@
                                     break;
                                 //ITSystems selected
                                 case '3':
-                                    httpUrl += 'itsystemusagerights?';
+                                    httpUrl += 'itSystemUsageRights?';
                                     break;
                                 //ITContracts selected
                                 case '4':

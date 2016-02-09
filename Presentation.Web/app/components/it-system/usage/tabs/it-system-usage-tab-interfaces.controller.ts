@@ -49,7 +49,7 @@
                 ],
                 canUseInterfaces: [
                     "$http", "itSystemUsage", "user", function ($http, itSystemUsage, user) {
-                        return $http.get("api/itInterfaceUse/?interfaces&sysId=" + itSystemUsage.itSystem.id + "&orgId=" + user.currentOrganizationId).then(function (result) {
+                        return $http.get("api/itInterfaceUse/?interfaces=true&sysId=" + itSystemUsage.itSystem.id + "&orgId=" + user.currentOrganizationId).then(function (result) {
                             var interfaces = result.data.response;
                             return interfaces;
                         });
@@ -57,7 +57,7 @@
                 ],
                 exhibits: [
                     "$http", "itSystemUsage", "user", function ($http, itSystemUsage, user) {
-                        return $http.get("api/exhibit/?interfaces&sysId=" + itSystemUsage.itSystem.id + "&orgId=" + user.currentOrganizationId).then(function(result) {
+                        return $http.get("api/exhibit/?interfaces=true&sysId=" + itSystemUsage.itSystem.id + "&orgId=" + user.currentOrganizationId).then(function(result) {
                             var interfaces = result.data.response;
                             _.each(interfaces, function(data: { exhibitedById; usage; }) {
                                 $http.get("api/itInterfaceExhibitUsage/?usageId=" + itSystemUsage.id + "&exhibitId=" + data.exhibitedById).success(function(usageResult) {
@@ -142,7 +142,7 @@
             });
             $scope.interfaceUsages = canUseInterfaces;
 
-            $scope.itSystemUsageSelectOptions = selectLazyLoading("api/itsystemusage", ["organizationId=" + itSystemUsage.organizationId]);
+            $scope.itSystemUsageSelectOptions = selectLazyLoading("api/itSystemUsage", ["organizationId=" + itSystemUsage.organizationId]);
             function selectLazyLoading(url, paramAry) {
                 return {
                     allowClear: true,

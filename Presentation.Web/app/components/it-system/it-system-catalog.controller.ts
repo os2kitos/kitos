@@ -591,7 +591,7 @@
 
         // adds system to usage within the current context
         private addUsage(systemId) {
-            return this.$http.post("api/itsystemusage", {
+            return this.$http.post("api/itSystemUsage", {
                 itSystemId: systemId,
                 organizationId: this.user.currentOrganizationId
             })
@@ -601,7 +601,7 @@
 
         // removes system from usage within the current context
         private deleteUsage(systemId) {
-            var url = `api/itsystemusage?itSystemId=${systemId}&organizationId=${this.user.currentOrganizationId}`;
+            var url = `api/itSystemUsage?itSystemId=${systemId}&organizationId=${this.user.currentOrganizationId}`;
 
             return this.$http.delete(url)
                 .success(() => this.notify.addSuccessMessage("Anvendelse af systemet er fjernet"))
