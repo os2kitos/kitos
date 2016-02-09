@@ -12,7 +12,7 @@ set TEST_ASSEMBLIES=Tests.Unit.Presentation.Web\bin\AppVeyor\Tests.Unit.Presenta
 
 if not exist ".\coverage" mkdir ".\coverage"
 
-packages\OpenCover.4.6.166\tools\OpenCover.Console.exe -output:"coverage\backend.xml" -target:run-tests.bat -register:user -filter:"%COVERAGE_FILTER_CORE_APPLICATIONSERVICES% %COVERAGE_FILTER_CORE_DOMAINMODEL% %COVERAGE_FILTER_CORE_DOMAINSERVICES% %COVERAGE_FILTER_INFRASTRUCTURE_DATAACCESS% %COVERAGE_FILTER_INFRASTRUCTURE_OPENXML% %COVERAGE_FILTER_PRESENTATION_WEB% %COVERAGE_EXCL_FILTER_PRESENTATION_WEB%"
-packages\ReportGenerator.2.3.2.0\tools\ReportGenerator.exe -reports:results.xml -targetdir:coverage
+packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -output:"coverage\backend.xml" -target:run-tests.bat -register:user -filter:"%COVERAGE_FILTER_CORE_APPLICATIONSERVICES% %COVERAGE_FILTER_CORE_DOMAINMODEL% %COVERAGE_FILTER_CORE_DOMAINSERVICES% %COVERAGE_FILTER_INFRASTRUCTURE_DATAACCESS% %COVERAGE_FILTER_INFRASTRUCTURE_OPENXML% %COVERAGE_FILTER_PRESENTATION_WEB% %COVERAGE_EXCL_FILTER_PRESENTATION_WEB%"
+packages\ReportGenerator.2.4.2.0\tools\ReportGenerator.exe -reports:coverage\backend.xml -targetdir:coverage
 
 start .\coverage\index.htm
