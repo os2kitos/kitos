@@ -13,7 +13,11 @@
                     <a data-ui-sref="it-project.edit.status-project({ id: project.id })">{{ project.name }}</a>
                 </td>
                 <td class="text-right">
-                    <button type="button" class="btn btn-danger btn-xs" data-confirmed-click="delete({{ project.id }})" data-confirm-click="Er du sikker på at du vil slette tilknytningen?" data-ng-show="hasWriteAccess">
+                    <button type="button"
+                            class="btn btn-danger btn-xs delete-project"
+                            data-confirmed-click="delete({{ project.id }})"
+                            data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
+                            data-ng-show="hasWriteAccess">
                         <i class="glyphicon glyphicon-trash"></i>
                     </button>
                 </td>
@@ -22,8 +26,12 @@
         <tfoot data-ng-show="hasWriteAccess">
             <tr>
                 <td colspan="2">
-                    <input type="hidden" data-ui-select2="itProjectsSelectOptions"
-                           data-ng-model="selectedProject" class="form-control input-sm" data-ng-change="save()"
+                    <input type="hidden"
+                           id="project-selector"
+                           class="form-control input-sm"
+                           data-ui-select2="itProjectsSelectOptions"
+                           data-ng-model="selectedProject"
+                           data-ng-change="save()"
                            data-placeholder="Vælg IT projekt" />
                 </td>
             </tr>

@@ -7,7 +7,7 @@
                 resolve: {
                     interfaces: [
                         '$http', 'itSystem', 'user', function ($http, itSystem, user) {
-                            return $http.get('api/itInterfaceUse/?interfaces&sysId=' + itSystem.id + '&orgId=' + user.currentOrganizationId).then(function(result) {
+                            return $http.get('api/itInterfaceUse/?interfaces=true&sysId=' + itSystem.id + '&orgId=' + user.currentOrganizationId).then(function(result) {
                                 return result.data.response;
                             });
                         }

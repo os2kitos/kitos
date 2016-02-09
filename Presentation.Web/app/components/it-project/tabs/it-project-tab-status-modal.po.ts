@@ -18,13 +18,13 @@ class ItProjectEditTabStrategy implements IPageObject {
 
     // name input
     nameElement = element(by.css("#name"));
-    nameInput = (value: string) => {
+    nameInput(value: string) {
         this.nameElement.sendKeys(value);
     }
 
     // humanReadableId input
     humanReadableIdElement = element(by.css("#humanReadableId"));
-    humanReadableIdInput = (value: string) => {
+    humanReadableIdInput(value: string) {
         this.humanReadableIdElement.sendKeys(value);
     }
 
@@ -33,26 +33,25 @@ class ItProjectEditTabStrategy implements IPageObject {
 
     // startDate input
     startDateElement = element(by.css("#startDate"));
-    startDateInput = (value: string) => {
+    startDateInput(value: string) {
         this.startDateElement.sendKeys(value);
     }
 
     // endDate input
     endDateElement = element(by.css("#endDate"));
-    endDateInput = (value: string) => {
+    endDateInput(value: string) {
         this.endDateElement.sendKeys(value);
     }
 
     // date input
     dateElement = element(by.css("#date"));
-    dateInput = (value: string) => {
+    dateInput(value: string) {
         this.dateElement.sendKeys(value);
     }
 
-
     // timeEstimate input
     timeEstimateElement = element(by.css("#timeEstimate"));
-    timeEstimateInput = (value: string) => {
+    timeEstimateInput(value: string) {
         this.timeEstimateElement.sendKeys(value);
     }
 
@@ -64,13 +63,13 @@ class ItProjectEditTabStrategy implements IPageObject {
 
     // description input
     descriptionElement = element(by.css("#description"));
-    descriptionInput = (value: string) => {
+    descriptionInput(value: string) {
         this.descriptionElement.sendKeys(value);
     }
 
     // note input
     noteElement = element(by.css("#assignment-note"));
-    noteInput = (value: string) => {
+    noteInput(value: string) {
         this.noteElement.sendKeys(value);
     }
 

@@ -315,7 +315,7 @@
                     {
                         field: "ItContractId", title: "KontraktID", width: 150,
                         persistId: "contractid", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => dataItem && dataItem.ItContractId,
+                        excelTemplate: dataItem => dataItem && dataItem.ItContractId || "",
                         hidden: true,
                         filterable: {
                             cell: {

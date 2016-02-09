@@ -90,7 +90,7 @@
                     }
                     var usageId = $state.params.id;
                     var msg = notify.addInfoMessage('Sletter IT System anvendelsen...', false);
-                    $http.delete('api/itsystemusage/' + usageId + '?organizationId=' + user.currentOrganizationId)
+                    $http.delete('api/itSystemUsage/' + usageId + '?organizationId=' + user.currentOrganizationId)
                         .success(function (result) {
                             msg.toSuccessMessage('IT System anvendelsen er slettet!');
                             $state.go('it-system.overview');

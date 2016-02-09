@@ -30,6 +30,7 @@ export class Browser {
      * dismiss open alert box
      */
     dismissAlert(): webdriver.promise.Promise<void> {
+        browser.wait(protractor.ExpectedConditions.alertIsPresent(), 1000);
         return browser.switchTo().alert()
             .then(alert => alert.dismiss());
     }
@@ -38,6 +39,7 @@ export class Browser {
      * accept open alert box
      */
     acceptAlert(): webdriver.promise.Promise<void> {
+        browser.wait(protractor.ExpectedConditions.alertIsPresent(), 1000);
         return browser.switchTo().alert()
             .then(alert => alert.accept());
     }

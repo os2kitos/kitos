@@ -28,12 +28,11 @@ describe("project edit tab communication", () => {
     });
 
     describe("with no write access", () => {
-        beforeEach(() => {
+        beforeEach(done => {
             mock(["itProjectNoWriteAccess"].concat(mockDependencies));
-            pageObject.getPage();
-
-            // clear initial requests
-            mock.clearRequests();
+            pageObject.getPage()
+                .then(() => mock.clearRequests())
+                .then(() => done());
         });
 
         it("should hide input fields", () => {
@@ -66,14 +65,11 @@ describe("project edit tab communication", () => {
     });
 
     describe("with write access", () => {
-        beforeEach(() => {
+        beforeEach(done => {
             mock(["itProjectWriteAccess"].concat(mockDependencies));
-            pageObject.getPage();
-
-            // clear initial requests
-            // necessary hack to let protractor-http-mock clear all requests after page load
-            browser.sleep(300);
-            mock.clearRequests();
+            pageObject.getPage()
+                .then(() => mock.clearRequests())
+                .then(() => done());
         });
 
         it("should mark required inputs on save when nothing is entered", () => {

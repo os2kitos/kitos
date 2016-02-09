@@ -22,12 +22,11 @@ describe("project edit view", () => {
     });
 
     describe("with no write access", () => {
-        beforeEach(() => {
+        beforeEach(done => {
             mock(["itProjectNoWriteAccess"].concat(mockDependencies));
-            pageObject.getPage();
-
-            // clear initial requests
-            mock.clearRequests();
+            pageObject.getPage()
+                .then(() => mock.clearRequests())
+                .then(() => done());
         });
 
         it("should disable inputs", () => {
@@ -53,12 +52,11 @@ describe("project edit view", () => {
     });
 
     describe("with write access", () => {
-        beforeEach(() => {
+        beforeEach(done => {
             mock(["itProjectWriteAccess"].concat(mockDependencies));
-            pageObject.getPage();
-
-            // clear initial requests
-            mock.clearRequests();
+            pageObject.getPage()
+                .then(() => mock.clearRequests())
+                .then(() => done());
         });
 
         it("should not delete when delete confirm popup is dismissed", () => {

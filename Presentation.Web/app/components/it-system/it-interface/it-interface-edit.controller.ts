@@ -17,7 +17,7 @@
                 hasWriteAccess: [
                     '$http', '$stateParams', 'user', function($http, $stateParams, user) {
                         var interfaceId = $stateParams.id;
-                        return $http.get('api/itInterface/' + interfaceId + '?hasWriteAccess&organizationId=' + user.currentOrganizationId)
+                        return $http.get('api/itInterface/' + interfaceId + '?hasWriteAccess=true&organizationId=' + user.currentOrganizationId)
                             .then(function(result) {
                                 return result.data.response;
                             });

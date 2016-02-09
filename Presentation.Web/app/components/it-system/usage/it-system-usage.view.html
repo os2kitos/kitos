@@ -25,8 +25,6 @@
                         <label for="system-parent" class="control-label small">Overordnet system</label>
                         <input type="text" id="system-parent" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystemParentName">
                     </div>
-
-
                 </div>
 
                 <!-- 2st column -->
@@ -40,7 +38,7 @@
                     <!-- Object owner -->
                     <div class="form-group">
                         <label class="control-label small">Oprettet af</label>
-                        <input class="form-control input-sm" disabled="true" type="text" value="{{usage.itSystem.objectOwnerFullName}}"/>
+                        <input class="form-control input-sm" disabled="disabled" type="text" value="{{usage.itSystem.objectOwnerFullName}}" />
                     </div>
                     <!--Access modifier -->
                     <div class="form-group">
@@ -48,7 +46,7 @@
                         <input id="system-access" class="form-control input-sm" disabled data-select-access-modifier="" data-ng-model="usage.itSystem.accessModifier">
                     </div>
                 </div>
-                
+
 
                 <!-- full width -->
                 <div class="col-md-12">
@@ -83,7 +81,7 @@
                                data-ng-disabled="!hasWriteAccess"
                                data-ng-model="usage.localSystemId"
                                data-field="localSystemId"
-                               data-autosave="api/itsystemusage/{{usageId}}">
+                               data-autosave="api/itSystemUsage/{{usageId}}">
                     </div>
 
                     <!-- local call name -->
@@ -93,7 +91,7 @@
                                data-ng-model="usage.localCallName"
                                data-ng-disabled="!hasWriteAccess"
                                data-field="localCallName"
-                               data-autosave="api/itsystemusage/{{usageId}}">
+                               data-autosave="api/itSystemUsage/{{usageId}}">
                     </div>
 
                     <!-- sensitive data -->
@@ -105,7 +103,7 @@
                                 data-ng-disabled="!hasWriteAccess"
                                 data-ng-model="usage.sensitiveDataTypeId"
                                 data-field="sensitiveDataTypeId"
-                                data-autosave="api/itsystemusage/{{usageId}}">
+                                data-autosave="api/itSystemUsage/{{usageId}}">
                             <option value=""></option>
                             <option data-ng-repeat="sensitiveDataType in sensitiveDataTypes" value="{{sensitiveDataType.id}}">{{sensitiveDataType.name}}</option>
                         </select>
@@ -119,7 +117,7 @@
                                    data-ng-model="usage.esdhRef"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-field="esdhRef"
-                                   data-autosave="api/itsystemusage/{{usageId}}">
+                                   data-autosave="api/itSystemUsage/{{usageId}}">
                             <span class="input-group-btn">
                                 <button class="btn btn-sm btn-default" type="button" data-href-blank="usage.esdhRef">
                                     <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
@@ -137,7 +135,7 @@
                                    data-ng-model="usage.directoryOrUrlRef"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-field="directoryOrUrlRef"
-                                   data-autosave="api/itsystemusage/{{usageId}}">
+                                   data-autosave="api/itSystemUsage/{{usageId}}">
                             <span class="input-group-btn">
                                 <button class="btn btn-sm btn-default" type="button" data-href-blank="usage.directoryOrUrlRef">
                                     <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
@@ -157,13 +155,13 @@
                                data-ng-disabled="!hasWriteAccess"
                                data-ng-model="usage.version"
                                data-field="version"
-                               data-autosave="api/itsystemusage/{{usageId}}">
+                               data-autosave="api/itSystemUsage/{{usageId}}">
                     </div>
 
                     <!-- Object owner -->
                     <div class="form-group">
                         <label for="usage-owner" class="control-label small">Taget i anvendelse af</label>
-                        <input type="text" id="usage-owner" class="form-control input-sm" 
+                        <input type="text" id="usage-owner" class="form-control input-sm"
                                data-ng-disabled="true"
                                value="{{usage.objectOwnerFullName}}">
                     </div>
@@ -175,7 +173,7 @@
                                data-ui-select2="itSytemUsagesSelectOptions"
                                data-ng-disabled="!hasWriteAccess"
                                data-ng-model="usage.overview"
-                               data-autosave="api/itsystemusage/{{usageId}}"
+                               data-autosave="api/itSystemUsage/{{usageId}}"
                                data-field="overviewId">
                     </div>
 
@@ -188,7 +186,7 @@
                                 data-ng-model="usage.archiveTypeId"
                                 data-ng-disabled="!hasWriteAccess"
                                 data-field="archiveTypeId"
-                                data-autosave="api/itsystemusage/{{usageId}}">
+                                data-autosave="api/itSystemUsage/{{usageId}}">
                             <option value=""></option>
                             <option data-ng-repeat="archiveType in archiveTypes" value="{{archiveType.id}}">{{archiveType.name}}</option>
                         </select>
@@ -203,7 +201,7 @@
                                    data-ng-model="usage.cmdbRef"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-field="cmdbRef"
-                                   data-autosave="api/itsystemusage/{{usageId}}">
+                                   data-autosave="api/itSystemUsage/{{usageId}}">
                             <span class="input-group-btn">
                                 <button class="btn btn-sm btn-default" type="button" data-href-blank="usage.cmdbRef">
                                     <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
@@ -223,7 +221,7 @@
                         <textarea id="note" class="form-control input-sm" rows="5"
                                   data-ng-model="usage.note"
                                   data-ng-disabled="!hasWriteAccess"
-                                  data-field="note" data-autosave="api/itsystemusage/{{usageId}}"></textarea>
+                                  data-field="note" data-autosave="api/itSystemUsage/{{usageId}}"></textarea>
                     </div>
                 </div>
             </div>
@@ -259,4 +257,4 @@
 </ul>
 
 <!-- sub tabs view -->
-<ui-view autoscroll="false" class="subtabs"/>
+<ui-view autoscroll="false" class="subtabs" />
