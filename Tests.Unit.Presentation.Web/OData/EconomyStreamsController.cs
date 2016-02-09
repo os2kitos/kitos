@@ -27,13 +27,14 @@ namespace Tests.Unit.Presentation.Web.OData
 
             _economyStreamsController = new EconomyStreamsController(_economyStreamRepository, _userRepository);
             _userMock = new UserMock(_economyStreamsController, "12345678");
+
+            _userMock.LogOn();
         }
 
         [Fact]
         public void GetByOrganization_NoAccess_ReturnUnauthorized()
         {
             // Arrange
-            _userMock.LogOn();
             const int orgKey = 1;
             SetAccess(false, orgKey);
 
@@ -48,7 +49,6 @@ namespace Tests.Unit.Presentation.Web.OData
         public void GetByOrganization_Access_ReturnOk()
         {
             // Arrange
-            _userMock.LogOn();
             const int orgKey = 1;
             SetAccess(true, orgKey);
             IQueryable<EconomyStream> list = new EnumerableQuery<EconomyStream>(new List<EconomyStream>());
@@ -71,7 +71,6 @@ namespace Tests.Unit.Presentation.Web.OData
         public void GetAllExtern_NoAccess_ReturnUnauthorized()
         {
             // Arrange
-            _userMock.LogOn();
             const int orgKey = 1;
             const int contractKey = 1;
             SetAccess(false, orgKey);
@@ -87,7 +86,6 @@ namespace Tests.Unit.Presentation.Web.OData
         public void GetAllExtern_Access_ReturnOk()
         {
             // Arrange
-            _userMock.LogOn();
             const int orgKey = 1;
             const int contractKey = 1;
             SetAccess(true, orgKey);
@@ -111,7 +109,6 @@ namespace Tests.Unit.Presentation.Web.OData
         public void GetAllIntern_NoAccess_ReturnUnauthorized()
         {
             // Arrange
-            _userMock.LogOn();
             const int orgKey = 1;
             const int contractKey = 1;
             SetAccess(false, orgKey);
@@ -127,7 +124,6 @@ namespace Tests.Unit.Presentation.Web.OData
         public void GetAllIntern_Access_ReturnOk()
         {
             // Arrange
-            _userMock.LogOn();
             const int orgKey = 1;
             const int contractKey = 1;
             SetAccess(true, orgKey);
@@ -151,7 +147,6 @@ namespace Tests.Unit.Presentation.Web.OData
         public void GetSingleExtern_NoAccess_ReturnUnauthorized()
         {
             // Arrange
-            _userMock.LogOn();
             const int orgKey = 1;
             const int contractKey = 1;
             const int key = 1;
@@ -168,7 +163,6 @@ namespace Tests.Unit.Presentation.Web.OData
         public void GetSingleExtern_Access_ReturnOk()
         {
             // Arrange
-            _userMock.LogOn();
             const int orgKey = 1;
             const int contractKey = 1;
             const int key = 1;
@@ -193,7 +187,6 @@ namespace Tests.Unit.Presentation.Web.OData
         public void GetSingleIntern_NoAccess_ReturnUnauthorized()
         {
             // Arrange
-            _userMock.LogOn();
             const int orgKey = 1;
             const int contractKey = 1;
             const int key = 1;
@@ -210,7 +203,6 @@ namespace Tests.Unit.Presentation.Web.OData
         public void GetSingleIntern_Access_ReturnOk()
         {
             // Arrange
-            _userMock.LogOn();
             const int orgKey = 1;
             const int contractKey = 1;
             const int key = 1;
@@ -240,7 +232,6 @@ namespace Tests.Unit.Presentation.Web.OData
         /// <param name="orgKey">The orgKey to grant access for.</param>
         private void SetAccess(bool allow, int orgKey)
         {
-
             var list = new List<User>();
             if (allow)
             {
