@@ -199,6 +199,21 @@ namespace Presentation.Web.Controllers.API
                         var enumValue = Enum.Parse(t, value, true);
                         propRef.SetValue(item, enumValue);
                     }
+                    // parse null values properly
+                    else if (t.IsEquivalentTo(typeof (int?)))
+                    {
+                        var value = valuePair.Value.Value<string>();
+
+                        int intValue;
+                        if (!String.IsNullOrEmpty(value) && Int32.TryParse(value, out intValue))
+                        {
+                            propRef.SetValue(item, intValue);
+                        }
+                        else
+                        {
+                            propRef.SetValue(item, null);
+                        }
+                    }
                     // BUG JSON.NET throws on Guid
                     // Bugreport https://json.codeplex.com/workitem/25599
                     else if (t.IsEquivalentTo(typeof(Guid)))

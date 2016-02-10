@@ -47,7 +47,7 @@ namespace Presentation.Web.Models
         public string ParentName { get; set; }
         public IEnumerable<int> ChildrenIds { get; set; }
 
-        public int ItProjectTypeId { get; set; }
+        public int? ItProjectTypeId { get; set; }
         public string ItProjectTypeName { get; set; }
         public int OrganizationId { get; set; }
         public IEnumerable<EconomyYearDTO> EconomyYears { get; set; }
