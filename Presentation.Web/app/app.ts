@@ -22,8 +22,9 @@ app.config([
 
 app.config([
     '$httpProvider',
+    '$windowProvider',
     'notifyProvider',
-    function ($httpProvider, notifyProvider) {
+    function ($httpProvider, $windowProvider, notifyProvider) {
         $httpProvider.interceptors.push('httpBusyInterceptor');
         // for some reason templates aren't updated so this is needed
         $httpProvider.defaults.headers.get = {
@@ -31,6 +32,20 @@ app.config([
         };
         notifyProvider.globalTimeToLive(5000);
         notifyProvider.onlyUniqueMessages(false);
+
+        // $window isn't ready yet, so fetch it ourself
+        var $window = $windowProvider.$get();
+
+        // encode all url requests - fixes IE not correctly encoding special chars
+        $httpProvider.interceptors.push(function () {
+            return {
+                'request': function (config) {
+                    config.url = $window.encodeURI(config.url);
+                    return config;
+                }
+
+            }
+        });
     }
 ]);
 
