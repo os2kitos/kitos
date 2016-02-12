@@ -39,4 +39,8 @@
         addFilter(filterObj, field, operator, value, logic);
         findKeyDeep(obj, keyObj);
     }
+
+    export interface IKendoGridExcelExportEvent<TDataSource> extends kendo.ui.GridExcelExportEvent {
+        sender: IKendoGrid<TDataSource>;
+    }
 }
