@@ -1,10 +1,8 @@
 ﻿module Kitos.ItSystem.Catalog {
     "use strict";
 
-    import IItSystem = Models.ItSystem.IItSystem;
-
     export interface ICatalogController {
-        mainGrid: IKendoGrid<IItSystem>;
+        mainGrid: IKendoGrid<Models.ItSystem.IItSystem>;
         mainGridOptions: kendo.ui.GridOptions;
         usageGrid: kendo.ui.Grid;
         usageDetailsGrid: kendo.ui.GridOptions;
@@ -22,8 +20,8 @@
     export class CatalogController implements ICatalogController {
         private storageKey = "it-system-catalog-options";
         private gridState = this.gridStateService.getService(this.storageKey);
-        public mainGrid: IKendoGrid<IItSystem>;
-        public mainGridOptions: IKendoGridOptions<IItSystem>;
+        public mainGrid: IKendoGrid<Models.ItSystem.IItSystem>;
+        public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItSystem>;
         public usageGrid: kendo.ui.Grid;
         public modal: kendo.ui.Window;
 
@@ -510,7 +508,7 @@
         };
 
         private exportFlag = false;
-        private exportToExcel = (e) => {
+        private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItSystem>) => {
             var columns = e.sender.columns;
 
             if (!this.exportFlag) {
@@ -544,7 +542,7 @@
                     var row = sheet.rows[rowIndex];
 
                     // -1 as sheet has header and dataSource doesn't
-                    var dataItem = <IKendoDataObservableObject>this.mainGrid.dataSource.at(rowIndex - 1);
+                    var dataItem = e.data[rowIndex - 1];
 
                     for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
                         if (columns[columnIndex].field === "") continue;

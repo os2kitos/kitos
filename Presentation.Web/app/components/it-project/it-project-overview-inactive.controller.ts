@@ -699,13 +699,13 @@
         };
 
         private exportFlag = false;
-        private exportToExcel = (e: kendo.ui.GridExcelExportEvent) => {
+        private exportToExcel = (e: IKendoGridExcelExportEvent<IItProjectInactiveOverview>) => {
             var columns = e.sender.columns;
 
             if (!this.exportFlag) {
                 e.preventDefault();
                 this._.forEach(columns, kendoColumn => {
-                    var column = <IKendoGridColumn<IItProjectInactiveOverview>>kendoColumn;
+                    var column = kendoColumn;
                     if (column.hidden) {
                         column.tempVisual = true;
                         e.sender.showColumn(column);
@@ -720,7 +720,7 @@
 
                 // hide coloumns on visual grid
                 this._.forEach(columns, kendoColumn => {
-                    var column = <IKendoGridColumn<IItProjectInactiveOverview>>kendoColumn;
+                    var column = kendoColumn;
 
                     if (column.tempVisual) {
                         delete column.tempVisual;
@@ -736,7 +736,7 @@
                     var row = sheet.rows[rowIndex];
 
                     // -1 as sheet has header and dataSource doesn't
-                    var dataItem = <IKendoDataObservableObject>this.mainGrid.dataSource.at(rowIndex - 1);
+                    var dataItem = e.data[rowIndex - 1];
 
                     for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
                         if (columns[columnIndex].field === "") continue;
