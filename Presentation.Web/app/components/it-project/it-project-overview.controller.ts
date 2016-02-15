@@ -746,8 +746,8 @@
         };
 
         private exportFlag = false;
-        private exportToExcel = (e: kendo.ui.GridExcelExportEvent) => {
-            var columns = <Array<IKendoGridColumn<Models.ItProject.IItProject>>>e.sender.columns;
+        private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItProject.IItProject>) => {
+            var columns = e.sender.columns;
 
             if (!this.exportFlag) {
                 e.preventDefault();
@@ -780,7 +780,7 @@
                     var row = sheet.rows[rowIndex];
 
                     // -1 as sheet has header and dataSource doesn't
-                    var dataItem = <IKendoDataObservableObject>this.mainGrid.dataSource.at(rowIndex - 1);
+                    var dataItem = e.data[rowIndex - 1];
 
                     for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
                         if (columns[columnIndex].field === "") continue;
