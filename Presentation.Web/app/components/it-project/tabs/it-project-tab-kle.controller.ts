@@ -48,7 +48,6 @@
                 };
 
                 function loadTasks() {
-
                     var url = baseUrl + "?tasks=true";
                     url += "&onlySelected=" + !$scope.showAllTasks;
                     url += "&taskGroup=" + $scope.selectedTaskGroup;
@@ -60,16 +59,14 @@
                     }
 
                     $http.get(url)
-                        .success((result, status, headers) => {
+                        .success(function(result, status, headers) {
                             $scope.tasklist = result.response;
 
                             var paginationHeader = JSON.parse(headers("X-Pagination"));
                             $scope.totalCount = paginationHeader.TotalCount;
-
-                        }).error(() => {
+                        }).error(function() {
                             notify.addErrorMessage("Kunne ikke hente opgaver!");
                         });
-
                 }
 
                 function add(task) {
