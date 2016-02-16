@@ -26,11 +26,11 @@
         public mainGrid: IKendoGrid<IItSystemUsageOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
 
-        public usageGrid: kendo.ui.Grid;
-        public modal: kendo.ui.Window;
+        //public usageGrid: kendo.ui.Grid;
+        //public modal: kendo.ui.Window;
 
-        public exhibitGrid: kendo.ui.Grid;
-        public exhibitModal: kendo.ui.Window;
+        //public exhibitGrid: kendo.ui.Grid;
+        //public exhibitModal: kendo.ui.Window;
 
         public static $inject: Array<string> = [
             "$rootScope",
@@ -85,10 +85,10 @@
             this.activate();
         }
 
-        // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(c/User/Name,'foo') and c/RoleId eq {roleId})"
+        // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(concat(concat(c/User/Name, ' '), c/User/LastName),'foo') and c/RoleId eq {roleId})"
         private fixRoleFilter(filterUrl, roleName, roleId) {
             var pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
-            return filterUrl.replace(pattern, `Rights/any(c: $1c/User/Name$2 and c/RoleId eq ${roleId})`);
+            return filterUrl.replace(pattern, `Rights/any(c: $1concat(concat(c/User/Name, ' '), c/User/LastName)$2 and c/RoleId eq ${roleId})`);
         }
 
         private fixKleIdFilter(filterUrl, column) {

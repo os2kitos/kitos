@@ -96,10 +96,10 @@
             this.gridState.saveGridOptions(this.mainGrid);
         }
 
-        // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(c/User/Name,'foo') and c/RoleId eq {roleId})"
+        // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(concat(concat(c/User/Name, ' '), c/User/LastName),'foo') and c/RoleId eq {roleId})"
         private fixRoleFilter(filterUrl, roleName, roleId) {
             var pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
-            return filterUrl.replace(pattern, `Rights/any(c: $1c/User/Name$2 and c/RoleId eq ${roleId})`);
+            return filterUrl.replace(pattern, `Rights/any(c: $1concat(concat(c/User/Name, ' '), c/User/LastName)$2 and c/RoleId eq ${roleId})`);
         }
 
         private fixSystemFilter(filterUrl, column) {
