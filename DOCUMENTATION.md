@@ -1,8 +1,8 @@
-# Technical documentation of KITOS
+# Technical documentation of OS2KITOS
 
-Here follows a short documentation of the development setup for KITOS.
+Here follows a short documentation of the development setup for OS2KITOS.
 
-KITOS consists of two major parts. The backend WebAPI and OData API written in C# and .NET and an [AngularJS 1.x](https://angularjs.org/) frontend written in [Typescript](http://www.typescriptlang.org/).
+OS2KITOS consists of two major parts. The backend WebAPI and OData API written in C# and .NET and an [AngularJS 1.x](https://angularjs.org/) frontend written in [Typescript](http://www.typescriptlang.org/).
 
 # Frontend
 
