@@ -72,22 +72,22 @@ exports.config = {
 
         //    'acceptSslCerts': 'true'
         //},
-        {
-            // Firefox 42
-            'browserstack.local': 'true',
+        //{
+        //    // Firefox 42
+        //    'browserstack.local': 'true',
 
-            'project': process.env.APPVEYOR_PROJECT_NAME || 'kitos local',
-            'build': process.env.APPVEYOR_BUILD_NUMBER || 'local build',
+        //    'project': process.env.APPVEYOR_PROJECT_NAME || 'kitos local',
+        //    'build': process.env.APPVEYOR_BUILD_NUMBER || 'local build',
 
-            // settings for the browser to test
-            'browserName': 'Firefox',
-            'browser_version': '42.0',
-            'os': 'Windows',
-            'os_version': '7',
-            'resolution': '1280x1024',
+        //    // settings for the browser to test
+        //    'browserName': 'Firefox',
+        //    'browser_version': '42.0',
+        //    'os': 'Windows',
+        //    'os_version': '7',
+        //    'resolution': '1280x1024',
 
-            'acceptSslCerts': 'true'
-        }
+        //    'acceptSslCerts': 'true'
+        //}
     ],
 
     // select all end to end tests
