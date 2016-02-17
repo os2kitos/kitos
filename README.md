@@ -25,4 +25,5 @@ See the automated test results on [BrowserStack Automate](https://www.browsersta
 =======
 
 This website uses [BrowserStack](https://www.browserstack.com/) for testing.
+
 <a name="BrowserStack">[<img src="https://cdn.rawgit.com/os2kitos/kitos/master/Assets/BrowserStack.svg" width="300" />](https://www.browserstack.com/)</a>
