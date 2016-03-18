@@ -1,10 +1,10 @@
-﻿<script type="text/ng-template"  id="tree_item_renderer.html">
+﻿<script type="text/ng-template" id="tree_item_template">
     <a data-ui-sref="it-contract.edit.systems({ id: contract.id })">{{ contract.name }}</a>
     <ul>
-        <li ng-repeat="contract in contract.children" ng-include="'tree_item_renderer.html'"></li>
+        <li ng-repeat="contract in contract.children" ng-include="'tree_item_template'"></li>
     </ul>
 </script>
 
 <ul>
-    <li data-ng-repeat="contract in hierarchy" data-ng-include="'tree_item_renderer.html'"></li>
+    <li data-ng-repeat="contract in hierarchy" data-ng-include="'tree_item_template'"></li>
 </ul>

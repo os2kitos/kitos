@@ -179,6 +179,39 @@ _.mixin({
 });
 
 _.mixin({
+    toHierarchy: function (objAry, idPropertyName, parentIdPropertyName, childPropertyName) {
+        // default values
+        idPropertyName = typeof idPropertyName !== 'undefined' ? idPropertyName : 'id';
+        parentIdPropertyName = typeof parentIdPropertyName !== 'undefined' ? parentIdPropertyName : 'parentId';
+        childPropertyName = typeof childPropertyName !== 'undefined' ? childPropertyName : 'children';
+
+        function self(array, parent, tree) {
+            tree = typeof tree !== 'undefined' ? tree : [];
+            parent = typeof parent !== 'undefined' ? parent : { id: null };
+
+            var children = _.filter(array, function(child) {
+                return child[parentIdPropertyName] === parent[idPropertyName];
+            });
+
+            if (!_.isEmpty(children)) {
+                if (parent[idPropertyName] == null) {
+                    tree = children;
+                } else {
+                    parent[childPropertyName] = children;
+                }
+                _.each(children, function(child) {
+                    self(array, child);
+                });
+            }
+
+            return tree;
+        }
+
+        return self(objAry);
+    }
+});
+
+_.mixin({
     removeFiltersForField: function (filterObj, field) {
         var clonedFilterObj = _.clone(filterObj, true);
 
