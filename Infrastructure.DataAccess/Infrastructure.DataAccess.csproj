@@ -245,6 +245,10 @@
     <Compile Include="Migrations\201602091402254_Make ItContract.Duration nullable.Designer.cs">
       <DependentUpon>201602091402254_Make ItContract.Duration nullable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201603180949146_AddedNavigationPropToModel.cs" />
+    <Compile Include="Migrations\201603180949146_AddedNavigationPropToModel.Designer.cs">
+      <DependentUpon>201603180949146_AddedNavigationPropToModel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
     <Compile Include="UserRepository.cs" />
@@ -336,6 +340,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201602091402254_Make ItContract.Duration nullable.resx">
       <DependentUpon>201602091402254_Make ItContract.Duration nullable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201603180949146_AddedNavigationPropToModel.resx">
+      <DependentUpon>201603180949146_AddedNavigationPropToModel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

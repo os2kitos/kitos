@@ -68,7 +68,7 @@ namespace Core.DomainModel
         /// <value>
         /// It system usages.
         /// </value>
-        public virtual ICollection<ItSystemUsage.ItSystemUsage> ItSystemUsages { get; set; }
+        public virtual ICollection<ItSystemUsage.ItSystemUsage> ItSystemUsages { get; set; } // TODO is this used anymore isn't Using used instead?
 
         /// <summary>
         /// Users which have set this as their default OrganizationUnit.

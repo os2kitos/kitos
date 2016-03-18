@@ -19,7 +19,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .Map(t => t.ToTable("OrgUnitSystemUsage"));
 
             this.HasOptional(t => t.ResponsibleUsage)
-                .WithOptionalPrincipal();
+                .WithOptionalPrincipal(t => t.ResponsibleItSystemUsage);
 
             this.HasRequired(t => t.ItSystem)
                 .WithMany(t => t.Usages);
