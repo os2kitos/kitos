@@ -27,9 +27,9 @@
         /** This Organization Unit is using these IT Systems (Via ItSystemUsage) */
         Using: Array<IItSystemUsageOrgUnitUsage>;
         /** This Organization Unit is using these IT projects */
-        UsingItProjects: Array<ItProject.IItProjectOrgUnitUsage>;
+        ItProjects: Array<ItProject.IItProjectOrgUnitUsage>;
         /** This Organization Unit is responsible for these IT ItContracts */
-        ResponsibleForItContracts: Array<ItContract.IItContract>;
+        ItContracts: Array<ItContract.IItContract>;
         /** The Organization Unit is listed in these economy streams */
         EconomyStreams: Array<ItContract.IEconomyStream>;
     }
