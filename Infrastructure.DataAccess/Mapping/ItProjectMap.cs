@@ -8,7 +8,7 @@ namespace Infrastructure.DataAccess.Mapping
         {
             // Table & Column Mappings
             this.ToTable("ItProject");
-                
+
             this.HasRequired(t => t.Organization)
                 .WithMany(d => d.ItProjects)
                 .HasForeignKey(t => t.OrganizationId)

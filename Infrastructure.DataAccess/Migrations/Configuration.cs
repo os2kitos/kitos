@@ -23,10 +23,6 @@ namespace Infrastructure.DataAccess.Migrations
             // MySQL oddness
             SetSqlGenerator("MySql.Data.MySqlClient", new MySql.Data.Entity.MySqlMigrationSqlGenerator());
             CodeGenerator = new MySql.Data.Entity.MySqlMigrationCodeGenerator();
-
-            // TODO this is apparently not needed anymore - remove when confirmed
-            ////Use a smaller key size for our migration history table. See MySqlHistoryContext.cs
-            //SetHistoryContextFactory("MySql.Data.MySqlClient", (conn, schema) => new MySqlHistoryContext(conn, schema));
         }
 
         /// <summary>

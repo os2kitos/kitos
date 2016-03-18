@@ -246,7 +246,6 @@
       <DependentUpon>201602091402254_Make ItContract.Duration nullable.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="MySqlHistoryContext.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
     <Compile Include="UserRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
