@@ -320,13 +320,13 @@
 
                             _.each($scope.nodes, filter);
 
-
                             // format the selected unit for editing
                             $modalScope.orgUnit = {
                                 'id': unit.id,
                                 'oldName': unit.name,
                                 'newName': unit.name,
                                 'newEan': unit.ean,
+                                'localId' : unit.localId,
                                 'newParent': unit.parentId,
                                 'orgId': unit.organizationId,
                                 'isRoot': unit.parentId == undefined
@@ -343,12 +343,14 @@
                                 var name = $modalScope.orgUnit.newName;
                                 var parent = $modalScope.orgUnit.newParent;
                                 var ean = $modalScope.orgUnit.newEan;
+                                var localId = $modalScope.orgUnit.localId;
 
                                 if (!name) return;
 
                                 var data = {
                                     "name": name,
-                                    "ean": ean
+                                    "ean": ean,
+                                    "localId": localId
                                 };
 
                                 // only allow changing the parent if user is admin, and the unit isn't at the root
@@ -366,7 +368,6 @@
                                     $modalScope.submitting = false;
                                     notify.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
                                 });
-
                             };
 
                             $modalScope.post = function() {
@@ -379,12 +380,14 @@
                                 var parent = $modalScope.newOrgUnit.parent;
                                 var orgId = $modalScope.newOrgUnit.orgId;
                                 var ean = $modalScope.newOrgUnit.ean;
+                                var localId = $modalScope.newOrgUnit.localId;
 
                                 var data = {
                                     "name": name,
                                     "parentId": parent,
                                     "organizationId": orgId,
-                                    "ean": ean
+                                    "ean": ean,
+                                    "localId": localId
                                 };
 
                                 $modalScope.submitting = true;
@@ -395,7 +398,11 @@
                                     $modalInstance.close(result.response);
                                 }).error(function (result, status) {
                                     $modalScope.submitting = false;
-                                    notify.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
+                                    if (result.msg.indexOf("Duplicate entry") > -1) {
+                                        notify.addErrorMessage("Fejl! Enhed ID er allerede brugt!");
+                                    } else {
+                                        notify.addErrorMessage("Fejl! " + name + " kunne ikke oprettes!");
+                                    }
                                 });
                             };
 
