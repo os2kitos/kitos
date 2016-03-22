@@ -1,10 +1,10 @@
-﻿<script type="text/ng-template"  id="tree_item_renderer.html">
+﻿<script type="text/ng-template"  id="tree_item_template">
     <a data-ui-sref="it-system.edit.interfaces({ id: system.id })">{{ system.name }}</a>
     <ul>
-        <li ng-repeat="system in system.children" ng-include="'tree_item_renderer.html'"></li>
+        <li ng-repeat="system in system.children" ng-include="'tree_item_template'"></li>
     </ul>
 </script>
 
 <ul>
-    <li data-ng-repeat="system in systems" data-ng-include="'tree_item_renderer.html'"></li>
+    <li data-ng-repeat="system in systems" data-ng-include="'tree_item_template'"></li>
 </ul>

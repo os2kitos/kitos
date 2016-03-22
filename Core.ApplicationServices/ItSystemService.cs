@@ -20,7 +20,7 @@ namespace Core.ApplicationServices
             if (string.IsNullOrWhiteSpace(nameSearch))
                 return _repository.Get(
                     s =>
-                        // global admin sees all within the context 
+                        // global admin sees all within the context
                         user.IsGlobalAdmin && s.OrganizationId == organizationId ||
                         // object owner sees his own objects
                         s.ObjectOwnerId == user.Id ||
@@ -37,9 +37,9 @@ namespace Core.ApplicationServices
                 s =>
                     // filter by name
                     s.Name.Contains(nameSearch) &&
-                    // global admin sees all within the context 
+                    // global admin sees all within the context
                     (user.IsGlobalAdmin && s.OrganizationId == organizationId ||
-                    // object owner sees his own objects     
+                    // object owner sees his own objects
                     s.ObjectOwnerId == user.Id ||
                     // it's public everyone can see it
                     s.AccessModifier == AccessModifier.Public ||
@@ -64,7 +64,7 @@ namespace Core.ApplicationServices
         public IEnumerable<ItSystem> GetHierarchy(int systemId)
         {
             var result = new List<ItSystem>();
-            var system = _repository.GetByKey(systemId);         
+            var system = _repository.GetByKey(systemId);
             result.Add(system);
             result.AddRange(GetHierarchyChildren(system));
             result.AddRange(GetHierarchyParents(system));
