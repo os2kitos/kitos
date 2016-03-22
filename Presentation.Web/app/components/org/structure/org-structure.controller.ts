@@ -366,7 +366,11 @@
                                     $modalInstance.close(result.response);
                                 }).error(function(result, status) {
                                     $modalScope.submitting = false;
-                                    notify.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
+                                    if (result.msg.indexOf("Duplicate entry") > -1) {
+                                        notify.addErrorMessage("Fejl! Enhed ID er allerede brugt!");
+                                    } else {
+                                        notify.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
+                                    }
                                 });
                             };
 
