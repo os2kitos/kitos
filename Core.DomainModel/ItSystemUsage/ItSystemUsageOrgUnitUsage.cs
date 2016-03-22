@@ -7,5 +7,7 @@
 
         public int OrganizationUnitId { get; set; }
         public virtual OrganizationUnit OrganizationUnit { get; set; }
+
+        public virtual ItSystemUsage ResponsibleItSystemUsage { get; set; }
     }
 }

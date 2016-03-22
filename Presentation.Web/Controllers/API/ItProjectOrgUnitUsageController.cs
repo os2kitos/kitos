@@ -41,9 +41,9 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var project = _projectRepository.GetByKey(id);
-                
+
                 if (project.ResponsibleUsage == null) return Ok(); // TODO should be NotFound but ui router resolve redirects to mainpage on 404
-                
+
                 var organizationUnit = project.ResponsibleUsage.OrganizationUnit;
                 var dtos = Mapper.Map<SimpleOrgUnitDTO>(organizationUnit);
                 return Ok(dtos);
@@ -81,7 +81,7 @@ namespace Presentation.Web.Controllers.API
                 // WARNING: force loading so setting it to null will be tracked
                 var forceLoad = project.ResponsibleUsage;
                 project.ResponsibleUsage = null;
-                
+
                 _projectRepository.Save();
 
                 return Ok();
