@@ -16,7 +16,7 @@ namespace Presentation.Web
             bundles.Add(new ScriptBundle("~/Scripts/angular")
                 .Include("~/Scripts/angular-bundle.min.js")
 			);
-			
+
             // angular app files
             bundles.Add(new ScriptBundle("~/Scripts/app")
                 .Include("~/app/app.js")

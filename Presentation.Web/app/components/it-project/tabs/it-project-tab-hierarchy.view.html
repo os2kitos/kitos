@@ -1,10 +1,10 @@
-﻿<script type="text/ng-template"  id="tree_item_renderer.html">
+﻿<script type="text/ng-template"  id="tree_item_template">
     <a data-ui-sref="it-project.edit.status-project({ id: project.id })">{{ project.name }}</a>
     <ul>
-        <li ng-repeat="project in project.children" ng-include="'tree_item_renderer.html'"></li>
+        <li ng-repeat="project in project.children" ng-include="'tree_item_template'"></li>
     </ul>
 </script>
 
 <ul>
-    <li data-ng-repeat="project in hierarchy" data-ng-include="'tree_item_renderer.html'"></li>
+    <li data-ng-repeat="project in hierarchy" data-ng-include="'tree_item_template'"></li>
 </ul>

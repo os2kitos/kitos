@@ -109,16 +109,7 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            var selectedOrgUnitId = <number>this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
-            var selectedOrgUnit: any = this._.find(this.orgUnits, (orgUnit: any) => (orgUnit.Id == selectedOrgUnitId));
-
-            var filter = undefined;
-            // if selected is a root then no need to filter as it should display everything anyway
-            if (selectedOrgUnit && selectedOrgUnit.$level != 0) {
-                filter = this.getFilterWithOrgUnit({}, selectedOrgUnitId, selectedOrgUnit.childIds);
-            }
-
-            this.gridState.loadGridOptions(this.mainGrid, filter);
+            this.gridState.loadGridOptions(this.mainGrid);
         }
 
         private reload() {
@@ -186,7 +177,16 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: `/odata/Organizations(${this.user.currentOrganizationId})/ItContracts?$expand=Parent,ResponsibleOrganizationUnit,PaymentModel,PaymentFreqency,Rights($expand=User,Role),Supplier,AssociatedSystemUsages($expand=ItSystemUsage($expand=ItSystem)),TerminationDeadline,ContractSigner`,
+                            url: (options) => {
+                                var urlParameters = `?$expand=Parent,ResponsibleOrganizationUnit,PaymentModel,PaymentFreqency,Rights($expand=User,Role),Supplier,AssociatedSystemUsages($expand=ItSystemUsage($expand=ItSystem)),TerminationDeadline,ContractSigner`;
+                                // if orgunit is set then the org unit filter is active
+                                var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
+                                if (orgUnitId === null) {
+                                    return `/odata/Organizations(${this.user.currentOrganizationId})/ItContracts` + urlParameters;
+                                } else {
+                                    return `/odata/Organizations(${this.user.currentOrganizationId})/OrganizationUnits(${orgUnitId})/ItContracts` + urlParameters;
+                                }
+                            },
                             dataType: "json"
                         },
                         parameterMap: (options, type) => {
@@ -766,20 +766,20 @@
                 // if we do then the view doesn't update.
                 // So have to go through $scope - sadly :(
                 var dataSource = self.mainGrid.dataSource;
-                var currentFilter = dataSource.filter();
                 var selectedIndex = kendoElem.select();
                 var selectedId = self._.parseInt(kendoElem.value());
-                var childIds = kendoElem.dataItem().childIds;
-
-                self.$window.sessionStorage.setItem(self.orgUnitStorageKey, selectedId.toString());
 
                 if (selectedIndex > 0) {
                     // filter by selected
-                    dataSource.filter(self.getFilterWithOrgUnit(currentFilter, selectedId, childIds));
+                    self.$window.sessionStorage.setItem(self.orgUnitStorageKey, selectedId.toString());
                 } else {
                     // else clear filter because the 0th element should act like a placeholder
-                    dataSource.filter(self.getFilterWithOrgUnit(currentFilter));
+                    self.$window.sessionStorage.removeItem(self.orgUnitStorageKey);
                 }
+                // setting the above session value will cause the grid to fetch from a different URL
+                // see the function part of this http://docs.telerik.com/kendo-ui/api/javascript/data/datasource#configuration-transport.read.url
+                // so that's why it works
+                dataSource.read();
             }
 
             // http://dojo.telerik.com/ODuDe/5
@@ -792,20 +792,6 @@
                 dataBound: setDefaultOrgUnit,
                 change: orgUnitChanged
             });
-        }
-
-        private getFilterWithOrgUnit(currentFilter: kendo.data.DataSourceFilters, selectedId?: number, childIds?: number[]): kendo.data.DataSourceFilters {
-            var field = "ResponsibleOrganizationUnit.Id";
-            // remove old values first
-            var newFilter = this._.removeFiltersForField(currentFilter, field);
-
-            // is selectedId a number?
-            if (!isNaN(selectedId)) {
-                newFilter = this._.addFilter(newFilter, field, "eq", selectedId, "or");
-                // add children to filters
-                this._.forEach(childIds, id => newFilter = this._.addFilter(newFilter, field, "eq", id, "or"));
-            }
-            return newFilter;
         }
 
         public roleSelectorOptions = (): kendo.ui.DropDownListOptions => {

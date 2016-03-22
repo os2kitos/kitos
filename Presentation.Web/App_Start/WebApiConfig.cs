@@ -1,4 +1,5 @@
-﻿using System.Web.Http;
+﻿using System;
+using System.Web.Http;
 using System.Web.OData.Builder;
 using System.Web.OData.Extensions;
 using Core.DomainModel;
@@ -130,6 +131,8 @@ namespace Presentation.Web
 
             var orgUnits = builder.EntitySet<OrganizationUnit>("OrganizationUnits");
             orgUnits.EntityType.HasKey(x => x.Id);
+            orgUnits.EntityType.HasMany(x => x.ResponsibleForItContracts).Name = "ItContracts";
+            orgUnits.EntityType.HasMany(x => x.UsingItProjects).Name = "ItProjects";
 
             var users = builder.EntitySet<User>("Users");
             users.EntityType.HasKey(x => x.Id);

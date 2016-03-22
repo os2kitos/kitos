@@ -10,7 +10,7 @@ namespace Presentation.Web.Controllers.API
     public abstract class GenericOptionApiController<TModel, TReference, TDto> : GenericApiController<TModel, TDto>
         where TModel : Entity, IOptionEntity<TReference>
     {
-        protected GenericOptionApiController(IGenericRepository<TModel> repository) 
+        protected GenericOptionApiController(IGenericRepository<TModel> repository)
             : base(repository)
         {
         }
@@ -47,7 +47,7 @@ namespace Presentation.Web.Controllers.API
                 return Error(e);
             }
         }
-        
+
         protected override TModel PutQuery(TModel item)
         {
             if (!item.IsSuggestion && !IsGlobalAdmin())

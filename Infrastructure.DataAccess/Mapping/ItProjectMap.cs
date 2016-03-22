@@ -8,7 +8,7 @@ namespace Infrastructure.DataAccess.Mapping
         {
             // Table & Column Mappings
             this.ToTable("ItProject");
-                
+
             this.HasRequired(t => t.Organization)
                 .WithMany(d => d.ItProjects)
                 .HasForeignKey(t => t.OrganizationId)
@@ -54,7 +54,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .WillCascadeOnDelete(true);
 
             this.HasOptional(t => t.ResponsibleUsage)
-                .WithOptionalPrincipal();
+                .WithOptionalPrincipal(t => t.ResponsibleItProject);
 
             this.HasOptional(t => t.Original)
                 .WithMany(t => t.Clones)
