@@ -7,7 +7,7 @@ namespace Presentation.Web.Controllers.API
 {
     public class SensitiveDataTypeController : GenericOptionApiController<SensitiveDataType, ItSystemUsage, OptionDTO>
     {
-        public SensitiveDataTypeController(IGenericRepository<SensitiveDataType> repository) 
+        public SensitiveDataTypeController(IGenericRepository<SensitiveDataType> repository)
             : base(repository)
         {
         }

@@ -6,7 +6,7 @@ namespace Presentation.Web.Controllers.API
 {
     public class ProcurementStrategyController : GenericOptionApiController<ProcurementStrategy, ItContract, OptionDTO>
     {
-        public ProcurementStrategyController(IGenericRepository<ProcurementStrategy> repository) 
+        public ProcurementStrategyController(IGenericRepository<ProcurementStrategy> repository)
             : base(repository)
         {
         }
