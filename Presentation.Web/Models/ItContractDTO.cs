@@ -45,14 +45,14 @@ namespace Presentation.Web.Models
         public int? ProcurementPlanYear { get; set; }
         public int? ContractTemplateId { get; set; }
         public int? ContractTypeId { get; set; }
-        public int? PurchaseFormId { get; set; }
+        public OptionDTO PurchaseForm { get; set; }
         public int? ParentId { get; set; }
         public string ParentName { get; set; }
         public IEnumerable<OptionDTO> AgreementElements { get; set; }
 
         public IEnumerable<ItSystemUsageSimpleDTO> AssociatedSystemUsages { get; set; }
         public IEnumerable<InterfaceUsageDTO> AssociatedInterfaceUsages { get; set; }
-        public IEnumerable<InterfaceExposureDTO> AssociatedInterfaceExposures { get; set; } 
+        public IEnumerable<InterfaceExposureDTO> AssociatedInterfaceExposures { get; set; }
 
         public IEnumerable<EconomyStreamDTO> InternEconomyStreams { get; set; }
         public IEnumerable<EconomyStreamDTO> ExternEconomyStreams { get; set; }

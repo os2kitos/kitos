@@ -387,6 +387,10 @@
     <Content Include="app\shared\filters\joinBy.filter.js" />
     <Content Include="app\shared\kleFilter\kleFilter.directive.js" />
     <Content Include="app\shared\match.directive.js" />
+    <Content Include="app\shared\selectMultipleOption\selectMultipleOption.directive.js" />
+    <Content Include="app\shared\selectMultipleOption\selectMultipleOption.view.html" />
+    <Content Include="app\shared\selectOption\selectOption.directive.js" />
+    <Content Include="app\shared\selectOption\selectOption.view.html" />
     <Content Include="app\shared\optionList\optionList.directive.js" />
     <Content Include="app\shared\orderBy\orderBy.directive.js" />
     <Content Include="app\shared\paginationButtons\paginationButtons.directive.js" />
@@ -1006,7 +1010,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>28231</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
