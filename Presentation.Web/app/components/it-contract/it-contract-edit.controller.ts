@@ -100,6 +100,7 @@
             $scope.contracts = contracts;
             $scope.agreementElements = agreementElements;
             $scope.selectedAgreementElements = _.pluck(contract.agreementElements, 'id');
+            $scope.selectedAgreementElements = _.pluck(contract.agreementElements, 'id');
 
             $scope.datepickerOptions = {
                 format: "dd-MM-yyyy",
