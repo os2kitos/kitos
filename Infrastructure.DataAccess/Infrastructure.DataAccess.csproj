@@ -153,101 +153,9 @@
     <Compile Include="Mapping\TextMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
-    <Compile Include="Migrations\201410021644216_InitialCreate.cs" />
-    <Compile Include="Migrations\201410021644216_InitialCreate.Designer.cs">
-      <DependentUpon>201410021644216_InitialCreate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201410091216152_InfraToSysUsage.cs" />
-    <Compile Include="Migrations\201410091216152_InfraToSysUsage.Designer.cs">
-      <DependentUpon>201410091216152_InfraToSysUsage.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201410101230382_DataRowFieldsToNullable.cs" />
-    <Compile Include="Migrations\201410101230382_DataRowFieldsToNullable.Designer.cs">
-      <DependentUpon>201410101230382_DataRowFieldsToNullable.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201411111257484_MakeNullable.cs" />
-    <Compile Include="Migrations\201411111257484_MakeNullable.Designer.cs">
-      <DependentUpon>201411111257484_MakeNullable.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201411181232099_Xauth.cs" />
-    <Compile Include="Migrations\201411181232099_Xauth.Designer.cs">
-      <DependentUpon>201411181232099_Xauth.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201501081324371_InfUsageIndex.cs" />
-    <Compile Include="Migrations\201501081324371_InfUsageIndex.Designer.cs">
-      <DependentUpon>201501081324371_InfUsageIndex.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201501121147229_UserAddIsLocked.cs" />
-    <Compile Include="Migrations\201501121147229_UserAddIsLocked.Designer.cs">
-      <DependentUpon>201501121147229_UserAddIsLocked.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201501131442397_Add-User-LastAdvisDate.cs" />
-    <Compile Include="Migrations\201501131442397_Add-User-LastAdvisDate.Designer.cs">
-      <DependentUpon>201501131442397_Add-User-LastAdvisDate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201502011724241_RemovedUserCreatedInAndIsLocked.cs" />
-    <Compile Include="Migrations\201502011724241_RemovedUserCreatedInAndIsLocked.Designer.cs">
-      <DependentUpon>201502011724241_RemovedUserCreatedInAndIsLocked.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201502011747173_AddedUserLastNameAndPhoneNumber.cs" />
-    <Compile Include="Migrations\201502011747173_AddedUserLastNameAndPhoneNumber.Designer.cs">
-      <DependentUpon>201502011747173_AddedUserLastNameAndPhoneNumber.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201502091439436_AddedItProjectPhaseNavigationProp.cs" />
-    <Compile Include="Migrations\201502091439436_AddedItProjectPhaseNavigationProp.Designer.cs">
-      <DependentUpon>201502091439436_AddedItProjectPhaseNavigationProp.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201502091610206_AddedOrgUUID.cs" />
-    <Compile Include="Migrations\201502091610206_AddedOrgUUID.Designer.cs">
-      <DependentUpon>201502091610206_AddedOrgUUID.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201502121301345_AddedDefaultOrgUnitToAdminRight.cs" />
-    <Compile Include="Migrations\201502121301345_AddedDefaultOrgUnitToAdminRight.Designer.cs">
-      <DependentUpon>201502121301345_AddedDefaultOrgUnitToAdminRight.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201503181333494_AddedUniqueUserEmail.cs" />
-    <Compile Include="Migrations\201503181333494_AddedUniqueUserEmail.Designer.cs">
-      <DependentUpon>201503181333494_AddedUniqueUserEmail.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs" />
-    <Compile Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.Designer.cs">
-      <DependentUpon>201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201503240921390_AddedItInterfaceNoteField.cs" />
-    <Compile Include="Migrations\201503240921390_AddedItInterfaceNoteField.Designer.cs">
-      <DependentUpon>201503240921390_AddedItInterfaceNoteField.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201503270921214_AddedUniqueItInterfaceToNamePerOrg.cs" />
-    <Compile Include="Migrations\201503270921214_AddedUniqueItInterfaceToNamePerOrg.Designer.cs">
-      <DependentUpon>201503270921214_AddedUniqueItInterfaceToNamePerOrg.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201505271137151_AddedMaxLengthToItInterfaceVersion.cs" />
-    <Compile Include="Migrations\201505271137151_AddedMaxLengthToItInterfaceVersion.Designer.cs">
-      <DependentUpon>201505271137151_AddedMaxLengthToItInterfaceVersion.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201505291237028_RemovedUniqueIndexOnEAN.cs" />
-    <Compile Include="Migrations\201505291237028_RemovedUniqueIndexOnEAN.Designer.cs">
-      <DependentUpon>201505291237028_RemovedUniqueIndexOnEAN.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201506221106303_ProjectPhaseToComplexType.cs" />
-    <Compile Include="Migrations\201506221106303_ProjectPhaseToComplexType.Designer.cs">
-      <DependentUpon>201506221106303_ProjectPhaseToComplexType.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201508071443388_RenamedAssociatedPhaseId.cs" />
-    <Compile Include="Migrations\201508071443388_RenamedAssociatedPhaseId.Designer.cs">
-      <DependentUpon>201508071443388_RenamedAssociatedPhaseId.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201509161534264_DefaultOrgUnit.cs" />
-    <Compile Include="Migrations\201509161534264_DefaultOrgUnit.Designer.cs">
-      <DependentUpon>201509161534264_DefaultOrgUnit.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201602091402254_Make ItContract.Duration nullable.cs" />
-    <Compile Include="Migrations\201602091402254_Make ItContract.Duration nullable.Designer.cs">
-      <DependentUpon>201602091402254_Make ItContract.Duration nullable.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201603180949146_AddedNavigationPropToModel.cs" />
-    <Compile Include="Migrations\201603180949146_AddedNavigationPropToModel.Designer.cs">
-      <DependentUpon>201603180949146_AddedNavigationPropToModel.cs</DependentUpon>
+    <Compile Include="Migrations\201604011422598_Initial.cs" />
+    <Compile Include="Migrations\201604011422598_Initial.Designer.cs">
+      <DependentUpon>201604011422598_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -272,77 +180,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201410021644216_InitialCreate.resx">
-      <DependentUpon>201410021644216_InitialCreate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201410091216152_InfraToSysUsage.resx">
-      <DependentUpon>201410091216152_InfraToSysUsage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201410101230382_DataRowFieldsToNullable.resx">
-      <DependentUpon>201410101230382_DataRowFieldsToNullable.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201411111257484_MakeNullable.resx">
-      <DependentUpon>201411111257484_MakeNullable.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201411181232099_Xauth.resx">
-      <DependentUpon>201411181232099_Xauth.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201501081324371_InfUsageIndex.resx">
-      <DependentUpon>201501081324371_InfUsageIndex.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201501121147229_UserAddIsLocked.resx">
-      <DependentUpon>201501121147229_UserAddIsLocked.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201501131442397_Add-User-LastAdvisDate.resx">
-      <DependentUpon>201501131442397_Add-User-LastAdvisDate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201502011724241_RemovedUserCreatedInAndIsLocked.resx">
-      <DependentUpon>201502011724241_RemovedUserCreatedInAndIsLocked.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201502011747173_AddedUserLastNameAndPhoneNumber.resx">
-      <DependentUpon>201502011747173_AddedUserLastNameAndPhoneNumber.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201502091439436_AddedItProjectPhaseNavigationProp.resx">
-      <DependentUpon>201502091439436_AddedItProjectPhaseNavigationProp.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201502091610206_AddedOrgUUID.resx">
-      <DependentUpon>201502091610206_AddedOrgUUID.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201502121301345_AddedDefaultOrgUnitToAdminRight.resx">
-      <DependentUpon>201502121301345_AddedDefaultOrgUnitToAdminRight.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201503181333494_AddedUniqueUserEmail.resx">
-      <DependentUpon>201503181333494_AddedUniqueUserEmail.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.resx">
-      <DependentUpon>201503191337103_AddedUniqueOrgUnitEanAndOrgCvr.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201503240921390_AddedItInterfaceNoteField.resx">
-      <DependentUpon>201503240921390_AddedItInterfaceNoteField.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201503270921214_AddedUniqueItInterfaceToNamePerOrg.resx">
-      <DependentUpon>201503270921214_AddedUniqueItInterfaceToNamePerOrg.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201505271137151_AddedMaxLengthToItInterfaceVersion.resx">
-      <DependentUpon>201505271137151_AddedMaxLengthToItInterfaceVersion.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201505291237028_RemovedUniqueIndexOnEAN.resx">
-      <DependentUpon>201505291237028_RemovedUniqueIndexOnEAN.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201506221106303_ProjectPhaseToComplexType.resx">
-      <DependentUpon>201506221106303_ProjectPhaseToComplexType.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201508071443388_RenamedAssociatedPhaseId.resx">
-      <DependentUpon>201508071443388_RenamedAssociatedPhaseId.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201509161534264_DefaultOrgUnit.resx">
-      <DependentUpon>201509161534264_DefaultOrgUnit.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201602091402254_Make ItContract.Duration nullable.resx">
-      <DependentUpon>201602091402254_Make ItContract.Duration nullable.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201603180949146_AddedNavigationPropToModel.resx">
-      <DependentUpon>201603180949146_AddedNavigationPropToModel.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201604011422598_Initial.resx">
+      <DependentUpon>201604011422598_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
