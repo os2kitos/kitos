@@ -39,6 +39,7 @@ namespace Infrastructure.DataAccess.Migrations
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
+                        LocalId = c.String(maxLength: 100, storeType: "nvarchar"),
                         Name = c.String(unicode: false),
                         Ean = c.Long(),
                         ParentId = c.Int(),
@@ -52,8 +53,8 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("User", t => t.ObjectOwnerId, cascadeDelete: true)
                 .ForeignKey("Organization", t => t.OrganizationId, cascadeDelete: true)
                 .ForeignKey("OrganizationUnit", t => t.ParentId, cascadeDelete: true)
+                .Index(t => new { t.OrganizationId, t.LocalId }, unique: true, name: "UniqueLocalId")
                 .Index(t => t.ParentId)
-                .Index(t => t.OrganizationId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
 
@@ -2251,8 +2252,8 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("ItSystemUsage", new[] { "OrganizationId" });
             DropIndex("OrganizationUnit", new[] { "LastChangedByUserId" });
             DropIndex("OrganizationUnit", new[] { "ObjectOwnerId" });
-            DropIndex("OrganizationUnit", new[] { "OrganizationId" });
             DropIndex("OrganizationUnit", new[] { "ParentId" });
+            DropIndex("OrganizationUnit", "UniqueLocalId");
             DropIndex("AdminRights", new[] { "LastChangedByUserId" });
             DropIndex("AdminRights", new[] { "ObjectOwnerId" });
             DropIndex("AdminRights", new[] { "DefaultOrgUnitId" });
