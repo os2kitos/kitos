@@ -6,6 +6,7 @@ namespace Presentation.Web.Models
     public class OrgUnitDTO
     {
         public int Id { get; set; }
+        public string LocalId { get; set; }
         public string Name { get; set; }
         public int OrganizationId { get; set; }
         public int? ParentId { get; set; }

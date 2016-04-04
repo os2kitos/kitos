@@ -157,6 +157,10 @@
     <Compile Include="Migrations\201604011422598_Initial.Designer.cs">
       <DependentUpon>201604011422598_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201603221239560_AddedLocalIdToOrgUnit.cs" />
+    <Compile Include="Migrations\201603221239560_AddedLocalIdToOrgUnit.Designer.cs">
+      <DependentUpon>201603221239560_AddedLocalIdToOrgUnit.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
     <Compile Include="UserRepository.cs" />
@@ -182,6 +186,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201604011422598_Initial.resx">
       <DependentUpon>201604011422598_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201603221239560_AddedLocalIdToOrgUnit.resx">
+      <DependentUpon>201603221239560_AddedLocalIdToOrgUnit.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
