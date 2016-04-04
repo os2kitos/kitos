@@ -7,6 +7,9 @@ namespace Infrastructure.DataAccess.Mapping
         public OrganizationUnitMap()
         {
             // Properties
+            this.Property(x => x.OrganizationId).HasUniqueIndexAnnotation("UniqueLocalId", 0);
+            this.Property(x => x.LocalId).HasMaxLength(100).HasUniqueIndexAnnotation("UniqueLocalId", 1);
+
             // Table & Column Mappings
             this.ToTable("OrganizationUnit");
 
