@@ -153,9 +153,9 @@
     <Compile Include="Mapping\TextMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
-    <Compile Include="Migrations\201604040730093_Initial.cs" />
-    <Compile Include="Migrations\201604040730093_Initial.Designer.cs">
-      <DependentUpon>201604040730093_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201604040834360_Initial.cs" />
+    <Compile Include="Migrations\201604040834360_Initial.Designer.cs">
+      <DependentUpon>201604040834360_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -180,8 +180,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201604040730093_Initial.resx">
-      <DependentUpon>201604040730093_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201604040834360_Initial.resx">
+      <DependentUpon>201604040834360_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
