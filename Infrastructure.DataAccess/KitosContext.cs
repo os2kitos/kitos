@@ -20,6 +20,7 @@ namespace Infrastructure.DataAccess
         public KitosContext()
             : base("Name=KitosContext")
         {
+            Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
         }
 
         public DbSet<AdminRight> AdminRights { get; set; }

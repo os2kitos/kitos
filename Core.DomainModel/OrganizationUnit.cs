@@ -20,6 +20,8 @@ namespace Core.DomainModel
             this.UsingItProjects = new List<ItProjectOrgUnitUsage>();
         }
 
+        public string LocalId { get; set; }
+
         public string Name { get; set; }
 
         /// <summary>

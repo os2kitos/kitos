@@ -156,7 +156,7 @@ namespace Core.DomainModel.ItProject
         #region Status project tab
 
         /// <summary>
-        /// Traffic-light dropdown for overall statusr
+        /// Traffic-light dropdown for overall status
         /// </summary>
         public TrafficLight StatusProject { get; set; }
         /// <summary>
