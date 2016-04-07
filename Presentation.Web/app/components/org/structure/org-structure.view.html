@@ -34,6 +34,7 @@
             <div class="col-md-12" data-ng-show="chosenOrgUnit">
                 <h3>
                     {{ chosenOrgUnit.name }}
+                    <span class="text-muted" data-ng-show="chosenOrgUnit.localId">({{ chosenOrgUnit.localId }})</span>
                     <span class="text-muted">({{ chosenOrgUnit.organization.name }})</span>
 
                 </h3>
