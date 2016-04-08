@@ -181,16 +181,16 @@
                 <!-- frequency -->
                 <td>
                     <span data-ng-if="usage.numRows > 0">
-                        <select data-ng-model="usage.dataRows[0].usage.frequencyId"
-                                class="form-control input-sm"
-                                data-ng-show="usage.usage.itContract.isActive"
-                                data-ng-disabled="!hasWriteAccess"
-                                data-ng-options="freq.id as freq.name for freq in frequencies"
-                                data-field="frequencyId"
-                                data-appendurl="{{usage.dataRows[0].urlParams}}"
-                                data-autosave="{{usage.dataRows[0].updateUrl}}">
-                            <option value=""></option>
-                        </select>
+                        <select-option data-ng-show="usage.usage.itContract.isActive"
+                                       data-placeholder="Vælg frekvens"
+                                       data-selected-text="{{ usage.dataRows[0].usage.frequencyName }}"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       data-ng-model="usage.dataRows[0].usage.frequencyId"
+                                       data-options="frequencies"
+                                       data-auto-save-url="{{usage.dataRows[0].updateUrl}}"
+                                       data-appendurl="{{ usage.dataRows[0].urlParams }}"
+                                       data-field="frequencyId">
+                        </select-option>
                     </span>
                 </td>
 
@@ -241,16 +241,18 @@
                     {{dataRow.dataType.name}}
                 </td>
 
-                <!-- frequency -->
+                <!-- frequency  data-ng-show="usage.usage.itContract.isActive"-->
                 <td>
-                    <select data-ng-model="dataRow.usage.frequencyId"
-                            class="form-control input-sm"
-                            data-ng-show="usage.usage.itContract.isActive"
-                            data-ng-disabled="!hasWriteAccess"
-                            data-ng-options="freq.id as freq.name for freq in frequencies"
-                            data-field="frequencyId"
-                            data-appendurl="{{dataRow.urlParams}}"
-                            data-autosave="{{dataRow.updateUrl}}"></select>
+                    <select-option data-ng-show="usage.usage.itContract.isActive"
+                                   data-placeholder="Vælg frekvens"
+                                   data-selected-text="{{ dataRow.usage.frequencyName }}"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="dataRow.usage.frequencyId"
+                                   data-options="frequencies"
+                                   data-auto-save-url="{{ dataRow.updateUrl }}"
+                                   data-appendurl="{{ dataRow.urlParams }}"
+                                   data-field="frequencyId">
+                    </select-option>
                 </td>
 
                 <!-- price -->

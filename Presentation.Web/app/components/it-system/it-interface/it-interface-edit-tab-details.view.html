@@ -5,30 +5,28 @@
                 <!-- TSA -->
                 <label for="interface-tsa" class="control-label col-md-2 small">TSA</label>
                 <div class="col-md-4">
-                    <select id="interface-tsa"  class="form-control input-sm"
-                            data-ui-select2="select2AllowClearOpt"
-                            data-placeholder="Vælg TSA"
-                            data-ng-model="system.tsaId"
-                            data-ng-disabled="!hasWriteAccess"
-                            data-autosave="{{system.updateUrl}}"
-                            data-field="tsaId">
-                        <option></option>
-                        <option data-ng-repeat="tsa in tsas" value="{{tsa.id}}">{{tsa.name}}</option>
-                    </select>
+                    <select-option data-id="interface-tsa"
+                                   data-placeholder="Vælg TSA"
+                                   data-selected-text="{{ system.tsaName }}"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="system.tsaId"
+                                   data-options="tsas"
+                                   data-auto-save-url="{{ system.updateUrl }}"
+                                   data-field="tsaId">
+                    </select-option>
                 </div>
                 <!-- Interface type -->
                 <label for="interface-type" class="control-label col-md-2 small">Snitfladetype</label>
                 <div class="col-md-4">
-                    <select id="interface-type" class="form-control input-sm"
-                            data-ui-select2="select2AllowClearOpt"
-                            data-placeholder="Vælg snitfladetype"
-                            data-ng-model="system.interfaceTypeId"
-                            data-ng-disabled="!hasWriteAccess"
-                            data-autosave="{{system.updateUrl}}"
-                            data-field="interfaceTypeId">
-                        <option></option>
-                        <option data-ng-repeat="interfaceType in interfaceTypes" value="{{interfaceType.id}}">{{interfaceType.name}}</option>
-                    </select>
+                    <select-option data-id="interface-type"
+                                   data-placeholder="Vælg snitfladetype"
+                                   data-selected-text="{{ system.interfaceTypeName }}"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="system.interfaceTypeId"
+                                   data-options="interfaceTypes"
+                                   data-auto-save-url="{{ system.updateUrl }}"
+                                   data-field="interfaceTypeId">
+                    </select-option>
                 </div>
             </div>
 
@@ -36,29 +34,28 @@
             <div class="form-group">
                 <label for="interface-interface" class="control-label col-md-2 small">Grænseflade</label>
                 <div class="col-md-4">
-                    <select id="interface-interface" class="form-control input-sm"
-                            data-ui-select2="select2AllowClearOpt"
-                            data-placeholder="Vælg grænseflade"
-                            data-ng-model="system.interfaceId"
-                            data-ng-disabled="!hasWriteAccess"
-                            data-autosave="{{system.updateUrl}}"
-                            data-field="interfaceId">
-                        <option></option>
-                        <option data-ng-repeat="interface in interfaces" value="{{interface.id}}">{{interface.name}}</option>
-                    </select>
+                    <select-option data-id="interface-interface"
+                                   data-placeholder="Vælg grænseflade"
+                                   data-selected-text="{{ system.interfaceName }}"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="system.interfaceId"
+                                   data-options="interfaces"
+                                   data-auto-save-url="{{ system.updateUrl }}"
+                                   data-field="interfaceId">
+                    </select-option>
                 </div>
                 <!-- Method -->
                 <label for="interface-method" class="control-label col-md-2 small">Metode</label>
                 <div class="col-md-4">
-                    <select id="interface-method" class="form-control input-sm"
-                            data-ui-select2="select2AllowClearOpt"
-                            data-placeholder="Vælg methode"
-                            data-ng-model="system.methodId"
-                            data-ng-disabled="!hasWriteAccess"
-                            data-autosave="{{system.updateUrl}}" data-field="methodId">
-                        <option></option>
-                        <option data-ng-repeat="method in methods" value="{{method.id}}">{{method.name}}</option>
-                    </select>
+                    <select-option data-id="interface-method"
+                                   data-placeholder="Vælg methode"
+                                   data-selected-text="{{ system.methodName }}"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="system.methodId"
+                                   data-options="methods"
+                                   data-auto-save-url="{{ system.updateUrl }}"
+                                   data-field="methodId">
+                    </select-option>
                 </div>
             </div>
 
@@ -97,16 +94,15 @@
                                    data-field="data">
                         </td>
                         <td class="data-type-selector">
-                            <select class="form-control input-sm"
-                                    data-ui-select2=""
-                                    data-placeholder="Vælg datatype"
-                                    data-ng-model="dataRow.dataTypeId"
-                                    data-ng-disabled="!hasWriteAccess"
-                                    data-autosave="{{dataRow.updateUrl}}"
-                                    data-field="dataTypeId">
-                                <option></option>
-                                <option data-ng-repeat="dataType in dataTypes" value="{{dataType.id}}">{{dataType.name}}</option>
-                            </select>
+                            <select-option data-id="interface-data-type"
+                                           data-placeholder="Vælg datatype"
+                                           data-selected-text="{{ dataRow.dataTypeName }}"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-ng-model="dataRow.dataTypeId"
+                                           data-options="dataTypes"
+                                           data-auto-save-url="{{ dataRow.updateUrl }}"
+                                           data-field="dataTypeId">
+                            </select-option>
                         </td>
                         <td class="text-right">
                             <button class="btn btn-danger btn-xs delete-data-row"

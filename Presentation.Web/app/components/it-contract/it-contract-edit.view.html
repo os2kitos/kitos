@@ -39,17 +39,16 @@
 
                     <!-- Type -->
                     <div class="form-group">
-                        <label for="contract-type" class="control-label small">Kontrakttype</label>
-                        <select id="contract-type" class="form-control input-sm"
-                                data-ui-select2="allowClearOption"
-                                data-placeholder="Vælg kontrakttype"
-                                data-ng-disabled="!hasWriteAccess"
-                                data-ng-model="contract.contractTypeId"
-                                data-autosave="{{ autoSaveUrl }}"
-                                data-field="contractTypeId">
-                            <option value=""></option>
-                            <option data-ng-repeat="contractType in contractTypes" value="{{contractType.id}}">{{contractType.name}}</option>
-                        </select>
+                        <select-option data-id="contract-type"
+                                         data-label="Kontrakttype"
+                                         data-placeholder="Vælg kontrakttype"
+                                         data-selected-text="{{ contract.contractTypeName }}"
+                                         data-ng-disabled="!hasWriteAccess"
+                                         data-ng-model="contract.contractTypeId"
+                                         data-options="contractTypes"
+                                         data-auto-save-url="{{ autoSaveUrl }}"
+                                         data-field="contractTypeId">
+                        </select-option>
                     </div>
 
                     <!-- ESDH -->
@@ -280,17 +279,16 @@
                 <div class="col-md-12">
                     <!-- Agreement elements -->
                     <div class="form-group">
-                        <select-option data-id="agreement-elements"
+                        <select-multiple-option data-id="agreement-elements"
                                        data-label="IT Kontrakten omfatter flg. aftaleelementer"
                                        data-placeholder="Vælg aftaleelementer"
-                                       data-selected-text="{{  }}"
+                                       data-selected-texts="selectedAgreementElementNames"
                                        data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="selectedAgreementElements"
+                                       data-ng-model="selectedAgreementElementIds"
                                        data-options="agreementElements"
                                        data-auto-save-url="{{ autoSaveUrl }}"
-                                       data-field="elemId"
-                                       data-multiple="true">
-                        </select-option>
+                                       data-field="elemId">
+                        </select-multiple-option>
                     </div>
                 </div>
             </div>

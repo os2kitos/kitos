@@ -7,17 +7,16 @@
                 <div class="col-md-6">
                     <!--AppTypeOption-->
                     <div class="form-group">
-                        <label for="system-type" class="control-label small">Applikationstype</label>
-                        <select id="system-type" class="form-control input-sm"
-                                data-ui-select2="select2AllowClearOpt"
-                                data-placeholder="Vælg applikationstype"
-                                data-ng-disabled="!hasWriteAccess"
-                                data-autosave="{{system.updateUrl}}"
-                                data-field="appTypeOptionId"
-                                data-ng-model="system.appTypeOptionId">
-                            <option value=""></option>
-                            <option data-ng-repeat="appTypeOption in appTypeOptions" value="{{appTypeOption.id}}">{{appTypeOption.name}}</option>
-                        </select>
+                        <select-option data-id="system-type"
+                                       data-label="Applikationstype"
+                                       data-placeholder="Vælg applikationstype"
+                                       data-selected-text="{{ system.appTypeOptionName }}"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       data-ng-model="system.appTypeOptionId"
+                                       data-options="appTypeOptions"
+                                       data-auto-save-url="{{ system.updateUrl }}"
+                                       data-field="appTypeOptionId">
+                        </select-option>
                     </div>
 
                     <!--Name-->
@@ -72,17 +71,16 @@
                 <div class="col-md-12">
                     <!-- Usage type -->
                     <div class="form-group">
-                        <label for="system-business-type" class="control-label small">Forretningstype</label>
-                        <select id="system-business-type" class="form-control input-sm"
-                                data-ui-select2="select2AllowClearOpt"
-                                data-placeholder="Vælg forretningstype"
-                                data-autosave="{{system.updateUrl}}"
-                                data-field="businessTypeId"
-                                data-ng-disabled="!hasWriteAccess"
-                                data-ng-model="system.businessTypeId">
-                            <option value=""></option>
-                            <option data-ng-repeat="businessType in businessTypes" value="{{businessType.id}}">{{businessType.name}}</option>
-                        </select>
+                        <select-option data-id="system-business-type"
+                                       data-label="Forretningstype"
+                                       data-placeholder="Vælg forretningstype"
+                                       data-selected-text="{{ system.businessTypeName }}"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       data-ng-model="system.businessTypeId"
+                                       data-options="businessTypes"
+                                       data-auto-save-url="{{ system.updateUrl }}"
+                                       data-field="businessTypeId">
+                        </select-option>
                     </div>
                 </div>
             </div>
