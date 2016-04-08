@@ -16,7 +16,7 @@
                         }
                 ],
             },
-            controller: ['$rootScope', '$modal', '$state', 'user', 'organizationRoles', function ($rootScope, $modal, $state, user, organizationRoles: { id; name; }[]) {
+            controller: ['$rootScope', '$uibModal', '$state', 'user', 'organizationRoles', function ($rootScope, $modal, $state, user, organizationRoles: { id; name; }[]) {
                 $rootScope.page.title = 'Organisation';
 
                 var subnav = [];
