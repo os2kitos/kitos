@@ -7,7 +7,7 @@ namespace Presentation.Web.Controllers.API
     public class DataTypeController : GenericOptionApiController<DataType, DataRow, OptionDTO>
     {
 
-        public DataTypeController(IGenericRepository<DataType> repository) 
+        public DataTypeController(IGenericRepository<DataType> repository)
             : base(repository)
         {
         }

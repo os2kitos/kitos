@@ -8,7 +8,7 @@ namespace Presentation.Web.Controllers.API
 {
     public class DataRowController : GenericContextAwareApiController<DataRow, DataRowDTO>
     {
-        public DataRowController(IGenericRepository<DataRow> repository) 
+        public DataRowController(IGenericRepository<DataRow> repository)
             : base(repository)
         {
         }

@@ -19,7 +19,7 @@ namespace Presentation.Web.Models
         public string InfrastructureItSystemName { get; set; }
 
         public bool IsWishedFor { get; set; }
-        
+
         public int ItInterfaceId { get; set; }
         public int ItSystemId { get; set; }
 

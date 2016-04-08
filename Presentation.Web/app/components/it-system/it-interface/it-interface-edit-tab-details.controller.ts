@@ -80,8 +80,6 @@
 
             function pushDataRow(dataRow) {
                 dataRow.show = true;
-                $scope.dataRows.push(dataRow);
-
                 dataRow.updateUrl = 'api/dataRow/' + dataRow.id;
                 dataRow.delete = function() {
                     var msg = notify.addInfoMessage('Fjerner rækken...', false);
@@ -92,6 +90,8 @@
                         msg.toErrorMessage('Fejl! Kunne ikke fjerne rækken!');
                     });
                 };
+
+                $scope.dataRows.push(dataRow);
             }
 
             $scope.newDataRow = function() {

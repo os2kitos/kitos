@@ -7,7 +7,7 @@ namespace Presentation.Web.Controllers.API
 {
     public class HandoverTrialController : GenericContextAwareApiController<HandoverTrial, HandoverTrialDTO>
     {
-        public HandoverTrialController(IGenericRepository<HandoverTrial> repository) 
+        public HandoverTrialController(IGenericRepository<HandoverTrial> repository)
             : base(repository)
         {
         }
