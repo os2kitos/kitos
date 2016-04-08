@@ -12,7 +12,7 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IGenericRepository<InterfaceUsage> _repository;
 
-        public InterfaceUsageController(IGenericRepository<InterfaceUsage> repository) 
+        public InterfaceUsageController(IGenericRepository<InterfaceUsage> repository)
         {
             _repository = repository;
         }

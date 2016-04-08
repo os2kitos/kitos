@@ -15,16 +15,15 @@
                     <tr data-ng-repeat="ht in handoverTrials">
                         <td>
                             <div class="form-group">
-                                <select class="form-control input-sm handover-trial"
-                                        data-ui-select2="allowClearOption"
-                                        data-placeholder="Vælg overtagelsesprøve"
-                                        data-ng-model="ht.handoverTrialTypeId"
-                                        data-autosave="api/handoverTrial/{{ ht.id }}"
-                                        data-ng-disabled="!hasWriteAccess"
-                                        data-field="handoverTrialTypeId">
-                                    <option value=""></option>
-                                    <option data-ng-repeat="handoverTrialType in handoverTrialTypes" value="{{handoverTrialType.id}}">{{handoverTrialType.name}}</option>
-                                </select>
+                                <select-option data-id="contract-handover-trial"
+                                         data-placeholder="Vælg overtagelsesprøve"
+                                         data-selected-text="{{ ht.handoverTrialTypeName }}"
+                                         data-ng-disabled="!hasWriteAccess"
+                                         data-ng-model="ht.handoverTrialTypeId"
+                                         data-options="handoverTrialTypes"
+                                         data-auto-save-url="api/handoverTrial/{{ ht.id }}"
+                                         data-field="handoverTrialTypeId">
+                                </select-option>
                             </div>
                         </td>
                         <td>
@@ -233,17 +232,16 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="agreement-option-extend" class="control-label small">Option forlæng</label>
-                <select id="agreement-option-extend" class="form-control input-sm"
-                        data-ui-select2="allowClearOption"
-                        data-placeholder="Vælg forlængelse"
-                        data-ng-disabled="!hasWriteAccess"
-                        data-ng-model="contract.optionExtendId"
-                        data-autosave="{{autosaveUrl}}"
-                        data-field="optionExtendId">
-                    <option value=""></option>
-                    <option data-ng-repeat="optionExtension in optionExtensions" value="{{optionExtension.id}}">{{optionExtension.name}}</option>
-                </select>
+                <select-option data-id="agreement-option-extend"
+                               data-label="Option forlæng"
+                               data-placeholder="Vælg forlængelse"
+                               data-selected-text="{{ contract.optionExtendName }}"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-model="contract.optionExtendId"
+                               data-options="optionExtensions"
+                               data-auto-save-url="{{ autosaveUrl }}"
+                               data-field="optionExtendId">
+                </select-option>
                 <input id="agreement-option-extend-multiplier"
                        type="number"
                        min="0"
@@ -294,17 +292,16 @@
             </div>
 
             <div class="form-group">
-                <label for="agreement-notice" class="control-label small">Opsigelsesfrist (måneder)</label>
-                <select id="agreement-notice" class="form-control input-sm"
-                        data-ui-select2="allowClearOption"
-                        data-placeholder="Vælg opsigelsesfrist"
-                        data-ng-disabled="!hasWriteAccess"
-                        data-ng-model="contract.terminationDeadlineId"
-                        data-autosave="{{autosaveUrl}}"
-                        data-field="terminationDeadlineId">
-                    <option value=""></option>
-                    <option data-ng-repeat="terminationDeadline in terminationDeadlines" value="{{terminationDeadline.id}}">{{terminationDeadline.name}}</option>
-                </select>
+                <select-option data-id="agreement-notice"
+                               data-label="Opsigelsesfrist (måneder)"
+                               data-placeholder="Vælg opsigelsesfrist"
+                               data-selected-text="{{ contract.terminationDeadlineName }}"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-model="contract.terminationDeadlineId"
+                               data-options="terminationDeadlines"
+                               data-auto-save-url="{{ autosaveUrl }}"
+                               data-field="terminationDeadlineId">
+                </select-option>
             </div>
         </div>
     </div>

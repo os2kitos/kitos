@@ -48,8 +48,8 @@ namespace Presentation.Web.Controllers.OData
                     .Include(x => x.Using.Select(y => y.ResponsibleItSystemUsage))
                     .First(x => x.OrganizationId == orgKey && x.Id == orgUnitKey);
 
-                var responsibles = orgUnit.Using.Select(x => x.ResponsibleItSystemUsage).Where(x => x != null).ToList();
-                systemUsages.AddRange(responsibles);
+                var responsible = orgUnit.Using.Select(x => x.ResponsibleItSystemUsage).Where(x => x != null).ToList();
+                systemUsages.AddRange(responsible);
 
                 var childIds = orgUnit.Children.Select(x => x.Id);
                 foreach (var childId in childIds)

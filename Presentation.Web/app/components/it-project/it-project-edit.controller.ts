@@ -45,10 +45,6 @@
             private autofocus) {
             autofocus();
 
-            if (this.project.itProjectTypeId && !_.find(this.projectTypes, (type: { id }) => type.id === this.project.itProjectTypeId)) {
-                this.projectTypes.unshift({ id: this.project.itProjectTypeId, name: this.project.itProjectTypeName });
-            }
-
             if (this.project.parentId) {
                 this.project.parent = {
                     id: this.project.parentId,

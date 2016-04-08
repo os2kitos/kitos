@@ -6,6 +6,6 @@
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }
-        public string Note { get; set; }  
+        public string Note { get; set; }
     }
 }

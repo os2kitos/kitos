@@ -37,7 +37,7 @@ namespace Presentation.Web.Models
         public int? BelongsToId { get; set; }
         public string BelongsToName { get; set; }
         public string Version { get; set; }
-        
+
         /// <summary>
         /// Gets or sets whether this instance has a usage in any organization.
         /// </summary>

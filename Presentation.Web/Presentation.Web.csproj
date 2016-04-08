@@ -387,6 +387,10 @@
     <Content Include="app\shared\filters\joinBy.filter.js" />
     <Content Include="app\shared\kleFilter\kleFilter.directive.js" />
     <Content Include="app\shared\match.directive.js" />
+    <Content Include="app\shared\selectMultipleOption\selectMultipleOption.directive.js" />
+    <Content Include="app\shared\selectMultipleOption\selectMultipleOption.view.html" />
+    <Content Include="app\shared\selectOption\selectOption.directive.js" />
+    <Content Include="app\shared\selectOption\selectOption.view.html" />
     <Content Include="app\shared\optionList\optionList.directive.js" />
     <Content Include="app\shared\orderBy\orderBy.directive.js" />
     <Content Include="app\shared\paginationButtons\paginationButtons.directive.js" />

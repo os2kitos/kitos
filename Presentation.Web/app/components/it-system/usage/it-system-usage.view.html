@@ -11,7 +11,7 @@
                     <div class="form-group">
                         <label for="system-type" class="control-label small">Applikationstype</label>
                         <select id="system-type" class="form-control input-sm" disabled="disabled">
-                            <option value="">{{usage.itSystem.appTypeOptionName}}</option>
+                            <option value="" selected>{{usage.itSystem.appTypeOptionName}}</option>
                         </select>
                     </div>
 
@@ -47,14 +47,13 @@
                     </div>
                 </div>
 
-
                 <!-- full width -->
                 <div class="col-md-12">
                     <!--Usage type-->
                     <div class="form-group">
                         <label for="system-business-type" class="control-label small">Forretningstype</label>
-                        <select id="system-business-type" class="form-control input-sm" disabled data-ui-select2="" data-ng-model="usage.itSystem.businessTypeId">
-                            <option data-ng-repeat="businessType in businessTypes" value="{{businessType.id}}">{{businessType.name}}</option>
+                        <select id="system-business-type" class="form-control input-sm" disabled>
+                            <option value="" selected>{{ usage.itSystem.businessTypeName }}</option>
                         </select>
                     </div>
                     <!-- Description and URL -->
@@ -96,17 +95,16 @@
 
                     <!-- sensitive data -->
                     <div class="form-group">
-                        <label for="sensitive" class="control-label small">Personfølsom data</label>
-                        <select id="sensitive" class="form-control input-sm"
-                                data-ui-select2="allowClearOption"
-                                data-placeholder="Vælg personfølsom data"
-                                data-ng-disabled="!hasWriteAccess"
-                                data-ng-model="usage.sensitiveDataTypeId"
-                                data-field="sensitiveDataTypeId"
-                                data-autosave="api/itSystemUsage/{{usageId}}">
-                            <option value=""></option>
-                            <option data-ng-repeat="sensitiveDataType in sensitiveDataTypes" value="{{sensitiveDataType.id}}">{{sensitiveDataType.name}}</option>
-                        </select>
+                        <select-option data-id="sensitive"
+                                       data-label="Personfølsom data"
+                                       data-placeholder="Vælg personfølsom data"
+                                       data-selected-text="{{ usage.sensitiveDataTypeName }}"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       data-ng-model="usage.sensitiveDataTypeId"
+                                       data-options="sensitiveDataTypes"
+                                       data-auto-save-url="api/itSystemUsage/{{usageId}}"
+                                       data-field="sensitiveDataTypeId">
+                        </select-option>
                     </div>
 
                     <!-- esdh ref -->
@@ -179,17 +177,16 @@
 
                     <!-- archiving -->
                     <div class="form-group">
-                        <label for="archive" class="control-label small">Arkivering</label>
-                        <select id="archive" class="form-control input-sm"
-                                data-ui-select2="allowClearOption"
-                                data-placeholder="Vælg arkivering"
-                                data-ng-model="usage.archiveTypeId"
-                                data-ng-disabled="!hasWriteAccess"
-                                data-field="archiveTypeId"
-                                data-autosave="api/itSystemUsage/{{usageId}}">
-                            <option value=""></option>
-                            <option data-ng-repeat="archiveType in archiveTypes" value="{{archiveType.id}}">{{archiveType.name}}</option>
-                        </select>
+                        <select-option data-id="archive"
+                                       data-label="Arkivering"
+                                       data-placeholder="Vælg arkivering"
+                                       data-selected-text="{{ usage.archiveTypeName }}"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       data-ng-model="usage.archiveTypeId"
+                                       data-options="archiveTypes"
+                                       data-auto-save-url="api/itSystemUsage/{{usageId}}"
+                                       data-field="archiveTypeId">
+                        </select-option>
                         <span class="help-block small">&nbsp;</span>
                     </div>
 

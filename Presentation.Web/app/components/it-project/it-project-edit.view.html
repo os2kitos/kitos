@@ -28,16 +28,16 @@
 
                     <!-- type -->
                     <div class="form-group">
-                        <label for="project-type" class="control-label small">Type</label>
-                        <select id="project-type" class="form-control input-sm"
-                                data-ui-select2="projectEditVm.allowClearOption"
-                                data-ng-model="projectEditVm.project.itProjectTypeId"
-                                data-field="itProjectTypeId"
-                                data-autosave="{{projectEditVm.autosaveUrl}}"
-                                data-ng-disabled="!projectEditVm.hasWriteAccess">
-                            <option value=""></option>
-                            <option data-ng-repeat="projectType in projectEditVm.projectTypes" value="{{projectType.id}}">{{projectType.name}}</option>
-                        </select>
+                        <select-option data-id="project-type"
+                                       data-label="Type"
+                                       data-placeholder="Vælg projekt type"
+                                       data-selected-text="{{ projectEditVm.project.itProjectTypeName }}"
+                                       data-ng-disabled="!projectEditVm.hasWriteAccess"
+                                       data-ng-model="projectEditVm.project.itProjectTypeId"
+                                       data-options="projectEditVm.projectTypes"
+                                       data-auto-save-url="{{ projectEditVm.autosaveUrl }}"
+                                       data-field="itProjectTypeId">
+                        </select-option>
                         <span class="help-block small">&nbsp;</span>
                     </div>
 

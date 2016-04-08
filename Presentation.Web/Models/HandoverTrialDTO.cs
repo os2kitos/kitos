@@ -9,5 +9,6 @@ namespace Presentation.Web.Models
         public DateTime? Approved { get; set; }
         public int ItContractId { get; set; }
         public int? HandoverTrialTypeId { get; set; }
+        public string HandoverTrialTypeName { get; set; }
     }
 }
