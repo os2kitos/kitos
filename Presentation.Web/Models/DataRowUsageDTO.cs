@@ -8,6 +8,7 @@
         public int ItInterfaceId { get; set; }
         public int InterfaceUsageId { get; set; }
         public int? FrequencyId { get; set; }
+        public string FrequencyName { get; set; }
         public int? Amount { get; set; }
         public int? Economy { get; set; }
         public int? Price { get; set; }

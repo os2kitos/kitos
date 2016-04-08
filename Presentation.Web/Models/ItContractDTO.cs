@@ -28,10 +28,15 @@ namespace Presentation.Web.Models
         public int ExtendMultiplier { get; set; }
 
         public int? TerminationDeadlineId { get; set; }
+        public string TerminationDeadlineName { get; set; }
         public int? PaymentFreqencyId { get; set; }
+        public string PaymentFreqencyName { get; set; }
         public int? PaymentModelId { get; set; }
+        public string PaymentModelName { get; set; }
         public int? PriceRegulationId { get; set; }
+        public string PriceRegulationName { get; set; }
         public int? OptionExtendId { get; set; }
+        public string OptionExtendName { get; set; }
         public int? ContractSignerId { get; set; }
         public UserDTO ContractSigner { get; set; }
 
@@ -41,11 +46,15 @@ namespace Presentation.Web.Models
         public int? SupplierId { get; set; }
         public string SupplierName { get; set; }
         public int? ProcurementStrategyId { get; set; }
+        public string ProcurementStrategyName { get; set; }
         public int? ProcurementPlanHalf { get; set; }
         public int? ProcurementPlanYear { get; set; }
         public int? ContractTemplateId { get; set; }
+        public string ContractTemplateName { get; set; }
         public int? ContractTypeId { get; set; }
-        public OptionDTO PurchaseForm { get; set; }
+        public string ContractTypeName { get; set; }
+        public int? PurchaseFormId { get; set; }
+        public string PurchaseFormName { get; set; }
         public int? ParentId { get; set; }
         public string ParentName { get; set; }
         public IEnumerable<OptionDTO> AgreementElements { get; set; }
