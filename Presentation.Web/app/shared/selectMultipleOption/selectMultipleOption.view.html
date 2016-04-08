@@ -3,11 +3,11 @@
         data-ng-disabled="{{ disabled() }}"
         data-ui-select2="{ allowClear: true }"
         data-placeholder="{{ placeholder }}"
-        data-ng-model="selectedId"
+        data-ng-model="selectedIds"
         data-autosave="{{ autoSaveUrl }}"
         data-field="{{ field }}"
         multiple>
     <option value=""></option>
-    <option data-ng-repeat="option in deletedOptions()" value="{{ savedId }}">{{ selectedText }} (udgået)</option>
+    <option data-ng-repeat="option in deletedOptions" value="{{ option.id }}">{{ option.name }} (udgået)</option>
     <option data-ng-repeat="option in options()" value="{{ option.id }}">{{ option.name }}</option>
 </select>

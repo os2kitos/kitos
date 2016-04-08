@@ -1,10 +1,11 @@
-﻿<label for="{{ id }}" class="control-label small">{{ label }}</label>
+﻿<label data-ng-if="label" for="{{ id }}" class="control-label small">{{ label }}</label>
 <select id="{{ id }}" class="form-control input-sm"
         data-ng-disabled="{{ disabled() }}"
         data-ui-select2="{ allowClear: true }"
         data-placeholder="{{ placeholder }}"
         data-ng-model="selectedId"
         data-autosave="{{ autoSaveUrl }}"
+        data-appendurl="{{ appendurl }}"
         data-field="{{ field }}">
     <option value=""></option>
     <option value="{{ savedId }}" data-ng-if="isDeletedSelected">{{ selectedText }} (udgået)</option>

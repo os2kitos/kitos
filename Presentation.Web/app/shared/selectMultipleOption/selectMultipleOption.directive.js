@@ -10,17 +10,22 @@
                     label: "@",
                     placeholder: "@",
                     options: "&",
-                    selectedId: "=ngModel",
-                    selectedText: "@",
+                    selectedIds: "=ngModel",
+                    selectedTexts: "&",
                     autoSaveUrl: "@",
                     field: "@",
                     disabled: "&ngDisabled"
                 },
                 link: function (scope, element, attr, ctrl) {
-                    var foundSelectedInOptions = _.find(scope.options(), function (option) { return option.id === scope.selectedId });
-                    scope.isDeletedSelected = scope.selectedId != null && !foundSelectedInOptions;
+                    var deletedOptions = [];
+                    _.forEach(scope.selectedIds, function (value, key) {
+                        var isDeleted = !_.some(scope.options(), { id: value });
+                        if (isDeleted) {
+                            deletedOptions.push({ id: value, name: scope.selectedTexts()[key] });
+                        }
+                    });
 
-                    scope.savedId = scope.selectedId;
+                    scope.deletedOptions = deletedOptions;
                 }
             };
         }

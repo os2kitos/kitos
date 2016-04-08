@@ -13,9 +13,9 @@
                     selectedId: "=ngModel",
                     selectedText: "@",
                     autoSaveUrl: "@",
+                    appendurl: "@",
                     field: "@",
                     disabled: "&ngDisabled",
-                    multiple: "@"
                 },
                 link: function (scope, element, attr, ctrl) {
                     var foundSelectedInOptions = _.find(scope.options(), function(option) { return option.id === scope.selectedId });
