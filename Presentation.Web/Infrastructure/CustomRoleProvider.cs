@@ -77,7 +77,7 @@ namespace Presentation.Web.Infrastructure
             throw new NotImplementedException();
         }
 
-        /// <summary> 
+        /// <summary>
         /// </summary>
         /// <param name="username"></param>
         /// <param name="roleName"></param>
@@ -85,7 +85,7 @@ namespace Presentation.Web.Infrastructure
         public override bool IsUserInRole(string username, string roleName)
         {
             throw new NotImplementedException();
-            
+
             /*
             var userRepository = UserRepositoryFactory.GetUserRepository();
             var user = userRepository.GetByEmail(username);

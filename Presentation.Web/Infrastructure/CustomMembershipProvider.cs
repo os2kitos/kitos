@@ -152,7 +152,7 @@ namespace Presentation.Web.Infrastructure
         }
 
         #endregion
-        
+
         public override bool ValidateUser(string username, string password)
         {
             var userRepository = UserRepositoryFactory.GetUserRepository();
