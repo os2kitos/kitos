@@ -1,6 +1,6 @@
 ﻿namespace Presentation.Web.Models
 {
-    public class InterfaceExposureDTO
+    public class ItInterfaceExposureDTO
     {
         public int Id { get; set; }
         public int ItSystemUsageId { get; set; }

@@ -6,13 +6,13 @@ namespace Core.DomainModel.ItSystemUsage
     /// <summary>
     /// Represent the local usage of a interface.
     /// When an <see cref="ItSystem"/>, which can use an interface, is taken into local usage,
-    /// a InterfaceUsage is created, to allow for adding local details regarding the usage
+    /// a ItInterfaceUsage is created, to allow for adding local details regarding the usage
     /// of the interface.
     /// It is also used for binding an <see cref="ItContract"/> with the usage.
     /// </summary>
-    public class InterfaceUsage
+    public class ItInterfaceUsage
     {
-        public InterfaceUsage()
+        public ItInterfaceUsage()
         {
             this.DataRowUsages = new List<DataRowUsage>();
         }

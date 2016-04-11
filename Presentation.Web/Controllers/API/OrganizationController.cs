@@ -14,7 +14,7 @@ namespace Presentation.Web.Controllers.API
         private readonly IOrganizationService _organizationService;
         private readonly IGenericRepository<User> _useRepository;
 
-        public OrganizationController(IGenericRepository<Organization> repository, IOrganizationService organizationService, IGenericRepository<User> useRepository) 
+        public OrganizationController(IGenericRepository<Organization> repository, IOrganizationService organizationService, IGenericRepository<User> useRepository)
             : base(repository)
         {
             _organizationService = organizationService;
@@ -33,10 +33,10 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 //var orgs = Repository.Get(
-                //    org => 
+                //    org =>
                 //        // filter by project name
                 //        org.Name.Contains(q) &&
-                //        // global admin sees all 
+                //        // global admin sees all
                 //        (KitosUser.IsGlobalAdmin ||
                 //        // object owner sees his own objects
                 //        org.ObjectOwnerId == KitosUser.Id ||
@@ -81,10 +81,10 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 //var orgs = Repository.Get(
-                //    org => 
+                //    org =>
                 //        // filter by project name or cvr
                 //        (org.Name.Contains(q) || org.Cvr.Contains(q)) &&
-                //        // global admin sees all 
+                //        // global admin sees all
                 //        (KitosUser.IsGlobalAdmin ||
                 //        // object owner sees his own objects
                 //        org.ObjectOwnerId == KitosUser.Id ||
@@ -106,7 +106,7 @@ namespace Presentation.Web.Controllers.API
                     org =>
                         // filter by project name or cvr
                         (org.Name.Contains(q) || org.Cvr.Contains(q))).ToList();
-                
+
                 // filter locally
                 var orgs2 = orgs.Where(org => KitosUser.IsGlobalAdmin || org.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
@@ -114,7 +114,7 @@ namespace Presentation.Web.Controllers.API
                         // everyone in the same organization can see normal objects
                         org.AccessModifier == AccessModifier.Normal &&
                         org.Id == orgId || org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id)));
-                
+
                 var dtos = Map(orgs2);
                 return Ok(dtos);
             }
@@ -146,7 +146,7 @@ namespace Presentation.Web.Controllers.API
                 var qry =
                     _useRepository.Get(
                         u =>
-                            u.AdminRights.Count(r => r.ObjectId == id) != 0 && (u.Name.Contains(q) || u.Email.Contains(q)));
+                            u.OrganizationRights.Count(r => r.ObjectId == id) != 0 && (u.Name.Contains(q) || u.Email.Contains(q)));
 
                 return Ok(Map<IEnumerable<User>, IEnumerable<UserDTO>>(qry));
             }

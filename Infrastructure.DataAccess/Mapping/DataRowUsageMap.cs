@@ -18,7 +18,7 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("DataRowUsage");
 
-            this.HasRequired(t => t.InterfaceUsage)
+            this.HasRequired(t => t.ItInterfaceUsage)
                 .WithMany(t => t.DataRowUsages)
                 .HasForeignKey(d => new {d.ItSystemUsageId, d.ItSystemId, d.ItInterfaceId})
                 .WillCascadeOnDelete(true);

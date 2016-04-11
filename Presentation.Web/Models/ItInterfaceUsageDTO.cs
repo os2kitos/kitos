@@ -2,7 +2,7 @@
 
 namespace Presentation.Web.Models
 {
-    public class InterfaceUsageDTO
+    public class ItInterfaceUsageDTO
     {
         public int Id { get; set; }
         public int ItSystemUsageId { get; set; }

@@ -8,14 +8,14 @@ namespace Core.DomainModel
     /// <summary>
     /// Represents a unit or department within an organization (OIO term: "OrgEnhed").
     /// </summary>
-    public class OrganizationUnit : HasRightsEntity<OrganizationUnit, OrganizationRight, OrganizationRole>, IHierarchy<OrganizationUnit>, IContextAware
+    public class OrganizationUnit : HasRightsEntity<OrganizationUnit, OrganizationUnitRight, OrganizationUnitRole>, IHierarchy<OrganizationUnit>, IContextAware
     {
         public OrganizationUnit()
         {
             this.TaskUsages = new List<TaskUsage>();
             this.TaskRefs = new List<TaskRef>();
             this.OwnedTasks = new List<TaskRef>();
-            this.DefaultUsers = new List<AdminRight>();
+            this.DefaultUsers = new List<OrganizationRight>();
             this.Using = new List<ItSystemUsageOrgUnitUsage>();
             this.UsingItProjects = new List<ItProjectOrgUnitUsage>();
         }
@@ -76,10 +76,10 @@ namespace Core.DomainModel
         /// Users which have set this as their default OrganizationUnit.
         /// </summary>
         /// <remarks>
-        /// Goes through <seealso cref="AdminRight"/>.
+        /// Goes through <seealso cref="OrganizationRight"/>.
         /// So to access the user you must call .User on the rights object.
         /// </remarks>
-        public virtual ICollection<AdminRight> DefaultUsers { get; set; }
+        public virtual ICollection<OrganizationRight> DefaultUsers { get; set; }
 
         /// <summary>
         /// This Organization Unit is using these IT Systems (Via ItSystemUsage)

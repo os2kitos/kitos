@@ -9,7 +9,7 @@ namespace Core.DomainModel.ItSystem
         {
             this.DataRows = new List<DataRow>();
             this.CanBeUsedBy = new List<ItInterfaceUse>();
-            this.InterfaceLocalUsages = new List<InterfaceUsage>();
+            this.InterfaceLocalUsages = new List<ItInterfaceUsage>();
             this.InterfaceLocalExposure = new List<ItInterfaceExhibitUsage>();
         }
 
@@ -83,7 +83,7 @@ namespace Core.DomainModel.ItSystem
         /// <value>
         /// The interface local usages.
         /// </value>
-        public virtual ICollection<InterfaceUsage> InterfaceLocalUsages { get; set; }
+        public virtual ICollection<ItInterfaceUsage> InterfaceLocalUsages { get; set; }
 
         /// <summary>
         /// Gets or sets local exposure of the system, in case the system is an interface.

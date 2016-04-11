@@ -23,8 +23,8 @@ namespace Infrastructure.DataAccess
             Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
         }
 
-        public DbSet<AdminRight> AdminRights { get; set; }
-        public DbSet<AdminRole> AdminRoles { get; set; }
+        public DbSet<OrganizationRight> OrganizationRights { get; set; }
+        public DbSet<OrganizationRole> OrganizationRoles { get; set; }
         public DbSet<Advice> Advices { get; set; }
         public DbSet<AgreementElement> AgreementElements { get; set; }
         public DbSet<ArchiveType> ArchiveTypes { get; set; }
@@ -47,9 +47,9 @@ namespace Infrastructure.DataAccess
         public DbSet<HandoverTrialType> HandoverTrialTypes { get; set; }
         public DbSet<Interface> Interfaces { get; set; }
         public DbSet<ItInterfaceUse> ItInterfaceUses { get; set; }
-        public DbSet<InterfaceUsage> InterfaceUsages { get; set; }
+        public DbSet<ItInterfaceUsage> ItInterfaceUsages { get; set; }
         public DbSet<ItInterfaceExhibit> ItInterfaceExhibits { get; set; }
-        public DbSet<ItInterfaceExhibitUsage> InterfaceExhibtUsages { get; set; }
+        public DbSet<ItInterfaceExhibitUsage> ItInterfaceExhibtUsages { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
         public DbSet<ItContractItSystemUsage> ItContractItSystemUsages { get; set; }
@@ -70,8 +70,8 @@ namespace Infrastructure.DataAccess
         public DbSet<OptionExtend> OptionExtention { get; set; }
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<OrganizationUnit> OrganizationUnits { get; set; }
-        public DbSet<OrganizationRight> OrganizationRights { get; set; }
-        public DbSet<OrganizationRole> OrganizationRoles { get; set; }
+        public DbSet<OrganizationUnitRight> OrganizationUnitRights { get; set; }
+        public DbSet<OrganizationUnitRole> OrganizationUnitRoles { get; set; }
         public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
         public DbSet<PaymentFreqency> PaymentFreqencies { get; set; }
         public DbSet<PaymentMilestone> PaymentMilestones { get; set; }
@@ -95,8 +95,8 @@ namespace Infrastructure.DataAccess
         {
             modelBuilder.ComplexType<ItProjectPhase>();
 
-            modelBuilder.Configurations.Add(new AdminRightMap());
-            modelBuilder.Configurations.Add(new AdminRoleMap());
+            modelBuilder.Configurations.Add(new OrganizationRightMap());
+            modelBuilder.Configurations.Add(new OrganizationRoleMap());
             modelBuilder.Configurations.Add(new AdviceMap());
             modelBuilder.Configurations.Add(new AgreementElementMap());
             modelBuilder.Configurations.Add(new ArchiveTypeMap());
@@ -118,7 +118,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new HandoverTrialMap());
             modelBuilder.Configurations.Add(new HandoverTrialTypeMap());
             modelBuilder.Configurations.Add(new InterfaceMap());
-            modelBuilder.Configurations.Add(new InterfaceUsageMap());
+            modelBuilder.Configurations.Add(new ItInterfaceUsageMap());
             modelBuilder.Configurations.Add(new ItInterfaceMap());
             modelBuilder.Configurations.Add(new ItInterfaceUseMap());
             modelBuilder.Configurations.Add(new ItInterfaceExhibitMap());
@@ -142,8 +142,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new MethodMap());
             modelBuilder.Configurations.Add(new OrganizationMap());
             modelBuilder.Configurations.Add(new OrganizationUnitMap());
-            modelBuilder.Configurations.Add(new OrganizationRightMap());
-            modelBuilder.Configurations.Add(new OrganizationRoleMap());
+            modelBuilder.Configurations.Add(new OrganizationUnitRightMap());
+            modelBuilder.Configurations.Add(new OrganizationUnitRoleMap());
             modelBuilder.Configurations.Add(new PasswordResetRequestMap());
             modelBuilder.Configurations.Add(new ItProjectTypeMap());
             modelBuilder.Configurations.Add(new ProcurementStrategyMap());

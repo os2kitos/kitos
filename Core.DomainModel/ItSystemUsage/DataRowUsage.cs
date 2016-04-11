@@ -8,7 +8,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// a DataRowUsage is created for each DataRow. This allows for adding details
     /// regarding the usage.
     /// </summary>
-    /// TODO the db schema for this is wrong, it needs to be deleted when a contract relation to a InterfaceUsage is removed so it needs to somehow attach itself to the relation between ItContract and InterfaceUsage
+    /// TODO the db schema for this is wrong, it needs to be deleted when a contract relation to a ItInterfaceUsage is removed so it needs to somehow attach itself to the relation between ItContract and ItInterfaceUsage
     public class DataRowUsage
     {
         public int ItSystemUsageId { get; set; }
@@ -18,7 +18,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// <summary>
         /// The local usage of an interface, which this DataRowUsage is bound to.
         /// </summary>
-        public virtual InterfaceUsage InterfaceUsage { get; set; }
+        public virtual ItInterfaceUsage ItInterfaceUsage { get; set; }
 
         public int DataRowId { get; set; }
         /// <summary>

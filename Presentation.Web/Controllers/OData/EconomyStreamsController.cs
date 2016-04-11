@@ -112,7 +112,7 @@ namespace Presentation.Web.Controllers.OData
         {
             var id = Convert.ToUInt32(User.Identity.Name);
             var user = _userRepository.Get(u => u.Id == id).FirstOrDefault();
-            var hasRightsOnOrganization = user != null && user.AdminRights.Any(x => x.ObjectId == orgKey);
+            var hasRightsOnOrganization = user != null && user.OrganizationRights.Any(x => x.ObjectId == orgKey);
             return hasRightsOnOrganization;
         }
     }

@@ -8,11 +8,11 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class InterfaceUsageController : BaseApiController
+    public class ItInterfaceUsageController : BaseApiController
     {
-        private readonly IGenericRepository<InterfaceUsage> _repository;
+        private readonly IGenericRepository<ItInterfaceUsage> _repository;
 
-        public InterfaceUsageController(IGenericRepository<InterfaceUsage> repository)
+        public ItInterfaceUsageController(IGenericRepository<ItInterfaceUsage> repository)
         {
             _repository = repository;
         }
@@ -22,7 +22,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var item = _repository.GetByKey(new object[] {usageId, sysId, interfaceId});
-                var dto = Map<InterfaceUsage, InterfaceUsageDTO>(item);
+                var dto = Map<ItInterfaceUsage, ItInterfaceUsageDTO>(item);
                 return Ok(dto);
             }
             catch (Exception e)
@@ -36,7 +36,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var items = _repository.Get(x => x.ItSystemUsageId == usageId);
-                var dtos = Map<IEnumerable<InterfaceUsage>, IEnumerable<InterfaceUsageDTO>>(items);
+                var dtos = Map<IEnumerable<ItInterfaceUsage>, IEnumerable<ItInterfaceUsageDTO>>(items);
                 return Ok(dtos);
             }
             catch (Exception e)
@@ -50,7 +50,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var items = _repository.Get(x => x.ItContractId == contractId);
-                var dtos = Map<IEnumerable<InterfaceUsage>, IEnumerable<InterfaceUsageDTO>>(items);
+                var dtos = Map<IEnumerable<ItInterfaceUsage>, IEnumerable<ItInterfaceUsageDTO>>(items);
                 return Ok(dtos);
             }
             catch (Exception e)
@@ -99,7 +99,7 @@ namespace Presentation.Web.Controllers.API
                     item.InfrastructureId = infraToken.Value<int?>();
 
                 _repository.Save();
-                var outDto = Map<InterfaceUsage, InterfaceUsageDTO>(item);
+                var outDto = Map<ItInterfaceUsage, ItInterfaceUsageDTO>(item);
                 return Ok(outDto);
             }
             catch (Exception e)

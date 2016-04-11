@@ -15,19 +15,19 @@ namespace Core.ApplicationServices
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<User> _userRepository;
         private readonly IGenericRepository<ItContract> _itContractRepository;
-        private readonly IGenericRepository<AdminRight> _adminRightRepository;
+        private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
         private readonly IExcelHandler _excelHandler;
 
         public ExcelService(IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<User> userRepository,
             IGenericRepository<ItContract> itContractRepository,
-            IGenericRepository<AdminRight> adminRightRepository,
+            IGenericRepository<OrganizationRight> orgRightRepository,
             IExcelHandler excelHandler)
         {
             _orgUnitRepository = orgUnitRepository;
             _userRepository = userRepository;
             _itContractRepository = itContractRepository;
-            _adminRightRepository = adminRightRepository;
+            _orgRightRepository = orgRightRepository;
             _excelHandler = excelHandler;
         }
 
@@ -40,7 +40,7 @@ namespace Core.ApplicationServices
         /// <returns></returns>
         public Stream ExportUsers(Stream stream, int organizationId, User kitosUSer)
         {
-            var users = _userRepository.Get(x => x.AdminRights.Count(r => r.ObjectId == organizationId) > 0);
+            var users = _userRepository.Get(x => x.OrganizationRights.Count(r => r.ObjectId == organizationId) > 0);
 
             var set = new DataSet();
             set.Tables.Add(GetUserTable(users));
@@ -104,18 +104,18 @@ namespace Core.ApplicationServices
             var errors = ImportItContractsTransaction(contractDataTable, organizationId, kitosUser).ToList();
 
             // then finally, did we notice any errors?
-            if (errors.Any()) 
+            if (errors.Any())
                 throw new ExcelImportException { Errors = errors };
         }
 
         private IEnumerable<ExcelImportError> ImportItContractsTransaction(DataTable contractTable, int organizationId, User kitosUser)
         {
             var errors = new List<ExcelImportError>();
-            
+
             // select only contracts that should be inserted
             var newContracts = contractTable.Select("[Column1] IS NULL OR [Column1] = ''").AsEnumerable().ToList();
             var firstRow = newContracts.FirstOrDefault();
-            
+
             // if nothing to add then abort here
             if (firstRow == null)
             {
@@ -152,7 +152,7 @@ namespace Core.ApplicationServices
                     };
                     errors.Add(error);
                 }
-                    
+
                 // validate Concluded is a date
                 try
                 {
@@ -171,7 +171,7 @@ namespace Core.ApplicationServices
                     };
                     errors.Add(error);
                 }
-                    
+
                 // validate IrrevocableTo is a date
                 try
                 {
@@ -251,7 +251,7 @@ namespace Core.ApplicationServices
             // no errors found, it's safe to save to DB
             if (!errors.Any())
                 _itContractRepository.Save();
-            
+
             return errors;
         }
 
@@ -271,9 +271,9 @@ namespace Core.ApplicationServices
 
             // unresolved rows are orgUnits which still needs to be added to the DB.
             var unresolvedRows = new List<UserRow>();
-            
+
             var rowIndex = userTable.Rows.IndexOf(firstRow) + 2; // adding 2 to get it to lign up with row numbers in excel
-            
+
             // preliminary pass and error checking
             // and the new rows that the users has added to the sheet
             foreach (var row in newUsers)
@@ -383,11 +383,11 @@ namespace Core.ApplicationServices
                     resolvedInThisPass.Add(userRow);
 
                     // if adminRight exists, no further action is needed
-                    if (_adminRightRepository.Get(x => x.User.Email == userEntity.Email && x.ObjectId == organizationId).Any())
+                    if (_orgRightRepository.Get(x => x.User.Email == userEntity.Email && x.ObjectId == organizationId).Any())
                         continue;
 
                     // create the adminright within the organization
-                    _adminRightRepository.Insert(new AdminRight
+                    _orgRightRepository.Insert(new OrganizationRight
                     {
                         ObjectId = organizationId,
                         UserId = userEntity.Id,
@@ -396,7 +396,7 @@ namespace Core.ApplicationServices
                         LastChanged = DateTime.UtcNow,
                         ObjectOwnerId = kitosUser.Id
                     });
-                    _adminRightRepository.Save();
+                    _orgRightRepository.Save();
                 }
             }
             return errors;
@@ -429,7 +429,7 @@ namespace Core.ApplicationServices
                 scope.Complete();
             }
         }
-        
+
         private static long? StringToEan(string s)
         {
             if (String.IsNullOrEmpty(s)) return null;
@@ -446,7 +446,7 @@ namespace Core.ApplicationServices
 
         private static int? StringToId(string s)
         {
-            if (String.IsNullOrEmpty(s)) 
+            if (String.IsNullOrEmpty(s))
                 return null;
             return Convert.ToInt32(Convert.ToDouble(s));
         }
@@ -705,14 +705,14 @@ namespace Core.ApplicationServices
 
             foreach (var user in users)
                 table.Rows.Add(user.Id, user.Name, user.LastName, user.Email, user.PhoneNumber);
-            
+
             return table;
         }
 
         private static DataTable GetItContractTable(IEnumerable<ItContract> itContracts)
         {
             var table = new DataTable("IT Kontrakter");
-            
+
             // add columns according to fields added below
             for (var i = 0; i < 10; i++)
                 table.Columns.Add();

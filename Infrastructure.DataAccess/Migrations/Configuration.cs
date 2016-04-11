@@ -114,14 +114,14 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region ADMIN ROLES
 
-            var localAdmin = new AdminRole
+            var localAdmin = new OrganizationRole
             {
                 Name = "LocalAdmin",
                 IsActive = true,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
             };
-            var orgRole = new AdminRole
+            var orgRole = new OrganizationRole
             {
                 Name = "Medarbejder",
                 IsActive = true,
@@ -129,14 +129,14 @@ namespace Infrastructure.DataAccess.Migrations
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
             };
-            context.AdminRoles.AddOrUpdate(x => x.Name, localAdmin, orgRole);
+            context.OrganizationRoles.AddOrUpdate(x => x.Name, localAdmin, orgRole);
             context.SaveChanges();
 
             #endregion
 
             #region ORG ROLES
 
-            var boss = new OrganizationRole()
+            var boss = new OrganizationUnitRole()
             {
                 IsActive = true,
                 Name = "Chef",
@@ -146,7 +146,7 @@ namespace Infrastructure.DataAccess.Migrations
                 LastChangedByUserId = globalAdmin.Id
             };
 
-            var resourcePerson = new OrganizationRole()
+            var resourcePerson = new OrganizationUnitRole()
             {
                 IsActive = true,
                 Name = "Ressourceperson",
@@ -156,7 +156,7 @@ namespace Infrastructure.DataAccess.Migrations
                 LastChangedByUserId = globalAdmin.Id
             };
 
-            var employee = new OrganizationRole()
+            var employee = new OrganizationUnitRole()
             {
                 IsActive = true,
                 Name = "Medarbejder",
@@ -166,7 +166,7 @@ namespace Infrastructure.DataAccess.Migrations
                 LastChangedByUserId = globalAdmin.Id
             };
 
-            var digitalConsultant = new OrganizationRole()
+            var digitalConsultant = new OrganizationUnitRole()
             {
                 IsActive = true,
                 Name = "Digitaliseringskonsulent",
@@ -176,7 +176,7 @@ namespace Infrastructure.DataAccess.Migrations
                 LastChangedByUserId = globalAdmin.Id
             };
 
-            var itConsultant = new OrganizationRole()
+            var itConsultant = new OrganizationUnitRole()
             {
                 IsActive = true,
                 Name = "IT konsulent",
@@ -186,7 +186,7 @@ namespace Infrastructure.DataAccess.Migrations
                 LastChangedByUserId = globalAdmin.Id
             };
 
-            var leader = new OrganizationRole()
+            var leader = new OrganizationUnitRole()
             {
                 IsActive = true,
                 Name = "Leder",
@@ -196,7 +196,7 @@ namespace Infrastructure.DataAccess.Migrations
                 LastChangedByUserId = globalAdmin.Id
             };
 
-            var director = new OrganizationRole()
+            var director = new OrganizationUnitRole()
             {
                 IsActive = true,
                 Name = "Direktør",
@@ -206,7 +206,7 @@ namespace Infrastructure.DataAccess.Migrations
                 LastChangedByUserId = globalAdmin.Id
             };
 
-            context.OrganizationRoles.AddOrUpdate(role => role.Name, boss, resourcePerson, employee, digitalConsultant, itConsultant, leader, director);
+            context.OrganizationUnitRoles.AddOrUpdate(role => role.Name, boss, resourcePerson, employee, digitalConsultant, itConsultant, leader, director);
             context.SaveChanges();
 
             #endregion

@@ -8,9 +8,9 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class AdminRightsController : GenericRightsController<Organization, AdminRight, AdminRole>
+    public class OrganizationRightsController : GenericRightsController<Organization, OrganizationRight, OrganizationRole>
     {
-        public AdminRightsController(IGenericRepository<AdminRight> rightRepository, IGenericRepository<Organization> objectRepository)
+        public OrganizationRightsController(IGenericRepository<OrganizationRight> rightRepository, IGenericRepository<Organization> objectRepository)
             : base(rightRepository, objectRepository)
         {
         }
@@ -21,7 +21,7 @@ namespace Presentation.Web.Controllers.API
             {
                 if (!IsGlobalAdmin()) return Unauthorized();
                 var theRights = RightRepository.Get();
-                var dtos = Map<IEnumerable<AdminRight>, IEnumerable<RightOutputDTO>>(theRights);
+                var dtos = Map<IEnumerable<OrganizationRight>, IEnumerable<RightOutputDTO>>(theRights);
 
                 return Ok(dtos);
             }
@@ -58,7 +58,7 @@ namespace Presentation.Web.Controllers.API
             {
                 if (!IsGlobalAdmin()) return Unauthorized();
                 var theRights = RightRepository.Get(x => x.Role.Name == roleName);
-                var dtos = Map<IEnumerable<AdminRight>, IEnumerable<RightOutputDTO>>(theRights);
+                var dtos = Map<IEnumerable<OrganizationRight>, IEnumerable<RightOutputDTO>>(theRights);
                 return Ok(dtos);
             }
             catch (Exception e)
@@ -68,7 +68,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         /// <summary>
-        /// Removes AdminRights for a given user within a given organization
+        /// Removes OrganizationRights for a given user within a given organization
         /// </summary>
         /// <param name="orgId">OrganizationId</param>
         /// <param name="uId">UserId</param>
@@ -117,7 +117,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage PostRightByOrganizationRight(bool? rightByOrganizationRight, int organizationId, int userId, AdminRight right)
+        public HttpResponseMessage PostRightByOrganizationRight(bool? rightByOrganizationRight, int organizationId, int userId, OrganizationRight right)
         {
             try
             {

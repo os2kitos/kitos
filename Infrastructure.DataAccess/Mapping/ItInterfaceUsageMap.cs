@@ -3,9 +3,9 @@ using Core.DomainModel.ItSystemUsage;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    class InterfaceUsageMap : EntityTypeConfiguration<InterfaceUsage>
+    class ItInterfaceUsageMap : EntityTypeConfiguration<ItInterfaceUsage>
     {
-        public InterfaceUsageMap()
+        public ItInterfaceUsageMap()
         {
             // Primary key
             this.HasKey(x => new { x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId });
@@ -14,12 +14,12 @@ namespace Infrastructure.DataAccess.Mapping
             this.ToTable("InfUsage");
 
             this.HasRequired(t => t.ItSystemUsage)
-                .WithMany(d => d.InterfaceUsages)
+                .WithMany(d => d.ItInterfaceUsages)
                 .HasForeignKey(t => t.ItSystemUsageId)
                 .WillCascadeOnDelete(true);
 
             this.HasRequired(t => t.ItInterfaceUse)
-                .WithMany(t => t.InterfaceUsages)
+                .WithMany(t => t.ItInterfaceUsages)
                 .HasForeignKey(d => new {d.ItSystemId, d.ItInterfaceId})
                 //.Map(m => m.MapKey(new[] { "infUseId", "infUsageId" })) // have to rename key else it's too long for MySql
                 .WillCascadeOnDelete(true);

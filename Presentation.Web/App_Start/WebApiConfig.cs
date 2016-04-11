@@ -1,5 +1,4 @@
-﻿using System;
-using System.Web.Http;
+﻿using System.Web.Http;
 using System.Web.OData.Builder;
 using System.Web.OData.Extensions;
 using Core.DomainModel;
@@ -48,8 +47,8 @@ namespace Presentation.Web
             var accessMod = builder.AddEnumType(typeof(AccessModifier));
             accessMod.Namespace = "Kitos";
 
-            //builder.EntitySet<AdminRight>("AdminRights");
-            //builder.EntitySet<AdminRole>("AdminRoles");
+            //builder.EntitySet<OrganizationRight>("OrganizationRights");
+            //builder.EntitySet<OrganizationRole>("OrganizationRoles");
             //builder.EntitySet<Advice>("Advices");
             //builder.EntitySet<AgreementElement>("AgreementElements");
             //builder.EntitySet<BusinessType>("BusinessTypes");
@@ -79,7 +78,7 @@ namespace Presentation.Web
             //builder.EntitySet<HandoverTrialType>("HandoverTrialTypes");
             //builder.EntitySet<Interface>("Interfaces");
             //builder.EntitySet<ItInterfaceExhibit>("ItInterfaceExhibits");
-            //builder.EntitySet<ItInterfaceExhibitUsage>("InterfaceExhibtUsages");
+            //builder.EntitySet<ItInterfaceExhibitUsage>("ItInterfaceExhibtUsages");
             //builder.EntitySet<InterfaceType>("InterfaceTypes");
             //builder.EntitySet<ItContractRight>("ItContractRights");
             //builder.EntitySet<ItSystemUsageOrgUnitUsage>("ItSystemUsageOrgUnitUsages");
@@ -101,7 +100,7 @@ namespace Presentation.Web
             var itProject = builder.EntitySet<ItProject>("ItProjects");
             itProject.EntityType.HasKey(x => x.Id);
 
-            var interfaceUsage = builder.EntitySet<InterfaceUsage>("InterfaceUsages");
+            var interfaceUsage = builder.EntitySet<ItInterfaceUsage>("ItInterfaceUsages");
             interfaceUsage.EntityType.HasKey(x => new { x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId });
 
             var dataOption = builder.EntitySet<DataType>("DataTypes");
@@ -198,8 +197,8 @@ namespace Presentation.Web
             sensitiveDataOption.EntityType.HasKey(x => x.Id);
 
             //builder.EntitySet<Optionend>("OptionExtention");
-            //builder.EntitySet<OrganizationRight>("OrganizationRights");
-            //builder.EntitySet<OrganizationRole>("OrganizationRoles");
+            //builder.EntitySet<OrganizationUnitRight>("OrganizationUnitRights");
+            //builder.EntitySet<OrganizationUnitRole>("OrganizationUnitRoles");
             //builder.EntitySet<PasswordResetRequest>("PasswordResetRequests");
             //builder.EntitySet<PaymentFreqency>("PaymentFreqencies");
             //builder.EntitySet<PaymentMilestone>("PaymentMilestones");

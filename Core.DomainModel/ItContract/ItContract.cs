@@ -14,7 +14,7 @@ namespace Core.DomainModel.ItContract
             this.AgreementElements = new List<AgreementElement>();
             this.Children = new List<ItContract>();
             this.AssociatedSystemUsages = new List<ItContractItSystemUsage>();
-            this.AssociatedInterfaceUsages = new List<InterfaceUsage>();
+            this.AssociatedInterfaceUsages = new List<ItInterfaceUsage>();
             this.AssociatedInterfaceExposures = new List<ItInterfaceExhibitUsage>();
             this.PaymentMilestones = new List<PaymentMilestone>();
             this.InternEconomyStreams = new List<EconomyStream>();
@@ -407,7 +407,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         /// The associated interface usages.
         /// </value>
-        public virtual ICollection<InterfaceUsage> AssociatedInterfaceUsages { get; set; }
+        public virtual ICollection<ItInterfaceUsage> AssociatedInterfaceUsages { get; set; }
         /// <summary>
         /// Gets or sets the associated interface exposures.
         /// </summary>
