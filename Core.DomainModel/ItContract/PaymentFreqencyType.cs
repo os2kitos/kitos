@@ -3,11 +3,11 @@ using System.Collections.Generic;
 namespace Core.DomainModel.ItContract
 {
     /// <summary>
-    /// It contract termination deadline option.
+    /// It contract payment freqency option.
     /// </summary>
-    public class TerminationDeadline : Entity, IOptionEntity<ItContract>
+    public class PaymentFreqencyType : Entity, IOptionEntity<ItContract>
     {
-        public TerminationDeadline()
+        public PaymentFreqencyType()
         {
             References = new List<ItContract>();
         }

@@ -4,9 +4,9 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class ContractTemplateController : GenericOptionApiController<ContractTemplate, ItContract, OptionDTO>
+    public class ContractTemplateController : GenericOptionApiController<ContractTemplateType, ItContract, OptionDTO>
     {
-        public ContractTemplateController(IGenericRepository<ContractTemplate> repository) 
+        public ContractTemplateController(IGenericRepository<ContractTemplateType> repository) 
             : base(repository)
         {
         }

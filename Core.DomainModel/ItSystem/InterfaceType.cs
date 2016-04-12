@@ -3,7 +3,7 @@
 namespace Core.DomainModel.ItSystem
 {
     /// <summary>
-    /// Dropdown type for the <see cref="ItSystem"/>.  
+    /// Dropdown type for the <see cref="ItSystem"/>.
     /// Provides details about an ItSystem of type interface.
     /// </summary>
     public class InterfaceType : Entity, IOptionEntity<ItInterface>

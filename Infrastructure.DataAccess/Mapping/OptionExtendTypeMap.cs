@@ -2,7 +2,7 @@ using Core.DomainModel.ItContract;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ContractTemplateMap : OptionEntityMap<ContractTemplateType, ItContract>
+    public class OptionExtendTypeMap : OptionEntityMap<OptionExtendType, ItContract>
     {
     }
 }

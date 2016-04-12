@@ -2,7 +2,7 @@
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ProcurementStrategyMap : OptionEntityMap<ProcurementStrategy, ItContract>
+    public class ProcurementStrategyTypeMap : OptionEntityMap<ProcurementStrategyType, ItContract>
     {
     }
 }

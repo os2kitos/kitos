@@ -4,12 +4,12 @@ using Core.DomainModel.ItSystemUsage;
 namespace Core.DomainModel.ItSystem
 {
     /// <summary>
-    /// Dropdown type for the <see cref="DataRowUsage"/>. Represents the frequency of 
+    /// Dropdown type for the <see cref="DataRowUsage"/>. Represents the frequency of
     /// the usage of the DataRow.
     /// </summary>
-    public class Frequency : Entity, IOptionEntity<DataRowUsage>
+    public class FrequencyType : Entity, IOptionEntity<DataRowUsage>
     {
-        public Frequency()
+        public FrequencyType()
         {
             this.References = new List<DataRowUsage>();
         }

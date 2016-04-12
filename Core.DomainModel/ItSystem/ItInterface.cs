@@ -53,10 +53,10 @@ namespace Core.DomainModel.ItSystem
         public virtual InterfaceType InterfaceType { get; set; }
 
         public int? TsaId { get; set; }
-        public virtual Tsa Tsa { get; set; }
+        public virtual TsaType Tsa { get; set; }
 
         public int? MethodId { get; set; }
-        public virtual Method Method { get; set; }
+        public virtual MethodType Method { get; set; }
 
         public virtual ICollection<DataRow> DataRows { get; set; }
         public string Note { get; set; }

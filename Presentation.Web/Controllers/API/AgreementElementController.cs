@@ -4,9 +4,9 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class AgreementElementController : GenericOptionApiController<AgreementElement, ItContract, OptionDTO>
+    public class AgreementElementController : GenericOptionApiController<AgreementElementType, ItContract, OptionDTO>
     {
-        public AgreementElementController(IGenericRepository<AgreementElement> repository) 
+        public AgreementElementController(IGenericRepository<AgreementElementType> repository)
             : base(repository)
         {
         }

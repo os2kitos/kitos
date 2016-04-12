@@ -2,7 +2,7 @@
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class AgreementElementMap : OptionEntityMap<AgreementElement, ItContract>
+    public class AgreementElementMap : OptionEntityMap<AgreementElementType, ItContract>
     {
     }
 }

@@ -2,12 +2,9 @@
 
 namespace Core.DomainModel.ItSystem
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public class Method : Entity, IOptionEntity<ItInterface>
+    public class MethodType : Entity, IOptionEntity<ItInterface>
     {
-        public Method()
+        public MethodType()
         {
             References = new List<ItInterface>();
         }

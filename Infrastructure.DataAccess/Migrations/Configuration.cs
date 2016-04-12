@@ -15,7 +15,6 @@ namespace Infrastructure.DataAccess.Migrations
 
     internal sealed class Configuration : DbMigrationsConfiguration<KitosContext>
     {
-
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
@@ -64,7 +63,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             AddOptions<GoalType, Goal>(context.GoalTypes, globalAdmin, "Effektivitet", "Kvalitet", "Service");
 
-            AddOptions<ItSystemTypeOption, ItSystem>(context.ItSystemTypeOptions, globalAdmin, "Fagsystem", "Selvbetjening", "Applikation", "Brugerinterface", "Programmeringsinterface", "Applikationsservice", "Applikationskomponent", "Applikationsfunktion", "Applikationsmodul");
+            AddOptions<ItSystemType, ItSystem>(context.ItSystemTypes, globalAdmin, "Fagsystem", "Selvbetjening", "Applikation", "Brugerinterface", "Programmeringsinterface", "Applikationsservice", "Applikationskomponent", "Applikationsfunktion", "Applikationsmodul");
 
             AddOptions<BusinessType, ItSystem>(context.BusinessTypes, globalAdmin, "Desing, visualisering og grafik", "Kommunikation", "Hjemmesider og portaler", "Selvbetjening og indberetning", "E-læring", "ESDH og Journalisering", "Specialsystemer", "Processtyring", "IT management", "Økonomi og betaling", "Løn, personale og HR", "BI og ledelsesinformation", "Master data og registre", "GIS", "Bruger- og rettighedsstyring", "Sikkerhed og overvågning", "Sagsbærende", "Administrativt");
 
@@ -72,39 +71,39 @@ namespace Infrastructure.DataAccess.Migrations
 
             AddOptions<DataType, DataRow>(context.DataTypes, globalAdmin, "Person", "Virksomhed", "Sag", "Dokument", "Organisation", "Klassikfikation", "Ejendom", "GIS", "Andet");
 
-            AddOptions<Frequency, DataRowUsage>(context.Frequencies, globalAdmin, "Dagligt", "Ugentligt", "Månedligt", "Årligt", "Kvartal", "Halvårligt");
+            AddOptions<FrequencyType, DataRowUsage>(context.FrequencyTypes, globalAdmin, "Dagligt", "Ugentligt", "Månedligt", "Årligt", "Kvartal", "Halvårligt");
 
             AddOptions<InterfaceType, ItInterface>(context.InterfaceTypes, globalAdmin, "Webservice", "API", "iFrame", "Link", "Link - dybt", "Andet");
 
             AddOptions<Interface, ItInterface>(context.Interfaces, globalAdmin, "CSV", "WS SOAP", "WS REST", "MOX", "OIO REST", "LDAP", "User interface", "ODBC (SQL)", "Andet");
 
-            AddOptions<Method, ItInterface>(context.Methods, globalAdmin, "Batch", "Request-Response", "Store and forward", "Publish-subscribe", "App interface", "Andet");
+            AddOptions<MethodType, ItInterface>(context.MethodTypes, globalAdmin, "Batch", "Request-Response", "Store and forward", "Publish-subscribe", "App interface", "Andet");
 
             AddOptions<SensitiveDataType, ItSystemUsage>(context.SensitiveDataTypes, globalAdmin, "Ja", "Nej");
 
-            AddOptions<Tsa, ItInterface>(context.Tsas, globalAdmin, "Ja", "Nej");
+            AddOptions<TsaType, ItInterface>(context.TsaTypes, globalAdmin, "Ja", "Nej");
 
             AddOptions<ContractType, ItContract>(context.ContractTypes, globalAdmin, "Hovedkontrakt", "Tillægskontrakt", "Snitflade", "Serviceaftale", "Databehandleraftale");
 
-            AddOptions<ContractTemplate, ItContract>(context.ContractTemplates, globalAdmin, "K01", "K02", "K03", "Egen", "KOMBIT", "Leverandør", "OPI", "Anden");
+            AddOptions<ContractTemplateType, ItContract>(context.ContractTemplateTypes, globalAdmin, "K01", "K02", "K03", "Egen", "KOMBIT", "Leverandør", "OPI", "Anden");
 
-            AddOptions<PurchaseForm, ItContract>(context.PurchaseForms, globalAdmin, "SKI", "SKI 02.18", "SKI 02.19", "Udbud", "EU udbud", "Direkte tildeling", "Annoncering");
+            AddOptions<PurchaseFormType, ItContract>(context.PurchaseFormTypes, globalAdmin, "SKI", "SKI 02.18", "SKI 02.19", "Udbud", "EU udbud", "Direkte tildeling", "Annoncering");
 
-            AddOptions<PaymentModel, ItContract>(context.PaymentModels, globalAdmin, "Licens", "icens - flatrate", "Licens - forbrug", "Licens - indbyggere", "Licens - pr. sag", "Gebyr", "Engangsydelse");
+            AddOptions<PaymentModelType, ItContract>(context.PaymentModelTypes, globalAdmin, "Licens", "icens - flatrate", "Licens - forbrug", "Licens - indbyggere", "Licens - pr. sag", "Gebyr", "Engangsydelse");
 
-            AddOptions<AgreementElement, ItContract>(context.AgreementElements, globalAdmin,
+            AddOptions<AgreementElementType, ItContract>(context.AgreementElementTypes, globalAdmin,
                 "Licens", "Udvikling", "Drift", "Vedligehold", "Support",
                 "Serverlicenser", "Serverdrift", "Databaselicenser", "Backup", "Overvågning");
 
-            AddOptions<OptionExtend, ItContract>(context.OptionExtention, globalAdmin, "2 x 1 år", "1 x 1 år", "1 x ½ år");
+            AddOptions<OptionExtendType, ItContract>(context.OptionExtendTypes, globalAdmin, "2 x 1 år", "1 x 1 år", "1 x ½ år");
 
-            AddOptions<PaymentFreqency, ItContract>(context.PaymentFreqencies, globalAdmin, "Månedligt", "Kvartalsvis", "Halvårligt", "Årligt");
+            AddOptions<PaymentFreqencyType, ItContract>(context.PaymentFreqencyTypes, globalAdmin, "Månedligt", "Kvartalsvis", "Halvårligt", "Årligt");
 
-            AddOptions<PriceRegulation, ItContract>(context.PriceRegulations, globalAdmin, "TSA", "KL pris og lønskøn", "Nettoprisindeks");
+            AddOptions<PriceRegulationType, ItContract>(context.PriceRegulationTypes, globalAdmin, "TSA", "KL pris og lønskøn", "Nettoprisindeks");
 
-            AddOptions<ProcurementStrategy, ItContract>(context.ProcurementStrategies, globalAdmin, "Direkte tildeling", "Annoncering", "Udbud", "EU udbud", "Mini-udbud", "SKI - direkte tildeling", "SKI - mini-udbud", "Underhåndsbud");
+            AddOptions<ProcurementStrategyType, ItContract>(context.ProcurementStrategyTypes, globalAdmin, "Direkte tildeling", "Annoncering", "Udbud", "EU udbud", "Mini-udbud", "SKI - direkte tildeling", "SKI - mini-udbud", "Underhåndsbud");
 
-            AddOptions<TerminationDeadline, ItContract>(context.TerminationDeadlines, globalAdmin, "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
+            AddOptions<TerminationDeadlineType, ItContract>(context.TerminationDeadlineTypes, globalAdmin, "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
 
             AddOptions<HandoverTrialType, HandoverTrial>(context.HandoverTrialTypes, globalAdmin, "Funktionsprøve", "Driftovertagelsesprøve");
 

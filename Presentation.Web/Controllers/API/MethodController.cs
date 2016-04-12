@@ -4,9 +4,9 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class MethodController : GenericOptionApiController<Method, ItInterface, OptionDTO>
+    public class MethodController : GenericOptionApiController<MethodType, ItInterface, OptionDTO>
     {
-        public MethodController(IGenericRepository<Method> repository) 
+        public MethodController(IGenericRepository<MethodType> repository)
             : base(repository)
         {
         }

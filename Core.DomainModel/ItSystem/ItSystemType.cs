@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ItSystemTypeOption : Entity, IOptionEntity<ItSystem>
+    public class ItSystemType : Entity, IOptionEntity<ItSystem>
     {
         public string Name { get; set; }
         public bool IsActive { get; set; }

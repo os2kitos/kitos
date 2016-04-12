@@ -34,7 +34,7 @@ namespace Presentation.Web
             // TODO do we need an admin DTO and normal DTO to strip unused properties in normal DTO
             // like IsActive and Note
 
-            Mapper.CreateMap<AgreementElement, OptionDTO>()
+            Mapper.CreateMap<AgreementElementType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
@@ -42,7 +42,7 @@ namespace Presentation.Web
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<ContractTemplate, OptionDTO>()
+            Mapper.CreateMap<ContractTemplateType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
@@ -62,7 +62,7 @@ namespace Presentation.Web
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<Method, OptionDTO>()
+            Mapper.CreateMap<MethodType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
@@ -70,15 +70,15 @@ namespace Presentation.Web
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<PurchaseForm, OptionDTO>()
+            Mapper.CreateMap<PurchaseFormType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<Tsa, OptionDTO>()
+            Mapper.CreateMap<TsaType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<Frequency, OptionDTO>()
+            Mapper.CreateMap<FrequencyType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
@@ -98,7 +98,7 @@ namespace Presentation.Web
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<ItSystemTypeOption, OptionDTO>()
+            Mapper.CreateMap<ItSystemType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
@@ -118,27 +118,27 @@ namespace Presentation.Web
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<ProcurementStrategy, OptionDTO>()
+            Mapper.CreateMap<ProcurementStrategyType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<OptionExtend, OptionDTO>()
+            Mapper.CreateMap<OptionExtendType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<PriceRegulation, OptionDTO>()
+            Mapper.CreateMap<PriceRegulationType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<PaymentModel, OptionDTO>()
+            Mapper.CreateMap<PaymentModelType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<PaymentFreqency, OptionDTO>()
+            Mapper.CreateMap<PaymentFreqencyType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<TerminationDeadline, OptionDTO>()
+            Mapper.CreateMap<TerminationDeadlineType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 

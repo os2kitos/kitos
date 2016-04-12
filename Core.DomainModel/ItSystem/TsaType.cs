@@ -2,9 +2,9 @@
 
 namespace Core.DomainModel.ItSystem
 {
-    public class Tsa : Entity, IOptionEntity<ItInterface>
+    public class TsaType : Entity, IOptionEntity<ItInterface>
     {
-        public Tsa()
+        public TsaType()
         {
             References = new List<ItInterface>();
         }

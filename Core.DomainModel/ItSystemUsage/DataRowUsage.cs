@@ -30,7 +30,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// <summary>
         /// How often the data of the DataRow is used
         /// </summary>
-        public virtual Frequency Frequency { get; set; }
+        public virtual FrequencyType Frequency { get; set; }
 
         /// <summary>
         /// How much the data of the DataRow is used

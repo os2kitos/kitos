@@ -26,19 +26,19 @@ namespace Infrastructure.DataAccess
         public DbSet<OrganizationRight> OrganizationRights { get; set; }
         public DbSet<OrganizationRole> OrganizationRoles { get; set; }
         public DbSet<Advice> Advices { get; set; }
-        public DbSet<AgreementElement> AgreementElements { get; set; }
+        public DbSet<AgreementElementType> AgreementElementTypes { get; set; }
         public DbSet<ArchiveType> ArchiveTypes { get; set; }
         public DbSet<BusinessType> BusinessTypes { get; set; }
         public DbSet<Communication> Communications { get; set; }
         public DbSet<Config> Configs { get; set; }
-        public DbSet<ContractTemplate> ContractTemplates { get; set; }
+        public DbSet<ContractTemplateType> ContractTemplateTypes { get; set; }
         public DbSet<ContractType> ContractTypes { get; set; }
         public DbSet<DataType> DataTypes { get; set; }
         public DbSet<DataRow> DataRows { get; set; }
         public DbSet<DataRowUsage> DataRowUsages { get; set; }
         public DbSet<EconomyYear> EconomyYears { get; set; }
         public DbSet<EconomyStream> EconomyStrams { get; set; }
-        public DbSet<Frequency> Frequencies { get; set; }
+        public DbSet<FrequencyType> FrequencyTypes { get; set; }
         public DbSet<Goal> Goals { get; set; }
         public DbSet<GoalStatus> GoalStatus { get; set; }
         public DbSet<GoalType> GoalTypes { get; set; }
@@ -65,29 +65,29 @@ namespace Infrastructure.DataAccess
         public DbSet<ItSystemUsage> ItSystemUsages { get; set; }
         public DbSet<ItSystemRight> ItSystemRights { get; set; }
         public DbSet<ItSystemRole> ItSystemRoles { get; set; }
-        public DbSet<ItSystemTypeOption> ItSystemTypeOptions { get; set; }
-        public DbSet<Method> Methods { get; set; }
-        public DbSet<OptionExtend> OptionExtention { get; set; }
+        public DbSet<ItSystemType> ItSystemTypes { get; set; }
+        public DbSet<MethodType> MethodTypes { get; set; }
+        public DbSet<OptionExtendType> OptionExtendTypes { get; set; }
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<OrganizationUnit> OrganizationUnits { get; set; }
         public DbSet<OrganizationUnitRight> OrganizationUnitRights { get; set; }
         public DbSet<OrganizationUnitRole> OrganizationUnitRoles { get; set; }
         public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
-        public DbSet<PaymentFreqency> PaymentFreqencies { get; set; }
+        public DbSet<PaymentFreqencyType> PaymentFreqencyTypes { get; set; }
         public DbSet<PaymentMilestone> PaymentMilestones { get; set; }
-        public DbSet<PaymentModel> PaymentModels { get; set; }
-        public DbSet<PriceRegulation> PriceRegulations { get; set; }
-        public DbSet<ProcurementStrategy> ProcurementStrategies { get; set; }
+        public DbSet<PaymentModelType> PaymentModelTypes { get; set; }
+        public DbSet<PriceRegulationType> PriceRegulationTypes { get; set; }
+        public DbSet<ProcurementStrategyType> ProcurementStrategyTypes { get; set; }
         public DbSet<ItProjectType> ProjectTypes { get; set; }
-        public DbSet<PurchaseForm> PurchaseForms { get; set; }
+        public DbSet<PurchaseFormType> PurchaseFormTypes { get; set; }
         public DbSet<Risk> Risks { get; set; }
         public DbSet<SensitiveDataType> SensitiveDataTypes { get; set; }
         public DbSet<Stakeholder> Stakeholders { get; set; }
-        public DbSet<TerminationDeadline> TerminationDeadlines { get; set; }
+        public DbSet<TerminationDeadlineType> TerminationDeadlineTypes { get; set; }
         public DbSet<TaskRef> TaskRefs { get; set; }
         public DbSet<TaskUsage> TaskUsages { get; set; }
         public DbSet<Text> Texts { get; set; }
-        public DbSet<Tsa> Tsas { get; set; }
+        public DbSet<TsaType> TsaTypes { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Wish> Wishes { get; set; }
 
@@ -110,7 +110,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new DataRowUsageMap());
             modelBuilder.Configurations.Add(new EconomyStreamMap());
             modelBuilder.Configurations.Add(new EconomyYearMap());
-            modelBuilder.Configurations.Add(new FrequencyMap());
+            modelBuilder.Configurations.Add(new FrequencyTypeMap());
             modelBuilder.Configurations.Add(new GoalMap());
             modelBuilder.Configurations.Add(new GoalStatusMap());
             modelBuilder.Configurations.Add(new GoalTypeMap());
@@ -138,25 +138,30 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemUsageMap());
             modelBuilder.Configurations.Add(new ItSystemRightMap());
             modelBuilder.Configurations.Add(new ItSystemRoleMap());
-            modelBuilder.Configurations.Add(new ItSystemTypeOptionMap());
-            modelBuilder.Configurations.Add(new MethodMap());
+            modelBuilder.Configurations.Add(new ItSystemTypeMap());
+            modelBuilder.Configurations.Add(new MethodTypeMap());
             modelBuilder.Configurations.Add(new OrganizationMap());
             modelBuilder.Configurations.Add(new OrganizationUnitMap());
             modelBuilder.Configurations.Add(new OrganizationUnitRightMap());
             modelBuilder.Configurations.Add(new OrganizationUnitRoleMap());
             modelBuilder.Configurations.Add(new PasswordResetRequestMap());
             modelBuilder.Configurations.Add(new ItProjectTypeMap());
-            modelBuilder.Configurations.Add(new ProcurementStrategyMap());
-            modelBuilder.Configurations.Add(new PurchaseFormMap());
+            modelBuilder.Configurations.Add(new ProcurementStrategyTypeMap());
+            modelBuilder.Configurations.Add(new PurchaseFormTypeMap());
             modelBuilder.Configurations.Add(new RiskMap());
             modelBuilder.Configurations.Add(new SensitiveDataTypeMap());
             modelBuilder.Configurations.Add(new StakeholderMap());
             modelBuilder.Configurations.Add(new TaskRefMap());
             modelBuilder.Configurations.Add(new TaskUsageMap());
             modelBuilder.Configurations.Add(new TextMap());
-            modelBuilder.Configurations.Add(new TsaMap());
+            modelBuilder.Configurations.Add(new TsaTypeMap());
+            modelBuilder.Configurations.Add(new TerminationDeadlineTypeMap());
             modelBuilder.Configurations.Add(new UserMap());
             modelBuilder.Configurations.Add(new WishMap());
+            modelBuilder.Configurations.Add(new PriceRegulationTypeMap());
+            modelBuilder.Configurations.Add(new PaymentModelTypeMap());
+            modelBuilder.Configurations.Add(new PaymentFreqencyTypeMap());
+            modelBuilder.Configurations.Add(new OptionExtendTypeMap());
         }
     }
 }

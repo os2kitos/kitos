@@ -3,11 +3,11 @@ using System.Collections.Generic;
 namespace Core.DomainModel.ItContract
 {
     /// <summary>
-    /// It contract payment model option.
+    /// It contract procurment strategy option. (udbudsstrategi)
     /// </summary>
-    public class PaymentModel : Entity, IOptionEntity<ItContract>
+    public class ProcurementStrategyType : Entity, IOptionEntity<ItContract>
     {
-        public PaymentModel()
+        public ProcurementStrategyType()
         {
             References = new List<ItContract>();
         }

@@ -1,13 +1,13 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Core.DomainModel.ItContract
 {
     /// <summary>
-    /// It contract price regulation option.
+    /// It contract agreement elements options.
     /// </summary>
-    public class PriceRegulation : Entity, IOptionEntity<ItContract>
+    public class AgreementElementType : Entity, IOptionEntity<ItContract>
     {
-        public PriceRegulation()
+        public AgreementElementType()
         {
             References = new List<ItContract>();
         }

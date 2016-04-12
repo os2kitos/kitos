@@ -50,11 +50,11 @@ namespace Presentation.Web
             //builder.EntitySet<OrganizationRight>("OrganizationRights");
             //builder.EntitySet<OrganizationRole>("OrganizationRoles");
             //builder.EntitySet<Advice>("Advices");
-            //builder.EntitySet<AgreementElement>("AgreementElements");
+            //builder.EntitySet<AgreementElementType>("AgreementElementTypes");
             //builder.EntitySet<BusinessType>("BusinessTypes");
             //builder.EntitySet<Communication>("Communications");
             //builder.EntitySet<Config>("Configs");
-            //builder.EntitySet<ContractTemplate>("ContractTemplates");
+            //builder.EntitySet<ContractTemplateType>("ContractTemplateTypes");
             //builder.EntitySet<ContractType>("ContractTypes");
 
             var dataRowUsage = builder.EntitySet<DataRowUsage>("DataRowUsages");
@@ -69,7 +69,7 @@ namespace Presentation.Web
             economyFunc.Parameter<int>("Organization");
             economyFunc.ReturnsCollectionFromEntitySet<EconomyStream>("EconomyStreams");
 
-            //builder.EntitySet<Frequency>("Frequencies");
+            //builder.EntitySet<FrequencyType>("FrequencyTypes");
             //builder.EntitySet<Goal>("Goals");
             //builder.EntitySet<GoalStatus>("GoalStatus");
             //builder.EntitySet<GoalType>("GoalTypes");
@@ -115,7 +115,7 @@ namespace Presentation.Web
             var itSystems = builder.EntitySet<ItSystem>("ItSystems");
             itSystems.EntityType.HasKey(x => x.Id);
 
-            var itSystemTypeOptions = builder.EntitySet<ItSystemTypeOption>("ItSystemTypeOptions");
+            var itSystemTypeOptions = builder.EntitySet<ItSystemType>("ItSystemTypes");
             itSystemTypeOptions.EntityType.HasKey(x => x.Id);
 
             var businessTypes = builder.EntitySet<BusinessType>("BusinessTypes");
@@ -187,33 +187,32 @@ namespace Presentation.Web
                 .HasKey(x => x.ItSystemId)
                 .HasKey(x => x.ItInterfaceId);
 
-            var tsas = builder.EntitySet<Tsa>("Tsas");
+            var tsas = builder.EntitySet<TsaType>("TsaTypes");
             tsas.EntityType.HasKey(x => x.Id);
 
-            var methods = builder.EntitySet<Method>("Methods");
+            var methods = builder.EntitySet<MethodType>("MethodTypes");
             methods.EntityType.HasKey(x => x.Id);
 
             var sensitiveDataOption = builder.EntitySet<SensitiveDataType>("SensitiveDataTypes");
             sensitiveDataOption.EntityType.HasKey(x => x.Id);
 
-            //builder.EntitySet<Optionend>("OptionExtention");
+            //builder.EntitySet<Optionend>("OptionExtendTypes");
             //builder.EntitySet<OrganizationUnitRight>("OrganizationUnitRights");
             //builder.EntitySet<OrganizationUnitRole>("OrganizationUnitRoles");
             //builder.EntitySet<PasswordResetRequest>("PasswordResetRequests");
-            //builder.EntitySet<PaymentFreqency>("PaymentFreqencies");
+            //builder.EntitySet<PaymentFreqencyType>("PaymentFreqencyTypes");
             //builder.EntitySet<PaymentMilestone>("PaymentMilestones");
-            //builder.EntitySet<PaymentModel>("PaymentModels");
-            //builder.EntitySet<PriceRegulation>("PriceRegulations");
-            //builder.EntitySet<ProcurementStrategy>("ProcurementStrategies");
+            //builder.EntitySet<PaymentModelType>("PaymentModelTypes");
+            //builder.EntitySet<PriceRegulationType>("PriceRegulationTypes");
+            //builder.EntitySet<ProcurementStrategyType>("ProcurementStrategyTypes");
             builder.EntitySet<ItProjectType>("ProjectTypes");
-            //builder.EntitySet<PurchaseForm>("PurchaseForms");
+            //builder.EntitySet<PurchaseFormType>("PurchaseFormTypes");
             //builder.EntitySet<Risk>("Risks");
             //builder.EntitySet<Stakeholder>("Stakeholders");
-            //builder.EntitySet<TerminationDeadline>("TerminationDeadlines");
+            //builder.EntitySet<TerminationDeadlineType>("TerminationDeadlineTypes");
             //builder.EntitySet<TaskRef>("TaskRefs");
             //builder.EntitySet<TaskUsage>("TaskUsages");
             //builder.EntitySet<Text>("Texts");
-            //builder.EntitySet<Tsa>("Tsas");
             //builder.EntitySet<User>("Users");
             //builder.EntitySet<Wish>("Wishes");
 
