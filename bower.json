@@ -34,6 +34,10 @@
     "select2-bootstrap-css": "~1.4.6"
   },
   "resolutions": {
-    "select2": "^3.3.2"
+    "select2": "^3.3.2",
+    "angular": "1.4.7"
+  },
+  "devDependencies": {
+    "angular-mocks": "1.4.7"
   }
 }

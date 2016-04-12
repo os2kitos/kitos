@@ -8,28 +8,27 @@ var source = "Presentation.Web",
 
     // dependency files of files to unit test
     unitDependencies = [
-        source + "/Scripts/lodash.js",
-        source + "/Scripts/jquery-2.1.4.js",
-        source + "/Scripts/select2.js",
-        source + "/Scripts/moment.js",
-        source + "/Scripts/jsonfn.js",
-        source + "/Scripts/bootstrap.js",
-        source + "/Scripts/angular.js",
-        source + "/Scripts/i18n/angular-locale_da-dk.js",
-        source + "/Scripts/angular-animate.js",
-        source + "/Scripts/angular-sanitize.js",
-        source + "/Scripts/angular-mocks.js",
-        source + "/Scripts/angular-ui-router.js",
-        source + "/Scripts/angular-ui/ui-bootstrap.js",
-        source + "/Scripts/angular-ui/ui-bootstrap-tpls.js",
-        source + "/Scripts/ui-select2.js",
-        source + "/Scripts/notify/*.js",
-        source + "/Scripts/angular-ui-util/ui-utils.js"
+        "bower_components/lodash/lodash.js",
+        "bower_components/jquery/dist/jquery.js",
+        "bower_components/select2/select2.js",
+        "bower_components/moment/moment.js",
+        "bower_components/jsonfn-bower/jsonfn.js",
+        "bower_components/bootstrap/dist/js/bootstrap.js",
+        "bower_components/angular/angular.js",
+        "bower_components/angular-i18n/angular-locale_da-dk.js",
+        "bower_components/angular-animate/angular-animate.js",
+        "bower_components/angular-sanitize/angular-sanitize.js",
+        "bower_components/angular-mocks/angular-mocks.js",
+        "bower_components/angular-ui-router/release/angular-ui-router.js",
+        "bower_components/angular-bootstrap/ui-bootstrap.js",
+        "bower_components/angular-bootstrap/ui-bootstrap-tpls.js",
+        "bower_components/angular-ui-select2/src/select2.js"
     ],
 
     // unit
     karmaConf = __dirname + "/karma.conf.js",
     unitSource = [
+        sourceApp + "/shared/notify/notify.module.js",
         sourceApp + "/app.js",
         sourceApp + "/**/!(*.po|*.spec).js",
         sourceApp + "/**/*.spec.js"
@@ -51,7 +50,7 @@ var source = "Presentation.Web",
     frontendCoverageReport = "frontend.json",
     tempFrontendCoverageReport = "temp-coverage.json",
 
-    tempFiles = [ e2eReport + ".json", coverage ];
+    tempFiles = [e2eReport + ".json", coverage];
 
 module.exports = {
     source: source,

@@ -13,7 +13,7 @@ environment:
   NODEJS_VERSION: "4"
 services:
 - iis
-- mysql56
+- mysql57
 cache:
   - node_modules -> package.json
   - bower_components -> bower.json
