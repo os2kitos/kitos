@@ -1,7 +1,7 @@
 ﻿(function (ng, app) {
     var _user = null;
 
-    app.factory('userService', ['$http', '$q', '$rootScope', '$uibModal', function ($http, $q, $rootScope, $modal) {
+    app.factory('userService', ['$http', '$window', '$q', '$rootScope', '$uibModal', 'JSONfn', function ($http, $window, $q, $rootScope, $modal, JSONfn) {
         // formats and saves the user
         function saveUser(user, orgAndDefaultUnit) {
             var currOrg = orgAndDefaultUnit.organization;
@@ -102,12 +102,12 @@
                 loadUserDeferred = $q.defer();
 
                 // login or re-auth?
-                var httpDeferred = payload ? $http.post("api/authorize", payload) : $http.get("api/authorize");
+                var httpDeferred = payload ? $http.post("api/authorize", payload) : reAuth();
 
-                httpDeferred.success(function (result) {
-                    var user = result.response.user;
-                    var orgsAndDefaultUnits = result.response.organizations;
-
+                httpDeferred.then(function (result) {
+                    var user = result.data.response.user;
+                    var orgsAndDefaultUnits = result.data.response.organizations;
+                    $window.localStorage.setItem('userResponse', JSONfn.stringify(result));
                     resolveOrganization2(orgsAndDefaultUnits).then(function (orgAndDefaultUnit) {
                         saveUser(user, orgAndDefaultUnit);
                         loadUserDeferred.resolve(_user);
@@ -117,14 +117,24 @@
                         loadUserDeferred.reject("No organization selected");
                         loadUserDeferred = null;
                     });
-                }).error(function (result) {
-                    loadUserDeferred.reject(result);
+                }, function (result) {
+                    loadUserDeferred.reject(result.data);
                     loadUserDeferred = null;
                     clearSavedOrgId();
                 });
             }
 
             return loadUserDeferred.promise;
+        }
+
+        function reAuth() {
+            if ($window.localStorage.getItem('userResponse') === null) {
+                return $http.get("api/authorize");
+            } else {
+                var deferred = $q.defer();
+                deferred.resolve(JSONfn.parse($window.localStorage.getItem('userResponse')));
+                return deferred.promise;
+            }
         }
 
         function login(email, password, rememberMe) {
@@ -156,6 +166,7 @@
                 deferred.resolve();
 
                 clearSavedOrgId();
+                $window.localStorage.removeItem('userResponse');
 
             }).error(function (result) {
                 deferred.reject("Could not log out");
