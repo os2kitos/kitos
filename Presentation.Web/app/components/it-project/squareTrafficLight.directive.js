@@ -4,7 +4,7 @@
     app.directive('squareTrafficLight', [
         function() {
             return {
-                template: '<progressbar class="status-bar" data-value="value" data-type="{{type}}"></progressbar>',
+                template: '<uib-progressbar class="status-bar" data-value="value" data-type="{{type}}"></uib-progressbar>',
                 scope: {
                     status: '@squareTrafficLight'
                 },
