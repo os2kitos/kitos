@@ -570,8 +570,8 @@
                         field: "PriorityPf", title: "Prioritet: Portefølje", width: 150,
                         persistId: "prioritypf", // DON'T YOU DARE RENAME!
                         template: () => `<div class="btn-group btn-group-sm" data-toggle="buttons">
-                                                    <label class="btn btn-star" data-ng-class="{ 'unstarred': !dataItem.IsPriorityLocked }" data-ng-disabled="!dataItem.hasWriteAccess" data-ng-click="dataItem.IsPriorityLocked = !dataItem.IsPriorityLocked">
-                                                        <input type="checkbox" data-ng-model="dataItem.IsPriorityLocked" data-autosave="api/itproject/{{dataItem.Id}}" data-field="IsPriorityLocked">
+                                                    <label class="btn btn-star" data-ng-class="{ 'unstarred': !dataItem.IsPriorityLocked }" data-ng-disabled="!dataItem.hasWriteAccess">
+                                                        <input type="checkbox" data-ng-model="dataItem.IsPriorityLocked" data-autosave="api/itproject/{{dataItem.Id}}" data-field="IsPriorityLocked" data-ng-click="dataItem.IsPriorityLocked = !dataItem.IsPriorityLocked" data-ng-disabled="!dataItem.hasWriteAccess">
                                                         <i class="glyphicon glyphicon-lock"></i>
                                                     </label>
                                                 </div>
