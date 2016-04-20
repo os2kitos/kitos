@@ -9,7 +9,6 @@ module.exports = {
         bower("/select2/select2.min.js"),
         bower("/select2/select2_locale_da.js"),
         bower("/moment/min/moment.min.js"),
-        bower("/bootstrap/dist/js/bootstrap.min.js"),
         bower("/jsonfn-bower/jsonfn.min.js")
     ],
     libraryBundle: "library-bundle.min.js",
