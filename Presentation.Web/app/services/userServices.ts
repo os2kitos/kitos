@@ -107,7 +107,7 @@
                 httpDeferred.then(function (result) {
                     var user = result.data.response.user;
                     var orgsAndDefaultUnits = result.data.response.organizations;
-                    $window.localStorage.setItem('userResponse', JSONfn.stringify(result));
+                    $window.sessionStorage.setItem('userResponse', JSONfn.stringify(result));
                     resolveOrganization2(orgsAndDefaultUnits).then(function (orgAndDefaultUnit) {
                         saveUser(user, orgAndDefaultUnit);
                         loadUserDeferred.resolve(_user);
@@ -128,11 +128,11 @@
         }
 
         function reAuth() {
-            if ($window.localStorage.getItem('userResponse') === null) {
+            if ($window.sessionStorage.getItem('userResponse') === null) {
                 return $http.get("api/authorize");
             } else {
                 var deferred = $q.defer();
-                deferred.resolve(JSONfn.parse($window.localStorage.getItem('userResponse')));
+                deferred.resolve(JSONfn.parse($window.sessionStorage.getItem('userResponse')));
                 return deferred.promise;
             }
         }
@@ -166,7 +166,7 @@
                 deferred.resolve();
 
                 clearSavedOrgId();
-                $window.localStorage.removeItem('userResponse');
+                $window.sessionStorage.removeItem('userResponse');
 
             }).error(function (result) {
                 deferred.reject("Could not log out");
