@@ -89,9 +89,7 @@
 
         function getUser() {
             var deferred = $q.defer();
-
             deferred.resolve(loadUser(null));
-
             return deferred.promise;
         }
 
@@ -156,24 +154,13 @@
         }
 
         function logout() {
-            var deferred = $q.defer();
+            $window.sessionStorage.removeItem('userResponse');
+            clearSavedOrgId();
+            loadUserDeferred = null;
+            _user = null;
+            $rootScope.user = null;
 
-            $http.post("api/authorize?logout").success(function (result) {
-                loadUserDeferred = null;
-                _user = null;
-                $rootScope.user = null;
-
-                deferred.resolve();
-
-                clearSavedOrgId();
-                $window.sessionStorage.removeItem('userResponse');
-
-            }).error(function (result) {
-                deferred.reject("Could not log out");
-
-            });
-
-            return deferred.promise;
+            return $http.post("api/authorize?logout");
         }
 
         function auth(adminRoles) {

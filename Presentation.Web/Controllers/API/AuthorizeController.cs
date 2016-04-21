@@ -65,6 +65,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [AllowAnonymous]
         public HttpResponseMessage PostLogout(bool? logout)
         {
             try
