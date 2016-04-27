@@ -1,7 +1,7 @@
 ﻿(function (ng, app) {
     var _user = null;
 
-    app.factory('userService', ['$http', '$window', '$q', '$rootScope', '$uibModal', 'JSONfn', function ($http, $window, $q, $rootScope, $modal, JSONfn) {
+    app.factory('userService', ['$http', '$window', '$q', '$rootScope', '$uibModal', function ($http, $window, $q, $rootScope, $modal) {
         // formats and saves the user
         function saveUser(user, orgAndDefaultUnit) {
             var currOrg = orgAndDefaultUnit.organization;
@@ -70,16 +70,16 @@
             } else {
                 $http({
                     method: "PATCH",
-                    url: "api/user/" + _user.id + "?organizationId=" + _user.currentOrganizationId,
+                    url: `api/user/${_user.id}?organizationId=${_user.currentOrganizationId}`,
                     data: payload
-                }).success(function (result) {
+                }).success(result => {
                     var newUser = result.response;
 
                     // updating the user. the organization and default org unit is unchanged
                     saveUser(newUser, _user.orgAndDefaultUnit);
                     loadUserDeferred = null;
                     deferred.resolve(_user);
-                }).error(function () {
+                }).error(() => {
                     deferred.reject("Couldn't patch the user!");
                 });
             }
@@ -100,22 +100,21 @@
                 loadUserDeferred = $q.defer();
 
                 // login or re-auth?
-                var httpDeferred = payload ? $http.post("api/authorize", payload) : reAuth();
+                var httpDeferred = payload ? $http.post("api/authorize", payload) : $http.get("api/authorize");
 
-                httpDeferred.then(function (result) {
+                httpDeferred.then(result => {
                     var user = result.data.response.user;
                     var orgsAndDefaultUnits = result.data.response.organizations;
-                    $window.sessionStorage.setItem('userResponse', JSONfn.stringify(result));
-                    resolveOrganization2(orgsAndDefaultUnits).then(function (orgAndDefaultUnit) {
+
+                    resolveOrganization2(orgsAndDefaultUnits).then(orgAndDefaultUnit => {
                         saveUser(user, orgAndDefaultUnit);
                         loadUserDeferred.resolve(_user);
                         loadUserDeferred = null;
-
-                    }, function () {
+                    }, () => {
                         loadUserDeferred.reject("No organization selected");
                         loadUserDeferred = null;
                     });
-                }, function (result) {
+                }, result => {
                     loadUserDeferred.reject(result.data);
                     loadUserDeferred = null;
                     clearSavedOrgId();
@@ -123,16 +122,6 @@
             }
 
             return loadUserDeferred.promise;
-        }
-
-        function reAuth() {
-            if ($window.sessionStorage.getItem('userResponse') === null) {
-                return $http.get("api/authorize");
-            } else {
-                var deferred = $q.defer();
-                deferred.resolve(JSONfn.parse($window.sessionStorage.getItem('userResponse')));
-                return deferred.promise;
-            }
         }
 
         function login(email, password, rememberMe) {
@@ -154,7 +143,6 @@
         }
 
         function logout() {
-            $window.sessionStorage.removeItem('userResponse');
             clearSavedOrgId();
             loadUserDeferred = null;
             _user = null;
@@ -164,13 +152,9 @@
         }
 
         function auth(adminRoles) {
-            return getUser().then(function (user) {
+            return getUser().then(user => {
                 if (adminRoles) {
-                    var hasRequiredRole = _.some(adminRoles, function (role) {
-                        //if the state role is global admin, and the user is global admin, it's cool
-                        //same for local admin
-                        return (role == "GlobalAdmin" && user.isGlobalAdmin) || (role == "LocalAdmin" && user.isLocalAdmin);
-                    });
+                    var hasRequiredRole = _.some(adminRoles, role => ((role == "GlobalAdmin" && user.isGlobalAdmin) || (role == "LocalAdmin" && user.isLocalAdmin)));
 
                     if (!hasRequiredRole) return $q.reject("User doesn't have the required permissions");
                 }
@@ -181,11 +165,11 @@
 
         function getSavedOrgId() {
             var orgId = localStorage.getItem("currentOrgId");
-            return orgId != null && JSON.parse(orgId);
+            return orgId != null && $window.JSON.parse(orgId);
         }
 
         function setSavedOrgId(orgId) {
-            localStorage.setItem("currentOrgId", JSON.stringify(orgId));
+            localStorage.setItem("currentOrgId", $window.JSON.stringify(orgId));
         }
 
         function clearSavedOrgId() {
