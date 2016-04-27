@@ -21,17 +21,17 @@
         </div>
         <div class="status-column">
             <button class="btn btn-link btn-xs"
-                    data-tooltip-html-unsafe="<small>{{ usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
-                    data-tooltip-trigger="mouseenter"
-                    data-tooltip-placement="right"
+                    data-uib-tooltip-html-unsafe="<small>{{ usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
+                    data-uib-tooltip-trigger="mouseenter"
+                    data-uib-tooltip-placement="right"
                     data-ng-click="openComment(usage)"
                     data-ng-if="usage.hasWriteAccess">
                 <i class="glyphicon glyphicon-comment" data-ng-class="{'faded': !usage.comment}"></i>
             </button>
             <button class="btn btn-link btn-xs"
-                    data-tooltip-html-unsafe="<small>Læs kommentar</small>"
-                    data-tooltip-trigger="mouseenter"
-                    data-tooltip-placement="right"
+                    data-uib-tooltip-html-unsafe="<small>Læs kommentar</small>"
+                    data-uib-tooltip-trigger="mouseenter"
+                    data-uib-tooltip-placement="right"
                     data-ng-click="openComment(usage)"
                     data-ng-if="!usage.hasWriteAccess && usage.comment">
                 <i class="glyphicon glyphicon-comment"></i>
@@ -42,12 +42,12 @@
     <!-- extra info -->
     <div class="col-md-1 text-center">
         <span data-ng-if="usage.projects.length > 0" class="text-success">
-            <i class="glyphicon glyphicon-ok" data-tooltip="{{usage.projects | joinBy:', ':'name'}}"></i>
+            <i class="glyphicon glyphicon-ok" data-uib-tooltip="{{usage.projects | joinBy:', ':'name'}}"></i>
         </span>
     </div>
     <div class="col-md-1 text-center">
         <span data-ng-if="usage.systems.length > 0" class="text-success">
-            <i class="glyphicon glyphicon-ok" data-tooltip="{{usage.systems | joinBy:', ':'itSystemName'}}"></i>
+            <i class="glyphicon glyphicon-ok" data-uib-tooltip="{{usage.systems | joinBy:', ':'itSystemName'}}"></i>
         </span>
     </div>
 </div>
@@ -74,17 +74,17 @@
 
             <div class="status-column">
                 <button class="btn btn-link btn-xs"
-                        data-tooltip-html-unsafe="<small>{{ usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
-                        data-tooltip-trigger="mouseenter"
-                        data-tooltip-placement="right"
+                        data-uib-tooltip-html-unsafe="<small>{{ usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
+                        data-uib-tooltip-trigger="mouseenter"
+                        data-uib-tooltip-placement="right"
                         data-ng-click="openComment(usage)"
                         data-ng-if="usage.hasWriteAccess">
                     <i class="glyphicon glyphicon-comment" data-ng-class="{'faded': !usage.comment}"></i>
                 </button>
                 <button class="btn btn-link btn-xs"
-                        data-tooltip-html-unsafe="<small>Læs kommentar</small>"
-                        data-tooltip-trigger="mouseenter"
-                        data-tooltip-placement="right"
+                        data-uib-tooltip-html-unsafe="<small>Læs kommentar</small>"
+                        data-uib-tooltip-trigger="mouseenter"
+                        data-uib-tooltip-placement="right"
                         data-ng-click="openComment(usage)"
                         data-ng-if="!usage.hasWriteAccess && usage.comment">
                     <i class="glyphicon glyphicon-comment"></i>
@@ -95,12 +95,12 @@
         <!-- extra info -->
         <div class="col-md-1 text-center">
             <span data-ng-if="usage.projects.length > 0" class="text-success">
-                <i class="glyphicon glyphicon-ok" data-tooltip="{{usage.projects | joinBy:', ':'name'}}"></i>
+                <i class="glyphicon glyphicon-ok" data-uib-tooltip="{{ usage.projects | joinBy:', ':'name' }}"></i>
             </span>
         </div>
         <div class="col-md-1 text-center">
             <span data-ng-if="usage.systemUsages.length > 0" class="text-success">
-                <i class="glyphicon glyphicon-ok" data-tooltip="{{usage.systemUsages | joinBy:', ':'itSystemName'}}"></i>
+                <i class="glyphicon glyphicon-ok" data-uib-tooltip="{{ usage.systemUsages | joinBy:', ':'itSystemName' }}"></i>
             </span>
         </div>
     </div>

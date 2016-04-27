@@ -183,13 +183,13 @@
                                             data-ng-class="{'unstarred': !task.usage.starred}"
                                             data-ng-click="task.toggleStar()"
                                             data-ng-disabled="!chosenOrgUnit.hasWriteAccess"
-                                            data-tooltip="Vis under overblik?">
+                                            data-uib-tooltip="Vis under overblik?">
                                         <i class="glyphicon glyphicon-star"></i>
                                     </button>
                                 </td>
                                 <td>
                                     <span class="text-success" data-ng-show="task.usage.hasDelegations">
-                                        <i class="glyphicon glyphicon-ok" data-tooltip="{{ task.usage.delegatedTo | joinBy:', ' }}" data-tooltip-placement="right"></i>
+                                        <i class="glyphicon glyphicon-ok" data-uib-tooltip="{{ task.usage.delegatedTo | joinBy:', ' }}" data-uib-tooltip-placement="right"></i>
                                     </span>
                                 </td>
                             </tr>
