@@ -145,6 +145,12 @@
             this.reload();
         }
 
+        public toggleLock(dataItem) {
+            if (dataItem.hasWriteAccess) {
+                dataItem.IsPriorityLocked = !dataItem.IsPriorityLocked;
+            }
+        }
+
         private reload() {
             this.$state.go(".", null, { reload: true });
         }
@@ -219,8 +225,10 @@
                                 var phase = `Phase${project.CurrentPhase}`;
                                 project.CurrentPhaseObj = project[phase];
 
-                                if (this.user.isGlobalAdmin || this.user.isLocalAdmin || this._.find(project.Rights, { 'userId': this.user.id })) {
+                                if (this.user.isGlobalAdmin || this.user.isLocalAdmin || this._.find(project.Rights, { 'userId': this.user.id }) || this.user.id === project.ObjectOwnerId) {
                                     project.hasWriteAccess = true;
+                                } else {
+                                    project.hasWriteAccess = false;
                                 }
                             });
 
@@ -568,12 +576,12 @@
                         field: "PriorityPf", title: "Prioritet: Portefølje", width: 150,
                         persistId: "prioritypf", // DON'T YOU DARE RENAME!
                         template: () => `<div class="btn-group btn-group-sm" data-toggle="buttons">
-                                                    <label class="btn btn-star" data-ng-class="{ 'unstarred': !dataItem.IsPriorityLocked }" data-ng-disabled="!dataItem.hasWriteAccess" data-ng-click="dataItem.IsPriorityLocked = !dataItem.IsPriorityLocked">
-                                                        <input type="checkbox" data-ng-model="dataItem.IsPriorityLocked" data-autosave="api/itproject/{{dataItem.Id}}" data-field="IsPriorityLocked">
+                                                    <label class="btn btn-star" data-ng-class="{ 'unstarred': !dataItem.IsPriorityLocked, 'disabled': !dataItem.hasWriteAccess }" data-ng-click="projectOverviewVm.toggleLock(dataItem)">
+                                                        <input type="checkbox" data-ng-model="dataItem.IsPriorityLocked" data-autosave="api/itproject/{{dataItem.Id}}" data-field="IsPriorityLocked" data-ng-disabled="!dataItem.hasWriteAccess">
                                                         <i class="glyphicon glyphicon-lock"></i>
                                                     </label>
                                                 </div>
-                                                <select data-ng-model="dataItem.PriorityPf" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priorityPf">
+                                                <select data-ng-model="dataItem.PriorityPf" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priorityPf" data-ng-disabled="!dataItem.hasWriteAccess">
                                                     <option value="None">-- Vælg --</option>
                                                     <option value="High">Høj</option>
                                                     <option value="Mid">Mellem</option>
