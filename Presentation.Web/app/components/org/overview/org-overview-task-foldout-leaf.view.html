@@ -1,9 +1,8 @@
 ﻿<div class="row task-usage-row task-foldout-leaf">
-
     <!-- org unit name -->
     <div class="col-md-8">
         <span class="indent">{{ indent(usage.level) }}</span>
-        <i class="glyphicon glyphicon-asterisk invisible"></i>
+        <span class="glyphicon glyphicon-asterisk invisible"></span>
         {{ usage.orgUnitName }}
     </div>
 
@@ -19,20 +18,19 @@
         </div>
         <div class="status-column">
             <button class="btn btn-link btn-xs"
-                data-uib-tooltip-html-unsafe="<small>{{ usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
-                data-uib-tooltip-trigger="mouseenter"
-                data-uib-tooltip-placement="right"
-                data-ng-click="openComment(usage)"
-                data-ng-if="usage.hasWriteAccess">
-                <i class="glyphicon glyphicon-comment" data-ng-class="{'faded': !usage.comment}"></i>
+                    data-ng-class="{'faded': !usage.comment}"
+                    data-uib-tooltip="{{ usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}"
+                    data-tooltip-placement="right"
+                    data-ng-click="openComment(usage)"
+                    data-ng-if="usage.hasWriteAccess">
+                <span class="glyphicon glyphicon-comment"></span>
             </button>
             <button class="btn btn-link btn-xs"
-                data-uib-tooltip-html-unsafe="<small>Læs kommentar</small>"
-                data-uib-tooltip-trigger="mouseenter"
-                data-uib-tooltip-placement="right"
-                data-ng-click="openComment(usage)"
-                data-ng-if="!usage.hasWriteAccess && usage.comment">
-                <i class="glyphicon glyphicon-comment"></i>
+                    data-uib-tooltip="Læs kommentar"
+                    data-tooltip-placement="right"
+                    data-ng-click="openComment(usage)"
+                    data-ng-if="!usage.hasWriteAccess && usage.comment">
+                <span class="glyphicon glyphicon-comment"></span>
             </button>
         </div>
     </div>
