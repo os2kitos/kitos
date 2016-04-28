@@ -730,3 +730,11 @@ div.searchbox-wrapper {
 .k-header {
    vertical-align: middle!important;
 }
+
+/*
+    Fixes odd uib-tooltip placement
+    https://github.com/angular-ui/bootstrap/issues/4649
+*/
+.nowrap {
+    white-space: nowrap;
+}

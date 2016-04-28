@@ -39,13 +39,11 @@
 
     <!-- extra info -->
     <div class="col-md-1 text-center">
-        <span data-ng-if="usage.projects.length > 0" class="text-success">
-            <i class="glyphicon glyphicon-ok" data-uib-tooltip="{{usage.projects | joinBy:', ':'name'}}"></i>
+        <span data-ng-if="usage.projects.length > 0" class="glyphicon glyphicon-ok text-success" aria-hidden="true" data-uib-tooltip="{{usage.projects | joinBy:', ':'name'}}" tooltip-class="nowrap">
         </span>
     </div>
     <div class="col-md-1 text-center">
-        <span data-ng-if="usage.systems.length > 0" class="text-success">
-            <i class="glyphicon glyphicon-ok" data-uib-tooltip="{{usage.systems | joinBy:', ':'itSystemName'}}"></i>
+        <span data-ng-if="usage.systems.length > 0" class="glyphicon glyphicon-ok text-success" aria-hidden="true" data-uib-tooltip="{{usage.systems | joinBy:', ':'itSystemName'}}" tooltip-class="nowrap">
         </span>
     </div>
 </div>
@@ -90,13 +88,13 @@
 
         <!-- extra info -->
         <div class="col-md-1 text-center">
-            <span data-ng-if="usage.projects.length > 0" class="text-success">
-                <i class="glyphicon glyphicon-ok" data-uib-tooltip="{{ usage.projects | joinBy:', ':'name' }}"></i>
+            <span data-ng-if="usage.projects.length > 0" class="text-success" data-uib-tooltip="{{ usage.projects | joinBy:', ':'name' }}" data-tooltip-class="nowrap">
+                <span class="glyphicon glyphicon-ok"></span>
             </span>
         </div>
         <div class="col-md-1 text-center">
-            <span data-ng-if="usage.systemUsages.length > 0" class="text-success">
-                <i class="glyphicon glyphicon-ok" data-uib-tooltip="{{ usage.systemUsages | joinBy:', ':'itSystemName' }}"></i>
+            <span data-ng-if="usage.systemUsages.length > 0" class="text-success" data-uib-tooltip="{{ usage.systemUsages | joinBy:', ':'itSystemName' }}" data-tooltip-class="nowrap">
+                <span class="glyphicon glyphicon-ok"></span>
             </span>
         </div>
     </div>
