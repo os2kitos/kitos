@@ -27,7 +27,6 @@
                 function create() {
                     var payload = {
                         name: "Unavngivet projekt",
-                        itProjectTypeId: 1,
                         responsibleOrgUnitId: orgUnitId,
                         organizationId: user.currentOrganizationId
                     };
