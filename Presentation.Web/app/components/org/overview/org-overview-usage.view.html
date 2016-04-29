@@ -1,7 +1,7 @@
 ﻿<div class="col-md-12 task-usage-root" data-ng-if="!usage.hasDelegations">
     <!-- org unit name -->
     <div class="col-md-3">
-        <i class="glyphicon glyphicon-asterisk small invisible"></i>
+        <span class="glyphicon glyphicon-asterisk small invisible"></span>
         {{ usage.orgUnitName }}
     </div>
 
@@ -21,33 +21,31 @@
         </div>
         <div class="status-column">
             <button class="btn btn-link btn-xs"
-                    data-tooltip-html-unsafe="<small>{{ usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
-                    data-tooltip-trigger="mouseenter"
+                    data-uib-tooltip="{{ usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}"
                     data-tooltip-placement="right"
                     data-ng-click="openComment(usage)"
                     data-ng-if="usage.hasWriteAccess">
-                <i class="glyphicon glyphicon-comment" data-ng-class="{'faded': !usage.comment}"></i>
+                <span class="glyphicon glyphicon-comment" data-ng-class="{'faded': !usage.comment}"></span>
             </button>
             <button class="btn btn-link btn-xs"
-                    data-tooltip-html-unsafe="<small>Læs kommentar</small>"
-                    data-tooltip-trigger="mouseenter"
+                    data-uib-tooltip="Læs kommentar"
                     data-tooltip-placement="right"
                     data-ng-click="openComment(usage)"
                     data-ng-if="!usage.hasWriteAccess && usage.comment">
-                <i class="glyphicon glyphicon-comment"></i>
+                <span class="glyphicon glyphicon-comment"></span>
             </button>
         </div>
     </div>
 
     <!-- extra info -->
     <div class="col-md-1 text-center">
-        <span data-ng-if="usage.projects.length > 0" class="text-success">
-            <i class="glyphicon glyphicon-ok" data-tooltip="{{usage.projects | joinBy:', ':'name'}}"></i>
+        <span data-ng-if="usage.projects.length > 0" class="text-success" data-uib-tooltip="{{usage.projects | joinBy:', ':'name'}}" tooltip-class="nowrap">
+            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
         </span>
     </div>
     <div class="col-md-1 text-center">
-        <span data-ng-if="usage.systems.length > 0" class="text-success">
-            <i class="glyphicon glyphicon-ok" data-tooltip="{{usage.systems | joinBy:', ':'itSystemName'}}"></i>
+        <span data-ng-if="usage.systems.length > 0" class="text-success" data-uib-tooltip="{{usage.systems | joinBy:', ':'itSystemName'}}" tooltip-class="nowrap">
+            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
         </span>
     </div>
 </div>
@@ -74,33 +72,31 @@
 
             <div class="status-column">
                 <button class="btn btn-link btn-xs"
-                        data-tooltip-html-unsafe="<small>{{ usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}</small>"
-                        data-tooltip-trigger="mouseenter"
+                        data-uib-tooltip="{{ usage.comment && 'Læs kommentar' || 'Tilføj kommentar' }}"
                         data-tooltip-placement="right"
                         data-ng-click="openComment(usage)"
                         data-ng-if="usage.hasWriteAccess">
-                    <i class="glyphicon glyphicon-comment" data-ng-class="{'faded': !usage.comment}"></i>
+                    <span class="glyphicon glyphicon-comment" data-ng-class="{'faded': !usage.comment}"></span>
                 </button>
                 <button class="btn btn-link btn-xs"
-                        data-tooltip-html-unsafe="<small>Læs kommentar</small>"
-                        data-tooltip-trigger="mouseenter"
+                        data-uib-tooltip="Læs kommentar"
                         data-tooltip-placement="right"
                         data-ng-click="openComment(usage)"
                         data-ng-if="!usage.hasWriteAccess && usage.comment">
-                    <i class="glyphicon glyphicon-comment"></i>
+                    <span class="glyphicon glyphicon-comment"></span>
                 </button>
             </div>
         </div>
 
         <!-- extra info -->
         <div class="col-md-1 text-center">
-            <span data-ng-if="usage.projects.length > 0" class="text-success">
-                <i class="glyphicon glyphicon-ok" data-tooltip="{{usage.projects | joinBy:', ':'name'}}"></i>
+            <span data-ng-if="usage.projects.length > 0" class="text-success" data-uib-tooltip="{{ usage.projects | joinBy:', ':'name' }}" data-tooltip-class="nowrap">
+                <span class="glyphicon glyphicon-ok"></span>
             </span>
         </div>
         <div class="col-md-1 text-center">
-            <span data-ng-if="usage.systemUsages.length > 0" class="text-success">
-                <i class="glyphicon glyphicon-ok" data-tooltip="{{usage.systemUsages | joinBy:', ':'itSystemName'}}"></i>
+            <span data-ng-if="usage.systemUsages.length > 0" class="text-success" data-uib-tooltip="{{ usage.systemUsages | joinBy:', ':'itSystemName' }}" data-tooltip-class="nowrap">
+                <span class="glyphicon glyphicon-ok"></span>
             </span>
         </div>
     </div>
