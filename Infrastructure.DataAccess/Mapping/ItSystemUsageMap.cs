@@ -35,7 +35,7 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.Overview)
                 .WithMany()
                 .HasForeignKey(d => d.OverviewId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(true);
 
             this.HasMany(t => t.UsedBy)
                 .WithRequired(t => t.ItSystemUsage)
