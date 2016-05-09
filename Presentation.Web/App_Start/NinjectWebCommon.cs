@@ -3,8 +3,16 @@ using Core.ApplicationServices;
 using Core.DomainServices;
 using Infrastructure.DataAccess;
 using Infrastructure.OpenXML;
+using Ninject.Extensions.Interception.Infrastructure.Language;
+using Ninject.Extensions.Logging;
+using Ninject.Extensions.Logging.Serilog;
+using Ninject.Extensions.Logging.Serilog.Infrastructure;
+using Ninject.Modules;
+using Ninject.Web.WebApi;
+using Ninject.Web.WebApi.WebHost;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Properties;
+using Serilog;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(Presentation.Web.App_Start.NinjectWebCommon), "Start")]
 [assembly: WebActivatorEx.ApplicationShutdownMethodAttribute(typeof(Presentation.Web.App_Start.NinjectWebCommon), "Stop")]
@@ -48,6 +56,7 @@ namespace Presentation.Web.App_Start
         private static IKernel CreateKernel()
         {
             var kernel = new StandardKernel();
+
             try
             {
                 kernel.Bind<Func<IKernel>>().ToMethod(ctx => () => new Bootstrapper().Kernel);
@@ -72,26 +81,26 @@ namespace Presentation.Web.App_Start
             kernel.Bind<KitosContext>().ToSelf().InRequestScope();
 
             kernel.Bind(typeof(IGenericRepository<>)).To(typeof(GenericRepository<>)).InRequestScope();
-            kernel.Bind<IUserRepository>().To<UserRepository>().InRequestScope();
-            kernel.Bind<IMailClient>().To<MailClient>().InRequestScope();
-            kernel.Bind<ICryptoService>().To<CryptoService>();
+            kernel.Bind<IUserRepository>().To<UserRepository>().InRequestScope().Intercept().With<LogInterceptor>();
+            kernel.Bind<IMailClient>().To<MailClient>().InRequestScope().Intercept().With<LogInterceptor>();
+            kernel.Bind<ICryptoService>().To<CryptoService>().Intercept().With<LogInterceptor>();
             kernel.Bind<IUserService>().To<UserService>().InRequestScope()
                 .WithConstructorArgument("ttl", Settings.Default.ResetPasswordTTL)
                 .WithConstructorArgument("baseUrl", Settings.Default.BaseUrl)
-                .WithConstructorArgument("mailSuffix", Settings.Default.MailSuffix);
-            kernel.Bind<IOrgUnitService>().To<OrgUnitService>().InRequestScope();
-            kernel.Bind<IAdminService>().To<AdminService>().InRequestScope();
-            kernel.Bind<IOrganizationService>().To<OrganizationService>().InRequestScope();
-            kernel.Bind<IItSystemService>().To<ItSystemService>().InRequestScope();
-            kernel.Bind<IItProjectService>().To<ItProjectService>().InRequestScope();
-            kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InRequestScope();
-            kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
-            kernel.Bind<IExcelService>().To<ExcelService>().InRequestScope();
-            kernel.Bind<IExcelHandler>().To<ExcelHandler>().InRequestScope();
+                .WithConstructorArgument("mailSuffix", Settings.Default.MailSuffix).Intercept().With<LogInterceptor>();
+            kernel.Bind<IOrgUnitService>().To<OrgUnitService>().InRequestScope().Intercept().With<LogInterceptor>();
+            kernel.Bind<IAdminService>().To<AdminService>().InRequestScope().Intercept().With<LogInterceptor>();
+            kernel.Bind<IOrganizationService>().To<OrganizationService>().InRequestScope().Intercept().With<LogInterceptor>();
+            kernel.Bind<IItSystemService>().To<ItSystemService>().InRequestScope().Intercept().With<LogInterceptor>();
+            kernel.Bind<IItProjectService>().To<ItProjectService>().InRequestScope().Intercept().With<LogInterceptor>();
+            kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InRequestScope().Intercept().With<LogInterceptor>();
+            kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope().Intercept().With<LogInterceptor>();
+            kernel.Bind<IExcelService>().To<ExcelService>().InRequestScope().Intercept().With<LogInterceptor>();
+            kernel.Bind<IExcelHandler>().To<ExcelHandler>().InRequestScope().Intercept().With<LogInterceptor>();
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
-            kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
-            kernel.Bind<RoleProvider>().ToMethod(ctx => Roles.Provider);
+            kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider).Intercept().With<LogInterceptor>();
+            kernel.Bind<RoleProvider>().ToMethod(ctx => Roles.Provider).Intercept().With<LogInterceptor>();
             kernel.Bind<IHttpModule>().To<ProviderInitializationHttpModule>();
         }
     }

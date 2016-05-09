@@ -4,6 +4,7 @@ using System.Web.Optimization;
 using System.Web.Routing;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Presentation.Web.App_Start;
 
 namespace Presentation.Web
 {
@@ -16,6 +17,7 @@ namespace Presentation.Web
         {
             AreaRegistration.RegisterAllAreas();
 
+            LogConfig.RegisterLog();
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);

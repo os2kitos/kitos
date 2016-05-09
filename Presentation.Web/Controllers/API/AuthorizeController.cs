@@ -5,6 +5,7 @@ using System.Web.Http;
 using System.Web.Security;
 using Core.DomainModel;
 using Core.DomainServices;
+using Ninject.Extensions.Logging;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
@@ -15,17 +16,19 @@ namespace Presentation.Web.Controllers.API
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
+        private readonly ILogger _logger;
 
-
-        public AuthorizeController(IUserRepository userRepository, IUserService userService,  IOrganizationService organizationService)
+        public AuthorizeController(IUserRepository userRepository, IUserService userService,  IOrganizationService organizationService, ILogger logger)
         {
             _userRepository = userRepository;
             _userService = userService;
             _organizationService = organizationService;
+            _logger = logger;
         }
 
         public HttpResponseMessage GetLogin()
         {
+            _logger.Debug("GetLogin called");
             try
             {
                 var response = CreateLoginResponse(KitosUser);
@@ -42,6 +45,7 @@ namespace Presentation.Web.Controllers.API
         [AllowAnonymous]
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
         {
+            _logger.Debug("PostLogin called");
             try
             {
                 if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
