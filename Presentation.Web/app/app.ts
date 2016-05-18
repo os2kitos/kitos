@@ -24,7 +24,7 @@ app.config([
     '$httpProvider',
     '$windowProvider',
     'notifyProvider',
-    function ($httpProvider, $windowProvider, notifyProvider) {
+    ($httpProvider, $windowProvider, notifyProvider) => {
         $httpProvider.interceptors.push('httpBusyInterceptor');
         // for some reason templates aren't updated so this is needed
         $httpProvider.defaults.headers.get = {
@@ -37,21 +37,18 @@ app.config([
         var $window = $windowProvider.$get();
 
         // encode all url requests - fixes IE not correctly encoding special chars
-        $httpProvider.interceptors.push(function () {
-            return {
-                'request': function (config) {
-                    config.url = $window.encodeURI(config.url);
-                    return config;
-                }
-
+        $httpProvider.interceptors.push(() => ({
+            'request'(config) {
+                config.url = $window.encodeURI(config.url);
+                return config;
             }
-        });
+        }));
     }
 ]);
 
 app.run([
     '$rootScope', '$http', '$state', '$uibModal', 'notify', 'userService', 'uiSelect2Config',
-    function ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config) {
+    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config) => {
         // init info
         $rootScope.page = {
             title: 'Index',
@@ -66,23 +63,23 @@ app.run([
         uiSelect2Config.dropdownAutoWidth = true;
 
         // logout function for top navigation bar
-        $rootScope.logout = function() {
-            userService.logout().then(function() {
+        $rootScope.logout = () => {
+            userService.logout().then(() => {
                 $state.go('index');
             });
         };
 
         // when changing states, we might need to authorize the user
-        $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
+        $rootScope.$on('$stateChangeStart', (event, toState, toParams, fromState, fromParams) => {
 
             if (toState.noAuth) { // no need to auth
-                 return;
+                return;
             }
 
-            userService.auth(toState.adminRoles).then(function(val) {
+            userService.auth(toState.adminRoles).then(val => {
                 // authentication OK!
 
-            }, function() {
+            }, () => {
                 event.preventDefault();
 
                 // bad authentication
@@ -91,7 +88,7 @@ app.run([
         });
 
         // when something goes wrong during state change (e.g a rejected resolve)
-        $rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
+        $rootScope.$on('$stateChangeError', (event, toState, toParams, fromState, fromParams, error) => {
             console.log(error);
             $state.go('index');
         });
