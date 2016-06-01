@@ -28,7 +28,7 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage GetLogin()
         {
-            _logger.Debug("{corrId} - GetLogin called for {user}", Request.GetCorrelationId(), KitosUser);
+            _logger.Debug("GetLogin called for {user}", KitosUser);
             try
             {
                 var response = CreateLoginResponse(KitosUser);

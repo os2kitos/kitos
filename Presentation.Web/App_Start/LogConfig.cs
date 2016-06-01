@@ -1,4 +1,6 @@
 ﻿using Serilog;
+using Serilog.Exceptions.Destructurers;
+using SerilogWeb.Classic.Enrichers;
 
 namespace Presentation.Web.App_Start
 {
@@ -8,7 +10,11 @@ namespace Presentation.Web.App_Start
         {
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.AppSettings()
-                .Destructure.ByTransforming<Core.DomainModel.User>(u => new {u.Id, u.Name, u.LastName, u.Uuid})
+                .Enrich.With<HttpRequestIdEnricher>()
+                .Enrich.With<HttpSessionIdEnricher>()
+                .Enrich.With<UserNameEnricher>()
+                .Enrich.With<HttpRequestUserAgentEnricher>()
+                .Enrich.With<ExceptionEnricher>()
                 .WriteTo.Trace()
                 .CreateLogger();
         }
