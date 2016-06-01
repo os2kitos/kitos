@@ -8,6 +8,7 @@ namespace Presentation.Web.App_Start
         {
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.AppSettings()
+                .Destructure.ByTransforming<Core.DomainModel.User>(u => new {u.Id, u.Name, u.LastName, u.Uuid})
                 .WriteTo.Trace()
                 .CreateLogger();
         }

@@ -1,5 +1,5 @@
 ﻿using Ninject.Extensions.Interception;
-using Ninject.Extensions.Logging;
+using Serilog;
 
 namespace Presentation.Web.Infrastructure
 {
@@ -7,10 +7,10 @@ namespace Presentation.Web.Infrastructure
     {
         private readonly ILogger _logger;
 
-        public LogInterceptor(ILogger logger)
+        public LogInterceptor()
         {
 
-            _logger = logger;
+            _logger = Log.Logger;
         }
 
         protected override void BeforeInvoke(IInvocation invocation)
@@ -21,7 +21,7 @@ namespace Presentation.Web.Infrastructure
         protected override void AfterInvoke(IInvocation invocation)
         {
 
-            _logger.Info("Method: {Name} called with arguments {@Arguments}",
+            _logger.Information("Method: {Name} called with arguments {@Arguments}",
                     invocation.Request.Target +"."+ invocation.Request.Method.Name,
                     invocation.Request.Arguments);
         }

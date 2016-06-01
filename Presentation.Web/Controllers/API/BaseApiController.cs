@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.Caching;
 using System.Security;
+using System.Web.Caching;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
@@ -134,9 +136,14 @@ namespace Presentation.Web.Controllers.API
                         return UserRepository.Get(u => u.Uuid == uuid).First();
                     }
 
-                    var id = Convert.ToUInt32(User.Identity.Name);
-                    var user = UserRepository.Get(u => u.Id == id).FirstOrDefault();
-                    if (user == null) throw new SecurityException();
+                    var user = MemoryCache.Default.Get(User.Identity.Name) as User;
+                    if (user == null)
+                    {
+                        var id = Convert.ToUInt32(User.Identity.Name);
+                        user = UserRepository.Get(u => u.Id == id).FirstOrDefault();
+                        if (user == null) throw new SecurityException();
+                        MemoryCache.Default.Add(User.Identity.Name, user, DateTimeOffset.UtcNow.AddHours(1));
+                    }
 
                     return user;
                 }

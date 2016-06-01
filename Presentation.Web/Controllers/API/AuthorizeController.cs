@@ -28,7 +28,7 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage GetLogin()
         {
-            _logger.Debug("GetLogin called");
+            _logger.Debug("{corrId} - GetLogin called for {user}", Request.GetCorrelationId(), KitosUser);
             try
             {
                 var response = CreateLoginResponse(KitosUser);
@@ -45,7 +45,7 @@ namespace Presentation.Web.Controllers.API
         [AllowAnonymous]
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
         {
-            _logger.Debug("PostLogin called");
+            _logger.Debug("PostLogin called", loginDto);
             try
             {
                 if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))

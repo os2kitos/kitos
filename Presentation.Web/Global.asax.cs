@@ -5,6 +5,7 @@ using System.Web.Routing;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Presentation.Web.App_Start;
+using Presentation.Web.Infrastructure.MessageHandlers;
 
 namespace Presentation.Web
 {
@@ -15,9 +16,9 @@ namespace Presentation.Web
     {
         protected void Application_Start()
         {
-            AreaRegistration.RegisterAllAreas();
-
             LogConfig.RegisterLog();
+            GlobalConfiguration.Configuration.MessageHandlers.Add(new MessageLoggingHandler());
+            AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
