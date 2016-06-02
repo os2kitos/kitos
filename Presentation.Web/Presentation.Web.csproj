@@ -750,7 +750,6 @@
     <TypeScriptCompile Include="app\components\local-config\local-config-org.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-subnav.controller.ts" />
     <TypeScriptCompile Include="app\services\taskService.ts" />
-    <Content Include="Scripts\angular-bundle.min.js" />
     <TypeScriptCompile Include="app\components\home\home.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-hierarchy.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.controller.ts" />
