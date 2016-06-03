@@ -237,6 +237,11 @@
                     }
                 },
                 toolbar: [
+                    {
+                        name: "opretITProjekt",
+                        text: "Opret IT Projekt",
+                        template: "<a class='btn btn-success pull-right'>#: text #</a>"
+                    },
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",
