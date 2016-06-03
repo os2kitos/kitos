@@ -28,7 +28,9 @@
             "moment",
             "notify",
             "user",
-            "gridStateService"
+            "gridStateService",
+            '$uibModal',
+            '$http'
         ];
 
         constructor(
@@ -41,7 +43,9 @@
             private moment: moment.MomentStatic,
             private notify,
             private user,
-            private gridStateService: Services.IGridStateFactory) {
+            private gridStateService: Services.IGridStateFactory,
+            private $modal,
+            private $http) {
             $rootScope.page.title = "Snitflade - Katalog";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -118,6 +122,11 @@
                     serverFiltering: true
                 },
                 toolbar: [
+                    {
+                        name: "createSnitflade",
+                        text: "Opret Snitflade",
+                        template: "<a ng-click='interfaceCatalogVm.createSnitflade()' class='btn btn-success pull-right'>#: text #</a>"
+                    },
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",
@@ -415,6 +424,57 @@
                 ]
             };
         }
+
+
+        public createSnitflade() {
+            var self = this;
+            var modalInstance = this.$modal.open({
+                // fade in instead of slide from top, fixes strange cursor placement in IE
+                // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
+                windowClass: 'modal fade in',
+                templateUrl: 'app/components/it-system/it-interface/it-interface-modal-create.view.html',
+                controller: ['$scope', '$uibModalInstance', function ($scope, $modalInstance) {
+                    $scope.formData = { itInterfaceId: "" }; // set itInterfaceId to an empty string
+                    $scope.type = 'IT Snitflade';
+                    $scope.checkAvailbleUrl = 'api/itInterface/';
+
+
+                    $scope.validateName = function () {
+                        $scope.createForm.name.$validate();
+                    }
+                    $scope.validateItInterfaceId = function () {
+                        $scope.createForm.itInterfaceId.$validate();
+                    }
+
+                    $scope.uniqueConstraintError = false;
+
+                    $scope.submit = function () {
+                        var payload = {
+                            name: $scope.formData.name,
+                            itInterfaceId: $scope.formData.itInterfaceId,
+                            belongsToId: self.user.currentOrganizationId,
+                            organizationId: self.user.currentOrganizationId
+                        };
+
+                        var msg = self.notify.addInfoMessage('Opretter snitflade...', false);
+                        self.$http.post('api/itinterface', payload)
+                            .success(function (result) {
+                                msg.toSuccessMessage('En ny snitflade er oprettet!');
+                                var interfaceId = result.response.id;
+                                $modalInstance.close(interfaceId);
+                            }).error(function () {
+                                msg.toErrorMessage('Fejl! Kunne ikke oprette snitflade!');
+                            });
+                    };
+                }]
+            });
+
+            modalInstance.result.then(function (id) {
+                // modal was closed with OK
+                self.$state.go('it-system.interface-edit.interface-details', { id: id });
+            });
+        }
+
 
         // saves grid state to localStorage
         private saveGridOptions = () => {
