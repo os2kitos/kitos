@@ -455,8 +455,6 @@
     <Content Include="app\components\org\uniqueOrgUser.directive.js" />
     <Content Include="app\shared\autofocus.directive.js" />
     <Content Include="app\utility\lodash.mixin.js" />
-    <Content Include="Content\css\app.css" />
-    <Content Include="Content\css\app.min.css" />
     <Content Include="Content\css\select2-spinner.gif" />
     <Content Include="Content\css\select2.png" />
     <Content Include="Content\css\select2x2.png" />

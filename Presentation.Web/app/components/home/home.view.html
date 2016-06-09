@@ -7,11 +7,11 @@
                     <h3 class="panel-title">Om KITOS?</h3>
                 </div>
                 <div class="panel-body">
-                    <textarea data-ng-model="about" class="resize-vertical" cols="56" rows="8" data-autosave="api/text/1" data-field="value" data-ng-if="user.isGlobalAdmin"></textarea>
+                    <textarea data-ng-model="about" class="resize-vertical" style="width: 100%;" rows="8" data-autosave="api/text/1" data-field="value" data-ng-if="user.isGlobalAdmin"></textarea>
                     <div data-ng-bind-html="about" data-ng-if="!user.isGlobalAdmin"></div>
                 </div>
                 <div class="panel-footer">
-                    <a href="http://os2web.dk/document/kitos" target="_blank">Klik her for at læse mere</a>
+                    <a href="http://os2web.dk/document/kitos" target="_blank">Klik her for at læse mereee</a>
                 </div>
             </div>
 
@@ -124,7 +124,7 @@
                     <h3 class="panel-title">Driftstatus</h3>
                 </div>
                 <div class="panel-body">
-                    <textarea class="resize-vertical" data-ng-model="status" cols="56" data-autosave="api/text/2" data-field="value" data-ng-if="user.isGlobalAdmin"></textarea>
+                    <textarea class="resize-vertical" data-ng-model="status" rows="4" style="width: 100%;" data-autosave="api/text/2" data-field="value" data-ng-if="user.isGlobalAdmin"></textarea>
                     <div data-ng-bind-html="status" data-ng-if="!user.isGlobalAdmin"></div>
                 </div>
             </div>
