@@ -157,6 +157,10 @@
     <Compile Include="Migrations\201604040834360_Initial.Designer.cs">
       <DependentUpon>201604040834360_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201605020926257_ItSysUsageOverviewWillCascade.cs" />
+    <Compile Include="Migrations\201605020926257_ItSysUsageOverviewWillCascade.Designer.cs">
+      <DependentUpon>201605020926257_ItSysUsageOverviewWillCascade.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
     <Compile Include="UserRepository.cs" />
@@ -182,6 +186,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201604040834360_Initial.resx">
       <DependentUpon>201604040834360_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605020926257_ItSysUsageOverviewWillCascade.resx">
+      <DependentUpon>201605020926257_ItSysUsageOverviewWillCascade.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
