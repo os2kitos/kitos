@@ -145,9 +145,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.CData.MySQL.Entities.EF6">
-      <HintPath>..\..\..\..\..\..\Program Files\CData\CData ADO.NET Provider for MySQL 2016\lib\4.0\System.Data.CData.MySQL.Entities.EF6.dll</HintPath>
-    </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http.Formatting">
