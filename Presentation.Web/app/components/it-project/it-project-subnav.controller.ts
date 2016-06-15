@@ -15,7 +15,7 @@
                     { state: "it-project.overview", text: "IT projekter" },
                     { state: "it-project.overview-inactive", text: "Inaktive IT projekter" },
                     //{ state: 'it-project.catalog', text: 'IT Projekt katalog' },
-                    { state: "it-project.edit", text: "IT Projekt", showWhen: "it-project.edit" },
+                    { state: "it-project.edit", text: "IT Projekt", showWhen: "it-project.edit" }
                 ];
                 $rootScope.page.subnav.buttons = [
                     { func: remove, text: "Slet IT Projekt", style: "btn-danger", showWhen: "it-project.edit" }
