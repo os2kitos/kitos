@@ -3,8 +3,16 @@ using Core.ApplicationServices;
 using Core.DomainServices;
 using Infrastructure.DataAccess;
 using Infrastructure.OpenXML;
+using Ninject.Extensions.Interception.Infrastructure.Language;
+using Ninject.Extensions.Logging;
+using Ninject.Extensions.Logging.Serilog;
+using Ninject.Extensions.Logging.Serilog.Infrastructure;
+using Ninject.Modules;
+using Ninject.Web.WebApi;
+using Ninject.Web.WebApi.WebHost;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Properties;
+using Serilog;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(Presentation.Web.App_Start.NinjectWebCommon), "Start")]
 [assembly: WebActivatorEx.ApplicationShutdownMethodAttribute(typeof(Presentation.Web.App_Start.NinjectWebCommon), "Stop")]
@@ -48,6 +56,7 @@ namespace Presentation.Web.App_Start
         private static IKernel CreateKernel()
         {
             var kernel = new StandardKernel();
+
             try
             {
                 kernel.Bind<Func<IKernel>>().ToMethod(ctx => () => new Bootstrapper().Kernel);
@@ -87,7 +96,7 @@ namespace Presentation.Web.App_Start
             kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InRequestScope();
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
             kernel.Bind<IExcelService>().To<ExcelService>().InRequestScope();
-            kernel.Bind<IExcelHandler>().To<ExcelHandler>().InRequestScope();
+            kernel.Bind<IExcelHandler>().To<ExcelHandler>().InRequestScope().Intercept().With(new LogInterceptor());
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
