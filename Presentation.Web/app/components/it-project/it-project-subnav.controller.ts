@@ -18,7 +18,7 @@
                     { state: "it-project.edit", text: "IT Projekt", showWhen: "it-project.edit" },
                 ];
                 $rootScope.page.subnav.buttons = [
-                    { func: remove, text: "Slet IT Projekt", style: "btn-danger", icon: "glyphicon-minus", showWhen: "it-project.edit" }
+                    { func: remove, text: "Slet IT Projekt", style: "btn-danger", showWhen: "it-project.edit" }
                 ];
 
                 function remove() {
