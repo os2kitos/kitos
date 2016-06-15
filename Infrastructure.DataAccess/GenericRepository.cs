@@ -14,7 +14,7 @@ namespace Infrastructure.DataAccess
     {
         private readonly KitosContext _context;
         private readonly DbSet<T> _dbSet;
-        private bool _disposed = false;
+        private bool _disposed;
 
         public GenericRepository(KitosContext context)
         {
@@ -35,12 +35,12 @@ namespace Infrastructure.DataAccess
             }
 
             foreach (var includeProperty in includeProperties.Split
-                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                (new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 query = query.Include(includeProperty);
             }
 
-            return orderBy != null ? orderBy(query).ToList() : query.ToList();
+            return orderBy?.Invoke(query).ToList() ?? query.ToList();
         }
 
         public IQueryable<T> AsQueryable()

@@ -23,7 +23,7 @@
     <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <TargetFrameworkProfile />
-    <UseGlobalApplicationHostFile />
+    <UseGlobalApplicationHostFile>false</UseGlobalApplicationHostFile>
     <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -589,6 +589,7 @@
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-roles.po.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-systems.po.ts" />
     <TypeScriptCompile Include="app\components\reports\reports-overview.ts" />
+    <TypeScriptCompile Include="app\components\reports\reports-subnav.controller.ts" />
     <TypeScriptCompile Include="app\models\it-contract\economy-stream.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-overview-inactive.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-overview.spec.ts" />

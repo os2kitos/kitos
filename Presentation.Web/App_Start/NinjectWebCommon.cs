@@ -1,34 +1,26 @@
+using System;
+using System.Web;
 using System.Web.Security;
 using Core.ApplicationServices;
 using Core.DomainServices;
 using Infrastructure.DataAccess;
 using Infrastructure.OpenXML;
+using Microsoft.Web.Infrastructure.DynamicModuleHelper;
+using Ninject;
 using Ninject.Extensions.Interception.Infrastructure.Language;
-using Ninject.Extensions.Logging;
-using Ninject.Extensions.Logging.Serilog;
-using Ninject.Extensions.Logging.Serilog.Infrastructure;
-using Ninject.Modules;
-using Ninject.Web.WebApi;
-using Ninject.Web.WebApi.WebHost;
+using Ninject.Web.Common;
+using Presentation.Web;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Properties;
-using Serilog;
 
-[assembly: WebActivatorEx.PreApplicationStartMethod(typeof(Presentation.Web.App_Start.NinjectWebCommon), "Start")]
-[assembly: WebActivatorEx.ApplicationShutdownMethodAttribute(typeof(Presentation.Web.App_Start.NinjectWebCommon), "Stop")]
+[assembly: WebActivatorEx.PreApplicationStartMethod(typeof(NinjectWebCommon), "Start")]
+[assembly: WebActivatorEx.ApplicationShutdownMethodAttribute(typeof(NinjectWebCommon), "Stop")]
 
-namespace Presentation.Web.App_Start
+namespace Presentation.Web
 {
-    using System;
-    using System.Web;
-
-    using Microsoft.Web.Infrastructure.DynamicModuleHelper;
-
-    using Ninject;
-    using Ninject.Web.Common;
-
     public static class NinjectWebCommon
     {
+        // ReSharper disable once InconsistentNaming
         private static readonly Bootstrapper bootstrapper = new Bootstrapper();
 
         /// <summary>
