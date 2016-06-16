@@ -136,14 +136,14 @@ namespace Presentation.Web.Controllers.API
                         return UserRepository.Get(u => u.Uuid == uuid).First();
                     }
 
-                    var user = MemoryCache.Default.Get(User.Identity.Name) as User;
-                    if (user == null)
-                    {
+                    //var user = MemoryCache.Default.Get(User.Identity.Name) as User;
+                    //if (user == null)
+                    //{
                         var id = Convert.ToUInt32(User.Identity.Name);
-                        user = UserRepository.Get(u => u.Id == id).FirstOrDefault();
+                        var user = UserRepository.Get(u => u.Id == id).FirstOrDefault();
                         if (user == null) throw new SecurityException();
-                        MemoryCache.Default.Add(User.Identity.Name, user, DateTimeOffset.UtcNow.AddHours(1));
-                    }
+                      //  MemoryCache.Default.Add(User.Identity.Name, user, DateTimeOffset.UtcNow.AddHours(1));
+                    //}
 
                     return user;
                 }
