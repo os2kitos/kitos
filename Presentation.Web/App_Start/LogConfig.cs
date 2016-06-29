@@ -15,6 +15,7 @@ namespace Presentation.Web.App_Start
                 .Enrich.With<UserNameEnricher>()
                 .Enrich.With<HttpRequestUserAgentEnricher>()
                 .Enrich.With<ExceptionEnricher>()
+                .Enrich.With<HttpRequestClientHostIPEnricher>()
                 .WriteTo.Trace()
                 .CreateLogger();
         }
