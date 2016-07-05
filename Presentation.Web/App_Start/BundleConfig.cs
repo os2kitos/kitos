@@ -10,6 +10,7 @@ namespace Presentation.Web
             // vendor bundle
             bundles.Add(new ScriptBundle("~/Scripts/vendor")
                 .Include("~/Scripts/library-bundle.min.js")
+                .Include("~/app/utility/lodash.mixin.js")
             );
 
             // angular module bundle
