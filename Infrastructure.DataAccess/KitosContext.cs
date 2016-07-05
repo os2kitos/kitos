@@ -5,11 +5,11 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Infrastructure.DataAccess.Mapping;
-using MySql.Data.Entity;
+using System;
+using System.Data.Entity.ModelConfiguration.Conventions;
 
 namespace Infrastructure.DataAccess
 {
-    [DbConfigurationType(typeof(MySqlEFConfiguration))]
     public class KitosContext : DbContext
     {
         static KitosContext()
@@ -93,6 +93,14 @@ namespace Infrastructure.DataAccess
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            // it's not possible to remove individual cascading deletes pr M:M relation
+            // so have to remove all of them
+            modelBuilder.Conventions.Remove<ManyToManyCascadeDeleteConvention>();
+            // configure DateTime to use datetime2 in sql server as their range match
+            modelBuilder.Properties<DateTime>().Configure(c => c.HasColumnType("datetime2"));
+            // placed first because then we have the ability to override
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.ComplexType<ItProjectPhase>();
 
             modelBuilder.Configurations.Add(new AdminRightMap());

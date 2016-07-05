@@ -13,7 +13,8 @@ namespace Infrastructure.DataAccess.Mapping
             // Relationships
             this.HasRequired(t => t.OrgUnit)
                 .WithMany(o => o.TaskUsages)
-                .HasForeignKey(t => t.OrgUnitId);
+                .HasForeignKey(t => t.OrgUnitId)
+                .WillCascadeOnDelete(false);
 
             this.HasRequired(t => t.TaskRef)
                 .WithMany(r => r.Usages)
@@ -22,7 +23,7 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.Parent)
                 .WithMany(d => d.Children)
                 .HasForeignKey(t => t.ParentId)
-                .WillCascadeOnDelete(true);
+                .WillCascadeOnDelete(false);
         }
     }
 }

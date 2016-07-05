@@ -19,10 +19,6 @@ namespace Infrastructure.DataAccess.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
-
-            // MySQL oddness
-            SetSqlGenerator("MySql.Data.MySqlClient", new MySql.Data.Entity.MySqlMigrationSqlGenerator());
-            CodeGenerator = new MySql.Data.Entity.MySqlMigrationCodeGenerator();
         }
 
         /// <summary>

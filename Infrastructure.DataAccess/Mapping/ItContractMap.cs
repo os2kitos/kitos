@@ -55,7 +55,8 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasRequired(t => t.Organization)
                 .WithMany(t => t.ItContracts)
-                .HasForeignKey(d => d.OrganizationId);
+                .HasForeignKey(d => d.OrganizationId)
+                .WillCascadeOnDelete(false);
 
             this.HasOptional(t => t.ContractSigner)
                 .WithMany(d => d.SignerForContracts)
