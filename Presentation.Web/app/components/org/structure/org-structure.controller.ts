@@ -7,15 +7,15 @@
                 controller: 'org.StructureCtrl',
                 resolve: {
                     orgUnits: [
-                        '$http', 'user', function ($http, user) {
-                            return $http.get('api/organizationunit?organization=' + user.currentOrganizationId).then(function (result) {
+                        '$http', 'user', function ($http: ng.IHttpService, user) {
+                            return $http.get<Kitos.Models.IApiWrapper<any>>('api/organizationunit?organization=' + user.currentOrganizationId).then((result) => {
                                 return result.data.response;
                             });
                         }
                     ],
                     orgRoles: [
-                        '$http', function ($http) {
-                            return $http.get('api/organizationRole/?nonsuggestions').then(function (result) {
+                        '$http', function ($http: ng.IHttpService) {
+                            return $http.get<Kitos.Models.IApiWrapper<any>>('api/organizationRole/?nonsuggestions').then((result) => {
                                 return result.data.response;
                             });
                         }
@@ -32,7 +32,7 @@
 
     app.controller('org.StructureCtrl', [
         '$scope', '$http', '$q', '$filter', '$uibModal', '$state', 'notify', 'orgUnits', 'orgRoles', 'user',
-        function ($scope, $http, $q, $filter, $modal, $state, notify, orgUnits, orgRoles, user) {
+        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, orgRoles, user) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
@@ -70,11 +70,11 @@
                 $scope.orgUnits[orgUnit.id] = orgUnit;
 
                 if (!inheritWriteAccess) {
-                    $http.get('api/organizationUnit/' + orgUnit.id + '?hasWriteAccess&organizationId=' + user.currentOrganizationId).success(function(result) {
-                        orgUnit.hasWriteAccess = result.response;
+                    $http.get<Kitos.Models.IApiWrapper<any>>('api/organizationUnit/' + orgUnit.id + '?hasWriteAccess&organizationId=' + user.currentOrganizationId).then((result) => {
+                        orgUnit.hasWriteAccess = result.data.response;
 
                         _.each(orgUnit.children, function(u) {
-                            flattenAndSave(u, result.response, orgUnit);
+                            flattenAndSave(u, result.data.response, orgUnit);
                         });
 
                     });
@@ -120,11 +120,11 @@
                         node.organization = orgs[node.organizationId];
                     } else {
                         //else get from server
-                        $http.get('api/organization/' + node.organizationId).success(function(data) {
-                            node.organization = data.response;
+                        $http.get<Kitos.Models.IApiWrapper<any>>('api/organization/' + node.organizationId).then((result) => {
+                            node.organization = result.data.response;
 
                             //save to cache
-                            orgs[node.organizationId] = data.response;
+                            orgs[node.organizationId] = result.data.response;
                         });
                     }
                 }
@@ -141,10 +141,10 @@
 
             function loadRights(node) {
                 //get org rights on the org unit and subtree
-                $http.get('api/organizationUnitRights/' + node.id + '?paged&take=' + $scope.rightsPagination.take + '&skip=' + $scope.rightsPagination.skip).success(function (data, status, headers) {
-                    var paginationHeader = JSON.parse(headers('X-Pagination'));
+                $http.get<Kitos.Models.IApiWrapper<any>>('api/organizationUnitRights/' + node.id + '?paged&take=' + $scope.rightsPagination.take + '&skip=' + $scope.rightsPagination.skip).then((result) => {
+                    var paginationHeader = JSON.parse(result.headers('X-Pagination'));
                     $scope.totalRightsCount = paginationHeader.TotalCount;
-                    node.orgRights = data.response;
+                    node.orgRights = result.data.response;
 
                     _.each(node.orgRights, function (right: { userForSelect; roleForSelect; user; roleId; show; }) {
                         right.userForSelect = { id: right.user.id, text: right.user.fullName };
@@ -181,22 +181,22 @@
                     "userId": uId
                 };
 
-                $http.post("api/organizationUnitRights/" + oId + '?organizationId=' + user.currentOrganizationId, data).success(function(result) {
-                    notify.addSuccessMessage(result.response.user.fullName + " er knyttet i rollen");
+                $http.post<Kitos.Models.IApiWrapper<any>>("api/organizationUnitRights/" + oId + '?organizationId=' + user.currentOrganizationId, data).then((result) => {
+                    notify.addSuccessMessage(result.data.response.user.fullName + " er knyttet i rollen");
 
                     $scope.chosenOrgUnit.orgRights.push({
-                        "objectId": result.response.objectId,
-                        "roleId": result.response.roleId,
-                        "userId": result.response.userId,
-                        "user": result.response.user,
-                        'userForSelect': { id: result.response.userId, text: result.response.user.fullName },
-                        'roleForSelect': result.response.roleId,
+                        "objectId": result.data.response.objectId,
+                        "roleId": result.data.response.roleId,
+                        "userId": result.data.response.userId,
+                        "user": result.data.response.user,
+                        'userForSelect': { id: result.data.response.userId, text: result.data.response.user.fullName },
+                        'roleForSelect': result.data.response.roleId,
                         show: true
                     });
 
                     $scope.newRole = getDefaultNewRole();
                     $scope.selectedUser = "";
-                }).error(function(result) {
+                }, (error) => {
                     notify.addErrorMessage('Fejl!');
                 });
             };
@@ -206,10 +206,10 @@
                 var rId = right.roleId;
                 var uId = right.userId;
 
-                $http.delete("api/organizationUnitRights/" + oId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
+                $http.delete<Kitos.Models.IApiWrapper<any>>("api/organizationUnitRights/" + oId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).then((deleteResult) => {
                     right.show = false;
                     notify.addSuccessMessage('Rollen er slettet!');
-                }).error(function(deleteResult) {
+                }, (error) => {
                     notify.addErrorMessage('Kunne ikke slette rollen!');
                 });
             };
@@ -234,29 +234,28 @@
 
                 //otherwise, we should delete the old entry, then add a new one
 
-                $http.delete("api/organizationUnitRights/" + oIdOld + "?rId=" + rIdOld + "&uId=" + uIdOld + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
+                $http.delete<Kitos.Models.IApiWrapper<any>>("api/organizationUnitRights/" + oIdOld + "?rId=" + rIdOld + "&uId=" + uIdOld + '&organizationId=' + user.currentOrganizationId).then((deleteResult) => {
                     var data = {
                         "roleId": rIdNew,
                         "userId": uIdNew
                     };
 
-                    $http.post("api/organizationUnitRights/" + oIdNew + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
-                        right.roleId = result.response.roleId;
-                        right.user = result.response.user;
-                        right.userId = result.response.userId;
+                    $http.post<Kitos.Models.IApiWrapper<any>>("api/organizationUnitRights/" + oIdNew + '?organizationId=' + user.currentOrganizationId, data).then((result) => {
+                        right.roleId = result.data.response.roleId;
+                        right.user = result.data.response.user;
+                        right.userId = result.data.response.userId;
 
                         right.edit = false;
 
                         notify.addSuccessMessage(right.user.fullName + " er knyttet i rollen");
-                    }).error(function(result) {
+                    }, (error) => {
                         // we successfully deleted the old entry, but didn't add a new one
                         // fuck
-
                         right.show = false;
 
                         notify.addErrorMessage('Fejl!');
                     });
-                }).error(function(deleteResult) {
+                }, (error) => {
                     // couldn't delete the old entry, just reset select options
                     right.userForSelect = { id: right.user.id, text: right.user.fullName };
                     right.roleForSelect = right.roleId;
@@ -360,13 +359,13 @@
 
                                 var id = unit.id;
 
-                                $http({ method: 'PATCH', url: "api/organizationUnit/" + id + '?organizationId=' + user.currentOrganizationId, data: data }).success(function(result) {
+                                $http<Kitos.Models.IApiWrapper<any>>({ method: 'PATCH', url: "api/organizationUnit/" + id + '?organizationId=' + user.currentOrganizationId, data: data }).then((result) => {
                                     notify.addSuccessMessage(name + " er ændret.");
 
-                                    $modalInstance.close(result.response);
-                                }).error(function(result, status) {
+                                    $modalInstance.close(result.data.response);
+                                }, (error: ng.IHttpPromiseCallbackArg<Kitos.Models.IApiWrapper<any>>) => {
                                     $modalScope.submitting = false;
-                                    if (result.msg.indexOf("Duplicate entry") > -1) {
+                                    if (error.data.msg.indexOf("Duplicate entry") > -1) {
                                         notify.addErrorMessage("Fejl! Enhed ID er allerede brugt!");
                                     } else {
                                         notify.addErrorMessage("Fejl! " + name + " kunne ikke ændres!");
@@ -396,13 +395,13 @@
 
                                 $modalScope.submitting = true;
 
-                                $http({ method: 'POST', url: "api/organizationUnit/", data: data }).success(function(result) {
+                                $http<Kitos.Models.IApiWrapper<any>>({ method: 'POST', url: "api/organizationUnit/", data: data }).then((result) => {
                                     notify.addSuccessMessage(name + " er gemt.");
 
-                                    $modalInstance.close(result.response);
-                                }).error(function (result, status) {
+                                    $modalInstance.close(result.data.response);
+                                }, (error: ng.IHttpPromiseCallbackArg<Kitos.Models.IApiWrapper<any>>) => {
                                     $modalScope.submitting = false;
-                                    if (result.msg.indexOf("Duplicate entry") > -1) {
+                                    if (error.data.msg.indexOf("Duplicate entry") > -1) {
                                         notify.addErrorMessage("Fejl! Enhed ID er allerede brugt!");
                                     } else {
                                         notify.addErrorMessage("Fejl! " + name + " kunne ikke oprettes!");
@@ -427,11 +426,10 @@
 
                                 $modalScope.submitting = true;
 
-                                $http.delete("api/organizationUnit/" + unit.id + '?organizationId=' + user.currentOrganizationId).success(function () {
+                                $http.delete<Kitos.Models.IApiWrapper<any>>("api/organizationUnit/" + unit.id + '?organizationId=' + user.currentOrganizationId).then((result) => {
                                     $modalInstance.close();
                                     notify.addSuccessMessage(unit.name + " er slettet!");
-
-                                }).error(function() {
+                                }, (error) => {
                                     $modalScope.submitting = false;
 
                                     notify.addErrorMessage(`Fejl! ${unit.name} kunne ikke slettes!<br /><br />
@@ -493,13 +491,13 @@
                     if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
                 }
 
-                $http.get(url).success(function(result, status, headers) {
-                    $scope.taskRefUsageList = result.response;
+                $http.get<Kitos.Models.IApiWrapper<any>>(url).then((result) => {
+                    $scope.taskRefUsageList = result.data.response;
 
-                    var paginationHeader = JSON.parse(headers('X-Pagination'));
+                    var paginationHeader = JSON.parse(result.headers('X-Pagination'));
                     $scope.totalCount = paginationHeader.TotalCount;
                     decorateTasks();
-                }).error(function() {
+                }, (error) => {
                     notify.addErrorMessage("Kunne ikke hente opgaver!");
                 });
             }
@@ -515,10 +513,10 @@
                     orgUnitId: $scope.chosenOrgUnit.id
                 };
 
-                $http.post(url, payload).success(function(result) {
-                    refUsage.usage = result.response;
+                $http.post<Kitos.Models.IApiWrapper<any>>(url, payload).then((result) => {
+                    refUsage.usage = result.data.response;
                     if (showMessage) msg.toSuccessMessage("Tilknytningen er oprettet");
-                }).error(function() {
+                }, (error) => {
                     if (showMessage) msg.toErrorMessage("Fejl! Kunne ikke oprette tilknytningen!");
                 });
             }
@@ -528,16 +526,15 @@
 
                 var url = 'api/taskUsage/' + refUsage.usage.id + '?organizationId=' + user.currentOrganizationId;
 
-                $http.delete(url).success(function(result) {
+                $http.delete<Kitos.Models.IApiWrapper<any>>(url).then((result) => {
                     refUsage.usage = null;
                     if (showMessage) msg.toSuccessMessage("Tilknytningen er fjernet");
-                }).error(function() {
+                }, (error) => {
                     if (showMessage) msg.toErrorMessage("Fejl! Kunne ikke fjerne tilknytningen!");
                 });
             }
 
             function decorateTasks() {
-
                 _.each($scope.taskRefUsageList, function(refUsage: { toggleUsage; usage; toggleStar; }) {
                     refUsage.toggleUsage = function() {
                         if (refUsage.usage) {
@@ -556,10 +553,10 @@
 
                         var url = 'api/taskUsage/' + refUsage.usage.id;
                         var msg = notify.addInfoMessage("Opdaterer...", false);
-                        $http({ method: 'PATCH', url: url + '?organizationId=' + user.currentOrganizationId, data: payload }).success(function () {
+                        $http<Kitos.Models.IApiWrapper<any>>({ method: 'PATCH', url: url + '?organizationId=' + user.currentOrganizationId, data: payload }).then(() => {
                             refUsage.usage.starred = !refUsage.usage.starred;
                             msg.toSuccessMessage("Feltet er opdateret");
-                        }).error(function() {
+                        }, (error) => {
                             msg.toErrorMessage("Fejl!");
                         });
                     };
@@ -586,10 +583,10 @@
                 var url = 'api/taskusage?orgUnitId=' + $scope.chosenOrgUnit.id + '&taskId=' + $scope.selectedTaskGroup;
 
                 var msg = notify.addInfoMessage("Opretter tilknytning...", false);
-                $http.post(url).success(function() {
+                $http.post<Kitos.Models.IApiWrapper<any>>(url, null).then((result) => {
                     msg.toSuccessMessage("Tilknytningen er oprettet");
                     reload();
-                }).error(function() {
+                }, (error) => {
                     msg.toErrorMessage("Fejl! Kunne ikke oprette tilknytningen!");
                 });
             };
@@ -598,10 +595,10 @@
                 var url = 'api/taskusage?orgUnitId=' + $scope.chosenOrgUnit.id + '&taskId=' + $scope.selectedTaskGroup;
 
                 var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
-                $http.delete(url).success(function () {
+                $http.delete<Kitos.Models.IApiWrapper<any>>(url).then(() => {
                     msg.toSuccessMessage("Tilknytningen er fjernet");
                     reload();
-                }).error(function () {
+                }, (error) => {
                     msg.toErrorMessage("Fejl! Kunne ikke fjerne tilknytningen!");
                 });
             };
