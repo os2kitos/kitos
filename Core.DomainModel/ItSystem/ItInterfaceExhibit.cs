@@ -4,7 +4,7 @@ using Core.DomainModel.ItSystemUsage;
 namespace Core.DomainModel.ItSystem
 {
     /// <summary>
-    /// Represents what <see cref="DomainModel.ItSystem.ItInterface"/> 
+    /// Represents what <see cref="DomainModel.ItSystem.ItInterface"/>
     /// an <see cref="ItSystem"/> exhibts (udstiller).
     /// This is a (sys) 1:M (inf) relation.
     /// </summary>
