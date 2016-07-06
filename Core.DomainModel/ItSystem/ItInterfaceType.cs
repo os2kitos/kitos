@@ -1,18 +1,14 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Core.DomainModel.ItSystem
 {
     /// <summary>
-    /// Dropdown type for the <see cref="ItInterface"/>.
+    /// Dropdown type for the <see cref="ItSystem"/>.
     /// Provides details about an ItSystem of type interface.
     /// </summary>
-    /// <remarks>
-    /// Notice that this is NOT an interface, nor does it
-    /// distinguish systems from interfaces.
-    /// </remarks>
-    public class Interface : Entity, IOptionEntity<ItInterface> // TODO find a better suited name for this, note that InterfaceType is taken
+    public class ItInterfaceType : Entity, IOptionEntity<ItInterface>
     {
-        public Interface()
+        public ItInterfaceType()
         {
             References = new List<ItInterface>();
         }

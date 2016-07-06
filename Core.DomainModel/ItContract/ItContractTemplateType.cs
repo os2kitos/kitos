@@ -5,9 +5,9 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     /// It contract contract template options.
     /// </summary>
-    public class ContractTemplateType : Entity, IOptionEntity<ItContract>
+    public class ItContractTemplateType : Entity, IOptionEntity<ItContract>
     {
-        public ContractTemplateType()
+        public ItContractTemplateType()
         {
             References = new List<ItContract>();
         }

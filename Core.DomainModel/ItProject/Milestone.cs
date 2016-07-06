@@ -1,7 +1,6 @@
 ﻿using System;
-using Core.DomainModel.ItProject;
 
-namespace Core.DomainModel
+namespace Core.DomainModel.ItProject
 {
     /// <summary>
     /// Represents a milestone for a it project. (OIO entity: "Tilstand")

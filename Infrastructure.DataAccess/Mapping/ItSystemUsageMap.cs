@@ -15,8 +15,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.ItSystemUsages);
 
             this.HasMany(t => t.OrgUnits)
-                .WithMany(t => t.ItSystemUsages)
-                .Map(t => t.ToTable("OrgUnitSystemUsage")); // MySQL: short name due to limit in mysql
+                .WithMany(t => t.ItSystemUsages);
 
             this.HasOptional(t => t.ResponsibleUsage)
                 .WithOptionalPrincipal(t => t.ResponsibleItSystemUsage);

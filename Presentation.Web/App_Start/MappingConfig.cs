@@ -42,19 +42,19 @@ namespace Presentation.Web
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<ContractTemplateType, OptionDTO>()
+            Mapper.CreateMap<ItContractTemplateType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<ContractType, OptionDTO>()
+            Mapper.CreateMap<ItContractType, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
+
+            Mapper.CreateMap<ItInterfaceType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<InterfaceType, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
-
-            Mapper.CreateMap<Interface, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 

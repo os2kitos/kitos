@@ -54,8 +54,8 @@ namespace Presentation.Web
             //builder.EntitySet<BusinessType>("BusinessTypes");
             //builder.EntitySet<Communication>("Communications");
             //builder.EntitySet<Config>("Configs");
-            //builder.EntitySet<ContractTemplateType>("ContractTemplateTypes");
-            //builder.EntitySet<ContractType>("ContractTypes");
+            //builder.EntitySet<ItContractTemplateTypes>("ItContractTemplateTypes");
+            //builder.EntitySet<IContractType>("ItContractTypes");
 
             var dataRowUsage = builder.EntitySet<DataRowUsage>("DataRowUsages");
             dataRowUsage.EntityType.HasKey(x => new {x.DataRowId, x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId});
@@ -165,14 +165,14 @@ namespace Presentation.Web
             // if ItContract.Terminated has a value
             contracts.EntityType.Ignore(x => x.IsActive);
 
-            var interfaces = builder.EntitySet<Interface>("Interfaces");
-            interfaces.EntityType.HasKey(x => x.Id);
+            var interfaceTypes = builder.EntitySet<InterfaceType>("InterfaceTypes");
+            interfaceTypes.EntityType.HasKey(x => x.Id);
 
             var itInterfaces = builder.EntitySet<ItInterface>("ItInterfaces");
             itInterfaces.EntityType.HasKey(x => x.Id);
 
-            var interfaceTypes = builder.EntitySet<InterfaceType>("InterfaceType");
-            interfaceTypes.EntityType.HasKey(x => x.Id);
+            var itInterfaceTypes = builder.EntitySet<ItInterfaceType>("ItInterfaceTypes");
+            itInterfaceTypes.EntityType.HasKey(x => x.Id);
 
             var itInterfaceExihibits = builder.EntitySet<ItInterfaceExhibit>("ItInterfaceExhibits");
             itInterfaceExihibits.EntityType.HasKey(x => x.Id);
@@ -205,7 +205,7 @@ namespace Presentation.Web
             //builder.EntitySet<PaymentModelType>("PaymentModelTypes");
             //builder.EntitySet<PriceRegulationType>("PriceRegulationTypes");
             //builder.EntitySet<ProcurementStrategyType>("ProcurementStrategyTypes");
-            builder.EntitySet<ItProjectType>("ProjectTypes");
+            builder.EntitySet<ItProjectType>("ItProjectTypes");
             //builder.EntitySet<PurchaseFormType>("PurchaseFormTypes");
             //builder.EntitySet<Risk>("Risks");
             //builder.EntitySet<Stakeholder>("Stakeholders");

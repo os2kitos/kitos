@@ -84,8 +84,8 @@
     <Compile Include="Mapping\ArchiveTypeMap.cs" />
     <Compile Include="Mapping\CommunicationMap.cs" />
     <Compile Include="Mapping\ConfigMap.cs" />
-    <Compile Include="Mapping\ContractTemplateMap.cs" />
-    <Compile Include="Mapping\ContractTypeMap.cs" />
+    <Compile Include="Mapping\ItContractTemplateMap.cs" />
+    <Compile Include="Mapping\ItContractTypeMap.cs" />
     <Compile Include="Mapping\OptionExtendTypeMap.cs" />
     <Compile Include="Mapping\OrganizationRightMap.cs" />
     <Compile Include="Mapping\OrganizationRoleMap.cs" />
@@ -126,8 +126,8 @@
     <Compile Include="Mapping\GoalMap.cs" />
     <Compile Include="Mapping\GoalStatusMap.cs" />
     <Compile Include="Mapping\HandoverMap.cs" />
-    <Compile Include="Mapping\InterfaceMap.cs" />
     <Compile Include="Mapping\InterfaceTypeMap.cs" />
+    <Compile Include="Mapping\ItInterfaceTypeMap.cs" />
     <Compile Include="Mapping\ItContractMap.cs" />
     <Compile Include="Mapping\ItContractRightMap.cs" />
     <Compile Include="Mapping\ItContractRoleMap.cs" />
@@ -156,6 +156,98 @@
     <Compile Include="Migrations\201607041312172_MakeFilteredIndexes.cs" />
     <Compile Include="Migrations\201607041312172_MakeFilteredIndexes.Designer.cs">
       <DependentUpon>201607041312172_MakeFilteredIndexes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061016182_RenameStep1.cs" />
+    <Compile Include="Migrations\201607061016182_RenameStep1.Designer.cs">
+      <DependentUpon>201607061016182_RenameStep1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061031534_RenameStep2.cs" />
+    <Compile Include="Migrations\201607061031534_RenameStep2.Designer.cs">
+      <DependentUpon>201607061031534_RenameStep2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061041310_RenameStep3.cs" />
+    <Compile Include="Migrations\201607061041310_RenameStep3.Designer.cs">
+      <DependentUpon>201607061041310_RenameStep3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061045410_RenameStep4.cs" />
+    <Compile Include="Migrations\201607061045410_RenameStep4.Designer.cs">
+      <DependentUpon>201607061045410_RenameStep4.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061046558_RenameStep5.cs" />
+    <Compile Include="Migrations\201607061046558_RenameStep5.Designer.cs">
+      <DependentUpon>201607061046558_RenameStep5.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061050291_RenameStep6.cs" />
+    <Compile Include="Migrations\201607061050291_RenameStep6.Designer.cs">
+      <DependentUpon>201607061050291_RenameStep6.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061052190_RenameStep7.cs" />
+    <Compile Include="Migrations\201607061052190_RenameStep7.Designer.cs">
+      <DependentUpon>201607061052190_RenameStep7.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061053258_RenameStep8.cs" />
+    <Compile Include="Migrations\201607061053258_RenameStep8.Designer.cs">
+      <DependentUpon>201607061053258_RenameStep8.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061058441_RenameStep9.cs" />
+    <Compile Include="Migrations\201607061058441_RenameStep9.Designer.cs">
+      <DependentUpon>201607061058441_RenameStep9.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061100169_RenameStep10.cs" />
+    <Compile Include="Migrations\201607061100169_RenameStep10.Designer.cs">
+      <DependentUpon>201607061100169_RenameStep10.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061101316_RenameStep11.cs" />
+    <Compile Include="Migrations\201607061101316_RenameStep11.Designer.cs">
+      <DependentUpon>201607061101316_RenameStep11.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061103264_RenameStep12.cs" />
+    <Compile Include="Migrations\201607061103264_RenameStep12.Designer.cs">
+      <DependentUpon>201607061103264_RenameStep12.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061104541_RenameStep13.cs" />
+    <Compile Include="Migrations\201607061104541_RenameStep13.Designer.cs">
+      <DependentUpon>201607061104541_RenameStep13.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061107594_RenameStep14.cs" />
+    <Compile Include="Migrations\201607061107594_RenameStep14.Designer.cs">
+      <DependentUpon>201607061107594_RenameStep14.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061109597_RenameStep15.cs" />
+    <Compile Include="Migrations\201607061109597_RenameStep15.Designer.cs">
+      <DependentUpon>201607061109597_RenameStep15.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061114168_RenameStep16.cs" />
+    <Compile Include="Migrations\201607061114168_RenameStep16.Designer.cs">
+      <DependentUpon>201607061114168_RenameStep16.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061116410_RenameStep17.cs" />
+    <Compile Include="Migrations\201607061116410_RenameStep17.Designer.cs">
+      <DependentUpon>201607061116410_RenameStep17.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061119114_RenameStep18.cs" />
+    <Compile Include="Migrations\201607061119114_RenameStep18.Designer.cs">
+      <DependentUpon>201607061119114_RenameStep18.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061120320_RenameStep19.cs" />
+    <Compile Include="Migrations\201607061120320_RenameStep19.Designer.cs">
+      <DependentUpon>201607061120320_RenameStep19.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061157270_RenameStep20.cs" />
+    <Compile Include="Migrations\201607061157270_RenameStep20.Designer.cs">
+      <DependentUpon>201607061157270_RenameStep20.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061159506_RenameStep21.cs" />
+    <Compile Include="Migrations\201607061159506_RenameStep21.Designer.cs">
+      <DependentUpon>201607061159506_RenameStep21.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061202425_RenameStep22.cs" />
+    <Compile Include="Migrations\201607061202425_RenameStep22.Designer.cs">
+      <DependentUpon>201607061202425_RenameStep22.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607061204203_RenameStep23.cs" />
+    <Compile Include="Migrations\201607061204203_RenameStep23.Designer.cs">
+      <DependentUpon>201607061204203_RenameStep23.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -186,6 +278,75 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201607041312172_MakeFilteredIndexes.resx">
       <DependentUpon>201607041312172_MakeFilteredIndexes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061016182_RenameStep1.resx">
+      <DependentUpon>201607061016182_RenameStep1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061031534_RenameStep2.resx">
+      <DependentUpon>201607061031534_RenameStep2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061041310_RenameStep3.resx">
+      <DependentUpon>201607061041310_RenameStep3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061045410_RenameStep4.resx">
+      <DependentUpon>201607061045410_RenameStep4.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061046558_RenameStep5.resx">
+      <DependentUpon>201607061046558_RenameStep5.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061050291_RenameStep6.resx">
+      <DependentUpon>201607061050291_RenameStep6.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061052190_RenameStep7.resx">
+      <DependentUpon>201607061052190_RenameStep7.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061053258_RenameStep8.resx">
+      <DependentUpon>201607061053258_RenameStep8.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061058441_RenameStep9.resx">
+      <DependentUpon>201607061058441_RenameStep9.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061100169_RenameStep10.resx">
+      <DependentUpon>201607061100169_RenameStep10.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061101316_RenameStep11.resx">
+      <DependentUpon>201607061101316_RenameStep11.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061103264_RenameStep12.resx">
+      <DependentUpon>201607061103264_RenameStep12.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061104541_RenameStep13.resx">
+      <DependentUpon>201607061104541_RenameStep13.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061107594_RenameStep14.resx">
+      <DependentUpon>201607061107594_RenameStep14.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061109597_RenameStep15.resx">
+      <DependentUpon>201607061109597_RenameStep15.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061114168_RenameStep16.resx">
+      <DependentUpon>201607061114168_RenameStep16.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061116410_RenameStep17.resx">
+      <DependentUpon>201607061116410_RenameStep17.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061119114_RenameStep18.resx">
+      <DependentUpon>201607061119114_RenameStep18.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061120320_RenameStep19.resx">
+      <DependentUpon>201607061120320_RenameStep19.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061157270_RenameStep20.resx">
+      <DependentUpon>201607061157270_RenameStep20.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061159506_RenameStep21.resx">
+      <DependentUpon>201607061159506_RenameStep21.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061202425_RenameStep22.resx">
+      <DependentUpon>201607061202425_RenameStep22.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607061204203_RenameStep23.resx">
+      <DependentUpon>201607061204203_RenameStep23.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

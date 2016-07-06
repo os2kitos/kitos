@@ -31,8 +31,8 @@ namespace Infrastructure.DataAccess
         public DbSet<BusinessType> BusinessTypes { get; set; }
         public DbSet<Communication> Communications { get; set; }
         public DbSet<Config> Configs { get; set; }
-        public DbSet<ContractTemplateType> ContractTemplateTypes { get; set; }
-        public DbSet<ContractType> ContractTypes { get; set; }
+        public DbSet<ItContractTemplateType> ItContractTemplateTypes { get; set; }
+        public DbSet<ItContractType> ItContractTypes { get; set; }
         public DbSet<DataType> DataTypes { get; set; }
         public DbSet<DataRow> DataRows { get; set; }
         public DbSet<DataRowUsage> DataRowUsages { get; set; }
@@ -45,12 +45,12 @@ namespace Infrastructure.DataAccess
         public DbSet<Handover> Handovers { get; set; }
         public DbSet<HandoverTrial> HandoverTrials { get; set; }
         public DbSet<HandoverTrialType> HandoverTrialTypes { get; set; }
-        public DbSet<Interface> Interfaces { get; set; }
+        public DbSet<InterfaceType> InterfaceTypes { get; set; }
         public DbSet<ItInterfaceUse> ItInterfaceUses { get; set; }
         public DbSet<ItInterfaceUsage> ItInterfaceUsages { get; set; }
         public DbSet<ItInterfaceExhibit> ItInterfaceExhibits { get; set; }
         public DbSet<ItInterfaceExhibitUsage> ItInterfaceExhibtUsages { get; set; }
-        public DbSet<InterfaceType> InterfaceTypes { get; set; }
+        public DbSet<ItInterfaceType> ItInterfaceTypes { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
         public DbSet<ItContractItSystemUsage> ItContractItSystemUsages { get; set; }
         public DbSet<ItContractRight> ItContractRights { get; set; }
@@ -78,7 +78,7 @@ namespace Infrastructure.DataAccess
         public DbSet<PaymentModelType> PaymentModelTypes { get; set; }
         public DbSet<PriceRegulationType> PriceRegulationTypes { get; set; }
         public DbSet<ProcurementStrategyType> ProcurementStrategyTypes { get; set; }
-        public DbSet<ItProjectType> ProjectTypes { get; set; }
+        public DbSet<ItProjectType> ItProjectTypes { get; set; }
         public DbSet<PurchaseFormType> PurchaseFormTypes { get; set; }
         public DbSet<Risk> Risks { get; set; }
         public DbSet<SensitiveDataType> SensitiveDataTypes { get; set; }
@@ -111,8 +111,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new BusinessTypeMap());
             modelBuilder.Configurations.Add(new CommunicationMap());
             modelBuilder.Configurations.Add(new ConfigMap());
-            modelBuilder.Configurations.Add(new ContractTemplateMap());
-            modelBuilder.Configurations.Add(new ContractTypeMap());
+            modelBuilder.Configurations.Add(new ItContractTemplateMap());
+            modelBuilder.Configurations.Add(new ItContractTypeMap());
             modelBuilder.Configurations.Add(new DataTypeMap());
             modelBuilder.Configurations.Add(new DataRowMap());
             modelBuilder.Configurations.Add(new DataRowUsageMap());
@@ -125,13 +125,13 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new HandoverMap());
             modelBuilder.Configurations.Add(new HandoverTrialMap());
             modelBuilder.Configurations.Add(new HandoverTrialTypeMap());
-            modelBuilder.Configurations.Add(new InterfaceMap());
+            modelBuilder.Configurations.Add(new InterfaceTypeMap());
             modelBuilder.Configurations.Add(new ItInterfaceUsageMap());
             modelBuilder.Configurations.Add(new ItInterfaceMap());
             modelBuilder.Configurations.Add(new ItInterfaceUseMap());
             modelBuilder.Configurations.Add(new ItInterfaceExhibitMap());
             modelBuilder.Configurations.Add(new ItInterfaceExhibitUsageMap());
-            modelBuilder.Configurations.Add(new InterfaceTypeMap());
+            modelBuilder.Configurations.Add(new ItInterfaceTypeMap());
             modelBuilder.Configurations.Add(new ItContractMap());
             modelBuilder.Configurations.Add(new ItContractItSystemUsageMap());
             modelBuilder.Configurations.Add(new ItContractRightMap());

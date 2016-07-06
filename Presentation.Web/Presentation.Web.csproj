@@ -205,7 +205,7 @@
     <Compile Include="Controllers\API\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\API\ItProjectOrgUnitUsageController.cs" />
     <Compile Include="Controllers\OData\BaseController.cs" />
-    <Compile Include="Controllers\OData\InterfacesController.cs" />
+    <Compile Include="Controllers\OData\InterfaceTypesController.cs" />
     <Compile Include="Controllers\OData\EconomyStreamsController.cs" />
     <Compile Include="Controllers\OData\ItInterfaceUsesController.cs" />
     <Compile Include="Controllers\OData\ItInterfaceExhibitsController.cs" />

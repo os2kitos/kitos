@@ -31,7 +31,7 @@ namespace Core.ApplicationServices
             usage.LastChangedByUser = objectOwner;
 
             _usageRepository.Insert(usage);
-            
+
             _usageRepository.Save(); // abuse this as UoW
             return usage;
         }
@@ -40,7 +40,7 @@ namespace Core.ApplicationServices
         {
             // http://stackoverflow.com/questions/15226312/entityframewok-how-to-configure-cascade-delete-to-nullify-foreign-keys
             // when children are loaded into memory the foreign key is correctly set to null on children when deleted
-            var itSystemUsage = _usageRepository.Get(x => x.Id == id, null, $"{nameof(ItSystemUsage.ItInterfaceExhibitUsages)}, {nameof(ItSystemUsage.ItProjects)}, {nameof(ItSystemUsage.TaskRefs)}, {nameof(ItSystemUsage.Contracts)}, {nameof(ItSystemUsage.InterfaceUsages)}, {nameof(ItSystemUsage.UsedBy)}").FirstOrDefault();
+            var itSystemUsage = _usageRepository.Get(x => x.Id == id, null, $"{nameof(ItSystemUsage.ItInterfaceExhibitUsages)}, {nameof(ItSystemUsage.ItProjects)}, {nameof(ItSystemUsage.TaskRefs)}, {nameof(ItSystemUsage.Contracts)}, {nameof(ItSystemUsage.ItInterfaceUsages)}, {nameof(ItSystemUsage.UsedBy)}").FirstOrDefault();
 
             // delete it system usage
             _usageRepository.Delete(itSystemUsage);

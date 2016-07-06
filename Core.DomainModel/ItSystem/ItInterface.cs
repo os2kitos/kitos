@@ -40,7 +40,7 @@ namespace Core.DomainModel.ItSystem
         /// <value>
         /// The interface option.
         /// </value>
-        public virtual Interface Interface { get; set; }
+        public virtual InterfaceType Interface { get; set; }
 
         public int? InterfaceTypeId { get; set; }
         /// <summary>
@@ -50,7 +50,7 @@ namespace Core.DomainModel.ItSystem
         /// <value>
         /// The type of the interface.
         /// </value>
-        public virtual InterfaceType InterfaceType { get; set; }
+        public virtual ItInterfaceType InterfaceType { get; set; }
 
         public int? TsaId { get; set; }
         public virtual TsaType Tsa { get; set; }

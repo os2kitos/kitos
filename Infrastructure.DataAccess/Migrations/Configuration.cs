@@ -55,7 +55,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region OPTIONS
 
-            AddOptions<ItProjectType, ItProject>(context.ProjectTypes, globalAdmin, "Fællesoffentlig", "Fælleskommunal", "Lokal", "Tværkommunal", "SKAL", "Udvikling", "Implementering");
+            AddOptions<ItProjectType, ItProject>(context.ItProjectTypes, globalAdmin, "Fællesoffentlig", "Fælleskommunal", "Lokal", "Tværkommunal", "SKAL", "Udvikling", "Implementering");
 
             AddOptions<GoalType, Goal>(context.GoalTypes, globalAdmin, "Effektivitet", "Kvalitet", "Service");
 
@@ -69,9 +69,9 @@ namespace Infrastructure.DataAccess.Migrations
 
             AddOptions<FrequencyType, DataRowUsage>(context.FrequencyTypes, globalAdmin, "Dagligt", "Ugentligt", "Månedligt", "Årligt", "Kvartal", "Halvårligt");
 
-            AddOptions<InterfaceType, ItInterface>(context.InterfaceTypes, globalAdmin, "Webservice", "API", "iFrame", "Link", "Link - dybt", "Andet");
+            AddOptions<ItInterfaceType, ItInterface>(context.ItInterfaceTypes, globalAdmin, "Webservice", "API", "iFrame", "Link", "Link - dybt", "Andet");
 
-            AddOptions<Interface, ItInterface>(context.Interfaces, globalAdmin, "CSV", "WS SOAP", "WS REST", "MOX", "OIO REST", "LDAP", "User interface", "ODBC (SQL)", "Andet");
+            AddOptions<InterfaceType, ItInterface>(context.InterfaceTypes, globalAdmin, "CSV", "WS SOAP", "WS REST", "MOX", "OIO REST", "LDAP", "User interface", "ODBC (SQL)", "Andet");
 
             AddOptions<MethodType, ItInterface>(context.MethodTypes, globalAdmin, "Batch", "Request-Response", "Store and forward", "Publish-subscribe", "App interface", "Andet");
 
@@ -79,9 +79,9 @@ namespace Infrastructure.DataAccess.Migrations
 
             AddOptions<TsaType, ItInterface>(context.TsaTypes, globalAdmin, "Ja", "Nej");
 
-            AddOptions<ContractType, ItContract>(context.ContractTypes, globalAdmin, "Hovedkontrakt", "Tillægskontrakt", "Snitflade", "Serviceaftale", "Databehandleraftale");
+            AddOptions<ItContractType, ItContract>(context.ItContractTypes, globalAdmin, "Hovedkontrakt", "Tillægskontrakt", "Snitflade", "Serviceaftale", "Databehandleraftale");
 
-            AddOptions<ContractTemplateType, ItContract>(context.ContractTemplateTypes, globalAdmin, "K01", "K02", "K03", "Egen", "KOMBIT", "Leverandør", "OPI", "Anden");
+            AddOptions<ItContractTemplateType, ItContract>(context.ItContractTemplateTypes, globalAdmin, "K01", "K02", "K03", "Egen", "KOMBIT", "Leverandør", "OPI", "Anden");
 
             AddOptions<PurchaseFormType, ItContract>(context.PurchaseFormTypes, globalAdmin, "SKI", "SKI 02.18", "SKI 02.19", "Udbud", "EU udbud", "Direkte tildeling", "Annoncering");
 

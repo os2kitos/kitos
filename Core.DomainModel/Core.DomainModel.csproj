@@ -68,7 +68,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assignment.cs" />
+    <Compile Include="ItProject\Assignment.cs" />
     <Compile Include="OrganizationRight.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="IContextAware.cs" />
@@ -114,8 +114,8 @@
     <Compile Include="IRight.cs" />
     <Compile Include="IRoleEntity.cs" />
     <Compile Include="ItContract\AgreementElementType.cs" />
-    <Compile Include="ItContract\ContractTemplateType.cs" />
-    <Compile Include="ItContract\ContractType.cs" />
+    <Compile Include="ItContract\ItContractTemplateType.cs" />
+    <Compile Include="ItContract\ItContractType.cs" />
     <Compile Include="ItContract\ItContract.cs" />
     <Compile Include="ItContract\ItContractRight.cs" />
     <Compile Include="ItContract\ItContractRole.cs" />
@@ -131,15 +131,15 @@
     <Compile Include="ItProject\ItProjectType.cs" />
     <Compile Include="ItProject\Risk.cs" />
     <Compile Include="ItProject\Stakeholder.cs" />
-    <Compile Include="ItSystem\Interface.cs" />
     <Compile Include="ItSystem\InterfaceType.cs" />
+    <Compile Include="ItSystem\ItInterfaceType.cs" />
     <Compile Include="ItSystem\ItSystem.cs" />
     <Compile Include="ItSystem\ItSystemRight.cs" />
     <Compile Include="ItSystem\ItSystemRole.cs" />
     <Compile Include="ItSystem\MethodType.cs" />
     <Compile Include="ItSystem\BusinessType.cs" />
     <Compile Include="ItSystem\Wish.cs" />
-    <Compile Include="Milestone.cs" />
+    <Compile Include="ItProject\Milestone.cs" />
     <Compile Include="TaskRef.cs" />
     <Compile Include="Organization.cs" />
     <Compile Include="OrganizationUnitRole.cs" />

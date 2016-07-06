@@ -23,6 +23,7 @@ namespace Infrastructure.DataAccess.Mapping
                 // when it comes to unique indexs with nulls in them - we can't...
                 // http://bugs.mysql.com/bug.php?id=8173
                 // So instead we set it to an empty string :´(
+                // TODO we're no longer using MySql so we can fix this
                 .IsRequired()
                 .HasUniqueIndexAnnotation("UX_NamePerOrg", 2);
 

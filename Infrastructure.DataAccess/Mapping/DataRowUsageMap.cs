@@ -11,9 +11,9 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasKey(x => new {x.DataRowId, x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId});
 
             // Properties
-            this.Property(x => x.ItSystemUsageId).HasColumnName("SysUsageId");  // have to rename else foreign key will be too long for MySql to handle
-            this.Property(x => x.ItSystemId).HasColumnName("SysId");            // have to rename else foreign key will be too long for MySql to handle
-            this.Property(x => x.ItInterfaceId).HasColumnName("IntfId");        // have to rename else foreign key will be too long for MySql to handle
+            this.Property(x => x.ItSystemUsageId);
+            this.Property(x => x.ItSystemId);
+            this.Property(x => x.ItInterfaceId);
 
             // Table & Column Mappings
             this.ToTable("DataRowUsage");

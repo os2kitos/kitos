@@ -11,7 +11,7 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasKey(x => new { x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId });
 
             // Table & Column Mappings
-            this.ToTable("InfUsage"); // MySQL: rename else it'll cause name length issues
+            this.ToTable("ItInterfaceUsage");
 
             this.HasRequired(t => t.ItSystemUsage)
                 .WithMany(d => d.ItInterfaceUsages)

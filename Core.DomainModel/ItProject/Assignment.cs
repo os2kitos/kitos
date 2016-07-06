@@ -1,10 +1,9 @@
 ﻿using System;
-using Core.DomainModel.ItProject;
 
-namespace Core.DomainModel
+namespace Core.DomainModel.ItProject
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class Assignment : ItProjectStatus
     {

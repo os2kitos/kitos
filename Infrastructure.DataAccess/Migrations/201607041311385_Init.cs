@@ -2,7 +2,7 @@ namespace Infrastructure.DataAccess.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class Init : DbMigration
     {
         public override void Up()
@@ -33,7 +33,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.DefaultOrgUnitId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.OrganizationUnit",
                 c => new
@@ -57,7 +57,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ParentId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.ItSystemUsage",
                 c => new
@@ -98,7 +98,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId)
                 .Index(t => t.OrganizationUnit_Id);
-            
+
             CreateTable(
                 "dbo.ArchiveTypes",
                 c => new
@@ -117,7 +117,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.User",
                 c => new
@@ -142,7 +142,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.Email, unique: true)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.Handover",
                 c => new
@@ -162,7 +162,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.Id)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.ItProject",
                 c => new
@@ -237,7 +237,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.OriginalId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.Communication",
                 c => new
@@ -263,7 +263,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ItProjectId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.EconomyYears",
                 c => new
@@ -308,7 +308,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ItProjectId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.GoalStatus",
                 c => new
@@ -328,7 +328,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.Id)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.Goal",
                 c => new
@@ -364,7 +364,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.GoalStatusId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.GoalTypes",
                 c => new
@@ -383,7 +383,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.ItProjectStatus",
                 c => new
@@ -416,7 +416,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.AssociatedItProjectId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.ItProjectTypes",
                 c => new
@@ -435,7 +435,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.Organization",
                 c => new
@@ -457,7 +457,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.Cvr)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.ItSystem",
                 c => new
@@ -493,7 +493,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.BelongsToId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.ItSystemTypeOptions",
                 c => new
@@ -512,7 +512,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.BusinessTypes",
                 c => new
@@ -531,7 +531,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.ItInterfaceUses",
                 c => new
@@ -544,7 +544,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.ItSystem", t => t.ItSystemId, cascadeDelete: true)
                 .Index(t => t.ItSystemId)
                 .Index(t => t.ItInterfaceId);
-            
+
             CreateTable(
                 "dbo.InfUsage",
                 c => new
@@ -567,7 +567,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ItInterfaceId)
                 .Index(t => t.ItContractId)
                 .Index(t => t.InfrastructureId);
-            
+
             CreateTable(
                 "dbo.DataRowUsage",
                 c => new
@@ -588,7 +588,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.DataRowId)
                 .Index(t => new { t.SysUsageId, t.SysId, t.IntfId })
                 .Index(t => t.FrequencyId);
-            
+
             CreateTable(
                 "dbo.DataRow",
                 c => new
@@ -610,7 +610,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.DataTypeId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.DataTypes",
                 c => new
@@ -629,7 +629,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.ItInterface",
                 c => new
@@ -670,7 +670,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.BelongsToId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.Exhibit",
                 c => new
@@ -690,7 +690,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ItSystemId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.ItInterfaceExhibitUsage",
                 c => new
@@ -710,7 +710,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ItInterfaceExhibitId)
                 .Index(t => t.ItContractId)
                 .Index(t => t.ItInterface_Id);
-            
+
             CreateTable(
                 "dbo.ItContract",
                 c => new
@@ -790,7 +790,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.PriceRegulationId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.Advice",
                 c => new
@@ -819,7 +819,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ItContractId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.ItContractRoles",
                 c => new
@@ -840,7 +840,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.ItContractRights",
                 c => new
@@ -864,7 +864,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ObjectId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.AgreementElements",
                 c => new
@@ -883,7 +883,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.ItContractItSystemUsages",
                 c => new
@@ -899,7 +899,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ItContractId)
                 .Index(t => t.ItSystemUsageId)
                 .Index(t => t.ItSystemUsage_Id);
-            
+
             CreateTable(
                 "dbo.ContractTemplates",
                 c => new
@@ -918,7 +918,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.ContractTypes",
                 c => new
@@ -937,7 +937,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.EconomyStream",
                 c => new
@@ -968,7 +968,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.OrganizationUnitId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.HandoverTrial",
                 c => new
@@ -991,7 +991,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.HandoverTrialTypeId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.HandoverTrialTypes",
                 c => new
@@ -1010,7 +1010,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.OptionExtends",
                 c => new
@@ -1029,7 +1029,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.PaymentFreqencies",
                 c => new
@@ -1048,7 +1048,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.PaymentMilestones",
                 c => new
@@ -1069,7 +1069,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ItContractId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.PaymentModels",
                 c => new
@@ -1088,7 +1088,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.PriceRegulations",
                 c => new
@@ -1107,7 +1107,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.ProcurementStrategies",
                 c => new
@@ -1126,7 +1126,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.PurchaseForms",
                 c => new
@@ -1145,7 +1145,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.TerminationDeadlines",
                 c => new
@@ -1164,7 +1164,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.Interfaces",
                 c => new
@@ -1183,7 +1183,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.InterfaceTypes",
                 c => new
@@ -1202,7 +1202,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.Methods",
                 c => new
@@ -1221,7 +1221,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.Tsas",
                 c => new
@@ -1240,7 +1240,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.Frequencies",
                 c => new
@@ -1259,7 +1259,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.TaskRef",
                 c => new
@@ -1290,7 +1290,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId)
                 .Index(t => t.OrganizationUnit_Id);
-            
+
             CreateTable(
                 "dbo.TaskUsage",
                 c => new
@@ -1318,7 +1318,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ParentId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.Wish",
                 c => new
@@ -1344,7 +1344,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId)
                 .Index(t => t.ItSystem_Id);
-            
+
             CreateTable(
                 "dbo.Config",
                 c => new
@@ -1369,7 +1369,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.Id)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.ItProjectOrgUnitUsages",
                 c => new
@@ -1385,7 +1385,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ItProjectId)
                 .Index(t => t.OrganizationUnitId)
                 .Index(t => t.ResponsibleItProject_Id);
-            
+
             CreateTable(
                 "dbo.ItProjectRights",
                 c => new
@@ -1409,7 +1409,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ObjectId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.ItProjectRoles",
                 c => new
@@ -1430,7 +1430,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.Risk",
                 c => new
@@ -1455,7 +1455,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ResponsibleUserId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.Stakeholder",
                 c => new
@@ -1479,7 +1479,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ItProjectId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.PasswordResetRequest",
                 c => new
@@ -1499,7 +1499,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.UserId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.itusageorgusage",
                 c => new
@@ -1515,7 +1515,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ItSystemUsageId)
                 .Index(t => t.OrganizationUnitId)
                 .Index(t => t.ResponsibleItSystemUsage_Id);
-            
+
             CreateTable(
                 "dbo.ItSystemRights",
                 c => new
@@ -1539,7 +1539,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ObjectId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.ItSystemRoles",
                 c => new
@@ -1560,7 +1560,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.SensitiveDataTypes",
                 c => new
@@ -1579,7 +1579,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.OrganizationRights",
                 c => new
@@ -1603,7 +1603,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ObjectId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.OrganizationRoles",
                 c => new
@@ -1624,7 +1624,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.AdminRoles",
                 c => new
@@ -1645,7 +1645,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.Text",
                 c => new
@@ -1661,7 +1661,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
-            
+
             CreateTable(
                 "dbo.ItProjectItSystemUsages",
                 c => new
@@ -1674,7 +1674,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.ItSystemUsage", t => t.ItSystemUsage_Id)
                 .Index(t => t.ItProject_Id)
                 .Index(t => t.ItSystemUsage_Id);
-            
+
             CreateTable(
                 "dbo.ItContractAgreementElements",
                 c => new
@@ -1687,7 +1687,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.AgreementElements", t => t.ElemId)
                 .Index(t => t.ItContractId)
                 .Index(t => t.ElemId);
-            
+
             CreateTable(
                 "dbo.TaskRefItSystems",
                 c => new
@@ -1700,7 +1700,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.ItSystem", t => t.ItSystem_Id)
                 .Index(t => t.TaskRef_Id)
                 .Index(t => t.ItSystem_Id);
-            
+
             CreateTable(
                 "dbo.TaskRefItSystemUsages",
                 c => new
@@ -1713,7 +1713,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.ItSystemUsage", t => t.ItSystemUsage_Id)
                 .Index(t => t.TaskRef_Id)
                 .Index(t => t.ItSystemUsage_Id);
-            
+
             CreateTable(
                 "dbo.ItProjectTaskRefs",
                 c => new
@@ -1726,7 +1726,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.TaskRef", t => t.TaskRef_Id)
                 .Index(t => t.ItProject_Id)
                 .Index(t => t.TaskRef_Id);
-            
+
             CreateTable(
                 "dbo.HandoverUsers",
                 c => new
@@ -1739,7 +1739,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.User", t => t.User_Id)
                 .Index(t => t.Handover_Id)
                 .Index(t => t.User_Id);
-            
+
             CreateTable(
                 "dbo.OrgUnitSystemUsage",
                 c => new
@@ -1752,9 +1752,9 @@ namespace Infrastructure.DataAccess.Migrations
                 .ForeignKey("dbo.OrganizationUnit", t => t.OrganizationUnit_Id)
                 .Index(t => t.ItSystemUsage_Id)
                 .Index(t => t.OrganizationUnit_Id);
-            
+
         }
-        
+
         public override void Down()
         {
             DropForeignKey("dbo.Text", "ObjectOwnerId", "dbo.User");

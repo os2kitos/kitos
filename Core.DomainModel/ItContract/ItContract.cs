@@ -204,7 +204,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         /// Chosen contract template.
         /// </value>
-        public virtual ContractTemplateType ContractTemplate { get; set; }
+        public virtual ItContractTemplateType ContractTemplate { get; set; }
         /// <summary>
         /// Gets or sets the chosen contract type option identifier.
         /// </summary>
@@ -218,7 +218,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         /// The type of the contract.
         /// </value>
-        public virtual ContractType ContractType { get; set; }
+        public virtual ItContractType ContractType { get; set; }
         /// <summary>
         /// Gets or sets the chosen purchase form option identifier.
         /// </summary>
