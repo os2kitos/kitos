@@ -11,11 +11,11 @@ namespace Infrastructure.DataAccess.Mapping
             // Properties
             this.Property(x => x.Name)
                 .HasMaxLength(100) // http://stackoverflow.com/questions/1827063/mysql-error-key-specification-without-a-key-length
-                .HasColumnAnnotation("Index", new IndexAnnotation(new IndexAttribute()));
+                .HasColumnAnnotation(IndexAnnotation.AnnotationName, new IndexAnnotation(new IndexAttribute()));
             this.Property(t => t.Cvr)
                 .HasMaxLength(10)
                 .IsOptional()
-                .HasColumnAnnotation("Index", new IndexAnnotation(new IndexAttribute()));
+                .HasColumnAnnotation(IndexAnnotation.AnnotationName, new IndexAnnotation(new IndexAttribute()));
 
             // Table & Column Mappings
             this.ToTable("Organization");
