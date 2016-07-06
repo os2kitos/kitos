@@ -11,10 +11,10 @@ namespace Core.DomainModel.ItContract
     {
         public ItContract()
         {
-            this.AgreementElements = new List<AgreementElement>();
+            this.AgreementElements = new List<AgreementElementType>();
             this.Children = new List<ItContract>();
             this.AssociatedSystemUsages = new List<ItContractItSystemUsage>();
-            this.AssociatedInterfaceUsages = new List<InterfaceUsage>();
+            this.AssociatedInterfaceUsages = new List<ItInterfaceUsage>();
             this.AssociatedInterfaceExposures = new List<ItInterfaceExhibitUsage>();
             this.PaymentMilestones = new List<PaymentMilestone>();
             this.InternEconomyStreams = new List<EconomyStream>();
@@ -170,7 +170,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         /// Chosen procurement strategy.
         /// </value>
-        public virtual ProcurementStrategy ProcurementStrategy { get; set; }
+        public virtual ProcurementStrategyType ProcurementStrategy { get; set; }
         /// <summary>
         /// Gets or sets the procurement plan half. (udbudsplan)
         /// </summary>
@@ -204,7 +204,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         /// Chosen contract template.
         /// </value>
-        public virtual ContractTemplate ContractTemplate { get; set; }
+        public virtual ContractTemplateType ContractTemplate { get; set; }
         /// <summary>
         /// Gets or sets the chosen contract type option identifier.
         /// </summary>
@@ -232,7 +232,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         /// Chosen purchase form.
         /// </value>
-        public virtual PurchaseForm PurchaseForm { get; set; }
+        public virtual PurchaseFormType PurchaseForm { get; set; }
         /// <summary>
         /// Id of parent ItContract
         /// </summary>
@@ -260,7 +260,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         /// Chosen agreement elements.
         /// </value>
-        public virtual ICollection<AgreementElement> AgreementElements { get; set; }
+        public virtual ICollection<AgreementElementType> AgreementElements { get; set; }
 
         #endregion
 
@@ -352,7 +352,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         /// The termination deadline.
         /// </value>
-        public virtual TerminationDeadline TerminationDeadline { get; set; }
+        public virtual TerminationDeadlineType TerminationDeadline { get; set; }
         /// <summary>
         /// Gets or sets the payment milestones.
         /// </summary>
@@ -361,7 +361,7 @@ namespace Core.DomainModel.ItContract
         /// </value>
         public virtual ICollection<PaymentMilestone> PaymentMilestones { get; set; }
         public int? OptionExtendId { get; set; }
-        public virtual OptionExtend OptionExtend { get; set; }
+        public virtual OptionExtendType OptionExtend { get; set; }
         public int ExtendMultiplier { get; set; }
         /// <summary>
         /// Gets or sets the handover trials.
@@ -383,11 +383,11 @@ namespace Core.DomainModel.ItContract
         /// </value>
         public DateTime? OperationRemunerationBegun { get; set; }
         public int? PaymentFreqencyId { get; set; }
-        public virtual PaymentFreqency PaymentFreqency { get; set; }
+        public virtual PaymentFreqencyType PaymentFreqency { get; set; }
         public int? PaymentModelId { get; set; }
-        public virtual PaymentModel PaymentModel { get; set; }
+        public virtual PaymentModelType PaymentModel { get; set; }
         public int? PriceRegulationId { get; set; }
-        public virtual PriceRegulation PriceRegulation { get; set; }
+        public virtual PriceRegulationType PriceRegulation { get; set; }
 
         #endregion
 
@@ -407,7 +407,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         /// The associated interface usages.
         /// </value>
-        public virtual ICollection<InterfaceUsage> AssociatedInterfaceUsages { get; set; }
+        public virtual ICollection<ItInterfaceUsage> AssociatedInterfaceUsages { get; set; }
         /// <summary>
         /// Gets or sets the associated interface exposures.
         /// </summary>

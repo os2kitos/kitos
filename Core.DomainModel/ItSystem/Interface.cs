@@ -7,10 +7,10 @@ namespace Core.DomainModel.ItSystem
     /// Provides details about an ItSystem of type interface.
     /// </summary>
     /// <remarks>
-    /// Notice that this is NOT an interface, nor does it 
+    /// Notice that this is NOT an interface, nor does it
     /// distinguish systems from interfaces.
     /// </remarks>
-    public class Interface : Entity, IOptionEntity<ItInterface>
+    public class Interface : Entity, IOptionEntity<ItInterface> // TODO find a better suited name for this, note that InterfaceType is taken
     {
         public Interface()
         {

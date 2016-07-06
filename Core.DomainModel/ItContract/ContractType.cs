@@ -11,7 +11,7 @@ namespace Core.DomainModel.ItContract
         {
             References = new List<ItContract>();
         }
-        
+
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public bool IsSuggestion { get; set; }

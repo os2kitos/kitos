@@ -18,7 +18,7 @@ namespace Core.DomainModel.ItSystem
         public string Note { get; set; }
 
         /// <summary>
-        /// The ItSystems that has been marked with this BusinessType 
+        /// The ItSystems that has been marked with this BusinessType
         /// </summary>
         public virtual ICollection<ItSystem> References { get; set; }
     }

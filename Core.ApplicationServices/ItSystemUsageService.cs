@@ -8,12 +8,12 @@ namespace Core.ApplicationServices
     public class ItSystemUsageService : IItSystemUsageService
     {
         private readonly IGenericRepository<ItSystemUsage> _usageRepository;
-        private readonly IGenericRepository<InterfaceUsage> _interfaceUsageRepository;
+        private readonly IGenericRepository<ItInterfaceUsage> _interfaceUsageRepository;
         private readonly IGenericRepository<DataRowUsage> _dataRowUsageRepository;
 
         public ItSystemUsageService(
             IGenericRepository<ItSystemUsage> usageRepository,
-            IGenericRepository<InterfaceUsage> interfaceUsageRepository,
+            IGenericRepository<ItInterfaceUsage> interfaceUsageRepository,
             IGenericRepository<DataRowUsage> dataRowUsageRepository)
         {
             _usageRepository = usageRepository;
@@ -31,7 +31,7 @@ namespace Core.ApplicationServices
             usage.LastChangedByUser = objectOwner;
 
             _usageRepository.Insert(usage);
-
+            
             _usageRepository.Save(); // abuse this as UoW
             return usage;
         }
@@ -48,10 +48,10 @@ namespace Core.ApplicationServices
         }
 
         ///// <summary>
-        ///// Adds a new InterfaceUsage to an existing ItSystemUsage.
+        ///// Adds a new ItInterfaceUsage to an existing ItSystemUsage.
         ///// </summary>
         ///// <param name="usage">The ItSystemUsage</param>
-        ///// <param name="theInterface">The new interface, which the InterfaceUsage should be generated from</param>
+        ///// <param name="theInterface">The new interface, which the ItInterfaceUsage should be generated from</param>
         //public void AddInterfaceUsage(ItSystemUsage usage, ItSystem theInterface)
         //{
         //    CreateAndInsertInterfaceUsage(theInterface.CanUseInterfaces, usage.ObjectOwner);

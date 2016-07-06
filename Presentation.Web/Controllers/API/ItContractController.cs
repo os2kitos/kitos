@@ -19,7 +19,7 @@ namespace Presentation.Web.Controllers.API
 {
     public class ItContractController : GenericHierarchyApiController<ItContract, ItContractDTO>
     {
-        private readonly IGenericRepository<AgreementElement> _agreementElementRepository;
+        private readonly IGenericRepository<AgreementElementType> _agreementElementRepository;
         private readonly IGenericRepository<ItContractRole> _roleRepository;
         private readonly IGenericRepository<ItContractItSystemUsage> _itContractItSystemUsageRepository;
         private readonly IGenericRepository<ItSystemUsage> _usageRepository;
@@ -27,7 +27,7 @@ namespace Presentation.Web.Controllers.API
 
         public ItContractController(IGenericRepository<ItContract> repository,
             IGenericRepository<ItSystemUsage> usageRepository,
-            IGenericRepository<AgreementElement> agreementElementRepository,
+            IGenericRepository<AgreementElementType> agreementElementRepository,
             IGenericRepository<ItContractRole> roleRepository,
             IGenericRepository<ItContractItSystemUsage> itContractItSystemUsageRepository,
             IItContractService itContractService)

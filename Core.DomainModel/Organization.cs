@@ -16,7 +16,7 @@ namespace Core.DomainModel
     /// Holds local configuration and admin roles, as well as collections of
     /// ItSystems, ItProjects, etc that was created in this organization.
     /// </summary>
-    public class Organization : HasRightsEntity<Organization, AdminRight, AdminRole>, IHasAccessModifier, IContextAware
+    public class Organization : HasRightsEntity<Organization, OrganizationRight, OrganizationRole>, IHasAccessModifier, IContextAware
     {
         public Organization()
         {
