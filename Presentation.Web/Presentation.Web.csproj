@@ -865,12 +865,12 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Web.Debug.config">
+    <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
-    </Content>
-    <Content Include="Web.Release.config">
+    </None>
+    <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
-    </Content>
+    </None>
     <Content Include="Scripts\_references.js" />
     <Content Include="Images\accent.png" />
     <Content Include="Images\bullet.png" />
@@ -970,9 +970,6 @@
     <Content Include="Tests\mocks\itContractRole.json" />
     <Content Include="Tests\mocks\advice.json" />
     <Content Include="Tests\mocks\interfaceUsage.json" />
-    <None Include="Web.AppVeyor.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
     <None Include="Web.MiracleTest.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -983,9 +980,9 @@
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabStatusProject.e2e.spec.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="packages.config">
+    <None Include="packages.config">
       <SubType>Designer</SubType>
-    </Content>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">
@@ -1029,23 +1026,11 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AppVeyor|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptTarget>ES5</TypeScriptTarget>
     <TypeScriptModuleKind>commonjs</TypeScriptModuleKind>
     <TypeScriptSourceMap>True</TypeScriptSourceMap>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'AppVeyor'">
-    <TypeScriptModuleKind>commonjs</TypeScriptModuleKind>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <TypeScriptModuleKind>commonjs</TypeScriptModuleKind>
@@ -1083,4 +1068,11 @@
   </Target>
   <Target Name="AfterBuild">
   </Target> -->
+  <Target Name="AfterBuild" Condition="'$(Configuration)' == 'Release'">
+    <TransformXml Source="Web.config" Transform="Web.Sandbox.config"
+                  Destination="$(OutputPath)\Web.Sandbox.config" />
+    <TransformXml Source="Web.config" Transform="Web.MiracleTest.config"
+                  Destination="$(OutputPath)\Web.MiracleTest.config" />
+  </Target>
+          
 </Project>
