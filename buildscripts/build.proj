@@ -13,7 +13,7 @@
     <RunAllDependOn>Build;RunTest</RunAllDependOn>
   </PropertyGroup>
   <Target Name="BuildWeb" DependsOnTargets="Clean">
-    <Exec Command="gulp deploy" WorkingDirectory="$(RootFolder)" />
+    <!--<Exec Command="gulp deploy" WorkingDirectory="$(RootFolder)" />-->
     <MakeDir Directories="$(DeployFolder)\Web" />
     <MSBuild Projects="$(WebProjects)" Targets="Build" 
              Properties="Configuration=$(Configuration);DeployOnBuild=True;PackageAsSingleFile=False;ExcludeGeneratedDebugSymbol=False" />
