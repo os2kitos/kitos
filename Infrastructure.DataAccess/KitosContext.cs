@@ -106,7 +106,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new OrganizationRightMap());
             modelBuilder.Configurations.Add(new OrganizationRoleMap());
             modelBuilder.Configurations.Add(new AdviceMap());
-            modelBuilder.Configurations.Add(new AgreementElementMap());
+            modelBuilder.Configurations.Add(new AgreementElementTypeMap());
             modelBuilder.Configurations.Add(new ArchiveTypeMap());
             modelBuilder.Configurations.Add(new BusinessTypeMap());
             modelBuilder.Configurations.Add(new CommunicationMap());

@@ -8,12 +8,12 @@ namespace Infrastructure.DataAccess.Migrations
         public override void Up()
         {
             RenameTable(name: "dbo.OrganizationRights", newName: "OrganizationUnitRights");
-            RenameTable(name: "dbo.ContractTemplateTypes", newName: "ItContractTemplateTypes");
+            RenameTable(name: "dbo.ContractTemplates", newName: "ItContractTemplateTypes");
         }
 
         public override void Down()
         {
-            RenameTable(name: "dbo.ItContractTemplateTypes", newName: "ContractTemplateTypes");
+            RenameTable(name: "dbo.ItContractTemplateTypes", newName: "ContractTemplates");
             RenameTable(name: "dbo.OrganizationUnitRights", newName: "OrganizationRights");
         }
     }
