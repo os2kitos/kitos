@@ -10,7 +10,7 @@ gulp.task('unit', function (done) {
         configFile: paths.karmaConf,
         singleRun: true,
         browsers: ['IE', 'Firefox', 'Chrome'],
-        reporters: ['progress', 'coverage', 'appveyor'],
+        reporters: ['progress', 'coverage', 'teamcity'],
         coverageReporter: {
             type: 'json',
             subdir: '.',
@@ -66,7 +66,6 @@ gulp.task('webdriver', require('gulp-protractor').webdriver_standalone);
 
 // run e2e tests with protractor locally
 gulp.task('locale2e', function () {
-    var taskExitValue = 0;
     var args = process.argv;
     if (args && args.length > 3) {
         args = args.slice(3, args.length);
