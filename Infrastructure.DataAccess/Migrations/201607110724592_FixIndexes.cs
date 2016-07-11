@@ -3,7 +3,7 @@ namespace Infrastructure.DataAccess.Migrations
     using System;
     using System.Data.Entity.Migrations;
 
-    public partial class MakeFilteredIndexes : DbMigration
+    public partial class FixIndexes : DbMigration
     {
         public override void Up()
         {
