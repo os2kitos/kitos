@@ -43,7 +43,7 @@ namespace Presentation.Web.Controllers.API
                 //        // it's public everyone can see it
                 //        org.AccessModifier == AccessModifier.Public ||
                 //        // everyone in the same organization can see normal objects
-                //        org.AccessModifier == AccessModifier.Normal &&
+                //        org.AccessModifier == AccessModifier.Local &&
                 //        org.Id == orgId ||
                 //        // user with a role on the object can see it
                 //        org.Rights.Any(x => x.UserId == KitosUser.Id) ||
@@ -64,7 +64,7 @@ namespace Presentation.Web.Controllers.API
                     // it's public everyone can see it
                         org.AccessModifier == AccessModifier.Public ||
                     // everyone in the same organization can see normal objects
-                        org.AccessModifier == AccessModifier.Normal &&
+                        org.AccessModifier == AccessModifier.Local &&
                         org.Id == orgId || org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id)));
 
                 var dtos = Map(orgs2);
@@ -91,7 +91,7 @@ namespace Presentation.Web.Controllers.API
                 //        // it's public everyone can see it
                 //        org.AccessModifier == AccessModifier.Public ||
                 //        // everyone in the same organization can see normal objects
-                //        org.AccessModifier == AccessModifier.Normal &&
+                //        org.AccessModifier == AccessModifier.Local &&
                 //        org.Id == orgId ||
                 //        // user with a role on the object can see it
                 //        org.Rights.Any(x => x.UserId == KitosUser.Id) ||
@@ -112,7 +112,7 @@ namespace Presentation.Web.Controllers.API
                         // it's public everyone can see it
                         org.AccessModifier == AccessModifier.Public ||
                         // everyone in the same organization can see normal objects
-                        org.AccessModifier == AccessModifier.Normal &&
+                        org.AccessModifier == AccessModifier.Local &&
                         org.Id == orgId || org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id)));
                 
                 var dtos = Map(orgs2);
