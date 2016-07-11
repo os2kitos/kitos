@@ -249,6 +249,10 @@
     <Compile Include="Migrations\201607061204203_RenameStep23.Designer.cs">
       <DependentUpon>201607061204203_RenameStep23.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201607110655574_RenameStep24.cs" />
+    <Compile Include="Migrations\201607110655574_RenameStep24.Designer.cs">
+      <DependentUpon>201607110655574_RenameStep24.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -347,6 +351,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201607061204203_RenameStep23.resx">
       <DependentUpon>201607061204203_RenameStep23.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607110655574_RenameStep24.resx">
+      <DependentUpon>201607110655574_RenameStep24.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
