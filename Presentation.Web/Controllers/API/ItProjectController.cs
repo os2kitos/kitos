@@ -59,9 +59,7 @@ namespace Presentation.Web.Controllers.API
                         // object owner sees his own objects
                         p.ObjectOwnerId == KitosUser.Id ||
                         // everyone in the same organization can see normal objects
-                        p.AccessModifier == AccessModifier.Normal ||
-                        // only users with a role on the object can see private objects
-                        p.AccessModifier == AccessModifier.Private && p.Rights.Any(x => x.UserId == KitosUser.Id))
+                        p.AccessModifier == AccessModifier.Normal)
                     );
 
                 var projects = Page(Repository.AsQueryable(), pagingModel);
@@ -91,9 +89,7 @@ namespace Presentation.Web.Controllers.API
                         // object owner sees his own objects
                         p.ObjectOwnerId == KitosUser.Id ||
                         // everyone in the same organization can see normal objects
-                        p.AccessModifier == AccessModifier.Normal &&
-                        // only users with a role on the object can see private objects
-                        p.AccessModifier == AccessModifier.Private && p.Rights.Any(x => x.UserId == KitosUser.Id))
+                        p.AccessModifier == AccessModifier.Normal)
                     );
 
                 return Ok(Map(items));
@@ -141,10 +137,7 @@ namespace Presentation.Web.Controllers.API
                         // it's public everyone can see it
                         p.AccessModifier == AccessModifier.Public ||
                         // everyone in the same organization can see normal objects
-                        p.AccessModifier == AccessModifier.Normal &&
-                        p.OrganizationId == orgId ||
-                        // only users with a role on the object can see private objects
-                        p.AccessModifier == AccessModifier.Private && p.Rights.Any(x => x.UserId == KitosUser.Id)
+                        p.AccessModifier == AccessModifier.Normal && p.OrganizationId == orgId
                     );
 
                 if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
