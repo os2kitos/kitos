@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Runtime.Caching;
 using System.Security;
-using System.Web.Caching;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
@@ -55,12 +53,12 @@ namespace Presentation.Web.Controllers.API
             return result;
         }
 
-        protected HttpResponseMessage Ok()
+        protected new HttpResponseMessage Ok()
         {
             return CreateResponse(HttpStatusCode.OK);
         }
 
-        protected HttpResponseMessage Ok<T>(T response)
+        protected new HttpResponseMessage Ok<T>(T response)
         {
             return CreateResponse(HttpStatusCode.OK, response);
         }
@@ -87,7 +85,7 @@ namespace Presentation.Web.Controllers.API
             return CreateResponse(HttpStatusCode.NoContent);
         }
 
-        protected HttpResponseMessage NotFound()
+        protected new HttpResponseMessage NotFound()
         {
             return CreateResponse(HttpStatusCode.NotFound);
         }
@@ -154,10 +152,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        protected bool IsAuthenticated
-        {
-            get { return User.Identity.IsAuthenticated; }
-        }
+        protected bool IsAuthenticated => User.Identity.IsAuthenticated;
 
         protected virtual TDest Map<TSource, TDest>(TSource item)
         {

@@ -9,9 +9,16 @@
   <PropertyGroup>
     <WebProjects>$(RootFolder)\Presentation.Web\Presentation.Web.csproj</WebProjects>
     <TestProjects>$(RootFolder)\Tests.Unit.Presentation.Web\Tests.Unit.Presentation.Web.csproj</TestProjects>
-    <BuildDepeneds>BuildWeb;BuildTest</BuildDepeneds>
+    <BuildDepeneds>GetVersion;BuildWeb;BuildTest</BuildDepeneds>
     <RunAllDependOn>Build;RunTest</RunAllDependOn>
   </PropertyGroup>
+  <Import Project="$(RootFolder)\packages\GitVersionTask.3.6.0\Build\dotnet\GitVersionTask.targets" Condition="Exists('$(RootFolder)\packages\GitVersionTask.3.6.0\Build\dotnet\GitVersionTask.targets')" />
+  <Target Name="GetVersion" Returns="$(MajorMinorPatch)">
+    <GitVersionTask.GetVersion SolutionDirectory="$(RootFolder)">
+      <Output TaskParameter="MajorMinorPatch" PropertyName="MajorMinorPatch" />
+      <Output TaskParameter="BranchName" PropertyName="BranchName" />
+    </GitVersionTask.GetVersion>
+  </Target>
   <Target Name="BuildWeb" DependsOnTargets="Clean">
     <Exec Command="gulp deploy" WorkingDirectory="$(RootFolder)" />
     <MakeDir Directories="$(DeployFolder)\Web" />
