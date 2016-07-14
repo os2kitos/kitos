@@ -14,7 +14,7 @@ namespace Presentation.Web.Models
         public string DefaultOrganizationUnitName { get; set; }
         public bool IsGlobalAdmin { get; set; }
         public Guid? Uuid { get; set; }
-        public List<AdminRightDTO> AdminRights { get; set; }
+        public List<OrganizationRightDTO> AdminRights { get; set; }
         public string ObjectOwnerName { get; set; }
         public string ObjectOwnerLastName { get; set; }
         public DateTime? LastAdvisDate { get; set; }

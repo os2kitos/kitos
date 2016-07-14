@@ -114,10 +114,10 @@
 
             // interface usages
             _.each(canUseInterfaces, function(canUseInterface: { id; updateUrl; urlParams; usage; infrastructure; dataRows; }) {
-                canUseInterface.updateUrl = "api/interfaceUsage/";
+                canUseInterface.updateUrl = "api/ItInterfaceUsage/";
                 canUseInterface.urlParams = "&usageId=" + itSystemUsage.id + "&sysId=" + itSystemUsage.itSystem.id + "&interfaceId=" + canUseInterface.id;
 
-                $http.get("api/interfaceUsage/?usageId=" + itSystemUsage.id + "&sysId=" + itSystemUsage.itSystem.id + "&interfaceId=" + canUseInterface.id).success(function (usageResult) {
+                $http.get("api/ItInterfaceUsage/?usageId=" + itSystemUsage.id + "&sysId=" + itSystemUsage.itSystem.id + "&interfaceId=" + canUseInterface.id).success(function (usageResult) {
                     var usage = usageResult.response;
                     canUseInterface.usage = usage;
 

@@ -43,7 +43,7 @@ namespace Core.ApplicationServices
             CreateDefaultPhases(project);
             _projectRepository.Insert(project);
             _projectRepository.Save();
-            
+
             AddEconomyYears(project);
 
             project.Handover = new Handover()
@@ -125,13 +125,15 @@ namespace Core.ApplicationServices
         {
             // http://stackoverflow.com/questions/15226312/entityframewok-how-to-configure-cascade-delete-to-nullify-foreign-keys
             // when children are loaded into memory the foreign key is correctly set to null on children when deleted
-            var entity = _projectRepository.Get(x => x.Id == id, null, "Children, JointMunicipalProjects, CommonPublicProjects").FirstOrDefault();
-            _projectRepository.Delete(entity);
+            var project = _projectRepository.Get(x => x.Id == id, null, $"{nameof(ItProject.Children)}, {nameof(ItProject.JointMunicipalProjects)}, {nameof(ItProject.CommonPublicProjects)}, {nameof(ItProject.TaskRefs)}, {nameof(ItProject.ItSystemUsages)}").FirstOrDefault();
+
+            // delete it project
+            _projectRepository.Delete(project);
             _projectRepository.Save();
         }
 
         /// <summary>
-        /// Adds default phases 1-5 and select the first phase as current phase 
+        /// Adds default phases 1-5 and select the first phase as current phase
         /// </summary>
         /// <param name="project"></param>
         /// <returns></returns>

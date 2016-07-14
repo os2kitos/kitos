@@ -27,7 +27,7 @@
                     var uId = selectedUser.id;
                     var oId = user.currentOrganizationId;
 
-                    return $http.get("api/adminrights/?roleName=LocalAdmin&userId=" + uId + "&organizationId=" + oId + "&orgRightsForUserWithRole=").success(function (result) {
+                    return $http.get("api/OrganizationRights/?roleName=LocalAdmin&userId=" + uId + "&organizationId=" + oId + "&orgRightsForUserWithRole=").success(function (result) {
                         return result.response;
                     }).error(function (error) {
                         notify.addErrorMessage("Fejl. Noget gik galt!");
@@ -129,7 +129,7 @@
 
                     var msg = notify.addInfoMessage("Arbejder ...", false);
 
-                    $http.delete("api/adminrights/?orgId=" + user.currentOrganizationId + "&userId=" + uId + "&byOrganization=").success(function (deleteResult) {
+                    $http.delete("api/OrganizationRights/?orgId=" + user.currentOrganizationId + "&userId=" + uId + "&byOrganization=").success(function (deleteResult) {
                         msg.toSuccessMessage(u.name + " " + u.lastName + " er ikke længere tilknyttet organisationen");
                         reload();
                     }).error(function (deleteResult) {

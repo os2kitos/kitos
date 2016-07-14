@@ -79,14 +79,6 @@
       <HintPath>..\packages\Microsoft.Spatial.6.15.0\lib\portable-net45+win+wpa81\Microsoft.Spatial.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MySql.Data, Version=6.9.8.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
-      <HintPath>..\packages\MySql.Data.6.9.8\lib\net45\MySql.Data.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="MySql.Data.Entity.EF6, Version=6.9.8.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
-      <HintPath>..\packages\MySql.Data.Entity.6.9.8\lib\net45\MySql.Data.Entity.EF6.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -204,7 +196,7 @@
     <Compile Include="Controllers\API\HandoverTrialController.cs" />
     <Compile Include="Controllers\API\HandoverTrialTypeController.cs" />
     <Compile Include="Controllers\API\GenericHierarchyApiController.cs" />
-    <Compile Include="Controllers\API\AdminRightsController.cs" />
+    <Compile Include="Controllers\API\OrganizationRightsController.cs" />
     <Compile Include="Controllers\API\DataRowController.cs" />
     <Compile Include="Controllers\API\ItContractRightsController.cs" />
     <Compile Include="Controllers\API\ItProjectRightController.cs" />
@@ -213,7 +205,7 @@
     <Compile Include="Controllers\API\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\API\ItProjectOrgUnitUsageController.cs" />
     <Compile Include="Controllers\OData\BaseController.cs" />
-    <Compile Include="Controllers\OData\InterfacesController.cs" />
+    <Compile Include="Controllers\OData\InterfaceTypesController.cs" />
     <Compile Include="Controllers\OData\EconomyStreamsController.cs" />
     <Compile Include="Controllers\OData\ItInterfaceUsesController.cs" />
     <Compile Include="Controllers\OData\ItInterfaceExhibitsController.cs" />
@@ -267,7 +259,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\API\AssignmentController.cs" />
-    <Compile Include="Controllers\API\AdminRoleController.cs" />
+    <Compile Include="Controllers\API\OrganizationRoleController.cs" />
     <Compile Include="Controllers\API\AgreementElementController.cs" />
     <Compile Include="Controllers\API\ArchiveTypeController.cs" />
     <Compile Include="Controllers\API\AuthorizeController.cs" />
@@ -286,7 +278,7 @@
     <Compile Include="Controllers\API\FrequencyController.cs" />
     <Compile Include="Controllers\API\GenericRightsController.cs" />
     <Compile Include="Controllers\API\InterfaceController.cs" />
-    <Compile Include="Controllers\API\InterfaceUsageController.cs" />
+    <Compile Include="Controllers\API\ItInterfaceUsageController.cs" />
     <Compile Include="Controllers\API\ItProjectController.cs" />
     <Compile Include="Controllers\API\ItSystemController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageController.cs" />
@@ -297,7 +289,7 @@
     <Compile Include="Models\GoalDTO.cs" />
     <Compile Include="Models\GoalStatusDTO.cs" />
     <Compile Include="Models\HandoverDTO.cs" />
-    <Compile Include="Models\InterfaceExposureDTO.cs" />
+    <Compile Include="Models\ItInterfaceExposureDTO.cs" />
     <Compile Include="Models\RiskDTO.cs" />
     <Compile Include="Controllers\API\SensitiveDataTypeController.cs" />
     <Compile Include="Controllers\API\TsaController.cs" />
@@ -306,14 +298,14 @@
     <Compile Include="Models\DataRowDTO.cs" />
     <Compile Include="Models\DataRowUsageDTO.cs" />
     <Compile Include="Models\EconomyYearDTO.cs" />
-    <Compile Include="Models\InterfaceUsageDTO.cs" />
+    <Compile Include="Models\ItInterfaceUsageDTO.cs" />
     <Compile Include="Models\ItProjectDTO.cs" />
     <Compile Include="Models\ItSystemDTO.cs" />
     <Compile Include="Controllers\API\TaskUsageController.cs" />
     <Compile Include="Models\CreateGlobalAdminDTO.cs" />
     <Compile Include="Models\CreateLocalAdminDTO.cs" />
     <Compile Include="Controllers\API\ConfigController.cs" />
-    <Compile Include="Controllers\API\OrganizationRoleController.cs" />
+    <Compile Include="Controllers\API\OrganizationUnitRoleController.cs" />
     <Compile Include="Controllers\API\GenericOptionApiController.cs" />
     <Compile Include="Controllers\API\InterfaceTypeController.cs" />
     <Compile Include="Controllers\API\ItContractRoleController.cs" />
@@ -352,7 +344,7 @@
     <Compile Include="Models\OrgUnitDTO.cs" />
     <Compile Include="Models\PasswordResetRequestDTO.cs" />
     <Compile Include="Models\ResetPasswordDTO.cs" />
-    <Compile Include="Models\AdminRightDTO.cs" />
+    <Compile Include="Models\OrganizationRightDTO.cs" />
     <Compile Include="Models\RightOutputDTO.cs" />
     <Compile Include="Models\RightInputDTO.cs" />
     <Compile Include="Models\RoleDTO.cs" />
@@ -637,6 +629,7 @@
     <TypeScriptCompile Include="app\models\task-ref.ts" />
     <TypeScriptCompile Include="app\models\task-usage.ts" />
     <TypeScriptCompile Include="app\models\traffic-light.ts" />
+    <TypeScriptCompile Include="app\models\api-wrapper.ts" />
     <TypeScriptCompile Include="app\models\user.ts" />
     <TypeScriptCompile Include="app\services\economyCalc.ts" />
     <TypeScriptCompile Include="app\services\gridStateService.ts" />

@@ -1,14 +1,14 @@
 ﻿(function (ng, app) {
     app.factory("httpBusyInterceptor", ['$q', '$rootScope', function ($q, $rootScope) {
         var isBusy = false;
-        
+
         function makeBusy() {
             isBusy = true;
             waitCursor();
 
             $rootScope.$broadcast("httpBusy");
         }
-        
+
         function clearBusy() {
             if (isBusy) {
                 isBusy = false;
@@ -35,16 +35,16 @@
 
                     return cfg;
                 });
-                
-                
+
+
             },
-            
+
             'response': function (response) {
                 clearBusy();
 
                 return response || $q.when(response);
             },
-            
+
             'responseError': function (rejection) {
                 clearBusy();
 

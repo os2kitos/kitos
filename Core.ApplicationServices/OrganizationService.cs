@@ -8,12 +8,12 @@ namespace Core.ApplicationServices
     public class OrganizationService : IOrganizationService
     {
         private readonly IGenericRepository<Organization> _orgRepository;
-        private readonly IGenericRepository<AdminRight> _admRightRepository;
+        private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
 
-        public OrganizationService(IGenericRepository<Organization> orgRepository, IGenericRepository<AdminRight> admRightRepository)
+        public OrganizationService(IGenericRepository<Organization> orgRepository, IGenericRepository<OrganizationRight> orgRightRepository)
         {
             _orgRepository = orgRepository;
-            _admRightRepository = admRightRepository;
+            _orgRightRepository = orgRightRepository;
         }
 
         //returns a list of organizations that the user is a member of
@@ -27,17 +27,17 @@ namespace Core.ApplicationServices
         //or null if none has been chosen
         public OrganizationUnit GetDefaultUnit(Organization organization, User user)
         {
-            return _admRightRepository.Get(r => r.ObjectId == organization.Id && r.UserId == user.Id).Select(r => r.DefaultOrgUnit).FirstOrDefault();
+            return _orgRightRepository.Get(r => r.ObjectId == organization.Id && r.UserId == user.Id).Select(r => r.DefaultOrgUnit).FirstOrDefault();
         }
 
         public void SetDefaultOrgUnit(User user, int orgId, int orgUnitId)
         {
             //TODO this should probably be Single() ?
-            var right = _admRightRepository.Get(r => r.UserId == user.Id && r.ObjectId == orgId).First();
+            var right = _orgRightRepository.Get(r => r.UserId == user.Id && r.ObjectId == orgId).First();
             right.DefaultOrgUnitId = orgUnitId;
 
-            _admRightRepository.Update(right);
-            _admRightRepository.Save();
+            _orgRightRepository.Update(right);
+            _orgRightRepository.Save();
         }
 
         public void SetupDefaultOrganization(Organization org, User objectOwner)

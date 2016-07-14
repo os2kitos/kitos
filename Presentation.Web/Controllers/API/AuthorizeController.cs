@@ -96,17 +96,17 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        //helper function
+        // helper function
         private LoginResponseDTO CreateLoginResponse(User user)
         {
             var userDto = AutoMapper.Mapper.Map<User, UserDTO>(user);
 
-            //getting all the organizations that the user is member of
-            var organizations = _organizationService.GetOrganizations(user);
-            //getting the default org units (one or null for each organization)
+            // getting all the organizations that the user is member of
+            var organizations = _organizationService.GetOrganizations(user).ToList();
+            // getting the default org units (one or null for each organization)
             var defaultUnits = organizations.Select(org => _organizationService.GetDefaultUnit(org, user));
 
-            //creating dtos
+            // creating DTOs
             var orgsDto = organizations.Zip(defaultUnits, (org, defaultUnit) => new OrganizationAndDefaultUnitDTO()
             {
                 Organization = AutoMapper.Mapper.Map<Organization, OrganizationDTO>(org),

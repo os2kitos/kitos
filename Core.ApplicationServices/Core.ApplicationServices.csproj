@@ -74,7 +74,11 @@
     <Compile Include="CryptoService.cs" />
     <Compile Include="IExcelHandler.cs" />
     <Compile Include="IExcelService.cs" />
+    <Compile Include="IItContractService.cs" />
+    <Compile Include="IItInterfaceService.cs" />
+    <Compile Include="ItContractService.cs" />
     <Compile Include="ItProjectService.cs" />
+    <Compile Include="ItInterfaceService.cs" />
     <Compile Include="ItSystemService.cs" />
     <Compile Include="ItSystemUsageService.cs" />
     <Compile Include="LinqTreeExtensions.cs" />

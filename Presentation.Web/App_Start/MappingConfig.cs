@@ -34,7 +34,7 @@ namespace Presentation.Web
             // TODO do we need an admin DTO and normal DTO to strip unused properties in normal DTO
             // like IsActive and Note
 
-            Mapper.CreateMap<AgreementElement, OptionDTO>()
+            Mapper.CreateMap<AgreementElementType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
@@ -42,11 +42,15 @@ namespace Presentation.Web
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<ContractTemplate, OptionDTO>()
+            Mapper.CreateMap<ItContractTemplateType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<ContractType, OptionDTO>()
+            Mapper.CreateMap<ItContractType, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
+
+            Mapper.CreateMap<ItInterfaceType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
@@ -54,15 +58,11 @@ namespace Presentation.Web
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<Interface, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
-
             Mapper.CreateMap<DataType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<Method, OptionDTO>()
+            Mapper.CreateMap<MethodType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
@@ -70,15 +70,15 @@ namespace Presentation.Web
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<PurchaseForm, OptionDTO>()
+            Mapper.CreateMap<PurchaseFormType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<Tsa, OptionDTO>()
+            Mapper.CreateMap<TsaType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<Frequency, OptionDTO>()
+            Mapper.CreateMap<FrequencyType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
@@ -98,15 +98,15 @@ namespace Presentation.Web
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<ItSystemTypeOption, OptionDTO>()
+            Mapper.CreateMap<ItSystemType, OptionDTO>()
+                  .ReverseMap()
+                  .ForMember(dest => dest.References, opt => opt.Ignore());
+
+            Mapper.CreateMap<OrganizationUnitRole, RoleDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<OrganizationRole, RoleDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
-
-            Mapper.CreateMap<AdminRole, RoleDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
@@ -118,27 +118,27 @@ namespace Presentation.Web
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<ProcurementStrategy, OptionDTO>()
+            Mapper.CreateMap<ProcurementStrategyType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<OptionExtend, OptionDTO>()
+            Mapper.CreateMap<OptionExtendType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<PriceRegulation, OptionDTO>()
+            Mapper.CreateMap<PriceRegulationType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<PaymentModel, OptionDTO>()
+            Mapper.CreateMap<PaymentModelType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<PaymentFreqency, OptionDTO>()
+            Mapper.CreateMap<PaymentFreqencyType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<TerminationDeadline, OptionDTO>()
+            Mapper.CreateMap<TerminationDeadlineType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
@@ -161,16 +161,16 @@ namespace Presentation.Web
 
             Mapper.CreateMap<User, UserDTO>()
                   .ForMember(dest => dest.DefaultOrganizationUnitId,
-                      opt => opt.MapFrom(src => src.AdminRights.FirstOrDefault() != null ? src.AdminRights.First().DefaultOrgUnitId : null))
+                      opt => opt.MapFrom(src => src.OrganizationRights.FirstOrDefault() != null ? src.OrganizationRights.First().DefaultOrgUnitId : null))
                   .ForMember(dest => dest.DefaultOrganizationUnitName,
-                      opt => opt.MapFrom(src => src.AdminRights.FirstOrDefault() != null ? src.AdminRights.First().DefaultOrgUnit.Name : null))
+                      opt => opt.MapFrom(src => src.OrganizationRights.FirstOrDefault() != null ? src.OrganizationRights.First().DefaultOrgUnit.Name : null))
                   .ReverseMap();
 
             Mapper.CreateMap<User, UserOverviewDTO>()
                 .ForMember(dest => dest.DefaultOrganizationUnitId,
-                      opt => opt.MapFrom(src => src.AdminRights.FirstOrDefault() != null ? src.AdminRights.First().DefaultOrgUnitId : null))
+                      opt => opt.MapFrom(src => src.OrganizationRights.FirstOrDefault() != null ? src.OrganizationRights.First().DefaultOrgUnitId : null))
                   .ForMember(dest => dest.DefaultOrganizationUnitName,
-                      opt => opt.MapFrom(src => src.AdminRights.FirstOrDefault() != null ? src.AdminRights.First().DefaultOrgUnit.Name : null));
+                      opt => opt.MapFrom(src => src.OrganizationRights.FirstOrDefault() != null ? src.OrganizationRights.First().DefaultOrgUnit.Name : null));
 
             Mapper.CreateMap<Wish, WishDTO>()
                   .ReverseMap()
@@ -202,15 +202,15 @@ namespace Presentation.Web
                 .ForMember(dto => dto.HasDelegations, opt => opt.MapFrom(src => src.Children.Any()))
                 .ReverseMap();
 
-            Mapper.CreateMap<AdminRight, AdminRightDTO>()
+            Mapper.CreateMap<OrganizationRight, OrganizationRightDTO>()
                   .ForMember(dto => dto.OrganizationId, opt => opt.MapFrom(src => src.ObjectId))
                   .ForMember(dto => dto.RoleName, opt => opt.MapFrom(src => src.Role.Name));
 
+            Mapper.CreateMap<OrganizationUnitRight, RightOutputDTO>();
+            Mapper.CreateMap<RightInputDTO, OrganizationUnitRight>();
+
             Mapper.CreateMap<OrganizationRight, RightOutputDTO>();
             Mapper.CreateMap<RightInputDTO, OrganizationRight>();
-
-            Mapper.CreateMap<AdminRight, RightOutputDTO>();
-            Mapper.CreateMap<RightInputDTO, AdminRight>();
 
             Mapper.CreateMap<ItSystemRight, RightOutputDTO>()
                 .ForMember(dto => dto.ObjectName, opt => opt.MapFrom(src => src.Object.ItSystem.Name));
@@ -257,11 +257,11 @@ namespace Presentation.Web
             Mapper.CreateMap<DataRowUsage, DataRowUsageDTO>()
                   .ReverseMap();
 
-            Mapper.CreateMap<InterfaceUsage, InterfaceUsageDTO>()
+            Mapper.CreateMap<ItInterfaceUsage, ItInterfaceUsageDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.ItContract, opt => opt.Ignore());
 
-            Mapper.CreateMap<ItInterfaceExhibitUsage, InterfaceExposureDTO>()
+            Mapper.CreateMap<ItInterfaceExhibitUsage, ItInterfaceExposureDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.ItContract, opt => opt.Ignore());
 
@@ -273,7 +273,7 @@ namespace Presentation.Web
                 .ForMember(dest => dest.MainContractIsActive, opt => opt.MapFrom(src => src.MainContract.ItContract.IsActive))
                 .ForMember(dest => dest.InterfaceExhibitCount, opt => opt.MapFrom(src => src.ItSystem.ItInterfaceExhibits.Count))
                 .ForMember(dest => dest.InterfaceUseCount, opt => opt.MapFrom(src => src.ItSystem.CanUseInterfaces.Count))
-                .ForMember(dest => dest.ActiveInterfaceUseCount, opt => opt.MapFrom(src => src.ItSystem.CanUseInterfaces.Sum(x => x.InterfaceUsages.Count(y => y.ItContract.IsActive))))
+                .ForMember(dest => dest.ActiveInterfaceUseCount, opt => opt.MapFrom(src => src.ItSystem.CanUseInterfaces.Sum(x => x.ItInterfaceUsages.Count(y => y.ItContract.IsActive))))
                 .ReverseMap()
                 .ForMember(dest => dest.OrgUnits, opt => opt.Ignore())
                 .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())

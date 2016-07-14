@@ -85,6 +85,8 @@ namespace Presentation.Web.App_Start
             kernel.Bind<IItSystemService>().To<ItSystemService>().InRequestScope();
             kernel.Bind<IItProjectService>().To<ItProjectService>().InRequestScope();
             kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InRequestScope();
+            kernel.Bind<IItInterfaceService>().To<ItInterfaceService>().InRequestScope();
+            kernel.Bind<IItContractService>().To<ItContractService>().InRequestScope();
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
             kernel.Bind<IExcelService>().To<ExcelService>().InRequestScope();
             kernel.Bind<IExcelHandler>().To<ExcelHandler>().InRequestScope();

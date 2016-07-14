@@ -12,11 +12,13 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasRequired(t => t.ObjectOwner)
                 .WithMany()
-                .HasForeignKey(d => d.ObjectOwnerId);
+                .HasForeignKey(d => d.ObjectOwnerId)
+                .WillCascadeOnDelete(false);
 
             this.HasRequired(t => t.LastChangedByUser)
                 .WithMany()
-                .HasForeignKey(d => d.LastChangedByUserId);
+                .HasForeignKey(d => d.LastChangedByUserId)
+                .WillCascadeOnDelete(false);
         }
     }
 }

@@ -127,7 +127,7 @@ namespace Presentation.Web.Controllers.API
             var obj = _objectRepository.GetByKey(objectId);
             // local admin have write access if the obj is in context
             if (obj.IsInContext(organizationId) &&
-                user.AdminRights.Any(x => x.ObjectId == organizationId && x.Role.HasWriteAccess))
+                user.OrganizationRights.Any(x => x.ObjectId == organizationId && x.Role.HasWriteAccess))
                 return true;
 
             return obj.HasUserWriteAccess(user);

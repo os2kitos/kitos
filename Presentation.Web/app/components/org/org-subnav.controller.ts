@@ -10,7 +10,7 @@
                 }],
                 organizationRoles: [
                         '$http', function ($http) {
-                            return $http.get('api/adminrole').then(function (result) {
+                            return $http.get('api/OrganizationRole').then(function (result) {
                                 return result.data.response;
                             });
                         }
@@ -83,7 +83,7 @@
                                         roleId: orgUserRole.id,
                                     };
 
-                                    $http.post("api/adminrights/?rightByOrganizationRight&organizationId=" + oId + "&userId=" + user.id, data, { handleBusy: true }).success(function (result) {
+                                    $http.post("api/OrganizationRights/?rightByOrganizationRight&organizationId=" + oId + "&userId=" + user.id, data, { handleBusy: true }).success(function (result) {
                                         msg.toSuccessMessage(userResult.fullName + " er oprettet i KITOS");
                                         reload();
                                     }).error(function() {

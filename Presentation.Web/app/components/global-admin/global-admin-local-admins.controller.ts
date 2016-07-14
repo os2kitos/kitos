@@ -9,14 +9,14 @@
                 resolve: {
                     localAdminRole: [
                         '$http', function($http) {
-                            return $http.get('api/adminrole?getLocalAdminRole=true').then(function(result) {
+                            return $http.get('api/OrganizationRole?getLocalAdminRole=true').then(function(result) {
                                 return result.data.response;
                             });
                         }
                     ],
                     adminRights: [
                         '$http', function($http) {
-                            return $http.get('api/adminrights/?roleName=LocalAdmin&roleWithName').then(function (result) {
+                            return $http.get('api/OrganizationRights/?roleName=LocalAdmin&roleWithName').then(function (result) {
                                 return result.data.response;
                             });
                         }
@@ -58,7 +58,7 @@
                 };
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);
-                $http.post("api/adminrights/" + oId + "?organizationId=" + oId, data, { handleBusy: true }).success(function (result) {
+                $http.post("api/OrganizationRights/" + oId + "?organizationId=" + oId, data, { handleBusy: true }).success(function (result) {
                     msg.toSuccessMessage(user.text + " er blevet lokal administrator for " + orgName);
                     reload();
                 }).error(function() {
@@ -88,7 +88,7 @@
                 var uId = right.userId;
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);
-                $http.delete("api/adminrights/" + oId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function(deleteResult) {
+                $http.delete("api/OrganizationRights/" + oId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function(deleteResult) {
                     msg.toSuccessMessage(right.userName + " er ikke længere lokal administrator");
                     reload();
                 }).error(function(deleteResult) {

@@ -16,7 +16,6 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasRequired(t => t.User)
                 .WithMany(t => t.PasswordResetRequests)
                 .HasForeignKey(d => d.UserId);
-                
         }
     }
 }

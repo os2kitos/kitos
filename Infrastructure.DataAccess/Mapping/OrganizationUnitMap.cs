@@ -7,8 +7,8 @@ namespace Infrastructure.DataAccess.Mapping
         public OrganizationUnitMap()
         {
             // Properties
-            this.Property(x => x.OrganizationId).HasUniqueIndexAnnotation("UniqueLocalId", 0);
-            this.Property(x => x.LocalId).HasMaxLength(100).HasUniqueIndexAnnotation("UniqueLocalId", 1);
+            this.Property(x => x.OrganizationId).HasUniqueIndexAnnotation("UX_LocalId", 0);
+            this.Property(x => x.LocalId).HasMaxLength(100).HasUniqueIndexAnnotation("UX_LocalId", 1);
 
             // Table & Column Mappings
             this.ToTable("OrganizationUnit");
@@ -17,7 +17,7 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(o => o.Parent)
                 .WithMany(p => p.Children)
                 .HasForeignKey(o => o.ParentId)
-                .WillCascadeOnDelete(true);
+                .WillCascadeOnDelete(false);
 
             this.HasRequired(o => o.Organization)
                 .WithMany(m => m.OrgUnits)
@@ -26,11 +26,13 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasMany(t => t.UsingItProjects)
                 .WithRequired(t => t.OrganizationUnit)
-                .HasForeignKey(d => d.OrganizationUnitId);
+                .HasForeignKey(d => d.OrganizationUnitId)
+                .WillCascadeOnDelete(false);
 
             this.HasMany(t => t.Using)
                 .WithRequired(t => t.OrganizationUnit)
-                .HasForeignKey(d => d.OrganizationUnitId);
+                .HasForeignKey(d => d.OrganizationUnitId)
+                .WillCascadeOnDelete(false);
         }
     }
 }
