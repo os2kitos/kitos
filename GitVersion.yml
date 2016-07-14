@@ -1,26 +1,4 @@
-{
-  "Major":1,
-  "Minor":3,
-  "Patch":1,
-  "PreReleaseTag":"",
-  "PreReleaseTagWithDash":"",
-  "PreReleaseLabel":"",
-  "PreReleaseNumber":"",
-  "BuildMetaData":3,
-  "BuildMetaDataPadded":"0003",
-  "FullBuildMetaData":"3.Branch.master.Sha.c66da13ac17ab2a4ce1d37626edb56d83c7981e9",
-  "MajorMinorPatch":"1.3.1",
-  "SemVer":"1.3.1",
-  "LegacySemVer":"1.3.1",
-  "LegacySemVerPadded":"1.3.1",
-  "AssemblySemVer":"1.3.1.0",
-  "FullSemVer":"1.3.1+3",
-  "InformationalVersion":"1.3.1+3.Branch.master.Sha.c66da13ac17ab2a4ce1d37626edb56d83c7981e9",
-  "BranchName":"master",
-  "Sha":"c66da13ac17ab2a4ce1d37626edb56d83c7981e9",
-  "NuGetVersionV2":"1.3.1",
-  "NuGetVersion":"1.3.1",
-  "CommitsSinceVersionSource":3,
-  "CommitsSinceVersionSourcePadded":"0003",
-  "CommitDate":"2016-06-09"
-}
+mode: ContinuousDelivery
+branches: {}
+ignore:
+  sha: []
