@@ -5,7 +5,7 @@
 		<DeployFolder>$(RootFolder)\deploy</DeployFolder>
     <TestOutputFolder>$(DeployFolder)\test</TestOutputFolder>
     <XunitPath>$(RootFolder)\packages\xunit.runner.console.2.1.0\tools\xunit.console.exe</XunitPath>
-	  <GitVersionTaskPath>$(RootFolder)\packages\GitVersionTask.3.6.0\build\dotnet\GitVersionTask.targets</GitVersionTaskPath>
+	  <GitVersionTaskPath>$(RootFolder)\packages\GitVersionTask.3.5.4\build\dotnet\GitVersionTask.targets</GitVersionTaskPath>
 	  <BuildFolder>$(RootFolder)\buildscripts\</BuildFolder>
 	</PropertyGroup>
   <PropertyGroup>
