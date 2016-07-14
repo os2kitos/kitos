@@ -5,6 +5,8 @@
 		<DeployFolder>$(RootFolder)\deploy</DeployFolder>
     <TestOutputFolder>$(DeployFolder)\test</TestOutputFolder>
     <XunitPath>$(RootFolder)\packages\xunit.runner.console.2.1.0\tools\xunit.console.exe</XunitPath>
+	  <GitVersionTaskPath>$(RootFolder)\packages\GitVersionTask.3.6.0\build\dotnet\GitVersionTask.targets</GitVersionTaskPath>
+	  <BuildFolder>$(RootFolder)\buildscripts\</BuildFolder>
 	</PropertyGroup>
   <PropertyGroup>
     <WebProjects>$(RootFolder)\Presentation.Web\Presentation.Web.csproj</WebProjects>
@@ -12,8 +14,9 @@
     <BuildDepeneds>GetVersion;BuildWeb;BuildTest</BuildDepeneds>
     <RunAllDependOn>Build;RunTest</RunAllDependOn>
   </PropertyGroup>
-  <Import Project="$(RootFolder)\packages\GitVersionTask.3.6.0\Build\dotnet\GitVersionTask.targets" Condition="Exists('$(RootFolder)\packages\GitVersionTask.3.6.0\Build\dotnet\GitVersionTask.targets')" />
+  <Import Project="$(GitVersionTaskPath)" Condition="Exists($(GitVersionTaskPath))" />
   <Target Name="GetVersion" Returns="$(MajorMinorPatch)">
+    <Message Text="Kan ikke finde nuget pakke GitVersionTask.targets" Condition="!Exists($(GitVersionTaskPath))"/>
     <GitVersionTask.GetVersion SolutionDirectory="$(RootFolder)">
       <Output TaskParameter="MajorMinorPatch" PropertyName="MajorMinorPatch" />
       <Output TaskParameter="BranchName" PropertyName="BranchName" />
@@ -48,6 +51,7 @@
     <Message Text="##teamcity[publishArtifacts 'deploy\test/** =&gt; test.zip']" />
   </Target>
   <Target Name="RunTest" DependsOnTargets="BuildTest">
+    <Message Text="Kan ikke finde nuget pakke xunit.console.exe" Condition="!Exists($(XunitPath))"/>
     <Exec Command="$(XunitPath) Tests.Unit.Presentation.Web.dll" WorkingDirectory="$(TestOutputFolder)" />
   </Target>
   <Target Name="RunAll" DependsOnTargets="$(RunAllDependOn)"></Target>
