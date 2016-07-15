@@ -19,12 +19,16 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Table & Column Mappings
             this.ToTable("Organization");
-            this.Property(t => t.Type).IsOptional();
 
             // Relationships
             this.HasOptional(t => t.Config)
                 .WithRequired(t => t.Organization)
                 .WillCascadeOnDelete(true);
+
+            this.HasRequired(t => t.Type)
+                .WithMany(t => t.Organizations)
+                .HasForeignKey(t => t.TypeId)
+                .WillCascadeOnDelete(false);
         }
     }
 }

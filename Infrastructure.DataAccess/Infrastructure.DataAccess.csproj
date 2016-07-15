@@ -87,6 +87,7 @@
     <Compile Include="Mapping\ItContractTemplateMap.cs" />
     <Compile Include="Mapping\ItContractTypeMap.cs" />
     <Compile Include="Mapping\OptionExtendTypeMap.cs" />
+    <Compile Include="Mapping\OrganizationTypeMap.cs" />
     <Compile Include="Mapping\OrganizationRightMap.cs" />
     <Compile Include="Mapping\OrganizationRoleMap.cs" />
     <Compile Include="Mapping\BusinessTypeMap.cs" />
@@ -157,6 +158,14 @@
     <Compile Include="Migrations\201607110724592_FixIndexes.Designer.cs">
       <DependentUpon>201607110724592_FixIndexes.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201607141106381_AlteredOrgType.cs" />
+    <Compile Include="Migrations\201607141106381_AlteredOrgType.Designer.cs">
+      <DependentUpon>201607141106381_AlteredOrgType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607141111592_MigrateDataOrgType.cs" />
+    <Compile Include="Migrations\201607141111592_MigrateDataOrgType.Designer.cs">
+      <DependentUpon>201607141111592_MigrateDataOrgType.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -186,6 +195,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201607110724592_FixIndexes.resx">
       <DependentUpon>201607110724592_FixIndexes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607141106381_AlteredOrgType.resx">
+      <DependentUpon>201607141106381_AlteredOrgType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607141111592_MigrateDataOrgType.resx">
+      <DependentUpon>201607141111592_MigrateDataOrgType.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

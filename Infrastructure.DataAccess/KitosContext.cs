@@ -69,6 +69,7 @@ namespace Infrastructure.DataAccess
         public DbSet<MethodType> MethodTypes { get; set; }
         public DbSet<OptionExtendType> OptionExtendTypes { get; set; }
         public DbSet<Organization> Organizations { get; set; }
+        public DbSet<OrganizationType> OrganizationTypes { get; set; }
         public DbSet<OrganizationUnit> OrganizationUnits { get; set; }
         public DbSet<OrganizationUnitRight> OrganizationUnitRights { get; set; }
         public DbSet<OrganizationUnitRole> OrganizationUnitRoles { get; set; }
@@ -103,8 +104,6 @@ namespace Infrastructure.DataAccess
 
             modelBuilder.ComplexType<ItProjectPhase>();
 
-            modelBuilder.Configurations.Add(new OrganizationRightMap());
-            modelBuilder.Configurations.Add(new OrganizationRoleMap());
             modelBuilder.Configurations.Add(new AdviceMap());
             modelBuilder.Configurations.Add(new AgreementElementTypeMap());
             modelBuilder.Configurations.Add(new ArchiveTypeMap());
@@ -149,6 +148,9 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemTypeMap());
             modelBuilder.Configurations.Add(new MethodTypeMap());
             modelBuilder.Configurations.Add(new OrganizationMap());
+            modelBuilder.Configurations.Add(new OrganizationRightMap());
+            modelBuilder.Configurations.Add(new OrganizationRoleMap());
+            modelBuilder.Configurations.Add(new OrganizationTypeMap());
             modelBuilder.Configurations.Add(new OrganizationUnitMap());
             modelBuilder.Configurations.Add(new OrganizationUnitRightMap());
             modelBuilder.Configurations.Add(new OrganizationUnitRoleMap());

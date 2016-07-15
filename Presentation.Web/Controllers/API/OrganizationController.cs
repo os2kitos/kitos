@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
+using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
@@ -160,6 +161,20 @@ namespace Presentation.Web.Controllers.API
         {
             _organizationService.SetupDefaultOrganization(item, KitosUser);
             return base.PostQuery(item);
+        }
+
+        public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
+        {
+            if (!KitosUser.IsGlobalAdmin)
+	        {
+		        if (obj.GetValue("typeId", StringComparison.InvariantCultureIgnoreCase) != null)
+                {
+                    // only global admin is allowed to change the type of an organization
+                    return Unauthorized();
+                }
+	        }
+
+            return base.Patch(id, organizationId, obj);
         }
     }
 }

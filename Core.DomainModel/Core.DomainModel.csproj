@@ -107,6 +107,7 @@
     <Compile Include="ItSystem\ItSystemType.cs" />
     <Compile Include="ItSystem\SensitiveDataType.cs" />
     <Compile Include="ItSystem\TsaType.cs" />
+    <Compile Include="OrganizationType.cs" />
     <Compile Include="OrganizationUnit.cs" />
     <Compile Include="OrganizationUnitRight.cs" />
     <Compile Include="HasRightsEntity.cs" />
@@ -140,6 +141,7 @@
     <Compile Include="ItSystem\BusinessType.cs" />
     <Compile Include="ItSystem\Wish.cs" />
     <Compile Include="ItProject\Milestone.cs" />
+    <Compile Include="OrganizationCategory.cs" />
     <Compile Include="TaskRef.cs" />
     <Compile Include="Organization.cs" />
     <Compile Include="OrganizationUnitRole.cs" />

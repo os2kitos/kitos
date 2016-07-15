@@ -4,13 +4,6 @@ using System.Linq;
 
 namespace Core.DomainModel
 {
-    public enum OrganizationType
-    {
-        Company,
-        Municipality,
-        CommunityOfInterests
-    }
-
     /// <summary>
     /// Represents an Organization (such as a municipality, or a company).
     /// Holds local configuration and admin roles, as well as collections of
@@ -29,6 +22,7 @@ namespace Core.DomainModel
         }
 
         public string Name { get; set; }
+        public int TypeId { get; set; }
         public OrganizationType Type { get; set; }
         /// <summary>
         /// Cvr number
