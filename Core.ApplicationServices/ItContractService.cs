@@ -26,7 +26,7 @@ namespace Core.ApplicationServices
             _repository.Save();
 
             // delete orphan economy streams
-            var orphanStreams = _economyStreamRepository.Get(x => x.InternPaymentForId == null || x.ExternPaymentForId == null);
+            var orphanStreams = _economyStreamRepository.Get(x => x.InternPaymentForId == null && x.ExternPaymentForId == null);
             foreach (var orphan in orphanStreams)
             {
                 _economyStreamRepository.DeleteByKey(orphan.Id);
