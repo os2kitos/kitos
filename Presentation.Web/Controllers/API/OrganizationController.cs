@@ -166,13 +166,13 @@ namespace Presentation.Web.Controllers.API
         public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
         {
             if (!KitosUser.IsGlobalAdmin)
-	        {
-		        if (obj.GetValue("typeId", StringComparison.InvariantCultureIgnoreCase) != null)
+            {
+	            if (obj.GetValue("typeId", StringComparison.InvariantCultureIgnoreCase) != null)
                 {
                     // only global admin is allowed to change the type of an organization
                     return Unauthorized();
                 }
-	        }
+            }
 
             return base.Patch(id, organizationId, obj);
         }

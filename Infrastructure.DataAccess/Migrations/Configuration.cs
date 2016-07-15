@@ -667,14 +667,14 @@ Kontakt: info@kitos.dk",
         {
             var options = names.Select(name => CreateOption<T, TReference>(name, objectOwner)).ToArray();
             try
-	        {
+            {
                 dbSet.AddOrUpdate(x => x.Name, options);
             }
-	        catch
-	        {
-		        // we don't really care about duplicates
+            catch
+            {
+	            // we don't really care about duplicates
                 // just do nothing
-	        }
+            }
         }
 
         /// <summary>
