@@ -10,7 +10,7 @@
         Uuid: any;
         LastAdvisDate: Date;
         /** The admin rights of the user */
-        AdminRights: Array<IAdminRight>;
+        OrganizationRights: Array<IAdminRight>;
         /** Passwords reset request issued for the user */
         PasswordResetRequests: Array<IPasswordResetRequest>;
         /** Wishes created by this user */
