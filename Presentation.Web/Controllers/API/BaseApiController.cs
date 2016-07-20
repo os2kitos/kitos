@@ -53,12 +53,12 @@ namespace Presentation.Web.Controllers.API
             return result;
         }
 
-        protected HttpResponseMessage Ok()
+        protected new HttpResponseMessage Ok()
         {
             return CreateResponse(HttpStatusCode.OK);
         }
 
-        protected HttpResponseMessage Ok<T>(T response)
+        protected new HttpResponseMessage Ok<T>(T response)
         {
             return CreateResponse(HttpStatusCode.OK, response);
         }
@@ -85,7 +85,7 @@ namespace Presentation.Web.Controllers.API
             return CreateResponse(HttpStatusCode.NoContent);
         }
 
-        protected HttpResponseMessage NotFound()
+        protected new HttpResponseMessage NotFound()
         {
             return CreateResponse(HttpStatusCode.NotFound);
         }
@@ -134,9 +134,14 @@ namespace Presentation.Web.Controllers.API
                         return UserRepository.Get(u => u.Uuid == uuid).First();
                     }
 
-                    var id = Convert.ToUInt32(User.Identity.Name);
-                    var user = UserRepository.Get(u => u.Id == id).FirstOrDefault();
-                    if (user == null) throw new SecurityException();
+                    //var user = MemoryCache.Default.Get(User.Identity.Name) as User;
+                    //if (user == null)
+                    //{
+                        var id = Convert.ToUInt32(User.Identity.Name);
+                        var user = UserRepository.Get(u => u.Id == id).FirstOrDefault();
+                        if (user == null) throw new SecurityException();
+                      //  MemoryCache.Default.Add(User.Identity.Name, user, DateTimeOffset.UtcNow.AddHours(1));
+                    //}
 
                     return user;
                 }
@@ -147,10 +152,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        protected bool IsAuthenticated
-        {
-            get { return User.Identity.IsAuthenticated; }
-        }
+        protected bool IsAuthenticated => User.Identity.IsAuthenticated;
 
         protected virtual TDest Map<TSource, TDest>(TSource item)
         {

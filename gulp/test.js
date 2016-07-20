@@ -1,16 +1,21 @@
-var gulp = require('gulp'),
-    paths = require('../paths.config.js'),
-    gutil = require('gulp-util'),
-    protractor = require('gulp-protractor').protractor,
-    karma = require('karma');
+'use strict';
+
+var gulp = require('gulp');
+var paths = require('../paths.config.js');
+var gutil = require('gulp-util');
+var protractor = require('gulp-angular-protractor');
+var karma = require('karma');
+var browserSync = require('browser-sync');
+var $ = require('gulp-load-plugins')();
+
 
 // run unit tests with karma
 gulp.task('unit', function (done) {
     new karma.Server({
         configFile: paths.karmaConf,
         singleRun: true,
-        browsers: ['IE', 'Firefox', 'Chrome'],
-        reporters: ['progress', 'coverage', 'appveyor'],
+        browsers: ['IE', 'Chrome'],
+        reporters: ['progress', 'coverage', 'teamcity'],
         coverageReporter: {
             type: 'json',
             subdir: '.',
@@ -28,8 +33,38 @@ gulp.task('unit', function (done) {
     }, done).start();
 });
 
-// run e2e tests with protractor
-gulp.task('e2e', function (done) {
+// use protractor
+gulp.task('e2e:local', runProtractor);
+
+function runProtractor(done) {
+    var params = process.argv;
+    var args = params.length > 3 ? [params[3], params[4]] : [];
+
+    gutil.log('arguments: ' + args);
+
+    var singleSpec = 'Presentation.Web/Tests/it-contract/Edit/Tabs/it-contract-tab-payment-model.e2e.spec.js';
+    gulp.src(singleSpec) // paths.e2eSuites.itSystem
+      .pipe(protractor({
+          configFile: 'protractor.local.conf.js',
+          args: args,
+          'autoStartStopServer': true,
+          'debug': false
+      }))
+      .on('error', function (err) {
+          gutil.log(gutil.colors.red('error: ' + err));
+          // Make sure failed tests cause gulp to exit non-zero
+          throw err;
+      })
+      .on('end', function () {
+          // Close browser sync server
+          browserSync.exit();
+          done();
+      });
+}
+
+// run e2e tests with protractor with browserstack
+gulp.task('e2e:browserstack', function (done) {
+// ReSharper disable once InconsistentNaming
     var BrowserStackTunnel = require('browserstacktunnel-wrapper');
 
     var browserStackTunnel = new BrowserStackTunnel({
@@ -59,30 +94,6 @@ gulp.task('e2e', function (done) {
                 });
             });
     }
-});
-
-// start standalone selenium webdriver
-gulp.task('webdriver', require('gulp-protractor').webdriver_standalone);
-
-// run e2e tests with protractor locally
-gulp.task('locale2e', function () {
-    var taskExitValue = 0;
-    var args = process.argv;
-    if (args && args.length > 3) {
-        args = args.slice(3, args.length);
-    } else {
-        args = null;
-    }
-
-    return gulp.src(paths.e2eFiles)
-        .pipe(protractor({
-            configFile: 'protractor.local.conf.js',
-            args: args
-        }))
-        .on('error', function (err) {
-            gutil.log(gutil.colors.red("An error occurred in protractor. Did you start the webdriver?"));
-            gutil.log(gutil.colors.red("Run cmd 'start gulp webdriver'."));
-        });
 });
 
 // map karma coverage results from js to ts source

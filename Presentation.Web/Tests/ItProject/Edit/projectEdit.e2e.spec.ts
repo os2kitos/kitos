@@ -11,9 +11,7 @@ describe("project edit view", () => {
     beforeEach(() => {
         mockHelper = new Helper.Mock();
         browserHelper = new Helper.Browser(browser);
-
         pageObject = new ItProjectEditPo();
-
         browser.driver.manage().window().maximize();
     });
 
@@ -61,7 +59,7 @@ describe("project edit view", () => {
 
         it("should not delete when delete confirm popup is dismissed", () => {
             // arrange
-            pageObject.deleteProjectElement.first().click();
+            pageObject.deleteProjectElement.click();
 
             // act
             browserHelper.dismissAlert();
@@ -72,7 +70,7 @@ describe("project edit view", () => {
 
         it("should delete when delete confirm popup is accepted", () => {
             // arrange
-            pageObject.deleteProjectElement.first().click();
+            pageObject.deleteProjectElement.click();
 
             // act
             browserHelper.acceptAlert();

@@ -80,6 +80,34 @@
             this.activate();
         }
 
+
+        public opretITProjekt() {
+            let orgUnitId = this.user.currentOrganizationUnitId;
+            const payload = {
+                name: "Unavngivet projekt",
+                responsibleOrgUnitId: orgUnitId,
+                organizationId: this.user.currentOrganizationId
+            };
+
+            var msg = this.notify.addInfoMessage("Opretter projekt...", false);
+
+            this.$http.post("api/itproject", payload)
+                .success((result: any) => {
+                    msg.toSuccessMessage("Et nyt projekt er oprettet!");
+                    let projectId = result.response.id;
+
+                    if (orgUnitId) {
+                        // add users default org unit to the new project
+                        this.$http.post(`api/itproject/${projectId}?organizationunit=${orgUnitId}&organizationId=${this.user.currentOrganizationId}`, null);
+                    }
+
+                    this.$state.go("it-project.edit.status-project", { id: projectId });
+                })
+                .error(() => {
+                    msg.toErrorMessage("Fejl! Kunne ikke oprette nyt projekt!");
+                });
+        };
+
         // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(concat(concat(c/User/Name, ' '), c/User/LastName),'foo') and c/RoleId eq {roleId})"
         private fixRoleFilter(filterUrl, roleName, roleId) {
             var pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
@@ -237,6 +265,12 @@
                     }
                 },
                 toolbar: [
+                    {
+                        //TODO ng-show='hasWriteAccess'
+                        name: "opretITProjekt",
+                        text: "Opret IT Projekt",
+                        template: "<a ng-click='projectOverviewVm.opretITProjekt()' class='btn btn-success pull-right'>#: text #</a>"
+                    },
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",

@@ -29,7 +29,7 @@ class ItContractEditTabDeadlinesPo implements IPageObject {
     public handoverTrialsRepeater = new RepeaterWrapper("ht in handoverTrials");
 
     // handoverTrial locator
-    public handoverTrialLocator = new Select2Wrapper(".handover-trial.select2-container");
+    public handoverTrialLocator = new Select2Wrapper("#contract-handover-trial");
 
     // handoverTrialExpectedDate locator
     public handoverTrialExpectedDateLocator = by.css("input.handover-trial-expected-date");
@@ -77,7 +77,7 @@ class ItContractEditTabDeadlinesPo implements IPageObject {
     public paymentMilestoneDeleteLocator = by.css(".payment-milestone-delete");
 
     // agreementConcluded input
-    public agreementConcludedElement = element(by.css("#agreement-concluded"));
+    public agreementConcludedElement = element(by.id("agreement-concluded"));
     public agreementConcludedInput = (value: string) => {
         this.agreementConcludedElement.sendKeys(value);
     }

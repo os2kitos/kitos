@@ -1,22 +1,17 @@
-﻿(function (ng, app) {
-    app.config(['$stateProvider', function ($stateProvider) {
+﻿((ng, app) => {
+    app.config(['$stateProvider', $stateProvider => {
         $stateProvider.state('organization', {
             url: '/organization',
             abstract: true,
             template: '<ui-view autoscroll="false" />',
             resolve: {
-                user: ['userService', function (userService) {
-                    return userService.getUser();
-                }],
+                user: ['userService', userService => userService.getUser()],
                 organizationRoles: [
-                        '$http', function ($http) {
-                            return $http.get('api/adminrole').then(function (result) {
-                                return result.data.response;
-                            });
-                        }
+                    '$http', $http => $http.get('api/adminrole')
+                    .then(result => result.data.response)
                 ],
             },
-            controller: ['$rootScope', '$uibModal', '$state', 'user', 'organizationRoles', function ($rootScope, $modal, $state, user, organizationRoles: { id; name; }[]) {
+            controller: ['$rootScope', '$uibModal', '$state', 'user', 'organizationRoles', ($rootScope, $modal, $state, user, organizationRoles: { id; name; }[]) => {
                 $rootScope.page.title = 'Organisation';
 
                 var subnav = [];
@@ -38,7 +33,7 @@
                     $state.go('.', null, { reload: true });
                 }
 
-                var orgUserRole = _.find(organizationRoles, function (role) { return role.name == 'Medarbejder'; });
+                var orgUserRole = _.find(organizationRoles, role => (role.name === 'Medarbejder'));
 
 
                 function createUser() {
