@@ -1,9 +1,13 @@
 ﻿module Kitos.Tests.e2e.Home {
     class KitosHomePage {
-        emailInput;
+        public  emailInput;
+        public  passwordInput;
+        public loginButton;
 
         constructor() {
             this.emailInput = element(by.model("email"));
+            this.passwordInput = element(by.model("password"));
+            this.loginButton = element(by.buttonText('Log ind'));
         }
 
         get(): void {
@@ -16,6 +20,14 @@
 
         set email(value: string) {
             this.emailInput.sendKeys(value);
+        }
+
+        get password(): string {
+            return this.passwordInput.getText();
+        }
+
+        set password(value: string) {
+            this.passwordInput.sendKeys(value);
         }
     }
 

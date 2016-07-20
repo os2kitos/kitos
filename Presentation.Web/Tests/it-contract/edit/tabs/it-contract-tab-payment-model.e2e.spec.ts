@@ -41,10 +41,6 @@ describe("contract edit tab payment model", () => {
         });
 
         it("should disable inputs", () => {
-            // arrange
-
-            // act
-
             // assert
             expect(pageObject.operationDateElement).toBeDisabled();
             expect(pageObject.freqSelector.element).toBeSelect2Disabled();

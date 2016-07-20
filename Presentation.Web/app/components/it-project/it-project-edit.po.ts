@@ -9,7 +9,7 @@ class ItPojectEditPo implements IPageObject {
     }
 
     // delete project
-    deleteProjectElement = element.all(by.css("a.btn-danger .glyphicon-minus"));
+    deleteProjectElement = element(by.className("btn-danger"));
 
     // name
     nameElement = element(by.model(this.controllerVm + ".project.name"));
