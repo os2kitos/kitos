@@ -1,17 +1,22 @@
-﻿((ng, app) => {
-    app.config(['$stateProvider', $stateProvider => {
+﻿(function (ng, app) {
+    app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('organization', {
             url: '/organization',
             abstract: true,
             template: '<ui-view autoscroll="false" />',
             resolve: {
-                user: ['userService', userService => userService.getUser()],
+                user: ['userService', function (userService) {
+                    return userService.getUser();
+                }],
                 organizationRoles: [
-                    '$http', $http => $http.get('api/adminrole')
-                    .then(result => result.data.response)
+                        '$http', function ($http) {
+                            return $http.get('api/OrganizationRole').then(function (result) {
+                                return result.data.response;
+                            });
+                        }
                 ],
             },
-            controller: ['$rootScope', '$uibModal', '$state', 'user', 'organizationRoles', ($rootScope, $modal, $state, user, organizationRoles: { id; name; }[]) => {
+            controller: ['$rootScope', '$uibModal', '$state', 'user', 'organizationRoles', function ($rootScope, $modal, $state, user, organizationRoles: { id; name; }[]) {
                 $rootScope.page.title = 'Organisation';
 
                 var subnav = [];
@@ -33,7 +38,7 @@
                     $state.go('.', null, { reload: true });
                 }
 
-                var orgUserRole = _.find(organizationRoles, role => (role.name === 'Medarbejder'));
+                var orgUserRole = _.find(organizationRoles, function (role) { return role.name == 'Medarbejder'; });
 
 
                 function createUser() {
@@ -78,7 +83,7 @@
                                         roleId: orgUserRole.id,
                                     };
 
-                                    $http.post("api/adminrights/?rightByOrganizationRight&organizationId=" + oId + "&userId=" + user.id, data, { handleBusy: true }).success(function (result) {
+                                    $http.post("api/OrganizationRights/?rightByOrganizationRight&organizationId=" + oId + "&userId=" + user.id, data, { handleBusy: true }).success(function (result) {
                                         msg.toSuccessMessage(userResult.fullName + " er oprettet i KITOS");
                                         reload();
                                     }).error(function() {

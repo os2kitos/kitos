@@ -29,7 +29,7 @@ namespace Core.DomainModel.ItSystem
         public string ItSystemId { get; set; }
 
         public int? AppTypeOptionId { get; set; }
-        public virtual ItSystemTypeOption AppTypeOption { get; set; }
+        public virtual ItSystemType AppTypeOption { get; set; }
 
         /// <summary>
         /// Gets or sets exhibited interfaces for this instance.

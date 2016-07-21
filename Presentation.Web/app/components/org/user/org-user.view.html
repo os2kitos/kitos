@@ -56,7 +56,7 @@
             <tr data-ng-repeat="user in users">
                 <td>{{user.fullName}}</td>
                 <td>{{user.email}} </td>
-                <td>{{user.adminRights.defaultOrgUnitName == null ? rootUnitName : user.defaultOrganizationUnitName}}</td>
+                <td>{{user.organizationRights.defaultOrgUnitName == null ? rootUnitName : user.defaultOrganizationUnitName}}</td>
                 <td>
                     <button type="button" data-ng-if="user.lastAdvisDate === null" class="btn btn-success btn-xs btn-block" data-ng-click="sendAdvis(user, false)" data-ng-disabled="!user.canBeEdited">
                         Send Advis

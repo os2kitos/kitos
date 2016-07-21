@@ -31,14 +31,16 @@
     "lodash": "3.10.1",
     "moment": "~2.12.0",
     "select2": "~3.5.4",
-    "select2-bootstrap-css": "~1.4.6"
+    "select2-bootstrap-css": "~1.4.6",
+    "angularjs-dropdown-multiselect": "^1.5.2"
   },
   "resolutions": {
     "select2": "^3.3.2",
     "angular": "^1.5.6",
     "angular-animate": "^1.5.6",
     "angular-ui-router": "^0.3.0",
-    "angular-sanitize": "^1.5.6"
+    "angular-sanitize": "^1.5.6",
+    "lodash": "3.10.1"
   },
   "devDependencies": {
     "angular-mocks": "1.4.7"

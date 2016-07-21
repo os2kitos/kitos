@@ -235,9 +235,9 @@ namespace Tests.Unit.Presentation.Web.OData
             {
                 list.Add(new User
                 {
-                    AdminRights = new List<AdminRight>
+                    OrganizationRights = new List<OrganizationRight>
                         {
-                            new AdminRight
+                            new OrganizationRight
                             {
                                 ObjectId = orgKey
                             }

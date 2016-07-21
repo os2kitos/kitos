@@ -4,9 +4,9 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class PaymentModelController : GenericOptionApiController<PaymentModel, ItContract, OptionDTO>
+    public class PaymentModelController : GenericOptionApiController<PaymentModelType, ItContract, OptionDTO>
     {
-        public PaymentModelController(IGenericRepository<PaymentModel> repository) 
+        public PaymentModelController(IGenericRepository<PaymentModelType> repository)
             : base(repository)
         {
         }

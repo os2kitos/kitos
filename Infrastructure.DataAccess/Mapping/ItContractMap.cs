@@ -37,13 +37,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .WillCascadeOnDelete(false);
 
             this.HasMany(t => t.AgreementElements)
-                .WithMany(t => t.References)
-                .Map(mc =>
-                    {
-                        // have to rename key else it's too long for MySql
-                        mc.MapLeftKey("ItContractId");
-                        mc.MapRightKey("ElemId");
-                    });
+                .WithMany(t => t.References);
 
             this.HasOptional(t => t.ResponsibleOrganizationUnit)
                 .WithMany(t => t.ResponsibleForItContracts)
@@ -55,7 +49,8 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasRequired(t => t.Organization)
                 .WithMany(t => t.ItContracts)
-                .HasForeignKey(d => d.OrganizationId);
+                .HasForeignKey(d => d.OrganizationId)
+                .WillCascadeOnDelete(false);
 
             this.HasOptional(t => t.ContractSigner)
                 .WithMany(d => d.SignerForContracts)

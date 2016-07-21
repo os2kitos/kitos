@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using System.Linq;
 
 namespace Core.ApplicationServices
 {
@@ -27,7 +29,7 @@ namespace Core.ApplicationServices
                         // it's public everyone can see it
                         s.AccessModifier == AccessModifier.Public ||
                         // everyone in the same organization can see normal objects
-                        s.AccessModifier == AccessModifier.Normal &&
+                        s.AccessModifier == AccessModifier.Local &&
                         s.OrganizationId == organizationId
                         // it systems doesn't have roles so private doesn't make sense
                         // only object owners will be albe to see private objects
@@ -44,7 +46,7 @@ namespace Core.ApplicationServices
                     // it's public everyone can see it
                     s.AccessModifier == AccessModifier.Public ||
                     // everyone in the same organization can see normal objects
-                    s.AccessModifier == AccessModifier.Normal &&
+                    s.AccessModifier == AccessModifier.Local &&
                     s.OrganizationId == organizationId)
                     // it systems doesn't have roles so private doesn't make sense
                     // only object owners will be albe to see private objects
@@ -93,6 +95,17 @@ namespace Core.ApplicationServices
                 parents.AddRange(GetHierarchyParents(itSystem.Parent));
             }
             return parents;
+        }
+
+        public void Delete(int id)
+        {
+            // http://stackoverflow.com/questions/15226312/entityframewok-how-to-configure-cascade-delete-to-nullify-foreign-keys
+            // when children are loaded into memory the foreign key is correctly set to null on children when deleted
+            var system = _repository.Get(x => x.Id == id, null, $"{nameof(ItSystem.TaskRefs)}").FirstOrDefault();
+
+            // delete it project
+            _repository.Delete(system);
+            _repository.Save();
         }
     }
 }

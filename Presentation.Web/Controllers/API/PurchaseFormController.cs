@@ -4,9 +4,9 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class PurchaseFormController : GenericOptionApiController<PurchaseForm, ItContract, OptionDTO>
+    public class PurchaseFormController : GenericOptionApiController<PurchaseFormType, ItContract, OptionDTO>
     {
-        public PurchaseFormController(IGenericRepository<PurchaseForm> repository) 
+        public PurchaseFormController(IGenericRepository<PurchaseFormType> repository)
             : base(repository)
         {
         }

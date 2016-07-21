@@ -15,7 +15,8 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasRequired(t => t.ItSystemUsage)
                 .WithMany(d => d.ItInterfaceExhibitUsages)
-                .HasForeignKey(t => t.ItSystemUsageId);
+                .HasForeignKey(t => t.ItSystemUsageId)
+                .WillCascadeOnDelete(false);
 
             this.HasRequired(t => t.ItInterfaceExhibit)
                 .WithMany(d => d.ItInterfaceExhibitUsage)
