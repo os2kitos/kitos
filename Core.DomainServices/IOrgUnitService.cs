@@ -12,5 +12,6 @@ namespace Core.DomainServices
 
         bool IsAncestorOf(OrganizationUnit unitA, OrganizationUnit unitB);
         bool IsAncestorOf(int unitIdA, int unitIdB);
+        void Delete(int id);
     }
 }

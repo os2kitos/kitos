@@ -28,7 +28,7 @@ namespace Core.DomainModel.ItProject
             // default value(s) TODO does these have an effect? Aren't they overwritten when mapped
             this.Priority = ItProjectPriority.None;
             this.PriorityPf = ItProjectPriority.None;
-            this.AccessModifier = AccessModifier.Normal;
+            this.AccessModifier = AccessModifier.Local;
         }
 
         #region Master

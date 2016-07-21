@@ -19,22 +19,25 @@ namespace Presentation.Web.Controllers.API
 {
     public class ItContractController : GenericHierarchyApiController<ItContract, ItContractDTO>
     {
-        private readonly IGenericRepository<AgreementElement> _agreementElementRepository;
+        private readonly IGenericRepository<AgreementElementType> _agreementElementRepository;
         private readonly IGenericRepository<ItContractRole> _roleRepository;
         private readonly IGenericRepository<ItContractItSystemUsage> _itContractItSystemUsageRepository;
         private readonly IGenericRepository<ItSystemUsage> _usageRepository;
+        private readonly IItContractService _itContractService;
 
         public ItContractController(IGenericRepository<ItContract> repository,
             IGenericRepository<ItSystemUsage> usageRepository,
-            IGenericRepository<AgreementElement> agreementElementRepository,
+            IGenericRepository<AgreementElementType> agreementElementRepository,
             IGenericRepository<ItContractRole> roleRepository,
-            IGenericRepository<ItContractItSystemUsage> itContractItSystemUsageRepository)
+            IGenericRepository<ItContractItSystemUsage> itContractItSystemUsageRepository,
+            IItContractService itContractService)
             : base(repository)
         {
             _usageRepository = usageRepository;
             _agreementElementRepository = agreementElementRepository;
             _roleRepository = roleRepository;
             _itContractItSystemUsageRepository = itContractItSystemUsageRepository;
+            _itContractService = itContractService;
         }
 
         public virtual HttpResponseMessage Get(string q, int orgId, [FromUri] PagingModel<ItContract> paging)
@@ -373,6 +376,11 @@ namespace Presentation.Web.Controllers.API
         private IEnumerable<ItSystemUsageSimpleDTO> MapSystemUsages(ItContract contract)
         {
             return Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageSimpleDTO>>(contract.AssociatedSystemUsages.Select(x => x.ItSystemUsage));
+        }
+
+        protected override void DeleteQuery(ItContract entity)
+        {
+            _itContractService.Delete(entity.Id);
         }
     }
 }

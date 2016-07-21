@@ -4,9 +4,9 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class OptionExtendController : GenericOptionApiController<OptionExtend, ItContract, OptionDTO>
+    public class OptionExtendController : GenericOptionApiController<OptionExtendType, ItContract, OptionDTO>
     {
-        public OptionExtendController(IGenericRepository<OptionExtend> repository) 
+        public OptionExtendController(IGenericRepository<OptionExtendType> repository)
             : base(repository)
         {
         }

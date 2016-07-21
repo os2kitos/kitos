@@ -1,18 +1,19 @@
 ﻿using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
+using System.Linq;
 
 namespace Core.ApplicationServices
 {
     public class ItSystemUsageService : IItSystemUsageService
     {
         private readonly IGenericRepository<ItSystemUsage> _usageRepository;
-        private readonly IGenericRepository<InterfaceUsage> _interfaceUsageRepository;
+        private readonly IGenericRepository<ItInterfaceUsage> _interfaceUsageRepository;
         private readonly IGenericRepository<DataRowUsage> _dataRowUsageRepository;
 
         public ItSystemUsageService(
-            IGenericRepository<ItSystemUsage> usageRepository, 
-            IGenericRepository<InterfaceUsage> interfaceUsageRepository,
+            IGenericRepository<ItSystemUsage> usageRepository,
+            IGenericRepository<ItInterfaceUsage> interfaceUsageRepository,
             IGenericRepository<DataRowUsage> dataRowUsageRepository)
         {
             _usageRepository = usageRepository;
@@ -30,16 +31,27 @@ namespace Core.ApplicationServices
             usage.LastChangedByUser = objectOwner;
 
             _usageRepository.Insert(usage);
-            
+
             _usageRepository.Save(); // abuse this as UoW
             return usage;
         }
 
+        public void Delete(int id)
+        {
+            // http://stackoverflow.com/questions/15226312/entityframewok-how-to-configure-cascade-delete-to-nullify-foreign-keys
+            // when children are loaded into memory the foreign key is correctly set to null on children when deleted
+            var itSystemUsage = _usageRepository.Get(x => x.Id == id, null, $"{nameof(ItSystemUsage.ItInterfaceExhibitUsages)}, {nameof(ItSystemUsage.ItProjects)}, {nameof(ItSystemUsage.TaskRefs)}, {nameof(ItSystemUsage.Contracts)}, {nameof(ItSystemUsage.ItInterfaceUsages)}, {nameof(ItSystemUsage.UsedBy)}").FirstOrDefault();
+
+            // delete it system usage
+            _usageRepository.Delete(itSystemUsage);
+            _usageRepository.Save();
+        }
+
         ///// <summary>
-        ///// Adds a new InterfaceUsage to an existing ItSystemUsage.
+        ///// Adds a new ItInterfaceUsage to an existing ItSystemUsage.
         ///// </summary>
         ///// <param name="usage">The ItSystemUsage</param>
-        ///// <param name="theInterface">The new interface, which the InterfaceUsage should be generated from</param>
+        ///// <param name="theInterface">The new interface, which the ItInterfaceUsage should be generated from</param>
         //public void AddInterfaceUsage(ItSystemUsage usage, ItSystem theInterface)
         //{
         //    CreateAndInsertInterfaceUsage(theInterface.CanUseInterfaces, usage.ObjectOwner);

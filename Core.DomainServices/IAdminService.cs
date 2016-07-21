@@ -5,14 +5,14 @@ namespace Core.DomainServices
 {
     public interface IAdminService
     {
-        AdminRight MakeLocalAdmin(User user, Organization organization, User kitosUser);
+        OrganizationRight MakeLocalAdmin(User user, Organization organization, User kitosUser);
         void RemoveLocalAdmin(User user, Organization organization);
 
         bool IsGlobalAdmin(User user);
         bool IsLocalAdmin(User user, Organization organization);
 
-        AdminRole GetLocalAdminRole();
+        OrganizationRole GetLocalAdminRole();
 
-        IEnumerable<AdminRight> GetAdminRights();
+        IEnumerable<OrganizationRight> GetAdminRights();
     }
 }

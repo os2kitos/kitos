@@ -4,9 +4,9 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class PriceRegulationController : GenericOptionApiController<PriceRegulation, ItContract, OptionDTO>
+    public class PriceRegulationController : GenericOptionApiController<PriceRegulationType, ItContract, OptionDTO>
     {
-        public PriceRegulationController(IGenericRepository<PriceRegulation> repository) 
+        public PriceRegulationController(IGenericRepository<PriceRegulationType> repository)
             : base(repository)
         {
         }

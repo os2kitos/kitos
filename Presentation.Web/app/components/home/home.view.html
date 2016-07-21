@@ -7,11 +7,11 @@
                     <h3 class="panel-title">Om KITOS?</h3>
                 </div>
                 <div class="panel-body">
-                    <textarea data-ng-model="about" class="resize-vertical" style="width: 100%;" rows="8" data-autosave="api/text/1" data-field="value" data-ng-if="user.isGlobalAdmin"></textarea>
+                    <textarea data-ng-model="about" class="resize-vertical" cols="56" rows="8" data-autosave="api/text/1" data-field="value" data-ng-if="user.isGlobalAdmin"></textarea>
                     <div data-ng-bind-html="about" data-ng-if="!user.isGlobalAdmin"></div>
                 </div>
                 <div class="panel-footer">
-                    <a href="http://os2web.dk/document/kitos" target="_blank">Klik her for at læse mereee</a>
+                    <a href="http://os2.eu/produkt/os2kitos" target="_blank">Klik her for at læse mere</a>
                 </div>
             </div>
 
@@ -23,7 +23,7 @@
                 <div class="panel-body">
                     <p>Gør følgende for at tilslutte jer KITOS:</p>
                     <ol>
-                        <li>Læs tilslutningsaftalen <a href="http://os2web.dk/sites/default/files/KITOS%20tilslutningsaftale%20-%20Skabelon.pdf">her</a>.</li>
+                        <li>Læs tilslutningsaftalen <a href="http://os2.eu/dokument/kitos-tilslutningsaftale-publiceret">her</a>.</li>
                         <li>
                             Udfyld og underskriv tilslutningsaftalen og send den til <a href="mailto:info@kitos.dk">info@kitos.dk</a> for at tilmelde jer KITOS. Skriv gerne hvornår
                             I ønsker, at tilslutningen skal træde i kraft.
@@ -32,7 +32,7 @@
                     </ol>
                     <p>Ønsker I mere information om tilslutningsprocessen og KITOS generelt:</p>
                     <ol>
-                        <li>Læs mere om KITOS <a href="http://os2web.dk/document/kitos">her</a>.</li>
+                        <li>Læs mere om KITOS <a href="http://os2.eu/produkt/os2kitos">her</a>.</li>
                         <li>Skriv til <a href="mailto:info@kitos.dk">info@kitos.dk</a> for at få besvaret eventuelle spørgsmål. Oplys et telefonnr., hvis I ønsker at blive ringet op.</li>
                     </ol>
                 </div>
@@ -124,7 +124,7 @@
                     <h3 class="panel-title">Driftstatus</h3>
                 </div>
                 <div class="panel-body">
-                    <textarea class="resize-vertical" data-ng-model="status" rows="4" style="width: 100%;" data-autosave="api/text/2" data-field="value" data-ng-if="user.isGlobalAdmin"></textarea>
+                    <textarea class="resize-vertical" data-ng-model="status" cols="56" data-autosave="api/text/2" data-field="value" data-ng-if="user.isGlobalAdmin"></textarea>
                     <div data-ng-bind-html="status" data-ng-if="!user.isGlobalAdmin"></div>
                 </div>
             </div>

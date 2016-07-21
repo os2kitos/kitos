@@ -10,5 +10,6 @@ namespace Core.DomainServices
         IEnumerable<ItSystem> GetNonInterfaces(int organizationId, string nameSearch, User user);
         IEnumerable<ItSystem> GetInterfaces(int organizationId, string nameSearch, User user);
         IEnumerable<ItSystem> GetHierarchy(int systemId);
+        void Delete(int id);
     }
 }

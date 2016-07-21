@@ -19,9 +19,12 @@ namespace Presentation.Web.Controllers.API
 {
     public class ItInterfaceController : GenericContextAwareApiController<ItInterface, ItInterfaceDTO>
     {
-        public ItInterfaceController(IGenericRepository<ItInterface> repository) 
+        private readonly IItInterfaceService _itInterfaceService;
+
+        public ItInterfaceController(IGenericRepository<ItInterface> repository, IItInterfaceService itInterfaceService)
             : base(repository)
         {
+            _itInterfaceService = itInterfaceService;
         }
 
         // DELETE api/ItInterface
@@ -43,6 +46,11 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        protected override void DeleteQuery(ItInterface entity)
+        {
+            _itInterfaceService.Delete(entity.Id);
+        }
+
         public HttpResponseMessage GetSearch(string q, int orgId)
         {
             try
@@ -51,15 +59,15 @@ namespace Presentation.Web.Controllers.API
                     s =>
                         // filter by name
                         s.Name.Contains(q) &&
-                        // global admin sees all within the context 
+                        // global admin sees all within the context
                         (KitosUser.IsGlobalAdmin &&
                          s.OrganizationId == orgId ||
-                         // object owner sees his own objects     
+                         // object owner sees his own objects
                          s.ObjectOwnerId == KitosUser.Id ||
                          // it's public everyone can see it
                          s.AccessModifier == AccessModifier.Public ||
                          // everyone in the same organization can see normal objects
-                         s.AccessModifier == AccessModifier.Normal &&
+                         s.AccessModifier == AccessModifier.Local &&
                          s.OrganizationId == orgId)
                         // it systems doesn't have roles so private doesn't make sense
                         // only object owners will be albe to see private objects
@@ -78,15 +86,15 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 pagingModel.Where(s =>
-                    // global admin sees all within the context 
+                    // global admin sees all within the context
                     KitosUser.IsGlobalAdmin &&
                     s.OrganizationId == organizationId ||
-                    // object owner sees his own objects     
+                    // object owner sees his own objects
                     s.ObjectOwnerId == KitosUser.Id ||
                     // it's public everyone can see it
                     s.AccessModifier == AccessModifier.Public ||
                     // everyone in the same organization can see normal objects
-                    s.AccessModifier == AccessModifier.Normal &&
+                    s.AccessModifier == AccessModifier.Local &&
                     s.OrganizationId == organizationId
                     // it systems doesn't have roles so private doesn't make sense
                     // only object owners will be albe to see private objects
@@ -111,21 +119,21 @@ namespace Presentation.Web.Controllers.API
             {
                 var interfaces = Repository.Get(
                     x =>
-                        // global admin sees all within the context 
+                        // global admin sees all within the context
                         KitosUser.IsGlobalAdmin &&
                         x.OrganizationId == organizationId ||
-                        // object owner sees his own objects     
+                        // object owner sees his own objects
                         x.ObjectOwnerId == KitosUser.Id ||
                         // it's public everyone can see it
                         x.AccessModifier == AccessModifier.Public ||
                         // everyone in the same organization can see normal objects
-                        x.AccessModifier == AccessModifier.Normal &&
+                        x.AccessModifier == AccessModifier.Local &&
                         x.OrganizationId == organizationId
                         // it systems doesn't have roles so private doesn't make sense
                         // only object owners will be albe to see private objects
                     );
                 var dtos = Map(interfaces);
-                
+
                 var list = new List<dynamic>();
                 var header = new ExpandoObject() as IDictionary<string, Object>;
                 header.Add("Snitflade", "Snitflade");
@@ -187,15 +195,15 @@ namespace Presentation.Web.Controllers.API
                         s.Name.Contains(q) &&
                         // filter (remove) interfaces already used by the system
                         s.CanBeUsedBy.Count(x => x.ItSystemId == sysId) == 0 &&
-                        // global admin sees all within the context 
+                        // global admin sees all within the context
                         (KitosUser.IsGlobalAdmin &&
                          s.OrganizationId == orgId ||
-                         // object owner sees his own objects     
+                         // object owner sees his own objects
                          s.ObjectOwnerId == KitosUser.Id ||
                          // it's public everyone can see it
                          s.AccessModifier == AccessModifier.Public ||
                          // everyone in the same organization can see normal objects
-                         s.AccessModifier == AccessModifier.Normal &&
+                         s.AccessModifier == AccessModifier.Local &&
                          s.OrganizationId == orgId)
                         // it systems doesn't have roles so private doesn't make sense
                         // only object owners will be albe to see private objects

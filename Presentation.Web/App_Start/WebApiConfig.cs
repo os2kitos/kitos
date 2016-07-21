@@ -1,5 +1,4 @@
-﻿using System;
-using System.Web.Http;
+﻿using System.Web.Http;
 using System.Web.OData.Builder;
 using System.Web.OData.Extensions;
 using Core.DomainModel;
@@ -45,15 +44,15 @@ namespace Presentation.Web
             var accessMod = builder.AddEnumType(typeof(AccessModifier));
             accessMod.Namespace = "Kitos";
 
-            //builder.EntitySet<AdminRight>("AdminRights");
-            //builder.EntitySet<AdminRole>("AdminRoles");
+            //builder.EntitySet<OrganizationRight>("OrganizationRights");
+            //builder.EntitySet<OrganizationRole>("OrganizationRoles");
             //builder.EntitySet<Advice>("Advices");
-            //builder.EntitySet<AgreementElement>("AgreementElements");
+            //builder.EntitySet<AgreementElementType>("AgreementElementTypes");
             //builder.EntitySet<BusinessType>("BusinessTypes");
             //builder.EntitySet<Communication>("Communications");
             //builder.EntitySet<Config>("Configs");
-            //builder.EntitySet<ContractTemplate>("ContractTemplates");
-            //builder.EntitySet<ContractType>("ContractTypes");
+            //builder.EntitySet<ItContractTemplateTypes>("ItContractTemplateTypes");
+            //builder.EntitySet<IContractType>("ItContractTypes");
 
             var dataRowUsage = builder.EntitySet<DataRowUsage>("DataRowUsages");
             dataRowUsage.EntityType.HasKey(x => new {x.DataRowId, x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId});
@@ -67,7 +66,7 @@ namespace Presentation.Web
             economyFunc.Parameter<int>("Organization");
             economyFunc.ReturnsCollectionFromEntitySet<EconomyStream>("EconomyStreams");
 
-            //builder.EntitySet<Frequency>("Frequencies");
+            //builder.EntitySet<FrequencyType>("FrequencyTypes");
             //builder.EntitySet<Goal>("Goals");
             //builder.EntitySet<GoalStatus>("GoalStatus");
             //builder.EntitySet<GoalType>("GoalTypes");
@@ -76,7 +75,7 @@ namespace Presentation.Web
             //builder.EntitySet<HandoverTrialType>("HandoverTrialTypes");
             //builder.EntitySet<Interface>("Interfaces");
             //builder.EntitySet<ItInterfaceExhibit>("ItInterfaceExhibits");
-            //builder.EntitySet<ItInterfaceExhibitUsage>("InterfaceExhibtUsages");
+            //builder.EntitySet<ItInterfaceExhibitUsage>("ItInterfaceExhibtUsages");
             //builder.EntitySet<InterfaceType>("InterfaceTypes");
             //builder.EntitySet<ItContractRight>("ItContractRights");
             //builder.EntitySet<ItSystemUsageOrgUnitUsage>("ItSystemUsageOrgUnitUsages");
@@ -98,7 +97,7 @@ namespace Presentation.Web
             var itProject = builder.EntitySet<ItProject>("ItProjects");
             itProject.EntityType.HasKey(x => x.Id);
 
-            var interfaceUsage = builder.EntitySet<InterfaceUsage>("InterfaceUsages");
+            var interfaceUsage = builder.EntitySet<ItInterfaceUsage>("ItInterfaceUsages");
             interfaceUsage.EntityType.HasKey(x => new { x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId });
 
             var dataOption = builder.EntitySet<DataType>("DataTypes");
@@ -113,7 +112,7 @@ namespace Presentation.Web
             var itSystems = builder.EntitySet<ItSystem>("ItSystems");
             itSystems.EntityType.HasKey(x => x.Id);
 
-            var itSystemTypeOptions = builder.EntitySet<ItSystemTypeOption>("ItSystemTypeOptions");
+            var itSystemTypeOptions = builder.EntitySet<ItSystemType>("ItSystemTypes");
             itSystemTypeOptions.EntityType.HasKey(x => x.Id);
 
             var businessTypes = builder.EntitySet<BusinessType>("BusinessTypes");
@@ -163,14 +162,14 @@ namespace Presentation.Web
             // if ItContract.Terminated has a value
             contracts.EntityType.Ignore(x => x.IsActive);
 
-            var interfaces = builder.EntitySet<Interface>("Interfaces");
-            interfaces.EntityType.HasKey(x => x.Id);
+            var interfaceTypes = builder.EntitySet<InterfaceType>("InterfaceTypes");
+            interfaceTypes.EntityType.HasKey(x => x.Id);
 
             var itInterfaces = builder.EntitySet<ItInterface>("ItInterfaces");
             itInterfaces.EntityType.HasKey(x => x.Id);
 
-            var interfaceTypes = builder.EntitySet<InterfaceType>("InterfaceType");
-            interfaceTypes.EntityType.HasKey(x => x.Id);
+            var itInterfaceTypes = builder.EntitySet<ItInterfaceType>("ItInterfaceTypes");
+            itInterfaceTypes.EntityType.HasKey(x => x.Id);
 
             var itInterfaceExihibits = builder.EntitySet<ItInterfaceExhibit>("ItInterfaceExhibits");
             itInterfaceExihibits.EntityType.HasKey(x => x.Id);
@@ -185,33 +184,32 @@ namespace Presentation.Web
                 .HasKey(x => x.ItSystemId)
                 .HasKey(x => x.ItInterfaceId);
 
-            var tsas = builder.EntitySet<Tsa>("Tsas");
+            var tsas = builder.EntitySet<TsaType>("TsaTypes");
             tsas.EntityType.HasKey(x => x.Id);
 
-            var methods = builder.EntitySet<Method>("Methods");
+            var methods = builder.EntitySet<MethodType>("MethodTypes");
             methods.EntityType.HasKey(x => x.Id);
 
             var sensitiveDataOption = builder.EntitySet<SensitiveDataType>("SensitiveDataTypes");
             sensitiveDataOption.EntityType.HasKey(x => x.Id);
 
-            //builder.EntitySet<Optionend>("OptionExtention");
-            //builder.EntitySet<OrganizationRight>("OrganizationRights");
-            //builder.EntitySet<OrganizationRole>("OrganizationRoles");
+            //builder.EntitySet<Optionend>("OptionExtendTypes");
+            //builder.EntitySet<OrganizationUnitRight>("OrganizationUnitRights");
+            //builder.EntitySet<OrganizationUnitRole>("OrganizationUnitRoles");
             //builder.EntitySet<PasswordResetRequest>("PasswordResetRequests");
-            //builder.EntitySet<PaymentFreqency>("PaymentFreqencies");
+            //builder.EntitySet<PaymentFreqencyType>("PaymentFreqencyTypes");
             //builder.EntitySet<PaymentMilestone>("PaymentMilestones");
-            //builder.EntitySet<PaymentModel>("PaymentModels");
-            //builder.EntitySet<PriceRegulation>("PriceRegulations");
-            //builder.EntitySet<ProcurementStrategy>("ProcurementStrategies");
-            builder.EntitySet<ItProjectType>("ProjectTypes");
-            //builder.EntitySet<PurchaseForm>("PurchaseForms");
+            //builder.EntitySet<PaymentModelType>("PaymentModelTypes");
+            //builder.EntitySet<PriceRegulationType>("PriceRegulationTypes");
+            //builder.EntitySet<ProcurementStrategyType>("ProcurementStrategyTypes");
+            builder.EntitySet<ItProjectType>("ItProjectTypes");
+            //builder.EntitySet<PurchaseFormType>("PurchaseFormTypes");
             //builder.EntitySet<Risk>("Risks");
             //builder.EntitySet<Stakeholder>("Stakeholders");
-            //builder.EntitySet<TerminationDeadline>("TerminationDeadlines");
+            //builder.EntitySet<TerminationDeadlineType>("TerminationDeadlineTypes");
             //builder.EntitySet<TaskRef>("TaskRefs");
             //builder.EntitySet<TaskUsage>("TaskUsages");
             //builder.EntitySet<Text>("Texts");
-            //builder.EntitySet<Tsa>("Tsas");
             //builder.EntitySet<User>("Users");
             //builder.EntitySet<Wish>("Wishes");
 

@@ -10,12 +10,12 @@ namespace Infrastructure.DataAccess.Mapping
 
             // BUG there's an issue with indexing http://stackoverflow.com/questions/26055140/ef-migrations-drops-index-when-adding-compsite-index
             this.Property(x => x.OrganizationId)
-                .HasUniqueIndexAnnotation("IX_NamePerOrg", 0);
+                .HasUniqueIndexAnnotation("UX_NamePerOrg", 0);
             this.Property(x => x.Name)
                 .HasMaxLength(100) // http://stackoverflow.com/questions/1827063/mysql-error-key-specification-without-a-key-length
                 .IsRequired()
-                .HasUniqueIndexAnnotation("IX_NamePerOrg", 1);
-            
+                .HasUniqueIndexAnnotation("UX_NamePerOrg", 1);
+
             // Table & Column Mappings
             this.ToTable("ItSystem");
 
@@ -27,7 +27,8 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasRequired(t => t.Organization)
                 .WithMany(d => d.ItSystems)
-                .HasForeignKey(t => t.OrganizationId);
+                .HasForeignKey(t => t.OrganizationId)
+                .WillCascadeOnDelete(false);
 
             this.HasOptional(t => t.BelongsTo)
                 .WithMany(d => d.BelongingSystems)
@@ -36,7 +37,7 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.BusinessType)
                 .WithMany(t => t.References)
                 .HasForeignKey(t => t.BusinessTypeId);
-            
+
             this.HasMany(t => t.CanUseInterfaces)
                 .WithRequired(t => t.ItSystem)
                 .HasForeignKey(d => d.ItSystemId);

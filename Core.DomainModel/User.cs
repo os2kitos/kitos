@@ -14,7 +14,7 @@ namespace Core.DomainModel
         public User()
         {
             this.PasswordResetRequests = new List<PasswordResetRequest>();
-            this.AdminRights = new List<AdminRight>();
+            this.OrganizationRights = new List<OrganizationRight>();
             this.Wishes = new List<Wish>();
             this.ItProjectStatuses = new List<ItProjectStatus>();
             this.ResponsibleForRisks = new List<Risk>();
@@ -36,7 +36,7 @@ namespace Core.DomainModel
         /// <summary>
         /// The admin rights of the user
         /// </summary>
-        public virtual ICollection<AdminRight> AdminRights { get; set; }
+        public virtual ICollection<OrganizationRight> OrganizationRights { get; set; }
 
         /// <summary>
         /// Passwords reset request issued for the user

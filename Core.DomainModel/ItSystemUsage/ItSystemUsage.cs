@@ -15,7 +15,7 @@ namespace Core.DomainModel.ItSystemUsage
             this.Wishes = new List<Wish>();
             this.OrgUnits = new List<OrganizationUnit>();
             this.TaskRefs = new List<TaskRef>();
-            this.InterfaceUsages = new List<InterfaceUsage>();
+            this.ItInterfaceUsages = new List<ItInterfaceUsage>();
             this.ItInterfaceExhibitUsages = new List<ItInterfaceExhibitUsage>();
             this.UsedBy = new List<ItSystemUsageOrgUnitUsage>();
             this.ItProjects = new List<ItProject.ItProject>();
@@ -174,7 +174,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// <summary>
         /// The local usages of interfaces.
         /// </summary>
-        public virtual ICollection<InterfaceUsage> InterfaceUsages { get; set; }
+        public virtual ICollection<ItInterfaceUsage> ItInterfaceUsages { get; set; }
         /// <summary>
         /// The local exposures of interfaces.
         /// </summary>
