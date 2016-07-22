@@ -5,7 +5,7 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     /// Contains info about Advices on a contract.
     /// </summary>
-    public class Advice : Entity, IContextAware
+    public class Advice : Entity, IContextAware, IContractModule
     {
         /// <summary>
         /// Gets or sets a value indicating whether this instance is active.

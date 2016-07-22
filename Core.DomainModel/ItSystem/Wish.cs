@@ -3,7 +3,7 @@ namespace Core.DomainModel.ItSystem
     /// <summary>
     /// A user generated feature requests for an existing it system.
     /// </summary>
-    public class Wish : Entity, IContextAware
+    public class Wish : Entity, IContextAware, ISystemModule
     {
         /// <summary>
         /// Gets or sets a value indicating whether this instance is public.
@@ -39,7 +39,7 @@ namespace Core.DomainModel.ItSystem
         /// It system usage.
         /// </value>
         public virtual ItSystemUsage.ItSystemUsage ItSystemUsage { get; set; }
-        
+
         /// <summary>
         /// Determines whether a user has write access to this instance.
         /// </summary>
@@ -49,7 +49,7 @@ namespace Core.DomainModel.ItSystem
         /// </returns>
         public override bool HasUserWriteAccess(User user)
         {
-            if (ItSystemUsage != null && ItSystemUsage.HasUserWriteAccess(user)) 
+            if (ItSystemUsage != null && ItSystemUsage.HasUserWriteAccess(user))
                 return true;
 
             return base.HasUserWriteAccess(user);

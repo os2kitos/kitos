@@ -20,7 +20,7 @@ namespace Presentation.Web.Controllers.API
         public IGenericRepository<User> UserRepository { get; set; }
 
         [Inject]
-        public IAdminService AdminService { get; set; }
+        public IAuthenticationService AuthenticationService { get; set; }
 
         protected HttpResponseMessage CreateResponse<T>(HttpStatusCode statusCode, T response, string msg = "")
         {
@@ -109,7 +109,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                return AdminService.IsGlobalAdmin(KitosUser);
+                return AuthenticationService.IsGlobalAdmin(KitosUser);
             }
             catch
             {

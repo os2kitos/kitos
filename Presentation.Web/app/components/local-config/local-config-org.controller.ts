@@ -30,7 +30,7 @@
                     resolve: {
                         organization: ['$http', 'userService', ($http: ng.IHttpService, userService) => {
                             return userService.getUser().then((user) => {
-                                return $http.get<Kitos.Models.IApiWrapper<any>>('api/organization/' + user.currentOrganizationId).then((result) => {
+                                return $http.get<Kitos.API.Models.IApiWrapper<any>>('api/organization/' + user.currentOrganizationId).then((result) => {
                                     return result.data.response;
                                 });
                             });

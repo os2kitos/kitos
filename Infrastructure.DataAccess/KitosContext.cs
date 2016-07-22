@@ -24,7 +24,6 @@ namespace Infrastructure.DataAccess
         }
 
         public DbSet<OrganizationRight> OrganizationRights { get; set; }
-        public DbSet<OrganizationRole> OrganizationRoles { get; set; }
         public DbSet<Advice> Advices { get; set; }
         public DbSet<AgreementElementType> AgreementElementTypes { get; set; }
         public DbSet<ArchiveType> ArchiveTypes { get; set; }
@@ -149,7 +148,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new MethodTypeMap());
             modelBuilder.Configurations.Add(new OrganizationMap());
             modelBuilder.Configurations.Add(new OrganizationRightMap());
-            modelBuilder.Configurations.Add(new OrganizationRoleMap());
             modelBuilder.Configurations.Add(new OrganizationTypeMap());
             modelBuilder.Configurations.Add(new OrganizationUnitMap());
             modelBuilder.Configurations.Add(new OrganizationUnitRightMap());

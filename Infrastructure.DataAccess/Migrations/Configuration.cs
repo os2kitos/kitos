@@ -107,28 +107,6 @@ namespace Infrastructure.DataAccess.Migrations
 
             #endregion
 
-            #region ADMIN ROLES
-
-            var localAdmin = new OrganizationRole
-            {
-                Name = "LocalAdmin",
-                IsActive = true,
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
-            };
-            var orgRole = new OrganizationRole
-            {
-                Name = "Medarbejder",
-                IsActive = true,
-                HasWriteAccess = false,
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
-            };
-            context.OrganizationRoles.AddOrUpdate(x => x.Name, localAdmin, orgRole);
-            context.SaveChanges();
-
-            #endregion
-
             #region ORG ROLES
 
             var boss = new OrganizationUnitRole()

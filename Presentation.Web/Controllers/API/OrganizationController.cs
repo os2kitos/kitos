@@ -147,7 +147,7 @@ namespace Presentation.Web.Controllers.API
                 var qry =
                     _useRepository.Get(
                         u =>
-                            u.OrganizationRights.Count(r => r.ObjectId == id) != 0 && (u.Name.Contains(q) || u.Email.Contains(q)));
+                            u.OrganizationRights.Count(r => r.OrganizationId == id) != 0 && (u.Name.Contains(q) || u.Email.Contains(q)));
 
                 return Ok(Map<IEnumerable<User>, IEnumerable<UserDTO>>(qry));
             }

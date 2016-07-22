@@ -1,6 +1,6 @@
 namespace Core.DomainModel.ItProject
 {
-    public class Stakeholder : Entity, IContextAware
+    public class Stakeholder : Entity, IContextAware, IProjectModule
     {
         /// <summary>
         /// Gets or sets the associated it project identifier.

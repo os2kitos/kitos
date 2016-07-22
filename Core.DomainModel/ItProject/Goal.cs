@@ -5,7 +5,7 @@ namespace Core.DomainModel.ItProject
     /// <summary>
     /// It project goal.
     /// </summary>
-    public class Goal : Entity, IContextAware
+    public class Goal : Entity, IContextAware, IProjectModule
     {
         /// <summary>
         /// Human readable identifier.
@@ -40,7 +40,7 @@ namespace Core.DomainModel.ItProject
         public string SubGoalRea1 { get; set; }
         public string SubGoalRea2 { get; set; }
         public string SubGoalRea3 { get; set; }
-        
+
         /// <summary>
         /// Determines whether a user has write access to this instance.
         /// </summary>
@@ -50,7 +50,7 @@ namespace Core.DomainModel.ItProject
         /// </returns>
         public override bool HasUserWriteAccess(User user)
         {
-            if (GoalStatus != null && GoalStatus.HasUserWriteAccess(user)) 
+            if (GoalStatus != null && GoalStatus.HasUserWriteAccess(user))
                 return true;
 
             return base.HasUserWriteAccess(user);

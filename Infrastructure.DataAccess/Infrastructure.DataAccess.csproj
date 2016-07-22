@@ -89,7 +89,6 @@
     <Compile Include="Mapping\OptionExtendTypeMap.cs" />
     <Compile Include="Mapping\OrganizationTypeMap.cs" />
     <Compile Include="Mapping\OrganizationRightMap.cs" />
-    <Compile Include="Mapping\OrganizationRoleMap.cs" />
     <Compile Include="Mapping\BusinessTypeMap.cs" />
     <Compile Include="Mapping\ItSystemTypeMap.cs" />
     <Compile Include="Mapping\ItInterfaceExhibitMap.cs" />
@@ -166,6 +165,10 @@
     <Compile Include="Migrations\201607141111592_MigrateDataOrgType.Designer.cs">
       <DependentUpon>201607141111592_MigrateDataOrgType.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201607220834424_AlterOrganizationRole.cs" />
+    <Compile Include="Migrations\201607220834424_AlterOrganizationRole.Designer.cs">
+      <DependentUpon>201607220834424_AlterOrganizationRole.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -201,6 +204,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201607141111592_MigrateDataOrgType.resx">
       <DependentUpon>201607141111592_MigrateDataOrgType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607220834424_AlterOrganizationRole.resx">
+      <DependentUpon>201607220834424_AlterOrganizationRole.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

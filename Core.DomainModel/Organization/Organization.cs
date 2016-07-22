@@ -9,7 +9,7 @@ namespace Core.DomainModel
     /// Holds local configuration and admin roles, as well as collections of
     /// ItSystems, ItProjects, etc that was created in this organization.
     /// </summary>
-    public class Organization : HasRightsEntity<Organization, OrganizationRight, OrganizationRole>, IHasAccessModifier, IContextAware
+    public class Organization : Entity, IHasAccessModifier, IContextAware, IOrganizationModule
     {
         public Organization()
         {
@@ -19,6 +19,7 @@ namespace Core.DomainModel
             this.ItSystemUsages = new List<ItSystemUsage.ItSystemUsage>();
             this.ItContracts = new List<ItContract.ItContract>();
             this.OrgUnits = new List<OrganizationUnit>();
+            this.Rights = new List<OrganizationRight>();
         }
 
         public string Name { get; set; }
@@ -67,6 +68,8 @@ namespace Core.DomainModel
         /// Local configuration of KITOS
         /// </summary>
         public virtual Config Config { get; set; }
+
+        public virtual ICollection<OrganizationRight> Rights { get; set; }
 
         /// <summary>
         /// Get the level-0 organization unit, which by convention is named represently

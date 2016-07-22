@@ -9,7 +9,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// regarding the usage.
     /// </summary>
     /// TODO the db schema for this is wrong, it needs to be deleted when a contract relation to a ItInterfaceUsage is removed so it needs to somehow attach itself to the relation between ItContract and ItInterfaceUsage
-    public class DataRowUsage
+    public class DataRowUsage : ISystemModule
     {
         public int ItSystemUsageId { get; set; }
         public int ItSystemId { get; set; }

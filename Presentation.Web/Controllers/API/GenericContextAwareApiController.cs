@@ -16,7 +16,7 @@ namespace Presentation.Web.Controllers.API
         {
             // local admin have write access if the obj is in context
             if (obj.IsInContext(organizationId) &&
-                user.OrganizationRights.Any(x => x.ObjectId == organizationId && x.Role.HasWriteAccess))
+                user.OrganizationRights.Any(x => x.OrganizationId == organizationId && x.Role == OrganizationRole.LocalAdmin))
                 return true;
 
             return base.HasWriteAccess(obj, user, organizationId);

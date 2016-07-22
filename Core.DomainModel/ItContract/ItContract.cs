@@ -7,7 +7,7 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     /// Contains info about an it contract
     /// </summary>
-    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHierarchy<ItContract>, IContextAware
+    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHierarchy<ItContract>, IContextAware, IContractModule
     {
         public ItContract()
         {

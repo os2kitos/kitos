@@ -5,7 +5,7 @@ namespace Core.DomainModel.ItProject
     /// <summary>
     ///
     /// </summary>
-    public class Assignment : ItProjectStatus
+    public class Assignment : ItProjectStatus, IProjectModule
     {
         /// <summary>
         /// Gets or sets the start date.

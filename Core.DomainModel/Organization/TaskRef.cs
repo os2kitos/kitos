@@ -7,7 +7,7 @@ namespace Core.DomainModel
     /// Represents a task (such as KLE), which can be associated
     /// with Systems, Projects or Organization Units.
     /// </summary>
-    public class TaskRef : Entity, IHierarchy<TaskRef>, IHasAccessModifier, IContextAware
+    public class TaskRef : Entity, IHierarchy<TaskRef>, IHasAccessModifier, IContextAware, IOrganizationModule
     {
         public TaskRef()
         {

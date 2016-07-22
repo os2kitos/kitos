@@ -106,10 +106,6 @@ namespace Presentation.Web
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<OrganizationRole, RoleDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
-
             Mapper.CreateMap<SensitiveDataType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
@@ -203,14 +199,10 @@ namespace Presentation.Web
                 .ReverseMap();
 
             Mapper.CreateMap<OrganizationRight, OrganizationRightDTO>()
-                  .ForMember(dto => dto.OrganizationId, opt => opt.MapFrom(src => src.ObjectId))
-                  .ForMember(dto => dto.RoleName, opt => opt.MapFrom(src => src.Role.Name));
+                .ReverseMap();
 
             Mapper.CreateMap<OrganizationUnitRight, RightOutputDTO>();
             Mapper.CreateMap<RightInputDTO, OrganizationUnitRight>();
-
-            Mapper.CreateMap<OrganizationRight, RightOutputDTO>();
-            Mapper.CreateMap<RightInputDTO, OrganizationRight>();
 
             Mapper.CreateMap<ItSystemRight, RightOutputDTO>()
                 .ForMember(dto => dto.ObjectName, opt => opt.MapFrom(src => src.Object.ItSystem.Name));

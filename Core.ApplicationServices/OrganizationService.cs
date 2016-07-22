@@ -20,20 +20,20 @@ namespace Core.ApplicationServices
         public IEnumerable<Organization> GetOrganizations(User user)
         {
             if (user.IsGlobalAdmin) return _orgRepository.Get();
-            return _orgRepository.Get(o => o.Rights.Count(r => r.ObjectId == o.Id && r.UserId == user.Id) > 0);
+            return _orgRepository.Get(o => o.Rights.Count(r => r.OrganizationId == o.Id && r.UserId == user.Id) > 0);
         }
 
         //returns the default org unit for that user inside that organization
         //or null if none has been chosen
         public OrganizationUnit GetDefaultUnit(Organization organization, User user)
         {
-            return _orgRightRepository.Get(r => r.ObjectId == organization.Id && r.UserId == user.Id).Select(r => r.DefaultOrgUnit).FirstOrDefault();
+            return _orgRightRepository.Get(r => r.OrganizationId == organization.Id && r.UserId == user.Id).Select(r => r.DefaultOrgUnit).FirstOrDefault();
         }
 
         public void SetDefaultOrgUnit(User user, int orgId, int orgUnitId)
         {
             //TODO this should probably be Single() ?
-            var right = _orgRightRepository.Get(r => r.UserId == user.Id && r.ObjectId == orgId).First();
+            var right = _orgRightRepository.Get(r => r.UserId == user.Id && r.OrganizationId == orgId).First();
             right.DefaultOrgUnitId = orgUnitId;
 
             _orgRightRepository.Update(right);
