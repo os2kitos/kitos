@@ -456,6 +456,7 @@
     <Content Include="app\components\org\uniqueOrgUser.directive.js" />
     <Content Include="app\shared\autofocus.directive.js" />
     <Content Include="app\utility\lodash.mixin.js" />
+    <Content Include="Content\css\app.min.css" />
     <Content Include="Content\css\select2-spinner.gif" />
     <Content Include="Content\css\select2.png" />
     <Content Include="Content\css\select2x2.png" />
@@ -1044,7 +1045,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>28231</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
